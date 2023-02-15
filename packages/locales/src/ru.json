@@ -1,0 +1,158 @@
+{
+  "appName": {
+    "message": "Tonkeeper"
+  },
+  "appExtensionDescription": {
+    "message": "Your extension wallet on The Open Network"
+  },
+  "actionTitle": {
+    "message": "Открыть Кошелек"
+  },
+  "Activity": {
+    "message": "Aктивность"
+  },
+  "Collectibles": {
+    "message": "Коллекция",
+    "description": "Collectibles button"
+  },
+  "Edit_jettons": {
+    "message": "Редактировать"
+  },
+  "Toncoin": {
+    "message": "Toncoin"
+  },
+  "Transfer_token": {
+    "message": "Передать токен",
+    "description": "Transfer token button"
+  },
+  "View_on_market": {
+    "message": "Посмотреть на рынке",
+    "description": "View on market button"
+  },
+  "About_collection": {
+    "message": "О коллекции",
+    "description": "About collection nft preview title"
+  },
+  "NFT_creation": {
+    "message": "Создание NFT",
+    "description": "NFT_creation activity title"
+  },
+  "Manage": {
+    "message": "Управлять",
+    "description": "Manage button in header"
+  },
+  "Manage_wallets": {
+    "message": "Управление кошельками",
+    "description": "Manage wallets settings button"
+  },
+  "Localization": {
+    "message": "Локализация",
+    "description": "Localization settings button"
+  },
+  "settings_news_url_discuss": {
+    "message": "https://t.me/tonkeeper_discuss"
+  },
+  "Delete_all_accounts_and_logout": {
+    "message": "Удалить все учетные записи и выйти",
+    "description": "Delete all accounts and logout settings button"
+  },
+  "Rename": {
+    "message": "Переименовать",
+    "description": "Rename settings button"
+  },
+  "Wallet_name": {
+    "message": "Имя кошелька",
+    "description": "Wallet name input label"
+  },
+  "I_have_a_backup_copy_of_recovery_phrase": {
+    "message": "У меня есть резервная копия фразы восстановления",
+    "description": "Dangerous notification for clear actions"
+  },
+  "Back_up_now": {
+    "message": "Сделать резервную копию сейчас",
+    "description": "Back up now button label"
+  },
+  "Delete_wallet_data": {
+    "message": "Удалить данные кошелька",
+    "description": "Delete wallet data notification title"
+  },
+  "Delete_wallet_data_description": {
+    "message": "Ключи кошелька и все личные данные будут удалены с этого устройства.",
+    "description": "Delete wallet data notification description"
+  },
+  "enter_password": {
+    "message": "Введите пароль"
+  },
+  "Create_password": {
+    "message": "Придумайте пароль",
+    "description": "Initialize screen Create password title"
+  },
+  "Change_password": {
+    "message": "Изменить пароль",
+    "description": "Settings Change password title"
+  },
+  "Old_password": {
+    "message": "Старый пароль",
+    "description": "Settings Old password label"
+  },
+  "Password": {
+    "message": "Пароль",
+    "description": "Password input label"
+  },
+  "Unlock": {
+    "message": "Разблокировать",
+    "description": "Unlock button label"
+  },
+  "check_words_caption": {
+    "message": "Чтобы убедиться, что вы записали секретный ключ правильно, введите слова %1%, %2% и %3%."
+  },
+  "Lock_screen": {
+    "message": "Экран блокировки",
+    "description": "Lock screen option label"
+  },
+  "Name_your_wallet": {
+    "message": "Назовите свой кошелек",
+    "description": "Name your wallet notification title"
+  },
+  "Name_your_wallet_description": {
+    "message": "Назовите свой кошелек, чтобы его было легко идентифицировать при использовании Tonkeeper. Эти имена хранятся локально и видны только вам.",
+    "description": "Name your wallet notification description"
+  },
+  "Ton_page_description": {
+    "message": "TON — это полностью децентрализованный блокчейн первого уровня, разработанный Telegram для миллиардов пользователей. Он может похвастаться сверхбыстрыми транзакциями, небольшими комиссиями, простыми в использовании приложениями и экологичностью.",
+    "description": "The description of the ton coin"
+  },
+  "wallet_sell": {
+    "message": "Продать"
+  },
+  "Other_ways_to_buy_TON": {
+    "message": "Другие способы покупки",
+    "description": "Other ways to buy TON link"
+  },
+  "Other_ways_to_buy_TON_link": {
+    "message": "https://t.me/toncoin_rus/90",
+    "description": "Other ways to buy TON link"
+  },
+  "Other_ways_to_sell_TON": {
+    "message": "Другие способы продажи",
+    "description": "Other ways to sell TON link"
+  },
+  "Change": {
+    "message": "Изменить"
+  },
+  "Enable_storing_config": {
+    "message": "Cохранение конфигурации"
+  },
+  "Copy_address": {
+    "message": "Скопировать адрес"
+  },
+  "App_version_copied": {
+    "message": "Версия приложения скопирована"
+  },
+  "Your_activity_will_be_shown_here": {
+    "message": "Ваша активность будет отображаться здесь"
+  },
+  "Make_your_first_transaction": {
+    "message": "Совершите первую транзакцию"
+  }
+}

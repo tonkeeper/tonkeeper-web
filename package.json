@@ -1,0 +1,24 @@
+{
+  "name": "tonkeeper-web",
+  "version": "3.0.0",
+  "scripts": {
+    "build": "npx turbo build",
+    "build:web": "npx turbo build:web",
+    "build:extension": "npx turbo build:extension"
+  },
+  "private": true,
+  "devDependencies": {
+    "prettier": "^2.6.2",
+    "turbo": "^1.6.3"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "apps/*"
+    ],
+    "nohoist": [
+      "**/electron",
+      "**/electron**"
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "@tonkeeper/core",
+  "version": "0.1.0",
+  "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
+  "description": "Core features and state for tonkeeper web wallet",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -fr dist && yarn generate:sdk && tsc",
+    "start": "tsc -w",
+    "generate:sdk": "rm -fr src/tonApi && docker build . -t tonapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdk",
+    "build:pkg": "yarn build"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@aws-crypto/sha256-js": "^3.0.0",
+    "bignumber.js": "^9.1.1",
+    "ton": "^13.0.0",
+    "ton-core": "^0.27.0",
+    "ton-crypto": "^3.2.0"
+  }
+}

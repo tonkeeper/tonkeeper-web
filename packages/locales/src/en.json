@@ -1,0 +1,162 @@
+{
+  "appName": {
+    "message": "Tonkeeper",
+    "description": "The name of the application"
+  },
+  "appExtensionDescription": {
+    "message": "Your extension wallet on The Open Network",
+    "description": "The description of the application"
+  },
+  "actionTitle": {
+    "message": "Open the wallet",
+    "description": "The action title of the application"
+  },
+  "Activity": {
+    "message": "Activity",
+    "description": "Activity footer button"
+  },
+  "Collectibles": {
+    "message": "Collectibles",
+    "description": "Collectibles button"
+  },
+  "Edit_jettons": {
+    "message": "Edit"
+  },
+  "Toncoin": {
+    "message": "Toncoin"
+  },
+  "Transfer_token": {
+    "message": "Transfer token",
+    "description": "Transfer token button"
+  },
+  "View_on_market": {
+    "message": "View on market",
+    "description": "View on market button"
+  },
+  "About_collection": {
+    "message": "About collection",
+    "description": "About collection nft preview title"
+  },
+  "NFT_creation": {
+    "message": "NFT creation",
+    "description": "NFT_creation activity title"
+  },
+  "Manage": {
+    "message": "Manage",
+    "description": "Manage button in header"
+  },
+  "Manage_wallets": {
+    "message": "Manage wallets",
+    "description": "Manage wallets settings button"
+  },
+  "Localization": {
+    "message": "Localization",
+    "description": "Localization settings button"
+  },
+  "settings_news_url_discuss": {
+    "message": "https://t.me/tonkeeper_discuss"
+  },
+  "Delete_all_accounts_and_logout": {
+    "message": "Delete all accounts and logout",
+    "description": "Delete all accounts and logout settings button"
+  },
+  "Rename": {
+    "message": "Rename",
+    "description": "Rename settings button"
+  },
+  "Wallet_name": {
+    "message": "Wallet name",
+    "description": "Wallet name input label"
+  },
+  "I_have_a_backup_copy_of_recovery_phrase": {
+    "message": "I have a backup copy of recovery phrase",
+    "description": "Dangerous notification for clear actions"
+  },
+  "Back_up_now": {
+    "message": "Back up now",
+    "description": "Back up now button label"
+  },
+  "Delete_wallet_data": {
+    "message": "Delete wallet data",
+    "description": "Delete wallet data notification title"
+  },
+  "Delete_wallet_data_description": {
+    "message": "Wallet keys and all personal data will be erased from this device.",
+    "description": "Delete wallet data notification description"
+  },
+  "enter_password": {
+    "message": "Enter password"
+  },
+  "Create_password": {
+    "message": "Create password",
+    "description": "Initialize screen Create password title"
+  },
+  "Change_password": {
+    "message": "Change password",
+    "description": "Settings Change password title"
+  },
+  "Old_password": {
+    "message": "Old password",
+    "description": "Settings Old password label"
+  },
+  "Password": {
+    "message": "Password",
+    "description": "Password input label"
+  },
+  "Unlock": {
+    "message": "Unlock",
+    "description": "Unlock button label"
+  },
+  "check_words_caption": {
+    "message": "To check whether you’ve written down your recovery phrase correctly, please enter the %1%, %2%, and  %3% words."
+  },
+  "Lock_screen": {
+    "message": "Lock screen",
+    "description": "Lock screen option label"
+  },
+  "Name_your_wallet": {
+    "message": "Name your wallet",
+    "description": "Name your wallet notification title"
+  },
+  "Name_your_wallet_description": {
+    "message": "Name your wallet to easily identify it while using the Tonkeeper. These names are stored locally, and can only be seen by you.",
+    "description": "Name your wallet notification description"
+  },
+  "Ton_page_description": {
+    "message": "TON is a fully decentralized layer-1 blockchain designed by Telegram to onboard billions of users. It boasts ultra-fast transactions, tiny fees, easy-to-use apps, and is environmentally friendly.",
+    "description": "The description of the ton coin"
+  },
+  "wallet_sell": {
+    "message": "Sell"
+  },
+  "Other_ways_to_buy_TON": {
+    "message": "Other ways to buy",
+    "description": "Other ways to buy TON link"
+  },
+  "Other_ways_to_buy_TON_link": {
+    "message": "https://t.me/toncoin/703",
+    "description": "Other ways to buy TON link"
+  },
+  "Other_ways_to_sell_TON": {
+    "message": "Other ways to sell",
+    "description": "Other ways to sell TON link"
+  },
+  "Change": {
+    "message": "Change"
+  },
+  "Enable_storing_config": {
+    "message": "Enable storing config"
+  },
+  "Copy_address": {
+    "message": "Copy address"
+  },
+  "App_version_copied": {
+    "message": "App version copied"
+  },
+  "Your_activity_will_be_shown_here": {
+    "message": "Your activity will be shown here"
+  },
+  "Make_your_first_transaction": {
+    "message": "Make your first transaction"
+  }
+}
