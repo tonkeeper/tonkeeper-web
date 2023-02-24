@@ -2,6 +2,7 @@ import { InfiniteData } from '@tanstack/react-query';
 import {
   AccountEvent,
   AccountEvents200Response,
+  Action,
 } from '@tonkeeper/core/dist/tonApi';
 
 export const formatActivityDate = (
@@ -159,29 +160,31 @@ export const groupAndFilterJettonActivityItems = (
   return list;
 };
 
+const seeIfTonTransfer = (action: Action) => {
+  if (action.type == 'TonTransfer') {
+    return true;
+  } else if (action.type == 'ContractDeploy') {
+    if (action.contractDeploy?.interfaces.includes('wallet')) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export const groupAndFilterTonActivityItems = (
-  data: InfiniteData<AccountEvents200Response>,
-  walletAddress: string
+  data: InfiniteData<AccountEvents200Response>
 ) => {
   const list = [] as ActivityItem[];
 
   data.pages.forEach((page) => {
     page.events.forEach((event) => {
-      if (walletAddress) {
-        event.actions = event.actions.filter((action) => {
-          if (action.tonTransfer) {
-            return (
-              action.tonTransfer.sender.address === walletAddress ||
-              action.tonTransfer.recipient.address === walletAddress
-            );
-          }
-          return false;
+      const tonTransferEvent = event.actions.every(seeIfTonTransfer);
+      if (tonTransferEvent) {
+        list.push({
+          timestamp: event.timestamp,
+          event,
         });
       }
-      list.push({
-        timestamp: event.timestamp,
-        event,
-      });
     });
   });
   return list;

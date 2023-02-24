@@ -53,33 +53,23 @@ export const TonActivity = () => {
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
 
-  const {
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    data,
-    isFetched,
-    ...result
-  } = useInfiniteQuery({
-    queryKey: [wallet.active.rawAddress, QueryKey.activity],
-    queryFn: ({ pageParam = undefined }) =>
-      new EventApi(tonApi).accountEvents({
-        account: wallet.active.rawAddress,
-        limit: 20,
-        beforeLt: pageParam,
-      }),
-    getNextPageParam: (lastPage) => lastPage.nextFrom,
-  });
+  const { fetchNextPage, hasNextPage, isFetchingNextPage, data, isFetched } =
+    useInfiniteQuery({
+      queryKey: [wallet.active.rawAddress, QueryKey.activity],
+      queryFn: ({ pageParam = undefined }) =>
+        new EventApi(tonApi).accountEvents({
+          account: wallet.active.rawAddress,
+          limit: 20,
+          beforeLt: pageParam,
+        }),
+      getNextPageParam: (lastPage) => lastPage.nextFrom,
+    });
 
   useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage);
 
   const items = useMemo<ActivityGroup[]>(() => {
-    return data
-      ? groupActivity(
-          groupAndFilterTonActivityItems(data, wallet.active.rawAddress)
-        )
-      : [];
-  }, [data, wallet.active.rawAddress]);
+    return data ? groupActivity(groupAndFilterTonActivityItems(data)) : [];
+  }, [data]);
 
   if (!isFetched) {
     return <CoinHistorySkeleton />;
