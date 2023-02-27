@@ -18,7 +18,7 @@ body {
 `;
 
 export const Container = styled.div`
-  min-width: 375px;
+  min-width: 300px;
   max-width: 550px;
   margin: 0 auto;
   display: flex;
