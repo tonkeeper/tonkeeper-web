@@ -28,6 +28,10 @@ export class ExtensionAppSdk implements IAppSdk {
   uiEvents = new EventEmitter();
   version = packageJson.version ?? 'Unknown';
 
+  disableScroll = () => null;
+  enableScroll = () => null;
+  getScrollbarWidth = () => 0;
+
   static openTab(options: browser.Tabs.CreateCreatePropertiesType) {
     return new Promise((resolve, reject) => {
       browser.tabs.create(options).then((newTab) => {

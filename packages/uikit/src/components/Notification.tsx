@@ -4,9 +4,11 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import styled from 'styled-components';
+import { useAppSdk } from '../hooks/appSdk';
 import { Container } from '../styles/globalStyle';
 import { BackButton } from './fields/BackButton';
 import { CloseIcon } from './Icon';
@@ -14,11 +16,29 @@ import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
 
-const NotificationContainer = styled(Container)`
+const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
   background: transparent;
+  padding-left: ${(props) => props.scrollbarWidth}px;
 `;
+
+const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean }>> = ({
+  children,
+  entered,
+}) => {
+  const sdk = useAppSdk();
+
+  const scrollbarWidth = useMemo(() => {
+    return sdk.getScrollbarWidth();
+  }, [sdk, entered]);
+
+  return (
+    <NotificationContainer scrollbarWidth={scrollbarWidth}>
+      {children}
+    </NotificationContainer>
+  );
+};
+
 const Wrapper = styled.div`
-  display: flex;
   display: flex;
   flex-direction: column;
   min-height: var(--app-height);
@@ -40,6 +60,7 @@ const Overlay = styled.div`
   inset: 0;
   top: var(--app-height);
   transition: all 0.3s ease-in-out;
+  overflow: hidden;
 `;
 const Splash = styled.div`
   position: fixed;
@@ -59,12 +80,11 @@ const Splash = styled.div`
   &.enter-done {
     opacity: 1;
     pointer-events: auto;
-    overflow: auto;
   }
   &.enter-done ${Overlay} {
     top: 0;
     pointer-events: auto;
-    overflow: auto;
+    overflow-y: scroll;
   }
 
   &.exit {
@@ -151,6 +171,9 @@ export const Notification: FC<{
   title?: string;
   children: (afterClose: (action?: () => void) => void) => React.ReactNode;
 }> = React.memo(({ children, isOpen, hideButton, handleClose, title }) => {
+  const [entered, setEntered] = useState(false);
+
+  const sdk = useAppSdk();
   const nodeRef = useRef(null);
   useEffect(() => {
     const closeOnEscapeKey = (e: KeyboardEvent) =>
@@ -171,14 +194,14 @@ export const Notification: FC<{
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      sdk.disableScroll();
     } else {
-      document.body.style.overflow = 'auto';
+      sdk.enableScroll();
     }
     return () => {
-      document.body.style.overflow = 'auto';
+      sdk.enableScroll();
     };
-  }, [isOpen]);
+  }, [isOpen, sdk]);
 
   return (
     <ReactPortal wrapperId="react-portal-modal-container">
@@ -187,10 +210,12 @@ export const Notification: FC<{
         timeout={{ enter: 0, exit: 300 }}
         unmountOnExit
         nodeRef={nodeRef}
+        onEntered={() => setEntered(true)}
+        onExited={() => setEntered(false)}
       >
         <Splash ref={nodeRef}>
           <Overlay>
-            <NotificationContainer>
+            <NotificationWrapper entered={entered}>
               <Wrapper>
                 <Padding onClick={handleClose} />
                 <Gap onClick={handleClose} />
@@ -208,7 +233,7 @@ export const Notification: FC<{
                   {Child}
                 </Content>
               </Wrapper>
-            </NotificationContainer>
+            </NotificationWrapper>
           </Overlay>
         </Splash>
       </CSSTransition>

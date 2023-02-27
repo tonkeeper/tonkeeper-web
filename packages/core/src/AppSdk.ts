@@ -12,6 +12,9 @@ export interface UIEvents {
 export interface IAppSdk {
   copyToClipboard: (value: string, notification?: string) => void;
   openPage: (url: string) => Promise<unknown>;
+  disableScroll: () => void;
+  enableScroll: () => void;
+  getScrollbarWidth: () => number;
   uiEvents: IEventEmitter<UIEvents>;
   version: string;
 }
@@ -23,6 +26,9 @@ export class MockAppSdk implements IAppSdk {
   openPage = async (url: string): Promise<void> => {
     console.log(url);
   };
+  disableScroll = () => {};
+  enableScroll = () => {};
+  getScrollbarWidth = () => 0;
   uiEvents = new EventEmitter();
   version = '0.0.0';
 }

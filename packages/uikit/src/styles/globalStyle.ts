@@ -9,7 +9,7 @@ body {
   background-color: ${(props) => props.theme.backgroundContent};
   color:  ${(props) => props.theme.textPrimary};
 
-
+  overflow-y: scroll;
 }
 
 :root {
