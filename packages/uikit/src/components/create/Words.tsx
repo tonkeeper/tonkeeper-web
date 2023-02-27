@@ -1,7 +1,9 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
+import { mnemonicValidate } from 'ton-crypto';
 import { wordlist } from 'ton-crypto/dist/mnemonic/wordlist';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { BackButton } from '../fields/BackButton';
@@ -150,7 +152,11 @@ const Input = styled.input`
   color: ${(props) => props.theme.textPrimary};
 `;
 
-const InputBlock = styled.label<{ active: boolean; valid: boolean }>`
+const InputBlock = styled.label<{
+  active: boolean;
+  valid: boolean;
+  submitted?: boolean;
+}>`
   width: 100%;
   line-height: 54px;
   border-radius: ${(props) => props.theme.cornerSmall};
@@ -158,21 +164,39 @@ const InputBlock = styled.label<{ active: boolean; valid: boolean }>`
   box-sizing: border-box;
   text-align: left;
 
-  ${(props) =>
-    props.active
-      ? css`
-          border: 1px solid ${props.theme.fieldActiveBorder};
-          background: ${props.theme.fieldBackground};
-        `
-      : !props.valid
-      ? css`
-          border: 1px solid ${props.theme.fieldErrorBorder};
-          background: ${props.theme.fieldErrorBackground};
-        `
-      : css`
-          border: 1px solid ${props.theme.fieldBackground};
-          background: ${props.theme.fieldBackground};
-        `}
+  ${(props) => {
+    if (props.submitted) {
+      return !props.valid
+        ? css`
+            border: 1px solid ${props.theme.fieldErrorBorder};
+            background: ${props.theme.fieldErrorBackground};
+          `
+        : props.active
+        ? css`
+            border: 1px solid ${props.theme.fieldActiveBorder};
+            background: ${props.theme.fieldBackground};
+          `
+        : css`
+            border: 1px solid ${props.theme.fieldBackground};
+            background: ${props.theme.fieldBackground};
+          `;
+    } else {
+      return props.active
+        ? css`
+            border: 1px solid ${props.theme.fieldActiveBorder};
+            background: ${props.theme.fieldBackground};
+          `
+        : !props.valid
+        ? css`
+            border: 1px solid ${props.theme.fieldErrorBorder};
+            background: ${props.theme.fieldErrorBackground};
+          `
+        : css`
+            border: 1px solid ${props.theme.fieldBackground};
+            background: ${props.theme.fieldBackground};
+          `;
+    }
+  }}
 
   ${Number1} {
     display: inline-block;
@@ -193,19 +217,24 @@ const WordInput: FC<{
   onChange: (value: string) => void;
   test: number;
   isValid?: boolean;
-}> = ({ value, test, onChange, isValid }) => {
+  submitted?: boolean;
+}> = ({ value, test, onChange, isValid, submitted }) => {
   const [active, setActive] = useState(false);
+  const [touched, setTouched] = useState(false);
 
-  const valid = isValid || active;
+  const valid = submitted || touched ? isValid === true : isValid || active;
   return (
-    <InputBlock active={active} valid={valid}>
+    <InputBlock submitted={submitted || touched} active={active} valid={valid}>
       <Number1>{test}:</Number1>
       <Input
         autoComplete="off"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setActive(true)}
-        onBlur={() => setActive(false)}
+        onBlur={() => {
+          setTouched(true);
+          setActive(false);
+        }}
       />
     </InputBlock>
   );
@@ -326,40 +355,81 @@ const Inputs = styled.div`
   }
 `;
 
+const seeIfValidWord = (word: string) => {
+  return wordlist.includes(word);
+};
+
+const fucusInput = (current: HTMLDivElement | null, index: number) => {
+  if (!current) return;
+  const wrapper = current.childNodes[index] as HTMLDivElement;
+  if (!wrapper) return;
+  wrapper.querySelector('input')?.focus();
+};
+
 export const ImportWords: FC<{
   isLoading: boolean;
   onMnemonic: (mnemonic: string[]) => void;
 }> = ({ isLoading, onMnemonic }) => {
+  const [submitted, setSubmit] = useState(false);
+  const sdk = useAppSdk();
+  const ref = useRef<HTMLDivElement>(null);
+
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [mnemonic, setMnemonic] = useState<string[]>(Array(24).fill(''));
 
-  const onChange = useCallback((newValue: string, index: number) => {
-    if (newValue.includes(' ')) {
-      let values = newValue.trim().split(' ');
-      const max = Math.min(24 - index, values.length);
-      values = values.slice(0, max);
-      return setMnemonic((items) => {
-        items = [...items];
-        items.splice(index, max, ...values);
-        return items;
-      });
-    } else {
-      return setMnemonic((items) =>
-        items.map((v, i) => (i === index ? newValue : v))
-      );
-    }
-  }, []);
+  const onChange = useCallback(
+    (newValue: string, index: number) => {
+      if (newValue.includes(' ')) {
+        let values = newValue.trim().split(' ');
+        const max = Math.min(24 - index, values.length);
+        values = values.slice(0, max);
+        setMnemonic((items) => {
+          items = [...items];
+          items.splice(index, max, ...values);
+          return items;
+        });
+        fucusInput(ref.current, max - 1);
+        return;
+      } else {
+        return setMnemonic((items) =>
+          items.map((v, i) => (i === index ? newValue : v))
+        );
+      }
+    },
+    [ref.current]
+  );
 
   const validations = useMemo(() => {
     return mnemonic.map((item) => item === '' || wordlist.includes(item));
   }, [mnemonic]);
 
-  const isValid = useMemo(
-    () => mnemonic.length === 24 && mnemonic.every((item) => item != ''),
-    [mnemonic]
-  );
+  const notify = () => {
+    sdk.uiEvents.emit('copy', {
+      method: 'copy',
+      params: t('Incorrect_phrase'),
+    });
+  };
+  const onSubmit = async () => {
+    setSubmit(true);
+    const invalid = mnemonic.findIndex((work) => !seeIfValidWord(work));
+    if (invalid != -1) {
+      fucusInput(ref.current, invalid);
+      notify();
+    }
+    if (mnemonic.length < 24) {
+      fucusInput(ref.current, mnemonic.length - 1);
+      notify();
+    }
+
+    const valid = await mnemonicValidate(mnemonic);
+    if (!valid) {
+      notify();
+    } else {
+      onMnemonic(mnemonic);
+    }
+  };
 
   return (
     <>
@@ -375,13 +445,14 @@ export const ImportWords: FC<{
         </div>
       </Block>
       <Block>
-        <Inputs>
+        <Inputs ref={ref}>
           {mnemonic.map((item, index) => (
             <WordInput
               key={index}
               value={item}
               test={index + 1}
               isValid={validations[index]}
+              submitted={submitted}
               onChange={(newValue) => onChange(newValue, index)}
             />
           ))}
@@ -392,9 +463,8 @@ export const ImportWords: FC<{
           size="large"
           fullWidth
           primary
-          disabled={!isValid}
           loading={isLoading}
-          onClick={() => onMnemonic(mnemonic)}
+          onClick={onSubmit}
         >
           {t('create_wallet_continue_button')}
         </Button>

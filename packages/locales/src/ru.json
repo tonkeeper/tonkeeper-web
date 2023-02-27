@@ -154,5 +154,8 @@
   },
   "Make_your_first_transaction": {
     "message": "Совершите первую транзакцию"
+  },
+  "Incorrect_phrase": {
+    "message": "Неправильный ключ"
   }
 }

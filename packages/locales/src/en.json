@@ -158,5 +158,8 @@
   },
   "Make_your_first_transaction": {
     "message": "Make your first transaction"
+  },
+  "Incorrect_phrase": {
+    "message": "Incorrect phrase"
   }
 }
