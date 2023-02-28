@@ -161,5 +161,11 @@
   },
   "Incorrect_phrase": {
     "message": "Incorrect phrase"
+  },
+  "Remaining": {
+    "message": "Remaining: %1%"
+  },
+  "Max": {
+    "message": "Max"
   }
 }

@@ -1,9 +1,12 @@
-import React, { FC, useState } from 'react';
+import { FiatCurrencySymbolsConfig } from '@tonkeeper/core/dist/entries/fiat';
+import React, { FC, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
+import { useWalletJettonList } from '../../state/wallet';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
-import { Input } from '../fields/Input';
+import { Sentence } from '../fields/Sentence';
 import { ChevronLeftIcon } from '../Icon';
 import { Gap } from '../Layout';
 import {
@@ -11,7 +14,7 @@ import {
   NotificationCancelButton,
   NotificationTitleBlock,
 } from '../Notification';
-import { H3 } from '../Text';
+import { Body2, H3, Label2, Num2 } from '../Text';
 
 export interface AmountData {
   amount: number;
@@ -26,6 +29,51 @@ const ButtonBlock = styled.div`
   width: 500px;
 `;
 
+const AmountBlock = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 272px;
+  padding: 1rem;
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  border-radius: ${(props) => props.theme.cornerSmall};
+  background: ${(props) => props.theme.backgroundContent};
+`;
+
+const MaxRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const MaxButton = styled(Label2)`
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: ${(props) => props.theme.cornerSmall};
+  background: ${(props) => props.theme.backgroundContent};
+
+  &:hover {
+    background: ${(props) => props.theme.backgroundContentTint};
+  }
+`;
+
+const Remaining = styled(Body2)`
+  color: ${(props) => props.theme.textSecondary};
+`;
+
+const Symbol = styled(Num2)`
+  color: ${(props) => props.theme.textSecondary};
+  padding-left: 1rem;
+`;
+
+function isNumeric(str: string) {
+  str = str.replaceAll(',', '');
+  return !isNaN(Number(str)) && !isNaN(parseFloat(str));
+}
+
 export const AmountView: FC<{
   onClose: () => void;
   onBack: () => void;
@@ -34,12 +82,37 @@ export const AmountView: FC<{
   asset: string;
   data?: AmountData;
 }> = ({ address, onClose, onBack, setAmount, asset, data }) => {
+  const { fiat } = useAppContext();
+  const { data: jettons } = useWalletJettonList();
+
   const { t } = useTranslation();
   const [amount, setAmountValue] = useState(data ? String(data.amount) : '');
   const [max, setMax] = useState(data?.max ?? false);
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
 
-  const isValid = amount != '';
+  const suffix = jetton === 'TON' ? 'TON' : 'JETTON';
+
+  const onInput = (value: string) => {
+    if (value.length > 30) return;
+    try {
+      const [entry, ...tail] = value.replaceAll(',', '').split('.');
+      const start = parseInt(entry, 10);
+
+      if (isNaN(start)) {
+        throw new Error('Not a number');
+      }
+      const config = FiatCurrencySymbolsConfig[fiat];
+      const balanceFormat = new Intl.NumberFormat(config.numberFormat);
+
+      setAmountValue([balanceFormat.format(start), ...tail].join('.'));
+    } catch (e) {
+      setAmountValue(value);
+    }
+  };
+
+  const isValid = useMemo(() => {
+    return isNumeric(amount);
+  }, [amount]);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.stopPropagation();
@@ -57,7 +130,14 @@ export const AmountView: FC<{
         <NotificationCancelButton handleClose={onClose} />
       </NotificationTitleBlock>
 
-      <Input value={amount} onChange={setAmountValue} />
+      <AmountBlock>
+        <Sentence value={amount} setValue={onInput} />
+        <Symbol>{suffix}</Symbol>
+      </AmountBlock>
+      <MaxRow>
+        <MaxButton onClick={() => setMax(true)}>{t('Max')}</MaxButton>
+        <Remaining>{t('Remaining').replace('%1%', '100 TON')}</Remaining>
+      </MaxRow>
 
       <Gap />
       <ButtonBlock>

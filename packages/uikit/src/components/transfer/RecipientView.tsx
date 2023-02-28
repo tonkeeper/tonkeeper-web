@@ -107,13 +107,18 @@ export const RecipientView: FC<{
       <SuggestionList onSelect={setAddress} />
 
       <Gap />
-      {isValid && (
-        <ButtonBlock>
-          <Button fullWidth size="large" primary type="submit">
-            {t('continue')}
-          </Button>
-        </ButtonBlock>
-      )}
+
+      <ButtonBlock>
+        <Button
+          fullWidth
+          size="large"
+          primary
+          type="submit"
+          disabled={!isValid}
+        >
+          {t('continue')}
+        </Button>
+      </ButtonBlock>
     </FullHeightBlock>
   );
 };

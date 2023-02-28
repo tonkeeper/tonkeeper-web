@@ -4,7 +4,7 @@ import {
   Suggestion,
 } from '@tonkeeper/core/dist/entries/suggestion';
 import { getSuggestionsList } from '@tonkeeper/core/dist/service/suggestionService';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { delay, toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -21,7 +21,10 @@ const useLatestSuggestion = () => {
 
   return useQuery(
     [wallet.active.rawAddress, QueryKey.activity, 'suggestions'],
-    () => getSuggestionsList(tonApi, wallet)
+    async () => {
+      await delay(100);
+      return await getSuggestionsList(tonApi, wallet);
+    }
   );
 };
 

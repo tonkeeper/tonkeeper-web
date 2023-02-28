@@ -157,5 +157,11 @@
   },
   "Incorrect_phrase": {
     "message": "Неправильный ключ"
+  },
+  "Remaining": {
+    "message": "Всего: %1%"
+  },
+  "Max": {
+    "message": "Все"
   }
 }

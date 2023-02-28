@@ -10,7 +10,8 @@ import { RecipientData, RecipientView } from './RecipientView';
 
 import styled from 'styled-components';
 
-const duration = 500;
+const duration = 300;
+const timingFunction = 'ease-in-out';
 
 const rightToLeft = 'right-to-left';
 const leftToTight = 'left-to-right';
@@ -34,13 +35,15 @@ const Wrapper = styled.div`
   .${rightToLeft}-enter-active {
     transform: translateX(0);
     opacity: 1;
-    transition: transform ${duration}ms linear, opacity ${duration / 2}ms linear;
+    transition: transform ${duration}ms ${timingFunction},
+      opacity ${duration / 2}ms ${timingFunction};
   }
 
   .${rightToLeft}-exit-active {
     transform: translateX(-100%);
     opacity: 0;
-    transition: transform ${duration}ms linear, opacity ${duration / 2}ms linear;
+    transition: transform ${duration}ms ${timingFunction},
+      opacity ${duration / 2}ms ${timingFunction};
   }
 
   .${leftToTight}-enter {
@@ -50,13 +53,15 @@ const Wrapper = styled.div`
   .${leftToTight}-enter-active {
     transform: translateX(0);
     opacity: 1;
-    transition: transform ${duration}ms linear, opacity ${duration / 2}ms linear;
+    transition: transform ${duration}ms ${timingFunction},
+      opacity ${duration / 2}ms ${timingFunction};
   }
 
   .${leftToTight}-exit-active {
     transform: translateX(100%);
     opacity: 0;
-    transition: transform ${duration}ms linear, opacity ${duration / 2}ms linear;
+    transition: transform ${duration}ms ${timingFunction},
+      opacity ${duration / 2}ms ${timingFunction};
   }
 `;
 
