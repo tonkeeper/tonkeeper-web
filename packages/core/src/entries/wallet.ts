@@ -2,6 +2,7 @@ import { FiatCurrencies } from './fiat';
 import { Language } from './language';
 import { Network } from './network';
 import { WalletProxy } from './proxy';
+import { WalletFavorite } from './suggestion';
 
 export enum WalletVersion {
   v3R1 = 0,
@@ -44,22 +45,24 @@ export interface WalletVoucher {
 
 export interface WalletState {
   publicKey: string;
-  revision: number;
+  name?: string;
 
+  revision: number;
   voucher?: WalletVoucher;
 
-  active: WalletAddress;
+  network?: Network;
 
-  name?: string;
+  active: WalletAddress;
 
   hiddenJettons?: string[];
   shownJettons?: string[];
   orderJettons?: string[];
 
-  network?: Network;
   lang?: Language;
   fiat?: FiatCurrencies;
   theme?: string;
 
   proxy?: WalletProxy;
+
+  favorites?: WalletFavorite[];
 }

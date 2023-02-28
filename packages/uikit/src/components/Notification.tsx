@@ -143,7 +143,9 @@ export const NotificationBlock = styled.form`
 `;
 
 export const FullHeightBlock = styled(NotificationBlock)`
-  min-height: calc(100vh - 4rem);
+  min-height: calc(100vh - 3rem);
+  padding-bottom: calc(56px + 1rem);
+  box-sizing: border-box;
 `;
 
 export const NotificationTitleBlock = styled.div`

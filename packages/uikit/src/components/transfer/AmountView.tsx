@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react';
+import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
@@ -19,6 +20,12 @@ export interface AmountData {
   done: boolean;
 }
 
+const ButtonBlock = styled.div`
+  position: fixed;
+  bottom: 1rem;
+  width: 500px;
+`;
+
 export const AmountView: FC<{
   onClose: () => void;
   onBack: () => void;
@@ -36,7 +43,7 @@ export const AmountView: FC<{
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.stopPropagation();
-
+    e.preventDefault();
     setAmount({ amount: parseInt(amount), max, done: true, jetton });
   };
 
@@ -53,10 +60,17 @@ export const AmountView: FC<{
       <Input value={amount} onChange={setAmountValue} />
 
       <Gap />
-
-      <Button fullWidth size="large" primary type="submit" disabled={!isValid}>
-        {t('continue')}
-      </Button>
+      <ButtonBlock>
+        <Button
+          fullWidth
+          size="large"
+          primary
+          type="submit"
+          disabled={!isValid}
+        >
+          {t('continue')}
+        </Button>
+      </ButtonBlock>
     </FullHeightBlock>
   );
 };

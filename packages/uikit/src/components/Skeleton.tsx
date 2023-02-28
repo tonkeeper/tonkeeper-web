@@ -127,21 +127,23 @@ export const SkeletonListPayload = React.memo(() => {
   );
 });
 
-export const SkeletonList: FC<{ size?: number; margin?: boolean }> = React.memo(
-  ({ size = 1, margin }) => {
-    return (
-      <ListBlock margin={margin}>
-        {Array(size)
-          .fill(null)
-          .map((item, index) => (
-            <ListItem key={index} hover={false}>
-              <SkeletonListPayload />
-            </ListItem>
-          ))}
-      </ListBlock>
-    );
-  }
-);
+export const SkeletonList: FC<{
+  size?: number;
+  margin?: boolean;
+  fullWidth?: boolean;
+}> = React.memo(({ size = 1, margin, fullWidth }) => {
+  return (
+    <ListBlock margin={margin} fullWidth={fullWidth}>
+      {Array(size)
+        .fill(null)
+        .map((item, index) => (
+          <ListItem key={index} hover={false}>
+            <SkeletonListPayload />
+          </ListItem>
+        ))}
+    </ListBlock>
+  );
+});
 
 const SkeletonSettingsList: FC<{ size?: number }> = React.memo(
   ({ size = 1 }) => {
