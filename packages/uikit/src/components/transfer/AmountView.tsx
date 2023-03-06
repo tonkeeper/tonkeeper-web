@@ -1,5 +1,5 @@
 import { FiatCurrencySymbolsConfig } from '@tonkeeper/core/dist/entries/fiat';
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
@@ -91,6 +91,16 @@ export const AmountView: FC<{
   const { fiat } = useAppContext();
   const { data: jettons } = useWalletJettonList();
 
+  const ref = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      setTimeout(() => {
+        ref.current && ref.current.focus();
+      }, 300);
+    }
+  }, [ref.current]);
+
   const { t } = useTranslation();
   const [amount, setAmountValue] = useState(data ? String(data.amount) : '');
   const [max, setMax] = useState(data?.max ?? false);
@@ -139,7 +149,7 @@ export const AmountView: FC<{
       </NotificationTitleBlock>
 
       <AmountBlock>
-        <Sentence value={amount} setValue={onInput} />
+        <Sentence ref={ref} value={amount} setValue={onInput} />
         <Symbol>{suffix}</Symbol>
       </AmountBlock>
       <MaxRow>
