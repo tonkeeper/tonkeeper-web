@@ -57,6 +57,16 @@ export const getJettonSymbol = (
   return jetton?.metadata?.symbol ?? address;
 };
 
+export const getJettonDecimals = (
+  address: string,
+  jettons: JettonsBalances
+): number => {
+  const jetton = jettons.balances.find(
+    (item) => item.jettonAddress === address
+  );
+  return jetton?.metadata?.decimals ?? 9;
+};
+
 const AssetDropDown: FC<{
   onClose: () => void;
   jetton: string;

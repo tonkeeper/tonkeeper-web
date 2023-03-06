@@ -3,7 +3,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
-import { useWalletJettonList } from '../../state/wallet';
+import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
 import { Notification } from '../Notification';
@@ -75,6 +75,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   asset = TONAsset,
 }) => {
   const { data: jettons } = useWalletJettonList();
+  const { data: info } = useWalletAccountInfo();
   const filter = useUserJettonList(jettons);
 
   const recipientRef = useRef<HTMLDivElement>(null);
@@ -152,6 +153,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 onBack={backToRecipient}
                 asset={asset}
                 jettons={filter}
+                info={info}
                 address={recipient!.address.address}
                 setAmount={onAmount}
                 width={width}

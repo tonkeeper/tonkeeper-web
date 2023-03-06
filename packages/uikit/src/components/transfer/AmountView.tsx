@@ -1,8 +1,10 @@
 import { FiatCurrencySymbolsConfig } from '@tonkeeper/core/dist/entries/fiat';
-import { JettonsBalances } from '@tonkeeper/core/dist/tonApi';
+import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApi';
+import BigNumber from 'bignumber.js';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
+import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
@@ -15,8 +17,8 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body2, H3, Label2, Num2 } from '../Text';
-import { AssetSelect, getJettonSymbol } from './AssetSelect';
-import { duration } from './common';
+import { AssetSelect, getJettonDecimals, getJettonSymbol } from './AssetSelect';
+import { duration, TONAsset } from './common';
 
 export interface AmountData {
   amount: number;
@@ -66,6 +68,10 @@ const Remaining = styled(Body2)`
   color: ${(props) => props.theme.textSecondary};
 `;
 
+const RemainingInvalid = styled(Body2)`
+  color: ${(props) => props.theme.accentRed};
+`;
+
 const Symbol = styled(Num2)`
   color: ${(props) => props.theme.textSecondary};
   padding-left: 1rem;
@@ -83,10 +89,66 @@ const SelectCenter = styled.div`
   transform: translateX(-50%);
 `;
 
+function toNumberAmount(str: string): number {
+  str = str.replaceAll(',', '');
+  return parseFloat(str);
+}
 function isNumeric(str: string) {
   str = str.replaceAll(',', '');
   return !isNaN(Number(str)) && !isNaN(parseFloat(str));
 }
+
+const getRemaining = (
+  jettons: JettonsBalances,
+  info: AccountRepr | undefined,
+  jetton: string,
+  amount: string,
+  max: boolean,
+  format: (amount: number | string, decimals?: number) => string
+): [string, boolean] => {
+  if (jetton === TONAsset) {
+    if (max) {
+      return [`0 ${TONAsset}`, true];
+    }
+
+    const remaining = new BigNumber(info?.balance ?? 0).minus(
+      isNumeric(amount)
+        ? new BigNumber(toNumberAmount(amount)).multipliedBy(Math.pow(10, 9))
+        : 0
+    );
+
+    return [
+      `${format(remaining.toString())} ${TONAsset}`,
+      remaining.isGreaterThan(0),
+    ];
+  }
+
+  const jettonInfo = jettons.balances.find(
+    (item) => item.jettonAddress === jetton
+  );
+  if (!jettonInfo) {
+    return ['0', false];
+  }
+
+  if (max) {
+    return [`0 ${jettonInfo.metadata?.symbol}`, true];
+  }
+
+  const remaining = new BigNumber(jettonInfo.balance).minus(
+    isNumeric(amount)
+      ? new BigNumber(toNumberAmount(amount)).multipliedBy(
+          Math.pow(10, jettonInfo.metadata?.decimals ?? 9)
+        )
+      : 0
+  );
+
+  return [
+    `${format(remaining.toString(), jettonInfo.metadata?.decimals)} ${
+      jettonInfo.metadata?.symbol
+    }`,
+    remaining.isGreaterThan(0),
+  ];
+};
 
 export const AmountView: FC<{
   onClose: () => void;
@@ -95,9 +157,23 @@ export const AmountView: FC<{
   address: string;
   asset: string;
   jettons: JettonsBalances;
+  info?: AccountRepr;
   data?: AmountData;
   width: number;
-}> = ({ address, onClose, onBack, setAmount, asset, data, width, jettons }) => {
+}> = ({
+  address,
+  onClose,
+  onBack,
+  setAmount,
+  asset,
+  data,
+  width,
+  jettons,
+  info,
+}) => {
+  const format = useFormatCoinValue();
+
+  const [amount, setAmountValue] = useState(data ? String(data.amount) : '');
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
 
   const { fiat } = useAppContext();
@@ -110,10 +186,10 @@ export const AmountView: FC<{
         ref.current && ref.current.focus();
       }, duration);
     }
-  }, [ref.current]);
+  }, [ref.current, jetton]);
 
   const { t } = useTranslation();
-  const [amount, setAmountValue] = useState(data ? String(data.amount) : '');
+
   const [max, setMax] = useState(data?.max ?? false);
 
   const suffix = getJettonSymbol(jetton, jettons);
@@ -123,6 +199,9 @@ export const AmountView: FC<{
     try {
       const [entry, ...tail] = value.replaceAll(',', '').split('.');
       if (entry.length > 11) return;
+      if (tail.length > 1) return;
+      const decimals = getJettonDecimals(jetton, jettons);
+      if (tail && tail[0].length > decimals) return;
 
       const start = parseInt(entry, 10);
 
@@ -138,9 +217,14 @@ export const AmountView: FC<{
     }
   };
 
+  const [remaining, valid] = useMemo(
+    () => getRemaining(jettons, info, jetton, amount, max, format),
+    [jettons, info, jetton, amount, max]
+  );
+
   const isValid = useMemo(() => {
-    return isNumeric(amount);
-  }, [amount]);
+    return valid && isNumeric(amount);
+  }, [valid, amount]);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.stopPropagation();
@@ -171,7 +255,13 @@ export const AmountView: FC<{
       </AmountBlock>
       <MaxRow>
         <MaxButton onClick={() => setMax(true)}>{t('Max')}</MaxButton>
-        <Remaining>{t('Remaining').replace('%1%', '100 TON')}</Remaining>
+        {valid ? (
+          <Remaining>{t('Remaining').replace('%1%', remaining)}</Remaining>
+        ) : (
+          <RemainingInvalid>
+            {t('send_screen_steps_amount_insufficient_balance')}
+          </RemainingInvalid>
+        )}
       </MaxRow>
 
       <Gap />
