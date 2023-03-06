@@ -1,4 +1,5 @@
 import { FiatCurrencySymbolsConfig } from '@tonkeeper/core/dist/entries/fiat';
+import { JettonsBalances } from '@tonkeeper/core/dist/tonApi';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
