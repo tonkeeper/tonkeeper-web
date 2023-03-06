@@ -23,10 +23,10 @@ export interface RecipientData {
   done: boolean;
 }
 
-const ButtonBlock = styled.div`
+const ButtonBlock = styled.div<{ width: number }>`
   position: fixed;
   bottom: 1rem;
-  width: 500px;
+  width: ${(props) => props.width}px;
 `;
 
 const Label = styled(Label1)`
@@ -39,7 +39,8 @@ export const RecipientView: FC<{
   data?: RecipientData;
   onClose: () => void;
   setRecipient: (options: RecipientData) => void;
-}> = ({ data, onClose, setRecipient }) => {
+  width: number;
+}> = ({ data, onClose, setRecipient, width }) => {
   const { t } = useTranslation();
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -108,7 +109,7 @@ export const RecipientView: FC<{
 
       <Gap />
 
-      <ButtonBlock>
+      <ButtonBlock width={width}>
         <Button
           fullWidth
           size="large"

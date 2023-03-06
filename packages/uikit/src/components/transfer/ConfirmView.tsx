@@ -14,10 +14,10 @@ import { H3 } from '../Text';
 import { AmountData } from './AmountView';
 import { RecipientData } from './RecipientView';
 
-const ButtonBlock = styled.div`
-  position: sticky;
+const ButtonBlock = styled.div<{ width: number }>`
+  position: fixed;
   bottom: 1rem;
-  width: 100%;
+  width: ${(props) => props.width}px;
 `;
 
 export const ConfirmView: FC<{
@@ -25,7 +25,8 @@ export const ConfirmView: FC<{
   amount: AmountData;
   onBack: () => void;
   onClose: () => void;
-}> = ({ onBack, onClose }) => {
+  width: number;
+}> = ({ onBack, onClose, width }) => {
   const { t } = useTranslation();
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -46,7 +47,7 @@ export const ConfirmView: FC<{
 
       <Gap />
 
-      <ButtonBlock>
+      <ButtonBlock width={width}>
         <Button
           fullWidth
           size="large"

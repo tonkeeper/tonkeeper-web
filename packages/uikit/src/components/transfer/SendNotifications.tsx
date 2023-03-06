@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
@@ -78,6 +78,8 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   const amountRef = useRef<HTMLDivElement>(null);
   const confirmRef = useRef<HTMLDivElement>(null);
 
+  const [width, setWidth] = useState(0);
+
   const [right, setRight] = useState(true);
   const [recipient, setRecipient] = useState<RecipientData | undefined>(
     undefined
@@ -114,6 +116,12 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     return ['confirm', confirmRef] as const;
   })();
 
+  useEffect(() => {
+    if (nodeRef.current) {
+      setWidth(nodeRef.current.clientWidth);
+    }
+  }, [nodeRef.current]);
+
   return (
     <Wrapper>
       <TransitionGroup childFactory={childFactoryCreator(right)}>
@@ -131,6 +139,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 data={recipient}
                 onClose={onClose}
                 setRecipient={onRecipient}
+                width={width}
               />
             )}
             {state === 'amount' && (
@@ -141,6 +150,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 asset={asset}
                 address={recipient!.address.address}
                 setAmount={onAmount}
+                width={width}
               />
             )}
             {state === 'confirm' && (
@@ -149,6 +159,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 onBack={backToAmount}
                 recipient={recipient!}
                 amount={amount!}
+                width={width}
               />
             )}
           </div>

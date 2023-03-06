@@ -23,10 +23,10 @@ export interface AmountData {
   done: boolean;
 }
 
-const ButtonBlock = styled.div`
+const ButtonBlock = styled.div<{ width: number }>`
   position: fixed;
   bottom: 1rem;
-  width: 500px;
+  width: ${(props) => props.width}px;
 `;
 
 const AmountBlock = styled.div`
@@ -86,7 +86,8 @@ export const AmountView: FC<{
   address: string;
   asset: string;
   data?: AmountData;
-}> = ({ address, onClose, onBack, setAmount, asset, data }) => {
+  width: number;
+}> = ({ address, onClose, onBack, setAmount, asset, data, width }) => {
   const { fiat } = useAppContext();
   const { data: jettons } = useWalletJettonList();
 
@@ -147,7 +148,7 @@ export const AmountView: FC<{
       </MaxRow>
 
       <Gap />
-      <ButtonBlock>
+      <ButtonBlock width={width}>
         <Button
           fullWidth
           size="large"
