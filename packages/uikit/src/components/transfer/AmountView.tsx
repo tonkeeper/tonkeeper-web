@@ -96,6 +96,8 @@ export const AmountView: FC<{
     if (value.length > 30) return;
     try {
       const [entry, ...tail] = value.replaceAll(',', '').split('.');
+      if (entry.length > 14) return;
+
       const start = parseInt(entry, 10);
 
       if (isNaN(start)) {
