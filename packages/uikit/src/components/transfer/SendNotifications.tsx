@@ -1,7 +1,8 @@
-import React, { FC, useCallback, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
+import { useWalletJettonList } from '../../state/wallet';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
 import { Notification } from '../Notification';
@@ -74,9 +75,13 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
   asset = 'TON',
 }) => {
+  const { data: jettons } = useWalletJettonList();
+
   const recipientRef = useRef<HTMLDivElement>(null);
   const amountRef = useRef<HTMLDivElement>(null);
   const confirmRef = useRef<HTMLDivElement>(null);
+
+  const [width, setWidth] = useState(0);
 
   const [right, setRight] = useState(true);
   const [recipient, setRecipient] = useState<RecipientData | undefined>(
@@ -114,6 +119,12 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     return ['confirm', confirmRef] as const;
   })();
 
+  useEffect(() => {
+    if (nodeRef.current) {
+      setWidth(nodeRef.current.clientWidth);
+    }
+  }, [nodeRef.current]);
+
   return (
     <Wrapper>
       <TransitionGroup childFactory={childFactoryCreator(right)}>
@@ -131,6 +142,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 data={recipient}
                 onClose={onClose}
                 setRecipient={onRecipient}
+                width={width}
               />
             )}
             {state === 'amount' && (
@@ -139,8 +151,10 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 onClose={onClose}
                 onBack={backToRecipient}
                 asset={asset}
+                jettons={jettons}
                 address={recipient!.address.address}
                 setAmount={onAmount}
+                width={width}
               />
             )}
             {state === 'confirm' && (

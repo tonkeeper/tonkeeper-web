@@ -1,9 +1,9 @@
 import { FiatCurrencySymbolsConfig } from '@tonkeeper/core/dist/entries/fiat';
-import React, { FC, useMemo, useState } from 'react';
+import { JettonsBalances } from '@tonkeeper/core/dist/tonApi';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useWalletJettonList } from '../../state/wallet';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
 import { Sentence } from '../fields/Sentence';
@@ -23,10 +23,10 @@ export interface AmountData {
   done: boolean;
 }
 
-const ButtonBlock = styled.div`
+const ButtonBlock = styled.div<{ width: number }>`
   position: fixed;
   bottom: 1rem;
-  width: 500px;
+  width: ${(props) => props.width}px;
 `;
 
 const AmountBlock = styled.div`
@@ -67,6 +67,11 @@ const Remaining = styled(Body2)`
 const Symbol = styled(Num2)`
   color: ${(props) => props.theme.textSecondary};
   padding-left: 1rem;
+
+  @media (max-width: 600px) {
+    padding-left: 0.5rem;
+    font-size: 22px;
+  }
 `;
 
 function isNumeric(str: string) {
@@ -80,10 +85,19 @@ export const AmountView: FC<{
   setAmount: (data: AmountData) => void;
   address: string;
   asset: string;
+  jettons: JettonsBalances | undefined;
   data?: AmountData;
-}> = ({ address, onClose, onBack, setAmount, asset, data }) => {
+  width: number;
+}> = ({ address, onClose, onBack, setAmount, asset, data, width }) => {
+  const ref = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.focus();
+    }
+  }, [ref.current]);
+
   const { fiat } = useAppContext();
-  const { data: jettons } = useWalletJettonList();
 
   const { t } = useTranslation();
   const [amount, setAmountValue] = useState(data ? String(data.amount) : '');
@@ -93,10 +107,10 @@ export const AmountView: FC<{
   const suffix = jetton === 'TON' ? 'TON' : 'JETTON';
 
   const onInput = (value: string) => {
-    if (value.length > 30) return;
+    if (value.length > 22) return;
     try {
       const [entry, ...tail] = value.replaceAll(',', '').split('.');
-      if (entry.length > 14) return;
+      if (entry.length > 11) return;
 
       const start = parseInt(entry, 10);
 
@@ -133,7 +147,7 @@ export const AmountView: FC<{
       </NotificationTitleBlock>
 
       <AmountBlock>
-        <Sentence value={amount} setValue={onInput} />
+        <Sentence ref={ref} value={amount} setValue={onInput} />
         <Symbol>{suffix}</Symbol>
       </AmountBlock>
       <MaxRow>
@@ -142,7 +156,7 @@ export const AmountView: FC<{
       </MaxRow>
 
       <Gap />
-      <ButtonBlock>
+      <ButtonBlock width={width}>
         <Button
           fullWidth
           size="large"

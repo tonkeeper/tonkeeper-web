@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 const SentenceInput = styled.input<{ small?: boolean }>`
@@ -28,6 +28,14 @@ const SentenceInput = styled.input<{ small?: boolean }>`
       : css`
           font-size: 40px;
         `}
+
+  @media (max-width: 600px) {
+    font-size: 22px;
+  }
+  @media (max-width: 400px) {
+    font-size: 18px;
+  }
+        
   line-height: 49px;
 `;
 
@@ -50,21 +58,32 @@ const Template = styled.span<{ small?: boolean }>`
       : css`
           font-size: 40px;
         `}
+
+  @media (max-width: 600px) {
+    font-size: 22px;
+  }
+  @media (max-width: 400px) {
+    font-size: 18px;
+  }
+
   line-height: 49px;
 
   white-space: pre;
   /* max-width : could be wised to set a maximum width and overflow:hidden; */
 `;
 
-export const Sentence: FC<{
+interface InputProps {
   value: string;
   setValue: (value: string) => void;
-}> = ({ value, setValue }) => {
+}
+
+export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(({ value, setValue }, ref) => {
   const small = value.length > 18;
   return (
     <Label>
       <Template small={small}>{value ? value : ' '}</Template>
       <SentenceInput
+        ref={ref}
         small={small}
         type="text"
         value={value}
