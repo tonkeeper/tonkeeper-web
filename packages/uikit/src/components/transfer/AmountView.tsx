@@ -67,6 +67,11 @@ const Remaining = styled(Body2)`
 const Symbol = styled(Num2)`
   color: ${(props) => props.theme.textSecondary};
   padding-left: 1rem;
+
+  @media (max-width: 600px) {
+    padding-left: 0.5rem;
+    font-size: 22px;
+  }
 `;
 
 function isNumeric(str: string) {
@@ -93,10 +98,10 @@ export const AmountView: FC<{
   const suffix = jetton === 'TON' ? 'TON' : 'JETTON';
 
   const onInput = (value: string) => {
-    if (value.length > 30) return;
+    if (value.length > 22) return;
     try {
       const [entry, ...tail] = value.replaceAll(',', '').split('.');
-      if (entry.length > 14) return;
+      if (entry.length > 11) return;
 
       const start = parseInt(entry, 10);
 
