@@ -1,5 +1,6 @@
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
@@ -7,8 +8,6 @@ import { Notification } from '../Notification';
 import { AmountData, AmountView } from './AmountView';
 import { ConfirmView } from './ConfirmView';
 import { RecipientData, RecipientView } from './RecipientView';
-
-import styled from 'styled-components';
 
 const duration = 300;
 const timingFunction = 'ease-in-out';
@@ -105,23 +104,15 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     setAmount((value) => (value ? { ...value, done: false } : undefined));
   }, [setAmount]);
 
-  const state = (() => {
+  const [state, nodeRef] = (() => {
     if (!recipient || !recipient.done) {
-      return 'recipient';
+      return ['recipient', recipientRef] as const;
     }
     if (!amount || !amount.done) {
-      return 'amount';
+      return ['amount', amountRef] as const;
     }
-
-    return 'confirm';
+    return ['confirm', confirmRef] as const;
   })();
-
-  const nodeRef =
-    state === 'recipient'
-      ? recipientRef
-      : state === 'amount'
-      ? amountRef
-      : confirmRef;
 
   return (
     <Wrapper>
