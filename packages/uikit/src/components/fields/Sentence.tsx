@@ -35,7 +35,7 @@ const SentenceInput = styled.input<{ small?: boolean }>`
   @media (max-width: 400px) {
     font-size: 18px;
   }
-        
+
   line-height: 49px;
 `;
 
@@ -77,20 +77,22 @@ interface InputProps {
   setValue: (value: string) => void;
 }
 
-export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(({ value, setValue }, ref) => {
-  const small = value.length > 18;
-  return (
-    <Label>
-      <Template small={small}>{value ? value : ' '}</Template>
-      <SentenceInput
-        ref={ref}
-        small={small}
-        type="text"
-        value={value}
-        onChange={(event) => {
-          setValue(event.target.value);
-        }}
-      />
-    </Label>
-  );
-};
+export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ value, setValue }, ref) => {
+    const small = value.length > 18;
+    return (
+      <Label>
+        <Template small={small}>{value ? value : ' '}</Template>
+        <SentenceInput
+          ref={ref}
+          small={small}
+          type="text"
+          value={value}
+          onChange={(event) => {
+            setValue(event.target.value);
+          }}
+        />
+      </Label>
+    );
+  }
+);
