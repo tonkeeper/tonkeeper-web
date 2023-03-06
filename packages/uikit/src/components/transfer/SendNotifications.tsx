@@ -2,16 +2,15 @@ import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
+import { useUserJettonList } from '../../state/jetton';
 import { useWalletJettonList } from '../../state/wallet';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
 import { Notification } from '../Notification';
 import { AmountData, AmountView } from './AmountView';
+import { duration, timingFunction, TONAsset } from './common';
 import { ConfirmView } from './ConfirmView';
 import { RecipientData, RecipientView } from './RecipientView';
-
-const duration = 300;
-const timingFunction = 'ease-in-out';
 
 const rightToLeft = 'right-to-left';
 const leftToTight = 'left-to-right';
@@ -73,9 +72,10 @@ const childFactoryCreator = (right: boolean) => (child: React.ReactElement) =>
 
 const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
-  asset = 'TON',
+  asset = TONAsset,
 }) => {
   const { data: jettons } = useWalletJettonList();
+  const filter = useUserJettonList(jettons);
 
   const recipientRef = useRef<HTMLDivElement>(null);
   const amountRef = useRef<HTMLDivElement>(null);
@@ -151,7 +151,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 onClose={onClose}
                 onBack={backToRecipient}
                 asset={asset}
-                jettons={jettons}
+                jettons={filter}
                 address={recipient!.address.address}
                 setAmount={onAmount}
                 width={width}

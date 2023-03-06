@@ -15,6 +15,8 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body2, H3, Label2, Num2 } from '../Text';
+import { AssetSelect, getJettonSymbol } from './AssetSelect';
+import { duration } from './common';
 
 export interface AmountData {
   amount: number;
@@ -74,6 +76,13 @@ const Symbol = styled(Num2)`
   }
 `;
 
+const SelectCenter = styled.div`
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+`;
+
 function isNumeric(str: string) {
   str = str.replaceAll(',', '');
   return !isNaN(Number(str)) && !isNaN(parseFloat(str));
@@ -85,10 +94,12 @@ export const AmountView: FC<{
   setAmount: (data: AmountData) => void;
   address: string;
   asset: string;
-  jettons: JettonsBalances | undefined;
+  jettons: JettonsBalances;
   data?: AmountData;
   width: number;
-}> = ({ address, onClose, onBack, setAmount, asset, data, width }) => {
+}> = ({ address, onClose, onBack, setAmount, asset, data, width, jettons }) => {
+  const [jetton, setJetton] = useState(data?.jetton ?? asset);
+
   const { fiat } = useAppContext();
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -97,16 +108,15 @@ export const AmountView: FC<{
     if (ref.current) {
       setTimeout(() => {
         ref.current && ref.current.focus();
-      }, 300);
+      }, duration);
     }
   }, [ref.current]);
 
   const { t } = useTranslation();
   const [amount, setAmountValue] = useState(data ? String(data.amount) : '');
   const [max, setMax] = useState(data?.max ?? false);
-  const [jetton, setJetton] = useState(data?.jetton ?? asset);
 
-  const suffix = jetton === 'TON' ? 'TON' : 'JETTON';
+  const suffix = getJettonSymbol(jetton, jettons);
 
   const onInput = (value: string) => {
     if (value.length > 22) return;
@@ -149,6 +159,13 @@ export const AmountView: FC<{
       </NotificationTitleBlock>
 
       <AmountBlock>
+        <SelectCenter>
+          <AssetSelect
+            jetton={jetton}
+            setJetton={setJetton}
+            jettons={jettons}
+          />
+        </SelectCenter>
         <Sentence ref={ref} value={amount} setValue={onInput} />
         <Symbol>{suffix}</Symbol>
       </AmountBlock>
