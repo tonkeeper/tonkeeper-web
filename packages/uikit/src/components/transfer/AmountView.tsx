@@ -3,7 +3,6 @@ import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useWalletJettonList } from '../../state/wallet';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
 import { Sentence } from '../fields/Sentence';
@@ -85,11 +84,11 @@ export const AmountView: FC<{
   setAmount: (data: AmountData) => void;
   address: string;
   asset: string;
+  jettons: JettonsBalances | undefined;
   data?: AmountData;
   width: number;
 }> = ({ address, onClose, onBack, setAmount, asset, data, width }) => {
   const { fiat } = useAppContext();
-  const { data: jettons } = useWalletJettonList();
 
   const ref = useRef<HTMLInputElement | null>(null);
 

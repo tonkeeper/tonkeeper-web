@@ -2,6 +2,7 @@ import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
+import { useWalletJettonList } from '../../state/wallet';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
 import { Notification } from '../Notification';
@@ -74,6 +75,8 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
   asset = 'TON',
 }) => {
+  const { data: jettons } = useWalletJettonList();
+
   const recipientRef = useRef<HTMLDivElement>(null);
   const amountRef = useRef<HTMLDivElement>(null);
   const confirmRef = useRef<HTMLDivElement>(null);
@@ -148,6 +151,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 onClose={onClose}
                 onBack={backToRecipient}
                 asset={asset}
+                jettons={jettons}
                 address={recipient!.address.address}
                 setAmount={onAmount}
                 width={width}
