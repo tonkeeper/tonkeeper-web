@@ -87,6 +87,7 @@ const SelectCenter = styled.div`
   top: 1rem;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 2;
 `;
 
 function toNumberAmount(str: string): number {
