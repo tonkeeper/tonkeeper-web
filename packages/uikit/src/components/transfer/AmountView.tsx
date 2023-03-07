@@ -1,9 +1,14 @@
-import { FiatCurrencySymbolsConfig } from '@tonkeeper/core/dist/entries/fiat';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApi';
-import BigNumber from 'bignumber.js';
+import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import {
+  getJettonSymbol,
+  getMaxValue,
+  getRemaining,
+  isNumeric,
+  parseAndValidateInput,
+} from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { BackButton } from '../fields/BackButton';
@@ -17,8 +22,8 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body2, H3, Label2, Num2 } from '../Text';
-import { AssetSelect, getJettonDecimals, getJettonSymbol } from './AssetSelect';
-import { duration, TONAsset } from './common';
+import { AssetSelect } from './AssetSelect';
+import { duration } from './common';
 
 export interface AmountData {
   amount: number;
@@ -27,13 +32,25 @@ export interface AmountData {
   done: boolean;
 }
 
+const Center = styled.div`
+  text-align: center;
+  margin-bottom: -8px;
+`;
+
+const SubTitle = styled(Body2)`
+  color: ${(props) => props.theme.textSecondary};
+`;
+
+const Title = styled(H3)`
+  margin: -3px 0 0;
+`;
 const ButtonBlock = styled.div<{ width: number }>`
   position: fixed;
   bottom: 1rem;
   width: ${(props) => props.width}px;
 `;
 
-const AmountBlock = styled.div`
+const AmountBlock = styled.label`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,14 +70,20 @@ const MaxRow = styled.div`
   width: 100%;
 `;
 
-const MaxButton = styled(Label2)`
+const MaxButton = styled(Label2)<{ maxValue: boolean }>`
   cursor: pointer;
   padding: 8px 16px;
   border-radius: ${(props) => props.theme.cornerSmall};
-  background: ${(props) => props.theme.backgroundContent};
+  background: ${(props) =>
+    props.maxValue
+      ? props.theme.buttonPrimaryBackground
+      : props.theme.backgroundContent};
 
   &:hover {
-    background: ${(props) => props.theme.backgroundContentTint};
+    background: ${(props) =>
+      props.maxValue
+        ? props.theme.buttonPrimaryBackgroundHighlighted
+        : props.theme.backgroundContentTint};
   }
 `;
 
@@ -90,67 +113,6 @@ const SelectCenter = styled.div`
   z-index: 2;
 `;
 
-function toNumberAmount(str: string): number {
-  str = str.replaceAll(',', '');
-  return parseFloat(str);
-}
-function isNumeric(str: string) {
-  str = str.replaceAll(',', '');
-  return !isNaN(Number(str)) && !isNaN(parseFloat(str));
-}
-
-const getRemaining = (
-  jettons: JettonsBalances,
-  info: AccountRepr | undefined,
-  jetton: string,
-  amount: string,
-  max: boolean,
-  format: (amount: number | string, decimals?: number) => string
-): [string, boolean] => {
-  if (jetton === TONAsset) {
-    if (max) {
-      return [`0 ${TONAsset}`, true];
-    }
-
-    const remaining = new BigNumber(info?.balance ?? 0).minus(
-      isNumeric(amount)
-        ? new BigNumber(toNumberAmount(amount)).multipliedBy(Math.pow(10, 9))
-        : 0
-    );
-
-    return [
-      `${format(remaining.toString())} ${TONAsset}`,
-      remaining.isGreaterThan(0),
-    ];
-  }
-
-  const jettonInfo = jettons.balances.find(
-    (item) => item.jettonAddress === jetton
-  );
-  if (!jettonInfo) {
-    return ['0', false];
-  }
-
-  if (max) {
-    return [`0 ${jettonInfo.metadata?.symbol}`, true];
-  }
-
-  const remaining = new BigNumber(jettonInfo.balance).minus(
-    isNumeric(amount)
-      ? new BigNumber(toNumberAmount(amount)).multipliedBy(
-          Math.pow(10, jettonInfo.metadata?.decimals ?? 9)
-        )
-      : 0
-  );
-
-  return [
-    `${format(remaining.toString(), jettonInfo.metadata?.decimals)} ${
-      jettonInfo.metadata?.symbol
-    }`,
-    remaining.isGreaterThan(0),
-  ];
-};
-
 export const AmountView: FC<{
   onClose: () => void;
   onBack: () => void;
@@ -177,8 +139,6 @@ export const AmountView: FC<{
   const [amount, setAmountValue] = useState(data ? String(data.amount) : '');
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
 
-  const { fiat } = useAppContext();
-
   const ref = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -196,25 +156,10 @@ export const AmountView: FC<{
   const suffix = getJettonSymbol(jetton, jettons);
 
   const onInput = (value: string) => {
-    if (value.length > 22) return;
-    try {
-      const [entry, ...tail] = value.replaceAll(',', '').split('.');
-      if (entry.length > 11) return;
-      if (tail.length > 1) return;
-      const decimals = getJettonDecimals(jetton, jettons);
-      if (tail && tail[0].length > decimals) return;
-
-      const start = parseInt(entry, 10);
-
-      if (isNaN(start)) {
-        throw new Error('Not a number');
-      }
-      const config = FiatCurrencySymbolsConfig[fiat];
-      const balanceFormat = new Intl.NumberFormat(config.numberFormat);
-
-      setAmountValue([balanceFormat.format(start), ...tail].join('.'));
-    } catch (e) {
-      setAmountValue(value);
+    const fixed = parseAndValidateInput(value, jettons, jetton, format);
+    if (fixed !== undefined) {
+      setMax(false);
+      setAmountValue(fixed);
     }
   };
 
@@ -233,21 +178,42 @@ export const AmountView: FC<{
     setAmount({ amount: parseInt(amount), max, done: true, jetton });
   };
 
+  const onMax = () => {
+    setMax(true);
+    setAmountValue(getMaxValue(jettons, info, jetton, format));
+  };
+
+  const onJetton = (value: string) => {
+    setJetton(value);
+    if (max) {
+      setAmountValue(getMaxValue(jettons, info, value, format));
+    }
+  };
+
   return (
     <FullHeightBlock onSubmit={onSubmit}>
       <NotificationTitleBlock>
         <BackButton onClick={onBack}>
           <ChevronLeftIcon />
         </BackButton>
-        <H3>{t('txActions_amount')}</H3>
+        <Center>
+          <Title>{t('txActions_amount')}</Title>
+          <SubTitle>
+            {t('send_screen_steps_done_to').replace(
+              '%{name}',
+              toShortAddress(address)
+            )}
+          </SubTitle>
+        </Center>
         <NotificationCancelButton handleClose={onClose} />
       </NotificationTitleBlock>
 
       <AmountBlock>
         <SelectCenter>
           <AssetSelect
+            info={info}
             jetton={jetton}
-            setJetton={setJetton}
+            setJetton={onJetton}
             jettons={jettons}
           />
         </SelectCenter>
@@ -255,7 +221,9 @@ export const AmountView: FC<{
         <Symbol>{suffix}</Symbol>
       </AmountBlock>
       <MaxRow>
-        <MaxButton onClick={() => setMax(true)}>{t('Max')}</MaxButton>
+        <MaxButton maxValue={max} onClick={onMax}>
+          {t('Max')}
+        </MaxButton>
         {valid ? (
           <Remaining>{t('Remaining').replace('%1%', remaining)}</Remaining>
         ) : (

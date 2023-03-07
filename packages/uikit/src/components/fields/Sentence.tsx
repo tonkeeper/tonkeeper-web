@@ -50,6 +50,9 @@ const Template = styled.span<{ small?: boolean }>`
   font-family: 'Montserrat';
   font-style: normal;
   font-weight: 600;
+
+  color: ${(props) => props.theme.backgroundContent};
+
   ${(props) =>
     props.small
       ? css`

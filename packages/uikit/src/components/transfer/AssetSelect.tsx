@@ -1,4 +1,5 @@
-import { JettonsBalances } from '@tonkeeper/core/dist/tonApi';
+import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApi';
+import { getJettonSymbol, TONAsset } from '@tonkeeper/core/dist/utils/send';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { useFormatCoinValue } from '../../hooks/balance';
@@ -6,7 +7,6 @@ import { DropDown } from '../DropDown';
 import { DoneIcon, DownIcon } from '../Icon';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Body1, Label1 } from '../Text';
-import { TONAsset } from './common';
 
 const AssetValue = styled.div`
   background: ${(props) => props.theme.buttonTertiaryBackground};
@@ -47,32 +47,13 @@ const Icon = styled.span`
   display: flex;
 `;
 
-export const getJettonSymbol = (
-  address: string,
-  jettons: JettonsBalances
-): string => {
-  const jetton = jettons.balances.find(
-    (item) => item.jettonAddress === address
-  );
-  return jetton?.metadata?.symbol ?? address;
-};
-
-export const getJettonDecimals = (
-  address: string,
-  jettons: JettonsBalances
-): number => {
-  const jetton = jettons.balances.find(
-    (item) => item.jettonAddress === address
-  );
-  return jetton?.metadata?.decimals ?? 9;
-};
-
 const AssetDropDown: FC<{
+  info?: AccountRepr;
   onClose: () => void;
   jetton: string;
   jettons: JettonsBalances;
   setJetton: (value: string) => void;
-}> = ({ onClose, jetton, jettons, setJetton }) => {
+}> = ({ onClose, jetton, jettons, setJetton, info }) => {
   const format = useFormatCoinValue();
   return (
     <ListBlock margin={false} dropDown>
@@ -87,7 +68,7 @@ const AssetDropDown: FC<{
           <AssetInfo>
             <AssetImage src="/img/toncoin.svg"></AssetImage>
             <Label1>{TONAsset}</Label1>
-            <Amount>{format(5)}</Amount>
+            <Amount>{format(info?.balance ?? 0)}</Amount>
           </AssetInfo>
           {TONAsset === jetton ? (
             <Icon>
@@ -127,15 +108,17 @@ const AssetDropDown: FC<{
 };
 
 export const AssetSelect: FC<{
+  info?: AccountRepr;
   jetton: string;
   jettons: JettonsBalances;
   setJetton: (value: string) => void;
-}> = ({ jetton, jettons, setJetton }) => {
+}> = ({ jetton, jettons, setJetton, info }) => {
   return (
     <DropDown
       center
       payload={(onClose) => (
         <AssetDropDown
+          info={info}
           onClose={onClose}
           jetton={jetton}
           jettons={jettons}

@@ -1,3 +1,4 @@
+import { TONAsset } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
@@ -8,7 +9,7 @@ import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
 import { Notification } from '../Notification';
 import { AmountData, AmountView } from './AmountView';
-import { duration, timingFunction, TONAsset } from './common';
+import { duration, timingFunction } from './common';
 import { ConfirmView } from './ConfirmView';
 import { RecipientData, RecipientView } from './RecipientView';
 
