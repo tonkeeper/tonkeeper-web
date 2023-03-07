@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 import { AccountRepr, JettonsBalances } from '../tonApi';
 
 export const TONAsset = 'TON';
+export const DefaultDecimals = 9;
 
 export function toNumberAmount(str: string): number {
   str = str.replaceAll(',', '');
@@ -29,7 +30,7 @@ export const getJettonDecimals = (
   const jetton = jettons.balances.find(
     (item) => item.jettonAddress === address
   );
-  return jetton?.metadata?.decimals ?? 9;
+  return jetton?.metadata?.decimals ?? DefaultDecimals;
 };
 
 export const getMaxValue = (
@@ -63,7 +64,9 @@ export const getRemaining = (
 
     const remaining = new BigNumber(info?.balance ?? 0).minus(
       isNumeric(amount)
-        ? new BigNumber(toNumberAmount(amount)).multipliedBy(Math.pow(10, 9))
+        ? new BigNumber(toNumberAmount(amount)).multipliedBy(
+            Math.pow(10, DefaultDecimals)
+          )
         : 0
     );
 
@@ -87,7 +90,7 @@ export const getRemaining = (
   const remaining = new BigNumber(jettonInfo.balance).minus(
     isNumeric(amount)
       ? new BigNumber(toNumberAmount(amount)).multipliedBy(
-          Math.pow(10, jettonInfo.metadata?.decimals ?? 9)
+          Math.pow(10, jettonInfo.metadata?.decimals ?? DefaultDecimals)
         )
       : 0
   );
@@ -96,7 +99,7 @@ export const getRemaining = (
     `${format(remaining.toString(), jettonInfo.metadata?.decimals)} ${
       jettonInfo.metadata?.symbol
     }`,
-    remaining.isGreaterThan(0),
+    remaining.isGreaterThanOrEqualTo(0),
   ];
 };
 

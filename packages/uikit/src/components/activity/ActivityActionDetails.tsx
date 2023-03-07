@@ -34,7 +34,7 @@ const Amount = styled(Body1)`
   color: ${(props) => props.theme.textSecondary};
 `;
 
-const TransferComment: FC<{ comment?: string }> = ({ comment }) => {
+export const TransferComment: FC<{ comment?: string }> = ({ comment }) => {
   const { t } = useTranslation();
 
   const sdk = useAppSdk();

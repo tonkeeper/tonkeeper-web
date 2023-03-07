@@ -21,6 +21,8 @@ export interface RecipientData {
   address: Recipient;
   comment: string;
   done: boolean;
+
+  logo?: string;
 }
 
 const ButtonBlock = styled.div<{ width: number }>`

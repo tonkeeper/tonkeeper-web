@@ -167,6 +167,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 recipient={recipient!}
                 amount={amount!}
                 width={width}
+                jettons={filter}
               />
             )}
           </div>
