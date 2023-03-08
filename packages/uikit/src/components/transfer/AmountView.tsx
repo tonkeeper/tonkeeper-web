@@ -1,6 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
-import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transferService';
+import {
+  AmountData,
+  AmountValue,
+  RecipientData,
+} from '@tonkeeper/core/dist/entries/send';
+import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApi';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
@@ -137,9 +141,9 @@ const useEstimateTransaction = (recipient: RecipientData, jetton: string) => {
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
 
-  return useMutation(async (amount: string) => {
+  return useMutation(async (options: AmountValue) => {
     if (jetton === TONAsset) {
-      return estimateTonTransfer(tonApi, wallet, recipient, amount);
+      return estimateTonTransfer(tonApi, wallet, recipient, options);
     } else {
       throw new Error('Undone');
     }
@@ -217,7 +221,7 @@ export const AmountView: FC<{
       e.preventDefault();
       if (isValid) {
         reset();
-        const fee = await mutateAsync(amount);
+        const fee = await mutateAsync({ amount, max });
         console.log(fee);
         setAmount({ amount, max, done: true, jetton, fee });
       }

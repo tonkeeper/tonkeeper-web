@@ -10,7 +10,12 @@ export interface RecipientData {
   toAccount: AccountRepr;
 }
 
-export interface AmountData {
+export interface AmountValue {
+  amount: string;
+  max: boolean;
+}
+
+export interface AmountData extends AmountValue {
   amount: string;
   jetton: string;
   max: boolean;
