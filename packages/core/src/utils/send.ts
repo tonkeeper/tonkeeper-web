@@ -1,5 +1,8 @@
 import BigNumber from 'bignumber.js';
+import { FiatCurrencies } from '../entries/fiat';
 import { AccountRepr, JettonsBalances } from '../tonApi';
+import { TonendpointStock } from '../tonkeeperApi/stock';
+import { getJettonStockPrice, getTonCoinStockPrice } from './balance';
 
 export const TONAsset = 'TON';
 export const DefaultDecimals = 9;
@@ -46,7 +49,7 @@ export const getMaxValue = (
   const jettonInfo = jettons.balances.find(
     (item) => item.jettonAddress === jetton
   );
-  return format(jettonInfo?.balance ?? 0);
+  return format(jettonInfo?.balance ?? 0, jettonInfo?.metadata?.decimals);
 };
 
 export const getRemaining = (
@@ -127,5 +130,33 @@ export const parseAndValidateInput = (
     return [format(start, 0), ...tail].join('.');
   } catch (e) {
     return value;
+  }
+};
+
+export const getFiatAmountValue = (
+  stock: TonendpointStock | undefined,
+  jettons: JettonsBalances,
+  fiat: FiatCurrencies,
+  jetton: string,
+  amount: string
+) => {
+  if (!isNumeric(amount)) return undefined;
+  if (!stock) return undefined;
+
+  const value = new BigNumber(toNumberAmount(amount));
+
+  if (jetton === TONAsset) {
+    const price = getTonCoinStockPrice(stock.today, fiat);
+    return value.multipliedBy(price);
+  } else {
+    const jettonInfo = jettons.balances.find(
+      (item) => item.jettonAddress === jetton
+    );
+
+    if (!jettonInfo) return undefined;
+
+    const price = getJettonStockPrice(jettonInfo, stock.today, fiat);
+    if (!price) return undefined;
+    return value.multipliedBy(price);
   }
 };

@@ -2,6 +2,10 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { AccountRepr, EventApi } from '@tonkeeper/core/dist/tonApi';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
+import {
+  formatDecimals,
+  getTonCoinStockPrice,
+} from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import React, { useMemo } from 'react';
 import { ActivityGroupRaw } from '../../components/activity/ActivityGroup';
@@ -15,12 +19,7 @@ import {
 } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
-import {
-  formatDecimals,
-  formatFiatCurrency,
-  getTonCoinStockPrice,
-  useFormatCoinValue,
-} from '../../hooks/balance';
+import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
@@ -83,8 +82,8 @@ export const TonActivity = () => {
   );
 };
 export const TonPage = () => {
-  const { fiat, tonendpoint } = useAppContext();
-  const { data: stock } = useTonenpointStock(tonendpoint);
+  const { fiat } = useAppContext();
+  const { data: stock } = useTonenpointStock();
   const { data: info } = useWalletAccountInfo();
 
   const format = useFormatCoinValue();

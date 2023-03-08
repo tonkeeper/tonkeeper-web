@@ -1,3 +1,4 @@
+import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApi';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
@@ -5,6 +6,7 @@ import React, { FC } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { useTonenpointStock } from '../../state/tonendpoint';
 import { TransferComment } from '../activity/ActivityActionDetails';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
@@ -17,8 +19,7 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body1, H3, Label1 } from '../Text';
-import { AmountData } from './AmountView';
-import { RecipientData } from './RecipientView';
+import { useFiatAmount } from './common';
 
 const ButtonBlock = styled.div<{ width: number }>`
   position: fixed;
@@ -66,6 +67,9 @@ export const ConfirmView: FC<{
   width: number;
 }> = ({ recipient, onBack, onClose, width, amount, jettons }) => {
   const { t } = useTranslation();
+
+  const { data: stock } = useTonenpointStock();
+
   const sdk = useAppSdk();
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -73,6 +77,12 @@ export const ConfirmView: FC<{
   };
 
   const isValid = false;
+
+  const fiatAmount = useFiatAmount(jettons, amount.jetton, amount.amount);
+  const coinAmount = `${amount.amount} ${getJettonSymbol(
+    amount.jetton,
+    jettons
+  )}`;
 
   return (
     <FullHeightBlock onSubmit={onSubmit}>
@@ -83,11 +93,15 @@ export const ConfirmView: FC<{
         <NotificationCancelButton handleClose={onClose} />
       </NotificationTitleBlock>
       <Info>
-        {recipient.logo ? <Image src={recipient.logo} /> : <ImageMock />}
+        {recipient.toAccount.icon ? (
+          <Image src={recipient.toAccount.icon} />
+        ) : (
+          <ImageMock />
+        )}
         <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
         <H3>
-          {recipient.logo
-            ? recipient.logo
+          {recipient.toAccount.name
+            ? recipient.toAccount.name
             : t('txActions_signRaw_types_tonTransfer')}
         </H3>
       </Info>
@@ -103,14 +117,15 @@ export const ConfirmView: FC<{
         <ListItem>
           <ListItemPayload>
             <Label>{t('txActions_amount')}</Label>
-            <ColumnText
-              right
-              text={`${amount.amount} ${getJettonSymbol(
-                amount.jetton,
-                jettons
-              )}`}
-              secondary={`≈`}
-            />
+            {fiatAmount ? (
+              <ColumnText
+                right
+                text={coinAmount}
+                secondary={`≈ ${fiatAmount}`}
+              />
+            ) : (
+              <Label1>{coinAmount}</Label1>
+            )}
           </ListItemPayload>
         </ListItem>
         <ListItem>

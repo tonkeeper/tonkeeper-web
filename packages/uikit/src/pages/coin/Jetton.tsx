@@ -4,6 +4,10 @@ import {
   JettonBalance,
   JettonInfo,
 } from '@tonkeeper/core/dist/tonApi';
+import {
+  getJettonStockAmount,
+  getJettonStockPrice,
+} from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo } from 'react';
 import { ActivityGroupRaw } from '../../components/activity/ActivityGroup';
 import { ActionsRow } from '../../components/home/Actions';
@@ -17,12 +21,7 @@ import {
 import { SubHeader } from '../../components/SubHeader';
 import { SendAction } from '../../components/transfer/SendNotifications';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
-import {
-  formatFiatCurrency,
-  getJettonStockAmount,
-  getJettonStockPrice,
-  useFormatCoinValue,
-} from '../../hooks/balance';
+import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { JettonKey, QueryKey } from '../../libs/queryKey';
 import {
@@ -79,10 +78,10 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({
   jettonAddress,
 }) => {
   const { t } = useTranslation();
-  const { tonendpoint, fiat } = useAppContext();
+  const { fiat } = useAppContext();
   const { data: info } = useJettonInfo(jettonAddress);
   const { data: balance } = useJettonBalance(jettonAddress);
-  const { data: stock } = useTonenpointStock(tonendpoint);
+  const { data: stock } = useTonenpointStock();
 
   const format = useFormatCoinValue();
 

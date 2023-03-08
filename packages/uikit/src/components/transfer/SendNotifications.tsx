@@ -1,3 +1,4 @@
+import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { TONAsset } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -8,10 +9,10 @@ import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
 import { Notification } from '../Notification';
-import { AmountData, AmountView } from './AmountView';
+import { AmountView } from './AmountView';
 import { duration, timingFunction } from './common';
 import { ConfirmView } from './ConfirmView';
-import { RecipientData, RecipientView } from './RecipientView';
+import { RecipientView } from './RecipientView';
 
 const rightToLeft = 'right-to-left';
 const leftToTight = 'left-to-right';
@@ -155,7 +156,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 asset={asset}
                 jettons={filter}
                 info={info}
-                address={recipient!.address.address}
+                recipient={recipient!}
                 setAmount={onAmount}
                 width={width}
               />

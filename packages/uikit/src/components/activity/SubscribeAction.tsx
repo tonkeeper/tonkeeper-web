@@ -30,8 +30,8 @@ export const UnSubscribeActionDetails: FC<ActionData> = ({
   const { t } = useTranslation();
   const { unSubscribe } = action;
 
-  const { fiat, tonendpoint } = useAppContext();
-  const { data: stock } = useTonenpointStock(tonendpoint);
+  const { fiat } = useAppContext();
+  const { data: stock } = useTonenpointStock();
 
   if (!unSubscribe) {
     return <ErrorActivityNotification event={event} />;
@@ -60,8 +60,8 @@ export const SubscribeActionDetails: FC<ActionData> = ({
   const { t } = useTranslation();
   const { subscribe } = action;
 
-  const { fiat, tonendpoint } = useAppContext();
-  const { data: stock } = useTonenpointStock(tonendpoint);
+  const { fiat } = useAppContext();
+  const { data: stock } = useTonenpointStock();
 
   if (!subscribe) {
     return <ErrorActivityNotification event={event} />;

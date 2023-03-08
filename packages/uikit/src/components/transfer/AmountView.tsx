@@ -1,4 +1,8 @@
+import { useMutation } from '@tanstack/react-query';
+import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transferService';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApi';
+import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import {
   getJettonSymbol,
@@ -7,13 +11,20 @@ import {
   isNumeric,
   parseAndValidateInput,
 } from '@tonkeeper/core/dist/utils/send';
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
-import { Sentence } from '../fields/Sentence';
 import { ChevronLeftIcon } from '../Icon';
 import { Gap } from '../Layout';
 import {
@@ -21,16 +32,10 @@ import {
   NotificationCancelButton,
   NotificationTitleBlock,
 } from '../Notification';
-import { Body2, H3, Label2, Num2 } from '../Text';
+import { Body1, Body2, H3, Label2, Num2 } from '../Text';
 import { AssetSelect } from './AssetSelect';
-import { duration } from './common';
-
-export interface AmountData {
-  amount: number;
-  jetton: string;
-  max: boolean;
-  done: boolean;
-}
+import { duration, useFiatAmount } from './common';
+import { Sentence } from './Sentence';
 
 const Center = styled.div`
   text-align: center;
@@ -110,21 +115,45 @@ const SelectCenter = styled.div`
   top: 1rem;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2;
+  z-index: 3;
 `;
+
+const FiatBlock = styled(Body1)`
+  position: absolute;
+  bottom: 61px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+
+  padding: 8px 16px;
+
+  color: ${(props) => props.theme.textSecondary};
+  border: 1px solid ${(props) => props.theme.buttonTertiaryBackground};
+  border-radius: ${(props) => props.theme.cornerLarge};
+`;
+
+const useEstimateTransaction = (recipient: RecipientData) => {
+  const { tonApi } = useAppContext();
+  const wallet = useWalletContext();
+
+  return useMutation(async (amount: string) => {
+    return estimateTonTransfer(tonApi, wallet, recipient, amount);
+  });
+};
 
 export const AmountView: FC<{
   onClose: () => void;
   onBack: () => void;
   setAmount: (data: AmountData) => void;
-  address: string;
+  recipient: RecipientData;
   asset: string;
   jettons: JettonsBalances;
   info?: AccountRepr;
   data?: AmountData;
   width: number;
+  stock?: TonendpointStock;
 }> = ({
-  address,
+  recipient,
   onClose,
   onBack,
   setAmount,
@@ -136,8 +165,10 @@ export const AmountView: FC<{
 }) => {
   const format = useFormatCoinValue();
 
-  const [amount, setAmountValue] = useState(data ? String(data.amount) : '');
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
+  const [amount, setAmountValue] = useState(data ? data.amount : '');
+
+  const { mutateAsync, isLoading, reset } = useEstimateTransaction(recipient);
 
   const ref = useRef<HTMLInputElement | null>(null);
 
@@ -172,11 +203,19 @@ export const AmountView: FC<{
     return valid && isNumeric(amount);
   }, [valid, amount]);
 
-  const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setAmount({ amount: parseInt(amount), max, done: true, jetton });
-  };
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = useCallback(
+    async (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (isValid) {
+        reset();
+        const fee = await mutateAsync(amount);
+        console.log(fee);
+        setAmount({ amount, max, done: true, jetton, fee });
+      }
+    },
+    [setAmount, amount, max, jetton, isValid]
+  );
 
   const onMax = () => {
     setMax(true);
@@ -190,6 +229,8 @@ export const AmountView: FC<{
     }
   };
 
+  const fiatAmount = useFiatAmount(jettons, jetton, amount);
+
   return (
     <FullHeightBlock onSubmit={onSubmit}>
       <NotificationTitleBlock>
@@ -201,7 +242,7 @@ export const AmountView: FC<{
           <SubTitle>
             {t('send_screen_steps_done_to').replace(
               '%{name}',
-              toShortAddress(address)
+              toShortAddress(recipient.address.address)
             )}
           </SubTitle>
         </Center>
@@ -219,6 +260,7 @@ export const AmountView: FC<{
         </SelectCenter>
         <Sentence ref={ref} value={amount} setValue={onInput} />
         <Symbol>{suffix}</Symbol>
+        {fiatAmount && <FiatBlock>{fiatAmount}</FiatBlock>}
       </AmountBlock>
       <MaxRow>
         <MaxButton maxValue={max} onClick={onMax}>

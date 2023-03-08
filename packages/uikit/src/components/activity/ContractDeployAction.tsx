@@ -31,8 +31,8 @@ export const ContractDeployActionDetails: FC<ActionData> = ({
   const { t } = useTranslation();
   const { contractDeploy } = action;
 
-  const { fiat, tonendpoint } = useAppContext();
-  const { data: stock } = useTonenpointStock(tonendpoint);
+  const { fiat } = useAppContext();
+  const { data: stock } = useTonenpointStock();
 
   if (!contractDeploy) {
     return <ErrorActivityNotification event={event} />;

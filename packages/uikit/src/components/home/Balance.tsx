@@ -1,19 +1,19 @@
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApi';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
+import {
+  formatDecimals,
+  getJettonStockAmount,
+  getJettonStockPrice,
+  getTonCoinStockPrice,
+} from '@tonkeeper/core/dist/utils/balance';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import {
-  formatDecimals,
-  formatFiatCurrency,
-  getJettonStockAmount,
-  getJettonStockPrice,
-  getTonCoinStockPrice,
-} from '../../hooks/balance';
+import { formatFiatCurrency } from '../../hooks/balance';
 import { useUserJettonList } from '../../state/jetton';
 import { SkeletonText } from '../Skeleton';
 import { Label2, Num2 } from '../Text';

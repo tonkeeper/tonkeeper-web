@@ -14,6 +14,7 @@ import {
   TonendpointConfig,
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { useMemo } from 'react';
+import { useAppContext } from '../hooks/appContext';
 import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
 
 export const useTonendpoint = (
@@ -38,12 +39,11 @@ export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
   );
 };
 
-export const useTonenpointStock = (tonendpoint: Tonendpoint) => {
+export const useTonenpointStock = () => {
+  const { tonendpoint } = useAppContext();
   return useQuery<TonendpointStock, Error>(
     [QueryKey.tonkeeperApi, TonkeeperApiKey.stock],
-    async () => {
-      return getStock(tonendpoint);
-    }
+    () => getStock(tonendpoint)
   );
 };
 

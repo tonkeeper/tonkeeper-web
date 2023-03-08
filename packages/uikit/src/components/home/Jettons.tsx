@@ -5,19 +5,18 @@ import {
   JettonsBalances,
 } from '@tonkeeper/core/dist/tonApi';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
+import {
+  formatDecimals,
+  getJettonStockAmount,
+  getJettonStockPrice,
+  getTonCoinStockPrice,
+} from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
-import {
-  formatDecimals,
-  formatFiatCurrency,
-  getJettonStockAmount,
-  getJettonStockPrice,
-  getTonCoinStockPrice,
-  useFormatCoinValue,
-} from '../../hooks/balance';
+import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { ToncoinIcon } from '../Icon';

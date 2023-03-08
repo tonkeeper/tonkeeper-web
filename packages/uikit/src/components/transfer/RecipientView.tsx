@@ -1,8 +1,12 @@
-import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
+import { useQuery } from '@tanstack/react-query';
+import { Recipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { AccountApi, AccountRepr } from '@tonkeeper/core/dist/tonApi';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
+import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
+import { QueryKey } from '../../libs/queryKey';
 import { ButtonMock } from '../fields/BackButton';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
@@ -15,16 +19,6 @@ import {
 import { H3, Label1 } from '../Text';
 import { SuggestionList } from './SuggestionList';
 
-type Recipient = Suggestion | { address: string };
-
-export interface RecipientData {
-  address: Recipient;
-  comment: string;
-  done: boolean;
-
-  logo?: string;
-}
-
 const ButtonBlock = styled.div<{ width: number }>`
   position: fixed;
   bottom: 1rem;
@@ -36,6 +30,17 @@ const Label = styled(Label1)`
   margin-top: 12px;
   margin-bottom: -4px;
 `;
+
+const useToAccount = (isValid: boolean, account: string) => {
+  const { tonApi } = useAppContext();
+  return useQuery<AccountRepr, Error>(
+    [QueryKey.account, account],
+    () => {
+      return new AccountApi(tonApi).getAccountInfo({ account });
+    },
+    { enabled: isValid }
+  );
+};
 
 export const RecipientView: FC<{
   data?: RecipientData;
@@ -52,6 +57,22 @@ export const RecipientView: FC<{
       address: '',
     }
   );
+
+  const isValid = useMemo(() => {
+    try {
+      const result = Address.parse(recipient.address);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }, [recipient]);
+
+  const {
+    data: toAccount,
+    isFetching,
+    error,
+  } = useToAccount(isValid, recipient.address);
+
   const [comment, setComment] = useState(data?.comment ?? '');
 
   useEffect(() => {
@@ -67,20 +88,11 @@ export const RecipientView: FC<{
     return recipient.address;
   }, [recipient]);
 
-  const isValid = useMemo(() => {
-    try {
-      const result = Address.parse(recipient.address);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }, [recipient]);
-
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    if (isValid) {
-      setRecipient({ address: recipient, comment, done: true });
+    if (isValid && toAccount) {
+      setRecipient({ address: recipient, toAccount, comment, done: true });
     }
   };
 
@@ -118,6 +130,7 @@ export const RecipientView: FC<{
           primary
           type="submit"
           disabled={!isValid}
+          loading={isFetching}
         >
           {t('continue')}
         </Button>

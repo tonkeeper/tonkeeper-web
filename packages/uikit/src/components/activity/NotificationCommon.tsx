@@ -2,6 +2,10 @@ import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { AccountAddress, AccountEvent, Fee } from '@tonkeeper/core/dist/tonApi';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import {
+  formatDecimals,
+  getTonCoinStockPrice,
+} from '@tonkeeper/core/dist/utils/balance';
+import {
   toShortAddress,
   toShortValue,
 } from '@tonkeeper/core/dist/utils/common';
@@ -10,12 +14,7 @@ import React, { FC, PropsWithChildren, useMemo } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { useAppSdk } from '../../hooks/appSdk';
-import {
-  formatDecimals,
-  formatFiatCurrency,
-  getTonCoinStockPrice,
-  useFormatCoinValue,
-} from '../../hooks/balance';
+import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
 import { ColumnText } from '../Layout';

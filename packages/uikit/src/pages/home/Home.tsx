@@ -42,9 +42,9 @@ const HomeAssets: FC<{
 const Home = () => {
   const wallet = useWalletContext();
 
-  const { fiat, tonendpoint } = useAppContext();
+  const { fiat } = useAppContext();
 
-  const { data: stock } = useTonenpointStock(tonendpoint);
+  const { data: stock } = useTonenpointStock();
 
   const { data: info, error } = useWalletAccountInfo();
   const { data: jettons } = useWalletJettonList();

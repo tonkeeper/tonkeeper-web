@@ -1,15 +1,14 @@
+import {
+  formatDecimals,
+  getStockPrice,
+} from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import {
-  formatDecimals,
-  formatFiatCurrency,
-  getStockPrice,
-  useFormatCoinValue,
-} from '../../hooks/balance';
+import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { Body1, Label1 } from '../Text';
@@ -64,8 +63,8 @@ export const TonTransferActionNotification: FC<ActionData> = ({
   const { tonTransfer } = action;
 
   const format = useFormatCoinValue();
-  const { fiat, tonendpoint } = useAppContext();
-  const { data: stock } = useTonenpointStock(tonendpoint);
+  const { fiat } = useAppContext();
+  const { data: stock } = useTonenpointStock();
 
   const price = useBalanceValue(tonTransfer?.amount, stock, fiat);
 
@@ -119,8 +118,8 @@ export const JettonTransferActionNotification: FC<ActionData> = ({
   const { jettonTransfer } = action;
 
   const format = useFormatCoinValue();
-  const { fiat, tonendpoint } = useAppContext();
-  const { data: stock } = useTonenpointStock(tonendpoint);
+  const { fiat } = useAppContext();
+  const { data: stock } = useTonenpointStock();
 
   const total = useMemo(() => {
     if (!stock || !jettonTransfer) return undefined;
@@ -196,8 +195,8 @@ export const AuctionBidActionDetails: FC<ActionData> = ({
   const { t } = useTranslation();
   const { auctionBid } = action;
 
-  const { fiat, tonendpoint } = useAppContext();
-  const { data: stock } = useTonenpointStock(tonendpoint);
+  const { fiat } = useAppContext();
+  const { data: stock } = useTonenpointStock();
 
   const format = useFormatCoinValue();
   const price = useBalanceValue(auctionBid?.amount.value, stock, fiat);

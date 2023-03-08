@@ -185,8 +185,8 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({
   const wallet = useWalletContext();
   const { nftItemTransfer } = action;
 
-  const { fiat, tonendpoint } = useAppContext();
-  const { data: stock } = useTonenpointStock(tonendpoint);
+  const { fiat } = useAppContext();
+  const { data: stock } = useTonenpointStock();
   const { data } = useNftItemData(nftItemTransfer?.nft);
 
   if (!nftItemTransfer) {

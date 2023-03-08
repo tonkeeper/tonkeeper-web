@@ -2,18 +2,10 @@ import {
   FiatCurrencies,
   FiatCurrencySymbolsConfig,
 } from '@tonkeeper/core/dist/entries/fiat';
-import { JettonBalance } from '@tonkeeper/core/dist/tonApi';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { useCallback, useMemo } from 'react';
-import { Address } from 'ton-core';
 import { useAppContext } from './appContext';
-
-export const formatDecimals = (
-  amount: BigNumber.Value,
-  decimals: number = 9
-): number => {
-  return new BigNumber(amount).div(Math.pow(10, decimals)).toNumber();
-};
 
 export const useCoinFullBalance = (
   currency: FiatCurrencies,
@@ -77,53 +69,6 @@ export const useFormatCoinValue = () => {
     },
     [fiat, formats]
   );
-};
-
-export const getTonCoinStockPrice = (
-  rates: { [key: string]: string },
-  currency: FiatCurrencies
-): BigNumber => {
-  const btcPrice = rates['TON'];
-  const btcInFiat = rates[currency] ?? rates[FiatCurrencies.USD];
-
-  return new BigNumber(btcInFiat).div(new BigNumber(btcPrice));
-};
-
-export const getJettonStockPrice = (
-  jetton: JettonBalance,
-  rates: { [key: string]: string },
-  currency: FiatCurrencies
-) => {
-  if (jetton.verification !== 'whitelist') return null;
-  return getStockPrice(
-    Address.parse(jetton.jettonAddress).toString(),
-    rates,
-    currency
-  );
-};
-
-export const getJettonStockAmount = (
-  jetton: JettonBalance,
-  price: BigNumber | null
-) => {
-  if (!price) return null;
-  return formatDecimals(
-    price.multipliedBy(jetton.balance),
-    jetton.metadata?.decimals
-  );
-};
-
-export const getStockPrice = (
-  coin: string,
-  rates: { [key: string]: string },
-  currency: FiatCurrencies
-): BigNumber | null => {
-  const btcPrice = rates[coin];
-  const btcInFiat = rates[currency];
-
-  if (!btcPrice || !btcInFiat) return null;
-
-  return new BigNumber(btcInFiat).div(new BigNumber(btcPrice));
 };
 
 const toFiatCurrencyFormat = (
