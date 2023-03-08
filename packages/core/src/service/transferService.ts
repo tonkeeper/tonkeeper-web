@@ -1,19 +1,11 @@
 import {
   beginCell,
   Cell,
-  CellMessage,
-  CommonMessageInfo,
-  ExternalMessage,
+  external,
   fromNano,
   internal,
-  InternalMessage,
-  SendMode,
-  StateInit,
   toNano,
 } from 'ton-core';
-import { Maybe } from 'ton-core/dist/utils/maybe';
-import { sign } from 'ton-crypto';
-import { WalletV4SigningMessage } from 'ton/dist/wallets/signing/WalletV4SigningMessage';
 
 import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
@@ -39,78 +31,35 @@ export const getWalletContract = (wallet: WalletState) => {
   }
 };
 
-function createWalletTransfer(args: {
-  contract: WalletContractV3R1 | WalletContractV3R2 | WalletContractV4;
-  seqno: number;
-  secretKey: Buffer;
-  messages: InternalMessage[];
-  sendMode: SendMode;
-  timeout?: Maybe<number>;
-}) {
-  // Check number of messages
-  if (args.messages.length > 4) {
-    throw new Error('Maximum number of messages in a single transfer is 4');
-  }
-  let signingMessage = new WalletV4SigningMessage({
-    timeout: args.timeout,
-    walletId: args.contract.walletId,
-    seqno: args.seqno,
-    sendMode: args.sendMode,
-    messages: args.messages,
-  });
-  // Sign message
-  const cell = beginCell().storeWritable(signingMessage).endCell().hash();
-
-  console.log(args.secretKey.length);
-
-  let signature =
-    args.secretKey.length != 64
-      ? Buffer.from(new Uint8Array(64)) // For estimation
-      : sign(cell, args.secretKey);
-
-  // Body
-  const body = beginCell()
-    .storeBuffer(signature)
-    .storeWritable(signingMessage)
-    .endCell();
-
-  return body;
-}
-
-const external = async (
+export const externalMessage = (
   contract: WalletContractV3R1 | WalletContractV3R2 | WalletContractV4,
-  message: Cell
+  seqno: number,
+  body: Cell
 ) => {
-  const neededInit = true;
-
-  const ext = new ExternalMessage({
-    to: contract.address,
-    body: new CommonMessageInfo({
-      stateInit: neededInit
-        ? new StateInit({ code: contract.init.code, data: contract.init.data })
-        : null,
-      body: new CellMessage(message),
-    }),
-  });
-  let boc = beginCell().storeWritable(ext).endCell().toBoc();
-
-  return boc;
+  return beginCell()
+    .storeWritable(
+      external({
+        to: contract.address,
+        init: seqno === 0 ? contract.init : undefined,
+        body: body,
+      })
+    )
+    .endCell();
 };
 
-export const createTonTransfer = async (
+const createTonTransfer = async (
   tonApi: Configuration,
   walletState: WalletState,
   recipient: RecipientData,
   amount: string,
-  secretKey: Buffer = Buffer.alloc(0)
+  secretKey: Buffer = Buffer.alloc(64)
 ) => {
   const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
     account: walletState.active.rawAddress,
   });
 
   const contract = getWalletContract(walletState);
-  const message = createWalletTransfer({
-    contract,
+  const transfer = contract.createTransfer({
     seqno,
     secretKey,
     sendMode: 3,
@@ -119,18 +68,11 @@ export const createTonTransfer = async (
         to: recipient.toAccount.address.raw,
         bounce: recipient.toAccount.status !== 'active',
         value: toNano(fromNano(toNumberAmount(amount))),
-        init: contract.init,
-        body: recipient.comment
-          ? beginCell()
-              .storeUint(0, 32)
-              .storeStringTail(recipient.comment)
-              .endCell()
-          : undefined,
+        body: recipient.comment ?? undefined,
       }),
     ],
   });
-
-  return await external(contract, message);
+  return externalMessage(contract, seqno, transfer).toBoc();
 };
 
 export const estimateTonTransfer = async (
