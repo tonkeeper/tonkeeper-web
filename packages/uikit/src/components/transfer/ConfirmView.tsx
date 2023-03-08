@@ -1,5 +1,5 @@
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { JettonsBalances } from '@tonkeeper/core/dist/tonApi';
+import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import { getJettonSymbol, TONAsset } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useMemo } from 'react';

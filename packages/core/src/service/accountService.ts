@@ -2,7 +2,7 @@ import { AccountState, defaultAccountState } from '../entries/account';
 import { AuthState } from '../entries/password';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
-import { Configuration } from '../tonApi';
+import { Configuration } from '../tonApiV1';
 import { encrypt } from './cryptoService';
 import {
   deleteWalletMnemonic,

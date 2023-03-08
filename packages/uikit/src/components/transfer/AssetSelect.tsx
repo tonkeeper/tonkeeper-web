@@ -1,4 +1,4 @@
-import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApi';
+import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { getJettonSymbol, TONAsset } from '@tonkeeper/core/dist/utils/send';
 import React, { FC } from 'react';
 import styled from 'styled-components';

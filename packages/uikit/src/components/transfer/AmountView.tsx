@@ -5,7 +5,7 @@ import {
   RecipientData,
 } from '@tonkeeper/core/dist/entries/send';
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
-import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApi';
+import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import {

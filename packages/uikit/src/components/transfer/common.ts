@@ -1,4 +1,4 @@
-import { JettonsBalances } from '@tonkeeper/core/dist/tonApi';
+import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { getFiatAmountValue } from '@tonkeeper/core/dist/utils/send';
 import { useMemo } from 'react';
 import { useAppContext } from '../../hooks/appContext';

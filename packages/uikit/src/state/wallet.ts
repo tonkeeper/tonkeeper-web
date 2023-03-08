@@ -9,6 +9,7 @@ import {
   getWalletState,
   updateWalletProperty,
 } from '@tonkeeper/core/dist/service/walletService';
+import { getWalletActiveAddresses } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
 import {
   AccountApi,
   AccountRepr,
@@ -19,8 +20,7 @@ import {
   NftItemRepr,
   NftItemsRepr,
   WalletApi,
-} from '@tonkeeper/core/dist/tonApi';
-import { getWalletActiveAddresses } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
+} from '@tonkeeper/core/dist/tonApiV1';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';

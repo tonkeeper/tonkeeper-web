@@ -1,4 +1,4 @@
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApi';
+import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useCallback, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { useFBAnalyticsEvent } from '../../hooks/analytics';

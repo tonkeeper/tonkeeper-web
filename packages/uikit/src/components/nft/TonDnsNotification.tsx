@@ -1,4 +1,4 @@
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApi/models';
+import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1/models';
 import React, { FC, useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';

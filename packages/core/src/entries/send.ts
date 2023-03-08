@@ -1,4 +1,4 @@
-import { AccountRepr, Fee } from '../tonApi';
+import { AccountRepr, Fee } from '../tonApiV1';
 import { Suggestion } from './suggestion';
 
 export type Recipient = Suggestion | { address: string };

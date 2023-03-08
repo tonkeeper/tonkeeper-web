@@ -1,5 +1,9 @@
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { AccountAddress, AccountEvent, Fee } from '@tonkeeper/core/dist/tonApi';
+import {
+  AccountAddress,
+  AccountEvent,
+  Fee,
+} from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import {
   formatDecimals,

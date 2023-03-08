@@ -1,6 +1,6 @@
 import { Suggestion } from '../entries/suggestion';
 import { WalletState } from '../entries/wallet';
-import { Configuration, EventApi } from '../tonApi';
+import { Configuration, EventApi } from '../tonApiV1';
 
 export const getSuggestionsList = async (
   tonApi: Configuration,

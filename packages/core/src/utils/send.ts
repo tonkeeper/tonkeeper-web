@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { FiatCurrencies } from '../entries/fiat';
-import { AccountRepr, JettonsBalances } from '../tonApi';
+import { AccountRepr, JettonsBalances } from '../tonApiV1';
 import { TonendpointStock } from '../tonkeeperApi/stock';
 import { getJettonStockPrice, getTonCoinStockPrice } from './balance';
 

@@ -3,12 +3,12 @@ import { WalletState } from '../entries/wallet';
 import {
   AccountApi,
   AccountRepr,
+  Configuration,
   JettonApi,
   JettonBalance,
   JettonsBalances,
   WalletApi,
-} from '../tonApi';
-import { Configuration } from '../tonApi/runtime';
+} from '../tonApiV1';
 
 export const getWalletActiveAddresses = async (
   tonApi: Configuration,

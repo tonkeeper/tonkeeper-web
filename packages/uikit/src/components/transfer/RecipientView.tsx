@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Recipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { AccountApi, AccountRepr } from '@tonkeeper/core/dist/tonApi';
+import { AccountApi, AccountRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';

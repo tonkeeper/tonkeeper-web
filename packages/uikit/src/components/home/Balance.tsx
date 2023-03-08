@@ -1,5 +1,5 @@
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApi';
+import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import {
   formatDecimals,

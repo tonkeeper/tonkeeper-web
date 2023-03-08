@@ -11,7 +11,7 @@ import {
   getAccountState,
 } from '@tonkeeper/core/dist/service/accountService';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { Configuration } from '@tonkeeper/core/dist/tonApi';
+import { Configuration } from '@tonkeeper/core/dist/tonApiV1';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { mnemonicValidate } from 'ton-crypto';

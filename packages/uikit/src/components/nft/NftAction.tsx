@@ -1,4 +1,4 @@
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApi';
+import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';

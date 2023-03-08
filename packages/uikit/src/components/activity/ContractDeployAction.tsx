@@ -1,4 +1,4 @@
-import { Action, NftItemRepr } from '@tonkeeper/core/dist/tonApi';
+import { Action, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import {

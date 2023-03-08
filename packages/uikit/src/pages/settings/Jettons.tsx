@@ -1,4 +1,4 @@
-import { JettonBalance } from '@tonkeeper/core/dist/tonApi';
+import { JettonBalance } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useCallback, useMemo } from 'react';
 import {
   DragDropContext,

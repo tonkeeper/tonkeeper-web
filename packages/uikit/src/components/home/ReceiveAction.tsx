@@ -1,4 +1,4 @@
-import { JettonInfo } from '@tonkeeper/core/dist/tonApi';
+import { JettonInfo } from '@tonkeeper/core/dist/tonApiV1';
 import { formatTransferUrl } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useState } from 'react';
 import QRCode from 'react-qr-code';

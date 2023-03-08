@@ -1,4 +1,4 @@
-import { AccountEvent, Action } from '@tonkeeper/core/dist/tonApi';
+import { AccountEvent, Action } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useCallback } from 'react';
 import { Notification } from '../Notification';
 import {

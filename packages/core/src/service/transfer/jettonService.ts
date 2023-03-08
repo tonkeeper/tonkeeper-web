@@ -9,7 +9,7 @@ import {
 } from 'ton-core';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
-import { JettonBalance } from '../../tonApi';
+import { JettonBalance } from '../../tonApiV1';
 import { DefaultDecimals, toNumberAmount } from '../../utils/send';
 import { externalMessage, walletContract } from './common';
 

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { NFTApi, NftItemsRepr } from '@tonkeeper/core/dist/tonApi';
+import { NFTApi, NftItemsRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { QueryKey } from '../libs/queryKey';
 

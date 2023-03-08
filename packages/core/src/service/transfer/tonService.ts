@@ -3,7 +3,7 @@ import { mnemonicToPrivateKey } from 'ton-crypto';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration, SendApi, WalletApi } from '../../tonApi';
+import { Configuration, SendApi, WalletApi } from '../../tonApiV1';
 import { toNumberAmount } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import { externalMessage, walletContract } from './common';

@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { EventApi } from '@tonkeeper/core/dist/tonApi';
+import { EventApi } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useMemo } from 'react';
 import styled from 'styled-components';
 import { ActivityGroupRaw } from '../../components/activity/ActivityGroup';

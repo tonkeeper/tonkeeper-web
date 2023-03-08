@@ -1,4 +1,4 @@
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApi';
+import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { VerificationIcon } from '../Icon';

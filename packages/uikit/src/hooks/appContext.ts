@@ -8,7 +8,7 @@ import {
   defaultAuthState,
 } from '@tonkeeper/core/dist/entries/password';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { Configuration } from '@tonkeeper/core/dist/tonApi';
+import { Configuration } from '@tonkeeper/core/dist/tonApiV1';
 import {
   defaultTonendpointConfig,
   Tonendpoint,

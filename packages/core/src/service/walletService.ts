@@ -8,7 +8,7 @@ import { KeyPair, mnemonicToPrivateKey } from 'ton-crypto';
 import { WalletAddress, WalletState, WalletVersion } from '../entries/wallet';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
-import { Configuration, WalletApi } from '../tonApi';
+import { Configuration, WalletApi } from '../tonApiV1';
 import {
   createWalletBackup,
   deleteWalletBackup,

@@ -3,7 +3,7 @@ import {
   AccountEvent,
   AccountEvents200Response,
   Action,
-} from '@tonkeeper/core/dist/tonApi';
+} from '@tonkeeper/core/dist/tonApiV1';
 
 export const formatActivityDate = (
   language: string,

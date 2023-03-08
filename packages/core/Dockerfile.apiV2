@@ -1,0 +1,3 @@
+FROM openapitools/openapi-generator-cli
+
+CMD ["generate", "-i", "https://raw.githubusercontent.com/tonkeeper/opentonapi/master/api/openapi.yml", "-g", "typescript-fetch", "-o", "/local/src/tonApiV2", "-p", "supportsES6=true,withInterfaces=true"]

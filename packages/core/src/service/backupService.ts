@@ -4,7 +4,7 @@ import { Language } from '../entries/language';
 import { Network } from '../entries/network';
 import { WalletProxy } from '../entries/proxy';
 import { WalletState, WalletVersion, WalletVoucher } from '../entries/wallet';
-import { BackupApi, Configuration } from '../tonApi';
+import { BackupApi, Configuration } from '../tonApiV1';
 import { sha256 } from './cryptoService';
 import { createExpireTimestamp } from './voucherService';
 

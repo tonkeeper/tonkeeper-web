@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
+import { getActiveWalletJetton } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
 import {
   AccountEvents,
   JettonApi,
   JettonBalance,
   JettonInfo,
   JettonsBalances,
-} from '@tonkeeper/core/dist/tonApi';
-import { getActiveWalletJetton } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
+} from '@tonkeeper/core/dist/tonApiV1';
 import { useMemo } from 'react';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useStorage } from '../hooks/storage';

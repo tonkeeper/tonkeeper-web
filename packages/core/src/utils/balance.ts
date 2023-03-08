@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { Address } from 'ton-core';
 import { FiatCurrencies } from '../entries/fiat';
-import { JettonBalance } from '../tonApi';
+import { JettonBalance } from '../tonApiV1';
 
 export const formatDecimals = (
   amount: BigNumber.Value,

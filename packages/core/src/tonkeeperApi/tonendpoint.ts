@@ -1,5 +1,5 @@
 import { Network } from '../entries/network';
-import { FetchAPI } from '../tonApi';
+import { FetchAPI } from '../tonApiV1';
 import { TonendpointStock } from './stock';
 
 interface BootParams {

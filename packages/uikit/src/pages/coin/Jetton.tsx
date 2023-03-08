@@ -3,7 +3,7 @@ import {
   JettonApi,
   JettonBalance,
   JettonInfo,
-} from '@tonkeeper/core/dist/tonApi';
+} from '@tonkeeper/core/dist/tonApiV1';
 import {
   getJettonStockAmount,
   getJettonStockPrice,

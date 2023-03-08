@@ -3,7 +3,7 @@ import {
   AccountRepr,
   JettonBalance,
   JettonsBalances,
-} from '@tonkeeper/core/dist/tonApi';
+} from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import {
   formatDecimals,

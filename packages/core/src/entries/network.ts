@@ -1,4 +1,4 @@
-import { Configuration } from '../tonApi';
+import { Configuration } from '../tonApiV1';
 import { TonendpointConfig } from '../tonkeeperApi/tonendpoint';
 
 export enum Network {

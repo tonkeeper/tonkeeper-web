@@ -5,9 +5,10 @@
   "description": "Core features and state for tonkeeper web wallet",
   "main": "index.js",
   "scripts": {
-    "build": "rm -fr dist && yarn generate:sdk && tsc",
+    "build": "rm -fr dist && yarn generate:sdkV1 && yarn generate:sdkV2 && tsc",
     "start": "tsc -w",
-    "generate:sdk": "rm -fr src/tonApi && docker build . -t tonapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdk",
+    "generate:sdkV1": "rm -fr src/tonApiV1 && docker build -f Dockerfile.apiV1 . -t tonapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdk",
+    "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f Dockerfile.apiV2 . -t tonapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdk",
     "build:pkg": "yarn build"
   },
   "license": "ISC",
