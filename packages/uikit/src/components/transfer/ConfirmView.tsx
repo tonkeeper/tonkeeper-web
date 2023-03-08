@@ -1,12 +1,12 @@
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApi';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
-import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
-import React, { FC } from 'react';
+import { getJettonSymbol, TONAsset } from '@tonkeeper/core/dist/utils/send';
+import React, { FC, useMemo } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
+import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
-import { useTonenpointStock } from '../../state/tonendpoint';
 import { TransferComment } from '../activity/ActivityActionDetails';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
@@ -67,9 +67,6 @@ export const ConfirmView: FC<{
   width: number;
 }> = ({ recipient, onBack, onClose, width, amount, jettons }) => {
   const { t } = useTranslation();
-
-  const { data: stock } = useTonenpointStock();
-
   const sdk = useAppSdk();
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -83,6 +80,10 @@ export const ConfirmView: FC<{
     amount.jetton,
     jettons
   )}`;
+
+  const format = useFormatCoinValue();
+  const feeAmount = useMemo(() => format(amount.fee.total), [format, amount]);
+  const fiatFeeAmount = useFiatAmount(jettons, TONAsset, feeAmount);
 
   return (
     <FullHeightBlock onSubmit={onSubmit}>
@@ -114,24 +115,34 @@ export const ConfirmView: FC<{
             <Label1>{toShortAddress(recipient.address.address)}</Label1>
           </ListItemPayload>
         </ListItem>
-        <ListItem>
+        <ListItem onClick={() => sdk.copyToClipboard(coinAmount)}>
           <ListItemPayload>
             <Label>{t('txActions_amount')}</Label>
             {fiatAmount ? (
               <ColumnText
                 right
                 text={coinAmount}
-                secondary={`≈ ${fiatAmount}`}
+                secondary={<>≈&thinsp;{fiatAmount}</>}
               />
             ) : (
               <Label1>{coinAmount}</Label1>
             )}
           </ListItemPayload>
         </ListItem>
-        <ListItem>
+        <ListItem
+          onClick={() => sdk.copyToClipboard(`${feeAmount} ${TONAsset}`)}
+        >
           <ListItemPayload>
             <Label>{t('txActions_fee')}</Label>
-            <ColumnText right text={` TON`} secondary={`≈ `} />
+            <ColumnText
+              right
+              text={
+                <>
+                  ≈&thinsp;{feeAmount} {TONAsset}
+                </>
+              }
+              secondary={<>≈&thinsp;{fiatFeeAmount}</>}
+            />
           </ListItemPayload>
         </ListItem>
         <TransferComment comment={recipient.comment} />

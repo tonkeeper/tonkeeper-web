@@ -10,6 +10,7 @@ import {
   getRemaining,
   isNumeric,
   parseAndValidateInput,
+  TONAsset,
 } from '@tonkeeper/core/dist/utils/send';
 import React, {
   FC,
@@ -132,12 +133,16 @@ const FiatBlock = styled(Body1)`
   border-radius: ${(props) => props.theme.cornerLarge};
 `;
 
-const useEstimateTransaction = (recipient: RecipientData) => {
+const useEstimateTransaction = (recipient: RecipientData, jetton: string) => {
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
 
   return useMutation(async (amount: string) => {
-    return estimateTonTransfer(tonApi, wallet, recipient, amount);
+    if (jetton === TONAsset) {
+      return estimateTonTransfer(tonApi, wallet, recipient, amount);
+    } else {
+      throw new Error('Undone');
+    }
   });
 };
 
@@ -168,7 +173,10 @@ export const AmountView: FC<{
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
   const [amount, setAmountValue] = useState(data ? data.amount : '');
 
-  const { mutateAsync, isLoading, reset } = useEstimateTransaction(recipient);
+  const { mutateAsync, isLoading, reset } = useEstimateTransaction(
+    recipient,
+    jetton
+  );
 
   const ref = useRef<HTMLInputElement | null>(null);
 
@@ -283,6 +291,7 @@ export const AmountView: FC<{
           primary
           type="submit"
           disabled={!isValid}
+          loading={isLoading}
         >
           {t('continue')}
         </Button>
