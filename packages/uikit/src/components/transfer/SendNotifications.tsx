@@ -87,6 +87,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 onClose={onClose}
                 setRecipient={onRecipient}
                 width={width}
+                allowComment={asset === TONAsset}
               />
             )}
             {state === 'amount' && (

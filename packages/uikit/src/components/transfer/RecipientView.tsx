@@ -39,10 +39,11 @@ const useToAccount = (isValid: boolean, account: string) => {
 
 export const RecipientView: FC<{
   data?: RecipientData;
+  allowComment?: boolean;
   onClose: () => void;
   setRecipient: (options: RecipientData) => void;
   width: number;
-}> = ({ data, onClose, setRecipient, width }) => {
+}> = ({ data, onClose, setRecipient, width, allowComment = true }) => {
   const { t } = useTranslation();
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -106,11 +107,13 @@ export const RecipientView: FC<{
         label={t('transaction_recipient_address')}
         isValid={isValid || recipient.address.length == 0}
       />
-      <Input
-        value={comment}
-        onChange={setComment}
-        label={t('send_comment_label')}
-      />
+      {allowComment && (
+        <Input
+          value={comment}
+          onChange={setComment}
+          label={t('send_comment_label')}
+        />
+      )}
 
       <Label>{t('send_screen_steps_address_suggests_label')}</Label>
 

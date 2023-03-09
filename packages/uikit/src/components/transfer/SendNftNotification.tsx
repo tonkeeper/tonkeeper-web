@@ -1,12 +1,32 @@
+import { useQuery } from '@tanstack/react-query';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { estimateNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { QueryKey } from '../../libs/queryKey';
 import { useWalletAccountInfo } from '../../state/wallet';
 import { Notification } from '../Notification';
 import { childFactoryCreator, duration, Wrapper } from './common';
 import { ConfirmNftView } from './ConfirmNftView';
 import { RecipientView } from './RecipientView';
+
+const useNftTransferEstimation = (
+  nftItem: NftItemRepr,
+  data?: RecipientData
+) => {
+  const { tonApi } = useAppContext();
+  const wallet = useWalletContext();
+
+  return useQuery(
+    [QueryKey.estimate, data?.toAccount.address],
+    () => {
+      return estimateNftTransfer(tonApi, wallet, data!, nftItem);
+    },
+    { enabled: data != null }
+  );
+};
 
 const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
   nftItem,
@@ -22,6 +42,8 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
   const [recipient, setRecipient] = useState<RecipientData | undefined>(
     undefined
   );
+
+  const { data: fee } = useNftTransferEstimation(nftItem, recipient);
 
   const onRecipient = (data: RecipientData) => {
     setRight(true);
@@ -64,6 +86,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
                 onClose={onClose}
                 setRecipient={onRecipient}
                 width={width}
+                allowComment={false}
               />
             )}
             {state === 'confirm' && (
@@ -71,6 +94,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
                 onClose={onClose}
                 onBack={backToRecipient}
                 recipient={recipient!}
+                fee={fee}
                 nftItem={nftItem}
                 width={width}
               />

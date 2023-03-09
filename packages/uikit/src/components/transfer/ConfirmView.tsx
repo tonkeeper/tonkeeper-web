@@ -5,7 +5,6 @@ import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import { getJettonSymbol, TONAsset } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useMemo, useState } from 'react';
-import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
@@ -27,34 +26,9 @@ import {
   NotificationCancelButton,
   NotificationTitleBlock,
 } from '../Notification';
-import { Body1, H3, Label1, Label2 } from '../Text';
+import { Label1, Label2 } from '../Text';
 import { ButtonBlock, Label, ResultButton, useFiatAmount } from './common';
-
-const Info = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
-
-const Image = styled.img`
-  width: 96px;
-  height: 96px;
-  border-radius: ${(props) => props.theme.cornerFull};
-`;
-
-const ImageMock = styled.div`
-  width: 96px;
-  height: 96px;
-  border-radius: ${(props) => props.theme.cornerFull};
-  background: ${(props) => props.theme.backgroundContent};
-`;
-
-const SendingTitle = styled(Body1)`
-  user-select: none;
-  color: ${(props) => props.theme.textSecondary};
-  margin: 20px 0 4px;
-`;
+import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 
 const useSendTransaction = (
   recipient: RecipientData,
@@ -138,16 +112,16 @@ export const ConfirmView: FC<{
       </NotificationTitleBlock>
       <Info>
         {recipient.toAccount.icon ? (
-          <Image src={recipient.toAccount.icon} />
+          <Image full src={recipient.toAccount.icon} />
         ) : (
-          <ImageMock />
+          <ImageMock full />
         )}
         <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
-        <H3>
+        <Title>
           {recipient.toAccount.name
             ? recipient.toAccount.name
             : t('txActions_signRaw_types_tonTransfer')}
-        </H3>
+        </Title>
       </Info>
       <ListBlock margin={false} fullWidth>
         <ListItem
@@ -188,7 +162,9 @@ export const ConfirmView: FC<{
             />
           </ListItemPayload>
         </ListItem>
-        <TransferComment comment={recipient.comment} />
+        <TransferComment
+          comment={amount.jetton === TONAsset ? recipient.comment : undefined}
+        />
       </ListBlock>
       <Gap />
 
