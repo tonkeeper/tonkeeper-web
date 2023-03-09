@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import {
   AuthState,
   defaultAuthState,
@@ -8,6 +9,7 @@ import {
   addWalletVoucher,
   deleteWalletVoucher,
 } from '@tonkeeper/core/dist/service/walletService';
+import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
@@ -59,14 +61,19 @@ export const useMutateVoucher = () => {
     if (wallet.voucher) {
       await deleteWalletVoucher(tonApi, storage, wallet);
     } else {
-      const auth = await storage.get<AuthState>(AppKey.password);
-      if (!auth) {
-        throw new Error('Auth not defined');
-      }
-      const password = await getPasswordByNotification(sdk, auth);
+      const password = await getWalletPassword(sdk, storage);
       await addWalletVoucher(tonApi, storage, wallet, password);
     }
 
     await client.invalidateQueries();
   });
+};
+
+export const getWalletPassword = async (sdk: IAppSdk, storage: IStorage) => {
+  const auth = await storage.get<AuthState>(AppKey.password);
+  if (!auth) {
+    throw new Error('Auth not defined');
+  }
+  const password = await getPasswordByNotification(sdk, auth);
+  return password;
 };

@@ -4,6 +4,7 @@ import {
   AmountValue,
   RecipientData,
 } from '@tonkeeper/core/dist/entries/send';
+import { getJettonDate } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
@@ -137,7 +138,11 @@ const FiatBlock = styled(Body1)`
   border-radius: ${(props) => props.theme.cornerLarge};
 `;
 
-const useEstimateTransaction = (recipient: RecipientData, jetton: string) => {
+const useEstimateTransaction = (
+  recipient: RecipientData,
+  jetton: string,
+  jettons: JettonsBalances
+) => {
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
 
@@ -145,6 +150,10 @@ const useEstimateTransaction = (recipient: RecipientData, jetton: string) => {
     if (jetton === TONAsset) {
       return estimateTonTransfer(tonApi, wallet, recipient, options);
     } else {
+      const [jettonInfo] = jettons.balances.filter(
+        (item) => item.jettonAddress === jetton
+      );
+      await getJettonDate(tonApi, jettonInfo, recipient);
       throw new Error('Undone');
     }
   });
@@ -179,7 +188,8 @@ export const AmountView: FC<{
 
   const { mutateAsync, isLoading, reset } = useEstimateTransaction(
     recipient,
-    jetton
+    jetton,
+    jettons
   );
 
   const ref = useRef<HTMLInputElement | null>(null);

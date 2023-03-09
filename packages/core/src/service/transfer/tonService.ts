@@ -1,4 +1,4 @@
-import { fromNano, internal, SendMode, toNano } from 'ton-core';
+import { internal, SendMode, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
@@ -26,7 +26,7 @@ const createTonTransfer = (
       internal({
         to: recipient.toAccount.address.raw,
         bounce: recipient.toAccount.status !== 'active',
-        value: toNano(fromNano(toNumberAmount(data.amount))),
+        value: toNano(String(toNumberAmount(data.amount))),
         body: recipient.comment ?? undefined,
       }),
     ],

@@ -9,7 +9,11 @@ import {
 } from 'ton-core';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
-import { JettonBalance } from '../../tonApiV1';
+import { Configuration, JettonBalance } from '../../tonApiV1';
+import {
+  BlockchainApi,
+  Configuration as ConfigurationV2,
+} from '../../tonApiV2';
 import { DefaultDecimals, toNumberAmount } from '../../utils/send';
 import { externalMessage, walletContract } from './common';
 
@@ -34,6 +38,35 @@ const jettonTransferBody = (params: {
     .storeBit(true) // forward_payload in this slice, not separate cell
     .storeBuilder(params.forwardPayload)
     .endCell();
+};
+
+export const getJettonDate = async (
+  tonApi: Configuration,
+  jettonInfo: JettonBalance,
+  recipient: RecipientData
+) => {
+  const tonApiV2 = new ConfigurationV2({
+    ...(tonApi as any).configuration,
+  });
+  const result = await new BlockchainApi(tonApiV2).execGetMethod(
+    {
+      accountId: jettonInfo.jettonAddress,
+      methodName: 'get_jetton_data', //'get_wallet_address',
+      // body: [
+      //   [
+      //     'tvm.Slice',
+      //     beginCell()
+      //       .storeAddress(Address.parse(recipient.toAccount.address.raw))
+      //       .endCell()
+      //       .toBoc()
+      //       .toString('base64'),
+      //   ],
+      // ],
+    },
+    { method: 'GET' }
+  );
+
+  console.log(result);
 };
 
 const createJettonTransfer = (
