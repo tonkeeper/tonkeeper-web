@@ -7,12 +7,14 @@ import { getJettonStockPrice, getTonCoinStockPrice } from './balance';
 export const TONAsset = 'TON';
 export const DefaultDecimals = 9;
 
+export function toStringAmount(str: string): string {
+  return str.replaceAll(',', '');
+}
 export function toNumberAmount(str: string): number {
-  str = str.replaceAll(',', '');
-  return parseFloat(str);
+  return parseFloat(toStringAmount(str));
 }
 export function isNumeric(str: string) {
-  str = str.replaceAll(',', '');
+  str = toStringAmount(str);
   return !isNaN(Number(str)) && !isNaN(parseFloat(str));
 }
 

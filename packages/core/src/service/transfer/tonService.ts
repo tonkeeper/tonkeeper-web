@@ -4,7 +4,7 @@ import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
 import { Configuration, SendApi, WalletApi } from '../../tonApiV1';
-import { toNumberAmount } from '../../utils/send';
+import { toStringAmount } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import { externalMessage, walletContract } from './common';
 
@@ -26,7 +26,7 @@ const createTonTransfer = (
       internal({
         to: recipient.toAccount.address.raw,
         bounce: recipient.toAccount.status !== 'active',
-        value: toNano(String(toNumberAmount(data.amount))),
+        value: toNano(toStringAmount(data.amount)),
         body: recipient.comment ?? undefined,
       }),
     ],
