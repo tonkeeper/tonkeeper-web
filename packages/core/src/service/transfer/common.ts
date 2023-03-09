@@ -36,3 +36,13 @@ export const externalMessage = (
     )
     .endCell();
 };
+
+export const forwardPayloadComment = (comment: string) => {
+  let result = beginCell();
+
+  if (comment) {
+    result = result.storeUint(0, 32).storeStringTail(comment);
+  }
+
+  return result;
+};

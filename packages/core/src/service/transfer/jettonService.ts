@@ -15,7 +15,11 @@ import {
   Configuration as ConfigurationV2,
 } from '../../tonApiV2';
 import { DefaultDecimals, toNumberAmount } from '../../utils/send';
-import { externalMessage, walletContract } from './common';
+import {
+  externalMessage,
+  forwardPayloadComment,
+  walletContract,
+} from './common';
 
 const jettonTransferAmount = toNano('0.64');
 const jettonTransferForwardAmount = toNano('0.0001');
@@ -68,9 +72,7 @@ const createJettonTransfer = (
   jettonInfo: JettonBalance,
   secretKey: Buffer = Buffer.alloc(64)
 ) => {
-  const payloadCell = beginCell()
-    .storeUint(0, 32)
-    .storeStringTail(recipient.comment);
+  const payloadCell = forwardPayloadComment(recipient.comment);
 
   const jettonAmount = data.max
     ? BigInt(jettonInfo.balance)
@@ -101,7 +103,7 @@ const createJettonTransfer = (
     messages: [
       internal({
         to: jettonWalletAddress,
-        bounce: recipient.toAccount.status !== 'active',
+        bounce: true,
         value: jettonTransferAmount,
         body: body,
       }),
