@@ -28,13 +28,7 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body1, H3, Label1, Label2 } from '../Text';
-import { useFiatAmount } from './common';
-
-const ButtonBlock = styled.div<{ width: number }>`
-  position: fixed;
-  bottom: 1rem;
-  width: ${(props) => props.width}px;
-`;
+import { ButtonBlock, Label, ResultButton, useFiatAmount } from './common';
 
 const Info = styled.div`
   display: flex;
@@ -60,20 +54,6 @@ const SendingTitle = styled(Body1)`
   user-select: none;
   color: ${(props) => props.theme.textSecondary};
   margin: 20px 0 4px;
-`;
-
-const Label = styled(Body1)`
-  user-select: none;
-  color: ${(props) => props.theme.textSecondary};
-`;
-
-const ResultButton = styled.div<{ done?: boolean }>`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: center;
-  color: ${(props) =>
-    props.done ? props.theme.accentGreen : props.theme.accentRed};
 `;
 
 const useSendTransaction = (

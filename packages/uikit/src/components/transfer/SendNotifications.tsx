@@ -2,7 +2,6 @@ import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { TONAsset } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
@@ -10,67 +9,9 @@ import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
 import { Notification } from '../Notification';
 import { AmountView } from './AmountView';
-import { duration, timingFunction } from './common';
+import { childFactoryCreator, duration, Wrapper } from './common';
 import { ConfirmView } from './ConfirmView';
 import { RecipientView } from './RecipientView';
-
-const rightToLeft = 'right-to-left';
-const leftToTight = 'left-to-right';
-
-const Wrapper = styled.div`
-  position: relative;
-  overflow: hidden;
-  margin-bottom: -1rem;
-
-  .${rightToLeft}-exit, .${leftToTight}-exit {
-    position: absolute;
-    inset: 0;
-    transform: translateX(0);
-    opacity: 1;
-  }
-
-  .${rightToLeft}-enter {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  .${rightToLeft}-enter-active {
-    transform: translateX(0);
-    opacity: 1;
-    transition: transform ${duration}ms ${timingFunction},
-      opacity ${duration / 2}ms ${timingFunction};
-  }
-
-  .${rightToLeft}-exit-active {
-    transform: translateX(-100%);
-    opacity: 0;
-    transition: transform ${duration}ms ${timingFunction},
-      opacity ${duration / 2}ms ${timingFunction};
-  }
-
-  .${leftToTight}-enter {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  .${leftToTight}-enter-active {
-    transform: translateX(0);
-    opacity: 1;
-    transition: transform ${duration}ms ${timingFunction},
-      opacity ${duration / 2}ms ${timingFunction};
-  }
-
-  .${leftToTight}-exit-active {
-    transform: translateX(100%);
-    opacity: 0;
-    transition: transform ${duration}ms ${timingFunction},
-      opacity ${duration / 2}ms ${timingFunction};
-  }
-`;
-
-const childFactoryCreator = (right: boolean) => (child: React.ReactElement) =>
-  React.cloneElement(child, {
-    classNames: right ? rightToLeft : leftToTight,
-    timeout: duration,
-  });
 
 const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,

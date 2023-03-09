@@ -6,7 +6,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Action, ActionsRow } from '../home/Actions';
 import { GlobalIcon, SendIcon } from '../home/HomeIcons';
-import { NftTransferNotification } from './NftTransferNotification';
+import { SendNftAction } from '../transfer/SendNftNotification';
 import { TonDnsUnlinkNotification } from './TonDnsNotification';
 
 const getMarketplaceUrl = (nftItem: NftItemRepr) => {
@@ -35,9 +35,9 @@ const ActionTransfer: FC<{
         title={t('Transfer_token')}
         action={() => setOpen(true)}
       />
-      <NftTransferNotification
+      <SendNftAction
         nftItem={open ? nftItem : undefined}
-        handleClose={() => setOpen(false)}
+        onClose={() => setOpen(false)}
       />
     </>
   );

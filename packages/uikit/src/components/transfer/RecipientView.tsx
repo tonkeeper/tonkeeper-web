@@ -17,13 +17,8 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { H3, Label1 } from '../Text';
+import { ButtonBlock } from './common';
 import { SuggestionList } from './SuggestionList';
-
-const ButtonBlock = styled.div<{ width: number }>`
-  position: fixed;
-  bottom: 1rem;
-  width: ${(props) => props.width}px;
-`;
 
 const Label = styled(Label1)`
   width: 100%;

@@ -40,7 +40,7 @@ import {
 } from '../Notification';
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
 import { AssetSelect } from './AssetSelect';
-import { duration, useFiatAmount } from './common';
+import { ButtonBlock, duration, useFiatAmount } from './common';
 import { Sentence } from './Sentence';
 
 const Center = styled.div`
@@ -54,11 +54,6 @@ const SubTitle = styled(Body2)`
 
 const Title = styled(H3)`
   margin: -3px 0 0;
-`;
-const ButtonBlock = styled.div<{ width: number }>`
-  position: fixed;
-  bottom: 1rem;
-  width: ${(props) => props.width}px;
 `;
 
 const AmountBlock = styled.label`

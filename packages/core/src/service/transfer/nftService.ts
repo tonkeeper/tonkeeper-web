@@ -11,7 +11,7 @@ import { mnemonicToPrivateKey } from 'ton-crypto';
 import { RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration, SendApi, WalletApi } from '../../tonApiV1';
+import { Configuration, NftItemRepr, SendApi, WalletApi } from '../../tonApiV1';
 import { getWalletMnemonic } from '../menmonicService';
 import {
   externalMessage,
@@ -45,7 +45,7 @@ export const createNftTransfer = (
   seqno: number,
   walletState: WalletState,
   recipient: RecipientData,
-  nftAddress: string,
+  nftItem: NftItemRepr,
   secretKey: Buffer = Buffer.alloc(64)
 ) => {
   const forwardPayload = forwardPayloadComment(recipient.comment);
@@ -65,7 +65,7 @@ export const createNftTransfer = (
     sendMode: SendMode.PAY_GAS_SEPARATLY + SendMode.IGNORE_ERRORS,
     messages: [
       internal({
-        to: Address.parse(nftAddress),
+        to: Address.parse(nftItem.address),
         bounce: true,
         value: nftTransferAmount,
         body: body,
@@ -80,12 +80,12 @@ export const estimateNftTransfer = async (
   tonApi: Configuration,
   walletState: WalletState,
   recipient: RecipientData,
-  nftAddress: string
+  nftItem: NftItemRepr
 ) => {
   const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
     account: walletState.active.rawAddress,
   });
-  const cell = createNftTransfer(seqno, walletState, recipient, nftAddress);
+  const cell = createNftTransfer(seqno, walletState, recipient, nftItem);
 
   const { fee } = await new SendApi(tonApi).estimateTx({
     sendBocRequest: { boc: cell.toString('base64') },
@@ -98,7 +98,7 @@ export const sendNftTransfer = async (
   tonApi: Configuration,
   walletState: WalletState,
   recipient: RecipientData,
-  nftAddress: string,
+  nftItem: NftItemRepr,
   password: string
 ) => {
   const mnemonic = await getWalletMnemonic(
@@ -115,7 +115,7 @@ export const sendNftTransfer = async (
     seqno,
     walletState,
     recipient,
-    nftAddress,
+    nftItem,
     keyPair.secretKey
   );
 
