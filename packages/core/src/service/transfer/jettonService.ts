@@ -17,7 +17,8 @@ import {
 import { DefaultDecimals, toNumberAmount } from '../../utils/send';
 import { externalMessage, walletContract } from './common';
 
-export const jettonTransferForwardAmount = toNano('0.64');
+const jettonTransferAmount = toNano('0.64');
+const jettonTransferForwardAmount = toNano('0.0001');
 
 const jettonTransferBody = (params: {
   queryId?: number;
@@ -34,8 +35,8 @@ const jettonTransferBody = (params: {
     .storeAddress(params.toAddress)
     .storeAddress(params.responseAddress)
     .storeBit(false) // null custom_payload
-    .storeCoins(params.forwardAmount || 0)
-    .storeBit(true) // forward_payload in this slice, not separate cell
+    .storeCoins(params.forwardAmount)
+    .storeBit(false) // forward_payload in this slice, not separate cell
     .storeBuilder(params.forwardPayload)
     .endCell();
 };
@@ -52,16 +53,6 @@ export const getJettonDate = async (
     {
       accountId: jettonInfo.jettonAddress,
       methodName: 'get_jetton_data', //'get_wallet_address',
-      // body: [
-      //   [
-      //     'tvm.Slice',
-      //     beginCell()
-      //       .storeAddress(Address.parse(recipient.toAccount.address.raw))
-      //       .endCell()
-      //       .toBoc()
-      //       .toString('base64'),
-      //   ],
-      // ],
     },
     { method: 'GET' }
   );
@@ -96,7 +87,7 @@ const createJettonTransfer = (
     jettonAmount,
     toAddress: Address.parse(recipient.toAccount.address.raw),
     responseAddress: Address.parse(walletState.active.rawAddress),
-    forwardAmount: toNano('0.0001'),
+    forwardAmount: jettonTransferForwardAmount,
     forwardPayload: payloadCell,
   });
 
@@ -111,7 +102,7 @@ const createJettonTransfer = (
       internal({
         to: jettonWalletAddress,
         bounce: recipient.toAccount.status !== 'active',
-        value: jettonTransferForwardAmount,
+        value: jettonTransferAmount,
         body: body,
       }),
     ],
