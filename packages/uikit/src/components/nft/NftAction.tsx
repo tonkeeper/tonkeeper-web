@@ -100,7 +100,7 @@ export const NftAction: FC<{
               sdk.openPage(`https://dns.ton.org/#${nftItem.dns?.slice(0, -4)}`)
             }
           />
-          <UnlinkAction nftItem={nftItem} />
+          {/* <UnlinkAction nftItem={nftItem} /> */}
         </Row>
       );
     }

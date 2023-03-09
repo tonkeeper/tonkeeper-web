@@ -17,6 +17,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
   asset = TONAsset,
 }) => {
+  const { t } = useTranslation();
   const { data: jettons } = useWalletJettonList();
   const { data: info } = useWalletAccountInfo();
   const filter = useUserJettonList(jettons);
@@ -83,6 +84,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
           <div ref={nodeRef}>
             {state === 'recipient' && (
               <RecipientView
+                title={t('transaction_recipient')}
                 data={recipient}
                 onClose={onClose}
                 setRecipient={onRecipient}

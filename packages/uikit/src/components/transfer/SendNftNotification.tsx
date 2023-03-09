@@ -5,6 +5,7 @@ import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { useWalletAccountInfo } from '../../state/wallet';
 import { Notification } from '../Notification';
@@ -32,6 +33,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
   nftItem,
   onClose,
 }) => {
+  const { t } = useTranslation();
   const { data: info } = useWalletAccountInfo();
   const recipientRef = useRef<HTMLDivElement>(null);
   const confirmRef = useRef<HTMLDivElement>(null);
@@ -82,6 +84,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
           <div ref={nodeRef}>
             {state === 'recipient' && (
               <RecipientView
+                title={t('nft_transfer_title')}
                 data={recipient}
                 onClose={onClose}
                 setRecipient={onRecipient}

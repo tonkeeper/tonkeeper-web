@@ -38,12 +38,13 @@ const useToAccount = (isValid: boolean, account: string) => {
 };
 
 export const RecipientView: FC<{
+  title: string;
   data?: RecipientData;
   allowComment?: boolean;
   onClose: () => void;
   setRecipient: (options: RecipientData) => void;
   width: number;
-}> = ({ data, onClose, setRecipient, width, allowComment = true }) => {
+}> = ({ title, data, onClose, setRecipient, width, allowComment = true }) => {
   const { t } = useTranslation();
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -96,7 +97,7 @@ export const RecipientView: FC<{
     <FullHeightBlock onSubmit={onSubmit}>
       <NotificationTitleBlock>
         <ButtonMock />
-        <H3>{t('transaction_recipient')}</H3>
+        <H3>{title}</H3>
         <NotificationCancelButton handleClose={onClose} />
       </NotificationTitleBlock>
 
