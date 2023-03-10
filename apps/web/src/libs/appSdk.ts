@@ -17,6 +17,9 @@ export class BrowserAppSdk implements IAppSdk {
   openPage = async (url: string) => {
     window.open(url, '_black');
   };
+
+  confirm = async (text: string) => window.confirm(text);
+
   disableScroll = disableScroll;
   enableScroll = enableScroll;
   getScrollbarWidth = getScrollbarWidth;

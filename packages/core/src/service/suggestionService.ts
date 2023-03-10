@@ -5,6 +5,26 @@ import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { Configuration, EventApi } from '../tonApiV1';
 
+export const getHiddenSuggestions = async (
+  storage: IStorage,
+  publicKey: string
+) => {
+  const result = await storage.get<string[]>(
+    `${AppKey.hiddenSuggestions}_${publicKey}`
+  );
+  return result ?? [];
+};
+
+export const hideSuggestions = async (
+  storage: IStorage,
+  publicKey: string,
+  address: string
+) => {
+  const items = await getHiddenSuggestions(storage, publicKey);
+  items.push(address);
+  await storage.set(`${AppKey.hiddenSuggestions}_${publicKey}`, items);
+};
+
 export const getFavoriteSuggestions = async (
   storage: IStorage,
   publicKey: string
@@ -20,7 +40,7 @@ export const setFavoriteSuggestion = async (
   publicKey: string,
   items: FavoriteSuggestion[]
 ) => {
-  storage.set(`${AppKey.favorites}_${publicKey}`, items);
+  await storage.set(`${AppKey.favorites}_${publicKey}`, items);
 };
 
 export const deleteFavoriteSuggestion = async (
@@ -44,6 +64,7 @@ export const getSuggestionsList = async (
   });
 
   const favorites = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);
+  const hidden = await getHiddenSuggestions(sdk.storage, wallet.publicKey);
   const list = [] as Suggestion[];
 
   items.events.forEach((event) => {
@@ -60,6 +81,7 @@ export const getSuggestionsList = async (
     const address = recipient.tonTransfer!.recipient.address;
 
     if (list.concat(favorites).some((item) => item.address === address)) return;
+    if (hidden.some((item) => item === address)) return;
 
     list.push({
       isFavorite: false,

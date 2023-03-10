@@ -9,6 +9,9 @@ export class DesktopAppSdk implements IAppSdk {
   openPage = async (url: string) => {
     console.log(url);
   };
+
+  confirm = async (text: string) => false;
+
   uiEvents = new EventEmitter();
   version = packageJson.version ?? 'Unknown';
   disableScroll = () => null;

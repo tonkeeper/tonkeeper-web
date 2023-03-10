@@ -9,4 +9,5 @@ export enum AppKey {
   lock = 'lock',
 
   favorites = 'favorites',
+  hiddenSuggestions = 'hiddenSuggestions',
 }

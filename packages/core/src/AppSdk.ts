@@ -19,6 +19,8 @@ export interface IAppSdk {
   getScrollbarWidth: () => number;
   uiEvents: IEventEmitter<UIEvents>;
   version: string;
+
+  confirm: (text: string) => Promise<boolean>;
 }
 
 export class MockAppSdk implements IAppSdk {
@@ -34,4 +36,5 @@ export class MockAppSdk implements IAppSdk {
   getScrollbarWidth = () => 0;
   uiEvents = new EventEmitter();
   version = '0.0.0';
+  confirm = async () => false;
 }

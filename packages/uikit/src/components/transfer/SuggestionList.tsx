@@ -1,10 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   FavoriteSuggestion,
   LatestSuggestion,
-  Suggestion
+  Suggestion,
 } from '@tonkeeper/core/dist/entries/suggestion';
-import { getSuggestionsList } from '@tonkeeper/core/dist/service/suggestionService';
+import {
+  deleteFavoriteSuggestion,
+  getSuggestionsList,
+  hideSuggestions,
+} from '@tonkeeper/core/dist/service/suggestionService';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
@@ -48,12 +52,28 @@ const getLatestDate = (language: string, timestamp: number) => {
   }).format(new Date(timestamp * 1000));
 };
 
+const useDeleteFavorite = (item: FavoriteSuggestion) => {
+  const sdk = useAppSdk();
+  const wallet = useWalletContext();
+  const queryClient = useQueryClient();
+
+  return useMutation(async () => {
+    await deleteFavoriteSuggestion(sdk.storage, wallet.publicKey, item.address);
+    await queryClient.invalidateQueries([
+      wallet.active.rawAddress,
+      QueryKey.activity,
+      'suggestions',
+    ]);
+  });
+};
 const FavoriteItem: FC<{
   item: FavoriteSuggestion;
   onSelect: (item: Suggestion) => void;
-  onDelete: (item: FavoriteSuggestion) => void;
   onEdit: (item: FavoriteSuggestion) => void;
-}> = ({ item, onSelect, onDelete, onEdit }) => {
+}> = ({ item, onSelect, onEdit }) => {
+  const sdk = useAppSdk();
+
+  const { mutateAsync } = useDeleteFavorite(item);
   const { t } = useTranslation();
 
   return (
@@ -89,8 +109,21 @@ const FavoriteItem: FC<{
                 dropDown
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDelete(item);
-                  onClose();
+                  sdk
+                    .confirm(
+                      t('send_screen_steps_address_delete_alert_text').replace(
+                        '%{name}',
+                        item.name
+                      )
+                    )
+                    .then((value) => {
+                      if (value) {
+                        return mutateAsync();
+                      }
+                    })
+                    .finally(() => {
+                      onClose();
+                    });
                 }}
               >
                 <ListItemPayload>
@@ -108,12 +141,30 @@ const FavoriteItem: FC<{
     </ListItem>
   );
 };
+
+const useHideSuggestion = (item: LatestSuggestion) => {
+  const sdk = useAppSdk();
+  const wallet = useWalletContext();
+  const queryClient = useQueryClient();
+
+  return useMutation(async () => {
+    await hideSuggestions(sdk.storage, wallet.publicKey, item.address);
+    await queryClient.invalidateQueries([
+      wallet.active.rawAddress,
+      QueryKey.activity,
+      'suggestions',
+    ]);
+  });
+};
+
 const LatestItem: FC<{
   item: LatestSuggestion;
   onSelect: (item: Suggestion) => void;
   onAddFavorite: (item: LatestSuggestion) => void;
-  onHideLatest: (item: LatestSuggestion) => void;
-}> = ({ item, onSelect, onAddFavorite, onHideLatest }) => {
+}> = ({ item, onSelect, onAddFavorite }) => {
+  const sdk = useAppSdk();
+
+  const { mutateAsync } = useHideSuggestion(item);
   const { t, i18n } = useTranslation();
 
   return (
@@ -144,8 +195,7 @@ const LatestItem: FC<{
                 dropDown
                 onClick={(e) => {
                   e.stopPropagation();
-                  onHideLatest(item);
-                  onClose();
+                  mutateAsync().finally(() => onClose());
                 }}
               >
                 <ListItemPayload>
@@ -173,15 +223,10 @@ export const SuggestionList: FC<{
   const [addFavorite, setAdd] = useState<LatestSuggestion | undefined>(
     undefined
   );
-  const [hideLatest, setHide] = useState<LatestSuggestion | undefined>(
-    undefined
-  );
-  const [deleteFavorite, setDelete] = useState<FavoriteSuggestion | undefined>(
-    undefined
-  );
   const [editFavorite, setEdit] = useState<FavoriteSuggestion | undefined>(
     undefined
   );
+
   if (isFetching || !data) {
     return <SkeletonList size={6} margin={false} fullWidth />;
   }
@@ -196,7 +241,6 @@ export const SuggestionList: FC<{
                 key={item.address}
                 item={item}
                 onSelect={onSelect}
-                onDelete={setDelete}
                 onEdit={setEdit}
               />
             );
@@ -207,7 +251,6 @@ export const SuggestionList: FC<{
               item={item}
               onSelect={onSelect}
               onAddFavorite={setAdd}
-              onHideLatest={setHide}
             />
           );
         })}
