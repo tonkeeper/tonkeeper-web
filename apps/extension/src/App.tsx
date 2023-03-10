@@ -81,8 +81,8 @@ const queryClient = new QueryClient({
     },
   },
 });
-const sdk = new ExtensionAppSdk();
 const storage = new ExtensionStorage();
+const sdk = new ExtensionAppSdk(storage);
 
 export const App: FC = () => {
   const translation = useMemo(() => {

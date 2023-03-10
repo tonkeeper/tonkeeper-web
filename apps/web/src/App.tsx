@@ -96,7 +96,7 @@ const queryClient = new QueryClient({
   },
 });
 const storage = new BrowserStorage();
-const sdk = new BrowserAppSdk();
+const sdk = new BrowserAppSdk(storage);
 
 export const App: FC<PropsWithChildren> = () => {
   const { t, i18n } = useTranslation();
@@ -142,7 +142,7 @@ export const App: FC<PropsWithChildren> = () => {
 const useLock = () => {
   const [lock, setLock] = useState<boolean | undefined>(undefined);
   useEffect(() => {
-    storage
+    sdk.storage
       .get<boolean>(AppKey.lock)
       .then((useLock) => setLock(useLock === true));
 

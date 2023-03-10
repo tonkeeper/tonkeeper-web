@@ -1,5 +1,6 @@
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { AuthState } from './entries/password';
+import { IStorage, MemoryStorage } from './Storage';
 
 export interface UIEvents {
   unlock: void;
@@ -10,6 +11,7 @@ export interface UIEvents {
 }
 
 export interface IAppSdk {
+  storage: IStorage;
   copyToClipboard: (value: string, notification?: string) => void;
   openPage: (url: string) => Promise<unknown>;
   disableScroll: () => void;
@@ -20,6 +22,7 @@ export interface IAppSdk {
 }
 
 export class MockAppSdk implements IAppSdk {
+  storage = new MemoryStorage();
   copyToClipboard = (value: string, notification?: string) => {
     console.log(value, notification);
   };

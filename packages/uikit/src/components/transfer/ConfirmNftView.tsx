@@ -8,7 +8,6 @@ import React, { FC, useMemo, useState } from 'react';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
-import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
 import { getWalletPassword } from '../../state/password';
 import { TransferComment } from '../activity/ActivityActionDetails';
@@ -32,15 +31,14 @@ import { ButtonBlock, Label, ResultButton, useFaitTonAmount } from './common';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 
 const useSendNft = (recipient: RecipientData, nftItem: NftItemRepr) => {
-  const storage = useStorage();
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
 
   return useMutation<void, Error>(async () => {
-    const password = await getWalletPassword(sdk, storage);
+    const password = await getWalletPassword(sdk);
     await sendNftTransfer(
-      storage,
+      sdk.storage,
       tonApi,
       wallet,
       recipient,

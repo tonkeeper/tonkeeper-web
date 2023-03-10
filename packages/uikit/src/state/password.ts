@@ -9,7 +9,6 @@ import {
   addWalletVoucher,
   deleteWalletVoucher,
 } from '@tonkeeper/core/dist/service/walletService';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
@@ -61,7 +60,7 @@ export const useMutateVoucher = () => {
     if (wallet.voucher) {
       await deleteWalletVoucher(tonApi, storage, wallet);
     } else {
-      const password = await getWalletPassword(sdk, storage);
+      const password = await getWalletPassword(sdk);
       await addWalletVoucher(tonApi, storage, wallet, password);
     }
 
@@ -69,8 +68,8 @@ export const useMutateVoucher = () => {
   });
 };
 
-export const getWalletPassword = async (sdk: IAppSdk, storage: IStorage) => {
-  const auth = await storage.get<AuthState>(AppKey.password);
+export const getWalletPassword = async (sdk: IAppSdk) => {
+  const auth = await sdk.storage.get<AuthState>(AppKey.password);
   if (!auth) {
     throw new Error('Auth not defined');
   }

@@ -1,5 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Language, languages } from '@tonkeeper/core/dist/entries/language';
+import {
+  languages,
+  localizationText,
+} from '@tonkeeper/core/dist/entries/language';
 import { Footer } from '@tonkeeper/uikit/dist/components/Footer';
 import { Header } from '@tonkeeper/uikit/dist/components/Header';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
@@ -22,8 +25,8 @@ const SettingsRouter = React.lazy(
 );
 
 const queryClient = new QueryClient();
-const sdk = new DesktopAppSdk();
 const storage = new DesktopStorage();
+const sdk = new DesktopAppSdk(storage);
 
 export const Providers: FC<PropsWithChildren> = ({ children }) => {
   const { t, i18n } = useTranslation();
@@ -35,8 +38,8 @@ export const Providers: FC<PropsWithChildren> = ({ children }) => {
         enable: true,
         reloadResources: i18n.reloadResources,
         changeLanguage: i18n.changeLanguage as any,
-        language: i18n.language as Language,
-        languages: [...languages],
+        language: i18n.language,
+        languages: [...languages].map(localizationText),
       },
     };
     return client;
