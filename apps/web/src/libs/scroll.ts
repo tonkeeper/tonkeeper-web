@@ -1,13 +1,11 @@
 export const disableScroll = () => {
-  var x = window.scrollX;
-  var y = window.scrollY;
-  window.onscroll = function () {
-    window.scrollTo(x, y);
-  };
+  window.document.body.style.overflow = 'hidden';
+  window.document.body.style.paddingRight = `${getScrollbarWidth()}px`;
 };
 
 export const enableScroll = () => {
-  window.onscroll = function () {};
+  window.document.body.style.overflow = 'auto';
+  window.document.body.style.paddingRight = '0px';
 };
 
 export const getScrollbarWidth = () => {
