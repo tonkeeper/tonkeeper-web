@@ -13,13 +13,9 @@ import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
 import { Configuration, NftItemRepr, SendApi, WalletApi } from '../../tonApiV1';
 import { getWalletMnemonic } from '../menmonicService';
-import {
-  externalMessage,
-  forwardPayloadComment,
-  walletContract,
-} from './common';
+import { externalMessage, walletContract } from './common';
 
-const nftTransferAmount = toNano('1');
+const initNftTransferAmount = toNano('1');
 const nftTransferForwardAmount = toNano(fromNano('1'));
 
 const nftTransferBody = (params: {
@@ -27,7 +23,7 @@ const nftTransferBody = (params: {
   newOwnerAddress: Address;
   responseAddress: Address;
   forwardAmount: bigint;
-  forwardPayload: Builder;
+  forwardPayload: Builder | null;
 }) => {
   return beginCell()
     .storeUint(0x5fcc3d14, 32) // transfer op
@@ -37,22 +33,22 @@ const nftTransferBody = (params: {
     .storeBit(false) // null custom_payload
     .storeCoins(params.forwardAmount)
     .storeBit(false) // forward_payload in this slice, not separate cell
-    .storeBuilder(params.forwardPayload)
+    .storeMaybeBuilder(params.forwardPayload)
     .endCell();
 };
 
-export const createNftTransfer = (
+const createNftTransfer = (
   seqno: number,
   walletState: WalletState,
-  recipient: RecipientData,
-  nftItem: NftItemRepr,
+  recipientAddress: string,
+  nftAddress: string,
+  nftTransferAmount: bigint,
+  forwardPayload: Builder | null = null,
   secretKey: Buffer = Buffer.alloc(64)
 ) => {
-  const forwardPayload = forwardPayloadComment(recipient.comment);
-
   const body = nftTransferBody({
     queryId: Date.now(),
-    newOwnerAddress: Address.parse(recipient.toAccount.address.raw),
+    newOwnerAddress: Address.parse(recipientAddress),
     responseAddress: Address.parse(walletState.active.rawAddress),
     forwardAmount: nftTransferForwardAmount,
     forwardPayload,
@@ -65,7 +61,7 @@ export const createNftTransfer = (
     sendMode: SendMode.PAY_GAS_SEPARATLY + SendMode.IGNORE_ERRORS,
     messages: [
       internal({
-        to: Address.parse(nftItem.address),
+        to: Address.parse(nftAddress),
         bounce: true,
         value: nftTransferAmount,
         body: body,
@@ -85,7 +81,15 @@ export const estimateNftTransfer = async (
   const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
     account: walletState.active.rawAddress,
   });
-  const cell = createNftTransfer(seqno, walletState, recipient, nftItem);
+
+  const cell = createNftTransfer(
+    seqno,
+    walletState,
+    recipient.toAccount.address.raw,
+    nftItem.address,
+    initNftTransferAmount,
+    null
+  );
 
   const { fee } = await new SendApi(tonApi).estimateTx({
     sendBocRequest: { boc: cell.toString('base64') },
@@ -114,8 +118,10 @@ export const sendNftTransfer = async (
   const cell = createNftTransfer(
     seqno,
     walletState,
-    recipient,
-    nftItem,
+    recipient.toAccount.address.raw,
+    nftItem.address,
+    initNftTransferAmount,
+    null,
     keyPair.secretKey
   );
 
