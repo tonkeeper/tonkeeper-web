@@ -1,10 +1,10 @@
 import BigNumber from 'bignumber.js';
+import { CryptoCurrency } from '../entries/crypto';
 import { FiatCurrencies } from '../entries/fiat';
 import { AccountRepr, JettonsBalances } from '../tonApiV1';
 import { TonendpointStock } from '../tonkeeperApi/stock';
 import { getJettonStockPrice, getTonCoinStockPrice } from './balance';
 
-export const TONAsset = 'TON';
 export const DefaultDecimals = 9;
 
 export function toStringAmount(str: string): string {
@@ -44,7 +44,7 @@ export const getMaxValue = (
   jetton: string,
   format: (amount: number | string, decimals?: number) => string
 ): string => {
-  if (jetton === TONAsset) {
+  if (jetton === CryptoCurrency.TON) {
     return format(info?.balance ?? 0);
   }
 
@@ -62,9 +62,9 @@ export const getRemaining = (
   max: boolean,
   format: (amount: number | string, decimals?: number) => string
 ): [string, boolean] => {
-  if (jetton === TONAsset) {
+  if (jetton === CryptoCurrency.TON) {
     if (max) {
-      return [`0 ${TONAsset}`, true];
+      return [`0 ${CryptoCurrency.TON}`, true];
     }
 
     const remaining = new BigNumber(info?.balance ?? 0).minus(
@@ -76,7 +76,7 @@ export const getRemaining = (
     );
 
     return [
-      `${format(remaining.toString())} ${TONAsset}`,
+      `${format(remaining.toString())} ${CryptoCurrency.TON}`,
       remaining.isGreaterThan(0),
     ];
   }
@@ -147,7 +147,7 @@ export const getFiatAmountValue = (
 
   const value = new BigNumber(toNumberAmount(amount));
 
-  if (jetton === TONAsset) {
+  if (jetton === CryptoCurrency.TON) {
     const price = getTonCoinStockPrice(stock.today, fiat);
     return value.multipliedBy(price);
   } else {

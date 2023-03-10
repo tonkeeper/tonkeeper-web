@@ -3,7 +3,9 @@ import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
-import { getJettonSymbol, TONAsset } from '@tonkeeper/core/dist/utils/send';
+import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
+
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import React, { FC, useMemo, useState } from 'react';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -40,7 +42,7 @@ const useSendTransaction = (
 
   return useMutation<void, Error>(async () => {
     const password = await getWalletPassword(sdk);
-    if (amount.jetton === TONAsset) {
+    if (amount.jetton === CryptoCurrency.TON) {
       return sendTonTransfer(
         sdk.storage,
         tonApi,
@@ -98,7 +100,7 @@ export const ConfirmView: FC<{
 
   const format = useFormatCoinValue();
   const feeAmount = useMemo(() => format(amount.fee.total), [format, amount]);
-  const fiatFeeAmount = useFiatAmount(jettons, TONAsset, feeAmount);
+  const fiatFeeAmount = useFiatAmount(jettons, CryptoCurrency.TON, feeAmount);
 
   return (
     <FullHeightBlock onSubmit={onSubmit}>
@@ -145,7 +147,9 @@ export const ConfirmView: FC<{
           </ListItemPayload>
         </ListItem>
         <ListItem
-          onClick={() => sdk.copyToClipboard(`${feeAmount} ${TONAsset}`)}
+          onClick={() =>
+            sdk.copyToClipboard(`${feeAmount} ${CryptoCurrency.TON}`)
+          }
         >
           <ListItemPayload>
             <Label>{t('txActions_fee')}</Label>
@@ -153,7 +157,7 @@ export const ConfirmView: FC<{
               right
               text={
                 <>
-                  ≈&thinsp;{feeAmount} {TONAsset}
+                  ≈&thinsp;{feeAmount} {CryptoCurrency.TON}
                 </>
               }
               secondary={<>≈&thinsp;{fiatFeeAmount}</>}
@@ -161,7 +165,9 @@ export const ConfirmView: FC<{
           </ListItemPayload>
         </ListItem>
         <TransferComment
-          comment={amount.jetton === TONAsset ? recipient.comment : undefined}
+          comment={
+            amount.jetton === CryptoCurrency.TON ? recipient.comment : undefined
+          }
         />
       </ListBlock>
       <Gap />

@@ -1,5 +1,6 @@
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { getFiatAmountValue, TONAsset } from '@tonkeeper/core/dist/utils/send';
+import { getFiatAmountValue } from '@tonkeeper/core/dist/utils/send';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
@@ -98,7 +99,7 @@ export const useFaitTonAmount = (amount: string) => {
       stock,
       { balances: [] },
       fiat,
-      TONAsset,
+      CryptoCurrency.TON,
       amount
     );
     if (fiatAmount === undefined) return undefined;

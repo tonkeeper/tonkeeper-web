@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { sendNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { Fee, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
-import { TONAsset } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useMemo, useState } from 'react';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -105,7 +105,9 @@ export const ConfirmNftView: FC<{
           </ListItemPayload>
         </ListItem>
         <ListItem
-          onClick={() => sdk.copyToClipboard(`${feeAmount} ${TONAsset}`)}
+          onClick={() =>
+            sdk.copyToClipboard(`${feeAmount} ${CryptoCurrency.TON}`)
+          }
         >
           <ListItemPayload>
             <Label>{t('txActions_fee')}</Label>
@@ -113,7 +115,7 @@ export const ConfirmNftView: FC<{
               right
               text={
                 <>
-                  ≈&thinsp;{feeAmount} {TONAsset}
+                  ≈&thinsp;{feeAmount} {CryptoCurrency.TON}
                 </>
               }
               secondary={<>≈&thinsp;{fiatFeeAmount}</>}

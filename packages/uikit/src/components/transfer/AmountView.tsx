@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
   AmountData,
   AmountValue,
@@ -15,7 +16,6 @@ import {
   getRemaining,
   isNumeric,
   parseAndValidateInput,
-  TONAsset,
 } from '@tonkeeper/core/dist/utils/send';
 import React, {
   FC,
@@ -142,7 +142,7 @@ const useEstimateTransaction = (
   const wallet = useWalletContext();
 
   return useMutation(async (options: AmountValue) => {
-    if (jetton === TONAsset) {
+    if (jetton === CryptoCurrency.TON) {
       return estimateTonTransfer(tonApi, wallet, recipient, options);
     } else {
       const [jettonInfo] = jettons.balances.filter(

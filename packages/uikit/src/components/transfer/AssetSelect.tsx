@@ -1,5 +1,6 @@
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { getJettonSymbol, TONAsset } from '@tonkeeper/core/dist/utils/send';
+import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { useFormatCoinValue } from '../../hooks/balance';
@@ -60,17 +61,17 @@ const AssetDropDown: FC<{
       <ListItem
         dropDown
         onClick={() => {
-          setJetton(TONAsset);
+          setJetton(CryptoCurrency.TON);
           onClose();
         }}
       >
         <ListItemPayload>
           <AssetInfo>
             <AssetImage src="/img/toncoin.svg"></AssetImage>
-            <Label1>{TONAsset}</Label1>
+            <Label1>{CryptoCurrency.TON}</Label1>
             <Amount>{format(info?.balance ?? 0)}</Amount>
           </AssetInfo>
-          {TONAsset === jetton ? (
+          {CryptoCurrency.TON === jetton ? (
             <Icon>
               <DoneIcon />
             </Icon>

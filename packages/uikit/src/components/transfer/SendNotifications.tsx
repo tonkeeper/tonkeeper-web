@@ -1,5 +1,5 @@
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { TONAsset } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useTranslation } from '../../hooks/translation';
@@ -15,7 +15,7 @@ import { RecipientView } from './RecipientView';
 
 const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
-  asset = TONAsset,
+  asset = CryptoCurrency.TON,
 }) => {
   const { t } = useTranslation();
   const { data: jettons } = useWalletJettonList();
@@ -89,7 +89,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 onClose={onClose}
                 setRecipient={onRecipient}
                 width={width}
-                allowComment={asset === TONAsset}
+                allowComment={asset === CryptoCurrency.TON}
               />
             )}
             {state === 'amount' && (

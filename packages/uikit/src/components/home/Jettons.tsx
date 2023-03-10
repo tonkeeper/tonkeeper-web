@@ -96,7 +96,7 @@ export const Delta: FC<{ stock: TonendpointStock }> = ({ stock }) => {
   return <DeltaColor positive={positive}>{delta}%</DeltaColor>;
 };
 
-export const TonAsset: FC<{
+const TonAsset: FC<{
   info: AccountRepr;
   stock: TonendpointStock;
 }> = ({ info, stock }) => {
@@ -161,7 +161,7 @@ const ListItemPayload = styled.div`
   width: 100%;
 `;
 
-export const JettonAsset: FC<{
+const JettonAsset: FC<{
   jetton: JettonBalance;
   stock: TonendpointStock;
 }> = ({ jetton, stock }) => {

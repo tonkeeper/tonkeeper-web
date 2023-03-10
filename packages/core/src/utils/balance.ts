@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { Address } from 'ton-core';
+import { CryptoCurrency } from '../entries/crypto';
 import { FiatCurrencies } from '../entries/fiat';
 import { JettonBalance } from '../tonApiV1';
 
@@ -14,7 +15,7 @@ export const getTonCoinStockPrice = (
   rates: { [key: string]: string },
   currency: FiatCurrencies
 ): BigNumber => {
-  const btcPrice = rates['TON'];
+  const btcPrice = rates[CryptoCurrency.TON];
   const btcInFiat = rates[currency] ?? rates[FiatCurrencies.USD];
 
   return new BigNumber(btcInFiat).div(new BigNumber(btcPrice));
