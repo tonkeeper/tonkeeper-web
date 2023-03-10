@@ -51,6 +51,8 @@ const InputField = styled.input`
 `;
 
 const Label = styled.label<{ active?: boolean }>`
+  user-select: none;
+
   position: absolute;
   pointer-events: none;
   transform: translate(0, 20px) scale(1);

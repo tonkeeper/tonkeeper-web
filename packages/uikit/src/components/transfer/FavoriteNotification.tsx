@@ -1,17 +1,22 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { LatestSuggestion } from '@tonkeeper/core/dist/entries/suggestion';
 import {
+  FavoriteSuggestion,
+  LatestSuggestion,
+} from '@tonkeeper/core/dist/entries/suggestion';
+import {
+  deleteFavoriteSuggestion,
   getFavoriteSuggestions,
   setFavoriteSuggestion,
 } from '@tonkeeper/core/dist/service/suggestionService';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { Address } from 'ton-core';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { Button } from '../fields/Button';
+import { Button, ButtonRow } from '../fields/Button';
 import { Input } from '../fields/Input';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Notification } from '../Notification';
@@ -95,7 +100,10 @@ const AddFavoriteContent: FC<{
         <ListItem
           onClick={(e) => {
             e.stopPropagation();
-            sdk.copyToClipboard(latest.address, t('address_copied'));
+            sdk.copyToClipboard(
+              Address.parse(latest.address).toString(),
+              t('address_copied')
+            );
           }}
         >
           <ListItemPayload>
@@ -136,6 +144,176 @@ export const AddFavoriteNotification: FC<{
       handleClose={onClose}
       hideButton
       title={t('add_edit_favorite_add_title')}
+    >
+      {Content}
+    </Notification>
+  );
+};
+
+const useDeleteFavorite = (favorite: FavoriteSuggestion) => {
+  const sdk = useAppSdk();
+  const wallet = useWalletContext();
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error>(async () => {
+    await deleteFavoriteSuggestion(
+      sdk.storage,
+      wallet.publicKey,
+      favorite.address
+    );
+    await queryClient.invalidateQueries([
+      wallet.active.rawAddress,
+      QueryKey.activity,
+      'suggestions',
+    ]);
+  });
+};
+const useEditFavorite = (favorite: FavoriteSuggestion) => {
+  const sdk = useAppSdk();
+  const wallet = useWalletContext();
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, string>(async (name) => {
+    if (name.length < 2) {
+      throw new Error('Name is to short');
+    }
+    let items = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);
+    if (
+      items.some(
+        (item) => item.name === name && item.address != favorite.address
+      )
+    ) {
+      throw new Error('Name is already taken');
+    }
+    items = items.map((item) =>
+      item.address === favorite.address
+        ? { isFavorite: true, address: favorite.address, name }
+        : item
+    );
+
+    await setFavoriteSuggestion(sdk.storage, wallet.publicKey, items);
+    await queryClient.invalidateQueries([
+      wallet.active.rawAddress,
+      QueryKey.activity,
+      'suggestions',
+    ]);
+  });
+};
+
+const EditFavoriteContent: FC<{
+  favorite: FavoriteSuggestion;
+  onClose: () => void;
+}> = ({ favorite, onClose }) => {
+  const { t } = useTranslation();
+  const sdk = useAppSdk();
+  const {
+    mutateAsync: editAsync,
+    reset,
+    isLoading: isEditLoading,
+    isError,
+  } = useEditFavorite(favorite);
+  const { mutateAsync: deleteAsync, isLoading: isDeleteLoading } =
+    useDeleteFavorite(favorite);
+
+  const ref = useRef<HTMLInputElement | null>(null);
+
+  const isLoading = isEditLoading || isDeleteLoading;
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.focus();
+    }
+  }, [ref.current]);
+
+  const [name, setName] = useState(favorite.name);
+
+  const onName = (value: string) => {
+    reset();
+    setName(value);
+  };
+
+  const onDelete = async () => {
+    await deleteAsync();
+    onClose();
+  };
+
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    await editAsync(name);
+    onClose();
+  };
+
+  return (
+    <Block onSubmit={handleSubmit}>
+      <Input
+        ref={ref}
+        value={name}
+        onChange={onName}
+        label={t('add_edit_favorite_name_placeholder')}
+        isValid={!isError}
+        disabled={isLoading}
+      />
+      <ListBlock margin={false}>
+        <ListItem
+          onClick={(e) => {
+            e.stopPropagation();
+            sdk.copyToClipboard(
+              Address.parse(favorite.address).toString(),
+              t('address_copied')
+            );
+          }}
+        >
+          <ListItemPayload>
+            <Label>{t('add_edit_favorite_address_label')}</Label>
+            <Label1>{toShortAddress(favorite.address)}</Label1>
+          </ListItemPayload>
+        </ListItem>
+      </ListBlock>
+
+      <ButtonRow>
+        <Button
+          size="large"
+          fullWidth
+          type="button"
+          onClick={onDelete}
+          disabled={isLoading}
+          loading={isDeleteLoading}
+        >
+          {t('send_screen_steps_address_suggest_actions_delete')}
+        </Button>
+        <Button
+          size="large"
+          primary
+          fullWidth
+          type="submit"
+          disabled={isLoading}
+          loading={isEditLoading}
+        >
+          {t('add_edit_favorite_save')}
+        </Button>
+      </ButtonRow>
+    </Block>
+  );
+};
+
+export const EditFavoriteNotification: FC<{
+  favorite?: FavoriteSuggestion;
+  onClose: () => void;
+}> = ({ favorite, onClose }) => {
+  const { t } = useTranslation();
+
+  const Content = useCallback(() => {
+    if (!favorite) return undefined;
+    return <EditFavoriteContent onClose={onClose} favorite={favorite} />;
+  }, [favorite, onClose]);
+
+  return (
+    <Notification
+      isOpen={favorite != null}
+      handleClose={onClose}
+      hideButton
+      title={t('add_edit_favorite_edit_title')}
     >
       {Content}
     </Notification>

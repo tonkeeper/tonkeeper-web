@@ -26,6 +26,8 @@ export const H3 = styled.h3`
   font-size: 20px;
   line-height: 28px;
   margin: 0 0 0.25rem;
+
+  user-select: none;
 `;
 
 export const Label1 = styled.span`

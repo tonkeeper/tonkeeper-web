@@ -4,6 +4,7 @@ export const ListBlock = styled.div<{
   margin?: boolean;
   dropDown?: boolean;
   fullWidth?: boolean;
+  noUserSelect?: boolean;
 }>`
   display: flex;
   flex-direction: column;
@@ -30,6 +31,13 @@ export const ListBlock = styled.div<{
     props.fullWidth
       ? css`
           width: 100%;
+        `
+      : undefined}
+
+      ${(props) =>
+    props.noUserSelect
+      ? css`
+          user-select: none;
         `
       : undefined}
 

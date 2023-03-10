@@ -21,6 +21,7 @@ import { ButtonBlock } from './common';
 import { SuggestionList } from './SuggestionList';
 
 const Label = styled(Label1)`
+  user-select: none;
   width: 100%;
   margin-top: 12px;
   margin-bottom: -4px;

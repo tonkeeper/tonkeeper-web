@@ -22,7 +22,10 @@ import { ColumnText } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { SkeletonList } from '../Skeleton';
 import { Label1 } from '../Text';
-import { AddFavoriteNotification } from './FavoriteNotification';
+import {
+  AddFavoriteNotification,
+  EditFavoriteNotification,
+} from './FavoriteNotification';
 
 const useLatestSuggestion = () => {
   const sdk = useAppSdk();
@@ -43,6 +46,10 @@ const Icon = styled.span`
 const IconBlue = styled.span`
   display: inline-flex;
   color: ${(props) => props.theme.accentBlue};
+`;
+
+const FavoriteText = styled.div`
+  user-select: none;
 `;
 
 const getLatestDate = (language: string, timestamp: number) => {
@@ -66,6 +73,7 @@ const useDeleteFavorite = (item: FavoriteSuggestion) => {
     ]);
   });
 };
+
 const FavoriteItem: FC<{
   item: FavoriteSuggestion;
   onSelect: (item: Suggestion) => void;
@@ -81,12 +89,12 @@ const FavoriteItem: FC<{
       <ListItemPayload>
         <ColumnText
           text={
-            <>
-              {item.name}{' '}
+            <FavoriteText>
+              {item.name}
               <IconBlue>
                 <StarIcon />
               </IconBlue>
-            </>
+            </FavoriteText>
           }
           secondary={toShortAddress(item.address)}
         />
@@ -233,7 +241,7 @@ export const SuggestionList: FC<{
 
   return (
     <>
-      <ListBlock margin={false} fullWidth>
+      <ListBlock margin={false} fullWidth noUserSelect>
         {data.map((item) => {
           if (item.isFavorite) {
             return (
@@ -258,6 +266,10 @@ export const SuggestionList: FC<{
       <AddFavoriteNotification
         latest={addFavorite}
         onClose={() => setAdd(undefined)}
+      />
+      <EditFavoriteNotification
+        favorite={editFavorite}
+        onClose={() => setEdit(undefined)}
       />
     </>
   );
