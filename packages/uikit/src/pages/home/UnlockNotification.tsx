@@ -56,16 +56,6 @@ const Block = styled.form`
   width: 100%;
 `;
 
-const Logo = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  font-size: 400%;
-
-  margin-bottom: 2rem;
-`;
-
 const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
   const storage = useStorage();
 
@@ -131,40 +121,38 @@ const PasswordUnlock: FC<{
   };
 
   return (
-    <>
-      <Block onSubmit={handleSubmit}>
-        <Input
-          ref={ref}
-          value={password}
-          onChange={onChange}
-          type="password"
-          label={t('Password')}
-          isValid={!isError}
-          disabled={isLoading}
-        />
-        <ButtonRow>
-          <Button
-            size="large"
-            fullWidth
-            onClick={onClose}
-            type="button"
-            loading={isLoading}
-          >
-            {t('settings_reset')}
-          </Button>
-          <Button
-            size="large"
-            primary
-            fullWidth
-            type="submit"
-            disabled={password.length < 5}
-            loading={isLoading}
-          >
-            {t('Unlock')}
-          </Button>
-        </ButtonRow>
-      </Block>
-    </>
+    <Block onSubmit={handleSubmit}>
+      <Input
+        ref={ref}
+        value={password}
+        onChange={onChange}
+        type="password"
+        label={t('Password')}
+        isValid={!isError}
+        disabled={isLoading}
+      />
+      <ButtonRow>
+        <Button
+          size="large"
+          fullWidth
+          onClick={onClose}
+          type="button"
+          loading={isLoading}
+        >
+          {t('settings_reset')}
+        </Button>
+        <Button
+          size="large"
+          primary
+          fullWidth
+          type="submit"
+          disabled={password.length < 5}
+          loading={isLoading}
+        >
+          {t('Unlock')}
+        </Button>
+      </ButtonRow>
+    </Block>
   );
 };
 

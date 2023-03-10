@@ -57,8 +57,10 @@ const Padding = styled.div`
 
 const Overlay = styled.div`
   position: fixed;
-  inset: 0;
-  transform: translateY(100%);
+  left: 0;
+  right: 0;
+  height: 100%;
+  top: 100%;
   transition: all 0.3s ease-in-out;
   overflow: hidden;
 `;
@@ -83,7 +85,7 @@ const Splash = styled.div`
     pointer-events: auto;
   }
   &.enter-done ${Overlay} {
-    transform: translateY(0);
+    top: 0;
     pointer-events: auto;
     overflow-y: scroll;
   }
@@ -92,7 +94,7 @@ const Splash = styled.div`
     opacity: 0;
   }
   &.exit ${Overlay} {
-    transform: translateY(100%);
+    top: 100%;
   }
 `;
 

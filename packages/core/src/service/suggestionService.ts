@@ -1,8 +1,40 @@
-import { Suggestion } from '../entries/suggestion';
+import { IAppSdk } from '../AppSdk';
+import { FavoriteSuggestion, Suggestion } from '../entries/suggestion';
 import { WalletState } from '../entries/wallet';
+import { AppKey } from '../Keys';
+import { IStorage } from '../Storage';
 import { Configuration, EventApi } from '../tonApiV1';
 
+export const getFavoriteSuggestions = async (
+  storage: IStorage,
+  publicKey: string
+) => {
+  const result = await storage.get<FavoriteSuggestion[]>(
+    `${AppKey.favorites}_${publicKey}`
+  );
+  return result ?? [];
+};
+
+export const setFavoriteSuggestion = async (
+  storage: IStorage,
+  publicKey: string,
+  items: FavoriteSuggestion[]
+) => {
+  storage.set(`${AppKey.favorites}_${publicKey}`, items);
+};
+
+export const deleteFavoriteSuggestion = async (
+  storage: IStorage,
+  publicKey: string,
+  address: string
+) => {
+  let items = await getFavoriteSuggestions(storage, publicKey);
+  items = items.filter((item) => item.address !== address);
+  storage.set(`${AppKey.favorites}_${publicKey}`, items);
+};
+
 export const getSuggestionsList = async (
+  sdk: IAppSdk,
   tonApi: Configuration,
   wallet: WalletState
 ) => {
@@ -11,10 +43,10 @@ export const getSuggestionsList = async (
     limit: 100,
   });
 
+  const favorites = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);
   const list = [] as Suggestion[];
 
   items.events.forEach((event) => {
-    event.timestamp;
     const tonTransferEvent = event.actions.every(
       (item) => item.type === 'TonTransfer'
     );
@@ -27,7 +59,7 @@ export const getSuggestionsList = async (
 
     const address = recipient.tonTransfer!.recipient.address;
 
-    if (list.some((item) => item.address === address)) return;
+    if (list.concat(favorites).some((item) => item.address === address)) return;
 
     list.push({
       isFavorite: false,
@@ -36,5 +68,5 @@ export const getSuggestionsList = async (
     });
   });
 
-  return list.slice(0, 10);
+  return [...favorites, ...list.slice(0, 10)];
 };

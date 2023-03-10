@@ -99,9 +99,15 @@ export const DropDown = ({
     }
   };
 
+  const onOpen: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    toggling();
+  };
+
   return (
     <DropDownContainer>
-      <DropDownHeader onClick={toggling}>{children}</DropDownHeader>
+      <DropDownHeader onClick={onOpen}>{children}</DropDownHeader>
       {isOpen && (
         <Container onClose={toggling} center={center}>
           {payload(toggling)}
