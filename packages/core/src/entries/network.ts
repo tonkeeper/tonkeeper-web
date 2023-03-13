@@ -1,3 +1,4 @@
+import { TonClient } from 'ton';
 import { Configuration } from '../tonApiV1';
 import { TonendpointConfig } from '../tonkeeperApi/tonendpoint';
 
@@ -21,5 +22,15 @@ export const getTonClient = (config: TonendpointConfig, current?: Network) => {
     headers: {
       Authorization: `Bearer ${config.tonApiKey}`,
     },
+  });
+};
+
+/**
+ * @deprecated use ton api
+ */
+export const getOldTonClient = (config: TonendpointConfig) => {
+  return new TonClient({
+    endpoint: config.tonEndpoint,
+    apiKey: config.tonEndpointAPIKey,
   });
 };

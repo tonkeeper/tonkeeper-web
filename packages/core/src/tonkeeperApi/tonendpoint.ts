@@ -33,6 +33,15 @@ export interface TonendpointConfig {
 
   mercuryoSecret?: string;
   neocryptoWebView?: string;
+
+  /**
+   * @deprecated use ton api
+   */
+  tonEndpoint: string;
+  /**
+   * @deprecated use ton api
+   */
+  tonEndpointAPIKey: string;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';

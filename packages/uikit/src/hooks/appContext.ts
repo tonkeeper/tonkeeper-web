@@ -15,9 +15,11 @@ import {
   TonendpointConfig,
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import React, { useContext } from 'react';
+import { TonClient } from 'ton';
 
 export const AppContext = React.createContext<{
   tonApi: Configuration;
+  tonClient: TonClient;
   account: AccountState;
   auth: AuthState;
   fiat: FiatCurrencies;
@@ -26,6 +28,7 @@ export const AppContext = React.createContext<{
 }>({
   tonApi: new Configuration(),
   account: defaultAccountState,
+  tonClient: new TonClient({ endpoint: '' }),
   auth: defaultAuthState,
   fiat: FiatCurrencies.USD,
   config: defaultTonendpointConfig,

@@ -4,7 +4,11 @@ import {
   languages,
   localizationText,
 } from '@tonkeeper/core/dist/entries/language';
-import { getTonClient, Network } from '@tonkeeper/core/dist/entries/network';
+import {
+  getOldTonClient,
+  getTonClient,
+  Network,
+} from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -210,6 +214,7 @@ export const Loader: FC = () => {
   const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
   const context = {
     tonApi: getTonClient(config, network),
+    tonClient: getOldTonClient(config),
     auth,
     fiat,
     account,

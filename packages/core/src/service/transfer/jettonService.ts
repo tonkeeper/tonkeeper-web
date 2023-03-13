@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { TonClient } from 'ton';
 import {
   Address,
   beginCell,
@@ -7,19 +8,19 @@ import {
   SendMode,
   toNano,
 } from 'ton-core';
+import { mnemonicToPrivateKey } from 'ton-crypto';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
-import { Configuration, JettonBalance } from '../../tonApiV1';
+import { IStorage } from '../../Storage';
 import {
-  BlockchainApi,
-  Configuration as ConfigurationV2,
-} from '../../tonApiV2';
+  Configuration,
+  JettonBalance,
+  SendApi,
+  WalletApi,
+} from '../../tonApiV1';
 import { DefaultDecimals, toNumberAmount } from '../../utils/send';
-import {
-  externalMessage,
-  forwardPayloadComment,
-  walletContract,
-} from './common';
+import { getWalletMnemonic } from '../menmonicService';
+import { externalMessage, walletContract } from './common';
 
 const jettonTransferAmount = toNano('0.64');
 const jettonTransferForwardAmount = toNano('0.0001');
@@ -30,7 +31,7 @@ const jettonTransferBody = (params: {
   toAddress: Address;
   responseAddress: Address;
   forwardAmount: bigint;
-  forwardPayload: Builder;
+  forwardPayload: Builder | null;
 }) => {
   return beginCell()
     .storeUint(0xf8a7ea5, 32) // request_transfer op
@@ -41,39 +42,81 @@ const jettonTransferBody = (params: {
     .storeBit(false) // null custom_payload
     .storeCoins(params.forwardAmount)
     .storeBit(false) // forward_payload in this slice, not separate cell
-    .storeBuilder(params.forwardPayload)
+    .storeMaybeBuilder(params.forwardPayload)
     .endCell();
 };
 
-export const getJettonDate = async (
-  tonApi: Configuration,
+/**
+ * @deprecated use ton api
+ */
+const getJettonAddress = async (
+  tonClient: TonClient,
   jettonInfo: JettonBalance,
   recipient: RecipientData
 ) => {
-  const tonApiV2 = new ConfigurationV2({
-    ...(tonApi as any).configuration,
-  });
-  const result = await new BlockchainApi(tonApiV2).execGetMethod(
-    {
-      accountId: jettonInfo.jettonAddress,
-      methodName: 'get_jetton_data', //'get_wallet_address',
-    },
-    { method: 'GET' }
+  const result = await tonClient.callGetMethodWithError(
+    Address.parse(jettonInfo.jettonAddress),
+    'get_wallet_address',
+    [
+      {
+        type: 'slice',
+        cell: beginCell()
+          .storeAddress(Address.parse(recipient.toAccount.address.raw))
+          .endCell(),
+      },
+    ]
   );
 
-  console.log(result);
+  const jettonWalletAddress = result.stack.readAddress();
+
+  const jettonData = await tonClient.callGetMethodWithError(
+    jettonWalletAddress,
+    'get_wallet_data'
+  );
+
+  const balance = jettonData.stack.readBigNumber();
+  const owner = jettonData.stack.readAddress();
+  const jettonMaster = jettonData.stack.readAddress();
+
+  if (
+    jettonMaster.toString() !==
+    Address.parse(jettonInfo.jettonAddress).toString()
+  ) {
+    throw new Error('Jetton minter address not match');
+  }
+
+  return jettonWalletAddress;
 };
+
+// export const getJettonDate = async (
+//   tonApi: Configuration,
+//   jettonInfo: JettonBalance,
+//   recipient: RecipientData
+// ) => {
+//   const tonApiV2 = new ConfigurationV2({
+//     ...(tonApi as any).configuration,
+//   });
+//   const result = await new BlockchainApi(tonApiV2).execGetMethod(
+//     {
+//       accountId: jettonInfo.jettonAddress,
+//       methodName: 'get_jetton_data', //'get_wallet_address',
+//     },
+//     { method: 'GET' }
+//   );
+
+//   console.log(result);
+// };
 
 const createJettonTransfer = (
   seqno: number,
   walletState: WalletState,
-  recipient: RecipientData,
+  recipientAddress: string,
   data: AmountValue,
   jettonInfo: JettonBalance,
+  jettonWalletAddress: Address,
+  forwardPayload: Builder | null,
   secretKey: Buffer = Buffer.alloc(64)
 ) => {
-  const payloadCell = forwardPayloadComment(recipient.comment);
-
   const jettonAmount = data.max
     ? BigInt(jettonInfo.balance)
     : BigInt(
@@ -87,13 +130,11 @@ const createJettonTransfer = (
   const body = jettonTransferBody({
     queryId: Date.now(),
     jettonAmount,
-    toAddress: Address.parse(recipient.toAccount.address.raw),
+    toAddress: Address.parse(recipientAddress),
     responseAddress: Address.parse(walletState.active.rawAddress),
     forwardAmount: jettonTransferForwardAmount,
-    forwardPayload: payloadCell,
+    forwardPayload,
   });
-
-  const jettonWalletAddress = Address.parse('123');
 
   const contract = walletContract(walletState);
   const transfer = contract.createTransfer({
@@ -111,4 +152,72 @@ const createJettonTransfer = (
   });
 
   return externalMessage(contract, seqno, transfer).toBoc();
+};
+
+export const estimateJettonTransfer = async (
+  tonClient: TonClient,
+  tonApi: Configuration,
+  walletState: WalletState,
+  recipient: RecipientData,
+  data: AmountValue,
+  jettonInfo: JettonBalance
+) => {
+  const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
+    account: walletState.active.rawAddress,
+  });
+
+  const jettonWallet = await getJettonAddress(tonClient, jettonInfo, recipient);
+  const cell = createJettonTransfer(
+    seqno,
+    walletState,
+    recipient.toAccount.address.raw,
+    data,
+    jettonInfo,
+    jettonWallet,
+    null
+  );
+
+  const { fee } = await new SendApi(tonApi).estimateTx({
+    sendBocRequest: { boc: cell.toString('base64') },
+  });
+  return fee;
+};
+
+export const sendJettonTransfer = async (
+  storage: IStorage,
+  tonClient: TonClient,
+  tonApi: Configuration,
+  walletState: WalletState,
+  recipient: RecipientData,
+  data: AmountValue,
+  jettonInfo: JettonBalance,
+  password: string
+) => {
+  const mnemonic = await getWalletMnemonic(
+    storage,
+    walletState.publicKey,
+    password
+  );
+  const keyPair = await mnemonicToPrivateKey(mnemonic);
+
+  const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
+    account: walletState.active.rawAddress,
+  });
+
+  const jettonWallet = await getJettonAddress(tonClient, jettonInfo, recipient);
+
+  const cell = createJettonTransfer(
+    seqno,
+    walletState,
+    recipient.toAccount.address.raw,
+    data,
+    jettonInfo,
+    jettonWallet,
+    null,
+    keyPair.secretKey
+  );
+
+  await new SendApi(tonApi).sendBoc({
+    sendBocRequest: { boc: cell.toString('base64') },
+  });
 };

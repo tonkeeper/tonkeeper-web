@@ -1,7 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
-import { getTonClient, Network } from '@tonkeeper/core/dist/entries/network';
+import {
+  getOldTonClient,
+  getTonClient,
+  Network,
+} from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -170,6 +174,7 @@ export const Loader: FC = React.memo(() => {
 
   const context = {
     tonApi: getTonClient(config, network),
+    tonClient: getOldTonClient(config),
     account,
     auth,
     fiat,
