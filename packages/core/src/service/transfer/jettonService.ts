@@ -114,7 +114,6 @@ const createJettonTransfer = (
   recipientAddress: string,
   data: AmountValue,
   jettonInfo: JettonBalance,
-  jettonWalletAddress: Address,
   forwardPayload: Builder | null,
   secretKey: Buffer = Buffer.alloc(64)
 ) => {
@@ -128,6 +127,7 @@ const createJettonTransfer = (
           .toString()
       );
 
+      
   const body = jettonTransferBody({
     queryId: Date.now(),
     jettonAmount,
@@ -144,7 +144,7 @@ const createJettonTransfer = (
     sendMode: SendMode.PAY_GAS_SEPARATLY + SendMode.IGNORE_ERRORS,
     messages: [
       internal({
-        to: jettonWalletAddress,
+        to: Address.parse(jettonInfo.walletAddress.address),
         bounce: true,
         value: jettonTransferAmount,
         body: body,
@@ -156,7 +156,6 @@ const createJettonTransfer = (
 };
 
 export const estimateJettonTransfer = async (
-  tonClient: TonClient,
   tonApi: Configuration,
   walletState: WalletState,
   recipient: RecipientData,
@@ -167,14 +166,12 @@ export const estimateJettonTransfer = async (
     account: walletState.active.rawAddress,
   });
 
-  const jettonWallet = await getJettonAddress(tonClient, jettonInfo, recipient);
   const cell = createJettonTransfer(
     seqno,
     walletState,
     recipient.toAccount.address.raw,
     data,
     jettonInfo,
-    jettonWallet,
     null
   );
 
@@ -186,7 +183,6 @@ export const estimateJettonTransfer = async (
 
 export const sendJettonTransfer = async (
   storage: IStorage,
-  tonClient: TonClient,
   tonApi: Configuration,
   walletState: WalletState,
   recipient: RecipientData,
@@ -205,15 +201,12 @@ export const sendJettonTransfer = async (
     account: walletState.active.rawAddress,
   });
 
-  const jettonWallet = await getJettonAddress(tonClient, jettonInfo, recipient);
-
   const cell = createJettonTransfer(
     seqno,
     walletState,
     recipient.toAccount.address.raw,
     data,
     jettonInfo,
-    jettonWallet,
     null,
     keyPair.secretKey
   );

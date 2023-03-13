@@ -38,7 +38,7 @@ const useSendTransaction = (
   jettons: JettonsBalances
 ) => {
   const sdk = useAppSdk();
-  const { tonApi, tonClient } = useAppContext();
+  const { tonApi } = useAppContext();
   const wallet = useWalletContext();
 
   return useMutation<void, Error>(async () => {
@@ -56,7 +56,7 @@ const useSendTransaction = (
       const [jettonInfo] = jettons.balances.filter(
         (item) => item.jettonAddress === amount.jetton
       );
-      return sendJettonTransfer(sdk.storage, tonClient, tonApi, wallet, recipient, amount, jettonInfo, password);
+      return sendJettonTransfer(sdk.storage, tonApi, wallet, recipient, amount, jettonInfo, password);
     }
   });
 };

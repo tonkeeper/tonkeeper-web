@@ -2,9 +2,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
 import {
-  getOldTonClient,
   getTonClient,
-  Network,
+  Network
 } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
@@ -16,21 +15,21 @@ import {
   ActivitySkeleton,
   CoinSkeleton,
   HomeSkeleton,
-  SettingsSkeleton,
+  SettingsSkeleton
 } from '@tonkeeper/uikit/dist/components/SKeleton';
 import {
   AppContext,
-  WalletStateContext,
+  WalletStateContext
 } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
   AfterImportAction,
   AppSdkContext,
-  OnImportAction,
+  OnImportAction
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import {
   I18nContext,
-  TranslationContext,
+  TranslationContext
 } from '@tonkeeper/uikit/dist/hooks/translation';
 import { any, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
@@ -38,14 +37,14 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import {
   Initialize,
-  InitializeContainer,
+  InitializeContainer
 } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/ThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import {
   useTonendpoint,
-  useTonenpointConfig,
+  useTonenpointConfig
 } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Body, Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -55,14 +54,14 @@ import React, {
   Suspense,
   useEffect,
   useMemo,
-  useState,
+  useState
 } from 'react';
 import {
   MemoryRouter,
   Route,
   Routes,
   useLocation,
-  useNavigate,
+  useNavigate
 } from 'react-router-dom';
 import styled from 'styled-components';
 import browser from 'webextension-polyfill';
@@ -174,7 +173,6 @@ export const Loader: FC = React.memo(() => {
 
   const context = {
     tonApi: getTonClient(config, network),
-    tonClient: getOldTonClient(config),
     account,
     auth,
     fiat,

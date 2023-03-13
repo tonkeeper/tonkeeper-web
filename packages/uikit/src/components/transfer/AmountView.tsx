@@ -138,7 +138,7 @@ const useEstimateTransaction = (
   jetton: string,
   jettons: JettonsBalances
 ) => {
-  const { tonApi, tonClient } = useAppContext();
+  const { tonApi } = useAppContext();
   const wallet = useWalletContext();
 
   return useMutation(async (options: AmountValue) => {
@@ -148,7 +148,7 @@ const useEstimateTransaction = (
       const [jettonInfo] = jettons.balances.filter(
         (item) => item.jettonAddress === jetton
       );
-      return estimateJettonTransfer(tonClient, tonApi, wallet, recipient, options, jettonInfo);
+      return estimateJettonTransfer(tonApi, wallet, recipient, options, jettonInfo);
     }
   });
 };
