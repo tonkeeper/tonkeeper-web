@@ -28,13 +28,3 @@ export const getScrollbarWidth = () => {
 
   return scrollbarWidth;
 };
-
-
-export const virtualKeyboardHeight = () => {
-  var sx = document.body.scrollLeft, sy = document.body.scrollTop;
-  var naturalHeight = window.innerHeight;
-  window.scrollTo(sx, document.body.scrollHeight);
-  var keyboardHeight = naturalHeight - window.innerHeight;
-  window.scrollTo(sx, sy);
-  return keyboardHeight;
-};
