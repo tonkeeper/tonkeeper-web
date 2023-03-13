@@ -35,6 +35,7 @@ export class ExtensionAppSdk implements IAppSdk {
   disableScroll = () => null;
   enableScroll = () => null;
   getScrollbarWidth = () => 0;
+  getKeyboardHeight = () => 0;
 
   static openTab(options: browser.Tabs.CreateCreatePropertiesType) {
     return new Promise((resolve, reject) => {

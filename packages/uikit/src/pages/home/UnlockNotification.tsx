@@ -10,7 +10,6 @@ import styled from 'styled-components';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
 import { Notification } from '../../components/Notification';
-import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
 
 export const getPasswordByNotification = async (
@@ -46,7 +45,7 @@ export const getPasswordByNotification = async (
   });
 };
 
-const Block = styled.form`
+const Block = styled.form<{ padding: number }>`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -54,23 +53,23 @@ const Block = styled.form`
   justify-content: center;
   gap: 2rem;
   width: 100%;
+
+  padding-bottom: ${props => props.padding}px;
 `;
 
 const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
-  const storage = useStorage();
-
   return useMutation<void, Error, string>(async (password) => {
-    const account = await getAccountState(storage);
+    const account = await getAccountState(sdk.storage);
     if (account.publicKeys.length === 0) {
       throw new Error('Missing wallets');
     }
     const [publicKey] = account.publicKeys;
-    const wallet = await getWalletState(storage, publicKey);
+    const wallet = await getWalletState(sdk.storage, publicKey);
     if (!wallet) {
       throw new Error('Missing wallet');
     }
 
-    const isValid = await validateWalletMnemonic(storage, publicKey, password);
+    const isValid = await validateWalletMnemonic(sdk.storage, publicKey, password);
     if (!isValid) {
       throw new Error('Mnemonic not valid');
     }
@@ -84,17 +83,21 @@ const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
 };
 
 const PasswordUnlock: FC<{
+  sdk: IAppSdk
   onClose: () => void;
   onSubmit: (password: string) => void;
   isError: boolean;
   isLoading: boolean;
-}> = ({ onClose, onSubmit, isError, isLoading }) => {
+}> = ({ sdk, onClose, onSubmit, isError, isLoading }) => {
+
   const { t } = useTranslation();
 
   const ref = useRef<HTMLInputElement | null>(null);
   const [password, setPassword] = useState('');
   const [active, setActive] = useState(false);
   const location = useLocation();
+
+  const [padding, setPadding] = useState(0);
 
   useEffect(() => {
     if (!active) {
@@ -107,6 +110,23 @@ const PasswordUnlock: FC<{
   useEffect(() => {
     if (ref.current) {
       ref.current.focus();
+
+      ref.current.onfocus = () => {
+        setTimeout(() => { 
+            setPadding(sdk.getKeyboardHeight());
+          }, 200);
+      }
+
+      ref.current.onblur = () => {
+        setPadding(0);
+      }
+    }
+
+    return () => {
+      if (ref.current) {
+        ref.current.onfocus = null;
+        ref.current.onblur = null;
+      }
     }
   }, [ref.current]);
 
@@ -115,13 +135,12 @@ const PasswordUnlock: FC<{
   };
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    console.log('submit');
     e.preventDefault();
     onSubmit(password);
   };
 
   return (
-    <Block onSubmit={handleSubmit}>
+    <Block onSubmit={handleSubmit} padding={padding}>
       <Input
         ref={ref}
         value={password}
@@ -208,13 +227,14 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     if (!auth || !requestId) return undefined;
     return (
       <PasswordUnlock
+      sdk={sdk}
         onClose={onCancel}
         onSubmit={onSubmit}
         isLoading={isLoading}
         isError={isError}
       />
     );
-  }, [auth, requestId, onSubmit]);
+  }, [sdk, auth, requestId, onSubmit]);
 
   return (
     <Notification

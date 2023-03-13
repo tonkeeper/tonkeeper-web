@@ -17,4 +17,5 @@ export class DesktopAppSdk implements IAppSdk {
   disableScroll = () => null;
   enableScroll = () => null;
   getScrollbarWidth = () => 0;
+  getKeyboardHeight = () => 0;
 }

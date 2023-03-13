@@ -3,7 +3,7 @@ import { EventEmitter } from '@tonkeeper/core/dist/entries/eventEmitter';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
-import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
+import { disableScroll, enableScroll, getScrollbarWidth, virtualKeyboardHeight } from './scroll';
 
 export class BrowserAppSdk implements IAppSdk {
   constructor(public storage: IStorage) {}
@@ -23,6 +23,8 @@ export class BrowserAppSdk implements IAppSdk {
   disableScroll = disableScroll;
   enableScroll = enableScroll;
   getScrollbarWidth = getScrollbarWidth;
+  getKeyboardHeight = virtualKeyboardHeight;
+  
   uiEvents = new EventEmitter();
   version = packageJson.version ?? 'Unknown';
 }
