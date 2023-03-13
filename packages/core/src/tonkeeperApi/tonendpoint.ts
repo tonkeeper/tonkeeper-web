@@ -41,13 +41,14 @@ export interface TonendpointConfig {
   /**
    * @deprecated use ton api
    */
-  tonEndpointAPIKey: string;
+  tonEndpointAPIKey?: string;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';
 
 export const defaultTonendpointConfig: TonendpointConfig = {
   tonendpoint: defaultTonendpoint,
+  tonEndpoint: "",
   flags: {},
 };
 
