@@ -66,6 +66,9 @@ const AddFavoriteContent: FC<{
   const ref = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
+    if (/iPhone|iPad|iPod/.test(window.navigator.userAgent)) {
+      return;
+    }
     if (ref.current) {
       ref.current.focus();
     }
@@ -219,6 +222,9 @@ const EditFavoriteContent: FC<{
 
   const isLoading = isEditLoading || isDeleteLoading;
   useEffect(() => {
+    if (/iPhone|iPad|iPod/.test(window.navigator.userAgent)) {
+      return;
+    }
     if (ref.current) {
       ref.current.focus();
     }

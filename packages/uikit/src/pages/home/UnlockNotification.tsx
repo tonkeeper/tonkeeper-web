@@ -111,22 +111,12 @@ const PasswordUnlock: FC<{
   }, [location]);
 
   useEffect(() => {
-    const handler = (e: UIEvent) => {
-      setTimeout(() => {
-        setPadding(sdk.getKeyboardHeight());
-      }, 100);
-      document.title = 'Virtual keyboard detected!!!';
-    };
-
-    window.addEventListener('resize', handler);
-
+    if (/iPhone|iPad|iPod/.test(window.navigator.userAgent)) {
+      return;
+    }
     if (ref.current) {
       ref.current.focus();
     }
-
-    return () => {
-      window.removeEventListener('resize', handler);
-    };
   }, [ref.current]);
 
   const onChange = (value: string) => {
