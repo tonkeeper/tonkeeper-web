@@ -3,9 +3,8 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
   AmountData,
   AmountValue,
-  RecipientData,
+  RecipientData
 } from '@tonkeeper/core/dist/entries/send';
-import { getJettonDate } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
@@ -15,7 +14,7 @@ import {
   getMaxValue,
   getRemaining,
   isNumeric,
-  parseAndValidateInput,
+  parseAndValidateInput
 } from '@tonkeeper/core/dist/utils/send';
 import React, {
   FC,
@@ -23,7 +22,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -36,7 +35,7 @@ import { Gap } from '../Layout';
 import {
   FullHeightBlock,
   NotificationCancelButton,
-  NotificationTitleBlock,
+  NotificationTitleBlock
 } from '../Notification';
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
 import { AssetSelect } from './AssetSelect';
@@ -148,7 +147,6 @@ const useEstimateTransaction = (
       const [jettonInfo] = jettons.balances.filter(
         (item) => item.jettonAddress === jetton
       );
-      await getJettonDate(tonApi, jettonInfo, recipient);
       throw new Error('Undone');
     }
   });
