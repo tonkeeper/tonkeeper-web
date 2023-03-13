@@ -6,7 +6,7 @@ import {
   Builder,
   internal,
   SendMode,
-  toNano,
+  toNano
 } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { AmountValue, RecipientData } from '../../entries/send';
@@ -16,7 +16,7 @@ import {
   Configuration,
   JettonBalance,
   SendApi,
-  WalletApi,
+  WalletApi
 } from '../../tonApiV1';
 import { DefaultDecimals, toNumberAmount } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
@@ -73,16 +73,17 @@ const getJettonAddress = async (
     jettonWalletAddress,
     'get_wallet_data'
   );
-
-  const balance = jettonData.stack.readBigNumber();
-  const owner = jettonData.stack.readAddress();
-  const jettonMaster = jettonData.stack.readAddress();
-
-  if (
-    jettonMaster.toString() !==
-    Address.parse(jettonInfo.jettonAddress).toString()
-  ) {
-    throw new Error('Jetton minter address not match');
+  if (jettonData.exit_code === 0) {
+    const balance = jettonData.stack.readBigNumber();
+    const owner = jettonData.stack.readAddress();
+    const jettonMaster = jettonData.stack.readAddress();
+  
+    if (
+      jettonMaster.toString() !==
+      Address.parse(jettonInfo.jettonAddress).toString()
+    ) {
+      throw new Error('Jetton minter address not match');
+    }
   }
 
   return jettonWalletAddress;

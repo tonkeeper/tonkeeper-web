@@ -5,6 +5,7 @@ import {
   AmountValue,
   RecipientData
 } from '@tonkeeper/core/dist/entries/send';
+import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
@@ -137,7 +138,7 @@ const useEstimateTransaction = (
   jetton: string,
   jettons: JettonsBalances
 ) => {
-  const { tonApi } = useAppContext();
+  const { tonApi, tonClient } = useAppContext();
   const wallet = useWalletContext();
 
   return useMutation(async (options: AmountValue) => {
@@ -147,7 +148,7 @@ const useEstimateTransaction = (
       const [jettonInfo] = jettons.balances.filter(
         (item) => item.jettonAddress === jetton
       );
-      throw new Error('Undone');
+      return estimateJettonTransfer(tonClient, tonApi, wallet, recipient, options, jettonInfo);
     }
   });
 };

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { TonClient } from 'ton';
 import { Configuration } from '../tonApiV1';
 import { TonendpointConfig } from '../tonkeeperApi/tonendpoint';
@@ -24,6 +25,15 @@ export const getTonClient = (config: TonendpointConfig, current?: Network) => {
     },
   });
 };
+
+
+axios.interceptors.request.use(function (config) {
+  if (config.headers) {
+    // Broke CORS
+    delete config.headers["X-Ton-Client-Version"];
+  }
+  return config;
+}, undefined);
 
 /**
  * @deprecated use ton api

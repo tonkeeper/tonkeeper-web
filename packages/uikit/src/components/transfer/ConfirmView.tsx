@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
@@ -18,14 +19,14 @@ import { Button } from '../fields/Button';
 import {
   CheckmarkCircleIcon,
   ChevronLeftIcon,
-  ExclamationMarkCircleIcon,
+  ExclamationMarkCircleIcon
 } from '../Icon';
 import { ColumnText, Gap } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import {
   FullHeightBlock,
   NotificationCancelButton,
-  NotificationTitleBlock,
+  NotificationTitleBlock
 } from '../Notification';
 import { Label1, Label2 } from '../Text';
 import { ButtonBlock, Label, ResultButton, useFiatAmount } from './common';
@@ -37,7 +38,7 @@ const useSendTransaction = (
   jettons: JettonsBalances
 ) => {
   const sdk = useAppSdk();
-  const { tonApi } = useAppContext();
+  const { tonApi, tonClient } = useAppContext();
   const wallet = useWalletContext();
 
   return useMutation<void, Error>(async () => {
@@ -55,7 +56,7 @@ const useSendTransaction = (
       const [jettonInfo] = jettons.balances.filter(
         (item) => item.jettonAddress === amount.jetton
       );
-      throw new Error('Undone');
+      return sendJettonTransfer(sdk.storage, tonClient, tonApi, wallet, recipient, amount, jettonInfo, password);
     }
   });
 };
