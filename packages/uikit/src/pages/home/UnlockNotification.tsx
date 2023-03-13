@@ -54,7 +54,7 @@ const Block = styled.form<{ padding: number }>`
   gap: 2rem;
   width: 100%;
 
-  padding-bottom: ${props => props.padding}px;
+  padding-bottom: ${(props) => props.padding}px;
 `;
 
 const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
@@ -69,7 +69,11 @@ const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
       throw new Error('Missing wallet');
     }
 
-    const isValid = await validateWalletMnemonic(sdk.storage, publicKey, password);
+    const isValid = await validateWalletMnemonic(
+      sdk.storage,
+      publicKey,
+      password
+    );
     if (!isValid) {
       throw new Error('Mnemonic not valid');
     }
@@ -83,13 +87,12 @@ const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
 };
 
 const PasswordUnlock: FC<{
-  sdk: IAppSdk
+  sdk: IAppSdk;
   onClose: () => void;
   onSubmit: (password: string) => void;
   isError: boolean;
   isLoading: boolean;
 }> = ({ sdk, onClose, onSubmit, isError, isLoading }) => {
-
   const { t } = useTranslation();
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -108,26 +111,22 @@ const PasswordUnlock: FC<{
   }, [location]);
 
   useEffect(() => {
+    const handler = (e: UIEvent) => {
+      setTimeout(() => {
+        setPadding(sdk.getKeyboardHeight());
+      }, 100);
+      document.title = 'Virtual keyboard detected!!!';
+    };
+
+    window.addEventListener('resize', handler);
+
     if (ref.current) {
       ref.current.focus();
-
-      ref.current.onfocus = () => {
-        setTimeout(() => { 
-            setPadding(sdk.getKeyboardHeight());
-          }, 200);
-      }
-
-      ref.current.onblur = () => {
-        setPadding(0);
-      }
     }
 
     return () => {
-      if (ref.current) {
-        ref.current.onfocus = null;
-        ref.current.onblur = null;
-      }
-    }
+      window.removeEventListener('resize', handler);
+    };
   }, [ref.current]);
 
   const onChange = (value: string) => {
@@ -227,7 +226,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     if (!auth || !requestId) return undefined;
     return (
       <PasswordUnlock
-      sdk={sdk}
+        sdk={sdk}
         onClose={onCancel}
         onSubmit={onSubmit}
         isLoading={isLoading}
