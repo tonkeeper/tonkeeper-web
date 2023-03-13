@@ -1,11 +1,9 @@
 export const disableScroll = () => {
-  document.documentElement.style.overflow = 'hidden';
   window.document.body.style.overflow = 'hidden';
   window.document.body.style.paddingRight = `${getScrollbarWidth()}px`;
 };
 
 export const enableScroll = () => {
-  document.documentElement.style.overflow = 'auto';
   window.document.body.style.overflow = 'auto';
   window.document.body.style.paddingRight = '0px';
 };
@@ -31,9 +29,9 @@ export const getScrollbarWidth = () => {
   return scrollbarWidth;
 };
 
+
 export const virtualKeyboardHeight = () => {
-  var sx = document.body.scrollLeft,
-    sy = document.body.scrollTop;
+  var sx = document.body.scrollLeft, sy = document.body.scrollTop;
   var naturalHeight = window.innerHeight;
   window.scrollTo(sx, document.body.scrollHeight);
   var keyboardHeight = naturalHeight - window.innerHeight;
