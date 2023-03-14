@@ -19,6 +19,7 @@ import {
 } from '../Notification';
 import { Body2, H3, Label1 } from '../Text';
 import { ButtonBlock } from './common';
+import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
 
 const Label = styled(Label1)`
@@ -148,6 +149,8 @@ export const RecipientView: FC<{
     return recipient.address;
   }, [recipient]);
 
+  const showAddress = useShowAddress(ref, formatted, toAccount);
+
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -164,14 +167,16 @@ export const RecipientView: FC<{
         <H3>{title}</H3>
         <NotificationCancelButton handleClose={onClose} />
       </NotificationTitleBlock>
+      <ShowAddress value={showAddress}>
+        <Input
+          ref={ref}
+          value={formatted}
+          onChange={(address) => setAddress({ address })}
+          label={t('transaction_recipient_address')}
+          isValid={!submitted || isDnsFetching || isValid}
+        />
+      </ShowAddress>
 
-      <Input
-        ref={ref}
-        value={formatted}
-        onChange={(address) => setAddress({ address })}
-        label={t('transaction_recipient_address')}
-        isValid={!submitted || isDnsFetching || isValid}
-      />
       {allowComment && (
         <Input
           value={comment}
