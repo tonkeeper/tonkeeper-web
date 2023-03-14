@@ -1,12 +1,18 @@
+import BigNumber from 'bignumber.js';
 import { internal, SendMode, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration, SendApi, WalletApi } from '../../tonApiV1';
+import { Configuration, Fee, SendApi, WalletApi } from '../../tonApiV1';
 import { toStringAmount } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
-import { externalMessage, walletContract } from './common';
+import {
+  checkWalletBalance,
+  externalMessage,
+  getWalletBalance,
+  walletContract,
+} from './common';
 
 const createTonTransfer = (
   seqno: number,
@@ -57,6 +63,7 @@ export const sendTonTransfer = async (
   walletState: WalletState,
   recipient: RecipientData,
   data: AmountValue,
+  fee: Fee,
   password: string
 ) => {
   const mnemonic = await getWalletMnemonic(
@@ -66,9 +73,13 @@ export const sendTonTransfer = async (
   );
   const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-  const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
-    account: walletState.active.rawAddress,
-  });
+  const total = new BigNumber(fee.total).plus(
+    toNano(toStringAmount(data.amount)).toString()
+  );
+
+  const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+  checkWalletBalance(total, wallet);
+
   const cell = createTonTransfer(
     seqno,
     walletState,

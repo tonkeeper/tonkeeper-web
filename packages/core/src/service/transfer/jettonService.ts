@@ -6,7 +6,7 @@ import {
   Builder,
   internal,
   SendMode,
-  toNano
+  toNano,
 } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { AmountValue, RecipientData } from '../../entries/send';
@@ -14,13 +14,19 @@ import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
 import {
   Configuration,
+  Fee,
   JettonBalance,
   SendApi,
-  WalletApi
+  WalletApi,
 } from '../../tonApiV1';
 import { DefaultDecimals, toNumberAmount } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
-import { externalMessage, walletContract } from './common';
+import {
+  checkWalletBalance,
+  externalMessage,
+  getWalletBalance,
+  walletContract,
+} from './common';
 
 const jettonTransferAmount = toNano('0.64');
 const jettonTransferForwardAmount = toNano('0.0001');
@@ -77,7 +83,7 @@ const getJettonAddress = async (
     const balance = jettonData.stack.readBigNumber();
     const owner = jettonData.stack.readAddress();
     const jettonMaster = jettonData.stack.readAddress();
-  
+
     if (
       jettonMaster.toString() !==
       Address.parse(jettonInfo.jettonAddress).toString()
@@ -127,7 +133,6 @@ const createJettonTransfer = (
           .toString()
       );
 
-      
   const body = jettonTransferBody({
     queryId: Date.now(),
     jettonAmount,
@@ -188,6 +193,7 @@ export const sendJettonTransfer = async (
   recipient: RecipientData,
   data: AmountValue,
   jettonInfo: JettonBalance,
+  fee: Fee,
   password: string
 ) => {
   const mnemonic = await getWalletMnemonic(
@@ -197,9 +203,10 @@ export const sendJettonTransfer = async (
   );
   const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-  const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
-    account: walletState.active.rawAddress,
-  });
+  const total = new BigNumber(fee.total).plus(jettonTransferAmount.toString());
+
+  const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+  checkWalletBalance(total, wallet);
 
   const cell = createJettonTransfer(
     seqno,

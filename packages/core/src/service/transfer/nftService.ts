@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import {
   Address,
   beginCell,
@@ -11,9 +12,20 @@ import { mnemonicToPrivateKey } from 'ton-crypto';
 import { RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration, NftItemRepr, SendApi, WalletApi } from '../../tonApiV1';
+import {
+  Configuration,
+  Fee,
+  NftItemRepr,
+  SendApi,
+  WalletApi,
+} from '../../tonApiV1';
 import { getWalletMnemonic } from '../menmonicService';
-import { externalMessage, walletContract } from './common';
+import {
+  checkWalletBalance,
+  externalMessage,
+  getWalletBalance,
+  walletContract,
+} from './common';
 
 const initNftTransferAmount = toNano('1');
 const nftTransferForwardAmount = toNano(fromNano('1'));
@@ -103,6 +115,7 @@ export const sendNftTransfer = async (
   walletState: WalletState,
   recipient: RecipientData,
   nftItem: NftItemRepr,
+  fee: Fee,
   password: string
 ) => {
   const mnemonic = await getWalletMnemonic(
@@ -112,15 +125,27 @@ export const sendNftTransfer = async (
   );
   const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-  const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
-    account: walletState.active.rawAddress,
-  });
+  const nftTransferAmount = new BigNumber(fee.deposit)
+    .minus(fee.refund)
+    .plus(toNano('0.05').toString());
+
+  const total = nftTransferAmount.plus(fee.total);
+
+  if (nftTransferAmount.isLessThanOrEqualTo(0)) {
+    throw new Error(
+      `Unexpected nft transfer amount: ${nftTransferAmount.toString()}`
+    );
+  }
+
+  const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+  checkWalletBalance(total, wallet);
+
   const cell = createNftTransfer(
     seqno,
     walletState,
     recipient.toAccount.address.raw,
     nftItem.address,
-    initNftTransferAmount,
+    BigInt(nftTransferAmount.toString()),
     null,
     keyPair.secretKey
   );

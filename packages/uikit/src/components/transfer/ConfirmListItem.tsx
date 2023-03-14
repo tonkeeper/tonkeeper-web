@@ -9,7 +9,10 @@ import { ListItem, ListItemPayload } from '../List';
 import { Label1 } from '../Text';
 import { Label } from './common';
 
-const RecipientItem: FC<{ name: string }> = ({ name }) => {
+const RecipientItem: FC<{ name: string; label: string }> = ({
+  name,
+  label,
+}) => {
   const { t } = useTranslation();
   const sdk = useAppSdk();
 
@@ -17,7 +20,7 @@ const RecipientItem: FC<{ name: string }> = ({ name }) => {
     <ListItem onClick={() => sdk.copyToClipboard(name)}>
       <ListItemPayload>
         <Label>{t('txActions_signRaw_recipient')}</Label>
-        <Label1>{name}</Label1>
+        <Label1>{label}</Label1>
       </ListItemPayload>
     </ListItem>
   );
@@ -47,7 +50,10 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({
   if ('dns' in recipient.address) {
     return (
       <>
-        <RecipientItem name={recipient.address.address} />
+        <RecipientItem
+          name={recipient.address.address}
+          label={recipient.address.address}
+        />
         <RecipientItemAddress
           address={recipient.toAccount.address.bounceable}
         />
@@ -59,7 +65,7 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({
   if (name) {
     return (
       <>
-        <RecipientItem name={name} />
+        <RecipientItem name={name} label={name} />
         <RecipientItemAddress
           address={recipient.toAccount.address.bounceable}
         />
@@ -67,7 +73,12 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({
     );
   }
 
-  return <RecipientItem name={recipient.toAccount.address.bounceable} />;
+  return (
+    <RecipientItem
+      name={recipient.toAccount.address.bounceable}
+      label={toShortAddress(recipient.toAccount.address.bounceable)}
+    />
+  );
 };
 
 export const AmountListItem: FC<{

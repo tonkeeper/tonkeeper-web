@@ -55,6 +55,7 @@ const useSendTransaction = (
         wallet,
         recipient,
         amount,
+        amount.fee,
         password
       );
     } else {
@@ -68,6 +69,7 @@ const useSendTransaction = (
         recipient,
         amount,
         jettonInfo,
+        amount.fee,
         password
       );
     }
@@ -84,7 +86,6 @@ export const ConfirmView: FC<{
 }> = ({ recipient, onBack, onClose, width, amount, jettons }) => {
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
-  const sdk = useAppSdk();
 
   const { mutateAsync, isLoading, error } = useSendTransaction(
     recipient,

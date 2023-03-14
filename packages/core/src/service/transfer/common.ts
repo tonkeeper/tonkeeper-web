@@ -1,9 +1,16 @@
+import BigNumber from 'bignumber.js';
 import { beginCell, Cell, external } from 'ton-core';
 
 import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
 import { WalletState, WalletVersion } from '../../entries/wallet';
+import {
+  AccountApi,
+  AccountRepr,
+  Configuration,
+  WalletApi,
+} from '../../tonApiV1';
 
 const workchain = 0;
 
@@ -45,4 +52,28 @@ export const forwardPayloadComment = (comment: string) => {
   }
 
   return result;
+};
+
+export const checkWalletBalance = (total: BigNumber, wallet: AccountRepr) => {
+  if (total.isGreaterThanOrEqualTo(wallet.balance)) {
+    throw new Error(
+      `Not enough account "${wallet.address}" amount: "${
+        wallet.balance
+      }", transaction total: ${total.toString()}`
+    );
+  }
+};
+
+export const getWalletBalance = async (
+  tonApi: Configuration,
+  walletState: WalletState
+) => {
+  const wallet = await new AccountApi(tonApi).getAccountInfo({
+    account: walletState.active.rawAddress,
+  });
+  const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
+    account: walletState.active.rawAddress,
+  });
+
+  return [wallet, seqno] as const;
 };

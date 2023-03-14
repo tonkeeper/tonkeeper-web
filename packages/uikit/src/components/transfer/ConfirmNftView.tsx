@@ -31,13 +31,18 @@ import { ButtonBlock, Label, ResultButton, useFaitTonAmount } from './common';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { FeeListItem, RecipientListItem } from './ConfirmListItem';
 
-const useSendNft = (recipient: RecipientData, nftItem: NftItemRepr) => {
+const useSendNft = (
+  recipient: RecipientData,
+  nftItem: NftItemRepr,
+  fee?: Fee
+) => {
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
   const client = useQueryClient();
 
   return useMutation<void, Error>(async () => {
+    if (!fee) return;
     const password = await getWalletPassword(sdk);
     await sendNftTransfer(
       sdk.storage,
@@ -45,6 +50,7 @@ const useSendNft = (recipient: RecipientData, nftItem: NftItemRepr) => {
       wallet,
       recipient,
       nftItem,
+      fee,
       password
     );
 
@@ -64,7 +70,7 @@ export const ConfirmNftView: FC<{
   const { t } = useTranslation();
   const sdk = useAppSdk();
 
-  const { mutateAsync, isLoading, error } = useSendNft(recipient, nftItem);
+  const { mutateAsync, isLoading, error } = useSendNft(recipient, nftItem, fee);
 
   const isValid = !isLoading;
 
@@ -153,7 +159,7 @@ export const ConfirmNftView: FC<{
             primary
             type="submit"
             disabled={!isValid}
-            loading={isLoading}
+            loading={isLoading || fee == undefined}
           >
             {t('confirm_sending_submit')}
           </Button>
