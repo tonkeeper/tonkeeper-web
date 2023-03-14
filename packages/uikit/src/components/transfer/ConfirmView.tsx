@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
@@ -41,6 +41,7 @@ const useSendTransaction = (
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
+  const client = useQueryClient();
 
   return useMutation<void, Error>(async () => {
     const password = await getWalletPassword(sdk);
@@ -67,6 +68,7 @@ const useSendTransaction = (
         password
       );
     }
+    await client.invalidateQueries();
   });
 };
 

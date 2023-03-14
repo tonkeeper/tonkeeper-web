@@ -1,7 +1,12 @@
-import { AccountRepr, Fee } from '../tonApiV1';
+import { AccountRepr, Fee, WalletDNS } from '../tonApiV1';
 import { Suggestion } from './suggestion';
 
-export type Recipient = Suggestion | { address: string };
+export type DnsRecipient = {
+  address: string;
+  dns: WalletDNS;
+};
+
+export type Recipient = Suggestion | { address: string } | DnsRecipient;
 
 export interface RecipientData {
   address: Recipient;

@@ -31,6 +31,17 @@ export function throttle<Args extends unknown[]>(
   return throttled;
 }
 
+export function debounce<Args extends unknown[]>(
+  fn: (...args: Args) => void,
+  ms = 300
+) {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return function (this: any, ...args: Args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn.apply(this, args), ms);
+  };
+}
+
 export const toShortAddress = (address: string, length = 4): string => {
   return toShortValue(Address.parse(address).toString(), length);
 };

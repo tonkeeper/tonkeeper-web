@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { sendNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
@@ -35,6 +35,7 @@ const useSendNft = (recipient: RecipientData, nftItem: NftItemRepr) => {
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
+  const client = useQueryClient();
 
   return useMutation<void, Error>(async () => {
     const password = await getWalletPassword(sdk);
@@ -46,6 +47,8 @@ const useSendNft = (recipient: RecipientData, nftItem: NftItemRepr) => {
       nftItem,
       password
     );
+
+    await client.invalidateQueries();
   });
 };
 

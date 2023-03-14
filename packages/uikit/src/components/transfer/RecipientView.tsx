@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Recipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { AccountApi, AccountRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { AccountApi, AccountRepr, DNSApi } from '@tonkeeper/core/dist/tonApiV1';
+import { debounce } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
@@ -16,7 +17,7 @@ import {
   NotificationCancelButton,
   NotificationTitleBlock,
 } from '../Notification';
-import { H3, Label1 } from '../Text';
+import { Body2, H3, Label1 } from '../Text';
 import { ButtonBlock } from './common';
 import { SuggestionList } from './SuggestionList';
 
@@ -27,14 +28,55 @@ const Label = styled(Label1)`
   margin-bottom: -4px;
 `;
 
-const useToAccount = (isValid: boolean, account: string) => {
+const Warning = styled(Body2)`
+  user-select: none;
+  display: block;
+  width: 100%;
+  margin-top: -4px;
+  color: ${(props) => props.theme.accentOrange};
+`;
+
+const seeIfValidAddress = (value: string): boolean => {
+  try {
+    const result = Address.parse(value);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+const useToAccount = (isValid: boolean, recipient: Recipient) => {
   const { tonApi } = useAppContext();
+  const account =
+    'dns' in recipient ? recipient.dns.address : recipient.address;
   return useQuery<AccountRepr, Error>(
     [QueryKey.account, account],
-    () => {
-      return new AccountApi(tonApi).getAccountInfo({ account });
-    },
+    () => new AccountApi(tonApi).getAccountInfo({ account }),
     { enabled: isValid }
+  );
+};
+
+const useDnsWallet = (value: string) => {
+  const { tonApi } = useAppContext();
+
+  const [name, setName] = useState('');
+
+  const update = useMemo(() => {
+    return debounce<[string]>((v) => setName(v), 400);
+  }, [setName]);
+
+  update(value);
+
+  return useQuery(
+    [QueryKey.dns, name],
+    async () => {
+      const result = await new DNSApi(tonApi).dnsResolve({ name });
+      if (!result.wallet) {
+        throw new Error('Missing wallet');
+      }
+      return result.wallet;
+    },
+    { enabled: name.length > 3 && !seeIfValidAddress(name) }
   );
 };
 
@@ -46,6 +88,7 @@ export const RecipientView: FC<{
   setRecipient: (options: RecipientData) => void;
   width: number;
 }> = ({ title, data, onClose, setRecipient, width, allowComment = true }) => {
+  const [submitted, setSubmit] = useState(false);
   const { t } = useTranslation();
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -56,22 +99,41 @@ export const RecipientView: FC<{
     }
   );
 
-  const isValid = useMemo(() => {
-    try {
-      const result = Address.parse(recipient.address);
-      return true;
-    } catch (e) {
-      return false;
+  const { data: dnsWallet, isFetching: isDnsFetching } = useDnsWallet(
+    recipient.address
+  );
+
+  useEffect(() => {
+    if (dnsWallet) {
+      setAddress((recipient) => ({
+        address: recipient.address,
+        dns: dnsWallet,
+      }));
     }
+  }, [setAddress, dnsWallet]);
+
+  const isValid = useMemo(() => {
+    if ('dns' in recipient) {
+      return true;
+    }
+    return seeIfValidAddress(recipient.address);
   }, [recipient]);
 
   const {
     data: toAccount,
     isFetching,
     error,
-  } = useToAccount(isValid, recipient.address);
+  } = useToAccount(isValid, recipient);
 
   const [comment, setComment] = useState(data?.comment ?? '');
+
+  const isMemoValid = useMemo(() => {
+    if (!toAccount) return true;
+    if (toAccount.memoRequired) {
+      return comment.length > 0;
+    }
+    return true;
+  }, [toAccount, comment]);
 
   useEffect(() => {
     if (ref.current) {
@@ -89,7 +151,8 @@ export const RecipientView: FC<{
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    if (isValid && toAccount) {
+    setSubmit(true);
+    if (isValid && isMemoValid && toAccount) {
       setRecipient({ address: recipient, toAccount, comment, done: true });
     }
   };
@@ -107,14 +170,20 @@ export const RecipientView: FC<{
         value={formatted}
         onChange={(address) => setAddress({ address })}
         label={t('transaction_recipient_address')}
-        isValid={isValid || recipient.address.length == 0}
+        isValid={!submitted || isDnsFetching || isValid}
       />
       {allowComment && (
         <Input
           value={comment}
           onChange={setComment}
           label={t('send_comment_label')}
+          isValid={!submitted || isMemoValid}
         />
+      )}
+      {allowComment && toAccount && toAccount.memoRequired && (
+        <Warning>
+          {t('send_screen_steps_comfirm_comment_required_text')}
+        </Warning>
       )}
 
       <Label>{t('send_screen_steps_address_suggests_label')}</Label>

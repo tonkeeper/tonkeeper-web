@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { Address } from 'ton';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { useNftItemData } from '../../state/wallet';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Body1, H3, Label1 } from '../Text';
 import { NFTKind } from './NftAction';
@@ -32,9 +33,13 @@ const RightText = styled(Body1)`
 export const NftDetails: FC<{ nftItem: NftItemRepr; kind: NFTKind }> =
   React.memo(({ nftItem }) => {
     const { t } = useTranslation();
+    const { data } = useNftItemData(nftItem.address);
+
+    const item = data ?? nftItem;
+
     const sdk = useAppSdk();
-    const owner = nftItem.owner?.address;
-    const address = Address.parse(nftItem.address).toString();
+    const owner = item.owner?.address;
+    const address = Address.parse(item.address).toString();
 
     return (
       <Block>
