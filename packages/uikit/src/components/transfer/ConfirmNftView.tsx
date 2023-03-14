@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { sendNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { Fee, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
@@ -19,7 +18,7 @@ import {
   ChevronLeftIcon,
   ExclamationMarkCircleIcon,
 } from '../Icon';
-import { ColumnText, Gap } from '../Layout';
+import { Gap } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import {
   FullHeightBlock,
@@ -30,6 +29,7 @@ import { Label1, Label2 } from '../Text';
 import { ButtonBlock, Label, ResultButton, useFaitTonAmount } from './common';
 
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
+import { FeeListItem, RecipientListItem } from './ConfirmListItem';
 
 const useSendNft = (recipient: RecipientData, nftItem: NftItemRepr) => {
   const sdk = useAppSdk();
@@ -100,36 +100,8 @@ export const ConfirmNftView: FC<{
         <Title>{t('txActions_signRaw_types_nftItemTransfer')}</Title>
       </Info>
       <ListBlock margin={false} fullWidth>
-        <ListItem
-          onClick={() =>
-            sdk.copyToClipboard(
-              Address.parse(recipient.address.address).toString()
-            )
-          }
-        >
-          <ListItemPayload>
-            <Label>{t('txActions_signRaw_recipient')}</Label>
-            <Label1>{toShortAddress(recipient.address.address)}</Label1>
-          </ListItemPayload>
-        </ListItem>
-        <ListItem
-          onClick={() =>
-            sdk.copyToClipboard(`${feeAmount} ${CryptoCurrency.TON}`)
-          }
-        >
-          <ListItemPayload>
-            <Label>{t('txActions_fee')}</Label>
-            <ColumnText
-              right
-              text={
-                <>
-                  {feeAmount} {CryptoCurrency.TON}
-                </>
-              }
-              secondary={<>≈&thinsp;{fiatFeeAmount}</>}
-            />
-          </ListItemPayload>
-        </ListItem>
+        <RecipientListItem recipient={recipient} />
+        <FeeListItem feeAmount={feeAmount} fiatFeeAmount={fiatFeeAmount} />
         <TransferComment comment={recipient.comment} />
       </ListBlock>
 

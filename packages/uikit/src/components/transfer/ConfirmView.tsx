@@ -3,12 +3,10 @@ import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
 
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import React, { FC, useMemo, useState } from 'react';
-import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
@@ -22,16 +20,21 @@ import {
   ChevronLeftIcon,
   ExclamationMarkCircleIcon,
 } from '../Icon';
-import { ColumnText, Gap } from '../Layout';
-import { ListBlock, ListItem, ListItemPayload } from '../List';
+import { Gap } from '../Layout';
+import { ListBlock } from '../List';
 import {
   FullHeightBlock,
   NotificationCancelButton,
   NotificationTitleBlock,
 } from '../Notification';
-import { Label1, Label2 } from '../Text';
-import { ButtonBlock, Label, ResultButton, useFiatAmount } from './common';
+import { Label2 } from '../Text';
+import { ButtonBlock, ResultButton, useFiatAmount } from './common';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
+import {
+  AmountListItem,
+  FeeListItem,
+  RecipientListItem,
+} from './ConfirmListItem';
 
 const useSendTransaction = (
   recipient: RecipientData,
@@ -68,7 +71,6 @@ const useSendTransaction = (
         password
       );
     }
-    await client.invalidateQueries();
   });
 };
 
@@ -136,50 +138,9 @@ export const ConfirmView: FC<{
         </Title>
       </Info>
       <ListBlock margin={false} fullWidth>
-        <ListItem
-          onClick={() =>
-            sdk.copyToClipboard(
-              Address.parse(recipient.address.address).toString()
-            )
-          }
-        >
-          <ListItemPayload>
-            <Label>{t('txActions_signRaw_recipient')}</Label>
-            <Label1>{toShortAddress(recipient.address.address)}</Label1>
-          </ListItemPayload>
-        </ListItem>
-        <ListItem onClick={() => sdk.copyToClipboard(coinAmount)}>
-          <ListItemPayload>
-            <Label>{t('txActions_amount')}</Label>
-            {fiatAmount ? (
-              <ColumnText
-                right
-                text={coinAmount}
-                secondary={<>≈&thinsp;{fiatAmount}</>}
-              />
-            ) : (
-              <Label1>{coinAmount}</Label1>
-            )}
-          </ListItemPayload>
-        </ListItem>
-        <ListItem
-          onClick={() =>
-            sdk.copyToClipboard(`${feeAmount} ${CryptoCurrency.TON}`)
-          }
-        >
-          <ListItemPayload>
-            <Label>{t('txActions_fee')}</Label>
-            <ColumnText
-              right
-              text={
-                <>
-                  {feeAmount} {CryptoCurrency.TON}
-                </>
-              }
-              secondary={<>≈&thinsp;{fiatFeeAmount}</>}
-            />
-          </ListItemPayload>
-        </ListItem>
+        <RecipientListItem recipient={recipient} />
+        <AmountListItem coinAmount={coinAmount} fiatAmount={fiatAmount} />
+        <FeeListItem feeAmount={feeAmount} fiatFeeAmount={fiatFeeAmount} />
         <TransferComment
           comment={
             amount.jetton === CryptoCurrency.TON ? recipient.comment : undefined

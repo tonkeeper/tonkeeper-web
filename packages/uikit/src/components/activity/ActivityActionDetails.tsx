@@ -33,6 +33,12 @@ const Amount = styled(Body1)`
   color: ${(props) => props.theme.textSecondary};
 `;
 
+const LabelRight = styled(Label1)`
+  padding-left: 1rem;
+  box-sizing: border-box;
+  text-align: right;
+`;
+
 export const TransferComment: FC<{ comment?: string }> = ({ comment }) => {
   const { t } = useTranslation();
 
@@ -43,7 +49,7 @@ export const TransferComment: FC<{ comment?: string }> = ({ comment }) => {
       <ListItem onClick={() => sdk.copyToClipboard(comment!)}>
         <ListItemPayload>
           <Label>{t('transaction_message')}</Label>
-          <Label1>{comment}</Label1>
+          <LabelRight>{comment}</LabelRight>
         </ListItemPayload>
       </ListItem>
     );
