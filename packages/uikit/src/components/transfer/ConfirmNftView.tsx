@@ -5,6 +5,7 @@ import { sendNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftServic
 import { Fee, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useMemo, useState } from 'react';
+import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
@@ -97,7 +98,11 @@ export const ConfirmNftView: FC<{
       </Info>
       <ListBlock margin={false} fullWidth>
         <ListItem
-          onClick={() => sdk.copyToClipboard(recipient.address.address)}
+          onClick={() =>
+            sdk.copyToClipboard(
+              Address.parse(recipient.address.address).toString()
+            )
+          }
         >
           <ListItemPayload>
             <Label>{t('txActions_signRaw_recipient')}</Label>
@@ -115,7 +120,7 @@ export const ConfirmNftView: FC<{
               right
               text={
                 <>
-                  ≈&thinsp;{feeAmount} {CryptoCurrency.TON}
+                  {feeAmount} {CryptoCurrency.TON}
                 </>
               }
               secondary={<>≈&thinsp;{fiatFeeAmount}</>}
@@ -123,6 +128,33 @@ export const ConfirmNftView: FC<{
           </ListItemPayload>
         </ListItem>
         <TransferComment comment={recipient.comment} />
+      </ListBlock>
+
+      <ListBlock fullWidth>
+        {nftItem.collection && (
+          <ListItem
+            onClick={() =>
+              sdk.copyToClipboard(
+                Address.parse(nftItem.collection!.address).toString()
+              )
+            }
+          >
+            <ListItemPayload>
+              <Label>{t('NFT_collection_id')}</Label>
+              <Label1>{toShortAddress(nftItem.collection!.address)}</Label1>
+            </ListItemPayload>
+          </ListItem>
+        )}
+        <ListItem
+          onClick={() =>
+            sdk.copyToClipboard(Address.parse(nftItem.address).toString())
+          }
+        >
+          <ListItemPayload>
+            <Label>{t('NFT_item_id')}</Label>
+            <Label1>{toShortAddress(nftItem.address)}</Label1>
+          </ListItemPayload>
+        </ListItem>
       </ListBlock>
       <Gap />
 

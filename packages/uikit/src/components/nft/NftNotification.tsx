@@ -29,7 +29,7 @@ const Delimiter = styled.div`
 
 const DelimiterExtra = styled.div`
   margin: 0 -1rem;
-  width: 100%;
+  width: calc(100% + 2rem);
   border-top: 1px solid ${(props) => props.theme.separatorCommon};
 `;
 

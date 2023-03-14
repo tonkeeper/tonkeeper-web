@@ -163,5 +163,11 @@
   },
   "Max": {
     "message": "Все"
+  },
+  "NFT_item_id": {
+    "message": "Идентификатор NFT"
+  },
+  "NFT_collection_id": {
+    "message": "Идентификатор коллекции"
   }
 }

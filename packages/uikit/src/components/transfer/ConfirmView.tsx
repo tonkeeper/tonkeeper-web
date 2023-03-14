@@ -8,6 +8,7 @@ import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
 
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import React, { FC, useMemo, useState } from 'react';
+import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
@@ -19,14 +20,14 @@ import { Button } from '../fields/Button';
 import {
   CheckmarkCircleIcon,
   ChevronLeftIcon,
-  ExclamationMarkCircleIcon
+  ExclamationMarkCircleIcon,
 } from '../Icon';
 import { ColumnText, Gap } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import {
   FullHeightBlock,
   NotificationCancelButton,
-  NotificationTitleBlock
+  NotificationTitleBlock,
 } from '../Notification';
 import { Label1, Label2 } from '../Text';
 import { ButtonBlock, Label, ResultButton, useFiatAmount } from './common';
@@ -56,7 +57,15 @@ const useSendTransaction = (
       const [jettonInfo] = jettons.balances.filter(
         (item) => item.jettonAddress === amount.jetton
       );
-      return sendJettonTransfer(sdk.storage, tonApi, wallet, recipient, amount, jettonInfo, password);
+      return sendJettonTransfer(
+        sdk.storage,
+        tonApi,
+        wallet,
+        recipient,
+        amount,
+        jettonInfo,
+        password
+      );
     }
   });
 };
@@ -126,7 +135,11 @@ export const ConfirmView: FC<{
       </Info>
       <ListBlock margin={false} fullWidth>
         <ListItem
-          onClick={() => sdk.copyToClipboard(recipient.address.address)}
+          onClick={() =>
+            sdk.copyToClipboard(
+              Address.parse(recipient.address.address).toString()
+            )
+          }
         >
           <ListItemPayload>
             <Label>{t('txActions_signRaw_recipient')}</Label>
@@ -158,7 +171,7 @@ export const ConfirmView: FC<{
               right
               text={
                 <>
-                  ≈&thinsp;{feeAmount} {CryptoCurrency.TON}
+                  {feeAmount} {CryptoCurrency.TON}
                 </>
               }
               secondary={<>≈&thinsp;{fiatFeeAmount}</>}

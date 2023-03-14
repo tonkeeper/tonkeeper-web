@@ -167,5 +167,11 @@
   },
   "Max": {
     "message": "Max"
+  },
+  "NFT_item_id": {
+    "message": "NFT item ID"
+  },
+  "NFT_collection_id": {
+    "message": "NFT collection ID"
   }
 }
