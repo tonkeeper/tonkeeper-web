@@ -255,7 +255,7 @@ export const AmountView: FC<{
   const fiatAmount = useFiatAmount(jettons, jetton, amount);
 
   return (
-    <FullHeightBlock onSubmit={onSubmit}>
+    <FullHeightBlock onSubmit={onSubmit} noValidate>
       <NotificationTitleBlock>
         <BackButton onClick={onBack}>
           <ChevronLeftIcon />
