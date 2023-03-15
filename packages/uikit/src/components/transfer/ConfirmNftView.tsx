@@ -64,9 +64,7 @@ export const ConfirmNftView: FC<{
   fee?: Fee;
   onBack: () => void;
   onClose: () => void;
-  width: number;
-  standalone: boolean;
-}> = ({ recipient, onBack, onClose, width, nftItem, fee, standalone }) => {
+}> = ({ recipient, onBack, onClose, nftItem, fee }) => {
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
   const sdk = useAppSdk();
@@ -140,7 +138,7 @@ export const ConfirmNftView: FC<{
       </ListBlock>
       <Gap />
 
-      <ButtonBlock width={width} standalone={standalone}>
+      <ButtonBlock>
         {done && (
           <ResultButton done>
             <CheckmarkCircleIcon />

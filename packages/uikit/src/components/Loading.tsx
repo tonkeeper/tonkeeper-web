@@ -10,10 +10,10 @@ const Block = styled.div`
   align-items: center;
 `;
 
-export const Loading = () => {
+export const Loading = React.forwardRef<HTMLDivElement>(({}, ref) => {
   return (
-    <Block>
+    <Block ref={ref}>
       <TonkeeperIcon loop />
     </Block>
   );
-};
+});

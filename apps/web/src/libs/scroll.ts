@@ -4,7 +4,6 @@ export const disableScroll = () => {
 };
 
 export const enableScroll = () => {
-  console.log('enableScroll');
   document.documentElement.className = '';
   window.document.body.style.paddingRight = '0px';
 };

@@ -73,7 +73,11 @@ import {
 } from 'react-router-dom';
 import styled from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
-import { useAppHeight, useDisableFocusOnScroll } from './libs/hooks';
+import {
+  useAppHeight,
+  useAppWidth,
+  useDisableFocusOnScroll,
+} from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
 
 const ImportRouter = React.lazy(
@@ -158,15 +162,22 @@ const useLock = () => {
   return lock;
 };
 
-const Wrapper = styled(Container)`
+const Wrapper = styled(Container)<{ standalone: boolean }>`
   @media (min-width: 600px) {
     border-left: 1px solid ${(props) => props.theme.separatorCommon};
     border-right: 1px solid ${(props) => props.theme.separatorCommon};
   }
+
+  box-sizing: border-box;
+  padding-bottom: ${(props) => (props.standalone ? '96' : '80')}px;
 `;
 
 export const Loader: FC = () => {
   const { data: activeWallet } = useActiveWallet();
+
+  const [ios, standalone] = useMemo(() => {
+    return [sdk.isIOs(), sdk.isIOs() && sdk.isStandalone()] as const;
+  }, []);
 
   const lock = useLock();
   const { i18n } = useTranslation();
@@ -217,13 +228,15 @@ export const Loader: FC = () => {
     account,
     config,
     tonendpoint,
+    standalone,
+    ios,
   };
 
   return (
     <OnImportAction.Provider value={navigate}>
       <AfterImportAction.Provider value={() => navigate(AppRoute.home)}>
         <AppContext.Provider value={context}>
-          <Wrapper>
+          <Wrapper standalone={standalone}>
             <Content activeWallet={activeWallet} lock={lock} />
           </Wrapper>
           <CopyNotification />
@@ -238,6 +251,7 @@ export const Content: FC<{
   lock: boolean;
 }> = ({ activeWallet, lock }) => {
   const location = useLocation();
+  useAppWidth();
 
   if (lock) {
     return <Unlock />;

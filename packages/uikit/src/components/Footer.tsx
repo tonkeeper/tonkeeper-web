@@ -2,6 +2,7 @@ import { throttle } from '@tonkeeper/core/dist/utils/common';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
+import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute } from '../libs/routes';
@@ -108,9 +109,11 @@ const Block = styled.div<{ bottom: boolean; standalone: boolean }>`
   flex-shrink: 0;
   display: flex;
   justify-content: space-around;
-  position: sticky;
+  position: fixed;
   bottom: 0;
   padding: 1rem;
+  width: var(--app-width);
+  box-sizing: border-box;
 
   background-color: ${(props) => props.theme.backgroundPage};
 
@@ -167,7 +170,7 @@ const useIsScrollBottom = () => {
   return isBottom;
 };
 export const Footer = () => {
-  const sdk = useAppSdk();
+  const { standalone } = useAppContext();
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -184,10 +187,6 @@ export const Footer = () => {
     }
     return AppRoute.home;
   }, [location.pathname]);
-
-  const standalone = useMemo(() => {
-    return sdk.isIOs() && sdk.isStandalone();
-  }, [sdk]);
 
   const scrollTop = useCallback(() => {
     window.requestAnimationFrame(() => {

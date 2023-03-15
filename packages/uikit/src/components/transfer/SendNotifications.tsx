@@ -1,13 +1,6 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import React, {
-  FC,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -34,8 +27,6 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   const recipientRef = useRef<HTMLDivElement>(null);
   const amountRef = useRef<HTMLDivElement>(null);
   const confirmRef = useRef<HTMLDivElement>(null);
-
-  const [width, setWidth] = useState(0);
 
   const [right, setRight] = useState(true);
   const [recipient, setRecipient] = useState<RecipientData | undefined>(
@@ -73,16 +64,6 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     return ['confirm', confirmRef] as const;
   })();
 
-  useEffect(() => {
-    if (nodeRef.current) {
-      setWidth(nodeRef.current.clientWidth);
-    }
-  }, [nodeRef.current]);
-
-  const standalone = useMemo(() => {
-    return sdk.isIOs() && sdk.isStandalone();
-  }, [sdk]);
-
   return (
     <Wrapper>
       <TransitionGroup childFactory={childFactoryCreator(right)}>
@@ -101,8 +82,6 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 data={recipient}
                 onClose={onClose}
                 setRecipient={onRecipient}
-                width={width}
-                standalone={standalone}
                 allowComment={asset === CryptoCurrency.TON}
               />
             )}
@@ -116,8 +95,6 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 info={info}
                 recipient={recipient!}
                 setAmount={onAmount}
-                width={width}
-                standalone={standalone}
               />
             )}
             {state === 'confirm' && (
@@ -126,8 +103,6 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 onBack={backToAmount}
                 recipient={recipient!}
                 amount={amount!}
-                width={width}
-                standalone={standalone}
                 jettons={filter}
               />
             )}

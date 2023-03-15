@@ -88,19 +88,8 @@ export const RecipientView: FC<{
   allowComment?: boolean;
   onClose: () => void;
   setRecipient: (options: RecipientData) => void;
-  width: number;
-  standalone: boolean;
-}> = ({
-  title,
-  data,
-  onClose,
-  setRecipient,
-  width,
-  standalone,
-  allowComment = true,
-}) => {
+}> = ({ title, data, onClose, setRecipient, allowComment = true }) => {
   const sdk = useAppSdk();
-
   const [submitted, setSubmit] = useState(false);
   const { t } = useTranslation();
 
@@ -212,7 +201,7 @@ export const RecipientView: FC<{
 
       <Gap />
 
-      <ButtonBlock width={width} standalone={standalone}>
+      <ButtonBlock>
         <Button
           fullWidth
           size="large"

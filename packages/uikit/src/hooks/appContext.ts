@@ -1,18 +1,18 @@
 import {
   AccountState,
-  defaultAccountState
+  defaultAccountState,
 } from '@tonkeeper/core/dist/entries/account';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import {
   AuthState,
-  defaultAuthState
+  defaultAuthState,
 } from '@tonkeeper/core/dist/entries/password';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { Configuration } from '@tonkeeper/core/dist/tonApiV1';
 import {
   defaultTonendpointConfig,
   Tonendpoint,
-  TonendpointConfig
+  TonendpointConfig,
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import React, { useContext } from 'react';
 
@@ -23,6 +23,8 @@ export const AppContext = React.createContext<{
   fiat: FiatCurrencies;
   config: TonendpointConfig;
   tonendpoint: Tonendpoint;
+  standalone: boolean;
+  ios: boolean;
 }>({
   tonApi: new Configuration(),
   account: defaultAccountState,
@@ -30,6 +32,8 @@ export const AppContext = React.createContext<{
   fiat: FiatCurrencies.USD,
   config: defaultTonendpointConfig,
   tonendpoint: new Tonendpoint({}, {}),
+  standalone: false,
+  ios: false,
 });
 
 export const useAppContext = () => {

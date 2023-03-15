@@ -166,8 +166,6 @@ export const AmountView: FC<{
   jettons: JettonsBalances;
   info?: AccountRepr;
   data?: AmountData;
-  width: number;
-  standalone: boolean;
   stock?: TonendpointStock;
 }> = ({
   recipient,
@@ -176,8 +174,6 @@ export const AmountView: FC<{
   setAmount,
   asset,
   data,
-  width,
-  standalone,
   jettons,
   info,
 }) => {
@@ -301,7 +297,7 @@ export const AmountView: FC<{
       </MaxRow>
 
       <Gap />
-      <ButtonBlock width={width} standalone={standalone}>
+      <ButtonBlock>
         <Button
           fullWidth
           size="large"
