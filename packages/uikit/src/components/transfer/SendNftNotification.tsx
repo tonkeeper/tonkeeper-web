@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { estimateNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
@@ -59,12 +59,6 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
     }
     return ['confirm', confirmRef] as const;
   })();
-
-  useEffect(() => {
-    if (nodeRef.current) {
-      setWidth(nodeRef.current.clientWidth);
-    }
-  }, [nodeRef.current]);
 
   return (
     <Wrapper>
