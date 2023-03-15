@@ -8,7 +8,7 @@ import { AppRoute } from '../libs/routes';
 import { useIsScrollTop } from './Header';
 import { Label3 } from './Text';
 
-export const WalletIcon = () => {
+const WalletIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -37,7 +37,7 @@ export const WalletIcon = () => {
   );
 };
 
-export const ActivityIcon = () => {
+const ActivityIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -59,7 +59,7 @@ export const ActivityIcon = () => {
   );
 };
 
-export const SettingsIcon = () => {
+const SettingsIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -104,7 +104,7 @@ const Button = styled.div<{ active: boolean }>`
     `}
 `;
 
-const Block = styled.div<{ bottom: boolean }>`
+const Block = styled.div<{ bottom: boolean; standalone: boolean }>`
   flex-shrink: 0;
   display: flex;
   justify-content: space-around;
@@ -127,6 +127,21 @@ const Block = styled.div<{ bottom: boolean }>`
         bottom: 100%;
       }
     `}
+
+  ${(props) =>
+    props.standalone &&
+    css`
+      padding-bottom: 2rem;
+    `}
+    
+  &:before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: var(--app-height);
+    position: absolute;
+    top: 100%;
+  }
 `;
 
 const useIsScrollBottom = () => {
@@ -161,6 +176,7 @@ const useIsScrollBottom = () => {
   return isBottom;
 };
 export const Footer = () => {
+  const sdk = useAppSdk();
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -178,13 +194,17 @@ export const Footer = () => {
     return AppRoute.home;
   }, [location.pathname]);
 
+  const standalone = useMemo(() => {
+    return sdk.isIOs() && sdk.isStandalone();
+  }, [sdk]);
+
   const scrollTop = useCallback(() => {
     window.requestAnimationFrame(() => {
       window.scrollTo(0, 0);
     });
   }, []);
   return (
-    <Block bottom={bottom}>
+    <Block bottom={bottom} standalone={standalone}>
       <Button
         active={active === AppRoute.home}
         onClick={() =>

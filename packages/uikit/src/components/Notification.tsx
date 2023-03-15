@@ -7,7 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { CSSTransition } from 'react-transition-group';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { Container } from '../styles/globalStyle';
 import { BackButton } from './fields/BackButton';
@@ -98,7 +98,7 @@ const Splash = styled.div`
   }
 `;
 
-const Content = styled.div`
+const Content = styled.div<{ standalone: boolean }>`
   width: 100%;
   background-color: ${(props) => props.theme.backgroundPage};
   border-top-right-radius: ${(props) => props.theme.cornerMedium};
@@ -106,6 +106,12 @@ const Content = styled.div`
   padding: 1rem;
   flex-shrink: 0;
   box-sizing: border-box;
+
+  ${(props) =>
+    props.standalone &&
+    css`
+      padding-bottom: 2rem;
+    `}
 `;
 
 const TitleRow = styled.div`
@@ -208,6 +214,10 @@ export const Notification: FC<{
     };
   }, [isOpen, sdk]);
 
+  const standalone = useMemo(() => {
+    return sdk.isIOs() && sdk.isStandalone();
+  }, [sdk]);
+
   return (
     <ReactPortal wrapperId="react-portal-modal-container">
       <CSSTransition
@@ -224,7 +234,7 @@ export const Notification: FC<{
               <Wrapper>
                 <Padding onClick={handleClose} />
                 <Gap onClick={handleClose} />
-                <Content>
+                <Content standalone={standalone}>
                   {title && (
                     <NotificationTitleRow handleClose={handleClose}>
                       {title}

@@ -18,6 +18,8 @@ export interface IAppSdk {
   enableScroll: () => void;
   getScrollbarWidth: () => number;
   getKeyboardHeight: () => number;
+  isIOs: () => boolean;
+  isStandalone: () => boolean;
   uiEvents: IEventEmitter<UIEvents>;
   version: string;
 
@@ -36,6 +38,8 @@ export class MockAppSdk implements IAppSdk {
   enableScroll = () => {};
   getScrollbarWidth = () => 0;
   getKeyboardHeight = () => 0;
+  isIOs = () => false;
+  isStandalone = () => false;
   uiEvents = new EventEmitter();
   version = '0.0.0';
   confirm = async () => false;

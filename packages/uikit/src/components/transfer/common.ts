@@ -2,7 +2,7 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { getFiatAmountValue } from '@tonkeeper/core/dist/utils/send';
 import React, { useMemo } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { useTonenpointStock } from '../../state/tonendpoint';
@@ -63,9 +63,18 @@ export const Wrapper = styled.div`
   }
 `;
 
-export const ButtonBlock = styled.div<{ width: number }>`
+export const ButtonBlock = styled.div<{ width: number; standalone: boolean }>`
   position: fixed;
-  bottom: 1rem;
+
+  ${(props) =>
+    props.standalone
+      ? css`
+          bottom: 2rem;
+        `
+      : css`
+          bottom: 1rem;
+        `}
+
   width: ${(props) => props.width}px;
 `;
 

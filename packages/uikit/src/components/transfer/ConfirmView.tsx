@@ -83,7 +83,8 @@ export const ConfirmView: FC<{
   onBack: () => void;
   onClose: () => void;
   width: number;
-}> = ({ recipient, onBack, onClose, width, amount, jettons }) => {
+  standalone: boolean;
+}> = ({ recipient, onBack, onClose, width, amount, jettons, standalone }) => {
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
 
@@ -150,7 +151,7 @@ export const ConfirmView: FC<{
       </ListBlock>
       <Gap />
 
-      <ButtonBlock width={width}>
+      <ButtonBlock width={width} standalone={standalone}>
         {done && (
           <ResultButton done>
             <CheckmarkCircleIcon />

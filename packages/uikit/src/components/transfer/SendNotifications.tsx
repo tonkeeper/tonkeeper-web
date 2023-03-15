@@ -1,7 +1,15 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
@@ -17,6 +25,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
   asset = CryptoCurrency.TON,
 }) => {
+  const sdk = useAppSdk();
   const { t } = useTranslation();
   const { data: jettons } = useWalletJettonList();
   const { data: info } = useWalletAccountInfo();
@@ -70,6 +79,10 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     }
   }, [nodeRef.current]);
 
+  const standalone = useMemo(() => {
+    return sdk.isIOs() && sdk.isStandalone();
+  }, [sdk]);
+
   return (
     <Wrapper>
       <TransitionGroup childFactory={childFactoryCreator(right)}>
@@ -89,6 +102,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 onClose={onClose}
                 setRecipient={onRecipient}
                 width={width}
+                standalone={standalone}
                 allowComment={asset === CryptoCurrency.TON}
               />
             )}
@@ -103,6 +117,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 recipient={recipient!}
                 setAmount={onAmount}
                 width={width}
+                standalone={standalone}
               />
             )}
             {state === 'confirm' && (
@@ -112,6 +127,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 recipient={recipient!}
                 amount={amount!}
                 width={width}
+                standalone={standalone}
                 jettons={filter}
               />
             )}
