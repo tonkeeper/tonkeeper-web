@@ -3,6 +3,7 @@ export enum FiatCurrencies {
   EUR = 'EUR',
   RUB = 'RUB',
   AED = 'AED',
+  UAH = 'UAH',
   GBP = 'GBP',
   CHF = 'CHF',
   CNY = 'CNY',
@@ -43,6 +44,12 @@ export const FiatCurrencySymbolsConfig: Record<FiatCurrency, CurrencyState> = {
   [FiatCurrencies.AED]: {
     numberFormat: 'en-US',
     symbol: 'Rp',
+    side: 'end',
+    maximumFractionDigits: 2,
+  },
+  [FiatCurrencies.UAH]: {
+    numberFormat: 'en-US',
+    symbol: '₴',
     side: 'end',
     maximumFractionDigits: 2,
   },
