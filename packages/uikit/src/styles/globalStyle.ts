@@ -27,6 +27,10 @@ body {
       /* want to exclude padding from the height */
       box-sizing: border-box;
   }
+
+  .disable-hover {
+    pointer-events: none;
+  }
 `;
 
 export const Container = styled.div`

@@ -2,12 +2,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import {
   languages,
-  localizationText
+  localizationText,
 } from '@tonkeeper/core/dist/entries/language';
-import {
-  getTonClient,
-  Network
-} from '@tonkeeper/core/dist/entries/network';
+import { getTonClient, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -19,27 +16,27 @@ import {
   ActivitySkeleton,
   CoinSkeleton,
   HomeSkeleton,
-  SettingsSkeleton
+  SettingsSkeleton,
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import {
   AnalyticsContext,
   useAnalyticsScreenView,
   useCreateAnalytics,
-  useFBAnalyticsEvent
+  useFBAnalyticsEvent,
 } from '@tonkeeper/uikit/dist/hooks/analytics';
 import {
   AppContext,
-  WalletStateContext
+  WalletStateContext,
 } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
   AfterImportAction,
   AppSdkContext,
-  OnImportAction
+  OnImportAction,
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import {
   I18nContext,
-  TranslationContext
+  TranslationContext,
 } from '@tonkeeper/uikit/dist/hooks/translation';
 import { any, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
@@ -47,14 +44,14 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 
 import {
   Initialize,
-  InitializeContainer
+  InitializeContainer,
 } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/ThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import {
   useTonendpoint,
-  useTonenpointConfig
+  useTonenpointConfig,
 } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Body, Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -64,7 +61,7 @@ import React, {
   Suspense,
   useEffect,
   useMemo,
-  useState
+  useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -72,11 +69,11 @@ import {
   Route,
   Routes,
   useLocation,
-  useNavigate
+  useNavigate,
 } from 'react-router-dom';
 import styled from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
-import { useAppHeight } from './libs/hooks';
+import { useAppHeight, useDisableFocusOnScroll } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
 
 const ImportRouter = React.lazy(
@@ -185,6 +182,8 @@ export const Loader: FC = () => {
 
   const navigate = useNavigate();
   useAppHeight();
+  useDisableFocusOnScroll();
+
   useAnalyticsScreenView();
   useFBAnalyticsEvent('session_start');
 

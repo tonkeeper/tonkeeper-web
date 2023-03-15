@@ -15,3 +15,29 @@ export const useAppHeight = () => {
     };
   }, []);
 };
+
+export const useDisableFocusOnScroll = () => {
+  return useEffect(() => {
+    const body = document.body;
+    if (!window.addEventListener || !body.classList) return;
+
+    let timer: NodeJS.Timeout | undefined;
+
+    const handler = function () {
+      clearTimeout(timer);
+      if (!body.classList.contains('disable-hover')) {
+        body.classList.add('disable-hover');
+      }
+      timer = setTimeout(function () {
+        body.classList.remove('disable-hover');
+      }, 500);
+    };
+
+    window.addEventListener('scroll', handler, false);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handler);
+    };
+  }, []);
+};
