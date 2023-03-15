@@ -15,7 +15,6 @@ import {
   getMaxValue,
   getRemaining,
   isNumeric,
-  parseAndValidateInput,
 } from '@tonkeeper/core/dist/utils/send';
 import React, {
   FC,
@@ -107,7 +106,6 @@ const Symbol = styled(Num2)`
 
   @media (max-width: 600px) {
     padding-left: 0.5rem;
-    font-size: 22px;
   }
 `;
 
@@ -209,11 +207,14 @@ export const AmountView: FC<{
   const suffix = getJettonSymbol(jetton, jettons);
 
   const onInput = (value: string) => {
-    const fixed = parseAndValidateInput(value, jettons, jetton, format);
-    if (fixed !== undefined) {
-      setMax(false);
-      setAmountValue(fixed);
-    }
+    // const fixed = parseAndValidateInput(value, jettons, jetton, format);
+    // if (fixed !== undefined) {
+
+    // }
+    if (value.length > 22) return;
+
+    setMax(false);
+    setAmountValue(value);
   };
 
   const [remaining, valid] = useMemo(

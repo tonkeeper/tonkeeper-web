@@ -29,14 +29,21 @@ const SentenceInput = styled.input<{ small?: boolean }>`
           font-size: 40px;
         `}
 
-  @media (max-width: 600px) {
-    font-size: 22px;
-  }
-  @media (max-width: 400px) {
-    font-size: 18px;
-  }
+  // @media (max-width: 600px) {
+  //   font-size: 22px;
+  // }
+  // @media (max-width: 400px) {
+  //   font-size: 18px;
+  // }
 
   line-height: 49px;
+
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
 `;
 
 const Label = styled.label`
@@ -89,7 +96,7 @@ export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
         <SentenceInput
           ref={ref}
           small={small}
-          type="tel"
+          type="number"
           value={value}
           onChange={(event) => {
             setValue(event.target.value);
