@@ -172,5 +172,8 @@
   },
   "choose_currency_currencies_UAH": {
     "message": "Украинская гривна"
+  },
+  "choose_currency_currencies_KZT": {
+    "message": "Казахстанский тенге"
   }
 }
