@@ -111,7 +111,7 @@ const PasswordUnlock: FC<{
   }, [location]);
 
   useEffect(() => {
-    if (/iPhone|iPad|iPod/.test(window.navigator.userAgent)) {
+    if (sdk.isIOs()) {
       return;
     }
     if (ref.current) {

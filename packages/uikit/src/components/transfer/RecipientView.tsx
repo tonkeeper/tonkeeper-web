@@ -6,6 +6,7 @@ import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { ButtonMock } from '../fields/BackButton';
@@ -98,6 +99,8 @@ export const RecipientView: FC<{
   standalone,
   allowComment = true,
 }) => {
+  const sdk = useAppSdk();
+
   const [submitted, setSubmit] = useState(false);
   const { t } = useTranslation();
 
@@ -146,6 +149,9 @@ export const RecipientView: FC<{
   }, [toAccount, comment]);
 
   useEffect(() => {
+    if (sdk.isIOs()) {
+      return;
+    }
     if (ref.current) {
       ref.current.focus();
     }
