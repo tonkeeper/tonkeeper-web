@@ -129,7 +129,12 @@ export const SendAction: FC<{ asset?: string }> = ({ asset }) => {
         title={t('wallet_send')}
         action={() => setOpen(true)}
       />
-      <Notification isOpen={open} handleClose={() => setOpen(false)} hideButton>
+      <Notification
+        isOpen={open}
+        handleClose={() => setOpen(false)}
+        hideButton
+        backShadow
+      >
         {Content}
       </Notification>
     </>

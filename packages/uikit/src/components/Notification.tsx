@@ -128,6 +128,15 @@ const RowTitle = styled(H3)`
   user-select: none;
 `;
 
+const BackShadow = styled.div`
+  width: var(--app-width);
+  height: 60vh;
+  position: fixed;
+  bottom: 0;
+  z-index: -1;
+  background-color: ${(props) => props.theme.backgroundPage};
+`;
+
 export const NotificationTitleRow: FC<
   PropsWithChildren<{ handleClose: () => void }>
 > = ({ handleClose, children }) => {
@@ -179,79 +188,83 @@ export const Notification: FC<{
   isOpen: boolean;
   handleClose: () => void;
   hideButton?: boolean;
+  backShadow?: boolean;
   title?: string;
   children: (afterClose: (action?: () => void) => void) => React.ReactNode;
-}> = React.memo(({ children, isOpen, hideButton, handleClose, title }) => {
-  const [entered, setEntered] = useState(false);
+}> = React.memo(
+  ({ children, isOpen, hideButton, backShadow, handleClose, title }) => {
+    const [entered, setEntered] = useState(false);
 
-  const sdk = useAppSdk();
-  const nodeRef = useRef(null);
-  useEffect(() => {
-    const closeOnEscapeKey = (e: KeyboardEvent) =>
-      e.key === 'Escape' ? handleClose() : null;
-    document.body.addEventListener('keydown', closeOnEscapeKey);
-    return () => {
-      document.body.removeEventListener('keydown', closeOnEscapeKey);
-    };
-  }, [handleClose]);
+    const sdk = useAppSdk();
+    const nodeRef = useRef(null);
+    useEffect(() => {
+      const closeOnEscapeKey = (e: KeyboardEvent) =>
+        e.key === 'Escape' ? handleClose() : null;
+      document.body.addEventListener('keydown', closeOnEscapeKey);
+      return () => {
+        document.body.removeEventListener('keydown', closeOnEscapeKey);
+      };
+    }, [handleClose]);
 
-  const Child = useMemo(() => {
-    if (!isOpen) return undefined;
-    return children((afterClose?: () => void) => {
-      setTimeout(() => afterClose && afterClose(), 300);
-      handleClose();
-    });
-  }, [isOpen, children, handleClose]);
+    const Child = useMemo(() => {
+      if (!isOpen) return undefined;
+      return children((afterClose?: () => void) => {
+        setTimeout(() => afterClose && afterClose(), 300);
+        handleClose();
+      });
+    }, [isOpen, children, handleClose]);
 
-  useEffect(() => {
-    if (isOpen) {
-      sdk.disableScroll();
-    } else {
-      sdk.enableScroll();
-    }
-    return () => {
-      sdk.enableScroll();
-    };
-  }, [isOpen, sdk]);
+    useEffect(() => {
+      if (isOpen) {
+        sdk.disableScroll();
+      } else {
+        sdk.enableScroll();
+      }
+      return () => {
+        // sdk.enableScroll();
+      };
+    }, [isOpen, sdk]);
 
-  const standalone = useMemo(() => {
-    return sdk.isIOs() && sdk.isStandalone();
-  }, [sdk]);
+    const standalone = useMemo(() => {
+      return sdk.isIOs() && sdk.isStandalone();
+    }, [sdk]);
 
-  return (
-    <ReactPortal wrapperId="react-portal-modal-container">
-      <CSSTransition
-        in={isOpen}
-        timeout={{ enter: 0, exit: 300 }}
-        unmountOnExit
-        nodeRef={nodeRef}
-        onEntered={() => setEntered(true)}
-        onExited={() => setEntered(false)}
-      >
-        <Splash ref={nodeRef}>
-          <Overlay>
-            <NotificationWrapper entered={entered}>
-              <Wrapper>
-                <Padding onClick={handleClose} />
-                <Gap onClick={handleClose} />
-                <Content standalone={standalone}>
-                  {title && (
-                    <NotificationTitleRow handleClose={handleClose}>
-                      {title}
-                    </NotificationTitleRow>
-                  )}
-                  {!hideButton && (
-                    <ButtonContainer>
-                      <NotificationCancelButton handleClose={handleClose} />
-                    </ButtonContainer>
-                  )}
-                  {Child}
-                </Content>
-              </Wrapper>
-            </NotificationWrapper>
-          </Overlay>
-        </Splash>
-      </CSSTransition>
-    </ReactPortal>
-  );
-});
+    return (
+      <ReactPortal wrapperId="react-portal-modal-container">
+        <CSSTransition
+          in={isOpen}
+          timeout={{ enter: 0, exit: 300 }}
+          unmountOnExit
+          nodeRef={nodeRef}
+          onEntered={() => setEntered(true)}
+          onExited={() => setEntered(false)}
+        >
+          <Splash ref={nodeRef}>
+            <Overlay>
+              <NotificationWrapper entered={entered}>
+                <Wrapper>
+                  <Padding onClick={handleClose} />
+                  <Gap onClick={handleClose} />
+                  <Content standalone={standalone}>
+                    {title && (
+                      <NotificationTitleRow handleClose={handleClose}>
+                        {title}
+                      </NotificationTitleRow>
+                    )}
+                    {!hideButton && (
+                      <ButtonContainer>
+                        <NotificationCancelButton handleClose={handleClose} />
+                      </ButtonContainer>
+                    )}
+                    {Child}
+                  </Content>
+                </Wrapper>
+                {backShadow && entered && <BackShadow />}
+              </NotificationWrapper>
+            </Overlay>
+          </Splash>
+        </CSSTransition>
+      </ReactPortal>
+    );
+  }
+);

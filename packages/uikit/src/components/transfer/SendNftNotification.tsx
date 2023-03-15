@@ -111,6 +111,7 @@ export const SendNftAction: FC<{
       isOpen={nftItem != undefined}
       handleClose={onClose}
       hideButton
+      backShadow
     >
       {Content}
     </Notification>

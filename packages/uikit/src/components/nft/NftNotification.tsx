@@ -136,6 +136,7 @@ export const NftNotification: FC<{
       isOpen={nftItem != undefined}
       hideButton
       handleClose={handleClose}
+      backShadow
     >
       {Content}
     </Notification>
