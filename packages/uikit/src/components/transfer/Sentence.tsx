@@ -62,12 +62,12 @@ const Template = styled.span<{ small?: boolean }>`
           font-size: 40px;
         `}
 
-  @media (max-width: 600px) {
-    font-size: 22px;
-  }
-  @media (max-width: 400px) {
-    font-size: 18px;
-  }
+  // @media (max-width: 600px) {
+  //   font-size: 22px;
+  // }
+  // @media (max-width: 400px) {
+  //   font-size: 18px;
+  // }
 
   line-height: 49px;
 
@@ -89,7 +89,7 @@ export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
         <SentenceInput
           ref={ref}
           small={small}
-          type="number"
+          type="tel"
           value={value}
           onChange={(event) => {
             setValue(event.target.value);
