@@ -89,7 +89,7 @@ export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
         <SentenceInput
           ref={ref}
           small={small}
-          type="text"
+          type="number"
           value={value}
           onChange={(event) => {
             setValue(event.target.value);
