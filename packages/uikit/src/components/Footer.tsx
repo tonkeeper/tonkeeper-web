@@ -133,15 +133,6 @@ const Block = styled.div<{ bottom: boolean; standalone: boolean }>`
     css`
       padding-bottom: 2rem;
     `}
-    
-  &:before {
-    content: '';
-    display: block;
-    width: 100%;
-    height: var(--app-height);
-    position: absolute;
-    top: 100%;
-  }
 `;
 
 const useIsScrollBottom = () => {
