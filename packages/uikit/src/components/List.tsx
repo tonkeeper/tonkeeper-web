@@ -1,4 +1,6 @@
+import React, { FC, PropsWithChildren } from 'react';
 import styled, { css } from 'styled-components';
+import { useAppContext } from '../hooks/appContext';
 
 export const ListBlock = styled.div<{
   margin?: boolean;
@@ -64,7 +66,11 @@ export const ListItemPayload = styled.div`
   width: 100%;
 `;
 
-export const ListItem = styled.div<{ hover?: boolean; dropDown?: boolean }>`
+const ListItemElement = styled.div<{
+  hover?: boolean;
+  dropDown?: boolean;
+  ios: boolean;
+}>`
   display: flex;
   padding: 0 0 0 1rem;
 
@@ -82,7 +88,7 @@ export const ListItem = styled.div<{ hover?: boolean; dropDown?: boolean }>`
       return props.hover !== false
         ? css`
             cursor: pointer;
-            &:hover {
+            &: ${props.ios ? 'active' : 'hover'} {
               background: ${props.theme.backgroundHighlighted};
 
               > div {
@@ -96,7 +102,7 @@ export const ListItem = styled.div<{ hover?: boolean; dropDown?: boolean }>`
       return props.hover !== false
         ? css`
             cursor: pointer;
-            &:hover {
+            &: ${props.ios ? 'active' : 'hover'} {
               background: ${props.theme.backgroundContentTint};
 
               > div {
@@ -114,3 +120,19 @@ export const ListItem = styled.div<{ hover?: boolean; dropDown?: boolean }>`
     padding-top: 15px;
   }
 `;
+
+export const ListItem: FC<
+  PropsWithChildren<
+    { hover?: boolean; dropDown?: boolean } & Omit<
+      React.HTMLProps<HTMLDivElement>,
+      'size' | 'children' | 'ref' | 'as'
+    >
+  >
+> = ({ children, hover, dropDown, ...props }) => {
+  const { ios } = useAppContext();
+  return (
+    <ListItemElement hover={hover} dropDown={dropDown} ios={ios} {...props}>
+      {children}
+    </ListItemElement>
+  );
+};
