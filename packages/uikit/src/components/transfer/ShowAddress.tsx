@@ -62,7 +62,7 @@ const ShowAddressLabel = styled(Body1)<{ inputTextWidth: number }>`
   position: absolute;
   bottom: 0;
   line-height: 48px;
-  left: ${(props) => Math.ceil(props.inputTextWidth) + 32}px;
+  left: ${(props) => Math.ceil(props.inputTextWidth) + 36}px;
   color: ${(props) => props.theme.textSecondary};
   user-select: none;
 `;
