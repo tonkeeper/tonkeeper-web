@@ -114,6 +114,24 @@ const Content = styled.div<{ standalone: boolean }>`
     `}
 `;
 
+const BottomShadow = styled.div`
+  position: relative;
+  width: 100%;
+  height: 0;
+
+  overflow-y: hidden;
+
+  &:before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: var(--app-height);
+    background: ${(props) => props.theme.backgroundPage};
+    position: absolute;
+    top: 100%;
+  }
+`;
+
 const TitleRow = styled.div`
   display: flex;
   gap: 1;
@@ -247,6 +265,7 @@ export const Notification: FC<{
                   )}
                   {Child}
                 </Content>
+                <BottomShadow />
               </Wrapper>
             </NotificationWrapper>
           </Overlay>
