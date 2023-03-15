@@ -12,7 +12,6 @@ import {
 import { deleteWalletState, importWallet } from './walletService';
 
 export const getAccountState = async (storage: IStorage) => {
-  console.log('load account');
   const state = await storage.get<AccountState>(AppKey.account);
   return state ?? defaultAccountState;
 };

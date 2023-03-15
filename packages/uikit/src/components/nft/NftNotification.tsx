@@ -128,7 +128,6 @@ export const NftNotification: FC<{
 }> = ({ nftItem, handleClose }) => {
   const Content = useCallback(() => {
     if (!nftItem) return undefined;
-    console.log('nftItem', nftItem);
     return <NftPreview onClose={handleClose} nftItem={nftItem} />;
   }, [nftItem, handleClose]);
 

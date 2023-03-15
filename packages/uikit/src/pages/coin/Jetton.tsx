@@ -100,7 +100,6 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({
     return <CoinSkeleton />;
   }
 
-  console.log(info);
   const { description, image, name } = info.metadata;
   return (
     <div>
