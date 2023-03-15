@@ -169,5 +169,8 @@
   },
   "NFT_collection_id": {
     "message": "Идентификатор коллекции"
+  },
+  "choose_currency_currencies_UAH": {
+    "message": "Украинская гривна"
   }
 }

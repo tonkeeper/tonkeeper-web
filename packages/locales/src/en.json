@@ -173,5 +173,8 @@
   },
   "NFT_collection_id": {
     "message": "NFT collection ID"
+  },
+  "choose_currency_currencies_UAH": {
+    "message": "Ukrainian hryvnia"
   }
 }
