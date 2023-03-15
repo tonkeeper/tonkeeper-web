@@ -125,13 +125,19 @@ export const ListItem: FC<
   PropsWithChildren<
     { hover?: boolean; dropDown?: boolean } & Omit<
       React.HTMLProps<HTMLDivElement>,
-      'size' | 'children' | 'ref' | 'as'
+      'size' | 'children' | 'as'
     >
   >
-> = ({ children, hover, dropDown, ...props }) => {
+> = ({ children, hover, dropDown, ref, ...props }) => {
   const { ios } = useAppContext();
   return (
-    <ListItemElement hover={hover} dropDown={dropDown} ios={ios} {...props}>
+    <ListItemElement
+      hover={hover}
+      dropDown={dropDown}
+      ios={ios}
+      ref={ref as React.MutableRefObject<HTMLInputElement>}
+      {...props}
+    >
       {children}
     </ListItemElement>
   );
