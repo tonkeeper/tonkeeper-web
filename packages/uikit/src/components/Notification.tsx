@@ -215,10 +215,13 @@ export const Notification: FC<{
     }, [isOpen, children, handleClose]);
 
     useEffect(() => {
-      if (isOpen) {
-        sdk.disableScroll();
-      } else {
-        sdk.enableScroll();
+      const container = document.getElementById('react-portal-modal-container');
+      if (container) {
+        if (container.childElementCount) {
+          sdk.disableScroll();
+        } else {
+          sdk.enableScroll();
+        }
       }
       return () => {
         sdk.enableScroll();
