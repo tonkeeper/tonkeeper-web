@@ -122,9 +122,9 @@ const SelectCenter = styled.div`
 
 const FiatBlock = styled(Body1)`
   position: absolute;
-  bottom: 56px;
+  top: 50$;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, 48px);
   z-index: 2;
 
   padding: 8px 16px;
@@ -199,6 +199,7 @@ const seeIfValueValid = (value: string, decimals: number) => {
 
 const useButtonPosition = (
   ref: React.RefObject<HTMLDivElement>,
+  blockRef: React.RefObject<HTMLLabelElement>,
   inputRef: React.RefObject<HTMLInputElement>
 ) => {
   const { ios, standalone } = useAppContext();
@@ -216,13 +217,21 @@ const useButtonPosition = (
         height = viewport.height;
       }
       button.style.bottom = `${height - viewport.height + 16}px`;
+
+      const labelHeight =
+        viewport.height - 16 - 56 - 16 - 36 - 16 - 32 - 16 - 16 - 37;
+      if (blockRef.current) {
+        blockRef.current.style.height = `${labelHeight}px`;
+      }
     }
 
     viewport.addEventListener('resize', resizeHandler);
 
     function blurHandler() {
-      if (!button) return;
-      button.style.bottom = standalone ? '2rem' : '1rem';
+      setTimeout(() => {
+        if (!button) return;
+        button.style.bottom = standalone ? '2rem' : '1rem';
+      });
     }
 
     if (inputRef.current) {
@@ -275,7 +284,7 @@ export const AmountView: FC<{
   const refBlock = useRef<HTMLLabelElement>(null);
   const refButton = useRef<HTMLDivElement>(null);
 
-  useButtonPosition(refButton, ref);
+  useButtonPosition(refButton, refBlock, ref);
 
   useEffect(() => {
     if (refBlock.current) {
