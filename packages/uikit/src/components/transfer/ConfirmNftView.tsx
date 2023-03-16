@@ -41,9 +41,10 @@ const useSendNft = (
   const wallet = useWalletContext();
   const client = useQueryClient();
 
-  return useMutation<void, Error>(async () => {
-    if (!fee) return;
-    const password = await getWalletPassword(sdk);
+  return useMutation<boolean, Error>(async () => {
+    if (!fee) return false;
+    const password = await getWalletPassword(sdk).catch(() => null);
+    if (password === null) return false;
     await sendNftTransfer(
       sdk.storage,
       tonApi,
@@ -55,6 +56,7 @@ const useSendNft = (
     );
 
     await client.invalidateQueries();
+    return true;
   });
 };
 
@@ -69,7 +71,11 @@ export const ConfirmNftView: FC<{
   const { t } = useTranslation();
   const sdk = useAppSdk();
 
-  const { mutateAsync, isLoading, error } = useSendNft(recipient, nftItem, fee);
+  const { mutateAsync, isLoading, error, reset } = useSendNft(
+    recipient,
+    nftItem,
+    fee
+  );
 
   const isValid = !isLoading;
 
@@ -85,9 +91,12 @@ export const ConfirmNftView: FC<{
 
     if (isLoading) return;
     try {
-      await mutateAsync();
-      setDone(true);
-      setTimeout(onClose, 2000);
+      reset();
+      const done = await mutateAsync();
+      if (done) {
+        setDone(true);
+        setTimeout(onClose, 2000);
+      }
     } catch (e) {}
   };
 

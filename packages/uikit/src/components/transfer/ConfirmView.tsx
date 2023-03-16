@@ -46,10 +46,11 @@ const useSendTransaction = (
   const wallet = useWalletContext();
   const client = useQueryClient();
 
-  return useMutation<void, Error>(async () => {
-    const password = await getWalletPassword(sdk);
+  return useMutation<boolean, Error>(async () => {
+    const password = await getWalletPassword(sdk).catch(() => null);
+    if (password === null) return false;
     if (amount.jetton === CryptoCurrency.TON) {
-      return sendTonTransfer(
+      await sendTonTransfer(
         sdk.storage,
         tonApi,
         wallet,
@@ -62,7 +63,7 @@ const useSendTransaction = (
       const [jettonInfo] = jettons.balances.filter(
         (item) => item.jettonAddress === amount.jetton
       );
-      return sendJettonTransfer(
+      await sendJettonTransfer(
         sdk.storage,
         tonApi,
         wallet,
@@ -73,6 +74,8 @@ const useSendTransaction = (
         password
       );
     }
+    await client.invalidateQueries();
+    return true;
   });
 };
 
@@ -86,7 +89,7 @@ export const ConfirmView: FC<{
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
 
-  const { mutateAsync, isLoading, error } = useSendTransaction(
+  const { mutateAsync, isLoading, error, reset } = useSendTransaction(
     recipient,
     amount,
     jettons
@@ -98,9 +101,12 @@ export const ConfirmView: FC<{
 
     if (isLoading) return;
     try {
-      await mutateAsync();
-      setDone(true);
-      setTimeout(onClose, 2000);
+      reset();
+      const done = await mutateAsync();
+      if (done) {
+        setDone(true);
+        setTimeout(onClose, 2000);
+      }
     } catch (e) {}
   };
 
