@@ -3,10 +3,11 @@ import { Address } from 'ton-core';
 import { CryptoCurrency } from '../entries/crypto';
 import { FiatCurrencies } from '../entries/fiat';
 import { JettonBalance } from '../tonApiV1';
+import { DefaultDecimals } from './send';
 
 export const formatDecimals = (
   amount: BigNumber.Value,
-  decimals: number = 9
+  decimals: number = DefaultDecimals
 ): number => {
   return new BigNumber(amount).div(Math.pow(10, decimals)).toNumber();
 };

@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Recipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
 import { AccountApi, AccountRepr, DNSApi } from '@tonkeeper/core/dist/tonApiV1';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
@@ -47,6 +48,14 @@ const seeIfValidAddress = (value: string): boolean => {
   }
 };
 
+const useGetToAccount = () => {
+  const { tonApi } = useAppContext();
+  return useMutation<AccountRepr, Error, Recipient>((recipient) => {
+    const account =
+      'dns' in recipient ? recipient.dns.address : recipient.address;
+    return new AccountApi(tonApi).getAccountInfo({ account });
+  });
+};
 const useToAccount = (isValid: boolean, recipient: Recipient) => {
   const { tonApi } = useAppContext();
   const account =
@@ -95,6 +104,10 @@ export const RecipientView: FC<{
 
   const ref = useRef<HTMLInputElement | null>(null);
 
+  const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
+    useGetToAccount();
+
+  const [comment, setComment] = useState(data?.comment ?? '');
   const [recipient, setAddress] = useState<Recipient>(
     data?.address ?? {
       address: '',
@@ -121,13 +134,12 @@ export const RecipientView: FC<{
     return seeIfValidAddress(recipient.address);
   }, [recipient]);
 
-  const {
-    data: toAccount,
-    isFetching,
-    error,
-  } = useToAccount(isValid, recipient);
+  const { data: toAccount, isFetching: isAccountFetching } = useToAccount(
+    isValid,
+    recipient
+  );
 
-  const [comment, setComment] = useState(data?.comment ?? '');
+  const isFetching = isAccountFetching || isAccountLoading;
 
   const isMemoValid = useMemo(() => {
     if (!toAccount) return true;
@@ -164,6 +176,17 @@ export const RecipientView: FC<{
     }
   };
 
+  const onSelect = async (item: Suggestion) => {
+    setAddress(item);
+    const toAccount = await getAccountAsync(item);
+    setRecipient({
+      address: recipient,
+      toAccount,
+      comment,
+      done: true,
+    });
+  };
+
   return (
     <FullHeightBlock onSubmit={onSubmit}>
       <NotificationTitleBlock>
@@ -197,7 +220,7 @@ export const RecipientView: FC<{
 
       <Label>{t('send_screen_steps_address_suggests_label')}</Label>
 
-      <SuggestionList onSelect={setAddress} />
+      <SuggestionList onSelect={onSelect} />
 
       <Gap />
 

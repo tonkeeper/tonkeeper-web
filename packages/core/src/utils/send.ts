@@ -7,15 +7,24 @@ import { getJettonStockPrice, getTonCoinStockPrice } from './balance';
 
 export const DefaultDecimals = 9;
 
-export function toStringAmount(str: string): string {
+export function removeCommas(str: string): string {
   return str.replaceAll(',', '');
 }
+
+export function toStringAmount(str: string): string {
+  return str;
+}
 export function toNumberAmount(str: string): number {
-  return parseFloat(toStringAmount(str));
+  return parseFloat(str);
 }
 export function isNumeric(str: string) {
-  str = toStringAmount(str);
   return !isNaN(Number(str)) && !isNaN(parseFloat(str));
+}
+
+export function seeIfLargeTail(str: string, decimals: number) {
+  const [entry, tail] = str.trim().replaceAll(',', '').split('.');
+  if (tail && tail.length > decimals) return true;
+  return false;
 }
 
 export const getJettonSymbol = (
@@ -45,13 +54,15 @@ export const getMaxValue = (
   format: (amount: number | string, decimals?: number) => string
 ): string => {
   if (jetton === CryptoCurrency.TON) {
-    return format(info?.balance ?? 0);
+    return removeCommas(format(info?.balance ?? 0));
   }
 
   const jettonInfo = jettons.balances.find(
     (item) => item.jettonAddress === jetton
   );
-  return format(jettonInfo?.balance ?? 0, jettonInfo?.metadata?.decimals);
+  return removeCommas(
+    format(jettonInfo?.balance ?? 0, jettonInfo?.metadata?.decimals)
+  );
 };
 
 export const getRemaining = (
@@ -106,33 +117,6 @@ export const getRemaining = (
     }`,
     remaining.isGreaterThanOrEqualTo(0),
   ];
-};
-
-export const parseAndValidateInput = (
-  value: string,
-  jettons: JettonsBalances,
-  jetton: string,
-  format: (amount: number | string, decimals?: number) => string
-): string | undefined => {
-  if (value.trim() == '') return '';
-  if (value.length > 22) return;
-  try {
-    const [entry, ...tail] = value.trim().replaceAll(',', '').split('.');
-    if (entry.length > 11) return;
-    const start = parseInt(entry, 10);
-
-    if (isNaN(start)) {
-      throw new Error('Not a number');
-    }
-
-    if (tail.length > 1) return;
-    const decimals = getJettonDecimals(jetton, jettons);
-    if (tail.length && tail[0].length > decimals) return;
-
-    return [format(start, 0), ...tail].join('.');
-  } catch (e) {
-    return value;
-  }
 };
 
 export const getFiatAmountValue = (

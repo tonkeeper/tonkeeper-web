@@ -11,10 +11,12 @@ import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import {
+  getJettonDecimals,
   getJettonSymbol,
   getMaxValue,
   getRemaining,
   isNumeric,
+  seeIfLargeTail,
 } from '@tonkeeper/core/dist/utils/send';
 import React, {
   FC,
@@ -231,9 +233,13 @@ export const AmountView: FC<{
   const onInput = (value: string) => {
     if (!refBlock.current) return;
     if (value.length > 32) return;
+    if (value !== '') {
+      if (/^[a-zA-Z]+$/.test(value)) return;
+      if (!isNumeric(value)) return;
+      if (seeIfLargeTail(value, getJettonDecimals(jetton, jettons))) return;
+    }
 
-    const size = getInputSize(value, refBlock.current);
-    setFontSize(size);
+    setFontSize(getInputSize(value, refBlock.current));
     setMax(false);
     setAmountValue(value);
   };
