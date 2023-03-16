@@ -17,7 +17,7 @@ const Block = styled.div<{ top: boolean }>`
 
   position: fixed;
   width: var(--app-width);
-  top: 0;
+  top: -1px;
 
   background: ${(props) => props.theme.backgroundPage};
 
