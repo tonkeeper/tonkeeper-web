@@ -196,6 +196,48 @@ const seeIfValueValid = (value: string, decimals: number) => {
 
   return true;
 };
+
+const useButtonPosition = (
+  ref: React.RefObject<HTMLDivElement>,
+  inputRef: React.RefObject<HTMLInputElement>
+) => {
+  const { ios, standalone } = useAppContext();
+  useEffect(() => {
+    const button = ref.current;
+    if (!button) return;
+
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    let height = viewport.height;
+
+    function resizeHandler() {
+      if (!viewport || !button) return;
+      if (!ios) {
+        height = viewport.height;
+      }
+      button.style.bottom = `${height - viewport.height + 16}px`;
+    }
+
+    viewport.addEventListener('resize', resizeHandler);
+
+    function blurHandler() {
+      if (!button) return;
+      button.style.bottom = standalone ? '2rem' : '1rem';
+    }
+
+    if (inputRef.current) {
+      inputRef.current.onblur = blurHandler;
+    }
+
+    return () => {
+      blurHandler();
+      viewport.removeEventListener('resize', resizeHandler);
+      if (inputRef.current) {
+        inputRef.current.onblur = null;
+      }
+    };
+  }, [ref, inputRef]);
+};
 export const AmountView: FC<{
   onClose: () => void;
   onBack: () => void;
@@ -231,6 +273,9 @@ export const AmountView: FC<{
 
   const ref = useRef<HTMLInputElement>(null);
   const refBlock = useRef<HTMLLabelElement>(null);
+  const refButton = useRef<HTMLDivElement>(null);
+
+  useButtonPosition(refButton, ref);
 
   useEffect(() => {
     if (refBlock.current) {
@@ -362,7 +407,7 @@ export const AmountView: FC<{
       </MaxRow>
 
       <Gap />
-      <ButtonBlock>
+      <ButtonBlock ref={refButton}>
         <Button
           fullWidth
           size="large"

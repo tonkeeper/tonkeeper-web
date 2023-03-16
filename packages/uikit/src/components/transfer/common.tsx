@@ -1,7 +1,7 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { getFiatAmountValue } from '@tonkeeper/core/dist/utils/send';
-import React, { FC, PropsWithChildren, useMemo } from 'react';
+import React, { PropsWithChildren, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { formatFiatCurrency } from '../../hooks/balance';
@@ -79,12 +79,16 @@ const ButtonBlockElement = styled.div<{ standalone: boolean }>`
         `}
 `;
 
-export const ButtonBlock: FC<PropsWithChildren> = ({ children }) => {
-  const { standalone } = useAppContext();
-  return (
-    <ButtonBlockElement standalone={standalone}>{children}</ButtonBlockElement>
-  );
-};
+export const ButtonBlock = React.forwardRef<HTMLDivElement, PropsWithChildren>(
+  ({ children }, ref) => {
+    const { standalone } = useAppContext();
+    return (
+      <ButtonBlockElement ref={ref} standalone={standalone}>
+        {children}
+      </ButtonBlockElement>
+    );
+  }
+);
 
 export const ResultButton = styled.div<{ done?: boolean }>`
   display: flex;
