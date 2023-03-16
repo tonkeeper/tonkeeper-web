@@ -183,6 +183,18 @@ const getInputSize = (value: string, parent: HTMLLabelElement) => {
   };
 };
 
+const seeIfValueValid = (value: string, decimals: number) => {
+  if (value.length > 32) return false;
+  if (value !== '') {
+    if (value.endsWith(',')) return false;
+    if (value.endsWith('e')) return false;
+    if (/^[a-zA-Z]+$/.test(value)) return false;
+    if (!isNumeric(value)) return false;
+    if (seeIfLargeTail(value, decimals)) return false;
+  }
+
+  return true;
+};
 export const AmountView: FC<{
   onClose: () => void;
   onBack: () => void;
@@ -235,12 +247,10 @@ export const AmountView: FC<{
 
   const onInput = (value: string) => {
     if (!refBlock.current) return;
-    if (value.length > 32) return;
-    if (value !== '') {
-      if (value.endsWith(',')) return;
-      if (/^[a-zA-Z]+$/.test(value)) return;
-      if (!isNumeric(value)) return;
-      if (seeIfLargeTail(value, getJettonDecimals(jetton, jettons))) return;
+    const decimals = getJettonDecimals(jetton, jettons);
+
+    if (!seeIfValueValid(value, decimals)) {
+      return setAmountValue(amount);
     }
 
     setFontSize(getInputSize(value, refBlock.current));
