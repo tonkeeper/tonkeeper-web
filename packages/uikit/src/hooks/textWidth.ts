@@ -20,7 +20,7 @@ const getContext = () => {
   return canvas.getContext('2d') as CanvasRenderingContext2D;
 };
 
-const getTextWidth = (currentText: string | string[], font: string) => {
+export const getTextWidth = (currentText: string | string[], font: string) => {
   const context = getContext();
   context.font = font;
 

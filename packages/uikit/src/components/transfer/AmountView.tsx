@@ -27,6 +27,7 @@ import React, {
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFormatCoinValue } from '../../hooks/balance';
+import { getTextWidth } from '../../hooks/textWidth';
 import { useTranslation } from '../../hooks/translation';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
@@ -40,7 +41,7 @@ import {
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
 import { AssetSelect } from './AssetSelect';
 import { ButtonBlock, duration, useFiatAmount } from './common';
-import { Sentence } from './Sentence';
+import { InputSize, Sentence } from './Sentence';
 
 const Center = styled.div`
   text-align: center;
@@ -129,6 +130,10 @@ const FiatBlock = styled(Body1)`
   color: ${(props) => props.theme.textSecondary};
   border: 1px solid ${(props) => props.theme.buttonTertiaryBackground};
   border-radius: ${(props) => props.theme.cornerLarge};
+
+  max-width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const useEstimateTransaction = (
@@ -157,6 +162,22 @@ const useEstimateTransaction = (
   });
 };
 
+const defaultSize: InputSize = { size: 40, width: 20 };
+
+const getInputSize = (value: string, parent: HTMLLabelElement) => {
+  const max = parent.clientWidth;
+  let size = defaultSize.size;
+  let width = getTextWidth(value, `600 ${size}px 'Montserrat'`);
+  while (Math.round(width) > max - 115) {
+    size = Math.max(1, size - 1);
+    width = getTextWidth(value, `600 ${size}px 'Montserrat'`);
+  }
+  return {
+    width: Math.max(Math.round(width) + 10, 20),
+    size: size,
+  };
+};
+
 export const AmountView: FC<{
   onClose: () => void;
   onBack: () => void;
@@ -182,13 +203,16 @@ export const AmountView: FC<{
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
   const [amount, setAmountValue] = useState(data ? data.amount : '');
 
+  const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
+
   const { mutateAsync, isLoading, reset } = useEstimateTransaction(
     recipient,
     jetton,
     jettons
   );
 
-  const ref = useRef<HTMLInputElement | null>(null);
+  const ref = useRef<HTMLInputElement>(null);
+  const refBlock = useRef<HTMLLabelElement>(null);
 
   useEffect(() => {
     if (ref.current) {
@@ -205,12 +229,11 @@ export const AmountView: FC<{
   const suffix = getJettonSymbol(jetton, jettons);
 
   const onInput = (value: string) => {
-    // const fixed = parseAndValidateInput(value, jettons, jetton, format);
-    // if (fixed !== undefined) {
+    if (!refBlock.current) return;
+    if (value.length > 80) return;
 
-    // }
-    if (value.length > 22) return;
-
+    const size = getInputSize(value, refBlock.current);
+    setFontSize(size);
     setMax(false);
     setAmountValue(value);
   };
@@ -270,7 +293,7 @@ export const AmountView: FC<{
         <NotificationCancelButton handleClose={onClose} />
       </NotificationTitleBlock>
 
-      <AmountBlock>
+      <AmountBlock ref={refBlock}>
         <SelectCenter>
           <AssetSelect
             info={info}
@@ -279,7 +302,12 @@ export const AmountView: FC<{
             jettons={jettons}
           />
         </SelectCenter>
-        <Sentence ref={ref} value={amount} setValue={onInput} />
+        <Sentence
+          ref={ref}
+          value={amount}
+          setValue={onInput}
+          inputSize={fontSize}
+        />
         <Symbol>{suffix}</Symbol>
         {fiatAmount && <FiatBlock>{fiatAmount}</FiatBlock>}
       </AmountBlock>
