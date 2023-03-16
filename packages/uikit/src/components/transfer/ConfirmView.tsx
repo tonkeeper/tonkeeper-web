@@ -47,7 +47,7 @@ const useSendTransaction = (
   const client = useQueryClient();
 
   return useMutation<boolean, Error>(async () => {
-    const password = await getWalletPassword(sdk).catch(() => null);
+    const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
     if (password === null) return false;
     if (amount.jetton === CryptoCurrency.TON) {
       await sendTonTransfer(

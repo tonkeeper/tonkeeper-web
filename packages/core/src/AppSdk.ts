@@ -2,10 +2,17 @@ import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { AuthState } from './entries/password';
 import { IStorage, MemoryStorage } from './Storage';
 
+export type GetPasswordType = 'confirm' | 'unlock';
+
+export type GetPasswordParams = {
+  auth: AuthState;
+  type?: GetPasswordType;
+};
+
 export interface UIEvents {
   unlock: void;
   copy: string;
-  getPassword: AuthState;
+  getPassword: GetPasswordParams;
   loading: void;
   response: any;
 }

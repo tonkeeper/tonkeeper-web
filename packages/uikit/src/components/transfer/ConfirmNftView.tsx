@@ -43,7 +43,7 @@ const useSendNft = (
 
   return useMutation<boolean, Error>(async () => {
     if (!fee) return false;
-    const password = await getWalletPassword(sdk).catch(() => null);
+    const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
     if (password === null) return false;
     await sendNftTransfer(
       sdk.storage,

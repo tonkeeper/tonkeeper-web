@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { GetPasswordType, IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import {
   AuthState,
   defaultAuthState,
@@ -68,11 +68,14 @@ export const useMutateVoucher = () => {
   });
 };
 
-export const getWalletPassword = async (sdk: IAppSdk) => {
+export const getWalletPassword = async (
+  sdk: IAppSdk,
+  type?: GetPasswordType
+) => {
   const auth = await sdk.storage.get<AuthState>(AppKey.password);
   if (!auth) {
     throw new Error('Auth not defined');
   }
-  const password = await getPasswordByNotification(sdk, auth);
+  const password = await getPasswordByNotification(sdk, auth, type);
   return password;
 };

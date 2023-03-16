@@ -1,5 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import {
+  GetPasswordParams,
+  GetPasswordType,
+  IAppSdk,
+} from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/menmonicService';
@@ -14,14 +18,15 @@ import { useTranslation } from '../../hooks/translation';
 
 export const getPasswordByNotification = async (
   sdk: IAppSdk,
-  auth: AuthState
+  auth: AuthState,
+  type?: GetPasswordType
 ): Promise<string> => {
   const id = Date.now();
   return new Promise<string>((resolve, reject) => {
     sdk.uiEvents.emit('getPassword', {
       method: 'getPassword',
       id,
-      params: auth,
+      params: { type, auth },
     });
 
     const onCallback = (message: {
@@ -92,7 +97,8 @@ const PasswordUnlock: FC<{
   onSubmit: (password: string) => void;
   isError: boolean;
   isLoading: boolean;
-}> = ({ sdk, onClose, onSubmit, isError, isLoading }) => {
+  reason?: GetPasswordType;
+}> = ({ sdk, onClose, onSubmit, isError, isLoading, reason }) => {
   const { t } = useTranslation();
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -147,7 +153,7 @@ const PasswordUnlock: FC<{
           type="button"
           loading={isLoading}
         >
-          {t('settings_reset')}
+          {reason === 'confirm' ? t('cancel') : t('settings_reset')}
         </Button>
         <Button
           size="large"
@@ -157,7 +163,7 @@ const PasswordUnlock: FC<{
           disabled={password.length < 5}
           loading={isLoading}
         >
-          {t('Unlock')}
+          {reason === 'confirm' ? t('confirm_sending_submit') : t('Unlock')}
         </Button>
       </ButtonRow>
     </Block>
@@ -167,6 +173,7 @@ const PasswordUnlock: FC<{
 export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
   const { t } = useTranslation();
 
+  const [type, setType] = useState<'confirm' | 'unlock' | undefined>(undefined);
   const [auth, setAuth] = useState<AuthState | undefined>(undefined);
   const [requestId, setId] = useState<number | undefined>(undefined);
 
@@ -200,9 +207,10 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const handler = (options: {
       method: 'getPassword';
       id?: number | undefined;
-      params: AuthState;
+      params: GetPasswordParams;
     }) => {
-      setAuth(options.params);
+      setType(options.params.type);
+      setAuth(options.params?.auth);
       setId(options.id);
     };
     sdk.uiEvents.on('getPassword', handler);
@@ -221,9 +229,10 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
         onSubmit={onSubmit}
         isLoading={isLoading}
         isError={isError}
+        reason={type}
       />
     );
-  }, [sdk, auth, requestId, onSubmit]);
+  }, [sdk, auth, requestId, onSubmit, type]);
 
   return (
     <Notification
