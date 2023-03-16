@@ -179,8 +179,9 @@ export const RecipientView: FC<{
   const onSelect = async (item: Suggestion) => {
     setAddress(item);
     const toAccount = await getAccountAsync(item);
+    if (toAccount.memoRequired) return;
     setRecipient({
-      address: recipient,
+      address: item,
       toAccount,
       comment,
       done: true,
