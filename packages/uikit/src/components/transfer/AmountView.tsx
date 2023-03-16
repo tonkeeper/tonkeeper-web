@@ -164,7 +164,7 @@ const useEstimateTransaction = (
   });
 };
 
-const defaultSize: InputSize = { size: 40, width: 20 };
+const defaultSize: InputSize = { size: 40, width: 50 };
 
 const getInputSize = (value: string, parent: HTMLLabelElement) => {
   if (value.endsWith('.')) {
@@ -179,7 +179,7 @@ const getInputSize = (value: string, parent: HTMLLabelElement) => {
   }
 
   return {
-    width: Math.max(Math.round(width) + 10, value.length * 6, 20),
+    width: Math.max(Math.round(width) + 10, value.length * 6, 50),
     size: size,
   };
 };
@@ -306,7 +306,7 @@ export const AmountView: FC<{
   const fiatAmount = useFiatAmount(jettons, jetton, amount);
 
   return (
-    <FullHeightBlock onSubmit={onSubmit} noValidate>
+    <FullHeightBlock onSubmit={onSubmit}>
       <NotificationTitleBlock>
         <BackButton onClick={onBack}>
           <ChevronLeftIcon />

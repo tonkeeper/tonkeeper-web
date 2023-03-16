@@ -180,8 +180,6 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({
   timestamp,
   event,
 }) => {
-  console.log(action, event);
-
   const wallet = useWalletContext();
   const { nftItemTransfer } = action;
 
