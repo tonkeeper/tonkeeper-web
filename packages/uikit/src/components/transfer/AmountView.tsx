@@ -218,8 +218,11 @@ const useButtonPosition = (
       }
       button.style.bottom = `${height - viewport.height + 16}px`;
 
-      const labelHeight =
-        viewport.height - 16 - 56 - 16 - 36 - 16 - 32 - 16 - 16 - 37;
+      const labelHeight = Math.min(
+        viewport.height - 16 - 56 - 16 - 36 - 16 - 32 - 16 - 16 - 37,
+        272
+      );
+
       if (blockRef.current) {
         blockRef.current.style.height = `${labelHeight}px`;
       }
