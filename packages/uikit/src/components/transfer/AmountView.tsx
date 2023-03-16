@@ -202,7 +202,7 @@ const useButtonPosition = (
   blockRef: React.RefObject<HTMLLabelElement>,
   inputRef: React.RefObject<HTMLInputElement>
 ) => {
-  const { ios, standalone } = useAppContext();
+  const { ios } = useAppContext();
   useEffect(() => {
     const button = ref.current;
     if (!button) return;
@@ -228,24 +228,31 @@ const useButtonPosition = (
       }
     }
 
-    viewport.addEventListener('resize', resizeHandler);
+    function subscribe() {
+      if (!viewport) return;
+      viewport.addEventListener('resize', resizeHandler);
+    }
 
     function blurHandler() {
+      if (!viewport) return;
+      viewport.removeEventListener('resize', resizeHandler);
       setTimeout(() => {
         if (!button) return;
-        button.style.bottom = standalone ? '2rem' : '1rem';
+        button.style.bottom = null!;
       });
     }
 
     if (inputRef.current) {
       inputRef.current.onblur = blurHandler;
+      inputRef.current.onfocus = subscribe;
     }
 
     return () => {
       blurHandler();
-      viewport.removeEventListener('resize', resizeHandler);
+
       if (inputRef.current) {
         inputRef.current.onblur = null;
+        inputRef.current.onfocus = null;
       }
     };
   }, [ref, inputRef]);
@@ -270,6 +277,7 @@ export const AmountView: FC<{
   jettons,
   info,
 }) => {
+  const { standalone } = useAppContext();
   const format = useFormatCoinValue();
 
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
@@ -370,7 +378,7 @@ export const AmountView: FC<{
   const fiatAmount = useFiatAmount(jettons, jetton, amount);
 
   return (
-    <FullHeightBlock onSubmit={onSubmit}>
+    <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
       <NotificationTitleBlock>
         <BackButton onClick={onBack}>
           <ChevronLeftIcon />

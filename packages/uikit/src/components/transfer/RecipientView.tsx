@@ -101,7 +101,7 @@ export const RecipientView: FC<{
   const sdk = useAppSdk();
   const [submitted, setSubmit] = useState(false);
   const { t } = useTranslation();
-
+  const { standalone } = useAppContext();
   const ref = useRef<HTMLInputElement | null>(null);
 
   const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
@@ -189,7 +189,7 @@ export const RecipientView: FC<{
   };
 
   return (
-    <FullHeightBlock onSubmit={onSubmit}>
+    <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
       <NotificationTitleBlock>
         <ButtonMock />
         <H3>{title}</H3>

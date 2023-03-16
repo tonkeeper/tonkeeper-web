@@ -67,6 +67,7 @@ export const ConfirmNftView: FC<{
   onBack: () => void;
   onClose: () => void;
 }> = ({ recipient, onBack, onClose, nftItem, fee }) => {
+  const { standalone } = useAppContext();
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
   const sdk = useAppSdk();
@@ -101,7 +102,7 @@ export const ConfirmNftView: FC<{
   };
 
   return (
-    <FullHeightBlock onSubmit={onSubmit}>
+    <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
       <NotificationTitleBlock>
         <BackButton onClick={onBack}>
           <ChevronLeftIcon />

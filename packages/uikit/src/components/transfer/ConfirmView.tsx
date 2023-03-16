@@ -89,6 +89,8 @@ export const ConfirmView: FC<{
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
 
+  const { standalone } = useAppContext();
+
   const { mutateAsync, isLoading, error, reset } = useSendTransaction(
     recipient,
     amount,
@@ -123,7 +125,7 @@ export const ConfirmView: FC<{
   const fiatFeeAmount = useFiatAmount(jettons, CryptoCurrency.TON, feeAmount);
 
   return (
-    <FullHeightBlock onSubmit={onSubmit}>
+    <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
       <NotificationTitleBlock>
         <BackButton onClick={onBack}>
           <ChevronLeftIcon />

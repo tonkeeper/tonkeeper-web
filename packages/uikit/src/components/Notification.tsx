@@ -161,8 +161,12 @@ export const NotificationBlock = styled.form`
   align-items: center;
 `;
 
-export const FullHeightBlock = styled(NotificationBlock)`
-  min-height: calc(var(--app-height) - 2rem);
+export const FullHeightBlock = styled(NotificationBlock)<{
+  standalone: boolean;
+}>`
+  min-height: calc(
+    var(--app-height) - ${(props) => (props.standalone ? 1 : 2)}rem
+  );
   padding-bottom: calc(56px + 1rem);
   box-sizing: border-box;
 `;
