@@ -86,8 +86,8 @@ export const Wrapper = styled.div`
     ${ButtonBlockElement},
     .${rightToLeft}-exit-active
     ${ButtonBlockElement} {
-    position: absolute;
-    bottom: 1rem;
+    position: absolute !important;
+    bottom: 5rem !important;
   }
 `;
 

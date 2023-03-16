@@ -2,12 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   FavoriteSuggestion,
   LatestSuggestion,
-  Suggestion
+  Suggestion,
 } from '@tonkeeper/core/dist/entries/suggestion';
 import {
   deleteFavoriteSuggestion,
   getSuggestionsList,
-  hideSuggestions
+  hideSuggestions,
 } from '@tonkeeper/core/dist/service/suggestionService';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
@@ -24,7 +24,7 @@ import { SkeletonList } from '../Skeleton';
 import { Label1 } from '../Text';
 import {
   AddFavoriteNotification,
-  EditFavoriteNotification
+  EditFavoriteNotification,
 } from './FavoriteNotification';
 
 const useLatestSuggestion = () => {
@@ -91,7 +91,7 @@ const FavoriteItem: FC<{
           noWrap
           text={
             <>
-              {item.name}{" "}
+              {item.name}{' '}
               <IconBlue>
                 <StarIcon />
               </IconBlue>
@@ -171,7 +171,6 @@ const LatestItem: FC<{
   onSelect: (item: Suggestion) => void;
   onAddFavorite: (item: LatestSuggestion) => void;
 }> = ({ item, onSelect, onAddFavorite }) => {
-
   const { mutateAsync } = useHideSuggestion(item);
   const { t, i18n } = useTranslation();
 
@@ -236,7 +235,7 @@ export const SuggestionList: FC<{
   );
 
   if (isFetching || !data) {
-    return <SkeletonList size={6} margin={false} fullWidth />;
+    return <SkeletonList size={4} margin={false} fullWidth />;
   }
 
   return (
