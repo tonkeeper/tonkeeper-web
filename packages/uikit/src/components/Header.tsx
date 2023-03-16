@@ -18,8 +18,8 @@ const Block = styled.div<{ top: boolean; center?: boolean; second?: boolean }>`
   flex-shrink: 0;
 
   user-select: none;
-
-  position: sticky;
+  position: fixed;
+  width: var(--app-width);
   top: 0;
   z-index: 1;
 
