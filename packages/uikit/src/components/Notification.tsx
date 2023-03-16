@@ -15,6 +15,7 @@ import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
+import { duration } from './transfer/common';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
   background: transparent;
@@ -215,15 +216,22 @@ export const Notification: FC<{
     }, [isOpen, children, handleClose]);
 
     useEffect(() => {
-      const container = document.getElementById('react-portal-modal-container');
-      if (container) {
-        if (container.childElementCount) {
-          sdk.disableScroll();
-        } else {
-          sdk.enableScroll();
+      const timer = setTimeout(() => {
+        const container = document.getElementById(
+          'react-portal-modal-container'
+        );
+
+        if (container) {
+          if (container.childElementCount) {
+            sdk.disableScroll();
+          } else {
+            sdk.enableScroll();
+          }
         }
-      }
+      }, duration + 10);
+
       return () => {
+        clearTimeout(timer);
         sdk.enableScroll();
       };
     }, [isOpen, sdk]);
