@@ -162,7 +162,7 @@ export const NotificationBlock = styled.form`
 `;
 
 export const FullHeightBlock = styled(NotificationBlock)`
-  min-height: calc(100vh - 3rem);
+  min-height: calc(var(--app-height) - 2rem);
   padding-bottom: calc(56px + 1rem);
   box-sizing: border-box;
 `;
@@ -216,7 +216,7 @@ export const Notification: FC<{
     }, [isOpen, children, handleClose]);
 
     useEffect(() => {
-      const timer = setTimeout(() => {
+      const handler = () => {
         const container = document.getElementById(
           'react-portal-modal-container'
         );
@@ -228,11 +228,13 @@ export const Notification: FC<{
             sdk.enableScroll();
           }
         }
-      }, duration + 10);
+      };
+
+      const timer = setTimeout(handler, duration + 10);
 
       return () => {
         clearTimeout(timer);
-        sdk.enableScroll();
+        handler();
       };
     }, [isOpen, sdk]);
 

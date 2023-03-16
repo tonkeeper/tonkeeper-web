@@ -14,6 +14,22 @@ export const timingFunction = 'ease-in-out';
 const rightToLeft = 'right-to-left';
 const leftToTight = 'left-to-right';
 
+const ButtonBlockElement = styled.div<{ standalone: boolean }>`
+  position: fixed;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  width: var(--app-width);
+
+  ${(props) =>
+    props.standalone
+      ? css`
+          bottom: 2rem;
+        `
+      : css`
+          bottom: 1rem;
+        `}
+`;
+
 export const Wrapper = styled.div`
   position: relative;
   overflow: hidden;
@@ -61,22 +77,17 @@ export const Wrapper = styled.div`
     transition: transform ${duration}ms ${timingFunction},
       opacity ${duration / 2}ms ${timingFunction};
   }
-`;
 
-const ButtonBlockElement = styled.div<{ standalone: boolean }>`
-  position: fixed;
-  padding: 0 1rem;
-  box-sizing: border-box;
-  width: var(--app-width);
-
-  ${(props) =>
-    props.standalone
-      ? css`
-          bottom: 2rem;
-        `
-      : css`
-          bottom: 1rem;
-        `}
+  .${leftToTight}-exit-active
+    ${ButtonBlockElement},
+    .${leftToTight}-enter-active
+    ${ButtonBlockElement},
+    .${rightToLeft}-exit-active
+    ${ButtonBlockElement},
+    .${rightToLeft}-exit-active
+    ${ButtonBlockElement} {
+    position: absolute;
+  }
 `;
 
 export const ButtonBlock = React.forwardRef<HTMLDivElement, PropsWithChildren>(
