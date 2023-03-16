@@ -167,6 +167,9 @@ const useEstimateTransaction = (
 const defaultSize: InputSize = { size: 40, width: 20 };
 
 const getInputSize = (value: string, parent: HTMLLabelElement) => {
+  if (value.endsWith('.')) {
+    value = `${value}0`;
+  }
   const max = parent.clientWidth;
   let size = defaultSize.size;
   let width = getTextWidth(value, `600 ${size}px 'Montserrat'`);
@@ -234,6 +237,7 @@ export const AmountView: FC<{
     if (!refBlock.current) return;
     if (value.length > 32) return;
     if (value !== '') {
+      if (value.endsWith(',')) return;
       if (/^[a-zA-Z]+$/.test(value)) return;
       if (!isNumeric(value)) return;
       if (seeIfLargeTail(value, getJettonDecimals(jetton, jettons))) return;
