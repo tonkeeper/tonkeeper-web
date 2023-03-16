@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 const SentenceInput = styled.input`
@@ -40,8 +40,6 @@ interface InputProps {
 
 export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
   ({ value, setValue, inputSize }, ref) => {
-    const lastValidValue = useRef<string>(value);
-
     return (
       <SentenceInput
         ref={ref}
@@ -49,19 +47,9 @@ export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
           fontSize: `${inputSize.size}px`,
           width: `${inputSize.width}px`,
         }}
-        type="number"
+        inputMode="numeric"
+        type="text"
         value={value}
-        onKeyUp={(e) => {
-          const input = ref as React.MutableRefObject<HTMLInputElement | null>;
-          if (e.nativeEvent.key === '.') return;
-          if (input.current) {
-            if (input.current.validity.badInput) {
-              setValue(lastValidValue.current);
-            } else {
-              lastValidValue.current = value;
-            }
-          }
-        }}
         onChange={(event) => {
           setValue(event.target.value);
         }}
