@@ -30,7 +30,7 @@ const ButtonBlockElement = styled.div<{ standalone: boolean }>`
         `}
 `;
 
-export const Wrapper = styled.div`
+export const Wrapper = styled.div<{ standalone: boolean }>`
   position: relative;
   overflow: hidden;
   margin-bottom: -1rem;
@@ -87,7 +87,13 @@ export const Wrapper = styled.div`
     .${rightToLeft}-enter-active
     ${ButtonBlockElement} {
     position: absolute !important;
-    bottom: 1rem !important;
+
+    ${(props) =>
+      props.standalone
+        ? css`
+            bottom: 1rem !important;
+          `
+        : undefined}
   }
 `;
 
