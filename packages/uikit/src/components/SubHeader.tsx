@@ -15,7 +15,8 @@ const Block = styled.div<{ top: boolean }>`
   justify-content: center;
   position: relative;
 
-  position: sticky;
+  position: fixed;
+  width: var(--app-width);
   top: 0;
 
   background: ${(props) => props.theme.backgroundPage};

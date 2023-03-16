@@ -169,6 +169,7 @@ const Wrapper = styled(Container)<{ standalone: boolean }>`
   }
 
   box-sizing: border-box;
+  padding-top: 64px;
   padding-bottom: ${(props) => (props.standalone ? '96' : '80')}px;
 `;
 

@@ -14,12 +14,17 @@ import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1 } from './Text';
 
-const Block = styled.div<{ top: boolean; center?: boolean; second?: boolean }>`
+const Block = styled.div<{
+  top: boolean;
+  center?: boolean;
+  second?: boolean;
+}>`
   flex-shrink: 0;
 
   user-select: none;
 
-  position: sticky;
+  position: fixed;
+  width: var(--app-width);
   top: 0;
   z-index: 1;
 
