@@ -239,7 +239,7 @@ export const JettonList: FC<AssetProps> = ({ info, jettons, stock }) => {
 
   return (
     <>
-      <ListBlock>
+      <ListBlock noUserSelect>
         <TonAsset info={info} stock={stock} />
         {jettons.balances.map((jetton) => (
           <JettonAsset

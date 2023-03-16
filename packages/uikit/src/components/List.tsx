@@ -66,7 +66,7 @@ export const ListItemPayload = styled.div`
   width: 100%;
 `;
 
-const ListItemElement = styled.div<{
+export const ListItemElement = styled.div<{
   hover?: boolean;
   dropDown?: boolean;
   ios: boolean;

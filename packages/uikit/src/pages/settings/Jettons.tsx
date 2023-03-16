@@ -12,7 +12,11 @@ import { Radio } from '../../components/fields/Checkbox';
 import { ReorderIcon } from '../../components/Icon';
 import { ColumnText } from '../../components/Layout';
 
-import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
+import {
+  ListBlock,
+  ListItemElement,
+  ListItemPayload,
+} from '../../components/List';
 import { SkeletonList } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -143,7 +147,11 @@ export const JettonsSettings = () => {
       <DragDropContext onDragEnd={handleDrop}>
         <Droppable droppableId="jettons">
           {(provided) => (
-            <ListBlock {...provided.droppableProps} ref={provided.innerRef}>
+            <ListBlock
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              noUserSelect
+            >
               {jettons.map((jetton, index) => (
                 <Draggable
                   key={jetton.jettonAddress}
@@ -151,16 +159,17 @@ export const JettonsSettings = () => {
                   index={index}
                 >
                   {(provided) => (
-                    <ListItem
+                    <ListItemElement
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       hover={false}
+                      ios={true}
                     >
                       <JettonRow
                         dragHandleProps={provided.dragHandleProps}
                         jetton={jetton}
                       />
-                    </ListItem>
+                    </ListItemElement>
                   )}
                 </Draggable>
               ))}

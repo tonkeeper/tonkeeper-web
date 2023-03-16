@@ -113,6 +113,7 @@ const Block = styled.div<{ bottom: boolean; standalone: boolean }>`
   bottom: 0;
   padding: 1rem;
   width: var(--app-width);
+  max-width: 548px;
   box-sizing: border-box;
 
   background-color: ${(props) => props.theme.backgroundPage};

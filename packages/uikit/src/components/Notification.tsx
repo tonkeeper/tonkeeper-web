@@ -221,7 +221,7 @@ export const Notification: FC<{
         sdk.enableScroll();
       }
       return () => {
-        // sdk.enableScroll();
+        sdk.enableScroll();
       };
     }, [isOpen, sdk]);
 

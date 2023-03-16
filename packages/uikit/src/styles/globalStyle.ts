@@ -14,7 +14,7 @@ body {
 
 :root {
   --app-height: 100vh;
-  --app-width: 550px;
+  --app-width: 100vw;
  } 
 
   html.is-locked,
