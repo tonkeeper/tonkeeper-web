@@ -11,6 +11,7 @@ export const useFetchNext = (
 
     const handler = throttle(() => {
       if (isFetchingNextPage) return;
+      if (document.documentElement.className == 'is-locked') return;
       if (
         window.innerHeight + window.scrollY >=
         document.body.offsetHeight - 500
