@@ -47,7 +47,7 @@ export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
           fontSize: `${inputSize.size}px`,
           width: `${inputSize.width}px`,
         }}
-        inputMode="numeric"
+        inputMode="decimal"
         type="text"
         value={value}
         onChange={(event) => {
