@@ -29,14 +29,6 @@ body {
       box-sizing: border-box;
   }
 
-  html.is-locked #root {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-  }
-
 
   .disable-hover {
     pointer-events: none;
