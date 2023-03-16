@@ -165,7 +165,7 @@ export const FullHeightBlock = styled(NotificationBlock)<{
   standalone: boolean;
 }>`
   min-height: calc(
-    var(--app-height) - ${(props) => (props.standalone ? 1 : 2)}rem
+    var(--app-height) - ${(props) => (props.standalone ? 3 : 2)}rem
   );
   padding-bottom: calc(56px + 1rem);
   box-sizing: border-box;
