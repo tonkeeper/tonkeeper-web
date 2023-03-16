@@ -177,8 +177,9 @@ const getInputSize = (value: string, parent: HTMLLabelElement) => {
     size = Math.max(1, size - 1);
     width = getTextWidth(value, `600 ${size}px 'Montserrat'`);
   }
+
   return {
-    width: Math.max(Math.round(width) + 10, 20),
+    width: Math.max(Math.round(width) + 10, value.length * 6, 20),
     size: size,
   };
 };
@@ -250,7 +251,7 @@ export const AmountView: FC<{
     const decimals = getJettonDecimals(jetton, jettons);
 
     if (!seeIfValueValid(value, decimals)) {
-      return setAmountValue(amount);
+      value = amount;
     }
 
     setFontSize(getInputSize(value, refBlock.current));
