@@ -249,6 +249,7 @@ export const AmountView: FC<{
   const onInput = (value: string) => {
     if (!refBlock.current) return;
     const decimals = getJettonDecimals(jetton, jettons);
+    value = value.replace(',', '.');
 
     if (!seeIfValueValid(value, decimals)) {
       value = amount;
