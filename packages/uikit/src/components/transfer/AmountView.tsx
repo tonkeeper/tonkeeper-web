@@ -202,7 +202,7 @@ const useButtonPosition = (
   blockRef: React.RefObject<HTMLLabelElement>,
   inputRef: React.RefObject<HTMLInputElement>
 ) => {
-  const { ios } = useAppContext();
+  const { ios, standalone } = useAppContext();
   useEffect(() => {
     const button = ref.current;
     if (!button) return;
@@ -233,7 +233,7 @@ const useButtonPosition = (
     function blurHandler() {
       setTimeout(() => {
         if (!button) return;
-        button.style.bottom = null!;
+        button.style.bottom = standalone ? '2rem' : '1rem';
       });
     }
 
