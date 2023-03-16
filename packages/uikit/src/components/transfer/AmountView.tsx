@@ -62,7 +62,7 @@ const AmountBlock = styled.label`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 272px;
+  height: 256px;
   padding: 1rem;
   box-sizing: border-box;
   position: relative;
@@ -122,7 +122,7 @@ const SelectCenter = styled.div`
 
 const FiatBlock = styled(Body1)`
   position: absolute;
-  bottom: 61px;
+  bottom: 56px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
