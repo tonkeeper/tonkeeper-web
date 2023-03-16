@@ -2,7 +2,7 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
@@ -18,7 +18,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
   asset = CryptoCurrency.TON,
 }) => {
-  const sdk = useAppSdk();
+  const { standalone } = useAppContext();
   const { t } = useTranslation();
   const { data: jettons } = useWalletJettonList();
   const { data: info } = useWalletAccountInfo();
@@ -65,7 +65,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   })();
 
   return (
-    <Wrapper>
+    <Wrapper standalone={standalone}>
       <TransitionGroup childFactory={childFactoryCreator(right)}>
         <CSSTransition
           key={state}

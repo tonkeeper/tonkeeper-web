@@ -14,10 +14,10 @@ export const timingFunction = 'ease-in-out';
 const rightToLeft = 'right-to-left';
 const leftToTight = 'left-to-right';
 
-export const Wrapper = styled.div`
+export const Wrapper = styled.div<{ standalone: boolean }>`
   position: relative;
   overflow: hidden;
-  margin-bottom: -1rem;
+  margin-bottom: ${(props) => (props.standalone ? '0' : '-1rem')};
 
   .${rightToLeft}-exit, .${leftToTight}-exit {
     position: absolute;
