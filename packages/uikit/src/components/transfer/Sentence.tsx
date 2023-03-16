@@ -51,8 +51,9 @@ export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
         }}
         type="number"
         value={value}
-        onKeyUp={() => {
+        onKeyUp={(e) => {
           const input = ref as React.MutableRefObject<HTMLInputElement | null>;
+          if (e.nativeEvent.key === '.') return;
           if (input.current) {
             if (input.current.validity.badInput) {
               setValue(lastValidValue.current);
@@ -62,7 +63,6 @@ export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
           }
         }}
         onChange={(event) => {
-          //console.log(event);
           setValue(event.target.value);
         }}
       />
