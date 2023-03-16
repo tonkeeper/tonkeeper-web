@@ -124,7 +124,7 @@ const FiatBlock = styled(Body1)`
   position: absolute;
   top: 50$;
   left: 50%;
-  transform: translate(-50%, 48px);
+  transform: translate(-50%, 54px);
   z-index: 2;
 
   padding: 8px 16px;
@@ -219,7 +219,7 @@ const useButtonPosition = (
       button.style.bottom = `${height - viewport.height + 16}px`;
 
       const labelHeight = Math.min(
-        viewport.height - 16 - 56 - 16 - 36 - 16 - 32 - 16 - 16 - 37,
+        viewport.height - 16 - 56 - 16 - 36 - 16 - 16 - 16 - 16 - 37,
         272
       );
 

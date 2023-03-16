@@ -53,7 +53,7 @@ export const ButtonContainer = styled.div`
 
 const Padding = styled.div`
   flex-shrink: 0;
-  height: 2rem;
+  height: 1rem;
 `;
 
 const Overlay = styled.div`
