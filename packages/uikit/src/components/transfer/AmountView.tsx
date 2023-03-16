@@ -233,6 +233,12 @@ export const AmountView: FC<{
   const refBlock = useRef<HTMLLabelElement>(null);
 
   useEffect(() => {
+    if (refBlock.current) {
+      setFontSize(getInputSize(amount, refBlock.current));
+    }
+  }, [refBlock.current]);
+
+  useEffect(() => {
     if (ref.current) {
       setTimeout(() => {
         ref.current && ref.current.focus();
