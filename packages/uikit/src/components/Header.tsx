@@ -25,7 +25,7 @@ const Block = styled.div<{
 
   position: fixed;
   width: var(--app-width);
-  top: -1px;
+  top: 0;
   z-index: 1;
 
   ${(props) =>

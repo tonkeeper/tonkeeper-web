@@ -110,7 +110,7 @@ const Block = styled.div<{ bottom: boolean; standalone: boolean }>`
   display: flex;
   justify-content: space-around;
   position: fixed;
-  bottom: -1px;
+  bottom: 0;
   padding: 1rem;
   width: var(--app-width);
   max-width: 548px;
