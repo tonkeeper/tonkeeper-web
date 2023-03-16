@@ -230,7 +230,7 @@ export const AmountView: FC<{
 
   const onInput = (value: string) => {
     if (!refBlock.current) return;
-    if (value.length > 80) return;
+    if (value.length > 32) return;
 
     const size = getInputSize(value, refBlock.current);
     setFontSize(size);
@@ -254,7 +254,6 @@ export const AmountView: FC<{
       if (isValid) {
         reset();
         const fee = await mutateAsync({ amount, max });
-        console.log(fee);
         setAmount({ amount, max, done: true, jetton, fee });
       }
     },
@@ -262,14 +261,24 @@ export const AmountView: FC<{
   );
 
   const onMax = () => {
+    if (!refBlock.current) return;
+
     setMax(true);
-    setAmountValue(getMaxValue(jettons, info, jetton, format));
+    const value = getMaxValue(jettons, info, jetton, format);
+    const size = getInputSize(value, refBlock.current);
+    setFontSize(size);
+    setAmountValue(value);
   };
 
-  const onJetton = (value: string) => {
-    setJetton(value);
+  const onJetton = (asset: string) => {
+    if (!refBlock.current) return;
+
+    setJetton(asset);
     if (max) {
-      setAmountValue(getMaxValue(jettons, info, value, format));
+      const value = getMaxValue(jettons, info, asset, format);
+      const size = getInputSize(value, refBlock.current);
+      setFontSize(size);
+      setAmountValue(value);
     }
   };
 
