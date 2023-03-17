@@ -85,6 +85,7 @@ const SettingsIcon = () => {
 };
 
 const Button = styled.div<{ active: boolean }>`
+  user-select: none;
   display: flex;
   flex-direction: column;
   align-items: center;
