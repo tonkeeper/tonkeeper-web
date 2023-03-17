@@ -212,7 +212,7 @@ const useButtonPosition = (
       const button = ref.current;
       if (!button) return;
       const value = height - this.height + 16;
-      const bottom = standalone ? Math.min(32, value) : value;
+      const bottom = standalone ? Math.max(32, value) : value;
       button.style.bottom = `${bottom}px`;
 
       const labelHeight = Math.min(
