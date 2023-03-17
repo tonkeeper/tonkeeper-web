@@ -15,7 +15,6 @@ import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
-import { duration } from './transfer/common';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
   background: transparent;
@@ -234,13 +233,13 @@ export const Notification: FC<{
         }
       };
 
-      const timer = setTimeout(handler, duration + 10);
+      const timer = setTimeout(handler, 0);
 
       return () => {
         clearTimeout(timer);
         handler();
       };
-    }, [isOpen, sdk]);
+    }, [isOpen, entered, sdk]);
 
     const standalone = useMemo(() => {
       return sdk.isIOs() && sdk.isStandalone();
