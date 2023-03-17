@@ -164,6 +164,9 @@
   "Max": {
     "message": "Все"
   },
+  "Confirm": {
+    "message": "Подтверждение пароля"
+  },
   "NFT_item_id": {
     "message": "Идентификатор NFT"
   },

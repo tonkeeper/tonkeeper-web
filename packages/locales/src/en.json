@@ -168,6 +168,9 @@
   "Max": {
     "message": "Max"
   },
+  "Confirm": {
+    "message": "Confirm"
+  },
   "NFT_item_id": {
     "message": "NFT item ID"
   },

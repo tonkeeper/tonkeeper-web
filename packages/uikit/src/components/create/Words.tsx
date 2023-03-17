@@ -135,7 +135,7 @@ export const Worlds: FC<{
       </WorldsGrid>
 
       <Button size="large" fullWidth primary marginTop onClick={onCheck}>
-        {t('create_wallet_continue_button')}
+        {t('continue')}
       </Button>
     </>
   );
@@ -337,7 +337,7 @@ export const Check: FC<{
           disabled={!isValid}
           onClick={onConfirm}
         >
-          {t('create_wallet_continue_button')}
+          {t('continue')}
         </Button>
       </Block>
     </>
@@ -466,7 +466,7 @@ export const ImportWords: FC<{
           loading={isLoading}
           onClick={onSubmit}
         >
-          {t('create_wallet_continue_button')}
+          {t('continue')}
         </Button>
       </Block>
     </>

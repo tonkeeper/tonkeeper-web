@@ -80,7 +80,7 @@ export const Create = () => {
             marginTop
             onClick={() => setOpen(true)}
           >
-            {t('create_wallet_continue_button')}
+            {t('continue')}
           </Button>
         }
       />

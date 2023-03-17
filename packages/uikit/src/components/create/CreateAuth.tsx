@@ -142,7 +142,7 @@ const FillPassword: FC<{
         disabled={isCreating || error != null}
         onClick={onCreate}
       >
-        {t('create_wallet_continue_button')}
+        {t('continue')}
       </Button>
     </>
   );
