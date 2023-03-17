@@ -30,6 +30,10 @@ body {
       box-sizing: border-box;
   }
 
+  html.is-locked #root div {
+    overflow: hidden;
+  }
+
 
   .disable-hover {
     pointer-events: none;
