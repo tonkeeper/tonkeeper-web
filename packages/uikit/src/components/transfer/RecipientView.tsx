@@ -73,7 +73,13 @@ const useDnsWallet = (value: string) => {
   const [name, setName] = useState('');
 
   const update = useMemo(() => {
-    return debounce<[string]>((v) => setName(v.toLowerCase()), 400);
+    return debounce<[string]>((v) => {
+      let value = v.trim().toLowerCase();
+      if (!value.includes('.')) {
+        value += '.ton';
+      }
+      setName(value);
+    }, 400);
   }, [setName]);
 
   update(value);
