@@ -95,10 +95,6 @@ const Button = styled.div<{ active: boolean }>`
 
   color: ${(props) => props.theme.tabBarInactiveIcon};
 
-  &:hover {
-    color: ${(props) => props.theme.tabBarActiveIcon};
-  }
-
   ${(props) =>
     props.active &&
     css`
