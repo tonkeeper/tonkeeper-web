@@ -172,9 +172,7 @@ export const RecipientView: FC<{
     e.preventDefault();
     setSubmit(true);
     if (isValid && isMemoValid && toAccount) {
-      setTimeout(() => {
-        setRecipient({ address: recipient, toAccount, comment, done: true });
-      });
+      setRecipient({ address: recipient, toAccount, comment, done: true });
     }
   };
 
