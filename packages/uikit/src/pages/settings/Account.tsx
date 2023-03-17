@@ -13,7 +13,12 @@ import { ImportNotification } from '../../components/create/ImportNotification';
 import { DropDown } from '../../components/DropDown';
 import { EllipsisIcon, ReorderIcon } from '../../components/Icon';
 import { ColumnText, Divider } from '../../components/Layout';
-import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
+import {
+  ListBlock,
+  ListItem,
+  ListItemElement,
+  ListItemPayload,
+} from '../../components/List';
 import {
   DeleteWalletNotification,
   LogOutWalletNotification,
@@ -192,7 +197,8 @@ export const Account = () => {
                   index={index}
                 >
                   {(provided) => (
-                    <ListItem
+                    <ListItemElement
+                      ios={true}
                       hover={false}
                       ref={provided.innerRef}
                       {...provided.draggableProps}
@@ -201,7 +207,7 @@ export const Account = () => {
                         dragHandleProps={provided.dragHandleProps}
                         publicKey={publicKey}
                       />
-                    </ListItem>
+                    </ListItemElement>
                   )}
                 </Draggable>
               ))}
