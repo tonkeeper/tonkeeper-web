@@ -50,7 +50,7 @@
     "description": "Manage wallets settings button"
   },
   "Localization": {
-    "message": "Localization",
+    "message": "Language",
     "description": "Localization settings button"
   },
   "settings_news_url_discuss": {
