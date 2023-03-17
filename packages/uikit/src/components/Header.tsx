@@ -66,7 +66,8 @@ const Block = styled.div<{
     width: 100%;
     height: 200px;
     position: absolute;
-    bottom: 100%;
+    bottom: 63px;
+    z-index: 1;
     background-color: ${(props) => props.theme.backgroundPage};
   }
 `;
