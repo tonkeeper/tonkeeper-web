@@ -211,15 +211,15 @@ const useButtonPosition = (
     if (!viewport) return;
     let height = viewport.height;
 
-    function resizeHandler() {
-      if (!viewport || !button) return;
+    function resizeHandler(this: VisualViewport) {
+      if (!button) return;
       if (!ios) {
-        height = viewport.height;
+        height = this.height;
       }
-      button.style.bottom = `${height - viewport.height + 16}px`;
+      button.style.bottom = `${height - this.height + 16}px`;
 
       const labelHeight = Math.min(
-        viewport.height - 16 - 56 - 16 - 36 - 16 - 16 - 16 - 16 - 37,
+        this.height - 16 - 56 - 16 - 36 - 16 - 16 - 16 - 16 - 37,
         272
       );
 
@@ -255,7 +255,7 @@ const useButtonPosition = (
         inputRef.current.onfocus = null;
       }
     };
-  }, [ref, blockRef, inputRef, window.visualViewport]);
+  }, [ref.current, blockRef.current, inputRef.current, window.visualViewport]);
 };
 export const AmountView: FC<{
   onClose: () => void;
