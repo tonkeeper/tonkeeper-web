@@ -58,6 +58,16 @@ const Block = styled.div<{
         left: 0;
       }
     `}
+
+  &:before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 200px;
+    position: absolute;
+    bottom: 100%;
+    background-color: ${(props) => props.theme.backgroundPage};
+  }
 `;
 
 const Title = styled(H3)`

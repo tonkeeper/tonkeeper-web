@@ -137,6 +137,16 @@ const Block = styled.div<{ bottom: boolean; standalone: boolean }>`
     css`
       padding-bottom: 2rem;
     `}
+
+  &:before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 200px;
+    position: absolute;
+    top: 100%;
+    background-color: ${(props) => props.theme.backgroundPage};
+  }
 `;
 
 const useIsScrollBottom = () => {
