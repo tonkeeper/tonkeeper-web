@@ -255,7 +255,7 @@ const useButtonPosition = (
         inputRef.current.onfocus = null;
       }
     };
-  }, [ref, inputRef]);
+  }, [ref, blockRef, inputRef, window.visualViewport]);
 };
 export const AmountView: FC<{
   onClose: () => void;
