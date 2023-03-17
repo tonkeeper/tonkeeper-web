@@ -132,7 +132,7 @@ const BackShadow = styled.div`
   width: var(--app-width);
   height: 60vh;
   position: fixed;
-  bottom: 0;
+  bottom: -10vh;
   z-index: -1;
   background-color: ${(props) => props.theme.backgroundPage};
 `;
