@@ -162,12 +162,14 @@ const useLock = () => {
   return lock;
 };
 
-const Wrapper = styled(Container)<{ standalone: boolean }>`
+const FullSizeWrapper = styled(Container)`
   @media (min-width: 600px) {
     border-left: 1px solid ${(props) => props.theme.separatorCommon};
     border-right: 1px solid ${(props) => props.theme.separatorCommon};
   }
+`;
 
+const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
   box-sizing: border-box;
   padding-top: 64px;
   padding-bottom: ${(props) => (props.standalone ? '96' : '80')}px;
@@ -237,9 +239,11 @@ export const Loader: FC = () => {
     <OnImportAction.Provider value={navigate}>
       <AfterImportAction.Provider value={() => navigate(AppRoute.home)}>
         <AppContext.Provider value={context}>
-          <Wrapper standalone={standalone}>
-            <Content activeWallet={activeWallet} lock={lock} />
-          </Wrapper>
+          <Content
+            activeWallet={activeWallet}
+            lock={lock}
+            standalone={standalone}
+          />
           <CopyNotification />
         </AppContext.Provider>
       </AfterImportAction.Provider>
@@ -250,74 +254,83 @@ export const Loader: FC = () => {
 export const Content: FC<{
   activeWallet?: WalletState | null;
   lock: boolean;
-}> = ({ activeWallet, lock }) => {
+  standalone: boolean;
+}> = ({ activeWallet, lock, standalone }) => {
   const location = useLocation();
   useAppWidth();
 
   if (lock) {
-    return <Unlock />;
+    return (
+      <FullSizeWrapper>
+        <Unlock />
+      </FullSizeWrapper>
+    );
   }
 
   if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
     return (
-      <Suspense fallback={<Loading />}>
-        <InitializeContainer fullHeight={false}>
-          <Routes>
-            <Route path={any(AppRoute.import)} element={<ImportRouter />} />
-            <Route path="*" element={<Initialize />} />
-          </Routes>
-        </InitializeContainer>
-      </Suspense>
+      <FullSizeWrapper>
+        <Suspense fallback={<Loading />}>
+          <InitializeContainer fullHeight={false}>
+            <Routes>
+              <Route path={any(AppRoute.import)} element={<ImportRouter />} />
+              <Route path="*" element={<Initialize />} />
+            </Routes>
+          </InitializeContainer>
+        </Suspense>
+      </FullSizeWrapper>
     );
   }
 
   return (
-    <WalletStateContext.Provider value={activeWallet}>
-      <Routes>
-        <Route
-          path={AppRoute.activity}
-          element={
-            <Suspense fallback={<ActivitySkeleton />}>
-              <Activity />
-            </Suspense>
-          }
-        />
-        <Route
-          path={any(AppRoute.settings)}
-          element={
-            <Suspense fallback={<SettingsSkeleton />}>
-              <Settings />
-            </Suspense>
-          }
-        />
-        <Route path={AppRoute.coins}>
+    <Wrapper standalone={standalone}>
+      <WalletStateContext.Provider value={activeWallet}>
+        <Routes>
           <Route
-            path=":name"
+            path={AppRoute.activity}
             element={
-              <Body>
-                <Suspense fallback={<CoinSkeleton />}>
-                  <Coin />
-                </Suspense>
-              </Body>
+              <Suspense fallback={<ActivitySkeleton />}>
+                <Activity />
+              </Suspense>
             }
           />
-        </Route>
-        <Route
-          path="*"
-          element={
-            <>
-              <Header />
-              <Body>
-                <Suspense fallback={<HomeSkeleton />}>
-                  <Home />
-                </Suspense>
-              </Body>
-            </>
-          }
-        />
-      </Routes>
-      <Footer />
-      <MemoryScroll />
-    </WalletStateContext.Provider>
+          <Route
+            path={any(AppRoute.settings)}
+            element={
+              <Suspense fallback={<SettingsSkeleton />}>
+                <Settings />
+              </Suspense>
+            }
+          />
+          <Route path={AppRoute.coins}>
+            <Route
+              path=":name"
+              element={
+                <Body>
+                  <Suspense fallback={<CoinSkeleton />}>
+                    <Coin />
+                  </Suspense>
+                </Body>
+              }
+            />
+          </Route>
+          <Route
+            path="*"
+            element={
+              <>
+                <Header />
+                <Body>
+                  <Suspense fallback={<HomeSkeleton />}>
+                    <Home />
+                  </Suspense>
+                </Body>
+              </>
+            }
+          />
+        </Routes>
+        <Footer />
+        <MemoryScroll />
+      </WalletStateContext.Provider>
+    </Wrapper>
   );
 };
