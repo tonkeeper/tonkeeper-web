@@ -26,7 +26,7 @@ const Block = styled.div<{
   position: fixed;
   width: var(--app-width);
   max-width: 548px;
-  top: 0;
+  top: -1px;
   z-index: 1;
 
   ${(props) =>
