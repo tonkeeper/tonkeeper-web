@@ -26,12 +26,12 @@ const Block = styled.div<{
   position: fixed;
   width: var(--app-width);
   max-width: 548px;
-  top: -2px;
+  top: -5px;
   z-index: 1;
 
   ${(props) =>
     css`
-      padding: ${props.second ? '0.75rem 1rem' : '1rem 1rem'};
+      padding: ${props.second ? '0.75rem 1rem 0.75rem' : '1rem 1rem 1rem'};
     `}
 
   display: flex;
