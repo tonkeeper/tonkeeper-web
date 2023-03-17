@@ -130,9 +130,9 @@ const RowTitle = styled(H3)`
 
 const BackShadow = styled.div`
   width: var(--app-width);
-  height: 60vh;
+  height: 100vh;
   position: fixed;
-  bottom: -10vh;
+  bottom: -50vh;
   z-index: -1;
   background-color: ${(props) => props.theme.backgroundPage};
 `;
