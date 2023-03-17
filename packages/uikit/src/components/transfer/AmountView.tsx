@@ -204,14 +204,13 @@ const useButtonPosition = (
 ) => {
   const { ios, standalone } = useAppContext();
   useEffect(() => {
-    let height = window.visualViewport?.height ?? 0;
+    if (!ios) return;
+
+    let height = window.innerHeight;
 
     function resizeHandler(this: VisualViewport) {
       const button = ref.current;
       if (!button) return;
-      if (!ios) {
-        height = this.height;
-      }
       button.style.bottom = `${
         height - this.height + (standalone ? 32 : 16)
       }px`;
