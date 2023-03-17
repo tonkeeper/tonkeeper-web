@@ -211,9 +211,9 @@ const useButtonPosition = (
     function resizeHandler(this: VisualViewport) {
       const button = ref.current;
       if (!button) return;
-      button.style.bottom = `${
-        height - this.height + (standalone ? 32 : 16)
-      }px`;
+      const value = height - this.height + 16;
+      const bottom = standalone ? Math.min(32, value) : value;
+      button.style.bottom = `${bottom}px`;
 
       const labelHeight = Math.min(
         this.height - 16 - 56 - 16 - 36 - 16 - 16 - 16 - 16 - 37,
