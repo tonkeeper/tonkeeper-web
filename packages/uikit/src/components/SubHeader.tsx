@@ -10,12 +10,13 @@ const Block = styled.div<{ top: boolean }>`
   flex-shrink: 0;
 
   padding: 1rem;
-
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
   position: relative;
 
   position: fixed;
+  z-index: 3;
   width: var(--app-width);
   max-width: 548px;
   top: 0;
@@ -23,8 +24,6 @@ const Block = styled.div<{ top: boolean }>`
   background: ${(props) => props.theme.backgroundPage};
 
   margin: 0 -1rem;
-
-  height: 31px;
 
   ${(props) =>
     !props.top &&
