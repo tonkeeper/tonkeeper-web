@@ -12,6 +12,7 @@ const Grid = styled.div`
 `;
 
 export const NftBlock = styled.div<{ hover?: boolean }>`
+  user-select: none;
   width: 100%;
   display: flex;
   flex-direction: column;
