@@ -204,14 +204,10 @@ const useButtonPosition = (
 ) => {
   const { ios } = useAppContext();
   useEffect(() => {
-    const button = ref.current;
-    if (!button) return;
-
-    const viewport = window.visualViewport;
-    if (!viewport) return;
-    let height = viewport.height;
+    let height = window.visualViewport?.height ?? 0;
 
     function resizeHandler(this: VisualViewport) {
+      const button = ref.current;
       if (!button) return;
       if (!ios) {
         height = this.height;
@@ -229,14 +225,19 @@ const useButtonPosition = (
     }
 
     function subscribe() {
-      if (!viewport) return;
-      viewport.addEventListener('resize', resizeHandler);
+      const viewport = window.visualViewport;
+      if (viewport) {
+        viewport.addEventListener('resize', resizeHandler);
+      }
     }
 
     function blurHandler() {
-      if (!viewport) return;
-      viewport.removeEventListener('resize', resizeHandler);
+      const viewport = window.visualViewport;
+      if (viewport) {
+        viewport.removeEventListener('resize', resizeHandler);
+      }
       setTimeout(() => {
+        const button = ref.current;
         if (!button) return;
         button.style.bottom = null!;
       });
@@ -255,7 +256,7 @@ const useButtonPosition = (
         inputRef.current.onfocus = null;
       }
     };
-  }, [ref.current, blockRef.current, inputRef.current, window.visualViewport]);
+  }, [ref.current, blockRef.current, inputRef.current]);
 };
 export const AmountView: FC<{
   onClose: () => void;
