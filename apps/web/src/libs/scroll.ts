@@ -1,11 +1,21 @@
+const preventDefault = (e: TouchEvent) => {
+  const target = e.target as HTMLElement | null;
+  if (!target?.classList.contains('scrollable')) {
+    e.preventDefault();
+  }
+};
+
 export const disableScroll = () => {
   document.documentElement.className = 'is-locked';
   window.document.body.style.paddingRight = `${getScrollbarWidth()}px`;
+
+  window.document.body.addEventListener('touchmove', preventDefault);
 };
 
 export const enableScroll = () => {
   document.documentElement.className = '';
   window.document.body.style.paddingRight = '0px';
+  window.document.body.removeEventListener('touchmove', preventDefault);
 };
 
 export const getScrollbarWidth = () => {

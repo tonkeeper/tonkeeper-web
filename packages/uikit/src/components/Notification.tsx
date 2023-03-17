@@ -255,7 +255,7 @@ export const Notification: FC<{
           onEntered={() => setEntered(true)}
           onExited={() => setEntered(false)}
         >
-          <Splash ref={nodeRef}>
+          <Splash ref={nodeRef} className="scrollable">
             <Overlay>
               <NotificationWrapper entered={entered}>
                 <Wrapper>
