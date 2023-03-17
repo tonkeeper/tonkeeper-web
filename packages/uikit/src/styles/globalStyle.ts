@@ -17,12 +17,13 @@ body {
   --app-width: 100vw;
  } 
 
+ html.is-locked {
+  height: calc(var(--app-height) - 1px);
+ }
+
   html.is-locked,
   html.is-locked body,
   html.is-locked #root {
-      /* want to fix the height to the window height 
-      height: calc(var(--app-height) - 1px);*/
-
       /* want to block all overflowing content */
       overflow: hidden;
 
