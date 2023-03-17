@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js';
-import { TonClient } from 'ton';
 import {
   Address,
   beginCell,
@@ -51,68 +50,6 @@ const jettonTransferBody = (params: {
     .storeMaybeBuilder(params.forwardPayload)
     .endCell();
 };
-
-/**
- * @deprecated use ton api
- */
-const getJettonAddress = async (
-  tonClient: TonClient,
-  jettonInfo: JettonBalance,
-  recipient: RecipientData
-) => {
-  const result = await tonClient.callGetMethodWithError(
-    Address.parse(jettonInfo.jettonAddress),
-    'get_wallet_address',
-    [
-      {
-        type: 'slice',
-        cell: beginCell()
-          .storeAddress(Address.parse(recipient.toAccount.address.raw))
-          .endCell(),
-      },
-    ]
-  );
-
-  const jettonWalletAddress = result.stack.readAddress();
-
-  const jettonData = await tonClient.callGetMethodWithError(
-    jettonWalletAddress,
-    'get_wallet_data'
-  );
-  if (jettonData.exit_code === 0) {
-    const balance = jettonData.stack.readBigNumber();
-    const owner = jettonData.stack.readAddress();
-    const jettonMaster = jettonData.stack.readAddress();
-
-    if (
-      jettonMaster.toString() !==
-      Address.parse(jettonInfo.jettonAddress).toString()
-    ) {
-      throw new Error('Jetton minter address not match');
-    }
-  }
-
-  return jettonWalletAddress;
-};
-
-// export const getJettonDate = async (
-//   tonApi: Configuration,
-//   jettonInfo: JettonBalance,
-//   recipient: RecipientData
-// ) => {
-//   const tonApiV2 = new ConfigurationV2({
-//     ...(tonApi as any).configuration,
-//   });
-//   const result = await new BlockchainApi(tonApiV2).execGetMethod(
-//     {
-//       accountId: jettonInfo.jettonAddress,
-//       methodName: 'get_jetton_data', //'get_wallet_address',
-//     },
-//     { method: 'GET' }
-//   );
-
-//   console.log(result);
-// };
 
 const createJettonTransfer = (
   seqno: number,
