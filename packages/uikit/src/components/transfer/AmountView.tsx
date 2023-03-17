@@ -202,7 +202,7 @@ const useButtonPosition = (
   blockRef: React.RefObject<HTMLLabelElement>,
   inputRef: React.RefObject<HTMLInputElement>
 ) => {
-  const { ios } = useAppContext();
+  const { ios, standalone } = useAppContext();
   useEffect(() => {
     let height = window.visualViewport?.height ?? 0;
 
@@ -212,7 +212,9 @@ const useButtonPosition = (
       if (!ios) {
         height = this.height;
       }
-      button.style.bottom = `${height - this.height + 16}px`;
+      button.style.bottom = `${
+        height - this.height + (standalone ? 32 : 16)
+      }px`;
 
       const labelHeight = Math.min(
         this.height - 16 - 56 - 16 - 36 - 16 - 16 - 16 - 16 - 37,
@@ -245,18 +247,8 @@ const useButtonPosition = (
 
     subscribe();
 
-    if (inputRef.current) {
-      inputRef.current.onblur = blurHandler;
-      inputRef.current.onfocus = subscribe;
-    }
-
     return () => {
       blurHandler();
-
-      if (inputRef.current) {
-        inputRef.current.onblur = null;
-        inputRef.current.onfocus = null;
-      }
     };
   }, [ref.current, blockRef.current, inputRef.current]);
 };
