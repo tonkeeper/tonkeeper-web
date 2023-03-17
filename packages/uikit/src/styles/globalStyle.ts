@@ -18,7 +18,8 @@ body {
  } 
 
   html.is-locked,
-  html.is-locked body {
+  html.is-locked body,
+  html.is-locked #root {
       /* want to fix the height to the window height 
       height: calc(var(--app-height) - 1px);*/
 
