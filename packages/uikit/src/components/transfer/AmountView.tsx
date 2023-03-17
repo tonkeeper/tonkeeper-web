@@ -243,6 +243,8 @@ const useButtonPosition = (
       });
     }
 
+    subscribe();
+
     if (inputRef.current) {
       inputRef.current.onblur = blurHandler;
       inputRef.current.onfocus = subscribe;
