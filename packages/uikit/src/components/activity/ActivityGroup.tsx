@@ -13,12 +13,15 @@ import {
 import { NftNotification } from '../nft/NftNotification';
 import { ActionData, ActivityNotification } from './ActivityNotification';
 
+const Group = styled.div`
+  margin-bottom: 1.875rem;
+`;
 const List = styled(ListBlock)`
   margin: 0.5rem 0;
 `;
 
 const Title = styled(H3)`
-  margin: 1.875rem 0 0.875rem;
+  margin: 0 0 0.875rem;
   user-select: none;
 `;
 
@@ -33,7 +36,7 @@ export const ActivityGroupRaw: FC<{
     <>
       {items.map(([key, events]) => {
         return (
-          <div key={key}>
+          <Group key={key}>
             <Title>
               {getActivityTitle(i18n.language, key, events[0].timestamp)}
             </Title>
@@ -62,7 +65,7 @@ export const ActivityGroupRaw: FC<{
                 </List>
               );
             })}
-          </div>
+          </Group>
         );
       })}
       <ActivityNotification

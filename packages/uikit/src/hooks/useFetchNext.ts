@@ -28,10 +28,6 @@ export const useFetchNext = (
         }
       } else {
         const item = element as HTMLDivElement;
-        console.log({
-          scrollTop: item.scrollTop,
-          scrollHeight: item.scrollHeight - window.innerHeight,
-        });
         if (item.scrollTop >= item.scrollHeight - window.innerHeight - 500) {
           fetchNextPage();
         }

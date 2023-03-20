@@ -41,7 +41,8 @@ export class BrowserAppSdk implements IAppSdk {
   getKeyboardHeight = () => 0;
 
   isIOs = iOS;
-  isStandalone = () => (window.navigator as any).standalone as boolean;
+  isStandalone = () =>
+    iOS() && ((window.navigator as any).standalone as boolean);
 
   uiEvents = new EventEmitter();
   version = packageJson.version ?? 'Unknown';
