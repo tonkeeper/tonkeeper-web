@@ -42,7 +42,7 @@ import {
 } from '../Notification';
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
 import { AssetSelect } from './AssetSelect';
-import { ButtonBlock, duration, useFiatAmount } from './common';
+import { ButtonBlock, useFiatAmount } from './common';
 import { InputSize, Sentence } from './Sentence';
 
 const Center = styled.div`
@@ -298,12 +298,9 @@ export const AmountView: FC<{
   }, [refBlock.current]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      ref.current && ref.current.focus();
-    }, duration * 2);
-    return () => {
-      clearTimeout(timer);
-    };
+    if (ref.current) {
+      ref.current.focus();
+    }
   }, [ref.current, jetton]);
 
   const { t } = useTranslation();
