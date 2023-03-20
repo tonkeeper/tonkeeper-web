@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
-import { getActiveWalletJetton } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
 import {
   AccountEvents,
   JettonApi,
@@ -53,7 +52,9 @@ export const useJettonBalance = (jettonAddress: string) => {
   return useQuery<JettonBalance, Error>(
     [wallet.publicKey, QueryKey.jettons, JettonKey.balance, jettonAddress],
     async () => {
-      const result = await getActiveWalletJetton(tonApi, wallet);
+      const result = await new JettonApi(tonApi).getJettonsBalances({
+        account: jettonAddress,
+      });
 
       const balance = result.balances.find(
         (item) => item.jettonAddress === jettonAddress
