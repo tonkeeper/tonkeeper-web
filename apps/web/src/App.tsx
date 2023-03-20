@@ -84,7 +84,11 @@ import {
 } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
-import { useAppHeight, useDisableFocusOnScroll } from './libs/hooks';
+import {
+  useAppHeight,
+  useAppWidth,
+  useDisableFocusOnScroll,
+} from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
 
 const ImportRouter = React.lazy(
@@ -288,6 +292,7 @@ export const Content: FC<{
 }> = ({ activeWallet, lock, standalone }) => {
   const location = useLocation();
   useWindowsScroll();
+  useAppWidth(standalone);
 
   if (lock) {
     return (

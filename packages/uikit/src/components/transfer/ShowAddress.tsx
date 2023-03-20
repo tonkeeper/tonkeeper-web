@@ -21,8 +21,6 @@ export const useShowAddress = (
     undefined
   );
 
-  console.log(showAddress);
-
   const inputTextWidth = useTextWidth({
     text: value,
     font: '16px sans-serif',
