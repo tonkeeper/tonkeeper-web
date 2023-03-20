@@ -302,9 +302,9 @@ export const AmountView: FC<{
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      const input = document.getElementById('sentence');
-      if (input) {
-        (input as HTMLInputElement).focus();
+      if (ref.current) {
+        ref.current.focus();
+        ref.current.setSelectionRange(0, 999);
       }
     }, 300);
     return () => {
