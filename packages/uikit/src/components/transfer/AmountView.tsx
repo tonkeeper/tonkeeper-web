@@ -299,7 +299,11 @@ export const AmountView: FC<{
 
   useEffect(() => {
     if (ref.current) {
-      ref.current.focus();
+      setTimeout(() => {
+        if (ref.current) {
+          ref.current.focus();
+        }
+      }, 400);
     }
   }, [ref.current, jetton]);
 
