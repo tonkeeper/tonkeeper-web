@@ -17,27 +17,26 @@ const Block = styled.div`
   position: fixed;
   z-index: 3;
   width: var(--app-width);
+  overflow: visible !important;
   max-width: 548px;
   top: 0;
 
   background: ${(props) => props.theme.backgroundPage};
-
-  margin: 0 -1rem;
 `;
 
 export const SybHeaderGlobalStyle = createGlobalStyle`
-      body:not(.top) ${Block} {
-        &:after {
-          content: '';
-          display: block;
-          width: 100%;
-          height: 1px;
-          background: ${(props) => props.theme.separatorCommon};
-          position: absolute;
-          top: 100%;
-          left: 0;
-        }
-      }
+  body:not(.top) ${Block} {
+    &:after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 1px;
+      background: ${(props) => props.theme.separatorCommon};
+      position: absolute;
+      top: 100%;
+      left: 0;
+    }
+  }
 `;
 
 export const BackButtonLeft = styled(BackButton)`

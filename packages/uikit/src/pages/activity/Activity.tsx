@@ -3,8 +3,9 @@ import { EventApi } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useMemo, useRef } from 'react';
 import { ActivityGroupRaw } from '../../components/activity/ActivityGroup';
 import { EmptyActivity } from '../../components/activity/EmptyActivity';
+import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
-import { ActivitySkeleton, SkeletonList } from '../../components/Skeleton';
+import { ActivitySkeletonPage, SkeletonList } from '../../components/Skeleton';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
@@ -13,7 +14,6 @@ import {
   groupActivity,
   groupActivityItems,
 } from '../../state/activity';
-import { Body } from '../../styles/globalStyle';
 
 const Activity: FC = () => {
   const wallet = useWalletContext();
@@ -40,7 +40,7 @@ const Activity: FC = () => {
   }, [data]);
 
   if (!data) {
-    return <ActivitySkeleton />;
+    return <ActivitySkeletonPage />;
   }
 
   if (items.length === 0) {
@@ -50,10 +50,10 @@ const Activity: FC = () => {
   return (
     <>
       <ActivityHeader />
-      <Body ref={ref}>
+      <InnerBody ref={ref}>
         <ActivityGroupRaw items={items} />
         {isFetchingNextPage && <SkeletonList size={3} />}
-      </Body>
+      </InnerBody>
     </>
   );
 };

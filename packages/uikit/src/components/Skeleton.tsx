@@ -1,7 +1,7 @@
 import React, { FC, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
-import { Body } from '../styles/globalStyle';
+import { InnerBody } from './Body';
 import { ActivityHeader, SettingsHeader } from './Header';
 import { ActionsRow } from './home/Actions';
 import { BalanceSkeleton } from './home/Balance';
@@ -168,10 +168,6 @@ const SkeletonSettingsList: FC<{ size?: number }> = React.memo(
   }
 );
 
-const Container = styled.div`
-  flex-grow: 1;
-  padding: 0 1rem;
-`;
 const ActivityList = styled.div`
   flex-grow: 1;
   display: flex;
@@ -183,18 +179,11 @@ const Title = styled(H3)`
   margin: 1.875rem 0 0.875rem;
 `;
 
-export const ActivitySkeleton = React.memo(() => {
-  const sdk = useAppSdk();
-  useEffect(() => {
-    return () => {
-      sdk.uiEvents.emit('loading');
-    };
-  }, []);
-
+export const ActivitySkeletonPage = React.memo(() => {
   return (
     <>
       <ActivityHeader />
-      <Body>
+      <InnerBody>
         <Title>
           <SkeletonText size="large" />
         </Title>
@@ -204,30 +193,23 @@ export const ActivitySkeleton = React.memo(() => {
           <SkeletonList size={2} margin={false} />
           <SkeletonList size={4} margin={false} />
         </ActivityList>
-      </Body>
+      </InnerBody>
     </>
   );
 });
 
-export const SettingsSkeleton = React.memo(() => {
-  const sdk = useAppSdk();
-  useEffect(() => {
-    return () => {
-      sdk.uiEvents.emit('loading');
-    };
-  }, []);
-
+export const SettingsSkeletonPage = React.memo(() => {
   return (
     <>
       <SettingsHeader />
-      <Body>
+      <InnerBody>
         <ActivityList>
           <SkeletonSettingsList size={2} />
           <SkeletonSettingsList size={4} />
           <SkeletonSettingsList size={3} />
           <SkeletonSettingsList size={6} />
         </ActivityList>
-      </Body>
+      </InnerBody>
     </>
   );
 });
@@ -254,22 +236,24 @@ export const CoinHistorySkeleton = React.memo(() => {
   );
 });
 
-export const CoinSkeleton: FC<{ activity?: number }> = React.memo(
+export const CoinSkeletonPage: FC<{ activity?: number }> = React.memo(
   ({ activity = 2 }) => {
     return (
-      <div>
+      <>
         <SkeletonSubHeader />
-        <CoinInfoSkeleton />
-        <ActionsRow>
-          {Array(activity)
-            .fill(null)
-            .map((item, index) => (
-              <SkeletonAction key={index} />
-            ))}
-        </ActionsRow>
+        <InnerBody>
+          <CoinInfoSkeleton />
+          <ActionsRow>
+            {Array(activity)
+              .fill(null)
+              .map((item, index) => (
+                <SkeletonAction key={index} />
+              ))}
+          </ActionsRow>
 
-        <CoinHistorySkeleton />
-      </div>
+          <CoinHistorySkeleton />
+        </InnerBody>
+      </>
     );
   }
 );

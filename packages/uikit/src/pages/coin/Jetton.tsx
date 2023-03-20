@@ -10,12 +10,13 @@ import {
 } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo } from 'react';
 import { ActivityGroupRaw } from '../../components/activity/ActivityGroup';
+import { InnerBody } from '../../components/Body';
 import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
 import {
   CoinHistorySkeleton,
-  CoinSkeleton,
+  CoinSkeletonPage,
   HistoryBlock,
 } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
@@ -38,22 +39,21 @@ const JettonHistory: FC<{ info: JettonInfo; balance: JettonBalance }> = ({
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
 
-  const { fetchNextPage, hasNextPage, isFetchingNextPage, data } =
-    useInfiniteQuery({
-      queryKey: [
-        balance.walletAddress.address,
-        QueryKey.activity,
-        JettonKey.history,
-      ],
-      queryFn: ({ pageParam = undefined }) =>
-        new JettonApi(tonApi).getJettonHistory({
-          account: wallet.active.rawAddress,
-          jettonMaster: balance.walletAddress.address,
-          limit: 200,
-          // beforeLt: pageParam,
-        }),
-      getNextPageParam: (lastPage) => lastPage.nextFrom,
-    });
+  const { data } = useInfiniteQuery({
+    queryKey: [
+      balance.walletAddress.address,
+      QueryKey.activity,
+      JettonKey.history,
+    ],
+    queryFn: ({ pageParam = undefined }) =>
+      new JettonApi(tonApi).getJettonHistory({
+        account: wallet.active.rawAddress,
+        jettonMaster: balance.walletAddress.address,
+        limit: 200,
+        // beforeLt: pageParam,
+      }),
+    getNextPageParam: (lastPage) => lastPage.nextFrom,
+  });
 
   const items = useMemo<ActivityGroup[]>(() => {
     return data
@@ -97,26 +97,28 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({
   }, [balance, stock, fiat]);
 
   if (!info || !balance || !stock) {
-    return <CoinSkeleton />;
+    return <CoinSkeletonPage />;
   }
 
   const { description, image, name } = info.metadata;
   return (
-    <div>
+    <>
       <SubHeader title={name} />
-      <CoinInfo
-        amount={format(balance.balance, info.metadata.decimals)}
-        symbol={info.metadata.symbol}
-        price={total}
-        description={description}
-        image={image}
-      />
-      <ActionsRow>
-        <SendAction asset={info.metadata.address} />
-        <ReceiveAction info={info} />
-      </ActionsRow>
+      <InnerBody>
+        <CoinInfo
+          amount={format(balance.balance, info.metadata.decimals)}
+          symbol={info.metadata.symbol}
+          price={total}
+          description={description}
+          image={image}
+        />
+        <ActionsRow>
+          <SendAction asset={info.metadata.address} />
+          <ReceiveAction info={info} />
+        </ActionsRow>
 
-      <JettonHistory info={info} balance={balance} />
-    </div>
+        <JettonHistory info={info} balance={balance} />
+      </InnerBody>
+    </>
   );
 };

@@ -14,6 +14,10 @@ function withRouter(Component: React.ComponentClass<ScrollProps>) {
 }
 
 const getScrollPage = (): number => {
+  const body = document.getElementById('body');
+  if (body) {
+    return body.scrollTop;
+  }
   let docScrollTop = 0;
   if (document.documentElement && document.documentElement !== null) {
     docScrollTop = document.documentElement.scrollTop;
@@ -21,10 +25,16 @@ const getScrollPage = (): number => {
   return window.pageYOffset || docScrollTop;
 };
 
-const scrollTo = (scrollnumber: number = 0): number =>
-  window.requestAnimationFrame(() => {
-    window.scrollTo(0, scrollnumber);
+const scrollTo = (scrollnumber: number = 0): number => {
+  return window.requestAnimationFrame(() => {
+    const body = document.getElementById('body');
+    if (body) {
+      body.scrollTo(0, scrollnumber);
+    } else {
+      window.scrollTo(0, scrollnumber);
+    }
   });
+};
 
 class ScrollMemory extends Component<ScrollProps> {
   url: Map<string, number>;
@@ -44,9 +54,11 @@ class ScrollMemory extends Component<ScrollProps> {
 
     if (locationChanged) {
       const scroll = getScrollPage();
+      console.log('scroll', scroll);
       this.url.set(actual.pathname, scroll);
 
       const nextScroll = this.url.get(next.pathname);
+      console.log('nextScroll', nextScroll);
       scrollTo(nextScroll ?? 0);
     }
     return false;

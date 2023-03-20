@@ -1,9 +1,8 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { InnerBody } from '../../components/Body';
 import { SettingsHeader } from '../../components/Header';
-import { useAppContext } from '../../hooks/appContext';
 import { SettingsRoute } from '../../libs/routes';
-import { Body } from '../../styles/globalStyle';
 import { Account } from './Account';
 import { DevSettings } from './Dev';
 import { FiatCurrency } from './FiatCurrency';
@@ -17,55 +16,54 @@ import { UserTheme } from './Theme';
 import { WalletVersion } from './Version';
 
 const SettingsRouter = () => {
-  const { standalone } = useAppContext();
   return (
     <Routes>
       <Route
         path={SettingsRoute.localization}
         element={
-          <Body>
+          <InnerBody>
             <Localization />
-          </Body>
+          </InnerBody>
         }
       />
       <Route
         path={SettingsRoute.legal}
         element={
-          <Body>
+          <InnerBody>
             <Legal />
-          </Body>
+          </InnerBody>
         }
       />
       <Route
         path={SettingsRoute.theme}
         element={
-          <Body>
+          <InnerBody>
             <UserTheme />
-          </Body>
+          </InnerBody>
         }
       />
       <Route
         path={SettingsRoute.dev}
         element={
-          <Body>
+          <InnerBody>
             <DevSettings />
-          </Body>
+          </InnerBody>
         }
       />
       <Route
         path={SettingsRoute.fiat}
         element={
-          <Body>
+          <InnerBody>
             <FiatCurrency />
-          </Body>
+          </InnerBody>
         }
       />
       <Route
         path={SettingsRoute.account}
         element={
-          <Body>
+          <InnerBody>
             <Account />
-          </Body>
+          </InnerBody>
         }
       />
       <Route path={SettingsRoute.recovery}>
@@ -75,25 +73,25 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.version}
         element={
-          <Body>
+          <InnerBody>
             <WalletVersion />
-          </Body>
+          </InnerBody>
         }
       />
       <Route
         path={SettingsRoute.jettons}
         element={
-          <Body>
+          <InnerBody>
             <JettonsSettings />
-          </Body>
+          </InnerBody>
         }
       />
       <Route
         path={SettingsRoute.security}
         element={
-          <Body>
+          <InnerBody>
             <SecuritySettings />
-          </Body>
+          </InnerBody>
         }
       />
       <Route
@@ -101,9 +99,9 @@ const SettingsRouter = () => {
         element={
           <>
             <SettingsHeader />
-            <Body>
+            <InnerBody>
               <Settings />
-            </Body>
+            </InnerBody>
           </>
         }
       />

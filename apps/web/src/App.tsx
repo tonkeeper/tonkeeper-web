@@ -7,16 +7,26 @@ import {
 import { getTonClient, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
+import {
+  InnerBody,
+  useWindowsScroll,
+} from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
-import { Footer } from '@tonkeeper/uikit/dist/components/Footer';
-import { Header, HeaderGlobal } from '@tonkeeper/uikit/dist/components/Header';
+import {
+  Footer,
+  FooterGlobalStyle,
+} from '@tonkeeper/uikit/dist/components/Footer';
+import {
+  Header,
+  HeaderGlobalStyle,
+} from '@tonkeeper/uikit/dist/components/Header';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import {
-  ActivitySkeleton,
-  CoinSkeleton,
+  ActivitySkeletonPage,
+  CoinSkeletonPage,
   HomeSkeleton,
-  SettingsSkeleton,
+  SettingsSkeletonPage,
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import {
@@ -39,7 +49,6 @@ import {
   I18nContext,
   TranslationContext,
 } from '@tonkeeper/uikit/dist/hooks/translation';
-import { useAppScroll } from '@tonkeeper/uikit/dist/hooks/useFetchNext';
 import { any, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -56,14 +65,13 @@ import {
   useTonenpointConfig,
 } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import { Body, Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, {
   FC,
   PropsWithChildren,
   Suspense,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -76,11 +84,7 @@ import {
 } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
-import {
-  useAppHeight,
-  useAppWidth,
-  useDisableFocusOnScroll,
-} from './libs/hooks';
+import { useAppHeight, useDisableFocusOnScroll } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
 
 const ImportRouter = React.lazy(
@@ -133,7 +137,8 @@ export const App: FC<PropsWithChildren> = () => {
               <TranslationContext.Provider value={translation}>
                 <StorageContext.Provider value={storage}>
                   <UserThemeProvider>
-                    <HeaderGlobal />
+                    <HeaderGlobalStyle />
+                    <FooterGlobalStyle />
                     <SybHeaderGlobalStyle />
                     <Loader />
                     <UnlockNotification sdk={sdk} />
@@ -204,7 +209,7 @@ export const Loader: FC = () => {
   const { data: activeWallet } = useActiveWallet();
 
   const [ios, standalone] = useMemo(() => {
-    return [sdk.isIOs(), sdk.isIOs() && sdk.isStandalone()] as const;
+    return [sdk.isIOs(), sdk.isStandalone()] as const;
   }, []);
 
   const lock = useLock();
@@ -281,10 +286,8 @@ export const Content: FC<{
   lock: boolean;
   standalone: boolean;
 }> = ({ activeWallet, lock, standalone }) => {
-  const ref = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  useAppWidth(standalone);
-  useAppScroll(standalone, ref);
+  useWindowsScroll();
 
   if (lock) {
     return (
@@ -316,7 +319,7 @@ export const Content: FC<{
           <Route
             path={AppRoute.activity}
             element={
-              <Suspense fallback={<ActivitySkeleton />}>
+              <Suspense fallback={<ActivitySkeletonPage />}>
                 <Activity />
               </Suspense>
             }
@@ -324,7 +327,7 @@ export const Content: FC<{
           <Route
             path={any(AppRoute.settings)}
             element={
-              <Suspense fallback={<SettingsSkeleton />}>
+              <Suspense fallback={<SettingsSkeletonPage />}>
                 <Settings />
               </Suspense>
             }
@@ -333,11 +336,9 @@ export const Content: FC<{
             <Route
               path=":name"
               element={
-                <Body ref={ref}>
-                  <Suspense fallback={<CoinSkeleton />}>
-                    <Coin />
-                  </Suspense>
-                </Body>
+                <Suspense fallback={<CoinSkeletonPage />}>
+                  <Coin />
+                </Suspense>
               }
             />
           </Route>
@@ -346,11 +347,11 @@ export const Content: FC<{
             element={
               <>
                 <Header />
-                <Body ref={ref}>
+                <InnerBody>
                   <Suspense fallback={<HomeSkeleton />}>
                     <Home />
                   </Suspense>
-                </Body>
+                </InnerBody>
               </>
             }
           />

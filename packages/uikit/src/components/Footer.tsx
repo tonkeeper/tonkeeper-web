@@ -1,12 +1,9 @@
-import { throttle } from '@tonkeeper/core/dist/utils/common';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppContext } from '../hooks/appContext';
-import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute } from '../libs/routes';
-import { useIsScrollTop } from './Header';
 import { Label3 } from './Text';
 
 const WalletIcon = () => {
@@ -102,7 +99,7 @@ const Button = styled.div<{ active: boolean }>`
     `}
 `;
 
-const Block = styled.div<{ bottom: boolean; standalone: boolean }>`
+const Block = styled.div<{ standalone: boolean }>`
   flex-shrink: 0;
   display: flex;
   justify-content: space-around;
@@ -112,22 +109,9 @@ const Block = styled.div<{ bottom: boolean; standalone: boolean }>`
   width: var(--app-width);
   max-width: 548px;
   box-sizing: border-box;
+  overflow: visible !important;
 
   background-color: ${(props) => props.theme.backgroundPage};
-
-  ${(props) =>
-    !props.bottom &&
-    css`
-      &:after {
-        content: '';
-        display: block;
-        width: 100%;
-        height: 1px;
-        background: ${(props) => props.theme.separatorCommon};
-        position: absolute;
-        bottom: 100%;
-      }
-    `}
 
   ${(props) =>
     props.standalone &&
@@ -136,45 +120,25 @@ const Block = styled.div<{ bottom: boolean; standalone: boolean }>`
     `}
 `;
 
-const useIsScrollBottom = () => {
-  const [isBottom, setBottom] = useState(false);
-  const location = useLocation();
-  const sdk = useAppSdk();
+export const FooterGlobalStyle = createGlobalStyle`
+  body:not(.bottom) ${Block} {
+    &:after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 1px;
+      background: ${(props) => props.theme.separatorCommon};
+      position: absolute;
+      bottom: 100%;
+    }
+  }
+`;
 
-  useEffect(() => {
-    const handler = throttle(() => {
-      if (
-        window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 3
-      ) {
-        setBottom(true);
-      } else {
-        setBottom(false);
-      }
-    }, 50);
-
-    window.addEventListener('scroll', handler);
-
-    handler();
-
-    sdk.uiEvents.on('loading', handler);
-
-    return () => {
-      window.removeEventListener('scroll', handler);
-      sdk.uiEvents.off('loading', handler);
-    };
-  }, [location.pathname, sdk]);
-
-  return isBottom;
-};
 export const Footer = () => {
   const { standalone } = useAppContext();
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-
-  const bottom = useIsScrollBottom();
-  const top = useIsScrollTop();
 
   const active = useMemo<AppRoute>(() => {
     if (location.pathname.includes(AppRoute.activity)) {
@@ -186,42 +150,46 @@ export const Footer = () => {
     return AppRoute.home;
   }, [location.pathname]);
 
-  const scrollTop = useCallback(() => {
-    window.requestAnimationFrame(() => {
-      window.scrollTo(0, 0);
-    });
-  }, []);
+  const handleClick = useCallback(
+    (route: AppRoute) => {
+      if (active !== route) {
+        return navigate(route);
+      }
+      if (!document.body.classList.contains('top')) {
+        const body = document.getElementById('body');
+        if (body) {
+          window.requestAnimationFrame(() => {
+            body.scrollTo(0, 0);
+          });
+        } else {
+          window.requestAnimationFrame(() => {
+            window.scrollTo(0, 0);
+          });
+        }
+      }
+    },
+    [active]
+  );
+
   return (
-    <Block bottom={bottom} standalone={standalone}>
+    <Block standalone={standalone}>
       <Button
         active={active === AppRoute.home}
-        onClick={() =>
-          active === AppRoute.home && !top
-            ? scrollTop()
-            : navigate(AppRoute.home)
-        }
+        onClick={() => handleClick(AppRoute.home)}
       >
         <WalletIcon />
         <Label3>{t('wallet_title')}</Label3>
       </Button>
       <Button
         active={active === AppRoute.activity}
-        onClick={() =>
-          active === AppRoute.activity && !top
-            ? scrollTop()
-            : navigate(AppRoute.activity)
-        }
+        onClick={() => handleClick(AppRoute.activity)}
       >
         <ActivityIcon />
         <Label3>{t('Activity')}</Label3>
       </Button>
       <Button
         active={active === AppRoute.settings}
-        onClick={() =>
-          active === AppRoute.settings && !top
-            ? scrollTop()
-            : navigate(AppRoute.settings)
-        }
+        onClick={() => handleClick(AppRoute.settings)}
       >
         <SettingsIcon />
         <Label3>{t('settings_title')}</Label3>

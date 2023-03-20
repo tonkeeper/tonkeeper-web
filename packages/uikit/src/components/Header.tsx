@@ -1,6 +1,6 @@
-import { throttle, toShortAddress } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import React, { FC, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useTranslation } from '../hooks/translation';
@@ -46,7 +46,7 @@ const Block = styled.div<{
   background-color: ${(props) => props.theme.backgroundPage};
 `;
 
-export const HeaderGlobal = createGlobalStyle`
+export const HeaderGlobalStyle = createGlobalStyle`
   body:not(.top) ${Block} {
     &:after {
       content: '';
@@ -185,30 +185,6 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
       </>
     );
   }
-};
-
-export const useIsScrollTop = () => {
-  const [isTop, setTop] = useState(true);
-  const location = useLocation();
-  useEffect(() => {
-    const handler = throttle(() => {
-      if (window.scrollY > 20) {
-        setTop(false);
-      } else {
-        setTop(true);
-      }
-    }, 50);
-
-    window.addEventListener('scroll', handler);
-
-    handler();
-
-    return () => {
-      window.removeEventListener('scroll', handler);
-    };
-  }, [location.pathname]);
-
-  return isTop;
 };
 
 export const Header = () => {
