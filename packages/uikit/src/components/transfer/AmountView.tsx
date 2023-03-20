@@ -298,13 +298,14 @@ export const AmountView: FC<{
   }, [refBlock.current]);
 
   useEffect(() => {
-    if (ref.current) {
-      setTimeout(() => {
-        if (ref.current) {
-          ref.current.focus();
-        }
-      }, 400);
-    }
+    const timeout = setTimeout(() => {
+      if (ref.current) {
+        ref.current.focus();
+      }
+    }, 400);
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [ref.current, jetton]);
 
   const { t } = useTranslation();
