@@ -199,8 +199,7 @@ const seeIfValueValid = (value: string, decimals: number) => {
 
 const useButtonPosition = (
   ref: React.RefObject<HTMLDivElement>,
-  blockRef: React.RefObject<HTMLLabelElement>,
-  inputRef: React.RefObject<HTMLInputElement>
+  blockRef: React.RefObject<HTMLLabelElement>
 ) => {
   const { ios, standalone } = useAppContext();
   useEffect(() => {
@@ -249,7 +248,7 @@ const useButtonPosition = (
     return () => {
       blurHandler();
     };
-  }, [ref.current, blockRef.current, inputRef.current]);
+  }, [ref.current, blockRef.current]);
 };
 export const AmountView: FC<{
   onClose: () => void;
@@ -291,7 +290,7 @@ export const AmountView: FC<{
   const refBlock = useRef<HTMLLabelElement>(null);
   const refButton = useRef<HTMLDivElement>(null);
 
-  useButtonPosition(refButton, refBlock, ref);
+  useButtonPosition(refButton, refBlock);
 
   useEffect(() => {
     if (refBlock.current) {
