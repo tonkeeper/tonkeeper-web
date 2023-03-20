@@ -152,7 +152,7 @@ export const Footer = () => {
 
   const handleClick = useCallback(
     (route: AppRoute) => {
-      if (active !== route) {
+      if (location.pathname !== route) {
         return navigate(route);
       }
       if (!document.body.classList.contains('top')) {
@@ -168,7 +168,7 @@ export const Footer = () => {
         }
       }
     },
-    [active]
+    [location.pathname]
   );
 
   return (
