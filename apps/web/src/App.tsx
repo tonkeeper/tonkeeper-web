@@ -187,7 +187,7 @@ export const Loader: FC = () => {
   const { data: activeWallet } = useActiveWallet();
 
   const [ios, standalone] = useMemo(() => {
-    return [true, true] as const; // [sdk.isIOs(), sdk.isIOs() && sdk.isStandalone()] as const;
+    return [sdk.isIOs(), sdk.isIOs() && sdk.isStandalone()] as const;
   }, []);
 
   const lock = useLock();
