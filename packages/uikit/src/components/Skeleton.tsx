@@ -213,6 +213,7 @@ export const ActivitySkeleton = React.memo(() => {
 
 export const SettingsSkeleton = React.memo(() => {
   const sdk = useAppSdk();
+  const { standalone } = useAppContext();
   useEffect(() => {
     return () => {
       sdk.uiEvents.emit('loading');
@@ -222,14 +223,14 @@ export const SettingsSkeleton = React.memo(() => {
   return (
     <>
       <SettingsHeader />
-      <Container>
-        <Body>
+      <Body standalone={standalone}>
+        <ActivityList>
           <SkeletonSettingsList size={2} />
           <SkeletonSettingsList size={4} />
           <SkeletonSettingsList size={3} />
           <SkeletonSettingsList size={6} />
-        </Body>
-      </Container>
+        </ActivityList>
+      </Body>
     </>
   );
 });
