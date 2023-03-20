@@ -1,6 +1,5 @@
 import React, { FC, useEffect } from 'react';
 import styled, { css } from 'styled-components';
-import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { Body } from '../styles/globalStyle';
 import { ActivityHeader, SettingsHeader } from './Header';
@@ -186,7 +185,6 @@ const Title = styled(H3)`
 
 export const ActivitySkeleton = React.memo(() => {
   const sdk = useAppSdk();
-  const { standalone } = useAppContext();
   useEffect(() => {
     return () => {
       sdk.uiEvents.emit('loading');
@@ -196,7 +194,7 @@ export const ActivitySkeleton = React.memo(() => {
   return (
     <>
       <ActivityHeader />
-      <Body standalone={standalone}>
+      <Body>
         <Title>
           <SkeletonText size="large" />
         </Title>
@@ -213,7 +211,6 @@ export const ActivitySkeleton = React.memo(() => {
 
 export const SettingsSkeleton = React.memo(() => {
   const sdk = useAppSdk();
-  const { standalone } = useAppContext();
   useEffect(() => {
     return () => {
       sdk.uiEvents.emit('loading');
@@ -223,7 +220,7 @@ export const SettingsSkeleton = React.memo(() => {
   return (
     <>
       <SettingsHeader />
-      <Body standalone={standalone}>
+      <Body>
         <ActivityList>
           <SkeletonSettingsList size={2} />
           <SkeletonSettingsList size={4} />

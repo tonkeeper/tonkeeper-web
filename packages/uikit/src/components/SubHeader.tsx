@@ -39,16 +39,6 @@ const Block = styled.div<{ top: boolean }>`
         left: 0;
       }
     `}
-
-  &:before {
-    content: '';
-    display: block;
-    width: 100%;
-    height: 200px;
-    position: absolute;
-    bottom: 100%;
-    background-color: ${(props) => props.theme.backgroundPage};
-  }
 `;
 
 export const BackButtonLeft = styled(BackButton)`

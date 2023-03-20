@@ -26,7 +26,7 @@ const Block = styled.div<{
   position: fixed;
   width: var(--app-width);
   max-width: 548px;
-  top: -5px;
+  top: 0px;
   z-index: 1;
 
   ${(props) =>
@@ -59,17 +59,6 @@ const Block = styled.div<{
         left: 0;
       }
     `}
-
-  &:before {
-    content: '';
-    display: block;
-    width: 100%;
-    height: 200px;
-    position: absolute;
-    bottom: 63px;
-    z-index: 1;
-    background-color: ${(props) => props.theme.backgroundPage};
-  }
 `;
 
 const Title = styled(H3)`

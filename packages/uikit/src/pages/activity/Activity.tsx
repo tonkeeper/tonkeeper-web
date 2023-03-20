@@ -50,7 +50,7 @@ const Activity: FC = () => {
   return (
     <>
       <ActivityHeader />
-      <Body standalone={standalone} ref={ref}>
+      <Body ref={ref}>
         <ActivityGroupRaw items={items} />
         {isFetchingNextPage && <SkeletonList size={3} />}
       </Body>

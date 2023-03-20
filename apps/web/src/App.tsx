@@ -163,18 +163,30 @@ const useLock = () => {
 };
 
 const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
-  @media (min-width: 600px) {
-    border-left: 1px solid ${(props) => props.theme.separatorCommon};
-    border-right: 1px solid ${(props) => props.theme.separatorCommon};
-  }
-
   ${(props) =>
-    props.standalone &&
-    css`
-      position: fixed;
-      top: 0;
-      height: calc(var(--app-height) - 1px);
-    `};
+    props.standalone
+      ? css`
+          position: fixed;
+          top: 0;
+          height: calc(var(--app-height) - 2px);
+        `
+      : css`
+          @media (min-width: 600px) {
+            border-left: 1px solid ${props.theme.separatorCommon};
+            border-right: 1px solid ${props.theme.separatorCommon};
+          }
+        `};
+
+  > * {
+    ${(props) =>
+      props.standalone &&
+      css`
+        overflow: auto;
+        width: var(--app-width);
+        max-width: 548px;
+        box-sizing: border-box;
+      `}
+  }
 `;
 
 const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
@@ -314,7 +326,7 @@ export const Content: FC<{
             <Route
               path=":name"
               element={
-                <Body standalone={standalone}>
+                <Body>
                   <Suspense fallback={<CoinSkeleton />}>
                     <Coin />
                   </Suspense>
@@ -327,7 +339,7 @@ export const Content: FC<{
             element={
               <>
                 <Header />
-                <Body standalone={standalone}>
+                <Body>
                   <Suspense fallback={<HomeSkeleton />}>
                     <Home />
                   </Suspense>

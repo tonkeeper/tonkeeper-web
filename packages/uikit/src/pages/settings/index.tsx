@@ -23,7 +23,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.localization}
         element={
-          <Body standalone={standalone}>
+          <Body>
             <Localization />
           </Body>
         }
@@ -31,7 +31,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.legal}
         element={
-          <Body standalone={standalone}>
+          <Body>
             <Legal />
           </Body>
         }
@@ -39,7 +39,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.theme}
         element={
-          <Body standalone={standalone}>
+          <Body>
             <UserTheme />
           </Body>
         }
@@ -47,7 +47,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.dev}
         element={
-          <Body standalone={standalone}>
+          <Body>
             <DevSettings />
           </Body>
         }
@@ -55,7 +55,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.fiat}
         element={
-          <Body standalone={standalone}>
+          <Body>
             <FiatCurrency />
           </Body>
         }
@@ -63,7 +63,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.account}
         element={
-          <Body standalone={standalone}>
+          <Body>
             <Account />
           </Body>
         }
@@ -75,7 +75,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.version}
         element={
-          <Body standalone={standalone}>
+          <Body>
             <WalletVersion />
           </Body>
         }
@@ -83,7 +83,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.jettons}
         element={
-          <Body standalone={standalone}>
+          <Body>
             <JettonsSettings />
           </Body>
         }
@@ -91,7 +91,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.security}
         element={
-          <Body standalone={standalone}>
+          <Body>
             <SecuritySettings />
           </Body>
         }
@@ -101,7 +101,7 @@ const SettingsRouter = () => {
         element={
           <>
             <SettingsHeader />
-            <Body standalone={standalone}>
+            <Body>
               <Settings />
             </Body>
           </>
