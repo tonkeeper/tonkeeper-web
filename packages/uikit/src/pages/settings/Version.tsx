@@ -5,6 +5,7 @@ import {
 import { getWalletAddress } from '@tonkeeper/core/dist/service/walletService';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { useMemo } from 'react';
+import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
 import {
   SettingsItem,
@@ -37,7 +38,9 @@ export const WalletVersion = () => {
   return (
     <>
       <SubHeader title={t('settings_wallet_version')} />
-      <SettingsList items={items} loading={isLoading} />
+      <InnerBody>
+        <SettingsList items={items} loading={isLoading} />
+      </InnerBody>
     </>
   );
 };

@@ -8,6 +8,7 @@ import {
   OnDragEndResponder,
 } from 'react-beautiful-dnd';
 import styled from 'styled-components';
+import { InnerBody } from '../../components/Body';
 import { Radio } from '../../components/fields/Checkbox';
 import { ReorderIcon } from '../../components/Icon';
 import { ColumnText } from '../../components/Layout';
@@ -144,40 +145,42 @@ export const JettonsSettings = () => {
   return (
     <>
       <SubHeader title={t('settings_jettons_list')} />
-      <DragDropContext onDragEnd={handleDrop}>
-        <Droppable droppableId="jettons">
-          {(provided) => (
-            <ListBlock
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              noUserSelect
-            >
-              {jettons.map((jetton, index) => (
-                <Draggable
-                  key={jetton.jettonAddress}
-                  draggableId={jetton.jettonAddress}
-                  index={index}
-                >
-                  {(provided) => (
-                    <ListItemElement
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      hover={false}
-                      ios={true}
-                    >
-                      <JettonRow
-                        dragHandleProps={provided.dragHandleProps}
-                        jetton={jetton}
-                      />
-                    </ListItemElement>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </ListBlock>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <InnerBody>
+        <DragDropContext onDragEnd={handleDrop}>
+          <Droppable droppableId="jettons">
+            {(provided) => (
+              <ListBlock
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                noUserSelect
+              >
+                {jettons.map((jetton, index) => (
+                  <Draggable
+                    key={jetton.jettonAddress}
+                    draggableId={jetton.jettonAddress}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <ListItemElement
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        hover={false}
+                        ios={true}
+                      >
+                        <JettonRow
+                          dragHandleProps={provided.dragHandleProps}
+                          jetton={jetton}
+                        />
+                      </ListItemElement>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </ListBlock>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </InnerBody>
     </>
   );
 };

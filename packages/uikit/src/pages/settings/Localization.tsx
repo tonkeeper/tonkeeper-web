@@ -3,6 +3,7 @@ import {
   localizationSecondaryText,
 } from '@tonkeeper/core/dist/entries/language';
 import React, { useCallback, useMemo } from 'react';
+import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
 import {
   SettingsItem,
@@ -36,7 +37,9 @@ export const Localization = () => {
   return (
     <>
       <SubHeader title={t('Localization')} />
-      <SettingsList items={items} />
+      <InnerBody>
+        <SettingsList items={items} />
+      </InnerBody>
     </>
   );
 };

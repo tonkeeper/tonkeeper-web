@@ -1,5 +1,6 @@
 import { Network, switchNetwork } from '@tonkeeper/core/dist/entries/network';
 import React, { useMemo } from 'react';
+import { InnerBody } from '../../components/Body';
 import {
   SettingsItem,
   SettingsList,
@@ -29,7 +30,9 @@ export const DevSettings = React.memo(() => {
   return (
     <>
       <SubHeader title="Dev Menu" />
-      <SettingsList items={items} />
+      <InnerBody>
+        <SettingsList items={items} />
+      </InnerBody>
     </>
   );
 });

@@ -18,82 +18,19 @@ import { WalletVersion } from './Version';
 const SettingsRouter = () => {
   return (
     <Routes>
-      <Route
-        path={SettingsRoute.localization}
-        element={
-          <InnerBody>
-            <Localization />
-          </InnerBody>
-        }
-      />
-      <Route
-        path={SettingsRoute.legal}
-        element={
-          <InnerBody>
-            <Legal />
-          </InnerBody>
-        }
-      />
-      <Route
-        path={SettingsRoute.theme}
-        element={
-          <InnerBody>
-            <UserTheme />
-          </InnerBody>
-        }
-      />
-      <Route
-        path={SettingsRoute.dev}
-        element={
-          <InnerBody>
-            <DevSettings />
-          </InnerBody>
-        }
-      />
-      <Route
-        path={SettingsRoute.fiat}
-        element={
-          <InnerBody>
-            <FiatCurrency />
-          </InnerBody>
-        }
-      />
-      <Route
-        path={SettingsRoute.account}
-        element={
-          <InnerBody>
-            <Account />
-          </InnerBody>
-        }
-      />
+      <Route path={SettingsRoute.localization} element={<Localization />} />
+      <Route path={SettingsRoute.legal} element={<Legal />} />
+      <Route path={SettingsRoute.theme} element={<UserTheme />} />
+      <Route path={SettingsRoute.dev} element={<DevSettings />} />
+      <Route path={SettingsRoute.fiat} element={<FiatCurrency />} />
+      <Route path={SettingsRoute.account} element={<Account />} />
       <Route path={SettingsRoute.recovery}>
         <Route path=":publicKey" element={<Recovery />} />
         <Route index element={<ActiveRecovery />} />
       </Route>
-      <Route
-        path={SettingsRoute.version}
-        element={
-          <InnerBody>
-            <WalletVersion />
-          </InnerBody>
-        }
-      />
-      <Route
-        path={SettingsRoute.jettons}
-        element={
-          <InnerBody>
-            <JettonsSettings />
-          </InnerBody>
-        }
-      />
-      <Route
-        path={SettingsRoute.security}
-        element={
-          <InnerBody>
-            <SecuritySettings />
-          </InnerBody>
-        }
-      />
+      <Route path={SettingsRoute.version} element={<WalletVersion />} />
+      <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
+      <Route path={SettingsRoute.security} element={<SecuritySettings />} />
       <Route
         path="*"
         element={

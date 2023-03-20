@@ -9,6 +9,7 @@ import {
 } from 'react-beautiful-dnd';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { InnerBody } from '../../components/Body';
 import { ImportNotification } from '../../components/create/ImportNotification';
 import { DropDown } from '../../components/DropDown';
 import { EllipsisIcon, ReorderIcon } from '../../components/Icon';
@@ -186,38 +187,41 @@ export const Account = () => {
   return (
     <>
       <SubHeader title={t('Manage_wallets')} />
-      <DragDropContext onDragEnd={handleDrop}>
-        <Droppable droppableId="wallets">
-          {(provided) => (
-            <ListBlock {...provided.droppableProps} ref={provided.innerRef}>
-              {account.publicKeys.map((publicKey, index) => (
-                <Draggable
-                  key={publicKey}
-                  draggableId={publicKey}
-                  index={index}
-                >
-                  {(provided) => (
-                    <ListItemElement
-                      ios={true}
-                      hover={false}
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                    >
-                      <WalletRow
-                        dragHandleProps={provided.dragHandleProps}
-                        publicKey={publicKey}
-                      />
-                    </ListItemElement>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </ListBlock>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <InnerBody>
+        <DragDropContext onDragEnd={handleDrop}>
+          <Droppable droppableId="wallets">
+            {(provided) => (
+              <ListBlock {...provided.droppableProps} ref={provided.innerRef}>
+                {account.publicKeys.map((publicKey, index) => (
+                  <Draggable
+                    key={publicKey}
+                    draggableId={publicKey}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <ListItemElement
+                        ios={true}
+                        hover={false}
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                      >
+                        <WalletRow
+                          dragHandleProps={provided.dragHandleProps}
+                          publicKey={publicKey}
+                        />
+                      </ListItemElement>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </ListBlock>
+            )}
+          </Droppable>
+        </DragDropContext>
 
-      <SettingsList items={createItems} />
+        <SettingsList items={createItems} />
+      </InnerBody>
+
       <ImportNotification isOpen={isOpen} setOpen={setOpen} />
     </>
   );

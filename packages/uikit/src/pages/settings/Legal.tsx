@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
+import { InnerBody } from '../../components/Body';
 import { ChevronRightIcon } from '../../components/Icon';
 import {
   SettingsItem,
@@ -62,9 +63,11 @@ export const Legal = React.memo(() => {
   return (
     <>
       <SubHeader title={t('legal_header_title')} />
-      <SettingsList items={items} />
-      <Title>{t('legal_licenses_title')}</Title>
-      <SettingsList items={licenses} />
+      <InnerBody>
+        <SettingsList items={items} />
+        <Title>{t('legal_licenses_title')}</Title>
+        <SettingsList items={licenses} />
+      </InnerBody>
     </>
   );
 });

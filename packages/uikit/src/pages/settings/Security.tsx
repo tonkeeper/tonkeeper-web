@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { InnerBody } from '../../components/Body';
 import { ChangePasswordNotification } from '../../components/create/ChangePassword';
 import { Switch } from '../../components/fields/Switch';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
@@ -99,9 +100,11 @@ export const SecuritySettings = () => {
   return (
     <>
       <SubHeader title={t('settings_security')} />
-      <LockSwitch />
-      <ChangePassword />
-      <ShowPhrases />
+      <InnerBody>
+        <LockSwitch />
+        <ChangePassword />
+        <ShowPhrases />
+      </InnerBody>
     </>
   );
 };

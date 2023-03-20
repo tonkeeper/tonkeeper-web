@@ -1,5 +1,6 @@
 import { Theme } from '@tonkeeper/core/dist/entries/theme';
 import React, { useCallback, useMemo } from 'react';
+import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
 import {
   SettingsItem,
@@ -35,7 +36,9 @@ export const UserTheme = () => {
   return (
     <>
       <SubHeader title={t('Theme')} />
-      <SettingsList items={items} loading={isFetching} />
+      <InnerBody>
+        <SettingsList items={items} loading={isFetching} />
+      </InnerBody>
     </>
   );
 };

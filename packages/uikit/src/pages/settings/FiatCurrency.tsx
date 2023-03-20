@@ -3,6 +3,7 @@ import {
   FiatCurrencySymbolsConfig,
 } from '@tonkeeper/core/dist/entries/fiat';
 import React, { useMemo } from 'react';
+import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
 import {
   SettingsItem,
@@ -31,7 +32,9 @@ export const FiatCurrency = () => {
   return (
     <>
       <SubHeader title={t('settings_primary_currency')} />
-      <SettingsList items={items} />
+      <InnerBody>
+        <SettingsList items={items} />
+      </InnerBody>
     </>
   );
 };
