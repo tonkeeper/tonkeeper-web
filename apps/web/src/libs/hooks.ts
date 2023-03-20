@@ -18,19 +18,18 @@ export const useAppHeight = () => {
 
 export const useAppWidth = (standalone: boolean) => {
   useEffect(() => {
-    if (standalone) {
-      const doc = document.documentElement;
-      doc.style.setProperty('--app-width', `${window.innerWidth}px`);
-      return;
-    }
-
     const appWidth = throttle(() => {
-      const doc = document.documentElement;
-      const app = (
-        document.getElementById('root') as HTMLDivElement
-      ).childNodes.item(0) as HTMLDivElement;
+      if (standalone) {
+        const doc = document.documentElement;
+        doc.style.setProperty('--app-width', `${window.innerWidth}px`);
+      } else {
+        const doc = document.documentElement;
+        const app = (
+          document.getElementById('root') as HTMLDivElement
+        ).childNodes.item(0) as HTMLDivElement;
 
-      doc.style.setProperty('--app-width', `${app.clientWidth}px`);
+        doc.style.setProperty('--app-width', `${app.clientWidth}px`);
+      }
     }, 50);
     window.addEventListener('resize', appWidth);
 
