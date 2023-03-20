@@ -261,6 +261,7 @@ export const AmountView: FC<{
   info?: AccountRepr;
   data?: AmountData;
   stock?: TonendpointStock;
+  done: boolean;
 }> = ({
   recipient,
   onClose,
@@ -270,6 +271,7 @@ export const AmountView: FC<{
   data,
   jettons,
   info,
+  done,
 }) => {
   const { standalone } = useAppContext();
   const format = useFormatCoinValue();
@@ -302,11 +304,11 @@ export const AmountView: FC<{
       if (ref.current) {
         ref.current.focus();
       }
-    }, 400);
+    }, 300);
     return () => {
       clearTimeout(timeout);
     };
-  }, [ref.current, jetton]);
+  }, [ref.current, jetton, done]);
 
   const { t } = useTranslation();
 
