@@ -301,15 +301,9 @@ export const AmountView: FC<{
   const [max, setMax] = useState(data?.max ?? false);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (ref.current) {
-        setMax(true);
-        ref.current.focus();
-      }
-    }, 300);
-    return () => {
-      clearTimeout(timeout);
-    };
+    if (ref.current && done) {
+      ref.current.focus();
+    }
   }, [ref.current, jetton, done]);
 
   const { t } = useTranslation();

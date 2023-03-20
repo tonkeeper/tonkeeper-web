@@ -42,7 +42,6 @@ export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
   ({ value, setValue, inputSize }, ref) => {
     return (
       <SentenceInput
-        autoFocus
         ref={ref}
         style={{
           fontSize: `${inputSize.size}px`,
