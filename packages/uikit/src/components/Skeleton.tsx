@@ -176,7 +176,7 @@ const ActivityList = styled.div`
 `;
 
 const Title = styled(H3)`
-  margin: 1.875rem 0 0.875rem;
+  margin: 0 0 0.875rem;
 `;
 
 export const ActivitySkeletonPage = React.memo(() => {
