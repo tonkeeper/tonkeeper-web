@@ -1,6 +1,8 @@
 import React, { FC, useEffect } from 'react';
 import styled, { css } from 'styled-components';
+import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
+import { Body } from '../styles/globalStyle';
 import { ActivityHeader, SettingsHeader } from './Header';
 import { ActionsRow } from './home/Actions';
 import { BalanceSkeleton } from './home/Balance';
@@ -171,7 +173,7 @@ const Container = styled.div`
   flex-grow: 1;
   padding: 0 1rem;
 `;
-const Body = styled.div`
+const ActivityList = styled.div`
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -184,6 +186,7 @@ const Title = styled(H3)`
 
 export const ActivitySkeleton = React.memo(() => {
   const sdk = useAppSdk();
+  const { standalone } = useAppContext();
   useEffect(() => {
     return () => {
       sdk.uiEvents.emit('loading');
@@ -193,17 +196,17 @@ export const ActivitySkeleton = React.memo(() => {
   return (
     <>
       <ActivityHeader />
-      <Container>
+      <Body standalone={standalone}>
         <Title>
           <SkeletonText size="large" />
         </Title>
-        <Body>
+        <ActivityList>
           <SkeletonList size={1} margin={false} />
           <SkeletonList size={3} margin={false} />
           <SkeletonList size={2} margin={false} />
           <SkeletonList size={4} margin={false} />
-        </Body>
-      </Container>
+        </ActivityList>
+      </Body>
     </>
   );
 });
