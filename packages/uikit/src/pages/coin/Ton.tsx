@@ -49,7 +49,7 @@ const useBalanceValue = (
 };
 
 export const TonActivity = () => {
-  const { tonApi } = useAppContext();
+  const { tonApi, standalone } = useAppContext();
   const wallet = useWalletContext();
 
   const { fetchNextPage, hasNextPage, isFetchingNextPage, data, isFetched } =
@@ -64,7 +64,7 @@ export const TonActivity = () => {
       getNextPageParam: (lastPage) => lastPage.nextFrom,
     });
 
-  useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage);
+  useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone);
 
   const items = useMemo<ActivityGroup[]>(() => {
     return data ? groupActivity(groupAndFilterTonActivityItems(data)) : [];

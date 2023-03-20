@@ -71,7 +71,7 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
 import {
   useAppHeight,
@@ -162,11 +162,19 @@ const useLock = () => {
   return lock;
 };
 
-const FullSizeWrapper = styled(Container)`
+const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
   @media (min-width: 600px) {
     border-left: 1px solid ${(props) => props.theme.separatorCommon};
     border-right: 1px solid ${(props) => props.theme.separatorCommon};
   }
+
+  ${(props) =>
+    props.standalone &&
+    css`
+      position: fixed;
+      top: 0;
+      height: calc(var(--app-height) - 1px);
+    `};
 `;
 
 const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
@@ -179,7 +187,7 @@ export const Loader: FC = () => {
   const { data: activeWallet } = useActiveWallet();
 
   const [ios, standalone] = useMemo(() => {
-    return [sdk.isIOs(), sdk.isIOs() && sdk.isStandalone()] as const;
+    return [true, true] as const; // [sdk.isIOs(), sdk.isIOs() && sdk.isStandalone()] as const;
   }, []);
 
   const lock = useLock();
@@ -261,7 +269,7 @@ export const Content: FC<{
 
   if (lock) {
     return (
-      <FullSizeWrapper>
+      <FullSizeWrapper standalone={standalone}>
         <Unlock />
       </FullSizeWrapper>
     );
@@ -269,7 +277,7 @@ export const Content: FC<{
 
   if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
     return (
-      <FullSizeWrapper>
+      <FullSizeWrapper standalone={standalone}>
         <Suspense fallback={<Loading />}>
           <InitializeContainer fullHeight={false}>
             <Routes>
@@ -298,7 +306,7 @@ export const Content: FC<{
             path={any(AppRoute.settings)}
             element={
               <Suspense fallback={<SettingsSkeleton />}>
-                <Settings />
+                <Settings standalone={standalone} />
               </Suspense>
             }
           />
@@ -306,7 +314,7 @@ export const Content: FC<{
             <Route
               path=":name"
               element={
-                <Body>
+                <Body standalone={standalone}>
                   <Suspense fallback={<CoinSkeleton />}>
                     <Coin />
                   </Suspense>
@@ -319,7 +327,7 @@ export const Content: FC<{
             element={
               <>
                 <Header />
-                <Body>
+                <Body standalone={standalone}>
                   <Suspense fallback={<HomeSkeleton />}>
                     <Home />
                   </Suspense>

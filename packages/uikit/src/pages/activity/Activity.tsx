@@ -1,7 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { EventApi } from '@tonkeeper/core/dist/tonApiV1';
-import React, { FC, useMemo } from 'react';
-import styled from 'styled-components';
+import React, { FC, useMemo, useRef } from 'react';
 import { ActivityGroupRaw } from '../../components/activity/ActivityGroup';
 import { EmptyActivity } from '../../components/activity/EmptyActivity';
 import { ActivityHeader } from '../../components/Header';
@@ -14,15 +13,13 @@ import {
   groupActivity,
   groupActivityItems,
 } from '../../state/activity';
-
-const Body = styled.div`
-  flex-grow: 1;
-  padding: 0 1rem;
-`;
+import { Body } from '../../styles/globalStyle';
 
 const Activity: FC = () => {
   const wallet = useWalletContext();
-  const { tonApi } = useAppContext();
+  const { tonApi, standalone } = useAppContext();
+
+  const ref = useRef<HTMLDivElement>(null);
 
   const { fetchNextPage, hasNextPage, isFetchingNextPage, data, ...result } =
     useInfiniteQuery({
@@ -36,7 +33,7 @@ const Activity: FC = () => {
       getNextPageParam: (lastPage) => lastPage.nextFrom,
     });
 
-  useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage);
+  useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, ref);
 
   const items = useMemo<ActivityGroup[]>(() => {
     return data ? groupActivity(groupActivityItems(data)) : [];
@@ -53,7 +50,7 @@ const Activity: FC = () => {
   return (
     <>
       <ActivityHeader />
-      <Body>
+      <Body standalone={standalone} ref={ref}>
         <ActivityGroupRaw items={items} />
         {isFetchingNextPage && <SkeletonList size={3} />}
       </Body>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { SettingsHeader } from '../../components/Header';
 import { SettingsRoute } from '../../libs/routes';
@@ -15,13 +15,13 @@ import { Settings } from './Settings';
 import { UserTheme } from './Theme';
 import { WalletVersion } from './Version';
 
-const SettingsRouter = () => {
+const SettingsRouter: FC<{ standalone: boolean }> = ({ standalone }) => {
   return (
     <Routes>
       <Route
         path={SettingsRoute.localization}
         element={
-          <Body>
+          <Body standalone={standalone}>
             <Localization />
           </Body>
         }
@@ -29,7 +29,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.legal}
         element={
-          <Body>
+          <Body standalone={standalone}>
             <Legal />
           </Body>
         }
@@ -37,7 +37,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.theme}
         element={
-          <Body>
+          <Body standalone={standalone}>
             <UserTheme />
           </Body>
         }
@@ -45,7 +45,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.dev}
         element={
-          <Body>
+          <Body standalone={standalone}>
             <DevSettings />
           </Body>
         }
@@ -53,7 +53,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.fiat}
         element={
-          <Body>
+          <Body standalone={standalone}>
             <FiatCurrency />
           </Body>
         }
@@ -61,7 +61,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.account}
         element={
-          <Body>
+          <Body standalone={standalone}>
             <Account />
           </Body>
         }
@@ -73,7 +73,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.version}
         element={
-          <Body>
+          <Body standalone={standalone}>
             <WalletVersion />
           </Body>
         }
@@ -81,7 +81,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.jettons}
         element={
-          <Body>
+          <Body standalone={standalone}>
             <JettonsSettings />
           </Body>
         }
@@ -89,7 +89,7 @@ const SettingsRouter = () => {
       <Route
         path={SettingsRoute.security}
         element={
-          <Body>
+          <Body standalone={standalone}>
             <SecuritySettings />
           </Body>
         }
@@ -99,7 +99,7 @@ const SettingsRouter = () => {
         element={
           <>
             <SettingsHeader />
-            <Body>
+            <Body standalone={standalone}>
               <Settings />
             </Body>
           </>

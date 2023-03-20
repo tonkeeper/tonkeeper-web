@@ -1,4 +1,4 @@
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
 body {
@@ -49,7 +49,13 @@ export const Container = styled.div`
   white-space: pre-wrap;
 `;
 
-export const Body = styled.div`
+export const Body = styled.div<{ standalone: boolean }>`
   flex-grow: 1;
   padding: 0 1rem;
+
+  ${(props) =>
+    props.standalone &&
+    css`
+      overflow: auto;
+    `}
 `;

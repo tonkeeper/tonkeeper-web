@@ -4,28 +4,46 @@ import { useEffect } from 'react';
 export const useFetchNext = (
   hasNextPage: boolean | undefined,
   isFetchingNextPage: boolean,
-  fetchNextPage: () => void
+  fetchNextPage: () => void,
+  standalone: boolean,
+  ref?: React.RefObject<HTMLDivElement>
 ) => {
   useEffect(() => {
-    if (!hasNextPage) return () => {};
+    if (!hasNextPage) return;
+
+    const element = standalone ? ref?.current : window;
+
+    if (!element) return;
 
     const handler = throttle(() => {
       if (isFetchingNextPage) return;
       if (document.documentElement.className == 'is-locked') return;
-      if (
-        window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 500
-      ) {
-        fetchNextPage();
+
+      if (element === window) {
+        if (
+          window.innerHeight + window.scrollY >=
+          document.body.offsetHeight - 500
+        ) {
+          fetchNextPage();
+        }
+      } else {
+        const item = element as HTMLDivElement;
+        console.log({
+          scrollTop: item.scrollTop,
+          scrollHeight: item.scrollHeight - window.innerHeight,
+        });
+        if (item.scrollTop >= item.scrollHeight - window.innerHeight - 500) {
+          fetchNextPage();
+        }
       }
     }, 50);
 
-    window.addEventListener('scroll', handler);
+    element.addEventListener('scroll', handler);
 
     handler();
 
     return () => {
-      window.removeEventListener('scroll', handler);
+      element.removeEventListener('scroll', handler);
     };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, standalone, ref]);
 };
