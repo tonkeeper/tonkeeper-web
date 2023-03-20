@@ -301,9 +301,35 @@ export const AmountView: FC<{
   const [max, setMax] = useState(data?.max ?? false);
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.focus();
-    }
+    const timeout = setTimeout(() => {
+      // create invisible dummy input to receive the focus first
+      const fakeInput = document.createElement('input');
+      fakeInput.setAttribute('type', 'text');
+      fakeInput.style.position = 'absolute';
+      fakeInput.style.opacity = '0';
+      fakeInput.style.height = '0';
+      fakeInput.style.fontSize = '16px'; // disable auto zoom
+
+      // you may need to append to another element depending on the browser's auto
+      // zoom/scroll behavior
+      document.body.prepend(fakeInput);
+
+      // focus so that subsequent async focus will work
+      fakeInput.focus();
+
+      setTimeout(() => {
+        // now we can focus on the target input
+        if (ref.current) {
+          ref.current.focus();
+        }
+
+        // cleanup
+        fakeInput.remove();
+      }, 10);
+    }, 300);
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [ref.current, jetton]);
 
   const { t } = useTranslation();
