@@ -265,7 +265,7 @@ export const Content: FC<{
   standalone: boolean;
 }> = ({ activeWallet, lock, standalone }) => {
   const location = useLocation();
-  useAppWidth();
+  useAppWidth(standalone);
 
   if (lock) {
     return (
@@ -306,7 +306,7 @@ export const Content: FC<{
             path={any(AppRoute.settings)}
             element={
               <Suspense fallback={<SettingsSkeleton />}>
-                <Settings standalone={standalone} />
+                <Settings />
               </Suspense>
             }
           />

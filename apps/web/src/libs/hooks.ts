@@ -16,8 +16,14 @@ export const useAppHeight = () => {
   }, []);
 };
 
-export const useAppWidth = () => {
+export const useAppWidth = (standalone: boolean) => {
   useEffect(() => {
+    if (standalone) {
+      const doc = document.documentElement;
+      doc.style.setProperty('--app-width', `${window.innerWidth}px`);
+      return;
+    }
+
     const appWidth = throttle(() => {
       const doc = document.documentElement;
       const app = (
@@ -33,7 +39,7 @@ export const useAppWidth = () => {
     return () => {
       window.removeEventListener('resize', appWidth);
     };
-  }, []);
+  }, [standalone]);
 };
 
 export const useDisableFocusOnScroll = () => {

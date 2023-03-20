@@ -57,7 +57,7 @@ export const Body = styled.div<{ standalone: boolean }>`
     props.standalone &&
     css`
       overflow: auto;
-      width: 100%;
+      width: var(--app-width);
       box-sizing: border-box;
     `}
 `;

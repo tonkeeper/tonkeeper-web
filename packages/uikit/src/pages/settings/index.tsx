@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { SettingsHeader } from '../../components/Header';
+import { useAppContext } from '../../hooks/appContext';
 import { SettingsRoute } from '../../libs/routes';
 import { Body } from '../../styles/globalStyle';
 import { Account } from './Account';
@@ -15,7 +16,8 @@ import { Settings } from './Settings';
 import { UserTheme } from './Theme';
 import { WalletVersion } from './Version';
 
-const SettingsRouter: FC<{ standalone: boolean }> = ({ standalone }) => {
+const SettingsRouter = () => {
+  const { standalone } = useAppContext();
   return (
     <Routes>
       <Route
