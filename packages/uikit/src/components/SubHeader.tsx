@@ -2,11 +2,10 @@ import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 import { BackButton } from './fields/BackButton';
-import { useIsScrollTop } from './Header';
 import { ChevronLeftIcon } from './Icon';
 import { H3 } from './Text';
 
-const Block = styled.div<{ top: boolean }>`
+const Block = styled.div`
   flex-shrink: 0;
 
   padding: 1rem;
@@ -59,9 +58,8 @@ const Title = styled(H3)`
 
 export const SubHeader: FC<SubHeaderProps> = ({ title }) => {
   const navigate = useNavigate();
-  const top = useIsScrollTop();
   return (
-    <Block top={top}>
+    <Block>
       <BackButtonLeft onClick={() => navigate(-1)}>
         <ChevronLeftIcon />
       </BackButtonLeft>

@@ -15,7 +15,6 @@ import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1 } from './Text';
 
 const Block = styled.div<{
-  top: boolean;
   center?: boolean;
   second?: boolean;
 }>`
@@ -45,23 +44,21 @@ const Block = styled.div<{
     `}
 
   background-color: ${(props) => props.theme.backgroundPage};
-
-  ${(props) => !props.top && css``}
 `;
 
 export const HeaderGlobal = createGlobalStyle`
-      body:not(.top) ${Block} {
-        &:after {
-          content: '';
-          display: block;
-          width: 100%;
-          height: 1px;
-          background: ${(props) => props.theme.separatorCommon};
-          position: absolute;
-          top: 100%;
-          left: 0;
-        }
-      }
+  body:not(.top) ${Block} {
+    &:after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 1px;
+      background: ${(props) => props.theme.separatorCommon};
+      position: absolute;
+      top: 100%;
+      left: 0;
+    }
+  }
 `;
 
 const Title = styled(H3)`
@@ -218,9 +215,8 @@ export const Header = () => {
   const { t } = useTranslation();
   const wallet = useWalletContext();
   const [isOpen, setOpen] = useState(false);
-  const top = useIsScrollTop();
   return (
-    <Block top={top} center>
+    <Block center>
       <DropDown
         center
         payload={(onClose) => (
@@ -244,22 +240,20 @@ export const Header = () => {
 };
 
 export const ActivityHeader = () => {
-  const top = useIsScrollTop();
   const { t } = useTranslation();
 
   return (
-    <Block top={top} second>
+    <Block second>
       <H1>{t('Activity')}</H1>
     </Block>
   );
 };
 
 export const SettingsHeader = () => {
-  const top = useIsScrollTop();
   const { t } = useTranslation();
 
   return (
-    <Block top={top} second>
+    <Block second>
       <H1>{t('settings_title')}</H1>
     </Block>
   );
