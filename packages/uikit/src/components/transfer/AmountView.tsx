@@ -282,7 +282,6 @@ export const AmountView: FC<{
   data,
   jettons,
   info,
-  done,
 }) => {
   const { standalone } = useAppContext();
   const format = useFormatCoinValue();
