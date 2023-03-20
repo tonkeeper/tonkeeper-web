@@ -301,16 +301,10 @@ export const AmountView: FC<{
   const [max, setMax] = useState(data?.max ?? false);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (ref.current) {
-        ref.current.focus();
-        ref.current.setSelectionRange(0, 999);
-      }
-    }, 300);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [ref.current, jetton, done]);
+    if (ref.current) {
+      ref.current.focus();
+    }
+  }, [ref.current, jetton]);
 
   const { t } = useTranslation();
 
