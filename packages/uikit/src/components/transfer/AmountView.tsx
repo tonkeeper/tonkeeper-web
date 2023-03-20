@@ -300,7 +300,7 @@ export const AmountView: FC<{
   useEffect(() => {
     const timer = setTimeout(() => {
       ref.current && ref.current.focus();
-    }, duration);
+    }, duration * 2);
     return () => {
       clearTimeout(timer);
     };
