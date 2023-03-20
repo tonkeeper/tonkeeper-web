@@ -8,6 +8,7 @@ import { TonkeeperIcon } from '../Icon';
 import { Body3, Label2 } from '../Text';
 
 const Block = styled.div`
+  user-select: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,9 +25,6 @@ const Version = styled(Body3)`
   user-select: none;
 `;
 
-const Text = styled(Label2)`
-  user-select: none;
-`;
 const Icon = styled.span`
   margin-bottom: 0.25rem;
 `;
@@ -50,7 +48,7 @@ export const SettingsNetwork: FC = () => {
       <Icon onClick={onChange}>
         <TonkeeperIcon width="33" height="33" />
       </Icon>
-      <Text>Tonkeeper X</Text>
+      <Label2>Tonkeeper Web</Label2>
       <Version
         onClick={() => sdk.copyToClipboard(version, t('App_version_copied'))}
       >
