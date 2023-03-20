@@ -1,7 +1,7 @@
 import { throttle, toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute } from '../libs/routes';
@@ -46,20 +46,22 @@ const Block = styled.div<{
 
   background-color: ${(props) => props.theme.backgroundPage};
 
-  ${(props) =>
-    !props.top &&
-    css`
-      &:after {
-        content: '';
-        display: block;
-        width: 100%;
-        height: 1px;
-        background: ${(props) => props.theme.separatorCommon};
-        position: absolute;
-        top: 100%;
-        left: 0;
+  ${(props) => !props.top && css``}
+`;
+
+export const HeaderGlobal = createGlobalStyle`
+      body:not(.top) ${Block} {
+        &:after {
+          content: '';
+          display: block;
+          width: 100%;
+          height: 1px;
+          background: ${(props) => props.theme.separatorCommon};
+          position: absolute;
+          top: 100%;
+          left: 0;
+        }
       }
-    `}
 `;
 
 const Title = styled(H3)`

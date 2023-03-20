@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { BackButton } from './fields/BackButton';
 import { useIsScrollTop } from './Header';
 import { ChevronLeftIcon } from './Icon';
@@ -24,21 +24,21 @@ const Block = styled.div<{ top: boolean }>`
   background: ${(props) => props.theme.backgroundPage};
 
   margin: 0 -1rem;
+`;
 
-  ${(props) =>
-    !props.top &&
-    css`
-      &:after {
-        content: '';
-        display: block;
-        width: 100%;
-        height: 1px;
-        background: ${(props) => props.theme.separatorCommon};
-        position: absolute;
-        top: 100%;
-        left: 0;
+export const SybHeaderGlobalStyle = createGlobalStyle`
+      body:not(.top) ${Block} {
+        &:after {
+          content: '';
+          display: block;
+          width: 100%;
+          height: 1px;
+          background: ${(props) => props.theme.separatorCommon};
+          position: absolute;
+          top: 100%;
+          left: 0;
+        }
       }
-    `}
 `;
 
 export const BackButtonLeft = styled(BackButton)`

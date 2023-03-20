@@ -9,7 +9,7 @@ import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer } from '@tonkeeper/uikit/dist/components/Footer';
-import { Header } from '@tonkeeper/uikit/dist/components/Header';
+import { Header, HeaderGlobal } from '@tonkeeper/uikit/dist/components/Header';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import {
@@ -18,6 +18,7 @@ import {
   HomeSkeleton,
   SettingsSkeleton,
 } from '@tonkeeper/uikit/dist/components/Skeleton';
+import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import {
   AnalyticsContext,
   useAnalyticsScreenView,
@@ -38,6 +39,7 @@ import {
   I18nContext,
   TranslationContext,
 } from '@tonkeeper/uikit/dist/hooks/translation';
+import { useAppScroll } from '@tonkeeper/uikit/dist/hooks/useFetchNext';
 import { any, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -61,6 +63,7 @@ import React, {
   Suspense,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -130,6 +133,8 @@ export const App: FC<PropsWithChildren> = () => {
               <TranslationContext.Provider value={translation}>
                 <StorageContext.Provider value={storage}>
                   <UserThemeProvider>
+                    <HeaderGlobal />
+                    <SybHeaderGlobalStyle />
                     <Loader />
                     <UnlockNotification sdk={sdk} />
                   </UserThemeProvider>
@@ -276,8 +281,10 @@ export const Content: FC<{
   lock: boolean;
   standalone: boolean;
 }> = ({ activeWallet, lock, standalone }) => {
+  const ref = useRef<HTMLDivElement>(null);
   const location = useLocation();
   useAppWidth(standalone);
+  useAppScroll(standalone, ref);
 
   if (lock) {
     return (
@@ -326,7 +333,7 @@ export const Content: FC<{
             <Route
               path=":name"
               element={
-                <Body>
+                <Body ref={ref}>
                   <Suspense fallback={<CoinSkeleton />}>
                     <Coin />
                   </Suspense>
@@ -339,7 +346,7 @@ export const Content: FC<{
             element={
               <>
                 <Header />
-                <Body>
+                <Body ref={ref}>
                   <Suspense fallback={<HomeSkeleton />}>
                     <Home />
                   </Suspense>
