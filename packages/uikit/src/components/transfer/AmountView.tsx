@@ -304,7 +304,7 @@ export const AmountView: FC<{
     return () => {
       clearTimeout(timer);
     };
-  }, [ref, jetton]);
+  }, [ref.current, jetton]);
 
   const { t } = useTranslation();
 
