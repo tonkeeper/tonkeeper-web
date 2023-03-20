@@ -18,8 +18,6 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
   asset = CryptoCurrency.TON,
 }) => {
-  const [done, setDone] = useState(true);
-
   const { standalone } = useAppContext();
   const { t } = useTranslation();
   const { data: jettons } = useWalletJettonList();
@@ -74,11 +72,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
           nodeRef={nodeRef}
           classNames="right-to-left"
           addEndListener={(done) => {
-            setDone(false);
-            setTimeout(() => {
-              done();
-              setDone(true);
-            }, duration);
+            setTimeout(done, duration);
           }}
         >
           <div ref={nodeRef}>
@@ -101,7 +95,6 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 info={info}
                 recipient={recipient!}
                 setAmount={onAmount}
-                done={done}
               />
             )}
             {state === 'confirm' && (
