@@ -7,7 +7,6 @@ import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
 import { Notification, NotificationBlock } from '../Notification';
-import { H2 } from '../Text';
 
 const Block = styled.div`
   display: flex;
@@ -26,9 +25,6 @@ const useUpdatePassword = () => {
   >((options) => accountChangePassword(storage, options));
 };
 
-const ModalBlock = styled(NotificationBlock)`
-  margin-bottom: 3rem;
-`;
 const ChangePasswordContent: FC<{ handleClose: () => void }> = ({
   handleClose,
 }) => {
@@ -55,9 +51,7 @@ const ChangePasswordContent: FC<{ handleClose: () => void }> = ({
   };
 
   return (
-    <ModalBlock onSubmit={onUpdate}>
-      <H2>{t('Change_password')}</H2>
-
+    <NotificationBlock onSubmit={onUpdate}>
       <Input
         type="password"
         label={t('Old_password')}
@@ -96,13 +90,14 @@ const ChangePasswordContent: FC<{ handleClose: () => void }> = ({
         size="large"
         fullWidth
         primary
+        marginTop
         type="submit"
         loading={isLoading}
         disabled={isLoading || error != null}
       >
         {t('Change')}
       </Button>
-    </ModalBlock>
+    </NotificationBlock>
   );
 };
 
@@ -110,12 +105,19 @@ export const ChangePasswordNotification: FC<{
   isOpen: boolean;
   handleClose: () => void;
 }> = ({ isOpen, handleClose }) => {
+  const { t } = useTranslation();
+
   const Content = useCallback((onClose: () => void) => {
     return <ChangePasswordContent handleClose={onClose} />;
   }, []);
 
   return (
-    <Notification isOpen={isOpen} handleClose={handleClose}>
+    <Notification
+      isOpen={isOpen}
+      handleClose={handleClose}
+      title={t('Change_password')}
+      hideButton
+    >
       {Content}
     </Notification>
   );
