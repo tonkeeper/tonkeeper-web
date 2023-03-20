@@ -298,9 +298,12 @@ export const AmountView: FC<{
     }
   }, [refBlock.current]);
 
+  const [max, setMax] = useState(data?.max ?? false);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (ref.current) {
+        setMax(true);
         ref.current.focus();
       }
     }, 300);
@@ -310,8 +313,6 @@ export const AmountView: FC<{
   }, [ref.current, jetton, done]);
 
   const { t } = useTranslation();
-
-  const [max, setMax] = useState(data?.max ?? false);
 
   const suffix = getJettonSymbol(jetton, jettons);
 
