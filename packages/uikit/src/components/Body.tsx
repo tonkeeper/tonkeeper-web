@@ -34,7 +34,7 @@ const removeBottom = () => {
 
 export const useWindowsScroll = () => {
   const sdk = useAppSdk();
-  const { standalone } = useAppContext();
+  const { standalone, ios } = useAppContext();
   useLayoutEffect(() => {
     if (standalone) {
       return;
@@ -57,13 +57,14 @@ export const useWindowsScroll = () => {
         setTop();
       }
 
-      //   clearTimeout(timer);
-      //   if (!document.body.classList.contains('disable-hover')) {
-      //     document.body.classList.add('disable-hover');
-      //   }
-      //   timer = setTimeout(function () {
-      //     document.body.classList.remove('disable-hover');
-      //   }, 500);
+      if (ios) return;
+      clearTimeout(timer);
+      if (!document.body.classList.contains('disable-hover')) {
+        document.body.classList.add('disable-hover');
+      }
+      timer = setTimeout(function () {
+        document.body.classList.remove('disable-hover');
+      }, 500);
     }, 50);
 
     window.addEventListener('scroll', handler);
