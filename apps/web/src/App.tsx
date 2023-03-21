@@ -21,7 +21,6 @@ import {
   HeaderGlobalStyle,
 } from '@tonkeeper/uikit/dist/components/Header';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
-import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import {
   ActivitySkeletonPage,
   CoinSkeletonPage,
@@ -357,7 +356,7 @@ export const Content: FC<{
           />
         </Routes>
         <Footer />
-        <MemoryScroll />
+        {/* <MemoryScroll /> */}
       </WalletStateContext.Provider>
     </Wrapper>
   );
