@@ -225,13 +225,6 @@ const useButtonPosition = (
       }
     }
 
-    function subscribe() {
-      const viewport = window.visualViewport;
-      if (viewport) {
-        viewport.addEventListener('resize', resizeHandler);
-      }
-    }
-
     function blurHandler() {
       const viewport = window.visualViewport;
       if (viewport) {
@@ -244,7 +237,11 @@ const useButtonPosition = (
       });
     }
 
-    subscribe();
+    const viewport = window.visualViewport;
+    if (viewport) {
+      resizeHandler.call(viewport);
+      viewport.addEventListener('resize', resizeHandler);
+    }
 
     return () => {
       blurHandler();
