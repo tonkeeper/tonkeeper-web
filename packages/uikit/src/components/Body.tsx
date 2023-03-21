@@ -93,7 +93,7 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       if (!element) return;
       if (!standalone) return;
 
-      let timer: NodeJS.Timeout | undefined;
+      // let timer: NodeJS.Timeout | undefined;
 
       const handler = throttle(() => {
         if (element.scrollTop < 10) {
@@ -109,13 +109,13 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         } else {
           setBottom();
         }
-        clearTimeout(timer);
-        if (!document.body.classList.contains('disable-hover')) {
-          document.body.classList.add('disable-hover');
-        }
-        timer = setTimeout(function () {
-          document.body.classList.remove('disable-hover');
-        }, 500);
+        // clearTimeout(timer);
+        // if (!document.body.classList.contains('disable-hover')) {
+        //   document.body.classList.add('disable-hover');
+        // }
+        // timer = setTimeout(function () {
+        //   document.body.classList.remove('disable-hover');
+        // }, 500);
       }, 50);
 
       element.addEventListener('scroll', handler);
