@@ -31,6 +31,12 @@ body {
       box-sizing: border-box;
   }
 
+  html.hidden,
+  html.hidden body {
+    height: calc(var(--app-height) - 1px);
+    overflow: hidden;
+    box-sizing: border-box;
+  }
 
   .disable-hover {
     pointer-events: none;

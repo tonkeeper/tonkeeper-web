@@ -35,7 +35,10 @@ export const useWindowsScroll = () => {
   const sdk = useAppSdk();
   const { standalone } = useAppContext();
   useLayoutEffect(() => {
-    if (standalone) return;
+    if (standalone) {
+      document.documentElement.className = 'hidden';
+      return;
+    }
 
     let timer: NodeJS.Timeout | undefined;
 
@@ -93,9 +96,9 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       if (!element) return;
       if (!standalone) return;
 
-      // let timer: NodeJS.Timeout | undefined;
+      let timer: NodeJS.Timeout | undefined;
 
-      const handler = throttle(() => {
+      const handlerScroll = throttle(() => {
         if (element.scrollTop < 10) {
           setTop();
         } else {
@@ -109,25 +112,25 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         } else {
           setBottom();
         }
-        // clearTimeout(timer);
-        // if (!document.body.classList.contains('disable-hover')) {
-        //   document.body.classList.add('disable-hover');
-        // }
-        // timer = setTimeout(function () {
-        //   document.body.classList.remove('disable-hover');
-        // }, 500);
+        clearTimeout(timer);
+        if (!document.body.classList.contains('disable-hover')) {
+          document.body.classList.add('disable-hover');
+        }
+        timer = setTimeout(function () {
+          document.body.classList.remove('disable-hover');
+        }, 500);
       }, 50);
 
-      element.addEventListener('scroll', handler);
-      sdk.uiEvents.on('loading', handler);
+      element.addEventListener('scroll', handlerScroll);
+      sdk.uiEvents.on('loading', handlerScroll);
 
-      handler();
+      handlerScroll();
 
       return () => {
         setTop();
         setBottom();
-        element.removeEventListener('scroll', handler);
-        sdk.uiEvents.off('loading', handler);
+        element.removeEventListener('scroll', handlerScroll);
+        sdk.uiEvents.off('loading', handlerScroll);
       };
     }, [elementRef]);
 
