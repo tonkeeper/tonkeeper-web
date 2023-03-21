@@ -127,11 +127,48 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
 
       handlerScroll();
 
+      var lastY = 0;
+
+      const handlerTouchStart = function (event: TouchEvent) {
+        lastY = event.touches[0].clientY;
+      };
+
+      const handlerTouchMove = function (event: TouchEvent) {
+        var top = event.touches[0].clientY;
+
+        if (!event.currentTarget) return;
+
+        var scrollTop = element.scrollTop;
+
+        let style = window.getComputedStyle(element);
+        let outerHeight = ['height', 'padding-top', 'padding-bottom']
+          .map((key) => parseInt(style.getPropertyValue(key), 10))
+          .reduce((prev, cur) => prev + cur);
+
+        var maxScrollTop = element.scrollHeight - outerHeight;
+        var direction = lastY - top < 0 ? 'up' : 'down';
+
+        if (
+          event.cancelable &&
+          ((scrollTop <= 0 && direction === 'up') ||
+            (scrollTop >= maxScrollTop && direction === 'down'))
+        )
+          event.preventDefault();
+
+        lastY = top;
+      };
+
+      element.addEventListener('touchstart', handlerTouchStart);
+      element.addEventListener('touchmove', handlerTouchMove);
+
       return () => {
         setTop();
         setBottom();
-        element.removeEventListener('scroll', handlerScroll);
         sdk.uiEvents.off('loading', handlerScroll);
+
+        element.removeEventListener('scroll', handlerScroll);
+        element.removeEventListener('touchstart', handlerTouchStart);
+        element.removeEventListener('touchmove', handlerTouchMove);
       };
     }, [elementRef]);
 
