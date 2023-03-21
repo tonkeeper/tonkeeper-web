@@ -20,6 +20,7 @@ import {
   Header,
   HeaderGlobalStyle,
 } from '@tonkeeper/uikit/dist/components/Header';
+import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import {
   ActivitySkeletonPage,
@@ -139,6 +140,7 @@ export const App: FC<PropsWithChildren> = () => {
                     <HeaderGlobalStyle />
                     <FooterGlobalStyle />
                     <SybHeaderGlobalStyle />
+                    <GlobalListStyle />
                     <Loader />
                     <UnlockNotification sdk={sdk} />
                   </UserThemeProvider>

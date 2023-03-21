@@ -1,5 +1,5 @@
 import React, { FC, PropsWithChildren } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppContext } from '../hooks/appContext';
 
 export const ListBlock = styled.div<{
@@ -121,6 +121,12 @@ export const ListItemElement = styled.div<{
   }
 `;
 
+export const GlobalListStyle = createGlobalStyle`
+  body:not(.disable-hover) ${ListItemElement}:hover,
+  body:not(.disable-hover) ${ListItemElement}:active {
+    
+  }
+`;
 export const ListItem: FC<
   PropsWithChildren<
     { hover?: boolean; dropDown?: boolean } & Omit<
