@@ -62,8 +62,12 @@ export const useWindowsScroll = () => {
       if (!document.body.classList.contains('disable-hover')) {
         document.body.classList.add('disable-hover');
       }
+      if (!document.body.classList.contains('scroll')) {
+        document.body.classList.add('scroll');
+      }
       timer = setTimeout(function () {
         document.body.classList.remove('disable-hover');
+        document.body.classList.remove('scroll');
       }, 500);
     }, 50);
 
