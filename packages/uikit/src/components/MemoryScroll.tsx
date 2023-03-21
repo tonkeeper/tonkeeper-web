@@ -54,11 +54,9 @@ class ScrollMemory extends Component<ScrollProps> {
 
     if (locationChanged) {
       const scroll = getScrollPage();
-      console.log('scroll', scroll);
       this.url.set(actual.pathname, scroll);
 
       const nextScroll = this.url.get(next.pathname);
-      console.log('nextScroll', nextScroll);
       scrollTo(nextScroll ?? 0);
     }
     return false;
