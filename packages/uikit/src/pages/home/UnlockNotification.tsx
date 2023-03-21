@@ -115,9 +115,15 @@ const PasswordUnlock: FC<{
     if (ref.current) {
       ref.current.focus();
       if (sdk.isIOs()) {
-        setTimeout(() => {
-          document.body.scrollIntoView({ block: 'end', behavior: 'smooth' });
-        }, 300);
+        const element = document.getElementById('react-portal-modal-container');
+        if (element && element.lastChild) {
+          setTimeout(() => {
+            (element.lastChild as Element).children[0].scrollIntoView({
+              block: 'end',
+              behavior: 'smooth',
+            });
+          }, 300);
+        }
       }
     }
   }, [ref.current]);
