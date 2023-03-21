@@ -118,7 +118,7 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         // }, 500);
       }, 50);
 
-      //   element.addEventListener('scroll', handler);
+      element.addEventListener('scroll', handler);
       sdk.uiEvents.on('loading', handler);
 
       handler();
