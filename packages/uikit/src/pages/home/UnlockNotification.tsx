@@ -14,6 +14,7 @@ import styled from 'styled-components';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
 import { Notification } from '../../components/Notification';
+import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 
 export const getPasswordByNotification = async (
@@ -100,7 +101,7 @@ const PasswordUnlock: FC<{
   reason?: GetPasswordType;
 }> = ({ sdk, onClose, onSubmit, isError, isLoading, reason }) => {
   const { t } = useTranslation();
-
+  const { ios } = useAppContext();
   const ref = useRef<HTMLInputElement | null>(null);
   const [password, setPassword] = useState('');
   const [active, setActive] = useState(false);
@@ -119,6 +120,11 @@ const PasswordUnlock: FC<{
   useEffect(() => {
     if (ref.current) {
       ref.current.focus();
+      if (ios) {
+        setTimeout(() => {
+          document.body.scrollIntoView({ block: 'end', behavior: 'smooth' });
+        }, 300);
+      }
     }
   }, [ref.current]);
 
