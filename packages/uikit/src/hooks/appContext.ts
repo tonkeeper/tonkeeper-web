@@ -45,3 +45,7 @@ export const WalletStateContext = React.createContext<WalletState>(undefined!);
 export const useWalletContext = () => {
   return useContext(WalletStateContext);
 };
+
+export const AppSelectionContext = React.createContext<EventTarget | null>(
+  null
+);

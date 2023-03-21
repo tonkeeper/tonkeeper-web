@@ -1,7 +1,12 @@
 import { throttle } from '@tonkeeper/core/dist/utils/common';
-import React, { PropsWithChildren, useLayoutEffect, useRef } from 'react';
+import React, {
+  PropsWithChildren,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components';
-import { useAppContext } from '../hooks/appContext';
+import { AppSelectionContext, useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 
 const BodyElement = styled.div`
@@ -62,12 +67,12 @@ export const useWindowsScroll = () => {
       if (!document.body.classList.contains('disable-hover')) {
         document.body.classList.add('disable-hover');
       }
-      if (!document.body.classList.contains('scroll')) {
-        document.body.classList.add('scroll');
-      }
+      //   if (!document.body.classList.contains('scroll')) {
+      //     document.body.classList.add('scroll');
+      //   }
       timer = setTimeout(function () {
         document.body.classList.remove('disable-hover');
-        document.body.classList.remove('scroll');
+        // document.body.classList.remove('scroll');
       }, 500);
     }, 50);
 
@@ -83,6 +88,63 @@ export const useWindowsScroll = () => {
       sdk.uiEvents.off('loading', handler);
     };
   }, [standalone]);
+};
+
+export const useAppSelection = (
+  elementRef: React.MutableRefObject<HTMLDivElement | null>
+) => {
+  const [selection, setSelection] = useState<EventTarget | null>(null);
+
+  useLayoutEffect(() => {
+    const element = elementRef.current;
+    if (!element) return;
+
+    let timer: NodeJS.Timeout | undefined = undefined;
+    let scrollTimer: NodeJS.Timeout | undefined = undefined;
+    let scroll = false;
+
+    const handlerScroll = () => {
+      scroll = true;
+      scrollTimer = setTimeout(() => {
+        scroll = false;
+      }, 300);
+    };
+
+    const handlerTouchUp = () => {
+      clearTimeout(timer);
+      setSelection(null);
+    };
+
+    const handlerTouchStart = (ev: TouchEvent) => {
+      if (ev.touches.length > 1) return;
+      timer = setTimeout(() => {
+        setSelection(ev.target);
+      }, 100);
+    };
+
+    const handlerTouchMove = throttle(() => {
+      handlerTouchUp();
+    }, 50);
+
+    element.addEventListener('scroll', handlerScroll);
+
+    window.addEventListener('touchstart', handlerTouchStart);
+    window.addEventListener('touchmove', handlerTouchMove);
+    window.addEventListener('touchend', handlerTouchUp);
+    window.addEventListener('touchcancel', handlerTouchUp);
+
+    return () => {
+      clearTimeout(scrollTimer);
+      clearTimeout(timer);
+      element.removeEventListener('scroll', handlerScroll);
+      window.removeEventListener('touchstart', handlerTouchStart);
+      window.removeEventListener('touchmove', handlerTouchMove);
+      window.removeEventListener('touchend', handlerTouchUp);
+      window.removeEventListener('touchcancel', handlerTouchUp);
+    };
+  }, [elementRef]);
+
+  return selection;
 };
 
 export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
@@ -173,10 +235,14 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       };
     }, [elementRef]);
 
+    const selection = useAppSelection(elementRef);
     const id = standalone ? 'body' : undefined;
+
     return (
       <BodyElement ref={elementRef} id={id}>
-        {children}
+        <AppSelectionContext.Provider value={selection}>
+          {children}
+        </AppSelectionContext.Provider>
       </BodyElement>
     );
   }

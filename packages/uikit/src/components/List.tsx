@@ -1,13 +1,13 @@
-import { throttle } from '@tonkeeper/core/dist/utils/common';
 import React, {
   FC,
   PropsWithChildren,
+  useContext,
   useLayoutEffect,
   useRef,
   useState,
 } from 'react';
 import styled, { createGlobalStyle, css } from 'styled-components';
-import { useAppContext } from '../hooks/appContext';
+import { AppSelectionContext, useAppContext } from '../hooks/appContext';
 
 export const ListBlock = styled.div<{
   margin?: boolean;
@@ -144,51 +144,19 @@ export const ListItem: FC<
     >
   >
 > = ({ children, hover, dropDown, ...props }) => {
-  const { ios, standalone } = useAppContext();
+  const selection = useContext(AppSelectionContext);
+  const { ios } = useAppContext();
   const [isHover, setHover] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const element = ref.current;
-    if (!ios) return;
-    if (!element) return;
-
-    let timer: NodeJS.Timeout | undefined = undefined;
-
-    const handlerTouchUp = () => {
-      clearTimeout(timer);
+    if (selection && ref.current && ref.current.contains(selection as Node)) {
+      setHover(true);
+    } else {
       setHover(false);
-      element.removeEventListener('touchmove', handlerTouchMove);
-      window.removeEventListener('touchend', handlerTouchUp);
-      window.removeEventListener('touchcancel', handlerTouchUp);
-    };
+    }
+  }, [ref.current, selection, setHover]);
 
-    const handlerTouchStart = (ev: TouchEvent) => {
-      if (ev.touches.length > 1) return;
-      timer = setTimeout(() => {
-        setHover(true);
-      }, 100);
-      element.addEventListener('touchmove', handlerTouchMove);
-      window.addEventListener('touchend', handlerTouchUp);
-      window.addEventListener('touchcancel', handlerTouchUp);
-    };
-
-    const handlerTouchMove = throttle(() => {
-      if (document.body.classList.contains('scroll')) {
-        handlerTouchUp();
-      }
-    }, 50);
-
-    element.addEventListener('touchstart', handlerTouchStart);
-
-    return () => {
-      clearTimeout(timer);
-      element.removeEventListener('touchstart', handlerTouchStart);
-      element.removeEventListener('touchmove', handlerTouchMove);
-      window.removeEventListener('touchend', handlerTouchUp);
-      window.removeEventListener('touchcancel', handlerTouchUp);
-    };
-  }, [ref.current, setHover]);
   return (
     <ListItemElement
       hover={hover}
