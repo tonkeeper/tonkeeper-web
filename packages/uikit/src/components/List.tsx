@@ -77,7 +77,7 @@ export const ListItemElement = styled.div<{
   hover?: boolean;
   dropDown?: boolean;
   ios: boolean;
-  isHover: boolean;
+  isHover?: boolean;
 }>`
   display: flex;
   padding: 0 0 0 1rem;
