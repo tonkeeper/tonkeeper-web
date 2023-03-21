@@ -165,7 +165,7 @@ export const Footer = () => {
           });
         } else {
           window.requestAnimationFrame(() => {
-            window.scrollTo(0, 0);
+            window.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
           });
         }
       }
