@@ -167,7 +167,7 @@ export const ListItem: FC<
       if (ev.touches.length > 1) return;
       timer = setTimeout(() => {
         setHover(true);
-      }, 200);
+      }, 100);
       element.addEventListener('touchmove', handlerTouchMove);
       window.addEventListener('touchend', handlerTouchUp);
       window.addEventListener('touchcancel', handlerTouchUp);
