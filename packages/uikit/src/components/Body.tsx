@@ -7,6 +7,7 @@ import { useAppSdk } from '../hooks/appSdk';
 const BodyElement = styled.div`
   flex-grow: 1;
   padding: 0 1rem;
+  -webkit-overflow-scrolling: touch;
 `;
 
 const setTop = () => {
