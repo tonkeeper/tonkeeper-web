@@ -152,6 +152,7 @@ export const Footer = () => {
 
   const handleClick = useCallback(
     (route: AppRoute) => {
+      console.log(location.pathname, route);
       if (location.pathname !== route) {
         return navigate(route);
       }
@@ -159,7 +160,8 @@ export const Footer = () => {
         const body = document.getElementById('body');
         if (body) {
           window.requestAnimationFrame(() => {
-            body.scrollTo(0, 0);
+            const first = body.childNodes.item(0) as HTMLElement;
+            first.scrollIntoView({ behavior: 'smooth' });
           });
         } else {
           window.requestAnimationFrame(() => {
