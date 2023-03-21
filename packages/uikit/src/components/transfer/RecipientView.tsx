@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
+import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { ButtonMock } from '../fields/BackButton';
@@ -107,7 +108,7 @@ export const RecipientView: FC<{
   const sdk = useAppSdk();
   const [submitted, setSubmit] = useState(false);
   const { t } = useTranslation();
-  const { standalone } = useAppContext();
+  const { standalone, ios } = useAppContext();
   const ref = useRef<HTMLInputElement | null>(null);
 
   const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
@@ -178,12 +179,14 @@ export const RecipientView: FC<{
     e.preventDefault();
     setSubmit(true);
     if (isValid && isMemoValid && toAccount) {
+      if (ios) openIosKeyboard();
       setRecipient({ address: recipient, toAccount, comment, done: true });
     }
   };
 
   const onSelect = async (item: Suggestion) => {
     setAddress(item);
+    if (ios) openIosKeyboard();
     const toAccount = await getAccountAsync(item);
     if (toAccount.memoRequired) return;
     setRecipient({
