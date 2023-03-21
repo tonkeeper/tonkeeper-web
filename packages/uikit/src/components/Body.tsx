@@ -37,7 +37,6 @@ export const useWindowsScroll = () => {
   const { standalone } = useAppContext();
   useLayoutEffect(() => {
     if (standalone) {
-      document.documentElement.className = 'hidden';
       return;
     }
 
