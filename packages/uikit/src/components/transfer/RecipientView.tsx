@@ -104,7 +104,15 @@ export const RecipientView: FC<{
   allowComment?: boolean;
   onClose: () => void;
   setRecipient: (options: RecipientData) => void;
-}> = ({ title, data, onClose, setRecipient, allowComment = true }) => {
+  keyboard?: 'decimal';
+}> = ({
+  title,
+  data,
+  onClose,
+  setRecipient,
+  allowComment = true,
+  keyboard,
+}) => {
   const sdk = useAppSdk();
   const [submitted, setSubmit] = useState(false);
   const { t } = useTranslation();
@@ -179,14 +187,14 @@ export const RecipientView: FC<{
     e.preventDefault();
     setSubmit(true);
     if (isValid && isMemoValid && toAccount) {
-      if (ios) openIosKeyboard();
+      if (ios && keyboard) openIosKeyboard(keyboard);
       setRecipient({ address: recipient, toAccount, comment, done: true });
     }
   };
 
   const onSelect = async (item: Suggestion) => {
     setAddress(item);
-    if (ios) openIosKeyboard();
+    if (ios && keyboard) openIosKeyboard(keyboard);
     const toAccount = await getAccountAsync(item);
     if (toAccount.memoRequired) return;
     setRecipient({

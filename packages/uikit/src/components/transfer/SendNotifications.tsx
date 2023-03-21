@@ -83,6 +83,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 onClose={onClose}
                 setRecipient={onRecipient}
                 allowComment={asset === CryptoCurrency.TON}
+                keyboard="decimal"
               />
             )}
             {state === 'amount' && (
