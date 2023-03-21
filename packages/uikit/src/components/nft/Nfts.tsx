@@ -1,6 +1,13 @@
 import { NftItemRepr, NftItemsRepr } from '@tonkeeper/core/dist/tonApiV1';
-import React, { FC, useState } from 'react';
+import React, {
+  FC,
+  useContext,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import styled, { css } from 'styled-components';
+import { AppSelectionContext } from '../../hooks/appContext';
 import { NftCollectionBody3, NftHeaderLabel2 } from './NftHeader';
 import { NftNotification } from './NftNotification';
 
@@ -11,7 +18,7 @@ const Grid = styled.div`
   grid-template-columns: repeat(3, minmax(0, 1fr));
 `;
 
-export const NftBlock = styled.div<{ hover?: boolean }>`
+export const NftBlock = styled.div<{ hover?: boolean; isHover?: boolean }>`
   user-select: none;
   width: 100%;
   display: flex;
@@ -24,16 +31,22 @@ export const NftBlock = styled.div<{ hover?: boolean }>`
 
   overflow: hidden;
 
-  ${(props) =>
-    props.hover
-      ? css`
-          cursor: pointer;
+  ${(props) => {
+    if (!props.hover) return undefined;
+    if (props.isHover) {
+      return css`
+        background-color: ${props.theme.backgroundContentTint};
+      `;
+    } else {
+      return css`
+        cursor: pointer;
 
-          &:hover {
-            background-color: ${props.theme.backgroundContentTint};
-          }
-        `
-      : undefined}
+        &:hover {
+          background-color: ${props.theme.backgroundContentTint};
+        }
+      `;
+    }
+  }}
 `;
 
 export const Image = styled.div<{ url?: string }>`
@@ -62,8 +75,19 @@ export const NftItem: FC<{
 }> = React.memo(({ nft, resolution, onOpen }) => {
   const image = nft.previews?.find((item) => item.resolution === resolution);
 
+  const [isHover, setHover] = useState<boolean>(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selection = useContext(AppSelectionContext);
+  useLayoutEffect(() => {
+    if (ref.current && selection && ref.current.contains(selection as Node)) {
+      setHover(true);
+    } else {
+      setHover(false);
+    }
+  }, [ref.current, selection, setHover]);
+
   return (
-    <NftBlock hover onClick={() => onOpen(nft)}>
+    <NftBlock hover isHover={isHover} ref={ref} onClick={() => onOpen(nft)}>
       <Image url={image?.url} />
       <Text>
         <NftHeaderLabel2 nft={nft} />
