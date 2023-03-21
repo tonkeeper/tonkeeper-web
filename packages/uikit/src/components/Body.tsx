@@ -97,6 +97,7 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       if (!standalone) return;
 
       let timer: NodeJS.Timeout | undefined;
+      var lastY = 0;
 
       const handlerScroll = throttle(() => {
         if (element.scrollTop < 10) {
@@ -126,16 +127,12 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
 
       handlerScroll();
 
-      var lastY = 0;
-
       const handlerTouchStart = function (event: TouchEvent) {
         lastY = event.touches[0].clientY;
       };
 
       const handlerTouchMove = function (event: TouchEvent) {
         var top = event.touches[0].clientY;
-
-        if (!event.currentTarget) return;
 
         var scrollTop = element.scrollTop;
 
@@ -157,8 +154,8 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         lastY = top;
       };
 
-      element.addEventListener('touchstart', handlerTouchStart);
-      element.addEventListener('touchmove', handlerTouchMove);
+      //   element.addEventListener('touchstart', handlerTouchStart);
+      //   element.addEventListener('touchmove', handlerTouchMove);
 
       return () => {
         setTop();
@@ -166,8 +163,8 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         sdk.uiEvents.off('loading', handlerScroll);
 
         element.removeEventListener('scroll', handlerScroll);
-        element.removeEventListener('touchstart', handlerTouchStart);
-        element.removeEventListener('touchmove', handlerTouchMove);
+        // element.removeEventListener('touchstart', handlerTouchStart);
+        // element.removeEventListener('touchmove', handlerTouchMove);
       };
     }, [elementRef]);
 
