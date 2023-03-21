@@ -188,7 +188,7 @@ export const ListItem: FC<
       window.removeEventListener('touchend', handlerTouchUp);
       window.removeEventListener('touchcancel', handlerTouchUp);
     };
-  }, [ref.current]);
+  }, [ref.current, setHover]);
   return (
     <ListItemElement
       hover={hover}
