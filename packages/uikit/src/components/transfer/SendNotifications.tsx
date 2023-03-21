@@ -3,6 +3,7 @@ import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext } from '../../hooks/appContext';
+import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
@@ -18,7 +19,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
   asset = CryptoCurrency.TON,
 }) => {
-  const { standalone } = useAppContext();
+  const { standalone, ios } = useAppContext();
   const { t } = useTranslation();
   const { data: jettons } = useWalletJettonList();
   const { data: info } = useWalletAccountInfo();
@@ -50,6 +51,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   }, [setRecipient]);
 
   const backToAmount = useCallback(() => {
+    if (ios) openIosKeyboard('decimal');
     setRight(false);
     setAmount((value) => (value ? { ...value, done: false } : undefined));
   }, [setAmount]);
