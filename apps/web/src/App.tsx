@@ -84,11 +84,7 @@ import {
 } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
-import {
-  useAppHeight,
-  useAppWidth,
-  useDisableFocusOnScroll,
-} from './libs/hooks';
+import { useAppHeight, useAppWidth } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
 
 const ImportRouter = React.lazy(
@@ -230,7 +226,6 @@ export const Loader: FC = () => {
 
   const navigate = useNavigate();
   useAppHeight();
-  useDisableFocusOnScroll();
 
   useAnalyticsScreenView();
   useFBAnalyticsEvent('session_start');
