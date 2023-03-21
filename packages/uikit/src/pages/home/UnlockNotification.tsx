@@ -14,7 +14,6 @@ import styled from 'styled-components';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
 import { Notification } from '../../components/Notification';
-import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 
 export const getPasswordByNotification = async (
@@ -51,7 +50,7 @@ export const getPasswordByNotification = async (
   });
 };
 
-const Block = styled.form<{ padding: number }>`
+const Block = styled.form`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -59,8 +58,6 @@ const Block = styled.form<{ padding: number }>`
   justify-content: center;
   gap: 2rem;
   width: 100%;
-
-  padding-bottom: ${(props) => props.padding}px;
 `;
 
 const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
@@ -101,13 +98,10 @@ const PasswordUnlock: FC<{
   reason?: GetPasswordType;
 }> = ({ sdk, onClose, onSubmit, isError, isLoading, reason }) => {
   const { t } = useTranslation();
-  const { ios } = useAppContext();
   const ref = useRef<HTMLInputElement | null>(null);
   const [password, setPassword] = useState('');
   const [active, setActive] = useState(false);
   const location = useLocation();
-
-  const [padding, setPadding] = useState(0);
 
   useEffect(() => {
     if (!active) {
@@ -120,7 +114,7 @@ const PasswordUnlock: FC<{
   useEffect(() => {
     if (ref.current) {
       ref.current.focus();
-      if (ios) {
+      if (sdk.isIOs()) {
         setTimeout(() => {
           document.body.scrollIntoView({ block: 'end', behavior: 'smooth' });
         }, 300);
@@ -138,7 +132,7 @@ const PasswordUnlock: FC<{
   };
 
   return (
-    <Block onSubmit={handleSubmit} padding={padding}>
+    <Block onSubmit={handleSubmit}>
       <Input
         ref={ref}
         value={password}
