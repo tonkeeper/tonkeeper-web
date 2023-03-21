@@ -160,8 +160,7 @@ export const Footer = () => {
         const body = document.getElementById('body');
         if (body) {
           window.requestAnimationFrame(() => {
-            const first = body.childNodes.item(0) as HTMLElement;
-            first.scrollIntoView({ behavior: 'smooth' });
+            body.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
           });
         } else {
           window.requestAnimationFrame(() => {

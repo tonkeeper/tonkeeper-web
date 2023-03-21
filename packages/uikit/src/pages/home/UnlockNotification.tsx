@@ -117,11 +117,17 @@ const PasswordUnlock: FC<{
   }, [location]);
 
   useEffect(() => {
-    if (sdk.isIOs()) {
-      return;
-    }
     if (ref.current) {
       ref.current.focus();
+    }
+    if (sdk.isIOs()) {
+      window.requestAnimationFrame(() => {
+        window.scrollTo({
+          left: 0,
+          top: document.body.scrollHeight,
+          behavior: 'smooth',
+        });
+      });
     }
   }, [ref.current]);
 
