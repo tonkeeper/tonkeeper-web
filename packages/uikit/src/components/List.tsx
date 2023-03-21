@@ -159,6 +159,7 @@ export const ListItem: FC<
       setHover(false);
       element.removeEventListener('touchmove', handlerTouchMove);
       window.removeEventListener('touchend', handlerTouchUp);
+      window.removeEventListener('touchcancel', handlerTouchUp);
     };
 
     const handlerTouchStart = (ev: TouchEvent) => {
@@ -168,6 +169,7 @@ export const ListItem: FC<
       }, 100);
       element.addEventListener('touchmove', handlerTouchMove);
       window.addEventListener('touchend', handlerTouchUp);
+      window.addEventListener('touchcancel', handlerTouchUp);
     };
 
     const handlerTouchMove = throttle(() => {
@@ -183,6 +185,7 @@ export const ListItem: FC<
       element.removeEventListener('touchstart', handlerTouchStart);
       element.removeEventListener('touchmove', handlerTouchMove);
       window.removeEventListener('touchend', handlerTouchUp);
+      window.removeEventListener('touchcancel', handlerTouchUp);
     };
   }, [ref.current]);
   return (
