@@ -28,12 +28,13 @@ const ButtonRow = styled.div`
 
 const Button = styled(Label1)`
   padding: 12px 20px;
-  background: ${(props) => props.theme.backgroundContent};
+  background-color: ${(props) => props.theme.backgroundContent};
+  transition: background-color 0.1s ease;
   border-radius: ${(props) => props.theme.cornerLarge};
   cursor: pointer;
 
   &:hover {
-    background: ${(props) => props.theme.backgroundContentTint};
+    background-color: ${(props) => props.theme.backgroundContentTint};
   }
 `;
 

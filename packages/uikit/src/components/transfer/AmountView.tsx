@@ -82,13 +82,14 @@ const MaxButton = styled(Label2)<{ maxValue: boolean }>`
   cursor: pointer;
   padding: 8px 16px;
   border-radius: ${(props) => props.theme.cornerSmall};
-  background: ${(props) =>
+  background-color: ${(props) =>
     props.maxValue
       ? props.theme.buttonPrimaryBackground
       : props.theme.backgroundContent};
+  transition: background-color 0.1s ease;
 
   &:hover {
-    background: ${(props) =>
+    background-color: ${(props) =>
       props.maxValue
         ? props.theme.buttonPrimaryBackgroundHighlighted
         : props.theme.backgroundContentTint};

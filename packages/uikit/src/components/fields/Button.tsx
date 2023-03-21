@@ -30,6 +30,8 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
   font-style: normal;
   font-weight: 600;
 
+  transition: background-color 0.1s ease, color 0.1s ease;
+
   ${(props) =>
     !props.disabled
       ? css`
@@ -114,15 +116,15 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
       if (props.disabled) return;
       if (props.primary) {
         return css`
-          background: ${props.theme.buttonPrimaryBackgroundHighlighted};
+          background-color: ${props.theme.buttonPrimaryBackgroundHighlighted};
         `;
       } else if (props.secondary) {
         return css`
-          background: ${props.theme.buttonSecondaryBackgroundHighlighted};
+          background-color: ${props.theme.buttonSecondaryBackgroundHighlighted};
         `;
       } else {
         return css`
-          background: ${props.theme.buttonTertiaryBackgroundHighlighted};
+          background-color: ${props.theme.buttonTertiaryBackgroundHighlighted};
         `;
       }
     }}
@@ -133,36 +135,36 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
       if (props.disabled) {
         return css`
           color: ${props.theme.buttonPrimaryForegroundDisabled};
-          background: ${props.theme.buttonPrimaryBackgroundDisabled};
+          background-color: ${props.theme.buttonPrimaryBackgroundDisabled};
         `;
       } else {
         return css`
           color: ${props.theme.buttonPrimaryForeground};
-          background: ${props.theme.buttonPrimaryBackground};
+          background-color: ${props.theme.buttonPrimaryBackground};
         `;
       }
     } else if (props.secondary) {
       if (props.disabled) {
         return css`
           color: ${props.theme.buttonSecondaryForegroundDisabled};
-          background: ${props.theme.buttonSecondaryBackgroundDisabled};
+          background-color: ${props.theme.buttonSecondaryBackgroundDisabled};
         `;
       } else {
         return css`
           color: ${props.theme.buttonSecondaryForeground};
-          background: ${props.theme.buttonSecondaryBackground};
+          background-color: ${props.theme.buttonSecondaryBackground};
         `;
       }
     } else {
       if (props.disabled) {
         return css`
           color: ${props.theme.buttonTertiaryForegroundDisabled};
-          background: ${props.theme.buttonTertiaryBackgroundDisabled};
+          background-color: ${props.theme.buttonTertiaryBackgroundDisabled};
         `;
       } else {
         return css`
           color: ${props.theme.buttonTertiaryForeground};
-          background: ${props.theme.buttonTertiaryBackground};
+          background-color: ${props.theme.buttonTertiaryBackground};
         `;
       }
     }

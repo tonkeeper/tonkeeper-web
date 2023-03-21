@@ -4,7 +4,7 @@ import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
   TonendpoinFiatButton,
   TonendpoinFiatItem,
-  TonendpointConfig
+  TonendpointConfig,
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -60,6 +60,8 @@ const Icon = styled.div`
 `;
 
 const ItemPayload = styled(ListItemPayload)`
+  transition: color 0.1s ease;
+
   &:hover ${Icon} {
     color: ${(props) => props.theme.iconPrimary};
   }
@@ -101,6 +103,7 @@ const DisclaimerLink = styled(Body1)`
   cursor: pointer;
   color: ${(props) => props.theme.textSecondary};
   margin-right: 0.75rem;
+  transition: color 0.1s ease;
 
   &:hover {
     color: ${(props) => props.theme.textPrimary};

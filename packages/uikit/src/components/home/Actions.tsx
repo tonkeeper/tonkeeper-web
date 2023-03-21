@@ -17,7 +17,7 @@ const Button = styled.div`
   height: 44px;
   border-radius: ${(props) => props.theme.cornerFull};
   color: ${(props) => props.theme.textPrimary};
-  background: ${(props) => props.theme.backgroundContent};
+  background-color: ${(props) => props.theme.backgroundContent};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -37,9 +37,11 @@ const Block = styled.div`
 
   &:hover ${Text} {
     color: ${(props) => props.theme.textPrimary};
+    transition: color 0.1s ease;
   }
   &:hover ${Button} {
-    background: ${(props) => props.theme.backgroundContentTint};
+    background-color: ${(props) => props.theme.backgroundContentTint};
+    transition: background-color 0.1s ease;
   }
 `;
 

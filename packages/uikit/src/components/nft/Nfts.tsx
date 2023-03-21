@@ -17,7 +17,8 @@ export const NftBlock = styled.div<{ hover?: boolean }>`
   display: flex;
   flex-direction: column;
 
-  background: ${(props) => props.theme.backgroundContent};
+  background-color: ${(props) => props.theme.backgroundContent};
+  transition: background-color 0.1s ease;
 
   border-radius: ${(props) => props.theme.cornerSmall};
 
@@ -29,7 +30,7 @@ export const NftBlock = styled.div<{ hover?: boolean }>`
           cursor: pointer;
 
           &:hover {
-            background: ${props.theme.backgroundContentTint};
+            background-color: ${props.theme.backgroundContentTint};
           }
         `
       : undefined}

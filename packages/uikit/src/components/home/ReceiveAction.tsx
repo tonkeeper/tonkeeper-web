@@ -43,9 +43,10 @@ const CopyButton = styled(Label2)`
 
   border-top: 1px solid ${(props) => props.theme.separatorCommon};
   text-align: center;
+  transition: background-color 0.1s ease;
 
   &:hover {
-    background: ${(props) => props.theme.backgroundContentTint};
+    background-color: ${(props) => props.theme.backgroundContentTint};
     border-top: 1px solid ${(props) => props.theme.backgroundContentTint};
   }
 `;

@@ -58,12 +58,13 @@ const OtherBlock = styled.div`
 const OtherLink = styled(Label2)`
   cursor: pointer;
   padding: 7.5px 1rem 8.5px;
-  background: ${(props) => props.theme.backgroundContent};
+  background-color: ${(props) => props.theme.backgroundContent};
+  transition: background-color 0.1s ease;
   border-radius: ${(props) => props.theme.cornerMedium};
   display: inline-block;
 
   &:hover {
-    background: ${(props) => props.theme.backgroundHighlighted};
+    background-color: ${(props) => props.theme.backgroundHighlighted};
   }
 `;
 

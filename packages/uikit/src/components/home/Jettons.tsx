@@ -223,13 +223,14 @@ const EditButton = styled(Label2)`
   cursor: pointer;
   border-radius: ${(props) => props.theme.cornerMedium};
   color: ${(props) => props.theme.textPrimary};
-  background: ${(props) => props.theme.backgroundContent};
+  background-color: ${(props) => props.theme.backgroundContent};
+  transition: background-color 0.1s ease;
   display: flex;
   justify-content: center;
   align-items: center;
 
   &:hover {
-    background: ${(props) => props.theme.backgroundContentTint};
+    background-color: ${(props) => props.theme.backgroundContentTint};
   }
 `;
 
