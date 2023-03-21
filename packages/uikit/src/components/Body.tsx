@@ -97,7 +97,8 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       if (!standalone) return;
 
       let timer: NodeJS.Timeout | undefined;
-      var lastY = 0;
+      let lastY = 0;
+      let maxScrollTop = 0;
 
       const handlerScroll = throttle(() => {
         if (element.scrollTop < 10) {
@@ -129,33 +130,32 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
 
       const handlerTouchStart = function (event: TouchEvent) {
         lastY = event.touches[0].clientY;
+        let style = window.getComputedStyle(element);
+        let outerHeight = ['height', 'padding-top', 'padding-bottom']
+          .map((key) => parseInt(style.getPropertyValue(key), 10))
+          .reduce((prev, cur) => prev + cur);
+
+        maxScrollTop = element.scrollHeight - outerHeight;
       };
 
       const handlerTouchMove = function (event: TouchEvent) {
         var top = event.touches[0].clientY;
 
         var scrollTop = element.scrollTop;
-
-        let style = window.getComputedStyle(element);
-        let outerHeight = ['height', 'padding-top', 'padding-bottom']
-          .map((key) => parseInt(style.getPropertyValue(key), 10))
-          .reduce((prev, cur) => prev + cur);
-
-        var maxScrollTop = element.scrollHeight - outerHeight;
         var direction = lastY - top < 0 ? 'up' : 'down';
-
         if (
           event.cancelable &&
           ((scrollTop <= 0 && direction === 'up') ||
             (scrollTop >= maxScrollTop && direction === 'down'))
-        )
+        ) {
           event.preventDefault();
+        }
 
         lastY = top;
       };
 
-      //   element.addEventListener('touchstart', handlerTouchStart);
-      //   element.addEventListener('touchmove', handlerTouchMove);
+      element.addEventListener('touchstart', handlerTouchStart);
+      element.addEventListener('touchmove', handlerTouchMove);
 
       return () => {
         setTop();
@@ -163,8 +163,8 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         sdk.uiEvents.off('loading', handlerScroll);
 
         element.removeEventListener('scroll', handlerScroll);
-        // element.removeEventListener('touchstart', handlerTouchStart);
-        // element.removeEventListener('touchmove', handlerTouchMove);
+        element.removeEventListener('touchstart', handlerTouchStart);
+        element.removeEventListener('touchmove', handlerTouchMove);
       };
     }, [elementRef]);
 
