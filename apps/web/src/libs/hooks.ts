@@ -7,7 +7,7 @@ export const useAppHeight = () => {
       const doc = document.documentElement;
       doc.style.setProperty('--app-height', `${window.innerHeight}px`);
     }, 50);
-    window.addEventListener('resize', appHeight);
+    //window.addEventListener('resize', appHeight);
     appHeight();
 
     return () => {
@@ -31,7 +31,7 @@ export const useAppWidth = (standalone: boolean) => {
         doc.style.setProperty('--app-width', `${app.clientWidth}px`);
       }
     }, 50);
-    window.addEventListener('resize', appWidth);
+    //window.addEventListener('resize', appWidth);
 
     appWidth();
 
