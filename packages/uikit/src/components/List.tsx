@@ -1,4 +1,11 @@
-import React, { FC, PropsWithChildren } from 'react';
+import { throttle } from '@tonkeeper/core/dist/utils/common';
+import React, {
+  FC,
+  PropsWithChildren,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppContext } from '../hooks/appContext';
 
@@ -70,6 +77,7 @@ export const ListItemElement = styled.div<{
   hover?: boolean;
   dropDown?: boolean;
   ios: boolean;
+  isHover: boolean;
 }>`
   display: flex;
   padding: 0 0 0 1rem;
@@ -84,17 +92,17 @@ export const ListItemElement = styled.div<{
         `}
 
   ${(props) => {
-    if (props.dropDown) {
-      return props.hover !== false
-        ? css`
-            cursor: pointer;
-            &: ${props.ios ? 'active' : 'hover'} {
-              background: ${props.theme.backgroundHighlighted};
+    const background = props.dropDown
+      ? props.theme.backgroundHighlighted
+      : props.theme.backgroundContentTint;
 
-              > div {
-                border-top-color: ${props.theme
-                  .backgroundHighlighted} !important;
-              }
+    if (props.ios) {
+      return props.hover !== false && props.isHover
+        ? css`
+            background: ${background};
+
+            > div {
+              border-top-color: ${props.theme.backgroundHighlighted} !important;
             }
           `
         : undefined;
@@ -102,12 +110,12 @@ export const ListItemElement = styled.div<{
       return props.hover !== false
         ? css`
             cursor: pointer;
-            &: ${props.ios ? 'active' : 'hover'} {
-              background: ${props.theme.backgroundContentTint};
+            &:hover {
+              background: ${background};
 
               > div {
                 border-top-color: ${props.theme
-                  .backgroundContentTint} !important;
+                  .backgroundHighlighted} !important;
               }
             }
           `
@@ -131,17 +139,45 @@ export const ListItem: FC<
   PropsWithChildren<
     { hover?: boolean; dropDown?: boolean } & Omit<
       React.HTMLProps<HTMLDivElement>,
-      'size' | 'children' | 'as'
+      'size' | 'children' | 'as' | 'ref'
     >
   >
-> = ({ children, hover, dropDown, ref, ...props }) => {
-  const { ios } = useAppContext();
+> = ({ children, hover, dropDown, ...props }) => {
+  const { ios, standalone } = useAppContext();
+  const [isHover, setHover] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!ios) return;
+    if (!element) return;
+
+    const handlerTouchStart = () => {
+      setHover(true);
+      element.addEventListener('touchmove', handlerTouchMove);
+    };
+
+    const handlerTouchMove = throttle(() => {
+      if (document.body.classList.contains('scroll')) {
+        setHover(false);
+        element.removeEventListener('touchmove', handlerTouchMove);
+      }
+    }, 50);
+
+    element.addEventListener('touchstart', handlerTouchStart);
+
+    return () => {
+      element.removeEventListener('touchstart', handlerTouchStart);
+      element.removeEventListener('touchmove', handlerTouchMove);
+    };
+  }, [ref.current]);
   return (
     <ListItemElement
       hover={hover}
+      isHover={isHover}
+      ref={ref}
       dropDown={dropDown}
       ios={ios}
-      ref={ref as React.MutableRefObject<HTMLInputElement>}
       {...props}
     >
       {children}
