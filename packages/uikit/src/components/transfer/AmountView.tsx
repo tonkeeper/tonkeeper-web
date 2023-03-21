@@ -239,7 +239,7 @@ const useButtonPosition = (
 
     const viewport = window.visualViewport;
     if (viewport) {
-      resizeHandler.call(viewport);
+      setTimeout(() => resizeHandler.call(viewport), 300);
       viewport.addEventListener('resize', resizeHandler);
     }
 
