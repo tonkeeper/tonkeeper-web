@@ -81,14 +81,15 @@ export const ListItemElement = styled.div<{
 }>`
   display: flex;
   padding: 0 0 0 1rem;
+  transition: background-color 0.1s ease;
 
   ${(props) =>
     props.dropDown
       ? css`
-          background: ${(props) => props.theme.backgroundContentTint};
+          background-color: ${(props) => props.theme.backgroundContentTint};
         `
       : css`
-          background: ${(props) => props.theme.backgroundContent};
+          background-color: ${(props) => props.theme.backgroundContent};
         `}
 
   ${(props) => {
@@ -99,7 +100,7 @@ export const ListItemElement = styled.div<{
     if (props.ios) {
       return props.hover !== false && props.isHover
         ? css`
-            background: ${background};
+            background-color: ${background};
 
             > div {
               border-top-color: ${props.theme.backgroundHighlighted} !important;
@@ -111,7 +112,7 @@ export const ListItemElement = styled.div<{
         ? css`
             cursor: pointer;
             &:hover {
-              background: ${background};
+              background-color: ${background};
 
               > div {
                 border-top-color: ${props.theme
