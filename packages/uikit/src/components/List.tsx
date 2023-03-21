@@ -152,13 +152,17 @@ export const ListItem: FC<
     if (!ios) return;
     if (!element) return;
 
+    let timer: NodeJS.Timeout | undefined = undefined;
     const handlerTouchStart = () => {
-      setHover(true);
+      timer = setTimeout(() => {
+        setHover(true);
+      }, 50);
       element.addEventListener('touchmove', handlerTouchMove);
     };
 
     const handlerTouchMove = throttle(() => {
       if (document.body.classList.contains('scroll')) {
+        clearTimeout(timer);
         setHover(false);
         element.removeEventListener('touchmove', handlerTouchMove);
       }
@@ -167,6 +171,7 @@ export const ListItem: FC<
     element.addEventListener('touchstart', handlerTouchStart);
 
     return () => {
+      clearTimeout(timer);
       element.removeEventListener('touchstart', handlerTouchStart);
       element.removeEventListener('touchmove', handlerTouchMove);
     };
