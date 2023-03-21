@@ -157,9 +157,7 @@ export const ListItem: FC<
 
     const handlerTouchUp = () => {
       clearTimeout(timer);
-      window.requestAnimationFrame(() => {
-        setHover(false);
-      });
+      setHover(false);
       element.removeEventListener('touchmove', handlerTouchMove);
       window.removeEventListener('touchend', handlerTouchUp);
       window.removeEventListener('touchcancel', handlerTouchUp);
