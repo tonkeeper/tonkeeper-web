@@ -153,18 +153,26 @@ export const ListItem: FC<
     if (!element) return;
 
     let timer: NodeJS.Timeout | undefined = undefined;
-    const handlerTouchStart = () => {
+
+    const handlerTouchUp = () => {
+      clearTimeout(timer);
+      setHover(false);
+      element.removeEventListener('touchmove', handlerTouchMove);
+      window.removeEventListener('touchend', handlerTouchUp);
+    };
+
+    const handlerTouchStart = (ev: TouchEvent) => {
+      if (ev.touches.length > 1) return;
       timer = setTimeout(() => {
         setHover(true);
-      }, 50);
+      }, 100);
       element.addEventListener('touchmove', handlerTouchMove);
+      window.addEventListener('touchend', handlerTouchUp);
     };
 
     const handlerTouchMove = throttle(() => {
       if (document.body.classList.contains('scroll')) {
-        clearTimeout(timer);
-        setHover(false);
-        element.removeEventListener('touchmove', handlerTouchMove);
+        handlerTouchUp();
       }
     }, 50);
 
@@ -174,6 +182,7 @@ export const ListItem: FC<
       clearTimeout(timer);
       element.removeEventListener('touchstart', handlerTouchStart);
       element.removeEventListener('touchmove', handlerTouchMove);
+      window.removeEventListener('touchend', handlerTouchUp);
     };
   }, [ref.current]);
   return (
