@@ -68,9 +68,15 @@ const Tabs: FC<{ tab: HomeTabs; onTab: (value: HomeTabs) => void }> = ({
       const width = 40;
 
       lineRef.current.style.width = width + 'px';
-      lineRef.current.style.transition = 'all 0.3s ease-in-out';
+
       lineRef.current.style.left =
         active.offsetLeft + (active.clientWidth - width) / 2 + 'px';
+
+      window.requestAnimationFrame(() => {
+        if (lineRef.current) {
+          lineRef.current.style.transition = 'all 0.3s ease-in-out';
+        }
+      });
     }
   }, [blockRef, lineRef, tab]);
   return (
