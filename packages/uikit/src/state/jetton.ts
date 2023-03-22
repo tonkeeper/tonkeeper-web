@@ -53,7 +53,7 @@ export const useJettonBalance = (jettonAddress: string) => {
     [wallet.publicKey, QueryKey.jettons, JettonKey.balance, jettonAddress],
     async () => {
       const result = await new JettonApi(tonApi).getJettonsBalances({
-        account: jettonAddress,
+        account: wallet.active.rawAddress,
       });
 
       const balance = result.balances.find(
