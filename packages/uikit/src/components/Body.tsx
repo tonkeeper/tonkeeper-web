@@ -183,7 +183,7 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         );
 
         element.scrollTo({ top: scroll, behavior: 'smooth' });
-      }, 600);
+      }, 1000);
 
       window.addEventListener('touchend', handlerTouchEnd);
       window.addEventListener('touchcancel', handlerTouchEnd);
