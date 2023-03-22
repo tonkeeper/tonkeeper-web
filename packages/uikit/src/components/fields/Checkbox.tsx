@@ -88,7 +88,13 @@ export const Radio: FC<PropsWithChildren<CheckboxProps>> = ({
   children,
 }) => {
   return (
-    <Wrapper onClick={() => onChange(!checked)}>
+    <Wrapper
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onChange(!checked);
+      }}
+    >
       <RadioItem checked={checked} disabled={disabled}>
         {checked ? <CheckboxIcon /> : undefined}
       </RadioItem>
