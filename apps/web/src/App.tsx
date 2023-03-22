@@ -7,6 +7,7 @@ import {
 import { getTonClient, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { throttle } from '@tonkeeper/core/dist/utils/common';
 import {
   InnerBody,
   useWindowsScroll,
@@ -207,12 +208,30 @@ const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
   padding-bottom: ${(props) => (props.standalone ? '96' : '80')}px;
 `;
 
+const useStandalone = () => {
+  const [value, setValue] = useState<[boolean, boolean]>([
+    sdk.isIOs(),
+    sdk.isStandalone(),
+  ]);
+
+  useEffect(() => {
+    const handler = throttle(() => {
+      setValue([sdk.isIOs(), window.innerWidth < 548]);
+    }, 50);
+    window.addEventListener('resize', handler);
+    handler();
+
+    return () => {
+      window.removeEventListener('resize', handler);
+    };
+  }, []);
+  return value;
+};
+
 export const Loader: FC = () => {
   const { data: activeWallet } = useActiveWallet();
 
-  const [ios, standalone] = useMemo(() => {
-    return [sdk.isIOs(), sdk.isStandalone()] as const;
-  }, []);
+  const [ios, standalone] = useStandalone();
 
   const lock = useLock();
   const { i18n } = useTranslation();
