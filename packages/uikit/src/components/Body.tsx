@@ -175,20 +175,20 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         }, 300);
       }, 50);
 
-      // const handlerTouchEnd = debounce(() => {
-      //   const scroll = Math.max(
-      //     1,
-      //     Math.min(
-      //       element.scrollTop,
-      //       element.scrollHeight - element.clientHeight - 1
-      //     )
-      //   );
+      const handlerTouchEnd = debounce(() => {
+        const scroll = Math.max(
+          1,
+          Math.min(
+            element.scrollTop,
+            element.scrollHeight - element.clientHeight - 1
+          )
+        );
 
-      //   element.scrollTo({ top: scroll, behavior: 'smooth' });
-      // }, 600);
+        element.scrollTo({ top: scroll, behavior: 'smooth' });
+      }, 600);
 
-      // window.addEventListener('touchend', handlerTouchEnd);
-      // window.addEventListener('touchcancel', handlerTouchEnd);
+      window.addEventListener('touchend', handlerTouchEnd);
+      window.addEventListener('touchcancel', handlerTouchEnd);
       element.addEventListener('scroll', handlerScroll);
       sdk.uiEvents.on('loading', handlerScroll);
 
@@ -216,23 +216,23 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
           ((scrollTop <= 0 && direction === 'up') ||
             (scrollTop >= maxScrollTop && direction === 'down'))
         ) {
-          refocus = true;
+          //refocus = true;
           // event.preventDefault();
         }
 
         lastY = top;
       };
 
-      const handlerTouchEnd = debounce(() => {
-        if (refocus) {
-          element.focus();
-        }
-      }, 300);
+      // const handlerTouchEnd = debounce(() => {
+      //   if (refocus) {
+      //     element.focus();
+      //   }
+      // }, 300);
 
       element.addEventListener('touchstart', handlerTouchStart);
       element.addEventListener('touchmove', handlerTouchMove);
-      window.addEventListener('touchend', handlerTouchEnd);
-      window.addEventListener('touchcancel', handlerTouchEnd);
+      // window.addEventListener('touchend', handlerTouchEnd);
+      // window.addEventListener('touchcancel', handlerTouchEnd);
 
       return () => {
         setTop();
