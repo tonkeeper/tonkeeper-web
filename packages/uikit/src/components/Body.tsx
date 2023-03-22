@@ -184,7 +184,7 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
           )
         );
 
-        element.scrollTo({ top: scroll, behavior: 'smooth' });
+        // element.scrollTo({ top: scroll, behavior: 'smooth' });
       }, 600);
 
       window.addEventListener('touchend', handlerTouchEnd);
@@ -193,8 +193,6 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       sdk.uiEvents.on('loading', handlerScroll);
 
       handlerScroll();
-
-      let refocus = false;
 
       const handlerTouchStart = function (event: TouchEvent) {
         lastY = event.touches[0].clientY;
