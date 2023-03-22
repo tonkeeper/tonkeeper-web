@@ -208,7 +208,7 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
           ((scrollTop <= 0 && direction === 'up') ||
             (scrollTop >= maxScrollTop && direction === 'down'))
         ) {
-          event.preventDefault();
+          // event.preventDefault();
         }
 
         lastY = top;
