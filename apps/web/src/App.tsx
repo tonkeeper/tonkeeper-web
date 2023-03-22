@@ -181,6 +181,7 @@ const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
           position: fixed;
           top: 0;
           height: calc(var(--app-height) - 2px);
+          -webkit-overflow-scrolling: touch;
         `
       : css`
           @media (min-width: 600px) {

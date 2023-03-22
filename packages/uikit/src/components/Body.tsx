@@ -42,6 +42,7 @@ export const useWindowsScroll = () => {
   const { standalone, ios } = useAppContext();
   useLayoutEffect(() => {
     if (standalone) {
+      document.documentElement.classList.add('hidden');
       return;
     }
 
@@ -183,7 +184,8 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
             element.scrollHeight - element.clientHeight - 1
           )
         );
-        element.scrollTo({ top: scroll, behavior: 'smooth' });
+
+        //element.scrollTo({ top: scroll, behavior: 'smooth' });
       }, 600);
 
       window.addEventListener('touchend', handlerTouchEnd);
@@ -192,8 +194,6 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       sdk.uiEvents.on('loading', handlerScroll);
 
       handlerScroll();
-
-      let refocus = false;
 
       const handlerTouchStart = function (event: TouchEvent) {
         lastY = event.touches[0].clientY;

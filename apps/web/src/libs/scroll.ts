@@ -1,10 +1,10 @@
 export const disableScroll = () => {
-  document.documentElement.className = 'is-locked';
+  document.documentElement.classList.add('is-locked');
   window.document.body.style.paddingRight = `${getScrollbarWidth()}px`;
 };
 
 export const enableScroll = () => {
-  document.documentElement.className = '';
+  document.documentElement.classList.remove('is-locked');
   window.document.body.style.paddingRight = '0px';
 };
 

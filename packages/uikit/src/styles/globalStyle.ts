@@ -31,8 +31,11 @@ body {
       box-sizing: border-box;
   }
 
-  html.hidden body {
+  html.hidden,
+  html.hidden body,
+  html.hidden #root {
     overflow: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 
   .disable-hover {
