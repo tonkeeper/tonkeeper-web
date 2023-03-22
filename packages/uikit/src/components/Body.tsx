@@ -1,4 +1,4 @@
-import { throttle } from '@tonkeeper/core/dist/utils/common';
+import { debounce, throttle } from '@tonkeeper/core/dist/utils/common';
 import React, {
   PropsWithChildren,
   useLayoutEffect,
@@ -173,25 +173,20 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         }, 300);
       }, 50);
 
-      // const handlerTouchEnd = debounce(() => {
-      //   const scroll = Math.max(
-      //     1,
-      //     Math.min(
-      //       element.scrollTop,
-      //       element.scrollHeight - element.clientHeight - 1
-      //     )
-      //   );
+      const handlerTouchEnd = debounce(() => {
+        const scroll = Math.max(
+          1,
+          Math.min(
+            element.scrollTop,
+            element.scrollHeight - element.clientHeight - 1
+          )
+        );
 
-      //   element.scrollTo({ top: scroll, behavior: 'smooth' });
-      // }, 600);
+        element.scrollTo({ top: scroll, behavior: 'smooth' });
+      }, 600);
 
-      const backToElement = () => {
-        element.focus();
-      };
-      // window.addEventListener('touchend', handlerTouchEnd);
-      // window.addEventListener('touchcancel', handlerTouchEnd);
-
-      window.addEventListener('focus', backToElement);
+      window.addEventListener('touchend', handlerTouchEnd);
+      window.addEventListener('touchcancel', handlerTouchEnd);
 
       element.addEventListener('scroll', handlerScroll);
       sdk.uiEvents.on('loading', handlerScroll);
@@ -205,10 +200,8 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         sdk.uiEvents.off('loading', handlerScroll);
 
         element.removeEventListener('scroll', handlerScroll);
-        // window.removeEventListener('touchend', handlerTouchEnd);
-        // window.removeEventListener('touchcancel', handlerTouchEnd);
-
-        window.removeEventListener('focus', backToElement);
+        window.removeEventListener('touchend', handlerTouchEnd);
+        window.removeEventListener('touchcancel', handlerTouchEnd);
       };
     }, [elementRef]);
 
