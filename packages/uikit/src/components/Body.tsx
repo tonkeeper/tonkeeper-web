@@ -1,4 +1,4 @@
-import { throttle } from '@tonkeeper/core/dist/utils/common';
+import { debounce, throttle } from '@tonkeeper/core/dist/utils/common';
 import React, {
   PropsWithChildren,
   useLayoutEffect,
@@ -207,17 +207,15 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       //   lastY = top;
       // };
 
-      const handlerTouchEnd = () => {
-        offsetTimer = setTimeout(() => {
-          element.scrollTop = Math.max(
-            1,
-            Math.min(
-              element.scrollTop,
-              element.scrollHeight - element.clientHeight - 1
-            )
-          );
-        }, 300);
-      };
+      const handlerTouchEnd = debounce(() => {
+        element.scrollTop = Math.max(
+          1,
+          Math.min(
+            element.scrollTop,
+            element.scrollHeight - element.clientHeight - 1
+          )
+        );
+      }, 500);
 
       // element.addEventListener('touchstart', handlerTouchStart);
       // element.addEventListener('touchmove', handlerTouchMove);
