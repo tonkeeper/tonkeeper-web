@@ -149,6 +149,8 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       if (!standalone) return;
 
       let timer: NodeJS.Timeout | undefined;
+      let lastY = 0;
+      let maxScrollTop = 0;
 
       const handlerScroll = throttle(() => {
         if (element.scrollTop < 10) {
@@ -191,6 +193,49 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       sdk.uiEvents.on('loading', handlerScroll);
 
       handlerScroll();
+
+      const handlerTouchStart = function (event: TouchEvent) {
+        lastY = event.touches[0].clientY;
+        let style = window.getComputedStyle(element);
+        let outerHeight = ['height', 'padding-top', 'padding-bottom']
+          .map((key) => parseInt(style.getPropertyValue(key), 10))
+          .reduce((prev, cur) => prev + cur);
+
+        maxScrollTop = element.scrollHeight - outerHeight;
+      };
+
+      const handlerTouchMove = function (event: TouchEvent) {
+        var top = event.touches[0].clientY;
+
+        var scrollTop = element.scrollTop;
+        var direction = lastY - top < 0 ? 'up' : 'down';
+        if (
+          event.cancelable &&
+          ((scrollTop <= 0 && direction === 'up') ||
+            (scrollTop >= maxScrollTop && direction === 'down'))
+        ) {
+          // event.preventDefault();
+        }
+
+        lastY = top;
+      };
+
+      const handlerTouchEnd = () => {
+        window.requestAnimationFrame(() => {
+          element.scrollTop = Math.max(
+            1,
+            Math.min(
+              element.scrollTop,
+              element.scrollHeight - element.clientHeight - 1
+            )
+          );
+        });
+      };
+
+      element.addEventListener('touchstart', handlerTouchStart);
+      element.addEventListener('touchmove', handlerTouchMove);
+      window.addEventListener('touchend', handlerTouchEnd);
+      window.addEventListener('touchcancel', handlerTouchEnd);
 
       return () => {
         setTop();
