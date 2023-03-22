@@ -172,14 +172,6 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         }
         timer = setTimeout(function () {
           document.body.classList.remove('scroll');
-
-          element.scrollTop = Math.max(
-            1,
-            Math.min(
-              element.scrollTop,
-              element.scrollHeight - element.clientHeight - 1
-            )
-          );
         }, 300);
       }, 50);
 
@@ -214,8 +206,22 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         lastY = top;
       };
 
+      const handlerTouchEnd = () => {
+        window.requestAnimationFrame(() => {
+          element.scrollTop = Math.max(
+            1,
+            Math.min(
+              element.scrollTop,
+              element.scrollHeight - element.clientHeight - 1
+            )
+          );
+        });
+      };
+
       element.addEventListener('touchstart', handlerTouchStart);
       element.addEventListener('touchmove', handlerTouchMove);
+      window.addEventListener('touchend', handlerTouchEnd);
+      window.addEventListener('touchcancel', handlerTouchEnd);
 
       return () => {
         setTop();
@@ -225,6 +231,8 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         element.removeEventListener('scroll', handlerScroll);
         element.removeEventListener('touchstart', handlerTouchStart);
         element.removeEventListener('touchmove', handlerTouchMove);
+        window.removeEventListener('touchend', handlerTouchEnd);
+        window.removeEventListener('touchcancel', handlerTouchEnd);
       };
     }, [elementRef]);
 
