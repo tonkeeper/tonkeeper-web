@@ -97,14 +97,6 @@ export const useAppSelection = (
 
     let timer: NodeJS.Timeout | undefined = undefined;
     let scrollTimer: NodeJS.Timeout | undefined = undefined;
-    let scroll = false;
-
-    const handlerScroll = () => {
-      scroll = true;
-      scrollTimer = setTimeout(() => {
-        scroll = false;
-      }, 300);
-    };
 
     const handlerTouchUp = () => {
       clearTimeout(timer);
@@ -122,8 +114,6 @@ export const useAppSelection = (
       handlerTouchUp();
     }, 50);
 
-    element.addEventListener('scroll', handlerScroll);
-
     window.addEventListener('touchstart', handlerTouchStart);
     window.addEventListener('touchmove', handlerTouchMove);
     window.addEventListener('touchend', handlerTouchUp);
@@ -132,7 +122,6 @@ export const useAppSelection = (
     return () => {
       clearTimeout(scrollTimer);
       clearTimeout(timer);
-      element.removeEventListener('scroll', handlerScroll);
       window.removeEventListener('touchstart', handlerTouchStart);
       window.removeEventListener('touchmove', handlerTouchMove);
       window.removeEventListener('touchend', handlerTouchUp);
@@ -183,7 +172,15 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
         }
         timer = setTimeout(function () {
           document.body.classList.remove('scroll');
-        }, 500);
+
+          element.scrollTop = Math.max(
+            1,
+            Math.min(
+              element.scrollTop,
+              element.scrollHeight - element.clientHeight - 1
+            )
+          );
+        }, 300);
       }, 50);
 
       element.addEventListener('scroll', handlerScroll);
