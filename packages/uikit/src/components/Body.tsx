@@ -226,7 +226,6 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       const handlerTouchEnd = debounce(() => {
         if (refocus) {
           element.focus();
-          refocus = false;
         }
       }, 300);
 
