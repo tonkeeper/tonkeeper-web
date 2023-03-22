@@ -187,7 +187,6 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
 
       window.addEventListener('touchend', handlerTouchEnd);
       window.addEventListener('touchcancel', handlerTouchEnd);
-
       element.addEventListener('scroll', handlerScroll);
       sdk.uiEvents.on('loading', handlerScroll);
 
