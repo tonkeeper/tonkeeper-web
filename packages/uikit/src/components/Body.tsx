@@ -189,13 +189,6 @@ export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
       };
     }, [elementRef]);
 
-    useLayoutEffect(() => {
-      const element = elementRef.current;
-      if (elementRef.current) {
-        elementRef.current.scrollTop = 1;
-      }
-    }, [elementRef.current]);
-
     const selection = useAppSelection(elementRef);
     const id = standalone ? 'body' : undefined;
 
