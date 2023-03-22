@@ -184,7 +184,7 @@ export const ReceiveNotification: FC<{
   }, [open, info]);
 
   return (
-    <Notification isOpen={open} handleClose={handleClose}>
+    <Notification isOpen={open} handleClose={handleClose} backShadow>
       {Content}
     </Notification>
   );

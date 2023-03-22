@@ -130,7 +130,7 @@ const RowTitle = styled(H3)`
 
 const BackShadow = styled.div`
   width: var(--app-width);
-  height: 100vh;
+  height: 90vh;
   position: fixed;
   bottom: -50vh;
   z-index: -1;
