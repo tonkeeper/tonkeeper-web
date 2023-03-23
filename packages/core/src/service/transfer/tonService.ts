@@ -31,7 +31,7 @@ const createTonTransfer = (
     messages: [
       internal({
         to: recipient.toAccount.address.raw,
-        bounce: recipient.toAccount.status !== 'active',
+        bounce: recipient.toAccount.status == 'active',
         value: toNano(toStringAmount(data.amount)),
         body: recipient.comment ?? undefined,
       }),
