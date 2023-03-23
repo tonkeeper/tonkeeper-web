@@ -10,7 +10,7 @@ const Block = styled.div`
   z-index: 1;
   pointer-events: none;
 `;
-export const QrScanner = () => {
+const QrScanner = () => {
   const [scanId, setScanId] = useState<number | undefined>(undefined);
   const sdk = useAppSdk();
 
@@ -52,3 +52,5 @@ export const QrScanner = () => {
     </ReactPortal>
   );
 };
+
+export default QrScanner;

@@ -23,7 +23,6 @@ import {
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
-import { QrScanner } from '@tonkeeper/uikit/dist/components/QrScanner';
 import {
   ActivitySkeletonPage,
   CoinSkeletonPage,
@@ -100,6 +99,9 @@ const Activity = React.lazy(
 );
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
+const QrScanner = React.lazy(
+  () => import('@tonkeeper/uikit/dist/components/QrScanner')
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -278,7 +280,9 @@ export const Loader: FC = () => {
             standalone={standalone}
           />
           <CopyNotification />
-          <QrScanner />
+          <Suspense fallback={<></>}>
+            <QrScanner />
+          </Suspense>
         </AppContext.Provider>
       </AfterImportAction.Provider>
     </OnImportAction.Provider>
