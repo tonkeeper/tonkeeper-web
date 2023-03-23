@@ -4,6 +4,7 @@ import { RocketIcon, ShieldIcon } from '../../components/create/CreateIcon';
 import { Description } from '../../components/create/Description';
 import { ImportNotification } from '../../components/create/ImportNotification';
 import { Button } from '../../components/fields/Button';
+import { CenterContainer } from '../../components/Layout';
 import { H1 } from '../../components/Text';
 import { useFBAnalyticsEvent } from '../../hooks/analytics';
 import { useTranslation } from '../../hooks/translation';
@@ -48,7 +49,7 @@ export const Initialize: FC = () => {
   useFBAnalyticsEvent('screen_view');
 
   return (
-    <>
+    <CenterContainer>
       <Title>
         {t('intro_title')}
         <Accent>Tonkeeper</Accent>
@@ -80,6 +81,6 @@ export const Initialize: FC = () => {
         {t('intro_continue_btn')}
       </Button>
       <ImportNotification isOpen={isOpen} setOpen={setOpen} />
-    </>
+    </CenterContainer>
   );
 };

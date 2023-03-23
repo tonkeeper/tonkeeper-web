@@ -9,6 +9,7 @@ import { AppRoute } from '../../libs/routes';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
 import { ChevronLeftIcon } from '../Icon';
+import { CenterContainer } from '../Layout';
 import { Body1, Body2, H2, Label2 } from '../Text';
 
 const Block = styled.div`
@@ -296,7 +297,7 @@ export const Check: FC<{
     three.toLowerCase().trim() === mnemonic[test3 - 1];
 
   return (
-    <>
+    <CenterContainer>
       <BackBlock>
         <BackButton onClick={onBack}>
           <ChevronLeftIcon />
@@ -341,7 +342,7 @@ export const Check: FC<{
           {t('continue')}
         </Button>
       </Block>
-    </>
+    </CenterContainer>
   );
 };
 
@@ -354,6 +355,10 @@ const Inputs = styled.div`
   @media (max-width: 768px) {
     grid-template-rows: repeat(24, minmax(0, 1fr));
   }
+`;
+
+const Container = styled.div`
+  height: 100%;
 `;
 
 const seeIfValidWord = (word: string) => {

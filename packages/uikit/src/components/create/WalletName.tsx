@@ -12,6 +12,7 @@ import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
+import { CenterContainer } from '../Layout';
 import { Body2, H2 } from '../Text';
 
 const Block = styled.form`
@@ -79,32 +80,34 @@ export const UpdateWalletName: FC<{
   };
 
   return (
-    <Block onSubmit={onSubmit}>
-      <div>
-        <H2>{t('Name_your_wallet')}</H2>
-        <Body>{t('Name_your_wallet_description')}</Body>
-      </div>
+    <CenterContainer>
+      <Block onSubmit={onSubmit}>
+        <div>
+          <H2>{t('Name_your_wallet')}</H2>
+          <Body>{t('Name_your_wallet_description')}</Body>
+        </div>
 
-      <Input
-        ref={ref}
-        value={name}
-        onChange={onChange}
-        label={t('Wallet_name')}
-        disabled={isLoading}
-        isValid={!isError}
-      />
+        <Input
+          ref={ref}
+          value={name}
+          onChange={onChange}
+          label={t('Wallet_name')}
+          disabled={isLoading}
+          isValid={!isError}
+        />
 
-      <Button
-        size="large"
-        fullWidth
-        marginTop
-        primary
-        loading={isLoading}
-        disabled={isLoading}
-        type="submit"
-      >
-        {t('add_edit_favorite_save')}
-      </Button>
-    </Block>
+        <Button
+          size="large"
+          fullWidth
+          marginTop
+          primary
+          loading={isLoading}
+          disabled={isLoading}
+          type="submit"
+        >
+          {t('add_edit_favorite_save')}
+        </Button>
+      </Block>
+    </CenterContainer>
   );
 };

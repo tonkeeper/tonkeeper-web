@@ -22,6 +22,13 @@ const Body = styled(Body2)`
   color: ${(props) => props.theme.textSecondary};
 `;
 
+export const CenterContainer = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
 export const IconPage: FC<{
   icon: React.ReactNode;
   title?: string;
@@ -30,7 +37,7 @@ export const IconPage: FC<{
   logOut?: boolean;
 }> = ({ icon, title, description, button, logOut }) => {
   return (
-    <>
+    <CenterContainer>
       {logOut && (
         <LogoutBlock>
           <LogoutButton />
@@ -44,7 +51,7 @@ export const IconPage: FC<{
         </TextBlock>
         {button}
       </Block>
-    </>
+    </CenterContainer>
   );
 };
 

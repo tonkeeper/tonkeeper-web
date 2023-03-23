@@ -11,6 +11,7 @@ import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
+import { CenterContainer } from '../Layout';
 import { H2 } from '../Text';
 
 const Block = styled.div`
@@ -18,6 +19,7 @@ const Block = styled.div`
   text-align: center;
   gap: 1rem;
   flex-direction: column;
+  padding-bottom: 1rem;
 `;
 
 const useSetNoneAuthMutation = () => {
@@ -106,7 +108,7 @@ const FillPassword: FC<{
   };
 
   return (
-    <>
+    <CenterContainer>
       <Block>
         <H2>{t('Create_password')}</H2>
         <Input
@@ -144,7 +146,7 @@ const FillPassword: FC<{
       >
         {t('continue')}
       </Button>
-    </>
+    </CenterContainer>
   );
 };
 
