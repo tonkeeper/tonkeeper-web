@@ -9,6 +9,12 @@ const Block = styled.div`
   inset: 0;
   z-index: 1;
   pointer-events: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: ${(props) => props.theme.backgroundPage};
 `;
 const QrScanner = () => {
   const [scanId, setScanId] = useState<number | undefined>(undefined);
