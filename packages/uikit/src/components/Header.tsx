@@ -3,13 +3,14 @@ import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute } from '../libs/routes';
 import { useMutateActiveWallet } from '../state/account';
 import { useWalletState } from '../state/wallet';
 import { ImportNotification } from './create/ImportNotification';
 import { DropDown } from './DropDown';
-import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
+import { DoneIcon, DownIcon, PlusIcon, ScanIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1 } from './Text';
@@ -187,6 +188,31 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
   }
 };
 
+const ScanBlock = styled.div`
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+
+  color: ${(props) => props.theme.accentBlue};
+`;
+
+export const ScanButton = () => {
+  const sdk = useAppSdk();
+
+  const onClick = () => {
+    sdk.uiEvents.emit('scan', {
+      method: 'scan',
+      id: Date.now(),
+      params: undefined,
+    });
+  };
+
+  return (
+    <ScanBlock onClick={onClick}>
+      <ScanIcon></ScanIcon>
+    </ScanBlock>
+  );
+};
 export const Header = () => {
   const { t } = useTranslation();
   const wallet = useWalletContext();
@@ -210,6 +236,9 @@ export const Header = () => {
           </DownIconWrapper>
         </Title>
       </DropDown>
+
+      <ScanButton />
+
       <ImportNotification isOpen={isOpen} setOpen={setOpen} />
     </Block>
   );

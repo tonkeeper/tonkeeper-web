@@ -23,6 +23,7 @@ import {
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
+import { QrScanner } from '@tonkeeper/uikit/dist/components/QrScanner';
 import {
   ActivitySkeletonPage,
   CoinSkeletonPage,
@@ -277,6 +278,7 @@ export const Loader: FC = () => {
             standalone={standalone}
           />
           <CopyNotification />
+          <QrScanner />
         </AppContext.Provider>
       </AfterImportAction.Provider>
     </OnImportAction.Provider>

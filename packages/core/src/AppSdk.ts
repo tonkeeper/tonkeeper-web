@@ -12,6 +12,7 @@ export type GetPasswordParams = {
 export interface UIEvents {
   unlock: void;
   copy: string;
+  scan: void;
   getPassword: GetPasswordParams;
   loading: void;
   response: any;

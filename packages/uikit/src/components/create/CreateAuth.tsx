@@ -7,6 +7,7 @@ import {
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
@@ -23,13 +24,12 @@ const Block = styled.div`
 `;
 
 const useSetNoneAuthMutation = () => {
-  const storage = useStorage();
-
+  const sdk = useAppSdk();
   return useMutation<void, Error, void>(async () => {
     const state: AuthNone = {
       kind: 'none',
     };
-    await storage.set(AppKey.password, state);
+    await sdk.storage.set(AppKey.password, state);
   });
 };
 
