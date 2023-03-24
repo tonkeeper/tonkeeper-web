@@ -89,7 +89,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
     if (param === null) {
       return sdk.uiEvents.emit('copy', {
         method: 'copy',
-        params: t('Unexpected_QR_Code'),
+        params: `${t('Unexpected_QR_Code')} ${signature}`,
       });
     } else {
       await processRecipient(param);
