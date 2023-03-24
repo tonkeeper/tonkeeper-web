@@ -22,7 +22,7 @@ const ButtonPosition = styled.div`
   position: fixed;
   z-index: 6;
   top: 1rem;
-  right: 1rem;
+  right: 50%;
 `;
 
 const QrScanner = () => {
