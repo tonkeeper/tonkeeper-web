@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { ScanIcon } from '../Icon';
 
@@ -121,11 +122,11 @@ export interface InputWithScanner {
   disabled?: boolean;
 }
 
-const ScanBlock = styled.div`
+const ScanBlock = styled.div<{ ios: boolean }>`
   position: absolute;
   right: 1rem;
   top: 0;
-  height: 54px;
+  height: ${(props) => (props.ios ? '56px' : '54px')};
   align-items: center;
   display: flex;
 
@@ -139,6 +140,7 @@ export const InputWithScanner = React.forwardRef<
   const [focus, setFocus] = useState(false);
   const [scanId, setScanId] = useState<number | undefined>(undefined);
   const sdk = useAppSdk();
+  const { ios } = useAppContext();
 
   const onClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
     e.stopPropagation();
@@ -183,7 +185,7 @@ export const InputWithScanner = React.forwardRef<
       />
       {label && <Label active={value != ''}>{label}</Label>}
 
-      <ScanBlock onClick={onClick}>
+      <ScanBlock ios={ios} onClick={onClick}>
         <ScanIcon />
       </ScanBlock>
     </InputBlock>
