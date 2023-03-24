@@ -8,7 +8,7 @@ import ReactPortal from './ReactPortal';
 const Block = styled.div`
   position: fixed;
   inset: 0;
-  z-index: 5;
+  z-index: 15;
   pointer-events: none;
 
   display: flex;
@@ -20,9 +20,9 @@ const Block = styled.div`
 
 const ButtonPosition = styled.div`
   position: fixed;
-  z-index: 6;
+  z-index: 16;
   top: 1rem;
-  right: 50%;
+  right: 1rem;
 `;
 
 const QrScanner = () => {
@@ -44,14 +44,6 @@ const QrScanner = () => {
   };
   const onScan = ({ signature }: { signature: string }) => {
     signature = signature.slice(2);
-    console.log(signature);
-    setTimeout(() => {
-      sdk.uiEvents.emit('copy', {
-        method: 'copy',
-        params: signature,
-      });
-    }, 1000);
-
     sdk.uiEvents.emit('response', {
       method: 'response',
       id: scanId,

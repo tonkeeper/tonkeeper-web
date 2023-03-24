@@ -74,3 +74,48 @@ export function formatTransferUrl(options: {
 
   return url + '?' + params.join('&');
 }
+
+export const seeIfAddressEqual = (one?: string, two?: string) => {
+  if (!one || !two) return false;
+  return Address.parse(one).toRawString() === Address.parse(two).toRawString();
+};
+
+export const seeIfValidAddress = (value: string): boolean => {
+  try {
+    const result = Address.parse(value);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+export interface TonTransferParams {
+  address: string;
+  amount?: string;
+  text?: string;
+  jetton?: string;
+}
+
+export function parseTonTransfer(options: { url: string }) {
+  try {
+    const url = new URL(options.url);
+    if (url.protocol !== 'ton:') {
+      return null;
+    }
+    const [, , operation, address] = url.pathname.split('/');
+    if (operation !== 'transfer' || !seeIfValidAddress(address)) {
+      return null;
+    }
+
+    const result: TonTransferParams = {
+      address,
+    };
+    url.searchParams.forEach((value, key) =>
+      Object.assign(result, { [key]: value })
+    );
+
+    return result;
+  } catch (e) {
+    return null;
+  }
+}

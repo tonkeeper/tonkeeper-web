@@ -1,8 +1,16 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
+import {
+  parseTonTransfer,
+  seeIfAddressEqual,
+  TonTransferParams,
+} from '@tonkeeper/core/dist/utils/common';
+import { DefaultDecimals } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
@@ -13,12 +21,13 @@ import { Notification } from '../Notification';
 import { AmountView } from './AmountView';
 import { childFactoryCreator, duration, Wrapper } from './common';
 import { ConfirmView } from './ConfirmView';
-import { RecipientView } from './RecipientView';
+import { RecipientView, useGetToAccount } from './RecipientView';
 
 const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
   asset = CryptoCurrency.TON,
 }) => {
+  const sdk = useAppSdk();
   const { standalone, ios } = useAppContext();
   const { t } = useTranslation();
   const { data: jettons } = useWalletJettonList();
@@ -34,6 +43,9 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     undefined
   );
   const [amount, setAmount] = useState<AmountData | undefined>(undefined);
+
+  const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
+    useGetToAccount();
 
   const onRecipient = (data: RecipientData) => {
     setRight(true);
@@ -55,6 +67,63 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     setRight(false);
     setAmount((value) => (value ? { ...value, done: false } : undefined));
   }, [setAmount]);
+
+  const processRecipient = useCallback(
+    async ({ address, text }: TonTransferParams) => {
+      const item = { address: address };
+      const toAccount = await getAccountAsync(item);
+
+      const done = !toAccount.memoRequired
+        ? true
+        : toAccount.memoRequired && text
+        ? true
+        : false;
+      setRecipient({
+        address: item,
+        toAccount,
+        comment: text ?? '',
+        done,
+      });
+    },
+    [setRecipient, getAccountAsync]
+  );
+
+  const processJetton = useCallback(
+    async ({ amount, jetton }: TonTransferParams) => {
+      if (!amount && !jetton) return;
+
+      const balance = filter.balances.find((item) =>
+        seeIfAddressEqual(item.jettonAddress, jetton)
+      );
+      const decimals = balance?.metadata?.decimals ?? DefaultDecimals;
+
+      const amountValue = amount
+        ? String(formatDecimals(amount, decimals))
+        : '0';
+
+      setAmount({
+        amount: amountValue,
+        jetton: balance?.jettonAddress ?? asset,
+        max: false,
+        done: false,
+        fee: undefined!,
+      });
+    },
+    [setAmount, filter, asset]
+  );
+
+  const onScan = async (signature: string) => {
+    const param = parseTonTransfer({ url: signature });
+    if (param === null) {
+      return sdk.uiEvents.emit('copy', {
+        method: 'copy',
+        params: t('Unexpected_QR_Code'),
+      });
+    } else {
+      await processJetton(param);
+      await processRecipient(param);
+    }
+  };
 
   const [state, nodeRef] = (() => {
     if (!recipient || !recipient.done) {
@@ -85,7 +154,9 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 onClose={onClose}
                 setRecipient={onRecipient}
                 allowComment={asset === CryptoCurrency.TON}
+                onScan={onScan}
                 keyboard="decimal"
+                isExternalLoading={isAccountLoading}
               />
             )}
             {state === 'amount' && (

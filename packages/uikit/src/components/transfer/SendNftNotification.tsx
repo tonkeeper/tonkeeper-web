@@ -2,15 +2,20 @@ import { useQuery } from '@tanstack/react-query';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { estimateNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import {
+  parseTonTransfer,
+  TonTransferParams,
+} from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { Notification } from '../Notification';
 import { childFactoryCreator, duration, Wrapper } from './common';
 import { ConfirmNftView } from './ConfirmNftView';
-import { RecipientView } from './RecipientView';
+import { RecipientView, useGetToAccount } from './RecipientView';
 
 const useNftTransferEstimation = (
   nftItem: NftItemRepr,
@@ -32,6 +37,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
   nftItem,
   onClose,
 }) => {
+  const sdk = useAppSdk();
   const { t } = useTranslation();
   const { standalone } = useAppContext();
   const recipientRef = useRef<HTMLDivElement>(null);
@@ -42,6 +48,8 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
     undefined
   );
 
+  const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
+    useGetToAccount();
   const { data: fee } = useNftTransferEstimation(nftItem, recipient);
 
   const onRecipient = (data: RecipientData) => {
@@ -60,6 +68,33 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
     }
     return ['confirm', confirmRef] as const;
   })();
+
+  const processRecipient = useCallback(
+    async ({ address }: TonTransferParams) => {
+      const item = { address: address };
+      const toAccount = await getAccountAsync(item);
+
+      setRecipient({
+        address: item,
+        toAccount,
+        comment: '',
+        done: true,
+      });
+    },
+    [setRecipient, getAccountAsync]
+  );
+
+  const onScan = async (signature: string) => {
+    const param = parseTonTransfer({ url: signature });
+    if (param === null) {
+      return sdk.uiEvents.emit('copy', {
+        method: 'copy',
+        params: t('Unexpected_QR_Code'),
+      });
+    } else {
+      await processRecipient(param);
+    }
+  };
 
   return (
     <Wrapper standalone={standalone}>
@@ -80,6 +115,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
                 onClose={onClose}
                 setRecipient={onRecipient}
                 allowComment={false}
+                onScan={onScan}
               />
             )}
             {state === 'confirm' && (

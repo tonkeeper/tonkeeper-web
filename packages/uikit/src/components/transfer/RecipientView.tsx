@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Recipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
 import { AccountApi, AccountRepr, DNSApi } from '@tonkeeper/core/dist/tonApiV1';
-import { debounce } from '@tonkeeper/core/dist/utils/common';
+import { debounce, seeIfValidAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
@@ -13,7 +13,7 @@ import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { ButtonMock } from '../fields/BackButton';
 import { Button } from '../fields/Button';
-import { Input } from '../fields/Input';
+import { Input, InputWithScanner } from '../fields/Input';
 import { Gap } from '../Layout';
 import {
   FullHeightBlock,
@@ -40,16 +40,7 @@ const Warning = styled(Body2)`
   color: ${(props) => props.theme.accentOrange};
 `;
 
-const seeIfValidAddress = (value: string): boolean => {
-  try {
-    const result = Address.parse(value);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
-
-const useGetToAccount = () => {
+export const useGetToAccount = () => {
   const { tonApi } = useAppContext();
   return useMutation<AccountRepr, Error, Recipient>((recipient) => {
     const account =
@@ -57,6 +48,7 @@ const useGetToAccount = () => {
     return new AccountApi(tonApi).getAccountInfo({ account });
   });
 };
+
 const useToAccount = (isValid: boolean, recipient: Recipient) => {
   const { tonApi } = useAppContext();
   const account =
@@ -101,17 +93,21 @@ const useDnsWallet = (value: string) => {
 export const RecipientView: FC<{
   title: string;
   data?: RecipientData;
-  allowComment?: boolean;
   onClose: () => void;
   setRecipient: (options: RecipientData) => void;
   keyboard?: 'decimal';
+  allowComment: boolean;
+  onScan: (value: string) => void;
+  isExternalLoading?: boolean;
 }> = ({
   title,
   data,
   onClose,
   setRecipient,
-  allowComment = true,
   keyboard,
+  allowComment,
+  onScan,
+  isExternalLoading,
 }) => {
   const sdk = useAppSdk();
   const [submitted, setSubmit] = useState(false);
@@ -154,7 +150,7 @@ export const RecipientView: FC<{
     recipient
   );
 
-  const isFetching = isAccountFetching || isAccountLoading;
+  const isFetching = isAccountFetching || isAccountLoading || isExternalLoading;
 
   const isMemoValid = useMemo(() => {
     if (!toAccount) return true;
@@ -213,12 +209,14 @@ export const RecipientView: FC<{
         <NotificationCancelButton handleClose={onClose} />
       </NotificationTitleBlock>
       <ShowAddress value={showAddress}>
-        <Input
+        <InputWithScanner
           ref={ref}
           value={formatted}
+          onScan={onScan}
           onChange={(address) => setAddress({ address })}
           label={t('transaction_recipient_address')}
           isValid={!submitted || isDnsFetching || isValid}
+          disabled={isExternalLoading}
         />
       </ShowAddress>
 
@@ -228,6 +226,7 @@ export const RecipientView: FC<{
           onChange={setComment}
           label={t('send_comment_label')}
           isValid={!submitted || isMemoValid}
+          disabled={isExternalLoading}
         />
       )}
       {allowComment && toAccount && toAccount.memoRequired && (
@@ -238,7 +237,7 @@ export const RecipientView: FC<{
 
       <Label>{t('send_screen_steps_address_suggests_label')}</Label>
 
-      <SuggestionList onSelect={onSelect} />
+      <SuggestionList onSelect={onSelect} disabled={isExternalLoading} />
 
       <Gap />
 

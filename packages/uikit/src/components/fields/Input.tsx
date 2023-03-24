@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useAppSdk } from '../../hooks/appSdk';
+import { ScanIcon } from '../Icon';
 
-const InputBlock = styled.div<{ focus: boolean; valid: boolean }>`
+const InputBlock = styled.div<{
+  focus: boolean;
+  valid: boolean;
+  scanner?: boolean;
+}>`
   width: 100%;
   line-height: 56px;
   border-radius: ${(props) => props.theme.cornerSmall};
@@ -10,6 +16,12 @@ const InputBlock = styled.div<{ focus: boolean; valid: boolean }>`
   gap: 0.5rem;
   box-sizing: border-box;
   position: relative;
+
+  ${(props) =>
+    props.scanner &&
+    css`
+      padding-right: 3.5rem;
+    `}
 
   &:focus-within label {
     transform: translate(0, 6px) scale(0.7);
@@ -99,3 +111,79 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     );
   }
 );
+
+export interface InputWithScanner {
+  value: string;
+  onScan: (signature: string) => void;
+  onChange?: (value: string) => void;
+  isValid?: boolean;
+  label?: string;
+  disabled?: boolean;
+}
+
+const ScanBlock = styled.div`
+  position: absolute;
+  right: 1rem;
+  top: 13px;
+  display: flex;
+
+  color: ${(props) => props.theme.accentBlue};
+`;
+
+export const InputWithScanner = React.forwardRef<
+  HTMLInputElement,
+  InputWithScanner
+>(({ value, onChange, isValid = true, label, disabled, onScan }, ref) => {
+  const [focus, setFocus] = useState(false);
+  const [scanId, setScanId] = useState<number | undefined>(undefined);
+  const sdk = useAppSdk();
+
+  const onClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (disabled) return;
+    const id = Date.now();
+    sdk.uiEvents.emit('scan', {
+      method: 'scan',
+      id: id,
+      params: undefined,
+    });
+    setScanId(id);
+  };
+
+  useEffect(() => {
+    const handler = (options: {
+      method: 'response';
+      id?: number | undefined;
+      params: string;
+    }) => {
+      if (options.id === scanId) {
+        onScan(options.params);
+      }
+    };
+    sdk.uiEvents.on('response', handler);
+
+    return () => {
+      sdk.uiEvents.off('response', handler);
+    };
+  }, [sdk, scanId, onScan]);
+
+  return (
+    <InputBlock focus={focus} valid={isValid} scanner>
+      <InputField
+        ref={ref}
+        disabled={disabled}
+        type="text"
+        value={value}
+        onChange={(e) => onChange && onChange(e.target.value)}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+      />
+      {label && <Label active={value != ''}>{label}</Label>}
+
+      <ScanBlock onClick={onClick}>
+        <ScanIcon />
+      </ScanBlock>
+    </InputBlock>
+  );
+});

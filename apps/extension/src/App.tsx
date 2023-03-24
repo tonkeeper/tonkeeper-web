@@ -9,10 +9,10 @@ import { Footer } from '@tonkeeper/uikit/dist/components/Footer';
 import { Header } from '@tonkeeper/uikit/dist/components/Header';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import {
-  ActivitySkeleton,
-  CoinSkeleton,
+  ActivitySkeletonPage,
+  CoinSkeletonPage,
   HomeSkeleton,
-  SettingsSkeleton,
+  SettingsSkeletonPage,
 } from '@tonkeeper/uikit/dist/components/SKeleton';
 import {
   AppContext,
@@ -244,7 +244,7 @@ export const Content: FC<{
         <Route
           path={AppRoute.activity}
           element={
-            <Suspense fallback={<ActivitySkeleton />}>
+            <Suspense fallback={<ActivitySkeletonPage />}>
               <Activity />
             </Suspense>
           }
@@ -252,7 +252,7 @@ export const Content: FC<{
         <Route
           path={any(AppRoute.settings)}
           element={
-            <Suspense fallback={<SettingsSkeleton />}>
+            <Suspense fallback={<SettingsSkeletonPage />}>
               <Settings />
             </Suspense>
           }
@@ -262,7 +262,7 @@ export const Content: FC<{
             path=":name"
             element={
               <Body>
-                <Suspense fallback={<CoinSkeleton />}>
+                <Suspense fallback={<CoinSkeletonPage />}>
                   <Coin />
                 </Suspense>
               </Body>

@@ -225,7 +225,8 @@ const LatestItem: FC<{
 
 export const SuggestionList: FC<{
   onSelect: (item: Suggestion) => void;
-}> = ({ onSelect }) => {
+  disabled?: boolean;
+}> = ({ onSelect, disabled }) => {
   const { data, isFetching } = useLatestSuggestion();
   const [addFavorite, setAdd] = useState<LatestSuggestion | undefined>(
     undefined
@@ -247,8 +248,8 @@ export const SuggestionList: FC<{
               <FavoriteItem
                 key={item.address}
                 item={item}
-                onSelect={onSelect}
-                onEdit={setEdit}
+                onSelect={(value) => !disabled && onSelect(value)}
+                onEdit={(value) => !disabled && setEdit(value)}
               />
             );
           }
@@ -256,8 +257,8 @@ export const SuggestionList: FC<{
             <LatestItem
               key={item.address}
               item={item}
-              onSelect={onSelect}
-              onAddFavorite={setAdd}
+              onSelect={(value) => !disabled && onSelect(value)}
+              onAddFavorite={(value) => !disabled && setAdd(value)}
             />
           );
         })}

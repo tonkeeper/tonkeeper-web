@@ -178,5 +178,8 @@
   },
   "choose_currency_currencies_KZT": {
     "message": "Казахстанский тенге"
+  },
+  "Unexpected_QR_Code": {
+    "message": "Неожиданный QR-код"
   }
 }

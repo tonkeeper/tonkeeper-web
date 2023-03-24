@@ -182,5 +182,8 @@
   },
   "choose_currency_currencies_KZT": {
     "message": "Kazakhstani tenge"
+  },
+  "Unexpected_QR_Code": {
+    "message": "Unexpected QR Code"
   }
 }
