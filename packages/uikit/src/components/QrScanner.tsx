@@ -8,7 +8,7 @@ import ReactPortal from './ReactPortal';
 const Block = styled.div`
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: 5;
   pointer-events: none;
 
   display: flex;
@@ -19,9 +19,10 @@ const Block = styled.div`
 `;
 
 const ButtonPosition = styled.div`
-  position: absolute;
+  position: fixed;
+  z-index: 6;
   top: 1rem;
-  left: 1rem;
+  right: 1rem;
 `;
 
 const QrScanner = () => {
@@ -63,12 +64,14 @@ const QrScanner = () => {
   return (
     <ReactPortal wrapperId="qr-scanner">
       {scanId && (
-        <Block>
-          <QrScanSignature onScan={onScan} />
+        <>
           <ButtonPosition>
             <NotificationCancelButton handleClose={onCancel} />
           </ButtonPosition>
-        </Block>
+          <Block>
+            <QrScanSignature onScan={onScan} />
+          </Block>
+        </>
       )}
     </ReactPortal>
   );
