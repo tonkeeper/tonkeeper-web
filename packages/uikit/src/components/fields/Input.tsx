@@ -125,9 +125,7 @@ export interface InputWithScanner {
 const ScanBlock = styled.div<{ ios: boolean }>`
   position: absolute;
   right: 1rem;
-  top: 0;
-  height: ${(props) => (props.ios ? '56px' : '54px')};
-  align-items: center;
+  top: ${(props) => (props.ios ? '14px' : '13px')};
   display: flex;
 
   color: ${(props) => props.theme.accentBlue};
