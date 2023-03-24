@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import { Address } from 'ton-core';
 
 export const delay = (ms: number) =>
@@ -96,23 +97,60 @@ export interface TonTransferParams {
   jetton?: string;
 }
 
+const PREFIX = 'ton://transfer/';
 export function parseTonTransfer(options: { url: string }) {
   try {
-    const url = new URL(options.url);
-    if (url.protocol !== 'ton:') {
-      return null;
+    if (!options.url.startsWith(PREFIX)) {
+      throw new Error('must starts with ' + PREFIX);
     }
-    const [, , operation, address] = url.pathname.split('/');
-    if (operation !== 'transfer' || !seeIfValidAddress(address)) {
-      return null;
+
+    const arr = options.url.substring(PREFIX.length).split('?');
+    if (arr.length > 2) {
+      throw new Error('multiple "?"');
+    }
+
+    const address = arr[0];
+
+    if (!seeIfValidAddress(address)) {
+      throw new Error('invalid address format ' + address);
     }
 
     const result: TonTransferParams = {
       address,
     };
-    url.searchParams.forEach((value, key) =>
-      Object.assign(result, { [key]: value })
-    );
+    const rest = arr[1];
+    if (rest && rest.length) {
+      const pairs = rest.split('&').map((s) => s.split('='));
+
+      for (const pair of pairs) {
+        if (pair.length !== 2) throw new Error('invalid url pair');
+        const key = pair[0];
+        const value = pair[1];
+
+        if (key === 'amount') {
+          if (result.amount) {
+            throw new Error('amount already set');
+          }
+          const bn = new BigNumber(value);
+          if (bn.isNegative()) {
+            throw new Error('negative amount');
+          }
+          result.amount = value;
+        } else if (key === 'text') {
+          if (result.text) {
+            throw new Error('text already set');
+          }
+          result.text = decodeURIComponent(value);
+        } else if (key === 'jetton') {
+          if (result.jetton) {
+            throw new Error('text already set');
+          }
+          result.jetton = decodeURIComponent(value);
+        } else {
+          throw new Error('unknown url var ' + key);
+        }
+      }
+    }
 
     return result;
   } catch (e) {

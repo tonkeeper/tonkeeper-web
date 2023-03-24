@@ -44,6 +44,7 @@ const QrScanner = () => {
   };
   const onScan = ({ signature }: { signature: string }) => {
     signature = signature.slice(2);
+
     sdk.uiEvents.emit('response', {
       method: 'response',
       id: scanId,
