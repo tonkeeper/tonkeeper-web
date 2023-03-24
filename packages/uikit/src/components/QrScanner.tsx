@@ -2,6 +2,7 @@ import { QrScanSignature } from '@polkadot/react-qr/ScanSignature';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
+import { NotificationCancelButton } from './Notification';
 import ReactPortal from './ReactPortal';
 
 const Block = styled.div`
@@ -16,6 +17,13 @@ const Block = styled.div`
 
   background: ${(props) => props.theme.backgroundPage};
 `;
+
+const ButtonPosition = styled.div`
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+`;
+
 const QrScanner = () => {
   const [scanId, setScanId] = useState<number | undefined>(undefined);
   const sdk = useAppSdk();
@@ -30,7 +38,11 @@ const QrScanner = () => {
     };
   }, []);
 
+  const onCancel = () => {
+    setScanId(undefined);
+  };
   const onScan = ({ signature }: { signature: string }) => {
+    signature = signature.slice(2);
     console.log(signature);
     setTimeout(() => {
       sdk.uiEvents.emit('copy', {
@@ -53,6 +65,9 @@ const QrScanner = () => {
       {scanId && (
         <Block>
           <QrScanSignature onScan={onScan} />
+          <ButtonPosition>
+            <NotificationCancelButton handleClose={onCancel} />
+          </ButtonPosition>
         </Block>
       )}
     </ReactPortal>
