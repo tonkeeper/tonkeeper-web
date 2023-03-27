@@ -39,9 +39,8 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   const confirmRef = useRef<HTMLDivElement>(null);
 
   const [right, setRight] = useState(true);
-  const [recipient, setRecipient] = useState<RecipientData | undefined>(
-    undefined
-  );
+  const [recipient, setRecipient] =
+    useState<RecipientData | undefined>(undefined);
   const [amount, setAmount] = useState<AmountData | undefined>(undefined);
 
   const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
@@ -117,7 +116,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     if (param === null) {
       return sdk.uiEvents.emit('copy', {
         method: 'copy',
-        params: `${t('Unexpected_QR_Code')} ${signature}`,
+        params: t('Unexpected_QR_Code'),
       });
     } else {
       await processJetton(param);

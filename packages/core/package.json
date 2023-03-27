@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-js": "^3.0.0",
+    "@tonconnect/protocol": "^2.2.5",
     "bignumber.js": "^9.1.1",
     "ton": "^13.0.0",
     "ton-core": "^0.27.0",

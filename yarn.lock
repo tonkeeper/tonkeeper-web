@@ -3773,6 +3773,14 @@
   dependencies:
     "@babel/runtime" "^7.12.5"
 
+"@tonconnect/protocol@^2.2.5":
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/@tonconnect/protocol/-/protocol-2.2.5.tgz#15369801708354821295a6d284f0267799ac48cc"
+  integrity sha512-kR0E+CWZl6JrE/30283v+sRiAvEu21t1xOLFx6f/BxlCNLY2wki39+L32+iicX8gn/Ig99L1flr9TAI9QW9bnQ==
+  dependencies:
+    tweetnacl "^1.0.3"
+    tweetnacl-util "^0.15.1"
+
 "@tootallnate/once@1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
@@ -16029,6 +16037,11 @@ turbo@^1.6.3:
     turbo-linux-arm64 "1.6.3"
     turbo-windows-64 "1.6.3"
     turbo-windows-arm64 "1.6.3"
+
+tweetnacl-util@^0.15.1:
+  version "0.15.1"
+  resolved "https://registry.yarnpkg.com/tweetnacl-util/-/tweetnacl-util-0.15.1.tgz#b80fcdb5c97bcc508be18c44a4be50f022eea00b"
+  integrity sha512-RKJBIj8lySrShN4w6i/BonWp2Z/uxwC3h4y7xsRrpP59ZboCd0GpEVsOnMDYLMmKBpYhb5TgHzZXy7wTfYFBRw==
 
 tweetnacl@1.0.3, tweetnacl@^1.0.3:
   version "1.0.3"

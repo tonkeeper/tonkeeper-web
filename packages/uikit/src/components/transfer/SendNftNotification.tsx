@@ -44,9 +44,8 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
   const confirmRef = useRef<HTMLDivElement>(null);
 
   const [right, setRight] = useState(true);
-  const [recipient, setRecipient] = useState<RecipientData | undefined>(
-    undefined
-  );
+  const [recipient, setRecipient] =
+    useState<RecipientData | undefined>(undefined);
 
   const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
     useGetToAccount();
@@ -89,7 +88,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
     if (param === null) {
       return sdk.uiEvents.emit('copy', {
         method: 'copy',
-        params: `${t('Unexpected_QR_Code')} ${signature}`,
+        params: t('Unexpected_QR_Code'),
       });
     } else {
       await processRecipient(param);
