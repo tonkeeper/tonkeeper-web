@@ -22,7 +22,7 @@ export const TonConnectNotification: FC<{
   const Content = useCallback(() => {
     if (!params) return undefined;
     return <ConnectContent params={params} handleClose={handleClose} />;
-  }, [open]);
+  }, [params, handleClose]);
 
   return (
     <Notification isOpen={params != null} handleClose={handleClose} hideButton>

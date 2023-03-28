@@ -7,7 +7,6 @@ import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute } from '../libs/routes';
 import { useMutateActiveWallet } from '../state/account';
 import { useWalletState } from '../state/wallet';
-import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
@@ -212,7 +211,7 @@ export const Header = () => {
         </Title>
       </DropDown>
 
-      <ScanButton />
+      {/* <ScanButton /> */}
 
       <ImportNotification isOpen={isOpen} setOpen={setOpen} />
     </Block>
