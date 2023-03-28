@@ -164,7 +164,7 @@ const seeIfTonTransfer = (action: Action) => {
   if (action.type == 'TonTransfer') {
     return true;
   } else if (action.type == 'ContractDeploy') {
-    if (action.contractDeploy?.interfaces.includes('wallet')) {
+    if (action.contractDeploy?.interfaces?.includes('wallet')) {
       return true;
     }
   }

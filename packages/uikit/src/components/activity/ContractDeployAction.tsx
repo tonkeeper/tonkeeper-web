@@ -42,7 +42,7 @@ export const ContractDeployActionDetails: FC<ActionData> = ({
     <ActionDetailsBlock event={event}>
       <div>
         <Title>
-          {contractDeploy.interfaces.includes('wallet')
+          {contractDeploy.interfaces?.includes('wallet')
             ? t('transaction_type_wallet_initialized')
             : t('transaction_type_contract_deploy')}
         </Title>
