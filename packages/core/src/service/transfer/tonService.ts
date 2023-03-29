@@ -46,9 +46,14 @@ export const estimateTonTransfer = async (
   recipient: RecipientData,
   data: AmountValue
 ) => {
-  const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
-    account: walletState.active.rawAddress,
-  });
+  const { seqno } = await new WalletApi(tonApi)
+    .getWalletSeqno({
+      account: walletState.active.rawAddress,
+    })
+    .catch(() => ({
+      seqno: 0,
+    }));
+
   const cell = createTonTransfer(seqno, walletState, recipient, data);
 
   const { fee } = await new SendApi(tonApi).estimateTx({

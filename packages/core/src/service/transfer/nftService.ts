@@ -90,9 +90,13 @@ export const estimateNftTransfer = async (
   recipient: RecipientData,
   nftItem: NftItemRepr
 ) => {
-  const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
-    account: walletState.active.rawAddress,
-  });
+  const { seqno } = await new WalletApi(tonApi)
+    .getWalletSeqno({
+      account: walletState.active.rawAddress,
+    })
+    .catch(() => ({
+      seqno: 0,
+    }));
 
   const cell = createNftTransfer(
     seqno,

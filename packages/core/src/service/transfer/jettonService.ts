@@ -104,9 +104,13 @@ export const estimateJettonTransfer = async (
   data: AmountValue,
   jettonInfo: JettonBalance
 ) => {
-  const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
-    account: walletState.active.rawAddress,
-  });
+  const { seqno } = await new WalletApi(tonApi)
+    .getWalletSeqno({
+      account: walletState.active.rawAddress,
+    })
+    .catch(() => ({
+      seqno: 0,
+    }));
 
   const cell = createJettonTransfer(
     seqno,

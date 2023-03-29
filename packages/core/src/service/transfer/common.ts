@@ -71,9 +71,13 @@ export const getWalletBalance = async (
   const wallet = await new AccountApi(tonApi).getAccountInfo({
     account: walletState.active.rawAddress,
   });
-  const { seqno } = await new WalletApi(tonApi).getWalletSeqno({
-    account: walletState.active.rawAddress,
-  });
+  const { seqno } = await new WalletApi(tonApi)
+    .getWalletSeqno({
+      account: walletState.active.rawAddress,
+    })
+    .catch(() => ({
+      seqno: 0,
+    }));
 
   return [wallet, seqno] as const;
 };
