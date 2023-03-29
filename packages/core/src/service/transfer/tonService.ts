@@ -83,7 +83,9 @@ export const sendTonTransfer = async (
   );
 
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
-  checkWalletBalance(total, wallet);
+  if (!data.max) {
+    checkWalletBalance(total, wallet);
+  }
 
   const cell = createTonTransfer(
     seqno,
