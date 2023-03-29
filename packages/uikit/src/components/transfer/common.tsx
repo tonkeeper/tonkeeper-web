@@ -20,6 +20,24 @@ const ButtonBlockElement = styled.div<{ standalone: boolean }>`
   box-sizing: border-box;
   width: var(--app-width);
 
+  &:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    left: 0;
+    ${(props) =>
+      props.standalone
+        ? css`
+            bottom: -2rem;
+          `
+        : css`
+            bottom: -1rem;
+          `}
+    height: calc(100% + 2rem);
+    z-index: -1;
+    background: ${(props) => props.theme.gradientBackgroundBottom};
+  }
+
   ${(props) =>
     props.standalone
       ? css`
