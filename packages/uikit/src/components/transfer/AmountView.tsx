@@ -81,7 +81,7 @@ const MaxRow = styled.div`
 const MaxButton = styled(Label2)<{ maxValue: boolean }>`
   cursor: pointer;
   padding: 8px 16px;
-  border-radius: ${(props) => props.theme.cornerSmall};
+  border-radius: ${(props) => props.theme.cornerMedium};
   background-color: ${(props) =>
     props.maxValue
       ? props.theme.buttonPrimaryBackground
@@ -273,7 +273,7 @@ export const AmountView: FC<{
   const format = useFormatCoinValue();
 
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
-  const [amount, setAmountValue] = useState(data ? data.amount : '');
+  const [amount, setAmountValue] = useState(data ? data.amount : '0');
 
   const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
 

@@ -11,7 +11,7 @@ import { Body1, Label1 } from '../Text';
 
 const AssetValue = styled.div`
   background: ${(props) => props.theme.buttonTertiaryBackground};
-  border-radius: ${(props) => props.theme.cornerSmall};
+  border-radius: ${(props) => props.theme.cornerMedium};
   padding: 0.5rem 1rem;
   display: flex;
   gap: 0.5rem;
