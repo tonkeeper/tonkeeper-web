@@ -55,7 +55,7 @@ const SubTitle = styled(Body2)`
 `;
 
 const Title = styled(H3)`
-  margin: -3px 0 0;
+  margin: -8px 0 0;
 `;
 
 const AmountBlock = styled.label`

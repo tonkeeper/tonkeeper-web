@@ -1,7 +1,7 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
-import React, { FC } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { DropDown } from '../DropDown';
@@ -56,6 +56,13 @@ const AssetDropDown: FC<{
   setJetton: (value: string) => void;
 }> = ({ onClose, jetton, jettons, setJetton, info }) => {
   const format = useFormatCoinValue();
+
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [ref]);
   return (
     <ListBlock margin={false} dropDown>
       <ListItem
@@ -96,7 +103,7 @@ const AssetDropDown: FC<{
               </AssetInfo>
 
               {item.jettonAddress === jetton ? (
-                <Icon>
+                <Icon ref={ref}>
                   <DoneIcon />
                 </Icon>
               ) : undefined}
