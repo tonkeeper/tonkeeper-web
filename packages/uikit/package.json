@@ -27,7 +27,8 @@
     "react-router-dom": "^6.4.5",
     "react-transition-group": "^4.4.5",
     "styled-components": "^5.3.6",
-    "ton-core": "^0.36.1",
+    "ton": "^13.3.0",
+    "ton-core": "^0.47.1",
     "ton-crypto": "^3.2.0"
   },
   "devDependencies": {

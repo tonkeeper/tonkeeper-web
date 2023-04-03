@@ -15814,17 +15814,10 @@ toidentifier@1.0.1:
   resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.1.tgz#3be34321a88a820ed1bd80dfaa33e479fbb8dd35"
   integrity sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==
 
-ton-core@^0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/ton-core/-/ton-core-0.27.0.tgz#536cf47bfa64faa33ec0fec00741e21753c23bd4"
-  integrity sha512-p7evPe5SW+rImfnIIeXWZT0sLZ4emRdNH98D5xOfq2lHPsJYxfTqA4s8biD+kkXpkRPdCQKjq/ZZ5uqTmvIudw==
-  dependencies:
-    symbol.inspect "1.0.1"
-
-ton-core@^0.36.1:
-  version "0.36.1"
-  resolved "https://registry.yarnpkg.com/ton-core/-/ton-core-0.36.1.tgz#8a47edfa8a1196073e853cb8a8ac1f1ed94f8f7b"
-  integrity sha512-hr6LsaTC6f4Y/J3hFDYKRcQ1FbRPO2z7tODMp+777X0jiew1cAsresk0i2vqptqHZNgYZVEe6VenNzxi2hZHIQ==
+ton-core@^0.47.1:
+  version "0.47.1"
+  resolved "https://registry.yarnpkg.com/ton-core/-/ton-core-0.47.1.tgz#22298d79e345ea1a34825b4044dda5a7c5995474"
+  integrity sha512-XxcgLYH+Ngo3uh7O7jkzA0/O8nfG3WC3fgUmdvY9/IkGKpkO3Y/KHtrZgAOHYAkxJCmaXpi4aPf4JEnZEiPrWQ==
   dependencies:
     symbol.inspect "1.0.1"
 
@@ -15844,10 +15837,10 @@ ton-crypto@^3.2.0:
     ton-crypto-primitives "2.0.0"
     tweetnacl "1.0.3"
 
-ton@^13.0.0:
-  version "13.0.0"
-  resolved "https://registry.yarnpkg.com/ton/-/ton-13.0.0.tgz#91a8801f623d0fa91d385d168d09571ee4eec645"
-  integrity sha512-8gB/RHZg4uCV5C/5IGG0TfgkCaNUhFqhDM63CN2g58CHYvO8+Ly21h28o4EEoezvqwBhcFu+mvKzKoJv7Er6/Q==
+ton@^13.3.0:
+  version "13.4.1"
+  resolved "https://registry.yarnpkg.com/ton/-/ton-13.4.1.tgz#8808370785498a8762848d4cdd8a781964df6a74"
+  integrity sha512-VCHmGE8o1EJBp5JdKNiqjHW5hmUqSfSYYIsMfCje8/GA6sLzhhtMmznuGsrAQhM+MeEAUSt72SeI41z/wnu9MQ==
   dependencies:
     axios "^0.25.0"
     dataloader "^2.0.0"

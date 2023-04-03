@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { beginCell, Cell, external } from 'ton-core';
+import { beginCell, Cell, comment, external, storeMessage } from 'ton-core';
 
 import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
@@ -35,23 +35,20 @@ export const externalMessage = (
 ) => {
   return beginCell()
     .storeWritable(
-      external({
-        to: contract.address,
-        init: seqno === 0 ? contract.init : undefined,
-        body: body,
-      })
+      storeMessage(
+        external({
+          to: contract.address,
+          init: seqno === 0 ? contract.init : undefined,
+          body: body,
+        })
+      )
     )
     .endCell();
 };
 
-export const forwardPayloadComment = (comment: string) => {
-  let result = beginCell();
-
-  if (comment) {
-    result = result.storeUint(0, 32).storeStringTail(comment);
-  }
-
-  return result;
+export const forwardPayloadComment = (commentValue: string) => {
+  if (!commentValue) beginCell();
+  return comment(commentValue).asBuilder();
 };
 
 export const checkWalletBalance = (total: BigNumber, wallet: AccountRepr) => {
