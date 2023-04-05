@@ -10,11 +10,11 @@ import { CSSTransition } from 'react-transition-group';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { Container } from '../styles/globalStyle';
-import { BackButton } from './fields/BackButton';
 import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
+import { BackButton } from './fields/BackButton';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
   background: transparent;
@@ -63,6 +63,7 @@ const Overlay = styled.div`
   top: 100%;
   transition: all 0.3s ease-in-out;
   overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 `;
 
 const Splash = styled.div`
@@ -75,6 +76,7 @@ const Splash = styled.div`
   justify-content: center;
   transition: all 0.3s ease-in-out;
   overflow: hidden;
+  -webkit-overflow-scrolling: touch;
   z-index: 10;
   padding: 0;
   opacity: 0;
@@ -130,7 +132,7 @@ const RowTitle = styled(H3)`
 
 const BackShadow = styled.div`
   width: var(--app-width);
-  height: 90vh;
+  height: 70vh;
   position: fixed;
   bottom: -50vh;
   z-index: -1;
@@ -188,6 +190,70 @@ export const NotificationCancelButton: FC<{ handleClose: () => void }> = ({
   );
 };
 
+export const NotificationScrollContext =
+  React.createContext<HTMLDivElement | null>(null);
+
+const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
+  React.memo(({ children, handleClose }) => {
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      const element = scrollRef.current;
+
+      if (!element) return;
+
+      let lastY = 0;
+      let maxScrollTop = 0;
+      let startScroll = 0;
+
+      const handlerTouchStart = function (event: TouchEvent) {
+        lastY = event.touches[0].clientY;
+        let style = window.getComputedStyle(element);
+        let outerHeight = ['height', 'padding-top', 'padding-bottom']
+          .map((key) => parseInt(style.getPropertyValue(key), 10))
+          .reduce((prev, cur) => prev + cur);
+
+        maxScrollTop = element.scrollHeight - outerHeight;
+        startScroll = element.scrollTop;
+      };
+
+      const handlerTouchMove = function (event: TouchEvent) {
+        var top = event.touches[0].clientY;
+
+        var direction = lastY - top < 0 ? 'up' : 'down';
+        if (event.cancelable) {
+          if (startScroll <= 0 && direction === 'up') {
+            console.log('touchend', startScroll, direction);
+
+            window.addEventListener('touchend', handleClose);
+            window.addEventListener('touchcancel', handleClose);
+          } else if (startScroll >= maxScrollTop && direction === 'down') {
+            event.preventDefault();
+          }
+        }
+        lastY = top;
+      };
+
+      element.addEventListener('touchstart', handlerTouchStart);
+      element.addEventListener('touchmove', handlerTouchMove);
+
+      return () => {
+        element.removeEventListener('touchstart', handlerTouchStart);
+        element.removeEventListener('touchmove', handlerTouchMove);
+        window.removeEventListener('touchend', handleClose);
+        window.removeEventListener('touchcancel', handleClose);
+      };
+    }, [scrollRef, handleClose]);
+
+    return (
+      <Overlay ref={scrollRef}>
+        <NotificationScrollContext.Provider value={scrollRef.current}>
+          {children}
+        </NotificationScrollContext.Provider>
+      </Overlay>
+    );
+  });
+
 export const Notification: FC<{
   isOpen: boolean;
   handleClose: () => void;
@@ -200,7 +266,8 @@ export const Notification: FC<{
     const [entered, setEntered] = useState(false);
 
     const sdk = useAppSdk();
-    const nodeRef = useRef(null);
+    const nodeRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
       const closeOnEscapeKey = (e: KeyboardEvent) =>
         e.key === 'Escape' ? handleClose() : null;
@@ -256,7 +323,7 @@ export const Notification: FC<{
           onExited={() => setEntered(false)}
         >
           <Splash ref={nodeRef} className="scrollable">
-            <Overlay>
+            <NotificationOverlay handleClose={handleClose}>
               <NotificationWrapper entered={entered}>
                 <Wrapper>
                   <Padding onClick={handleClose} />
@@ -277,7 +344,7 @@ export const Notification: FC<{
                 </Wrapper>
                 {backShadow && entered && <BackShadow />}
               </NotificationWrapper>
-            </Overlay>
+            </NotificationOverlay>
           </Splash>
         </CSSTransition>
       </ReactPortal>

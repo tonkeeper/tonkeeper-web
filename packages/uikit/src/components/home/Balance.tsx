@@ -14,9 +14,10 @@ import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
+import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { SkeletonText } from '../Skeleton';
-import { Label2, Num2 } from '../Text';
+import { Body3, Label2, Num2 } from '../Text';
 
 const Block = styled.div`
   display: flex;
@@ -35,9 +36,37 @@ const Amount = styled(Num2)`
   margin-bottom: 0.5rem;
   user-select: none;
 `;
+
 const Error = styled.div`
   height: 26px;
+  line-height: 26px;
+  text-align: center;
+  width: 100%;
 `;
+
+const MessageBlock: FC<{ error?: Error | null; isFetching: boolean }> = ({
+  error,
+  isFetching,
+}) => {
+  const { t } = useTranslation();
+  if (isFetching) {
+    return (
+      <Error>
+        <Body3>{t('loading')}</Body3>
+      </Error>
+    );
+  }
+
+  if (error) {
+    return (
+      <Error>
+        <Body3>{error.message}</Body3>
+      </Error>
+    );
+  }
+
+  return <Error></Error>;
+};
 
 const useBalanceValue = (
   info: AccountRepr | undefined,
@@ -90,7 +119,8 @@ export const Balance: FC<{
   error?: Error | null;
   stock?: TonendpointStock | undefined;
   jettons?: JettonsBalances | undefined;
-}> = ({ address, currency, info, error, stock, jettons }) => {
+  isFetching: boolean;
+}> = ({ address, currency, info, error, stock, jettons, isFetching }) => {
   const sdk = useAppSdk();
   const wallet = useWalletContext();
 
@@ -103,7 +133,7 @@ export const Balance: FC<{
 
   return (
     <Block>
-      <Error>{error && error.message}</Error>
+      <MessageBlock error={error} isFetching={isFetching} />
       <Amount>{total}</Amount>
       <Body onClick={onClick}>{toShortAddress(address)}</Body>
     </Block>
