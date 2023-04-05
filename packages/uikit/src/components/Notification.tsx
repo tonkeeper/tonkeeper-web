@@ -275,8 +275,8 @@ export const Notification: FC<{
 
         if (event.cancelable) {
           if (scrollTop <= 0 && direction === 'up') {
-            event.preventDefault();
-            handleClose();
+            element.addEventListener('touchend', handleClose);
+            element.addEventListener('touchcancel', handleClose);
           } else if (scrollTop >= maxScrollTop && direction === 'down') {
             event.preventDefault();
           }
@@ -290,6 +290,8 @@ export const Notification: FC<{
       return () => {
         element.removeEventListener('touchstart', handlerTouchStart);
         element.removeEventListener('touchmove', handlerTouchMove);
+        element.removeEventListener('touchend', handleClose);
+        element.removeEventListener('touchcancel', handleClose);
       };
     }, [nodeRef, handleClose]);
 
