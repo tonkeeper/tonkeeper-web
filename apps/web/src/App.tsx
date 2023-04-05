@@ -136,7 +136,7 @@ export const App: FC<PropsWithChildren> = () => {
     <BrowserRouter>
       <AnalyticsContext.Provider value={analytics}>
         <QueryClientProvider client={queryClient}>
-          <Suspense fallback={<Loading />}>
+          <Suspense fallback={<div></div>}>
             <AppSdkContext.Provider value={sdk}>
               <TranslationContext.Provider value={translation}>
                 <StorageContext.Provider value={storage}>
