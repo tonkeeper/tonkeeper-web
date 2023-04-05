@@ -22,7 +22,7 @@ import {
 } from './common';
 
 const jettonTransferAmount = toNano('0.64');
-const jettonTransferForwardAmount = toNano('0.0001');
+const jettonTransferForwardAmount = toNano('0.0002');
 
 const jettonTransferBody = (params: {
   queryId?: number;
