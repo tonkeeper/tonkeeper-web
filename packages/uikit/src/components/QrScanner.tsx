@@ -1,33 +1,33 @@
 import { QrScanSignature } from '@polkadot/react-qr/ScanSignature';
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import React, { useCallback, useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
+import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
-import { NotificationCancelButton } from './Notification';
-import ReactPortal from './ReactPortal';
+import { useTranslation } from '../hooks/translation';
+import { FullHeightBlock, Notification } from './Notification';
 
-const Block = styled.div`
-  position: fixed;
-  inset: 0;
-  z-index: 15;
-  pointer-events: none;
+const Block = styled.div<{ ios: boolean }>`
+  margin: 0 -1rem;
+  width: calc(100% + 2rem);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  .ui--qr-Scan section > div {
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 0px 5px inset !important;
+  }
 
-  background: ${(props) => props.theme.backgroundPage};
-`;
-
-const ButtonPosition = styled.div`
-  position: fixed;
-  z-index: 16;
-  top: 1rem;
-  right: 1rem;
+  ${(props) =>
+    props.ios &&
+    css`
+      .ui--qr-Scan {
+        transform: none !important;
+      }
+    `}
 `;
 
 const QrScanner = () => {
   const [scanId, setScanId] = useState<number | undefined>(undefined);
   const sdk = useAppSdk();
+  const { standalone, ios } = useAppContext();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handler = (options: { method: 'scan'; id?: number | undefined }) => {
@@ -42,31 +42,49 @@ const QrScanner = () => {
   const onCancel = () => {
     setScanId(undefined);
   };
-  const onScan = ({ signature }: { signature: string }) => {
-    signature = signature.slice(2);
+  const onScan = useCallback(
+    ({ signature }: { signature: string }) => {
+      signature = signature.slice(2);
 
-    sdk.uiEvents.emit('response', {
-      method: 'response',
-      id: scanId,
-      params: signature,
-    });
+      sdk.uiEvents.emit('response', {
+        method: 'response',
+        id: scanId,
+        params: signature,
+      });
 
-    setScanId(undefined);
-  };
+      setScanId(undefined);
+    },
+    [sdk, setScanId]
+  );
+
+  const Content = useCallback(() => {
+    return (
+      <FullHeightBlock standalone={standalone}>
+        <Block ios={ios}>
+          <QrScanSignature
+            onScan={onScan}
+            onError={(e) => {
+              sdk.uiEvents.emit('copy', {
+                method: 'copy',
+                id: scanId,
+                params: e.message,
+              });
+            }}
+          />
+        </Block>
+      </FullHeightBlock>
+    );
+  }, [onScan, standalone, ios]);
 
   return (
-    <ReactPortal wrapperId="qr-scanner">
-      {scanId && (
-        <>
-          <ButtonPosition>
-            <NotificationCancelButton handleClose={onCancel} />
-          </ButtonPosition>
-          <Block>
-            <QrScanSignature onScan={onScan} />
-          </Block>
-        </>
-      )}
-    </ReactPortal>
+    <Notification
+      isOpen={scanId != null}
+      handleClose={onCancel}
+      hideButton
+      title={t('scan_qr_title')}
+    >
+      {Content}
+    </Notification>
   );
 };
 
