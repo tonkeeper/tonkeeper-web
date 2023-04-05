@@ -199,11 +199,9 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
 
     useEffect(() => {
       const element = scrollRef.current;
-      console.log(scrollRef);
 
       if (!element) return;
 
-      let timer: NodeJS.Timeout;
       let lastY = 0;
       let maxScrollTop = 0;
       let startScroll = 0;
@@ -219,10 +217,6 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
         startScroll = element.scrollTop;
       };
 
-      const closeNotification = () => {
-        timer = setTimeout(handleClose, 300);
-      };
-
       const handlerTouchMove = function (event: TouchEvent) {
         var top = event.touches[0].clientY;
 
@@ -231,8 +225,8 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
           if (startScroll <= 0 && direction === 'up') {
             console.log('touchend', startScroll, direction);
 
-            window.addEventListener('touchend', closeNotification);
-            window.addEventListener('touchcancel', closeNotification);
+            window.addEventListener('touchend', handleClose);
+            window.addEventListener('touchcancel', handleClose);
           } else if (startScroll >= maxScrollTop && direction === 'down') {
             event.preventDefault();
           }
@@ -244,11 +238,10 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
       element.addEventListener('touchmove', handlerTouchMove);
 
       return () => {
-        clearTimeout(timer);
         element.removeEventListener('touchstart', handlerTouchStart);
         element.removeEventListener('touchmove', handlerTouchMove);
-        window.removeEventListener('touchend', closeNotification);
-        window.removeEventListener('touchcancel', closeNotification);
+        window.removeEventListener('touchend', handleClose);
+        window.removeEventListener('touchcancel', handleClose);
       };
     }, [scrollRef, handleClose]);
 
