@@ -54,7 +54,7 @@ const QrScanner = () => {
 
       setScanId(undefined);
     },
-    [sdk, setScanId]
+    [sdk, scanId, setScanId]
   );
 
   const Content = useCallback(() => {
@@ -78,7 +78,7 @@ const QrScanner = () => {
 
   return (
     <Notification
-      isOpen={scanId != null}
+      isOpen={scanId != undefined}
       handleClose={onCancel}
       hideButton
       title={t('scan_qr_title')}

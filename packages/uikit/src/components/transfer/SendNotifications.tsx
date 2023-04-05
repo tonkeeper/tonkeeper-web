@@ -2,9 +2,9 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import {
+  TonTransferParams,
   parseTonTransfer,
   seeIfAddressEqual,
-  TonTransferParams,
 } from '@tonkeeper/core/dist/utils/common';
 import { DefaultDecimals } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useCallback, useRef, useState } from 'react';
@@ -15,13 +15,13 @@ import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
+import { Notification } from '../Notification';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
-import { Notification } from '../Notification';
 import { AmountView } from './AmountView';
-import { childFactoryCreator, duration, Wrapper } from './common';
 import { ConfirmView } from './ConfirmView';
 import { RecipientView, useGetToAccount } from './RecipientView';
+import { Wrapper, childFactoryCreator, duration } from './common';
 
 const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
@@ -39,8 +39,9 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   const confirmRef = useRef<HTMLDivElement>(null);
 
   const [right, setRight] = useState(true);
-  const [recipient, setRecipient] =
-    useState<RecipientData | undefined>(undefined);
+  const [recipient, setRecipient] = useState<RecipientData | undefined>(
+    undefined
+  );
   const [amount, setAmount] = useState<AmountData | undefined>(undefined);
 
   const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =

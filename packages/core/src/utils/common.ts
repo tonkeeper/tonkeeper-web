@@ -83,7 +83,7 @@ export const seeIfAddressEqual = (one?: string, two?: string) => {
 
 export const seeIfValidAddress = (value: string): boolean => {
   try {
-    const result = Address.parse(value);
+    Address.parse(value);
     return true;
   } catch (e) {
     return false;
@@ -100,6 +100,13 @@ export interface TonTransferParams {
 const PREFIX = 'ton://transfer/';
 export function parseTonTransfer(options: { url: string }) {
   try {
+    if (seeIfValidAddress(options.url)) {
+      const result: TonTransferParams = {
+        address: options.url,
+      };
+      return result;
+    }
+
     if (!options.url.startsWith(PREFIX)) {
       throw new Error('must starts with ' + PREFIX);
     }
