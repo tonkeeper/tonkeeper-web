@@ -10,11 +10,11 @@ import { CSSTransition } from 'react-transition-group';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { Container } from '../styles/globalStyle';
-import { BackButton } from './fields/BackButton';
 import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
+import { BackButton } from './fields/BackButton';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
   background: transparent;
@@ -188,6 +188,9 @@ export const NotificationCancelButton: FC<{ handleClose: () => void }> = ({
   );
 };
 
+export const NotificationScrollContext =
+  React.createContext<HTMLDivElement | null>(null);
+
 export const Notification: FC<{
   isOpen: boolean;
   handleClose: () => void;
@@ -200,7 +203,8 @@ export const Notification: FC<{
     const [entered, setEntered] = useState(false);
 
     const sdk = useAppSdk();
-    const nodeRef = useRef(null);
+    const nodeRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
       const closeOnEscapeKey = (e: KeyboardEvent) =>
         e.key === 'Escape' ? handleClose() : null;
@@ -258,23 +262,25 @@ export const Notification: FC<{
           <Splash ref={nodeRef} className="scrollable">
             <Overlay>
               <NotificationWrapper entered={entered}>
-                <Wrapper>
-                  <Padding onClick={handleClose} />
-                  <Gap onClick={handleClose} />
-                  <Content standalone={standalone}>
-                    {title && (
-                      <NotificationTitleRow handleClose={handleClose}>
-                        {title}
-                      </NotificationTitleRow>
-                    )}
-                    {!hideButton && (
-                      <ButtonContainer>
-                        <NotificationCancelButton handleClose={handleClose} />
-                      </ButtonContainer>
-                    )}
-                    {Child}
-                  </Content>
-                </Wrapper>
+                <NotificationScrollContext.Provider value={nodeRef.current}>
+                  <Wrapper>
+                    <Padding onClick={handleClose} />
+                    <Gap onClick={handleClose} />
+                    <Content standalone={standalone}>
+                      {title && (
+                        <NotificationTitleRow handleClose={handleClose}>
+                          {title}
+                        </NotificationTitleRow>
+                      )}
+                      {!hideButton && (
+                        <ButtonContainer>
+                          <NotificationCancelButton handleClose={handleClose} />
+                        </ButtonContainer>
+                      )}
+                      {Child}
+                    </Content>
+                  </Wrapper>
+                </NotificationScrollContext.Provider>
                 {backShadow && entered && <BackShadow />}
               </NotificationWrapper>
             </Overlay>
