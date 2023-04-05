@@ -6,12 +6,12 @@ import {
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import {
-  getFiatMethods,
-  getServerConfig,
-  getStock,
   TonendpoinFiatMethods,
   Tonendpoint,
   TonendpointConfig,
+  getFiatMethods,
+  getServerConfig,
+  getStock,
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
@@ -39,11 +39,19 @@ export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
   );
 };
 
+export const DefaultRefetchInterval = 60000; // 60 sec
+
 export const useTonenpointStock = () => {
   const { tonendpoint } = useAppContext();
   return useQuery<TonendpointStock, Error>(
     [QueryKey.tonkeeperApi, TonkeeperApiKey.stock],
-    () => getStock(tonendpoint)
+    () => getStock(tonendpoint),
+    {
+      refetchInterval: DefaultRefetchInterval,
+      refetchIntervalInBackground: true,
+      refetchOnWindowFocus: true,
+      keepPreviousData: true,
+    }
   );
 };
 

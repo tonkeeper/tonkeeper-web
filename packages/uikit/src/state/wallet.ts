@@ -24,6 +24,7 @@ import {
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
+import { DefaultRefetchInterval } from './tonendpoint';
 
 export const checkWalletBackup = () => {
   const wallet = useWalletContext();
@@ -126,6 +127,12 @@ export const useWalletAccountInfo = () => {
       return await new AccountApi(tonApi).getAccountInfo({
         account: wallet.active.rawAddress,
       });
+    },
+    {
+      refetchInterval: DefaultRefetchInterval,
+      refetchIntervalInBackground: true,
+      refetchOnWindowFocus: true,
+      keepPreviousData: true,
     }
   );
 };
@@ -154,6 +161,12 @@ export const useWalletJettonList = () => {
       });
 
       return result;
+    },
+    {
+      refetchInterval: DefaultRefetchInterval,
+      refetchIntervalInBackground: true,
+      refetchOnWindowFocus: true,
+      keepPreviousData: true,
     }
   );
 };
@@ -189,6 +202,12 @@ export const useWalletNftList = () => {
           [] as NftItemRepr[]
         ),
       };
+    },
+    {
+      refetchInterval: DefaultRefetchInterval,
+      refetchIntervalInBackground: true,
+      refetchOnWindowFocus: true,
+      keepPreviousData: true,
     }
   );
 };
