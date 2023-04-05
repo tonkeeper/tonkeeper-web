@@ -1,12 +1,5 @@
 import BigNumber from 'bignumber.js';
-import {
-  Address,
-  beginCell,
-  Builder,
-  internal,
-  SendMode,
-  toNano,
-} from 'ton-core';
+import { Address, beginCell, Builder, internal, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
@@ -24,6 +17,7 @@ import {
   checkWalletBalance,
   externalMessage,
   getWalletBalance,
+  SendMode,
   walletContract,
 } from './common';
 
@@ -83,7 +77,7 @@ const createJettonTransfer = (
   const transfer = contract.createTransfer({
     seqno,
     secretKey,
-    sendMode: SendMode.PAY_GAS_SEPARATLY + SendMode.IGNORE_ERRORS,
+    sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
     messages: [
       internal({
         to: Address.parse(jettonInfo.walletAddress.address),

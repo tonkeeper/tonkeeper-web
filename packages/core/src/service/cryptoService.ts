@@ -6,14 +6,6 @@
  * @since: 0.0.1
  */
 
-import { Sha256 } from '@aws-crypto/sha256-js';
-
-export const sha256 = (value: Buffer) => {
-  const sha = new Sha256();
-  sha.update(value);
-  return Buffer.from(sha.digestSync());
-};
-
 /**
  * @param plaintext {string}
  * @param password {string}
