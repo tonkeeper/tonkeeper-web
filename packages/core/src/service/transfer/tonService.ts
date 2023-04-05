@@ -1,13 +1,14 @@
 import BigNumber from 'bignumber.js';
-import { internal, SendMode, toNano } from 'ton-core';
+import { internal, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
+import { IStorage } from '../../Storage';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
-import { IStorage } from '../../Storage';
 import { Configuration, Fee, SendApi, WalletApi } from '../../tonApiV1';
 import { toStringAmount } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import {
+  SendMode,
   checkWalletBalance,
   externalMessage,
   getWalletBalance,
@@ -26,8 +27,8 @@ const createTonTransfer = (
     seqno,
     secretKey,
     sendMode: data.max
-      ? SendMode.CARRRY_ALL_REMAINING_BALANCE
-      : SendMode.PAY_GAS_SEPARATLY + SendMode.IGNORE_ERRORS,
+      ? SendMode.CARRY_ALL_REMAINING_BALANCE
+      : SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
     messages: [
       internal({
         to: recipient.toAccount.address.raw,

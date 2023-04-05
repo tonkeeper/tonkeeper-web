@@ -1,3 +1,4 @@
+import { sha256_sync } from 'ton-crypto';
 import nacl from 'tweetnacl';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language } from '../entries/language';
@@ -5,7 +6,6 @@ import { Network } from '../entries/network';
 import { WalletProxy } from '../entries/proxy';
 import { WalletState, WalletVersion, WalletVoucher } from '../entries/wallet';
 import { BackupApi, Configuration } from '../tonApiV1';
-import { sha256 } from './cryptoService';
 import { createExpireTimestamp } from './voucherService';
 
 const tenMin = 10 * 60;
@@ -40,7 +40,7 @@ const createBody = async (
   ]);
 
   const signature = nacl.sign.detached(
-    sha256(requestBody),
+    sha256_sync(requestBody),
     Buffer.from(voucher.secretKey, 'hex')
   );
 

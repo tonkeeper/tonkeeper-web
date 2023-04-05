@@ -1,7 +1,6 @@
-import { KeyPair } from 'ton-crypto';
+import { KeyPair, sha256_sync } from 'ton-crypto';
 import nacl from 'tweetnacl';
 import { WalletVoucher } from '../entries/wallet';
-import { sha256 } from './cryptoService';
 
 const hundredYears = 100 * 355 * 24 * 60 * 60;
 
@@ -33,7 +32,7 @@ export const createWalletVoucher = async (
   ]);
 
   const signature = nacl.sign.detached(
-    sha256(voucherBody),
+    sha256_sync(voucherBody),
     walletKeyPair.secretKey
   );
   console.log('signature', signature.length);
