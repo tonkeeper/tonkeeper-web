@@ -39,11 +39,14 @@ const Amount = styled(Num2)`
 
 const Error = styled.div`
   height: 26px;
-  line-height: 26px;
   text-align: center;
   width: 100%;
 `;
 
+const Text = styled(Body3)`
+  line-height: 26px;
+  color: ${(props) => props.theme.textSecondary};
+`;
 const MessageBlock: FC<{ error?: Error | null; isFetching: boolean }> = ({
   error,
   isFetching,
@@ -52,7 +55,7 @@ const MessageBlock: FC<{ error?: Error | null; isFetching: boolean }> = ({
   if (isFetching) {
     return (
       <Error>
-        <Body3>{t('loading')}</Body3>
+        <Text>{t('loading')}</Text>
       </Error>
     );
   }
@@ -60,7 +63,7 @@ const MessageBlock: FC<{ error?: Error | null; isFetching: boolean }> = ({
   if (error) {
     return (
       <Error>
-        <Body3>{error.message}</Body3>
+        <Text>{error.message}</Text>
       </Error>
     );
   }
