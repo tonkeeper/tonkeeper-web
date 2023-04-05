@@ -1,7 +1,6 @@
 import { userDefaultTheme } from '@tonkeeper/core/dist/entries/theme';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import { DefaultTheme, ThemeProvider } from 'styled-components';
-import { Loading } from '../components/Loading';
 import { useUserTheme } from '../state/theme';
 import { defaultTheme } from '../styles/defaultTheme';
 import { GlobalStyle } from '../styles/globalStyle';
@@ -29,7 +28,7 @@ export const UserThemeProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [data]);
 
   if (!isFetched) {
-    return <Loading />;
+    return <div></div>;
   }
 
   return (
