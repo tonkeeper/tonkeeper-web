@@ -3,15 +3,11 @@ import { formatTransferUrl } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useState } from 'react';
 import QRCode from 'react-qr-code';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { ToncoinIcon } from '../Icon';
-import {
-  FullHeightBlock,
-  Notification,
-  NotificationBlock,
-} from '../Notification';
+import { Notification, NotificationBlock } from '../Notification';
 import { Body1, H2, Label1, Label2 } from '../Text';
 import { Action } from './Actions';
 import { ReceiveIcon } from './HomeIcons';
@@ -120,50 +116,37 @@ const ReceiveContent: FC<{ info?: JettonInfo }> = ({ info }) => {
   const { t } = useTranslation();
   const sdk = useAppSdk();
   const wallet = useWalletContext();
-  const { standalone } = useAppContext();
 
   return (
-    <FullHeightBlock standalone={standalone}>
-      <NotificationBlock>
-        {info?.metadata.image ? (
-          <Logo src={info?.metadata.image} />
-        ) : (
-          <ToncoinIcon width="72" height="72" />
-        )}
-        <Title>
-          {info
-            ? t('receive_title').replace('%{currency}', info.metadata.symbol)
-            : t('receive_ton_and_jettons')}
-        </Title>
-        <Block>
-          <TitleText>{t('receive_qr_title')}</TitleText>
-          <Background>
-            <QRCode
-              size={400}
-              value={formatTransferUrl({
-                address: wallet.active.friendlyAddress,
-                jetton: info?.metadata.address,
-              })}
-              strokeLinecap="round"
-              strokeLinejoin="miter"
-            />
-          </Background>
-        </Block>
-        <CopyBlock>
-          <TextBlock>
-            <Text>{t('receive_address_title')}</Text>
-            <AddressText
-              onClick={() =>
-                sdk.copyToClipboard(
-                  wallet.active.friendlyAddress,
-                  t('address_copied')
-                )
-              }
-            >
-              {wallet.active.friendlyAddress}
-            </AddressText>
-          </TextBlock>
-          <CopyButton
+    <NotificationBlock>
+      {info?.metadata.image ? (
+        <Logo src={info?.metadata.image} />
+      ) : (
+        <ToncoinIcon width="72" height="72" />
+      )}
+      <Title>
+        {info
+          ? t('receive_title').replace('%{currency}', info.metadata.symbol)
+          : t('receive_ton_and_jettons')}
+      </Title>
+      <Block>
+        <TitleText>{t('receive_qr_title')}</TitleText>
+        <Background>
+          <QRCode
+            size={400}
+            value={formatTransferUrl({
+              address: wallet.active.friendlyAddress,
+              jetton: info?.metadata.address,
+            })}
+            strokeLinecap="round"
+            strokeLinejoin="miter"
+          />
+        </Background>
+      </Block>
+      <CopyBlock>
+        <TextBlock>
+          <Text>{t('receive_address_title')}</Text>
+          <AddressText
             onClick={() =>
               sdk.copyToClipboard(
                 wallet.active.friendlyAddress,
@@ -171,12 +154,22 @@ const ReceiveContent: FC<{ info?: JettonInfo }> = ({ info }) => {
               )
             }
           >
-            <CopyIcon />
-            <span>{t('Copy_address')}</span>
-          </CopyButton>
-        </CopyBlock>
-      </NotificationBlock>
-    </FullHeightBlock>
+            {wallet.active.friendlyAddress}
+          </AddressText>
+        </TextBlock>
+        <CopyButton
+          onClick={() =>
+            sdk.copyToClipboard(
+              wallet.active.friendlyAddress,
+              t('address_copied')
+            )
+          }
+        >
+          <CopyIcon />
+          <span>{t('Copy_address')}</span>
+        </CopyButton>
+      </CopyBlock>
+    </NotificationBlock>
   );
 };
 
