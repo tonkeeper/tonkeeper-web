@@ -2,7 +2,6 @@ import React, {
   FC,
   PropsWithChildren,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -64,6 +63,7 @@ const Overlay = styled.div`
   top: 100%;
   transition: all 0.3s ease-in-out;
   overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 `;
 
 const Splash = styled.div`
@@ -76,6 +76,7 @@ const Splash = styled.div`
   justify-content: center;
   transition: all 0.3s ease-in-out;
   overflow: hidden;
+  -webkit-overflow-scrolling: touch;
   z-index: 10;
   padding: 0;
   opacity: 0;
@@ -192,6 +193,68 @@ export const NotificationCancelButton: FC<{ handleClose: () => void }> = ({
 export const NotificationScrollContext =
   React.createContext<HTMLDivElement | null>(null);
 
+const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
+  React.memo(({ children, handleClose }) => {
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      const element = scrollRef.current;
+      console.log(scrollRef);
+
+      if (!element) return;
+
+      let lastY = 0;
+      let maxScrollTop = 0;
+      let startScroll = 0;
+
+      const handlerTouchStart = function (event: TouchEvent) {
+        lastY = event.touches[0].clientY;
+        let style = window.getComputedStyle(element);
+        let outerHeight = ['height', 'padding-top', 'padding-bottom']
+          .map((key) => parseInt(style.getPropertyValue(key), 10))
+          .reduce((prev, cur) => prev + cur);
+
+        maxScrollTop = element.scrollHeight - outerHeight;
+        startScroll = element.scrollTop;
+      };
+
+      const handlerTouchMove = function (event: TouchEvent) {
+        var top = event.touches[0].clientY;
+
+        var direction = lastY - top < 0 ? 'up' : 'down';
+        if (event.cancelable) {
+          if (startScroll <= 0 && direction === 'up') {
+            console.log('touchend', startScroll, direction);
+
+            window.addEventListener('touchend', handleClose);
+            window.addEventListener('touchcancel', handleClose);
+          } else if (startScroll >= maxScrollTop && direction === 'down') {
+            event.preventDefault();
+          }
+        }
+        lastY = top;
+      };
+
+      element.addEventListener('touchstart', handlerTouchStart);
+      element.addEventListener('touchmove', handlerTouchMove);
+
+      return () => {
+        element.removeEventListener('touchstart', handlerTouchStart);
+        element.removeEventListener('touchmove', handlerTouchMove);
+        window.removeEventListener('touchend', handleClose);
+        window.removeEventListener('touchcancel', handleClose);
+      };
+    }, [scrollRef, handleClose]);
+
+    return (
+      <Overlay ref={scrollRef}>
+        <NotificationScrollContext.Provider value={scrollRef.current}>
+          {children}
+        </NotificationScrollContext.Provider>
+      </Overlay>
+    );
+  });
+
 export const Notification: FC<{
   isOpen: boolean;
   handleClose: () => void;
@@ -250,51 +313,6 @@ export const Notification: FC<{
       return sdk.isIOs() && sdk.isStandalone();
     }, [sdk]);
 
-    useLayoutEffect(() => {
-      const element = nodeRef.current;
-      if (!element) return;
-
-      let lastY = 0;
-      let maxScrollTop = 0;
-
-      const handlerTouchStart = function (event: TouchEvent) {
-        lastY = event.touches[0].clientY;
-        let style = window.getComputedStyle(element);
-        let outerHeight = ['height', 'padding-top', 'padding-bottom']
-          .map((key) => parseInt(style.getPropertyValue(key), 10))
-          .reduce((prev, cur) => prev + cur);
-
-        maxScrollTop = element.scrollHeight - outerHeight;
-      };
-
-      const handlerTouchMove = function (event: TouchEvent) {
-        var top = event.touches[0].clientY;
-
-        var scrollTop = element.scrollTop;
-        var direction = lastY - top < 0 ? 'up' : 'down';
-
-        if (event.cancelable) {
-          if (scrollTop <= 0 && direction === 'up') {
-            element.addEventListener('touchend', handleClose);
-            element.addEventListener('touchcancel', handleClose);
-          } else if (scrollTop >= maxScrollTop && direction === 'down') {
-            // event.preventDefault();
-          }
-        }
-        lastY = top;
-      };
-
-      element.addEventListener('touchstart', handlerTouchStart);
-      element.addEventListener('touchmove', handlerTouchMove);
-
-      return () => {
-        element.removeEventListener('touchstart', handlerTouchStart);
-        element.removeEventListener('touchmove', handlerTouchMove);
-        element.removeEventListener('touchend', handleClose);
-        element.removeEventListener('touchcancel', handleClose);
-      };
-    }, [nodeRef, handleClose]);
-
     return (
       <ReactPortal wrapperId="react-portal-modal-container">
         <CSSTransition
@@ -306,30 +324,28 @@ export const Notification: FC<{
           onExited={() => setEntered(false)}
         >
           <Splash ref={nodeRef} className="scrollable">
-            <Overlay>
+            <NotificationOverlay handleClose={handleClose}>
               <NotificationWrapper entered={entered}>
-                <NotificationScrollContext.Provider value={nodeRef.current}>
-                  <Wrapper>
-                    <Padding onClick={handleClose} />
-                    <Gap onClick={handleClose} />
-                    <Content standalone={standalone}>
-                      {title && (
-                        <NotificationTitleRow handleClose={handleClose}>
-                          {title}
-                        </NotificationTitleRow>
-                      )}
-                      {!hideButton && (
-                        <ButtonContainer>
-                          <NotificationCancelButton handleClose={handleClose} />
-                        </ButtonContainer>
-                      )}
-                      {Child}
-                    </Content>
-                  </Wrapper>
-                </NotificationScrollContext.Provider>
+                <Wrapper>
+                  <Padding onClick={handleClose} />
+                  <Gap onClick={handleClose} />
+                  <Content standalone={standalone}>
+                    {title && (
+                      <NotificationTitleRow handleClose={handleClose}>
+                        {title}
+                      </NotificationTitleRow>
+                    )}
+                    {!hideButton && (
+                      <ButtonContainer>
+                        <NotificationCancelButton handleClose={handleClose} />
+                      </ButtonContainer>
+                    )}
+                    {Child}
+                  </Content>
+                </Wrapper>
                 {backShadow && entered && <BackShadow />}
               </NotificationWrapper>
-            </Overlay>
+            </NotificationOverlay>
           </Splash>
         </CSSTransition>
       </ReactPortal>
