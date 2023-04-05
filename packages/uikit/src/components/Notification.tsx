@@ -2,6 +2,7 @@ import React, {
   FC,
   PropsWithChildren,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -248,6 +249,49 @@ export const Notification: FC<{
     const standalone = useMemo(() => {
       return sdk.isIOs() && sdk.isStandalone();
     }, [sdk]);
+
+    useLayoutEffect(() => {
+      const element = nodeRef.current;
+      if (!element) return;
+
+      let lastY = 0;
+      let maxScrollTop = 0;
+
+      const handlerTouchStart = function (event: TouchEvent) {
+        lastY = event.touches[0].clientY;
+        let style = window.getComputedStyle(element);
+        let outerHeight = ['height', 'padding-top', 'padding-bottom']
+          .map((key) => parseInt(style.getPropertyValue(key), 10))
+          .reduce((prev, cur) => prev + cur);
+
+        maxScrollTop = element.scrollHeight - outerHeight;
+      };
+
+      const handlerTouchMove = function (event: TouchEvent) {
+        var top = event.touches[0].clientY;
+
+        var scrollTop = element.scrollTop;
+        var direction = lastY - top < 0 ? 'up' : 'down';
+
+        if (event.cancelable) {
+          if (scrollTop <= 0 && direction === 'up') {
+            event.preventDefault();
+            handleClose();
+          } else if (scrollTop >= maxScrollTop && direction === 'down') {
+            event.preventDefault();
+          }
+        }
+        lastY = top;
+      };
+
+      element.addEventListener('touchstart', handlerTouchStart);
+      element.addEventListener('touchmove', handlerTouchMove);
+
+      return () => {
+        element.removeEventListener('touchstart', handlerTouchStart);
+        element.removeEventListener('touchmove', handlerTouchMove);
+      };
+    }, [nodeRef, handleClose]);
 
     return (
       <ReactPortal wrapperId="react-portal-modal-container">
