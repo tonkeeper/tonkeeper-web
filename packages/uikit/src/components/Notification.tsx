@@ -278,7 +278,7 @@ export const Notification: FC<{
             element.addEventListener('touchend', handleClose);
             element.addEventListener('touchcancel', handleClose);
           } else if (scrollTop >= maxScrollTop && direction === 'down') {
-            event.preventDefault();
+            // event.preventDefault();
           }
         }
         lastY = top;
