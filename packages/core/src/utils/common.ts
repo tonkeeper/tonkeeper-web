@@ -100,15 +100,15 @@ export interface TonTransferParams {
 const PREFIX = 'ton://transfer/';
 export function parseTonTransfer(options: { url: string }) {
   try {
-    if (seeIfValidAddress(options.url)) {
-      const result: TonTransferParams = {
-        address: options.url,
-      };
-      return result;
-    }
-
     if (!options.url.startsWith(PREFIX)) {
-      throw new Error('must starts with ' + PREFIX);
+      if (seeIfValidAddress(options.url)) {
+        const result: TonTransferParams = {
+          address: options.url,
+        };
+        return result;
+      } else {
+        throw new Error('must starts with ' + PREFIX);
+      }
     }
 
     const arr = options.url.substring(PREFIX.length).split('?');
