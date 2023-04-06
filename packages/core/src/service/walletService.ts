@@ -40,9 +40,7 @@ export const importWallet = async (
   try {
     const backup = await getWalletBackup(tonApiConfig, publicKey, voucher);
     console.log(backup);
-  } catch (e) {
-    console.log(e);
-  }
+  } catch (e) {}
 
   const state: WalletState = {
     publicKey,
@@ -189,7 +187,7 @@ export const updateWalletProperty = async (
       updated.publicKey,
       updated.voucher,
       createWalletBackup(updated)
-    );
+    ).catch(() => console.log('fail backup'));
   }
 };
 
