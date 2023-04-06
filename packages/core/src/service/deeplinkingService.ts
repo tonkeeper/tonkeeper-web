@@ -24,7 +24,7 @@ export function parseTonTransfer(options: { url: string }) {
       if (operator === 'transfer' && seeIfValidAddress(address)) {
         linkAddress = address;
       } else {
-        throw new Error('unknown operator ' + paths);
+        throw new Error('unknown operator ' + data.url);
       }
     }
 
@@ -35,6 +35,7 @@ export function parseTonTransfer(options: { url: string }) {
 
     return result;
   } catch (e) {
+    console.log(e);
     return null;
   }
 }
