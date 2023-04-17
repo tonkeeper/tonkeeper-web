@@ -3,43 +3,37 @@ import {
   FiatCurrencySymbolsConfig,
 } from '@tonkeeper/core/dist/entries/fiat';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
+import {
+  getBrowserLocale,
+  getCoinFullBalance,
+} from '@tonkeeper/core/dist/utils/formatting';
 import BigNumber from 'bignumber.js';
 import { useCallback, useMemo } from 'react';
-import { useAppContext } from './appContext';
 
 export const useCoinFullBalance = (
   currency: FiatCurrencies,
   balance: number | string,
   decimals: number = 9
 ) => {
-  return useMemo(() => {
-    if (!balance) return '0';
-
-    const config = FiatCurrencySymbolsConfig[currency];
-    const balanceFormat = new Intl.NumberFormat(config.numberFormat, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: decimals,
-    });
-
-    return balanceFormat.format(formatDecimals(balance, decimals));
-  }, [currency, balance, decimals]);
+  return useMemo(
+    () => getCoinFullBalance(balance, decimals),
+    [currency, balance, decimals]
+  );
 };
 
 export const useFormatCoinValue = () => {
-  const { fiat } = useAppContext();
-
   const formats = useMemo(
     () => [
-      new Intl.NumberFormat(FiatCurrencySymbolsConfig[fiat].numberFormat, {
+      new Intl.NumberFormat(getBrowserLocale(), {
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
       }),
-      new Intl.NumberFormat(FiatCurrencySymbolsConfig[fiat].numberFormat, {
+      new Intl.NumberFormat(getBrowserLocale(), {
         minimumFractionDigits: 0,
         maximumFractionDigits: 4,
       }),
     ],
-    [fiat]
+    []
   );
 
   return useCallback(
@@ -58,16 +52,13 @@ export const useFormatCoinValue = () => {
         return formatted;
       }
 
-      const formatFull = new Intl.NumberFormat(
-        FiatCurrencySymbolsConfig[fiat].numberFormat,
-        {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: decimals,
-        }
-      );
+      const formatFull = new Intl.NumberFormat(getBrowserLocale(), {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: decimals,
+      });
       return formatFull.format(value);
     },
-    [fiat, formats]
+    [formats]
   );
 };
 
@@ -76,7 +67,7 @@ const toFiatCurrencyFormat = (
   maximumFractionDigits?: number
 ) => {
   const config = FiatCurrencySymbolsConfig[currency];
-  return new Intl.NumberFormat(config.numberFormat, {
+  return new Intl.NumberFormat(getBrowserLocale(), {
     minimumFractionDigits: 0,
     maximumFractionDigits:
       maximumFractionDigits ?? config.maximumFractionDigits,

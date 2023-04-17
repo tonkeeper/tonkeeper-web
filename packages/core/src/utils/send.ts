@@ -4,11 +4,16 @@ import { FiatCurrencies } from '../entries/fiat';
 import { AccountRepr, JettonsBalances } from '../tonApiV1';
 import { TonendpointStock } from '../tonkeeperApi/stock';
 import { getJettonStockPrice, getTonCoinStockPrice } from './balance';
+import {
+  getBrowserLocale,
+  getDecimalSeparator,
+  getGroupSeparator,
+} from './formatting';
 
 export const DefaultDecimals = 9;
 
-export function removeCommas(str: string): string {
-  return str.replaceAll(',', '');
+export function removeGroupSeparator(str: string): string {
+  return str.replaceAll(getGroupSeparator(), '');
 }
 
 export function toStringAmount(str: string): string {
@@ -22,9 +27,31 @@ export function isNumeric(str: string) {
 }
 
 export function seeIfLargeTail(str: string, decimals: number) {
-  const [entry, tail] = str.trim().replaceAll(',', '').split('.');
+  const [entry, tail] = removeGroupSeparator(str.trim()).split(
+    getDecimalSeparator()
+  );
   if (tail && tail.length > decimals) return true;
   return false;
+}
+
+export function getDecimalLength(str: string) {
+  const [entry, tail] = removeGroupSeparator(str.trim()).split(
+    getDecimalSeparator()
+  );
+  return tail ? tail.length : 0;
+}
+
+export function formatSendValue(str: string) {
+  const [entry, tail] = removeGroupSeparator(str.trim()).split(
+    getDecimalSeparator()
+  );
+
+  const path = [] as string[];
+  path.push(new Intl.NumberFormat(getBrowserLocale()).format(parseInt(entry)));
+  if (tail !== undefined) {
+    path.push(tail);
+  }
+  return path.join(getDecimalSeparator());
 }
 
 export const getJettonSymbol = (
@@ -54,13 +81,13 @@ export const getMaxValue = (
   format: (amount: number | string, decimals?: number) => string
 ): string => {
   if (jetton === CryptoCurrency.TON) {
-    return removeCommas(format(info?.balance ?? 0));
+    return removeGroupSeparator(format(info?.balance ?? 0));
   }
 
   const jettonInfo = jettons.balances.find(
     (item) => item.jettonAddress === jetton
   );
-  return removeCommas(
+  return removeGroupSeparator(
     format(jettonInfo?.balance ?? 0, jettonInfo?.metadata?.decimals)
   );
 };
@@ -77,6 +104,8 @@ export const getRemaining = (
     if (max) {
       return [`0 ${CryptoCurrency.TON}`, true];
     }
+
+    amount = removeGroupSeparator(amount);
 
     const remaining = new BigNumber(info?.balance ?? 0).minus(
       isNumeric(amount)
@@ -126,6 +155,8 @@ export const getFiatAmountValue = (
   jetton: string,
   amount: string
 ) => {
+  amount = removeGroupSeparator(amount);
+
   if (!isNumeric(amount)) return undefined;
   if (!stock) return undefined;
 

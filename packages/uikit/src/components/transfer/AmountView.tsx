@@ -10,12 +10,15 @@ import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonSe
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import {
+  formatSendValue,
   getJettonDecimals,
   getJettonSymbol,
   getMaxValue,
   getRemaining,
   isNumeric,
+  removeGroupSeparator,
   seeIfLargeTail,
 } from '@tonkeeper/core/dist/utils/send';
 import React, {
@@ -188,10 +191,11 @@ const getInputSize = (value: string, parent: HTMLLabelElement) => {
 const seeIfValueValid = (value: string, decimals: number) => {
   if (value.length > 32) return false;
   if (value !== '') {
-    if (value.endsWith(',')) return false;
     if (value.endsWith('e')) return false;
+    const separators = value.match(getDecimalSeparator());
+    if (separators && separators.length > 1) return false;
     if (/^[a-zA-Z]+$/.test(value)) return false;
-    if (!isNumeric(value)) return false;
+    if (!isNumeric(removeGroupSeparator(value))) return false;
     if (seeIfLargeTail(value, decimals)) return false;
   }
 
@@ -315,10 +319,13 @@ export const AmountView: FC<{
   const onInput = (value: string) => {
     if (!refBlock.current) return;
     const decimals = getJettonDecimals(jetton, jettons);
-    value = value.replace(',', '.');
 
     if (!seeIfValueValid(value, decimals)) {
       value = amount;
+    }
+
+    if (isNumeric(removeGroupSeparator(value))) {
+      value = formatSendValue(value);
     }
 
     setFontSize(getInputSize(value, refBlock.current));
@@ -332,7 +339,7 @@ export const AmountView: FC<{
   );
 
   const isValid = useMemo(() => {
-    return valid && isNumeric(amount);
+    return valid && isNumeric(removeGroupSeparator(amount));
   }, [valid, amount]);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = useCallback(
@@ -341,8 +348,9 @@ export const AmountView: FC<{
       e.preventDefault();
       if (isValid) {
         reset();
-        const fee = await mutateAsync({ amount, max });
-        setAmount({ amount, max, done: true, jetton, fee });
+        const value = removeGroupSeparator(amount);
+        const fee = await mutateAsync({ amount: value, max });
+        setAmount({ amount: value, max, done: true, jetton, fee });
       }
     },
     [setAmount, amount, max, jetton, isValid]
