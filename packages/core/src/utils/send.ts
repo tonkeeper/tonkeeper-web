@@ -13,17 +13,18 @@ import {
 export const DefaultDecimals = 9;
 
 export function removeGroupSeparator(str: string): string {
-  return str.replaceAll(getGroupSeparator(), '');
+  return str.toString().replaceAll(getGroupSeparator(), '');
 }
 
-export function toStringAmount(str: string): string {
-  return str;
-}
 export function toNumberAmount(str: string): number {
   return parseFloat(str);
 }
 export function isNumeric(str: string) {
-  return !isNaN(Number(str)) && !isNaN(parseFloat(str));
+  const [entry, tail] = removeGroupSeparator(str.trim()).split(
+    getDecimalSeparator()
+  );
+
+  return /^[0-9]+$/.test(entry) && (!tail || /^[0-9]+$/.test(tail));
 }
 
 export function seeIfLargeTail(str: string, decimals: number) {

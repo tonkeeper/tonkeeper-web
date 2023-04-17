@@ -193,6 +193,7 @@ const seeIfValueValid = (value: string, decimals: number) => {
   if (value !== '') {
     if (value.endsWith('e')) return false;
     const separators = value.match(getDecimalSeparator());
+    console.log(separators);
     if (separators && separators.length > 1) return false;
     if (/^[a-zA-Z]+$/.test(value)) return false;
     if (!isNumeric(removeGroupSeparator(value))) return false;
@@ -277,7 +278,9 @@ export const AmountView: FC<{
   const format = useFormatCoinValue();
 
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
-  const [amount, setAmountValue] = useState(data ? data.amount : '0');
+  const [amount, setAmountValue] = useState(
+    data ? data.amount.toString() : '0'
+  );
 
   const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
 
@@ -324,7 +327,7 @@ export const AmountView: FC<{
       value = amount;
     }
 
-    if (isNumeric(removeGroupSeparator(value))) {
+    if (isNumeric(value)) {
       value = formatSendValue(value);
     }
 
@@ -339,7 +342,7 @@ export const AmountView: FC<{
   );
 
   const isValid = useMemo(() => {
-    return valid && isNumeric(removeGroupSeparator(amount));
+    return valid && isNumeric(amount);
   }, [valid, amount]);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = useCallback(
@@ -348,7 +351,9 @@ export const AmountView: FC<{
       e.preventDefault();
       if (isValid) {
         reset();
-        const value = removeGroupSeparator(amount);
+        const value = parseFloat(
+          removeGroupSeparator(amount).replace(',', '.')
+        );
         const fee = await mutateAsync({ amount: value, max });
         setAmount({ amount: value, max, done: true, jetton, fee });
       }

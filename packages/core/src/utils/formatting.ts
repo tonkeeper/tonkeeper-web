@@ -5,6 +5,12 @@ const defaultDecimalsSeparator = '.';
 const defaultGroupSeparator = ',';
 
 export function getBrowserLocale() {
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+  if (isSafari) {
+    return 'fr-FR';
+  }
+
   const browserLocales =
     navigator.languages === undefined
       ? [navigator.language]

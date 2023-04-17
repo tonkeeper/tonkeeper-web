@@ -16,14 +16,12 @@ export interface RecipientData {
 }
 
 export interface AmountValue {
-  amount: string;
+  amount: number;
   max: boolean;
 }
 
 export interface AmountData extends AmountValue {
-  amount: string;
   jetton: string;
-  max: boolean;
   done: boolean;
   fee: Fee;
 }

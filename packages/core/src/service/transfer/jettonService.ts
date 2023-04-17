@@ -11,7 +11,7 @@ import {
   SendApi,
   WalletApi,
 } from '../../tonApiV1';
-import { DefaultDecimals, toNumberAmount } from '../../utils/send';
+import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import {
   checkWalletBalance,
@@ -57,7 +57,7 @@ const createJettonTransfer = (
   const jettonAmount = data.max
     ? BigInt(jettonInfo.balance)
     : BigInt(
-        new BigNumber(toNumberAmount(data.amount))
+        new BigNumber(data.amount.toString())
           .multipliedBy(
             Math.pow(10, jettonInfo.metadata?.decimals ?? DefaultDecimals)
           )
