@@ -96,9 +96,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
       );
       const decimals = balance?.metadata?.decimals ?? DefaultDecimals;
 
-      const amountValue = amount
-        ? String(formatDecimals(amount, decimals))
-        : '0';
+      const amountValue = amount ? formatDecimals(amount, decimals) : 0;
 
       setAmount({
         amount: amountValue,

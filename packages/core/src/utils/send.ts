@@ -13,7 +13,7 @@ import {
 export const DefaultDecimals = 9;
 
 export function removeGroupSeparator(str: string): string {
-  return str.toString().replaceAll(getGroupSeparator(), '');
+  return str.replaceAll(getGroupSeparator(), '');
 }
 
 export function toNumberAmount(str: string): number {
