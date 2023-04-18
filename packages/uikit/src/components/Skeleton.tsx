@@ -92,7 +92,7 @@ export const SkeletonSubHeader = React.memo(() => {
 });
 
 const ActionBlock = styled.div`
-  width: 55px;
+  width: 65px;
   display: flex;
   flex-direction: column;
   align-items: center;
