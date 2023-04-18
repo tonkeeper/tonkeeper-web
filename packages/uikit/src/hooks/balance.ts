@@ -1,11 +1,11 @@
-import {
-  FiatCurrencies,
-  FiatCurrencySymbolsConfig,
-} from '@tonkeeper/core/dist/entries/fiat';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { AmountFormatter } from '@tonkeeper/core/dist/utils/AmountFormatter';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import {
   getBrowserLocale,
   getCoinFullBalance,
+  getDecimalSeparator,
+  getGroupSeparator,
 } from '@tonkeeper/core/dist/utils/formatting';
 import BigNumber from 'bignumber.js';
 import { useCallback, useMemo } from 'react';
@@ -61,31 +61,20 @@ export const useFormatCoinValue = () => {
   );
 };
 
-const toFiatCurrencyFormat = (
-  currency: FiatCurrencies,
-  maximumFractionDigits?: number
-) => {
-  const config = FiatCurrencySymbolsConfig[currency];
-  return new Intl.NumberFormat(getBrowserLocale(), {
-    minimumFractionDigits: 0,
-    maximumFractionDigits:
-      maximumFractionDigits ?? config.maximumFractionDigits,
-    style: 'currency',
-    currency: currency,
-    currencyDisplay: 'symbol',
-  });
-};
+const formatter = new AmountFormatter({
+  getLocaleFormat: () => ({
+    decimalSeparator: getDecimalSeparator(),
+    groupingSeparator: getGroupSeparator(),
+  }),
+});
 
 export const formatFiatCurrency = (
   currency: FiatCurrencies,
   balance: BigNumber.Value
 ) => {
-  const amount = new BigNumber(balance).toNumber();
-  const balanceFormat = toFiatCurrencyFormat(currency);
-  const result = balanceFormat.format(amount);
-  if (result.match(/[1-9]/)) {
-    return result;
-  }
-  const balanceExtraFormat = toFiatCurrencyFormat(currency, 4);
-  return balanceExtraFormat.format(new BigNumber(balance).toNumber());
+  return formatter.format(balance.toString(), {
+    currency: currency,
+    ignoreZeroTruncate: false,
+    decimals: 4,
+  });
 };
