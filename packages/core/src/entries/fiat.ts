@@ -39,7 +39,7 @@ export const FiatCurrencySymbolsConfig: Record<FiatCurrency, CurrencyState> = {
     maximumFractionDigits: 2,
   },
   [FiatCurrencies.AED]: {
-    symbol: 'Rp',
+    symbol: 'DH',
     side: 'end',
     maximumFractionDigits: 2,
   },
