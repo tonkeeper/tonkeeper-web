@@ -103,6 +103,10 @@
     "message": "Password",
     "description": "Password input label"
   },
+  "ConfirmPassword": {
+    "message": "Re-enter password",
+    "description": "Password input label"
+  },
   "Unlock": {
     "message": "Unlock",
     "description": "Unlock button label"

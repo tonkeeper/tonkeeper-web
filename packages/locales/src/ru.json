@@ -99,6 +99,10 @@
     "message": "Пароль",
     "description": "Password input label"
   },
+  "ConfirmPassword": {
+    "message": "Введите пароль ещё раз",
+    "description": "Password input label"
+  },
   "Unlock": {
     "message": "Разблокировать",
     "description": "Unlock button label"

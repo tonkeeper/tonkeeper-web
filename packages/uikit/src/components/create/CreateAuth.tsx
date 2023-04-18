@@ -124,7 +124,7 @@ const FillPassword: FC<{
         {
           <Input
             type="password"
-            label={t('Confirm')}
+            label={t('ConfirmPassword')}
             value={confirm}
             onChange={(value) => {
               setError(undefined);
@@ -154,9 +154,8 @@ export const CreateAuthState: FC<{
   afterCreate: (password?: string) => void;
   isLoading?: boolean;
 }> = ({ afterCreate, isLoading }) => {
-  const [authType, setAuthType] = useState<AuthState['kind'] | undefined>(
-    'password'
-  );
+  const [authType, setAuthType] =
+    useState<AuthState['kind'] | undefined>('password');
 
   const { mutateAsync: setNoneAuth, isLoading: isNoneLoading } =
     useSetNoneAuthMutation();
