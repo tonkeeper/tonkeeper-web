@@ -4,6 +4,7 @@ import {
   beginCell,
   Builder,
   comment,
+  fromNano,
   internal,
   toNano,
 } from 'ton-core';
@@ -29,7 +30,7 @@ import {
 } from './common';
 
 const jettonTransferAmount = toNano('0.64');
-const jettonTransferForwardAmount = toNano('0.0002');
+const jettonTransferForwardAmount = toNano(fromNano('1'));
 
 const jettonTransferBody = (params: {
   queryId?: number;
