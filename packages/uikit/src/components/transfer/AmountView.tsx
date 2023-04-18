@@ -396,7 +396,8 @@ export const AmountView: FC<{
           <SubTitle>
             {t('send_screen_steps_done_to').replace(
               '%{name}',
-              toShortAddress(recipient.toAccount.address.bounceable)
+              recipient.toAccount.name ??
+                toShortAddress(recipient.toAccount.address.bounceable)
             )}
           </SubTitle>
         </Center>
