@@ -17,7 +17,7 @@ export function removeGroupSeparator(str: string): string {
 }
 
 export function toNumberAmount(str: string): number {
-  return parseFloat(str);
+  return parseFloat(str.replace(',', '.'));
 }
 export function isNumeric(str: string) {
   const [entry, tail] = removeGroupSeparator(str.trim()).split(
@@ -158,8 +158,9 @@ export const getFiatAmountValue = (
 ) => {
   amount = removeGroupSeparator(amount);
 
-  if (!isNumeric(amount)) return undefined;
   if (!stock) return undefined;
+
+  if (!isNumeric(amount)) return new BigNumber(0);
 
   const value = new BigNumber(toNumberAmount(amount));
 
