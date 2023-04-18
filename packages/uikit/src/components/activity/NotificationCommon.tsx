@@ -253,17 +253,16 @@ export const ActionFeeDetails: FC<{
   const { t } = useTranslation();
 
   const format = useFormatCoinValue();
-  const sdk = useAppSdk();
-
-  const price = useBalanceValue(fee.total, stock, fiat);
+  const feeAmount = fee.total < 0 ? fee.refund : fee.total;
+  const price = useBalanceValue(feeAmount, stock, fiat);
 
   return (
-    <ListItem onClick={() => sdk.copyToClipboard(format(fee.total))}>
+    <ListItem hover={false}>
       <ListItemPayload>
         <Label>{t('transaction_fee')}</Label>
         <ColumnText
           right
-          text={`${format(fee.total)} TON`}
+          text={`${format(feeAmount)} TON`}
           secondary={`≈ ${price}`}
         />
       </ListItemPayload>

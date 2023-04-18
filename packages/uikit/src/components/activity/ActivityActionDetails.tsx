@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
@@ -43,8 +42,6 @@ const LabelRight = styled(Label1)`
 
 export const TransferComment: FC<{ comment?: string }> = ({ comment }) => {
   const { t } = useTranslation();
-
-  const sdk = useAppSdk();
 
   if (comment) {
     return (
