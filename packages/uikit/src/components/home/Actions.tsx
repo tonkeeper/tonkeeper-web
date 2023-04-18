@@ -36,8 +36,7 @@ const Block = styled.div<{ ios: boolean; isHover?: boolean }>`
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  min-width: 55px;
-  max-width: 70px;
+  width: 65px;
   text-align: center;
 
   user-select: none;
