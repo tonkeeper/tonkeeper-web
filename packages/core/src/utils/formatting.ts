@@ -1,5 +1,3 @@
-import { formatDecimals } from './balance';
-
 const defaultFormat = 'en-US';
 const defaultDecimalsSeparator = '.';
 const defaultGroupSeparator = ',';
@@ -41,18 +39,4 @@ export const getDecimalSeparator = () => {
 export const getGroupSeparator = () => {
   const locale = getBrowserLocale();
   return getSeparator(locale, 'group') ?? defaultGroupSeparator;
-};
-
-export const getCoinFullBalance = (
-  balance: number | string,
-  decimals: number = 9
-) => {
-  if (!balance) return '0';
-
-  const balanceFormat = new Intl.NumberFormat(getBrowserLocale(), {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: decimals,
-  });
-
-  return balanceFormat.format(formatDecimals(balance, decimals));
 };
