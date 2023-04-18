@@ -86,7 +86,11 @@ const useDnsWallet = (value: string) => {
       }
       return result.wallet;
     },
-    { enabled: name.length > 3 && !seeIfValidAddress(name) }
+    {
+      enabled: name.length > 7 && !seeIfValidAddress(name),
+      retry: 0,
+      keepPreviousData: true,
+    }
   );
 };
 
@@ -243,7 +247,6 @@ export const RecipientView: FC<{
           size="large"
           primary
           type="submit"
-          disabled={!isValid}
           loading={isFetching}
         >
           {t('continue')}
