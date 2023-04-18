@@ -11,13 +11,12 @@ import BigNumber from 'bignumber.js';
 import { useCallback, useMemo } from 'react';
 
 export const useCoinFullBalance = (
-  currency: FiatCurrencies,
   balance: number | string,
   decimals: number = 9
 ) => {
   return useMemo(
     () => getCoinFullBalance(balance, decimals),
-    [currency, balance, decimals]
+    [balance, decimals]
   );
 };
 

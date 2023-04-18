@@ -2,23 +2,23 @@ import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import {
   AccountAddress,
   AccountEvent,
-  Fee,
+  Fee
 } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import {
   formatDecimals,
-  getTonCoinStockPrice,
+  getTonCoinStockPrice
 } from '@tonkeeper/core/dist/utils/balance';
 import {
   toShortAddress,
-  toShortValue,
+  toShortValue
 } from '@tonkeeper/core/dist/utils/common';
 import BigNumber from 'bignumber.js';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { useAppSdk } from '../../hooks/appSdk';
-import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
+import { formatFiatCurrency, useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
 import { ColumnText } from '../Layout';
@@ -252,8 +252,10 @@ export const ActionFeeDetails: FC<{
 }> = ({ fee, stock, fiat }) => {
   const { t } = useTranslation();
 
-  const format = useFormatCoinValue();
+  
+
   const feeAmount = fee.total < 0 ? fee.refund : fee.total;
+  const amount = useCoinFullBalance(feeAmount);
   const price = useBalanceValue(feeAmount, stock, fiat);
 
   return (
@@ -262,7 +264,7 @@ export const ActionFeeDetails: FC<{
         <Label>{t('transaction_fee')}</Label>
         <ColumnText
           right
-          text={`${format(feeAmount)} TON`}
+          text={`${amount} TON`}
           secondary={`≈ ${price}`}
         />
       </ListItemPayload>
