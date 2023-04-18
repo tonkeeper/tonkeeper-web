@@ -34,7 +34,8 @@ const useLatestSuggestion = () => {
 
   return useQuery(
     [wallet.active.rawAddress, QueryKey.activity, 'suggestions'],
-    () => getSuggestionsList(sdk, tonApi, wallet)
+    () => getSuggestionsList(sdk, tonApi, wallet),
+    { keepPreviousData: true }
   );
 };
 
@@ -227,15 +228,13 @@ export const SuggestionList: FC<{
   onSelect: (item: Suggestion) => void;
   disabled?: boolean;
 }> = ({ onSelect, disabled }) => {
-  const { data, isFetching } = useLatestSuggestion();
-  const [addFavorite, setAdd] = useState<LatestSuggestion | undefined>(
-    undefined
-  );
-  const [editFavorite, setEdit] = useState<FavoriteSuggestion | undefined>(
-    undefined
-  );
+  const { data } = useLatestSuggestion();
+  const [addFavorite, setAdd] =
+    useState<LatestSuggestion | undefined>(undefined);
+  const [editFavorite, setEdit] =
+    useState<FavoriteSuggestion | undefined>(undefined);
 
-  if (isFetching || !data) {
+  if (!data) {
     return <SkeletonList size={4} margin={false} fullWidth />;
   }
 

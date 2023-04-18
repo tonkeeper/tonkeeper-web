@@ -39,6 +39,7 @@ const useAddFavorite = (latest: LatestSuggestion) => {
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, string>(async (name) => {
+    name = name.trim();
     if (name.length < 2) {
       throw new Error('Name is to short');
     }
