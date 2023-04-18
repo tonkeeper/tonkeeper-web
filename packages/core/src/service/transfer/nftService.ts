@@ -3,6 +3,7 @@ import {
   Address,
   beginCell,
   Builder,
+  comment,
   fromNano,
   internal,
   toNano,
@@ -104,7 +105,7 @@ export const estimateNftTransfer = async (
     recipient.toAccount.address.raw,
     nftItem.address,
     initNftTransferAmount,
-    null
+    recipient.comment ? comment(recipient.comment).asBuilder() : null
   );
 
   const { fee } = await new SendApi(tonApi).estimateTx({
@@ -150,7 +151,7 @@ export const sendNftTransfer = async (
     recipient.toAccount.address.raw,
     nftItem.address,
     BigInt(nftTransferAmount.toString()),
-    null,
+    recipient.comment ? comment(recipient.comment).asBuilder() : null,
     keyPair.secretKey
   );
 

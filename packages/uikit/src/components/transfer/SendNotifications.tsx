@@ -150,7 +150,6 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 data={recipient}
                 onClose={onClose}
                 setRecipient={onRecipient}
-                allowComment={asset === CryptoCurrency.TON}
                 onScan={onScan}
                 keyboard="decimal"
                 isExternalLoading={isAccountLoading}

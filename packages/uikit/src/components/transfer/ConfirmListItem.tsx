@@ -43,10 +43,6 @@ const RecipientItemAddress: FC<{ address: string }> = ({ address }) => {
 export const RecipientListItem: FC<{ recipient: RecipientData }> = ({
   recipient,
 }) => {
-  const { t } = useTranslation();
-
-  const sdk = useAppSdk();
-
   if ('dns' in recipient.address) {
     return (
       <>
@@ -86,10 +82,9 @@ export const AmountListItem: FC<{
   fiatAmount?: string;
 }> = ({ coinAmount, fiatAmount }) => {
   const { t } = useTranslation();
-  const sdk = useAppSdk();
 
   return (
-    <ListItem onClick={() => sdk.copyToClipboard(coinAmount)}>
+    <ListItem hover={false}>
       <ListItemPayload>
         <Label>{t('txActions_amount')}</Label>
         {fiatAmount ? (
@@ -114,9 +109,7 @@ export const FeeListItem: FC<{ feeAmount: string; fiatFeeAmount?: string }> = ({
   const sdk = useAppSdk();
 
   return (
-    <ListItem
-      onClick={() => sdk.copyToClipboard(`${feeAmount} ${CryptoCurrency.TON}`)}
-    >
+    <ListItem hover={false}>
       <ListItemPayload>
         <Label>{t('txActions_fee')}</Label>
         <ColumnText

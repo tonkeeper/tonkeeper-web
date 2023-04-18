@@ -1,5 +1,12 @@
 import BigNumber from 'bignumber.js';
-import { Address, beginCell, Builder, internal, toNano } from 'ton-core';
+import {
+  Address,
+  beginCell,
+  Builder,
+  comment,
+  internal,
+  toNano,
+} from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
@@ -112,7 +119,7 @@ export const estimateJettonTransfer = async (
     recipient.toAccount.address.raw,
     data,
     jettonInfo,
-    null
+    recipient.comment ? comment(recipient.comment).asBuilder() : null
   );
 
   const { fee } = await new SendApi(tonApi).estimateTx({
@@ -149,7 +156,7 @@ export const sendJettonTransfer = async (
     recipient.toAccount.address.raw,
     data,
     jettonInfo,
-    null,
+    recipient.comment ? comment(recipient.comment).asBuilder() : null,
     keyPair.secretKey
   );
 

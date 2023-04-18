@@ -113,7 +113,6 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
                 data={recipient}
                 onClose={onClose}
                 setRecipient={onRecipient}
-                allowComment={false}
                 onScan={onScan}
               />
             )}

@@ -96,7 +96,6 @@ export const RecipientView: FC<{
   onClose: () => void;
   setRecipient: (options: RecipientData) => void;
   keyboard?: 'decimal';
-  allowComment: boolean;
   onScan: (value: string) => void;
   isExternalLoading?: boolean;
 }> = ({
@@ -105,7 +104,6 @@ export const RecipientView: FC<{
   onClose,
   setRecipient,
   keyboard,
-  allowComment,
   onScan,
   isExternalLoading,
 }) => {
@@ -220,16 +218,14 @@ export const RecipientView: FC<{
         />
       </ShowAddress>
 
-      {allowComment && (
-        <Input
-          value={comment}
-          onChange={setComment}
-          label={t('send_comment_label')}
-          isValid={!submitted || isMemoValid}
-          disabled={isExternalLoading}
-        />
-      )}
-      {allowComment && toAccount && toAccount.memoRequired && (
+      <Input
+        value={comment}
+        onChange={setComment}
+        label={t('send_comment_label')}
+        isValid={!submitted || isMemoValid}
+        disabled={isExternalLoading}
+      />
+      {toAccount && toAccount.memoRequired && (
         <Warning>
           {t('send_screen_steps_comfirm_comment_required_text')}
         </Warning>

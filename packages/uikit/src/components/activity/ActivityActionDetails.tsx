@@ -48,7 +48,7 @@ export const TransferComment: FC<{ comment?: string }> = ({ comment }) => {
 
   if (comment) {
     return (
-      <ListItem onClick={() => sdk.copyToClipboard(comment!)}>
+      <ListItem hover={false}>
         <ListItemPayload>
           <Label>{t('transaction_message')}</Label>
           <LabelRight>{comment}</LabelRight>
