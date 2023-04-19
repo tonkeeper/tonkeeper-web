@@ -93,6 +93,7 @@ const getEventGroup = (
   }
   if (
     getWeek(today) === getWeek(date) &&
+    today.getMonth() === date.getMonth() &&
     today.getFullYear() === date.getFullYear()
   ) {
     return `week-${date.getDay()}`;
