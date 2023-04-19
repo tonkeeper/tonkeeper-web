@@ -11,10 +11,19 @@ export const formatActivityDate = (
   timestamp: number
 ): string => {
   const date = new Date(timestamp * 1000);
-  if (key.startsWith('year')) {
-    return new Intl.DateTimeFormat(language, { dateStyle: 'short' }).format(
-      date
-    );
+
+  if (date.getFullYear() < new Date().getFullYear()) {
+    return new Intl.DateTimeFormat(language, {
+      day: 'numeric',
+      month: 'short',
+    }).format(date);
+  } else if (key.startsWith('year')) {
+    return new Intl.DateTimeFormat(language, {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
   } else {
     return new Intl.DateTimeFormat(language, { timeStyle: 'short' }).format(
       date
