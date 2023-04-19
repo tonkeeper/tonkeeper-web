@@ -88,7 +88,10 @@ const getEventGroup = (
   if (today.toDateString() === date.toDateString()) {
     return 'today';
   }
-  if (yesterday.toDateString() === date.toDateString()) {
+  if (
+    yesterday.toDateString() === date.toDateString() &&
+    yesterday.getMonth() === date.getMonth()
+  ) {
     return 'yesterday';
   }
   if (
