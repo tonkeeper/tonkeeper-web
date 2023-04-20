@@ -18,7 +18,9 @@
     ],
     "nohoist": [
       "**/electron",
-      "**/electron**"
+      "**/electron**",
+      "**/webpack",
+      "**/webpack**"
     ]
   }
 }

@@ -29,6 +29,13 @@ exec('npx react-app-rewired build', {
   },
 });
 
+notify(`Build Tonkeeper background.js, provider.js, content.js`);
+
+exec('npx webpack -c ./task/webpack.config.js', {
+  stdio: 'inherit',
+  env: process.env,
+});
+
 notify('Copy Locales');
 
 const srcDir = `../../packages/locales/dist/extension`;
