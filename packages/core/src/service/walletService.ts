@@ -77,14 +77,18 @@ const findWalletAddress = async (
     publicKey: keyPair.publicKey.toString('hex'),
   });
 
-  const activeWallet = result.wallets.find((wallet) => {
-    if (
-      wallet.interfaces.some((value) => Object.keys(versionMap).includes(value))
-    ) {
-      return wallet.balance > 0 || wallet.status === 'active';
-    }
-    return false;
-  });
+  const [activeWallet] = result.wallets
+    .filter((wallet) => {
+      if (
+        wallet.interfaces.some((value) =>
+          Object.keys(versionMap).includes(value)
+        )
+      ) {
+        return wallet.balance > 0 || wallet.status === 'active';
+      }
+      return false;
+    })
+    .sort((one, two) => two.balance - one.balance);
 
   if (activeWallet) {
     const wallet: WalletAddress = {
