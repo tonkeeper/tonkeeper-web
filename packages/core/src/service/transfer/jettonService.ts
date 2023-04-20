@@ -21,12 +21,12 @@ import {
 } from '../../tonApiV1';
 import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
+import { walletContractFromState } from '../wallet/contractService';
 import {
   checkWalletBalance,
   externalMessage,
   getWalletBalance,
   SendMode,
-  walletContract,
 } from './common';
 
 const jettonTransferAmount = toNano('0.64');
@@ -81,7 +81,7 @@ const createJettonTransfer = (
     forwardPayload,
   });
 
-  const contract = walletContract(walletState);
+  const contract = walletContractFromState(walletState);
   const transfer = contract.createTransfer({
     seqno,
     secretKey,

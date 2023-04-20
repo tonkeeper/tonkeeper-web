@@ -6,12 +6,12 @@ import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
 import { Configuration, Fee, SendApi, WalletApi } from '../../tonApiV1';
 import { getWalletMnemonic } from '../menmonicService';
+import { walletContractFromState } from '../wallet/contractService';
 import {
   checkWalletBalance,
   externalMessage,
   getWalletBalance,
   SendMode,
-  walletContract,
 } from './common';
 
 const createTonTransfer = (
@@ -21,7 +21,7 @@ const createTonTransfer = (
   data: AmountValue,
   secretKey: Buffer = Buffer.alloc(64)
 ) => {
-  const contract = walletContract(walletState);
+  const contract = walletContractFromState(walletState);
   const transfer = contract.createTransfer({
     seqno,
     secretKey,

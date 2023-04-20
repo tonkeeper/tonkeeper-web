@@ -1,9 +1,4 @@
-import {
-  Address,
-  WalletContractV3R1,
-  WalletContractV3R2,
-  WalletContractV4,
-} from 'ton';
+import { Address, WalletContractV4 } from 'ton';
 import { KeyPair, mnemonicToPrivateKey } from 'ton-crypto';
 import { WalletAddress, WalletState, WalletVersion } from '../entries/wallet';
 import { AppKey } from '../Keys';
@@ -18,6 +13,7 @@ import {
 import { encrypt } from './cryptoService';
 import { getWalletMnemonic } from './menmonicService';
 import { createWalletVoucher } from './voucherService';
+import { walletContract } from './wallet/contractService';
 
 export const importWallet = async (
   tonApiConfig: Configuration,
@@ -113,35 +109,11 @@ const findWalletAddress = async (
   return wallet;
 };
 
-export const getWalletContract = (
-  publicKey: Buffer,
-  version: WalletVersion
-) => {
-  switch (version) {
-    case WalletVersion.v3R1:
-      return WalletContractV3R1.create({
-        workchain: 0,
-        publicKey,
-      });
-    case WalletVersion.v3R2:
-      return WalletContractV3R2.create({
-        workchain: 0,
-        publicKey,
-      });
-    case WalletVersion.v4R2:
-      return WalletContractV4.create({
-        workchain: 0,
-        publicKey,
-      });
-    default:
-      throw new Error('Unexpected version: ');
-  }
-};
 export const getWalletAddress = (
   publicKey: Buffer,
   version: WalletVersion
 ): WalletAddress => {
-  const { address } = getWalletContract(publicKey, version);
+  const { address } = walletContract(publicKey, version);
   return {
     rawAddress: address.toRawString(),
     friendlyAddress: address.toString(),
