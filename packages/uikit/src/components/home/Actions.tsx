@@ -12,6 +12,7 @@ import { Label3 } from '../Text';
 interface ActionProps {
   icon: React.ReactNode;
   title: string;
+  disabled?: boolean;
   action: () => void;
 }
 
@@ -30,7 +31,11 @@ const Button = styled.div`
   align-items: center;
 `;
 
-const Block = styled.div<{ ios: boolean; isHover?: boolean }>`
+const Block = styled.div<{
+  disabled?: boolean;
+  ios: boolean;
+  isHover?: boolean;
+}>`
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -42,6 +47,19 @@ const Block = styled.div<{ ios: boolean; isHover?: boolean }>`
   user-select: none;
 
   ${(props) => {
+    if (props.disabled) {
+      return css`
+        cursor: auto;
+
+        ${Text} {
+          color: ${props.theme.textTertiary};
+        }
+        ${Button} {
+          color: ${props.theme.textTertiary};
+        }
+      `;
+    }
+
     if (props.ios) {
       if (props.isHover) {
         return css`
@@ -71,7 +89,7 @@ const Block = styled.div<{ ios: boolean; isHover?: boolean }>`
   }}
 `;
 
-export const Action: FC<ActionProps> = ({ icon, title, action }) => {
+export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
   const selection = useContext(AppSelectionContext);
   const { ios } = useAppContext();
   const [isHover, setHover] = useState(false);
@@ -86,7 +104,13 @@ export const Action: FC<ActionProps> = ({ icon, title, action }) => {
   }, [ref.current, selection, setHover]);
 
   return (
-    <Block ref={ref} onClick={action} isHover={isHover} ios={ios}>
+    <Block
+      ref={ref}
+      disabled={disabled}
+      onClick={!disabled ? action : undefined}
+      isHover={isHover}
+      ios={ios}
+    >
       <Button>{icon}</Button>
       <Text>{title}</Text>
     </Block>
