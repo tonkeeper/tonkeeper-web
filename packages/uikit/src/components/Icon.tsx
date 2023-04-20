@@ -301,8 +301,8 @@ export const PlusIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
+      width="16"
+      height="16"
       viewBox="0 0 16 16"
       fill="none"
     >
@@ -318,8 +318,8 @@ export const SettingsIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
+      width="16"
+      height="16"
       viewBox="0 0 16 16"
       fill="none"
     >
@@ -349,8 +349,8 @@ export const ReorderIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="1.75rem"
-      height="1.75rem"
+      width="28px"
+      height="28px"
       viewBox="0 0 28 28"
       fill="none"
     >
@@ -374,8 +374,8 @@ export const EllipsisIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
+      width="16"
+      height="16"
       viewBox="0 0 16 16"
       fill="none"
     >

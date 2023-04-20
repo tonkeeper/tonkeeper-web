@@ -91,13 +91,16 @@ export const LogoutBlock = styled.div`
   position: absolute;
   top: 1rem;
   right: 1rem;
+  z-index: 5;
 `;
 
 export const BackBlock = styled.div`
   position: absolute;
   top: 1rem;
   left: 1rem;
+  z-index: 5;
 `;
+
 export const LogoutButton = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();

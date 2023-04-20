@@ -4,16 +4,29 @@ import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
 import { getTonClient, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
+import {
+  InnerBody,
+  useWindowsScroll,
+} from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
-import { Footer } from '@tonkeeper/uikit/dist/components/Footer';
-import { Header } from '@tonkeeper/uikit/dist/components/Header';
+import {
+  Footer,
+  FooterGlobalStyle,
+} from '@tonkeeper/uikit/dist/components/Footer';
+import {
+  Header,
+  HeaderGlobalStyle,
+} from '@tonkeeper/uikit/dist/components/Header';
+import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
+import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import {
   ActivitySkeletonPage,
   CoinSkeletonPage,
   HomeSkeleton,
   SettingsSkeletonPage,
 } from '@tonkeeper/uikit/dist/components/SKeleton';
+import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import {
   AppContext,
   WalletStateContext,
@@ -28,10 +41,13 @@ import {
   I18nContext,
   TranslationContext,
 } from '@tonkeeper/uikit/dist/hooks/translation';
-import { any, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import {
+  any,
+  AppRoute,
+  SettingsRoute,
+} from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import {
   Initialize,
   InitializeContainer,
@@ -44,7 +60,7 @@ import {
   useTonenpointConfig,
 } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import { Body, Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, {
   FC,
   PropsWithChildren,
@@ -60,11 +76,14 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { ExtensionStorage } from './libs/storage';
 
+const ImportRouter = React.lazy(
+  () => import('@tonkeeper/uikit/dist/pages/import')
+);
 const Settings = React.lazy(
   () => import('@tonkeeper/uikit/dist/pages/settings')
 );
@@ -73,6 +92,9 @@ const Activity = React.lazy(
 );
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
+const QrScanner = React.lazy(
+  () => import('@tonkeeper/uikit/dist/components/QrScanner')
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -107,6 +129,10 @@ export const App: FC = () => {
             <StorageContext.Provider value={storage}>
               <TranslationContext.Provider value={translation}>
                 <UserThemeProvider>
+                  <HeaderGlobalStyle />
+                  <FooterGlobalStyle />
+                  <SybHeaderGlobalStyle />
+                  <GlobalListStyle />
                   <Loader />
                   <UnlockNotification sdk={sdk} />
                 </UserThemeProvider>
@@ -119,8 +145,29 @@ export const App: FC = () => {
   );
 };
 
-const Wrapper = styled(Container)`
+const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
+  min-width: 385px;
   height: 600px;
+
+  > * {
+    ${(props) =>
+      props.standalone &&
+      css`
+        overflow: auto;
+        width: var(--app-width);
+        max-width: 548px;
+        box-sizing: border-box;
+      `}
+  }
+`;
+
+const Wrapper = styled(FullSizeWrapper)<{
+  standalone: boolean;
+  recovery: boolean;
+}>`
+  box-sizing: border-box;
+  padding-top: ${(props) => (props.recovery ? 0 : 64)}px;
+  padding-bottom: 80px;
 `;
 
 const useLock = () => {
@@ -158,11 +205,7 @@ export const Loader: FC = React.memo(() => {
   console.log('Loader', account, auth);
 
   if (!account || !auth || !config || lock === undefined) {
-    return (
-      <Wrapper>
-        <Loading />
-      </Wrapper>
-    );
+    return <Loading />;
   }
 
   const network = activeWallet?.network ?? Network.MAINNET;
@@ -183,10 +226,11 @@ export const Loader: FC = React.memo(() => {
     <OnImportAction.Provider value={sdk.openExtensionInBrowser}>
       <AfterImportAction.Provider value={sdk.closeExtensionInBrowser}>
         <AppContext.Provider value={context}>
-          <Wrapper>
-            <Content activeWallet={activeWallet} lock={lock} />
-          </Wrapper>
+          <Content activeWallet={activeWallet} lock={lock} />
           <CopyNotification />
+          <Suspense fallback={<></>}>
+            <QrScanner />
+          </Suspense>
         </AppContext.Provider>
       </AfterImportAction.Provider>
     </OnImportAction.Provider>
@@ -210,80 +254,93 @@ export const Content: FC<{
   lock: boolean;
 }> = ({ activeWallet, lock }) => {
   const location = useLocation();
+  useWindowsScroll();
 
   if (lock) {
-    return <Unlock />;
+    return (
+      <FullSizeWrapper standalone>
+        <Unlock />
+      </FullSizeWrapper>
+    );
   }
 
   if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
     return (
-      <Routes>
-        <Route
-          path={any(AppRoute.import)}
-          element={
-            <InitializeContainer fullHeight={false}>
-              <ImportRouter />
-            </InitializeContainer>
-          }
-        />
-        <Route
-          path="*"
-          element={
-            <InitializeContainer>
-              <Initialize />
-            </InitializeContainer>
-          }
-        />
-      </Routes>
+      <FullSizeWrapper standalone>
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            <Route
+              path={any(AppRoute.import)}
+              element={
+                <InitializeContainer fullHeight={false}>
+                  <ImportRouter />
+                </InitializeContainer>
+              }
+            />
+            <Route
+              path="*"
+              element={
+                <InitializeContainer>
+                  <Initialize />
+                </InitializeContainer>
+              }
+            />
+          </Routes>
+        </Suspense>
+      </FullSizeWrapper>
     );
   }
 
   return (
-    <WalletStateContext.Provider value={activeWallet}>
-      <Routes>
-        <Route
-          path={AppRoute.activity}
-          element={
-            <Suspense fallback={<ActivitySkeletonPage />}>
-              <Activity />
-            </Suspense>
-          }
-        />
-        <Route
-          path={any(AppRoute.settings)}
-          element={
-            <Suspense fallback={<SettingsSkeletonPage />}>
-              <Settings />
-            </Suspense>
-          }
-        />
-        <Route path={AppRoute.coins}>
+    <Wrapper
+      standalone
+      recovery={location.pathname.includes(SettingsRoute.recovery)}
+    >
+      <WalletStateContext.Provider value={activeWallet}>
+        <Routes>
           <Route
-            path=":name"
+            path={AppRoute.activity}
             element={
-              <Body>
+              <Suspense fallback={<ActivitySkeletonPage />}>
+                <Activity />
+              </Suspense>
+            }
+          />
+          <Route
+            path={any(AppRoute.settings)}
+            element={
+              <Suspense fallback={<SettingsSkeletonPage />}>
+                <Settings />
+              </Suspense>
+            }
+          />
+          <Route path={AppRoute.coins}>
+            <Route
+              path=":name"
+              element={
                 <Suspense fallback={<CoinSkeletonPage />}>
                   <Coin />
                 </Suspense>
-              </Body>
+              }
+            />
+          </Route>
+          <Route
+            path="*"
+            element={
+              <>
+                <Header />
+                <InnerBody>
+                  <Suspense fallback={<HomeSkeleton />}>
+                    <Home />
+                  </Suspense>
+                </InnerBody>
+              </>
             }
           />
-        </Route>
-        <Route
-          path="*"
-          element={
-            <>
-              <Header />
-              <Body>
-                <Suspense fallback={<HomeSkeleton />}>
-                  <Home />
-                </Suspense>
-              </Body>
-            </>
-          }
-        />
-      </Routes>
-      <Footer />
-    </WalletStateContext.Provider>
+        </Routes>
+        <Footer />
+        <MemoryScroll />
+      </WalletStateContext.Provider>
+    </Wrapper>
   );
 };

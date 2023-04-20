@@ -1,7 +1,6 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
-import { useAppContext } from '../hooks/appContext';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute } from '../libs/routes';
 import { Label3 } from './Text';
@@ -134,8 +133,7 @@ export const FooterGlobalStyle = createGlobalStyle`
   }
 `;
 
-export const Footer = () => {
-  const { standalone } = useAppContext();
+export const Footer: FC<{ standalone?: boolean }> = ({ standalone }) => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
