@@ -33,7 +33,7 @@ const RenameWalletContent: FC<{
         <Input
           value={wallet.active.friendlyAddress}
           disabled
-          label={t('address_label')}
+          label={t('add_edit_favorite_address_label')}
         />
 
         <Button

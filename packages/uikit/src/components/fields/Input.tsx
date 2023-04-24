@@ -84,8 +84,8 @@ const Label = styled.label<{ active?: boolean }>`
     `}
 `;
 
-const Block = styled.div`
-    width: 100%:
+const OuterBlock = styled.div`
+  width: 100%;
 `;
 const HelpText = styled(Body2)<{ valid: boolean }>`
   user-select: none;
@@ -122,7 +122,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const [focus, setFocus] = useState(false);
 
     return (
-      <Block>
+      <OuterBlock>
         <InputBlock focus={focus} valid={isValid}>
           <InputField
             ref={ref}
@@ -136,7 +136,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {label && <Label active={value != ''}>{label}</Label>}
         </InputBlock>
         {helpText && <HelpText valid={isValid}>{helpText}</HelpText>}
-      </Block>
+      </OuterBlock>
     );
   }
 );
