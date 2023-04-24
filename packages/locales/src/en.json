@@ -96,7 +96,7 @@
     "description": "Settings Change password title"
   },
   "Old_password": {
-    "message": "Old password",
+    "message": "Current password",
     "description": "Settings Old password label"
   },
   "Password": {
@@ -106,6 +106,9 @@
   "ConfirmPassword": {
     "message": "Re-enter password",
     "description": "Password input label"
+  },
+  "MinPassword": {
+    "message": "Must be at least 6 characters."
   },
   "Unlock": {
     "message": "Unlock",

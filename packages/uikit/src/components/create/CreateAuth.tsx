@@ -120,6 +120,7 @@ const FillPassword: FC<{
             setPassword(value);
           }}
           isValid={error !== 'password'}
+          helpText={t('MinPassword')}
         />
         {
           <Input

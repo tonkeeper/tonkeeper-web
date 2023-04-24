@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { ScanIcon } from '../Icon';
+import { Body2 } from '../Text';
 
 const InputBlock = styled.div<{
   focus: boolean;
@@ -83,6 +84,26 @@ const Label = styled.label<{ active?: boolean }>`
     `}
 `;
 
+const Block = styled.div`
+    width: 100%:
+`;
+const HelpText = styled(Body2)<{ valid: boolean }>`
+  user-select: none;
+  display: inline-block;
+  width: 100%;
+  text-align: left;
+  margin-top: 12px;
+
+  ${(props) =>
+    props.valid
+      ? css`
+          color: ${(props) => props.theme.textSecondary};
+        `
+      : css`
+          color: ${(props) => props.theme.fieldErrorBorder};
+        `}
+`;
+
 interface InputProps {
   type?: 'password' | undefined;
   value: string;
@@ -90,25 +111,32 @@ interface InputProps {
   isValid?: boolean;
   label?: string;
   disabled?: boolean;
+  helpText?: string;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ type, value, onChange, isValid = true, label, disabled }, ref) => {
+  (
+    { type, value, onChange, isValid = true, label, disabled, helpText },
+    ref
+  ) => {
     const [focus, setFocus] = useState(false);
 
     return (
-      <InputBlock focus={focus} valid={isValid}>
-        <InputField
-          ref={ref}
-          disabled={disabled}
-          type={type}
-          value={value}
-          onChange={(e) => onChange && onChange(e.target.value)}
-          onFocus={() => setFocus(true)}
-          onBlur={() => setFocus(false)}
-        />
-        {label && <Label active={value != ''}>{label}</Label>}
-      </InputBlock>
+      <Block>
+        <InputBlock focus={focus} valid={isValid}>
+          <InputField
+            ref={ref}
+            disabled={disabled}
+            type={type}
+            value={value}
+            onChange={(e) => onChange && onChange(e.target.value)}
+            onFocus={() => setFocus(true)}
+            onBlur={() => setFocus(false)}
+          />
+          {label && <Label active={value != ''}>{label}</Label>}
+        </InputBlock>
+        {helpText && <HelpText valid={isValid}>{helpText}</HelpText>}
+      </Block>
     );
   }
 );
