@@ -6,10 +6,8 @@ import {
   accountSelectWallet,
   getAccountState,
 } from '@tonkeeper/core/dist/service/accountService';
-import {
-  getWalletState,
-  updateWalletVersion,
-} from '@tonkeeper/core/dist/service/walletService';
+import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
+import { updateWalletVersion } from '@tonkeeper/core/dist/service/walletService';
 import { useWalletContext } from '../hooks/appContext';
 import { useStorage } from '../hooks/storage';
 import { QueryKey } from '../libs/queryKey';

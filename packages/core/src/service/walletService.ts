@@ -1,7 +1,6 @@
 import { Address, WalletContractV4 } from 'ton';
 import { KeyPair, mnemonicToPrivateKey } from 'ton-crypto';
 import { WalletAddress, WalletState, WalletVersion } from '../entries/wallet';
-import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { Configuration, WalletApi } from '../tonApiV1';
 import {
@@ -14,6 +13,7 @@ import { encrypt } from './cryptoService';
 import { getWalletMnemonic } from './menmonicService';
 import { createWalletVoucher } from './voucherService';
 import { walletContract } from './wallet/contractService';
+import { setWalletState } from './wallet/storeService';
 
 export const importWallet = async (
   tonApiConfig: Configuration,
@@ -165,18 +165,6 @@ export const updateWalletProperty = async (
       createWalletBackup(updated)
     ).catch(() => console.log('fail backup'));
   }
-};
-
-export const getWalletState = (storage: IStorage, publicKey: string) => {
-  return storage.get<WalletState>(`${AppKey.wallet}_${publicKey}`);
-};
-
-export const setWalletState = (storage: IStorage, state: WalletState) => {
-  return storage.set(`${AppKey.wallet}_${state.publicKey}`, state);
-};
-
-export const deleteWalletState = (storage: IStorage, publicKey: string) => {
-  return storage.delete(`${AppKey.wallet}_${publicKey}`);
 };
 
 export const addWalletVoucher = async (

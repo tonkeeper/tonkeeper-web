@@ -5,10 +5,8 @@ import {
   getAccountState,
 } from '@tonkeeper/core/dist/service/accountService';
 import { getWalletBackup } from '@tonkeeper/core/dist/service/backupService';
-import {
-  getWalletState,
-  updateWalletProperty,
-} from '@tonkeeper/core/dist/service/walletService';
+import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
+import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import { getWalletActiveAddresses } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
 import {
   AccountApi,

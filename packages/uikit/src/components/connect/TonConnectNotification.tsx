@@ -1,5 +1,5 @@
 import { DAppManifest } from '@tonkeeper/core/dist/entries/tonConnect';
-import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import React, { FC, useCallback } from 'react';
 import { Notification } from '../Notification';
 

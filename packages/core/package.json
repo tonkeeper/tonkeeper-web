@@ -16,7 +16,6 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@tonconnect/protocol": "^2.2.5",
     "bignumber.js": "^9.1.1",
     "query-string": "^8.1.0",
     "ton": "^13.4.1",

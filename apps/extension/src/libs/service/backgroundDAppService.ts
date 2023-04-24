@@ -6,9 +6,9 @@
  * @since: 0.1.0
  */
 
-import { CONNECT_EVENT_ERROR_CODES } from '@tonconnect/protocol';
+import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
+import { CONNECT_EVENT_ERROR_CODES } from '@tonkeeper/core/dist/entries/tonConnect';
 import browser from 'webextension-polyfill';
-import { TonConnectError } from '../../entries/exception';
 import {
   DAppMessage,
   TonkeeperApiEvent,
@@ -17,9 +17,9 @@ import {
 import { backgroundEventsEmitter } from '../event';
 import {
   tonConnectDisconnect,
+  tonConnectReConnect,
   tonConnectRequest,
   tonConnectTransaction,
-  tonReConnectRequest,
 } from './dApp/tonConnectService';
 
 let contentScriptPorts = new Set<browser.Runtime.Port>();
@@ -94,7 +94,7 @@ const handleDAppMessage = async (message: DAppMessage): Promise<unknown> => {
       return tonConnectRequest(message.id, origin, message.params[0]);
     }
     case 'tonConnect_reconnect': {
-      return tonReConnectRequest(origin);
+      return tonConnectReConnect(origin);
     }
     case 'tonConnect_disconnect': {
       return tonConnectDisconnect(message.id, origin);

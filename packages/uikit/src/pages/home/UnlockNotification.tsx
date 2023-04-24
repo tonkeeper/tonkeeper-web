@@ -7,7 +7,7 @@ import {
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/menmonicService';
-import { getWalletState } from '@tonkeeper/core/dist/service/walletService';
+import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';

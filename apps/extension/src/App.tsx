@@ -25,7 +25,7 @@ import {
   CoinSkeletonPage,
   HomeSkeleton,
   SettingsSkeletonPage,
-} from '@tonkeeper/uikit/dist/components/SKeleton';
+} from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import {
   AppContext,

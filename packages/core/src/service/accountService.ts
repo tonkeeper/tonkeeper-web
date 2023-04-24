@@ -9,7 +9,8 @@ import {
   getWalletMnemonic,
   validateWalletMnemonic,
 } from './menmonicService';
-import { deleteWalletState, importWallet } from './walletService';
+import { deleteWalletState } from './wallet/storeService';
+import { importWallet } from './walletService';
 
 export const getAccountState = async (storage: IStorage) => {
   const state = await storage.get<AccountState>(AppKey.account);
