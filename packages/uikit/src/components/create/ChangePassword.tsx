@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { accountChangePassword } from '@tonkeeper/core/dist/service/accountService';
 import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { useStorage } from '../../hooks/storage';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
@@ -17,12 +17,23 @@ const Block = styled.div`
 `;
 
 const useUpdatePassword = () => {
-  const storage = useStorage();
+  const sdk = useAppSdk();
+  const { t } = useTranslation();
   return useMutation<
     string | undefined,
     Error,
     { old: string; password: string; confirm: string }
-  >((options) => accountChangePassword(storage, options));
+  >(async (options) => {
+    const error = await accountChangePassword(sdk.storage, options);
+    if (error === undefined) {
+      sdk.uiEvents.emit('copy', {
+        method: 'copy',
+        id: Date.now(),
+        params: t('PasswordChanged'),
+      });
+    }
+    return error;
+  });
 };
 
 const ChangePasswordContent: FC<{ handleClose: () => void }> = ({

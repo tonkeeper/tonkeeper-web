@@ -112,6 +112,9 @@
   "PasswordDoNotMatch": {
     "message": "Пароли не совпадают."
   },
+  "PasswordChanged": {
+    "message": "Пароль изменен"
+  },
   "Unlock": {
     "message": "Разблокировать",
     "description": "Unlock button label"

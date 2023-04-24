@@ -116,6 +116,9 @@
   "PasswordDoNotMatch": {
     "message": "Passwords do not match."
   },
+  "PasswordChanged": {
+    "message": "Password Changed"
+  },
   "Unlock": {
     "message": "Unlock",
     "description": "Unlock button label"
