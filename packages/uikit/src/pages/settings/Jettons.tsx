@@ -80,11 +80,7 @@ const JettonRow: FC<{
     }
   }, [wallet.hiddenJettons, wallet.shownJettons]);
 
-  const balance = useCoinFullBalance(
-    fiat,
-    jetton.balance,
-    jetton.metadata?.decimals
-  );
+  const balance = useCoinFullBalance(jetton.balance, jetton.metadata?.decimals);
 
   return (
     <ListItemPayload>

@@ -18,7 +18,7 @@ import React, { FC, PropsWithChildren, useMemo } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { useAppSdk } from '../../hooks/appSdk';
-import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
+import { formatFiatCurrency, useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
 import { ColumnText } from '../Layout';
@@ -252,20 +252,15 @@ export const ActionFeeDetails: FC<{
 }> = ({ fee, stock, fiat }) => {
   const { t } = useTranslation();
 
-  const format = useFormatCoinValue();
-  const sdk = useAppSdk();
-
-  const price = useBalanceValue(fee.total, stock, fiat);
+  const feeAmount = fee.total < 0 ? fee.refund : fee.total;
+  const amount = useCoinFullBalance(feeAmount);
+  const price = useBalanceValue(feeAmount, stock, fiat);
 
   return (
-    <ListItem onClick={() => sdk.copyToClipboard(format(fee.total))}>
+    <ListItem hover={false}>
       <ListItemPayload>
         <Label>{t('transaction_fee')}</Label>
-        <ColumnText
-          right
-          text={`${format(fee.total)} TON`}
-          secondary={`≈ ${price}`}
-        />
+        <ColumnText right text={`${amount} TON`} secondary={`≈ ${price}`} />
       </ListItemPayload>
     </ListItem>
   );

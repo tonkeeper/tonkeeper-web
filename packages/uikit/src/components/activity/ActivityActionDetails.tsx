@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
@@ -39,16 +38,27 @@ const LabelRight = styled(Label1)`
   text-align: right;
 
   word-break: break-all;
+
+  white-space: break-spaces;
+  overflow: hidden;
+`;
+
+const Span = styled(Label1)`
+  user-select: none;
+  color: ${(props) => props.theme.textPrimary};
+  background: ${(props) => props.theme.accentOrange};
+  padding: 4px 8px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: inline-block;
 `;
 
 export const TransferComment: FC<{ comment?: string }> = ({ comment }) => {
   const { t } = useTranslation();
 
-  const sdk = useAppSdk();
-
   if (comment) {
     return (
-      <ListItem onClick={() => sdk.copyToClipboard(comment!)}>
+      <ListItem hover={false}>
         <ListItemPayload>
           <Label>{t('transaction_message')}</Label>
           <LabelRight>{comment}</LabelRight>
@@ -64,9 +74,11 @@ export const TonTransferActionNotification: FC<ActionData> = ({
   action,
   timestamp,
   event,
+  isScam,
 }) => {
   console.log(action, event);
 
+  const { t } = useTranslation();
   const wallet = useWalletContext();
   const { tonTransfer } = action;
 
@@ -84,6 +96,7 @@ export const TonTransferActionNotification: FC<ActionData> = ({
     return (
       <ActionDetailsBlock event={event}>
         <div>
+          {isScam && <Span>{t('spam_action')}</Span>}
           <Title>+&thinsp;{format(tonTransfer.amount)} TON</Title>
           {price && <Amount>≈&thinsp;{price}</Amount>}
           <ActionDate kind="received" timestamp={timestamp} />
@@ -92,7 +105,7 @@ export const TonTransferActionNotification: FC<ActionData> = ({
           <ActionSenderDetails sender={tonTransfer.sender} />
           <ActionTransactionDetails event={event} />
           <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
-          <TransferComment comment={tonTransfer.comment} />
+          <TransferComment comment={isScam ? undefined : tonTransfer.comment} />
         </ListBlock>
       </ActionDetailsBlock>
     );
@@ -216,7 +229,7 @@ export const AuctionBidActionDetails: FC<ActionData> = ({
   return (
     <ActionDetailsBlock event={event}>
       <div>
-        <Title>{t('Bid')}</Title>
+        <Title>{t('transaction_type_bid')}</Title>
         <Amount>
           {format(auctionBid.amount.value)} {auctionBid.amount.tokenName}
         </Amount>

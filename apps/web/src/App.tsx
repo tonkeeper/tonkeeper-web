@@ -365,7 +365,7 @@ export const Content: FC<{
             }
           />
         </Routes>
-        <Footer />
+        <Footer standalone={standalone} />
         <MemoryScroll />
       </WalletStateContext.Provider>
     </Wrapper>

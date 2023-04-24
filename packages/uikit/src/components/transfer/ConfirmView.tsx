@@ -149,11 +149,7 @@ export const ConfirmView: FC<{
         <RecipientListItem recipient={recipient} />
         <AmountListItem coinAmount={coinAmount} fiatAmount={fiatAmount} />
         <FeeListItem feeAmount={feeAmount} fiatFeeAmount={fiatFeeAmount} />
-        <TransferComment
-          comment={
-            amount.jetton === CryptoCurrency.TON ? recipient.comment : undefined
-          }
-        />
+        <TransferComment comment={recipient.comment} />
       </ListBlock>
       <Gap />
 

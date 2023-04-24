@@ -15,6 +15,7 @@ import {
 } from './SubscribeAction';
 
 export interface ActionData {
+  isScam: boolean;
   action: Action;
   timestamp: number;
   event: AccountEvent;
@@ -57,6 +58,7 @@ export const ActivityNotification: FC<{
     if (!value) return undefined;
     return (
       <ActivityContent
+        isScam={value.isScam}
         action={value.action}
         timestamp={value.timestamp}
         event={value.event}

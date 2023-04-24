@@ -51,6 +51,13 @@ export const Label3 = styled.span`
   line-height: 16px;
 `;
 
+export const Label4 = styled.span`
+  font-style: normal;
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 14px;
+`;
+
 export const Body1 = styled.span`
   font-style: normal;
   font-weight: 500;

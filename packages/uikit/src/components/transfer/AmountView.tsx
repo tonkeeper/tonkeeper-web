@@ -10,12 +10,15 @@ import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonSe
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import {
+  formatSendValue,
   getJettonDecimals,
   getJettonSymbol,
   getMaxValue,
   getRemaining,
   isNumeric,
+  removeGroupSeparator,
   seeIfLargeTail,
 } from '@tonkeeper/core/dist/utils/send';
 import React, {
@@ -188,10 +191,12 @@ const getInputSize = (value: string, parent: HTMLLabelElement) => {
 const seeIfValueValid = (value: string, decimals: number) => {
   if (value.length > 32) return false;
   if (value !== '') {
-    if (value.endsWith(',')) return false;
     if (value.endsWith('e')) return false;
+    const separators = value.match(getDecimalSeparator());
+    console.log(separators);
+    if (separators && separators.length > 1) return false;
     if (/^[a-zA-Z]+$/.test(value)) return false;
-    if (!isNumeric(value)) return false;
+    if (!isNumeric(removeGroupSeparator(value))) return false;
     if (seeIfLargeTail(value, decimals)) return false;
   }
 
@@ -273,7 +278,9 @@ export const AmountView: FC<{
   const format = useFormatCoinValue();
 
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
-  const [amount, setAmountValue] = useState(data ? data.amount : '0');
+  const [amount, setAmountValue] = useState(
+    data ? data.amount.toString() : '0'
+  );
 
   const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
 
@@ -315,10 +322,13 @@ export const AmountView: FC<{
   const onInput = (value: string) => {
     if (!refBlock.current) return;
     const decimals = getJettonDecimals(jetton, jettons);
-    value = value.replace(',', '.');
 
     if (!seeIfValueValid(value, decimals)) {
       value = amount;
+    }
+
+    if (isNumeric(value)) {
+      value = formatSendValue(value);
     }
 
     setFontSize(getInputSize(value, refBlock.current));
@@ -341,8 +351,11 @@ export const AmountView: FC<{
       e.preventDefault();
       if (isValid) {
         reset();
-        const fee = await mutateAsync({ amount, max });
-        setAmount({ amount, max, done: true, jetton, fee });
+        const value = parseFloat(
+          removeGroupSeparator(amount).replace(',', '.')
+        );
+        const fee = await mutateAsync({ amount: value, max });
+        setAmount({ amount: value, max, done: true, jetton, fee });
       }
     },
     [setAmount, amount, max, jetton, isValid]
@@ -383,7 +396,8 @@ export const AmountView: FC<{
           <SubTitle>
             {t('send_screen_steps_done_to').replace(
               '%{name}',
-              toShortAddress(recipient.toAccount.address.bounceable)
+              recipient.toAccount.name ??
+                toShortAddress(recipient.toAccount.address.bounceable)
             )}
           </SubTitle>
         </Center>

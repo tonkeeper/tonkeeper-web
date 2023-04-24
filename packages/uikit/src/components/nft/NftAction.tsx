@@ -6,6 +6,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Action, ActionsRow } from '../home/Actions';
 import { GlobalIcon, SendIcon } from '../home/HomeIcons';
+import { Body2 } from '../Text';
 import { SendNftAction } from '../transfer/SendNftNotification';
 import { TonDnsUnlinkNotification } from './TonDnsNotification';
 
@@ -33,6 +34,7 @@ const ActionTransfer: FC<{
       <Action
         icon={<SendIcon />}
         title={t('Transfer_token')}
+        disabled={nftItem.sale != undefined}
         action={() => setOpen(true)}
       />
       <SendNftAction
@@ -69,6 +71,11 @@ export const UnlinkAction: FC<{ nftItem: NftItemRepr }> = ({ nftItem }) => {
   );
 };
 
+const SaleText = styled(Body2)`
+  width: 100%;
+  color: ${(props) => props.theme.textSecondary};
+`;
+
 export const NftAction: FC<{
   kind: NFTKind;
   nftItem: NftItemRepr;
@@ -79,14 +86,17 @@ export const NftAction: FC<{
   switch (kind) {
     case 'token': {
       return (
-        <Row>
-          <ActionTransfer nftItem={nftItem} />
-          <Action
-            icon={<GlobalIcon />}
-            title={t('View_on_market')}
-            action={() => sdk.openPage(getMarketplaceUrl(nftItem))}
-          />
-        </Row>
+        <>
+          <Row>
+            <ActionTransfer nftItem={nftItem} />
+            <Action
+              icon={<GlobalIcon />}
+              title={t('View_on_market')}
+              action={() => sdk.openPage(getMarketplaceUrl(nftItem))}
+            />
+          </Row>
+          {nftItem.sale && <SaleText>{t('nft_on_sale_text')}</SaleText>}
+        </>
       );
     }
     case 'ton.dns': {

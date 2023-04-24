@@ -1,11 +1,11 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import {
   parseTonTransfer,
-  seeIfAddressEqual,
   TonTransferParams,
-} from '@tonkeeper/core/dist/utils/common';
+} from '@tonkeeper/core/dist/service/deeplinkingService';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { seeIfAddressEqual } from '@tonkeeper/core/dist/utils/common';
 import { DefaultDecimals } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -96,9 +96,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
       );
       const decimals = balance?.metadata?.decimals ?? DefaultDecimals;
 
-      const amountValue = amount
-        ? String(formatDecimals(amount, decimals))
-        : '0';
+      const amountValue = amount ? formatDecimals(amount, decimals) : 0;
 
       setAmount({
         amount: amountValue,
@@ -152,7 +150,6 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                 data={recipient}
                 onClose={onClose}
                 setRecipient={onRecipient}
-                allowComment={asset === CryptoCurrency.TON}
                 onScan={onScan}
                 keyboard="decimal"
                 isExternalLoading={isAccountLoading}

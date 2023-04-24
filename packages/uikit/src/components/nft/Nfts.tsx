@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import styled, { css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
+import { SaleIcon } from '../Icon';
 import { NftCollectionBody3, NftHeaderLabel2 } from './NftHeader';
 import { NftNotification } from './NftNotification';
 
@@ -23,6 +24,7 @@ export const NftBlock = styled.div<{
   isHover?: boolean;
   ios?: boolean;
 }>`
+  position: relative;
   user-select: none;
   width: 100%;
   display: flex;
@@ -77,11 +79,18 @@ const Text = styled.div`
   white-space: nowrap;
 `;
 
+const SaleBlock = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 8px;
+`;
+
 export const NftItem: FC<{
   nft: NftItemRepr;
   resolution: string;
   onOpen: (nft: NftItemRepr) => void;
 }> = React.memo(({ nft, resolution, onOpen }) => {
+  const isSale = nft.sale != undefined;
   const image = nft.previews?.find((item) => item.resolution === resolution);
   const { ios } = useAppContext();
   const [isHover, setHover] = useState<boolean>(false);
@@ -103,6 +112,11 @@ export const NftItem: FC<{
       ref={ref}
       onClick={() => onOpen(nft)}
     >
+      {isSale && (
+        <SaleBlock>
+          <SaleIcon />
+        </SaleBlock>
+      )}
       <Image url={image?.url} />
       <Text>
         <NftHeaderLabel2 nft={nft} />

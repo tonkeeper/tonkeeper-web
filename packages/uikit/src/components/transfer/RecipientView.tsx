@@ -86,7 +86,11 @@ const useDnsWallet = (value: string) => {
       }
       return result.wallet;
     },
-    { enabled: name.length > 3 && !seeIfValidAddress(name) }
+    {
+      enabled: name.length > 7 && !seeIfValidAddress(name),
+      retry: 0,
+      keepPreviousData: true,
+    }
   );
 };
 
@@ -96,7 +100,6 @@ export const RecipientView: FC<{
   onClose: () => void;
   setRecipient: (options: RecipientData) => void;
   keyboard?: 'decimal';
-  allowComment: boolean;
   onScan: (value: string) => void;
   isExternalLoading?: boolean;
 }> = ({
@@ -105,7 +108,6 @@ export const RecipientView: FC<{
   onClose,
   setRecipient,
   keyboard,
-  allowComment,
   onScan,
   isExternalLoading,
 }) => {
@@ -220,16 +222,14 @@ export const RecipientView: FC<{
         />
       </ShowAddress>
 
-      {allowComment && (
-        <Input
-          value={comment}
-          onChange={setComment}
-          label={t('send_comment_label')}
-          isValid={!submitted || isMemoValid}
-          disabled={isExternalLoading}
-        />
-      )}
-      {allowComment && toAccount && toAccount.memoRequired && (
+      <Input
+        value={comment}
+        onChange={setComment}
+        label={t('send_comment_label')}
+        isValid={!submitted || isMemoValid}
+        disabled={isExternalLoading}
+      />
+      {toAccount && toAccount.memoRequired && (
         <Warning>
           {t('send_screen_steps_comfirm_comment_required_text')}
         </Warning>
@@ -247,7 +247,6 @@ export const RecipientView: FC<{
           size="large"
           primary
           type="submit"
-          disabled={!isValid}
           loading={isFetching}
         >
           {t('continue')}

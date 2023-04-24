@@ -1,5 +1,13 @@
 import BigNumber from 'bignumber.js';
-import { Address, beginCell, Builder, internal, toNano } from 'ton-core';
+import {
+  Address,
+  beginCell,
+  Builder,
+  comment,
+  fromNano,
+  internal,
+  toNano,
+} from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
@@ -11,18 +19,18 @@ import {
   SendApi,
   WalletApi,
 } from '../../tonApiV1';
-import { DefaultDecimals, toNumberAmount } from '../../utils/send';
+import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
+import { walletContractFromState } from '../wallet/contractService';
 import {
   checkWalletBalance,
   externalMessage,
   getWalletBalance,
   SendMode,
-  walletContract,
 } from './common';
 
 const jettonTransferAmount = toNano('0.64');
-const jettonTransferForwardAmount = toNano('0.0002');
+const jettonTransferForwardAmount = toNano(fromNano('1'));
 
 const jettonTransferBody = (params: {
   queryId?: number;
@@ -57,7 +65,7 @@ const createJettonTransfer = (
   const jettonAmount = data.max
     ? BigInt(jettonInfo.balance)
     : BigInt(
-        new BigNumber(toNumberAmount(data.amount))
+        new BigNumber(data.amount.toString())
           .multipliedBy(
             Math.pow(10, jettonInfo.metadata?.decimals ?? DefaultDecimals)
           )
@@ -73,7 +81,7 @@ const createJettonTransfer = (
     forwardPayload,
   });
 
-  const contract = walletContract(walletState);
+  const contract = walletContractFromState(walletState);
   const transfer = contract.createTransfer({
     seqno,
     secretKey,
@@ -112,7 +120,7 @@ export const estimateJettonTransfer = async (
     recipient.toAccount.address.raw,
     data,
     jettonInfo,
-    null
+    recipient.comment ? comment(recipient.comment).asBuilder() : null
   );
 
   const { fee } = await new SendApi(tonApi).estimateTx({
@@ -149,7 +157,7 @@ export const sendJettonTransfer = async (
     recipient.toAccount.address.raw,
     data,
     jettonInfo,
-    null,
+    recipient.comment ? comment(recipient.comment).asBuilder() : null,
     keyPair.secretKey
   );
 

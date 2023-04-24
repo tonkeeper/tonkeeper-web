@@ -167,13 +167,19 @@ export const useFaitTonAmount = (amount: string) => {
 export const useFiatAmount = (
   jettons: JettonsBalances,
   jetton: string,
-  amount: string
+  amount: number | string
 ) => {
   const { fiat } = useAppContext();
   const { data: stock } = useTonenpointStock();
 
   return useMemo(() => {
-    const fiatAmount = getFiatAmountValue(stock, jettons, fiat, jetton, amount);
+    const fiatAmount = getFiatAmountValue(
+      stock,
+      jettons,
+      fiat,
+      jetton,
+      amount.toString()
+    );
     if (fiatAmount === undefined) return undefined;
     return formatFiatCurrency(fiat, fiatAmount);
   }, [stock, jettons, fiat, jetton, amount]);

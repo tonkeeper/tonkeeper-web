@@ -60,7 +60,9 @@ const AssetDropDown: FC<{
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     if (ref.current) {
-      ref.current.scrollIntoView({ behavior: 'smooth' });
+      ref.current.parentElement?.parentElement?.scrollIntoView({
+        behavior: 'smooth',
+      });
     }
   }, [ref]);
   return (

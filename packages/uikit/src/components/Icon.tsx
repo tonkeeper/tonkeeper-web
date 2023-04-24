@@ -301,8 +301,8 @@ export const PlusIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
+      width="16"
+      height="16"
       viewBox="0 0 16 16"
       fill="none"
     >
@@ -318,8 +318,8 @@ export const SettingsIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
+      width="16"
+      height="16"
       viewBox="0 0 16 16"
       fill="none"
     >
@@ -349,8 +349,8 @@ export const ReorderIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="1.75rem"
-      height="1.75rem"
+      width="28px"
+      height="28px"
       viewBox="0 0 28 28"
       fill="none"
     >
@@ -374,8 +374,8 @@ export const EllipsisIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
+      width="16"
+      height="16"
       viewBox="0 0 16 16"
       fill="none"
     >
@@ -529,6 +529,64 @@ export const ScanIcon = () => {
         d="M7.5 12.5C6.67157 12.5 6 13.1716 6 14C6 14.8284 6.67157 15.5 7.5 15.5H20.5C21.3284 15.5 22 14.8284 22 14C22 13.1716 21.3284 12.5 20.5 12.5H7.5Z"
         fill="currentColor"
       />
+    </svg>
+  );
+};
+
+export const SaleIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="29"
+      height="29"
+      viewBox="0 0 29 29"
+      fill="none"
+    >
+      <g filter="url(#filter0_d_6325_2611)">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M15.6567 4H16.5998C18.14 4 18.91 4 19.4983 4.29973C20.0157 4.56338 20.4364 4.98408 20.7001 5.50153C20.9998 6.08978 20.9998 6.85986 20.9998 8.4V9.34315C20.9998 9.95462 20.9998 10.2604 20.9307 10.5481C20.8695 10.8032 20.7685 11.047 20.6314 11.2707C20.4768 11.523 20.2606 11.7392 19.8283 12.1716L16.7717 15.2281C15.8014 16.1984 15.3163 16.6835 14.7569 16.8653C14.2649 17.0251 13.7348 17.0251 13.2427 16.8653C12.6833 16.6835 12.1982 16.1984 11.228 15.2281L9.77168 13.7719C8.80144 12.8016 8.31632 12.3165 8.13456 11.7571C7.97468 11.265 7.97468 10.735 8.13456 10.2429C8.31632 9.6835 8.80144 9.19838 9.77168 8.22814L12.8283 5.17157C13.2606 4.73919 13.4768 4.523 13.7291 4.3684C13.9528 4.23133 14.1967 4.13032 14.4517 4.06908C14.7395 4 15.0452 4 15.6567 4ZM18.3748 7.75C18.9961 7.75 19.4998 7.24632 19.4998 6.625C19.4998 6.00368 18.9961 5.5 18.3748 5.5C17.7535 5.5 17.2498 6.00368 17.2498 6.625C17.2498 7.24632 17.7535 7.75 18.3748 7.75Z"
+          fill="white"
+        />
+      </g>
+      <defs>
+        <filter
+          id="filter0_d_6325_2611"
+          x="0.0146484"
+          y="0"
+          width="28.9854"
+          height="28.9852"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feColorMatrix
+            in="SourceAlpha"
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
+          />
+          <feOffset dy="4" />
+          <feGaussianBlur stdDeviation="4" />
+          <feComposite in2="hardAlpha" operator="out" />
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"
+          />
+          <feBlend
+            mode="normal"
+            in2="BackgroundImageFix"
+            result="effect1_dropShadow_6325_2611"
+          />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="effect1_dropShadow_6325_2611"
+            result="shape"
+          />
+        </filter>
+      </defs>
     </svg>
   );
 };

@@ -49,6 +49,7 @@ export const ActivityGroupRaw: FC<{
                       key={index}
                       onClick={() =>
                         setActivity({
+                          isScam: event.isScam,
                           action,
                           timestamp: timestamp * 1000,
                           event,
@@ -57,6 +58,7 @@ export const ActivityGroupRaw: FC<{
                     >
                       <ActivityAction
                         action={action}
+                        isScam={event.isScam}
                         date={date}
                         openNft={setNft}
                       />

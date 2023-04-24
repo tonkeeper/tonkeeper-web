@@ -3,6 +3,7 @@ import {
   Address,
   beginCell,
   Builder,
+  comment,
   fromNano,
   internal,
   toNano,
@@ -19,12 +20,12 @@ import {
   WalletApi,
 } from '../../tonApiV1';
 import { getWalletMnemonic } from '../menmonicService';
+import { walletContractFromState } from '../wallet/contractService';
 import {
   checkWalletBalance,
   externalMessage,
   getWalletBalance,
   SendMode,
-  walletContract,
 } from './common';
 
 const initNftTransferAmount = toNano('1');
@@ -66,7 +67,7 @@ const createNftTransfer = (
     forwardPayload,
   });
 
-  const contract = walletContract(walletState);
+  const contract = walletContractFromState(walletState);
   const transfer = contract.createTransfer({
     seqno,
     secretKey,
@@ -104,7 +105,7 @@ export const estimateNftTransfer = async (
     recipient.toAccount.address.raw,
     nftItem.address,
     initNftTransferAmount,
-    null
+    recipient.comment ? comment(recipient.comment).asBuilder() : null
   );
 
   const { fee } = await new SendApi(tonApi).estimateTx({
@@ -150,7 +151,7 @@ export const sendNftTransfer = async (
     recipient.toAccount.address.raw,
     nftItem.address,
     BigInt(nftTransferAmount.toString()),
-    null,
+    recipient.comment ? comment(recipient.comment).asBuilder() : null,
     keyPair.secretKey
   );
 

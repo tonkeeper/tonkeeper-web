@@ -26,44 +26,65 @@ import { ContractDeployAction } from './ContractDeployAction';
 import { NftComment, NftItemTransferAction } from './NftActivity';
 import { SubscribeAction, UnSubscribeAction } from './SubscribeAction';
 
-const TonTransferAction: FC<{ action: Action; date: string }> = ({
-  action,
-  date,
-}) => {
-  const { t } = useTranslation();
-  const wallet = useWalletContext();
-  const { tonTransfer } = action;
+const TonTransferAction: FC<{ action: Action; date: string; isScam: boolean }> =
+  ({ action, date, isScam }) => {
+    const { t } = useTranslation();
+    const wallet = useWalletContext();
+    const { tonTransfer } = action;
 
-  const format = useFormatCoinValue();
+    const format = useFormatCoinValue();
 
-  if (!tonTransfer) {
-    return <ErrorAction />;
-  }
+    if (!tonTransfer) {
+      return <ErrorAction />;
+    }
 
-  if (tonTransfer.recipient.address === wallet.active.rawAddress) {
+    if (tonTransfer.recipient.address === wallet.active.rawAddress) {
+      return (
+        <ListItemGrid>
+          <ActivityIcon>
+            <ReceiveIcon />
+          </ActivityIcon>
+          <Description>
+            <FirstLine>
+              <FirstLabel>
+                {tonTransfer.sender.isScam || isScam
+                  ? t('spam_action')
+                  : t('transaction_type_receive')}
+              </FirstLabel>
+              <AmountText isScam={tonTransfer.sender.isScam || isScam} green>
+                +&thinsp;{format(tonTransfer.amount)}
+              </AmountText>
+              <AmountText isScam={tonTransfer.sender.isScam || isScam} green>
+                TON
+              </AmountText>
+            </FirstLine>
+            <SecondLine>
+              <SecondaryText>
+                {tonTransfer.sender.name ??
+                  toShortAddress(tonTransfer.sender.address)}
+              </SecondaryText>
+              <SecondaryText>{date}</SecondaryText>
+            </SecondLine>
+          </Description>
+          <Comment comment={isScam ? undefined : tonTransfer.comment} />
+        </ListItemGrid>
+      );
+    }
     return (
       <ListItemGrid>
         <ActivityIcon>
-          <ReceiveIcon />
+          <SentIcon />
         </ActivityIcon>
         <Description>
           <FirstLine>
-            <FirstLabel>
-              {tonTransfer.sender.isScam
-                ? t('spam_action')
-                : t('transaction_type_receive')}
-            </FirstLabel>
-            <AmountText isScam={tonTransfer.sender.isScam} green>
-              +&thinsp;{format(tonTransfer.amount)}
-            </AmountText>
-            <AmountText isScam={tonTransfer.sender.isScam} green>
-              TON
-            </AmountText>
+            <FirstLabel>{t('transaction_type_sent')}</FirstLabel>
+            <AmountText>-&thinsp;{format(tonTransfer.amount)}</AmountText>
+            <Label1>TON</Label1>
           </FirstLine>
           <SecondLine>
             <SecondaryText>
-              {tonTransfer.sender.name ??
-                toShortAddress(tonTransfer.sender.address)}
+              {tonTransfer.recipient.name ??
+                toShortAddress(tonTransfer.recipient.address)}
             </SecondaryText>
             <SecondaryText>{date}</SecondaryText>
           </SecondLine>
@@ -71,30 +92,7 @@ const TonTransferAction: FC<{ action: Action; date: string }> = ({
         <Comment comment={tonTransfer.comment} />
       </ListItemGrid>
     );
-  }
-  return (
-    <ListItemGrid>
-      <ActivityIcon>
-        <SentIcon />
-      </ActivityIcon>
-      <Description>
-        <FirstLine>
-          <FirstLabel>{t('transaction_type_sent')}</FirstLabel>
-          <AmountText>-&thinsp;{format(tonTransfer.amount)}</AmountText>
-          <Label1>TON</Label1>
-        </FirstLine>
-        <SecondLine>
-          <SecondaryText>
-            {tonTransfer.recipient.name ??
-              toShortAddress(tonTransfer.recipient.address)}
-          </SecondaryText>
-          <SecondaryText>{date}</SecondaryText>
-        </SecondLine>
-      </Description>
-      <Comment comment={tonTransfer.comment} />
-    </ListItemGrid>
-  );
-};
+  };
 
 const JettonTransferAction: FC<{ action: Action; date: string }> = ({
   action,
@@ -193,7 +191,7 @@ export const AuctionBidAction: FC<{
       </ActivityIcon>
       <Description>
         <FirstLine>
-          <FirstLabel>{t('Bid')}</FirstLabel>
+          <FirstLabel>{t('transaction_type_bid')}</FirstLabel>
           <AmountText>-&thinsp;{format(auctionBid.amount.value)}</AmountText>
           <AmountText>{auctionBid.amount.tokenName}</AmountText>
         </FirstLine>
@@ -215,13 +213,14 @@ export const AuctionBidAction: FC<{
 export const ActivityAction: FC<{
   action: Action;
   date: string;
+  isScam: boolean;
   openNft: (nft: NftItemRepr) => void;
-}> = ({ action, date, openNft }) => {
+}> = ({ action, isScam, date, openNft }) => {
   const { t } = useTranslation();
 
   switch (action.type) {
     case 'TonTransfer':
-      return <TonTransferAction action={action} date={date} />;
+      return <TonTransferAction action={action} date={date} isScam={isScam} />;
     case 'JettonTransfer':
       return <JettonTransferAction action={action} date={date} />;
     case 'NftItemTransfer':
