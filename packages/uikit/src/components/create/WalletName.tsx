@@ -1,9 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
-import {
-  getWalletState,
-  updateWalletProperty,
-} from '@tonkeeper/core/dist/service/walletService';
+import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
+import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';

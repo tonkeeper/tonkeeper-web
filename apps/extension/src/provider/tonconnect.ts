@@ -1,3 +1,4 @@
+import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import {
   ConnectEvent,
   ConnectEventError,
@@ -7,9 +8,8 @@ import {
   DisconnectEvent,
   SendTransactionRpcRequest,
   SendTransactionRpcResponse,
-} from '@tonconnect/protocol';
+} from '@tonkeeper/core/dist/entries/tonConnect';
 import packageJson from '../../package.json';
-import { TonConnectError } from '../entries/exception';
 import { TonProvider } from '../provider/index';
 
 function getPlatform(): DeviceInfo['platform'] {
@@ -71,11 +71,6 @@ const formatConnectEventError = (error: TonConnectError): ConnectEventError => {
 };
 
 export type TonConnectAppRequest = TonConnectSendTransactionRequest;
-
-export type TonConnectAccount = {
-  address: string; // '<wc>:<hex>'
-  network: string; // '-239' for the mainnet and '-3' for the testnet
-};
 
 export interface TonConnectSendTransactionRequest {
   method: 'sendTransaction';
