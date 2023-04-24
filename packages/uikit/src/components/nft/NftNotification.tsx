@@ -47,17 +47,22 @@ const TonDnsRoot =
   '0:b774d95eb20543f186c06b371ab88ad704f7e256130caf96189368a7d0cb6ccf';
 
 const Title = styled(H2)`
-  display: flex;
-  align-items: center;
+  word-break: break-word;
+
+  user-select: none;
 `;
 
 const SaleBlock = styled(Label4)`
-  margin-left: 8px;
   color: ${(props) => props.theme.textSecondary};
   border: 1px solid ${(props) => props.theme.buttonTertiaryBackground};
   border-radius: 6px;
   padding: 3.5px 6px 4.5px;
   text-transform: uppercase;
+
+  position: relative;
+  top: -3px;
+
+  white-space: nowrap;
 `;
 
 const NftPreview: FC<{
@@ -101,7 +106,12 @@ const NftPreview: FC<{
         <Text>
           <Title>
             {name}
-            {nftItem.sale && <SaleBlock>{t('nft_on_sale')}</SaleBlock>}
+            {nftItem.sale && (
+              <>
+                {'  '}
+                <SaleBlock>{t('nft_on_sale')}</SaleBlock>
+              </>
+            )}
           </Title>
           {collectionName && (
             <Body open margin="small">
