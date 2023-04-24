@@ -52,10 +52,11 @@ const Block = styled.div<{
         cursor: auto;
 
         ${Text} {
-          color: ${props.theme.textTertiary};
+          color: ${props.theme.buttonSecondaryForegroundDisabled};
         }
         ${Button} {
-          color: ${props.theme.textTertiary};
+          background-color: ${props.theme.buttonSecondaryBackgroundDisabled};
+          color: ${props.theme.buttonSecondaryForegroundDisabled};
         }
       `;
     }
