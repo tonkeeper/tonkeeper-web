@@ -110,6 +110,12 @@
   "MinPassword": {
     "message": "Must be at least 6 characters."
   },
+  "IncorrectCurrentPassword": {
+    "message": "Incorrect current password."
+  },
+  "PasswordDoNotMatch": {
+    "message": "Passwords do not match."
+  },
   "Unlock": {
     "message": "Unlock",
     "description": "Unlock button label"

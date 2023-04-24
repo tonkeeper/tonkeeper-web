@@ -106,6 +106,12 @@
   "MinPassword": {
     "message": "Должно быть не менее 6 символов."
   },
+  "IncorrectCurrentPassword": {
+    "message": "Неверный текущий пароль."
+  },
+  "PasswordDoNotMatch": {
+    "message": "Пароли не совпадают."
+  },
   "Unlock": {
     "message": "Разблокировать",
     "description": "Unlock button label"

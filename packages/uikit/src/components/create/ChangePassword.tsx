@@ -52,16 +52,21 @@ const ChangePasswordContent: FC<{ handleClose: () => void }> = ({
 
   return (
     <NotificationBlock onSubmit={onUpdate}>
-      <Input
-        type="password"
-        label={t('Old_password')}
-        value={old}
-        onChange={(value) => {
-          setError(undefined);
-          setOldPassword(value);
-        }}
-        isValid={error !== 'invalid-old'}
-      />
+      <Block>
+        <Input
+          type="password"
+          label={t('Old_password')}
+          value={old}
+          onChange={(value) => {
+            setError(undefined);
+            setOldPassword(value);
+          }}
+          isValid={error !== 'invalid-old'}
+          helpText={
+            error === 'invalid-old' ? t('IncorrectCurrentPassword') : undefined
+          }
+        />
+      </Block>
 
       <Block>
         <Input
@@ -72,7 +77,12 @@ const ChangePasswordContent: FC<{ handleClose: () => void }> = ({
             setError(undefined);
             setPassword(value);
           }}
-          isValid={error !== 'invalid-password'}
+          isValid={error === undefined || error == 'invalid-old'}
+          helpText={
+            error === 'invalid-confirm'
+              ? t('PasswordDoNotMatch')
+              : t('MinPassword')
+          }
         />
 
         <Input

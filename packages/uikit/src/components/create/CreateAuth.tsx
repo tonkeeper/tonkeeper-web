@@ -119,8 +119,10 @@ const FillPassword: FC<{
             setError(undefined);
             setPassword(value);
           }}
-          isValid={error !== 'password'}
-          helpText={t('MinPassword')}
+          isValid={error == null}
+          helpText={
+            error === 'confirm' ? t('PasswordDoNotMatch') : t('MinPassword')
+          }
         />
         {
           <Input
