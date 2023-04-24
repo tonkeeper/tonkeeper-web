@@ -191,7 +191,7 @@ export const AuctionBidAction: FC<{
       </ActivityIcon>
       <Description>
         <FirstLine>
-          <FirstLabel>{t('Bid')}</FirstLabel>
+          <FirstLabel>{t('transaction_type_bid')}</FirstLabel>
           <AmountText>-&thinsp;{format(auctionBid.amount.value)}</AmountText>
           <AmountText>{auctionBid.amount.tokenName}</AmountText>
         </FirstLine>

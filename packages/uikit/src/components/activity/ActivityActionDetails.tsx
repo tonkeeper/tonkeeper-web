@@ -227,7 +227,7 @@ export const AuctionBidActionDetails: FC<ActionData> = ({
   return (
     <ActionDetailsBlock event={event}>
       <div>
-        <Title>{t('Bid')}</Title>
+        <Title>{t('transaction_type_bid')}</Title>
         <Amount>
           {format(auctionBid.amount.value)} {auctionBid.amount.tokenName}
         </Amount>
