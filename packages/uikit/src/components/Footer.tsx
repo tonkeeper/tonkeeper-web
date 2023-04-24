@@ -98,7 +98,7 @@ const Button = styled.div<{ active: boolean }>`
     `}
 `;
 
-const Block = styled.div<{ standalone: boolean }>`
+const Block = styled.div<{ standalone?: boolean }>`
   flex-shrink: 0;
   display: flex;
   justify-content: space-around;
