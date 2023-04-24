@@ -38,7 +38,9 @@ const LabelRight = styled(Label1)`
   text-align: right;
 
   word-break: break-all;
-  overflow-wrap: anywhere;
+
+  white-space: break-spaces;
+  overflow: hidden;
 `;
 
 const Span = styled(Label1)`
