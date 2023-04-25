@@ -34,18 +34,8 @@ export const Notifications = () => {
   }, []);
 
   useEffect(() => {
-    if (window.location.hash) {
-      console.log(window.location.hash);
-      if (window.location.hash === '#/notification') {
-        setTimeout(() => {
-          sdk.uiEvents.emit('copy', {
-            method: 'copy',
-            params: t('loading'),
-          });
-        }, 200);
-
-        reloadNotification(false);
-      }
+    if (window.location.hash === '#/notification') {
+      reloadNotification(false);
     }
   }, []);
 

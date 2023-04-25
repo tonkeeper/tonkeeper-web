@@ -14,7 +14,6 @@ import {
 } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration } from '../../tonApiV1';
 import { walletContractFromState } from '../wallet/contractService';
 import { getCurrentWallet } from '../wallet/storeService';
 import {
@@ -62,11 +61,9 @@ export function parseTonConnect(options: {
   }
 }
 
-export const getManifest = async (
-  tonApi: Configuration,
-  request: ConnectRequest
-) => {
-  const response = await tonApi.fetchApi!(request.manifestUrl, {
+export const getManifest = async (request: ConnectRequest) => {
+  // TODO: get fetch from context
+  const response = await window.fetch(request.manifestUrl, {
     method: 'GET',
   });
 
