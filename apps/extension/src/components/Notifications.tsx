@@ -45,8 +45,11 @@ export const Notifications = () => {
         origin={data?.origin}
         params={data?.kind === 'tonConnectRequest' ? data.data : null}
         handleClose={(payload?: ConnectItem[]) => {
-          if (payload && data) {
+          if (!data) return;
+          if (payload) {
             sendBackground.message('approveRequest', { id: data.id, payload });
+          } else {
+            sendBackground.message('rejectRequest', data.id);
           }
           reloadNotification(true);
         }}

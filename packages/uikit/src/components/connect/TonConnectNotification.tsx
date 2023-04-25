@@ -9,7 +9,7 @@ import { getManifest } from '@tonkeeper/core/dist/service/tonConnect/connectServ
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
@@ -30,7 +30,7 @@ const Title = styled(H2)`
   user-select: none;
 `;
 const SubTitle = styled(Body2)`
-  margin-ton: 8px;
+  margin-ton: 4px;
   display: block;
   color: ${(props) => props.theme.textSecondary};
   text-align: center;
@@ -132,7 +132,6 @@ const ConnectContent: FC<{
 };
 
 const useManifest = (params: ConnectRequest | null) => {
-  const { tonApi } = useAppContext();
   const sdk = useAppSdk();
   const { t } = useTranslation();
 
@@ -172,7 +171,7 @@ export const TonConnectNotification: FC<{
   }, [origin, params, manifest, handleClose]);
 
   return (
-    <Notification isOpen={manifest != null} handleClose={handleClose}>
+    <Notification isOpen={manifest != null} handleClose={() => handleClose()}>
       {Content}
     </Notification>
   );
