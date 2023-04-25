@@ -2,7 +2,10 @@ import {
   EventEmitter,
   IEventEmitter,
 } from '@tonkeeper/core/dist/entries/eventEmitter';
-import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
+import {
+  ConnectRequest,
+  TonConnectTransactionPayload,
+} from '@tonkeeper/core/dist/entries/tonConnect';
 import { ProxyConfiguration } from '../entries/proxy';
 
 export type PopUpEventEmitter = IEventEmitter<PupUpEvents>;
@@ -24,7 +27,7 @@ export type NotificationFields<Kind extends string, Value> = {
 };
 
 export type NotificationData =
-  | NotificationFields<'tonConnectRequest', any>
+  | NotificationFields<'tonConnectRequest', ConnectRequest>
   | NotificationFields<'tonConnectSend', TonConnectTransactionPayload>;
 
 export interface PupUpEvents {

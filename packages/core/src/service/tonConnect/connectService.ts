@@ -132,7 +132,7 @@ export const getDeviceInfo = (appVersion: string): DeviceInfo => {
   };
 };
 
-export const walletTonReConnect = async (options: {
+export const checkWalletConnectionOrDie = async (options: {
   storage: IStorage;
   wallet: WalletState;
   webViewUrl: string;
@@ -142,10 +142,12 @@ export const walletTonReConnect = async (options: {
     options.wallet
   );
 
+  console.log(connections);
+
   const connection = connections.find(
     (item) => item.webViewUrl === options.webViewUrl
   );
-  if (connection === null) {
+  if (connection == undefined) {
     throw new TonConnectError(
       'Missing connection',
       CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
@@ -158,19 +160,16 @@ export const tonReConnectRequest = async (
   webViewUrl: string
 ): Promise<ConnectItem[]> => {
   const wallet = await getCurrentWallet(storage);
+  console.log(wallet);
 
-  await walletTonReConnect({ storage, wallet, webViewUrl });
+  await checkWalletConnectionOrDie({ storage, wallet, webViewUrl });
 
-  const network = wallet.network || Network.MAINNET;
   const contract = walletContractFromState(wallet);
 
   const result: TonAddressItemReply = {
     name: 'ton_addr',
-    address: contract.address.toString({
-      urlSafe: false,
-      testOnly: network !== Network.MAINNET,
-    }),
-    network: network,
+    address: contract.address.toRawString(),
+    network: wallet.network || Network.MAINNET,
     walletStateInit: beginCell()
       .storeWritable(storeStateInit(contract.init))
       .endCell()

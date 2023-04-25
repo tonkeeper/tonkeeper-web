@@ -78,6 +78,8 @@ import {
 } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
+import { Notifications } from './components/Notifications';
+import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { ExtensionStorage } from './libs/storage';
 
@@ -105,6 +107,7 @@ const queryClient = new QueryClient({
 });
 const storage = new ExtensionStorage();
 const sdk = new ExtensionAppSdk(storage);
+connectToBackground();
 
 export const App: FC = () => {
   const translation = useMemo(() => {
@@ -324,23 +327,25 @@ export const Content: FC<{
               }
             />
           </Route>
-          <Route
-            path="*"
-            element={
-              <>
-                <Header />
-                <InnerBody>
-                  <Suspense fallback={<HomeSkeleton />}>
-                    <Home />
-                  </Suspense>
-                </InnerBody>
-              </>
-            }
-          />
+          <Route path="*" element={<IndexPage />} />
         </Routes>
         <Footer />
         <MemoryScroll />
       </WalletStateContext.Provider>
     </Wrapper>
+  );
+};
+
+const IndexPage = () => {
+  return (
+    <>
+      <Header />
+      <InnerBody>
+        <Suspense fallback={<HomeSkeleton />}>
+          <Home />
+        </Suspense>
+      </InnerBody>
+      <Notifications />
+    </>
   );
 };
