@@ -106,21 +106,25 @@ export const FeeListItem: FC<{ feeAmount: string; fiatFeeAmount?: string }> = ({
   fiatFeeAmount,
 }) => {
   const { t } = useTranslation();
-  const sdk = useAppSdk();
-
   return (
     <ListItem hover={false}>
       <ListItemPayload>
         <Label>{t('txActions_fee')}</Label>
-        <ColumnText
-          right
-          text={
-            <>
-              {feeAmount} {CryptoCurrency.TON}
-            </>
-          }
-          secondary={<>≈&thinsp;{fiatFeeAmount}</>}
-        />
+        {fiatFeeAmount ? (
+          <ColumnText
+            right
+            text={
+              <>
+                {feeAmount} {CryptoCurrency.TON}
+              </>
+            }
+            secondary={<>≈&thinsp;{fiatFeeAmount}</>}
+          />
+        ) : (
+          <Label1>
+            {feeAmount} {CryptoCurrency.TON}
+          </Label1>
+        )}
       </ListItemPayload>
     </ListItem>
   );

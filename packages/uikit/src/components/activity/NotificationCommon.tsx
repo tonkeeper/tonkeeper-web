@@ -195,7 +195,7 @@ export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({
         <ListItemPayload>
           <Label>
             {beneficiary.name
-              ? t('transaction_merchant_address')
+              ? t('add_edit_favorite_address_label')
               : t('transaction_merchant')}
           </Label>
           <Label1>{toShortAddress(beneficiary.address)}</Label1>
@@ -237,7 +237,7 @@ export const ActionDeployerDetails: FC<{ deployer: AccountAddress }> = ({
         }
       >
         <ListItemPayload>
-          <Label>{t('address_label')}</Label>
+          <Label>{t('add_edit_favorite_address_label')}</Label>
           <Label1>{toShortAddress(deployer.address)}</Label1>
         </ListItemPayload>
       </ListItem>

@@ -21,6 +21,7 @@ import { Notification, NotificationBlock } from '../Notification';
 import { Label2 } from '../Text';
 import { ResultButton } from '../transfer/common';
 import { FeeListItem } from '../transfer/ConfirmListItem';
+import { TonTransactionAction } from './TonTransactionAction';
 
 const useSendMutation = (params: TonConnectTransactionPayload) => {
   const wallet = useWalletContext();
@@ -70,7 +71,9 @@ const ConnectContent: FC<{
           <FeeListItem feeAmount={feeAmount} />
         </ListBlock>
       )}
-
+      {(accountEvent?.actions ?? []).map((action, index) => (
+        <TonTransactionAction key={index} action={action} />
+      ))}
       <>
         {done && (
           <ResultButton done>
