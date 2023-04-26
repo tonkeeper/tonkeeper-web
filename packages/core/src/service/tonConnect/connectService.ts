@@ -1,6 +1,13 @@
 import queryString from 'query-string';
-import { beginCell, storeStateInit } from 'ton-core';
-import { KeyPair, getSecureRandomBytes, keyPairFromSeed } from 'ton-crypto';
+import { Address, beginCell, storeStateInit } from 'ton-core';
+import {
+  KeyPair,
+  getSecureRandomBytes,
+  keyPairFromSeed,
+  mnemonicToPrivateKey,
+  sha256_sync,
+} from 'ton-crypto';
+import nacl from 'tweetnacl';
 import { IStorage } from '../../Storage';
 import { TonConnectError } from '../../entries/exception';
 import { Network } from '../../entries/network';
@@ -13,8 +20,10 @@ import {
   DAppManifest,
   DeviceInfo,
   TonAddressItemReply,
+  TonProofItemReplySuccess,
 } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
+import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import { getCurrentWallet } from '../wallet/storeService';
 import {
@@ -198,6 +207,99 @@ export const toTonAddressItemReply = (wallet: WalletState) => {
   };
 
   return result;
+};
+
+export interface ConnectProofPayload {
+  timestamp: number;
+  bufferToSign: Buffer;
+  domainBuffer: Buffer;
+  payload: string;
+  origin: string;
+}
+
+export const tonConnectProofPayload = (
+  origin: string,
+  wallet: string,
+  payload: string
+): ConnectProofPayload => {
+  const timestamp = Math.round(Date.now() / 1000);
+  const timestampBuffer = Buffer.allocUnsafe(8);
+  timestampBuffer.writeBigInt64LE(BigInt(timestamp));
+
+  const domainBuffer = Buffer.from(new URL(origin).host);
+  const domainLengthBuffer = Buffer.allocUnsafe(4);
+  domainLengthBuffer.writeInt32LE(domainBuffer.byteLength);
+
+  const address = Address.parse(wallet);
+
+  const addressWorkchainBuffer = Buffer.allocUnsafe(4);
+  addressWorkchainBuffer.writeInt32BE(address.workChain);
+
+  const addressBuffer = Buffer.concat([addressWorkchainBuffer, address.hash]);
+
+  const messageBuffer = Buffer.concat([
+    Buffer.from('ton-proof-item-v2/', 'utf8'),
+    addressBuffer,
+    domainLengthBuffer,
+    domainBuffer,
+    timestampBuffer,
+    Buffer.from(payload),
+  ]);
+
+  const bufferToSign = Buffer.concat([
+    Buffer.from('ffff', 'hex'),
+    Buffer.from('ton-connect', 'utf8'),
+    Buffer.from(sha256_sync(messageBuffer)),
+  ]);
+
+  return {
+    timestamp,
+    bufferToSign,
+    domainBuffer,
+    payload,
+    origin,
+  };
+};
+
+const toTonProofItemReplySuccess = (
+  proof: ConnectProofPayload,
+  signature: Buffer
+) => {
+  const result: TonProofItemReplySuccess = {
+    name: 'ton_proof',
+    proof: {
+      timestamp: proof.timestamp, // 64-bit unix epoch time of the signing operation (seconds)
+      domain: {
+        lengthBytes: proof.domainBuffer.byteLength, // AppDomain Length
+        value: proof.domainBuffer.toString('utf8'), // app domain name (as url part, without encoding)
+      },
+      signature: signature.toString('base64'), // base64-encoded signature
+      payload: proof.payload, // payload from the request
+    },
+  };
+
+  return result;
+};
+
+export const toTonProofItemReply = async (options: {
+  storage: IStorage;
+  wallet: WalletState;
+  password: string;
+  proof: ConnectProofPayload;
+}): Promise<TonProofItemReplySuccess> => {
+  const mnemonic = await getWalletMnemonic(
+    options.storage,
+    options.wallet.publicKey,
+    options.password
+  );
+  const keyPair = await mnemonicToPrivateKey(mnemonic);
+
+  const signature = nacl.sign.detached(
+    Buffer.from(sha256_sync(options.proof.bufferToSign)),
+    keyPair.secretKey
+  );
+
+  return toTonProofItemReplySuccess(options.proof, Buffer.from(signature));
 };
 
 export const tonDisconnectRequest = async (options: {

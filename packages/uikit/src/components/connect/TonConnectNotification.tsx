@@ -1,6 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import {
-  ConnectItem,
+  ConnectItemReply,
   ConnectRequest,
   DAppManifest,
 } from '@tonkeeper/core/dist/entries/tonConnect';
@@ -9,6 +11,8 @@ import {
   getManifest,
   getTonConnectParams,
   toTonAddressItemReply,
+  toTonProofItemReply,
+  tonConnectProofPayload,
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
@@ -17,6 +21,7 @@ import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { getPasswordByNotification } from '../../pages/home/UnlockNotification';
 import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
@@ -31,7 +36,7 @@ const useConnectMutation = (
   const wallet = useWalletContext();
   const sdk = useAppSdk();
 
-  return useMutation<ConnectItem[], Error>(async () => {
+  return useMutation<ConnectItemReply[], Error>(async () => {
     const params = await getTonConnectParams(request);
 
     await saveAccountConnection({
@@ -41,13 +46,31 @@ const useConnectMutation = (
       params,
       webViewUrl,
     });
-    const result = [] as ConnectItem[];
+    const result = [] as ConnectItemReply[];
 
     for (let item of request.items) {
       if (item.name === 'ton_addr') {
         result.push(toTonAddressItemReply(wallet));
       }
       if (item.name === 'ton_proof') {
+        const auth = await sdk.storage.get<AuthState>(AppKey.password);
+        if (!auth) {
+          throw new Error('Missing Auth');
+        }
+        const password = await getPasswordByNotification(sdk, auth);
+        const proof = tonConnectProofPayload(
+          origin,
+          wallet.active.friendlyAddress,
+          item.payload
+        );
+        result.push(
+          await toTonProofItemReply({
+            storage: sdk.storage,
+            wallet,
+            password,
+            proof,
+          })
+        );
       }
     }
     return result;
@@ -96,7 +119,7 @@ const ConnectContent: FC<{
   origin?: string;
   params: ConnectRequest;
   manifest: DAppManifest;
-  handleClose: (result?: ConnectItem[]) => void;
+  handleClose: (result?: ConnectItemReply[]) => void;
 }> = ({ params, manifest, origin, handleClose }) => {
   const [done, setDone] = useState(false);
 
@@ -187,7 +210,7 @@ const useManifest = (params: ConnectRequest | null) => {
 export const TonConnectNotification: FC<{
   origin?: string;
   params: ConnectRequest | null;
-  handleClose: (result?: ConnectItem[]) => void;
+  handleClose: (result?: ConnectItemReply[]) => void;
 }> = ({ params, handleClose }) => {
   const { data: manifest } = useManifest(params);
 

@@ -1,4 +1,4 @@
-import { ConnectItem } from '@tonkeeper/core/dist/entries/tonConnect';
+import { ConnectItemReply } from '@tonkeeper/core/dist/entries/tonConnect';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
@@ -44,7 +44,7 @@ export const Notifications = () => {
       <TonConnectNotification
         origin={data?.origin}
         params={data?.kind === 'tonConnectRequest' ? data.data : null}
-        handleClose={(payload?: ConnectItem[]) => {
+        handleClose={(payload?: ConnectItemReply[]) => {
           if (!data) return;
           if (payload) {
             sendBackground.message('approveRequest', { id: data.id, payload });

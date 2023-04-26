@@ -1,5 +1,5 @@
 import {
-  ConnectItem,
+  ConnectItemReply,
   ConnectRequest,
   TonConnectAccount,
   TonConnectTransactionPayload,
@@ -37,7 +37,7 @@ const connectWithNotification = async (
 
   try {
     const popupId = await openNotificationPopUp();
-    const result = await waitApprove<ConnectItem[]>(id, popupId);
+    const result = await waitApprove<ConnectItemReply[]>(id, popupId);
 
     return result;
   } finally {
