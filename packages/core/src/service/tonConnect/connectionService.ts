@@ -19,7 +19,7 @@ export interface AccountConnection {
   manifest: DAppManifest;
   sessionKeyPair: KeyPair;
   clientSessionId: string;
-  webViewUrl: string;
+  webViewUrl?: string;
 }
 
 export const getAccountConnection = async (
@@ -52,14 +52,18 @@ export const saveAccountConnection = async (options: {
   wallet: WalletState;
   manifest: DAppManifest;
   params: TonConnectParams;
-  webViewUrl: string;
+  webViewUrl?: string;
 }): Promise<void> => {
-  const connections = await getAccountConnection(
-    options.storage,
-    options.wallet
-  );
+  let connections = await getAccountConnection(options.storage, options.wallet);
 
-  connections.push({
+  const old = connections.find(
+    (item) => item.manifest.url === options.manifest.url
+  );
+  if (old) {
+    connections = connections.filter((item) => item !== old);
+  }
+
+  connections.unshift({
     manifest: options.manifest,
     sessionKeyPair: options.params.sessionKeyPair,
     clientSessionId: options.params.clientSessionId,

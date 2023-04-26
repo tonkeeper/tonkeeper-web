@@ -5,23 +5,52 @@ import {
   DAppManifest,
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
-import { getManifest } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import {
+  getManifest,
+  getTonConnectParams,
+  toTonAddressItemReply,
+} from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { Button } from '../fields/Button';
 import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
+import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 
-const useConnectMutation = (params: ConnectRequest, origin?: string) => {
+const useConnectMutation = (
+  request: ConnectRequest,
+  manifest: DAppManifest,
+  webViewUrl?: string
+) => {
+  const wallet = useWalletContext();
+  const sdk = useAppSdk();
+
   return useMutation<ConnectItem[], Error>(async () => {
-    console.log(params);
-    return [];
+    const params = await getTonConnectParams(request);
+
+    await saveAccountConnection({
+      storage: sdk.storage,
+      wallet,
+      manifest,
+      params,
+      webViewUrl,
+    });
+    const result = [] as ConnectItem[];
+
+    for (let item of request.items) {
+      if (item.name === 'ton_addr') {
+        result.push(toTonAddressItemReply(wallet));
+      }
+      if (item.name === 'ton_proof') {
+      }
+    }
+    return result;
   });
 };
 
@@ -75,7 +104,11 @@ const ConnectContent: FC<{
 
   const { t } = useTranslation();
 
-  const { mutateAsync, isLoading, error } = useConnectMutation(params, origin);
+  const { mutateAsync, isLoading, error } = useConnectMutation(
+    params,
+    manifest,
+    origin
+  );
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();

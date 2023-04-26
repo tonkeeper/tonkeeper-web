@@ -1,26 +1,27 @@
 import queryString from 'query-string';
 import { beginCell, storeStateInit } from 'ton-core';
+import { KeyPair, getSecureRandomBytes, keyPairFromSeed } from 'ton-crypto';
+import { IStorage } from '../../Storage';
 import { TonConnectError } from '../../entries/exception';
 import { Network } from '../../entries/network';
 import {
+  CONNECT_EVENT_ERROR_CODES,
   ConnectEvent,
   ConnectItem,
   ConnectItemReply,
   ConnectRequest,
-  CONNECT_EVENT_ERROR_CODES,
   DAppManifest,
   DeviceInfo,
   TonAddressItemReply,
 } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
-import { IStorage } from '../../Storage';
 import { walletContractFromState } from '../wallet/contractService';
 import { getCurrentWallet } from '../wallet/storeService';
 import {
+  TonConnectParams,
   disconnectAccountConnection,
   getAccountConnection,
   saveAccountConnection,
-  TonConnectParams,
 } from './connectionService';
 
 const TC_PREFIX = 'tc://';
@@ -49,7 +50,6 @@ export function parseTonConnect(options: {
     const request = JSON.parse(decodeURIComponent(query.r)) as ConnectRequest;
     const clientSessionId = query.id;
     //const sessionCrypto = new SessionCrypto();
-
     return {
       protocolVersion,
       request,
@@ -60,6 +60,26 @@ export function parseTonConnect(options: {
     return null;
   }
 }
+
+export const getTonConnectParams = async (
+  request: ConnectRequest,
+  protocolVersion?: number,
+  clientSessionId?: string
+): Promise<TonConnectParams> => {
+  const randomBytes: Buffer = await getSecureRandomBytes(32);
+  const keypair: KeyPair = keyPairFromSeed(randomBytes);
+
+  return {
+    protocolVersion: protocolVersion ?? 2,
+    request,
+    clientSessionId:
+      clientSessionId ?? (await getSecureRandomBytes(32)).toString('hex'),
+    sessionKeyPair: {
+      secretKey: keypair.secretKey.toString('hex'),
+      publicKey: keypair.publicKey.toString('hex'),
+    },
+  };
+};
 
 export const getManifest = async (request: ConnectRequest) => {
   // TODO: get fetch from context
@@ -160,9 +180,11 @@ export const tonReConnectRequest = async (
   console.log(wallet);
 
   await checkWalletConnectionOrDie({ storage, wallet, webViewUrl });
+  return [toTonAddressItemReply(wallet)];
+};
 
+export const toTonAddressItemReply = (wallet: WalletState) => {
   const contract = walletContractFromState(wallet);
-
   const result: TonAddressItemReply = {
     name: 'ton_addr',
     address: contract.address.toRawString(),
@@ -175,7 +197,7 @@ export const tonReConnectRequest = async (
     publicKey: wallet.publicKey,
   };
 
-  return [result];
+  return result;
 };
 
 export const tonDisconnectRequest = async (options: {
