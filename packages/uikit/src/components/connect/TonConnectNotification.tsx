@@ -22,7 +22,7 @@ import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { getPasswordByNotification } from '../../pages/home/UnlockNotification';
-import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../Icon';
+import { CheckmarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
@@ -37,15 +37,10 @@ const useConnectMutation = (
   const sdk = useAppSdk();
 
   return useMutation<ConnectItemReply[], Error>(async () => {
+    console.log(webViewUrl);
+
     const params = await getTonConnectParams(request);
 
-    await saveAccountConnection({
-      storage: sdk.storage,
-      wallet,
-      manifest,
-      params,
-      webViewUrl,
-    });
     const result = [] as ConnectItemReply[];
 
     for (let item of request.items) {
@@ -59,7 +54,7 @@ const useConnectMutation = (
         }
         const password = await getPasswordByNotification(sdk, auth);
         const proof = tonConnectProofPayload(
-          origin,
+          webViewUrl ?? manifest.url,
           wallet.active.friendlyAddress,
           item.payload
         );
@@ -73,6 +68,15 @@ const useConnectMutation = (
         );
       }
     }
+
+    await saveAccountConnection({
+      storage: sdk.storage,
+      wallet,
+      manifest,
+      params,
+      webViewUrl,
+    });
+
     return result;
   });
 };
@@ -160,16 +164,10 @@ const ConnectContent: FC<{
         {done && (
           <ResultButton done>
             <CheckmarkCircleIcon />
-            <Label2>{t('send_screen_steps_done_done_label')}</Label2>
+            <Label2>{t('ton_login_success')}</Label2>
           </ResultButton>
         )}
-        {error && (
-          <ResultButton>
-            <ExclamationMarkCircleIcon />
-            <Label2>{t('send_publish_tx_error')}</Label2>
-          </ResultButton>
-        )}
-        {!done && !error && (
+        {!done && (
           <Button
             size="large"
             fullWidth
@@ -211,7 +209,7 @@ export const TonConnectNotification: FC<{
   origin?: string;
   params: ConnectRequest | null;
   handleClose: (result?: ConnectItemReply[]) => void;
-}> = ({ params, handleClose }) => {
+}> = ({ params, origin, handleClose }) => {
   const { data: manifest } = useManifest(params);
 
   const Content = useCallback(() => {

@@ -1,5 +1,3 @@
-import { Network } from './network';
-
 export interface DAppManifest {
   url: string;
   name: string;
@@ -252,7 +250,7 @@ export interface TonAddressItem {
 export interface TonAddressItemReply {
   name: 'ton_addr';
   address: string;
-  network: Network;
+  network: string;
   walletStateInit: string;
   publicKey: string;
 }

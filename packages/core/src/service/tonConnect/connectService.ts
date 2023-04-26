@@ -197,7 +197,7 @@ export const toTonAddressItemReply = (wallet: WalletState) => {
   const result: TonAddressItemReply = {
     name: 'ton_addr',
     address: contract.address.toRawString(),
-    network: wallet.network || Network.MAINNET,
+    network: (wallet.network || Network.MAINNET).toString(),
     walletStateInit: beginCell()
       .storeWritable(storeStateInit(contract.init))
       .endCell()
@@ -227,6 +227,7 @@ export const tonConnectProofPayload = (
   timestampBuffer.writeBigInt64LE(BigInt(timestamp));
 
   const domainBuffer = Buffer.from(new URL(origin).host);
+
   const domainLengthBuffer = Buffer.allocUnsafe(4);
   domainLengthBuffer.writeInt32LE(domainBuffer.byteLength);
 
