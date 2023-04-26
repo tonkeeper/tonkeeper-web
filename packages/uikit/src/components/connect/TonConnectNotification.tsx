@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import {
   ConnectItemReply,
@@ -7,25 +6,27 @@ import {
   DAppManifest,
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import {
   getManifest,
   getTonConnectParams,
+  tonConnectProofPayload,
   toTonAddressItemReply,
   toTonProofItemReply,
-  tonConnectProofPayload,
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { QueryKey } from '../../libs/queryKey';
 import { getPasswordByNotification } from '../../pages/home/UnlockNotification';
+import { Button } from '../fields/Button';
 import { CheckmarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
-import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 
 const useConnectMutation = (
@@ -190,7 +191,7 @@ const useManifest = (params: ConnectRequest | null) => {
   const { t } = useTranslation();
 
   return useQuery(
-    ['manifest', params],
+    [QueryKey.estimate, params],
     () => {
       sdk.uiEvents.emit('copy', {
         method: 'copy',
