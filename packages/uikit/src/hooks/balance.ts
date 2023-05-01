@@ -8,7 +8,7 @@ import {
 import BigNumber from 'bignumber.js';
 import { useCallback, useMemo } from 'react';
 
-const formatter = new AmountFormatter({
+export const formatter = new AmountFormatter({
   getLocaleFormat: () => ({
     decimalSeparator: getDecimalSeparator(),
     groupingSeparator: getGroupSeparator(),

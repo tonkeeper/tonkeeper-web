@@ -42,17 +42,24 @@ export function getDecimalLength(str: string) {
   return tail ? tail.length : 0;
 }
 
-export function formatSendValue(str: string) {
-  const [entry, tail] = removeGroupSeparator(str.trim()).split(
-    getDecimalSeparator()
-  );
-
+function formatEntryAndTail(entry: string, tail: string) {
   const path = [] as string[];
   path.push(new Intl.NumberFormat(getBrowserLocale()).format(parseInt(entry)));
   if (tail !== undefined) {
     path.push(tail);
   }
   return path.join(getDecimalSeparator());
+}
+export function formatNumberValue(value: BigNumber) {
+  const [entry, tail] = value.toFormat().split('.');
+  return formatEntryAndTail(entry, tail);
+}
+
+export function formatSendValue(str: string) {
+  const [entry, tail] = removeGroupSeparator(str.trim()).split(
+    getDecimalSeparator()
+  );
+  return formatEntryAndTail(entry, tail);
 }
 
 export const getJettonSymbol = (

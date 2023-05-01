@@ -7,6 +7,7 @@ import {
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { seeIfAddressEqual } from '@tonkeeper/core/dist/utils/common';
 import { DefaultDecimals } from '@tonkeeper/core/dist/utils/send';
+import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext } from '../../hooks/appContext';
@@ -39,8 +40,9 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   const confirmRef = useRef<HTMLDivElement>(null);
 
   const [right, setRight] = useState(true);
-  const [recipient, setRecipient] =
-    useState<RecipientData | undefined>(undefined);
+  const [recipient, setRecipient] = useState<RecipientData | undefined>(
+    undefined
+  );
   const [amount, setAmount] = useState<AmountData | undefined>(undefined);
 
   const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
@@ -99,7 +101,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
       const amountValue = amount ? formatDecimals(amount, decimals) : 0;
 
       setAmount({
-        amount: amountValue,
+        amount: new BigNumber(amountValue),
         jetton: balance?.jettonAddress ?? asset,
         max: false,
         done: false,

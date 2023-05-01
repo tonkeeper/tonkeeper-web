@@ -12,6 +12,7 @@ import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import {
+  formatNumberValue,
   formatSendValue,
   getJettonDecimals,
   getJettonSymbol,
@@ -21,6 +22,7 @@ import {
   removeGroupSeparator,
   seeIfLargeTail,
 } from '@tonkeeper/core/dist/utils/send';
+import BigNumber from 'bignumber.js';
 import React, {
   FC,
   useCallback,
@@ -279,7 +281,7 @@ export const AmountView: FC<{
 
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
   const [amount, setAmountValue] = useState(
-    data ? data.amount.toString() : '0'
+    data ? formatNumberValue(data.amount) : '0'
   );
 
   const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
@@ -351,7 +353,7 @@ export const AmountView: FC<{
       e.preventDefault();
       if (isValid) {
         reset();
-        const value = parseFloat(
+        const value = new BigNumber(
           removeGroupSeparator(amount).replace(',', '.')
         );
         const fee = await mutateAsync({ amount: value, max });

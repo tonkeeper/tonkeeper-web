@@ -3,13 +3,16 @@ import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
+import {
+  getJettonDecimals,
+  getJettonSymbol,
+} from '@tonkeeper/core/dist/utils/send';
 
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import React, { FC, useMemo, useState } from 'react';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useFormatCoinValue } from '../../hooks/balance';
+import { formatter, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { getWalletPassword } from '../../state/password';
 import { TransferComment } from '../activity/ActivityActionDetails';
@@ -114,11 +117,15 @@ export const ConfirmView: FC<{
 
   const isValid = !isLoading;
 
-  const fiatAmount = useFiatAmount(jettons, amount.jetton, amount.amount);
-  const coinAmount = `${amount.amount} ${getJettonSymbol(
+  const fiatAmount = useFiatAmount(
+    jettons,
     amount.jetton,
-    jettons
-  )}`;
+    amount.amount.toFormat()
+  );
+  const coinAmount = `${formatter.format(amount.amount, {
+    ignoreZeroTruncate: false,
+    decimals: getJettonDecimals(amount.jetton, jettons),
+  })} ${getJettonSymbol(amount.jetton, jettons)}`;
 
   const format = useFormatCoinValue();
   const feeAmount = useMemo(() => format(amount.fee.total), [format, amount]);

@@ -6,6 +6,7 @@ import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
 import { Configuration, Fee, SendApi, WalletApi } from '../../tonApiV1';
+import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
@@ -52,7 +53,11 @@ const createTonTransfer = (
       internal({
         to: recipient.toAccount.address.raw,
         bounce: recipient.toAccount.status == 'active',
-        value: toNano(data.amount.toString()),
+        value: BigInt(
+          new BigNumber(data.amount)
+            .multipliedBy(Math.pow(10, DefaultDecimals))
+            .toString()
+        ),
         body: recipient.comment ?? undefined,
       }),
     ],
