@@ -181,8 +181,7 @@ export const useWalletNftList = () => {
       });
       const result = wallets
         .filter((item) => item.balance > 0 || item.status === 'active')
-        .map((wallet) => wallet.address)
-        .sort((a, b) => (a === wallet.active.rawAddress ? -1 : 1));
+        .map((wallet) => wallet.address);
 
       const items = await Promise.all(
         result.map((owner) =>

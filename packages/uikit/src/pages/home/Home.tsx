@@ -5,16 +5,15 @@ import {
 } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import React, { FC } from 'react';
-import { HomeSkeleton } from '../../components/Skeleton';
 import { Balance } from '../../components/home/Balance';
 import { CompactView } from '../../components/home/CompactView';
 import { TabsView } from '../../components/home/TabsView';
 import { HomeActions } from '../../components/home/TonActions';
+import { HomeSkeleton } from '../../components/Skeleton';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useUserJettonList } from '../../state/jetton';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import {
-  checkWalletBackup,
   useWalletAccountInfo,
   useWalletJettonList,
   useWalletNftList,
@@ -55,8 +54,6 @@ const Home = () => {
 
   const isLoading =
     isJettonLoading || isAccountLoading || isNftLoading || isStockLoading;
-
-  checkWalletBackup();
 
   if (!stock || !nfts || !jettons || !info) {
     return <HomeSkeleton />;
