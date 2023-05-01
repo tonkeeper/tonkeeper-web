@@ -66,11 +66,17 @@ export const getActivityTitle = (
         month: 'long',
       }).format(date)
     );
-  } else {
+  } else if (date.getFullYear() < new Date().getFullYear()) {
     return capitalize(
       new Intl.DateTimeFormat(language, {
         month: 'long',
         year: 'numeric',
+      }).format(date)
+    );
+  } else {
+    return capitalize(
+      new Intl.DateTimeFormat(language, {
+        month: 'long',
       }).format(date)
     );
   }
@@ -99,7 +105,7 @@ const getEventGroup = (
   }
   if (
     yesterday.toDateString() === date.toDateString() &&
-    yesterday.getMonth() === date.getMonth()
+    today.getMonth() === date.getMonth()
   ) {
     return 'yesterday';
   }
