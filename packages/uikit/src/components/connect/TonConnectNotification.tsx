@@ -38,8 +38,6 @@ const useConnectMutation = (
   const sdk = useAppSdk();
 
   return useMutation<ConnectItemReply[], Error>(async () => {
-    console.log(webViewUrl);
-
     const params = await getTonConnectParams(request);
 
     const result = [] as ConnectItemReply[];

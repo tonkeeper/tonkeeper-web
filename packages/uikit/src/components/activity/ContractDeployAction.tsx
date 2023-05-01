@@ -117,8 +117,6 @@ export const ContractDeployAction: FC<{
     );
   }
 
-  console.log({ interfaces });
-
   return (
     <ListItemGrid>
       <ActivityIcon>

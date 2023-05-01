@@ -201,7 +201,6 @@ const seeIfValueValid = (value: string, decimals: number) => {
   if (value !== '') {
     if (value.endsWith('e')) return false;
     const separators = value.match(getDecimalSeparator());
-    console.log(separators);
     if (separators && separators.length > 1) return false;
     if (/^[a-zA-Z]+$/.test(value)) return false;
     if (!isNumeric(removeGroupSeparator(value))) return false;

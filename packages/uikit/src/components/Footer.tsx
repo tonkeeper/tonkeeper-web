@@ -150,7 +150,6 @@ export const Footer: FC<{ standalone?: boolean }> = ({ standalone }) => {
 
   const handleClick = useCallback(
     (route: AppRoute) => {
-      console.log(location.pathname, route);
       if (location.pathname !== route) {
         return navigate(route);
       }
