@@ -14,6 +14,8 @@ import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import {
   formatNumberValue,
   formatSendValue,
+  getCoinAmountValue,
+  getFiatAmountValue,
   getJettonDecimals,
   getJettonSymbol,
   getMaxValue,
@@ -36,6 +38,7 @@ import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { getTextWidth } from '../../hooks/textWidth';
 import { useTranslation } from '../../hooks/translation';
+import { useTonenpointStock } from '../../state/tonendpoint';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
 import { ChevronLeftIcon } from '../Icon';
@@ -47,7 +50,7 @@ import {
 } from '../Notification';
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
 import { AssetSelect } from './AssetSelect';
-import { ButtonBlock, useFiatAmountWithSymbol } from './common';
+import { ButtonBlock, useSecondAmountWithSymbol } from './common';
 import { InputSize, Sentence } from './Sentence';
 
 const Center = styled.div`
@@ -112,6 +115,7 @@ const RemainingInvalid = styled(Body2)`
 const Symbol = styled(Num2)`
   color: ${(props) => props.theme.textSecondary};
   padding-left: 1rem;
+  white-space: pre;
 
   @media (max-width: 600px) {
     padding-left: 0.5rem;
@@ -127,6 +131,7 @@ const SelectCenter = styled.div`
 `;
 
 const FiatBlock = styled(Body1)`
+  cursor: pointer;
   position: absolute;
   top: 50$;
   left: 50%;
@@ -143,6 +148,8 @@ const FiatBlock = styled(Body1)`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: pre;
+
+  user-select: none;
 `;
 
 const InputBlock = styled.div`
@@ -281,15 +288,69 @@ export const AmountView: FC<{
   jettons,
   info,
 }) => {
-  const { standalone } = useAppContext();
+  const { fiat, standalone } = useAppContext();
+  const { data: stock } = useTonenpointStock();
   const format = useFormatCoinValue();
 
+  const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
+  const [inFiat, setInFiat] = useState(data ? data.fiat !== undefined : false);
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
-  const [amount, setAmountValue] = useState(
-    data ? formatNumberValue(data.amount) : '0'
+  const [inputAmount, setAmountValue] = useState(
+    data ? formatNumberValue(data.fiat ?? data.amount) : '0'
   );
 
-  const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
+  const ref = useRef<HTMLInputElement>(null);
+  const refBlock = useRef<HTMLLabelElement>(null);
+  const refButton = useRef<HTMLDivElement>(null);
+
+  const secondAmount = useSecondAmountWithSymbol(
+    jettons,
+    jetton,
+    inputAmount,
+    inFiat
+  );
+
+  const coinAmount = useMemo(() => {
+    if (inFiat) {
+      const value = getCoinAmountValue(
+        stock,
+        jettons,
+        fiat,
+        jetton,
+        inputAmount
+      );
+      return formatNumberValue(value ? value : new BigNumber('0'));
+    } else {
+      return inputAmount;
+    }
+  }, [inFiat, inputAmount, jetton, jettons]);
+
+  const toggleFiat = () => {
+    if (!refBlock.current) return;
+    if (inFiat) {
+      // inputAmount convert to coin
+      setAmountValue(coinAmount);
+      const size = getInputSize(coinAmount, refBlock.current);
+      setFontSize(size);
+      setInFiat(!inFiat);
+    } else {
+      // inputAmount convert to usd
+      const fiatAmount = getFiatAmountValue(
+        stock,
+        jettons,
+        fiat,
+        jetton,
+        inputAmount.toString()
+      );
+
+      if (!fiatAmount) return;
+      const value = formatNumberValue(new BigNumber(fiatAmount.toFormat(2)));
+      setAmountValue(value);
+      const size = getInputSize(value, refBlock.current);
+      setFontSize(size);
+      setInFiat(!inFiat);
+    }
+  };
 
   const { mutateAsync, isLoading, reset } = useEstimateTransaction(
     recipient,
@@ -297,15 +358,11 @@ export const AmountView: FC<{
     jettons
   );
 
-  const ref = useRef<HTMLInputElement>(null);
-  const refBlock = useRef<HTMLLabelElement>(null);
-  const refButton = useRef<HTMLDivElement>(null);
-
   useButtonPosition(refButton, refBlock);
 
   useEffect(() => {
     if (refBlock.current) {
-      setFontSize(getInputSize(amount, refBlock.current));
+      setFontSize(getInputSize(inputAmount, refBlock.current));
     }
   }, [refBlock.current]);
 
@@ -324,14 +381,14 @@ export const AmountView: FC<{
 
   const { t } = useTranslation();
 
-  const suffix = getJettonSymbol(jetton, jettons);
+  const suffix = inFiat ? fiat.toString() : getJettonSymbol(jetton, jettons);
 
   const onInput = (value: string) => {
     if (!refBlock.current) return;
-    const decimals = getJettonDecimals(jetton, jettons);
+    const decimals = inFiat ? 2 : getJettonDecimals(jetton, jettons);
 
     if (!seeIfValueValid(value, decimals)) {
-      value = amount;
+      value = inputAmount;
     }
 
     if (isNumeric(value)) {
@@ -344,13 +401,13 @@ export const AmountView: FC<{
   };
 
   const [remaining, valid] = useMemo(
-    () => getRemaining(jettons, info, jetton, amount, max, format),
-    [jettons, info, jetton, amount, max]
+    () => getRemaining(jettons, info, jetton, coinAmount, max, format),
+    [jettons, info, jetton, coinAmount, max, format]
   );
 
   const isValid = useMemo(() => {
-    return valid && isNumeric(amount);
-  }, [valid, amount]);
+    return valid && isNumeric(inputAmount);
+  }, [valid, inputAmount]);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = useCallback(
     async (e) => {
@@ -358,20 +415,38 @@ export const AmountView: FC<{
       e.preventDefault();
       if (isValid) {
         reset();
-        const value = new BigNumber(
-          removeGroupSeparator(amount).replace(',', '.')
+        const coinValue = new BigNumber(
+          removeGroupSeparator(coinAmount).replace(',', '.')
         );
-        const fee = await mutateAsync({ amount: value, max });
-        setAmount({ amount: value, max, done: true, jetton, fee });
+
+        const fiatValue = inFiat
+          ? new BigNumber(removeGroupSeparator(inputAmount).replace(',', '.'))
+          : undefined;
+
+        const fee = await mutateAsync({
+          amount: coinValue,
+          fiat: fiatValue,
+          max,
+        });
+
+        setAmount({
+          amount: coinValue,
+          fiat: fiatValue,
+          max,
+          done: true,
+          jetton,
+          fee,
+        });
       }
     },
-    [setAmount, amount, max, jetton, isValid]
+    [setAmount, inputAmount, coinAmount, inFiat, max, jetton, isValid]
   );
 
   const onMax = () => {
     if (!refBlock.current) return;
 
     setMax(true);
+    setInFiat(false);
     const value = getMaxValue(jettons, info, jetton, format);
     const size = getInputSize(value, refBlock.current);
     setFontSize(size);
@@ -382,15 +457,25 @@ export const AmountView: FC<{
     if (!refBlock.current) return;
 
     setJetton(asset);
+
     if (max) {
       const value = getMaxValue(jettons, info, asset, format);
       const size = getInputSize(value, refBlock.current);
       setFontSize(size);
       setAmountValue(value);
+    } else {
+      const value = getCoinAmountValue(
+        stock,
+        jettons,
+        fiat,
+        asset,
+        inputAmount
+      );
+      if (!value) {
+        setInFiat(false);
+      }
     }
   };
-
-  const fiatAmount = useFiatAmountWithSymbol(jettons, jetton, amount);
 
   return (
     <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
@@ -423,14 +508,16 @@ export const AmountView: FC<{
         <InputBlock>
           <Sentence
             ref={ref}
-            value={amount}
+            value={inputAmount}
             setValue={onInput}
             inputSize={fontSize}
           />
           <Symbol>{suffix}</Symbol>
         </InputBlock>
 
-        {fiatAmount && <FiatBlock>{fiatAmount}</FiatBlock>}
+        {secondAmount && (
+          <FiatBlock onClick={toggleFiat}>{secondAmount}</FiatBlock>
+        )}
       </AmountBlock>
       <MaxRow>
         <MaxButton maxValue={max} onClick={onMax}>

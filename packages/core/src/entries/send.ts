@@ -17,6 +17,7 @@ export interface RecipientData {
 }
 
 export interface AmountValue {
+  fiat?: BigNumber;
   amount: BigNumber;
   max: boolean;
 }

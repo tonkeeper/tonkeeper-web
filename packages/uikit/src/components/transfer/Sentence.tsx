@@ -42,6 +42,7 @@ export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
   ({ value, setValue, inputSize }, ref) => {
     return (
       <SentenceInput
+        autoComplete="off"
         id="sentence"
         ref={ref}
         style={{

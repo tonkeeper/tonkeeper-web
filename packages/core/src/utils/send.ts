@@ -108,12 +108,12 @@ export const getRemaining = (
   max: boolean,
   format: (amount: number | string, decimals?: number) => string
 ): [string, boolean] => {
+  amount = removeGroupSeparator(amount);
+
   if (jetton === CryptoCurrency.TON) {
     if (max) {
       return [`0 ${CryptoCurrency.TON}`, true];
     }
-
-    amount = removeGroupSeparator(amount);
 
     const remaining = new BigNumber(info?.balance ?? 0).minus(
       isNumeric(amount)
@@ -138,16 +138,16 @@ export const getRemaining = (
     return [`0 ${jettonInfo.metadata?.symbol}`, true];
   }
 
-  const remaining = new BigNumber(jettonInfo.balance).minus(
-    isNumeric(amount)
-      ? new BigNumber(toNumberAmount(amount)).shiftedBy(
-          jettonInfo.metadata?.decimals ?? DefaultDecimals
-        )
-      : 0
-  );
+  const fullAmount = isNumeric(amount)
+    ? new BigNumber(toNumberAmount(amount)).shiftedBy(
+        jettonInfo.metadata?.decimals ?? DefaultDecimals
+      )
+    : new BigNumber(0);
+
+  const remaining = new BigNumber(jettonInfo.balance).minus(fullAmount);
 
   return [
-    `${format(remaining.toFormat(), jettonInfo.metadata?.decimals)} ${
+    `${format(remaining.toString(), jettonInfo.metadata?.decimals)} ${
       jettonInfo.metadata?.symbol
     }`,
     remaining.isGreaterThanOrEqualTo(0),
@@ -182,5 +182,38 @@ export const getFiatAmountValue = (
     const price = getJettonStockPrice(jettonInfo, stock.today, fiat);
     if (!price) return undefined;
     return value.multipliedBy(price);
+  }
+};
+
+export const getCoinAmountValue = (
+  stock: TonendpointStock | undefined,
+  jettons: JettonsBalances,
+  fiat: FiatCurrencies,
+  jetton: string,
+  amount: string
+) => {
+  amount = removeGroupSeparator(amount);
+
+  if (!stock) return undefined;
+
+  if (!isNumeric(amount)) return new BigNumber(0);
+
+  const value = new BigNumber(toNumberAmount(amount));
+
+  if (jetton === CryptoCurrency.TON) {
+    const price = getTonCoinStockPrice(stock.today, fiat);
+    return new BigNumber(value.div(price).toFixed(DefaultDecimals));
+  } else {
+    const jettonInfo = jettons.balances.find(
+      (item) => item.jettonAddress === jetton
+    );
+
+    if (!jettonInfo) return undefined;
+
+    const price = getJettonStockPrice(jettonInfo, stock.today, fiat);
+    if (!price) return undefined;
+    return new BigNumber(
+      value.div(price).toFixed(jettonInfo.metadata?.decimals ?? DefaultDecimals)
+    );
   }
 };

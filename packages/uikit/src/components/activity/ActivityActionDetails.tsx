@@ -1,6 +1,6 @@
 import {
   formatDecimals,
-  getStockPrice
+  getStockPrice,
 } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo } from 'react';
 import styled from 'styled-components';
@@ -23,7 +23,7 @@ import {
   ErrorActivityNotification,
   Label,
   Title,
-  useBalanceValue
+  useBalanceValue,
 } from './NotificationCommon';
 
 const Amount = styled(Body1)`
@@ -76,8 +76,6 @@ export const TonTransferActionNotification: FC<ActionData> = ({
   event,
   isScam,
 }) => {
-  console.log(action, event);
-
   const { t } = useTranslation();
   const wallet = useWalletContext();
   const { tonTransfer } = action;
@@ -114,7 +112,7 @@ export const TonTransferActionNotification: FC<ActionData> = ({
   return (
     <ActionDetailsBlock event={event}>
       <div>
-      {isScam && <Span>{t('spam_action')}</Span>}
+        {isScam && <Span>{t('spam_action')}</Span>}
         <Title>-&thinsp;{format(tonTransfer.amount)} TON</Title>
         {price && <Amount>≈&thinsp;{price}</Amount>}
         <ActionDate kind="send" timestamp={timestamp} />
@@ -134,8 +132,6 @@ export const JettonTransferActionNotification: FC<ActionData> = ({
   timestamp,
   event,
 }) => {
-  console.log(action, event);
-
   const wallet = useWalletContext();
   const { jettonTransfer } = action;
 
