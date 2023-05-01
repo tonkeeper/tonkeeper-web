@@ -66,9 +66,7 @@ const createJettonTransfer = (
     ? BigInt(jettonInfo.balance)
     : BigInt(
         new BigNumber(data.amount.toString())
-          .multipliedBy(
-            Math.pow(10, jettonInfo.metadata?.decimals ?? DefaultDecimals)
-          )
+          .shiftedBy(jettonInfo.metadata?.decimals ?? DefaultDecimals)
           .toString()
       );
 

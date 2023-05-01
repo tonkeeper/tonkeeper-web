@@ -117,9 +117,7 @@ export const getRemaining = (
 
     const remaining = new BigNumber(info?.balance ?? 0).minus(
       isNumeric(amount)
-        ? new BigNumber(toNumberAmount(amount)).multipliedBy(
-            Math.pow(10, DefaultDecimals)
-          )
+        ? new BigNumber(toNumberAmount(amount)).shiftedBy(DefaultDecimals)
         : 0
     );
 
@@ -142,14 +140,14 @@ export const getRemaining = (
 
   const remaining = new BigNumber(jettonInfo.balance).minus(
     isNumeric(amount)
-      ? new BigNumber(toNumberAmount(amount)).multipliedBy(
-          Math.pow(10, jettonInfo.metadata?.decimals ?? DefaultDecimals)
+      ? new BigNumber(toNumberAmount(amount)).shiftedBy(
+          jettonInfo.metadata?.decimals ?? DefaultDecimals
         )
       : 0
   );
 
   return [
-    `${format(remaining.toString(), jettonInfo.metadata?.decimals)} ${
+    `${format(remaining.toFormat(), jettonInfo.metadata?.decimals)} ${
       jettonInfo.metadata?.symbol
     }`,
     remaining.isGreaterThanOrEqualTo(0),

@@ -9,7 +9,7 @@ export const formatDecimals = (
   amount: BigNumber.Value,
   decimals: number = DefaultDecimals
 ): number => {
-  return new BigNumber(amount).div(Math.pow(10, decimals)).toNumber();
+  return new BigNumber(amount).shiftedBy(-decimals).toNumber();
 };
 
 export const getTonCoinStockPrice = (

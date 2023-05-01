@@ -54,9 +54,7 @@ const createTonTransfer = (
         to: recipient.toAccount.address.raw,
         bounce: recipient.toAccount.status == 'active',
         value: BigInt(
-          new BigNumber(data.amount)
-            .multipliedBy(Math.pow(10, DefaultDecimals))
-            .toString()
+          new BigNumber(data.amount).shiftedBy(DefaultDecimals).toString()
         ),
         body: recipient.comment ?? undefined,
       }),
