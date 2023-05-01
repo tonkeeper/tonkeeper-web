@@ -47,7 +47,7 @@ import {
 } from '../Notification';
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
 import { AssetSelect } from './AssetSelect';
-import { ButtonBlock, useFiatAmount } from './common';
+import { ButtonBlock, useFiatAmountWithSymbol } from './common';
 import { InputSize, Sentence } from './Sentence';
 
 const Center = styled.div`
@@ -391,7 +391,7 @@ export const AmountView: FC<{
     }
   };
 
-  const fiatAmount = useFiatAmount(jettons, jetton, amount);
+  const fiatAmount = useFiatAmountWithSymbol(jettons, jetton, amount);
 
   return (
     <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>

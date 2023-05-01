@@ -4,7 +4,7 @@ import { getFiatAmountValue } from '@tonkeeper/core/dist/utils/send';
 import React, { PropsWithChildren, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
-import { formatFiatCurrency } from '../../hooks/balance';
+import { formatFiatCurrency, formatter } from '../../hooks/balance';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { Body1 } from '../Text';
 
@@ -184,3 +184,35 @@ export const useFiatAmount = (
     return formatFiatCurrency(fiat, fiatAmount);
   }, [stock, jettons, fiat, jetton, amount]);
 };
+
+export const useFiatAmountWithSymbol = (
+  jettons: JettonsBalances,
+  jetton: string,
+  amount: number | string
+) => {
+  const { fiat } = useAppContext();
+  const { data: stock } = useTonenpointStock();
+
+  return useMemo(() => {
+    const fiatAmount = getFiatAmountValue(
+      stock,
+      jettons,
+      fiat,
+      jetton,
+      amount.toString()
+    );
+    if (fiatAmount === undefined) return undefined;
+
+    return `${formatter.format(fiatAmount.toString(), {
+      ignoreZeroTruncate: false,
+      decimals: 4,
+    })} ${fiat}`;
+    
+  }, [stock, jettons, fiat, jetton, amount]);
+};
+
+  
+
+
+
+}
