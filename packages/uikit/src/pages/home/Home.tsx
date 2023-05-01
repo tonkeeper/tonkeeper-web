@@ -27,7 +27,10 @@ const HomeAssets: FC<{
 }> = ({ stock, jettons, info, nfts }) => {
   const filtered = useUserJettonList(jettons);
 
-  if (filtered.balances.length + nfts.nftItems.length < 10) {
+  if (
+    filtered.balances.length + nfts.nftItems.length < 10 &&
+    filtered.balances.length < 3
+  ) {
     return (
       <CompactView info={info} jettons={filtered} nfts={nfts} stock={stock} />
     );
