@@ -14,7 +14,6 @@ import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
-import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { SkeletonText } from '../Skeleton';
 import { Body3, Label2, Num2 } from '../Text';
@@ -49,17 +48,7 @@ const Text = styled(Body3)`
 `;
 const MessageBlock: FC<{ error?: Error | null; isFetching: boolean }> = ({
   error,
-  isFetching,
 }) => {
-  const { t } = useTranslation();
-  if (isFetching) {
-    return (
-      <Error>
-        <Text>{t('loading')}</Text>
-      </Error>
-    );
-  }
-
   if (error) {
     return (
       <Error>
