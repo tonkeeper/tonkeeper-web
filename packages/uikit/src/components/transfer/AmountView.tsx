@@ -142,6 +142,12 @@ const FiatBlock = styled(Body1)`
   max-width: 80%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: pre;
+`;
+
+const InputBlock = styled.div`
+  display: flex;
+  align-items: baseline;
 `;
 
 const useEstimateTransaction = (
@@ -415,13 +421,16 @@ export const AmountView: FC<{
             jettons={jettons}
           />
         </SelectCenter>
-        <Sentence
-          ref={ref}
-          value={amount}
-          setValue={onInput}
-          inputSize={fontSize}
-        />
-        <Symbol>{suffix}</Symbol>
+        <InputBlock>
+          <Sentence
+            ref={ref}
+            value={amount}
+            setValue={onInput}
+            inputSize={fontSize}
+          />
+          <Symbol>{suffix}</Symbol>
+        </InputBlock>
+
         {fiatAmount && <FiatBlock>{fiatAmount}</FiatBlock>}
       </AmountBlock>
       <MaxRow>
