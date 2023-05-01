@@ -207,12 +207,5 @@ export const useFiatAmountWithSymbol = (
       ignoreZeroTruncate: false,
       decimals: 4,
     })} ${fiat}`;
-    
   }, [stock, jettons, fiat, jetton, amount]);
 };
-
-  
-
-
-
-}
