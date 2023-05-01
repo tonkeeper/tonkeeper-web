@@ -82,17 +82,6 @@ export const getActivityTitle = (
   }
 };
 
-const getWeek = (date: Date) => {
-  var onejan = new Date(date.getFullYear(), 0, 1).getTime();
-  var today = new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate()
-  ).getTime();
-  var dayOfYear = (today - onejan + 86400000) / 86400000;
-  return Math.ceil(dayOfYear / 7);
-};
-
 const getEventGroup = (
   timestamp: number,
   today: Date,
@@ -108,13 +97,6 @@ const getEventGroup = (
     today.getMonth() === date.getMonth()
   ) {
     return 'yesterday';
-  }
-  if (
-    getWeek(today) === getWeek(date) &&
-    today.getMonth() === date.getMonth() &&
-    today.getFullYear() === date.getFullYear()
-  ) {
-    return `week-${date.getDay()}`;
   }
   if (
     today.getMonth() === date.getMonth() &&
