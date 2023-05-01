@@ -58,7 +58,7 @@ const versionMap: Record<string, WalletVersion> = {
 
 const findWalletVersion = (interfaces: string[]): WalletVersion => {
   for (let value of interfaces) {
-    if (versionMap[value]) {
+    if (versionMap[value] !== undefined) {
       return versionMap[value];
     }
   }
