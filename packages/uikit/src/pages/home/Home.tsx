@@ -28,7 +28,7 @@ const HomeAssets: FC<{
   const filtered = useUserJettonList(jettons);
 
   if (
-    filtered.balances.length + nfts.nftItems.length < 10 &&
+    filtered.balances.length + nfts.nftItems.length < 10 ||
     filtered.balances.length < 3
   ) {
     return (

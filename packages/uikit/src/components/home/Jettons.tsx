@@ -18,7 +18,7 @@ import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
-import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { AppRoute } from '../../libs/routes';
 import { ToncoinIcon } from '../Icon';
 import { ListBlock, ListItem } from '../List';
 import { Body2, Label1, Label2 } from '../Text';
@@ -235,30 +235,12 @@ const EditButton = styled(Label2)`
 `;
 
 export const JettonList: FC<AssetProps> = ({ info, jettons, stock }) => {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-
   return (
-    <>
-      <ListBlock noUserSelect>
-        <TonAsset info={info} stock={stock} />
-        {jettons.balances.map((jetton) => (
-          <JettonAsset
-            key={jetton.jettonAddress}
-            jetton={jetton}
-            stock={stock}
-          />
-        ))}
-      </ListBlock>
-      {jettons.balances.length > 0 && (
-        <ButtonRow>
-          <EditButton
-            onClick={() => navigate(AppRoute.settings + SettingsRoute.jettons)}
-          >
-            {t('Edit_jettons')}
-          </EditButton>
-        </ButtonRow>
-      )}
-    </>
+    <ListBlock noUserSelect>
+      <TonAsset info={info} stock={stock} />
+      {jettons.balances.map((jetton) => (
+        <JettonAsset key={jetton.jettonAddress} jetton={jetton} stock={stock} />
+      ))}
+    </ListBlock>
   );
 };
