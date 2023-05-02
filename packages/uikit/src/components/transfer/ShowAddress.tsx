@@ -11,7 +11,7 @@ interface ShowAddressProps {
   value: string;
 }
 export const useShowAddress = (
-  ref: React.MutableRefObject<HTMLInputElement | null>,
+  ref: React.MutableRefObject<HTMLTextAreaElement | null>,
   value: string,
   toAccount?: AccountRepr
 ) => {
@@ -59,8 +59,8 @@ const ShowAddressBlock = styled.div`
 const ShowAddressLabel = styled(Body1)<{ inputTextWidth: number }>`
   position: absolute;
   bottom: 0;
-  line-height: 48px;
-  left: ${(props) => Math.ceil(props.inputTextWidth) + 36}px;
+  line-height: 46px;
+  left: ${(props) => Math.ceil(props.inputTextWidth) + 46}px;
   color: ${(props) => props.theme.textSecondary};
   user-select: none;
 `;

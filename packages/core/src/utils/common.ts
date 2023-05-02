@@ -36,10 +36,16 @@ export function debounce<Args extends unknown[]>(
   ms = 300
 ) {
   let timeoutId: ReturnType<typeof setTimeout>;
-  return function (this: any, ...args: Args) {
+  function debounced(this: any, ...args: Args) {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => fn.apply(this, args), ms);
+  }
+
+  debounced.clear = () => {
+    clearTimeout(timeoutId);
   };
+
+  return debounced;
 }
 
 export const toShortAddress = (address: string, length = 4): string => {

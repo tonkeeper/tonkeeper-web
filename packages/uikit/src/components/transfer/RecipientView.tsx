@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Recipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
 import { AccountApi, AccountRepr, DNSApi } from '@tonkeeper/core/dist/tonApiV1';
@@ -13,7 +13,8 @@ import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { ButtonMock } from '../fields/BackButton';
 import { Button } from '../fields/Button';
-import { Input, InputWithScanner } from '../fields/Input';
+import { TextArea } from '../fields/Input';
+import { InputWithScanner } from '../fields/InputWithScanner';
 import { Gap } from '../Layout';
 import {
   FullHeightBlock,
@@ -61,6 +62,7 @@ const useToAccount = (isValid: boolean, recipient: Recipient) => {
 };
 
 const useDnsWallet = (value: string) => {
+  const client = useQueryClient();
   const { tonApi } = useAppContext();
 
   const [name, setName] = useState('');
@@ -71,6 +73,7 @@ const useDnsWallet = (value: string) => {
       if (!value.includes('.')) {
         value += '.ton';
       }
+      client.invalidateQueries([QueryKey.dns, value]);
       setName(value);
     }, 400);
   }, [setName]);
@@ -115,7 +118,7 @@ export const RecipientView: FC<{
   const [submitted, setSubmit] = useState(false);
   const { t } = useTranslation();
   const { standalone, ios } = useAppContext();
-  const ref = useRef<HTMLInputElement | null>(null);
+  const ref = useRef<HTMLTextAreaElement | null>(null);
 
   const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
     useGetToAccount();
@@ -222,7 +225,7 @@ export const RecipientView: FC<{
         />
       </ShowAddress>
 
-      <Input
+      <TextArea
         value={comment}
         onChange={setComment}
         label={t('send_comment_label')}
