@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Recipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
 import { AccountApi, AccountRepr, DNSApi } from '@tonkeeper/core/dist/tonApiV1';
@@ -62,7 +62,6 @@ const useToAccount = (isValid: boolean, recipient: Recipient) => {
 };
 
 const useDnsWallet = (value: string) => {
-  const client = useQueryClient();
   const { tonApi } = useAppContext();
 
   const [name, setName] = useState('');
@@ -73,7 +72,6 @@ const useDnsWallet = (value: string) => {
       if (!value.includes('.')) {
         value += '.ton';
       }
-      client.invalidateQueries([QueryKey.dns, value]);
       setName(value);
     }, 400);
   }, [setName]);
@@ -81,18 +79,18 @@ const useDnsWallet = (value: string) => {
   update(value);
 
   return useQuery(
-    [QueryKey.dns, name],
+    [QueryKey.dns, value, name],
     async () => {
       const result = await new DNSApi(tonApi).dnsResolve({ name });
       if (!result.wallet) {
-        throw new Error('Missing wallet');
+        return null;
       }
       return result.wallet;
     },
     {
       enabled: name.length > 7 && !seeIfValidAddress(name),
       retry: 0,
-      keepPreviousData: true,
+      keepPreviousData: false,
     }
   );
 };
@@ -139,6 +137,11 @@ export const RecipientView: FC<{
       setAddress((recipient) => ({
         address: recipient.address,
         dns: dnsWallet,
+      }));
+    }
+    if (dnsWallet === null) {
+      setAddress((recipient) => ({
+        address: recipient.address,
       }));
     }
   }, [setAddress, dnsWallet]);
