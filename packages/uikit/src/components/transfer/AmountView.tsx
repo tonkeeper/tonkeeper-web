@@ -36,7 +36,6 @@ import React, {
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFormatCoinValue } from '../../hooks/balance';
-import { getTextWidth } from '../../hooks/textWidth';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { ChevronLeftIcon } from '../Icon';
@@ -51,6 +50,7 @@ import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
 import { AssetSelect } from './AssetSelect';
 import { InputSize, Sentence } from './Sentence';
+import { defaultSize, getInputSize, useButtonPosition } from './amountHoocks';
 import { ButtonBlock, useSecondAmountWithSymbol } from './common';
 
 const Center = styled.div`
@@ -186,23 +186,6 @@ const useEstimateTransaction = (
   });
 };
 
-const defaultSize: InputSize = { size: 40, width: 30 };
-
-const getInputSize = (value: string, parent: HTMLLabelElement) => {
-  const max = parent.clientWidth;
-  let size = defaultSize.size;
-  let width = getTextWidth(value, `600 ${size}px 'Montserrat'`);
-  while (Math.round(width) > max - 115) {
-    size = Math.max(1, size - 1);
-    width = getTextWidth(value, `600 ${size}px 'Montserrat'`);
-  }
-
-  return {
-    width: Math.max(Math.round(width) + 5, value.length * 6, 30),
-    size: size,
-  };
-};
-
 const seeIfValueValid = (value: string, decimals: number) => {
   if (value.length > 21) return false;
   if (value !== '') {
@@ -219,57 +202,6 @@ const seeIfValueValid = (value: string, decimals: number) => {
 
 const inputToBigNumber = (value: string): BigNumber => {
   return new BigNumber(removeGroupSeparator(value).replace(',', '.'));
-};
-
-const useButtonPosition = (
-  ref: React.RefObject<HTMLDivElement>,
-  blockRef: React.RefObject<HTMLLabelElement>
-) => {
-  const { ios, standalone } = useAppContext();
-  useEffect(() => {
-    if (!ios) return;
-
-    let height = window.innerHeight;
-
-    function resizeHandler(this: VisualViewport) {
-      const button = ref.current;
-      if (!button) return;
-      const value = height - this.height + 16;
-      const bottom = standalone ? Math.max(32, value) : value;
-      button.style.bottom = `${bottom}px`;
-
-      const labelHeight = Math.min(
-        this.height - 16 - 56 - 16 - 36 - 16 - 16 - 16 - 16 - 37,
-        272
-      );
-
-      if (blockRef.current) {
-        blockRef.current.style.height = `${labelHeight}px`;
-      }
-    }
-
-    function blurHandler() {
-      const viewport = window.visualViewport;
-      if (viewport) {
-        viewport.removeEventListener('resize', resizeHandler);
-      }
-      setTimeout(() => {
-        const button = ref.current;
-        if (!button) return;
-        button.style.bottom = null!;
-      });
-    }
-
-    const viewport = window.visualViewport;
-    if (viewport) {
-      setTimeout(() => resizeHandler.call(viewport), 300);
-      viewport.addEventListener('resize', resizeHandler);
-    }
-
-    return () => {
-      blurHandler();
-    };
-  }, [ref.current, blockRef.current]);
 };
 
 export const AmountView: FC<{
