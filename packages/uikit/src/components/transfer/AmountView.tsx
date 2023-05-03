@@ -321,7 +321,11 @@ export const AmountView: FC<{
         jetton,
         inputAmount
       );
-      return formatNumberValue(value ? value : new BigNumber('0'));
+
+      const formatted = new BigNumber(
+        value ? value.toFormat(2, BigNumber.ROUND_HALF_UP) : new BigNumber('0')
+      );
+      return formatNumberValue(formatted);
     } else {
       return inputAmount;
     }
