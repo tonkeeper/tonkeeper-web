@@ -202,7 +202,7 @@ const getInputSize = (value: string, parent: HTMLLabelElement) => {
 };
 
 const seeIfValueValid = (value: string, decimals: number) => {
-  if (value.length > 32) return false;
+  if (value.length > 21) return false;
   if (value !== '') {
     if (value.endsWith('e')) return false;
     const separators = value.match(getDecimalSeparator());
@@ -412,7 +412,11 @@ export const AmountView: FC<{
   );
 
   const isValid = useMemo(() => {
-    return valid && isNumeric(inputAmount);
+    return (
+      valid &&
+      isNumeric(inputAmount) &&
+      inputToBigNumber(inputAmount).isGreaterThan(0)
+    );
   }, [valid, inputAmount]);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = useCallback(
