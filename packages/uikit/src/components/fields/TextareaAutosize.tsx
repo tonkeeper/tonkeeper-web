@@ -67,6 +67,8 @@ export interface TextareaAutosizeProps
    * @default 1
    */
   minRows?: string | number;
+
+  onSubmit?: () => void;
 }
 
 type State = {
@@ -114,6 +116,8 @@ const Textarea = styled.textarea`
 
   padding: 24px 0 12px;
   resize: none;
+
+  word-break: break-all;
 `;
 
 function isEmpty(obj: State) {
@@ -129,7 +133,15 @@ export const TextareaAutosize = React.forwardRef(function TextareaAutosize(
   props: TextareaAutosizeProps,
   forwardedRef: React.ForwardedRef<Element>
 ) {
-  const { onChange, maxRows, minRows = 1, style, value, ...other } = props;
+  const {
+    onChange,
+    maxRows,
+    minRows = 1,
+    style,
+    value,
+    onSubmit,
+    ...other
+  } = props;
 
   const { current: isControlled } = React.useRef(value != null);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -286,6 +298,17 @@ export const TextareaAutosize = React.forwardRef(function TextareaAutosize(
     renders.current = 0;
   }, [value]);
 
+  const onKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
+    if ((e.keyCode || e.which) == 13) {
+      if (onSubmit) {
+        e.preventDefault();
+        e.stopPropagation();
+        onSubmit();
+      }
+      return false;
+    }
+  };
+
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     renders.current = 0;
 
@@ -302,6 +325,7 @@ export const TextareaAutosize = React.forwardRef(function TextareaAutosize(
     <React.Fragment>
       <Textarea
         value={value}
+        onKeyDown={onKeyDown}
         onChange={handleChange}
         ref={handleRef}
         // Apply the rows prop to get a "correct" first SSR paint

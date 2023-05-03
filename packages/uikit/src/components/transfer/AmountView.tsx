@@ -114,11 +114,12 @@ const RemainingInvalid = styled(Body2)`
 
 const Symbol = styled(Num2)`
   color: ${(props) => props.theme.textSecondary};
-  padding-left: 1rem;
+  padding-left: 12px;
   white-space: pre;
+  padding-bottom: 3px;
 
   @media (max-width: 600px) {
-    padding-left: 0.5rem;
+    padding-left: 8px;
   }
 `;
 
@@ -154,7 +155,7 @@ const FiatBlock = styled(Body1)`
 
 const InputBlock = styled.div`
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
 `;
 
 const useEstimateTransaction = (
@@ -183,12 +184,9 @@ const useEstimateTransaction = (
   });
 };
 
-const defaultSize: InputSize = { size: 40, width: 50 };
+const defaultSize: InputSize = { size: 40, width: 30 };
 
 const getInputSize = (value: string, parent: HTMLLabelElement) => {
-  if (value.endsWith('.')) {
-    value = `${value}0`;
-  }
   const max = parent.clientWidth;
   let size = defaultSize.size;
   let width = getTextWidth(value, `600 ${size}px 'Montserrat'`);
@@ -198,7 +196,7 @@ const getInputSize = (value: string, parent: HTMLLabelElement) => {
   }
 
   return {
-    width: Math.max(Math.round(width) + 10, value.length * 6, 50),
+    width: Math.max(Math.round(width) + 5, value.length * 6, 30),
     size: size,
   };
 };

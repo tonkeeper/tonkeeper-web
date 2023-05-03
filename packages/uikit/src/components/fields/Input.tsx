@@ -106,6 +106,7 @@ export interface InputProps {
   type?: 'password' | undefined;
   value: string;
   onChange?: (value: string) => void;
+  onSubmit?: () => void;
   isValid?: boolean;
   label?: string;
   disabled?: boolean;
@@ -140,13 +141,17 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 );
 
 export const TextArea = React.forwardRef<HTMLTextAreaElement, InputProps>(
-  ({ value, onChange, isValid = true, label, disabled, helpText }, ref) => {
+  (
+    { value, onChange, isValid = true, label, disabled, helpText, onSubmit },
+    ref
+  ) => {
     const [focus, setFocus] = useState(false);
 
     return (
       <OuterBlock>
         <InputBlock focus={focus} valid={isValid}>
           <TextareaAutosize
+            onSubmit={onSubmit}
             ref={ref}
             disabled={disabled}
             value={value}
