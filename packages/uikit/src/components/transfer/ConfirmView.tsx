@@ -3,10 +3,7 @@ import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import {
-  getJettonDecimals,
-  getJettonSymbol,
-} from '@tonkeeper/core/dist/utils/send';
+import { DefaultDecimals } from '@tonkeeper/core/dist/utils/send';
 
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import React, { FC, useMemo, useState } from 'react';
@@ -15,9 +12,6 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { formatter, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { getWalletPassword } from '../../state/password';
-import { TransferComment } from '../activity/ActivityActionDetails';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
 import {
   CheckmarkCircleIcon,
   ChevronLeftIcon,
@@ -31,13 +25,16 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Label2 } from '../Text';
-import { ButtonBlock, ResultButton, useFiatAmount } from './common';
+import { TransferComment } from '../activity/ActivityActionDetails';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import {
   AmountListItem,
   FeeListItem,
   RecipientListItem,
 } from './ConfirmListItem';
+import { ButtonBlock, ResultButton, useFiatAmount } from './common';
 
 const useSendTransaction = (
   recipient: RecipientData,
@@ -117,15 +114,38 @@ export const ConfirmView: FC<{
 
   const isValid = !isLoading;
 
+  const [jettonImage, title, symbol, decimals] = useMemo(() => {
+    if (amount.jetton === CryptoCurrency.TON) {
+      return [
+        '/img/toncoin.svg',
+        t('txActions_signRaw_types_tonTransfer'),
+        CryptoCurrency.TON.toString(),
+        DefaultDecimals,
+      ] as const;
+    }
+
+    const jetton = jettons.balances.find(
+      (item) => item.jettonAddress === amount.jetton
+    );
+
+    return [
+      jetton?.metadata?.image,
+      t('txActions_signRaw_types_jettonTransfer'),
+      jetton?.metadata?.symbol ?? amount.jetton,
+      jetton?.metadata?.decimals ?? DefaultDecimals,
+    ] as const;
+  }, [amount.jetton, jettons, t]);
+
   const fiatAmount = useFiatAmount(
     jettons,
     amount.jetton,
     amount.amount.toFormat()
   );
+
   const coinAmount = `${formatter.format(amount.amount, {
     ignoreZeroTruncate: false,
-    decimals: getJettonDecimals(amount.jetton, jettons),
-  })} ${getJettonSymbol(amount.jetton, jettons)}`;
+    decimals,
+  })} ${symbol}`;
 
   const format = useFormatCoinValue();
   const feeAmount = useMemo(() => format(amount.fee.total), [format, amount]);
@@ -142,14 +162,14 @@ export const ConfirmView: FC<{
       <Info>
         {recipient.toAccount.icon ? (
           <Image full src={recipient.toAccount.icon} />
+        ) : jettonImage ? (
+          <Image full src={jettonImage} />
         ) : (
           <ImageMock full />
         )}
         <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
         <Title>
-          {recipient.toAccount.name
-            ? recipient.toAccount.name
-            : t('txActions_signRaw_types_tonTransfer')}
+          {recipient.toAccount.name ? recipient.toAccount.name : title}
         </Title>
       </Info>
       <ListBlock margin={false} fullWidth>
