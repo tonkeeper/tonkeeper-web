@@ -236,7 +236,7 @@ export const RecipientView: FC<{
         onSubmit={handleSubmit}
         value={comment}
         onChange={setComment}
-        label={t('send_comment_label')}
+        label={t('txActions_signRaw_comment')}
         isValid={!submitted || isMemoValid}
         disabled={isExternalLoading}
       />
