@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { accountChangePassword } from '@tonkeeper/core/dist/service/accountService';
 import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { useStorage } from '../../hooks/storage';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
@@ -17,12 +17,23 @@ const Block = styled.div`
 `;
 
 const useUpdatePassword = () => {
-  const storage = useStorage();
+  const sdk = useAppSdk();
+  const { t } = useTranslation();
   return useMutation<
     string | undefined,
     Error,
     { old: string; password: string; confirm: string }
-  >((options) => accountChangePassword(storage, options));
+  >(async (options) => {
+    const error = await accountChangePassword(sdk.storage, options);
+    if (error === undefined) {
+      sdk.uiEvents.emit('copy', {
+        method: 'copy',
+        id: Date.now(),
+        params: t('PasswordChanged'),
+      });
+    }
+    return error;
+  });
 };
 
 const ChangePasswordContent: FC<{ handleClose: () => void }> = ({
@@ -52,16 +63,21 @@ const ChangePasswordContent: FC<{ handleClose: () => void }> = ({
 
   return (
     <NotificationBlock onSubmit={onUpdate}>
-      <Input
-        type="password"
-        label={t('Old_password')}
-        value={old}
-        onChange={(value) => {
-          setError(undefined);
-          setOldPassword(value);
-        }}
-        isValid={error !== 'invalid-old'}
-      />
+      <Block>
+        <Input
+          type="password"
+          label={t('Old_password')}
+          value={old}
+          onChange={(value) => {
+            setError(undefined);
+            setOldPassword(value);
+          }}
+          isValid={error !== 'invalid-old'}
+          helpText={
+            error === 'invalid-old' ? t('IncorrectCurrentPassword') : undefined
+          }
+        />
+      </Block>
 
       <Block>
         <Input
@@ -72,7 +88,12 @@ const ChangePasswordContent: FC<{ handleClose: () => void }> = ({
             setError(undefined);
             setPassword(value);
           }}
-          isValid={error !== 'invalid-password'}
+          isValid={error === undefined || error == 'invalid-old'}
+          helpText={
+            error === 'invalid-confirm'
+              ? t('PasswordDoNotMatch')
+              : t('MinPassword')
+          }
         />
 
         <Input

@@ -12,7 +12,10 @@ import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import {
+  formatNumberValue,
   formatSendValue,
+  getCoinAmountValue,
+  getFiatAmountValue,
   getJettonDecimals,
   getJettonSymbol,
   getMaxValue,
@@ -21,6 +24,7 @@ import {
   removeGroupSeparator,
   seeIfLargeTail,
 } from '@tonkeeper/core/dist/utils/send';
+import BigNumber from 'bignumber.js';
 import React, {
   FC,
   useCallback,
@@ -32,10 +36,8 @@ import React, {
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFormatCoinValue } from '../../hooks/balance';
-import { getTextWidth } from '../../hooks/textWidth';
 import { useTranslation } from '../../hooks/translation';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
+import { useTonenpointStock } from '../../state/tonendpoint';
 import { ChevronLeftIcon } from '../Icon';
 import { Gap } from '../Layout';
 import {
@@ -44,9 +46,12 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
 import { AssetSelect } from './AssetSelect';
-import { ButtonBlock, useFiatAmount } from './common';
 import { InputSize, Sentence } from './Sentence';
+import { defaultSize, getInputSize, useButtonPosition } from './amountHoocks';
+import { ButtonBlock, useSecondAmountWithSymbol } from './common';
 
 const Center = styled.div`
   text-align: center;
@@ -79,6 +84,8 @@ const MaxRow = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+
+  user-select: none;
 `;
 
 const MaxButton = styled(Label2)<{ maxValue: boolean }>`
@@ -109,10 +116,12 @@ const RemainingInvalid = styled(Body2)`
 
 const Symbol = styled(Num2)`
   color: ${(props) => props.theme.textSecondary};
-  padding-left: 1rem;
+  padding-left: 12px;
+  white-space: pre;
+  padding-bottom: 3px;
 
   @media (max-width: 600px) {
-    padding-left: 0.5rem;
+    padding-left: 8px;
   }
 `;
 
@@ -125,6 +134,7 @@ const SelectCenter = styled.div`
 `;
 
 const FiatBlock = styled(Body1)`
+  cursor: pointer;
   position: absolute;
   top: 50$;
   left: 50%;
@@ -140,6 +150,14 @@ const FiatBlock = styled(Body1)`
   max-width: 80%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: pre;
+
+  user-select: none;
+`;
+
+const InputBlock = styled.div`
+  display: flex;
+  align-items: flex-end;
 `;
 
 const useEstimateTransaction = (
@@ -168,32 +186,11 @@ const useEstimateTransaction = (
   });
 };
 
-const defaultSize: InputSize = { size: 40, width: 50 };
-
-const getInputSize = (value: string, parent: HTMLLabelElement) => {
-  if (value.endsWith('.')) {
-    value = `${value}0`;
-  }
-  const max = parent.clientWidth;
-  let size = defaultSize.size;
-  let width = getTextWidth(value, `600 ${size}px 'Montserrat'`);
-  while (Math.round(width) > max - 115) {
-    size = Math.max(1, size - 1);
-    width = getTextWidth(value, `600 ${size}px 'Montserrat'`);
-  }
-
-  return {
-    width: Math.max(Math.round(width) + 10, value.length * 6, 50),
-    size: size,
-  };
-};
-
 const seeIfValueValid = (value: string, decimals: number) => {
-  if (value.length > 32) return false;
+  if (value.length > 21) return false;
   if (value !== '') {
     if (value.endsWith('e')) return false;
     const separators = value.match(getDecimalSeparator());
-    console.log(separators);
     if (separators && separators.length > 1) return false;
     if (/^[a-zA-Z]+$/.test(value)) return false;
     if (!isNumeric(removeGroupSeparator(value))) return false;
@@ -203,55 +200,8 @@ const seeIfValueValid = (value: string, decimals: number) => {
   return true;
 };
 
-const useButtonPosition = (
-  ref: React.RefObject<HTMLDivElement>,
-  blockRef: React.RefObject<HTMLLabelElement>
-) => {
-  const { ios, standalone } = useAppContext();
-  useEffect(() => {
-    if (!ios) return;
-
-    let height = window.innerHeight;
-
-    function resizeHandler(this: VisualViewport) {
-      const button = ref.current;
-      if (!button) return;
-      const value = height - this.height + 16;
-      const bottom = standalone ? Math.max(32, value) : value;
-      button.style.bottom = `${bottom}px`;
-
-      const labelHeight = Math.min(
-        this.height - 16 - 56 - 16 - 36 - 16 - 16 - 16 - 16 - 37,
-        272
-      );
-
-      if (blockRef.current) {
-        blockRef.current.style.height = `${labelHeight}px`;
-      }
-    }
-
-    function blurHandler() {
-      const viewport = window.visualViewport;
-      if (viewport) {
-        viewport.removeEventListener('resize', resizeHandler);
-      }
-      setTimeout(() => {
-        const button = ref.current;
-        if (!button) return;
-        button.style.bottom = null!;
-      });
-    }
-
-    const viewport = window.visualViewport;
-    if (viewport) {
-      setTimeout(() => resizeHandler.call(viewport), 300);
-      viewport.addEventListener('resize', resizeHandler);
-    }
-
-    return () => {
-      blurHandler();
-    };
-  }, [ref.current, blockRef.current]);
+const inputToBigNumber = (value: string): BigNumber => {
+  return new BigNumber(removeGroupSeparator(value).replace(',', '.'));
 };
 
 export const AmountView: FC<{
@@ -274,15 +224,73 @@ export const AmountView: FC<{
   jettons,
   info,
 }) => {
-  const { standalone } = useAppContext();
+  const { fiat, standalone } = useAppContext();
+  const { data: stock } = useTonenpointStock();
   const format = useFormatCoinValue();
 
+  const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
+  const [inFiat, setInFiat] = useState(data ? data.fiat !== undefined : false);
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
-  const [amount, setAmountValue] = useState(
-    data ? data.amount.toString() : '0'
+  const [inputAmount, setAmountValue] = useState(
+    data ? formatNumberValue(data.fiat ?? data.amount) : '0'
   );
 
-  const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
+  const ref = useRef<HTMLInputElement>(null);
+  const refBlock = useRef<HTMLLabelElement>(null);
+  const refButton = useRef<HTMLDivElement>(null);
+
+  const secondAmount = useSecondAmountWithSymbol(
+    jettons,
+    jetton,
+    inputAmount,
+    inFiat
+  );
+
+  const coinAmount = useMemo(() => {
+    if (inFiat) {
+      const value = getCoinAmountValue(
+        stock,
+        jettons,
+        fiat,
+        jetton,
+        inputAmount
+      );
+
+      const formatted = new BigNumber(
+        value ? value.toFormat(2, BigNumber.ROUND_HALF_UP) : new BigNumber('0')
+      );
+      return formatNumberValue(formatted);
+    } else {
+      return inputAmount;
+    }
+  }, [inFiat, inputAmount, jetton, jettons]);
+
+  const toggleFiat = () => {
+    if (!refBlock.current) return;
+    if (inFiat) {
+      // inputAmount convert to coin
+      setAmountValue(coinAmount);
+      const size = getInputSize(coinAmount, refBlock.current);
+      setFontSize(size);
+      setInFiat(!inFiat);
+    } else {
+      // inputAmount convert to usd
+      const fiatAmount = getFiatAmountValue(
+        stock,
+        jettons,
+        fiat,
+        jetton,
+        inputAmount.toString()
+      );
+
+      if (!fiatAmount) return;
+      const value = formatNumberValue(new BigNumber(fiatAmount.toFormat(2)));
+      setAmountValue(value);
+      const size = getInputSize(value, refBlock.current);
+      setFontSize(size);
+      setInFiat(!inFiat);
+    }
+  };
 
   const { mutateAsync, isLoading, reset } = useEstimateTransaction(
     recipient,
@@ -290,15 +298,11 @@ export const AmountView: FC<{
     jettons
   );
 
-  const ref = useRef<HTMLInputElement>(null);
-  const refBlock = useRef<HTMLLabelElement>(null);
-  const refButton = useRef<HTMLDivElement>(null);
-
   useButtonPosition(refButton, refBlock);
 
   useEffect(() => {
     if (refBlock.current) {
-      setFontSize(getInputSize(amount, refBlock.current));
+      setFontSize(getInputSize(inputAmount, refBlock.current));
     }
   }, [refBlock.current]);
 
@@ -317,14 +321,14 @@ export const AmountView: FC<{
 
   const { t } = useTranslation();
 
-  const suffix = getJettonSymbol(jetton, jettons);
+  const suffix = inFiat ? fiat.toString() : getJettonSymbol(jetton, jettons);
 
   const onInput = (value: string) => {
     if (!refBlock.current) return;
-    const decimals = getJettonDecimals(jetton, jettons);
+    const decimals = inFiat ? 2 : getJettonDecimals(jetton, jettons);
 
     if (!seeIfValueValid(value, decimals)) {
-      value = amount;
+      value = inputAmount;
     }
 
     if (isNumeric(value)) {
@@ -337,13 +341,17 @@ export const AmountView: FC<{
   };
 
   const [remaining, valid] = useMemo(
-    () => getRemaining(jettons, info, jetton, amount, max, format),
-    [jettons, info, jetton, amount, max]
+    () => getRemaining(jettons, info, jetton, coinAmount, max, format),
+    [jettons, info, jetton, coinAmount, max, format]
   );
 
   const isValid = useMemo(() => {
-    return valid && isNumeric(amount);
-  }, [valid, amount]);
+    return (
+      valid &&
+      isNumeric(inputAmount) &&
+      inputToBigNumber(inputAmount).isGreaterThan(0)
+    );
+  }, [valid, inputAmount]);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = useCallback(
     async (e) => {
@@ -351,39 +359,62 @@ export const AmountView: FC<{
       e.preventDefault();
       if (isValid) {
         reset();
-        const value = parseFloat(
-          removeGroupSeparator(amount).replace(',', '.')
-        );
-        const fee = await mutateAsync({ amount: value, max });
-        setAmount({ amount: value, max, done: true, jetton, fee });
+        const coinValue = inputToBigNumber(coinAmount);
+        const fiatValue = inFiat ? inputToBigNumber(inputAmount) : undefined;
+
+        const fee = await mutateAsync({
+          amount: coinValue,
+          fiat: fiatValue,
+          max,
+        });
+
+        setAmount({
+          amount: coinValue,
+          fiat: fiatValue,
+          max,
+          done: true,
+          jetton,
+          fee,
+        });
       }
     },
-    [setAmount, amount, max, jetton, isValid]
+    [setAmount, inputAmount, coinAmount, inFiat, max, jetton, isValid]
   );
 
   const onMax = () => {
     if (!refBlock.current) return;
 
-    setMax(true);
-    const value = getMaxValue(jettons, info, jetton, format);
+    const value = max ? '0' : getMaxValue(jettons, info, jetton, format);
     const size = getInputSize(value, refBlock.current);
     setFontSize(size);
     setAmountValue(value);
+    setMax((state) => !state);
+    setInFiat(false);
   };
 
   const onJetton = (asset: string) => {
     if (!refBlock.current) return;
 
     setJetton(asset);
+
     if (max) {
       const value = getMaxValue(jettons, info, asset, format);
       const size = getInputSize(value, refBlock.current);
       setFontSize(size);
       setAmountValue(value);
+    } else {
+      const value = getCoinAmountValue(
+        stock,
+        jettons,
+        fiat,
+        asset,
+        inputAmount
+      );
+      if (!value) {
+        setInFiat(false);
+      }
     }
   };
-
-  const fiatAmount = useFiatAmount(jettons, jetton, amount);
 
   return (
     <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
@@ -413,14 +444,19 @@ export const AmountView: FC<{
             jettons={jettons}
           />
         </SelectCenter>
-        <Sentence
-          ref={ref}
-          value={amount}
-          setValue={onInput}
-          inputSize={fontSize}
-        />
-        <Symbol>{suffix}</Symbol>
-        {fiatAmount && <FiatBlock>{fiatAmount}</FiatBlock>}
+        <InputBlock>
+          <Sentence
+            ref={ref}
+            value={inputAmount}
+            setValue={onInput}
+            inputSize={fontSize}
+          />
+          <Symbol>{suffix}</Symbol>
+        </InputBlock>
+
+        {secondAmount && (
+          <FiatBlock onClick={toggleFiat}>{secondAmount}</FiatBlock>
+        )}
       </AmountBlock>
       <MaxRow>
         <MaxButton maxValue={max} onClick={onMax}>

@@ -92,7 +92,7 @@
     "description": "Settings Change password title"
   },
   "Old_password": {
-    "message": "Старый пароль",
+    "message": "Текущий пароль",
     "description": "Settings Old password label"
   },
   "Password": {
@@ -102,6 +102,18 @@
   "ConfirmPassword": {
     "message": "Введите пароль ещё раз",
     "description": "Password input label"
+  },
+  "MinPassword": {
+    "message": "Должно быть не менее 6 символов."
+  },
+  "IncorrectCurrentPassword": {
+    "message": "Неверный текущий пароль."
+  },
+  "PasswordDoNotMatch": {
+    "message": "Пароли не совпадают."
+  },
+  "PasswordChanged": {
+    "message": "Пароль изменен"
   },
   "Unlock": {
     "message": "Разблокировать",

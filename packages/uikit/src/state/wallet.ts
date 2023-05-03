@@ -5,10 +5,8 @@ import {
   getAccountState,
 } from '@tonkeeper/core/dist/service/accountService';
 import { getWalletBackup } from '@tonkeeper/core/dist/service/backupService';
-import {
-  getWalletState,
-  updateWalletProperty,
-} from '@tonkeeper/core/dist/service/walletService';
+import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
+import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import { getWalletActiveAddresses } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
 import {
   AccountApi,
@@ -183,8 +181,7 @@ export const useWalletNftList = () => {
       });
       const result = wallets
         .filter((item) => item.balance > 0 || item.status === 'active')
-        .map((wallet) => wallet.address)
-        .sort((a, b) => (a === wallet.active.rawAddress ? -1 : 1));
+        .map((wallet) => wallet.address);
 
       const items = await Promise.all(
         result.map((owner) =>

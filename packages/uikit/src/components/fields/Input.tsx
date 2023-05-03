@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
-import { ScanIcon } from '../Icon';
+import { Body2 } from '../Text';
+import { TextareaAutosize } from './TextareaAutosize';
 
-const InputBlock = styled.div<{
+export const InputBlock = styled.div<{
   focus: boolean;
   valid: boolean;
   scanner?: boolean;
@@ -50,7 +49,7 @@ const InputBlock = styled.div<{
         `}
 `;
 
-const InputField = styled.input`
+export const InputField = styled.input`
   outline: none;
   border: none;
   background: transparent;
@@ -63,7 +62,7 @@ const InputField = styled.input`
   color: ${(props) => props.theme.textPrimary};
 `;
 
-const Label = styled.label<{ active?: boolean }>`
+export const Label = styled.label<{ active?: boolean }>`
   user-select: none;
 
   position: absolute;
@@ -83,109 +82,87 @@ const Label = styled.label<{ active?: boolean }>`
     `}
 `;
 
-interface InputProps {
+export const OuterBlock = styled.div`
+  width: 100%;
+`;
+export const HelpText = styled(Body2)<{ valid: boolean }>`
+  user-select: none;
+  display: inline-block;
+  width: 100%;
+  text-align: left;
+  margin-top: 12px;
+
+  ${(props) =>
+    props.valid
+      ? css`
+          color: ${(props) => props.theme.textSecondary};
+        `
+      : css`
+          color: ${(props) => props.theme.fieldErrorBorder};
+        `}
+`;
+
+export interface InputProps {
   type?: 'password' | undefined;
   value: string;
   onChange?: (value: string) => void;
+  onSubmit?: () => void;
   isValid?: boolean;
   label?: string;
   disabled?: boolean;
+  helpText?: string;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ type, value, onChange, isValid = true, label, disabled }, ref) => {
+  (
+    { type, value, onChange, isValid = true, label, disabled, helpText },
+    ref
+  ) => {
     const [focus, setFocus] = useState(false);
 
     return (
-      <InputBlock focus={focus} valid={isValid}>
-        <InputField
-          ref={ref}
-          disabled={disabled}
-          type={type}
-          value={value}
-          onChange={(e) => onChange && onChange(e.target.value)}
-          onFocus={() => setFocus(true)}
-          onBlur={() => setFocus(false)}
-        />
-        {label && <Label active={value != ''}>{label}</Label>}
-      </InputBlock>
+      <OuterBlock>
+        <InputBlock focus={focus} valid={isValid}>
+          <InputField
+            ref={ref}
+            disabled={disabled}
+            type={type}
+            value={value}
+            onChange={(e) => onChange && onChange(e.target.value)}
+            onFocus={() => setFocus(true)}
+            onBlur={() => setFocus(false)}
+          />
+          {label && <Label active={value != ''}>{label}</Label>}
+        </InputBlock>
+        {helpText && <HelpText valid={isValid}>{helpText}</HelpText>}
+      </OuterBlock>
     );
   }
 );
 
-export interface InputWithScanner {
-  value: string;
-  onScan: (signature: string) => void;
-  onChange?: (value: string) => void;
-  isValid?: boolean;
-  label?: string;
-  disabled?: boolean;
-}
+export const TextArea = React.forwardRef<HTMLTextAreaElement, InputProps>(
+  (
+    { value, onChange, isValid = true, label, disabled, helpText, onSubmit },
+    ref
+  ) => {
+    const [focus, setFocus] = useState(false);
 
-const ScanBlock = styled.div<{ ios: boolean }>`
-  position: absolute;
-  right: 1rem;
-  top: ${(props) => (props.ios ? '14px' : '13px')};
-  display: flex;
-
-  color: ${(props) => props.theme.accentBlue};
-`;
-
-export const InputWithScanner = React.forwardRef<
-  HTMLInputElement,
-  InputWithScanner
->(({ value, onChange, isValid = true, label, disabled, onScan }, ref) => {
-  const [focus, setFocus] = useState(false);
-  const [scanId, setScanId] = useState<number | undefined>(undefined);
-  const sdk = useAppSdk();
-  const { ios } = useAppContext();
-
-  const onClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (disabled) return;
-    const id = Date.now();
-    sdk.uiEvents.emit('scan', {
-      method: 'scan',
-      id: id,
-      params: undefined,
-    });
-    setScanId(id);
-  };
-
-  useEffect(() => {
-    const handler = (options: {
-      method: 'response';
-      id?: number | undefined;
-      params: string;
-    }) => {
-      if (options.id === scanId) {
-        onScan(options.params);
-      }
-    };
-    sdk.uiEvents.on('response', handler);
-
-    return () => {
-      sdk.uiEvents.off('response', handler);
-    };
-  }, [sdk, scanId, onScan]);
-
-  return (
-    <InputBlock focus={focus} valid={isValid} scanner>
-      <InputField
-        ref={ref}
-        disabled={disabled}
-        type="text"
-        value={value}
-        onChange={(e) => onChange && onChange(e.target.value)}
-        onFocus={() => setFocus(true)}
-        onBlur={() => setFocus(false)}
-      />
-      {label && <Label active={value != ''}>{label}</Label>}
-
-      <ScanBlock ios={ios} onClick={onClick}>
-        <ScanIcon />
-      </ScanBlock>
-    </InputBlock>
-  );
-});
+    return (
+      <OuterBlock>
+        <InputBlock focus={focus} valid={isValid}>
+          <TextareaAutosize
+            onSubmit={onSubmit}
+            ref={ref}
+            disabled={disabled}
+            value={value}
+            onChange={(e) => onChange && onChange(e.target.value)}
+            onFocus={() => setFocus(true)}
+            onBlur={() => setFocus(false)}
+          />
+          {label && <Label active={value != ''}>{label}</Label>}
+        </InputBlock>
+        {helpText && <HelpText valid={isValid}>{helpText}</HelpText>}
+      </OuterBlock>
+    );
+  }
+);

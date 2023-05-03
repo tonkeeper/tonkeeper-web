@@ -1,18 +1,40 @@
 import BigNumber from 'bignumber.js';
-import { internal, toNano } from 'ton-core';
+import { Address, Cell, internal } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
-import { AmountValue, RecipientData } from '../../entries/send';
-import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration, Fee, SendApi, WalletApi } from '../../tonApiV1';
+import { AmountValue, RecipientData } from '../../entries/send';
+import { TonConnectTransactionPayload } from '../../entries/tonConnect';
+import { WalletState } from '../../entries/wallet';
+import { Configuration, Fee, SendApi } from '../../tonApiV1';
+import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
+  SendMode,
   checkWalletBalance,
   externalMessage,
   getWalletBalance,
-  SendMode,
+  getWalletSeqNo,
 } from './common';
+
+const seeIfBounceable = (address: string) => {
+  return Address.isFriendly(address)
+    ? Address.parseFriendly(address).isBounceable
+    : false;
+};
+
+const toStateInit = (
+  stateInit?: string
+): { code: Cell; data: Cell } | undefined => {
+  if (!stateInit) {
+    return undefined;
+  }
+  const initSlice = Cell.fromBase64(stateInit).asSlice();
+  return {
+    code: initSlice.loadRef(),
+    data: initSlice.loadRef(),
+  };
+};
 
 const createTonTransfer = (
   seqno: number,
@@ -32,10 +54,37 @@ const createTonTransfer = (
       internal({
         to: recipient.toAccount.address.raw,
         bounce: recipient.toAccount.status == 'active',
-        value: toNano(data.amount.toString()),
+        value: BigInt(
+          new BigNumber(data.amount).shiftedBy(DefaultDecimals).toString()
+        ),
         body: recipient.comment ?? undefined,
       }),
     ],
+  });
+  return externalMessage(contract, seqno, transfer).toBoc();
+};
+
+const createTonConnectTransfer = (
+  seqno: number,
+  walletState: WalletState,
+  params: TonConnectTransactionPayload,
+  secretKey: Buffer = Buffer.alloc(64)
+) => {
+  const contract = walletContractFromState(walletState);
+
+  const transfer = contract.createTransfer({
+    seqno,
+    secretKey,
+    sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+    messages: params.messages.map((item) =>
+      internal({
+        to: item.address,
+        bounce: seeIfBounceable(item.address),
+        value: BigInt(item.amount),
+        init: toStateInit(item.stateInit),
+        body: item.payload ? Cell.fromBase64(item.payload) : undefined,
+      })
+    ),
   });
   return externalMessage(contract, seqno, transfer).toBoc();
 };
@@ -46,20 +95,53 @@ export const estimateTonTransfer = async (
   recipient: RecipientData,
   data: AmountValue
 ) => {
-  const { seqno } = await new WalletApi(tonApi)
-    .getWalletSeqno({
-      account: walletState.active.rawAddress,
-    })
-    .catch(() => ({
-      seqno: 0,
-    }));
-
+  const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
   const cell = createTonTransfer(seqno, walletState, recipient, data);
 
   const { fee } = await new SendApi(tonApi).estimateTx({
     sendBocRequest: { boc: cell.toString('base64') },
   });
   return fee;
+};
+
+export const estimateTonConnectTransfer = async (
+  tonApi: Configuration,
+  walletState: WalletState,
+  params: TonConnectTransactionPayload
+) => {
+  const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
+  const cell = createTonConnectTransfer(seqno, walletState, params);
+
+  return await new SendApi(tonApi).estimateTx({
+    sendBocRequest: { boc: cell.toString('base64') },
+  });
+};
+
+export const sendTonConnectTransfer = async (
+  storage: IStorage,
+  tonApi: Configuration,
+  walletState: WalletState,
+  params: TonConnectTransactionPayload,
+  password: string
+) => {
+  const mnemonic = await getWalletMnemonic(
+    storage,
+    walletState.publicKey,
+    password
+  );
+  const keyPair = await mnemonicToPrivateKey(mnemonic);
+  const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
+
+  const cell = createTonConnectTransfer(
+    seqno,
+    walletState,
+    params,
+    keyPair.secretKey
+  );
+
+  await new SendApi(tonApi).sendBoc({
+    sendBocRequest: { boc: cell.toString('base64') },
+  });
 };
 
 export const sendTonTransfer = async (
@@ -78,9 +160,7 @@ export const sendTonTransfer = async (
   );
   const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-  const total = new BigNumber(fee.total).plus(
-    toNano(data.amount.toString()).toString()
-  );
+  const total = new BigNumber(fee.total).plus(data.amount);
 
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
   if (!data.max) {

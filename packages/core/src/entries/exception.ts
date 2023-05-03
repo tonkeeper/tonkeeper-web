@@ -1,4 +1,4 @@
-import { CONNECT_EVENT_ERROR_CODES } from '@tonconnect/protocol';
+import { CONNECT_EVENT_ERROR_CODES } from './tonConnect';
 
 export class TonConnectError extends Error {
   code: number;

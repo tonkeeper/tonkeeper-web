@@ -26,73 +26,80 @@ import { ContractDeployAction } from './ContractDeployAction';
 import { NftComment, NftItemTransferAction } from './NftActivity';
 import { SubscribeAction, UnSubscribeAction } from './SubscribeAction';
 
-const TonTransferAction: FC<{ action: Action; date: string; isScam: boolean }> =
-  ({ action, date, isScam }) => {
-    const { t } = useTranslation();
-    const wallet = useWalletContext();
-    const { tonTransfer } = action;
+const TonTransferAction: FC<{
+  action: Action;
+  date: string;
+  isScam: boolean;
+}> = ({ action, date, isScam }) => {
+  const { t } = useTranslation();
+  const wallet = useWalletContext();
+  const { tonTransfer } = action;
 
-    const format = useFormatCoinValue();
+  const format = useFormatCoinValue();
 
-    if (!tonTransfer) {
-      return <ErrorAction />;
-    }
+  if (!tonTransfer) {
+    return <ErrorAction />;
+  }
 
-    if (tonTransfer.recipient.address === wallet.active.rawAddress) {
-      return (
-        <ListItemGrid>
-          <ActivityIcon>
-            <ReceiveIcon />
-          </ActivityIcon>
-          <Description>
-            <FirstLine>
-              <FirstLabel>
-                {tonTransfer.sender.isScam || isScam
-                  ? t('spam_action')
-                  : t('transaction_type_receive')}
-              </FirstLabel>
-              <AmountText isScam={tonTransfer.sender.isScam || isScam} green>
-                +&thinsp;{format(tonTransfer.amount)}
-              </AmountText>
-              <AmountText isScam={tonTransfer.sender.isScam || isScam} green>
-                TON
-              </AmountText>
-            </FirstLine>
-            <SecondLine>
-              <SecondaryText>
-                {tonTransfer.sender.name ??
-                  toShortAddress(tonTransfer.sender.address)}
-              </SecondaryText>
-              <SecondaryText>{date}</SecondaryText>
-            </SecondLine>
-          </Description>
-          <Comment comment={isScam ? undefined : tonTransfer.comment} />
-        </ListItemGrid>
-      );
-    }
+  if (tonTransfer.recipient.address === wallet.active.rawAddress) {
     return (
       <ListItemGrid>
         <ActivityIcon>
-          <SentIcon />
+          <ReceiveIcon />
         </ActivityIcon>
         <Description>
           <FirstLine>
-            <FirstLabel>{t('transaction_type_sent')}</FirstLabel>
-            <AmountText>-&thinsp;{format(tonTransfer.amount)}</AmountText>
-            <Label1>TON</Label1>
+            <FirstLabel>
+              {tonTransfer.sender.isScam || isScam
+                ? t('spam_action')
+                : t('transaction_type_receive')}
+            </FirstLabel>
+            <AmountText isScam={tonTransfer.sender.isScam || isScam} green>
+              +&thinsp;{format(tonTransfer.amount)}
+            </AmountText>
+            <AmountText isScam={tonTransfer.sender.isScam || isScam} green>
+              TON
+            </AmountText>
           </FirstLine>
           <SecondLine>
             <SecondaryText>
-              {tonTransfer.recipient.name ??
-                toShortAddress(tonTransfer.recipient.address)}
+              {tonTransfer.sender.name ??
+                toShortAddress(tonTransfer.sender.address)}
             </SecondaryText>
             <SecondaryText>{date}</SecondaryText>
           </SecondLine>
         </Description>
-        <Comment comment={tonTransfer.comment} />
+        <Comment comment={isScam ? undefined : tonTransfer.comment} />
       </ListItemGrid>
     );
-  };
+  }
+  return (
+    <ListItemGrid>
+      <ActivityIcon>
+        <SentIcon />
+      </ActivityIcon>
+      <Description>
+        <FirstLine>
+          <FirstLabel>
+            {isScam ? t('spam_action') : t('transaction_type_sent')}
+          </FirstLabel>
+          <AmountText isScam={isScam}>
+            -&thinsp;{format(tonTransfer.amount)}
+          </AmountText>
+          <AmountText isScam={isScam}>TON</AmountText>
+        </FirstLine>
+        <SecondLine>
+          <SecondaryText>
+            {tonTransfer.recipient.name ??
+              toShortAddress(tonTransfer.recipient.address)}
+          </SecondaryText>
+          <SecondaryText>{date}</SecondaryText>
+        </SecondLine>
+      </Description>
+      <Comment comment={tonTransfer.comment} />
+    </ListItemGrid>
+  );
+};
 
 const JettonTransferAction: FC<{ action: Action; date: string }> = ({
   action,

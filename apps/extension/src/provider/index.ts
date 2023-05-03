@@ -26,12 +26,14 @@ export class TonProvider extends EventEmitter {
 
   constructor(instance?: TonProvider) {
     super();
+
     if (instance) {
       this.nextJsonRpcId = instance.nextJsonRpcId;
       this.promises = instance.promises;
       this.callbacks = instance.callbacks;
       instance.destroyTonkeeper();
     }
+
     window.addEventListener('message', this.onMessage);
   }
 
@@ -106,12 +108,6 @@ export class TonProvider extends EventEmitter {
       }
     }
   };
-
-  addListener = this.on;
-  removeListener = this.off;
-
-  addEventListener = this.on;
-  removeEventListener = this.off;
 
   destroyTonkeeper() {
     window.removeEventListener('message', this.onMessage);

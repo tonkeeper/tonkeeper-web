@@ -66,25 +66,20 @@ export const getActivityTitle = (
         month: 'long',
       }).format(date)
     );
-  } else {
+  } else if (date.getFullYear() < new Date().getFullYear()) {
     return capitalize(
       new Intl.DateTimeFormat(language, {
         month: 'long',
         year: 'numeric',
       }).format(date)
     );
+  } else {
+    return capitalize(
+      new Intl.DateTimeFormat(language, {
+        month: 'long',
+      }).format(date)
+    );
   }
-};
-
-const getWeek = (date: Date) => {
-  var onejan = new Date(date.getFullYear(), 0, 1).getTime();
-  var today = new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate()
-  ).getTime();
-  var dayOfYear = (today - onejan + 86400000) / 86400000;
-  return Math.ceil(dayOfYear / 7);
 };
 
 const getEventGroup = (
@@ -99,16 +94,9 @@ const getEventGroup = (
   }
   if (
     yesterday.toDateString() === date.toDateString() &&
-    yesterday.getMonth() === date.getMonth()
+    today.getMonth() === date.getMonth()
   ) {
     return 'yesterday';
-  }
-  if (
-    getWeek(today) === getWeek(date) &&
-    today.getMonth() === date.getMonth() &&
-    today.getFullYear() === date.getFullYear()
-  ) {
-    return `week-${date.getDay()}`;
   }
   if (
     today.getMonth() === date.getMonth() &&

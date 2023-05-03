@@ -22,33 +22,31 @@ const RenameWalletContent: FC<{
   };
 
   return (
-    <>
-      <NotificationBlock onSubmit={onSubmit}>
-        <Input
-          value={name}
-          onChange={setName}
-          isValid={!isError}
-          label={t('Wallet_name')}
-        />
-        <Input
-          value={wallet.active.friendlyAddress}
-          disabled
-          label={t('address_label')}
-        />
+    <NotificationBlock onSubmit={onSubmit}>
+      <Input
+        value={name}
+        onChange={setName}
+        isValid={!isError}
+        label={t('Wallet_name')}
+      />
+      <Input
+        value={wallet.active.friendlyAddress}
+        disabled
+        label={t('add_edit_favorite_address_label')}
+      />
 
-        <Button
-          size="large"
-          fullWidth
-          bottom
-          primary
-          loading={isLoading}
-          disabled={isLoading}
-          type="submit"
-        >
-          {t('add_edit_favorite_save')}
-        </Button>
-      </NotificationBlock>
-    </>
+      <Button
+        size="large"
+        fullWidth
+        bottom
+        primary
+        loading={isLoading}
+        disabled={isLoading}
+        type="submit"
+      >
+        {t('add_edit_favorite_save')}
+      </Button>
+    </NotificationBlock>
   );
 };
 

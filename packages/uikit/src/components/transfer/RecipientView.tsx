@@ -11,9 +11,6 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { ButtonMock } from '../fields/BackButton';
-import { Button } from '../fields/Button';
-import { Input, InputWithScanner } from '../fields/Input';
 import { Gap } from '../Layout';
 import {
   FullHeightBlock,
@@ -21,9 +18,13 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body2, H3, Label1 } from '../Text';
-import { ButtonBlock } from './common';
+import { ButtonMock } from '../fields/BackButton';
+import { Button } from '../fields/Button';
+import { TextArea } from '../fields/Input';
+import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
+import { ButtonBlock } from './common';
 
 const Label = styled(Label1)`
   user-select: none;
@@ -78,18 +79,18 @@ const useDnsWallet = (value: string) => {
   update(value);
 
   return useQuery(
-    [QueryKey.dns, name],
+    [QueryKey.dns, value, name],
     async () => {
       const result = await new DNSApi(tonApi).dnsResolve({ name });
       if (!result.wallet) {
-        throw new Error('Missing wallet');
+        return null;
       }
       return result.wallet;
     },
     {
       enabled: name.length > 7 && !seeIfValidAddress(name),
       retry: 0,
-      keepPreviousData: true,
+      keepPreviousData: false,
     }
   );
 };
@@ -115,7 +116,7 @@ export const RecipientView: FC<{
   const [submitted, setSubmit] = useState(false);
   const { t } = useTranslation();
   const { standalone, ios } = useAppContext();
-  const ref = useRef<HTMLInputElement | null>(null);
+  const ref = useRef<HTMLTextAreaElement | null>(null);
 
   const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
     useGetToAccount();
@@ -136,6 +137,11 @@ export const RecipientView: FC<{
       setAddress((recipient) => ({
         address: recipient.address,
         dns: dnsWallet,
+      }));
+    }
+    if (dnsWallet === null) {
+      setAddress((recipient) => ({
+        address: recipient.address,
       }));
     }
   }, [setAddress, dnsWallet]);
@@ -180,14 +186,17 @@ export const RecipientView: FC<{
 
   const showAddress = useShowAddress(ref, formatted, toAccount);
 
-  const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const handleSubmit = () => {
     setSubmit(true);
     if (isValid && isMemoValid && toAccount) {
       if (ios && keyboard) openIosKeyboard(keyboard);
       setRecipient({ address: recipient, toAccount, comment, done: true });
     }
+  };
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    handleSubmit();
   };
 
   const onSelect = async (item: Suggestion) => {
@@ -212,6 +221,7 @@ export const RecipientView: FC<{
       </NotificationTitleBlock>
       <ShowAddress value={showAddress}>
         <InputWithScanner
+          onSubmit={handleSubmit}
           ref={ref}
           value={formatted}
           onScan={onScan}
@@ -222,10 +232,11 @@ export const RecipientView: FC<{
         />
       </ShowAddress>
 
-      <Input
+      <TextArea
+        onSubmit={handleSubmit}
         value={comment}
         onChange={setComment}
-        label={t('send_comment_label')}
+        label={t('txActions_signRaw_comment')}
         isValid={!submitted || isMemoValid}
         disabled={isExternalLoading}
       />

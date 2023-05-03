@@ -1,18 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
-import {
-  getManifest,
-  parseTonConnect,
-} from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { ConnectRequest } from '@tonkeeper/core/dist/entries/tonConnect';
+import { parseTonConnect } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { ScanIcon } from '../Icon';
-import {
-  TonConnectNotification,
-  TonConnectProps,
-} from './TonConnectNotification';
+import { TonConnectNotification } from './TonConnectNotification';
 
 const ScanBlock = styled.div`
   position: absolute;
@@ -24,10 +18,9 @@ const ScanBlock = styled.div`
 
 const useGetConnectInfo = () => {
   const sdk = useAppSdk();
-  const { tonApi } = useAppContext();
   const { t } = useTranslation();
 
-  return useMutation<null | TonConnectProps, Error, string>(async (url) => {
+  return useMutation<null | ConnectRequest, Error, string>(async (url) => {
     const params = parseTonConnect({ url });
 
     if (params === null) {
@@ -45,19 +38,14 @@ const useGetConnectInfo = () => {
       params: t('loading'),
     });
 
-    const manifest = await getManifest(tonApi, params.request);
-
-    return {
-      params,
-      manifest,
-    };
+    return params.request;
   });
 };
 
 export const ScanButton = () => {
   const sdk = useAppSdk();
   const [scanId, setScanId] = useState<number | undefined>(undefined);
-  const [params, setParams] = useState<TonConnectProps | null>(null);
+  const [params, setParams] = useState<ConnectRequest | null>(null);
 
   const { mutateAsync, reset } = useGetConnectInfo();
 
@@ -104,6 +92,7 @@ export const ScanButton = () => {
         <ScanIcon></ScanIcon>
       </ScanBlock>
       <TonConnectNotification
+        origin={undefined}
         params={params}
         handleClose={() => setParams(null)}
       />

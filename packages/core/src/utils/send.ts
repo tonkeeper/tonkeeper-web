@@ -42,17 +42,24 @@ export function getDecimalLength(str: string) {
   return tail ? tail.length : 0;
 }
 
-export function formatSendValue(str: string) {
-  const [entry, tail] = removeGroupSeparator(str.trim()).split(
-    getDecimalSeparator()
-  );
-
+function formatEntryAndTail(entry: string, tail: string) {
   const path = [] as string[];
   path.push(new Intl.NumberFormat(getBrowserLocale()).format(parseInt(entry)));
   if (tail !== undefined) {
     path.push(tail);
   }
   return path.join(getDecimalSeparator());
+}
+export function formatNumberValue(value: BigNumber) {
+  const [entry, tail] = value.toFormat().split('.');
+  return formatEntryAndTail(entry, tail);
+}
+
+export function formatSendValue(str: string) {
+  const [entry, tail] = removeGroupSeparator(str.trim()).split(
+    getDecimalSeparator()
+  );
+  return formatEntryAndTail(entry, tail);
 }
 
 export const getJettonSymbol = (
@@ -101,18 +108,16 @@ export const getRemaining = (
   max: boolean,
   format: (amount: number | string, decimals?: number) => string
 ): [string, boolean] => {
+  amount = removeGroupSeparator(amount);
+
   if (jetton === CryptoCurrency.TON) {
     if (max) {
       return [`0 ${CryptoCurrency.TON}`, true];
     }
 
-    amount = removeGroupSeparator(amount);
-
     const remaining = new BigNumber(info?.balance ?? 0).minus(
       isNumeric(amount)
-        ? new BigNumber(toNumberAmount(amount)).multipliedBy(
-            Math.pow(10, DefaultDecimals)
-          )
+        ? new BigNumber(toNumberAmount(amount)).shiftedBy(DefaultDecimals)
         : 0
     );
 
@@ -133,13 +138,13 @@ export const getRemaining = (
     return [`0 ${jettonInfo.metadata?.symbol}`, true];
   }
 
-  const remaining = new BigNumber(jettonInfo.balance).minus(
-    isNumeric(amount)
-      ? new BigNumber(toNumberAmount(amount)).multipliedBy(
-          Math.pow(10, jettonInfo.metadata?.decimals ?? DefaultDecimals)
-        )
-      : 0
-  );
+  const fullAmount = isNumeric(amount)
+    ? new BigNumber(toNumberAmount(amount)).shiftedBy(
+        jettonInfo.metadata?.decimals ?? DefaultDecimals
+      )
+    : new BigNumber(0);
+
+  const remaining = new BigNumber(jettonInfo.balance).minus(fullAmount);
 
   return [
     `${format(remaining.toString(), jettonInfo.metadata?.decimals)} ${
@@ -177,5 +182,38 @@ export const getFiatAmountValue = (
     const price = getJettonStockPrice(jettonInfo, stock.today, fiat);
     if (!price) return undefined;
     return value.multipliedBy(price);
+  }
+};
+
+export const getCoinAmountValue = (
+  stock: TonendpointStock | undefined,
+  jettons: JettonsBalances,
+  fiat: FiatCurrencies,
+  jetton: string,
+  amount: string
+) => {
+  amount = removeGroupSeparator(amount);
+
+  if (!stock) return undefined;
+
+  if (!isNumeric(amount)) return new BigNumber(0);
+
+  const value = new BigNumber(toNumberAmount(amount));
+
+  if (jetton === CryptoCurrency.TON) {
+    const price = getTonCoinStockPrice(stock.today, fiat);
+    return new BigNumber(value.div(price).toFixed(DefaultDecimals));
+  } else {
+    const jettonInfo = jettons.balances.find(
+      (item) => item.jettonAddress === jetton
+    );
+
+    if (!jettonInfo) return undefined;
+
+    const price = getJettonStockPrice(jettonInfo, stock.today, fiat);
+    if (!price) return undefined;
+    return new BigNumber(
+      value.div(price).toFixed(jettonInfo.metadata?.decimals ?? DefaultDecimals)
+    );
   }
 };

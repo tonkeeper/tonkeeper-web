@@ -10,11 +10,11 @@ import { CSSTransition } from 'react-transition-group';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { Container } from '../styles/globalStyle';
+import { BackButton } from './fields/BackButton';
 import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
-import { BackButton } from './fields/BackButton';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
   background: transparent;
@@ -39,6 +39,7 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean }>> = ({
 };
 
 const Wrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: var(--app-height);
@@ -132,10 +133,10 @@ const RowTitle = styled(H3)`
 
 const BackShadow = styled.div`
   width: var(--app-width);
-  height: 70vh;
-  position: fixed;
-  bottom: -50vh;
+  height: 60vh;
+  position: absolute;
   z-index: -1;
+  top: 80%;
   background-color: ${(props) => props.theme.backgroundPage};
 `;
 
@@ -342,9 +343,9 @@ export const Notification: FC<{
                     {Child}
                   </Content>
                 </Wrapper>
-                {backShadow && entered && <BackShadow />}
               </NotificationWrapper>
             </NotificationOverlay>
+            {backShadow && entered && <BackShadow />}
           </Splash>
         </CSSTransition>
       </ReactPortal>

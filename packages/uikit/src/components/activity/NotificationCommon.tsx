@@ -195,7 +195,7 @@ export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({
         <ListItemPayload>
           <Label>
             {beneficiary.name
-              ? t('transaction_merchant_address')
+              ? t('add_edit_favorite_address_label')
               : t('transaction_merchant')}
           </Label>
           <Label1>{toShortAddress(beneficiary.address)}</Label1>
@@ -237,7 +237,7 @@ export const ActionDeployerDetails: FC<{ deployer: AccountAddress }> = ({
         }
       >
         <ListItemPayload>
-          <Label>{t('address_label')}</Label>
+          <Label>{t('add_edit_favorite_address_label')}</Label>
           <Label1>{toShortAddress(deployer.address)}</Label1>
         </ListItemPayload>
       </ListItem>
@@ -252,14 +252,16 @@ export const ActionFeeDetails: FC<{
 }> = ({ fee, stock, fiat }) => {
   const { t } = useTranslation();
 
-  const feeAmount = fee.total < 0 ? fee.refund : fee.total;
+  const feeAmount = fee.total < 0 ? fee.total * -1 : fee.total;
   const amount = useCoinFullBalance(feeAmount);
   const price = useBalanceValue(feeAmount, stock, fiat);
 
   return (
     <ListItem hover={false}>
       <ListItemPayload>
-        <Label>{t('transaction_fee')}</Label>
+        <Label>
+          {fee.total < 0 ? t('txActions_refund') : t('transaction_fee')}
+        </Label>
         <ColumnText right text={`${amount} TON`} secondary={`≈ ${price}`} />
       </ListItemPayload>
     </ListItem>

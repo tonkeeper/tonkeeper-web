@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
-import { getTonClient, Network } from '@tonkeeper/core/dist/entries/network';
+import { Network, getTonClient } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
   InnerBody,
   useWindowsScroll,
@@ -25,7 +25,7 @@ import {
   CoinSkeletonPage,
   HomeSkeleton,
   SettingsSkeletonPage,
-} from '@tonkeeper/uikit/dist/components/SKeleton';
+} from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import {
   AppContext,
@@ -42,9 +42,9 @@ import {
   TranslationContext,
 } from '@tonkeeper/uikit/dist/hooks/translation';
 import {
-  any,
   AppRoute,
   SettingsRoute,
+  any,
 } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -78,6 +78,8 @@ import {
 } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
+import { Notifications } from './components/Notifications';
+import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { ExtensionStorage } from './libs/storage';
 
@@ -105,6 +107,7 @@ const queryClient = new QueryClient({
 });
 const storage = new ExtensionStorage();
 const sdk = new ExtensionAppSdk(storage);
+connectToBackground();
 
 export const App: FC = () => {
   const translation = useMemo(() => {
@@ -201,8 +204,6 @@ export const Loader: FC = React.memo(() => {
     localizationFrom(browser.i18n.getUILanguage())
   );
   const { data: config } = useTonenpointConfig(tonendpoint);
-
-  console.log('Loader', account, auth);
 
   if (!account || !auth || !config || lock === undefined) {
     return <Loading />;
@@ -324,23 +325,25 @@ export const Content: FC<{
               }
             />
           </Route>
-          <Route
-            path="*"
-            element={
-              <>
-                <Header />
-                <InnerBody>
-                  <Suspense fallback={<HomeSkeleton />}>
-                    <Home />
-                  </Suspense>
-                </InnerBody>
-              </>
-            }
-          />
+          <Route path="*" element={<IndexPage />} />
         </Routes>
         <Footer />
         <MemoryScroll />
       </WalletStateContext.Provider>
     </Wrapper>
+  );
+};
+
+const IndexPage = () => {
+  return (
+    <>
+      <Header />
+      <InnerBody>
+        <Suspense fallback={<HomeSkeleton />}>
+          <Home />
+        </Suspense>
+      </InnerBody>
+      <Notifications />
+    </>
   );
 };

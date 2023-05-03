@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import { AccountRepr, Fee, WalletDNS } from '../tonApiV1';
 import { Suggestion } from './suggestion';
 
@@ -16,7 +17,8 @@ export interface RecipientData {
 }
 
 export interface AmountValue {
-  amount: number;
+  fiat?: BigNumber;
+  amount: BigNumber;
   max: boolean;
 }
 

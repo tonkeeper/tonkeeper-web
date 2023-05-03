@@ -1,24 +1,37 @@
+import queryString from 'query-string';
+import { Address, beginCell, storeStateInit } from 'ton-core';
 import {
+  KeyPair,
+  getSecureRandomBytes,
+  keyPairFromSeed,
+  mnemonicToPrivateKey,
+  sha256_sync,
+} from 'ton-crypto';
+import nacl from 'tweetnacl';
+import { IStorage } from '../../Storage';
+import { TonConnectError } from '../../entries/exception';
+import { Network } from '../../entries/network';
+import {
+  CONNECT_EVENT_ERROR_CODES,
   ConnectEvent,
+  ConnectItem,
   ConnectItemReply,
   ConnectRequest,
+  DAppManifest,
   DeviceInfo,
-  KeyPair,
-  SessionCrypto,
-} from '@tonconnect/protocol';
-import queryString from 'query-string';
-import { DAppManifest } from '../../entries/tonConnect';
+  TonAddressItemReply,
+  TonProofItemReplySuccess,
+} from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
-import { AppKey } from '../../Keys';
-import { IStorage } from '../../Storage';
-import { Configuration } from '../../tonApiV1';
-
-export interface TonConnectParams {
-  protocolVersion: number;
-  request: ConnectRequest;
-  clientSessionId: string;
-  sessionCrypto: SessionCrypto;
-}
+import { getWalletMnemonic } from '../menmonicService';
+import { walletContractFromState } from '../wallet/contractService';
+import { getCurrentWallet } from '../wallet/storeService';
+import {
+  TonConnectParams,
+  disconnectAccountConnection,
+  getAccountConnection,
+  saveAccountConnection,
+} from './connectionService';
 
 const TC_PREFIX = 'tc://';
 
@@ -45,24 +58,41 @@ export function parseTonConnect(options: {
     const protocolVersion = parseInt(query.v);
     const request = JSON.parse(decodeURIComponent(query.r)) as ConnectRequest;
     const clientSessionId = query.id;
-    const sessionCrypto = new SessionCrypto();
-
+    //const sessionCrypto = new SessionCrypto();
     return {
       protocolVersion,
       request,
       clientSessionId,
-      sessionCrypto,
+      sessionKeyPair: undefined!,
     };
   } catch (e) {
     return null;
   }
 }
 
-export const getManifest = async (
-  tonApi: Configuration,
-  request: ConnectRequest
-) => {
-  const response = await tonApi.fetchApi!(request.manifestUrl, {
+export const getTonConnectParams = async (
+  request: ConnectRequest,
+  protocolVersion?: number,
+  clientSessionId?: string
+): Promise<TonConnectParams> => {
+  const randomBytes: Buffer = await getSecureRandomBytes(32);
+  const keypair: KeyPair = keyPairFromSeed(randomBytes);
+
+  return {
+    protocolVersion: protocolVersion ?? 2,
+    request,
+    clientSessionId:
+      clientSessionId ?? (await getSecureRandomBytes(32)).toString('hex'),
+    sessionKeyPair: {
+      secretKey: keypair.secretKey.toString('hex'),
+      publicKey: keypair.publicKey.toString('hex'),
+    },
+  };
+};
+
+export const getManifest = async (request: ConnectRequest) => {
+  // TODO: get fetch from context
+  const response = await window.fetch(request.manifestUrl, {
     method: 'GET',
   });
 
@@ -118,39 +148,17 @@ export const getDeviceInfo = (appVersion: string): DeviceInfo => {
     appName: 'Tonkeeper',
     appVersion: appVersion,
     maxProtocolVersion: 2,
-    features: ['SendTransaction'],
+    features: [
+      'SendTransaction',
+      {
+        name: 'SendTransaction',
+        maxMessages: 4,
+      },
+    ],
   };
 };
 
-export interface AccountConnection {
-  manifest: DAppManifest;
-  sessionKeyPair: KeyPair;
-  clientSessionId: string;
-  webViewUrl: string;
-}
-
-export const getAccountConnection = async (
-  storage: IStorage,
-  wallet: WalletState
-) => {
-  const result = await storage.get<AccountConnection[]>(
-    `${AppKey.connections}_${wallet.publicKey}_${wallet.network}`
-  );
-  return result ?? [];
-};
-
-export const setAccountConnection = async (
-  storage: IStorage,
-  wallet: WalletState,
-  items: AccountConnection[]
-) => {
-  await storage.set(
-    `${AppKey.connections}_${wallet.publicKey}_${wallet.network}`,
-    items
-  );
-};
-
-export const walletTonReConnect = async (options: {
+export const checkWalletConnectionOrDie = async (options: {
   storage: IStorage;
   wallet: WalletState;
   webViewUrl: string;
@@ -160,12 +168,147 @@ export const walletTonReConnect = async (options: {
     options.wallet
   );
 
+  console.log(connections);
+
   const connection = connections.find(
     (item) => item.webViewUrl === options.webViewUrl
   );
-  if (connection === null) {
-    throw new Error('missing connection');
+  if (connection == undefined) {
+    throw new TonConnectError(
+      'Missing connection',
+      CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
+    );
   }
+};
+
+export const tonReConnectRequest = async (
+  storage: IStorage,
+  webViewUrl: string
+): Promise<ConnectItem[]> => {
+  const wallet = await getCurrentWallet(storage);
+  console.log(wallet);
+
+  await checkWalletConnectionOrDie({ storage, wallet, webViewUrl });
+  return [toTonAddressItemReply(wallet)];
+};
+
+export const toTonAddressItemReply = (wallet: WalletState) => {
+  const contract = walletContractFromState(wallet);
+  const result: TonAddressItemReply = {
+    name: 'ton_addr',
+    address: contract.address.toRawString(),
+    network: (wallet.network || Network.MAINNET).toString(),
+    walletStateInit: beginCell()
+      .storeWritable(storeStateInit(contract.init))
+      .endCell()
+      .toBoc()
+      .toString('base64'),
+    publicKey: wallet.publicKey,
+  };
+
+  return result;
+};
+
+export interface ConnectProofPayload {
+  timestamp: number;
+  bufferToSign: Buffer;
+  domainBuffer: Buffer;
+  payload: string;
+  origin: string;
+}
+
+export const tonConnectProofPayload = (
+  origin: string,
+  wallet: string,
+  payload: string
+): ConnectProofPayload => {
+  const timestamp = Math.round(Date.now() / 1000);
+  const timestampBuffer = Buffer.allocUnsafe(8);
+  timestampBuffer.writeBigInt64LE(BigInt(timestamp));
+
+  const domainBuffer = Buffer.from(new URL(origin).host);
+
+  const domainLengthBuffer = Buffer.allocUnsafe(4);
+  domainLengthBuffer.writeInt32LE(domainBuffer.byteLength);
+
+  const address = Address.parse(wallet);
+
+  const addressWorkchainBuffer = Buffer.allocUnsafe(4);
+  addressWorkchainBuffer.writeInt32BE(address.workChain);
+
+  const addressBuffer = Buffer.concat([addressWorkchainBuffer, address.hash]);
+
+  const messageBuffer = Buffer.concat([
+    Buffer.from('ton-proof-item-v2/', 'utf8'),
+    addressBuffer,
+    domainLengthBuffer,
+    domainBuffer,
+    timestampBuffer,
+    Buffer.from(payload),
+  ]);
+
+  const bufferToSign = Buffer.concat([
+    Buffer.from('ffff', 'hex'),
+    Buffer.from('ton-connect', 'utf8'),
+    Buffer.from(sha256_sync(messageBuffer)),
+  ]);
+
+  return {
+    timestamp,
+    bufferToSign,
+    domainBuffer,
+    payload,
+    origin,
+  };
+};
+
+const toTonProofItemReplySuccess = (
+  proof: ConnectProofPayload,
+  signature: Buffer
+) => {
+  const result: TonProofItemReplySuccess = {
+    name: 'ton_proof',
+    proof: {
+      timestamp: proof.timestamp, // 64-bit unix epoch time of the signing operation (seconds)
+      domain: {
+        lengthBytes: proof.domainBuffer.byteLength, // AppDomain Length
+        value: proof.domainBuffer.toString('utf8'), // app domain name (as url part, without encoding)
+      },
+      signature: signature.toString('base64'), // base64-encoded signature
+      payload: proof.payload, // payload from the request
+    },
+  };
+
+  return result;
+};
+
+export const toTonProofItemReply = async (options: {
+  storage: IStorage;
+  wallet: WalletState;
+  password: string;
+  proof: ConnectProofPayload;
+}): Promise<TonProofItemReplySuccess> => {
+  const mnemonic = await getWalletMnemonic(
+    options.storage,
+    options.wallet.publicKey,
+    options.password
+  );
+  const keyPair = await mnemonicToPrivateKey(mnemonic);
+
+  const signature = nacl.sign.detached(
+    Buffer.from(sha256_sync(options.proof.bufferToSign)),
+    keyPair.secretKey
+  );
+
+  return toTonProofItemReplySuccess(options.proof, Buffer.from(signature));
+};
+
+export const tonDisconnectRequest = async (options: {
+  storage: IStorage;
+  webViewUrl: string;
+}) => {
+  const wallet = await getCurrentWallet(options.storage);
+  await disconnectAccountConnection({ ...options, wallet });
 };
 
 export const walletTonConnect = async (options: {
@@ -177,20 +320,7 @@ export const walletTonConnect = async (options: {
   appVersion: string;
   webViewUrl: string;
 }): Promise<ConnectEvent> => {
-  const connections = await getAccountConnection(
-    options.storage,
-    options.wallet
-  );
-
-  connections.push({
-    manifest: options.manifest,
-    sessionKeyPair: options.params.sessionCrypto.stringifyKeypair(),
-    clientSessionId: options.params.clientSessionId,
-    webViewUrl: options.webViewUrl,
-  });
-
-  await setAccountConnection(options.storage, options.wallet, connections);
-
+  await saveAccountConnection(options);
   return {
     id: Date.now(),
     event: 'connect',
