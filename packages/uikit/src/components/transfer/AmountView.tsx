@@ -84,6 +84,8 @@ const MaxRow = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+
+  user-select: none;
 `;
 
 const MaxButton = styled(Label2)<{ maxValue: boolean }>`
@@ -450,12 +452,12 @@ export const AmountView: FC<{
   const onMax = () => {
     if (!refBlock.current) return;
 
-    setMax(true);
-    setInFiat(false);
-    const value = getMaxValue(jettons, info, jetton, format);
+    const value = max ? '0' : getMaxValue(jettons, info, jetton, format);
     const size = getInputSize(value, refBlock.current);
     setFontSize(size);
     setAmountValue(value);
+    setMax((state) => !state);
+    setInFiat(false);
   };
 
   const onJetton = (asset: string) => {
