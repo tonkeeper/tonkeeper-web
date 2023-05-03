@@ -4,7 +4,6 @@ import {
   beginCell,
   Builder,
   comment,
-  fromNano,
   internal,
   toNano,
 } from 'ton-core';
@@ -12,24 +11,19 @@ import { mnemonicToPrivateKey } from 'ton-crypto';
 import { RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import {
-  Configuration,
-  Fee,
-  NftItemRepr,
-  SendApi,
-  WalletApi,
-} from '../../tonApiV1';
+import { Configuration, Fee, NftItemRepr, SendApi } from '../../tonApiV1';
 import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
   checkWalletBalance,
   externalMessage,
   getWalletBalance,
+  getWalletSeqNo,
   SendMode,
 } from './common';
 
 const initNftTransferAmount = toNano('1');
-const nftTransferForwardAmount = toNano(fromNano('1'));
+const nftTransferForwardAmount = BigInt('1');
 
 const nftTransferBody = (params: {
   queryId?: number;
@@ -91,13 +85,7 @@ export const estimateNftTransfer = async (
   recipient: RecipientData,
   nftItem: NftItemRepr
 ) => {
-  const { seqno } = await new WalletApi(tonApi)
-    .getWalletSeqno({
-      account: walletState.active.rawAddress,
-    })
-    .catch(() => ({
-      seqno: 0,
-    }));
+  const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
 
   const cell = createNftTransfer(
     seqno,

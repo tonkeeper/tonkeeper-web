@@ -39,8 +39,6 @@ import { useFormatCoinValue } from '../../hooks/balance';
 import { getTextWidth } from '../../hooks/textWidth';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
 import { ChevronLeftIcon } from '../Icon';
 import { Gap } from '../Layout';
 import {
@@ -49,9 +47,11 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
 import { AssetSelect } from './AssetSelect';
-import { ButtonBlock, useSecondAmountWithSymbol } from './common';
 import { InputSize, Sentence } from './Sentence';
+import { ButtonBlock, useSecondAmountWithSymbol } from './common';
 
 const Center = styled.div`
   text-align: center;
@@ -215,6 +215,10 @@ const seeIfValueValid = (value: string, decimals: number) => {
   }
 
   return true;
+};
+
+const inputToBigNumber = (value: string): BigNumber => {
+  return new BigNumber(removeGroupSeparator(value).replace(',', '.'));
 };
 
 const useButtonPosition = (
@@ -415,13 +419,8 @@ export const AmountView: FC<{
       e.preventDefault();
       if (isValid) {
         reset();
-        const coinValue = new BigNumber(
-          removeGroupSeparator(coinAmount).replace(',', '.')
-        );
-
-        const fiatValue = inFiat
-          ? new BigNumber(removeGroupSeparator(inputAmount).replace(',', '.'))
-          : undefined;
+        const coinValue = inputToBigNumber(coinAmount);
+        const fiatValue = inFiat ? inputToBigNumber(inputAmount) : undefined;
 
         const fee = await mutateAsync({
           amount: coinValue,

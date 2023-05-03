@@ -4,7 +4,6 @@ import {
   beginCell,
   Builder,
   comment,
-  fromNano,
   internal,
   toNano,
 } from 'ton-core';
@@ -12,13 +11,7 @@ import { mnemonicToPrivateKey } from 'ton-crypto';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import {
-  Configuration,
-  Fee,
-  JettonBalance,
-  SendApi,
-  WalletApi,
-} from '../../tonApiV1';
+import { Configuration, Fee, JettonBalance, SendApi } from '../../tonApiV1';
 import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
@@ -26,11 +19,12 @@ import {
   checkWalletBalance,
   externalMessage,
   getWalletBalance,
+  getWalletSeqNo,
   SendMode,
 } from './common';
 
 const jettonTransferAmount = toNano('0.64');
-const jettonTransferForwardAmount = toNano(fromNano('1'));
+const jettonTransferForwardAmount = BigInt('1');
 
 const jettonTransferBody = (params: {
   queryId?: number;
@@ -104,13 +98,7 @@ export const estimateJettonTransfer = async (
   data: AmountValue,
   jettonInfo: JettonBalance
 ) => {
-  const { seqno } = await new WalletApi(tonApi)
-    .getWalletSeqno({
-      account: walletState.active.rawAddress,
-    })
-    .catch(() => ({
-      seqno: 0,
-    }));
+  const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
 
   const cell = createJettonTransfer(
     seqno,

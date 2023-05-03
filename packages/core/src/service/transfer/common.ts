@@ -54,6 +54,21 @@ export const checkWalletBalance = (total: BigNumber, wallet: AccountRepr) => {
   }
 };
 
+export const getWalletSeqNo = async (
+  tonApi: Configuration,
+  account: string
+) => {
+  const { seqno } = await new WalletApi(tonApi)
+    .getWalletSeqno({
+      account,
+    })
+    .catch(() => ({
+      seqno: 0,
+    }));
+
+  return seqno;
+};
+
 export const getWalletBalance = async (
   tonApi: Configuration,
   walletState: WalletState
@@ -61,13 +76,7 @@ export const getWalletBalance = async (
   const wallet = await new AccountApi(tonApi).getAccountInfo({
     account: walletState.active.rawAddress,
   });
-  const { seqno } = await new WalletApi(tonApi)
-    .getWalletSeqno({
-      account: walletState.active.rawAddress,
-    })
-    .catch(() => ({
-      seqno: 0,
-    }));
+  const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
 
   return [wallet, seqno] as const;
 };
