@@ -226,8 +226,7 @@ export const useSecondAmountWithSymbol = (
       if (fiatAmount === undefined) return undefined;
 
       return `${formatter.format(fiatAmount.toString(), {
-        ignoreZeroTruncate: false,
-        decimals: 4,
+        ignoreZeroTruncate: true,
       })} ${fiat}`;
     }
   }, [stock, jettons, fiat, jetton, amount, inFiat]);
