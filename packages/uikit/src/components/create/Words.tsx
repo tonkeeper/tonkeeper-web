@@ -391,7 +391,7 @@ export const ImportWords: FC<{
   const onChange = useCallback(
     (newValue: string, index: number) => {
       if (newValue.includes(' ')) {
-        let values = newValue.trim().split(' ');
+        let values = newValue.trim().toLocaleLowerCase().split(' ');
         const max = Math.min(24 - index, values.length);
         values = values.slice(0, max);
         setMnemonic((items) => {
@@ -403,7 +403,7 @@ export const ImportWords: FC<{
         return;
       } else {
         return setMnemonic((items) =>
-          items.map((v, i) => (i === index ? newValue : v))
+          items.map((v, i) => (i === index ? newValue.toLocaleLowerCase() : v))
         );
       }
     },
