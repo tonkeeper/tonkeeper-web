@@ -38,6 +38,8 @@ import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
 import { ChevronLeftIcon } from '../Icon';
 import { Gap } from '../Layout';
 import {
@@ -46,12 +48,10 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
+import { defaultSize, getInputSize, useButtonPosition } from './amountHooks';
 import { AssetSelect } from './AssetSelect';
-import { InputSize, Sentence } from './Sentence';
-import { defaultSize, getInputSize, useButtonPosition } from './amountHoocks';
 import { ButtonBlock, useSecondAmountWithSymbol } from './common';
+import { InputSize, Sentence } from './Sentence';
 
 const Center = styled.div`
   text-align: center;
