@@ -86,9 +86,6 @@ export interface DropDownProps extends PropsWithChildren {
   disabled?: boolean;
 }
 
-const disableTouchEvent: React.TouchEventHandler<HTMLDivElement> = (e) => {
-  e.stopPropagation();
-};
 export const DropDown = ({
   children,
   payload,
@@ -109,11 +106,29 @@ export const DropDown = ({
     toggling();
   };
 
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = ref.current;
+
+    if (!element) return;
+
+    const listener = (e: TouchEvent) => {
+      e.stopPropagation();
+      return false;
+    };
+
+    element.addEventListener('touchstart', listener);
+    element.addEventListener('touchmove', listener);
+
+    return () => {
+      element.removeEventListener('touchstart', listener);
+      element.removeEventListener('touchmove', listener);
+    };
+  }, [ref]);
+
   return (
-    <DropDownContainer
-      onTouchStart={disableTouchEvent}
-      onTouchMove={disableTouchEvent}
-    >
+    <DropDownContainer ref={ref}>
       <DropDownHeader onClick={onOpen}>{children}</DropDownHeader>
       {isOpen && (
         <Container onClose={toggling} center={center}>
