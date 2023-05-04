@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { useEffect } from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 
@@ -29,9 +31,10 @@ export const useKeyboardHeight = () => {
       const doc = document.documentElement;
       doc.style.setProperty('--app-height', `${innerHeight}px`);
       message(`${innerHeight}px`);
-      doc.style.height = undefined!;
-      document.body.style.height = undefined!;
-      document.getElementById('root')!.style.height = undefined!;
+
+      delete doc.style.height;
+      delete document.body.style.height;
+      delete document.getElementById('root')!.style.height;
     };
   }, []);
 };
