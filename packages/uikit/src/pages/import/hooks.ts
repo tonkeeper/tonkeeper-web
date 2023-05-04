@@ -13,9 +13,6 @@ export const useKeyboardHeight = () => {
     function resizeHandler(this: VisualViewport) {
       const doc = document.documentElement;
       doc.style.setProperty('--app-height', `${this.height}px`);
-
-      window.scrollTo(0, 0);
-
       message(`${this.height}px`);
     }
 

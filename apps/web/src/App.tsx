@@ -310,7 +310,7 @@ export const Content: FC<{
     return (
       <FullSizeWrapper standalone={standalone}>
         <Suspense fallback={<Loading />}>
-          <InitializeContainer fullHeight={standalone ? true : false}>
+          <InitializeContainer fullHeight={standalone}>
             <Routes>
               <Route path={any(AppRoute.import)} element={<ImportRouter />} />
               <Route path="*" element={<Initialize />} />
