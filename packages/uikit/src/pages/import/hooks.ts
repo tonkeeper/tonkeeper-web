@@ -13,7 +13,9 @@ export const useKeyboardHeight = () => {
     function resizeHandler(this: VisualViewport) {
       const doc = document.documentElement;
       doc.style.setProperty('--app-height', `${this.height}px`);
+      doc.style.height = `${this.height}px`;
       document.body.style.height = `${this.height}px`;
+      document.getElementById('root')!.style.height = `${this.height}px`;
       message(`${this.height}px`);
     }
 
@@ -27,7 +29,9 @@ export const useKeyboardHeight = () => {
       const doc = document.documentElement;
       doc.style.setProperty('--app-height', `${innerHeight}px`);
       message(`${innerHeight}px`);
+      doc.style.height = undefined!;
       document.body.style.height = undefined!;
+      document.getElementById('root')!.style.height = undefined!;
     };
   }, []);
 };
