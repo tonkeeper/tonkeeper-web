@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { mnemonicValidate } from 'ton-crypto';
 import { wordlist } from 'ton-crypto/dist/mnemonic/wordlist';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
@@ -381,6 +382,7 @@ export const ImportWords: FC<{
 }> = ({ isLoading, onMnemonic }) => {
   const [submitted, setSubmit] = useState(false);
   const sdk = useAppSdk();
+  const { standalone } = useAppContext();
   const ref = useRef<HTMLDivElement>(null);
 
   const { t } = useTranslation();
@@ -474,6 +476,7 @@ export const ImportWords: FC<{
           primary
           loading={isLoading}
           onClick={onSubmit}
+          bottom={standalone}
         >
           {t('continue')}
         </Button>
