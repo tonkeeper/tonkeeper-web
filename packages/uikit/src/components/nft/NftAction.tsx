@@ -2,6 +2,7 @@ import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
+import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Action, ActionsRow } from '../home/Actions';
@@ -28,13 +29,17 @@ const ActionTransfer: FC<{
 }> = ({ nftItem }) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const wallet = useWalletContext();
 
   return (
     <>
       <Action
         icon={<SendIcon />}
         title={t('Transfer_token')}
-        disabled={nftItem.sale != undefined}
+        disabled={
+          nftItem.sale != undefined ||
+          nftItem.owner?.address !== wallet.active.rawAddress
+        }
         action={() => setOpen(true)}
       />
       <SendNftAction
