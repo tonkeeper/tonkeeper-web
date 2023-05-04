@@ -36,12 +36,12 @@ const LockSwitch = () => {
           <Switch checked={!!data} onChange={toggleLock} />
         </ListItemPayload>
       </ListItem>
-      <ListItem hover={false}>
+      {/* <ListItem hover={false}>
         <ListItemPayload>
           <Label1>{t('Enable_storing_config')}</Label1>
           <Switch checked={!!wallet.voucher} onChange={toggleVoucher} />
         </ListItemPayload>
-      </ListItem>
+      </ListItem> */}
     </ListBlock>
   );
 };
