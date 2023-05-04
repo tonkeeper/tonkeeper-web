@@ -224,7 +224,8 @@ const WordInput: FC<{
   test: number;
   isValid?: boolean;
   submitted?: boolean;
-}> = ({ value, test, onChange, isValid, submitted }) => {
+  tabIndex: number;
+}> = ({ value, test, onChange, isValid, submitted, tabIndex }) => {
   const [active, setActive] = useState(false);
   const [touched, setTouched] = useState(false);
 
@@ -233,6 +234,7 @@ const WordInput: FC<{
     <InputBlock submitted={submitted || touched} active={active} valid={valid}>
       <Number1>{test}:</Number1>
       <Input
+        tabIndex={tabIndex}
         autoComplete="off"
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -316,18 +318,21 @@ export const Check: FC<{
 
       <Block>
         <WordInput
+          tabIndex={0}
           test={test1}
           value={one}
           onChange={setOne}
           isValid={seeIfValid(one, mnemonic[test1 - 1])}
         />
         <WordInput
+          tabIndex={1}
           test={test2}
           value={two}
           onChange={setTwo}
           isValid={seeIfValid(two, mnemonic[test2 - 1])}
         />
         <WordInput
+          tabIndex={2}
           test={test3}
           value={three}
           onChange={setThree}
@@ -465,6 +470,7 @@ export const ImportWords: FC<{
               isValid={validations[index]}
               submitted={submitted}
               onChange={(newValue) => onChange(newValue, index)}
+              tabIndex={index}
             />
           ))}
         </Inputs>
