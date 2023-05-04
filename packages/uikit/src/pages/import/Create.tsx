@@ -13,11 +13,10 @@ import {
 } from '../../components/lottie/LottieIcons';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveWallet } from '../../state/wallet';
-import { useKeyboardHeight } from './hooks';
 import { FinalView, useAddWalletMutation } from './Password';
 
 export const Create = () => {
-  useKeyboardHeight();
+  //useKeyboardHeight();
   const { t } = useTranslation();
   const {
     mutateAsync: checkPasswordAndCreateWalletAsync,
