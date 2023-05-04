@@ -32,7 +32,7 @@ const nftTransferBody = (params: {
     .storeAddress(params.responseAddress)
     .storeBit(false) // null custom_payload
     .storeCoins(params.forwardAmount)
-    .storeBit(params.forwardPayload != null) // forward_payload in this slice, not separate cell
+    .storeBit(params.forwardPayload != null) // forward_payload in this slice - false, separate cell - true
     .storeMaybeRef(params.forwardPayload)
     .endCell();
 };
