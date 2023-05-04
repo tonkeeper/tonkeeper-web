@@ -118,9 +118,14 @@ export const sendNftTransfer = async (
   );
   const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-  const nftTransferAmount = new BigNumber(fee.deposit)
+  const min = toNano('0.05').toString();
+  let nftTransferAmount = new BigNumber(fee.deposit)
     .minus(fee.refund)
-    .plus(toNano('0.05').toString());
+    .plus(min);
+
+  nftTransferAmount = nftTransferAmount.isLessThan(min)
+    ? new BigNumber(min)
+    : nftTransferAmount;
 
   const total = nftTransferAmount.plus(fee.total);
 
