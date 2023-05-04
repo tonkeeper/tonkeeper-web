@@ -128,7 +128,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             disabled={disabled}
             type={type}
             value={value}
-            spellcheck={false}
+            spellCheck={false}
             onChange={(e) => onChange && onChange(e.target.value)}
             onFocus={() => setFocus(true)}
             onBlur={() => setFocus(false)}
