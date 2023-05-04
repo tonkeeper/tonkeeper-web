@@ -57,7 +57,7 @@ const createTonTransfer = (
         value: BigInt(
           new BigNumber(data.amount).shiftedBy(DefaultDecimals).toString()
         ),
-        body: recipient.comment ?? undefined,
+        body: recipient.comment != '' ? recipient.comment : undefined,
       }),
     ],
   });

@@ -36,6 +36,7 @@ const DropDownListContainer = styled.div<{ center?: boolean }>`
   border-radius: ${(props) => props.theme.cornerSmall};
   max-height: 368px;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
 `;
 
 export const DropDownListPayload = styled.div`
@@ -85,6 +86,9 @@ export interface DropDownProps extends PropsWithChildren {
   disabled?: boolean;
 }
 
+const disableTouchEvent: React.TouchEventHandler<HTMLDivElement> = (e) => {
+  e.stopPropagation();
+};
 export const DropDown = ({
   children,
   payload,
@@ -106,7 +110,10 @@ export const DropDown = ({
   };
 
   return (
-    <DropDownContainer>
+    <DropDownContainer
+      onTouchStart={disableTouchEvent}
+      onTouchMove={disableTouchEvent}
+    >
       <DropDownHeader onClick={onOpen}>{children}</DropDownHeader>
       {isOpen && (
         <Container onClose={toggling} center={center}>

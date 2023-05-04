@@ -1,12 +1,5 @@
 import BigNumber from 'bignumber.js';
-import {
-  Address,
-  beginCell,
-  Builder,
-  comment,
-  internal,
-  toNano,
-} from 'ton-core';
+import { Address, beginCell, Cell, comment, internal, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
@@ -30,7 +23,7 @@ const nftTransferBody = (params: {
   newOwnerAddress: Address;
   responseAddress: Address;
   forwardAmount: bigint;
-  forwardPayload: Builder | null;
+  forwardPayload: Cell | null;
 }) => {
   return beginCell()
     .storeUint(0x5fcc3d14, 32) // transfer op
@@ -39,8 +32,8 @@ const nftTransferBody = (params: {
     .storeAddress(params.responseAddress)
     .storeBit(false) // null custom_payload
     .storeCoins(params.forwardAmount)
-    .storeBit(false) // forward_payload in this slice, not separate cell
-    .storeMaybeBuilder(params.forwardPayload)
+    .storeBit(params.forwardPayload != null) // forward_payload in this slice - false, separate cell - true
+    .storeMaybeRef(params.forwardPayload)
     .endCell();
 };
 
@@ -50,7 +43,7 @@ const createNftTransfer = (
   recipientAddress: string,
   nftAddress: string,
   nftTransferAmount: bigint,
-  forwardPayload: Builder | null = null,
+  forwardPayload: Cell | null = null,
   secretKey: Buffer = Buffer.alloc(64)
 ) => {
   const body = nftTransferBody({
@@ -93,7 +86,7 @@ export const estimateNftTransfer = async (
     recipient.toAccount.address.raw,
     nftItem.address,
     initNftTransferAmount,
-    recipient.comment ? comment(recipient.comment).asBuilder() : null
+    recipient.comment ? comment(recipient.comment) : null
   );
 
   const { fee } = await new SendApi(tonApi).estimateTx({
@@ -118,9 +111,14 @@ export const sendNftTransfer = async (
   );
   const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-  const nftTransferAmount = new BigNumber(fee.deposit)
+  const min = toNano('0.05').toString();
+  let nftTransferAmount = new BigNumber(fee.deposit)
     .minus(fee.refund)
-    .plus(toNano('0.05').toString());
+    .plus(min);
+
+  nftTransferAmount = nftTransferAmount.isLessThan(min)
+    ? new BigNumber(min)
+    : nftTransferAmount;
 
   const total = nftTransferAmount.plus(fee.total);
 
@@ -139,7 +137,7 @@ export const sendNftTransfer = async (
     recipient.toAccount.address.raw,
     nftItem.address,
     BigInt(nftTransferAmount.toString()),
-    recipient.comment ? comment(recipient.comment).asBuilder() : null,
+    recipient.comment ? comment(recipient.comment) : null,
     keyPair.secretKey
   );
 

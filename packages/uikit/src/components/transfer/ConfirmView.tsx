@@ -9,9 +9,14 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import React, { FC, useMemo, useState } from 'react';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { formatter, useFormatCoinValue } from '../../hooks/balance';
+import { formatter } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { getWalletPassword } from '../../state/password';
+import { useTonenpointStock } from '../../state/tonendpoint';
+import { TransferComment } from '../activity/ActivityActionDetails';
+import { ActionFeeDetails } from '../activity/NotificationCommon';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
 import {
   CheckmarkCircleIcon,
   ChevronLeftIcon,
@@ -25,16 +30,9 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Label2 } from '../Text';
-import { TransferComment } from '../activity/ActivityActionDetails';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
-import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
-import {
-  AmountListItem,
-  FeeListItem,
-  RecipientListItem,
-} from './ConfirmListItem';
 import { ButtonBlock, ResultButton, useFiatAmount } from './common';
+import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
+import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 
 const useSendTransaction = (
   recipient: RecipientData,
@@ -89,7 +87,8 @@ export const ConfirmView: FC<{
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
 
-  const { standalone } = useAppContext();
+  const { standalone, fiat } = useAppContext();
+  const { data: stock } = useTonenpointStock();
 
   const { mutateAsync, isLoading, error, reset } = useSendTransaction(
     recipient,
@@ -147,10 +146,6 @@ export const ConfirmView: FC<{
     decimals,
   })} ${symbol}`;
 
-  const format = useFormatCoinValue();
-  const feeAmount = useMemo(() => format(amount.fee.total), [format, amount]);
-  const fiatFeeAmount = useFiatAmount(jettons, CryptoCurrency.TON, feeAmount);
-
   return (
     <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
       <NotificationTitleBlock>
@@ -175,7 +170,7 @@ export const ConfirmView: FC<{
       <ListBlock margin={false} fullWidth>
         <RecipientListItem recipient={recipient} />
         <AmountListItem coinAmount={coinAmount} fiatAmount={fiatAmount} />
-        <FeeListItem feeAmount={feeAmount} fiatFeeAmount={fiatFeeAmount} />
+        <ActionFeeDetails fee={amount.fee} stock={stock} fiat={fiat} />
         <TransferComment comment={recipient.comment} />
       </ListBlock>
       <Gap />

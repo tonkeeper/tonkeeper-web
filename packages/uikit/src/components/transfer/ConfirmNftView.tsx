@@ -3,14 +3,15 @@ import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { sendNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { Fee, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { getWalletPassword } from '../../state/password';
+import { useTonenpointStock } from '../../state/tonendpoint';
 import { TransferComment } from '../activity/ActivityActionDetails';
+import { ActionFeeDetails } from '../activity/NotificationCommon';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
 import {
@@ -26,10 +27,10 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Label1, Label2 } from '../Text';
-import { ButtonBlock, Label, ResultButton, useFaitTonAmount } from './common';
+import { ButtonBlock, Label, ResultButton } from './common';
 
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
-import { FeeListItem, RecipientListItem } from './ConfirmListItem';
+import { RecipientListItem } from './ConfirmListItem';
 
 const useSendNft = (
   recipient: RecipientData,
@@ -67,7 +68,8 @@ export const ConfirmNftView: FC<{
   onBack: () => void;
   onClose: () => void;
 }> = ({ recipient, onBack, onClose, nftItem, fee }) => {
-  const { standalone } = useAppContext();
+  const { standalone, fiat } = useAppContext();
+  const { data: stock } = useTonenpointStock();
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
   const sdk = useAppSdk();
@@ -79,10 +81,6 @@ export const ConfirmNftView: FC<{
   );
 
   const isValid = !isLoading;
-
-  const format = useFormatCoinValue();
-  const feeAmount = useMemo(() => format(fee?.total ?? 0), [format, fee]);
-  const fiatFeeAmount = useFaitTonAmount(feeAmount);
 
   const image = nftItem.previews?.find((item) => item.resolution === '100x100');
 
@@ -116,7 +114,7 @@ export const ConfirmNftView: FC<{
       </Info>
       <ListBlock margin={false} fullWidth>
         <RecipientListItem recipient={recipient} />
-        <FeeListItem feeAmount={feeAmount} fiatFeeAmount={fiatFeeAmount} />
+        {fee && <ActionFeeDetails fee={fee} stock={stock} fiat={fiat} />}
         <TransferComment comment={recipient.comment} />
       </ListBlock>
 

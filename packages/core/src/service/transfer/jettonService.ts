@@ -1,12 +1,5 @@
 import BigNumber from 'bignumber.js';
-import {
-  Address,
-  beginCell,
-  Builder,
-  comment,
-  internal,
-  toNano,
-} from 'ton-core';
+import { Address, beginCell, Cell, comment, internal, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
@@ -32,7 +25,7 @@ const jettonTransferBody = (params: {
   toAddress: Address;
   responseAddress: Address;
   forwardAmount: bigint;
-  forwardPayload: Builder | null;
+  forwardPayload: Cell | null;
 }) => {
   return beginCell()
     .storeUint(0xf8a7ea5, 32) // request_transfer op
@@ -42,8 +35,8 @@ const jettonTransferBody = (params: {
     .storeAddress(params.responseAddress)
     .storeBit(false) // null custom_payload
     .storeCoins(params.forwardAmount)
-    .storeBit(false) // forward_payload in this slice, not separate cell
-    .storeMaybeBuilder(params.forwardPayload)
+    .storeBit(params.forwardPayload != null) // forward_payload in this slice - false, separate cell - true
+    .storeMaybeRef(params.forwardPayload)
     .endCell();
 };
 
@@ -53,7 +46,7 @@ const createJettonTransfer = (
   recipientAddress: string,
   data: AmountValue,
   jettonInfo: JettonBalance,
-  forwardPayload: Builder | null,
+  forwardPayload: Cell | null,
   secretKey: Buffer = Buffer.alloc(64)
 ) => {
   const jettonAmount = data.max
@@ -106,7 +99,7 @@ export const estimateJettonTransfer = async (
     recipient.toAccount.address.raw,
     data,
     jettonInfo,
-    recipient.comment ? comment(recipient.comment).asBuilder() : null
+    recipient.comment ? comment(recipient.comment) : null
   );
 
   const { fee } = await new SendApi(tonApi).estimateTx({
@@ -143,7 +136,7 @@ export const sendJettonTransfer = async (
     recipient.toAccount.address.raw,
     data,
     jettonInfo,
-    recipient.comment ? comment(recipient.comment).asBuilder() : null,
+    recipient.comment ? comment(recipient.comment) : null,
     keyPair.secretKey
   );
 
