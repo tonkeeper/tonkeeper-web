@@ -16,6 +16,7 @@ import {
 } from './common';
 
 const initNftTransferAmount = toNano('1');
+const secondNftTransferAmount = toNano('0.05');
 const nftTransferForwardAmount = BigInt('1');
 
 const nftTransferBody = (params: {
@@ -80,19 +81,21 @@ export const estimateNftTransfer = async (
 ) => {
   const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
 
-  const cell = createNftTransfer(
-    seqno,
-    walletState,
-    recipient.toAccount.address.raw,
-    nftItem.address,
-    initNftTransferAmount,
-    recipient.comment ? comment(recipient.comment) : null
-  );
+  for (let amount of [initNftTransferAmount, secondNftTransferAmount]) {
+    const cell = createNftTransfer(
+      seqno,
+      walletState,
+      recipient.toAccount.address.raw,
+      nftItem.address,
+      amount,
+      recipient.comment ? comment(recipient.comment) : null
+    );
 
-  const { fee } = await new SendApi(tonApi).estimateTx({
-    sendBocRequest: { boc: cell.toString('base64') },
-  });
-  return fee;
+    const { fee } = await new SendApi(tonApi).estimateTx({
+      sendBocRequest: { boc: cell.toString('base64') },
+    });
+    return fee;
+  }
 };
 
 export const sendNftTransfer = async (
