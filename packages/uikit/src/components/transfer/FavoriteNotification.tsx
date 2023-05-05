@@ -33,16 +33,24 @@ const Block = styled.form`
   width: 100%;
 `;
 
+const validateName = (name: string) => {
+  name = name.trim();
+  if (name.length < 1) {
+    throw new Error('Name is to short');
+  }
+  if (name.length > 26) {
+    throw new Error('Name is to large');
+  }
+  return name;
+};
+
 const useAddFavorite = (latest: LatestSuggestion) => {
   const sdk = useAppSdk();
   const wallet = useWalletContext();
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, string>(async (name) => {
-    name = name.trim();
-    if (name.length < 2) {
-      throw new Error('Name is to short');
-    }
+    name = validateName(name);
     const items = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);
     if (items.some((item) => item.name === name)) {
       throw new Error('Name is already taken');
@@ -178,9 +186,7 @@ const useEditFavorite = (favorite: FavoriteSuggestion) => {
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, string>(async (name) => {
-    if (name.length < 2) {
-      throw new Error('Name is to short');
-    }
+    name = validateName(name);
     let items = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);
     if (
       items.some(
