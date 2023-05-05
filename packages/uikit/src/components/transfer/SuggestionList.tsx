@@ -2,12 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   FavoriteSuggestion,
   LatestSuggestion,
-  Suggestion,
+  Suggestion
 } from '@tonkeeper/core/dist/entries/suggestion';
 import {
   deleteFavoriteSuggestion,
   getSuggestionsList,
-  hideSuggestions,
+  hideSuggestions
 } from '@tonkeeper/core/dist/service/suggestionService';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
@@ -24,7 +24,7 @@ import { SkeletonList } from '../Skeleton';
 import { Label1 } from '../Text';
 import {
   AddFavoriteNotification,
-  EditFavoriteNotification,
+  EditFavoriteNotification
 } from './FavoriteNotification';
 
 const Label = styled(Label1)`
@@ -49,15 +49,14 @@ const useLatestSuggestion = () => {
 const Icon = styled.span`
   display: flex;
   color: ${(props) => props.theme.iconSecondary};
+
+  padding: 8px;
+  margin: -8px;
 `;
 
 const IconBlue = styled.span`
   display: inline-flex;
   color: ${(props) => props.theme.accentBlue};
-`;
-
-const FavoriteText = styled.div`
-  user-select: none;
 `;
 
 const getLatestDate = (language: string, timestamp: number) => {
