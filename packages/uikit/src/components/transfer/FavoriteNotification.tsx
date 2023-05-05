@@ -38,7 +38,7 @@ const validateName = (name: string) => {
   if (name.length < 1) {
     throw new Error('Name is to short');
   }
-  if (name.length > 26) {
+  if (name.length > 24) {
     throw new Error('Name is to large');
   }
   return name;
