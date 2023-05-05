@@ -11,27 +11,20 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
+import { ButtonMock } from '../fields/BackButton';
+import { Button } from '../fields/Button';
+import { TextArea } from '../fields/Input';
+import { InputWithScanner } from '../fields/InputWithScanner';
 import { Gap } from '../Layout';
 import {
   FullHeightBlock,
   NotificationCancelButton,
   NotificationTitleBlock,
 } from '../Notification';
-import { Body2, H3, Label1 } from '../Text';
-import { ButtonMock } from '../fields/BackButton';
-import { Button } from '../fields/Button';
-import { TextArea } from '../fields/Input';
-import { InputWithScanner } from '../fields/InputWithScanner';
+import { Body2, H3 } from '../Text';
+import { ButtonBlock } from './common';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
-import { ButtonBlock } from './common';
-
-const Label = styled(Label1)`
-  user-select: none;
-  width: 100%;
-  margin-top: 12px;
-  margin-bottom: -4px;
-`;
 
 const Warning = styled(Body2)`
   user-select: none;
@@ -245,8 +238,6 @@ export const RecipientView: FC<{
           {t('send_screen_steps_comfirm_comment_required_text')}
         </Warning>
       )}
-
-      <Label>{t('send_screen_steps_address_suggests_label')}</Label>
 
       <SuggestionList onSelect={onSelect} disabled={isExternalLoading} />
 

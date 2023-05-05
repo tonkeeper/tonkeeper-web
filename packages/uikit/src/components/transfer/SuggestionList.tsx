@@ -27,6 +27,13 @@ import {
   EditFavoriteNotification,
 } from './FavoriteNotification';
 
+const Label = styled(Label1)`
+  user-select: none;
+  width: 100%;
+  margin-top: 12px;
+  margin-bottom: -4px;
+`;
+
 const useLatestSuggestion = () => {
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
@@ -228,18 +235,29 @@ export const SuggestionList: FC<{
   onSelect: (item: Suggestion) => void;
   disabled?: boolean;
 }> = ({ onSelect, disabled }) => {
+  const { t } = useTranslation();
   const { data } = useLatestSuggestion();
-  const [addFavorite, setAdd] =
-    useState<LatestSuggestion | undefined>(undefined);
-  const [editFavorite, setEdit] =
-    useState<FavoriteSuggestion | undefined>(undefined);
+  const [addFavorite, setAdd] = useState<LatestSuggestion | undefined>(
+    undefined
+  );
+  const [editFavorite, setEdit] = useState<FavoriteSuggestion | undefined>(
+    undefined
+  );
 
   if (!data) {
-    return <SkeletonList size={4} margin={false} fullWidth />;
+    return (
+      <>
+        <Label>{t('send_screen_steps_address_suggests_label')}</Label>
+        <SkeletonList size={4} margin={false} fullWidth />
+      </>
+    );
   }
 
   return (
     <>
+      {data.length > 0 ? (
+        <Label>{t('send_screen_steps_address_suggests_label')}</Label>
+      ) : undefined}
       <ListBlock margin={false} fullWidth noUserSelect>
         {data.map((item) => {
           if (item.isFavorite) {
