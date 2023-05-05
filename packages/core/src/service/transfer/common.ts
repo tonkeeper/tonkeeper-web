@@ -44,6 +44,10 @@ export const forwardPayloadComment = (commentValue: string) => {
   return comment(commentValue).asBuilder();
 };
 
+export const seeIfBalanceError = (e: unknown): e is Error => {
+  return e instanceof Error && e.message.startsWith('Not enough account');
+};
+
 export const checkWalletBalance = (total: BigNumber, wallet: AccountRepr) => {
   if (total.isGreaterThanOrEqualTo(wallet.balance)) {
     throw new Error(

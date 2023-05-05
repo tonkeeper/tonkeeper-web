@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { seeIfBalanceError } from '@tonkeeper/core/dist/service/transfer/common';
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
@@ -39,6 +40,7 @@ const useSendTransaction = (
   amount: AmountData,
   jettons: JettonsBalances
 ) => {
+  const { t } = useTranslation();
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
@@ -47,31 +49,43 @@ const useSendTransaction = (
   return useMutation<boolean, Error>(async () => {
     const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
     if (password === null) return false;
-    if (amount.jetton === CryptoCurrency.TON) {
-      await sendTonTransfer(
-        sdk.storage,
-        tonApi,
-        wallet,
-        recipient,
-        amount,
-        amount.fee,
-        password
-      );
-    } else {
-      const [jettonInfo] = jettons.balances.filter(
-        (item) => item.jettonAddress === amount.jetton
-      );
-      await sendJettonTransfer(
-        sdk.storage,
-        tonApi,
-        wallet,
-        recipient,
-        amount,
-        jettonInfo,
-        amount.fee,
-        password
-      );
+    try {
+      if (amount.jetton === CryptoCurrency.TON) {
+        await sendTonTransfer(
+          sdk.storage,
+          tonApi,
+          wallet,
+          recipient,
+          amount,
+          amount.fee,
+          password
+        );
+      } else {
+        const [jettonInfo] = jettons.balances.filter(
+          (item) => item.jettonAddress === amount.jetton
+        );
+        await sendJettonTransfer(
+          sdk.storage,
+          tonApi,
+          wallet,
+          recipient,
+          amount,
+          jettonInfo,
+          amount.fee,
+          password
+        );
+      }
+    } catch (e) {
+      if (seeIfBalanceError(e)) {
+        sdk.uiEvents.emit('copy', {
+          method: 'copy',
+          params: t('send_screen_steps_amount_insufficient_balance'),
+        });
+      }
+
+      throw e;
     }
+
     await client.invalidateQueries();
     return true;
   });

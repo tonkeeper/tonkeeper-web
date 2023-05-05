@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { seeIfBalanceError } from '@tonkeeper/core/dist/service/transfer/common';
 import { sendNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { Fee, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
@@ -37,6 +38,7 @@ const useSendNft = (
   nftItem: NftItemRepr,
   fee?: Fee
 ) => {
+  const { t } = useTranslation();
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
@@ -46,15 +48,26 @@ const useSendNft = (
     if (!fee) return false;
     const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
     if (password === null) return false;
-    await sendNftTransfer(
-      sdk.storage,
-      tonApi,
-      wallet,
-      recipient,
-      nftItem,
-      fee,
-      password
-    );
+    try {
+      await sendNftTransfer(
+        sdk.storage,
+        tonApi,
+        wallet,
+        recipient,
+        nftItem,
+        fee,
+        password
+      );
+    } catch (e) {
+      if (seeIfBalanceError(e)) {
+        sdk.uiEvents.emit('copy', {
+          method: 'copy',
+          params: t('send_screen_steps_amount_insufficient_balance'),
+        });
+      }
+
+      throw e;
+    }
 
     await client.invalidateQueries();
     return true;
