@@ -69,6 +69,7 @@ const useSendNft = (
       throw e;
     }
 
+    await client.invalidateQueries([wallet.active.rawAddress]);
     await client.invalidateQueries();
     return true;
   });
