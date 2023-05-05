@@ -111,11 +111,21 @@ export interface InputProps {
   label?: string;
   disabled?: boolean;
   helpText?: string;
+  tabIndex?: number;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { type, value, onChange, isValid = true, label, disabled, helpText },
+    {
+      type,
+      value,
+      onChange,
+      isValid = true,
+      label,
+      disabled,
+      helpText,
+      tabIndex,
+    },
     ref
   ) => {
     const [focus, setFocus] = useState(false);
@@ -128,7 +138,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             disabled={disabled}
             type={type}
             value={value}
-            spellcheck={false}
+            spellCheck={false}
+            tabIndex={tabIndex}
             onChange={(e) => onChange && onChange(e.target.value)}
             onFocus={() => setFocus(true)}
             onBlur={() => setFocus(false)}
