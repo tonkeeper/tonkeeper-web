@@ -175,12 +175,12 @@ const useEstimateTransaction = (
   return useMutation(async (options: AmountValue) => {
     try {
       if (jetton === CryptoCurrency.TON) {
-        return estimateTonTransfer(tonApi, wallet, recipient, options);
+        return await estimateTonTransfer(tonApi, wallet, recipient, options);
       } else {
         const [jettonInfo] = jettons.balances.filter(
           (item) => item.jettonAddress === jetton
         );
-        return estimateJettonTransfer(
+        return await estimateJettonTransfer(
           tonApi,
           wallet,
           recipient,

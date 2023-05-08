@@ -1,5 +1,12 @@
 import BigNumber from 'bignumber.js';
-import { beginCell, Cell, comment, external, storeMessage } from 'ton-core';
+import {
+  beginCell,
+  Cell,
+  comment,
+  external,
+  storeMessage,
+  toNano,
+} from 'ton-core';
 
 import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
@@ -51,7 +58,7 @@ export const seeIfBalanceError = (e: unknown): e is Error => {
 export const checkWalletBalance = (total: BigNumber, wallet: AccountRepr) => {
   if (total.isGreaterThanOrEqualTo(wallet.balance)) {
     throw new Error(
-      `Not enough account "${wallet.address}" amount: "${
+      `Not enough account "${wallet.address.bounceable}" amount: "${
         wallet.balance
       }", transaction total: ${total.toString()}`
     );
@@ -59,9 +66,9 @@ export const checkWalletBalance = (total: BigNumber, wallet: AccountRepr) => {
 };
 
 export const checkWalletPositiveBalance = (wallet: AccountRepr) => {
-  if (new BigNumber(wallet.balance).isEqualTo(0)) {
+  if (new BigNumber(wallet.balance).isLessThan(toNano('0.01').toString())) {
     throw new Error(
-      `Not enough account "${wallet.address}" amount: "${wallet.balance}"`
+      `Not enough account "${wallet.address.bounceable}" amount: "${wallet.balance}"`
     );
   }
 };

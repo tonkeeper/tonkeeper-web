@@ -29,9 +29,9 @@ const useNftTransferEstimation = (
 
   return useQuery(
     [QueryKey.estimate, data?.toAccount.address],
-    () => {
+    async () => {
       try {
-        return estimateNftTransfer(tonApi, wallet, data!, nftItem);
+        return await estimateNftTransfer(tonApi, wallet, data!, nftItem);
       } catch (e) {
         if (seeIfBalanceError(e)) {
           sdk.uiEvents.emit('copy', {
