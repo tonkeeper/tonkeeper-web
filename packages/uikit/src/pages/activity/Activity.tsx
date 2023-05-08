@@ -15,6 +15,8 @@ import {
   groupActivityItems,
 } from '../../state/activity';
 
+const pageLimit = 20;
+
 const Activity: FC = () => {
   const wallet = useWalletContext();
   const { tonApi, standalone } = useAppContext();
@@ -27,10 +29,11 @@ const Activity: FC = () => {
       queryFn: ({ pageParam = undefined }) =>
         new EventApi(tonApi).accountEvents({
           account: wallet.active.rawAddress,
-          limit: 20,
+          limit: pageLimit,
           beforeLt: pageParam,
         }),
-      getNextPageParam: (lastPage) => lastPage.nextFrom,
+      getNextPageParam: (lastPage) =>
+        lastPage.events.length >= pageLimit ? lastPage.nextFrom : undefined,
     });
 
   useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, ref);
