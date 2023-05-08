@@ -97,6 +97,7 @@ export const estimateTonTransfer = async (
   recipient: RecipientData,
   data: AmountValue
 ) => {
+  await checkServiceTimeOrDie(tonApi);
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
   if (!data.max) {
     checkWalletPositiveBalanceOrDie(wallet);
@@ -115,6 +116,7 @@ export const estimateTonConnectTransfer = async (
   walletState: WalletState,
   params: TonConnectTransactionPayload
 ) => {
+  await checkServiceTimeOrDie(tonApi);
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
   checkWalletPositiveBalanceOrDie(wallet);
 

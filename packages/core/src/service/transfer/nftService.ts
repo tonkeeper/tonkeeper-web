@@ -80,6 +80,7 @@ export const estimateNftTransfer = async (
   recipient: RecipientData,
   nftItem: NftItemRepr
 ) => {
+  await checkServiceTimeOrDie(tonApi);
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
   checkWalletPositiveBalanceOrDie(wallet);
 

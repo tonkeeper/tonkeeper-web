@@ -92,6 +92,7 @@ export const estimateJettonTransfer = async (
   data: AmountValue,
   jettonInfo: JettonBalance
 ) => {
+  await checkServiceTimeOrDie(tonApi);
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
   checkWalletPositiveBalanceOrDie(wallet);
 
