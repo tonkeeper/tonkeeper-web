@@ -146,7 +146,7 @@ const PasswordUnlock: FC<{
           type="button"
           loading={isLoading}
         >
-          {reason === 'confirm' ? t('cancel') : t('settings_reset')}
+          {t('cancel')}
         </Button>
         <Button
           size="large"
@@ -156,7 +156,7 @@ const PasswordUnlock: FC<{
           disabled={password.length < 5}
           loading={isLoading}
         >
-          {reason === 'confirm' ? t('confirm_sending_submit') : t('Unlock')}
+          {t('confirm')}
         </Button>
       </ButtonRow>
     </Block>

@@ -3,13 +3,14 @@ import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/menmonicSer
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Button } from '../../components/fields/Button';
+import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
 import { TonkeeperIcon } from '../../components/Icon';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
+import { useMutateDeleteAll } from '../../state/account';
 
 const Block = styled.form<{ minHeight?: string }>`
   display: flex;
@@ -24,6 +25,8 @@ const Block = styled.form<{ minHeight?: string }>`
 
   justify-content: center;
   gap: 1rem;
+
+  position: relative;
 `;
 
 const Logo = styled.div`
@@ -60,11 +63,16 @@ const useMutateUnlock = () => {
 };
 
 export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
+  const sdk = useAppSdk();
   const { t } = useTranslation();
 
   const ref = useRef<HTMLInputElement | null>(null);
+  const { mutate: mutateLogOut, isLoading: isLogOutLoading } =
+    useMutateDeleteAll();
   const { mutate, isLoading, isError, reset } = useMutateUnlock();
   const [password, setPassword] = useState('');
+
+  const disabled = isLogOutLoading || isLoading;
 
   useEffect(() => {
     if (ref.current) {
@@ -82,6 +90,13 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
     mutate(password);
   };
 
+  const onLogOut = async () => {
+    const confirm = await sdk.confirm(t('Delete_wallet_data_description'));
+    if (confirm) {
+      await mutateLogOut();
+    }
+  };
+
   return (
     <Block minHeight={minHeight} onSubmit={onSubmit}>
       <Logo>
@@ -96,9 +111,31 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
         isValid={!isError}
         disabled={isLoading}
       />
-      <Button size="large" primary fullWidth type="submit" loading={isLoading}>
-        {t('Unlock')}
-      </Button>
+      <ButtonRow>
+        <Button
+          marginTop
+          size="large"
+          secondary
+          fullWidth
+          type="button"
+          disabled={disabled}
+          loading={isLogOutLoading}
+          onClick={onLogOut}
+        >
+          {t('settings_reset')}
+        </Button>
+        <Button
+          marginTop
+          size="large"
+          primary
+          fullWidth
+          type="submit"
+          disabled={disabled}
+          loading={isLoading}
+        >
+          {t('Unlock')}
+        </Button>
+      </ButtonRow>
     </Block>
   );
 };

@@ -25,7 +25,6 @@ export const InputBlock = styled.div<{
 
   &:focus-within label {
     transform: translate(0, 6px) scale(0.7);
-    color: ${(props) => props.theme.fieldActiveBorder};
   }
 
   ${(props) =>
@@ -70,7 +69,7 @@ export const Label = styled.label<{ active?: boolean }>`
   transform: translate(0, 20px) scale(1);
   transform-origin: top left;
   transition: 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
-  color: ${(props) => props.theme.textPrimary};
+  color: ${(props) => props.theme.textSecondary};
   font-size: 16px;
   line-height: 1;
   left: 1rem;
