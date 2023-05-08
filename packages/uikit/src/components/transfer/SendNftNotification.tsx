@@ -4,7 +4,6 @@ import {
   parseTonTransfer,
   TonTransferParams,
 } from '@tonkeeper/core/dist/service/deeplinkingService';
-import { seeIfBalanceError } from '@tonkeeper/core/dist/service/transfer/common';
 import { estimateNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useCallback, useRef, useState } from 'react';
@@ -14,7 +13,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { Notification } from '../Notification';
-import { childFactoryCreator, duration, Wrapper } from './common';
+import { childFactoryCreator, duration, notifyError, Wrapper } from './common';
 import { ConfirmNftView } from './ConfirmNftView';
 import { RecipientView, useGetToAccount } from './RecipientView';
 
@@ -33,14 +32,7 @@ const useNftTransferEstimation = (
       try {
         return await estimateNftTransfer(tonApi, wallet, data!, nftItem);
       } catch (e) {
-        if (seeIfBalanceError(e)) {
-          sdk.uiEvents.emit('copy', {
-            method: 'copy',
-            params: t('send_screen_steps_amount_insufficient_balance'),
-          });
-        }
-
-        throw e;
+        notifyError(sdk, t, e);
       }
     },
     { enabled: data != null }

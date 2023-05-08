@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { seeIfBalanceError } from '@tonkeeper/core/dist/service/transfer/common';
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
@@ -31,7 +30,12 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Label2 } from '../Text';
-import { ButtonBlock, ResultButton, useFiatAmount } from './common';
+import {
+  ButtonBlock,
+  notifyError,
+  ResultButton,
+  useFiatAmount,
+} from './common';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 
@@ -76,14 +80,7 @@ const useSendTransaction = (
         );
       }
     } catch (e) {
-      if (seeIfBalanceError(e)) {
-        sdk.uiEvents.emit('copy', {
-          method: 'copy',
-          params: t('send_screen_steps_amount_insufficient_balance'),
-        });
-      }
-
-      throw e;
+      notifyError(sdk, t, e);
     }
 
     await client.invalidateQueries([wallet.active.rawAddress]);

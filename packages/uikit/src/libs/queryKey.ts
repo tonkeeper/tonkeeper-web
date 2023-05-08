@@ -12,6 +12,7 @@ export enum QueryKey {
   tonkeeperApi = 'tonkeeperApi',
   estimate = 'estimate',
   dns = 'dns',
+  system = 'system',
 }
 
 export enum JettonKey {

@@ -5,7 +5,6 @@ import {
   AmountValue,
   RecipientData,
 } from '@tonkeeper/core/dist/entries/send';
-import { seeIfBalanceError } from '@tonkeeper/core/dist/service/transfer/common';
 import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
@@ -52,7 +51,7 @@ import {
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
 import { defaultSize, getInputSize, useButtonPosition } from './amountHooks';
 import { AssetSelect } from './AssetSelect';
-import { ButtonBlock, useSecondAmountWithSymbol } from './common';
+import { ButtonBlock, notifyError, useSecondAmountWithSymbol } from './common';
 import { InputSize, Sentence } from './Sentence';
 
 const Center = styled.div`
@@ -197,13 +196,7 @@ const useEstimateTransaction = (
         );
       }
     } catch (e) {
-      if (seeIfBalanceError(e)) {
-        sdk.uiEvents.emit('copy', {
-          method: 'copy',
-          params: t('send_screen_steps_amount_insufficient_balance'),
-        });
-      }
-
+      notifyError(sdk, t, e);
       throw e;
     }
   });

@@ -7,6 +7,7 @@ import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import React, { FC } from 'react';
 import { Balance } from '../../components/home/Balance';
 import { CompactView } from '../../components/home/CompactView';
+import { DateSyncBanner } from '../../components/home/SyncBunner';
 import { TabsView } from '../../components/home/TabsView';
 import { HomeActions } from '../../components/home/TonActions';
 import { HomeSkeleton } from '../../components/Skeleton';
@@ -64,6 +65,7 @@ const Home = () => {
 
   return (
     <>
+      <DateSyncBanner />
       <Balance
         address={wallet.active.friendlyAddress}
         currency={fiat}

@@ -32,6 +32,7 @@ export interface IAppSdk {
   version: string;
 
   confirm: (text: string) => Promise<boolean>;
+  alert: (text: string) => Promise<void>;
 }
 
 export class MockAppSdk implements IAppSdk {
@@ -51,4 +52,5 @@ export class MockAppSdk implements IAppSdk {
   uiEvents = new EventEmitter();
   version = '0.0.0';
   confirm = async () => false;
+  alert = async () => void 0;
 }

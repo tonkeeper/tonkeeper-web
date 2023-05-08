@@ -11,6 +11,7 @@ export class DesktopAppSdk implements IAppSdk {
   };
 
   confirm = async (text: string) => false;
+  alert = async (text: string) => window.alert(text);
 
   uiEvents = new EventEmitter();
   version = packageJson.version ?? 'Unknown';

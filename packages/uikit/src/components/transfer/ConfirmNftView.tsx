@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { seeIfBalanceError } from '@tonkeeper/core/dist/service/transfer/common';
 import { sendNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { Fee, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
@@ -28,7 +27,7 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Label1, Label2 } from '../Text';
-import { ButtonBlock, Label, ResultButton } from './common';
+import { ButtonBlock, Label, notifyError, ResultButton } from './common';
 
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { RecipientListItem } from './ConfirmListItem';
@@ -59,14 +58,7 @@ const useSendNft = (
         password
       );
     } catch (e) {
-      if (seeIfBalanceError(e)) {
-        sdk.uiEvents.emit('copy', {
-          method: 'copy',
-          params: t('send_screen_steps_amount_insufficient_balance'),
-        });
-      }
-
-      throw e;
+      notifyError(sdk, t, e);
     }
 
     await client.invalidateQueries([wallet.active.rawAddress]);

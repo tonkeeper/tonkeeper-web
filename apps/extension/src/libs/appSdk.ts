@@ -28,6 +28,7 @@ export class ExtensionAppSdk implements IAppSdk {
   };
 
   confirm = async (text: string) => window.confirm(text);
+  alert = async (text: string) => window.alert(text);
 
   uiEvents = new EventEmitter();
   version = packageJson.version ?? 'Unknown';

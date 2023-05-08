@@ -10,8 +10,9 @@ import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
-  checkWalletBalance,
-  checkWalletPositiveBalance,
+  checkServiceTimeOrDie,
+  checkWalletBalanceOrDie,
+  checkWalletPositiveBalanceOrDie,
   externalMessage,
   getWalletBalance,
   getWalletSeqNo,
@@ -98,7 +99,7 @@ export const estimateTonTransfer = async (
 ) => {
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
   if (!data.max) {
-    checkWalletPositiveBalance(wallet);
+    checkWalletPositiveBalanceOrDie(wallet);
   }
 
   const cell = createTonTransfer(seqno, walletState, recipient, data);
@@ -115,7 +116,7 @@ export const estimateTonConnectTransfer = async (
   params: TonConnectTransactionPayload
 ) => {
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
-  checkWalletPositiveBalance(wallet);
+  checkWalletPositiveBalanceOrDie(wallet);
 
   const cell = createTonConnectTransfer(seqno, walletState, params);
 
@@ -131,6 +132,7 @@ export const sendTonConnectTransfer = async (
   params: TonConnectTransactionPayload,
   password: string
 ) => {
+  await checkServiceTimeOrDie(tonApi);
   const mnemonic = await getWalletMnemonic(
     storage,
     walletState.publicKey,
@@ -160,6 +162,7 @@ export const sendTonTransfer = async (
   fee: Fee,
   password: string
 ) => {
+  await checkServiceTimeOrDie(tonApi);
   const mnemonic = await getWalletMnemonic(
     storage,
     walletState.publicKey,
@@ -171,7 +174,7 @@ export const sendTonTransfer = async (
 
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
   if (!data.max) {
-    checkWalletBalance(total, wallet);
+    checkWalletBalanceOrDie(total, wallet);
   }
 
   const cell = createTonTransfer(

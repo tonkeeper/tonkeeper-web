@@ -16,6 +16,7 @@ import {
   AccountApi,
   AccountRepr,
   Configuration,
+  SystemApi,
   WalletApi,
 } from '../../tonApiV1';
 
@@ -55,7 +56,10 @@ export const seeIfBalanceError = (e: unknown): e is Error => {
   return e instanceof Error && e.message.startsWith('Not enough account');
 };
 
-export const checkWalletBalance = (total: BigNumber, wallet: AccountRepr) => {
+export const checkWalletBalanceOrDie = (
+  total: BigNumber,
+  wallet: AccountRepr
+) => {
   if (total.isGreaterThanOrEqualTo(wallet.balance)) {
     throw new Error(
       `Not enough account "${wallet.address.bounceable}" amount: "${
@@ -65,7 +69,7 @@ export const checkWalletBalance = (total: BigNumber, wallet: AccountRepr) => {
   }
 };
 
-export const checkWalletPositiveBalance = (wallet: AccountRepr) => {
+export const checkWalletPositiveBalanceOrDie = (wallet: AccountRepr) => {
   if (new BigNumber(wallet.balance).isLessThan(toNano('0.01').toString())) {
     throw new Error(
       `Not enough account "${wallet.address.bounceable}" amount: "${wallet.balance}"`
@@ -98,4 +102,24 @@ export const getWalletBalance = async (
   const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
 
   return [wallet, seqno] as const;
+};
+
+export const seeIfServiceTimeSync = async (tonApi: Configuration) => {
+  const { time } = await new SystemApi(tonApi).currentTime();
+  const isSynced = Math.abs(Date.now() - time * 1000) <= 7000;
+
+  return isSynced;
+};
+
+export const seeIfTimeError = (e: unknown): e is Error => {
+  return (
+    e instanceof Error && e.message.startsWith('Time and date are incorrect')
+  );
+};
+
+export const checkServiceTimeOrDie = async (tonApi: Configuration) => {
+  const isSynced = await seeIfServiceTimeSync(tonApi);
+  if (!isSynced) {
+    throw new Error('Time and date are incorrect');
+  }
 };

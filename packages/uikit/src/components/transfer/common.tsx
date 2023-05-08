@@ -1,4 +1,9 @@
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import {
+  seeIfBalanceError,
+  seeIfTimeError,
+} from '@tonkeeper/core/dist/service/transfer/common';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import {
   getCoinAmountValue,
@@ -230,4 +235,23 @@ export const useSecondAmountWithSymbol = (
       })} ${fiat}`;
     }
   }, [stock, jettons, fiat, jetton, amount, inFiat]);
+};
+
+export const notifyError = (
+  sdk: IAppSdk,
+  t: (value: string) => string,
+  error: unknown
+) => {
+  if (seeIfBalanceError(error)) {
+    sdk.uiEvents.emit('copy', {
+      method: 'copy',
+      params: t('send_screen_steps_amount_insufficient_balance'),
+    });
+  }
+
+  if (seeIfTimeError(error)) {
+    sdk.alert(t('send_sending_wrong_time_description'));
+  }
+
+  throw error;
 };

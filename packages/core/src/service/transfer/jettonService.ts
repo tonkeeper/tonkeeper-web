@@ -9,8 +9,9 @@ import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
-  checkWalletBalance,
-  checkWalletPositiveBalance,
+  checkServiceTimeOrDie,
+  checkWalletBalanceOrDie,
+  checkWalletPositiveBalanceOrDie,
   externalMessage,
   getWalletBalance,
   SendMode,
@@ -92,7 +93,7 @@ export const estimateJettonTransfer = async (
   jettonInfo: JettonBalance
 ) => {
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
-  checkWalletPositiveBalance(wallet);
+  checkWalletPositiveBalanceOrDie(wallet);
 
   const cell = createJettonTransfer(
     seqno,
@@ -119,6 +120,7 @@ export const sendJettonTransfer = async (
   fee: Fee,
   password: string
 ) => {
+  await checkServiceTimeOrDie(tonApi);
   const mnemonic = await getWalletMnemonic(
     storage,
     walletState.publicKey,
@@ -129,7 +131,7 @@ export const sendJettonTransfer = async (
   const total = new BigNumber(fee.total).plus(jettonTransferAmount.toString());
 
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
-  checkWalletBalance(total, wallet);
+  checkWalletBalanceOrDie(total, wallet);
 
   const cell = createJettonTransfer(
     seqno,
