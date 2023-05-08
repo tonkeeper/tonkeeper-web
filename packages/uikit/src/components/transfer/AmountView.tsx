@@ -162,6 +162,14 @@ const InputBlock = styled.div`
   align-items: flex-end;
 `;
 
+const Name = styled.span`
+  color: ${(props) => props.theme.textPrimary};
+  margin-left: 4px;
+`;
+const Address = styled.span`
+  margin-left: 4px;
+`;
+
 const useEstimateTransaction = (
   recipient: RecipientData,
   jetton: string,
@@ -431,6 +439,8 @@ export const AmountView: FC<{
     }
   };
 
+  const address = toShortAddress(recipient.toAccount.address.bounceable);
+
   return (
     <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
       <NotificationTitleBlock>
@@ -440,11 +450,11 @@ export const AmountView: FC<{
         <Center>
           <Title>{t('txActions_amount')}</Title>
           <SubTitle>
-            {t('send_screen_steps_done_to').replace(
-              '%{name}',
-              recipient.toAccount.name ??
-                toShortAddress(recipient.toAccount.address.bounceable)
+            {t('send_screen_steps_done_to').replace('%{name}', '')}
+            {recipient.toAccount.name && (
+              <Name>{recipient.toAccount.name}</Name>
             )}
+            <Address>{address}</Address>
           </SubTitle>
         </Center>
         <NotificationCancelButton handleClose={onClose} />
