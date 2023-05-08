@@ -13,6 +13,7 @@ export enum QueryKey {
   estimate = 'estimate',
   dns = 'dns',
   system = 'system',
+  syncDate = 'syncDate',
 }
 
 export enum JettonKey {

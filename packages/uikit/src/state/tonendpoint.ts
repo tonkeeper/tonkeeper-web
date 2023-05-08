@@ -4,7 +4,6 @@ import {
   localizationText,
 } from '@tonkeeper/core/dist/entries/language';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { seeIfServiceTimeSync } from '@tonkeeper/core/dist/service/transfer/common';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import {
   getFiatMethods,
@@ -62,12 +61,5 @@ export const useTonenpointFiatMethods = (tonendpoint: Tonendpoint) => {
     async () => {
       return getFiatMethods(tonendpoint);
     }
-  );
-};
-
-export const useServiceTimeIsSync = () => {
-  const { tonApi } = useAppContext();
-  return useQuery<boolean, Error>([QueryKey.system], () =>
-    seeIfServiceTimeSync(tonApi)
   );
 };

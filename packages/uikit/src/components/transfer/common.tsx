@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/react-query';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
@@ -15,6 +16,7 @@ import React, { PropsWithChildren, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { formatFiatCurrency, formatter } from '../../hooks/balance';
+import { cleanSyncDateBanner } from '../../state/syncDate';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { Body1 } from '../Text';
 
@@ -237,7 +239,8 @@ export const useSecondAmountWithSymbol = (
   }, [stock, jettons, fiat, jetton, amount, inFiat]);
 };
 
-export const notifyError = (
+export const notifyError = async (
+  client: QueryClient,
   sdk: IAppSdk,
   t: (value: string) => string,
   error: unknown
@@ -250,6 +253,7 @@ export const notifyError = (
   }
 
   if (seeIfTimeError(error)) {
+    await cleanSyncDateBanner(client, sdk);
     sdk.alert(t('send_sending_wrong_time_description'));
   }
 

@@ -11,4 +11,5 @@ export enum AppKey {
   favorites = 'favorites',
   connections = 'connections',
   hiddenSuggestions = 'hiddenSuggestions',
+  syncDate = 'syncDate',
 }

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
   parseTonTransfer,
@@ -25,6 +25,7 @@ const useNftTransferEstimation = (
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
+  const client = useQueryClient();
 
   return useQuery(
     [QueryKey.estimate, data?.toAccount.address],
@@ -32,7 +33,7 @@ const useNftTransferEstimation = (
       try {
         return await estimateNftTransfer(tonApi, wallet, data!, nftItem);
       } catch (e) {
-        notifyError(sdk, t, e);
+        await notifyError(client, sdk, t, e);
       }
     },
     { enabled: data != null }

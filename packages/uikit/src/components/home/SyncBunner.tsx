@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
-import { useServiceTimeIsSync } from '../../state/tonendpoint';
+import {
+  useMutateSyncDateBanner,
+  useServiceTimeIsSync,
+  useSyncDateBanner,
+} from '../../state/syncDate';
 import { CloseIcon } from '../Icon';
 import { Body2, Label1 } from '../Text';
 
@@ -36,15 +40,16 @@ export const DateSyncBanner = () => {
   const { data: isSync } = useServiceTimeIsSync();
   const { t } = useTranslation();
 
-  const [open, setOpen] = useState(true);
+  const { data: open } = useSyncDateBanner();
+  const { mutate } = useMutateSyncDateBanner();
 
-  if (isSync !== false || open === false) {
+  if (isSync !== false || open !== true) {
     return null;
   }
 
   return (
     <Block>
-      <Close onClick={() => setOpen(false)}>
+      <Close onClick={() => mutate(false)}>
         <CloseIcon />
       </Close>
       <Label1>{t('notify_incorrect_time_err_title')}</Label1>

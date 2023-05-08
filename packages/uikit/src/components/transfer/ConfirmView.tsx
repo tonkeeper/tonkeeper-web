@@ -80,7 +80,7 @@ const useSendTransaction = (
         );
       }
     } catch (e) {
-      notifyError(sdk, t, e);
+      await notifyError(client, sdk, t, e);
     }
 
     await client.invalidateQueries([wallet.active.rawAddress]);

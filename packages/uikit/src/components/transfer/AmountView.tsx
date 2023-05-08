@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
   AmountData,
@@ -178,6 +178,7 @@ const useEstimateTransaction = (
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
+  const client = useQueryClient();
 
   return useMutation(async (options: AmountValue) => {
     try {
@@ -196,7 +197,7 @@ const useEstimateTransaction = (
         );
       }
     } catch (e) {
-      notifyError(sdk, t, e);
+      await notifyError(client, sdk, t, e);
       throw e;
     }
   });
