@@ -5,6 +5,7 @@ import {
   AmountValue,
   RecipientData,
 } from '@tonkeeper/core/dist/entries/send';
+import { seeIfBalanceError } from '@tonkeeper/core/dist/service/transfer/common';
 import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
@@ -35,6 +36,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
@@ -165,23 +167,36 @@ const useEstimateTransaction = (
   jetton: string,
   jettons: JettonsBalances
 ) => {
+  const { t } = useTranslation();
+  const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
 
   return useMutation(async (options: AmountValue) => {
-    if (jetton === CryptoCurrency.TON) {
-      return estimateTonTransfer(tonApi, wallet, recipient, options);
-    } else {
-      const [jettonInfo] = jettons.balances.filter(
-        (item) => item.jettonAddress === jetton
-      );
-      return estimateJettonTransfer(
-        tonApi,
-        wallet,
-        recipient,
-        options,
-        jettonInfo
-      );
+    try {
+      if (jetton === CryptoCurrency.TON) {
+        return estimateTonTransfer(tonApi, wallet, recipient, options);
+      } else {
+        const [jettonInfo] = jettons.balances.filter(
+          (item) => item.jettonAddress === jetton
+        );
+        return estimateJettonTransfer(
+          tonApi,
+          wallet,
+          recipient,
+          options,
+          jettonInfo
+        );
+      }
+    } catch (e) {
+      if (seeIfBalanceError(e)) {
+        sdk.uiEvents.emit('copy', {
+          method: 'copy',
+          params: t('send_screen_steps_amount_insufficient_balance'),
+        });
+      }
+
+      throw e;
     }
   });
 };

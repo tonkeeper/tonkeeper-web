@@ -58,6 +58,14 @@ export const checkWalletBalance = (total: BigNumber, wallet: AccountRepr) => {
   }
 };
 
+export const checkWalletPositiveBalance = (wallet: AccountRepr) => {
+  if (new BigNumber(wallet.balance).isGreaterThan(0)) {
+    throw new Error(
+      `Not enough account "${wallet.address}" amount: "${wallet.balance}"`
+    );
+  }
+};
+
 export const getWalletSeqNo = async (
   tonApi: Configuration,
   account: string

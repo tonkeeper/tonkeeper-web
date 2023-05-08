@@ -4,6 +4,7 @@ import {
   parseTonTransfer,
   TonTransferParams,
 } from '@tonkeeper/core/dist/service/deeplinkingService';
+import { seeIfBalanceError } from '@tonkeeper/core/dist/service/transfer/common';
 import { estimateNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useCallback, useRef, useState } from 'react';
@@ -21,13 +22,26 @@ const useNftTransferEstimation = (
   nftItem: NftItemRepr,
   data?: RecipientData
 ) => {
+  const { t } = useTranslation();
+  const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
 
   return useQuery(
     [QueryKey.estimate, data?.toAccount.address],
     () => {
-      return estimateNftTransfer(tonApi, wallet, data!, nftItem);
+      try {
+        return estimateNftTransfer(tonApi, wallet, data!, nftItem);
+      } catch (e) {
+        if (seeIfBalanceError(e)) {
+          sdk.uiEvents.emit('copy', {
+            method: 'copy',
+            params: t('send_screen_steps_amount_insufficient_balance'),
+          });
+        }
+
+        throw e;
+      }
     },
     { enabled: data != null }
   );
@@ -44,8 +58,9 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
   const confirmRef = useRef<HTMLDivElement>(null);
 
   const [right, setRight] = useState(true);
-  const [recipient, setRecipient] =
-    useState<RecipientData | undefined>(undefined);
+  const [recipient, setRecipient] = useState<RecipientData | undefined>(
+    undefined
+  );
 
   const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
     useGetToAccount();

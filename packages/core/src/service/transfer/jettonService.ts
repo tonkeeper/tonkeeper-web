@@ -10,9 +10,9 @@ import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
   checkWalletBalance,
+  checkWalletPositiveBalance,
   externalMessage,
   getWalletBalance,
-  getWalletSeqNo,
   SendMode,
 } from './common';
 
@@ -91,7 +91,8 @@ export const estimateJettonTransfer = async (
   data: AmountValue,
   jettonInfo: JettonBalance
 ) => {
-  const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
+  const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+  checkWalletPositiveBalance(wallet);
 
   const cell = createJettonTransfer(
     seqno,

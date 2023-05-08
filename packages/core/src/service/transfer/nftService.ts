@@ -9,9 +9,9 @@ import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
   checkWalletBalance,
+  checkWalletPositiveBalance,
   externalMessage,
   getWalletBalance,
-  getWalletSeqNo,
   SendMode,
 } from './common';
 
@@ -79,23 +79,22 @@ export const estimateNftTransfer = async (
   recipient: RecipientData,
   nftItem: NftItemRepr
 ) => {
-  const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
+  const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+  checkWalletPositiveBalance(wallet);
 
-  for (let amount of [initNftTransferAmount, secondNftTransferAmount]) {
-    const cell = createNftTransfer(
-      seqno,
-      walletState,
-      recipient.toAccount.address.raw,
-      nftItem.address,
-      amount,
-      recipient.comment ? comment(recipient.comment) : null
-    );
+  const cell = createNftTransfer(
+    seqno,
+    walletState,
+    recipient.toAccount.address.raw,
+    nftItem.address,
+    initNftTransferAmount,
+    recipient.comment ? comment(recipient.comment) : null
+  );
 
-    const { fee } = await new SendApi(tonApi).estimateTx({
-      sendBocRequest: { boc: cell.toString('base64') },
-    });
-    return fee;
-  }
+  const { fee } = await new SendApi(tonApi).estimateTx({
+    sendBocRequest: { boc: cell.toString('base64') },
+  });
+  return fee;
 };
 
 export const sendNftTransfer = async (
