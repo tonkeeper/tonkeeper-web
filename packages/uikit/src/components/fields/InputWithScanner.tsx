@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { ScanIcon } from '../Icon';
+import { ScanIcon, XmarkIcon } from '../Icon';
 import { InputBlock, Label } from './Input';
 import { TextareaAutosize } from './TextareaAutosize';
 
@@ -16,11 +16,27 @@ export interface InputWithScanner {
   disabled?: boolean;
 }
 
-const ScanBlock = styled.div<{ ios: boolean }>`
+const ClearBlock = styled.div`
   position: absolute;
   right: 1rem;
-  top: ${(props) => (props.ios ? '14px' : '13px')};
+  height: 100%;
   display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: ${(props) => props.theme.textSecondary};
+
+  &:hover {
+    color: ${(props) => props.theme.textTertiary};
+  }
+`;
+
+const ScanBlock = styled.div`
+  position: absolute;
+  right: 1rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 
   color: ${(props) => props.theme.accentBlue};
 `;
@@ -37,6 +53,13 @@ export const InputWithScanner = React.forwardRef<
     const [scanId, setScanId] = useState<number | undefined>(undefined);
     const sdk = useAppSdk();
     const { ios } = useAppContext();
+
+    const onClear: React.MouseEventHandler<HTMLDivElement> = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (disabled) return;
+      onChange && onChange('');
+    };
 
     const onClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
       e.stopPropagation();
@@ -81,9 +104,15 @@ export const InputWithScanner = React.forwardRef<
         />
         {label && <Label active={value != ''}>{label}</Label>}
 
-        <ScanBlock ios={ios} onClick={onClick}>
-          <ScanIcon />
-        </ScanBlock>
+        {value == '' ? (
+          <ScanBlock onClick={onClick}>
+            <ScanIcon />
+          </ScanBlock>
+        ) : (
+          <ClearBlock onClick={onClear}>
+            <XmarkIcon />
+          </ClearBlock>
+        )}
       </InputBlock>
     );
   }
