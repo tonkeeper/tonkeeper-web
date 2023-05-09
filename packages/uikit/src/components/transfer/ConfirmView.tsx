@@ -147,11 +147,7 @@ export const ConfirmView: FC<{
     ] as const;
   }, [amount.jetton, jettons, t]);
 
-  const fiatAmount = useFiatAmount(
-    jettons,
-    amount.jetton,
-    amount.amount.toFormat()
-  );
+  const fiatAmount = useFiatAmount(jettons, amount.jetton, amount.amount);
 
   const coinAmount = `${formatter.format(amount.amount, {
     ignoreZeroTruncate: false,

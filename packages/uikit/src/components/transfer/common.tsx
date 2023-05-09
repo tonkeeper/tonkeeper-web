@@ -1,11 +1,14 @@
 import { QueryClient } from '@tanstack/react-query';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
   seeIfBalanceError,
   seeIfTimeError,
 } from '@tonkeeper/core/dist/service/transfer/common';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
+import {
+  getDecimalSeparator,
+  getGroupSeparator,
+} from '@tonkeeper/core/dist/utils/formatting';
 import {
   getCoinAmountValue,
   getFiatAmountValue,
@@ -159,27 +162,10 @@ export const childFactoryCreator =
       timeout: duration,
     });
 
-export const useFaitTonAmount = (amount: string) => {
-  const { fiat } = useAppContext();
-  const { data: stock } = useTonenpointStock();
-
-  return useMemo(() => {
-    const fiatAmount = getFiatAmountValue(
-      stock,
-      { balances: [] },
-      fiat,
-      CryptoCurrency.TON,
-      amount
-    );
-    if (fiatAmount === undefined) return undefined;
-    return formatFiatCurrency(fiat, fiatAmount);
-  }, [stock, fiat, amount]);
-};
-
 export const useFiatAmount = (
   jettons: JettonsBalances,
   jetton: string,
-  amount: number | string
+  amount: BigNumber
 ) => {
   const { fiat } = useAppContext();
   const { data: stock } = useTonenpointStock();
@@ -190,7 +176,10 @@ export const useFiatAmount = (
       jettons,
       fiat,
       jetton,
-      amount.toString()
+      amount.toFormat({
+        decimalSeparator: getDecimalSeparator(),
+        groupSeparator: getGroupSeparator(),
+      })
     );
     if (fiatAmount === undefined) return undefined;
     return formatFiatCurrency(fiat, fiatAmount);
