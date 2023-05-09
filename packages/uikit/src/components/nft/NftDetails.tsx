@@ -46,7 +46,7 @@ export const NftDetails: FC<{ nftItem: NftItemRepr; kind: NFTKind }> =
         <Row>
           <H3>{t('nft_details')}</H3>
           <Link
-            onClick={() => sdk.openPage(`https://tonapi.io/account/${address}`)}
+            onClick={() => sdk.openPage(`https://tonviewer.com/${address}`)}
           >
             {t('nft_view_in_explorer')}
           </Link>

@@ -289,7 +289,7 @@ export const ActionDetailsBlock: FC<
         size="large"
         fullWidth
         onClick={() =>
-          sdk.openPage(`https://tonapi.io/transaction/${event.eventId}`)
+          sdk.openPage(`https://tonviewer.com/transaction/${event.eventId}`)
         }
       >
         {t('nft_view_in_explorer')}
