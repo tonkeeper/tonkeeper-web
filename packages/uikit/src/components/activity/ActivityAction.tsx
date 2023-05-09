@@ -4,7 +4,7 @@ import React, { FC } from 'react';
 import {
   ActivityIcon,
   ReceiveIcon,
-  SentIcon,
+  SentIcon
 } from '../../components/activity/ActivityIcons';
 import { ListItemPayload } from '../../components/List';
 import { useWalletContext } from '../../hooks/appContext';
@@ -20,7 +20,7 @@ import {
   FirstLine,
   ListItemGrid,
   SecondaryText,
-  SecondLine,
+  SecondLine
 } from './CommonAction';
 import { ContractDeployAction } from './ContractDeployAction';
 import { NftComment, NftItemTransferAction } from './NftActivity';
