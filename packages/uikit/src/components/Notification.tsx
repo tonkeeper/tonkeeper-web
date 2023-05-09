@@ -204,11 +204,12 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
       if (!element) return;
 
       let lastY = 0;
+      let startY = 0;
       let maxScrollTop = 0;
       let startScroll = 0;
 
       const handlerTouchStart = function (event: TouchEvent) {
-        lastY = event.touches[0].clientY;
+        lastY = startY = event.touches[0].clientY;
         let style = window.getComputedStyle(element);
         let outerHeight = ['height', 'padding-top', 'padding-bottom']
           .map((key) => parseInt(style.getPropertyValue(key), 10))
@@ -221,14 +222,17 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
       const handlerTouchMove = function (event: TouchEvent) {
         var top = event.touches[0].clientY;
 
-        var direction = lastY - top < 0 ? 'up' : 'down';
+        var direction = lastY - top < 0 ? 'down' : 'up';
         if (event.cancelable) {
-          if (startScroll <= 0 && direction === 'up') {
-            console.log('touchend', startScroll, direction);
+          if (startScroll <= 0 && direction === 'down') {
+            if (startY - top < -10) {
+              // pool down more then 10px
+              console.log('touchend', startScroll, direction, startY - top);
 
-            window.addEventListener('touchend', handleClose);
-            window.addEventListener('touchcancel', handleClose);
-          } else if (startScroll >= maxScrollTop && direction === 'down') {
+              window.addEventListener('touchend', handleClose);
+              window.addEventListener('touchcancel', handleClose);
+            }
+          } else if (startScroll >= maxScrollTop && direction === 'up') {
             event.preventDefault();
           }
         }

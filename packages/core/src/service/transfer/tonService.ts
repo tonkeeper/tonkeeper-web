@@ -1,20 +1,22 @@
 import BigNumber from 'bignumber.js';
 import { Address, Cell, internal } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
-import { IStorage } from '../../Storage';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
+import { IStorage } from '../../Storage';
 import { Configuration, Fee, SendApi } from '../../tonApiV1';
 import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
-  SendMode,
-  checkWalletBalance,
+  checkServiceTimeOrDie,
+  checkWalletBalanceOrDie,
+  checkWalletPositiveBalanceOrDie,
   externalMessage,
   getWalletBalance,
   getWalletSeqNo,
+  SendMode,
 } from './common';
 
 const seeIfBounceable = (address: string) => {
@@ -95,7 +97,12 @@ export const estimateTonTransfer = async (
   recipient: RecipientData,
   data: AmountValue
 ) => {
-  const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
+  await checkServiceTimeOrDie(tonApi);
+  const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+  if (!data.max) {
+    checkWalletPositiveBalanceOrDie(wallet);
+  }
+
   const cell = createTonTransfer(seqno, walletState, recipient, data);
 
   const { fee } = await new SendApi(tonApi).estimateTx({
@@ -109,7 +116,10 @@ export const estimateTonConnectTransfer = async (
   walletState: WalletState,
   params: TonConnectTransactionPayload
 ) => {
-  const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
+  await checkServiceTimeOrDie(tonApi);
+  const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+  checkWalletPositiveBalanceOrDie(wallet);
+
   const cell = createTonConnectTransfer(seqno, walletState, params);
 
   return await new SendApi(tonApi).estimateTx({
@@ -124,6 +134,7 @@ export const sendTonConnectTransfer = async (
   params: TonConnectTransactionPayload,
   password: string
 ) => {
+  await checkServiceTimeOrDie(tonApi);
   const mnemonic = await getWalletMnemonic(
     storage,
     walletState.publicKey,
@@ -153,6 +164,7 @@ export const sendTonTransfer = async (
   fee: Fee,
   password: string
 ) => {
+  await checkServiceTimeOrDie(tonApi);
   const mnemonic = await getWalletMnemonic(
     storage,
     walletState.publicKey,
@@ -164,7 +176,7 @@ export const sendTonTransfer = async (
 
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
   if (!data.max) {
-    checkWalletBalance(total, wallet);
+    checkWalletBalanceOrDie(total, wallet);
   }
 
   const cell = createTonTransfer(

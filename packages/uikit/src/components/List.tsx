@@ -79,6 +79,7 @@ export const ListItemElement = styled.div<{
   ios: boolean;
   isHover?: boolean;
 }>`
+  position: relative;
   display: flex;
   padding: 0 0 0 1rem;
   transition: background-color 0.1s ease;

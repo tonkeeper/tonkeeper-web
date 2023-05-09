@@ -1,5 +1,14 @@
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { QueryClient } from '@tanstack/react-query';
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import {
+  seeIfBalanceError,
+  seeIfTimeError,
+} from '@tonkeeper/core/dist/service/transfer/common';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
+import {
+  getDecimalSeparator,
+  getGroupSeparator,
+} from '@tonkeeper/core/dist/utils/formatting';
 import {
   getCoinAmountValue,
   getFiatAmountValue,
@@ -10,6 +19,7 @@ import React, { PropsWithChildren, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { formatFiatCurrency, formatter } from '../../hooks/balance';
+import { cleanSyncDateBanner } from '../../state/syncDate';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { Body1 } from '../Text';
 
@@ -152,27 +162,10 @@ export const childFactoryCreator =
       timeout: duration,
     });
 
-export const useFaitTonAmount = (amount: string) => {
-  const { fiat } = useAppContext();
-  const { data: stock } = useTonenpointStock();
-
-  return useMemo(() => {
-    const fiatAmount = getFiatAmountValue(
-      stock,
-      { balances: [] },
-      fiat,
-      CryptoCurrency.TON,
-      amount
-    );
-    if (fiatAmount === undefined) return undefined;
-    return formatFiatCurrency(fiat, fiatAmount);
-  }, [stock, fiat, amount]);
-};
-
 export const useFiatAmount = (
   jettons: JettonsBalances,
   jetton: string,
-  amount: number | string
+  amount: BigNumber
 ) => {
   const { fiat } = useAppContext();
   const { data: stock } = useTonenpointStock();
@@ -183,7 +176,10 @@ export const useFiatAmount = (
       jettons,
       fiat,
       jetton,
-      amount.toString()
+      amount.toFormat({
+        decimalSeparator: getDecimalSeparator(),
+        groupSeparator: getGroupSeparator(),
+      })
     );
     if (fiatAmount === undefined) return undefined;
     return formatFiatCurrency(fiat, fiatAmount);
@@ -230,4 +226,25 @@ export const useSecondAmountWithSymbol = (
       })} ${fiat}`;
     }
   }, [stock, jettons, fiat, jetton, amount, inFiat]);
+};
+
+export const notifyError = async (
+  client: QueryClient,
+  sdk: IAppSdk,
+  t: (value: string) => string,
+  error: unknown
+) => {
+  if (seeIfBalanceError(error)) {
+    sdk.uiEvents.emit('copy', {
+      method: 'copy',
+      params: t('send_screen_steps_amount_insufficient_balance'),
+    });
+  }
+
+  if (seeIfTimeError(error)) {
+    await cleanSyncDateBanner(client, sdk);
+    sdk.alert(t('send_sending_wrong_time_description'));
+  }
+
+  throw error;
 };

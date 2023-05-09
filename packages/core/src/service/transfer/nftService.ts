@@ -8,14 +8,16 @@ import { Configuration, Fee, NftItemRepr, SendApi } from '../../tonApiV1';
 import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
-  checkWalletBalance,
+  checkServiceTimeOrDie,
+  checkWalletBalanceOrDie,
+  checkWalletPositiveBalanceOrDie,
   externalMessage,
   getWalletBalance,
-  getWalletSeqNo,
   SendMode,
 } from './common';
 
 const initNftTransferAmount = toNano('1');
+const secondNftTransferAmount = toNano('0.05');
 const nftTransferForwardAmount = BigInt('1');
 
 const nftTransferBody = (params: {
@@ -78,7 +80,9 @@ export const estimateNftTransfer = async (
   recipient: RecipientData,
   nftItem: NftItemRepr
 ) => {
-  const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
+  await checkServiceTimeOrDie(tonApi);
+  const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+  checkWalletPositiveBalanceOrDie(wallet);
 
   const cell = createNftTransfer(
     seqno,
@@ -104,6 +108,7 @@ export const sendNftTransfer = async (
   fee: Fee,
   password: string
 ) => {
+  await checkServiceTimeOrDie(tonApi);
   const mnemonic = await getWalletMnemonic(
     storage,
     walletState.publicKey,
@@ -129,7 +134,7 @@ export const sendNftTransfer = async (
   }
 
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
-  checkWalletBalance(total, wallet);
+  checkWalletBalanceOrDie(total, wallet);
 
   const cell = createNftTransfer(
     seqno,

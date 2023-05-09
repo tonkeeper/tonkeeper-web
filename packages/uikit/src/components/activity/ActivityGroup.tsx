@@ -10,6 +10,7 @@ import {
   formatActivityDate,
   getActivityTitle,
 } from '../../state/activity';
+import { ClockIcon } from '../Icon';
 import { NftNotification } from '../nft/NftNotification';
 import { ActionData, ActivityNotification } from './ActivityNotification';
 
@@ -23,6 +24,14 @@ const List = styled(ListBlock)`
 const Title = styled(H3)`
   margin: 0 0 0.875rem;
   user-select: none;
+`;
+
+const ProgressIcon = styled.div`
+  position: absolute;
+  left: 45px;
+  top: 45px;
+  color: ${(props) => props.theme.textTertiary};
+  padding: 0 !important;
 `;
 
 export const ActivityGroupRaw: FC<{
@@ -62,6 +71,11 @@ export const ActivityGroupRaw: FC<{
                         date={date}
                         openNft={setNft}
                       />
+                      {event.inProgress && (
+                        <ProgressIcon>
+                          <ClockIcon />
+                        </ProgressIcon>
+                      )}
                     </ListItem>
                   ))}
                 </List>

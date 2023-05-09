@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
   AmountData,
@@ -35,6 +35,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
@@ -50,7 +51,7 @@ import {
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
 import { defaultSize, getInputSize, useButtonPosition } from './amountHooks';
 import { AssetSelect } from './AssetSelect';
-import { ButtonBlock, useSecondAmountWithSymbol } from './common';
+import { ButtonBlock, notifyError, useSecondAmountWithSymbol } from './common';
 import { InputSize, Sentence } from './Sentence';
 
 const Center = styled.div`
@@ -63,7 +64,7 @@ const SubTitle = styled(Body2)`
 `;
 
 const Title = styled(H3)`
-  margin: -8px 0 0;
+  margin: -6px 0 0;
 `;
 
 const AmountBlock = styled.label`
@@ -160,28 +161,44 @@ const InputBlock = styled.div`
   align-items: flex-end;
 `;
 
+const Name = styled.span`
+  color: ${(props) => props.theme.textPrimary};
+  margin-left: 4px;
+`;
+const Address = styled.span`
+  margin-left: 4px;
+`;
+
 const useEstimateTransaction = (
   recipient: RecipientData,
   jetton: string,
   jettons: JettonsBalances
 ) => {
+  const { t } = useTranslation();
+  const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
+  const client = useQueryClient();
 
   return useMutation(async (options: AmountValue) => {
-    if (jetton === CryptoCurrency.TON) {
-      return estimateTonTransfer(tonApi, wallet, recipient, options);
-    } else {
-      const [jettonInfo] = jettons.balances.filter(
-        (item) => item.jettonAddress === jetton
-      );
-      return estimateJettonTransfer(
-        tonApi,
-        wallet,
-        recipient,
-        options,
-        jettonInfo
-      );
+    try {
+      if (jetton === CryptoCurrency.TON) {
+        return await estimateTonTransfer(tonApi, wallet, recipient, options);
+      } else {
+        const [jettonInfo] = jettons.balances.filter(
+          (item) => item.jettonAddress === jetton
+        );
+        return await estimateJettonTransfer(
+          tonApi,
+          wallet,
+          recipient,
+          options,
+          jettonInfo
+        );
+      }
+    } catch (e) {
+      await notifyError(client, sdk, t, e);
+      throw e;
     }
   });
 };
@@ -416,6 +433,8 @@ export const AmountView: FC<{
     }
   };
 
+  const address = toShortAddress(recipient.toAccount.address.bounceable);
+
   return (
     <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
       <NotificationTitleBlock>
@@ -425,11 +444,11 @@ export const AmountView: FC<{
         <Center>
           <Title>{t('txActions_amount')}</Title>
           <SubTitle>
-            {t('send_screen_steps_done_to').replace(
-              '%{name}',
-              recipient.toAccount.name ??
-                toShortAddress(recipient.toAccount.address.bounceable)
+            {t('send_screen_steps_done_to').replace('%{name}', '')}
+            {recipient.toAccount.name && (
+              <Name>{recipient.toAccount.name}</Name>
             )}
+            <Address>{address}</Address>
           </SubTitle>
         </Center>
         <NotificationCancelButton handleClose={onClose} />

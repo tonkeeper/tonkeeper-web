@@ -46,7 +46,7 @@
     "description": "Manage wallets settings button"
   },
   "Localization": {
-    "message": "Локализация",
+    "message": "Язык",
     "description": "Localization settings button"
   },
   "settings_news_url_discuss": {

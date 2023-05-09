@@ -114,7 +114,7 @@ const Textarea = styled.textarea`
 
   color: ${(props) => props.theme.textPrimary};
 
-  padding: 24px 0 12px;
+  padding: 30px 0 12px;
   resize: none;
 
   word-break: break-all;

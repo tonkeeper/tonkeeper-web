@@ -98,6 +98,6 @@ export class AmountFormatter {
       return bn.toFormat(formatConf);
     }
 
-    return bn.toFormat(2, BigNumber.ROUND_DOWN, formatConf);
+    return bn.toFormat(Math.min(decimals, 2), BigNumber.ROUND_DOWN, formatConf);
   }
 }

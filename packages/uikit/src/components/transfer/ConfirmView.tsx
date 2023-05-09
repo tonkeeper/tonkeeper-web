@@ -30,7 +30,12 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Label2 } from '../Text';
-import { ButtonBlock, ResultButton, useFiatAmount } from './common';
+import {
+  ButtonBlock,
+  notifyError,
+  ResultButton,
+  useFiatAmount,
+} from './common';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 
@@ -39,6 +44,7 @@ const useSendTransaction = (
   amount: AmountData,
   jettons: JettonsBalances
 ) => {
+  const { t } = useTranslation();
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
@@ -47,31 +53,37 @@ const useSendTransaction = (
   return useMutation<boolean, Error>(async () => {
     const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
     if (password === null) return false;
-    if (amount.jetton === CryptoCurrency.TON) {
-      await sendTonTransfer(
-        sdk.storage,
-        tonApi,
-        wallet,
-        recipient,
-        amount,
-        amount.fee,
-        password
-      );
-    } else {
-      const [jettonInfo] = jettons.balances.filter(
-        (item) => item.jettonAddress === amount.jetton
-      );
-      await sendJettonTransfer(
-        sdk.storage,
-        tonApi,
-        wallet,
-        recipient,
-        amount,
-        jettonInfo,
-        amount.fee,
-        password
-      );
+    try {
+      if (amount.jetton === CryptoCurrency.TON) {
+        await sendTonTransfer(
+          sdk.storage,
+          tonApi,
+          wallet,
+          recipient,
+          amount,
+          amount.fee,
+          password
+        );
+      } else {
+        const [jettonInfo] = jettons.balances.filter(
+          (item) => item.jettonAddress === amount.jetton
+        );
+        await sendJettonTransfer(
+          sdk.storage,
+          tonApi,
+          wallet,
+          recipient,
+          amount,
+          jettonInfo,
+          amount.fee,
+          password
+        );
+      }
+    } catch (e) {
+      await notifyError(client, sdk, t, e);
     }
+
+    await client.invalidateQueries([wallet.active.rawAddress]);
     await client.invalidateQueries();
     return true;
   });
@@ -135,11 +147,7 @@ export const ConfirmView: FC<{
     ] as const;
   }, [amount.jetton, jettons, t]);
 
-  const fiatAmount = useFiatAmount(
-    jettons,
-    amount.jetton,
-    amount.amount.toFormat()
-  );
+  const fiatAmount = useFiatAmount(jettons, amount.jetton, amount.amount);
 
   const coinAmount = `${formatter.format(amount.amount, {
     ignoreZeroTruncate: false,

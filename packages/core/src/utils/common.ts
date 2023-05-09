@@ -88,6 +88,9 @@ export const seeIfAddressEqual = (one?: string, two?: string) => {
 
 export const seeIfValidAddress = (value: string): boolean => {
   try {
+    if (value.includes('://')) {
+      return false; // ignore links
+    }
     Address.parse(value);
     return true;
   } catch (e) {

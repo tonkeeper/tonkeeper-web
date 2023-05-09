@@ -2,12 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   FavoriteSuggestion,
   LatestSuggestion,
-  Suggestion,
+  Suggestion
 } from '@tonkeeper/core/dist/entries/suggestion';
 import {
   deleteFavoriteSuggestion,
   getSuggestionsList,
-  hideSuggestions,
+  hideSuggestions
 } from '@tonkeeper/core/dist/service/suggestionService';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
@@ -24,8 +24,15 @@ import { SkeletonList } from '../Skeleton';
 import { Label1 } from '../Text';
 import {
   AddFavoriteNotification,
-  EditFavoriteNotification,
+  EditFavoriteNotification
 } from './FavoriteNotification';
+
+const Label = styled(Label1)`
+  user-select: none;
+  width: 100%;
+  margin-top: 12px;
+  margin-bottom: -4px;
+`;
 
 const useLatestSuggestion = () => {
   const sdk = useAppSdk();
@@ -42,15 +49,14 @@ const useLatestSuggestion = () => {
 const Icon = styled.span`
   display: flex;
   color: ${(props) => props.theme.iconSecondary};
+
+  padding: 8px;
+  margin: -8px;
 `;
 
 const IconBlue = styled.span`
   display: inline-flex;
   color: ${(props) => props.theme.accentBlue};
-`;
-
-const FavoriteText = styled.div`
-  user-select: none;
 `;
 
 const getLatestDate = (language: string, timestamp: number) => {
@@ -228,18 +234,29 @@ export const SuggestionList: FC<{
   onSelect: (item: Suggestion) => void;
   disabled?: boolean;
 }> = ({ onSelect, disabled }) => {
+  const { t } = useTranslation();
   const { data } = useLatestSuggestion();
-  const [addFavorite, setAdd] =
-    useState<LatestSuggestion | undefined>(undefined);
-  const [editFavorite, setEdit] =
-    useState<FavoriteSuggestion | undefined>(undefined);
+  const [addFavorite, setAdd] = useState<LatestSuggestion | undefined>(
+    undefined
+  );
+  const [editFavorite, setEdit] = useState<FavoriteSuggestion | undefined>(
+    undefined
+  );
 
   if (!data) {
-    return <SkeletonList size={4} margin={false} fullWidth />;
+    return (
+      <>
+        <Label>{t('send_screen_steps_address_suggests_label')}</Label>
+        <SkeletonList size={4} margin={false} fullWidth />
+      </>
+    );
   }
 
   return (
     <>
+      {data.length > 0 ? (
+        <Label>{t('send_screen_steps_address_suggests_label')}</Label>
+      ) : undefined}
       <ListBlock margin={false} fullWidth noUserSelect>
         {data.map((item) => {
           if (item.isFavorite) {

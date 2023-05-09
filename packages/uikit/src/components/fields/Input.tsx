@@ -24,8 +24,7 @@ export const InputBlock = styled.div<{
     `}
 
   &:focus-within label {
-    transform: translate(0, 6px) scale(0.7);
-    color: ${(props) => props.theme.fieldActiveBorder};
+    transform: translate(0, 12px) scale(0.7);
   }
 
   ${(props) =>
@@ -56,8 +55,7 @@ export const InputField = styled.input`
   flex-grow: 1;
   font-weight: 500;
   font-size: 16px;
-  padding: 8px 0 0;
-  line-height: 46px;
+  padding: 30px 0 12px;
 
   color: ${(props) => props.theme.textPrimary};
 `;
@@ -67,10 +65,10 @@ export const Label = styled.label<{ active?: boolean }>`
 
   position: absolute;
   pointer-events: none;
-  transform: translate(0, 20px) scale(1);
+  transform: translate(0, 23px) scale(1);
   transform-origin: top left;
   transition: 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
-  color: ${(props) => props.theme.textPrimary};
+  color: ${(props) => props.theme.textSecondary};
   font-size: 16px;
   line-height: 1;
   left: 1rem;
@@ -78,7 +76,7 @@ export const Label = styled.label<{ active?: boolean }>`
   ${(props) =>
     props.active &&
     css`
-      transform: translate(0, 6px) scale(0.7);
+      transform: translate(0, 12px) scale(0.7);
     `}
 `;
 

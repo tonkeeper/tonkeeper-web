@@ -27,7 +27,7 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Label1, Label2 } from '../Text';
-import { ButtonBlock, Label, ResultButton } from './common';
+import { ButtonBlock, Label, notifyError, ResultButton } from './common';
 
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { RecipientListItem } from './ConfirmListItem';
@@ -37,6 +37,7 @@ const useSendNft = (
   nftItem: NftItemRepr,
   fee?: Fee
 ) => {
+  const { t } = useTranslation();
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
@@ -46,16 +47,21 @@ const useSendNft = (
     if (!fee) return false;
     const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
     if (password === null) return false;
-    await sendNftTransfer(
-      sdk.storage,
-      tonApi,
-      wallet,
-      recipient,
-      nftItem,
-      fee,
-      password
-    );
+    try {
+      await sendNftTransfer(
+        sdk.storage,
+        tonApi,
+        wallet,
+        recipient,
+        nftItem,
+        fee,
+        password
+      );
+    } catch (e) {
+      await notifyError(client, sdk, t, e);
+    }
 
+    await client.invalidateQueries([wallet.active.rawAddress]);
     await client.invalidateQueries();
     return true;
   });

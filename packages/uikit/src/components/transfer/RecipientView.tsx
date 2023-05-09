@@ -11,27 +11,20 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
+import { ButtonMock } from '../fields/BackButton';
+import { Button } from '../fields/Button';
+import { TextArea } from '../fields/Input';
+import { InputWithScanner } from '../fields/InputWithScanner';
 import { Gap } from '../Layout';
 import {
   FullHeightBlock,
   NotificationCancelButton,
   NotificationTitleBlock,
 } from '../Notification';
-import { Body2, H3, Label1 } from '../Text';
-import { ButtonMock } from '../fields/BackButton';
-import { Button } from '../fields/Button';
-import { TextArea } from '../fields/Input';
-import { InputWithScanner } from '../fields/InputWithScanner';
+import { Body2, H3 } from '../Text';
+import { ButtonBlock } from './common';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
-import { ButtonBlock } from './common';
-
-const Label = styled(Label1)`
-  user-select: none;
-  width: 100%;
-  margin-top: 12px;
-  margin-bottom: -4px;
-`;
 
 const Warning = styled(Body2)`
   user-select: none;
@@ -88,7 +81,7 @@ const useDnsWallet = (value: string) => {
       return result.wallet;
     },
     {
-      enabled: name.length > 7 && !seeIfValidAddress(name),
+      enabled: name.length >= 4 && !seeIfValidAddress(name),
       retry: 0,
       keepPreviousData: false,
     }
@@ -139,7 +132,7 @@ export const RecipientView: FC<{
         dns: dnsWallet,
       }));
     }
-    if (dnsWallet === null) {
+    if (dnsWallet == null) {
       setAddress((recipient) => ({
         address: recipient.address,
       }));
@@ -227,7 +220,7 @@ export const RecipientView: FC<{
           onScan={onScan}
           onChange={(address) => setAddress({ address })}
           label={t('transaction_recipient_address')}
-          isValid={!submitted || isDnsFetching || isValid}
+          isValid={!submitted || isValid}
           disabled={isExternalLoading}
         />
       </ShowAddress>
@@ -246,8 +239,6 @@ export const RecipientView: FC<{
         </Warning>
       )}
 
-      <Label>{t('send_screen_steps_address_suggests_label')}</Label>
-
       <SuggestionList onSelect={onSelect} disabled={isExternalLoading} />
 
       <Gap />
@@ -258,7 +249,7 @@ export const RecipientView: FC<{
           size="large"
           primary
           type="submit"
-          loading={isFetching}
+          loading={isFetching || isDnsFetching}
         >
           {t('continue')}
         </Button>

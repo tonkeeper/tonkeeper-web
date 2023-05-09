@@ -6,12 +6,12 @@ import {
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import {
-  TonendpoinFiatMethods,
-  Tonendpoint,
-  TonendpointConfig,
   getFiatMethods,
   getServerConfig,
   getStock,
+  TonendpoinFiatMethods,
+  Tonendpoint,
+  TonendpointConfig,
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';

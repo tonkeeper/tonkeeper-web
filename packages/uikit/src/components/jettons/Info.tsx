@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import styled from 'styled-components';
 import { SkeletonImage, SkeletonText } from '../Skeleton';
 import { H2 } from '../Text';
-import { Body, CroppedBodyText } from './CroppedText';
+import { Body } from './CroppedText';
 
 const Block = styled.div`
   display: flex;
@@ -42,10 +42,6 @@ export const CoinInfoSkeleton = () => {
         <Body open>
           <SkeletonText width="40px" />
         </Body>
-        <Body open margin="small">
-          <SkeletonText width="80%" />
-        </Body>
-        <SkeletonText />
       </Text>
       <SkeletonImage width="64px" />
     </Block>
@@ -70,7 +66,6 @@ export const CoinInfo: FC<CoinProps> = ({
           {amount} {symbol}
         </Title>
         {price && <Body open>{price}</Body>}
-        {description && <CroppedBodyText text={description} />}
       </Text>
       {image ? <Image src={image} /> : <SkeletonImage width="64px" />}
     </Block>
