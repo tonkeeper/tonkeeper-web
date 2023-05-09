@@ -49,6 +49,8 @@ const useBalanceValue = (
   }, [info, stock]);
 };
 
+const pageLimit = 20;
+
 export const TonPage = () => {
   const { fiat } = useAppContext();
   const { data: stock } = useTonenpointStock();
@@ -59,14 +61,15 @@ export const TonPage = () => {
 
   const { fetchNextPage, hasNextPage, isFetchingNextPage, data, isFetched } =
     useInfiniteQuery({
-      queryKey: [wallet.active.rawAddress, QueryKey.activity],
+      queryKey: [wallet.active.rawAddress, QueryKey.activity, 'ton'],
       queryFn: ({ pageParam = undefined }) =>
         new EventApi(tonApi).accountEvents({
           account: wallet.active.rawAddress,
-          limit: 20,
+          limit: pageLimit,
           beforeLt: pageParam,
         }),
-      getNextPageParam: (lastPage) => lastPage.nextFrom,
+      getNextPageParam: (lastPage) =>
+        lastPage.events.length >= pageLimit ? lastPage.nextFrom : undefined,
     });
 
   const format = useFormatCoinValue();
