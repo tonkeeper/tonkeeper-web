@@ -222,17 +222,17 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
       const handlerTouchMove = function (event: TouchEvent) {
         var top = event.touches[0].clientY;
 
-        var direction = lastY - top < 0 ? 'up' : 'down';
+        var direction = lastY - top < 0 ? 'down' : 'up';
         if (event.cancelable) {
-          if (startScroll <= 0 && direction === 'up') {
-            if (startY - top < -50) {
-              // scroll down more then 50px
+          if (startScroll <= 0 && direction === 'down') {
+            if (startY - top < -20) {
+              // pool down more then 20px
               console.log('touchend', startScroll, direction, startY - top);
 
               window.addEventListener('touchend', handleClose);
               window.addEventListener('touchcancel', handleClose);
             }
-          } else if (startScroll >= maxScrollTop && direction === 'down') {
+          } else if (startScroll >= maxScrollTop && direction === 'up') {
             event.preventDefault();
           }
         }
