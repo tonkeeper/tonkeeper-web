@@ -1,11 +1,12 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
   parseTonTransfer,
   TonTransferParams,
 } from '@tonkeeper/core/dist/service/deeplinkingService';
+import { checkWalletPositiveBalanceOrDie } from '@tonkeeper/core/dist/service/transfer/common';
 import { estimateNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { AccountApi, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -40,6 +41,25 @@ const useNftTransferEstimation = (
   );
 };
 
+const useMinimalBalance = () => {
+  const sdk = useAppSdk();
+  const { tonApi } = useAppContext();
+  const walletState = useWalletContext();
+  const { t } = useTranslation();
+  const client = useQueryClient();
+
+  return useMutation(async () => {
+    const wallet = await new AccountApi(tonApi).getAccountInfo({
+      account: walletState.active.rawAddress,
+    });
+    try {
+      checkWalletPositiveBalanceOrDie(wallet);
+    } catch (e) {
+      await notifyError(client, sdk, t, e);
+    }
+  });
+};
+
 const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
   nftItem,
   onClose,
@@ -57,9 +77,14 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
 
   const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
     useGetToAccount();
+
+  const { mutateAsync: checkBalanceAsync, isLoading: isChecking } =
+    useMinimalBalance();
+
   const { data: fee } = useNftTransferEstimation(nftItem, recipient);
 
-  const onRecipient = (data: RecipientData) => {
+  const onRecipient = async (data: RecipientData) => {
+    await checkBalanceAsync();
     setRight(true);
     setRecipient(data);
   };
@@ -122,6 +147,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
                 onClose={onClose}
                 setRecipient={onRecipient}
                 onScan={onScan}
+                isExternalLoading={isChecking}
               />
             )}
             {state === 'confirm' && (
