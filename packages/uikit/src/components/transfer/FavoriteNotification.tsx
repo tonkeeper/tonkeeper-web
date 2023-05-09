@@ -87,7 +87,7 @@ const AddFavoriteContent: FC<{
 
   const onName = (value: string) => {
     reset();
-    setName(value);
+    setName(value.slice(0, 24));
   };
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
@@ -241,7 +241,7 @@ const EditFavoriteContent: FC<{
 
   const onName = (value: string) => {
     reset();
-    setName(value);
+    setName(value.slice(0, 24));
   };
 
   const onDelete = async () => {
