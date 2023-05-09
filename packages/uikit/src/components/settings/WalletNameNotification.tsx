@@ -38,7 +38,7 @@ const RenameWalletContent: FC<{
       <Button
         size="large"
         fullWidth
-        bottom
+        marginTop
         primary
         loading={isLoading}
         disabled={isLoading}
