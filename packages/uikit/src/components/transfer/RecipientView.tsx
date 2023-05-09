@@ -81,7 +81,7 @@ const useDnsWallet = (value: string) => {
       return result.wallet;
     },
     {
-      enabled: name.length > 7 && !seeIfValidAddress(name),
+      enabled: name.length >= 4 && !seeIfValidAddress(name),
       retry: 0,
       keepPreviousData: false,
     }
@@ -132,7 +132,7 @@ export const RecipientView: FC<{
         dns: dnsWallet,
       }));
     }
-    if (dnsWallet === null) {
+    if (dnsWallet == null) {
       setAddress((recipient) => ({
         address: recipient.address,
       }));
