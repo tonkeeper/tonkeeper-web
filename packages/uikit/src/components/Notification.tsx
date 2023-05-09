@@ -225,8 +225,8 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
         var direction = lastY - top < 0 ? 'down' : 'up';
         if (event.cancelable) {
           if (startScroll <= 0 && direction === 'down') {
-            if (startY - top < -20) {
-              // pool down more then 20px
+            if (startY - top < -10) {
+              // pool down more then 10px
               console.log('touchend', startScroll, direction, startY - top);
 
               window.addEventListener('touchend', handleClose);
