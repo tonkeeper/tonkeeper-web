@@ -220,7 +220,7 @@ export const RecipientView: FC<{
           onScan={onScan}
           onChange={(address) => setAddress({ address })}
           label={t('transaction_recipient_address')}
-          isValid={!submitted || isDnsFetching || isValid}
+          isValid={!submitted || isValid}
           disabled={isExternalLoading}
         />
       </ShowAddress>
@@ -249,7 +249,7 @@ export const RecipientView: FC<{
           size="large"
           primary
           type="submit"
-          loading={isFetching}
+          loading={isFetching || isDnsFetching}
         >
           {t('continue')}
         </Button>
