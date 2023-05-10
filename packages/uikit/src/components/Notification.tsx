@@ -10,11 +10,11 @@ import { CSSTransition } from 'react-transition-group';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { Container } from '../styles/globalStyle';
-import { BackButton } from './fields/BackButton';
 import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
+import { BackButton } from './fields/BackButton';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
   background: transparent;
@@ -225,8 +225,8 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
         var direction = lastY - top < 0 ? 'down' : 'up';
         if (event.cancelable) {
           if (startScroll <= 0 && direction === 'down') {
-            if (startY - top < -20) {
-              // pool down more then 20px
+            if (startY - top < -40) {
+              // pool down more then 40px
               console.log('touchend', startScroll, direction, startY - top);
 
               window.addEventListener('touchend', handleClose);
