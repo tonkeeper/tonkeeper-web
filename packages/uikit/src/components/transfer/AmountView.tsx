@@ -12,12 +12,8 @@ import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import {
-  formatNumberValue,
   formatSendValue,
-  getCoinAmountValue,
-  getFiatAmountValue,
   getJettonDecimals,
-  getJettonSymbol,
   getMaxValue,
   getRemaining,
   isNumeric,
@@ -39,8 +35,6 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
 import { ChevronLeftIcon } from '../Icon';
 import { Gap } from '../Layout';
 import {
@@ -49,10 +43,21 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
-import { defaultSize, getInputSize, useButtonPosition } from './amountHooks';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
 import { AssetSelect } from './AssetSelect';
-import { ButtonBlock, notifyError, useSecondAmountWithSymbol } from './common';
 import { InputSize, Sentence } from './Sentence';
+import { defaultSize, getInputSize, useButtonPosition } from './amountHooks';
+import {
+  AmountState,
+  getCoinAmount,
+  initAmountState,
+  setAmountStateJetton,
+  setAmountStateMax,
+  setAmountStateValue,
+  toggleAmountState,
+} from './amountState';
+import { ButtonBlock, notifyError } from './common';
 
 const Center = styled.div`
   text-align: center;
@@ -246,67 +251,25 @@ export const AmountView: FC<{
   const format = useFormatCoinValue();
 
   const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
-  const [inFiat, setInFiat] = useState(data ? data.fiat !== undefined : false);
   const [jetton, setJetton] = useState(data?.jetton ?? asset);
-  const [inputAmount, setAmountValue] = useState(
-    data ? formatNumberValue(data.fiat ?? data.amount) : '0'
+  const [inputAmount, setAmountValue] = useState<AmountState>(
+    initAmountState({ data, fiat, stock, jetton, jettons })
   );
 
   const ref = useRef<HTMLInputElement>(null);
   const refBlock = useRef<HTMLLabelElement>(null);
   const refButton = useRef<HTMLDivElement>(null);
 
-  const secondAmount = useSecondAmountWithSymbol(
-    jettons,
-    jetton,
-    inputAmount,
-    inFiat
-  );
-
-  const coinAmount = useMemo(() => {
-    if (inFiat) {
-      const value = getCoinAmountValue(
-        stock,
-        jettons,
-        fiat,
-        jetton,
-        inputAmount
-      );
-
-      const formatted = new BigNumber(
-        value ? value.toFormat(2, BigNumber.ROUND_HALF_UP) : new BigNumber('0')
-      );
-      return formatNumberValue(formatted);
-    } else {
-      return inputAmount;
+  const setAmountState = (newState: AmountState) => {
+    if (refBlock.current) {
+      const size = getInputSize(newState.primaryValue, refBlock.current);
+      setFontSize(size);
     }
-  }, [inFiat, inputAmount, jetton, jettons]);
+    setAmountValue(newState);
+  };
 
   const toggleFiat = () => {
-    if (!refBlock.current) return;
-    if (inFiat) {
-      // inputAmount convert to coin
-      setAmountValue(coinAmount);
-      const size = getInputSize(coinAmount, refBlock.current);
-      setFontSize(size);
-      setInFiat(!inFiat);
-    } else {
-      // inputAmount convert to usd
-      const fiatAmount = getFiatAmountValue(
-        stock,
-        jettons,
-        fiat,
-        jetton,
-        inputAmount.toString()
-      );
-
-      if (!fiatAmount) return;
-      const value = formatNumberValue(new BigNumber(fiatAmount.toFormat(2)));
-      setAmountValue(value);
-      const size = getInputSize(value, refBlock.current);
-      setFontSize(size);
-      setInFiat(!inFiat);
-    }
+    setAmountState(toggleAmountState(inputAmount));
   };
 
   const { mutateAsync, isLoading, reset } = useEstimateTransaction(
@@ -319,7 +282,7 @@ export const AmountView: FC<{
 
   useEffect(() => {
     if (refBlock.current) {
-      setFontSize(getInputSize(inputAmount, refBlock.current));
+      setFontSize(getInputSize(inputAmount.primaryValue, refBlock.current));
     }
   }, [refBlock.current]);
 
@@ -338,35 +301,50 @@ export const AmountView: FC<{
 
   const { t } = useTranslation();
 
-  const suffix = inFiat ? fiat.toString() : getJettonSymbol(jetton, jettons);
-
   const onInput = (value: string) => {
-    if (!refBlock.current) return;
-    const decimals = inFiat ? 2 : getJettonDecimals(jetton, jettons);
+    const decimals = inputAmount.inFiat
+      ? 2
+      : getJettonDecimals(jetton, jettons);
 
     if (!seeIfValueValid(value, decimals)) {
-      value = inputAmount;
+      value = inputAmount.primaryValue;
     }
 
     if (isNumeric(value)) {
       value = formatSendValue(value);
     }
 
-    setFontSize(getInputSize(value, refBlock.current));
+    const newState = setAmountStateValue({
+      value,
+      state: inputAmount,
+      fiat,
+      stock,
+      jetton,
+      jettons,
+    });
+
+    setAmountState(newState);
     setMax(false);
-    setAmountValue(value);
   };
 
   const [remaining, valid] = useMemo(
-    () => getRemaining(jettons, info, jetton, coinAmount, max, format),
-    [jettons, info, jetton, coinAmount, max, format]
+    () =>
+      getRemaining(
+        jettons,
+        info,
+        jetton,
+        getCoinAmount(inputAmount),
+        max,
+        format
+      ),
+    [jettons, info, jetton, inputAmount, max, format]
   );
 
   const isValid = useMemo(() => {
     return (
       valid &&
-      isNumeric(inputAmount) &&
-      inputToBigNumber(inputAmount).isGreaterThan(0)
+      isNumeric(inputAmount.primaryValue) &&
+      inputToBigNumber(inputAmount.primaryValue).isGreaterThan(0)
     );
   }, [valid, inputAmount]);
 
@@ -376,8 +354,10 @@ export const AmountView: FC<{
       e.preventDefault();
       if (isValid) {
         reset();
-        const coinValue = inputToBigNumber(coinAmount);
-        const fiatValue = inFiat ? inputToBigNumber(inputAmount) : undefined;
+        const coinValue = inputToBigNumber(getCoinAmount(inputAmount));
+        const fiatValue = inputAmount.inFiat
+          ? inputToBigNumber(inputAmount.primaryValue)
+          : undefined;
 
         const fee = await mutateAsync({
           amount: coinValue,
@@ -395,42 +375,39 @@ export const AmountView: FC<{
         });
       }
     },
-    [setAmount, inputAmount, coinAmount, inFiat, max, jetton, isValid]
+    [setAmount, inputAmount, max, jetton, isValid]
   );
 
   const onMax = () => {
     if (!refBlock.current) return;
 
     const value = max ? '0' : getMaxValue(jettons, info, jetton, format);
-    const size = getInputSize(value, refBlock.current);
-    setFontSize(size);
-    setAmountValue(value);
+    const newState = setAmountStateMax({
+      value,
+      state: inputAmount,
+      fiat,
+      stock,
+      jetton,
+      jettons,
+    });
+    setAmountState(newState);
     setMax((state) => !state);
-    setInFiat(false);
   };
 
   const onJetton = (asset: string) => {
-    if (!refBlock.current) return;
-
     setJetton(asset);
-
-    if (max) {
-      const value = getMaxValue(jettons, info, asset, format);
-      const size = getInputSize(value, refBlock.current);
-      setFontSize(size);
-      setAmountValue(value);
-    } else {
-      const value = getCoinAmountValue(
+    setAmountState(
+      setAmountStateJetton({
+        state: inputAmount,
+        newMaxValue: max
+          ? getMaxValue(jettons, info, asset, format)
+          : undefined,
         stock,
+        jetton: asset,
         jettons,
         fiat,
-        asset,
-        inputAmount
-      );
-      if (!value) {
-        setInFiat(false);
-      }
-    }
+      })
+    );
   };
 
   const address = toShortAddress(recipient.toAccount.address.bounceable);
@@ -466,15 +443,17 @@ export const AmountView: FC<{
         <InputBlock>
           <Sentence
             ref={ref}
-            value={inputAmount}
+            value={inputAmount.primaryValue}
             setValue={onInput}
             inputSize={fontSize}
           />
-          <Symbol>{suffix}</Symbol>
+          <Symbol>{inputAmount.primarySymbol}</Symbol>
         </InputBlock>
 
-        {secondAmount && (
-          <FiatBlock onClick={toggleFiat}>{secondAmount}</FiatBlock>
+        {inputAmount.secondaryValue && (
+          <FiatBlock onClick={toggleFiat}>
+            {inputAmount.secondaryValue} {inputAmount.secondarySymbol}
+          </FiatBlock>
         )}
       </AmountBlock>
       <MaxRow>
