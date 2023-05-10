@@ -229,7 +229,7 @@ const inputToBigNumber = (value: string): BigNumber => {
 export const AmountView: FC<{
   onClose: () => void;
   onBack: () => void;
-  setAmount: (data: AmountData) => void;
+  setAmount: (data: AmountData | undefined) => void;
   recipient: RecipientData;
   asset: string;
   jettons: JettonsBalances;

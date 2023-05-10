@@ -42,7 +42,7 @@ const getFiatValue = (coinValue: string, options: StateOptions) => {
     options.jettons,
     options.fiat,
     options.jetton,
-    coinValue
+    coinValue == '' ? '0' : coinValue
   );
 
   if (!fiatAmount) return undefined;
