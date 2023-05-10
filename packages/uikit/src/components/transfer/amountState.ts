@@ -95,11 +95,12 @@ export const initAmountState = (
 
   if (data.fiat) {
     const primaryValue = formatNumberValue(data.fiat);
+    const secondaryValue = formatNumberValue(data.amount);
     return {
       primaryValue: primaryValue,
       primarySymbol: options.fiat,
       inFiat: true,
-      secondaryValue: getCoinValueOrDie(primaryValue, options),
+      secondaryValue: secondaryValue,
       secondarySymbol: jettonSymbol,
     };
   } else {
