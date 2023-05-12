@@ -37,21 +37,36 @@ export type StateOptions = {
   stock: TonendpointStock | undefined;
 };
 const getFiatValue = (coinValue: string, options: StateOptions) => {
+  if (coinValue == '' || coinValue == '0') {
+    return '0';
+  }
+
   const fiatAmount = getFiatAmountValue(
     options.stock,
     options.jettons,
     options.fiat,
     options.jetton,
-    coinValue == '' ? '0' : coinValue
+    coinValue
   );
 
   if (!fiatAmount) return undefined;
-  return formatter.format(fiatAmount.toString(), {
+  return formatter.format(fiatAmount, {
     ignoreZeroTruncate: true,
   });
 };
 
+const valueOrDefault = (str: string, defaultValue: string): string => {
+  if (str == '' || str == '0') {
+    return '0';
+  }
+  return defaultValue;
+};
+
 const getCoinValue = (fiatValue: string, options: StateOptions) => {
+  if (fiatValue == '' || fiatValue == '0') {
+    return '0';
+  }
+
   const coinAmount = getCoinAmountValue(
     options.stock,
     options.jettons,
@@ -133,20 +148,20 @@ export const toggleAmountState = (state: AmountState): AmountState => {
       primarySymbol: secondarySymbol,
       primaryValue: secondaryValue,
       secondarySymbol: primarySymbol,
-      secondaryValue: primaryValue,
+      secondaryValue: valueOrDefault(primaryValue, '0'),
       inFiat: false,
     };
   } else {
     const { primarySymbol, primaryValue, secondarySymbol, secondaryValue } =
       state;
-    if (secondaryValue == undefined) {
+    if (secondaryValue === undefined) {
       return state; // Missing fiat amount
     } else {
       return {
         primarySymbol: secondarySymbol,
         primaryValue: secondaryValue,
         secondarySymbol: primarySymbol,
-        secondaryValue: primaryValue,
+        secondaryValue: valueOrDefault(primaryValue, '0'),
         inFiat: true,
       };
     }
