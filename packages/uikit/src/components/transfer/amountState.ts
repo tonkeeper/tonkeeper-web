@@ -63,7 +63,8 @@ const getCoinValue = (fiatValue: string, options: StateOptions) => {
   if (!coinAmount) {
     return undefined;
   }
-  return formatter.format(coinAmount.toFormat(2), {
+
+  return formatter.format(coinAmount, {
     ignoreZeroTruncate: false,
   });
 };
