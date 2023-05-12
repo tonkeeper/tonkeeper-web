@@ -35,6 +35,19 @@ export function seeIfLargeTail(str: string, decimals: number) {
   return false;
 }
 
+export function cropTail(str: string, decimals: number) {
+  const [entry, tail] = removeGroupSeparator(str.trim()).split(
+    getDecimalSeparator()
+  );
+  if (tail && tail.length > decimals) {
+    return formatEntryAndTail(
+      entry,
+      decimals > 0 ? tail.slice(0, decimals) : undefined
+    );
+  }
+  return str;
+}
+
 export function getDecimalLength(str: string) {
   const [entry, tail] = removeGroupSeparator(str.trim()).split(
     getDecimalSeparator()
@@ -42,7 +55,7 @@ export function getDecimalLength(str: string) {
   return tail ? tail.length : 0;
 }
 
-function formatEntryAndTail(entry: string, tail: string) {
+function formatEntryAndTail(entry: string, tail: string | undefined) {
   const path = [] as string[];
   path.push(new Intl.NumberFormat(getBrowserLocale()).format(parseInt(entry)));
   if (tail !== undefined) {

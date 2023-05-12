@@ -1,8 +1,8 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
-  parseTonTransfer,
   TonTransferParams,
+  parseTonTransfer,
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { seeIfAddressEqual } from '@tonkeeper/core/dist/utils/common';
@@ -16,13 +16,13 @@ import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
+import { Notification } from '../Notification';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
-import { Notification } from '../Notification';
 import { AmountView } from './AmountView';
-import { childFactoryCreator, duration, Wrapper } from './common';
 import { ConfirmView } from './ConfirmView';
 import { RecipientView, useGetToAccount } from './RecipientView';
+import { Wrapper, childFactoryCreator, duration } from './common';
 
 const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
@@ -53,8 +53,10 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     setRecipient(data);
   };
 
-  const onAmount = (data: AmountData) => {
-    setRight(true);
+  const onAmount = (data: AmountData | undefined) => {
+    if (data) {
+      setRight(true);
+    }
     setAmount(data);
   };
 

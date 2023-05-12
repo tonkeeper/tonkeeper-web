@@ -9,16 +9,12 @@ import {
   getDecimalSeparator,
   getGroupSeparator,
 } from '@tonkeeper/core/dist/utils/formatting';
-import {
-  getCoinAmountValue,
-  getFiatAmountValue,
-  getJettonSymbol,
-} from '@tonkeeper/core/dist/utils/send';
+import { getFiatAmountValue } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import React, { PropsWithChildren, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
-import { formatFiatCurrency, formatter } from '../../hooks/balance';
+import { formatFiatCurrency } from '../../hooks/balance';
 import { cleanSyncDateBanner } from '../../state/syncDate';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { Body1 } from '../Text';
@@ -184,48 +180,6 @@ export const useFiatAmount = (
     if (fiatAmount === undefined) return undefined;
     return formatFiatCurrency(fiat, fiatAmount);
   }, [stock, jettons, fiat, jetton, amount]);
-};
-
-export const useSecondAmountWithSymbol = (
-  jettons: JettonsBalances,
-  jetton: string,
-  amount: number | string,
-  inFiat: boolean
-) => {
-  const { fiat } = useAppContext();
-  const { data: stock } = useTonenpointStock();
-
-  return useMemo(() => {
-    if (inFiat) {
-      const coinAmount = getCoinAmountValue(
-        stock,
-        jettons,
-        fiat,
-        jetton,
-        amount.toString()
-      );
-      if (coinAmount === undefined) return undefined;
-      return `${formatter.format(
-        coinAmount.toFormat(2, BigNumber.ROUND_HALF_UP),
-        {
-          ignoreZeroTruncate: false,
-        }
-      )} ${getJettonSymbol(jetton, jettons)}`;
-    } else {
-      const fiatAmount = getFiatAmountValue(
-        stock,
-        jettons,
-        fiat,
-        jetton,
-        amount.toString()
-      );
-      if (fiatAmount === undefined) return undefined;
-
-      return `${formatter.format(fiatAmount.toString(), {
-        ignoreZeroTruncate: true,
-      })} ${fiat}`;
-    }
-  }, [stock, jettons, fiat, jetton, amount, inFiat]);
 };
 
 export const notifyError = async (
