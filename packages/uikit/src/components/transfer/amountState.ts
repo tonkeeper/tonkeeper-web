@@ -57,9 +57,9 @@ const getFiatValue = (coinValue: string, options: StateOptions) => {
 
 const valueOrDefault = (str: string, defaultValue: string): string => {
   if (str == '' || str == '0') {
-    return '0';
+    return defaultValue;
   }
-  return defaultValue;
+  return str;
 };
 
 const getCoinValue = (fiatValue: string, options: StateOptions) => {
