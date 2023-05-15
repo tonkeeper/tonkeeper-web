@@ -9,6 +9,7 @@ export const InputBlock = styled.div<{
   scanner?: boolean;
 }>`
   width: 100%;
+  min-height: 64px;
   border-radius: ${(props) => props.theme.cornerSmall};
   display: flex;
   padding: 0 1rem;
@@ -54,7 +55,8 @@ export const InputField = styled.input`
   flex-grow: 1;
   font-weight: 500;
   font-size: 16px;
-  padding: 30px 0 12px;
+  padding: 30px 0 10px;
+  box-sizing: border-box;
 
   color: ${(props) => props.theme.textPrimary};
 `;

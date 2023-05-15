@@ -103,7 +103,7 @@ const Textarea = styled.textarea`
   border: none;
   background: transparent;
   flex-grow: 1;
-  padding: 8px 0 0;
+  box-sizing: border-box;
 
   font-style: normal;
   font-weight: 500;
@@ -114,7 +114,7 @@ const Textarea = styled.textarea`
 
   color: ${(props) => props.theme.textPrimary};
 
-  padding: 30px 0 12px;
+  padding: 30px 0 10px;
   resize: none;
 
   word-break: break-all;
@@ -203,8 +203,7 @@ export const TextareaAutosize = React.forwardRef(function TextareaAutosize(
     outerHeight = Math.max(outerHeight, singleRowHeight);
 
     // Take the box sizing into account for applying this value as a style.
-    const outerHeightStyle =
-      outerHeight + (boxSizing === 'border-box' ? padding + border : 0);
+    const outerHeightStyle = outerHeight + padding; //(boxSizing === 'border-box' ? padding + border : 0);
     const overflow = Math.abs(outerHeight - innerHeight) <= 1;
 
     return { outerHeightStyle, overflow };
