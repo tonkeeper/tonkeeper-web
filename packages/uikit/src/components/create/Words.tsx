@@ -221,15 +221,27 @@ const InputBlock = styled.label<{
 const WordInput: FC<{
   value: string;
   onChange: (value: string) => void;
+  focusNext: () => void;
   test: number;
   isValid?: boolean;
   submitted?: boolean;
   tabIndex: number;
-}> = ({ value, test, onChange, isValid, tabIndex }) => {
+}> = ({ value, test, onChange, focusNext, isValid, tabIndex }) => {
   const [active, setActive] = useState(false);
   const [touched, setTouched] = useState(false);
 
   const valid = touched ? isValid === true : isValid || active;
+
+  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> =
+    useCallback(
+      (event) => {
+        if (event.key === 'Enter') {
+          focusNext();
+        }
+      },
+      [focusNext]
+    );
+
   return (
     <InputBlock submitted={touched} active={active} valid={valid}>
       <Number1>{test}:</Number1>
@@ -239,6 +251,7 @@ const WordInput: FC<{
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setActive(true)}
+        onKeyDown={handleKeyDown}
         onBlur={() => {
           setTouched(true);
           setActive(false);
@@ -286,6 +299,8 @@ export const Check: FC<{
   const [two, setTwo] = useState('');
   const [three, setThree] = useState('');
 
+  const ref = useRef<HTMLDivElement>(null);
+
   const [test1, test2, test3] = useMemo(() => {
     return [getRandomInt(1, 8), getRandomInt(8, 16), getRandomInt(16, 24)];
   }, []);
@@ -316,13 +331,14 @@ export const Check: FC<{
         </div>
       </Block>
 
-      <Block>
+      <Block ref={ref}>
         <WordInput
           tabIndex={1}
           test={test1}
           value={one}
           onChange={setOne}
           isValid={seeIfValid(one, mnemonic[test1 - 1])}
+          focusNext={() => focusInput(ref.current, 1)}
         />
         <WordInput
           tabIndex={2}
@@ -330,6 +346,7 @@ export const Check: FC<{
           value={two}
           onChange={setTwo}
           isValid={seeIfValid(two, mnemonic[test2 - 1])}
+          focusNext={() => focusInput(ref.current, 2)}
         />
         <WordInput
           tabIndex={3}
@@ -337,6 +354,7 @@ export const Check: FC<{
           value={three}
           onChange={setThree}
           isValid={seeIfValid(three, mnemonic[test3 - 1])}
+          focusNext={onConfirm}
         />
       </Block>
       <Block>
@@ -367,15 +385,11 @@ const Inputs = styled.div`
   }
 `;
 
-const Container = styled.div`
-  height: 100%;
-`;
-
 const seeIfValidWord = (word: string) => {
   return wordlist.includes(word);
 };
 
-const fucusInput = (current: HTMLDivElement | null, index: number) => {
+const focusInput = (current: HTMLDivElement | null, index: number) => {
   if (!current) return;
   const wrapper = current.childNodes[index] as HTMLDivElement;
   if (!wrapper) return;
@@ -404,7 +418,7 @@ export const ImportWords: FC<{
           setMnemonic((items) =>
             items.map((v, i) => (i === index ? values[0] : v))
           );
-          fucusInput(ref.current, index + 1);
+          focusInput(ref.current, index + 1);
         } else {
           const max = Math.min(24 - index, values.length);
           values = values.slice(0, max);
@@ -413,7 +427,7 @@ export const ImportWords: FC<{
             items.splice(index, max, ...values);
             return items;
           });
-          fucusInput(ref.current, max - 1);
+          focusInput(ref.current, max - 1);
         }
 
         return;
@@ -440,11 +454,11 @@ export const ImportWords: FC<{
     setSubmit(true);
     const invalid = mnemonic.findIndex((work) => !seeIfValidWord(work));
     if (invalid != -1) {
-      fucusInput(ref.current, invalid);
+      focusInput(ref.current, invalid);
       notify();
     }
     if (mnemonic.length < 24) {
-      fucusInput(ref.current, mnemonic.length - 1);
+      focusInput(ref.current, mnemonic.length - 1);
       notify();
     }
 
@@ -480,6 +494,7 @@ export const ImportWords: FC<{
               submitted={submitted}
               onChange={(newValue) => onChange(newValue, index)}
               tabIndex={index + 1}
+              focusNext={() => focusInput(ref.current, index + 1)}
             />
           ))}
         </Inputs>
