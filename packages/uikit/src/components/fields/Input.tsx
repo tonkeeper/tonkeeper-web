@@ -55,7 +55,7 @@ export const InputField = styled.input`
   flex-grow: 1;
   font-weight: 500;
   font-size: 16px;
-  padding: 30px 0 10px;
+  padding: 30px 0 9px;
 
   color: ${(props) => props.theme.textPrimary};
 `;
