@@ -133,9 +133,12 @@ export const RecipientView: FC<{
       }));
     }
     if (dnsWallet == null) {
-      setAddress((recipient) => ({
-        address: recipient.address,
-      }));
+      setAddress((recipient) => {
+        if ('dns' in recipient) {
+          return { address: recipient.address };
+        }
+        return recipient;
+      });
     }
   }, [setAddress, dnsWallet]);
 
