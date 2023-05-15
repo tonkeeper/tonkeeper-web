@@ -2,7 +2,6 @@ import { debounce } from '@tonkeeper/core/dist/utils/common';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import styled from 'styled-components';
-import { useAppSdk } from '../../hooks/appSdk';
 
 const useEnhancedEffect =
   typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
@@ -152,8 +151,6 @@ export const TextareaAutosize = React.forwardRef(function TextareaAutosize(
   const [state, setState] = React.useState<State>({
     outerHeightStyle: 0,
   });
-
-  const sdk = useAppSdk();
 
   const getUpdatedState = React.useCallback(() => {
     const input = inputRef.current!;
@@ -322,15 +319,6 @@ export const TextareaAutosize = React.forwardRef(function TextareaAutosize(
       onChange(event);
     }
   };
-
-  React.useEffect(() => {
-    sdk.uiEvents.emit('copy', {
-      method: 'copy',
-      params: `oh: ${state.outerHeightStyle} sr: ${
-        shadowRef.current!.scrollHeight
-      }`,
-    });
-  }, [sdk, state.outerHeightStyle]);
 
   return (
     <React.Fragment>
