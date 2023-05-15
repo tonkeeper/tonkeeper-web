@@ -248,7 +248,7 @@ const WordInput: FC<{
         tabIndex={tabIndex}
         autoComplete="off"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value.toLocaleLowerCase())}
         onFocus={() => setActive(true)}
         onKeyDown={handleKeyDown}
         onBlur={() => {
@@ -353,7 +353,7 @@ export const Check: FC<{
           value={three}
           onChange={setThree}
           isValid={seeIfValid(three, mnemonic[test3 - 1])}
-          focusNext={onConfirm}
+          focusNext={() => (isValid ? onConfirm() : undefined)}
         />
       </Block>
       <Block>
@@ -411,7 +411,7 @@ export const ImportWords: FC<{
   const onChange = useCallback(
     (newValue: string, index: number) => {
       if (newValue.includes(' ')) {
-        let values = newValue.trim().toLocaleLowerCase().split(' ');
+        let values = newValue.trim().split(' ');
         if (values.length == 1) {
           setMnemonic((items) =>
             items.map((v, i) => (i === index ? values[0] : v))
@@ -431,7 +431,7 @@ export const ImportWords: FC<{
         return;
       } else {
         return setMnemonic((items) =>
-          items.map((v, i) => (i === index ? newValue.toLocaleLowerCase() : v))
+          items.map((v, i) => (i === index ? newValue : v))
         );
       }
     },
