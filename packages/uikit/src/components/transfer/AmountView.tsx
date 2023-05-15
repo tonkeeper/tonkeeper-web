@@ -10,7 +10,10 @@ import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonSe
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
-import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
+import {
+  getDecimalSeparator,
+  getNotDecimalSeparator,
+} from '@tonkeeper/core/dist/utils/formatting';
 import {
   formatSendValue,
   getJettonDecimals,
@@ -35,6 +38,8 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
 import { ChevronLeftIcon } from '../Icon';
 import { Gap } from '../Layout';
 import {
@@ -43,10 +48,6 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
-import { AssetSelect } from './AssetSelect';
-import { InputSize, Sentence } from './Sentence';
 import { defaultSize, getInputSize, useButtonPosition } from './amountHooks';
 import {
   AmountState,
@@ -57,7 +58,9 @@ import {
   setAmountStateValue,
   toggleAmountState,
 } from './amountState';
+import { AssetSelect } from './AssetSelect';
 import { ButtonBlock, notifyError } from './common';
+import { InputSize, Sentence } from './Sentence';
 
 const Center = styled.div`
   text-align: center;
@@ -208,6 +211,14 @@ const useEstimateTransaction = (
   });
 };
 
+const replaceTypedDecimalSeparator = (value: string): string => {
+  if (value.endsWith(getNotDecimalSeparator())) {
+    const updated = value.slice(0, -1) + getDecimalSeparator();
+    if (isNumeric(removeGroupSeparator(updated))) return updated;
+  }
+  return value;
+};
+
 const seeIfValueValid = (value: string, decimals: number) => {
   if (value.length > 21) return false;
   if (value !== '') {
@@ -305,6 +316,8 @@ export const AmountView: FC<{
     const decimals = inputAmount.inFiat
       ? 2
       : getJettonDecimals(jetton, jettons);
+
+    value = replaceTypedDecimalSeparator(value);
 
     if (!seeIfValueValid(value, decimals)) {
       value = inputAmount.primaryValue;
