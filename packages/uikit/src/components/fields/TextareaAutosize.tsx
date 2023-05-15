@@ -103,6 +103,7 @@ const Textarea = styled.textarea`
   border: none;
   background: transparent;
   flex-grow: 1;
+  box-sizing: border-box;
 
   font-style: normal;
   font-weight: 500;
@@ -113,7 +114,7 @@ const Textarea = styled.textarea`
 
   color: ${(props) => props.theme.textPrimary};
 
-  padding: 30px 0 9px;
+  padding: 30px 0 10px;
   resize: none;
 
   word-break: break-all;
