@@ -64,7 +64,7 @@ function formatEntryAndTail(entry: string, tail: string | undefined) {
   return path.join(getDecimalSeparator());
 }
 export function formatNumberValue(value: BigNumber) {
-  const [entry, tail] = value.toFormat().split('.');
+  const [entry, tail] = value.toString().split('.');
   return formatEntryAndTail(entry, tail);
 }
 
