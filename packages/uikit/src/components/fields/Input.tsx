@@ -9,8 +9,6 @@ export const InputBlock = styled.div<{
   scanner?: boolean;
 }>`
   width: 100%;
-  height: 64px;
-  overflow: hidden;
   border-radius: ${(props) => props.theme.cornerSmall};
   display: flex;
   padding: 0 1rem;
