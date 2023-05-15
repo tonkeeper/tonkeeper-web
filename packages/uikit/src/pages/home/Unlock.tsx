@@ -68,6 +68,7 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
   const sdk = useAppSdk();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { account } = useAppContext();
 
   const ref = useRef<HTMLInputElement | null>(null);
   const { mutate: mutateLogOut, isLoading: isLogOutLoading } =
@@ -94,7 +95,13 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
   };
 
   const onLogOut = async () => {
-    const confirm = await sdk.confirm(t('Delete_wallet_data_description'));
+    const confirm = await sdk.confirm(
+      t(
+        account.publicKeys.length > 1
+          ? 'logout_on_unlock_many'
+          : 'logout_on_unlock_one'
+      )
+    );
     if (confirm) {
       await mutateLogOut();
       navigate(AppRoute.home);

@@ -1,13 +1,11 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
-  TonTransferParams,
   parseTonTransfer,
+  TonTransferParams,
 } from '@tonkeeper/core/dist/service/deeplinkingService';
-import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { seeIfAddressEqual } from '@tonkeeper/core/dist/utils/common';
-import { DefaultDecimals } from '@tonkeeper/core/dist/utils/send';
-import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext } from '../../hooks/appContext';
@@ -16,13 +14,13 @@ import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
-import { Notification } from '../Notification';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
+import { Notification } from '../Notification';
 import { AmountView } from './AmountView';
+import { childFactoryCreator, duration, Wrapper } from './common';
 import { ConfirmView } from './ConfirmView';
 import { RecipientView, useGetToAccount } from './RecipientView';
-import { Wrapper, childFactoryCreator, duration } from './common';
 
 const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
@@ -93,24 +91,42 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
 
   const processJetton = useCallback(
     async ({ amount, jetton }: TonTransferParams) => {
-      if (!amount && !jetton) return;
+      if (!amount) {
+        return true;
+      }
 
-      const balance = filter.balances.find((item) =>
-        seeIfAddressEqual(item.jettonAddress, jetton)
-      );
-      const decimals = balance?.metadata?.decimals ?? DefaultDecimals;
+      if (jetton) {
+        const balance = filter.balances.find((item) =>
+          seeIfAddressEqual(item.jettonAddress, jetton)
+        );
+        if (!balance) {
+          sdk.uiEvents.emit('copy', {
+            method: 'copy',
+            params: t('Unexpected_QR_Code'),
+          });
+          return false;
+        }
 
-      const amountValue = amount ? formatDecimals(amount, decimals) : 0;
+        setAmount({
+          amount: shiftedDecimals(amount, balance.metadata?.decimals),
+          jetton: balance.jettonAddress,
+          max: false,
+          done: false,
+          fee: undefined!,
+        });
+      } else {
+        setAmount({
+          amount: shiftedDecimals(amount),
+          jetton: asset,
+          max: false,
+          done: false,
+          fee: undefined!,
+        });
+      }
 
-      setAmount({
-        amount: new BigNumber(amountValue),
-        jetton: balance?.jettonAddress ?? asset,
-        max: false,
-        done: false,
-        fee: undefined!,
-      });
+      return true;
     },
-    [setAmount, filter, asset]
+    [sdk, setAmount, filter, asset]
   );
 
   const onScan = async (signature: string) => {
@@ -121,8 +137,10 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
         params: t('Unexpected_QR_Code'),
       });
     } else {
-      await processJetton(param);
-      await processRecipient(param);
+      const ok = await processJetton(param);
+      if (ok) {
+        await processRecipient(param);
+      }
     }
   };
 

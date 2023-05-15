@@ -201,5 +201,11 @@
   },
   "Unexpected_QR_Code": {
     "message": "Unexpected QR Code"
+  },
+  "logout_on_unlock_one": {
+    "message": "This will erase keys to the wallet. Make sure you have backed up your secret recovery phrase."
+  },
+  "logout_on_unlock_many": {
+    "message": "This will erase keys to all your wallets. Make sure you have backed up your secret recovery phrases."
   }
 }
