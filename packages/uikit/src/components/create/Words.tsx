@@ -224,7 +224,6 @@ const WordInput: FC<{
   focusNext: () => void;
   test: number;
   isValid?: boolean;
-  submitted?: boolean;
   tabIndex: number;
 }> = ({ value, test, onChange, focusNext, isValid, tabIndex }) => {
   const [active, setActive] = useState(false);
@@ -400,7 +399,6 @@ export const ImportWords: FC<{
   isLoading: boolean;
   onMnemonic: (mnemonic: string[]) => void;
 }> = ({ isLoading, onMnemonic }) => {
-  const [submitted, setSubmit] = useState(false);
   const sdk = useAppSdk();
   const { standalone } = useAppContext();
   const ref = useRef<HTMLDivElement>(null);
@@ -451,7 +449,6 @@ export const ImportWords: FC<{
     });
   };
   const onSubmit = async () => {
-    setSubmit(true);
     const invalid = mnemonic.findIndex((work) => !seeIfValidWord(work));
     if (invalid != -1) {
       focusInput(ref.current, invalid);
@@ -491,7 +488,6 @@ export const ImportWords: FC<{
               value={item}
               test={index + 1}
               isValid={validations[index]}
-              submitted={submitted}
               onChange={(newValue) => onChange(newValue, index)}
               tabIndex={index + 1}
               focusNext={() => focusInput(ref.current, index + 1)}
