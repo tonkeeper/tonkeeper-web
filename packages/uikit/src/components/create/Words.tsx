@@ -225,13 +225,13 @@ const WordInput: FC<{
   isValid?: boolean;
   submitted?: boolean;
   tabIndex: number;
-}> = ({ value, test, onChange, isValid, submitted, tabIndex }) => {
+}> = ({ value, test, onChange, isValid, tabIndex }) => {
   const [active, setActive] = useState(false);
   const [touched, setTouched] = useState(false);
 
-  const valid = submitted || touched ? isValid === true : isValid || active;
+  const valid = touched ? isValid === true : isValid || active;
   return (
-    <InputBlock submitted={submitted || touched} active={active} valid={valid}>
+    <InputBlock submitted={touched} active={active} valid={valid}>
       <Number1>{test}:</Number1>
       <Input
         tabIndex={tabIndex}
@@ -318,21 +318,21 @@ export const Check: FC<{
 
       <Block>
         <WordInput
-          tabIndex={0}
+          tabIndex={1}
           test={test1}
           value={one}
           onChange={setOne}
           isValid={seeIfValid(one, mnemonic[test1 - 1])}
         />
         <WordInput
-          tabIndex={1}
+          tabIndex={2}
           test={test2}
           value={two}
           onChange={setTwo}
           isValid={seeIfValid(two, mnemonic[test2 - 1])}
         />
         <WordInput
-          tabIndex={2}
+          tabIndex={3}
           test={test3}
           value={three}
           onChange={setThree}
@@ -341,6 +341,7 @@ export const Check: FC<{
       </Block>
       <Block>
         <Button
+          tabIndex={4}
           size="large"
           fullWidth
           primary
@@ -399,14 +400,22 @@ export const ImportWords: FC<{
     (newValue: string, index: number) => {
       if (newValue.includes(' ')) {
         let values = newValue.trim().toLocaleLowerCase().split(' ');
-        const max = Math.min(24 - index, values.length);
-        values = values.slice(0, max);
-        setMnemonic((items) => {
-          items = [...items];
-          items.splice(index, max, ...values);
-          return items;
-        });
-        fucusInput(ref.current, max - 1);
+        if (values.length == 1) {
+          setMnemonic((items) =>
+            items.map((v, i) => (i === index ? values[0] : v))
+          );
+          fucusInput(ref.current, index + 1);
+        } else {
+          const max = Math.min(24 - index, values.length);
+          values = values.slice(0, max);
+          setMnemonic((items) => {
+            items = [...items];
+            items.splice(index, max, ...values);
+            return items;
+          });
+          fucusInput(ref.current, max - 1);
+        }
+
         return;
       } else {
         return setMnemonic((items) =>
@@ -470,7 +479,7 @@ export const ImportWords: FC<{
               isValid={validations[index]}
               submitted={submitted}
               onChange={(newValue) => onChange(newValue, index)}
-              tabIndex={index}
+              tabIndex={index + 1}
             />
           ))}
         </Inputs>
