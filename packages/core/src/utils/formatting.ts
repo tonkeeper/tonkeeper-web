@@ -36,6 +36,11 @@ export const getDecimalSeparator = () => {
   return getSeparator(locale, 'decimal') ?? defaultDecimalsSeparator;
 };
 
+export const getNotDecimalSeparator = () => {
+  const separator = getDecimalSeparator();
+  return { '.': ',', ',': '.' }[separator] as string;
+};
+
 export const getGroupSeparator = () => {
   const locale = getBrowserLocale();
   return getSeparator(locale, 'group') ?? defaultGroupSeparator;
