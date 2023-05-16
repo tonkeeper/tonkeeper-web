@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/menmonicService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import React, { FC, useEffect, useRef, useState } from 'react';
@@ -11,7 +11,6 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
-import { AppRoute } from '../../libs/routes';
 import { useMutateDeleteAll } from '../../state/account';
 
 const Block = styled.form<{ minHeight?: string }>`
@@ -67,7 +66,6 @@ const useMutateUnlock = () => {
 export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
   const sdk = useAppSdk();
   const { t } = useTranslation();
-  const client = useQueryClient();
   const navigate = useNavigate();
   const { account } = useAppContext();
 
@@ -105,8 +103,7 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
     );
     if (confirm) {
       await mutateLogOut();
-      await client.invalidateQueries();
-      navigate(AppRoute.home);
+      window.location.reload();
     }
   };
 
