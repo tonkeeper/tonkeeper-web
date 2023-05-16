@@ -11,7 +11,6 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
-import { AppRoute } from '../../libs/routes';
 import { useMutateDeleteAll } from '../../state/account';
 
 const Block = styled.form<{ minHeight?: string }>`
@@ -104,7 +103,7 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
     );
     if (confirm) {
       await mutateLogOut();
-      navigate(AppRoute.home);
+      window.location.reload();
     }
   };
 
