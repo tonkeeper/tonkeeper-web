@@ -233,12 +233,15 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
           });
 
           if (startScroll <= 0 && direction === 'down') {
-            if (startY - top < -30) {
-              // pool down more then 30px
-              console.log('touchend', startScroll, direction, startY - top);
+            // if (startY - top < -30) {
+            //   // pool down more then 30px
+            //   console.log('touchend', startScroll, direction, startY - top);
 
-              //   window.addEventListener('touchend', handleClose);
-              //   window.addEventListener('touchcancel', handleClose);
+            //   window.addEventListener('touchend', handleClose);
+            //   window.addEventListener('touchcancel', handleClose);
+            // }
+            if (startY - top < -60) {
+              handleClose();
             }
           } else if (startScroll >= maxScrollTop && direction === 'up') {
             event.preventDefault();
