@@ -196,6 +196,7 @@ export const NotificationScrollContext =
 
 const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
   React.memo(({ children, handleClose }) => {
+    const sdk = useAppSdk();
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -229,8 +230,12 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
               // pool down more then 30px
               console.log('touchend', startScroll, direction, startY - top);
 
-              window.addEventListener('touchend', handleClose);
-              window.addEventListener('touchcancel', handleClose);
+              sdk.uiEvents.emit('copy', {
+                method: 'copy',
+                params: String(startY - top),
+              });
+              //   window.addEventListener('touchend', handleClose);
+              //   window.addEventListener('touchcancel', handleClose);
             }
           } else if (startScroll >= maxScrollTop && direction === 'up') {
             event.preventDefault();
