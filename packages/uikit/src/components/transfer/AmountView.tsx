@@ -239,7 +239,7 @@ const inputToBigNumber = (value: string): BigNumber => {
 
 export const AmountView: FC<{
   onClose: () => void;
-  onBack: () => void;
+  onBack: (data: AmountData | undefined) => void;
   setAmount: (data: AmountData | undefined) => void;
   recipient: RecipientData;
   asset: string;
@@ -361,6 +361,26 @@ export const AmountView: FC<{
     );
   }, [valid, inputAmount]);
 
+  const handleBack = () => {
+    if (isValid) {
+      const coinValue = inputToBigNumber(getCoinAmount(inputAmount));
+      const fiatValue = inputAmount.inFiat
+        ? inputToBigNumber(inputAmount.primaryValue)
+        : undefined;
+
+      onBack({
+        amount: coinValue,
+        fiat: fiatValue,
+        max,
+        done: false,
+        jetton,
+        fee: undefined!,
+      });
+    } else {
+      onBack(undefined);
+    }
+  };
+
   const onSubmit: React.FormEventHandler<HTMLFormElement> = useCallback(
     async (e) => {
       e.stopPropagation();
@@ -428,7 +448,7 @@ export const AmountView: FC<{
   return (
     <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
       <NotificationTitleBlock>
-        <BackButton onClick={onBack}>
+        <BackButton onClick={handleBack}>
           <ChevronLeftIcon />
         </BackButton>
         <Center>
