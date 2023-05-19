@@ -3,11 +3,10 @@ import { AmountData } from '@tonkeeper/core/dist/entries/send';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import {
-  cropTail,
   formatNumberValue,
   getCoinAmountValue,
   getFiatAmountValue,
-  getJettonDecimals,
+  getFiatPrice,
   getJettonSymbol,
 } from '@tonkeeper/core/dist/utils/send';
 import { formatter } from '../../hooks/balance';
@@ -37,19 +36,25 @@ export type StateOptions = {
   stock: TonendpointStock | undefined;
 };
 const getFiatValue = (coinValue: string, options: StateOptions) => {
+  const price = getFiatPrice(
+    options.stock,
+    options.jettons,
+    options.fiat,
+    options.jetton
+  );
+
+  if (price == null) {
+    return undefined;
+  }
+
   if (coinValue == '' || coinValue == '0') {
     return '0';
   }
 
-  const fiatAmount = getFiatAmountValue(
-    options.stock,
-    options.jettons,
-    options.fiat,
-    options.jetton,
-    coinValue
-  );
+  const fiatAmount = getFiatAmountValue(price, coinValue);
 
   if (!fiatAmount) return undefined;
+
   return formatter.format(fiatAmount, {
     ignoreZeroTruncate: true,
   });
@@ -212,54 +217,13 @@ export const setAmountStateMax = (
   };
 };
 
-export const setAmountStateJetton = (
-  options: {
-    state: AmountState;
-    newMaxValue?: string;
-  } & StateOptions
-): AmountState => {
-  const { state, newMaxValue } = options;
-
+export const setAmountStateJetton = (options: StateOptions): AmountState => {
   const jettonSymbol = getJettonSymbol(options.jetton, options.jettons);
-
-  if (newMaxValue) {
-    return {
-      primaryValue: newMaxValue,
-      primarySymbol: jettonSymbol,
-      inFiat: false,
-      secondaryValue: getFiatValue(newMaxValue, options),
-      secondarySymbol: options.fiat,
-    };
-  }
-
-  if (state.inFiat) {
-    const secondaryValue = getCoinValue(state.primaryValue, options);
-    if (secondaryValue == undefined) {
-      return {
-        primaryValue: state.primaryValue,
-        primarySymbol: jettonSymbol,
-        inFiat: false,
-        secondaryValue: undefined,
-        secondarySymbol: options.fiat,
-      };
-    } else {
-      return {
-        primaryValue: state.primaryValue,
-        primarySymbol: options.fiat,
-        inFiat: state.inFiat,
-        secondaryValue: secondaryValue,
-        secondarySymbol: jettonSymbol,
-      };
-    }
-  } else {
-    const decimals = getJettonDecimals(options.jetton, options.jettons);
-    const primaryValue = cropTail(state.primaryValue, decimals);
-    return {
-      primaryValue: primaryValue,
-      primarySymbol: jettonSymbol,
-      inFiat: false,
-      secondaryValue: getFiatValue(primaryValue, options),
-      secondarySymbol: options.fiat,
-    };
-  }
+  return {
+    primaryValue: '0',
+    primarySymbol: jettonSymbol,
+    inFiat: false,
+    secondaryValue: getFiatValue('0', options),
+    secondarySymbol: options.fiat,
+  };
 };

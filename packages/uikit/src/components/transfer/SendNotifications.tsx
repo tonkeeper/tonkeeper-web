@@ -58,10 +58,14 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     setAmount(data);
   };
 
-  const backToRecipient = useCallback(() => {
-    setRight(false);
-    setRecipient((value) => (value ? { ...value, done: false } : undefined));
-  }, [setRecipient]);
+  const backToRecipient = useCallback(
+    (data: AmountData | undefined) => {
+      setRight(false);
+      setAmount(data);
+      setRecipient((value) => (value ? { ...value, done: false } : undefined));
+    },
+    [setRecipient]
+  );
 
   const backToAmount = useCallback(() => {
     if (ios) openIosKeyboard('decimal');

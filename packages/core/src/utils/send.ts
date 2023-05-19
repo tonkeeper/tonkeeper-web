@@ -169,35 +169,34 @@ export const getRemaining = (
   ];
 };
 
-export const getFiatAmountValue = (
+export const getFiatPrice = (
   stock: TonendpointStock | undefined,
   jettons: JettonsBalances,
   fiat: FiatCurrencies,
-  jetton: string,
-  amount: string
+  jetton: string
 ) => {
-  amount = removeGroupSeparator(amount);
-
   if (!stock) return undefined;
 
-  if (!isNumeric(amount)) return new BigNumber(0);
-
-  const value = new BigNumber(toNumberAmount(amount));
-
   if (jetton === CryptoCurrency.TON) {
-    const price = getTonCoinStockPrice(stock.today, fiat);
-    return value.multipliedBy(price);
+    return getTonCoinStockPrice(stock.today, fiat);
   } else {
     const jettonInfo = jettons.balances.find(
       (item) => item.jettonAddress === jetton
     );
 
     if (!jettonInfo) return undefined;
-
     const price = getJettonStockPrice(jettonInfo, stock.today, fiat);
-    if (!price) return undefined;
-    return value.multipliedBy(price);
+    return price;
   }
+};
+
+export const getFiatAmountValue = (price: BigNumber, amount: string) => {
+  amount = removeGroupSeparator(amount);
+
+  if (!isNumeric(amount)) return new BigNumber(0);
+
+  const value = new BigNumber(toNumberAmount(amount));
+  return value.multipliedBy(price);
 };
 
 export const getCoinAmountValue = (
