@@ -225,15 +225,16 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
 
         var direction = lastY - top < 0 ? 'down' : 'up';
         if (event.cancelable) {
+          sdk.uiEvents.emit('copy', {
+            method: 'copy',
+            params: `${direction} ${startY - top}`,
+          });
+
           if (startScroll <= 0 && direction === 'down') {
             if (startY - top < -30) {
               // pool down more then 30px
               console.log('touchend', startScroll, direction, startY - top);
 
-              sdk.uiEvents.emit('copy', {
-                method: 'copy',
-                params: String(startY - top),
-              });
               //   window.addEventListener('touchend', handleClose);
               //   window.addEventListener('touchcancel', handleClose);
             }
