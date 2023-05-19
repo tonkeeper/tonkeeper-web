@@ -227,7 +227,9 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
         if (event.cancelable) {
           sdk.uiEvents.emit('copy', {
             method: 'copy',
-            params: `${direction} ${startY - top}`,
+            params: `${direction} ${startScroll} ${maxScrollTop} ${
+              startY - top
+            }`,
           });
 
           if (startScroll <= 0 && direction === 'down') {
