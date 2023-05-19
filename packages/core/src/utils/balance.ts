@@ -58,7 +58,6 @@ export const getJettonStockPrice = (
   rates: { [key: string]: string },
   currency: FiatCurrencies
 ) => {
-  if (jetton.verification !== 'whitelist') return null;
   return getStockPrice(
     Address.parse(jetton.jettonAddress).toString(),
     rates,

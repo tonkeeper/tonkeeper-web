@@ -9,7 +9,10 @@ import {
   getDecimalSeparator,
   getGroupSeparator,
 } from '@tonkeeper/core/dist/utils/formatting';
-import { getFiatAmountValue } from '@tonkeeper/core/dist/utils/send';
+import {
+  getFiatAmountValue,
+  getFiatPrice,
+} from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import React, { PropsWithChildren, useMemo } from 'react';
 import styled, { css } from 'styled-components';
@@ -167,17 +170,16 @@ export const useFiatAmount = (
   const { data: stock } = useTonenpointStock();
 
   return useMemo(() => {
+    const price = getFiatPrice(stock, jettons, fiat, jetton);
+    if (!price) return undefined;
+
     const fiatAmount = getFiatAmountValue(
-      stock,
-      jettons,
-      fiat,
-      jetton,
+      price,
       amount.toFormat({
         decimalSeparator: getDecimalSeparator(),
         groupSeparator: getGroupSeparator(),
       })
     );
-    if (fiatAmount === undefined) return undefined;
     return formatFiatCurrency(fiat, fiatAmount);
   }, [stock, jettons, fiat, jetton, amount]);
 };

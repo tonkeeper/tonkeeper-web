@@ -431,10 +431,6 @@ export const AmountView: FC<{
     setJetton(asset);
     setAmountState(
       setAmountStateJetton({
-        state: inputAmount,
-        newMaxValue: max
-          ? getMaxValue(jettons, info, asset, format)
-          : undefined,
         stock,
         jetton: asset,
         jettons,
