@@ -103,7 +103,7 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
     );
     if (confirm) {
       await mutateLogOut();
-      window.location.reload();
+      window.location.href = window.location.href;
     }
   };
 
