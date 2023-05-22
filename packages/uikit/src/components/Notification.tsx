@@ -196,7 +196,6 @@ export const NotificationScrollContext =
 
 const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
   React.memo(({ children, handleClose }) => {
-    const sdk = useAppSdk();
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -235,7 +234,7 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
       const handlerTouchMoveWindow = function (event: TouchEvent) {
         if (startY === 0) return;
         var top = event.touches[0].clientY;
-        if (startScroll <= 0 && startY - top < -160) {
+        if (startScroll <= 0 && startY - top < -220) {
           window.addEventListener('touchend', handleClose);
           window.addEventListener('touchcancel', handleClose);
         }
