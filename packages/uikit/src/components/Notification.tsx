@@ -232,15 +232,9 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
         lastY = top;
       };
 
-      const handlerTouchMove = function (event: TouchEvent) {
+      const handlerTouchMoveWindow = function (event: TouchEvent) {
         if (startY === 0) return;
         var top = event.touches[0].clientY;
-
-        sdk.uiEvents.emit('copy', {
-          method: 'copy',
-          params: `${startScroll} ${maxScrollTop} ${startY - top}`,
-        });
-
         if (startScroll <= 0 && startY - top < -160) {
           window.addEventListener('touchend', handleClose);
           window.addEventListener('touchcancel', handleClose);
@@ -249,12 +243,12 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
 
       element.addEventListener('touchstart', handlerTouchStart);
       element.addEventListener('touchmove', handlerTouchMoveElement);
-      window.addEventListener('touchmove', handlerTouchMove);
+      window.addEventListener('touchmove', handlerTouchMoveWindow);
 
       return () => {
         element.removeEventListener('touchstart', handlerTouchStart);
         element.removeEventListener('touchmove', handlerTouchMoveElement);
-        window.removeEventListener('touchmove', handlerTouchMove);
+        window.removeEventListener('touchmove', handlerTouchMoveWindow);
         window.removeEventListener('touchend', handleClose);
         window.removeEventListener('touchcancel', handleClose);
       };
