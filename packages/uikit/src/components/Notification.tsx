@@ -196,6 +196,7 @@ export const NotificationScrollContext =
 
 const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
   React.memo(({ children, handleClose }) => {
+    const sdk = useAppSdk();
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -219,32 +220,35 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
         startScroll = element.scrollTop;
       };
 
-      const handlerTouchMove = function (event: TouchEvent) {
+      const handlerTouchMoveElement = function (event: TouchEvent) {
         var top = event.touches[0].clientY;
 
         var direction = lastY - top < 0 ? 'down' : 'up';
         if (event.cancelable) {
-          if (startScroll <= 0 && direction === 'down') {
-            if (startY - top < -30) {
-              // pool down more then 30px
-              console.log('touchend', startScroll, direction, startY - top);
-
-              window.addEventListener('touchend', handleClose);
-              window.addEventListener('touchcancel', handleClose);
-            }
-          } else if (startScroll >= maxScrollTop && direction === 'up') {
+          if (startScroll >= maxScrollTop && direction === 'up') {
             event.preventDefault();
           }
         }
         lastY = top;
       };
 
+      const handlerTouchMoveWindow = function (event: TouchEvent) {
+        if (startY === 0) return;
+        var top = event.touches[0].clientY;
+        if (startScroll <= 0 && startY - top < -160) {
+          window.addEventListener('touchend', handleClose);
+          window.addEventListener('touchcancel', handleClose);
+        }
+      };
+
       element.addEventListener('touchstart', handlerTouchStart);
-      element.addEventListener('touchmove', handlerTouchMove);
+      element.addEventListener('touchmove', handlerTouchMoveElement);
+      window.addEventListener('touchmove', handlerTouchMoveWindow);
 
       return () => {
         element.removeEventListener('touchstart', handlerTouchStart);
-        element.removeEventListener('touchmove', handlerTouchMove);
+        element.removeEventListener('touchmove', handlerTouchMoveElement);
+        window.removeEventListener('touchmove', handlerTouchMoveWindow);
         window.removeEventListener('touchend', handleClose);
         window.removeEventListener('touchcancel', handleClose);
       };
