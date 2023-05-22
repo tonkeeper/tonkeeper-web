@@ -55,11 +55,7 @@ export const getActivityTitle = (
     );
   }
   const date = new Date(timestamp * 1000);
-  if (key.startsWith('week')) {
-    return capitalize(
-      new Intl.DateTimeFormat(language, { weekday: 'long' }).format(date)
-    );
-  } else if (key.startsWith('month')) {
+  if (key.startsWith('month')) {
     return capitalize(
       new Intl.DateTimeFormat(language, {
         day: 'numeric',
@@ -102,7 +98,7 @@ const getEventGroup = (
     today.getMonth() === date.getMonth() &&
     today.getFullYear() === date.getFullYear()
   ) {
-    return `month-${date.getDay()}`;
+    return `month-${date.getDate()}`;
   }
 
   return `year-${date.getFullYear()}-${date.getMonth() + 1}`;
@@ -192,13 +188,13 @@ export const groupAndFilterTonActivityItems = (
 };
 
 export const groupActivity = (list: ActivityItem[]) => {
-  list.sort((a, b) => (a.timestamp > b.timestamp ? -1 : 1));
+  list.sort((a, b) => b.timestamp - a.timestamp);
 
   const todayDate = new Date();
   const yesterdayDate = new Date();
   yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 
-  const { today, yesterday, month, ...rest } = list.reduce((acc, item) => {
+  const { today, yesterday, ...rest } = list.reduce((acc, item) => {
     const group = getEventGroup(item.timestamp, todayDate, yesterdayDate);
     if (acc[group]) {
       acc[group].push(item);
@@ -208,7 +204,7 @@ export const groupActivity = (list: ActivityItem[]) => {
     return acc;
   }, {} as Record<string, ActivityItem[]>);
 
-  const result = [] as [] as ActivityGroup[];
+  const result = [] as ActivityGroup[];
   if (today) {
     result.push(['today', today]);
   }
@@ -216,9 +212,6 @@ export const groupActivity = (list: ActivityItem[]) => {
     result.push(['yesterday', yesterday]);
   }
 
-  Object.entries(rest)
-    .filter(([key]) => key.startsWith('week'))
-    .forEach((value) => result.push(value));
 
   Object.entries(rest)
     .filter(([key]) => key.startsWith('month'))
