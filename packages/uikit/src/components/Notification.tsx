@@ -220,6 +220,18 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
         startScroll = element.scrollTop;
       };
 
+      const handlerTouchMoveElement = function (event: TouchEvent) {
+        var top = event.touches[0].clientY;
+
+        var direction = lastY - top < 0 ? 'down' : 'up';
+        if (event.cancelable) {
+          if (startScroll >= maxScrollTop && direction === 'up') {
+            event.preventDefault();
+          }
+        }
+        lastY = top;
+      };
+
       const handlerTouchMove = function (event: TouchEvent) {
         if (startY === 0) return;
         var top = event.touches[0].clientY;
@@ -237,20 +249,16 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
             window.addEventListener('touchcancel', handleClose);
           }
         }
-
-        if (event.cancelable) {
-          if (startScroll >= maxScrollTop && direction === 'up') {
-            event.preventDefault();
-          }
-        }
         lastY = top;
       };
 
       element.addEventListener('touchstart', handlerTouchStart);
+      element.addEventListener('touchmove', handlerTouchMoveElement);
       window.addEventListener('touchmove', handlerTouchMove);
 
       return () => {
         element.removeEventListener('touchstart', handlerTouchStart);
+        element.removeEventListener('touchmove', handlerTouchMoveElement);
         window.removeEventListener('touchmove', handlerTouchMove);
         window.removeEventListener('touchend', handleClose);
         window.removeEventListener('touchcancel', handleClose);
