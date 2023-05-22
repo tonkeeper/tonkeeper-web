@@ -232,7 +232,7 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
         });
 
         if (startScroll <= 0 && direction === 'down') {
-          if (startY - top < -80) {
+          if (startY - top < -160) {
             window.addEventListener('touchend', handleClose);
             window.addEventListener('touchcancel', handleClose);
           }
