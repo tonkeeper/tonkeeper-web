@@ -221,7 +221,6 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
       };
 
       const handlerTouchMove = function (event: TouchEvent) {
-        if (startY == 0) return;
         var top = event.touches[0].clientY;
 
         var direction = lastY - top < 0 ? 'down' : 'up';
@@ -234,12 +233,7 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
           });
 
           if (startScroll <= 0 && direction === 'down') {
-            // if (startY - top < -30) {
-            //   // pool down more then 30px
-            //   console.log('touchend', startScroll, direction, startY - top);
-
-            // }
-            if (startY - top < -60) {
+            if (startY - top < -80) {
               window.addEventListener('touchend', handleClose);
               window.addEventListener('touchcancel', handleClose);
             }
