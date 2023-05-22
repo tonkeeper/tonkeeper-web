@@ -173,6 +173,25 @@ const Name = styled.span`
   color: ${(props) => props.theme.textPrimary};
   margin-left: 4px;
 `;
+
+const RecipientName: FC<{ recipient: RecipientData }> = ({ recipient }) => {
+  const { address } = recipient;
+
+  if ('isFavorite' in address && address.isFavorite) {
+    return <Name>{address.name}</Name>;
+  }
+
+  if (recipient.toAccount.name) {
+    return <Name>{recipient.toAccount.name}</Name>;
+  }
+
+  if ('dns' in address && address.dns.names === null) {
+    return <Name>{address.address}</Name>;
+  }
+
+  return <></>;
+};
+
 const Address = styled.span`
   margin-left: 4px;
 `;
@@ -437,6 +456,7 @@ export const AmountView: FC<{
         fiat,
       })
     );
+    setMax(false);
   };
 
   const address = toShortAddress(recipient.toAccount.address.bounceable);
@@ -451,9 +471,7 @@ export const AmountView: FC<{
           <Title>{t('txActions_amount')}</Title>
           <SubTitle>
             {t('send_screen_steps_done_to').replace('%{name}', '')}
-            {recipient.toAccount.name && (
-              <Name>{recipient.toAccount.name}</Name>
-            )}
+            <RecipientName recipient={recipient} />
             <Address>{address}</Address>
           </SubTitle>
         </Center>
