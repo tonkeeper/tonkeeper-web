@@ -236,20 +236,15 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
         if (startY === 0) return;
         var top = event.touches[0].clientY;
 
-        var direction = lastY - top < 0 ? 'down' : 'up';
-
         sdk.uiEvents.emit('copy', {
           method: 'copy',
-          params: `${direction} ${startScroll} ${maxScrollTop} ${startY - top}`,
+          params: `${startScroll} ${maxScrollTop} ${startY - top}`,
         });
 
-        if (startScroll <= 0 && direction === 'down') {
-          if (startY - top < -160) {
-            window.addEventListener('touchend', handleClose);
-            window.addEventListener('touchcancel', handleClose);
-          }
+        if (startScroll <= 0 && startY - top < -160) {
+          window.addEventListener('touchend', handleClose);
+          window.addEventListener('touchcancel', handleClose);
         }
-        lastY = top;
       };
 
       element.addEventListener('touchstart', handlerTouchStart);
