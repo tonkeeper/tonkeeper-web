@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
 } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import styled, { css } from 'styled-components';
@@ -220,7 +220,7 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
         startScroll = element.scrollTop;
       };
 
-      const handlerTouchMove = function (event: TouchEvent) {\
+      const handlerTouchMove = function (event: TouchEvent) {
         if (startY == 0) return;
         var top = event.touches[0].clientY;
 
