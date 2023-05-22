@@ -437,6 +437,7 @@ export const AmountView: FC<{
         fiat,
       })
     );
+    setMax(false);
   };
 
   const address = toShortAddress(recipient.toAccount.address.bounceable);
