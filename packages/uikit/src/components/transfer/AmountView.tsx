@@ -184,6 +184,11 @@ const RecipientName: FC<{ recipient: RecipientData }> = ({ recipient }) => {
   if (recipient.toAccount.name) {
     return <Name>{recipient.toAccount.name}</Name>;
   }
+
+  if ('dns' in address && address.dns.names === null) {
+    return <Name>{address.address}</Name>;
+  }
+
   return <></>;
 };
 
