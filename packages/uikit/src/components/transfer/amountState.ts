@@ -208,13 +208,25 @@ export const setAmountStateMax = (
 ): AmountState => {
   const { value, state } = options;
 
-  return {
-    primaryValue: value,
-    primarySymbol: state.primarySymbol,
-    inFiat: false,
-    secondaryValue: getFiatValue(value, options),
-    secondarySymbol: state.secondarySymbol,
-  };
+  const fiat = getFiatValue(value, options);
+
+  if (state.inFiat && fiat) {
+    return {
+      primaryValue: fiat,
+      primarySymbol: state.primarySymbol,
+      inFiat: true,
+      secondaryValue: value,
+      secondarySymbol: state.secondarySymbol,
+    };
+  } else {
+    return {
+      primaryValue: value,
+      primarySymbol: state.primarySymbol,
+      inFiat: false,
+      secondaryValue: fiat,
+      secondarySymbol: state.secondarySymbol,
+    };
+  }
 };
 
 export const setAmountStateJetton = (options: StateOptions): AmountState => {
