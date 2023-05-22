@@ -9,7 +9,6 @@ import React, {
 import { CSSTransition } from 'react-transition-group';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
-import { useKeyboardHeight } from '../pages/import/hooks';
 import { Container } from '../styles/globalStyle';
 import { BackButton } from './fields/BackButton';
 import { CloseIcon } from './Icon';
@@ -199,7 +198,6 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
   React.memo(({ children, handleClose }) => {
     const sdk = useAppSdk();
     const scrollRef = useRef<HTMLDivElement>(null);
-    useKeyboardHeight();
 
     useEffect(() => {
       const element = scrollRef.current;

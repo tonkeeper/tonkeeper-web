@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { useEffect } from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 
@@ -13,6 +15,12 @@ export const useKeyboardHeight = () => {
     function resizeHandler(this: VisualViewport) {
       const doc = document.documentElement;
       doc.style.setProperty('--app-height', `${this.height}px`);
+      doc.style.overflow = 'hidden';
+      doc.style.height = `${this.height}px`;
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = `${this.height}px`;
+      document.getElementById('root')!.style.overflow = 'hidden';
+      document.getElementById('root')!.style.height = `${this.height}px`;
       message(`${this.height}px`);
     }
 
@@ -26,6 +34,13 @@ export const useKeyboardHeight = () => {
       const doc = document.documentElement;
       doc.style.setProperty('--app-height', `${innerHeight}px`);
       message(`${innerHeight}px`);
+
+      delete doc.style.overflow;
+      delete doc.style.height;
+      delete document.body.style.overflow;
+      delete document.body.style.height;
+      delete document.getElementById('root')!.style.overflow;
+      delete document.getElementById('root')!.style.height;
     };
   }, []);
 };
