@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import styled, { css } from 'styled-components';
@@ -220,7 +220,8 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
         startScroll = element.scrollTop;
       };
 
-      const handlerTouchMove = function (event: TouchEvent) {
+      const handlerTouchMove = function (event: TouchEvent) {\
+        if (startY == 0) return;
         var top = event.touches[0].clientY;
 
         var direction = lastY - top < 0 ? 'down' : 'up';
@@ -237,11 +238,10 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
             //   // pool down more then 30px
             //   console.log('touchend', startScroll, direction, startY - top);
 
-            //   window.addEventListener('touchend', handleClose);
-            //   window.addEventListener('touchcancel', handleClose);
             // }
             if (startY - top < -60) {
-              handleClose();
+              window.addEventListener('touchend', handleClose);
+              window.addEventListener('touchcancel', handleClose);
             }
           } else if (startScroll >= maxScrollTop && direction === 'up') {
             event.preventDefault();
@@ -251,11 +251,11 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> =
       };
 
       element.addEventListener('touchstart', handlerTouchStart);
-      element.addEventListener('touchmove', handlerTouchMove);
+      window.addEventListener('touchmove', handlerTouchMove);
 
       return () => {
         element.removeEventListener('touchstart', handlerTouchStart);
-        element.removeEventListener('touchmove', handlerTouchMove);
+        window.removeEventListener('touchmove', handlerTouchMove);
         window.removeEventListener('touchend', handleClose);
         window.removeEventListener('touchcancel', handleClose);
       };
