@@ -3,7 +3,7 @@ import { FetchAPI } from '../tonApiV1';
 import { TonendpointStock } from './stock';
 
 interface BootParams {
-  platform: 'ios' | 'android';
+  platform: 'ios' | 'android' | 'web';
   lang: 'en' | 'ru';
   build: string; // "2.8.0"
   network: Network;
@@ -65,7 +65,7 @@ export class Tonendpoint {
       lang = 'en',
       build = '3.0.0',
       network = Network.MAINNET,
-      platform = 'ios',
+      platform = 'web',
     }: Partial<BootParams>,
     { fetchApi = defaultFetch, basePath = defaultTonendpoint }: BootOptions
   ) {
