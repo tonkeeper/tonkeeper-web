@@ -2,6 +2,7 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
+import { Address } from 'ton-core';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { ColumnText } from '../Layout';
@@ -43,12 +44,13 @@ const RecipientItemAddress: FC<{ address: string }> = ({ address }) => {
 export const RecipientListItem: FC<{ recipient: RecipientData }> = ({
   recipient,
 }) => {
-  if ('isFavorite' in recipient.address && recipient.address) {
+  const { address } = recipient;
+  if ('isFavorite' in address && address.isFavorite) {
     return (
       <>
         <RecipientItem
-          name={recipient.address.name}
-          label={recipient.address.address}
+          name={address.name}
+          label={Address.parse(address.address).toString()}
         />
         <RecipientItemAddress
           address={recipient.toAccount.address.bounceable}
