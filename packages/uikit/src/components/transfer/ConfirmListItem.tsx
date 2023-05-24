@@ -49,8 +49,8 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({
     return (
       <>
         <RecipientItem
-          name={address.name}
-          label={Address.parse(address.address).toString()}
+          name={Address.parse(address.address).toString()}
+          label={address.name}
         />
         <RecipientItemAddress
           address={recipient.toAccount.address.bounceable}
