@@ -5,15 +5,18 @@ import {
   IAppSdk,
 } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { getAccountState } from '@tonkeeper/core/dist/service/accountService';
+import {
+  MinPasswordLength,
+  getAccountState,
+} from '@tonkeeper/core/dist/service/accountService';
 import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/menmonicService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import { Notification } from '../../components/Notification';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
-import { Notification } from '../../components/Notification';
 import { useTranslation } from '../../hooks/translation';
 
 export const getPasswordByNotification = async (
@@ -153,7 +156,7 @@ const PasswordUnlock: FC<{
           primary
           fullWidth
           type="submit"
-          disabled={password.length < 5}
+          disabled={password.length < MinPasswordLength}
           loading={isLoading}
         >
           {t('confirm')}

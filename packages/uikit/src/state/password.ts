@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetPasswordType, IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
   AuthState,
   defaultAuthState,
 } from '@tonkeeper/core/dist/entries/password';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
   addWalletVoucher,
   deleteWalletVoucher,
