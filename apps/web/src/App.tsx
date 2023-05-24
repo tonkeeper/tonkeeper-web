@@ -273,7 +273,9 @@ export const Loader: FC = () => {
 
   return (
     <OnImportAction.Provider value={navigate}>
-      <AfterImportAction.Provider value={() => navigate(AppRoute.home)}>
+      <AfterImportAction.Provider
+        value={() => navigate(AppRoute.home, { replace: true })}
+      >
         <AppContext.Provider value={context}>
           <Content
             activeWallet={activeWallet}
