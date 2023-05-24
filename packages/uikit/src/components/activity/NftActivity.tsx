@@ -193,7 +193,7 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({
 
   const preview = data?.previews?.find((item) => item.resolution === '100x100');
 
-  if (nftItemTransfer.sender?.address === wallet.active.rawAddress) {
+  if (nftItemTransfer.recipient?.address === wallet.active.rawAddress) {
     return (
       <ActionDetailsBlock event={event}>
         <div>
@@ -211,11 +211,11 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({
               </Amount>
             </>
           )}
-          <ActionDate kind="send" timestamp={timestamp} />
+          <ActionDate kind="received" timestamp={timestamp} />
         </div>
         <ListBlock margin={false} fullWidth>
-          {nftItemTransfer.recipient && (
-            <ActionRecipientDetails recipient={nftItemTransfer.recipient} />
+          {nftItemTransfer.sender && (
+            <ActionSenderDetails sender={nftItemTransfer.sender} />
           )}
           <ActionTransactionDetails event={event} />
           <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
@@ -241,11 +241,11 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({
             </Amount>
           </>
         )}
-        <ActionDate kind="received" timestamp={timestamp} />
+        <ActionDate kind="send" timestamp={timestamp} />
       </div>
       <ListBlock margin={false} fullWidth>
-        {nftItemTransfer.sender && (
-          <ActionSenderDetails sender={nftItemTransfer.sender} />
+        {nftItemTransfer.recipient && (
+          <ActionRecipientDetails recipient={nftItemTransfer.recipient} />
         )}
         <ActionTransactionDetails event={event} />
         <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
