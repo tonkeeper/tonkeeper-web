@@ -43,6 +43,19 @@ const RecipientItemAddress: FC<{ address: string }> = ({ address }) => {
 export const RecipientListItem: FC<{ recipient: RecipientData }> = ({
   recipient,
 }) => {
+  if ('isFavorite' in recipient.address && recipient.address) {
+    return (
+      <>
+        <RecipientItem
+          name={recipient.address.address}
+          label={recipient.address.address}
+        />
+        <RecipientItemAddress
+          address={recipient.toAccount.address.bounceable}
+        />
+      </>
+    );
+  }
   if ('dns' in recipient.address) {
     return (
       <>
