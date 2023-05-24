@@ -47,7 +47,7 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({
     return (
       <>
         <RecipientItem
-          name={recipient.address.address}
+          name={recipient.address.name}
           label={recipient.address.address}
         />
         <RecipientItemAddress
