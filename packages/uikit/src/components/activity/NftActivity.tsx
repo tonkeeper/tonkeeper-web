@@ -8,8 +8,8 @@ import { useTonenpointStock } from '../../state/tonendpoint';
 import { useNftItemData } from '../../state/wallet';
 import { VerificationIcon } from '../Icon';
 import { ListBlock } from '../List';
-import { NftCollectionBody2, NftHeaderBody2 } from '../nft/NftHeader';
 import { Body1 } from '../Text';
+import { NftCollectionBody2, NftHeaderBody2 } from '../nft/NftHeader';
 import { ActivityIcon, ReceiveIcon, SentIcon } from './ActivityIcons';
 import { ActionData } from './ActivityNotification';
 import {
@@ -19,8 +19,8 @@ import {
   FirstLabel,
   FirstLine,
   ListItemGrid,
-  SecondaryText,
   SecondLine,
+  SecondaryText,
 } from './CommonAction';
 import {
   ActionDate,
@@ -100,23 +100,23 @@ export const NftItemTransferAction: FC<{
     return <ErrorAction />;
   }
 
-  if (nftItemTransfer.sender?.address === wallet.active.rawAddress) {
+  if (nftItemTransfer.recipient?.address === wallet.active.rawAddress) {
     return (
       <ListItemGrid>
         <ActivityIcon>
-          <SentIcon />
+          <ReceiveIcon />
         </ActivityIcon>
         <Description>
           <FirstLine>
-            <FirstLabel>{t('transaction_type_sent')}</FirstLabel>
+            <FirstLabel>{t('transaction_type_receive')}</FirstLabel>
             <AmountText></AmountText>
             <AmountText>NFT</AmountText>
           </FirstLine>
           <SecondLine>
             <SecondaryText>
-              {nftItemTransfer.recipient?.name ??
+              {nftItemTransfer.sender?.name ??
                 toShortAddress(
-                  nftItemTransfer.recipient?.address ?? nftItemTransfer.nft
+                  nftItemTransfer.sender?.address ?? nftItemTransfer.nft
                 )}
             </SecondaryText>
             <SecondaryText>{date}</SecondaryText>
@@ -130,19 +130,19 @@ export const NftItemTransferAction: FC<{
   return (
     <ListItemGrid>
       <ActivityIcon>
-        <ReceiveIcon />
+        <SentIcon />
       </ActivityIcon>
       <Description>
         <FirstLine>
-          <FirstLabel>{t('transaction_type_receive')}</FirstLabel>
+          <FirstLabel>{t('transaction_type_sent')}</FirstLabel>
           <AmountText></AmountText>
           <AmountText>NFT</AmountText>
         </FirstLine>
         <SecondLine>
           <SecondaryText>
-            {nftItemTransfer.sender?.name ??
+            {nftItemTransfer.recipient?.name ??
               toShortAddress(
-                nftItemTransfer.sender?.address ?? nftItemTransfer.nft
+                nftItemTransfer.recipient?.address ?? nftItemTransfer.nft
               )}
           </SecondaryText>
           <SecondaryText>{date}</SecondaryText>
