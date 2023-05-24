@@ -1,19 +1,20 @@
 import { useMutation } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
   AuthNone,
   AuthPassword,
   AuthState,
 } from '@tonkeeper/core/dist/entries/password';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { MinPasswordLength } from '@tonkeeper/core/dist/service/accountService';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
-import { Button } from '../fields/Button';
-import { Input } from '../fields/Input';
 import { CenterContainer } from '../Layout';
 import { H2 } from '../Text';
+import { Button } from '../fields/Button';
+import { Input } from '../fields/Input';
 
 const Block = styled.div`
   display: flex;
@@ -70,7 +71,7 @@ const useCreatePassword = () => {
     Error,
     { password: string; confirm: string }
   >(async ({ password, confirm }) => {
-    if (password.length < 5) {
+    if (password.length < MinPasswordLength) {
       return 'password';
     }
     if (password !== confirm) {
@@ -157,8 +158,9 @@ export const CreateAuthState: FC<{
   afterCreate: (password?: string) => void;
   isLoading?: boolean;
 }> = ({ afterCreate, isLoading }) => {
-  const [authType, setAuthType] =
-    useState<AuthState['kind'] | undefined>('password');
+  const [authType, setAuthType] = useState<AuthState['kind'] | undefined>(
+    'password'
+  );
 
   const { mutateAsync: setNoneAuth, isLoading: isNoneLoading } =
     useSetNoneAuthMutation();

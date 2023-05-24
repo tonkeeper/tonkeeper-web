@@ -1,11 +1,12 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
-  parseTonTransfer,
   TonTransferParams,
+  parseTonTransfer,
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { seeIfAddressEqual } from '@tonkeeper/core/dist/utils/common';
+import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext } from '../../hooks/appContext';
@@ -14,13 +15,13 @@ import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
+import { Notification } from '../Notification';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
-import { Notification } from '../Notification';
 import { AmountView } from './AmountView';
-import { childFactoryCreator, duration, Wrapper } from './common';
 import { ConfirmView } from './ConfirmView';
 import { RecipientView, useGetToAccount } from './RecipientView';
+import { Wrapper, childFactoryCreator, duration } from './common';
 
 const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
@@ -95,10 +96,6 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
 
   const processJetton = useCallback(
     async ({ amount, jetton }: TonTransferParams) => {
-      if (!amount) {
-        return true;
-      }
-
       if (jetton) {
         const balance = filter.balances.find((item) =>
           seeIfAddressEqual(item.jettonAddress, jetton)
@@ -112,7 +109,9 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
         }
 
         setAmount({
-          amount: shiftedDecimals(amount, balance.metadata?.decimals),
+          amount: amount
+            ? shiftedDecimals(amount, balance.metadata?.decimals)
+            : new BigNumber('0'),
           jetton: balance.jettonAddress,
           max: false,
           done: false,
@@ -120,7 +119,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
         });
       } else {
         setAmount({
-          amount: shiftedDecimals(amount),
+          amount: amount ? shiftedDecimals(amount) : new BigNumber('0'),
           jetton: asset,
           max: false,
           done: false,

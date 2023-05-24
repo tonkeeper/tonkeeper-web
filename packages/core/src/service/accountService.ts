@@ -128,8 +128,10 @@ export const accountChangePassword = async (
   await storage.setBatch(updated);
 };
 
+export const MinPasswordLength = 6;
+
 export const accountValidatePassword = (password: string, confirm: string) => {
-  if (password.length < 5) {
+  if (password.length < MinPasswordLength) {
     return 'invalid-password';
   }
   if (password !== confirm) {

@@ -12,12 +12,12 @@ import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
-import { Button } from '../fields/Button';
-import { Checkbox } from '../fields/Checkbox';
 import { ChevronRightIcon } from '../Icon';
 import { ListItem, ListItemPayload } from '../List';
 import { Notification } from '../Notification';
 import { Body1, H3, Label1 } from '../Text';
+import { Button } from '../fields/Button';
+import { Checkbox } from '../fields/Checkbox';
 
 const Logo = styled.img<{ large?: boolean }>`
   pointer-events: none;
@@ -156,12 +156,14 @@ const replacePlaceholders = (
   url: string,
   config: TonendpointConfig,
   wallet: WalletState,
-  fiat: FiatCurrencies
+  fiat: FiatCurrencies,
+  kind: 'buy' | 'sell'
 ) => {
+  const [CUR_FROM, CUR_TO] = kind == 'buy' ? [fiat, 'TON'] : ['TON', fiat];
   return url
     .replace('{ADDRESS}', wallet.active.friendlyAddress)
-    .replace('{CUR_FROM}', fiat)
-    .replace('{CUR_TO}', 'TON')
+    .replace('{CUR_FROM}', CUR_FROM)
+    .replace('{CUR_TO}', CUR_TO)
     .replaceAll('{TX_ID}', config.mercuryoSecret ?? '');
 };
 
@@ -180,7 +182,7 @@ export const BuyItemNotification: FC<{
 
   const onForceOpen = () => {
     sdk.openPage(
-      replacePlaceholders(item.action_button.url, config, wallet, fiat)
+      replacePlaceholders(item.action_button.url, config, wallet, fiat, kind)
     );
     setOpen(false);
   };

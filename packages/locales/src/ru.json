@@ -175,10 +175,10 @@
     "message": "Неправильный ключ"
   },
   "Remaining": {
-    "message": "Всего: %1%"
+    "message": "Доступно: %1%"
   },
   "Max": {
-    "message": "Все"
+    "message": "Максимум"
   },
   "Confirm": {
     "message": "Подтверждение пароля"
