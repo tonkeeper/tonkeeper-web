@@ -26,7 +26,7 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
   align-items: center;
   gap: 8px;
 
-  font-family: 'Montserrat';
+  font-family: 'Montserrat', sans-serif;
   font-style: normal;
   font-weight: 600;
 
