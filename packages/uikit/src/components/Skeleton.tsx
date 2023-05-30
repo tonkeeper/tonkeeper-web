@@ -273,7 +273,7 @@ export const HomeSkeleton = React.memo(() => {
         <SkeletonAction />
         <SkeletonAction />
         <SkeletonAction />
-        <SkeletonAction />
+        {/* <SkeletonAction /> */}
       </ActionsRow>
       <SkeletonList size={5} />
     </>
