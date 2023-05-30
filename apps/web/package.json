@@ -36,7 +36,7 @@
   "scripts": {
     "locales": "ts-node ./task/locales",
     "start": "yarn locales && react-app-rewired start",
-    "build": "react-app-rewired build && yarn locales",
+    "build": "GENERATE_SOURCEMAP=false react-app-rewired build && yarn locales",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "build:web": "yarn build"
