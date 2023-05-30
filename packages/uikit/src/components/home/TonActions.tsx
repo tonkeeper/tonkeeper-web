@@ -3,7 +3,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useTonenpointFiatMethods } from '../../state/tonendpoint';
 import { SendAction } from '../transfer/SendNotifications';
 import { ActionsRow } from './Actions';
-import { BuyAction, SellAction } from './BuyAction';
+import { BuyAction } from './BuyAction';
 import { ReceiveAction } from './ReceiveAction';
 
 export const HomeActions = () => {
@@ -18,7 +18,7 @@ export const HomeActions = () => {
       <BuyAction buy={buy} />
       <SendAction asset="TON" />
       <ReceiveAction />
-      <SellAction sell={sell} />
+      {/* <SellAction sell={sell} /> */}
     </ActionsRow>
   );
 };
