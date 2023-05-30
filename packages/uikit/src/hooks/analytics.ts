@@ -51,7 +51,6 @@ export const sendAnalyticsEvent = (
   eventKind: AnalyticsEvent
 ) => {
   logEvent(analytics, String(eventKind));
-  console.log(analytics, eventKind);
 };
 
 export const useFBAnalyticsEvent = (eventKind: AnalyticsEvent) => {
