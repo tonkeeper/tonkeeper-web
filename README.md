@@ -3,7 +3,7 @@
 ## Build script
 
 ```sh
-yarn install
+yarn
 
-yarn build
+yarn build:web
 ```
