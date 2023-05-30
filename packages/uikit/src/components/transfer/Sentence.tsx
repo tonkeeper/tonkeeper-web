@@ -12,7 +12,7 @@ const SentenceInput = styled.input`
   background: transparent;
   color: ${(props) => props.theme.textPrimary};
 
-  font-family: 'Montserrat';
+  font-family: 'Montserrat', sans-serif;
   font-style: normal;
   font-weight: 600;
 
