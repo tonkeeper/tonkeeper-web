@@ -8,6 +8,8 @@ import {
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { sha512 } from 'ton-crypto';
+import { v4 as uuidv4 } from 'uuid';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
@@ -160,11 +162,21 @@ const replacePlaceholders = (
   kind: 'buy' | 'sell'
 ) => {
   const [CUR_FROM, CUR_TO] = kind == 'buy' ? [fiat, 'TON'] : ['TON', fiat];
-  return url
+  url = url
     .replace('{ADDRESS}', wallet.active.friendlyAddress)
     .replace('{CUR_FROM}', CUR_FROM)
-    .replace('{CUR_TO}', CUR_TO)
-    .replaceAll('{TX_ID}', config.mercuryoSecret ?? '');
+    .replace('{CUR_TO}', CUR_TO);
+
+  if (url.includes('TX_ID')) {
+    const txId = 'mercuryo_' + uuidv4();
+    url = url.replace(/\{TX_ID\}/g, txId);
+    url = url.replace(/\=TON\&/gi, '=TONCOIN&');
+    url += `&signature=${sha512(
+      `${wallet.active.friendlyAddress}${config.mercuryoSecret ?? ''}`
+    )}`;
+  }
+
+  return url;
 };
 
 export const BuyItemNotification: FC<{
