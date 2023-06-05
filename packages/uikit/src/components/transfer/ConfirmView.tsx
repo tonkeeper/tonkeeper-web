@@ -7,6 +7,7 @@ import { DefaultDecimals } from '@tonkeeper/core/dist/utils/send';
 
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import React, { FC, useMemo, useState } from 'react';
+import { useSendFBAnalyticsEvent } from '../../hooks/analytics';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatter } from '../../hooks/balance';
@@ -49,12 +50,14 @@ const useSendTransaction = (
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
   const client = useQueryClient();
+  const track = useSendFBAnalyticsEvent();
 
   return useMutation<boolean, Error>(async () => {
     const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
     if (password === null) return false;
     try {
       if (amount.jetton === CryptoCurrency.TON) {
+        track('send_ton');
         await sendTonTransfer(
           sdk.storage,
           tonApi,
@@ -65,6 +68,7 @@ const useSendTransaction = (
           password
         );
       } else {
+        track('send_jetton');
         const [jettonInfo] = jettons.balances.filter(
           (item) => item.jettonAddress === amount.jetton
         );
