@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
-import { Network, getTonClient } from '@tonkeeper/core/dist/entries/network';
+import { getTonClient, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
   InnerBody,
   useWindowsScroll,
@@ -42,9 +42,9 @@ import {
   TranslationContext,
 } from '@tonkeeper/uikit/dist/hooks/translation';
 import {
+  any,
   AppRoute,
   SettingsRoute,
-  any,
 } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -221,6 +221,7 @@ export const Loader: FC = React.memo(() => {
     tonendpoint,
     ios: false,
     standalone: true,
+    extension: true,
   };
 
   return (

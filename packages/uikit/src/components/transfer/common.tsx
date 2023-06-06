@@ -62,10 +62,15 @@ const ButtonBlockElement = styled.div<{ standalone: boolean }>`
         `}
 `;
 
-export const Wrapper = styled.div<{ standalone: boolean }>`
+export const Wrapper = styled.div<{ standalone: boolean; extension: boolean }>`
   position: relative;
   overflow: hidden;
-  margin-bottom: -1rem;
+  ${(props) =>
+    props.extension
+      ? undefined
+      : css`
+          margin-bottom: -1rem;
+        `}
 
   .${rightToLeft}-exit, .${leftToTight}-exit {
     position: absolute;
@@ -118,10 +123,12 @@ export const Wrapper = styled.div<{ standalone: boolean }>`
     ${ButtonBlockElement},
     .${rightToLeft}-enter-active
     ${ButtonBlockElement} {
+    display: none;
+
     position: absolute !important;
 
     ${(props) =>
-      props.standalone
+      props.standalone && !props.extension
         ? css`
             bottom: 1rem !important;
           `
@@ -131,9 +138,9 @@ export const Wrapper = styled.div<{ standalone: boolean }>`
 
 export const ButtonBlock = React.forwardRef<HTMLDivElement, PropsWithChildren>(
   ({ children }, ref) => {
-    const { standalone } = useAppContext();
+    const { standalone, extension } = useAppContext();
     return (
-      <ButtonBlockElement ref={ref} standalone={standalone}>
+      <ButtonBlockElement ref={ref} standalone={standalone && !extension}>
         {children}
       </ButtonBlockElement>
     );
