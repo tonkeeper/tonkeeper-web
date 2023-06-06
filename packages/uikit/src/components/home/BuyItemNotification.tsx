@@ -8,7 +8,7 @@ import {
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { sha512 } from 'ton-crypto';
+import { sha512_sync } from 'ton-crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -171,7 +171,7 @@ const replacePlaceholders = (
     const txId = 'mercuryo_' + uuidv4();
     url = url.replace(/\{TX_ID\}/g, txId);
     url = url.replace(/\=TON\&/gi, '=TONCOIN&');
-    url += `&signature=${sha512(
+    url += `&signature=${sha512_sync(
       `${wallet.active.friendlyAddress}${config.mercuryoSecret ?? ''}`
     )}`;
   }
