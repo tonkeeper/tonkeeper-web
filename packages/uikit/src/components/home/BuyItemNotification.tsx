@@ -173,7 +173,7 @@ const replacePlaceholders = (
     url = url.replace(/\=TON\&/gi, '=TONCOIN&');
     url += `&signature=${sha512_sync(
       `${wallet.active.friendlyAddress}${config.mercuryoSecret ?? ''}`
-    )}`;
+    ).toString('hex')}`;
   }
 
   return url;
