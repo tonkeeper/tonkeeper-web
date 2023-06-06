@@ -148,6 +148,15 @@ export const App: FC = () => {
   );
 };
 
+const PageWrapper = styled(Container)`
+  > * {
+    overflow: auto;
+    width: var(--app-width);
+    max-width: 548px;
+    box-sizing: border-box;
+  }
+`;
+
 const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
   min-width: 385px;
   height: 600px;
@@ -206,7 +215,11 @@ export const Loader: FC = React.memo(() => {
   const { data: config } = useTonenpointConfig(tonendpoint);
 
   if (!account || !auth || !config || lock === undefined) {
-    return <Loading />;
+    return (
+      <FullSizeWrapper standalone={false}>
+        <Loading />
+      </FullSizeWrapper>
+    );
   }
 
   const network = activeWallet?.network ?? Network.MAINNET;
@@ -268,7 +281,7 @@ export const Content: FC<{
 
   if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
     return (
-      <FullSizeWrapper standalone>
+      <PageWrapper>
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route
@@ -289,7 +302,7 @@ export const Content: FC<{
             />
           </Routes>
         </Suspense>
-      </FullSizeWrapper>
+      </PageWrapper>
     );
   }
 
