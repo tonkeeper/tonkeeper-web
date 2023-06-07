@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
   estimateTonConnectTransfer,
   sendTonConnectTransfer,
@@ -15,13 +15,13 @@ import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { getPasswordByNotification } from '../../pages/home/UnlockNotification';
+import { Button, ButtonRow } from '../fields/Button';
 import { CheckmarkCircleIcon } from '../Icon';
 import { ListBlock } from '../List';
 import { Notification, NotificationBlock } from '../Notification';
 import { Label2 } from '../Text';
-import { Button, ButtonRow } from '../fields/Button';
-import { FeeListItem } from '../transfer/ConfirmListItem';
 import { ResultButton } from '../transfer/common';
+import { FeeListItem } from '../transfer/ConfirmListItem';
 import { TonTransactionAction } from './TonTransactionAction';
 
 const ButtonGap = styled.div`
@@ -126,7 +126,7 @@ const ConnectContent: FC<{
               loading={isLoading}
               disabled={isLoading}
             >
-              {t('Confirm')}
+              {t('Confirm_button')}
             </Button>
           </>
         )}

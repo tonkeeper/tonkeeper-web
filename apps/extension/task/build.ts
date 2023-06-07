@@ -83,7 +83,7 @@ manifestFFData.background = {
 manifestFFData.browser_specific_settings = {
   gecko: {
     id: 'wallet@tonkeeper.com',
-    strict_min_version: '91.1.0',
+    strict_min_version: '109.0',
   },
 };
 
