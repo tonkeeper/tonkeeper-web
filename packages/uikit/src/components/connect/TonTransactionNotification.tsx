@@ -8,6 +8,7 @@ import {
 } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { AccountEvent } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useCallback, useMemo, useState } from 'react';
+import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
@@ -22,6 +23,30 @@ import { Label2 } from '../Text';
 import { ResultButton } from '../transfer/common';
 import { FeeListItem } from '../transfer/ConfirmListItem';
 import { TonTransactionAction } from './TonTransactionAction';
+
+const ButtonGap = styled.div`
+  height: 56px;
+`;
+
+const ButtonRowFixed = styled(ButtonRow)`
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  padding: 0 16px;
+  box-sizing: border-box;
+
+  &:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: -1rem;
+    height: calc(100% + 1rem);
+    z-index: -1;
+    background: ${(props) => props.theme.gradientBackgroundBottom};
+  }
+`;
 
 const useSendMutation = (params: TonConnectTransactionPayload) => {
   const wallet = useWalletContext();
@@ -74,7 +99,8 @@ const ConnectContent: FC<{
       {(accountEvent?.actions ?? []).map((action, index) => (
         <TonTransactionAction key={index} action={action} />
       ))}
-      <>
+      <ButtonGap />
+      <ButtonRowFixed>
         {done && (
           <ResultButton done>
             <CheckmarkCircleIcon />
@@ -82,7 +108,7 @@ const ConnectContent: FC<{
           </ResultButton>
         )}
         {!done && (
-          <ButtonRow>
+          <>
             <Button
               size="large"
               type="button"
@@ -100,11 +126,11 @@ const ConnectContent: FC<{
               loading={isLoading}
               disabled={isLoading}
             >
-              {t('Confirm')}
+              {t('Confirm_button')}
             </Button>
-          </ButtonRow>
+          </>
         )}
-      </>
+      </ButtonRowFixed>
     </NotificationBlock>
   );
 };

@@ -2,16 +2,17 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Action } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC } from 'react';
 import styled from 'styled-components';
+import { useWalletContext } from '../../hooks/appContext';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
+import { ListBlock, ListItem, ListItemPayload } from '../List';
+import { H3, Label1 } from '../Text';
 import { TransferComment } from '../activity/ActivityActionDetails';
 import {
   ActionBeneficiaryDetails,
   ActionDeployerDetails,
   ActionRecipientDetails,
 } from '../activity/NotificationCommon';
-import { ListBlock, ListItem, ListItemPayload } from '../List';
-import { H3, Label1 } from '../Text';
 import { Label } from '../transfer/common';
 
 const actionLabel = (action: Action) => {
@@ -51,6 +52,7 @@ const ErrorDetails = () => {
 export const TonTransactionAction: FC<{ action: Action }> = ({ action }) => {
   const { t } = useTranslation();
   const format = useFormatCoinValue();
+  const wallet = useWalletContext();
 
   return (
     <Block>
@@ -63,20 +65,38 @@ export const TonTransactionAction: FC<{ action: Action }> = ({ action }) => {
               if (!tonTransfer) {
                 return <ErrorDetails />;
               }
-              return (
-                <>
-                  <ListItem hover={false}>
-                    <ListItemPayload>
-                      <Label>{t('confirm_sending_amount')}</Label>
-                      <Label1>
-                        {format(tonTransfer.amount)} {CryptoCurrency.TON}
-                      </Label1>
-                    </ListItemPayload>
-                  </ListItem>
-                  <ActionRecipientDetails recipient={tonTransfer.recipient} />
-                  <TransferComment comment={tonTransfer.comment} />
-                </>
-              );
+              if (tonTransfer.sender?.address === wallet.active.rawAddress) {
+                return (
+                  <>
+                    <ListItem hover={false}>
+                      <ListItemPayload>
+                        <Label>{t('confirm_sending_amount')}</Label>
+                        <Label1>
+                          -&thinsp;{format(tonTransfer.amount)}{' '}
+                          {CryptoCurrency.TON}
+                        </Label1>
+                      </ListItemPayload>
+                    </ListItem>
+                    <ActionRecipientDetails recipient={tonTransfer.recipient} />
+                    <TransferComment comment={tonTransfer.comment} />
+                  </>
+                );
+              } else {
+                return (
+                  <>
+                    <ListItem hover={false}>
+                      <ListItemPayload>
+                        <Label>{t('confirm_sending_amount')}</Label>
+                        <Label1>
+                          +&thinsp;{format(tonTransfer.amount)}{' '}
+                          {CryptoCurrency.TON}
+                        </Label1>
+                      </ListItemPayload>
+                    </ListItem>
+                    <TransferComment comment={tonTransfer.comment} />
+                  </>
+                );
+              }
             }
 
             case 'JettonTransfer': {
@@ -84,17 +104,50 @@ export const TonTransactionAction: FC<{ action: Action }> = ({ action }) => {
               if (!jettonTransfer) {
                 return <ErrorDetails />;
               }
-
-              return (
-                <>
-                  {jettonTransfer.recipient && (
-                    <ActionRecipientDetails
-                      recipient={jettonTransfer.recipient}
-                    />
-                  )}
-                  <TransferComment comment={jettonTransfer.comment} />
-                </>
-              );
+              if (jettonTransfer.sender?.address === wallet.active.rawAddress) {
+                return (
+                  <>
+                    <ListItem hover={false}>
+                      <ListItemPayload>
+                        <Label>{t('confirm_sending_amount')}</Label>
+                        <Label1>
+                          -&thinsp;
+                          {format(
+                            jettonTransfer.amount,
+                            jettonTransfer.jetton.decimals
+                          )}{' '}
+                          {jettonTransfer.jetton.symbol}
+                        </Label1>
+                      </ListItemPayload>
+                    </ListItem>
+                    {jettonTransfer.recipient && (
+                      <ActionRecipientDetails
+                        recipient={jettonTransfer.recipient}
+                      />
+                    )}
+                    <TransferComment comment={jettonTransfer.comment} />
+                  </>
+                );
+              } else {
+                return (
+                  <>
+                    <ListItem hover={false}>
+                      <ListItemPayload>
+                        <Label>{t('confirm_sending_amount')}</Label>
+                        <Label1>
+                          +&thinsp;
+                          {format(
+                            jettonTransfer.amount,
+                            jettonTransfer.jetton.decimals
+                          )}{' '}
+                          {jettonTransfer.jetton.symbol}
+                        </Label1>
+                      </ListItemPayload>
+                    </ListItem>
+                    <TransferComment comment={jettonTransfer.comment} />
+                  </>
+                );
+              }
             }
             case 'ContractDeploy': {
               const { contractDeploy } = action;

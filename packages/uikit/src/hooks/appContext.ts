@@ -24,6 +24,7 @@ export const AppContext = React.createContext<{
   config: TonendpointConfig;
   tonendpoint: Tonendpoint;
   standalone: boolean;
+  extension: boolean;
   ios: boolean;
 }>({
   tonApi: new Configuration(),
@@ -33,6 +34,7 @@ export const AppContext = React.createContext<{
   config: defaultTonendpointConfig,
   tonendpoint: new Tonendpoint({}, {}),
   standalone: false,
+  extension: false,
   ios: false,
 });
 

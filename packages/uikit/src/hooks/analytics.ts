@@ -1,6 +1,6 @@
 import { Analytics, getAnalytics, logEvent } from 'firebase/analytics';
 import { initializeApp } from 'firebase/app';
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export const useCreateAnalytics = () => {
@@ -44,7 +44,13 @@ export const useAnalyticsScreenView = () => {
   }, [location.pathname]);
 };
 
-type AnalyticsEvent = 'screen_view' | 'session_start' | 'first_open';
+type AnalyticsEvent =
+  | 'screen_view'
+  | 'session_start'
+  | 'first_open'
+  | 'send_ton'
+  | 'send_jetton'
+  | 'send_nft';
 
 export const sendAnalyticsEvent = (
   analytics: Analytics,
@@ -62,4 +68,18 @@ export const useFBAnalyticsEvent = (eventKind: AnalyticsEvent) => {
       console.log(eventKind);
     }
   }, []);
+};
+
+export const useSendFBAnalyticsEvent = () => {
+  const analytics = useAnalytics();
+  return useCallback(
+    (eventKind: AnalyticsEvent) => {
+      if (analytics) {
+        sendAnalyticsEvent(analytics, eventKind);
+      } else {
+        console.log(eventKind);
+      }
+    },
+    [analytics]
+  );
 };

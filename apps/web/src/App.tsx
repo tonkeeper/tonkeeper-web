@@ -268,6 +268,7 @@ export const Loader: FC = () => {
     config,
     tonendpoint,
     standalone,
+    extension: false,
     ios,
   };
 

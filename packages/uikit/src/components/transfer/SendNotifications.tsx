@@ -1,8 +1,8 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
-  TonTransferParams,
   parseTonTransfer,
+  TonTransferParams,
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { seeIfAddressEqual } from '@tonkeeper/core/dist/utils/common';
@@ -15,20 +15,20 @@ import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
-import { Notification } from '../Notification';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
+import { Notification } from '../Notification';
 import { AmountView } from './AmountView';
+import { childFactoryCreator, duration, Wrapper } from './common';
 import { ConfirmView } from './ConfirmView';
 import { RecipientView, useGetToAccount } from './RecipientView';
-import { Wrapper, childFactoryCreator, duration } from './common';
 
 const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   onClose,
   asset = CryptoCurrency.TON,
 }) => {
   const sdk = useAppSdk();
-  const { standalone, ios } = useAppContext();
+  const { standalone, ios, extension } = useAppContext();
   const { t } = useTranslation();
   const { data: jettons } = useWalletJettonList();
   const { data: info } = useWalletAccountInfo();
@@ -158,7 +158,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
   })();
 
   return (
-    <Wrapper standalone={standalone}>
+    <Wrapper standalone={standalone} extension={extension}>
       <TransitionGroup childFactory={childFactoryCreator(right)}>
         <CSSTransition
           key={state}

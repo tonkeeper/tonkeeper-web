@@ -66,7 +66,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
 }) => {
   const sdk = useAppSdk();
   const { t } = useTranslation();
-  const { standalone } = useAppContext();
+  const { standalone, extension } = useAppContext();
   const recipientRef = useRef<HTMLDivElement>(null);
   const confirmRef = useRef<HTMLDivElement>(null);
 
@@ -129,7 +129,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({
   };
 
   return (
-    <Wrapper standalone={standalone}>
+    <Wrapper standalone={standalone} extension={extension}>
       <TransitionGroup childFactory={childFactoryCreator(right)}>
         <CSSTransition
           key={state}
