@@ -1,27 +1,52 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
   estimateTonConnectTransfer,
   sendTonConnectTransfer,
 } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { AccountEvent } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useCallback, useMemo, useState } from 'react';
+import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { getPasswordByNotification } from '../../pages/home/UnlockNotification';
-import { Button, ButtonRow } from '../fields/Button';
 import { CheckmarkCircleIcon } from '../Icon';
 import { ListBlock } from '../List';
 import { Notification, NotificationBlock } from '../Notification';
 import { Label2 } from '../Text';
-import { ResultButton } from '../transfer/common';
+import { Button, ButtonRow } from '../fields/Button';
 import { FeeListItem } from '../transfer/ConfirmListItem';
+import { ResultButton } from '../transfer/common';
 import { TonTransactionAction } from './TonTransactionAction';
+
+const ButtonGap = styled.div`
+  height: 56px;
+`;
+
+const ButtonRowFixed = styled(ButtonRow)`
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  padding: 0 16px;
+  box-sizing: border-box;
+
+  &:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: -1rem;
+    height: calc(100% + 1rem);
+    z-index: -1;
+    background: ${(props) => props.theme.gradientBackgroundBottom};
+  }
+`;
 
 const useSendMutation = (params: TonConnectTransactionPayload) => {
   const wallet = useWalletContext();
@@ -74,7 +99,8 @@ const ConnectContent: FC<{
       {(accountEvent?.actions ?? []).map((action, index) => (
         <TonTransactionAction key={index} action={action} />
       ))}
-      <>
+      <ButtonGap />
+      <ButtonRowFixed>
         {done && (
           <ResultButton done>
             <CheckmarkCircleIcon />
@@ -82,7 +108,7 @@ const ConnectContent: FC<{
           </ResultButton>
         )}
         {!done && (
-          <ButtonRow>
+          <>
             <Button
               size="large"
               type="button"
@@ -102,9 +128,9 @@ const ConnectContent: FC<{
             >
               {t('Confirm')}
             </Button>
-          </ButtonRow>
+          </>
         )}
-      </>
+      </ButtonRowFixed>
     </NotificationBlock>
   );
 };
