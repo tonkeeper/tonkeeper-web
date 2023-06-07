@@ -37,12 +37,14 @@ const removeBottom = () => {
   }
 };
 
-export const useWindowsScroll = () => {
+export const useWindowsScroll = (addHidden = true) => {
   const sdk = useAppSdk();
-  const { standalone, ios, extension } = useAppContext();
+  const { standalone, ios } = useAppContext();
   useLayoutEffect(() => {
-    if (standalone && !extension) {
-      document.documentElement.classList.add('hidden');
+    if (standalone) {
+      if (addHidden) {
+        document.documentElement.classList.add('hidden');
+      }
       return;
     }
 

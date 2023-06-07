@@ -75,10 +75,18 @@ fs.copySync(buildDir, buildDirFireFox);
 
 const manifest = `${buildDirFireFox}/manifest.json`;
 const manifestFFData = JSON.parse(fs.readFileSync(manifest, 'utf8'));
+
 manifestFFData.version = packageJson.version;
 manifestFFData.background = {
   scripts: ['background.js'],
 };
+manifestFFData.browser_specific_settings = {
+  gecko: {
+    id: 'wallet@tonkeeper.com',
+    strict_min_version: '42.0',
+  },
+};
+
 fs.writeFileSync(manifest, JSON.stringify(manifestFFData));
 
 child_process.execSync(
