@@ -154,6 +154,7 @@ export const ResultButton = styled.div<{ done?: boolean }>`
   align-items: center;
   color: ${(props) =>
     props.done ? props.theme.accentGreen : props.theme.accentRed};
+  height: 56px;
 `;
 
 export const Label = styled(Body1)`
