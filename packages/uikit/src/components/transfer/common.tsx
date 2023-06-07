@@ -155,6 +155,7 @@ export const ResultButton = styled.div<{ done?: boolean }>`
   color: ${(props) =>
     props.done ? props.theme.accentGreen : props.theme.accentRed};
   height: 56px;
+  width: 100%;
 `;
 
 export const Label = styled(Body1)`
