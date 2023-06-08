@@ -42,9 +42,9 @@ const srcDir = `../../packages/locales/dist/extension`;
 const destDir = `build/_locales`;
 fs.copySync(srcDir, destDir, { overwrite: true });
 
-notify(`Create Chrome Build`);
-
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+
+notify(`Create Chrome Build ${packageJson.version}`);
 
 const buildDir = `build`;
 const buildDirChrome = `dist/chrome`;
@@ -69,7 +69,7 @@ child_process.execSync(
   }
 );
 
-notify(`Create FireFox Build`);
+notify(`Create FireFox Build ${packageJson.version}`);
 
 fs.copySync(buildDir, buildDirFireFox);
 
