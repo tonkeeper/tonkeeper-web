@@ -80,6 +80,15 @@ manifestFFData.version = packageJson.version;
 manifestFFData.background = {
   scripts: ['background.js'],
 };
+
+manifestFFData.permissions = [
+  'storage',
+  'unlimitedStorage',
+  'clipboardWrite',
+  'activeTab',
+];
+manifestFFData.host_permissions = ['<all_urls>'];
+
 manifestFFData.browser_specific_settings = {
   gecko: {
     id: 'wallet@tonkeeper.com',

@@ -35,6 +35,7 @@ export class BrowserAppSdk implements IAppSdk {
 
   confirm = async (text: string) => window.confirm(text);
   alert = async (text: string) => window.alert(text);
+  requestExtensionPermission = async () => void 0;
 
   disableScroll = disableScroll;
   enableScroll = enableScroll;

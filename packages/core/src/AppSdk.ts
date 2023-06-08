@@ -33,6 +33,8 @@ export interface IAppSdk {
 
   confirm: (text: string) => Promise<boolean>;
   alert: (text: string) => Promise<void>;
+
+  requestExtensionPermission: () => Promise<void>;
 }
 
 export class MockAppSdk implements IAppSdk {
@@ -53,4 +55,5 @@ export class MockAppSdk implements IAppSdk {
   version = '0.0.0';
   confirm = async () => false;
   alert = async () => void 0;
+  requestExtensionPermission = async () => void 0;
 }

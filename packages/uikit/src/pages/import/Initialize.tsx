@@ -7,6 +7,7 @@ import { Button } from '../../components/fields/Button';
 import { CenterContainer } from '../../components/Layout';
 import { H1 } from '../../components/Text';
 import { useFBAnalyticsEvent } from '../../hooks/analytics';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 
 const Block = styled.div<{ fullHeight: boolean }>`
@@ -45,8 +46,13 @@ const Title = styled(H1)`
 export const Initialize: FC = () => {
   const { t } = useTranslation();
   const [isOpen, setOpen] = useState(false);
+  const sdk = useAppSdk();
 
   useFBAnalyticsEvent('screen_view');
+
+  const onClick = () => {
+    sdk.requestExtensionPermission().then(() => setOpen(true));
+  };
 
   return (
     <CenterContainer>
@@ -71,13 +77,7 @@ export const Initialize: FC = () => {
           description={t('intro_item3_caption')}
         /> */}
       </div>
-      <Button
-        size="large"
-        fullWidth
-        primary
-        marginTop
-        onClick={() => setOpen(true)}
-      >
+      <Button size="large" fullWidth primary marginTop onClick={onClick}>
         {t('intro_continue_btn')}
       </Button>
       <ImportNotification isOpen={isOpen} setOpen={setOpen} />

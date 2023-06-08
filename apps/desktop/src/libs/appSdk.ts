@@ -21,4 +21,6 @@ export class DesktopAppSdk implements IAppSdk {
   getKeyboardHeight = () => 0;
   isIOs = () => false;
   isStandalone = () => false;
+
+  requestExtensionPermission = async () => void 0;
 }
