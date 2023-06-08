@@ -3,10 +3,11 @@ import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
+  EstimateData,
   estimateTonConnectTransfer,
+  getAccountsMap,
   sendTonConnectTransfer,
 } from '@tonkeeper/core/dist/service/transfer/tonService';
-import { AccountEvent } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -48,7 +49,10 @@ const ButtonRowFixed = styled(ButtonRow)`
   }
 `;
 
-const useSendMutation = (params: TonConnectTransactionPayload) => {
+const useSendMutation = (
+  params: TonConnectTransactionPayload,
+  estimate?: EstimateData
+) => {
   const wallet = useWalletContext();
   const sdk = useAppSdk();
   const { tonApi } = useAppContext();
@@ -58,8 +62,19 @@ const useSendMutation = (params: TonConnectTransactionPayload) => {
     if (!auth) {
       throw new Error('Missing Auth');
     }
+    const accounts = estimate?.accounts;
+    if (!accounts) {
+      throw new Error('Missing accounts data');
+    }
     const password = await getPasswordByNotification(sdk, auth);
-    await sendTonConnectTransfer(sdk.storage, tonApi, wallet, params, password);
+    await sendTonConnectTransfer(
+      sdk.storage,
+      tonApi,
+      wallet,
+      accounts,
+      params,
+      password
+    );
 
     return 'ok';
   });
@@ -67,14 +82,14 @@ const useSendMutation = (params: TonConnectTransactionPayload) => {
 
 const ConnectContent: FC<{
   params: TonConnectTransactionPayload;
-  accountEvent?: AccountEvent;
+  estimate?: EstimateData;
   handleClose: (result?: string) => void;
-}> = ({ params, accountEvent, handleClose }) => {
+}> = ({ params, estimate, handleClose }) => {
   const [done, setDone] = useState(false);
 
   const { t } = useTranslation();
 
-  const { mutateAsync, isLoading } = useSendMutation(params);
+  const { mutateAsync, isLoading } = useSendMutation(params, estimate);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -85,8 +100,8 @@ const ConnectContent: FC<{
 
   const format = useFormatCoinValue();
   const feeAmount = useMemo(
-    () => (accountEvent ? format(accountEvent.fee.total) : undefined),
-    [format, accountEvent]
+    () => (estimate ? format(estimate.accountEvent.fee.total) : undefined),
+    [format, estimate]
   );
 
   return (
@@ -96,7 +111,7 @@ const ConnectContent: FC<{
           <FeeListItem feeAmount={feeAmount} />
         </ListBlock>
       )}
-      {(accountEvent?.actions ?? []).map((action, index) => (
+      {(estimate?.accountEvent.actions ?? []).map((action, index) => (
         <TonTransactionAction key={index} action={action} />
       ))}
       <ButtonGap />
@@ -141,15 +156,22 @@ const useEstimation = (params: TonConnectTransactionPayload | null) => {
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
 
-  return useQuery<AccountEvent, Error>(
+  return useQuery<EstimateData, Error>(
     [QueryKey.estimate, params],
-    () => {
+    async () => {
       sdk.uiEvents.emit('copy', {
         method: 'copy',
         params: t('loading'),
       });
 
-      return estimateTonConnectTransfer(tonApi, wallet, params!);
+      const accounts = await getAccountsMap(tonApi, params!);
+      const accountEvent = await estimateTonConnectTransfer(
+        tonApi,
+        wallet,
+        accounts,
+        params!
+      );
+      return { accounts, accountEvent };
     },
     {
       enabled: params != null,
@@ -169,7 +191,7 @@ export const TonTransactionNotification: FC<{
     return (
       <ConnectContent
         params={params}
-        accountEvent={accountEvent}
+        estimate={accountEvent}
         handleClose={handleClose}
       />
     );

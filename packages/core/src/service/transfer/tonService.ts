@@ -5,7 +5,14 @@ import { AmountValue, RecipientData } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration, Fee, SendApi } from '../../tonApiV1';
+import {
+  AccountApi,
+  AccountEvent,
+  AccountRepr,
+  Configuration,
+  Fee,
+  SendApi,
+} from '../../tonApiV1';
 import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
@@ -19,10 +26,49 @@ import {
   SendMode,
 } from './common';
 
-const seeIfBounceable = (address: string) => {
+export type AccountsMap = Map<string, AccountRepr>;
+
+export type EstimateData = {
+  accounts: AccountsMap;
+  accountEvent: AccountEvent;
+};
+
+export const getAccountsMap = async (
+  tonApi: Configuration,
+  params: TonConnectTransactionPayload
+): Promise<AccountsMap> => {
+  const accounts = await Promise.all(
+    params.messages.map(async (message) => {
+      return [
+        message.address,
+        await new AccountApi(tonApi).getAccountInfo({
+          account: message.address,
+        }),
+      ] as const;
+    })
+  );
+  return new Map<string, AccountRepr>(accounts);
+};
+
+/*
+ * Raw address is bounceable by default,
+ * Please make a note that in the TonWeb Raw address is non bounceable by default
+ */
+const seeIfAddressBounceable = (address: string) => {
   return Address.isFriendly(address)
     ? Address.parseFriendly(address).isBounceable
-    : false;
+    : true;
+};
+
+/*
+ * Allow to send non bounceable only if address is non bounceable and target contract is non active
+ */
+const seeIfBounceable = (accounts: AccountsMap, address: string) => {
+  const bounceableAddress = seeIfAddressBounceable(address);
+  const toAccount = accounts.get(address);
+  const activeContract = toAccount && toAccount.status === 'active';
+
+  return bounceableAddress || activeContract;
 };
 
 const toStateInit = (
@@ -69,6 +115,7 @@ const createTonTransfer = (
 const createTonConnectTransfer = (
   seqno: number,
   walletState: WalletState,
+  accounts: AccountsMap,
   params: TonConnectTransactionPayload,
   secretKey: Buffer = Buffer.alloc(64)
 ) => {
@@ -81,7 +128,7 @@ const createTonConnectTransfer = (
     messages: params.messages.map((item) =>
       internal({
         to: item.address,
-        bounce: seeIfBounceable(item.address),
+        bounce: seeIfBounceable(accounts, item.address),
         value: BigInt(item.amount),
         init: toStateInit(item.stateInit),
         body: item.payload ? Cell.fromBase64(item.payload) : undefined,
@@ -114,13 +161,14 @@ export const estimateTonTransfer = async (
 export const estimateTonConnectTransfer = async (
   tonApi: Configuration,
   walletState: WalletState,
+  accounts: AccountsMap,
   params: TonConnectTransactionPayload
 ) => {
   await checkServiceTimeOrDie(tonApi);
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
   checkWalletPositiveBalanceOrDie(wallet);
 
-  const cell = createTonConnectTransfer(seqno, walletState, params);
+  const cell = createTonConnectTransfer(seqno, walletState, accounts, params);
 
   return await new SendApi(tonApi).estimateTx({
     sendBocRequest: { boc: cell.toString('base64') },
@@ -131,6 +179,7 @@ export const sendTonConnectTransfer = async (
   storage: IStorage,
   tonApi: Configuration,
   walletState: WalletState,
+  accounts: AccountsMap,
   params: TonConnectTransactionPayload,
   password: string
 ) => {
@@ -146,6 +195,7 @@ export const sendTonConnectTransfer = async (
   const cell = createTonConnectTransfer(
     seqno,
     walletState,
+    accounts,
     params,
     keyPair.secretKey
   );
