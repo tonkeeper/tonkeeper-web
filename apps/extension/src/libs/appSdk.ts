@@ -40,8 +40,9 @@ export class ExtensionAppSdk implements IAppSdk {
   isIOs = () => false;
   isStandalone = () => false;
 
-  requestExtensionPermission = async () =>
-    browser.permissions.request({ origins: ['<all_urls>'] });
+  requestExtensionPermission = async () => {
+    await browser.permissions.request({ origins: ['<all_urls>'] });
+  };
 
   static openTab(options: browser.Tabs.CreateCreatePropertiesType) {
     return new Promise((resolve, reject) => {
