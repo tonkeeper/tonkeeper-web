@@ -19,17 +19,18 @@ import {
   useWalletJettonList,
   useWalletNftList,
 } from '../../state/wallet';
+import {NFT} from "@tonkeeper/core/dist/entries/nft";
 
 const HomeAssets: FC<{
   stock: TonendpointStock;
   jettons: JettonsBalances;
   info: AccountRepr;
-  nfts: NftItemsRepr;
+  nfts: NFT[];
 }> = ({ stock, jettons, info, nfts }) => {
   const filtered = useUserJettonList(jettons);
 
   if (
-    filtered.balances.length + nfts.nftItems.length < 10 ||
+    filtered.balances.length + nfts.length < 10 ||
     filtered.balances.length < 3
   ) {
     return (

@@ -98,7 +98,7 @@ export const ConfirmView: FC<{
   amount: AmountData;
   jettons: JettonsBalances;
   onBack: () => void;
-  onClose: () => void;
+  onClose: (confirmed?: boolean) => void;
 }> = ({ recipient, onBack, onClose, amount, jettons }) => {
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
@@ -122,7 +122,7 @@ export const ConfirmView: FC<{
       const done = await mutateAsync();
       if (done) {
         setDone(true);
-        setTimeout(onClose, 2000);
+        setTimeout(() => onClose(true), 2000);
       }
     } catch (e) {}
   };
@@ -164,7 +164,7 @@ export const ConfirmView: FC<{
         <BackButton onClick={onBack}>
           <ChevronLeftIcon />
         </BackButton>
-        <NotificationCancelButton handleClose={onClose} />
+        <NotificationCancelButton handleClose={() => onClose()} />
       </NotificationTitleBlock>
       <Info>
         {recipient.toAccount.icon ? (
