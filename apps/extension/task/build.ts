@@ -26,6 +26,7 @@ common.notify('Copy Locales');
 
 const srcDir = `../../packages/locales/dist/extension`;
 const destDir = `build/_locales`;
+
 fs.copySync(srcDir, destDir, { overwrite: true });
 
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
