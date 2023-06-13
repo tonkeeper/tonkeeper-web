@@ -207,5 +207,17 @@
   },
   "logout_on_unlock_many": {
     "message": "This will erase keys to all your wallets. Make sure you have backed up your secret recovery phrases."
+  },
+  "renew_nft": {
+    "message": "Renew for a year for {{ value }} TON"
+  },
+  "renew_nft_in_progress": {
+    "message": "Domain renew in progress…"
+  },
+  "renew_nft_renewed": {
+    "message": "Domain renewed"
+  },
+  "renew_nft_expiration_date": {
+    "message": "Expiration domain date: {{ value }}"
   }
 }

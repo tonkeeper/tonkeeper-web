@@ -144,10 +144,11 @@ const useDNSNFTRefresh = (nft: NFTDNS) => {
 }
 
 
-const dNSRenewAmount = new BigNumber(0.1);
+const dNSRenewAmount = new BigNumber(0.01);
 export const RenewNft: FC<{
   nftItem: NFTDNS;
 }> = ({ nftItem }) => {
+  const { t } = useTranslation();
   const { refetch: refetchAllNFT } = useWalletNftList();
   const { data: dnsRenewed, isFetching: dnsRenewedLoading, refetch: refetchDnsRenewed } = useDNSNFTRefresh(nftItem);
   const [isOpen, setIsOpen] = useState(false);
@@ -202,7 +203,6 @@ export const RenewNft: FC<{
 
   const child = useCallback(() => <ConfirmView
       onClose={onClose}
-      onBack={() => onClose()}
       recipient={recipient}
       amount={amount}
       jettons={filter}
@@ -211,9 +211,9 @@ export const RenewNft: FC<{
   return <>
     <RenewDNSBlock>
       <RenewDNSButton type="button" disabled={dnsRenewedLoading || dnsRenewed} loading={!dnsRenewedLoading && (isFeeLoading || isRecipientLoading)} onClick={() => setIsOpen(true)} size="large" secondary fullWidth>
-        {dnsRenewedLoading ? 'Domain renew in progress…' :  dnsRenewed ? 'Domain renewed' : 'Renew for a year for 0.01 TON'}
+        {dnsRenewedLoading ? t('renew_nft_in_progress') :  dnsRenewed ? t('renew_nft_renewed') : t('renew_nft', { value: dNSRenewAmount.toString() })}
       </RenewDNSButton>
-      {!dnsRenewed && <RenewDNSValidUntil>Expiration domain date: { expiresAtFormatted }</RenewDNSValidUntil>}
+      {!dnsRenewed && <RenewDNSValidUntil>{t('renew_nft_expiration_date', { value: expiresAtFormatted })}</RenewDNSValidUntil>}
     </RenewDNSBlock>
     <Notification isOpen={isOpen} hideButton
                   handleClose={() => onClose}

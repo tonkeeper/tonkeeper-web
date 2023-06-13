@@ -97,7 +97,7 @@ export const ConfirmView: FC<{
   recipient: RecipientData;
   amount: AmountData;
   jettons: JettonsBalances;
-  onBack: () => void;
+  onBack?: () => void;
   onClose: (confirmed?: boolean) => void;
 }> = ({ recipient, onBack, onClose, amount, jettons }) => {
   const [done, setDone] = useState(false);
@@ -161,9 +161,9 @@ export const ConfirmView: FC<{
   return (
     <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
       <NotificationTitleBlock>
-        <BackButton onClick={onBack}>
+        {onBack && <BackButton onClick={onBack}>
           <ChevronLeftIcon />
-        </BackButton>
+        </BackButton> }
         <NotificationCancelButton handleClose={() => onClose()} />
       </NotificationTitleBlock>
       <Info>
