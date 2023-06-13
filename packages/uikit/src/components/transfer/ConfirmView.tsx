@@ -39,78 +39,38 @@ import {
 } from './common';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
-
-const useSendTransaction = (
-  recipient: RecipientData,
-  amount: AmountData,
-  jettons: JettonsBalances
-) => {
-  const { t } = useTranslation();
-  const sdk = useAppSdk();
-  const { tonApi } = useAppContext();
-  const wallet = useWalletContext();
-  const client = useQueryClient();
-  const track = useSendFBAnalyticsEvent();
-
-  return useMutation<boolean, Error>(async () => {
-    const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
-    if (password === null) return false;
-    try {
-      if (amount.jetton === CryptoCurrency.TON) {
-        track('send_ton');
-        await sendTonTransfer(
-          sdk.storage,
-          tonApi,
-          wallet,
-          recipient,
-          amount,
-          amount.fee,
-          password
-        );
-      } else {
-        track('send_jetton');
-        const [jettonInfo] = jettons.balances.filter(
-          (item) => item.jettonAddress === amount.jetton
-        );
-        await sendJettonTransfer(
-          sdk.storage,
-          tonApi,
-          wallet,
-          recipient,
-          amount,
-          jettonInfo,
-          amount.fee,
-          password
-        );
-      }
-    } catch (e) {
-      await notifyError(client, sdk, t, e);
-    }
-
-    await client.invalidateQueries([wallet.active.rawAddress]);
-    await client.invalidateQueries();
-    return true;
-  });
-};
-
+import {useSendNft} from "../../hooks/blockchain/useSendNft";
 export const ConfirmView: FC<{
   recipient: RecipientData;
   amount: AmountData;
   jettons: JettonsBalances;
-  onBack?: () => void;
-  onClose: (confirmed?: boolean) => void;
-}> = ({ recipient, onBack, onClose, amount, jettons }) => {
+  onBack: () => void;
+  onClose: () => void;
+}> = props => {
+
+  const mutationProps = useSendNft(
+      props.recipient,
+      props.amount,
+      props.jettons
+  );
+
+  return <ConfirmViewControllable {...props} {...mutationProps}/>
+};
+
+type MutationProps = Pick<ReturnType<typeof useMutation<boolean, Error>>, 'mutateAsync' | 'isLoading' | 'error' | 'reset'>;
+
+export const ConfirmViewControllable: FC<{
+  recipient: RecipientData;
+  amount: AmountData;
+  jettons: JettonsBalances;
+  onBack: () => void;
+  onClose: () => void;
+} & MutationProps> = ({ recipient, onBack, onClose, amount, jettons, mutateAsync, isLoading, error, reset }) => {
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
 
   const { standalone, fiat } = useAppContext();
   const { data: stock } = useTonenpointStock();
-
-  const { mutateAsync, isLoading, error, reset } = useSendTransaction(
-    recipient,
-    amount,
-    jettons
-  );
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.stopPropagation();
@@ -122,7 +82,7 @@ export const ConfirmView: FC<{
       const done = await mutateAsync();
       if (done) {
         setDone(true);
-        setTimeout(() => onClose(true), 2000);
+        setTimeout(onClose, 2000);
       }
     } catch (e) {}
   };
@@ -140,7 +100,7 @@ export const ConfirmView: FC<{
     }
 
     const jetton = jettons.balances.find(
-      (item) => item.jettonAddress === amount.jetton
+        (item) => item.jettonAddress === amount.jetton
     );
 
     return [
@@ -159,60 +119,60 @@ export const ConfirmView: FC<{
   })} ${symbol}`;
 
   return (
-    <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
-      <NotificationTitleBlock>
-        {onBack && <BackButton onClick={onBack}>
-          <ChevronLeftIcon />
-        </BackButton> }
-        <NotificationCancelButton handleClose={() => onClose()} />
-      </NotificationTitleBlock>
-      <Info>
-        {recipient.toAccount.icon ? (
-          <Image full src={recipient.toAccount.icon} />
-        ) : jettonImage ? (
-          <Image full src={jettonImage} />
-        ) : (
-          <ImageMock full />
-        )}
-        <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
-        <Title>
-          {recipient.toAccount.name ? recipient.toAccount.name : title}
-        </Title>
-      </Info>
-      <ListBlock margin={false} fullWidth>
-        <RecipientListItem recipient={recipient} />
-        <AmountListItem coinAmount={coinAmount} fiatAmount={fiatAmount} />
-        <ActionFeeDetails fee={amount.fee} stock={stock} fiat={fiat} />
-        <TransferComment comment={recipient.comment} />
-      </ListBlock>
-      <Gap />
+      <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
+        <NotificationTitleBlock>
+          <BackButton onClick={onBack}>
+            <ChevronLeftIcon />
+          </BackButton>
+          <NotificationCancelButton handleClose={onClose} />
+        </NotificationTitleBlock>
+        <Info>
+          {recipient.toAccount.icon ? (
+              <Image full src={recipient.toAccount.icon} />
+          ) : jettonImage ? (
+              <Image full src={jettonImage} />
+          ) : (
+              <ImageMock full />
+          )}
+          <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
+          <Title>
+            {recipient.toAccount.name ? recipient.toAccount.name : title}
+          </Title>
+        </Info>
+        <ListBlock margin={false} fullWidth>
+          <RecipientListItem recipient={recipient} />
+          <AmountListItem coinAmount={coinAmount} fiatAmount={fiatAmount} />
+          <ActionFeeDetails fee={amount.fee} stock={stock} fiat={fiat} />
+          <TransferComment comment={recipient.comment} />
+        </ListBlock>
+        <Gap />
 
-      <ButtonBlock>
-        {done && (
-          <ResultButton done>
-            <CheckmarkCircleIcon />
-            <Label2>{t('send_screen_steps_done_done_label')}</Label2>
-          </ResultButton>
-        )}
-        {error && (
-          <ResultButton>
-            <ExclamationMarkCircleIcon />
-            <Label2>{t('send_publish_tx_error')}</Label2>
-          </ResultButton>
-        )}
-        {!done && !error && (
-          <Button
-            fullWidth
-            size="large"
-            primary
-            type="submit"
-            disabled={!isValid}
-            loading={isLoading}
-          >
-            {t('confirm_sending_submit')}
-          </Button>
-        )}
-      </ButtonBlock>
-    </FullHeightBlock>
+        <ButtonBlock>
+          {done && (
+              <ResultButton done>
+                <CheckmarkCircleIcon />
+                <Label2>{t('send_screen_steps_done_done_label')}</Label2>
+              </ResultButton>
+          )}
+          {error && (
+              <ResultButton>
+                <ExclamationMarkCircleIcon />
+                <Label2>{t('send_publish_tx_error')}</Label2>
+              </ResultButton>
+          )}
+          {!done && !error && (
+              <Button
+                  fullWidth
+                  size="large"
+                  primary
+                  type="submit"
+                  disabled={!isValid}
+                  loading={isLoading}
+              >
+                {t('confirm_sending_submit')}
+              </Button>
+          )}
+        </ButtonBlock>
+      </FullHeightBlock>
   );
 };

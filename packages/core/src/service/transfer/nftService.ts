@@ -13,7 +13,7 @@ import {
   checkWalletPositiveBalanceOrDie,
   externalMessage,
   getWalletBalance,
-  SendMode,
+  SendMode, createTransferMessage,
 } from './common';
 
 const initNftTransferAmount = toNano('1');
@@ -56,22 +56,7 @@ const createNftTransfer = (
     forwardPayload,
   });
 
-  const contract = walletContractFromState(walletState);
-  const transfer = contract.createTransfer({
-    seqno,
-    secretKey,
-    sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-    messages: [
-      internal({
-        to: Address.parse(nftAddress),
-        bounce: true,
-        value: nftTransferAmount,
-        body: body,
-      }),
-    ],
-  });
-
-  return externalMessage(contract, seqno, transfer).toBoc();
+  return createTransferMessage({ seqno, state: walletState, secretKey }, { to: nftAddress, value: nftTransferAmount, body })
 };
 
 export const estimateNftTransfer = async (
@@ -147,6 +132,39 @@ export const sendNftTransfer = async (
   );
 
   await new SendApi(tonApi).sendBoc({
+    sendBocRequest: { boc: cell.toString('base64') },
+  });
+};
+
+export const sendNftRenew = async (options: {
+                                     storage: IStorage,
+                                     tonApi: Configuration,
+                                     walletState: WalletState,
+                                     nftAddress: string,
+                                     fee: Fee,
+                                     password: string
+                                   }) => {
+  await checkServiceTimeOrDie(options.tonApi);
+  const mnemonic = await getWalletMnemonic(
+      options.storage,
+      options.walletState.publicKey,
+      options.password
+  );
+  const keyPair = await mnemonicToPrivateKey(mnemonic);
+
+  const nftRenewAmount = new BigNumber(toNano('0.01').toString());
+  const total = nftRenewAmount.plus(options.fee.total);
+
+  const [wallet, seqno] = await getWalletBalance(options.tonApi, options.walletState);
+  checkWalletBalanceOrDie(total, wallet);
+
+  const cell = createTransferMessage({
+     seqno,
+      state: options.walletState,
+      secretKey: keyPair.secretKey
+    }, { to: options.nftAddress, value: nftRenewAmount });
+
+  await new SendApi(options.tonApi).sendBoc({
     sendBocRequest: { boc: cell.toString('base64') },
   });
 };
