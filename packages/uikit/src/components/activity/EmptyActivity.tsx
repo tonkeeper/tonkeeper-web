@@ -3,9 +3,13 @@ import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointFiatMethods } from '../../state/tonendpoint';
+import { Body1, H3, Label1 } from '../Text';
 import { BuyNotification } from '../home/BuyAction';
 import { ReceiveNotification } from '../home/ReceiveAction';
-import { Body1, H3, Label1 } from '../Text';
+
+const Header = styled(H3)`
+  text-align: center;
+`;
 
 const EmptyBody = styled.div`
   flex-grow: 1;
@@ -50,7 +54,7 @@ export const EmptyActivity = () => {
 
   return (
     <EmptyBody>
-      <H3>{t('Your_activity_will_be_shown_here')}</H3>
+      <Header>{t('Your_activity_will_be_shown_here')}</Header>
       <BodyText>{t('Make_your_first_transaction')}</BodyText>
       <ButtonRow>
         <Button onClick={() => setOpenBuy(true)}>{t('exchange_title')}</Button>
