@@ -1,23 +1,15 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
-import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { DefaultDecimals } from '@tonkeeper/core/dist/utils/send';
 
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import React, { FC, useMemo, useState } from 'react';
-import { useSendFBAnalyticsEvent } from '../../hooks/analytics';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppContext } from '../../hooks/appContext';
 import { formatter } from '../../hooks/balance';
+import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
 import { useTranslation } from '../../hooks/translation';
-import { getWalletPassword } from '../../state/password';
 import { useTonenpointStock } from '../../state/tonendpoint';
-import { TransferComment } from '../activity/ActivityActionDetails';
-import { ActionFeeDetails } from '../activity/NotificationCommon';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
 import {
   CheckmarkCircleIcon,
   ChevronLeftIcon,
@@ -31,41 +23,53 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Label2 } from '../Text';
-import {
-  ButtonBlock,
-  notifyError,
-  ResultButton,
-  useFiatAmount,
-} from './common';
+import { TransferComment } from '../activity/ActivityActionDetails';
+import { ActionFeeDetails } from '../activity/NotificationCommon';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
-import {useSendTransfer} from "../../hooks/blockchain/useSendTransfer";
+import { ButtonBlock, ResultButton, useFiatAmount } from './common';
 export const ConfirmView: FC<{
   recipient: RecipientData;
   amount: AmountData;
   jettons: JettonsBalances;
   onBack?: () => void;
   onClose: (confirmed?: boolean) => void;
-}> = props => {
-
+}> = (props) => {
   const mutationProps = useSendTransfer(
-      props.recipient,
-      props.amount,
-      props.jettons
+    props.recipient,
+    props.amount,
+    props.jettons
   );
 
-  return <ConfirmViewControllable {...props} {...mutationProps}/>
+  return <ConfirmViewControllable {...props} {...mutationProps} />;
 };
 
-type MutationProps = Pick<ReturnType<typeof useMutation<boolean, Error>>, 'mutateAsync' | 'isLoading' | 'error' | 'reset'>;
+type MutationProps = Pick<
+  ReturnType<typeof useMutation<boolean, Error>>,
+  'mutateAsync' | 'isLoading' | 'error' | 'reset'
+>;
 
-export const ConfirmViewControllable: FC<{
-  recipient: RecipientData;
-  amount: AmountData;
-  jettons: JettonsBalances;
-  onBack?: () => void;
-  onClose: (confirmed?: boolean) => void;
-} & MutationProps> = ({ recipient, onBack, onClose, amount, jettons, mutateAsync, isLoading, error, reset }) => {
+export const ConfirmViewControllable: FC<
+  {
+    recipient: RecipientData;
+    amount: AmountData;
+    jettons: JettonsBalances;
+    onBack?: () => void;
+    onClose: (confirmed?: boolean) => void;
+  } & MutationProps
+> = ({
+  recipient,
+  onBack,
+  onClose,
+  amount,
+  jettons,
+  mutateAsync,
+  isLoading,
+  error,
+  reset,
+}) => {
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
 
@@ -100,7 +104,7 @@ export const ConfirmViewControllable: FC<{
     }
 
     const jetton = jettons.balances.find(
-        (item) => item.jettonAddress === amount.jetton
+      (item) => item.jettonAddress === amount.jetton
     );
 
     return [
@@ -119,60 +123,62 @@ export const ConfirmViewControllable: FC<{
   })} ${symbol}`;
 
   return (
-      <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
-        <NotificationTitleBlock>
-          {onBack && <BackButton onClick={onBack}>
+    <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
+      <NotificationTitleBlock>
+        {onBack && (
+          <BackButton onClick={onBack}>
             <ChevronLeftIcon />
-          </BackButton> }
-          <NotificationCancelButton handleClose={() => onClose()} />
-        </NotificationTitleBlock>
-        <Info>
-          {recipient.toAccount.icon ? (
-              <Image full src={recipient.toAccount.icon} />
-          ) : jettonImage ? (
-              <Image full src={jettonImage} />
-          ) : (
-              <ImageMock full />
-          )}
-          <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
-          <Title>
-            {recipient.toAccount.name ? recipient.toAccount.name : title}
-          </Title>
-        </Info>
-        <ListBlock margin={false} fullWidth>
-          <RecipientListItem recipient={recipient} />
-          <AmountListItem coinAmount={coinAmount} fiatAmount={fiatAmount} />
-          <ActionFeeDetails fee={amount.fee} stock={stock} fiat={fiat} />
-          <TransferComment comment={recipient.comment} />
-        </ListBlock>
-        <Gap />
+          </BackButton>
+        )}
+        <NotificationCancelButton handleClose={() => onClose()} />
+      </NotificationTitleBlock>
+      <Info>
+        {recipient.toAccount.icon ? (
+          <Image full src={recipient.toAccount.icon} />
+        ) : jettonImage ? (
+          <Image full src={jettonImage} />
+        ) : (
+          <ImageMock full />
+        )}
+        <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
+        <Title>
+          {recipient.toAccount.name ? recipient.toAccount.name : title}
+        </Title>
+      </Info>
+      <ListBlock margin={false} fullWidth>
+        <RecipientListItem recipient={recipient} />
+        <AmountListItem coinAmount={coinAmount} fiatAmount={fiatAmount} />
+        <ActionFeeDetails fee={amount.fee} stock={stock} fiat={fiat} />
+        <TransferComment comment={recipient.comment} />
+      </ListBlock>
+      <Gap />
 
-        <ButtonBlock>
-          {done && (
-              <ResultButton done>
-                <CheckmarkCircleIcon />
-                <Label2>{t('send_screen_steps_done_done_label')}</Label2>
-              </ResultButton>
-          )}
-          {error && (
-              <ResultButton>
-                <ExclamationMarkCircleIcon />
-                <Label2>{t('send_publish_tx_error')}</Label2>
-              </ResultButton>
-          )}
-          {!done && !error && (
-              <Button
-                  fullWidth
-                  size="large"
-                  primary
-                  type="submit"
-                  disabled={!isValid}
-                  loading={isLoading}
-              >
-                {t('confirm_sending_submit')}
-              </Button>
-          )}
-        </ButtonBlock>
-      </FullHeightBlock>
+      <ButtonBlock>
+        {done && (
+          <ResultButton done>
+            <CheckmarkCircleIcon />
+            <Label2>{t('send_screen_steps_done_done_label')}</Label2>
+          </ResultButton>
+        )}
+        {error && (
+          <ResultButton>
+            <ExclamationMarkCircleIcon />
+            <Label2>{t('send_publish_tx_error')}</Label2>
+          </ResultButton>
+        )}
+        {!done && !error && (
+          <Button
+            fullWidth
+            size="large"
+            primary
+            type="submit"
+            disabled={!isValid}
+            loading={isLoading}
+          >
+            {t('confirm_sending_submit')}
+          </Button>
+        )}
+      </ButtonBlock>
+    </FullHeightBlock>
   );
 };
