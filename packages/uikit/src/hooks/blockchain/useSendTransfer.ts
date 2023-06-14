@@ -11,7 +11,7 @@ import {sendTonTransfer} from "@tonkeeper/core/dist/service/transfer/tonService"
 import {sendJettonTransfer} from "@tonkeeper/core/dist/service/transfer/jettonService";
 import {notifyError} from "../../components/transfer/common";
 
-export const useSendNft = (
+export const useSendTransfer = (
     recipient: RecipientData,
     amount: AmountData,
     jettons: JettonsBalances

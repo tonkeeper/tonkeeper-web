@@ -149,7 +149,7 @@ export const createTransferMessage = (
       internal({
         to: Address.parse(transaction.to),
         bounce: true,
-        value,
+        value: BigInt(value),
         body: transaction.body
       }),
     ],

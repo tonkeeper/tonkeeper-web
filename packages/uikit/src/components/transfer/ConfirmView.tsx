@@ -39,16 +39,16 @@ import {
 } from './common';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
-import {useSendNft} from "../../hooks/blockchain/useSendNft";
+import {useSendTransfer} from "../../hooks/blockchain/useSendTransfer";
 export const ConfirmView: FC<{
   recipient: RecipientData;
   amount: AmountData;
   jettons: JettonsBalances;
-  onBack: () => void;
-  onClose: () => void;
+  onBack?: () => void;
+  onClose: (confirmed?: boolean) => void;
 }> = props => {
 
-  const mutationProps = useSendNft(
+  const mutationProps = useSendTransfer(
       props.recipient,
       props.amount,
       props.jettons
@@ -63,8 +63,8 @@ export const ConfirmViewControllable: FC<{
   recipient: RecipientData;
   amount: AmountData;
   jettons: JettonsBalances;
-  onBack: () => void;
-  onClose: () => void;
+  onBack?: () => void;
+  onClose: (confirmed?: boolean) => void;
 } & MutationProps> = ({ recipient, onBack, onClose, amount, jettons, mutateAsync, isLoading, error, reset }) => {
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
@@ -82,7 +82,7 @@ export const ConfirmViewControllable: FC<{
       const done = await mutateAsync();
       if (done) {
         setDone(true);
-        setTimeout(onClose, 2000);
+        setTimeout(() => onClose(true), 2000);
       }
     } catch (e) {}
   };
@@ -121,10 +121,10 @@ export const ConfirmViewControllable: FC<{
   return (
       <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
         <NotificationTitleBlock>
-          <BackButton onClick={onBack}>
+          {onBack && <BackButton onClick={onBack}>
             <ChevronLeftIcon />
-          </BackButton>
-          <NotificationCancelButton handleClose={onClose} />
+          </BackButton> }
+          <NotificationCancelButton handleClose={() => onClose()} />
         </NotificationTitleBlock>
         <Info>
           {recipient.toAccount.icon ? (

@@ -18,7 +18,7 @@ import { Image, NftBlock } from './Nfts';
 import {Button} from "../fields/Button";
 import {isNFTDNS, NFT, NFTDNS} from "@tonkeeper/core/dist/entries/nft";
 import {useDateFormat} from "../../hooks/dateFormat";
-import {ConfirmView} from "../transfer/ConfirmView";
+import {ConfirmView, ConfirmViewControllable} from "../transfer/ConfirmView";
 import {useGetToAccount} from "../transfer/RecipientView";
 import {AmountValue, RecipientData} from "@tonkeeper/core/dist/entries/send";
 import {useAppSdk} from "../../hooks/appSdk";
@@ -30,6 +30,9 @@ import {childFactoryCreator, duration, notifyError, Wrapper} from "../transfer/c
 import BigNumber from "bignumber.js";
 import {useUserJettonList} from "../../state/jetton";
 import {AccountsApi} from "@tonkeeper/core/dist/tonApiV2";
+import {useRenewNft} from "../../hooks/blockchain/nft/useRenewNft";
+import {useEstimateNftRenew} from "../../hooks/blockchain/nft/useEstimateNftRenew";
+import {unShiftedDecimals} from "@tonkeeper/core/dist/utils/balance";
 
 const Text = styled.div`
   display: flex;
@@ -94,23 +97,6 @@ const SaleBlock = styled(Label4)`
   white-space: nowrap;
 `;
 
-const useEstimateTonTransfer = () => {
-  const { t } = useTranslation();
-  const sdk = useAppSdk();
-  const { tonApi } = useAppContext();
-  const wallet = useWalletContext();
-  const client = useQueryClient();
-
-  return useMutation(async ( options: { recipient:RecipientData, amount: AmountValue }) => {
-    try {
-        return await estimateTonTransfer(tonApi, wallet, options.recipient, options.amount);
-    } catch (e) {
-      await notifyError(client, sdk, t, e);
-      throw e;
-    }
-  });
-};
-
 const useDNSNFTRefresh = (nft: NFTDNS) => {
   const { tonApiV2 } = useAppContext();
   const timeout = 1000 * 60 * 2;
@@ -144,15 +130,23 @@ const useDNSNFTRefresh = (nft: NFTDNS) => {
 }
 
 
-const dNSRenewAmount = new BigNumber(0.01);
+const dnsRenewAmount = new BigNumber(0.02);
 export const RenewNft: FC<{
   nftItem: NFTDNS;
 }> = ({ nftItem }) => {
   const { t } = useTranslation();
+  const expiresAtFormatted = useDateFormat(nftItem.expiresAt);
+
   const { refetch: refetchAllNFT } = useWalletNftList();
   const { data: dnsRenewed, isFetching: dnsRenewedLoading, refetch: refetchDnsRenewed } = useDNSNFTRefresh(nftItem);
-  const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    if (dnsRenewed) {
+      refetchAllNFT();
+    }
+  }, [dnsRenewed, refetchAllNFT]);
 
+
+  const [isOpen, setIsOpen] = useState(false);
   const onClose = useCallback((confirmed?: boolean) => {
     setIsOpen(false);
 
@@ -160,58 +154,49 @@ export const RenewNft: FC<{
       refetchDnsRenewed();
     }
   }, [refetchDnsRenewed]);
-  const expiresAtFormatted = useDateFormat(nftItem.expiresAt);
 
   const { data: jettons } = useWalletJettonList();
   const filter = useUserJettonList(jettons);
 
-  const { isLoading: isRecipientLoading, data, mutate: mutateRecipient } =
+  const { isLoading: isRecipientLoading, data: toAccount, mutate: mutateRecipient } =
       useGetToAccount();
-
-  const { isLoading: isFeeLoading, data: fee, mutate: mutateFee } = useEstimateTonTransfer();
-
   useEffect(() => {
     mutateRecipient({ address: nftItem.address });
   }, [nftItem.address]);
-
   const recipient = useMemo(() => ({
     address: { address: nftItem.address },
     comment: '',
     done: false,
-    toAccount: data!
-  }), [data]);
+    toAccount: toAccount!
+  }), [toAccount]);
 
+
+  const { isLoading: isFeeLoading, data: fee, mutate: calculateFee } = useEstimateNftRenew();
   useEffect(() => {
-    if (recipient.toAccount) {
-      mutateFee({ recipient, amount: {amount: dNSRenewAmount, max: false} });
-    }
-  }, [recipient]);
-
+    calculateFee({ nftAddress: nftItem.address, amount: unShiftedDecimals(dnsRenewAmount) });
+  }, [nftItem.address]);
   const amount = useMemo(() => ({
     jetton: CryptoCurrency.TON,
     done: false,
-    amount: dNSRenewAmount,
+    amount: dnsRenewAmount,
     fee: fee!,
     max: false
   }), [fee])
 
-  useEffect(() => {
-    if (dnsRenewed) {
-      refetchAllNFT();
-    }
-  }, [dnsRenewed, refetchAllNFT]);
+  const renewNftMutation = useRenewNft(nftItem, dnsRenewAmount, fee);
 
-  const child = useCallback(() => <ConfirmView
+  const child = useCallback(() => <ConfirmViewControllable
       onClose={onClose}
       recipient={recipient}
       amount={amount}
       jettons={filter}
+      {...renewNftMutation}
   />, [recipient, amount, filter]);
 
   return <>
     <RenewDNSBlock>
       <RenewDNSButton type="button" disabled={dnsRenewedLoading || dnsRenewed} loading={!dnsRenewedLoading && (isFeeLoading || isRecipientLoading)} onClick={() => setIsOpen(true)} size="large" secondary fullWidth>
-        {dnsRenewedLoading ? t('renew_nft_in_progress') :  dnsRenewed ? t('renew_nft_renewed') : t('renew_nft', { value: dNSRenewAmount.toString() })}
+        {dnsRenewedLoading ? t('renew_nft_in_progress') :  dnsRenewed ? t('renew_nft_renewed') : t('renew_nft', { value: dnsRenewAmount.toString() })}
       </RenewDNSButton>
       {!dnsRenewed && <RenewDNSValidUntil>{t('renew_nft_expiration_date', { value: expiresAtFormatted })}</RenewDNSValidUntil>}
     </RenewDNSBlock>
