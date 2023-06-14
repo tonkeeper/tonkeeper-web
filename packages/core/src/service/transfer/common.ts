@@ -4,7 +4,8 @@ import {
   beginCell,
   Cell,
   comment,
-  external, internal,
+  external,
+  internal,
   storeMessage,
   toNano,
 } from 'ton-core';
@@ -20,7 +21,7 @@ import {
   SystemApi,
   WalletApi,
 } from '../../tonApiV1';
-import {walletContractFromState} from "../wallet/contractService";
+import { walletContractFromState } from '../wallet/contractService';
 
 export enum SendMode {
   CARRY_ALL_REMAINING_BALANCE = 128,
@@ -126,20 +127,22 @@ export const checkServiceTimeOrDie = async (tonApi: Configuration) => {
   }
 };
 
-
 export const createTransferMessage = (
-    wallet: {
-      seqno: number;
-      state: WalletState;
-      secretKey: Buffer;
-    },
-    transaction: {
-      to: string;
-      value: string | bigint | BigNumber;
-      body?: string | Cell | null
-    }
+  wallet: {
+    seqno: number;
+    state: WalletState;
+    secretKey: Buffer;
+  },
+  transaction: {
+    to: string;
+    value: string | bigint | BigNumber;
+    body?: string | Cell | null;
+  }
 ) => {
-  const value = transaction.value instanceof BigNumber ? transaction.value.toFixed(0) : transaction.value;
+  const value =
+    transaction.value instanceof BigNumber
+      ? transaction.value.toFixed(0)
+      : transaction.value;
   const contract = walletContractFromState(wallet.state);
   const transfer = contract.createTransfer({
     seqno: wallet.seqno,
@@ -150,7 +153,7 @@ export const createTransferMessage = (
         to: Address.parse(transaction.to),
         bounce: true,
         value: BigInt(value),
-        body: transaction.body
+        body: transaction.body,
       }),
     ],
   });

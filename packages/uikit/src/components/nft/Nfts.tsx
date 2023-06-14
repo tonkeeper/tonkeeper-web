@@ -1,4 +1,5 @@
-import { NftItemRepr, NftItemsRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NFT } from '@tonkeeper/core/dist/entries/nft';
+import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, {
   FC,
   useContext,
@@ -11,7 +12,6 @@ import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
 import { SaleIcon } from '../Icon';
 import { NftCollectionBody3, NftHeaderLabel2 } from './NftHeader';
 import { NftNotification } from './NftNotification';
-import {NFT} from "@tonkeeper/core/dist/entries/nft";
 
 const Grid = styled.div`
   display: grid;
@@ -128,9 +128,13 @@ export const NftItem: FC<{
 });
 
 export const NftsList: FC<{ nfts: NFT[] | undefined }> = ({ nfts }) => {
-  const [nftItemAddress, setNftItemAddress] = useState<string | undefined>(undefined);
+  const [nftItemAddress, setNftItemAddress] = useState<string | undefined>(
+    undefined
+  );
 
-  const selectedNft = nftItemAddress ? nfts?.find(nft => nft.address === nftItemAddress) : undefined;
+  const selectedNft = nftItemAddress
+    ? nfts?.find((nft) => nft.address === nftItemAddress)
+    : undefined;
 
   return (
     <>

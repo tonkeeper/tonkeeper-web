@@ -2,10 +2,10 @@ import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1/models';
 import React, { FC, useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
-import { Button, ButtonRow } from '../fields/Button';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Notification } from '../Notification';
 import { Body1, Label1 } from '../Text';
+import { Button, ButtonRow } from '../fields/Button';
 
 export const Label = styled(Body1)`
   user-select: none;
