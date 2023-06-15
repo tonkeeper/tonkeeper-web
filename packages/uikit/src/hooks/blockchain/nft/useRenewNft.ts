@@ -8,7 +8,6 @@ export const useRenewNft = (
   amount: BigNumber,
   fee?: Fee
 ) => {
-  console.log('in-hook', fee);
   return useExecuteContract(
     (params) =>
       sendNftRenew({

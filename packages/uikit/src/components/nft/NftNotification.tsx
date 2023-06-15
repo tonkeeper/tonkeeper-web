@@ -1,46 +1,28 @@
-import { useQuery } from '@tanstack/react-query';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { NFT, NFTDNS, isNFTDNS } from '@tonkeeper/core/dist/entries/nft';
-import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import BigNumber from 'bignumber.js';
+import { NFT, isNFTDNS } from '@tonkeeper/core/dist/entries/nft';
 import React, {
   FC,
   useCallback,
-  useEffect,
   useMemo,
-  useRef,
-  useState,
+  useRef
 } from 'react';
 import styled from 'styled-components';
 import { useFBAnalyticsEvent } from '../../hooks/analytics';
-import { useAppContext } from '../../hooks/appContext';
-import { useEstimateNftRenew } from '../../hooks/blockchain/nft/useEstimateNftRenew';
-import { useRenewNft } from '../../hooks/blockchain/nft/useRenewNft';
-import { useDateFormat } from '../../hooks/dateFormat';
 import { useTranslation } from '../../hooks/translation';
-import { useUserJettonList } from '../../state/jetton';
-import {
-  expiringNFTDaysPeriod,
-  useNftCollectionData,
-  useWalletJettonList,
-  useWalletNftList,
-} from '../../state/wallet';
+import { useNftCollectionData } from '../../state/wallet';
 import { ChevronDownIcon, VerificationIcon } from '../Icon';
 import {
   Notification,
   NotificationBlock,
   NotificationTitleBlock,
 } from '../Notification';
-import { Body2, H2, H3, Label1, Label4 } from '../Text';
+import { H2, H3, Label1, Label4 } from '../Text';
 import { BackButton, ButtonMock } from '../fields/BackButton';
-import { Button } from '../fields/Button';
 import { Body, CroppedBodyText } from '../jettons/CroppedText';
-import { ConfirmViewControllable } from '../transfer/ConfirmView';
-import { useGetToAccount } from '../transfer/RecipientView';
 import { NftAction } from './NftAction';
 import { NftDetails } from './NftDetails';
 import { Image, NftBlock } from './Nfts';
+import { RenewNft } from "./RenewNft";
+import {LinkNft} from "./LinkNft";
 
 const Text = styled.div`
   display: flex;
@@ -68,21 +50,6 @@ const Icon = styled.span`
   margin-left: 4px;
 `;
 
-const RenewDNSBlock = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const RenewDNSButton = styled(Button)`
-  margin-bottom: 0.75rem;
-`;
-
-const RenewDNSValidUntil = styled(Body2)`
-  color: ${(props) => props.theme.textSecondary};
-`;
-
 const TonDnsRoot =
   '0:b774d95eb20543f186c06b371ab88ad704f7e256130caf96189368a7d0cb6ccf';
 
@@ -104,165 +71,6 @@ const SaleBlock = styled(Label4)`
 
   white-space: nowrap;
 `;
-
-const useDNSNFTRefresh = (nft: NFTDNS) => {
-  const { tonApiV2 } = useAppContext();
-  const timeout = 1000 * 60 * 2;
-  const waitForDomainRenewed = async (
-    startTimestamp?: number
-  ): Promise<boolean> => {
-    const response = await new AccountsApi(tonApiV2).getDnsExpiring({
-      accountId: nft.owner!.address,
-      period: expiringNFTDaysPeriod,
-    });
-    const dns = response.items.find((item) => item.name === nft.dns);
-
-    if (!dns || !dns?.expiringAt) {
-      return true;
-    }
-
-    startTimestamp ||= Date.now();
-    if (Date.now() - startTimestamp < timeout) {
-      return waitForDomainRenewed(startTimestamp);
-    }
-
-    return false;
-  };
-
-  return useQuery({
-    queryKey: ['nft-dns-renewing_' + nft.dns],
-    queryFn: () => waitForDomainRenewed(),
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-    enabled: false,
-  });
-};
-
-const dnsRenewAmount = new BigNumber(0.02);
-export const RenewNft: FC<{
-  nftItem: NFTDNS;
-}> = ({ nftItem }) => {
-  const { t } = useTranslation();
-  const expiresAtFormatted = useDateFormat(nftItem.expiresAt);
-
-  const { refetch: refetchAllNFT } = useWalletNftList();
-  const {
-    data: dnsRenewed,
-    isFetching: dnsRenewedLoading,
-    refetch: refetchDnsRenewed,
-  } = useDNSNFTRefresh(nftItem);
-  useEffect(() => {
-    if (dnsRenewed) {
-      refetchAllNFT();
-    }
-  }, [dnsRenewed, refetchAllNFT]);
-
-  const [isOpen, setIsOpen] = useState(false);
-  const onClose = useCallback(
-    (confirmed?: boolean) => {
-      setIsOpen(false);
-
-      if (confirmed) {
-        refetchDnsRenewed();
-      }
-    },
-    [refetchDnsRenewed]
-  );
-
-  const { data: jettons } = useWalletJettonList();
-  const filter = useUserJettonList(jettons);
-
-  const {
-    isLoading: isRecipientLoading,
-    data: toAccount,
-    mutate: mutateRecipient,
-  } = useGetToAccount();
-  useEffect(() => {
-    mutateRecipient({ address: nftItem.address });
-  }, [nftItem.address]);
-  const recipient = useMemo(
-    () => ({
-      address: { address: nftItem.address },
-      comment: '',
-      done: false,
-      toAccount: toAccount!,
-    }),
-    [toAccount]
-  );
-
-  const {
-    isLoading: isFeeLoading,
-    data: fee,
-    mutate: calculateFee,
-  } = useEstimateNftRenew();
-  useEffect(() => {
-    calculateFee({
-      nftAddress: nftItem.address,
-      amount: unShiftedDecimals(dnsRenewAmount),
-    });
-  }, [nftItem.address]);
-  const amount = useMemo(
-    () => ({
-      jetton: CryptoCurrency.TON,
-      done: false,
-      amount: dnsRenewAmount,
-      fee: fee!,
-      max: false,
-    }),
-    [fee]
-  );
-
-  const renewNftMutation = useRenewNft(nftItem, dnsRenewAmount, fee);
-
-  const child = useCallback(
-    () => (
-      <ConfirmViewControllable
-        onClose={onClose}
-        recipient={recipient}
-        amount={amount}
-        jettons={filter}
-        {...renewNftMutation}
-      />
-    ),
-    [recipient, amount, filter]
-  );
-
-  return (
-    <>
-      <RenewDNSBlock>
-        <RenewDNSButton
-          type="button"
-          disabled={dnsRenewedLoading || dnsRenewed}
-          loading={!dnsRenewedLoading && (isFeeLoading || isRecipientLoading)}
-          onClick={() => setIsOpen(true)}
-          size="large"
-          secondary
-          fullWidth
-        >
-          {dnsRenewedLoading
-            ? t('renew_nft_in_progress')
-            : dnsRenewed
-            ? t('renew_nft_renewed')
-            : t('renew_nft', { value: dnsRenewAmount.toString() })}
-        </RenewDNSButton>
-        {!dnsRenewed && (
-          <RenewDNSValidUntil>
-            {t('renew_nft_expiration_date', { value: expiresAtFormatted })}
-          </RenewDNSValidUntil>
-        )}
-      </RenewDNSBlock>
-      <Notification
-        isOpen={isOpen}
-        hideButton
-        handleClose={() => onClose}
-        backShadow
-      >
-        {child}
-      </Notification>
-    </>
-  );
-};
 
 const NftPreview: FC<{
   onClose: () => void;
@@ -341,9 +149,15 @@ const NftPreview: FC<{
         )}
       </NftBlock>
 
-      {!!(isNFTDNS(nftItem) && nftItem.expiresAt) && (
-        <RenewNft nftItem={nftItem} />
-      )}
+      {
+        isNFTDNS(nftItem) &&
+          <>
+            <LinkNft nft={nftItem} />
+            {
+              !!nftItem.expiresAt && <RenewNft nftItem={nftItem} />
+            }
+          </>
+      }
 
       <NftAction nftItem={nftItem} kind={itemKind} />
       <DelimiterExtra />

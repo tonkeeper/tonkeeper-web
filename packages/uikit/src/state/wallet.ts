@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { NFT } from '@tonkeeper/core/dist/entries/nft';
+import {NFT, NFTDNS} from '@tonkeeper/core/dist/entries/nft';
 import {
   accountLogOutWallet,
   getAccountState,
@@ -19,7 +19,7 @@ import {
     NftItemRepr, NftItemsRepr,
     WalletApi,
 } from '@tonkeeper/core/dist/tonApiV1';
-import {AccountsApi, DnsExpiring} from '@tonkeeper/core/dist/tonApiV2';
+import {AccountsApi, DNSApi, DnsExpiring, DnsRecord} from '@tonkeeper/core/dist/tonApiV2';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
@@ -230,6 +230,21 @@ export const useWalletNftList = () => {
       keepPreviousData: true,
     }
   );
+};
+
+export const useNftDNSLinkData = (nft: NFT) => {
+    const { tonApiV2 } = useAppContext();
+
+    return useQuery<DnsRecord | null, Error>(
+        ['dns_link', nft?.address],
+        () => {
+            const { dns: domainName } = nft;
+            if (!domainName) return null;
+
+            return new DNSApi(tonApiV2).dnsResolve({domainName});
+        },
+        { enabled: nft.dns != null }
+    );
 };
 
 export const useNftCollectionData = (nft: NftItemRepr) => {
