@@ -10,7 +10,7 @@ import {
   checkServiceTimeOrDie,
   checkWalletBalanceOrDie,
   checkWalletPositiveBalanceOrDie,
-  createTransferMessage,
+  createTransferMessage, getKeyPairAndSeqno,
   getWalletBalance,
 } from './common';
 
@@ -43,6 +43,20 @@ const nftRenewBody = (params?: { queryId?: number }) => {
     .storeUint(params?.queryId || 0, 64)
     .storeUint(0, 256)
     .endCell();
+};
+
+const nftLinkBody = (params: { queryId?: number, linkToAddress: string }) => {
+  const addressToDNSAddressFormat = (address: string) => beginCell()
+        .storeUint(0x9fd3, 16)
+        .storeAddress(Address.parse(address))
+        .storeUint(0, 8);
+
+  return beginCell()
+      .storeUint(0x4eb1f0f9, 32) // op::change_dns_record,
+      .storeUint(params?.queryId || 0, 64)
+      .storeUint(BigInt('0xe8d44050873dba865aa7c170ab4cce64d90839a34dcfd6cf71d14e0205443b1b'), 256) // DNS_CATEGORY_WALLET
+      .storeRef(addressToDNSAddressFormat(params.linkToAddress))
+      .endCell();
 };
 
 const createNftTransfer = (
@@ -154,21 +168,7 @@ export const sendNftRenew = async (options: {
   password: string;
   amount: BigNumber;
 }) => {
-  await checkServiceTimeOrDie(options.tonApi);
-  const mnemonic = await getWalletMnemonic(
-    options.storage,
-    options.walletState.publicKey,
-    options.password
-  );
-  const keyPair = await mnemonicToPrivateKey(mnemonic);
-
-  const total = options.amount.plus(options.fee.total);
-
-  const [wallet, seqno] = await getWalletBalance(
-    options.tonApi,
-    options.walletState
-  );
-  checkWalletBalanceOrDie(total, wallet);
+  const { seqno, keyPair } = await getKeyPairAndSeqno(options);
 
   const body = nftRenewBody();
 
@@ -208,6 +208,62 @@ export const estimateNftRenew = async (options: {
       secretKey: Buffer.alloc(64),
     },
     { to: options.nftAddress, value: options.amount, body }
+  );
+
+  return cell.toString('base64');
+};
+
+export const sendNftLink = async (options: {
+  storage: IStorage;
+  tonApi: Configuration;
+  walletState: WalletState;
+  nftAddress: string;
+  linkToAddress: string;
+  fee: Fee;
+  password: string;
+  amount: BigNumber;
+}) => {
+  const { seqno, keyPair } = await getKeyPairAndSeqno(options);
+
+  const body = nftLinkBody(options);
+
+  const cell = createTransferMessage(
+      {
+        seqno,
+        state: options.walletState,
+        secretKey: keyPair.secretKey,
+      },
+      { to: options.nftAddress, value: options.amount, body }
+  );
+
+  await new SendApi(options.tonApi).sendBoc({
+    sendBocRequest: { boc: cell.toString('base64') },
+  });
+};
+
+export const estimateNftLink = async (options: {
+  tonApi: Configuration;
+  walletState: WalletState;
+  nftAddress: string;
+  linkToAddress: string;
+  amount: BigNumber;
+}) => {
+  await checkServiceTimeOrDie(options.tonApi);
+  const [wallet, seqno] = await getWalletBalance(
+      options.tonApi,
+      options.walletState
+  );
+  checkWalletPositiveBalanceOrDie(wallet);
+
+  const body = nftLinkBody(options);
+
+  const cell = createTransferMessage(
+      {
+        seqno,
+        state: options.walletState,
+        secretKey: Buffer.alloc(64),
+      },
+      { to: options.nftAddress, value: options.amount, body }
   );
 
   return cell.toString('base64');

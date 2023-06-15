@@ -237,11 +237,15 @@ export const useNftDNSLinkData = (nft: NFT) => {
 
     return useQuery<DnsRecord | null, Error>(
         ['dns_link', nft?.address],
-        () => {
+        async () => {
             const { dns: domainName } = nft;
             if (!domainName) return null;
 
-            return new DNSApi(tonApiV2).dnsResolve({domainName});
+            try {
+               return await new DNSApi(tonApiV2).dnsResolve({domainName});
+            } catch (e) {
+                return null;
+            }
         },
         { enabled: nft.dns != null }
     );

@@ -17,11 +17,14 @@ import { WalletState } from '../../entries/wallet';
 import {
   AccountApi,
   AccountRepr,
-  Configuration,
+  Configuration, Fee,
   SystemApi,
   WalletApi,
 } from '../../tonApiV1';
 import { walletContractFromState } from '../wallet/contractService';
+import {getWalletMnemonic} from "../menmonicService";
+import {mnemonicToPrivateKey} from "ton-crypto";
+import {IStorage} from "../../Storage";
 
 export enum SendMode {
   CARRY_ALL_REMAINING_BALANCE = 128,
@@ -160,3 +163,54 @@ export const createTransferMessage = (
 
   return externalMessage(contract, wallet.seqno, transfer).toBoc();
 };
+
+export async function getKeyPairAndSeqno(options: {
+  storage: IStorage;
+  tonApi: Configuration;
+  walletState: WalletState;
+  fee: Fee;
+  password: string;
+  amount: BigNumber;
+}) {
+  await checkServiceTimeOrDie(options.tonApi);
+  const mnemonic = await getWalletMnemonic(
+      options.storage,
+      options.walletState.publicKey,
+      options.password
+  );
+  const keyPair = await mnemonicToPrivateKey(mnemonic);
+
+  const total = options.amount.plus(options.fee.total);
+
+  const [wallet, seqno] = await getWalletBalance(
+      options.tonApi,
+      options.walletState
+  );
+  checkWalletBalanceOrDie(total, wallet);
+  return { seqno, keyPair };
+}
+
+export async function getKeySeqno(options: {
+  storage: IStorage;
+  tonApi: Configuration;
+  walletState: WalletState;
+  fee: Fee;
+  password: string;
+  amount: BigNumber;
+}) {
+  const mnemonic = await getWalletMnemonic(
+      options.storage,
+      options.walletState.publicKey,
+      options.password
+  );
+  const keyPair = await mnemonicToPrivateKey(mnemonic);
+
+  const total = options.amount.plus(options.fee.total);
+
+  const [wallet, seqno] = await getWalletBalance(
+      options.tonApi,
+      options.walletState
+  );
+  checkWalletBalanceOrDie(total, wallet);
+  return { seqno, keyPair };
+}

@@ -172,11 +172,11 @@ export const ConfirmView: FC<
       }>
         <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
           <NotificationTitleBlock>
-            {onBack && (
+            {onBack ? (
                 <BackButton onClick={onBack}>
                   <ChevronLeftIcon />
                 </BackButton>
-            )}
+            ): <div />}
             <NotificationCancelButton handleClose={() => onClose()} />
           </NotificationTitleBlock>
           { heading }

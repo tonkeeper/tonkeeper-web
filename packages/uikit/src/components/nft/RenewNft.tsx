@@ -18,6 +18,7 @@ import {Body2} from "../Text";
 import {useAppContext} from "../../hooks/appContext";
 import {AccountsApi} from "@tonkeeper/core/dist/tonApiV2";
 import {useQuery} from "@tanstack/react-query";
+import {useRecipient} from "../../hooks/blockchain/useRecipient";
 
 
 const RenewDNSBlock = styled.div`
@@ -104,23 +105,7 @@ export const RenewNft: FC<{
     const { data: jettons } = useWalletJettonList();
     const filter = useUserJettonList(jettons);
 
-    const {
-        isLoading: isRecipientLoading,
-        data: toAccount,
-        mutate: mutateRecipient,
-    } = useGetToAccount();
-    useEffect(() => {
-        mutateRecipient({ address: nftItem.address });
-    }, [nftItem.address]);
-    const recipient = useMemo(
-        () => ({
-            address: { address: nftItem.address },
-            comment: '',
-            done: false,
-            toAccount: toAccount!,
-        }),
-        [toAccount]
-    );
+    const { recipient, isLoading: isRecipientLoading } = useRecipient(nftItem.address);
 
     const {
         isLoading: isFeeLoading,
@@ -144,7 +129,7 @@ export const RenewNft: FC<{
         [fee]
     );
 
-    const renewNftMutation = useRenewNft(nftItem, dnsRenewAmount, fee);
+    const { mutateAsync: renewMutateAsync, ...renewNftMutation} = useRenewNft();
 
     const child = useCallback(
         () => (
@@ -153,6 +138,7 @@ export const RenewNft: FC<{
                 recipient={recipient}
                 amount={amount}
                 jettons={filter}
+                mutateAsync={() => renewMutateAsync({nftAddress: nftItem.address, fee: fee!, amount: dnsRenewAmount})}
                 {...renewNftMutation}
             >
                 <ConfirmViewButtonsSlot>
