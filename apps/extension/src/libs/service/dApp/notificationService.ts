@@ -70,6 +70,8 @@ export const closeCurrentPopUp = async (popupId: number | undefined) => {
   }
 };
 
+export const closeOpenedPopUp = async () => closeCurrentPopUp(popupId);
+
 export const openNotificationPopUp = async () => {
   await openPopUp('/notification');
   return popupId;
