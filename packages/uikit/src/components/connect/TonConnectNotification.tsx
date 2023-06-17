@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import {
   ConnectItemReply,
@@ -6,15 +7,14 @@ import {
   DAppManifest,
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import {
   getManifest,
   getTonConnectParams,
-  tonConnectProofPayload,
   toTonAddressItemReply,
   toTonProofItemReply,
+  tonConnectProofPayload,
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
@@ -23,10 +23,10 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { getPasswordByNotification } from '../../pages/home/UnlockNotification';
-import { Button } from '../fields/Button';
 import { CheckmarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
+import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 
 const useConnectMutation = (
@@ -118,6 +118,15 @@ const Image = styled.img`
   border-radius: ${(props) => props.theme.cornerMedium};
 `;
 
+const getDomain = (url: string) => {
+  try {
+    const data = new URL(url);
+    return data.hostname;
+  } catch (e) {
+    return url;
+  }
+};
+
 const ConnectContent: FC<{
   origin?: string;
   params: ConnectRequest;
@@ -153,7 +162,7 @@ const ConnectContent: FC<{
       <div>
         <Title>{t('ton_login_title').replace('%{name}', manifest.name)}</Title>
         <SubTitle>
-          {t('ton_login_caption').replace('%{name}', manifest.url)}{' '}
+          {t('ton_login_caption').replace('%{name}', getDomain(manifest.url))}{' '}
           <Address>{toShortAddress(wallet.active.friendlyAddress)}</Address>{' '}
           {walletVersionText(wallet.active.version)}
         </SubTitle>
