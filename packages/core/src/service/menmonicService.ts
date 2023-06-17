@@ -23,10 +23,6 @@ export const getWalletMnemonic = async (
   return mnemonic;
 };
 
-export const deleteWalletMnemonic = (storage: IStorage, publicKey: string) => {
-  return storage.delete(`${AppKey.mnemonic}_${publicKey}`);
-};
-
 export const validateWalletMnemonic = async (
   storage: IStorage,
   publicKey: string,
