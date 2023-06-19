@@ -61,7 +61,8 @@ type ConfirmViewContextValue = {
     isLoading: boolean;
     error: Error | null;
   }
-  onCancel: () => void;
+  onClose: () => void;
+  onBack?: () => void;
 };
 const ConfirmViewContext = createContext<ConfirmViewContextValue>({} as ConfirmViewContextValue);
 export function useConfirmViewContext() {
@@ -98,20 +99,24 @@ export const ConfirmView: FC<
 
   const { mutateAsync, isLoading, error, reset } = mutation;
 
-  let heading: ReactNode =  <ConfirmViewHeadingSlot><ConfirmViewHeading /></ConfirmViewHeadingSlot>
-  let details: ReactNode = <ConfirmViewDetailsSlot>
+  let titleBlock =  <ConfirmViewTitleSlot><ConfirmViewTitle /></ConfirmViewTitleSlot>
+  let heading =  <ConfirmViewHeadingSlot><ConfirmViewHeading /></ConfirmViewHeadingSlot>
+  let details = <ConfirmViewDetailsSlot>
     <ConfirmViewDetailsRecipient />
     <ConfirmViewDetailsAmount />
     <ConfirmViewDetailsFee />
     <ConfirmViewDetailsComment />
   </ConfirmViewDetailsSlot>;
-  let buttons: ReactNode =  <ConfirmViewButtonsSlot>
+  let buttons =  <ConfirmViewButtonsSlot>
     <ConfirmViewButtons />
   </ConfirmViewButtonsSlot>;
 
   Children.map(children, child => {
     if (isValidElement(child)) {
       switch (child.type) {
+        case ConfirmViewTitleSlot:
+          titleBlock = child;
+          return;
         case ConfirmViewHeadingSlot:
           heading = child;
           return;
@@ -168,17 +173,10 @@ export const ConfirmView: FC<
 
   return (
       <ConfirmViewContext.Provider value={
-        { recipient, jettons, amount, currencyInfo: { image: jettonImage, decimals, symbol, title }, formState: {  done, isLoading, error}, onCancel: () => onClose() }
+        { recipient, jettons, amount, currencyInfo: { image: jettonImage, decimals, symbol, title }, formState: {  done, isLoading, error}, onClose: () => onClose(), onBack }
       }>
         <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
-          <NotificationTitleBlock>
-            {onBack ? (
-                <BackButton onClick={onBack}>
-                  <ChevronLeftIcon />
-                </BackButton>
-            ): <div />}
-            <NotificationCancelButton handleClose={() => onClose()} />
-          </NotificationTitleBlock>
+          { titleBlock }
           { heading }
           <ListBlock margin={false} fullWidth>
             { details }
@@ -196,6 +194,19 @@ export const ConfirmView: FC<
 const ConfirmViewHeadingStyled = styled.div`
   margin-bottom: 1rem;
 `
+
+export const ConfirmViewTitleSlot: FC<PropsWithChildren> = ({ children }) => <>{children}</>;
+export const ConfirmViewTitle: FC<PropsWithChildren> = () => {
+  const { onClose, onBack } = useConfirmViewContext();
+  return <NotificationTitleBlock>
+    {onBack ? (
+        <BackButton onClick={onBack}>
+          <ChevronLeftIcon />
+        </BackButton>
+    ): <div />}
+    <NotificationCancelButton handleClose={() => onClose()} />
+  </NotificationTitleBlock>
+}
 
 export const ConfirmViewHeadingSlot: FC<PropsWithChildren<{ className?: string }>> = ({ children, className }) =>
     <ConfirmViewHeadingStyled className={className}>{children}</ConfirmViewHeadingStyled>;
@@ -261,7 +272,7 @@ const ConfirmViewButtonsContainerStyled = styled.div`
 `
 
 export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({ withCancelButton }) => {
-  const { formState: { done, error, isLoading }, onCancel } = useConfirmViewContext();
+  const { formState: { done, error, isLoading }, onClose } = useConfirmViewContext();
   const { t } = useTranslation();
 
   const isValid = !isLoading;
@@ -285,7 +296,7 @@ export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({ withCan
       <Button
           size="large"
           secondary
-          onClick={onCancel}
+          onClick={onClose}
       >
         Cancel{/*TODO i18n*/}
       </Button>

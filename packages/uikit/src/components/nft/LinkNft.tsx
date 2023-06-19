@@ -9,36 +9,44 @@ import {unShiftedDecimals} from "@tonkeeper/core/dist/utils/balance";
 import {CryptoCurrency} from "@tonkeeper/core/dist/entries/crypto";
 import {useEstimateNftLink} from "../../hooks/blockchain/nft/useEstimateNftLink";
 import BigNumber from "bignumber.js";
-import {useWalletContext} from "../../hooks/appContext";
-import {Notification} from "../Notification";
+import {useAppContext, useWalletContext} from "../../hooks/appContext";
+import {FullHeightBlock, Notification} from "../Notification";
 import {
     ConfirmView,
     ConfirmViewButtons,
     ConfirmViewButtonsSlot, ConfirmViewDetailsFee,
     ConfirmViewDetailsSlot,
-    ConfirmViewHeadingSlot
+    ConfirmViewHeadingSlot, ConfirmViewTitleSlot
 } from "../transfer/ConfirmView";
-import {Body2, H3, Label1} from "../Text";
+import {Body1, Body2, H3, Label1} from "../Text";
 import {ListItem, ListItemPayload} from "../List";
-import {ColumnText} from "../Layout";
+import {ColumnText, Gap} from "../Layout";
 import {Label} from "../activity/NotificationCommon";
 import styled from "styled-components";
+import {Input} from "../fields/Input";
+import {Address} from "ton-core";
+import {useAreNftActionsDisabled} from "../../hooks/blockchain/nft/useAreNftActionsDisabled";
+import {useLinkNft} from "../../hooks/blockchain/nft/useLinkNft";
+import {useQueryChangeWait} from "../../hooks/useQueryChangeWait";
 
 
 export const LinkNft: FC<{ nft: NFTDNS }> = ({nft}) => {
-    const { data, isLoading } = useNftDNSLinkData(nft);
+    const query = useNftDNSLinkData(nft);
+    const { data, isLoading } = query;
+
+    const linkedAddress = data?.wallet?.address ? toShortAddress(data?.wallet?.address) : '';
+
+    const { refetch, isLoading: isWaitingForUpdate } = useQueryChangeWait(query, current => !!linkedAddress !== !!current?.wallet?.address);
 
     if (!nft.dns) {
         return null;
     }
 
-    const linkedAddress = data?.wallet?.address ? toShortAddress(data?.wallet?.address) : '';
-
     if (!linkedAddress) {
-        return <LinkNftUnlinked nft={nft} isLoading={isLoading} />
+        return <LinkNftUnlinked nft={nft} isLoading={isLoading || isWaitingForUpdate} refetch={refetch} />
     }
 
-    return null
+    return <LinkNftLinked nft={nft} linkedAddress={linkedAddress} isLoading={isWaitingForUpdate} refetch={refetch} />
 }
 
 
@@ -49,12 +57,16 @@ const ReplaceButton = styled(Body2)`
 
 const dnsLinkAmount = new BigNumber(0.02);
 
-const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean }> = ({nft, isLoading}) => {
-    const [isOpen, setIsOpen] = useState(false);
+const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean, refetch: () => void }> = ({nft, isLoading, refetch}) => {
+    const [openedView, setOpenedView] = useState<'confirm' | 'wallet' | undefined>();
     const onClose = (confirm?: boolean) => {
-        setIsOpen(false);
+        setOpenedView(undefined);
+        if (confirm) {
+            refetch();
+        }
     }
     const walletState = useWalletContext();
+    const [linkToAddress, setLinkToAddress] = useState(walletState.active.rawAddress);
 
     const { data: jettons } = useWalletJettonList();
     const filter = useUserJettonList(jettons);
@@ -64,12 +76,12 @@ const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean }> = ({nft, isLoadin
     const {
         isLoading: isFeeLoading,
         data: fee,
-        mutate: calculateFee,
+        mutateAsync: calculateFee,
     } = useEstimateNftLink();
     useEffect(() => {
         calculateFee({
             nftAddress: nft.address,
-            linkToAddress: walletState.active.rawAddress,
+            linkToAddress: linkToAddress,
             amount: unShiftedDecimals(dnsLinkAmount),
         });
     }, [nft.address]);
@@ -84,24 +96,40 @@ const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean }> = ({nft, isLoadin
         [fee]
     );
 
-    const child = useCallback(
-        () => (
+    const onSaveLinkToAddress = useCallback(async (address: string) => {
+        setLinkToAddress(address);
+        await calculateFee({
+            nftAddress: nft.address,
+            linkToAddress: address,
+            amount: unShiftedDecimals(dnsLinkAmount),
+        });
+        setOpenedView('confirm')
+    }, [calculateFee, nft.address])
+
+    const { mutateAsync, ...mutationRest } = useLinkNft();
+    const sendLinkNftMutation = useCallback(() =>
+            mutateAsync({ nftAddress: nft.address, linkToAddress, amount: unShiftedDecimals(dnsLinkAmount), fee: fee! }
+            )
+        , [mutateAsync, nft.address, fee, linkToAddress]);
+
+    const confirmChild = () => (
             <ConfirmView
                 onClose={onClose}
                 recipient={recipient}
                 amount={amount}
                 jettons={filter}
+                mutateAsync={sendLinkNftMutation}
+                {...mutationRest}
             >
-                <ConfirmViewHeadingSlot>
-                    <H3>Confirm transaction</H3>
-                </ConfirmViewHeadingSlot>
+                <ConfirmViewTitleSlot />
+                <ConfirmViewHeadingSlot />
                 <ConfirmViewDetailsSlot>
                     <ListItem hover={false}>
                         <ListItemPayload>
                             <Label>
                                 Wallet address
                             </Label>
-                            <ColumnText right text={toShortAddress(walletState.active.rawAddress)} secondary={<ReplaceButton>Replace</ReplaceButton>} />
+                            <ColumnText right text={toShortAddress(linkToAddress)} secondary={<ReplaceButton onClick={() => setOpenedView('wallet')}>Replace</ReplaceButton>} />
                         </ListItemPayload>
                     </ListItem>
                     <ConfirmViewDetailsFee />
@@ -110,9 +138,16 @@ const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean }> = ({nft, isLoadin
                     <ConfirmViewButtons withCancelButton />
                 </ConfirmViewButtonsSlot>
             </ConfirmView>
+        )
+
+    const chooseWalletChild = useCallback(
+        () => (
+            <LinkNFTWalletView onSave={onSaveLinkToAddress} isLoading={isFeeLoading} />
         ),
-        [recipient, amount, filter]
+        [onSaveLinkToAddress, isFeeLoading]
     );
+
+    const isDisabled = useAreNftActionsDisabled(nft);
 
     return <>
         <Button
@@ -120,18 +155,155 @@ const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean }> = ({nft, isLoadin
             size="large"
             secondary
             fullWidth
+            disabled={isDisabled}
             loading={isFeeLoading || isRecipientLoading || isLoading}
-            onClick={() => setIsOpen(true)}
+            onClick={() => setOpenedView('confirm')}
         >
            Link Domain
         </Button>
         <Notification
-            isOpen={isOpen}
+            title={openedView === 'wallet' ? "Wallet address" : "Confirm transaction"}
+            isOpen={!!openedView}
             hideButton
-            handleClose={() => onClose}
+            handleClose={() => onClose()}
             backShadow
         >
-            {child}
+            { openedView === 'wallet' ? chooseWalletChild : confirmChild}
+        </Notification>
+    </>
+}
+
+const WalletLabelStyled = styled(Body1)`
+  color: ${(props) => props.theme.textSecondary};
+  margin-bottom: 1.5rem;
+`
+
+const FullHeightBlockStyled = styled(FullHeightBlock)`
+  align-items: flex-start;
+`
+
+const LinkNFTWalletView: FC<{onSave: (value: string) => void, isLoading: boolean}> = ({ onSave, isLoading }) => {
+    const [inputValue, setInputValue] = useState('');
+    const [wasSubmitted, setWasSubmitted] = useState(false);
+    const isInputValid = useMemo(() => {
+        if (!wasSubmitted) {
+            return true;
+        }
+
+        try {
+            Address.parse(inputValue);
+            return true
+        } catch {
+            return false;
+        }
+    }, [wasSubmitted, inputValue]);
+
+    const onSubmit: React.FormEventHandler<HTMLFormElement>  = e => {
+        e.stopPropagation();
+        e.preventDefault();
+        setWasSubmitted(true);
+        try {
+            onSave(Address.parse(inputValue).toRawString());
+        } catch { }
+    }
+
+    const { standalone } = useAppContext();
+    return  <FullHeightBlockStyled onSubmit={onSubmit} standalone={standalone}>
+        <WalletLabelStyled>
+            Add wallet address that domain cat.ton will link to.
+        </WalletLabelStyled>
+        <Input disabled={isLoading} isValid={isInputValid} value={inputValue} onChange={setInputValue} label="Wallet address" clearButton />
+        <Gap />
+        <Button fullWidth size="large" primary disabled={!inputValue} loading={isLoading}>Save</Button>
+    </FullHeightBlockStyled>
+}
+
+const linkToAddress = '';
+const LinkNftLinked: FC<{ nft: NFTDNS, linkedAddress: string, isLoading: boolean, refetch: () => void }> = ({nft, linkedAddress, isLoading, refetch}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const onClose = (confirm?: boolean) => {
+        setIsOpen(false);
+        if (confirm) {
+            refetch();
+        }
+    }
+
+    const { data: jettons } = useWalletJettonList();
+    const filter = useUserJettonList(jettons);
+
+    const { recipient, isLoading: isRecipientLoading } = useRecipient(nft.address);
+
+    const {
+        isLoading: isFeeLoading,
+        data: fee,
+        mutate: calculateFee,
+    } = useEstimateNftLink();
+    useEffect(() => {
+        calculateFee({
+            nftAddress: nft.address,
+            linkToAddress,
+            amount: unShiftedDecimals(dnsLinkAmount),
+        });
+    }, [nft.address]);
+    const amount = useMemo(
+        () => ({
+            jetton: CryptoCurrency.TON,
+            done: false,
+            amount: dnsLinkAmount,
+            fee: fee!,
+            max: false,
+        }),
+        [fee]
+    );
+
+    const { mutateAsync, ...mutationRest } = useLinkNft();
+    const sendLinkNftMutation = useCallback(() => mutateAsync({ nftAddress: nft.address, linkToAddress, amount: unShiftedDecimals(dnsLinkAmount), fee: fee! })
+    , [mutateAsync, nft.address, fee]);
+
+
+    const child = () => (
+            <ConfirmView
+                onClose={onClose}
+                recipient={recipient}
+                amount={amount}
+                jettons={filter}
+                mutateAsync={sendLinkNftMutation}
+                {...mutationRest}
+            >
+                <ConfirmViewTitleSlot />
+                <ConfirmViewHeadingSlot />
+                <ConfirmViewDetailsSlot>
+                    <ConfirmViewDetailsFee />
+                </ConfirmViewDetailsSlot>
+                <ConfirmViewButtonsSlot>
+                    <ConfirmViewButtons withCancelButton />
+                </ConfirmViewButtonsSlot>
+            </ConfirmView>
+        )
+
+
+    const isDisabled = useAreNftActionsDisabled(nft);
+
+    return <>
+        <Button
+            type="button"
+            size="large"
+            secondary
+            fullWidth
+            disabled={isDisabled}
+            loading={isFeeLoading || isRecipientLoading || isLoading}
+            onClick={() => setIsOpen(true)}
+        >
+            Linked with { linkedAddress }
+        </Button>
+        <Notification
+            title="Confirm unlink"
+            isOpen={isOpen}
+            hideButton
+            handleClose={() => onClose()}
+            backShadow
+        >
+            { child }
         </Notification>
     </>
 }

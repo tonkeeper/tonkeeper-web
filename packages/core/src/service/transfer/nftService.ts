@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { Address, beginCell, Cell, comment, toNano } from 'ton-core';
-import { mnemonicToPrivateKey } from 'ton-crypto';
+import {mnemonicToPrivateKey, sha256_sync} from 'ton-crypto';
 import { RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
@@ -51,12 +51,16 @@ const nftLinkBody = (params: { queryId?: number, linkToAddress: string }) => {
         .storeAddress(Address.parse(address))
         .storeUint(0, 8);
 
-  return beginCell()
+  let cell = beginCell()
       .storeUint(0x4eb1f0f9, 32) // op::change_dns_record,
       .storeUint(params?.queryId || 0, 64)
       .storeUint(BigInt('0xe8d44050873dba865aa7c170ab4cce64d90839a34dcfd6cf71d14e0205443b1b'), 256) // DNS_CATEGORY_WALLET
-      .storeRef(addressToDNSAddressFormat(params.linkToAddress))
-      .endCell();
+
+  if (params.linkToAddress) {
+      cell = cell.storeRef(addressToDNSAddressFormat(params.linkToAddress));
+  }
+
+  return cell.endCell();
 };
 
 const createNftTransfer = (
