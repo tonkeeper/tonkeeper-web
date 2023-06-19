@@ -28,6 +28,7 @@ import {Address} from "ton-core";
 import {useAreNftActionsDisabled} from "../../hooks/blockchain/nft/useAreNftActionsDisabled";
 import {useLinkNft} from "../../hooks/blockchain/nft/useLinkNft";
 import {useQueryChangeWait} from "../../hooks/useQueryChangeWait";
+import {useTranslation} from "../../hooks/translation";
 
 
 export const LinkNft: FC<{ nft: NFTDNS }> = ({nft}) => {
@@ -58,6 +59,7 @@ const ReplaceButton = styled(Body2)`
 const dnsLinkAmount = new BigNumber(0.02);
 
 const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean, refetch: () => void }> = ({nft, isLoading, refetch}) => {
+    const { t } = useTranslation();
     const [openedView, setOpenedView] = useState<'confirm' | 'wallet' | undefined>();
     const onClose = (confirm?: boolean) => {
         setOpenedView(undefined);
@@ -127,9 +129,9 @@ const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean, refetch: () => void
                     <ListItem hover={false}>
                         <ListItemPayload>
                             <Label>
-                                Wallet address
+                                { t('wallet_address') }
                             </Label>
-                            <ColumnText right text={toShortAddress(linkToAddress)} secondary={<ReplaceButton onClick={() => setOpenedView('wallet')}>Replace</ReplaceButton>} />
+                            <ColumnText right text={toShortAddress(linkToAddress)} secondary={<ReplaceButton onClick={() => setOpenedView('wallet')}>{ t('replace') }</ReplaceButton>} />
                         </ListItemPayload>
                     </ListItem>
                     <ConfirmViewDetailsFee />
@@ -142,7 +144,7 @@ const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean, refetch: () => void
 
     const chooseWalletChild = useCallback(
         () => (
-            <LinkNFTWalletView onSave={onSaveLinkToAddress} isLoading={isFeeLoading} />
+            <LinkNFTWalletView onSave={onSaveLinkToAddress} isLoading={isFeeLoading} domain={nft.dns} />
         ),
         [onSaveLinkToAddress, isFeeLoading]
     );
@@ -159,10 +161,10 @@ const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean, refetch: () => void
             loading={isFeeLoading || isRecipientLoading || isLoading}
             onClick={() => setOpenedView('confirm')}
         >
-           Link Domain
+            { t('link_domain') }
         </Button>
         <Notification
-            title={openedView === 'wallet' ? "Wallet address" : "Confirm transaction"}
+            title={openedView === 'wallet' ? t('wallet_address') : t('confirm_tx')}
             isOpen={!!openedView}
             hideButton
             handleClose={() => onClose()}
@@ -182,7 +184,8 @@ const FullHeightBlockStyled = styled(FullHeightBlock)`
   align-items: flex-start;
 `
 
-const LinkNFTWalletView: FC<{onSave: (value: string) => void, isLoading: boolean}> = ({ onSave, isLoading }) => {
+const LinkNFTWalletView: FC<{onSave: (value: string) => void, isLoading: boolean, domain: string}> = ({ onSave, isLoading, domain }) => {
+    const { t } = useTranslation();
     const [inputValue, setInputValue] = useState('');
     const [wasSubmitted, setWasSubmitted] = useState(false);
     const isInputValid = useMemo(() => {
@@ -210,9 +213,9 @@ const LinkNFTWalletView: FC<{onSave: (value: string) => void, isLoading: boolean
     const { standalone } = useAppContext();
     return  <FullHeightBlockStyled onSubmit={onSubmit} standalone={standalone}>
         <WalletLabelStyled>
-            Add wallet address that domain cat.ton will link to.
+            { t('add_dns_address').replace('%1%', domain) }
         </WalletLabelStyled>
-        <Input disabled={isLoading} isValid={isInputValid} value={inputValue} onChange={setInputValue} label="Wallet address" clearButton />
+        <Input disabled={isLoading} isValid={isInputValid} value={inputValue} onChange={setInputValue} label={t('wallet_address')} clearButton />
         <Gap />
         <Button fullWidth size="large" primary disabled={!inputValue} loading={isLoading}>Save</Button>
     </FullHeightBlockStyled>
@@ -220,6 +223,7 @@ const LinkNFTWalletView: FC<{onSave: (value: string) => void, isLoading: boolean
 
 const linkToAddress = '';
 const LinkNftLinked: FC<{ nft: NFTDNS, linkedAddress: string, isLoading: boolean, refetch: () => void }> = ({nft, linkedAddress, isLoading, refetch}) => {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const onClose = (confirm?: boolean) => {
         setIsOpen(false);
@@ -294,10 +298,10 @@ const LinkNftLinked: FC<{ nft: NFTDNS, linkedAddress: string, isLoading: boolean
             loading={isFeeLoading || isRecipientLoading || isLoading}
             onClick={() => setIsOpen(true)}
         >
-            Linked with { linkedAddress }
+            { t('linked_with').replace('%1%', linkedAddress) }
         </Button>
         <Notification
-            title="Confirm unlink"
+            title={t('confirm_unlink')}
             isOpen={isOpen}
             hideButton
             handleClose={() => onClose()}

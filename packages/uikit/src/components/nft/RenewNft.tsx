@@ -165,11 +165,11 @@ export const RenewNft: FC<{
                         ? t('renew_nft_in_progress')
                         : dnsRenewed
                             ? t('renew_nft_renewed')
-                            : t('renew_nft', { value: dnsRenewAmount.toString() })}
+                            : t('renew_nft').replace('%1%', dnsRenewAmount.toString())}
                 </RenewDNSButton>
                 {!dnsRenewed && (
                     <RenewDNSValidUntil>
-                        {t('renew_nft_expiration_date', { value: expiresAtFormatted })}
+                        {t('renew_nft_expiration_date').replace('%1%', expiresAtFormatted)}
                     </RenewDNSValidUntil>
                 )}
             </RenewDNSBlock>

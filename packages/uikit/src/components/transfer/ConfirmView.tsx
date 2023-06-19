@@ -298,7 +298,7 @@ export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({ withCan
           secondary
           onClick={onClose}
       >
-        Cancel{/*TODO i18n*/}
+        { t('Cancel') }
       </Button>
       <Button
           size="large"
@@ -307,7 +307,7 @@ export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({ withCan
           disabled={!isValid}
           loading={isLoading}
       >
-        Confirm{/*TODO i18n*/}
+        { t('Confirm_button') }
       </Button>
     </ConfirmViewButtonsContainerStyled>
   }

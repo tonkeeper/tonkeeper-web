@@ -209,7 +209,7 @@
     "message": "This will erase keys to all your wallets. Make sure you have backed up your secret recovery phrases."
   },
   "renew_nft": {
-    "message": "Renew for a year for {{ value }} TON"
+    "message": "Renew for a year for %1% TON"
   },
   "renew_nft_in_progress": {
     "message": "Domain renew in progress…"
@@ -218,6 +218,30 @@
     "message": "Domain renewed"
   },
   "renew_nft_expiration_date": {
-    "message": "Expiration domain date: {{ value }}"
+    "message": "Expiration domain date: %1%"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "link_domain": {
+    "message": "Link Domain"
+  },
+  "confirm_tx": {
+    "message": "Confirm transaction"
+  },
+  "confirm_unlink": {
+    "message": "Confirm unlink"
+  },
+  "wallet_address": {
+    "message": "Wallet address"
+  },
+  "linked_with": {
+    "message": "Linked with %1%"
+  },
+  "add_dns_address": {
+    "message": "Add wallet address that domain %1% will link to."
+  },
+  "replace": {
+    "message": "Replace"
   }
 }
