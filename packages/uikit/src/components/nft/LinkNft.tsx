@@ -29,6 +29,7 @@ import {useAreNftActionsDisabled} from "../../hooks/blockchain/nft/useAreNftActi
 import {useLinkNft} from "../../hooks/blockchain/nft/useLinkNft";
 import {useQueryChangeWait} from "../../hooks/useQueryChangeWait";
 import {useTranslation} from "../../hooks/translation";
+import {useNotification} from "../../hooks/useNotification";
 
 
 export const LinkNft: FC<{ nft: NFTDNS }> = ({nft}) => {
@@ -59,6 +60,7 @@ const ReplaceButton = styled(Body2)`
 const dnsLinkAmount = new BigNumber(0.02);
 
 const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean, refetch: () => void }> = ({nft, isLoading, refetch}) => {
+    const notifyError = useNotification();
     const { t } = useTranslation();
     const [openedView, setOpenedView] = useState<'confirm' | 'wallet' | undefined>();
     const onClose = (confirm?: boolean) => {
@@ -79,6 +81,7 @@ const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean, refetch: () => void
         isLoading: isFeeLoading,
         data: fee,
         mutateAsync: calculateFee,
+        error
     } = useEstimateNftLink();
     useEffect(() => {
         calculateFee({
@@ -151,6 +154,14 @@ const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean, refetch: () => void
 
     const isDisabled = useAreNftActionsDisabled(nft);
 
+    const onOpen = () => {
+        if (error) {
+            notifyError(error as Error);
+            return;
+        }
+        setOpenedView('confirm');
+    }
+
     return <>
         <Button
             type="button"
@@ -159,7 +170,7 @@ const LinkNftUnlinked: FC<{ nft: NFTDNS, isLoading: boolean, refetch: () => void
             fullWidth
             disabled={isDisabled}
             loading={isFeeLoading || isRecipientLoading || isLoading}
-            onClick={() => setOpenedView('confirm')}
+            onClick={onOpen}
         >
             { t('link_domain') }
         </Button>
@@ -222,13 +233,13 @@ const LinkNFTWalletView: FC<{onSave: (value: string) => void, isLoading: boolean
 }
 
 const WarnTextStyled = styled(Body2)`
-  margin-top: 0.75rem;
   text-align: center;
   color: ${props => props.theme.accentOrange}
 `
 
 const linkToAddress = '';
 const LinkNftLinked: FC<{ nft: NFTDNS, linkedAddress: string, isLoading: boolean, refetch: () => void }> = ({nft, linkedAddress, isLoading, refetch}) => {
+    const notifyError = useNotification();
     const { t } = useTranslation();
     const walletState = useWalletContext();
     const [isOpen, setIsOpen] = useState(false);
@@ -248,6 +259,7 @@ const LinkNftLinked: FC<{ nft: NFTDNS, linkedAddress: string, isLoading: boolean
         isLoading: isFeeLoading,
         data: fee,
         mutate: calculateFee,
+        error
     } = useEstimateNftLink();
     useEffect(() => {
         calculateFee({
@@ -295,6 +307,14 @@ const LinkNftLinked: FC<{ nft: NFTDNS, linkedAddress: string, isLoading: boolean
 
     const isDisabled = useAreNftActionsDisabled(nft);
 
+    const onOpen = () => {
+        if (error) {
+            notifyError(error as Error);
+            return;
+        }
+        setIsOpen(true);
+    }
+
     return <>
         <Button
             type="button"
@@ -303,7 +323,7 @@ const LinkNftLinked: FC<{ nft: NFTDNS, linkedAddress: string, isLoading: boolean
             fullWidth
             disabled={isDisabled}
             loading={isFeeLoading || isRecipientLoading || isLoading}
-            onClick={() => setIsOpen(true)}
+            onClick={onOpen}
         >
             { t('linked_with').replace('%1%', toShortAddress(linkedAddress)) }
         </Button>

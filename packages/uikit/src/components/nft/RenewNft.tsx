@@ -19,6 +19,7 @@ import {useAppContext} from "../../hooks/appContext";
 import {AccountsApi} from "@tonkeeper/core/dist/tonApiV2";
 import {useQuery} from "@tanstack/react-query";
 import {useRecipient} from "../../hooks/blockchain/useRecipient";
+import {useNotification} from "../../hooks/useNotification";
 
 
 const RenewDNSBlock = styled.div`
@@ -75,6 +76,7 @@ const dnsRenewAmount = new BigNumber(0.02);
 export const RenewNft: FC<{
     nftItem: NFTDNS;
 }> = ({ nftItem }) => {
+    const notifyError = useNotification();
     const { t } = useTranslation();
     const expiresAtFormatted = useDateFormat(nftItem.expiresAt);
 
@@ -111,6 +113,7 @@ export const RenewNft: FC<{
         isLoading: isFeeLoading,
         data: fee,
         mutate: calculateFee,
+        error
     } = useEstimateNftRenew();
     useEffect(() => {
         calculateFee({
@@ -130,6 +133,14 @@ export const RenewNft: FC<{
     );
 
     const { mutateAsync: renewMutateAsync, ...renewNftMutation} = useRenewNft();
+
+    const onOpen = () => {
+        if (error) {
+            notifyError(error as Error);
+            return;
+        }
+        setIsOpen(true);
+    }
 
     const child = useCallback(
         () => (
@@ -156,7 +167,7 @@ export const RenewNft: FC<{
                     type="button"
                     disabled={dnsRenewedLoading || dnsRenewed}
                     loading={!dnsRenewedLoading && (isFeeLoading || isRecipientLoading)}
-                    onClick={() => setIsOpen(true)}
+                    onClick={onOpen}
                     size="large"
                     secondary
                     fullWidth

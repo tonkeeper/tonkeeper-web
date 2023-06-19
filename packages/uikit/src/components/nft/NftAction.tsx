@@ -81,6 +81,12 @@ const SaleText = styled(Body2)`
   color: ${(props) => props.theme.textSecondary};
 `;
 
+const DNSSaleText = styled(SaleText)`
+  width: auto;
+  padding: 0 1rem;
+  text-align: center;
+`
+
 export const NftAction: FC<{
   kind: NFTKind;
   nftItem: NftItemRepr;
@@ -106,6 +112,8 @@ export const NftAction: FC<{
     }
     case 'ton.dns': {
       return (
+      <>
+        {nftItem.sale && <DNSSaleText>{t('nft_on_sale_text')}</DNSSaleText>}
         <Row>
           <ActionTransfer nftItem={nftItem} />
           <Action
@@ -115,8 +123,8 @@ export const NftAction: FC<{
               sdk.openPage(`https://dns.ton.org/#${nftItem.dns?.slice(0, -4)}`)
             }
           />
-          {nftItem.sale && <SaleText>{t('nft_on_sale_text')}</SaleText>}
         </Row>
+      </>
       );
     }
     case 'telegram.number': {
