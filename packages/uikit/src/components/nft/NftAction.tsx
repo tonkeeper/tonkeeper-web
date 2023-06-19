@@ -1,3 +1,4 @@
+import { NFT, isNFTDNS } from '@tonkeeper/core/dist/entries/nft';
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
@@ -7,7 +8,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Body2 } from '../Text';
 import { Button } from '../fields/Button';
-import { Action, ActionsRow } from '../home/Actions';
+import { Action } from '../home/Actions';
 import { GlobalIcon } from '../home/HomeIcons';
 import { SendNftAction } from '../transfer/SendNftNotification';
 import { LinkNft } from './LinkNft';
@@ -28,7 +29,7 @@ const getMarketplaceUrl = (nftItem: NftItemRepr) => {
 };
 
 const ActionTransfer: FC<{
-  nftItem: NftItemRepr;
+  nftItem: NFT;
 }> = ({ nftItem }) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -58,10 +59,6 @@ const ActionTransfer: FC<{
 };
 
 export type NFTKind = 'token' | 'telegram.name' | 'telegram.number' | 'ton.dns';
-
-const Row = styled(ActionsRow)`
-  margin: 1rem 0 0.563rem;
-`;
 
 export const UnlinkAction: FC<{ nftItem: NftItemRepr }> = ({ nftItem }) => {
   const { t } = useTranslation();
@@ -96,7 +93,7 @@ const DNSSaleText = styled(SaleText)`
 
 export const NftAction: FC<{
   kind: NFTKind;
-  nftItem: NftItemRepr;
+  nftItem: NFT;
 }> = ({ kind, nftItem }) => {
   const { t } = useTranslation();
   const sdk = useAppSdk();
@@ -118,6 +115,7 @@ export const NftAction: FC<{
       );
     }
     case 'ton.dns': {
+      if (!isNFTDNS(nftItem)) return <></>;
       return (
         <>
           <ActionTransfer nftItem={nftItem} />
@@ -131,6 +129,7 @@ export const NftAction: FC<{
           >
             {t('View_on_market')}
           </Button>
+
           <LinkNft nft={nftItem} />
           {!!nftItem.expiresAt && <RenewNft nftItem={nftItem} />}
         </>
@@ -156,6 +155,7 @@ export const NftAction: FC<{
       );
     }
     case 'telegram.name': {
+      if (!isNFTDNS(nftItem)) return <></>;
       return (
         <>
           <ActionTransfer nftItem={nftItem} />
