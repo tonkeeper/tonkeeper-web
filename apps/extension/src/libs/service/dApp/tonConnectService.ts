@@ -8,9 +8,14 @@ import {
   tonDisconnectRequest,
   tonReConnectRequest,
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { delay } from '@tonkeeper/core/dist/utils/common';
 import { ExtensionStorage } from '../../storage';
 import memoryStore from '../../store/memoryStore';
-import { getActiveTabLogo, openNotificationPopUp } from './notificationService';
+import {
+  closeOpenedPopUp,
+  getActiveTabLogo,
+  openNotificationPopUp,
+} from './notificationService';
 import { checkDAppConnection, waitApprove } from './utils';
 
 const storage = new ExtensionStorage();
@@ -21,12 +26,22 @@ export const tonConnectReConnect = (origin: string) =>
 export const tonConnectDisconnect = async (id: number, webViewUrl: string) =>
   tonDisconnectRequest({ storage, webViewUrl });
 
+const cancelOpenedNotification = async () => {
+  const notification = memoryStore.getNotification();
+  if (notification) {
+    await closeOpenedPopUp();
+    memoryStore.removeNotification(notification.id);
+    await delay(200); // wait resolving opened notification
+  }
+};
+
 const connectWithNotification = async (
   id: number,
   origin: string,
   data: ConnectRequest,
   logo: string
 ) => {
+  await cancelOpenedNotification();
   memoryStore.addNotification({
     kind: 'tonConnectRequest',
     id,
@@ -73,6 +88,7 @@ export const tonConnectTransaction = async (
 ) => {
   await checkDAppConnection(storage, origin, account);
 
+  await cancelOpenedNotification();
   memoryStore.addNotification({
     kind: 'tonConnectSend',
     id,

@@ -4,12 +4,7 @@ import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { Configuration } from '../tonApiV1';
 import { encrypt } from './cryptoService';
-import {
-  deleteWalletMnemonic,
-  getWalletMnemonic,
-  validateWalletMnemonic,
-} from './menmonicService';
-import { deleteWalletState } from './wallet/storeService';
+import { getWalletMnemonic, validateWalletMnemonic } from './menmonicService';
 import { importWallet } from './walletService';
 
 export const getAccountState = async (storage: IStorage) => {
@@ -85,17 +80,25 @@ export const accountLogOutWallet = async (
   let account = await getAccountState(storage);
 
   const publicKeys = account.publicKeys.filter((key) => key !== publicKey);
-  account = {
+  const updatedAccount = {
     publicKeys,
     activePublicKey: publicKeys.length > 0 ? publicKeys[0] : undefined,
   };
 
-  await deleteWalletState(storage, publicKey);
-  await deleteWalletMnemonic(storage, publicKey);
-  if (account.publicKeys.length === 0) {
-    await storage.delete(AppKey.password);
+  if (updatedAccount.publicKeys.length === 0) {
+    await storage.setBatch({
+      [AppKey.account]: null,
+      [AppKey.password]: null,
+      [`${AppKey.wallet}_${publicKey}`]: null,
+      [`${AppKey.mnemonic}_${publicKey}`]: null,
+    });
+  } else {
+    await storage.setBatch({
+      [AppKey.account]: updatedAccount,
+      [`${AppKey.wallet}_${publicKey}`]: null,
+      [`${AppKey.mnemonic}_${publicKey}`]: null,
+    });
   }
-  await storage.set(AppKey.account, account);
 };
 
 export const accountChangePassword = async (

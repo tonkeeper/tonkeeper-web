@@ -6,6 +6,9 @@ import browser from 'webextension-polyfill';
 import packageJson from '../../package.json';
 import { checkForError } from './utils';
 
+export const extensionType: 'Chrome' | 'FireFox' | string | undefined =
+  process.env.REACT_APP_EXTENSION_TYPE;
+
 export class ExtensionAppSdk implements IAppSdk {
   constructor(public storage: IStorage) {}
   copyToClipboard = (value: string, notification?: string) => {
@@ -39,6 +42,12 @@ export class ExtensionAppSdk implements IAppSdk {
   getKeyboardHeight = () => 0;
   isIOs = () => false;
   isStandalone = () => false;
+
+  requestExtensionPermission = async () => {
+    if (extensionType === 'FireFox') {
+      await browser.permissions.request({ origins: ['<all_urls>'] });
+    }
+  };
 
   static openTab(options: browser.Tabs.CreateCreatePropertiesType) {
     return new Promise((resolve, reject) => {

@@ -5,7 +5,7 @@ import { Language } from '../entries/language';
 import { Network } from '../entries/network';
 import { WalletProxy } from '../entries/proxy';
 import { WalletState, WalletVersion, WalletVoucher } from '../entries/wallet';
-import { BackupApi, Configuration } from '../tonApiV1';
+import { Configuration } from '../tonApiV1';
 import { createExpireTimestamp } from './voucherService';
 
 const tenMin = 10 * 60;
@@ -55,7 +55,7 @@ export const deleteWalletBackup = async (
   voucher: WalletVoucher
 ) => {
   const body = await createBody(publicKey, voucher);
-  await new BackupApi(tonApi).deleteWalletConfig({ body });
+  // await new BackupApi(tonApi).deleteWalletConfig({ body });
 };
 
 export const getWalletBackup = async (
@@ -63,31 +63,32 @@ export const getWalletBackup = async (
   publicKey: string,
   voucher: WalletVoucher
 ) => {
-  const body = await createBody(publicKey, voucher);
-  const result = await new BackupApi(tonApi).getWalletConfig({ body });
-  console.log('get payload', await result.arrayBuffer());
+  return;
+  // const body = await createBody(publicKey, voucher);
+  // const result = await new BackupApi(tonApi).getWalletConfig({ body });
+  // console.log('get payload', await result.arrayBuffer());
 
-  const messageWithNonceAsUint8Array = Buffer.from(await result.arrayBuffer());
+  // const messageWithNonceAsUint8Array = Buffer.from(await result.arrayBuffer());
 
-  console.log('get payload', messageWithNonceAsUint8Array);
-  const nonce = messageWithNonceAsUint8Array.subarray(0, nacl.box.nonceLength);
-  const message = messageWithNonceAsUint8Array.subarray(
-    nacl.box.nonceLength,
-    messageWithNonceAsUint8Array.length
-  );
+  // console.log('get payload', messageWithNonceAsUint8Array);
+  // const nonce = messageWithNonceAsUint8Array.subarray(0, nacl.box.nonceLength);
+  // const message = messageWithNonceAsUint8Array.subarray(
+  //   nacl.box.nonceLength,
+  //   messageWithNonceAsUint8Array.length
+  // );
 
-  const decrypted = nacl.box.open.after(
-    message,
-    nonce,
-    Buffer.from(voucher.sharedKey, 'hex')
-  );
+  // const decrypted = nacl.box.open.after(
+  //   message,
+  //   nonce,
+  //   Buffer.from(voucher.sharedKey, 'hex')
+  // );
 
-  if (!decrypted) {
-    throw new Error('Missing payload.');
-  }
+  // if (!decrypted) {
+  //   throw new Error('Missing payload.');
+  // }
 
-  console.log('get dencrypted', Buffer.from(decrypted));
-  return Buffer.from(decrypted);
+  // console.log('get dencrypted', Buffer.from(decrypted));
+  // return Buffer.from(decrypted);
 };
 
 export const putWalletBackup = async (
@@ -97,7 +98,7 @@ export const putWalletBackup = async (
   payload: Buffer
 ) => {
   const body = await createBody(publicKey, voucher, payload);
-  await new BackupApi(tonApi).putWalletConfig({ body });
+  // await new BackupApi(tonApi).putWalletConfig({ body });
 };
 
 const writeBase = (base: number[]) => {

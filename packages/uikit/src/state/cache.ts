@@ -6,7 +6,7 @@ interface BrowserCache<T> {
 }
 
 export const removeCachedStoreValue = async (sdk: IAppSdk, query: string) => {
-  await sdk.storage.delete(`catch_${query}`);
+  await sdk.storage.set(`catch_${query}`, null);
 };
 
 export const getCachedStoreValue = async <T>(

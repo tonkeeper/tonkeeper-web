@@ -13,10 +13,6 @@ export const setWalletState = (storage: IStorage, state: WalletState) => {
   return storage.set(`${AppKey.wallet}_${state.publicKey}`, state);
 };
 
-export const deleteWalletState = (storage: IStorage, publicKey: string) => {
-  return storage.delete(`${AppKey.wallet}_${publicKey}`);
-};
-
 export const getCurrentWallet = async (storage: IStorage) => {
   const state = await storage.get<AccountState>(AppKey.account);
 
