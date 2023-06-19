@@ -19,7 +19,7 @@ import {
     NftItemRepr, NftItemsRepr,
     WalletApi,
 } from '@tonkeeper/core/dist/tonApiV1';
-import {AccountsApi, DNSApi, DnsExpiring, DnsRecord} from '@tonkeeper/core/dist/tonApiV2';
+import {AccountsApi, Auctions, DNSApi, DnsExpiring, DnsRecord} from '@tonkeeper/core/dist/tonApiV2';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';

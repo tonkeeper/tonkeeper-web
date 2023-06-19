@@ -2,7 +2,7 @@ import React, {FC, useCallback, useEffect, useMemo, useState} from "react";
 import {NFTDNS} from "@tonkeeper/core/dist/entries/nft";
 import {Button} from "../fields/Button";
 import {useNftDNSLinkData, useWalletJettonList} from "../../state/wallet";
-import {toShortAddress} from "@tonkeeper/core/dist/utils/common";
+import {areEqAddresses, toShortAddress} from "@tonkeeper/core/dist/utils/common";
 import {useUserJettonList} from "../../state/jetton";
 import {useRecipient} from "../../hooks/blockchain/useRecipient";
 import {unShiftedDecimals} from "@tonkeeper/core/dist/utils/balance";
@@ -35,7 +35,7 @@ export const LinkNft: FC<{ nft: NFTDNS }> = ({nft}) => {
     const query = useNftDNSLinkData(nft);
     const { data, isLoading } = query;
 
-    const linkedAddress = data?.wallet?.address ? toShortAddress(data?.wallet?.address) : '';
+    const linkedAddress = data?.wallet?.address || '';
 
     const { refetch, isLoading: isWaitingForUpdate } = useQueryChangeWait(query, current => !!linkedAddress !== !!current?.wallet?.address);
 
@@ -221,9 +221,16 @@ const LinkNFTWalletView: FC<{onSave: (value: string) => void, isLoading: boolean
     </FullHeightBlockStyled>
 }
 
+const WarnTextStyled = styled(Body2)`
+  margin-top: 0.75rem;
+  text-align: center;
+  color: ${props => props.theme.accentOrange}
+`
+
 const linkToAddress = '';
 const LinkNftLinked: FC<{ nft: NFTDNS, linkedAddress: string, isLoading: boolean, refetch: () => void }> = ({nft, linkedAddress, isLoading, refetch}) => {
     const { t } = useTranslation();
+    const walletState = useWalletContext();
     const [isOpen, setIsOpen] = useState(false);
     const onClose = (confirm?: boolean) => {
         setIsOpen(false);
@@ -298,8 +305,11 @@ const LinkNftLinked: FC<{ nft: NFTDNS, linkedAddress: string, isLoading: boolean
             loading={isFeeLoading || isRecipientLoading || isLoading}
             onClick={() => setIsOpen(true)}
         >
-            { t('linked_with').replace('%1%', linkedAddress) }
+            { t('linked_with').replace('%1%', toShortAddress(linkedAddress)) }
         </Button>
+        {
+            !areEqAddresses(linkedAddress, walletState.active.rawAddress) && <WarnTextStyled>{t('dns_linked_with_another_address_warn')}</WarnTextStyled>
+        }
         <Notification
             title={t('confirm_unlink')}
             isOpen={isOpen}
