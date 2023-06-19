@@ -22,6 +22,7 @@ export interface TonendpointConfig {
   tonendpoint: string;
 
   tonApiKey?: string;
+  tonApiV2Key?: string;
   tonapiIOEndpoint?: string;
 
   amplitudeKey?: string;
