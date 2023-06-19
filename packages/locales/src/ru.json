@@ -200,5 +200,44 @@
   },
   "logout_on_unlock_many": {
     "message": "Доступ к кошелькам будет отключен. Убедитесь, что вы сохранили секретные ключи."
+  },
+  "renew_nft": {
+    "message": "Продлить на год за %1% TON"
+  },
+  "renew_nft_in_progress": {
+    "message": "Продление домена в процессе…"
+  },
+  "renew_nft_renewed": {
+    "message": "Домен продлен"
+  },
+  "renew_nft_expiration_date": {
+    "message": "Действие домена истекает: %1%"
+  },
+  "cancel": {
+    "message": "Отменить"
+  },
+  "link_domain": {
+    "message": "Привязать домен"
+  },
+  "confirm_tx": {
+    "message": "Подтвердите транзакцию"
+  },
+  "confirm_unlink": {
+    "message": "Подтвердите отвязывание"
+  },
+  "wallet_address": {
+    "message": "Адрес кошелька"
+  },
+  "linked_with": {
+    "message": "Привязан к %1%"
+  },
+  "add_dns_address": {
+    "message": "Укажите адрес кошелька, к которому будет привязан домен %1%"
+  },
+  "replace": {
+    "message": "Заменить"
+  },
+  "dns_linked_with_another_address_warn": {
+    "message": "Домен не привязан к адресу текущего кошелька. Будьте осторожны с транзакциями на этот домен"
   }
 }

@@ -1,4 +1,5 @@
-import { NftItemRepr, NftItemsRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NFT } from '@tonkeeper/core/dist/entries/nft';
+import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, {
   FC,
   useContext,
@@ -126,24 +127,30 @@ export const NftItem: FC<{
   );
 });
 
-export const NftsList: FC<{ nfts: NftItemsRepr | undefined }> = ({ nfts }) => {
-  const [nftItem, setNftItem] = useState<NftItemRepr | undefined>(undefined);
+export const NftsList: FC<{ nfts: NFT[] | undefined }> = ({ nfts }) => {
+  const [nftItemAddress, setNftItemAddress] = useState<string | undefined>(
+    undefined
+  );
+
+  const selectedNft = nftItemAddress
+    ? nfts?.find((nft) => nft.address === nftItemAddress)
+    : undefined;
 
   return (
     <>
       <Grid>
-        {(nfts?.nftItems ?? []).map((item) => (
+        {(nfts ?? []).map((item) => (
           <NftItem
             key={item.address}
             nft={item}
             resolution="500x500"
-            onOpen={setNftItem}
+            onOpen={() => setNftItemAddress(item.address)}
           />
         ))}
       </Grid>
       <NftNotification
-        nftItem={nftItem}
-        handleClose={() => setNftItem(undefined)}
+        nftItem={selectedNft}
+        handleClose={() => setNftItemAddress(undefined)}
       />
     </>
   );

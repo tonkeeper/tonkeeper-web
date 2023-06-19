@@ -1,9 +1,11 @@
 import BigNumber from 'bignumber.js';
 import {
+  Address,
   beginCell,
   Cell,
   comment,
   external,
+  internal,
   storeMessage,
   toNano,
 } from 'ton-core';
@@ -15,10 +17,14 @@ import { WalletState } from '../../entries/wallet';
 import {
   AccountApi,
   AccountRepr,
-  Configuration,
+  Configuration, Fee,
   SystemApi,
   WalletApi,
 } from '../../tonApiV1';
+import { walletContractFromState } from '../wallet/contractService';
+import {getWalletMnemonic} from "../menmonicService";
+import {mnemonicToPrivateKey} from "ton-crypto";
+import {IStorage} from "../../Storage";
 
 export enum SendMode {
   CARRY_ALL_REMAINING_BALANCE = 128,
@@ -123,3 +129,88 @@ export const checkServiceTimeOrDie = async (tonApi: Configuration) => {
     throw new Error('Time and date are incorrect');
   }
 };
+
+export const createTransferMessage = (
+  wallet: {
+    seqno: number;
+    state: WalletState;
+    secretKey: Buffer;
+  },
+  transaction: {
+    to: string;
+    value: string | bigint | BigNumber;
+    body?: string | Cell | null;
+  }
+) => {
+  const value =
+    transaction.value instanceof BigNumber
+      ? transaction.value.toFixed(0)
+      : transaction.value;
+  const contract = walletContractFromState(wallet.state);
+  const transfer = contract.createTransfer({
+    seqno: wallet.seqno,
+    secretKey: wallet.secretKey,
+    sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+    messages: [
+      internal({
+        to: Address.parse(transaction.to),
+        bounce: true,
+        value: BigInt(value),
+        body: transaction.body,
+      }),
+    ],
+  });
+
+  return externalMessage(contract, wallet.seqno, transfer).toBoc();
+};
+
+export async function getKeyPairAndSeqno(options: {
+  storage: IStorage;
+  tonApi: Configuration;
+  walletState: WalletState;
+  fee: Fee;
+  password: string;
+  amount: BigNumber;
+}) {
+  await checkServiceTimeOrDie(options.tonApi);
+  const mnemonic = await getWalletMnemonic(
+      options.storage,
+      options.walletState.publicKey,
+      options.password
+  );
+  const keyPair = await mnemonicToPrivateKey(mnemonic);
+
+  const total = options.amount.plus(options.fee.total);
+
+  const [wallet, seqno] = await getWalletBalance(
+      options.tonApi,
+      options.walletState
+  );
+  checkWalletBalanceOrDie(total, wallet);
+  return { seqno, keyPair };
+}
+
+export async function getKeySeqno(options: {
+  storage: IStorage;
+  tonApi: Configuration;
+  walletState: WalletState;
+  fee: Fee;
+  password: string;
+  amount: BigNumber;
+}) {
+  const mnemonic = await getWalletMnemonic(
+      options.storage,
+      options.walletState.publicKey,
+      options.password
+  );
+  const keyPair = await mnemonicToPrivateKey(mnemonic);
+
+  const total = options.amount.plus(options.fee.total);
+
+  const [wallet, seqno] = await getWalletBalance(
+      options.tonApi,
+      options.walletState
+  );
+  checkWalletBalanceOrDie(total, wallet);
+  return { seqno, keyPair };
+}

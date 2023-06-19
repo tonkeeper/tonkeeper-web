@@ -19,6 +19,14 @@ export const shiftedDecimals = (
   return new BigNumber(amount).shiftedBy(-decimals);
 };
 
+export const unShiftedDecimals = (
+    amount: BigNumber.Value,
+    decimals: number = DefaultDecimals
+): BigNumber => {
+  return new BigNumber(amount).shiftedBy(decimals);
+};
+
+
 export const getTonCoinStockPrice = (
   rates: { [key: string]: string },
   currency: FiatCurrencies

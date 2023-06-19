@@ -10,6 +10,7 @@ import { useTranslation } from '../../hooks/translation';
 import { NftsList } from '../nft/Nfts';
 import { Label1 } from '../Text';
 import { JettonList } from './Jettons';
+import {NFT} from "@tonkeeper/core/dist/entries/nft";
 
 const TabsBlock = styled.div`
   display: flex;
@@ -26,7 +27,7 @@ const TabsButton = styled.div<{ active?: boolean }>`
   cursor: pointer;
 
   padding: 0.5rem;
-  margin -0.5rem;
+  margin: -0.5rem;
   box-sizing: border-box;
 
   ${(props) =>
@@ -101,7 +102,7 @@ export const TabsView: FC<{
   stock: TonendpointStock;
   jettons: JettonsBalances;
   info: AccountRepr;
-  nfts: NftItemsRepr;
+  nfts: NFT[];
 }> = ({ stock, jettons, info, nfts }) => {
   const [tab, setTab] = useState<HomeTabs>(HomeTabs.Tokens);
 
