@@ -5,9 +5,9 @@ import { Address } from 'ton-core';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { Body2 } from '../Text';
 import { Action, ActionsRow } from '../home/Actions';
 import { GlobalIcon, SendIcon } from '../home/HomeIcons';
-import { Body2 } from '../Text';
 import { SendNftAction } from '../transfer/SendNftNotification';
 import { TonDnsUnlinkNotification } from './TonDnsNotification';
 
@@ -85,7 +85,7 @@ const DNSSaleText = styled(SaleText)`
   width: auto;
   padding: 0 1rem;
   text-align: center;
-`
+`;
 
 export const NftAction: FC<{
   kind: NFTKind;
@@ -112,19 +112,21 @@ export const NftAction: FC<{
     }
     case 'ton.dns': {
       return (
-      <>
-        {nftItem.sale && <DNSSaleText>{t('nft_on_sale_text')}</DNSSaleText>}
-        <Row>
-          <ActionTransfer nftItem={nftItem} />
-          <Action
-            icon={<GlobalIcon />}
-            title={t('View_on_market')}
-            action={() =>
-              sdk.openPage(`https://dns.ton.org/#${nftItem.dns?.slice(0, -4)}`)
-            }
-          />
-        </Row>
-      </>
+        <>
+          {nftItem.sale && <DNSSaleText>{t('nft_on_sale_text')}</DNSSaleText>}
+          <Row>
+            <ActionTransfer nftItem={nftItem} />
+            <Action
+              icon={<GlobalIcon />}
+              title={t('View_on_market')}
+              action={() =>
+                sdk.openPage(
+                  `https://dns.ton.org/#${nftItem.dns?.slice(0, -4)}`
+                )
+              }
+            />
+          </Row>
+        </>
       );
     }
     case 'telegram.number': {

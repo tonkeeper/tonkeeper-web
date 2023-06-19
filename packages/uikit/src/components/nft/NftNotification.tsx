@@ -1,10 +1,5 @@
 import { NFT, isNFTDNS } from '@tonkeeper/core/dist/entries/nft';
-import React, {
-  FC,
-  useCallback,
-  useMemo,
-  useRef
-} from 'react';
+import React, { FC, useCallback, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { useFBAnalyticsEvent } from '../../hooks/analytics';
 import { useTranslation } from '../../hooks/translation';
@@ -18,11 +13,11 @@ import {
 import { H2, H3, Label1, Label4 } from '../Text';
 import { BackButton, ButtonMock } from '../fields/BackButton';
 import { Body, CroppedBodyText } from '../jettons/CroppedText';
+import { LinkNft } from './LinkNft';
 import { NftAction } from './NftAction';
 import { NftDetails } from './NftDetails';
 import { Image, NftBlock } from './Nfts';
-import { RenewNft } from "./RenewNft";
-import {LinkNft} from "./LinkNft";
+import { RenewNft } from './RenewNft';
 
 const Text = styled.div`
   display: flex;
@@ -149,15 +144,12 @@ const NftPreview: FC<{
         )}
       </NftBlock>
 
-      {
-        isNFTDNS(nftItem) &&
-          <>
-            <LinkNft nft={nftItem} />
-            {
-              !!nftItem.expiresAt && <RenewNft nftItem={nftItem} />
-            }
-          </>
-      }
+      {isNFTDNS(nftItem) && (
+        <>
+          <LinkNft nft={nftItem} />
+          {!!nftItem.expiresAt && <RenewNft nftItem={nftItem} />}
+        </>
+      )}
 
       <NftAction nftItem={nftItem} kind={itemKind} />
       <DelimiterExtra />
