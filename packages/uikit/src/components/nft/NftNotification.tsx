@@ -1,4 +1,4 @@
-import { NFT, isNFTDNS } from '@tonkeeper/core/dist/entries/nft';
+import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import React, { FC, useCallback, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { useFBAnalyticsEvent } from '../../hooks/analytics';
@@ -13,11 +13,9 @@ import {
 import { H2, H3, Label1, Label4 } from '../Text';
 import { BackButton, ButtonMock } from '../fields/BackButton';
 import { Body, CroppedBodyText } from '../jettons/CroppedText';
-import { LinkNft } from './LinkNft';
 import { NftAction } from './NftAction';
 import { NftDetails } from './NftDetails';
 import { Image, NftBlock } from './Nfts';
-import { RenewNft } from './RenewNft';
 
 const Text = styled.div`
   display: flex;
@@ -47,6 +45,11 @@ const Icon = styled.span`
 
 const TonDnsRoot =
   '0:b774d95eb20543f186c06b371ab88ad704f7e256130caf96189368a7d0cb6ccf';
+const TelegramUsernames =
+  '0:80d78a35f955a14b679faa887ff4cd5bfc0f43b4a4eea2a7e6927f3701b273c2';
+
+const TelegramNumbers =
+  '0:0e41dc1dc3c9067ed24248580e12b3359818d83dee0304fabcf80845eafafdb2';
 
 const Title = styled(H2)`
   word-break: break-word;
@@ -81,10 +84,15 @@ const NftPreview: FC<{
   const name = nftItem.dns ?? nftItem.metadata.name;
 
   const itemKind = useMemo(() => {
-    if (nftItem.collection?.address == TonDnsRoot) {
-      return 'ton.dns';
-    } else {
-      return 'token';
+    switch (nftItem.collection?.address) {
+      case TonDnsRoot:
+        return 'ton.dns';
+      case TelegramUsernames:
+        return 'telegram.name';
+      case TelegramNumbers:
+        return 'telegram.number';
+      default:
+        return 'token';
     }
   }, [nftItem]);
 
@@ -144,14 +152,8 @@ const NftPreview: FC<{
         )}
       </NftBlock>
 
-      {isNFTDNS(nftItem) && (
-        <>
-          <LinkNft nft={nftItem} />
-          {!!nftItem.expiresAt && <RenewNft nftItem={nftItem} />}
-        </>
-      )}
-
       <NftAction nftItem={nftItem} kind={itemKind} />
+
       <DelimiterExtra />
 
       <NftDetails nftItem={nftItem} kind={itemKind} />
