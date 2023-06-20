@@ -44,13 +44,15 @@ export const useAnalyticsScreenView = () => {
   }, [location.pathname]);
 };
 
-type AnalyticsEvent =
+export type AnalyticsEvent =
   | 'screen_view'
   | 'session_start'
   | 'first_open'
   | 'send_ton'
   | 'send_jetton'
-  | 'send_nft';
+  | 'send_nft'
+  | 'link_dns'
+  | 'renew_dns';
 
 export const sendAnalyticsEvent = (
   analytics: Analytics,

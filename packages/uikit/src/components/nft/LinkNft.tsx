@@ -358,16 +358,14 @@ const LinkNftLinked: FC<{
   );
 
   const { mutateAsync, ...mutationRest } = useLinkNft();
-  const sendLinkNftMutation = useCallback(
-    () =>
-      mutateAsync({
-        nftAddress: nft.address,
-        linkToAddress,
-        amount: unShiftedDecimals(dnsLinkAmount),
-        fee: fee!,
-      }),
-    [mutateAsync, nft.address, fee]
-  );
+  const sendLinkNftMutation = useCallback(() => {
+    return mutateAsync({
+      nftAddress: nft.address,
+      linkToAddress,
+      amount: unShiftedDecimals(dnsLinkAmount),
+      fee: fee!,
+    });
+  }, [mutateAsync, nft.address, fee]);
 
   const child = () => (
     <ConfirmView

@@ -1,9 +1,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
-import {getTonClient, getTonClientV2, Network} from '@tonkeeper/core/dist/entries/network';
+import {
+  Network,
+  getTonClient,
+  getTonClientV2,
+} from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
   InnerBody,
   useWindowsScroll,
@@ -28,6 +32,12 @@ import {
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import {
+  AnalyticsContext,
+  useAnalyticsScreenView,
+  useCreateAnalytics,
+  useFBAnalyticsEvent,
+} from '@tonkeeper/uikit/dist/hooks/analytics';
+import {
   AppContext,
   WalletStateContext,
 } from '@tonkeeper/uikit/dist/hooks/appContext';
@@ -42,9 +52,9 @@ import {
   TranslationContext,
 } from '@tonkeeper/uikit/dist/hooks/translation';
 import {
-  any,
   AppRoute,
   SettingsRoute,
+  any,
 } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -125,27 +135,31 @@ export const App: FC = () => {
     return client;
   }, []);
 
+  const analytics = useCreateAnalytics();
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
-        <InitialRedirect>
-          <AppSdkContext.Provider value={sdk}>
-            <StorageContext.Provider value={storage}>
-              <TranslationContext.Provider value={translation}>
-                <UserThemeProvider>
-                  <HeaderGlobalStyle />
-                  <FooterGlobalStyle />
-                  <SybHeaderGlobalStyle />
-                  <GlobalListStyle />
-                  <Loader />
-                  <UnlockNotification sdk={sdk} />
-                </UserThemeProvider>
-              </TranslationContext.Provider>
-            </StorageContext.Provider>
-          </AppSdkContext.Provider>
-        </InitialRedirect>
-      </MemoryRouter>
-    </QueryClientProvider>
+    <AnalyticsContext.Provider value={analytics}>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <InitialRedirect>
+            <AppSdkContext.Provider value={sdk}>
+              <StorageContext.Provider value={storage}>
+                <TranslationContext.Provider value={translation}>
+                  <UserThemeProvider>
+                    <HeaderGlobalStyle />
+                    <FooterGlobalStyle />
+                    <SybHeaderGlobalStyle />
+                    <GlobalListStyle />
+                    <Loader />
+                    <UnlockNotification sdk={sdk} />
+                  </UserThemeProvider>
+                </TranslationContext.Provider>
+              </StorageContext.Provider>
+            </AppSdkContext.Provider>
+          </InitialRedirect>
+        </MemoryRouter>
+      </QueryClientProvider>
+    </AnalyticsContext.Provider>
   );
 };
 
@@ -214,6 +228,9 @@ export const Loader: FC = React.memo(() => {
     localizationFrom(browser.i18n.getUILanguage())
   );
   const { data: config } = useTonenpointConfig(tonendpoint);
+
+  useAnalyticsScreenView();
+  useFBAnalyticsEvent('session_start');
 
   if (!account || !auth || !config || lock === undefined) {
     return (

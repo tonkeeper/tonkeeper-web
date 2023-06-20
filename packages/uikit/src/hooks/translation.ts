@@ -5,7 +5,7 @@ import {
 } from '@tonkeeper/core/dist/entries/language';
 import React, { useContext } from 'react';
 
-export type Translation = (text: string, values?: Record<string, string>) => string;
+export type Translation = (text: string) => string;
 
 export interface I18nClient {
   enable: boolean;
