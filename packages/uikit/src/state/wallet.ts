@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { NFT } from '@tonkeeper/core/dist/entries/nft';
+import {NFT, NFTDNS} from '@tonkeeper/core/dist/entries/nft';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
   accountLogOutWallet,
@@ -10,20 +10,21 @@ import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import { getWalletActiveAddresses } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
 import {
-  AccountApi,
-  AccountRepr,
-  JettonApi,
-  JettonsBalances,
-  NFTApi,
-  NftCollection,
-  NftItemRepr,
-  WalletApi,
+    AccountApi,
+    AccountRepr,
+    JettonApi,
+    JettonsBalances,
+    NFTApi,
+    NftCollection,
+    NftItemRepr, NftItemsRepr,
+    WalletApi,
 } from '@tonkeeper/core/dist/tonApiV1';
-import { AccountsApi, DNSApi, DnsRecord } from '@tonkeeper/core/dist/tonApiV2';
+import {AccountsApi, DNSApi, DnsExpiringItemsInner, DnsRecord} from '@tonkeeper/core/dist/tonApiV2';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
 import { DefaultRefetchInterval } from './tonendpoint';
+import {areEqAddresses} from "@tonkeeper/core/dist/utils/common";
 
 export const checkWalletBackup = () => {
   const wallet = useWalletContext();
@@ -170,8 +171,48 @@ export const useWalletJettonList = () => {
   );
 };
 
-export const expiringNFTDaysPeriod = 90; // TODO set 360 for tests
+export const expiringNFTDaysPeriod = 360; // TODO set 360 for tests
 
+export const useWalletNftList = () => {
+    const wallet = useWalletContext();
+    const {tonApi} = useAppContext();
+
+    return useQuery<NFT[], Error>(
+        [wallet.publicKey, QueryKey.nft],
+        async () => {
+            const {wallets} = await new WalletApi(tonApi).findWalletsByPubKey({
+                publicKey: wallet.publicKey,
+            });
+            const result = wallets
+                .filter((item) => item.balance > 0 || item.status === 'active')
+                .map((wallet) => wallet.address);
+
+            const items = await Promise.all(
+                result.map((owner) =>
+                    new NFTApi(tonApi).searchNFTItems({
+                        owner: owner,
+                        offset: 0,
+                        limit: 1000,
+                        includeOnSale: true,
+                    })
+                )
+            );
+
+            return items.reduce(
+                    (acc, account) => acc.concat(account.nftItems),
+                    [] as NftItemRepr[]
+            )
+        },
+        {
+            refetchInterval: DefaultRefetchInterval,
+            refetchIntervalInBackground: true,
+            refetchOnWindowFocus: true,
+            keepPreviousData: true,
+        }
+    );
+}
+
+/*
 export const useWalletNftList = () => {
   const wallet = useWalletContext();
   const { tonApiV2, tonApi } = useAppContext();
@@ -235,18 +276,44 @@ export const useWalletNftList = () => {
     }
   );
 };
+*/
 
 export const useNftDNSLinkData = (nft: NFT) => {
+    const { tonApiV2 } = useAppContext();
+
+    return useQuery<DnsRecord | null, Error>(
+        ['dns_link', nft?.address],
+        async () => {
+            const { dns: domainName } = nft;
+            if (!domainName) return null;
+
+            try {
+                return await new DNSApi(tonApiV2).dnsResolve({ domainName });
+            } catch (e) {
+                return null;
+            }
+        },
+        { enabled: nft.dns != null }
+    );
+};
+
+export const useNftDNSExpiringData = (nft: NFTDNS) => {
   const { tonApiV2 } = useAppContext();
 
-  return useQuery<DnsRecord | null, Error>(
-    ['dns_link', nft?.address],
+  return useQuery<DnsExpiringItemsInner | null, Error>(
+    ['dns_expiring', nft?.address],
     async () => {
-      const { dns: domainName } = nft;
-      if (!domainName) return null;
+      if (!nft.owner?.address) {
+          return null;
+      }
 
       try {
-        return await new DNSApi(tonApiV2).dnsResolve({ domainName });
+        const nfts = await new AccountsApi(tonApiV2).getDnsExpiring({
+            accountId: nft.owner.address,
+            period: expiringNFTDaysPeriod,
+        })
+
+        return nfts.items.find(item => areEqAddresses(item.dnsItem.address, nft.address)) || null;
       } catch (e) {
         return null;
       }

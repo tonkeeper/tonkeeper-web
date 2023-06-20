@@ -130,8 +130,10 @@ export const NftAction: FC<{
             {t('View_on_market')}
           </Button>
 
-          <LinkNft nft={nftItem} />
-          {!!nftItem.expiresAt && <RenewNft nftItem={nftItem} />}
+            {isNFTDNS(nftItem) && <>
+                <LinkNft nft={nftItem} />
+                <RenewNft nft={nftItem} />
+            </>}
         </>
       );
     }

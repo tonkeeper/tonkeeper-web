@@ -206,16 +206,13 @@
     "message": "This will erase keys to all your wallets. Make sure you have backed up your secret recovery phrases."
   },
   "renew_nft": {
-    "message": "Renew for a year for %1% TON"
+    "message": "Renew until %1%"
   },
   "renew_nft_in_progress": {
     "message": "Domain renew in progress…"
   },
-  "renew_nft_renewed": {
-    "message": "Domain renewed"
-  },
   "renew_nft_expiration_date": {
-    "message": "Expiration domain date: %1%"
+    "message": "Valid for %1% more days"
   },
   "cancel": {
     "message": "Cancel"
