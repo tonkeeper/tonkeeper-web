@@ -27,12 +27,6 @@ const Delimiter = styled.div`
   border-top: 1px solid ${(props) => props.theme.separatorCommon};
 `;
 
-const DelimiterExtra = styled.div`
-  margin: 0 -1rem;
-  width: calc(100% + 2rem);
-  border-top: 1px solid ${(props) => props.theme.separatorCommon};
-`;
-
 const CollectionTitle = styled(Label1)`
   margin-bottom: 0.5rem;
 `;
@@ -153,8 +147,6 @@ const NftPreview: FC<{
       </NftBlock>
 
       <NftAction nftItem={nftItem} kind={itemKind} />
-
-      <DelimiterExtra />
 
       <NftDetails nftItem={nftItem} kind={itemKind} />
     </NotificationBlock>
