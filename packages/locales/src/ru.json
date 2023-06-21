@@ -21,14 +21,6 @@
   "Toncoin": {
     "message": "Toncoin"
   },
-  "Transfer_token": {
-    "message": "Передать токен",
-    "description": "Transfer token button"
-  },
-  "View_on_market": {
-    "message": "Посмотреть на рынке",
-    "description": "View on market button"
-  },
   "About_collection": {
     "message": "О коллекции",
     "description": "About collection nft preview title"
