@@ -86,7 +86,7 @@ const SaleText = styled(Body2)`
 `;
 
 const DNSSaleText = styled(SaleText)`
-  width: auto;
+  width: 100%;
   padding: 0 1rem;
   text-align: left;
 `;
