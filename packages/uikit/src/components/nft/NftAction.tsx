@@ -8,12 +8,9 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Body2 } from '../Text';
 import { Button } from '../fields/Button';
-import { Action } from '../home/Actions';
-import { GlobalIcon } from '../home/HomeIcons';
 import { SendNftAction } from '../transfer/SendNftNotification';
 import { LinkNft } from './LinkNft';
 import { RenewNft } from './RenewNft';
-import { TonDnsUnlinkNotification } from './TonDnsNotification';
 
 const getMarketplaceUrl = (nftItem: NftItemRepr) => {
   const { marketplace } = nftItem.metadata;
@@ -45,7 +42,11 @@ const ActionTransfer: FC<{
           nftItem.sale != undefined ||
           nftItem.owner?.address !== wallet.active.rawAddress
         }
-        onClick={() => setOpen(true)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpen(true);
+        }}
       >
         {t('Transfer_token')}
       </Button>
@@ -59,26 +60,6 @@ const ActionTransfer: FC<{
 };
 
 export type NFTKind = 'token' | 'telegram.name' | 'telegram.number' | 'ton.dns';
-
-export const UnlinkAction: FC<{ nftItem: NftItemRepr }> = ({ nftItem }) => {
-  const { t } = useTranslation();
-
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Action
-        icon={<GlobalIcon />}
-        title={t('nft_link_domain_button')}
-        action={() => setOpen(true)}
-      />
-      <TonDnsUnlinkNotification
-        nftItem={nftItem}
-        open={open}
-        handleClose={() => setOpen(false)}
-      />
-    </>
-  );
-};
 
 const SaleText = styled(Body2)`
   width: 100%;
@@ -107,7 +88,11 @@ export const NftAction: FC<{
             size="large"
             secondary
             fullWidth
-            onClick={() => sdk.openPage(getMarketplaceUrl(nftItem))}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              sdk.openPage(getMarketplaceUrl(nftItem));
+            }}
           >
             {t('View_on_market')}
           </Button>
@@ -115,7 +100,6 @@ export const NftAction: FC<{
       );
     }
     case 'ton.dns': {
-      if (!isNFTDNS(nftItem)) return <></>;
       return (
         <>
           <ActionTransfer nftItem={nftItem} />
@@ -123,17 +107,21 @@ export const NftAction: FC<{
             size="large"
             secondary
             fullWidth
-            onClick={() =>
-              sdk.openPage(`https://dns.ton.org/#${nftItem.dns?.slice(0, -4)}`)
-            }
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              sdk.openPage(`https://dns.ton.org/#${nftItem.dns?.slice(0, -4)}`);
+            }}
           >
             {t('View_on_market')}
           </Button>
 
-            {isNFTDNS(nftItem) && <>
-                <LinkNft nft={nftItem} />
-                <RenewNft nft={nftItem} />
-            </>}
+          {isNFTDNS(nftItem) && (
+            <>
+              <LinkNft nft={nftItem} />
+              <RenewNft nft={nftItem} />
+            </>
+          )}
         </>
       );
     }
@@ -147,9 +135,11 @@ export const NftAction: FC<{
             size="large"
             secondary
             fullWidth
-            onClick={() =>
-              sdk.openPage(`https://fragment.com/number/${numbers}`)
-            }
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              sdk.openPage(`https://fragment.com/number/${numbers}`);
+            }}
           >
             {t('View_on_market')}
           </Button>
@@ -157,7 +147,6 @@ export const NftAction: FC<{
       );
     }
     case 'telegram.name': {
-      if (!isNFTDNS(nftItem)) return <></>;
       return (
         <>
           <ActionTransfer nftItem={nftItem} />
@@ -165,15 +154,17 @@ export const NftAction: FC<{
             size="large"
             secondary
             fullWidth
-            onClick={() =>
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               sdk.openPage(
                 `https://fragment.com/username/${nftItem.dns?.slice(0, -5)}`
-              )
-            }
+              );
+            }}
           >
             {t('View_on_market')}
           </Button>
-          <LinkNft nft={nftItem} />
+          {isNFTDNS(nftItem) && <LinkNft nft={nftItem} />}
         </>
       );
     }
