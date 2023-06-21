@@ -95,9 +95,6 @@ export const NftAction: FC<{
   kind: NFTKind;
   nftItem: NFT;
 }> = ({ kind, nftItem }) => {
-  const { t } = useTranslation();
-  const sdk = useAppSdk();
-
   switch (kind) {
     case 'token': {
       return (

@@ -232,5 +232,8 @@
   },
   "dns_linked_with_another_address_warn": {
     "message": "The domain is not linked to your current address. Be careful with transactions to this domain."
+  },
+  "nft_on_sale_text": {
+    "message": "NFT is on sale at the marketplace now.\nFor transfer, you should remove it from sale first."
   }
 }
