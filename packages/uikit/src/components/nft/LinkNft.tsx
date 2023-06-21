@@ -47,10 +47,6 @@ export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
     (current) => !!linkedAddress !== !!current?.wallet?.address
   );
 
-  if (!nft.dns) {
-    return null;
-  }
-
   if (!linkedAddress) {
     return (
       <LinkNftUnlinked

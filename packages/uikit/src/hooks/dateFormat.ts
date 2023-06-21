@@ -1,7 +1,7 @@
 import {useMemo} from "react";
 import {useTranslation} from "./translation";
 
-export function useDateFormat(date: number | Date | undefined): string {
+export function useDateFormat(date: number | Date | undefined, options?: Intl.DateTimeFormatOptions): string {
     const {i18n} = useTranslation();
 
     return useMemo(() => {
@@ -18,6 +18,20 @@ export function useDateFormat(date: number | Date | undefined): string {
                     : undefined,
             hour: 'numeric',
             minute: 'numeric',
+            ...options
         }).format(date);
-    }, [date, i18n.language]);
+    }, [date, i18n.language, options]);
+}
+
+export function toDaysLeft(date: number | Date | undefined | null): string {
+    if (!date) {
+        return '';
+    }
+
+    const days = Math.floor((new Date(date).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    if (days < 0) {
+        return '0';
+    }
+
+    return days.toString();
 }
