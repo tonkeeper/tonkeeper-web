@@ -15,13 +15,7 @@
     "64": "logo-64x64.png",
     "128": "logo-128x128.png"
   },
-  "permissions": [
-    "proxy",
-    "storage",
-    "unlimitedStorage",
-    "clipboardWrite",
-    "activeTab"
-  ],
+  "permissions": ["proxy", "storage", "unlimitedStorage", "clipboardWrite"],
   "background": {
     "service_worker": "background.js"
   },
