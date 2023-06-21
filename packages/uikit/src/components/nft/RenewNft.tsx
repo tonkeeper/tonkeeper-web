@@ -15,9 +15,8 @@ import { useTranslation } from '../../hooks/translation';
 import { useNotification } from '../../hooks/useNotification';
 import { useUserJettonList } from '../../state/jetton';
 import {
-  expiringNFTDaysPeriod, useNftDNSExpiringData,
+  useNftDNSExpirationDate,
   useWalletJettonList,
-  useWalletNftList,
 } from '../../state/wallet';
 import { Notification } from '../Notification';
 import { Body2 } from '../Text';
@@ -46,7 +45,7 @@ const RenewDNSValidUntil = styled(Body2)<{ danger: boolean }>`
 `;
 
 const dnsRenewAmount = new BigNumber(0.02);
-const YEAR_MS = 1000 * 60 * 60 * 24 * 365;
+const YEAR_MS = 1000 * 60 * 60 * 24 * 366;
 const intlOptions = { year: 'numeric', hour: undefined, minute: undefined} as const;
 
 export const RenewNft: FC<{
@@ -56,13 +55,13 @@ export const RenewNft: FC<{
   const notifyError = useNotification();
   const { t } = useTranslation();
 
-  const query = useNftDNSExpiringData(nft);
-  const { data: expirationInfo, isLoading: isExpirationInfoLoading } = query;
+  const query = useNftDNSExpirationDate(nft);
+  const { data: expirationDate, isLoading: isExpirationInfoLoading } = query;
 
   const { refetch: refetchExpirationInfo, isLoading: isWaitingForUpdate } = useQueryChangeWait(
         query,
         (current, prev) => {
-            return !!current?.expiringAt && current.expiringAt !== prev?.expiringAt
+            return !!current?.getTime() && current.getTime() !== prev?.getTime()
         }
   );
 
@@ -117,7 +116,7 @@ export const RenewNft: FC<{
     setIsOpen(true);
   };
 
-  if (!isExpirationInfoLoading && !expirationInfo?.expiringAt) {
+  if (!isExpirationInfoLoading && !expirationDate) {
       return null;
   }
 
@@ -141,7 +140,7 @@ export const RenewNft: FC<{
         </ConfirmViewButtonsSlot>
       </ConfirmView>
 
-  const daysLeft = toDaysLeft(expirationInfo?.expiringAt ? expirationInfo?.expiringAt * 1000 : undefined);
+  const daysLeft = toDaysLeft(expirationDate);
 
   return (
     <>

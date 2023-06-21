@@ -23,7 +23,7 @@ export function useDateFormat(date: number | Date | undefined, options?: Intl.Da
     }, [date, i18n.language, options]);
 }
 
-export function toDaysLeft(date: number | Date | undefined): string {
+export function toDaysLeft(date: number | Date | undefined | null): string {
     if (!date) {
         return '';
     }
