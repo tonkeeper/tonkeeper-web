@@ -1,9 +1,9 @@
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
-import { ActivityAction } from '../../components/activity/ActivityAction';
 import { ListBlock, ListItem } from '../../components/List';
 import { H3 } from '../../components/Text';
+import { ActivityAction } from '../../components/activity/ActivityAction';
 import { useTranslation } from '../../hooks/translation';
 import {
   ActivityGroup,
@@ -30,7 +30,7 @@ const ProgressIcon = styled.div`
   position: absolute;
   left: 45px;
   top: 45px;
-  color: ${(props) => props.theme.textTertiary};
+  color: ${(props) => props.theme.iconSecondary};
   padding: 0 !important;
 `;
 
