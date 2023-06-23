@@ -9,7 +9,7 @@ export const useNotificationAnalytics = (
   const enable = useContext(AmplitudeAnalyticsContext);
 
   useEffect(() => {
-    if (enable !== true && item != null) {
+    if (enable === true && item != null) {
       amplitude.track('Notification', {
         name: item.kind,
         origin: item.origin,

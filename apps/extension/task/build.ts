@@ -80,17 +80,4 @@ child_process.execSync(
   }
 );
 
-common.updateApplicationName(
-  buildDirFireFox,
-  'Tonkeeper BETA',
-  'THIS EXTENSION IS FOR BETA TESTING'
-);
-
-child_process.execSync(
-  `zip ../tonkeeper_firefox_beta_${packageJson.version}.zip -r ${buildDirFireFox}/ *`,
-  {
-    cwd: `${buildDirFireFox}/`,
-  }
-);
-
 common.notify('End Build Extension');
