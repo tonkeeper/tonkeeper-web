@@ -32,6 +32,10 @@ import {
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import {
+  AmplitudeAnalyticsContext,
+  useAmplitudeAnalytics,
+} from '@tonkeeper/uikit/dist/hooks/amplitude';
+import {
   AnalyticsContext,
   useAnalyticsScreenView,
   useCreateAnalytics,
@@ -90,7 +94,7 @@ import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
 import { Notifications } from './components/Notifications';
 import { connectToBackground } from './event';
-import { ExtensionAppSdk } from './libs/appSdk';
+import { ExtensionAppSdk, extensionType } from './libs/appSdk';
 import { useAppWidth } from './libs/hoolks';
 import { ExtensionStorage } from './libs/storage';
 
@@ -232,6 +236,8 @@ export const Loader: FC = React.memo(() => {
   useAnalyticsScreenView();
   useFBAnalyticsEvent('session_start');
 
+  const enable = useAmplitudeAnalytics(extensionType, account, activeWallet);
+
   if (!account || !auth || !config || lock === undefined) {
     return (
       <FullSizeWrapper standalone={false}>
@@ -257,17 +263,19 @@ export const Loader: FC = React.memo(() => {
   };
 
   return (
-    <OnImportAction.Provider value={sdk.openExtensionInBrowser}>
-      <AfterImportAction.Provider value={sdk.closeExtensionInBrowser}>
-        <AppContext.Provider value={context}>
-          <Content activeWallet={activeWallet} lock={lock} />
-          <CopyNotification />
-          <Suspense fallback={<></>}>
-            <QrScanner />
-          </Suspense>
-        </AppContext.Provider>
-      </AfterImportAction.Provider>
-    </OnImportAction.Provider>
+    <AmplitudeAnalyticsContext.Provider value={enable}>
+      <OnImportAction.Provider value={sdk.openExtensionInBrowser}>
+        <AfterImportAction.Provider value={sdk.closeExtensionInBrowser}>
+          <AppContext.Provider value={context}>
+            <Content activeWallet={activeWallet} lock={lock} />
+            <CopyNotification />
+            <Suspense fallback={<></>}>
+              <QrScanner />
+            </Suspense>
+          </AppContext.Provider>
+        </AfterImportAction.Provider>
+      </OnImportAction.Provider>
+    </AmplitudeAnalyticsContext.Provider>
   );
 });
 

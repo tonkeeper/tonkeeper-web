@@ -6,6 +6,7 @@ import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonServic
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { notifyError } from '../../components/transfer/common';
 import { getWalletPassword } from '../../state/password';
+import { useTransactionAnalytics } from '../amplitude';
 import { useSendFBAnalyticsEvent } from '../analytics';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
@@ -22,6 +23,7 @@ export const useSendTransfer = (
   const wallet = useWalletContext();
   const client = useQueryClient();
   const track = useSendFBAnalyticsEvent();
+  const track2 = useTransactionAnalytics();
 
   return useMutation<boolean, Error>(async () => {
     const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
@@ -29,6 +31,7 @@ export const useSendTransfer = (
     try {
       if (amount.jetton === CryptoCurrency.TON) {
         track('send_ton');
+        track2('send-ton');
         await sendTonTransfer(
           sdk.storage,
           tonApi,
@@ -40,6 +43,7 @@ export const useSendTransfer = (
         );
       } else {
         track('send_jetton');
+        track2('send-jetton');
         const [jettonInfo] = jettons.balances.filter(
           (item) => item.jettonAddress === amount.jetton
         );

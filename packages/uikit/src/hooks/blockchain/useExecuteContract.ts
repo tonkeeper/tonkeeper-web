@@ -5,6 +5,10 @@ import { Configuration, Fee } from '@tonkeeper/core/dist/tonApiV1';
 import { Omit } from 'react-beautiful-dnd';
 import { notifyError } from '../../components/transfer/common';
 import { getWalletPassword } from '../../state/password';
+import {
+  AmplitudeTransactionType,
+  useTransactionAnalytics,
+} from '../amplitude';
 import { AnalyticsEvent, useSendFBAnalyticsEvent } from '../analytics';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
@@ -20,7 +24,8 @@ export type ContractExecutorParams = {
 
 export function useExecuteContract<Args extends ContractExecutorParams>(
   executor: (params: Args) => Promise<void>,
-  eventName: AnalyticsEvent
+  eventName: AnalyticsEvent,
+  eventName2: AmplitudeTransactionType
 ) {
   const { t } = useTranslation();
   const sdk = useAppSdk();
@@ -28,6 +33,7 @@ export function useExecuteContract<Args extends ContractExecutorParams>(
   const walletState = useWalletContext();
   const client = useQueryClient();
   const track = useSendFBAnalyticsEvent();
+  const track2 = useTransactionAnalytics();
 
   return useMutation(
     async (args: Omit<Args, Exclude<keyof ContractExecutorParams, 'fee'>>) => {
@@ -41,6 +47,7 @@ export function useExecuteContract<Args extends ContractExecutorParams>(
       if (password === null) return false;
 
       track(eventName);
+      track2(eventName2);
       try {
         await executor({
           storage: sdk.storage,
