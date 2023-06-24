@@ -30,7 +30,7 @@ const useInitAnalytics = (
         defaultTracking: {
           sessions: true,
           pageViews: true,
-          formInteractions: true,
+          formInteractions: false,
           fileDownloads: false,
         },
       });
