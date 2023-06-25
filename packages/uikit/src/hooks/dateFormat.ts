@@ -1,7 +1,7 @@
 import {useMemo} from "react";
 import {useTranslation} from "./translation";
 
-export function useDateFormat(date: number | Date | undefined, options?: Intl.DateTimeFormatOptions): string {
+export function useDateFormat(date: number | Date | undefined | null, options?: Intl.DateTimeFormatOptions): string {
     const {i18n} = useTranslation();
 
     return useMemo(() => {

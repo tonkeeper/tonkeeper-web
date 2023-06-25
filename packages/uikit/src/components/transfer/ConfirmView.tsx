@@ -345,7 +345,7 @@ export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({
     return (
       <ConfirmViewButtonsContainerStyled>
         <Button size="large" secondary onClick={onClose}>
-          {t('Cancel')}
+          {t('cancel')}
         </Button>
         <Button
           size="large"
