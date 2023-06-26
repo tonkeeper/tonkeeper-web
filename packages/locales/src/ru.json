@@ -199,8 +199,11 @@
   "renew_nft_in_progress": {
     "message": "Продление домена в процессе…"
   },
+  "renew_nft_renewed": {
+    "message": "Домен продлён на 1 год"
+  },
   "renew_nft_expiration_date": {
-    "message": "Действие домена истекает через %1% дней"
+    "message": "Действие домена истекает %1%"
   },
   "expiration_date": {
     "message": "Дата окончания аренды"
@@ -213,6 +216,12 @@
   },
   "link_tme": {
     "message": "Привязать имя"
+  },
+  "address_linked": {
+    "message": "Адрес связан"
+  },
+  "address_unlinked": {
+    "message": "Адрес отвязан"
   },
   "confirm_tx": {
     "message": "Подтвердите транзакцию"

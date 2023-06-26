@@ -28,7 +28,7 @@ import {
 } from '../transfer/ConfirmView';
 import {useAreNftActionsDisabled} from "../../hooks/blockchain/nft/useAreNftActionsDisabled";
 import {useQueryChangeWait} from "../../hooks/useQueryChangeWait";
-import {useAppSdk} from "../../hooks/appSdk";
+import { useToast} from "../../hooks/appSdk";
 
 const RenewDNSBlock = styled.div`
   width: 100%;
@@ -52,20 +52,27 @@ const intlOptions = { year: 'numeric', hour: undefined, minute: undefined} as co
 export const RenewNft: FC<{
   nft: NFTDNS;
 }> = ({ nft }) => {
-  const sdk = useAppSdk();
+  const toast = useToast();
   const isDisabled = useAreNftActionsDisabled(nft);
   const notifyError = useNotification();
-  const { t } = useTranslation();
+  const { t, i18n: { language } } = useTranslation();
+  const rtf = new Intl.RelativeTimeFormat(language, { style: 'long' });
 
   const query = useNftDNSExpirationDate(nft);
   const { data: expirationDate, isLoading: isExpirationInfoLoading } = query;
 
-  const { refetch: refetchExpirationInfo, isLoading: isWaitingForUpdate } = useQueryChangeWait(
+  const { refetch: refetchExpirationInfo, isLoading: isWaitingForUpdate, isCompleted } = useQueryChangeWait(
         query,
         (current, prev) => {
             return !!current?.getTime() && current.getTime() !== prev?.getTime()
         }
   );
+
+  useEffect(() => {
+      if (isCompleted) {
+          toast(t('renew_nft_renewed'));
+      }
+  }, [isCompleted])
 
   const renewUntilFormatted = useDateFormat(Date.now() + YEAR_MS, intlOptions);
 
@@ -128,6 +135,7 @@ export const RenewNft: FC<{
         recipient={recipient}
         amount={amount}
         jettons={filter}
+        fitContent
         mutateAsync={() =>
           renewMutateAsync({
             nftAddress: nft.address,
@@ -163,7 +171,7 @@ export const RenewNft: FC<{
 
         {daysLeft !== '' &&
         <RenewDNSValidUntil danger={Number(daysLeft) <= 30}>
-            {t('renew_nft_expiration_date').replace('%1%', daysLeft)}
+            {t('renew_nft_expiration_date').replace('%1%', rtf.format(Number(daysLeft), 'days'))}
         </RenewDNSValidUntil>
         }
       </RenewDNSBlock>

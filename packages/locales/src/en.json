@@ -203,8 +203,11 @@
   "renew_nft_in_progress": {
     "message": "Domain renew in progress…"
   },
+  "renew_nft_renewed": {
+    "message": "Domain renewed for 1 year"
+  },
   "renew_nft_expiration_date": {
-    "message": "Valid for %1% more days"
+    "message": "Will be expired %1%"
   },
   "expiration_date": {
     "message": "Expiration date"
@@ -217,6 +220,12 @@
   },
   "link_tme": {
     "message": "Link name"
+  },
+  "address_linked": {
+    "message": "Address linked"
+  },
+  "address_unlinked": {
+    "message": "Address unlinked"
   },
   "confirm_tx": {
     "message": "Confirm transaction"

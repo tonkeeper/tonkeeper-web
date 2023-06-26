@@ -21,7 +21,7 @@ import { useUserJettonList } from '../../state/jetton';
 import { useNftDNSLinkData, useWalletJettonList } from '../../state/wallet';
 import { ColumnText, Gap } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
-import { FullHeightBlock, Notification } from '../Notification';
+import {FullHeightBlock, Notification, NotificationBlock} from '../Notification';
 import { Body1, Body2 } from '../Text';
 import { Label } from '../activity/NotificationCommon';
 import { Button } from '../fields/Button';
@@ -29,7 +29,7 @@ import { Input } from '../fields/Input';
 import {
   ConfirmView,
   ConfirmViewButtons,
-  ConfirmViewButtonsSlot,
+  ConfirmViewButtonsSlot, ConfirmViewDetailsAmount,
   ConfirmViewDetailsFee,
   ConfirmViewDetailsSlot,
   ConfirmViewHeadingSlot,
@@ -38,17 +38,26 @@ import {
 import {getWalletsAddresses} from "@tonkeeper/core/dist/service/walletService";
 import {WalletAddress} from "@tonkeeper/core/dist/entries/wallet";
 import {isTMEDomain} from "@tonkeeper/core/dist/utils/nft";
+import {useToast} from "../../hooks/appSdk";
 
 export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
+  const toast = useToast();
+  const {t} = useTranslation();
   const query = useNftDNSLinkData(nft);
   const { data, isLoading } = query;
 
   const linkedAddress = data?.wallet?.address || '';
 
-  const { refetch, isLoading: isWaitingForUpdate } = useQueryChangeWait(
+  const { refetch, isLoading: isWaitingForUpdate, isCompleted } = useQueryChangeWait(
     query,
-    (current) => !!linkedAddress !== !!current?.wallet?.address
+    (current, prev) => !!prev?.wallet?.address !== !!current?.wallet?.address
   );
+
+  useEffect(() => {
+    if (isCompleted) {
+      toast(linkedAddress ? t('address_linked') : t('address_unlinked'));
+    }
+  }, [isCompleted, linkedAddress]);
 
   if (!linkedAddress) {
     return (
@@ -170,6 +179,7 @@ const LinkNftUnlinked: FC<{
       recipient={recipient}
       amount={amount}
       jettons={filter}
+      fitContent
       mutateAsync={sendLinkNftMutation}
       {...mutationRest}
     >
@@ -190,6 +200,7 @@ const LinkNftUnlinked: FC<{
             />
           </ListItemPayload>
         </ListItem>
+        <ConfirmViewDetailsAmount />
         <ConfirmViewDetailsFee />
       </ConfirmViewDetailsSlot>
       <ConfirmViewButtonsSlot>
@@ -252,7 +263,7 @@ const WalletLabelStyled = styled(Body1)`
   margin-bottom: 1.5rem;
 `;
 
-const FullHeightBlockStyled = styled(FullHeightBlock)`
+const ChangeWalletContainerStyled = styled(NotificationBlock)`
   align-items: flex-start;
 `;
 
@@ -288,7 +299,7 @@ const LinkNFTWalletView: FC<{
 
   const { standalone } = useAppContext();
   return (
-    <FullHeightBlockStyled onSubmit={onSubmit} standalone={standalone}>
+    <ChangeWalletContainerStyled onSubmit={onSubmit}>
       <WalletLabelStyled>
         {t('add_dns_address').replace('%1%', domain)}
       </WalletLabelStyled>
@@ -310,7 +321,7 @@ const LinkNFTWalletView: FC<{
       >
         Save
       </Button>
-    </FullHeightBlockStyled>
+    </ChangeWalletContainerStyled>
   );
 };
 
@@ -384,12 +395,14 @@ const LinkNftLinked: FC<{
       recipient={recipient}
       amount={amount}
       jettons={filter}
+      fitContent
       mutateAsync={sendLinkNftMutation}
       {...mutationRest}
     >
       <ConfirmViewTitleSlot />
       <ConfirmViewHeadingSlot />
       <ConfirmViewDetailsSlot>
+        <ConfirmViewDetailsAmount />
         <ConfirmViewDetailsFee />
       </ConfirmViewDetailsSlot>
       <ConfirmViewButtonsSlot>
