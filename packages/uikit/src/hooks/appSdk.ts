@@ -7,6 +7,16 @@ export const useAppSdk = () => {
   return useContext(AppSdkContext);
 };
 
+export function useToast() {
+  const sdk = useAppSdk();
+  return (content: string) => {
+    sdk.uiEvents.emit('copy', {
+      method: 'copy',
+      params: content
+    });
+  }
+}
+
 export const OnImportAction = React.createContext<(path: string) => void>(
   console.log
 );

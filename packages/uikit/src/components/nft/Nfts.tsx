@@ -13,6 +13,7 @@ import {FireBadgeIcon, SaleIcon} from '../Icon';
 import { NftCollectionBody3, NftHeaderLabel2 } from './NftHeader';
 import { NftNotification } from './NftNotification';
 import {useNftDNSExpirationDate} from "../../state/wallet";
+import {toDaysLeft} from "../../hooks/dateFormat";
 
 const Grid = styled.div`
   display: grid;
@@ -121,7 +122,7 @@ export const NftItem: FC<{
     }
   }, [ref.current, selection, setHover]);
 
-  const isExpiring = expirationDate && expirationDate.getTime() <= Date.now() + 1000 * 3600 * 24 * 30;
+  const isExpiring = expirationDate && Number(toDaysLeft(expirationDate)) <= 30;
 
   return (
     <NftBlock

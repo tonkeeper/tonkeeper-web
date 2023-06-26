@@ -79,6 +79,7 @@ export const ConfirmView: FC<
       jettons: JettonsBalances;
       onBack?: () => void;
       onClose: (confirmed?: boolean) => void;
+      fitContent?: boolean;
     } & (MutationProps | {})
   >
 > = ({
@@ -88,6 +89,7 @@ export const ConfirmView: FC<
   onClose,
   amount,
   jettons,
+  fitContent,
   ...mutationProps
 }) => {
   let mutation: MutationProps = useSendTransfer(recipient, amount, jettons);
@@ -194,7 +196,7 @@ export const ConfirmView: FC<
         onBack,
       }}
     >
-      <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
+      <FullHeightBlock onSubmit={onSubmit} standalone={standalone} fitContent={fitContent}>
         {titleBlock}
         {heading}
         <ListBlock margin={false} fullWidth>
