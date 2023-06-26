@@ -132,13 +132,13 @@ export const NftItem: FC<{
       ref={ref}
       onClick={() => onOpen(nft)}
     >
-      {isSale && (
-        <SaleBlock>
-          <SaleIcon />
-        </SaleBlock>
-      )}
       <ImageContainer>
         <Image url={image?.url} />
+        {isSale && (
+            <SaleBlock>
+              <SaleIcon />
+            </SaleBlock>
+        )}
         {
           isExpiring && <ExpiringBlock><FireBadgeIcon /></ExpiringBlock>
         }
