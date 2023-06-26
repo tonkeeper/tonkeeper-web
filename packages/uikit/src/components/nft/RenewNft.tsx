@@ -71,10 +71,6 @@ export const RenewNft: FC<{
 
   const [isOpen, setIsOpen] = useState(false);
   const onClose = (confirmed?: boolean) => {
-      sdk.uiEvents.emit('response', {
-          method: 'response',
-          params: 'notification',
-      });
       setIsOpen(false);
 
       if (confirmed) {
