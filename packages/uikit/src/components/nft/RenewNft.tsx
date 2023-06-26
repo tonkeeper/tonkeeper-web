@@ -28,6 +28,7 @@ import {
 } from '../transfer/ConfirmView';
 import {useAreNftActionsDisabled} from "../../hooks/blockchain/nft/useAreNftActionsDisabled";
 import {useQueryChangeWait} from "../../hooks/useQueryChangeWait";
+import {useAppSdk} from "../../hooks/appSdk";
 
 const RenewDNSBlock = styled.div`
   width: 100%;
@@ -51,6 +52,7 @@ const intlOptions = { year: 'numeric', hour: undefined, minute: undefined} as co
 export const RenewNft: FC<{
   nft: NFTDNS;
 }> = ({ nft }) => {
+  const sdk = useAppSdk();
   const isDisabled = useAreNftActionsDisabled(nft);
   const notifyError = useNotification();
   const { t } = useTranslation();

@@ -8,7 +8,7 @@ import {
 import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { Address } from 'ton-core';
+import {address, Address} from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAreNftActionsDisabled } from '../../hooks/blockchain/nft/useAreNftActionsDisabled';
 import { useEstimateNftLink } from '../../hooks/blockchain/nft/useEstimateNftLink';
@@ -35,6 +35,9 @@ import {
   ConfirmViewHeadingSlot,
   ConfirmViewTitleSlot,
 } from '../transfer/ConfirmView';
+import {getWalletsAddresses} from "@tonkeeper/core/dist/service/walletService";
+import {WalletAddress} from "@tonkeeper/core/dist/entries/wallet";
+import {isTMEDomain} from "@tonkeeper/core/dist/utils/nft";
 
 export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
   const query = useNftDNSLinkData(nft);
@@ -67,9 +70,10 @@ export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
   );
 };
 
-const ReplaceButton = styled(Body2)`
+const ReplaceButton = styled(Body2)<{isDisabled: boolean}>`
   cursor: pointer;
-  color: ${(props) => props.theme.textAccent};
+  color: ${(props) => !props.isDisabled ? props.theme.textAccent : props.theme.textSecondary};
+  pointer-events: ${props => props.isDisabled ? 'none' : 'unset'};
 `;
 
 const dnsLinkAmount = new BigNumber(0.02);
@@ -84,16 +88,23 @@ const LinkNftUnlinked: FC<{
   const [openedView, setOpenedView] = useState<
     'confirm' | 'wallet' | undefined
   >();
+  const walletState = useWalletContext();
+  const [linkToAddress, setLinkToAddress] = useState(
+      walletState.active.rawAddress
+  );
+
   const onClose = (confirm?: boolean) => {
+    if (openedView === 'wallet') {
+      return setOpenedView('confirm');
+    }
     setOpenedView(undefined);
     if (confirm) {
       refetch();
+    } else {
+      setLinkToAddress(walletState.active.rawAddress);
     }
   };
-  const walletState = useWalletContext();
-  const [linkToAddress, setLinkToAddress] = useState(
-    walletState.active.rawAddress
-  );
+
 
   const { data: jettons } = useWalletJettonList();
   const filter = useUserJettonList(jettons);
@@ -151,6 +162,8 @@ const LinkNftUnlinked: FC<{
     [mutateAsync, nft.address, fee, linkToAddress]
   );
 
+  const isSelectedCurrentAddress = areEqAddresses(linkToAddress, walletState.active.rawAddress);
+
   const confirmChild = () => (
     <ConfirmView
       onClose={onClose}
@@ -165,12 +178,12 @@ const LinkNftUnlinked: FC<{
       <ConfirmViewDetailsSlot>
         <ListItem hover={false}>
           <ListItemPayload>
-            <Label>{t('wallet_address')}</Label>
+            <Label>{isSelectedCurrentAddress ? t('current_address') : t('wallet_address')}</Label>
             <ColumnText
               right
               text={toShortAddress(linkToAddress)}
               secondary={
-                <ReplaceButton onClick={() => setOpenedView('wallet')}>
+                <ReplaceButton isDisabled={mutationRest.isLoading} onClick={() => setOpenedView('wallet')}>
                   {t('replace')}
                 </ReplaceButton>
               }
@@ -206,6 +219,8 @@ const LinkNftUnlinked: FC<{
     setOpenedView('confirm');
   };
 
+  const isTME = isTMEDomain(nft.dns);
+
   return (
     <>
       <Button
@@ -217,7 +232,7 @@ const LinkNftUnlinked: FC<{
         loading={isFeeLoading || isRecipientLoading || isLoading}
         onClick={onOpen}
       >
-        {t('link_domain')}
+        {isTME ? t('link_tme') : t('link_domain')}
       </Button>
       <Notification
         title={openedView === 'wallet' ? t('wallet_address') : t('confirm_tx')}
@@ -384,6 +399,7 @@ const LinkNftLinked: FC<{
   );
 
   const isDisabled = useAreNftActionsDisabled(nft);
+  const isTME = isTMEDomain(nft.dns);
 
   const onOpen = () => {
     if (error) {
@@ -392,6 +408,9 @@ const LinkNftLinked: FC<{
     }
     setIsOpen(true);
   };
+
+  const isLinkedWithAnotherWallet = Object.values<WalletAddress>(getWalletsAddresses(walletState.publicKey))
+      .every(address => !areEqAddresses(address.rawAddress, linkedAddress));
 
   return (
     <>
@@ -406,9 +425,9 @@ const LinkNftLinked: FC<{
       >
         {t('linked_with').replace('%1%', toShortAddress(linkedAddress))}
       </Button>
-      {!areEqAddresses(linkedAddress, walletState.active.rawAddress) && (
+      {isLinkedWithAnotherWallet && !isLoading && (
         <WarnTextStyled>
-          {t('dns_linked_with_another_address_warn')}
+          {isTME ? t('tme_linked_with_another_address_warn') : t('dns_linked_with_another_address_warn')}
         </WarnTextStyled>
       )}
       <Notification

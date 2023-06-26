@@ -9,9 +9,10 @@ import React, {
 } from 'react';
 import styled, { css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
-import { SaleIcon } from '../Icon';
+import {FireBadgeIcon, SaleIcon} from '../Icon';
 import { NftCollectionBody3, NftHeaderLabel2 } from './NftHeader';
 import { NftNotification } from './NftNotification';
+import {useNftDNSExpirationDate} from "../../state/wallet";
 
 const Grid = styled.div`
   display: grid;
@@ -61,6 +62,11 @@ export const NftBlock = styled.div<{
   }}
 `;
 
+const ImageContainer = styled.div`
+  width: 100%;
+  position: relative;
+`
+
 export const Image = styled.div<{ url?: string }>`
   width: 100%;
   padding-bottom: 100%;
@@ -86,6 +92,14 @@ const SaleBlock = styled.div`
   right: 8px;
 `;
 
+const ExpiringBlock = styled.div`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 32px;
+  width: 32px;
+`;
+
 export const NftItem: FC<{
   nft: NftItemRepr;
   resolution: string;
@@ -97,6 +111,8 @@ export const NftItem: FC<{
   const [isHover, setHover] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement>(null);
   const selection = useContext(AppSelectionContext);
+  const { data: expirationDate } = useNftDNSExpirationDate(nft);
+
   useLayoutEffect(() => {
     if (ref.current && selection && ref.current.contains(selection as Node)) {
       setHover(true);
@@ -104,6 +120,8 @@ export const NftItem: FC<{
       setHover(false);
     }
   }, [ref.current, selection, setHover]);
+
+  const isExpiring = expirationDate && expirationDate.getTime() <= Date.now() + 1000 * 3600 * 24 * 30;
 
   return (
     <NftBlock
@@ -118,7 +136,12 @@ export const NftItem: FC<{
           <SaleIcon />
         </SaleBlock>
       )}
-      <Image url={image?.url} />
+      <ImageContainer>
+        <Image url={image?.url} />
+        {
+          isExpiring && <ExpiringBlock><FireBadgeIcon /></ExpiringBlock>
+        }
+      </ImageContainer>
       <Text>
         <NftHeaderLabel2 nft={nft} />
         <NftCollectionBody3 nft={nft} />

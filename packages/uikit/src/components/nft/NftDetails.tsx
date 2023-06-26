@@ -5,10 +5,12 @@ import styled from 'styled-components';
 import { Address } from 'ton';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useNftItemData } from '../../state/wallet';
+import {useNftDNSExpirationDate, useNftItemData} from '../../state/wallet';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Body1, H3, Label1 } from '../Text';
 import { NFTKind } from './NftAction';
+import {useDateFormat} from "../../hooks/dateFormat";
+import {SpinnerIcon} from "../Icon";
 
 const Block = styled.div`
   width: 100%;
@@ -34,6 +36,8 @@ export const NftDetails: FC<{ nftItem: NftItemRepr; kind: NFTKind }> =
   React.memo(({ nftItem }) => {
     const { t } = useTranslation();
     const { data } = useNftItemData(nftItem.address);
+    const { data: expirationDate, isLoading: isExpirationDateLoading } = useNftDNSExpirationDate(nftItem);
+    const expirationDateFormatted = useDateFormat(expirationDate, { year: "numeric",  hour: undefined, minute: undefined });
 
     const item = data ?? nftItem;
 
@@ -66,6 +70,16 @@ export const NftDetails: FC<{ nftItem: NftItemRepr; kind: NFTKind }> =
               </ListItemPayload>
             </ListItem>
           )}
+            {!!(expirationDate || isExpirationDateLoading) &&
+            <ListItem hover={false}>
+                <ListItemPayload>
+                    <RightText>{t('expiration_date')}</RightText>
+                    {
+                        expirationDate ? <Label1>{expirationDateFormatted}</Label1> : <SpinnerIcon />
+                    }
+                </ListItemPayload>
+            </ListItem>
+            }
           <ListItem onClick={() => sdk.copyToClipboard(address)}>
             <ListItemPayload>
               <RightText>{t('nft_contract_address')}</RightText>

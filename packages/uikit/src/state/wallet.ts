@@ -25,6 +25,7 @@ import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
 import { DefaultRefetchInterval } from './tonendpoint';
 import {areEqAddresses} from "@tonkeeper/core/dist/utils/common";
+import {isTONDNSDomain} from "@tonkeeper/core/dist/utils/nft";
 
 export const checkWalletBackup = () => {
   const wallet = useWalletContext();
@@ -228,13 +229,13 @@ export const useNftDNSLinkData = (nft: NFT) => {
 };
 
 const MINUTES_IN_YEAR = 60 * 60 * 24 * 366;
-export const useNftDNSExpirationDate = (nft: NFTDNS) => {
+export const useNftDNSExpirationDate = (nft: NFT) => {
   const { tonApiV2 } = useAppContext();
 
   return useQuery<Date | null, Error>(
-    ['dns_expiring', nft?.address],
+    ['dns_expiring', nft.address],
     async () => {
-      if (!nft.owner?.address) {
+      if (!nft.owner?.address || !nft.dns || !isTONDNSDomain(nft.dns)) {
           return null;
       }
 
@@ -253,8 +254,7 @@ export const useNftDNSExpirationDate = (nft: NFTDNS) => {
       } catch (e) {
         return null;
       }
-    },
-    { enabled: nft.dns != null }
+    }
   );
 };
 
