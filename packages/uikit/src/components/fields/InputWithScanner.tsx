@@ -52,7 +52,7 @@ export const InputWithScanner = React.forwardRef<
     const [focus, setFocus] = useState(false);
     const [scanId, setScanId] = useState<number | undefined>(undefined);
     const sdk = useAppSdk();
-    const { ios } = useAppContext();
+    const { extension } = useAppContext();
 
     const onClear: React.MouseEventHandler<HTMLDivElement> = (e) => {
       e.stopPropagation();
@@ -105,9 +105,13 @@ export const InputWithScanner = React.forwardRef<
         {label && <Label active={value != ''}>{label}</Label>}
 
         {value == '' ? (
-          <ScanBlock onClick={onClick}>
-            <ScanIcon />
-          </ScanBlock>
+          extension ? (
+            <></>
+          ) : (
+            <ScanBlock onClick={onClick}>
+              <ScanIcon />
+            </ScanBlock>
+          )
         ) : (
           <ClearBlock onClick={onClear}>
             <XmarkIcon />
