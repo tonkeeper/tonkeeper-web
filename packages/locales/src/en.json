@@ -207,7 +207,7 @@
     "message": "Domain renewed for 1 year"
   },
   "renew_nft_expiration_date": {
-    "message": "Will be expired %1%"
+    "message": "Expires %1%"
   },
   "expiration_date": {
     "message": "Expiration date"

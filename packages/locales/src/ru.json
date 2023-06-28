@@ -197,13 +197,13 @@
     "message": "Продлить до %1%"
   },
   "renew_nft_in_progress": {
-    "message": "Продление домена в процессе…"
+    "message": "Выполняется продление домена…"
   },
   "renew_nft_renewed": {
     "message": "Домен продлён на 1 год"
   },
   "renew_nft_expiration_date": {
-    "message": "Действие домена истекает %1%"
+    "message": "Истекает %1%"
   },
   "expiration_date": {
     "message": "Дата окончания аренды"
