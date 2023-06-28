@@ -67,7 +67,7 @@ const useSendMutation = (
       throw new Error('Missing accounts data');
     }
     const password = await getPasswordByNotification(sdk, auth);
-    await sendTonConnectTransfer(
+    return await sendTonConnectTransfer(
       sdk.storage,
       tonApi,
       wallet,
@@ -75,8 +75,6 @@ const useSendMutation = (
       params,
       password
     );
-
-    return 'ok';
   });
 };
 
