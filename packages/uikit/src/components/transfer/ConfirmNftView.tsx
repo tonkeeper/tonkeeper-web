@@ -11,10 +11,6 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { getWalletPassword } from '../../state/password';
 import { useTonenpointStock } from '../../state/tonendpoint';
-import { TransferComment } from '../activity/ActivityActionDetails';
-import { ActionFeeDetails } from '../activity/NotificationCommon';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
 import {
   CheckmarkCircleIcon,
   ChevronLeftIcon,
@@ -28,8 +24,13 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Label1, Label2 } from '../Text';
-import { ButtonBlock, Label, notifyError, ResultButton } from './common';
+import { TransferComment } from '../activity/ActivityActionDetails';
+import { ActionFeeDetails } from '../activity/NotificationCommon';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
+import { ButtonBlock, Label, ResultButton, notifyError } from './common';
 
+import { useTransactionAnalytics } from '../../hooks/amplitude';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { RecipientListItem } from './ConfirmListItem';
 
@@ -44,6 +45,7 @@ const useSendNft = (
   const wallet = useWalletContext();
   const client = useQueryClient();
   const track = useSendFBAnalyticsEvent();
+  const track2 = useTransactionAnalytics();
 
   return useMutation<boolean, Error>(async () => {
     if (!fee) return false;
@@ -51,6 +53,7 @@ const useSendNft = (
     if (password === null) return false;
 
     track('send_nft');
+    track2('send-nft');
     try {
       await sendNftTransfer(
         sdk.storage,

@@ -40,5 +40,11 @@ Thumbs.db
 
 .turbo
 
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
 **/public/locales/*
 **/src/wallet-translation/*

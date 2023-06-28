@@ -12,6 +12,64 @@
   resolved "https://registry.yarnpkg.com/@adobe/css-tools/-/css-tools-4.0.1.tgz#b38b444ad3aa5fedbb15f2f746dcd934226a12dd"
   integrity sha512-+u76oB43nOHrF4DDWRLWDCtci7f3QJoEBigemIdIeTi1ODqjx6Tad9NCVnPRwewWlKkVab5PlK8DCtPTyX7S8g==
 
+"@amplitude/analytics-browser@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@amplitude/analytics-browser/-/analytics-browser-2.1.0.tgz#355b3f034070a0a1ccf4bdd672c469089cadfb9e"
+  integrity sha512-9ejvQUR1mrD3Lc8eR03fMDlrfoBZmaiphmw8CZ/qJaKNJ/bu/rh3tBlmvCn1lG/ibxT24Ggtkqz93Xc/n3x0Yg==
+  dependencies:
+    "@amplitude/analytics-client-common" "^2.0.2"
+    "@amplitude/analytics-core" "^2.0.2"
+    "@amplitude/analytics-types" "^2.1.0"
+    "@amplitude/plugin-page-view-tracking-browser" "^2.0.2"
+    "@amplitude/plugin-web-attribution-browser" "^2.0.2"
+    tslib "^2.4.1"
+
+"@amplitude/analytics-client-common@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@amplitude/analytics-client-common/-/analytics-client-common-2.0.2.tgz#420a16ded0bebb73c9052a1549dab472dc31a34c"
+  integrity sha512-Dqe9saZ5ag/ZknHlCYiu6oBOVjIU22Ta5EFtqI/lUm0XqaEdYBGduvlw5hwd8x7nmS6+5r4ip/nW1UoaciucDQ==
+  dependencies:
+    "@amplitude/analytics-connector" "^1.4.8"
+    "@amplitude/analytics-core" "^2.0.2"
+    "@amplitude/analytics-types" "^2.1.0"
+    tslib "^2.4.1"
+
+"@amplitude/analytics-connector@^1.4.8":
+  version "1.4.8"
+  resolved "https://registry.yarnpkg.com/@amplitude/analytics-connector/-/analytics-connector-1.4.8.tgz#dd801303db2662bc51be7e0194eeb8bd72267c42"
+  integrity sha512-dFW7c7Wb6Ng7vbmzwbaXZSpqfBx37ukamJV9ErFYYS8vGZK/Hkbt3M7fZHBI4WFU6CCwakr2ZXPme11uGPYWkQ==
+
+"@amplitude/analytics-core@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@amplitude/analytics-core/-/analytics-core-2.0.2.tgz#0eb6af356b6dfcc3986d8216930c76bac36604ed"
+  integrity sha512-9FHRRrSiVlg77jytV3ZKMMa/VMIUcR7QJejJDcwLTEbZLU9sWUH+y+msLyWpNu2h1bLJBNw1skcD1SvCGm3fnQ==
+  dependencies:
+    "@amplitude/analytics-types" "^2.1.0"
+    tslib "^2.4.1"
+
+"@amplitude/analytics-types@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@amplitude/analytics-types/-/analytics-types-2.1.0.tgz#f5b1f2df52ec23ef7876a828c414be09e5e9d33f"
+  integrity sha512-HG6q+IfEjUg9K+em01+2uccebZVs4tiyMIGpBJ0U7G3swx3lEL7DtFn3uzDzSsp3QOc9rRfJglYy2tNkJRUo7g==
+
+"@amplitude/plugin-page-view-tracking-browser@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@amplitude/plugin-page-view-tracking-browser/-/plugin-page-view-tracking-browser-2.0.2.tgz#22e1c1bdabeca6ff1814312e29dba13c9a82b119"
+  integrity sha512-tYrQ5wwf3qeEhM173lKHXjdl2pOBd6HsjDpelfvzZRLuirGpiGDQZr52WQgKFP4iIZGIkiKtG//wNdswSJ926w==
+  dependencies:
+    "@amplitude/analytics-client-common" "^2.0.2"
+    "@amplitude/analytics-types" "^2.1.0"
+    tslib "^2.4.1"
+
+"@amplitude/plugin-web-attribution-browser@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@amplitude/plugin-web-attribution-browser/-/plugin-web-attribution-browser-2.0.2.tgz#50849e71f2bfb740c55abab9907487259e75af77"
+  integrity sha512-5hCYyH4zVisuQXDpUoj3E8QR3HQt6iggXxB/JYGJac4a9h8aun6iKJHHHCfpEC4V46xVTusDJ/KKINKhcypRSg==
+  dependencies:
+    "@amplitude/analytics-client-common" "^2.0.2"
+    "@amplitude/analytics-types" "^2.1.0"
+    tslib "^2.4.1"
+
 "@ampproject/remapping@^2.1.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.2.0.tgz#56c133824780de3174aed5ab6834f3026790154d"
@@ -16235,6 +16293,11 @@ tslib@^2.0.0, tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
   integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==
+
+tslib@^2.4.1:
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.5.3.tgz#24944ba2d990940e6e982c4bea147aba80209913"
+  integrity sha512-mSxlJJwl3BMEQCUNnxXBU9jP4JBktcEGhURcPR6VQVlnP0FdDEsIaz0C35dXNGLyRfrATNofF0F5p2KPxQgB+w==
 
 tslib@^2.5.0:
   version "2.5.0"

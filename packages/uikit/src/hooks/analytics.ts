@@ -3,6 +3,9 @@ import { initializeApp } from 'firebase/app';
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 
+/**
+ * @deprecated use sdk storage
+ */
 export const useCreateAnalytics = () => {
   return useMemo(() => {
     if (
@@ -28,10 +31,16 @@ export const useCreateAnalytics = () => {
 };
 export const AnalyticsContext = React.createContext<Analytics | null>(null);
 
+/**
+ * @deprecated use sdk storage
+ */
 export const useAnalytics = () => {
   return useContext(AnalyticsContext);
 };
 
+/**
+ * @deprecated use sdk storage
+ */
 export const useAnalyticsScreenView = () => {
   const location = useLocation();
   const analytics = useAnalytics();
@@ -44,14 +53,22 @@ export const useAnalyticsScreenView = () => {
   }, [location.pathname]);
 };
 
-type AnalyticsEvent =
+/**
+ * @deprecated use sdk storage
+ */
+export type AnalyticsEvent =
   | 'screen_view'
   | 'session_start'
   | 'first_open'
   | 'send_ton'
   | 'send_jetton'
-  | 'send_nft';
+  | 'send_nft'
+  | 'link_dns'
+  | 'renew_dns';
 
+/**
+ * @deprecated use sdk storage
+ */
 export const sendAnalyticsEvent = (
   analytics: Analytics,
   eventKind: AnalyticsEvent
@@ -59,6 +76,9 @@ export const sendAnalyticsEvent = (
   logEvent(analytics, String(eventKind));
 };
 
+/**
+ * @deprecated use sdk storage
+ */
 export const useFBAnalyticsEvent = (eventKind: AnalyticsEvent) => {
   const analytics = useAnalytics();
   useEffect(() => {
@@ -70,6 +90,9 @@ export const useFBAnalyticsEvent = (eventKind: AnalyticsEvent) => {
   }, []);
 };
 
+/**
+ * @deprecated use sdk storage
+ */
 export const useSendFBAnalyticsEvent = () => {
   const analytics = useAnalytics();
   return useCallback(

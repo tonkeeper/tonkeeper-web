@@ -55,7 +55,7 @@ const createJettonTransfer = (
     : BigInt(
         new BigNumber(data.amount.toString())
           .shiftedBy(jettonInfo.metadata?.decimals ?? DefaultDecimals)
-          .toString()
+          .toFormat({ decimalSeparator: '.', groupSeparator: '' })
       );
 
   const body = jettonTransferBody({

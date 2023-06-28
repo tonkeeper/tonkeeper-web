@@ -20,7 +20,7 @@ import { SendIcon } from '../home/HomeIcons';
 import { Notification } from '../Notification';
 import { AmountView } from './AmountView';
 import { childFactoryCreator, duration, Wrapper } from './common';
-import { ConfirmView } from './ConfirmView';
+import {ConfirmView} from './ConfirmView';
 import { RecipientView, useGetToAccount } from './RecipientView';
 
 const SendContent: FC<{ onClose: () => void; asset?: string }> = ({

@@ -1,10 +1,10 @@
 import BigNumber from 'bignumber.js';
 import { Address, Cell, internal } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
+import { IStorage } from '../../Storage';
 import { AmountValue, RecipientData } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
-import { IStorage } from '../../Storage';
 import {
   AccountApi,
   AccountEvent,
@@ -17,13 +17,13 @@ import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../menmonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
+  SendMode,
   checkServiceTimeOrDie,
   checkWalletBalanceOrDie,
   checkWalletPositiveBalanceOrDie,
   externalMessage,
   getWalletBalance,
   getWalletSeqNo,
-  SendMode,
 } from './common';
 
 export type AccountsMap = Map<string, AccountRepr>;
@@ -203,6 +203,8 @@ export const sendTonConnectTransfer = async (
   await new SendApi(tonApi).sendBoc({
     sendBocRequest: { boc: cell.toString('base64') },
   });
+
+  return cell.toString();
 };
 
 export const sendTonTransfer = async (

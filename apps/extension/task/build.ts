@@ -47,9 +47,22 @@ chrome.updateChromeManifest(buildDirChrome, packageJson.version);
 common.addEnvironmentVariable(buildDirChrome, '%%%EXTENSION%%%', 'Chrome');
 
 child_process.execSync(
-  `zip tonkeeper_chrome_${packageJson.version}.zip -r ${buildDirChrome}/ *`,
+  `zip ../tonkeeper_chrome_${packageJson.version}.zip -r ${buildDirChrome}/ *`,
   {
-    cwd: buildDirChrome + '/',
+    cwd: `${buildDirChrome}/`,
+  }
+);
+
+common.updateApplicationName(
+  buildDirChrome,
+  'Tonkeeper BETA',
+  'THIS EXTENSION IS FOR BETA TESTING'
+);
+
+child_process.execSync(
+  `zip ../tonkeeper_chrome_beta_${packageJson.version}.zip -r ${buildDirChrome}/ *`,
+  {
+    cwd: `${buildDirChrome}/`,
   }
 );
 
@@ -61,9 +74,9 @@ firefox.updateFireFoxManifest(buildDirFireFox, packageJson.version);
 common.addEnvironmentVariable(buildDirFireFox, '%%%EXTENSION%%%', 'FireFox');
 
 child_process.execSync(
-  `zip tonkeeper_firefox_${packageJson.version}.zip -r ${buildDirFireFox}/ *`,
+  `zip ../tonkeeper_firefox_${packageJson.version}.zip -r ${buildDirFireFox}/ *`,
   {
-    cwd: buildDirFireFox + '/',
+    cwd: `${buildDirFireFox}/`,
   }
 );
 

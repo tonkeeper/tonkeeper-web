@@ -165,10 +165,9 @@ export const NotificationBlock = styled.form`
 
 export const FullHeightBlock = styled(NotificationBlock)<{
   standalone: boolean;
+  fitContent?: boolean;
 }>`
-  min-height: calc(
-    var(--app-height) - ${(props) => (props.standalone ? 3 : 2)}rem
-  );
+  min-height: ${props => props.fitContent ? 'unset' :  `calc(var(--app-height) - ${props.standalone ? 3 : 2}rem)`};
   padding-bottom: calc(56px + 1rem);
   box-sizing: border-box;
 `;

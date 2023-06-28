@@ -1,6 +1,6 @@
 import { Address, WalletContractV4 } from 'ton';
 import { KeyPair, mnemonicToPrivateKey } from 'ton-crypto';
-import { WalletAddress, WalletState, WalletVersion } from '../entries/wallet';
+import {WalletAddress, WalletState, WalletVersion, WalletVersions} from '../entries/wallet';
 import { IStorage } from '../Storage';
 import { Configuration, WalletApi } from '../tonApiV1';
 import {
@@ -119,6 +119,16 @@ export const getWalletAddress = (
     friendlyAddress: address.toString(),
     version,
   };
+};
+
+export const getWalletsAddresses = (
+    publicKey: Buffer | string,
+): Record<(typeof WalletVersions)[number], WalletAddress> => {
+  if (typeof publicKey === 'string') {
+    publicKey = Buffer.from(publicKey, 'hex');
+  }
+
+  return Object.fromEntries(WalletVersions.map(version => [version, getWalletAddress(publicKey as Buffer, version)])) as Record<(typeof WalletVersions)[number], WalletAddress>;
 };
 
 export const updateWalletVersion = async (

@@ -4,10 +4,12 @@ import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect
 import { TonTransactionNotification } from '@tonkeeper/uikit/dist/components/connect/TonTransactionNotification';
 import { useCallback, useEffect, useState } from 'react';
 import { askBackground, sendBackground } from '../event';
+import { useNotificationAnalytics } from '../libs/amplitude';
 import { NotificationData } from '../libs/event';
 
 export const Notifications = () => {
   const [data, setData] = useState<NotificationData | undefined>(undefined);
+
   const reloadNotification = useCallback(async (wait = true) => {
     setData(undefined);
     if (wait) {
@@ -26,6 +28,8 @@ export const Notifications = () => {
       sendBackground.message('closePopUp');
     }
   }, []);
+
+  useNotificationAnalytics(data);
 
   useEffect(() => {
     if (window.location.hash === '#/notification') {

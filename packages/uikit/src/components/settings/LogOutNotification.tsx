@@ -7,11 +7,11 @@ import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useMutateDeleteAll } from '../../state/account';
 import { useMutateLogOut } from '../../state/wallet';
+import { Notification } from '../Notification';
+import { Body1, H2, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
-import { Notification } from '../Notification';
-import { Body1, H2, Label1, Label2 } from '../Text';
 
 const NotificationBlock = styled.form`
   display: flex;
@@ -60,7 +60,11 @@ const LotOutContent: FC<{
         </DisclaimerText>
         <DisclaimerLink
           onClick={() =>
-            onClose(() => navigate(AppRoute.settings + SettingsRoute.recovery))
+            onClose(() =>
+              navigate(
+                AppRoute.settings + SettingsRoute.recovery + '/' + publicKey
+              )
+            )
           }
         >
           {t('Back_up_now')}
@@ -132,7 +136,11 @@ const DeleteContent: FC<{
         </DisclaimerText>
         <DisclaimerLink
           onClick={() =>
-            onClose(() => navigate(AppRoute.settings + SettingsRoute.recovery))
+            onClose(() =>
+              navigate(
+                AppRoute.settings + SettingsRoute.recovery + '/' + publicKey
+              )
+            )
           }
         >
           {t('Back_up_now')}

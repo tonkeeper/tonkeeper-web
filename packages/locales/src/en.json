@@ -25,14 +25,6 @@
   "Toncoin": {
     "message": "Toncoin"
   },
-  "Transfer_token": {
-    "message": "Transfer token",
-    "description": "Transfer token button"
-  },
-  "View_on_market": {
-    "message": "View on market",
-    "description": "View on market button"
-  },
   "About_collection": {
     "message": "About collection",
     "description": "About collection nft preview title"
@@ -204,5 +196,65 @@
   },
   "logout_on_unlock_many": {
     "message": "This will erase keys to all your wallets. Make sure you have backed up your secret recovery phrases."
+  },
+  "renew_nft": {
+    "message": "Renew until %1%"
+  },
+  "renew_nft_in_progress": {
+    "message": "Domain renew in progress…"
+  },
+  "renew_nft_renewed": {
+    "message": "Domain renewed for 1 year"
+  },
+  "renew_nft_expiration_date": {
+    "message": "Will be expired %1%"
+  },
+  "expiration_date": {
+    "message": "Expiration date"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "link_domain": {
+    "message": "Link domain"
+  },
+  "link_tme": {
+    "message": "Link name"
+  },
+  "address_linked": {
+    "message": "Address linked"
+  },
+  "address_unlinked": {
+    "message": "Address unlinked"
+  },
+  "confirm_tx": {
+    "message": "Confirm transaction"
+  },
+  "confirm_unlink": {
+    "message": "Confirm unlink"
+  },
+  "wallet_address": {
+    "message": "Wallet address"
+  },
+  "current_address": {
+    "message": "Your current address"
+  },
+  "linked_with": {
+    "message": "Linked with %1%"
+  },
+  "add_dns_address": {
+    "message": "Add wallet address that domain %1% will link to."
+  },
+  "replace": {
+    "message": "Replace"
+  },
+  "dns_linked_with_another_address_warn": {
+    "message": "The domain is not linked to your current address. Be careful with transactions to this domain."
+  },
+  "tme_linked_with_another_address_warn": {
+    "message": "The name is not linked to your current address. Be careful with transactions to this name."
+  },
+  "nft_on_sale_text": {
+    "message": "NFT is on sale at the marketplace now.\nFor transfer, you should remove it from sale first."
   }
 }

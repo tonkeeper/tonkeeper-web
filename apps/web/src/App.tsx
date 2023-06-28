@@ -4,7 +4,11 @@ import {
   languages,
   localizationText,
 } from '@tonkeeper/core/dist/entries/language';
-import { getTonClient, Network } from '@tonkeeper/core/dist/entries/network';
+import {
+  getTonClient,
+  getTonClientV2,
+  Network,
+} from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
@@ -54,6 +58,10 @@ import { any, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 
+import {
+  AmplitudeAnalyticsContext,
+  useAmplitudeAnalytics,
+} from '@tonkeeper/uikit/dist/hooks/amplitude';
 import {
   Initialize,
   InitializeContainer,
@@ -237,6 +245,8 @@ export const Loader: FC = () => {
   useAnalyticsScreenView();
   useFBAnalyticsEvent('session_start');
 
+  const enable = useAmplitudeAnalytics('Web', account, activeWallet);
+
   useEffect(() => {
     if (
       activeWallet &&
@@ -262,6 +272,7 @@ export const Loader: FC = () => {
   const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
   const context = {
     tonApi: getTonClient(config, network),
+    tonApiV2: getTonClientV2(config, network),
     auth,
     fiat,
     account,
@@ -273,23 +284,25 @@ export const Loader: FC = () => {
   };
 
   return (
-    <OnImportAction.Provider value={navigate}>
-      <AfterImportAction.Provider
-        value={() => navigate(AppRoute.home, { replace: true })}
-      >
-        <AppContext.Provider value={context}>
-          <Content
-            activeWallet={activeWallet}
-            lock={lock}
-            standalone={standalone}
-          />
-          <CopyNotification />
-          <Suspense fallback={<></>}>
-            <QrScanner />
-          </Suspense>
-        </AppContext.Provider>
-      </AfterImportAction.Provider>
-    </OnImportAction.Provider>
+    <AmplitudeAnalyticsContext.Provider value={enable}>
+      <OnImportAction.Provider value={navigate}>
+        <AfterImportAction.Provider
+          value={() => navigate(AppRoute.home, { replace: true })}
+        >
+          <AppContext.Provider value={context}>
+            <Content
+              activeWallet={activeWallet}
+              lock={lock}
+              standalone={standalone}
+            />
+            <CopyNotification />
+            <Suspense fallback={<></>}>
+              <QrScanner />
+            </Suspense>
+          </AppContext.Provider>
+        </AfterImportAction.Provider>
+      </OnImportAction.Provider>
+    </AmplitudeAnalyticsContext.Provider>
   );
 };
 

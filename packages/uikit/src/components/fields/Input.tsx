@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Body2 } from '../Text';
 import { TextareaAutosize } from './TextareaAutosize';
+import { XmarkIcon} from "../Icon";
 
 export const InputBlock = styled.div<{
   focus: boolean;
   valid: boolean;
   scanner?: boolean;
+  clearButton?: boolean;
 }>`
   width: 100%;
   min-height: 64px;
@@ -16,11 +18,17 @@ export const InputBlock = styled.div<{
   gap: 0.5rem;
   box-sizing: border-box;
   position: relative;
-
+  
   ${(props) =>
     props.scanner &&
     css`
       padding-right: 3.5rem;
+    `}
+  
+  ${(props) =>
+          props.clearButton &&
+          css`
+      padding-right: 2rem;
     `}
 
   &:focus-within label {
@@ -101,6 +109,21 @@ export const HelpText = styled(Body2)<{ valid: boolean }>`
         `}
 `;
 
+
+const ClearBlock = styled.div`
+  position: absolute;
+  right: 1rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: ${(props) => props.theme.textSecondary};
+
+  &:hover {
+    color: ${(props) => props.theme.textTertiary};
+  }
+`;
+
 export interface InputProps {
   type?: 'password' | undefined;
   value: string;
@@ -111,6 +134,7 @@ export interface InputProps {
   disabled?: boolean;
   helpText?: string;
   tabIndex?: number;
+  clearButton?: boolean;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -124,14 +148,22 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       disabled,
       helpText,
       tabIndex,
+      clearButton
     },
     ref
   ) => {
     const [focus, setFocus] = useState(false);
 
+      const onClear: React.MouseEventHandler<HTMLDivElement> = (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          if (disabled) return;
+          onChange && onChange('');
+      };
+
     return (
       <OuterBlock>
-        <InputBlock focus={focus} valid={isValid}>
+        <InputBlock focus={focus} valid={isValid} clearButton={clearButton}>
           <InputField
             ref={ref}
             disabled={disabled}
@@ -144,6 +176,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             onBlur={() => setFocus(false)}
           />
           {label && <Label active={value != ''}>{label}</Label>}
+          {!!value && clearButton &&
+            <ClearBlock onClick={onClear}>
+              <XmarkIcon />
+            </ClearBlock>
+          }
         </InputBlock>
         {helpText && <HelpText valid={isValid}>{helpText}</HelpText>}
       </OuterBlock>

@@ -1,4 +1,5 @@
-import { NftItemRepr, NftItemsRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NFT } from '@tonkeeper/core/dist/entries/nft';
+import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import React, {
   FC,
   useContext,
@@ -8,9 +9,11 @@ import React, {
 } from 'react';
 import styled, { css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
-import { SaleIcon } from '../Icon';
+import {FireBadgeIcon, SaleIcon} from '../Icon';
 import { NftCollectionBody3, NftHeaderLabel2 } from './NftHeader';
 import { NftNotification } from './NftNotification';
+import {useNftDNSExpirationDate} from "../../state/wallet";
+import {toDaysLeft} from "../../hooks/dateFormat";
 
 const Grid = styled.div`
   display: grid;
@@ -60,6 +63,11 @@ export const NftBlock = styled.div<{
   }}
 `;
 
+const ImageContainer = styled.div`
+  width: 100%;
+  position: relative;
+`
+
 export const Image = styled.div<{ url?: string }>`
   width: 100%;
   padding-bottom: 100%;
@@ -85,6 +93,14 @@ const SaleBlock = styled.div`
   right: 8px;
 `;
 
+const ExpiringBlock = styled.div`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 32px;
+  width: 32px;
+`;
+
 export const NftItem: FC<{
   nft: NftItemRepr;
   resolution: string;
@@ -96,6 +112,8 @@ export const NftItem: FC<{
   const [isHover, setHover] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement>(null);
   const selection = useContext(AppSelectionContext);
+  const { data: expirationDate } = useNftDNSExpirationDate(nft);
+
   useLayoutEffect(() => {
     if (ref.current && selection && ref.current.contains(selection as Node)) {
       setHover(true);
@@ -103,6 +121,8 @@ export const NftItem: FC<{
       setHover(false);
     }
   }, [ref.current, selection, setHover]);
+
+  const isExpiring = expirationDate && Number(toDaysLeft(expirationDate)) <= 30;
 
   return (
     <NftBlock
@@ -112,12 +132,17 @@ export const NftItem: FC<{
       ref={ref}
       onClick={() => onOpen(nft)}
     >
-      {isSale && (
-        <SaleBlock>
-          <SaleIcon />
-        </SaleBlock>
-      )}
-      <Image url={image?.url} />
+      <ImageContainer>
+        <Image url={image?.url} />
+        {isSale && (
+            <SaleBlock>
+              <SaleIcon />
+            </SaleBlock>
+        )}
+        {
+          isExpiring && <ExpiringBlock><FireBadgeIcon /></ExpiringBlock>
+        }
+      </ImageContainer>
       <Text>
         <NftHeaderLabel2 nft={nft} />
         <NftCollectionBody3 nft={nft} />
@@ -126,24 +151,30 @@ export const NftItem: FC<{
   );
 });
 
-export const NftsList: FC<{ nfts: NftItemsRepr | undefined }> = ({ nfts }) => {
-  const [nftItem, setNftItem] = useState<NftItemRepr | undefined>(undefined);
+export const NftsList: FC<{ nfts: NFT[] | undefined }> = ({ nfts }) => {
+  const [nftItemAddress, setNftItemAddress] = useState<string | undefined>(
+    undefined
+  );
+
+  const selectedNft = nftItemAddress
+    ? nfts?.find((nft) => nft.address === nftItemAddress)
+    : undefined;
 
   return (
     <>
       <Grid>
-        {(nfts?.nftItems ?? []).map((item) => (
+        {(nfts ?? []).map((item) => (
           <NftItem
             key={item.address}
             nft={item}
             resolution="500x500"
-            onOpen={setNftItem}
+            onOpen={() => setNftItemAddress(item.address)}
           />
         ))}
       </Grid>
       <NftNotification
-        nftItem={nftItem}
-        handleClose={() => setNftItem(undefined)}
+        nftItem={selectedNft}
+        handleClose={() => setNftItemAddress(undefined)}
       />
     </>
   );

@@ -52,6 +52,14 @@ export const toShortAddress = (address: string, length = 4): string => {
   return toShortValue(Address.parse(address).toString(), length);
 };
 
+export const areEqAddresses = (address1: string, address2: string) => {
+  try {
+    return Address.parse(address1).equals(Address.parse(address2));
+  } catch {
+    return false;
+  }
+}
+
 export const toShortValue = (value: string, length = 4): string => {
   return value.slice(0, length) + '...' + value.slice(-length);
 };

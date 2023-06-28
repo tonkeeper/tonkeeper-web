@@ -16,12 +16,11 @@ import { H2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
 
-const Block = styled.div`
+const Block = styled.form`
   display: flex;
   text-align: center;
   gap: 1rem;
   flex-direction: column;
-  padding-bottom: 1rem;
 `;
 
 const useSetNoneAuthMutation = () => {
@@ -98,7 +97,9 @@ const FillPassword: FC<{
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
 
-  const onCreate = async () => {
+  const onCreate: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.stopPropagation();
+    e.preventDefault();
     reset();
     const result = await mutateAsync({ password, confirm });
     if (result === undefined) {
@@ -110,7 +111,7 @@ const FillPassword: FC<{
 
   return (
     <CenterContainer>
-      <Block>
+      <Block onSubmit={onCreate}>
         <H2>{t('Create_password')}</H2>
         <Input
           type="password"
@@ -125,31 +126,30 @@ const FillPassword: FC<{
             error === 'confirm' ? t('PasswordDoNotMatch') : t('MinPassword')
           }
         />
-        {
-          <Input
-            type="password"
-            label={t('ConfirmPassword')}
-            value={confirm}
-            onChange={(value) => {
-              setError(undefined);
-              setConfirm(value);
-            }}
-            isValid={error !== 'confirm'}
-          />
-        }
-      </Block>
 
-      <Button
-        size="large"
-        fullWidth
-        primary
-        marginTop
-        loading={isLoading || isCreating}
-        disabled={isCreating || error != null}
-        onClick={onCreate}
-      >
-        {t('continue')}
-      </Button>
+        <Input
+          type="password"
+          label={t('ConfirmPassword')}
+          value={confirm}
+          onChange={(value) => {
+            setError(undefined);
+            setConfirm(value);
+          }}
+          isValid={error !== 'confirm'}
+        />
+
+        <Button
+          size="large"
+          fullWidth
+          primary
+          marginTop
+          loading={isLoading || isCreating}
+          disabled={isCreating || error != null}
+          type="submit"
+        >
+          {t('continue')}
+        </Button>
+      </Block>
     </CenterContainer>
   );
 };

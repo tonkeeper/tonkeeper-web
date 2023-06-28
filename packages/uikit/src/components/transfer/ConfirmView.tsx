@@ -1,18 +1,24 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
-import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { DefaultDecimals } from '@tonkeeper/core/dist/utils/send';
 
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import React, { FC, useMemo, useState } from 'react';
-import { useSendFBAnalyticsEvent } from '../../hooks/analytics';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
+import React, {
+  Children,
+  createContext,
+  FC,
+  isValidElement,
+  PropsWithChildren,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
+import styled from 'styled-components';
+import { useAppContext } from '../../hooks/appContext';
 import { formatter } from '../../hooks/balance';
+import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
 import { useTranslation } from '../../hooks/translation';
-import { getWalletPassword } from '../../state/password';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { TransferComment } from '../activity/ActivityActionDetails';
 import { ActionFeeDetails } from '../activity/NotificationCommon';
@@ -31,86 +37,115 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Label2 } from '../Text';
-import {
-  ButtonBlock,
-  notifyError,
-  ResultButton,
-  useFiatAmount,
-} from './common';
+import { ButtonBlock, ResultButton, useFiatAmount } from './common';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 
-const useSendTransaction = (
-  recipient: RecipientData,
-  amount: AmountData,
-  jettons: JettonsBalances
-) => {
-  const { t } = useTranslation();
-  const sdk = useAppSdk();
-  const { tonApi } = useAppContext();
-  const wallet = useWalletContext();
-  const client = useQueryClient();
-  const track = useSendFBAnalyticsEvent();
+type MutationProps = Pick<
+  ReturnType<typeof useMutation<boolean, Error>>,
+  'mutateAsync' | 'isLoading' | 'error' | 'reset'
+>;
 
-  return useMutation<boolean, Error>(async () => {
-    const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
-    if (password === null) return false;
-    try {
-      if (amount.jetton === CryptoCurrency.TON) {
-        track('send_ton');
-        await sendTonTransfer(
-          sdk.storage,
-          tonApi,
-          wallet,
-          recipient,
-          amount,
-          amount.fee,
-          password
-        );
-      } else {
-        track('send_jetton');
-        const [jettonInfo] = jettons.balances.filter(
-          (item) => item.jettonAddress === amount.jetton
-        );
-        await sendJettonTransfer(
-          sdk.storage,
-          tonApi,
-          wallet,
-          recipient,
-          amount,
-          jettonInfo,
-          amount.fee,
-          password
-        );
-      }
-    } catch (e) {
-      await notifyError(client, sdk, t, e);
-    }
-
-    await client.invalidateQueries([wallet.active.rawAddress]);
-    await client.invalidateQueries();
-    return true;
-  });
-};
-
-export const ConfirmView: FC<{
+type ConfirmViewContextValue = {
   recipient: RecipientData;
   amount: AmountData;
   jettons: JettonsBalances;
-  onBack: () => void;
+  currencyInfo: {
+    image: string | undefined;
+    title: string;
+    symbol: string;
+    decimals: number;
+  };
+  formState: {
+    done: boolean;
+    isLoading: boolean;
+    error: Error | null;
+  };
   onClose: () => void;
-}> = ({ recipient, onBack, onClose, amount, jettons }) => {
+  onBack?: () => void;
+};
+const ConfirmViewContext = createContext<ConfirmViewContextValue>(
+  {} as ConfirmViewContextValue
+);
+export function useConfirmViewContext() {
+  return useContext(ConfirmViewContext);
+}
+
+export const ConfirmView: FC<
+  PropsWithChildren<
+    {
+      recipient: RecipientData;
+      amount: AmountData;
+      jettons: JettonsBalances;
+      onBack?: () => void;
+      onClose: (confirmed?: boolean) => void;
+      fitContent?: boolean;
+    } & (MutationProps | {})
+  >
+> = ({
+  children,
+  recipient,
+  onBack,
+  onClose,
+  amount,
+  jettons,
+  fitContent,
+  ...mutationProps
+}) => {
+  let mutation: MutationProps = useSendTransfer(recipient, amount, jettons);
+
+  if ('mutateAsync' in mutationProps) {
+    mutation = mutationProps;
+  }
+
+  const { mutateAsync, isLoading, error, reset } = mutation;
+
+  let titleBlock = (
+    <ConfirmViewTitleSlot>
+      <ConfirmViewTitle />
+    </ConfirmViewTitleSlot>
+  );
+  let heading = (
+    <ConfirmViewHeadingSlot>
+      <ConfirmViewHeading />
+    </ConfirmViewHeadingSlot>
+  );
+  let details = (
+    <ConfirmViewDetailsSlot>
+      <ConfirmViewDetailsRecipient />
+      <ConfirmViewDetailsAmount />
+      <ConfirmViewDetailsFee />
+      <ConfirmViewDetailsComment />
+    </ConfirmViewDetailsSlot>
+  );
+  let buttons = (
+    <ConfirmViewButtonsSlot>
+      <ConfirmViewButtons />
+    </ConfirmViewButtonsSlot>
+  );
+
+  Children.map(children, (child) => {
+    if (isValidElement(child)) {
+      switch (child.type) {
+        case ConfirmViewTitleSlot:
+          titleBlock = child;
+          return;
+        case ConfirmViewHeadingSlot:
+          heading = child;
+          return;
+        case ConfirmViewDetailsSlot:
+          details = child;
+          return;
+        case ConfirmViewButtonsSlot:
+          buttons = child;
+          return;
+      }
+    }
+  });
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
 
-  const { standalone, fiat } = useAppContext();
-  const { data: stock } = useTonenpointStock();
-
-  const { mutateAsync, isLoading, error, reset } = useSendTransaction(
-    recipient,
-    amount,
-    jettons
-  );
+  const { standalone } = useAppContext();
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.stopPropagation();
@@ -122,12 +157,10 @@ export const ConfirmView: FC<{
       const done = await mutateAsync();
       if (done) {
         setDone(true);
-        setTimeout(onClose, 2000);
+        setTimeout(() => onClose(true), 2000);
       }
     } catch (e) {}
   };
-
-  const isValid = !isLoading;
 
   const [jettonImage, title, symbol, decimals] = useMemo(() => {
     if (amount.jetton === CryptoCurrency.TON) {
@@ -151,6 +184,103 @@ export const ConfirmView: FC<{
     ] as const;
   }, [amount.jetton, jettons, t]);
 
+  return (
+    <ConfirmViewContext.Provider
+      value={{
+        recipient,
+        jettons,
+        amount,
+        currencyInfo: { image: jettonImage, decimals, symbol, title },
+        formState: { done, isLoading, error },
+        onClose: () => onClose(),
+        onBack,
+      }}
+    >
+      <FullHeightBlock onSubmit={onSubmit} standalone={standalone} fitContent={fitContent}>
+        {titleBlock}
+        {heading}
+        <ListBlock margin={false} fullWidth>
+          {details}
+        </ListBlock>
+        <Gap />
+
+        <ButtonBlock>{buttons}</ButtonBlock>
+      </FullHeightBlock>
+    </ConfirmViewContext.Provider>
+  );
+};
+
+const ConfirmViewHeadingStyled = styled.div`
+  margin-bottom: 1rem;
+`;
+
+export const ConfirmViewTitleSlot: FC<PropsWithChildren> = ({ children }) => (
+  <>{children}</>
+);
+export const ConfirmViewTitle: FC<PropsWithChildren> = () => {
+  const { onClose, onBack } = useConfirmViewContext();
+  return (
+    <NotificationTitleBlock>
+      {onBack ? (
+        <BackButton onClick={onBack}>
+          <ChevronLeftIcon />
+        </BackButton>
+      ) : (
+        <div />
+      )}
+      <NotificationCancelButton handleClose={() => onClose()} />
+    </NotificationTitleBlock>
+  );
+};
+
+export const ConfirmViewHeadingSlot: FC<
+  PropsWithChildren<{ className?: string }>
+> = ({ children, className }) => (
+  <ConfirmViewHeadingStyled className={className}>
+    {children}
+  </ConfirmViewHeadingStyled>
+);
+
+export const ConfirmViewHeading: FC<
+  PropsWithChildren<{ className?: string }>
+> = ({ className }) => {
+  const { t } = useTranslation();
+  const {
+    recipient,
+    currencyInfo: { image, title },
+  } = useConfirmViewContext();
+  return (
+    <Info className={className}>
+      {recipient.toAccount.icon ? (
+        <Image full src={recipient.toAccount.icon} />
+      ) : image ? (
+        <Image full src={image} />
+      ) : (
+        <ImageMock full />
+      )}
+      <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
+      <Title>
+        {recipient.toAccount.name ? recipient.toAccount.name : title}
+      </Title>
+    </Info>
+  );
+};
+
+export const ConfirmViewDetailsSlot: FC<PropsWithChildren> = ({ children }) => (
+  <>{children}</>
+);
+
+export const ConfirmViewDetailsRecipient: FC = () => {
+  const { recipient } = useConfirmViewContext();
+  return <RecipientListItem recipient={recipient} />;
+};
+
+export const ConfirmViewDetailsAmount: FC = () => {
+  const {
+    jettons,
+    amount,
+    currencyInfo: { decimals, symbol },
+  } = useConfirmViewContext();
   const fiatAmount = useFiatAmount(jettons, amount.jetton, amount.amount);
 
   const coinAmount = `${formatter.format(amount.amount, {
@@ -158,61 +288,90 @@ export const ConfirmView: FC<{
     decimals,
   })} ${symbol}`;
 
-  return (
-    <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
-      <NotificationTitleBlock>
-        <BackButton onClick={onBack}>
-          <ChevronLeftIcon />
-        </BackButton>
-        <NotificationCancelButton handleClose={onClose} />
-      </NotificationTitleBlock>
-      <Info>
-        {recipient.toAccount.icon ? (
-          <Image full src={recipient.toAccount.icon} />
-        ) : jettonImage ? (
-          <Image full src={jettonImage} />
-        ) : (
-          <ImageMock full />
-        )}
-        <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
-        <Title>
-          {recipient.toAccount.name ? recipient.toAccount.name : title}
-        </Title>
-      </Info>
-      <ListBlock margin={false} fullWidth>
-        <RecipientListItem recipient={recipient} />
-        <AmountListItem coinAmount={coinAmount} fiatAmount={fiatAmount} />
-        <ActionFeeDetails fee={amount.fee} stock={stock} fiat={fiat} />
-        <TransferComment comment={recipient.comment} />
-      </ListBlock>
-      <Gap />
+  return <AmountListItem coinAmount={coinAmount} fiatAmount={fiatAmount} />;
+};
 
-      <ButtonBlock>
-        {done && (
-          <ResultButton done>
-            <CheckmarkCircleIcon />
-            <Label2>{t('send_screen_steps_done_done_label')}</Label2>
-          </ResultButton>
-        )}
-        {error && (
-          <ResultButton>
-            <ExclamationMarkCircleIcon />
-            <Label2>{t('send_publish_tx_error')}</Label2>
-          </ResultButton>
-        )}
-        {!done && !error && (
-          <Button
-            fullWidth
-            size="large"
-            primary
-            type="submit"
-            disabled={!isValid}
-            loading={isLoading}
-          >
-            {t('confirm_sending_submit')}
-          </Button>
-        )}
-      </ButtonBlock>
-    </FullHeightBlock>
+export const ConfirmViewDetailsFee: FC = () => {
+  const { data: stock } = useTonenpointStock();
+  const { fiat } = useAppContext();
+  const { amount } = useConfirmViewContext();
+  return <ActionFeeDetails fee={amount.fee} stock={stock} fiat={fiat} />;
+};
+export const ConfirmViewDetailsComment: FC = () => {
+  const { recipient } = useConfirmViewContext();
+  return <TransferComment comment={recipient.comment} />;
+};
+
+export const ConfirmViewButtonsSlot: FC<PropsWithChildren> = ({ children }) => (
+  <>{children}</>
+);
+
+const ConfirmViewButtonsContainerStyled = styled.div`
+  display: flex;
+  gap: 1rem;
+  & > * {
+    flex: 1;
+  }
+`;
+
+export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({
+  withCancelButton,
+}) => {
+  const {
+    formState: { done, error, isLoading },
+    onClose,
+  } = useConfirmViewContext();
+  const { t } = useTranslation();
+
+  const isValid = !isLoading;
+
+  if (done) {
+    return (
+      <ResultButton done>
+        <CheckmarkCircleIcon />
+        <Label2>{t('send_screen_steps_done_done_label')}</Label2>
+      </ResultButton>
+    );
+  }
+
+  if (error) {
+    return (
+      <ResultButton>
+        <ExclamationMarkCircleIcon />
+        <Label2>{t('send_publish_tx_error')}</Label2>
+      </ResultButton>
+    );
+  }
+
+  if (withCancelButton) {
+    return (
+      <ConfirmViewButtonsContainerStyled>
+        <Button size="large" secondary onClick={onClose}>
+          {t('cancel')}
+        </Button>
+        <Button
+          size="large"
+          primary
+          type="submit"
+          disabled={!isValid}
+          loading={isLoading}
+        >
+          {t('confirm')}
+        </Button>
+      </ConfirmViewButtonsContainerStyled>
+    );
+  }
+
+  return (
+    <Button
+      fullWidth
+      size="large"
+      primary
+      type="submit"
+      disabled={!isValid}
+      loading={isLoading}
+    >
+      {t('confirm_sending_submit')}
+    </Button>
   );
 };

@@ -21,14 +21,6 @@
   "Toncoin": {
     "message": "Toncoin"
   },
-  "Transfer_token": {
-    "message": "Передать токен",
-    "description": "Transfer token button"
-  },
-  "View_on_market": {
-    "message": "Посмотреть на рынке",
-    "description": "View on market button"
-  },
   "About_collection": {
     "message": "О коллекции",
     "description": "About collection nft preview title"
@@ -200,5 +192,65 @@
   },
   "logout_on_unlock_many": {
     "message": "Доступ к кошелькам будет отключен. Убедитесь, что вы сохранили секретные ключи."
+  },
+  "renew_nft": {
+    "message": "Продлить до %1%"
+  },
+  "renew_nft_in_progress": {
+    "message": "Продление домена в процессе…"
+  },
+  "renew_nft_renewed": {
+    "message": "Домен продлён на 1 год"
+  },
+  "renew_nft_expiration_date": {
+    "message": "Действие домена истекает %1%"
+  },
+  "expiration_date": {
+    "message": "Дата окончания аренды"
+  },
+  "cancel": {
+    "message": "Отменить"
+  },
+  "link_domain": {
+    "message": "Привязать домен"
+  },
+  "link_tme": {
+    "message": "Привязать имя"
+  },
+  "address_linked": {
+    "message": "Адрес связан"
+  },
+  "address_unlinked": {
+    "message": "Адрес отвязан"
+  },
+  "confirm_tx": {
+    "message": "Подтвердите транзакцию"
+  },
+  "confirm_unlink": {
+    "message": "Подтвердите отвязку"
+  },
+  "wallet_address": {
+    "message": "Адрес кошелька"
+  },
+  "current_address": {
+    "message": "Ваш текущий адрес"
+  },
+  "linked_with": {
+    "message": "Связан с %1%"
+  },
+  "add_dns_address": {
+    "message": "Добавьте адрес кошелька, на который будет ссылаться домен %1%"
+  },
+  "replace": {
+    "message": "Заменить"
+  },
+  "dns_linked_with_another_address_warn": {
+    "message": "Домен не связан с вашим текущим адресом. Будьте осторожными с транзакциями на это домен."
+  },
+  "tme_linked_with_another_address_warn": {
+    "message": "Имя не связано с вашим текущим адресом. Будьте осторожными с транзакциями на это имя."
+  },
+  "nft_on_sale_text": {
+    "message": "NFT сейчас выставлен на продажу на маркете.\nЧтобы передать, необходимо сначала снять его с продажи."
   }
 }
