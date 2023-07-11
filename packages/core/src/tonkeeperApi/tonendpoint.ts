@@ -27,8 +27,6 @@ export interface TonendpointConfig {
 
   amplitudeKey?: string;
 
-  NFTOnExplorerUrl?: string;
-
   exchangePostUrl?: string;
   supportLink?: string;
 
@@ -36,6 +34,11 @@ export interface TonendpointConfig {
   neocryptoWebView?: string;
 
   directSupportUrl?: string;
+
+  accountExplorer?: string;
+  transactionExplorer?: string;
+  NFTOnExplorerUrl?: string;
+
   /**
    * @deprecated use ton api
    */

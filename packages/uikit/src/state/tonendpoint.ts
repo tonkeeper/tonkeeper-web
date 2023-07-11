@@ -6,12 +6,12 @@ import {
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import {
-  getFiatMethods,
-  getServerConfig,
-  getStock,
   TonendpoinFiatMethods,
   Tonendpoint,
   TonendpointConfig,
+  getFiatMethods,
+  getServerConfig,
+  getStock,
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
@@ -32,7 +32,7 @@ export const useTonendpoint = (
 
 export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
   return useQuery<TonendpointConfig, Error>(
-    [QueryKey.tonkeeperApi, TonkeeperApiKey.config],
+    [QueryKey.tonkeeperApi, TonkeeperApiKey.config, tonendpoint],
     async () => {
       return getServerConfig(tonendpoint);
     }
