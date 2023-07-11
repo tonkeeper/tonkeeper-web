@@ -1,12 +1,12 @@
 import { Action, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import {
   ActivityIcon,
   ContractDeployIcon,
   CreateWalletIcon,
 } from '../../components/activity/ActivityIcons';
-import { useAppContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { ListBlock } from '../List';
@@ -30,7 +30,6 @@ export const ContractDeployActionDetails: FC<ActionData> = ({
 }) => {
   const { t } = useTranslation();
   const { contractDeploy } = action;
-
   const { fiat } = useAppContext();
   const { data: stock } = useTonenpointStock();
 
@@ -64,11 +63,14 @@ export const ContractDeployAction: FC<{
 }> = ({ action, date, openNft }) => {
   const { t } = useTranslation();
   const { contractDeploy } = action;
-
+  const wallet = useWalletContext();
   if (!contractDeploy) {
     return <ErrorAction />;
   }
   const interfaces = contractDeploy.interfaces ?? [];
+  const address = toShortValue(
+    formatAddress(contractDeploy.address, wallet.network)
+  );
 
   if (interfaces.includes('nft_item')) {
     return (
@@ -79,7 +81,7 @@ export const ContractDeployAction: FC<{
         <ColumnLayout
           title={t('NFT_creation')}
           entry="-"
-          address={toShortAddress(contractDeploy.address)}
+          address={address}
           date={date}
         />
         <NftComment address={contractDeploy.address} openNft={openNft} />
@@ -95,7 +97,7 @@ export const ContractDeployAction: FC<{
         <ColumnLayout
           title={t('nft_deploy_collection_title')}
           entry="-"
-          address={toShortAddress(contractDeploy.address)}
+          address={address}
           date={date}
         />
       </ListItemGrid>
@@ -110,7 +112,7 @@ export const ContractDeployAction: FC<{
         <ColumnLayout
           title={t('transaction_type_wallet_initialized')}
           entry="-"
-          address={toShortAddress(contractDeploy.address)}
+          address={address}
           date={date}
         />
       </ListItemGrid>
@@ -125,7 +127,7 @@ export const ContractDeployAction: FC<{
       <ColumnLayout
         title={t('transaction_type_contract_deploy')}
         entry="-"
-        address={toShortAddress(contractDeploy.address)}
+        address={address}
         date={date}
       />
     </ListItemGrid>

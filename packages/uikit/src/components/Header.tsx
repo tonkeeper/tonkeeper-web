@@ -1,4 +1,4 @@
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -7,12 +7,12 @@ import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute } from '../libs/routes';
 import { useMutateActiveWallet } from '../state/account';
 import { useWalletState } from '../state/wallet';
-import { ImportNotification } from './create/ImportNotification';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1 } from './Text';
+import { ImportNotification } from './create/ImportNotification';
 
 const Block = styled.div<{
   center?: boolean;
@@ -124,7 +124,7 @@ const WalletRow: FC<{
           text={
             wallet?.name ? wallet.name : `${t('wallet_title')} ${index + 1}`
           }
-          secondary={wallet && toShortAddress(wallet.active.friendlyAddress)}
+          secondary={wallet && toShortValue(wallet.active.friendlyAddress)}
         />
         {activePublicKey === publicKey ? (
           <Icon>

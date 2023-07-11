@@ -1,5 +1,5 @@
 import { AccountRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useTextWidth from '../../hooks/textWidth';
@@ -26,7 +26,7 @@ export const useShowAddress = (
     font: '16px sans-serif',
   });
   const addressTextWidth = useTextWidth({
-    text: address ? toShortAddress(address) : undefined,
+    text: address ? toShortValue(address) : undefined,
     font: '16px sans-serif',
   });
 
@@ -41,7 +41,7 @@ export const useShowAddress = (
       setShowAddress({
         inputTextWidth,
         addressTextWidth,
-        value: toShortAddress(toAccount.address.bounceable),
+        value: toShortValue(toAccount.address.bounceable),
       });
     } else {
       setShowAddress(undefined);

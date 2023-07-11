@@ -3,15 +3,15 @@ import {
   walletVersionText,
 } from '@tonkeeper/core/dist/entries/wallet';
 import { getWalletAddress } from '@tonkeeper/core/dist/service/walletService';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
+import { SubHeader } from '../../components/SubHeader';
 import {
   SettingsItem,
   SettingsList,
 } from '../../components/settings/SettingsList';
-import { SubHeader } from '../../components/SubHeader';
 import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useMutateWalletVersion } from '../../state/account';
@@ -27,8 +27,8 @@ export const WalletVersion = () => {
     const publicKey = Buffer.from(wallet.publicKey, 'hex');
     return WalletVersions.map((item) => ({
       name: walletVersionText(item),
-      secondary: toShortAddress(
-        getWalletAddress(publicKey, item).friendlyAddress
+      secondary: toShortValue(
+        getWalletAddress(publicKey, item, wallet.network).friendlyAddress
       ),
       icon: wallet.active.version === item ? <CheckIcon /> : undefined,
       action: () => mutate(item),

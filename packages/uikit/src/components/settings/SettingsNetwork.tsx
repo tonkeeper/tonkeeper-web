@@ -1,9 +1,9 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { relative, SettingsRoute } from '../../libs/routes';
+import { SettingsRoute, relative } from '../../libs/routes';
 import { TonkeeperIcon } from '../Icon';
 import { Body3, Label2 } from '../Text';
 
@@ -34,14 +34,23 @@ export const SettingsNetwork: FC = () => {
   const navigate = useNavigate();
   const { version } = useAppSdk();
   const sdk = useAppSdk();
-  const onChange: React.MouseEventHandler<HTMLDivElement> = useCallback(
-    (e) => {
-      if (e.detail === 6) {
-        navigate(relative(SettingsRoute.dev));
-      }
-    },
-    [navigate]
-  );
+
+  const ref = useRef<{ click: number; timer: NodeJS.Timeout | undefined }>({
+    click: 0,
+    timer: undefined,
+  });
+
+  const onChange: React.MouseEventHandler<HTMLDivElement> = () => {
+    clearTimeout(ref.current.timer);
+    ref.current.click++;
+    ref.current.timer = setTimeout(() => {
+      ref.current.click = 0;
+    }, 300);
+
+    if (ref.current.click === 6) {
+      navigate(relative(SettingsRoute.dev));
+    }
+  };
 
   return (
     <Block>

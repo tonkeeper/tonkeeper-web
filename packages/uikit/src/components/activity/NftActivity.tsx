@@ -1,5 +1,5 @@
 import { Action, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -115,8 +115,11 @@ export const NftItemTransferAction: FC<{
           <SecondLine>
             <SecondaryText>
               {nftItemTransfer.sender?.name ??
-                toShortAddress(
-                  nftItemTransfer.sender?.address ?? nftItemTransfer.nft
+                toShortValue(
+                  formatAddress(
+                    nftItemTransfer.sender?.address ?? nftItemTransfer.nft,
+                    wallet.network
+                  )
                 )}
             </SecondaryText>
             <SecondaryText>{date}</SecondaryText>
@@ -141,8 +144,11 @@ export const NftItemTransferAction: FC<{
         <SecondLine>
           <SecondaryText>
             {nftItemTransfer.recipient?.name ??
-              toShortAddress(
-                nftItemTransfer.recipient?.address ?? nftItemTransfer.nft
+              toShortValue(
+                formatAddress(
+                  nftItemTransfer.recipient?.address ?? nftItemTransfer.nft,
+                  wallet.network
+                )
               )}
           </SecondaryText>
           <SecondaryText>{date}</SecondaryText>

@@ -1,17 +1,13 @@
-import {
-  AccountRepr,
-  JettonsBalances,
-  NftItemsRepr,
-} from '@tonkeeper/core/dist/tonApiV1';
+import { NFT } from '@tonkeeper/core/dist/entries/nft';
+import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import React, { FC } from 'react';
+import { HomeSkeleton } from '../../components/Skeleton';
 import { Balance } from '../../components/home/Balance';
 import { CompactView } from '../../components/home/CompactView';
 import { DateSyncBanner } from '../../components/home/SyncBunner';
 import { TabsView } from '../../components/home/TabsView';
 import { HomeActions } from '../../components/home/TonActions';
-import { HomeSkeleton } from '../../components/Skeleton';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useUserJettonList } from '../../state/jetton';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import {
@@ -19,7 +15,6 @@ import {
   useWalletJettonList,
   useWalletNftList,
 } from '../../state/wallet';
-import {NFT} from "@tonkeeper/core/dist/entries/nft";
 
 const HomeAssets: FC<{
   stock: TonendpointStock;
@@ -44,9 +39,6 @@ const HomeAssets: FC<{
 };
 
 const Home = () => {
-  const wallet = useWalletContext();
-  const { fiat } = useAppContext();
-
   const { data: stock, isFetching: isStockLoading } = useTonenpointStock();
 
   const {
@@ -68,8 +60,6 @@ const Home = () => {
     <>
       <DateSyncBanner />
       <Balance
-        address={wallet.active.friendlyAddress}
-        currency={fiat}
         info={info}
         error={error}
         stock={stock}

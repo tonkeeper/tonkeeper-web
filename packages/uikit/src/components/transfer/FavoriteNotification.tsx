@@ -8,7 +8,7 @@ import {
   getFavoriteSuggestions,
   setFavoriteSuggestion,
 } from '@tonkeeper/core/dist/service/suggestionService';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
@@ -16,11 +16,11 @@ import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { Button, ButtonRow } from '../fields/Button';
-import { Input } from '../fields/Input';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Notification } from '../Notification';
 import { Label1 } from '../Text';
+import { Button, ButtonRow } from '../fields/Button';
+import { Input } from '../fields/Input';
 import { Label } from './common';
 
 const Block = styled.form`
@@ -71,6 +71,8 @@ const AddFavoriteContent: FC<{
 }> = ({ latest, onClose }) => {
   const { t } = useTranslation();
   const sdk = useAppSdk();
+  const wallet = useWalletContext();
+
   const { mutateAsync, reset, isLoading, isError } = useAddFavorite(latest);
   const ref = useRef<HTMLInputElement | null>(null);
 
@@ -120,7 +122,9 @@ const AddFavoriteContent: FC<{
         >
           <ListItemPayload>
             <Label>{t('add_edit_favorite_address_label')}</Label>
-            <Label1>{toShortAddress(latest.address)}</Label1>
+            <Label1>
+              {toShortValue(formatAddress(latest.address, wallet.network))}
+            </Label1>
           </ListItemPayload>
         </ListItem>
       </ListBlock>
@@ -216,6 +220,8 @@ const EditFavoriteContent: FC<{
 }> = ({ favorite, onClose }) => {
   const { t } = useTranslation();
   const sdk = useAppSdk();
+  const wallet = useWalletContext();
+
   const {
     mutateAsync: editAsync,
     reset,
@@ -279,7 +285,9 @@ const EditFavoriteContent: FC<{
         >
           <ListItemPayload>
             <Label>{t('add_edit_favorite_address_label')}</Label>
-            <Label1>{toShortAddress(favorite.address)}</Label1>
+            <Label1>
+              {toShortValue(formatAddress(favorite.address, wallet.network))}
+            </Label1>
           </ListItemPayload>
         </ListItem>
       </ListBlock>

@@ -135,7 +135,10 @@ const createTonConnectTransfer = (
       })
     ),
   });
-  return externalMessage(contract, seqno, transfer).toBoc();
+  return [
+    externalMessage(contract, seqno, transfer).toBoc(),
+    transfer,
+  ] as const;
 };
 
 export const estimateTonTransfer = async (
@@ -168,10 +171,15 @@ export const estimateTonConnectTransfer = async (
   const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
   checkWalletPositiveBalanceOrDie(wallet);
 
-  const cell = createTonConnectTransfer(seqno, walletState, accounts, params);
+  const [external] = createTonConnectTransfer(
+    seqno,
+    walletState,
+    accounts,
+    params
+  );
 
   return await new SendApi(tonApi).estimateTx({
-    sendBocRequest: { boc: cell.toString('base64') },
+    sendBocRequest: { boc: external.toString('base64') },
   });
 };
 
@@ -192,7 +200,7 @@ export const sendTonConnectTransfer = async (
   const keyPair = await mnemonicToPrivateKey(mnemonic);
   const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
 
-  const cell = createTonConnectTransfer(
+  const [external, internal] = createTonConnectTransfer(
     seqno,
     walletState,
     accounts,
@@ -201,10 +209,10 @@ export const sendTonConnectTransfer = async (
   );
 
   await new SendApi(tonApi).sendBoc({
-    sendBocRequest: { boc: cell.toString('base64') },
+    sendBocRequest: { boc: external.toString('base64') },
   });
 
-  return cell.toString();
+  return internal.toString();
 };
 
 export const sendTonTransfer = async (

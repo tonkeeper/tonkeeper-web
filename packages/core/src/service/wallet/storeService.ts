@@ -1,12 +1,22 @@
-import { AccountState } from '../../entries/account';
-import { TonConnectError } from '../../entries/exception';
-import { CONNECT_EVENT_ERROR_CODES } from '../../entries/tonConnect';
-import { WalletState } from '../../entries/wallet';
+import { Address } from 'ton-core';
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
+import { AccountState } from '../../entries/account';
+import { TonConnectError } from '../../entries/exception';
+import { Network } from '../../entries/network';
+import { CONNECT_EVENT_ERROR_CODES } from '../../entries/tonConnect';
+import { WalletState } from '../../entries/wallet';
 
-export const getWalletState = (storage: IStorage, publicKey: string) => {
-  return storage.get<WalletState>(`${AppKey.wallet}_${publicKey}`);
+export const getWalletState = async (storage: IStorage, publicKey: string) => {
+  const state = await storage.get<WalletState>(`${AppKey.wallet}_${publicKey}`);
+
+  if (state) {
+    state.active.friendlyAddress = Address.parse(
+      state.active.friendlyAddress
+    ).toString({ testOnly: state.network == Network.TESTNET });
+  }
+
+  return state;
 };
 
 export const setWalletState = (storage: IStorage, state: WalletState) => {

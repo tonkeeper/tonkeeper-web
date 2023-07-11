@@ -36,12 +36,6 @@ import {
   useAmplitudeAnalytics,
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import {
-  AnalyticsContext,
-  useAnalyticsScreenView,
-  useCreateAnalytics,
-  useFBAnalyticsEvent,
-} from '@tonkeeper/uikit/dist/hooks/analytics';
-import {
   AppContext,
   WalletStateContext,
 } from '@tonkeeper/uikit/dist/hooks/appContext';
@@ -139,31 +133,27 @@ export const App: FC = () => {
     return client;
   }, []);
 
-  const analytics = useCreateAnalytics();
-
   return (
-    <AnalyticsContext.Provider value={analytics}>
-      <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          <InitialRedirect>
-            <AppSdkContext.Provider value={sdk}>
-              <StorageContext.Provider value={storage}>
-                <TranslationContext.Provider value={translation}>
-                  <UserThemeProvider>
-                    <HeaderGlobalStyle />
-                    <FooterGlobalStyle />
-                    <SybHeaderGlobalStyle />
-                    <GlobalListStyle />
-                    <Loader />
-                    <UnlockNotification sdk={sdk} />
-                  </UserThemeProvider>
-                </TranslationContext.Provider>
-              </StorageContext.Provider>
-            </AppSdkContext.Provider>
-          </InitialRedirect>
-        </MemoryRouter>
-      </QueryClientProvider>
-    </AnalyticsContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <InitialRedirect>
+          <AppSdkContext.Provider value={sdk}>
+            <StorageContext.Provider value={storage}>
+              <TranslationContext.Provider value={translation}>
+                <UserThemeProvider>
+                  <HeaderGlobalStyle />
+                  <FooterGlobalStyle />
+                  <SybHeaderGlobalStyle />
+                  <GlobalListStyle />
+                  <Loader />
+                  <UnlockNotification sdk={sdk} />
+                </UserThemeProvider>
+              </TranslationContext.Provider>
+            </StorageContext.Provider>
+          </AppSdkContext.Provider>
+        </InitialRedirect>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
 };
 
@@ -232,9 +222,6 @@ export const Loader: FC = React.memo(() => {
     localizationFrom(browser.i18n.getUILanguage())
   );
   const { data: config } = useTonenpointConfig(tonendpoint);
-
-  useAnalyticsScreenView();
-  useFBAnalyticsEvent('session_start');
 
   const enable = useAmplitudeAnalytics(extensionType, account, activeWallet);
 

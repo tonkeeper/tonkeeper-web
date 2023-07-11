@@ -1,12 +1,11 @@
 import React, { FC, PropsWithChildren, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { CenterContainer } from '../../components/Layout';
+import { H1 } from '../../components/Text';
 import { RocketIcon, ShieldIcon } from '../../components/create/CreateIcon';
 import { Description } from '../../components/create/Description';
 import { ImportNotification } from '../../components/create/ImportNotification';
 import { Button } from '../../components/fields/Button';
-import { CenterContainer } from '../../components/Layout';
-import { H1 } from '../../components/Text';
-import { useFBAnalyticsEvent } from '../../hooks/analytics';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 
@@ -47,8 +46,6 @@ export const Initialize: FC = () => {
   const { t } = useTranslation();
   const [isOpen, setOpen] = useState(false);
   const sdk = useAppSdk();
-
-  useFBAnalyticsEvent('screen_view');
 
   const onClick = () => {
     sdk.requestExtensionPermission().then(() => setOpen(true));

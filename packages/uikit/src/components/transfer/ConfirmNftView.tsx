@@ -2,10 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { sendNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { Fee, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
-import { Address } from 'ton-core';
-import { useSendFBAnalyticsEvent } from '../../hooks/analytics';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -44,7 +42,6 @@ const useSendNft = (
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
   const client = useQueryClient();
-  const track = useSendFBAnalyticsEvent();
   const track2 = useTransactionAnalytics();
 
   return useMutation<boolean, Error>(async () => {
@@ -52,7 +49,6 @@ const useSendNft = (
     const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
     if (password === null) return false;
 
-    track('send_nft');
     track2('send-nft');
     try {
       await sendNftTransfer(
@@ -86,6 +82,7 @@ export const ConfirmNftView: FC<{
   const [done, setDone] = useState(false);
   const { t } = useTranslation();
   const sdk = useAppSdk();
+  const wallet = useWalletContext();
 
   const { mutateAsync, isLoading, error, reset } = useSendNft(
     recipient,
@@ -136,24 +133,30 @@ export const ConfirmNftView: FC<{
           <ListItem
             onClick={() =>
               sdk.copyToClipboard(
-                Address.parse(nftItem.collection!.address).toString()
+                formatAddress(nftItem.collection!.address, wallet.network)
               )
             }
           >
             <ListItemPayload>
               <Label>{t('NFT_collection_id')}</Label>
-              <Label1>{toShortAddress(nftItem.collection!.address)}</Label1>
+              <Label1>
+                {toShortValue(
+                  formatAddress(nftItem.collection!.address, wallet.network)
+                )}
+              </Label1>
             </ListItemPayload>
           </ListItem>
         )}
         <ListItem
           onClick={() =>
-            sdk.copyToClipboard(Address.parse(nftItem.address).toString())
+            sdk.copyToClipboard(formatAddress(nftItem.address, wallet.network))
           }
         >
           <ListItemPayload>
             <Label>{t('NFT_item_id')}</Label>
-            <Label1>{toShortAddress(nftItem.address)}</Label1>
+            <Label1>
+              {toShortValue(formatAddress(nftItem.address, wallet.network))}
+            </Label1>
           </ListItemPayload>
         </ListItem>
       </ListBlock>

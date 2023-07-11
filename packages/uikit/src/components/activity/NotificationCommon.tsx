@@ -9,21 +9,19 @@ import {
   formatDecimals,
   getTonCoinStockPrice,
 } from '@tonkeeper/core/dist/utils/balance';
-import {
-  toShortAddress,
-  toShortValue,
-} from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import BigNumber from 'bignumber.js';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency, useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
-import { Button } from '../fields/Button';
 import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
 import { Body1, H2, Label1 } from '../Text';
+import { Button } from '../fields/Button';
 
 export const Title = styled(H2)`
   user-select: none;
@@ -102,6 +100,8 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress }> = ({
 }) => {
   const { t } = useTranslation();
   const sdk = useAppSdk();
+  const wallet = useWalletContext();
+
   return (
     <>
       {recipient.name && (
@@ -126,7 +126,9 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress }> = ({
               ? t('transaction_recipient_address')
               : t('transaction_recipient')}
           </Label>
-          <Label1>{toShortAddress(recipient.address)}</Label1>
+          <Label1>
+            {toShortValue(formatAddress(recipient.address, wallet.network))}
+          </Label1>
         </ListItemPayload>
       </ListItem>
     </>
@@ -138,6 +140,8 @@ export const ActionSenderDetails: FC<{ sender: AccountAddress }> = ({
 }) => {
   const { t } = useTranslation();
   const sdk = useAppSdk();
+  const wallet = useWalletContext();
+
   return (
     <>
       {sender.name && (
@@ -162,7 +166,9 @@ export const ActionSenderDetails: FC<{ sender: AccountAddress }> = ({
               ? t('transaction_sender_address')
               : t('transaction_sender')}
           </Label>
-          <Label1>{toShortAddress(sender.address)}</Label1>
+          <Label1>
+            {toShortValue(formatAddress(sender.address, wallet.network))}
+          </Label1>
         </ListItemPayload>
       </ListItem>
     </>
@@ -174,6 +180,8 @@ export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({
 }) => {
   const { t } = useTranslation();
   const sdk = useAppSdk();
+  const wallet = useWalletContext();
+
   return (
     <>
       {beneficiary.name && (
@@ -198,7 +206,9 @@ export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({
               ? t('add_edit_favorite_address_label')
               : t('transaction_merchant')}
           </Label>
-          <Label1>{toShortAddress(beneficiary.address)}</Label1>
+          <Label1>
+            {toShortValue(formatAddress(beneficiary.address, wallet.network))}
+          </Label1>
         </ListItemPayload>
       </ListItem>
     </>
@@ -225,6 +235,7 @@ export const ActionDeployerDetails: FC<{ deployer: AccountAddress }> = ({
 }) => {
   const { t } = useTranslation();
   const sdk = useAppSdk();
+  const wallet = useWalletContext();
 
   return (
     <>
@@ -238,7 +249,9 @@ export const ActionDeployerDetails: FC<{ deployer: AccountAddress }> = ({
       >
         <ListItemPayload>
           <Label>{t('add_edit_favorite_address_label')}</Label>
-          <Label1>{toShortAddress(deployer.address)}</Label1>
+          <Label1>
+            {toShortValue(formatAddress(deployer.address, wallet.network))}
+          </Label1>
         </ListItemPayload>
       </ListItem>
     </>
@@ -281,16 +294,17 @@ export const ActionDetailsBlock: FC<
 > = ({ event, children }) => {
   const { t } = useTranslation();
   const sdk = useAppSdk();
+  const { config } = useAppContext();
 
+  const url =
+    config.transactionExplorer ?? 'https://tonviewer.com/transaction/%s';
   return (
     <Block>
       {children}
       <Button
         size="large"
         fullWidth
-        onClick={() =>
-          sdk.openPage(`https://tonviewer.com/transaction/${event.eventId}`)
-        }
+        onClick={() => sdk.openPage(url.replace('%s', event.eventId))}
       >
         {t('nft_view_in_explorer')}
       </Button>
