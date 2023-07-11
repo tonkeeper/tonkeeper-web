@@ -97,7 +97,7 @@ export const useMutateRenameWallet = (wallet: WalletState) => {
   });
 };
 
-export const useMutateWalletProperty = () => {
+export const useMutateWalletProperty = (clearWallet = false) => {
   const storage = useStorage();
   const wallet = useWalletContext();
   const client = useQueryClient();
@@ -112,6 +112,9 @@ export const useMutateWalletProperty = () => {
   >(async (props) => {
     await updateWalletProperty(tonApi, storage, wallet, props);
     await client.invalidateQueries([QueryKey.account]);
+    if (clearWallet) {
+      await client.invalidateQueries([wallet.publicKey]);
+    }
   });
 };
 
