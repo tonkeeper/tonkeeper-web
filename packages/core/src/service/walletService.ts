@@ -1,7 +1,13 @@
 import { Address, WalletContractV4 } from 'ton';
 import { KeyPair, mnemonicToPrivateKey } from 'ton-crypto';
-import {WalletAddress, WalletState, WalletVersion, WalletVersions} from '../entries/wallet';
 import { IStorage } from '../Storage';
+import { Network } from '../entries/network';
+import {
+  WalletAddress,
+  WalletState,
+  WalletVersion,
+  WalletVersions,
+} from '../entries/wallet';
 import { Configuration, WalletApi } from '../tonApiV1';
 import {
   createWalletBackup,
@@ -111,24 +117,33 @@ const findWalletAddress = async (
 
 export const getWalletAddress = (
   publicKey: Buffer,
-  version: WalletVersion
+  version: WalletVersion,
+  network?: Network
 ): WalletAddress => {
   const { address } = walletContract(publicKey, version);
   return {
     rawAddress: address.toRawString(),
-    friendlyAddress: address.toString(),
+    friendlyAddress: address.toString({
+      testOnly: network === Network.TESTNET,
+    }),
     version,
   };
 };
 
 export const getWalletsAddresses = (
-    publicKey: Buffer | string,
-): Record<(typeof WalletVersions)[number], WalletAddress> => {
+  publicKey: Buffer | string,
+  network?: Network
+): Record<typeof WalletVersions[number], WalletAddress> => {
   if (typeof publicKey === 'string') {
     publicKey = Buffer.from(publicKey, 'hex');
   }
 
-  return Object.fromEntries(WalletVersions.map(version => [version, getWalletAddress(publicKey as Buffer, version)])) as Record<(typeof WalletVersions)[number], WalletAddress>;
+  return Object.fromEntries(
+    WalletVersions.map((version) => [
+      version,
+      getWalletAddress(publicKey as Buffer, version, network),
+    ])
+  ) as Record<typeof WalletVersions[number], WalletAddress>;
 };
 
 export const updateWalletVersion = async (
@@ -139,7 +154,11 @@ export const updateWalletVersion = async (
   const updated: WalletState = {
     ...wallet,
     revision: wallet.revision + 1,
-    active: getWalletAddress(Buffer.from(wallet.publicKey, 'hex'), version),
+    active: getWalletAddress(
+      Buffer.from(wallet.publicKey, 'hex'),
+      version,
+      wallet.network
+    ),
   };
   await setWalletState(storage, updated);
 };

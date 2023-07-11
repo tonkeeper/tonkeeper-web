@@ -58,7 +58,7 @@ export const areEqAddresses = (address1: string, address2: string) => {
   } catch {
     return false;
   }
-}
+};
 
 export const toShortValue = (value: string, length = 4): string => {
   return value.slice(0, length) + '...' + value.slice(-length);

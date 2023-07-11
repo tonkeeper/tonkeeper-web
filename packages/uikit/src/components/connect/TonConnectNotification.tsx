@@ -15,7 +15,7 @@ import {
   tonConnectProofPayload,
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
@@ -163,7 +163,7 @@ const ConnectContent: FC<{
         <Title>{t('ton_login_title').replace('%{name}', manifest.name)}</Title>
         <SubTitle>
           {t('ton_login_caption').replace('%{name}', getDomain(manifest.url))}{' '}
-          <Address>{toShortAddress(wallet.active.friendlyAddress)}</Address>{' '}
+          <Address>{toShortValue(wallet.active.friendlyAddress)}</Address>{' '}
           {walletVersionText(wallet.active.version)}
         </SubTitle>
       </div>

@@ -1,4 +1,4 @@
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import {
   DragDropContext,
@@ -10,7 +10,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
-import { ImportNotification } from '../../components/create/ImportNotification';
 import { DropDown } from '../../components/DropDown';
 import { EllipsisIcon, ReorderIcon } from '../../components/Icon';
 import { ColumnText, Divider } from '../../components/Layout';
@@ -20,6 +19,10 @@ import {
   ListItemElement,
   ListItemPayload,
 } from '../../components/List';
+import { SkeletonListPayload } from '../../components/Skeleton';
+import { SubHeader } from '../../components/SubHeader';
+import { Label1 } from '../../components/Text';
+import { ImportNotification } from '../../components/create/ImportNotification';
 import {
   DeleteWalletNotification,
   LogOutWalletNotification,
@@ -27,9 +30,6 @@ import {
 import { SetUpWalletIcon } from '../../components/settings/SettingsIcons';
 import { SettingsList } from '../../components/settings/SettingsList';
 import { RenameWalletNotification } from '../../components/settings/WalletNameNotification';
-import { SkeletonListPayload } from '../../components/Skeleton';
-import { SubHeader } from '../../components/SubHeader';
-import { Label1 } from '../../components/Text';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
@@ -75,7 +75,7 @@ const WalletRow: FC<{
           <ColumnText
             noWrap
             text={wallet.name ? wallet.name : t('wallet_title')}
-            secondary={toShortAddress(wallet.active.friendlyAddress)}
+            secondary={toShortValue(wallet.active.friendlyAddress)}
           />
           <DropDown
             payload={(onClose) => (

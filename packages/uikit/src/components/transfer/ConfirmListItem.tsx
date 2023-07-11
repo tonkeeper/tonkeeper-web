@@ -1,6 +1,6 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { Address } from 'ton-core';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -35,7 +35,7 @@ const RecipientItemAddress: FC<{ address: string }> = ({ address }) => {
     <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
       <ListItemPayload>
         <Label>{t('transaction_recipient_address')}</Label>
-        <Label1>{toShortAddress(address)}</Label1>
+        <Label1>{toShortValue(address)}</Label1>
       </ListItemPayload>
     </ListItem>
   );
@@ -87,7 +87,7 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({
   return (
     <RecipientItem
       name={recipient.toAccount.address.bounceable}
-      label={toShortAddress(recipient.toAccount.address.bounceable)}
+      label={toShortValue(recipient.toAccount.address.bounceable)}
     />
   );
 };

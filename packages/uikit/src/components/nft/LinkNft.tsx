@@ -1,15 +1,19 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
+import { WalletAddress } from '@tonkeeper/core/dist/entries/wallet';
+import { getWalletsAddresses } from '@tonkeeper/core/dist/service/walletService';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import {
   areEqAddresses,
   toShortAddress,
 } from '@tonkeeper/core/dist/utils/common';
+import { isTMEDomain } from '@tonkeeper/core/dist/utils/nft';
 import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import {address, Address} from 'ton-core';
+import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useToast } from '../../hooks/appSdk';
 import { useAreNftActionsDisabled } from '../../hooks/blockchain/nft/useAreNftActionsDisabled';
 import { useEstimateNftLink } from '../../hooks/blockchain/nft/useEstimateNftLink';
 import { useLinkNft } from '../../hooks/blockchain/nft/useLinkNft';
@@ -21,7 +25,7 @@ import { useUserJettonList } from '../../state/jetton';
 import { useNftDNSLinkData, useWalletJettonList } from '../../state/wallet';
 import { ColumnText, Gap } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
-import {FullHeightBlock, Notification, NotificationBlock} from '../Notification';
+import { Notification, NotificationBlock } from '../Notification';
 import { Body1, Body2 } from '../Text';
 import { Label } from '../activity/NotificationCommon';
 import { Button } from '../fields/Button';
@@ -29,26 +33,27 @@ import { Input } from '../fields/Input';
 import {
   ConfirmView,
   ConfirmViewButtons,
-  ConfirmViewButtonsSlot, ConfirmViewDetailsAmount,
+  ConfirmViewButtonsSlot,
+  ConfirmViewDetailsAmount,
   ConfirmViewDetailsFee,
   ConfirmViewDetailsSlot,
   ConfirmViewHeadingSlot,
   ConfirmViewTitleSlot,
 } from '../transfer/ConfirmView';
-import {getWalletsAddresses} from "@tonkeeper/core/dist/service/walletService";
-import {WalletAddress} from "@tonkeeper/core/dist/entries/wallet";
-import {isTMEDomain} from "@tonkeeper/core/dist/utils/nft";
-import {useToast} from "../../hooks/appSdk";
 
 export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
   const toast = useToast();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const query = useNftDNSLinkData(nft);
   const { data, isLoading } = query;
 
   const linkedAddress = data?.wallet?.address || '';
 
-  const { refetch, isLoading: isWaitingForUpdate, isCompleted } = useQueryChangeWait(
+  const {
+    refetch,
+    isLoading: isWaitingForUpdate,
+    isCompleted,
+  } = useQueryChangeWait(
     query,
     (current, prev) => !!prev?.wallet?.address !== !!current?.wallet?.address
   );
@@ -79,10 +84,11 @@ export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
   );
 };
 
-const ReplaceButton = styled(Body2)<{isDisabled: boolean}>`
+const ReplaceButton = styled(Body2)<{ isDisabled: boolean }>`
   cursor: pointer;
-  color: ${(props) => !props.isDisabled ? props.theme.textAccent : props.theme.textSecondary};
-  pointer-events: ${props => props.isDisabled ? 'none' : 'unset'};
+  color: ${(props) =>
+    !props.isDisabled ? props.theme.textAccent : props.theme.textSecondary};
+  pointer-events: ${(props) => (props.isDisabled ? 'none' : 'unset')};
 `;
 
 const dnsLinkAmount = new BigNumber(0.02);
@@ -99,7 +105,7 @@ const LinkNftUnlinked: FC<{
   >();
   const walletState = useWalletContext();
   const [linkToAddress, setLinkToAddress] = useState(
-      walletState.active.rawAddress
+    walletState.active.rawAddress
   );
 
   const onClose = (confirm?: boolean) => {
@@ -113,7 +119,6 @@ const LinkNftUnlinked: FC<{
       setLinkToAddress(walletState.active.rawAddress);
     }
   };
-
 
   const { data: jettons } = useWalletJettonList();
   const filter = useUserJettonList(jettons);
@@ -171,7 +176,10 @@ const LinkNftUnlinked: FC<{
     [mutateAsync, nft.address, fee, linkToAddress]
   );
 
-  const isSelectedCurrentAddress = areEqAddresses(linkToAddress, walletState.active.rawAddress);
+  const isSelectedCurrentAddress = areEqAddresses(
+    linkToAddress,
+    walletState.active.rawAddress
+  );
 
   const confirmChild = () => (
     <ConfirmView
@@ -188,12 +196,19 @@ const LinkNftUnlinked: FC<{
       <ConfirmViewDetailsSlot>
         <ListItem hover={false}>
           <ListItemPayload>
-            <Label>{isSelectedCurrentAddress ? t('current_address') : t('wallet_address')}</Label>
+            <Label>
+              {isSelectedCurrentAddress
+                ? t('current_address')
+                : t('wallet_address')}
+            </Label>
             <ColumnText
               right
               text={toShortAddress(linkToAddress)}
               secondary={
-                <ReplaceButton isDisabled={mutationRest.isLoading} onClick={() => setOpenedView('wallet')}>
+                <ReplaceButton
+                  isDisabled={mutationRest.isLoading}
+                  onClick={() => setOpenedView('wallet')}
+                >
                   {t('replace')}
                 </ReplaceButton>
               }
@@ -422,8 +437,9 @@ const LinkNftLinked: FC<{
     setIsOpen(true);
   };
 
-  const isLinkedWithAnotherWallet = Object.values<WalletAddress>(getWalletsAddresses(walletState.publicKey))
-      .every(address => !areEqAddresses(address.rawAddress, linkedAddress));
+  const isLinkedWithAnotherWallet = Object.values<WalletAddress>(
+    getWalletsAddresses(walletState.publicKey, walletState.network)
+  ).every((address) => !areEqAddresses(address.rawAddress, linkedAddress));
 
   return (
     <>
@@ -440,7 +456,9 @@ const LinkNftLinked: FC<{
       </Button>
       {isLinkedWithAnotherWallet && !isLoading && (
         <WarnTextStyled>
-          {isTME ? t('tme_linked_with_another_address_warn') : t('dns_linked_with_another_address_warn')}
+          {isTME
+            ? t('tme_linked_with_another_address_warn')
+            : t('dns_linked_with_another_address_warn')}
         </WarnTextStyled>
       )}
       <Notification

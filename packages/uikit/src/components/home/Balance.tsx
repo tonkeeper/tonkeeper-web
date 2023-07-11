@@ -7,11 +7,11 @@ import {
   getJettonStockPrice,
   getTonCoinStockPrice,
 } from '@tonkeeper/core/dist/utils/balance';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
-import { useWalletContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { useUserJettonList } from '../../state/jetton';
@@ -105,19 +105,18 @@ export const BalanceSkeleton = () => {
 };
 
 export const Balance: FC<{
-  address: string;
-  currency: FiatCurrencies;
   info?: AccountRepr | undefined;
   error?: Error | null;
   stock?: TonendpointStock | undefined;
   jettons?: JettonsBalances | undefined;
   isFetching: boolean;
-}> = ({ address, currency, info, error, stock, jettons, isFetching }) => {
+}> = ({ info, error, stock, jettons, isFetching }) => {
   const sdk = useAppSdk();
+  const { fiat } = useAppContext();
   const wallet = useWalletContext();
 
   const filtered = useUserJettonList(jettons);
-  const total = useBalanceValue(info, stock, filtered, currency);
+  const total = useBalanceValue(info, stock, filtered, fiat);
 
   const onClick = useCallback(() => {
     sdk.copyToClipboard(wallet.active.friendlyAddress);
@@ -127,7 +126,9 @@ export const Balance: FC<{
     <Block>
       <MessageBlock error={error} isFetching={isFetching} />
       <Amount>{total}</Amount>
-      <Body onClick={onClick}>{toShortAddress(address)}</Body>
+      <Body onClick={onClick}>
+        {toShortValue(wallet.active.friendlyAddress)}
+      </Body>
     </Block>
   );
 };

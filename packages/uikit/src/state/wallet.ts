@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {NFT, NFTDNS} from '@tonkeeper/core/dist/entries/nft';
+import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
   accountLogOutWallet,
@@ -10,22 +10,26 @@ import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import { getWalletActiveAddresses } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
 import {
-    AccountApi,
-    AccountRepr,
-    JettonApi,
-    JettonsBalances,
-    NFTApi,
-    NftCollection,
-    NftItemRepr, NftItemsRepr,
-    WalletApi,
+  AccountApi,
+  AccountRepr,
+  JettonApi,
+  JettonsBalances,
+  NFTApi,
+  NftCollection,
+  NftItemRepr,
+  WalletApi,
 } from '@tonkeeper/core/dist/tonApiV1';
-import {AccountsApi, BlockchainApi, DNSApi, DnsExpiringItemsInner, DnsRecord} from '@tonkeeper/core/dist/tonApiV2';
+import {
+  BlockchainApi,
+  DNSApi,
+  DnsRecord,
+} from '@tonkeeper/core/dist/tonApiV2';
+import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
 import { DefaultRefetchInterval } from './tonendpoint';
-import {areEqAddresses} from "@tonkeeper/core/dist/utils/common";
-import {isTONDNSDomain} from "@tonkeeper/core/dist/utils/nft";
 
 export const checkWalletBackup = () => {
   const wallet = useWalletContext();
@@ -50,37 +54,37 @@ export const checkWalletBackup = () => {
 };
 
 export const useActiveWallet = () => {
-  const storage = useStorage();
+  const sdk = useAppSdk();
   return useQuery<WalletState | null, Error>(
     [QueryKey.account, QueryKey.wallet],
     async () => {
-      const account = await getAccountState(storage);
+      const account = await getAccountState(sdk.storage);
       if (!account.activePublicKey) return null;
-      return await getWalletState(storage, account.activePublicKey);
+      return await getWalletState(sdk.storage, account.activePublicKey);
     }
   );
 };
 
 export const useWalletState = (publicKey: string) => {
-  const storage = useStorage();
+  const sdk = useAppSdk();
   return useQuery<WalletState | null, Error>(
     [QueryKey.account, QueryKey.wallet, publicKey],
-    () => getWalletState(storage, publicKey)
+    () => getWalletState(sdk.storage, publicKey)
   );
 };
 
 export const useMutateLogOut = (publicKey: string, remove = false) => {
-  const storage = useStorage();
+  const sdk = useAppSdk();
   const client = useQueryClient();
   const { tonApi } = useAppContext();
   return useMutation<void, Error, void>(async () => {
-    await accountLogOutWallet(storage, tonApi, publicKey, remove);
+    await accountLogOutWallet(sdk.storage, tonApi, publicKey, remove);
     await client.invalidateQueries([QueryKey.account]);
   });
 };
 
 export const useMutateRenameWallet = (wallet: WalletState) => {
-  const storage = useStorage();
+  const sdk = useAppSdk();
   const client = useQueryClient();
   const { tonApi } = useAppContext();
   return useMutation<void, Error, string>(async (name) => {
@@ -88,7 +92,7 @@ export const useMutateRenameWallet = (wallet: WalletState) => {
       throw new Error('Missing name');
     }
 
-    await updateWalletProperty(tonApi, storage, wallet, { name });
+    await updateWalletProperty(tonApi, sdk.storage, wallet, { name });
     await client.invalidateQueries([QueryKey.account]);
   });
 };
@@ -172,60 +176,60 @@ export const useWalletJettonList = () => {
   );
 };
 export const useWalletNftList = () => {
-    const wallet = useWalletContext();
-    const {tonApi} = useAppContext();
+  const wallet = useWalletContext();
+  const { tonApi } = useAppContext();
 
-    return useQuery<NFT[], Error>(
-        [wallet.publicKey, QueryKey.nft],
-        async () => {
-            const {wallets} = await new WalletApi(tonApi).findWalletsByPubKey({
-                publicKey: wallet.publicKey,
-            });
-            const result = wallets
-                .filter((item) => item.balance > 0 || item.status === 'active')
-                .map((wallet) => wallet.address);
+  return useQuery<NFT[], Error>(
+    [wallet.publicKey, QueryKey.nft],
+    async () => {
+      const { wallets } = await new WalletApi(tonApi).findWalletsByPubKey({
+        publicKey: wallet.publicKey,
+      });
+      const result = wallets
+        .filter((item) => item.balance > 0 || item.status === 'active')
+        .map((wallet) => wallet.address);
 
-            const items = await Promise.all(
-                result.map((owner) =>
-                    new NFTApi(tonApi).searchNFTItems({
-                        owner: owner,
-                        offset: 0,
-                        limit: 1000,
-                        includeOnSale: true,
-                    })
-                )
-            );
+      const items = await Promise.all(
+        result.map((owner) =>
+          new NFTApi(tonApi).searchNFTItems({
+            owner: owner,
+            offset: 0,
+            limit: 1000,
+            includeOnSale: true,
+          })
+        )
+      );
 
-            return items.reduce(
-                    (acc, account) => acc.concat(account.nftItems),
-                    [] as NftItemRepr[]
-            )
-        },
-        {
-            refetchInterval: DefaultRefetchInterval,
-            refetchIntervalInBackground: true,
-            refetchOnWindowFocus: true,
-            keepPreviousData: true,
-        }
-    );
-}
+      return items.reduce(
+        (acc, account) => acc.concat(account.nftItems),
+        [] as NftItemRepr[]
+      );
+    },
+    {
+      refetchInterval: DefaultRefetchInterval,
+      refetchIntervalInBackground: true,
+      refetchOnWindowFocus: true,
+      keepPreviousData: true,
+    }
+  );
+};
 export const useNftDNSLinkData = (nft: NFT) => {
-    const { tonApiV2 } = useAppContext();
+  const { tonApiV2 } = useAppContext();
 
-    return useQuery<DnsRecord | null, Error>(
-        ['dns_link', nft?.address],
-        async () => {
-            const { dns: domainName } = nft;
-            if (!domainName) return null;
+  return useQuery<DnsRecord | null, Error>(
+    ['dns_link', nft?.address],
+    async () => {
+      const { dns: domainName } = nft;
+      if (!domainName) return null;
 
-            try {
-                return await new DNSApi(tonApiV2).dnsResolve({ domainName });
-            } catch (e) {
-                return null;
-            }
-        },
-        { enabled: nft.dns != null }
-    );
+      try {
+        return await new DNSApi(tonApiV2).dnsResolve({ domainName });
+      } catch (e) {
+        return null;
+      }
+    },
+    { enabled: nft.dns != null }
+  );
 };
 
 const MINUTES_IN_YEAR = 60 * 60 * 24 * 366;
@@ -236,18 +240,22 @@ export const useNftDNSExpirationDate = (nft: NFT) => {
     ['dns_expiring', nft.address],
     async () => {
       if (!nft.owner?.address || !nft.dns || !isTONDNSDomain(nft.dns)) {
-          return null;
+        return null;
       }
 
       try {
         const result = await new BlockchainApi(tonApiV2).execGetMethod({
-            accountId: nft.address,
-            methodName: 'get_last_fill_up_time'
-        })
+          accountId: nft.address,
+          methodName: 'get_last_fill_up_time',
+        });
 
         const lastRefill = result?.decoded?.last_fill_up_time;
-        if (lastRefill && typeof lastRefill === 'number' && isFinite(lastRefill)) {
-            return new Date((lastRefill + MINUTES_IN_YEAR) * 1000);
+        if (
+          lastRefill &&
+          typeof lastRefill === 'number' &&
+          isFinite(lastRefill)
+        ) {
+          return new Date((lastRefill + MINUTES_IN_YEAR) * 1000);
         }
 
         return null;
