@@ -8,7 +8,7 @@ Tonkeeper Extension supports Firefox 109.0 or higher version, Google Chrome, and
 
 - Install `Node.js` version 16 or 19
 - Install `Yarn` version 1.18.0
-- Install and run `Docker Desktop` 
+- Install and run `Docker Desktop`
 
 ### Build web script
 
@@ -29,3 +29,7 @@ yarn build:extension
 ```
 
 Compressed builds can be found in `/apps/extension/dist/chrome` and `/apps/extension/dist/firefox` once they're built.
+
+## License
+
+(c) Copyright 2023 TonApps Inc. Released under the [Apache License, Version 2.0](LICENSE.txt).
