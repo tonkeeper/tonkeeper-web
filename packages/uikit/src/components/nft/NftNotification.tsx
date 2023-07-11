@@ -1,7 +1,6 @@
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import React, { FC, useCallback, useMemo, useRef } from 'react';
 import styled from 'styled-components';
-import { useFBAnalyticsEvent } from '../../hooks/analytics';
 import { useTranslation } from '../../hooks/translation';
 import { useNftCollectionData } from '../../state/wallet';
 import { ChevronDownIcon, VerificationIcon } from '../Icon';
@@ -71,8 +70,6 @@ const NftPreview: FC<{
   const ref = useRef<HTMLImageElement | null>(null);
   const { t } = useTranslation();
   const { data: collection } = useNftCollectionData(nftItem);
-
-  useFBAnalyticsEvent('screen_view');
 
   const { description } = nftItem.metadata;
   const name = nftItem.dns ?? nftItem.metadata.name;

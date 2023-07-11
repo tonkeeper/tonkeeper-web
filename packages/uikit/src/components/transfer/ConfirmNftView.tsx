@@ -5,7 +5,6 @@ import { Fee, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import { Address } from 'ton-core';
-import { useSendFBAnalyticsEvent } from '../../hooks/analytics';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -44,7 +43,6 @@ const useSendNft = (
   const { tonApi } = useAppContext();
   const wallet = useWalletContext();
   const client = useQueryClient();
-  const track = useSendFBAnalyticsEvent();
   const track2 = useTransactionAnalytics();
 
   return useMutation<boolean, Error>(async () => {
@@ -52,7 +50,6 @@ const useSendNft = (
     const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
     if (password === null) return false;
 
-    track('send_nft');
     track2('send-nft');
     try {
       await sendNftTransfer(

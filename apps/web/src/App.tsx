@@ -35,12 +35,6 @@ import {
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import {
-  AnalyticsContext,
-  useAnalyticsScreenView,
-  useCreateAnalytics,
-  useFBAnalyticsEvent,
-} from '@tonkeeper/uikit/dist/hooks/analytics';
-import {
   AppContext,
   WalletStateContext,
 } from '@tonkeeper/uikit/dist/hooks/appContext';
@@ -139,30 +133,26 @@ export const App: FC<PropsWithChildren> = () => {
     return client;
   }, [t, i18n]);
 
-  const analytics = useCreateAnalytics();
-
   return (
     <BrowserRouter>
-      <AnalyticsContext.Provider value={analytics}>
-        <QueryClientProvider client={queryClient}>
-          <Suspense fallback={<div></div>}>
-            <AppSdkContext.Provider value={sdk}>
-              <TranslationContext.Provider value={translation}>
-                <StorageContext.Provider value={storage}>
-                  <UserThemeProvider>
-                    <HeaderGlobalStyle />
-                    <FooterGlobalStyle />
-                    <SybHeaderGlobalStyle />
-                    <GlobalListStyle />
-                    <Loader />
-                    <UnlockNotification sdk={sdk} />
-                  </UserThemeProvider>
-                </StorageContext.Provider>
-              </TranslationContext.Provider>
-            </AppSdkContext.Provider>
-          </Suspense>
-        </QueryClientProvider>
-      </AnalyticsContext.Provider>
+      <QueryClientProvider client={queryClient}>
+        <Suspense fallback={<div></div>}>
+          <AppSdkContext.Provider value={sdk}>
+            <TranslationContext.Provider value={translation}>
+              <StorageContext.Provider value={storage}>
+                <UserThemeProvider>
+                  <HeaderGlobalStyle />
+                  <FooterGlobalStyle />
+                  <SybHeaderGlobalStyle />
+                  <GlobalListStyle />
+                  <Loader />
+                  <UnlockNotification sdk={sdk} />
+                </UserThemeProvider>
+              </StorageContext.Provider>
+            </TranslationContext.Provider>
+          </AppSdkContext.Provider>
+        </Suspense>
+      </QueryClientProvider>
     </BrowserRouter>
   );
 };
@@ -241,9 +231,6 @@ export const Loader: FC = () => {
 
   const navigate = useNavigate();
   useAppHeight();
-
-  useAnalyticsScreenView();
-  useFBAnalyticsEvent('session_start');
 
   const enable = useAmplitudeAnalytics('Web', account, activeWallet);
 

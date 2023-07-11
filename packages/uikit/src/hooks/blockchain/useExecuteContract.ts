@@ -9,7 +9,6 @@ import {
   AmplitudeTransactionType,
   useTransactionAnalytics,
 } from '../amplitude';
-import { AnalyticsEvent, useSendFBAnalyticsEvent } from '../analytics';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
@@ -24,7 +23,6 @@ export type ContractExecutorParams = {
 
 export function useExecuteContract<Args extends ContractExecutorParams>(
   executor: (params: Args) => Promise<void>,
-  eventName: AnalyticsEvent,
   eventName2: AmplitudeTransactionType
 ) {
   const { t } = useTranslation();
@@ -32,7 +30,6 @@ export function useExecuteContract<Args extends ContractExecutorParams>(
   const { tonApi } = useAppContext();
   const walletState = useWalletContext();
   const client = useQueryClient();
-  const track = useSendFBAnalyticsEvent();
   const track2 = useTransactionAnalytics();
 
   return useMutation(
@@ -46,7 +43,6 @@ export function useExecuteContract<Args extends ContractExecutorParams>(
       );
       if (password === null) return false;
 
-      track(eventName);
       track2(eventName2);
       try {
         await executor({
