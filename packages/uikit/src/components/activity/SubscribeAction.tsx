@@ -1,12 +1,12 @@
 import { Action } from '@tonkeeper/core/dist/tonApiV1';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import {
   ActivityIcon,
   SubscribeIcon,
   UnsubscribeIcon,
 } from '../../components/activity/ActivityIcons';
-import { useAppContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { ListBlock } from '../List';
@@ -88,6 +88,7 @@ export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({
 }) => {
   const { t } = useTranslation();
   const { unSubscribe } = action;
+  const wallet = useWalletContext();
 
   if (!unSubscribe) {
     return <ErrorAction />;
@@ -102,7 +103,9 @@ export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({
         entry="-"
         address={
           unSubscribe.beneficiary.name ??
-          toShortAddress(unSubscribe.beneficiary.address)
+          toShortValue(
+            formatAddress(unSubscribe.beneficiary.address, wallet.network)
+          )
         }
         date={date}
       />
@@ -116,6 +119,7 @@ export const SubscribeAction: FC<{ action: Action; date: string }> = ({
 }) => {
   const { t } = useTranslation();
   const { subscribe } = action;
+  const wallet = useWalletContext();
 
   if (!subscribe) {
     return <ErrorAction />;
@@ -131,7 +135,9 @@ export const SubscribeAction: FC<{ action: Action; date: string }> = ({
         entry="-"
         address={
           subscribe.beneficiary.name ??
-          toShortAddress(subscribe.beneficiary.address)
+          toShortValue(
+            formatAddress(subscribe.beneficiary.address, wallet.network)
+          )
         }
         date={date}
       />

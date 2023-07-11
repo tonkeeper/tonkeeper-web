@@ -1,12 +1,12 @@
 import { Action, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
+import { ListItemPayload } from '../../components/List';
 import {
   ActivityIcon,
   ReceiveIcon,
-  SentIcon
+  SentIcon,
 } from '../../components/activity/ActivityIcons';
-import { ListItemPayload } from '../../components/List';
 import { useWalletContext } from '../../hooks/appContext';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
@@ -19,8 +19,8 @@ import {
   FirstLabel,
   FirstLine,
   ListItemGrid,
+  SecondLine,
   SecondaryText,
-  SecondLine
 } from './CommonAction';
 import { ContractDeployAction } from './ContractDeployAction';
 import { NftComment, NftItemTransferAction } from './NftActivity';
@@ -64,7 +64,9 @@ const TonTransferAction: FC<{
           <SecondLine>
             <SecondaryText>
               {tonTransfer.sender.name ??
-                toShortAddress(tonTransfer.sender.address)}
+                toShortValue(
+                  formatAddress(tonTransfer.sender.address, wallet.network)
+                )}
             </SecondaryText>
             <SecondaryText>{date}</SecondaryText>
           </SecondLine>
@@ -91,7 +93,9 @@ const TonTransferAction: FC<{
         <SecondLine>
           <SecondaryText>
             {tonTransfer.recipient.name ??
-              toShortAddress(tonTransfer.recipient.address)}
+              toShortValue(
+                formatAddress(tonTransfer.recipient.address, wallet.network)
+              )}
           </SecondaryText>
           <SecondaryText>{date}</SecondaryText>
         </SecondLine>
@@ -133,9 +137,12 @@ const JettonTransferAction: FC<{ action: Action; date: string }> = ({
           <SecondLine>
             <SecondaryText>
               {jettonTransfer.recipient?.name ??
-                toShortAddress(
-                  jettonTransfer.recipient?.address ??
-                    jettonTransfer.recipientsWallet
+                toShortValue(
+                  formatAddress(
+                    jettonTransfer.recipient?.address ??
+                      jettonTransfer.recipientsWallet,
+                    wallet.network
+                  )
                 )}
             </SecondaryText>
             <SecondaryText>{date}</SecondaryText>
@@ -165,8 +172,12 @@ const JettonTransferAction: FC<{ action: Action; date: string }> = ({
         <SecondLine>
           <SecondaryText>
             {jettonTransfer.sender?.name ??
-              toShortAddress(
-                jettonTransfer.sender?.address ?? jettonTransfer.sendersWallet
+              toShortValue(
+                formatAddress(
+                  jettonTransfer.sender?.address ??
+                    jettonTransfer.sendersWallet,
+                  wallet.network
+                )
               )}
           </SecondaryText>
           <SecondaryText>{date}</SecondaryText>
@@ -184,7 +195,7 @@ export const AuctionBidAction: FC<{
 }> = ({ action, date, openNft }) => {
   const { t } = useTranslation();
   const { auctionBid } = action;
-
+  const wallet = useWalletContext();
   const format = useFormatCoinValue();
 
   if (!auctionBid) {
@@ -205,7 +216,9 @@ export const AuctionBidAction: FC<{
         <SecondLine>
           <SecondaryText>
             {auctionBid.auctionType ??
-              toShortAddress(auctionBid.beneficiary.address)}
+              toShortValue(
+                formatAddress(auctionBid.beneficiary.address, wallet.network)
+              )}
           </SecondaryText>
           <SecondaryText>{date}</SecondaryText>
         </SecondLine>

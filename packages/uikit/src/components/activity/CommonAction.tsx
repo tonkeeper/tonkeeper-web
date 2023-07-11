@@ -1,11 +1,11 @@
 import React, { FC, PropsWithChildren } from 'react';
 import styled, { css } from 'styled-components';
+import { ListItemPayload } from '../../components/List';
+import { Body2, Label1 } from '../../components/Text';
 import {
   ActivityIcon,
   ReceiveIcon,
 } from '../../components/activity/ActivityIcons';
-import { ListItemPayload } from '../../components/List';
-import { Body2, Label1 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
 
 export const ListItemGrid = styled(ListItemPayload)`

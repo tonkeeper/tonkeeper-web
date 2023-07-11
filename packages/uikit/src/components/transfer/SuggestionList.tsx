@@ -2,14 +2,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   FavoriteSuggestion,
   LatestSuggestion,
-  Suggestion
+  Suggestion,
 } from '@tonkeeper/core/dist/entries/suggestion';
 import {
   deleteFavoriteSuggestion,
   getSuggestionsList,
-  hideSuggestions
+  hideSuggestions,
 } from '@tonkeeper/core/dist/service/suggestionService';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -24,7 +24,7 @@ import { SkeletonList } from '../Skeleton';
 import { Label1 } from '../Text';
 import {
   AddFavoriteNotification,
-  EditFavoriteNotification
+  EditFavoriteNotification,
 } from './FavoriteNotification';
 
 const Label = styled(Label1)`
@@ -87,6 +87,7 @@ const FavoriteItem: FC<{
   onEdit: (item: FavoriteSuggestion) => void;
 }> = ({ item, onSelect, onEdit }) => {
   const sdk = useAppSdk();
+  const wallet = useWalletContext();
 
   const { mutateAsync } = useDeleteFavorite(item);
   const { t } = useTranslation();
@@ -104,7 +105,7 @@ const FavoriteItem: FC<{
               </IconBlue>
             </>
           }
-          secondary={toShortAddress(item.address)}
+          secondary={toShortValue(formatAddress(item.address, wallet.network))}
         />
         <DropDown
           payload={(onClose) => (
@@ -180,12 +181,13 @@ const LatestItem: FC<{
 }> = ({ item, onSelect, onAddFavorite }) => {
   const { mutateAsync } = useHideSuggestion(item);
   const { t, i18n } = useTranslation();
+  const wallet = useWalletContext();
 
   return (
     <ListItem key={item.address} onClick={() => onSelect(item)}>
       <ListItemPayload>
         <ColumnText
-          text={toShortAddress(item.address)}
+          text={toShortValue(formatAddress(item.address, wallet.network))}
           secondary={getLatestDate(i18n.language, item.timestamp)}
         />
         <DropDown

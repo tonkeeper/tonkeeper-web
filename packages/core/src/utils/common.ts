@@ -1,4 +1,5 @@
 import { Address } from 'ton-core';
+import { Network } from '../entries/network';
 
 export const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -48,10 +49,6 @@ export function debounce<Args extends unknown[]>(
   return debounced;
 }
 
-export const toShortAddress = (address: string, length = 4): string => {
-  return toShortValue(Address.parse(address).toString(), length);
-};
-
 export const areEqAddresses = (address1: string, address2: string) => {
   try {
     return Address.parse(address1).equals(Address.parse(address2));
@@ -62,6 +59,12 @@ export const areEqAddresses = (address1: string, address2: string) => {
 
 export const toShortValue = (value: string, length = 4): string => {
   return value.slice(0, length) + '...' + value.slice(-length);
+};
+
+export const formatAddress = (value: string, network?: Network) => {
+  return Address.parse(value).toString({
+    testOnly: network == Network.TESTNET,
+  });
 };
 
 export function formatTransferUrl(options: {

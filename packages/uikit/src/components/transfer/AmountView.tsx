@@ -9,7 +9,7 @@ import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/je
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
-import { toShortAddress } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import {
   getDecimalSeparator,
   getNotDecimalSeparator,
@@ -38,8 +38,6 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
 import { ChevronLeftIcon } from '../Icon';
 import { Gap } from '../Layout';
 import {
@@ -48,6 +46,10 @@ import {
   NotificationTitleBlock,
 } from '../Notification';
 import { Body1, Body2, H3, Label2, Num2 } from '../Text';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
+import { AssetSelect } from './AssetSelect';
+import { InputSize, Sentence } from './Sentence';
 import { defaultSize, getInputSize, useButtonPosition } from './amountHooks';
 import {
   AmountState,
@@ -58,9 +60,7 @@ import {
   setAmountStateValue,
   toggleAmountState,
 } from './amountState';
-import { AssetSelect } from './AssetSelect';
 import { ButtonBlock, notifyError } from './common';
-import { InputSize, Sentence } from './Sentence';
 
 const Center = styled.div`
   text-align: center;
@@ -459,7 +459,7 @@ export const AmountView: FC<{
     setMax(false);
   };
 
-  const address = toShortAddress(recipient.toAccount.address.bounceable);
+  const address = toShortValue(recipient.toAccount.address.bounceable);
 
   return (
     <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>

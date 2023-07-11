@@ -5,7 +5,8 @@ import { getWalletsAddresses } from '@tonkeeper/core/dist/service/walletService'
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import {
   areEqAddresses,
-  toShortAddress,
+  formatAddress,
+  toShortValue,
 } from '@tonkeeper/core/dist/utils/common';
 import { isTMEDomain } from '@tonkeeper/core/dist/utils/nft';
 import BigNumber from 'bignumber.js';
@@ -203,7 +204,9 @@ const LinkNftUnlinked: FC<{
             </Label>
             <ColumnText
               right
-              text={toShortAddress(linkToAddress)}
+              text={toShortValue(
+                formatAddress(linkToAddress, walletState.network)
+              )}
               secondary={
                 <ReplaceButton
                   isDisabled={mutationRest.isLoading}
@@ -452,7 +455,10 @@ const LinkNftLinked: FC<{
         loading={isFeeLoading || isRecipientLoading || isLoading}
         onClick={onOpen}
       >
-        {t('linked_with').replace('%1%', toShortAddress(linkedAddress))}
+        {t('linked_with').replace(
+          '%1%',
+          toShortValue(formatAddress(linkedAddress, walletState.network))
+        )}
       </Button>
       {isLinkedWithAnotherWallet && !isLoading && (
         <WarnTextStyled>
