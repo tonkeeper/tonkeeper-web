@@ -17,7 +17,7 @@ export const getTonClient = (config: TonendpointConfig, current?: Network) => {
   return new Configuration({
     basePath:
       current === Network.MAINNET
-        ? 'https://dev.tonapi.io'
+        ? 'https://tonapi.io'
         : 'https://testnet.tonapi.io',
     headers: {
       Authorization: `Bearer ${config.tonApiKey}`,
