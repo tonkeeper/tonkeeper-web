@@ -1,0 +1,3 @@
+FROM openapitools/openapi-generator-cli
+
+CMD ["generate", "-i", "https://raw.githubusercontent.com/tonkeeper/gasless-tron-protocol/main/api/openapi.yml", "-g", "typescript-fetch", "-o", "/local/src/tronApi", "-p", "supportsES6=true,withInterfaces=true"]
