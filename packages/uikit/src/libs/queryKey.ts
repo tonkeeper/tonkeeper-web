@@ -15,6 +15,8 @@ export enum QueryKey {
   system = 'system',
   syncDate = 'syncDate',
   analytics = 'analytics',
+
+  tron = 'tron',
 }
 
 export enum JettonKey {

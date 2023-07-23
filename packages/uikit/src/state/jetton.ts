@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import {
   AccountEvents,
@@ -131,6 +132,20 @@ export const hideEmptyJettons = (jettons: JettonBalance[]) => {
   return jettons.filter((jetton) => {
     return jetton.balance != '0';
   });
+};
+
+export const filterTonAssetList = (
+  jettons?: JettonsBalances,
+  wallet?: WalletState
+) => {
+  if (!jettons) return { balances: [] };
+  const order = sortJettons(wallet?.orderJettons, jettons.balances);
+  const hide = hideJettons(wallet?.hiddenJettons, wallet?.shownJettons, order);
+  const notEmpty = hideEmptyJettons(hide);
+
+  return {
+    balances: notEmpty,
+  };
 };
 
 export const useUserJettonList = (jettons?: JettonsBalances) => {

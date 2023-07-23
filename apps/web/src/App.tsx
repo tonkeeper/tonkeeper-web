@@ -7,6 +7,7 @@ import {
 import {
   getTonClient,
   getTonClientV2,
+  getTronClient,
   Network,
 } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
@@ -260,6 +261,7 @@ export const Loader: FC = () => {
   const context = {
     tonApi: getTonClient(config, network),
     tonApiV2: getTonClientV2(config, network),
+    tronApi: getTronClient(network),
     auth,
     fiat,
     account,

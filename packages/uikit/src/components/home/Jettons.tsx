@@ -1,3 +1,4 @@
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import {
   AccountRepr,
@@ -5,6 +6,7 @@ import {
   JettonsBalances,
 } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
+import { TronBalances } from '@tonkeeper/core/dist/tronApi';
 import {
   formatDecimals,
   getJettonStockAmount,
@@ -21,47 +23,23 @@ import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { ToncoinIcon } from '../Icon';
 import { ListBlock, ListItem } from '../List';
-import { Body2, Label1, Label2 } from '../Text';
+import { ListItemPayload, TokenLayout } from './TokenLayout';
+import { TronAssets } from './TronAssets';
 
-export interface AssetProps {
-  stock: TonendpointStock;
+export interface TonAssetData {
   info: AccountRepr;
   jettons: JettonsBalances;
 }
 
-const Description = styled.div`
-  flex-grow: 1;
+export interface AssetData {
+  stock: TonendpointStock;
+  ton: TonAssetData;
+  tron: TronBalances;
+}
 
-  display: flex;
-  flex-direction: column;
-
-  white-space: nowrap;
-`;
-
-const FirstLine = styled.div`
-  display: grid;
-  grid-template-columns: auto 1fr 0fr;
-  gap: 0.25rem;
-  width: 100%;
-`;
-
-const CoinName = styled(Label1)`
-  text-overflow: ellipsis;
-  overflow: hidden;
-`;
-
-const SecondLine = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const Secondary = styled(Body2)`
-  color: ${(props) => props.theme.textSecondary};
-`;
-
-const Symbol = styled(Label1)`
-  color: ${(props) => props.theme.textSecondary};
-`;
+export interface AssetProps {
+  assets: AssetData;
+}
 
 const DeltaColor = styled.span<{ positive: boolean }>`
   margin-left: 0.5rem;
@@ -124,19 +102,17 @@ const TonAsset: FC<{
     <ListItem onClick={() => navigate(AppRoute.coins + '/ton')}>
       <ListItemPayload>
         <ToncoinIcon />
-        <Description>
-          <FirstLine>
-            <Label1>{t('Toncoin')}</Label1>
-            <Symbol>TON</Symbol>
-            <Label1>{balance}</Label1>
-          </FirstLine>
-          <SecondLine>
-            <Secondary>
+        <TokenLayout
+          name={t('Toncoin')}
+          symbol={CryptoCurrency.TON}
+          balance={balance}
+          secondary={
+            <>
               {fiatPrice} <Delta stock={stock} />
-            </Secondary>
-            <Secondary>{fiatAmount}</Secondary>
-          </SecondLine>
-        </Description>
+            </>
+          }
+          fiatAmount={fiatAmount}
+        />
       </ListItemPayload>
     </ListItem>
   );
@@ -148,17 +124,6 @@ const Logo = styled.img`
   border-radius: ${(props) => props.theme.cornerFull};
 
   pointer-events: none;
-`;
-
-const ListItemPayload = styled.div`
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1rem 1rem 0;
-  box-sizing: border-box;
-  gap: 1rem;
-  width: 100%;
 `;
 
 const JettonAsset: FC<{
@@ -193,52 +158,30 @@ const JettonAsset: FC<{
     >
       <ListItemPayload>
         <Logo src={jetton.metadata?.image} />
-
-        <Description>
-          <FirstLine>
-            <CoinName>{jetton.metadata?.name ?? t('Unknown_COIN')}</CoinName>
-            <Symbol>{jetton.metadata?.symbol}</Symbol>
-            <Label1>{formattedBalance}</Label1>
-          </FirstLine>
-          <SecondLine>
-            <Secondary>{price}</Secondary>
-            <Secondary>{total}</Secondary>
-          </SecondLine>
-        </Description>
+        <TokenLayout
+          name={jetton.metadata?.name ?? t('Unknown_COIN')}
+          symbol={jetton.metadata?.symbol}
+          balance={formattedBalance}
+          secondary={price}
+          fiatAmount={total}
+        />
       </ListItemPayload>
     </ListItem>
   );
 };
 
-const ButtonRow = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: -1rem;
-  margin-bottom: 1rem;
-`;
-
-const EditButton = styled(Label2)`
-  padding: 0.5rem 1rem;
-  box-sizing: border-box;
-  cursor: pointer;
-  border-radius: ${(props) => props.theme.cornerMedium};
-  color: ${(props) => props.theme.textPrimary};
-  background-color: ${(props) => props.theme.backgroundContent};
-  transition: background-color 0.1s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &:hover {
-    background-color: ${(props) => props.theme.backgroundContentTint};
-  }
-`;
-
-export const JettonList: FC<AssetProps> = ({ info, jettons, stock }) => {
+export const JettonList: FC<AssetProps> = ({
+  assets: {
+    stock,
+    ton: { info, jettons },
+    tron,
+  },
+}) => {
   return (
     <>
       <ListBlock noUserSelect>
         <TonAsset info={info} stock={stock} />
+        <TronAssets tokens={tron} stock={stock} />
       </ListBlock>
       <ListBlock noUserSelect>
         {jettons.balances.map((jetton) => (

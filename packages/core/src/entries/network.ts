@@ -1,6 +1,7 @@
 import { Configuration } from '../tonApiV1';
 import { Configuration as ConfigurationV2 } from '../tonApiV2';
 import { TonendpointConfig } from '../tonkeeperApi/tonendpoint';
+import { Configuration as TronConfiguration } from '../tronApi';
 
 export enum Network {
   MAINNET = -239,
@@ -37,5 +38,14 @@ export const getTonClientV2 = (
     headers: {
       Authorization: `Bearer ${config.tonApiV2Key}`,
     },
+  });
+};
+
+export const getTronClient = (current?: Network) => {
+  return new TronConfiguration({
+    basePath: 'http://localhost:5500',
+    // current === Network.MAINNET
+    //   ? 'https://tron.tonkeeper.com'
+    //   : 'https://testnet-tron.tonkeeper.com',
   });
 };

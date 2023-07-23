@@ -1,16 +1,10 @@
-import {
-  AccountRepr,
-  JettonsBalances,
-  NftItemsRepr,
-} from '@tonkeeper/core/dist/tonApiV1';
-import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
+import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
-import { NftsList } from '../nft/Nfts';
 import { Label1 } from '../Text';
-import { JettonList } from './Jettons';
-import {NFT} from "@tonkeeper/core/dist/entries/nft";
+import { NftsList } from '../nft/Nfts';
+import { AssetData, JettonList } from './Jettons';
 
 const TabsBlock = styled.div`
   display: flex;
@@ -99,19 +93,15 @@ const Tabs: FC<{ tab: HomeTabs; onTab: (value: HomeTabs) => void }> = ({
   );
 };
 export const TabsView: FC<{
-  stock: TonendpointStock;
-  jettons: JettonsBalances;
-  info: AccountRepr;
+  assets: AssetData;
   nfts: NFT[];
-}> = ({ stock, jettons, info, nfts }) => {
+}> = ({ assets, nfts }) => {
   const [tab, setTab] = useState<HomeTabs>(HomeTabs.Tokens);
 
   return (
     <>
       <Tabs tab={tab} onTab={setTab} />
-      {tab === HomeTabs.Tokens && (
-        <JettonList info={info} jettons={jettons} stock={stock} />
-      )}
+      {tab === HomeTabs.Tokens && <JettonList assets={assets} />}
       {tab === HomeTabs.Collectibles && <NftsList nfts={nfts} />}
     </>
   );

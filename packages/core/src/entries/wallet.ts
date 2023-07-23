@@ -62,4 +62,11 @@ export interface WalletState {
   theme?: string;
 
   proxy?: WalletProxy;
+
+  tron?: TronWalletState;
+}
+
+export interface TronWalletState {
+  ownerWalletAddress: string;
+  walletAddress: string;
 }
