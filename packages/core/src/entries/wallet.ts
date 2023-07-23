@@ -63,10 +63,16 @@ export interface WalletState {
 
   proxy?: WalletProxy;
 
-  tron?: TronWalletState;
+  tron?: TronWalletStorage;
+}
+
+export interface TronWalletStorage {
+  ownerWalletAddress: string;
+  walletByChain: Record<string, string>;
 }
 
 export interface TronWalletState {
   ownerWalletAddress: string;
+  chainId: string;
   walletAddress: string;
 }

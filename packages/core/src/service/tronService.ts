@@ -1,6 +1,11 @@
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../Storage';
-import { TronWalletState, WalletState } from '../entries/wallet';
+import { Network } from '../entries/network';
+import {
+  TronWalletState,
+  TronWalletStorage,
+  WalletState,
+} from '../entries/wallet';
 import { Configuration, TronApi } from '../tronApi';
 import { getWalletMnemonic } from './mnemonicService';
 import { setWalletState } from './wallet/storeService';
@@ -24,17 +29,21 @@ const getOwnerAddress = async (mnemonic: string[]): Promise<string> => {
 
 const getTronWallet = async (
   tronApi: Configuration,
-  mnemonic: string[]
-): Promise<TronWalletState> => {
+  mnemonic: string[],
+  wallet: WalletState
+): Promise<TronWalletStorage> => {
   const ownerWalletAddress = await getOwnerAddress(mnemonic);
 
-  const wallet = await new TronApi(tronApi).getWallet({
+  const tronWallet = await new TronApi(tronApi).getWallet({
     ownerAddress: ownerWalletAddress,
   });
 
   return {
     ownerWalletAddress,
-    walletAddress: wallet.address,
+    walletByChain: {
+      ...(wallet.tron?.walletByChain ?? {}),
+      [tronWallet.chainId]: tronWallet.address,
+    },
   };
 };
 
@@ -43,14 +52,40 @@ export const importTronWallet = async (
   tronApi: Configuration,
   wallet: WalletState,
   password: string
-): Promise<TronWalletState> => {
+): Promise<TronWalletStorage> => {
   const mnemonic = await getWalletMnemonic(storage, wallet.publicKey, password);
 
-  const tron = await getTronWallet(tronApi, mnemonic);
+  const tron = await getTronWallet(tronApi, mnemonic, wallet);
 
   const updated = { ...wallet, tron };
 
   await setWalletState(storage, updated);
 
   return tron;
+};
+
+export const getTronWalletState = async (
+  tronApi: Configuration,
+  tron: TronWalletStorage,
+  network?: Network
+): Promise<TronWalletState> => {
+  const chainId = network === Network.MAINNET ? '0x2b6653dc' : '0xcd8690dc';
+
+  if (tron.walletByChain[chainId]) {
+    return {
+      ownerWalletAddress: tron.ownerWalletAddress,
+      chainId: chainId,
+      walletAddress: tron.walletByChain[chainId],
+    };
+  }
+
+  const tronWallet = await new TronApi(tronApi).getWallet({
+    ownerAddress: tron.ownerWalletAddress,
+  });
+
+  return {
+    ownerWalletAddress: tron.ownerWalletAddress,
+    chainId: tronWallet.chainId,
+    walletAddress: tronWallet.address,
+  };
 };

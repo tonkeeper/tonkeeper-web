@@ -4,30 +4,51 @@ import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { InnerBody } from '../../components/Body';
 import { CoinSkeletonPage } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
+import { ActionsRow } from '../../components/home/Actions';
+import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
-import { useWalletContext } from '../../hooks/appContext';
+import { SendAction } from '../../components/transfer/SendNotifications';
+import { useFormatCoinValue } from '../../hooks/balance';
 import { AppRoute } from '../../libs/routes';
-import { useTronStateMigration } from '../../state/tron';
+import { useTronBalance, useTronWalletState } from '../../state/tron';
 
 const TronAsset: FC<{ tron: TronWalletState }> = ({ tron }) => {
   const { address } = useParams();
+  const navigate = useNavigate();
+  const { data: balance, isLoading, isError } = useTronBalance(tron, address);
+  const format = useFormatCoinValue();
+  useEffect(() => {
+    if (isError) {
+      navigate(AppRoute.home);
+    }
+  }, [isError]);
 
   console.log(tron);
 
   const ref = useRef<HTMLDivElement>(null);
 
+  if (isLoading || !balance) {
+    return <CoinSkeletonPage />;
+  }
+
+  const { token, weiAmount } = balance;
+
   return (
     <>
-      <SubHeader title={address} />
+      <SubHeader title={token.name} />
       <InnerBody ref={ref}>
         <CoinInfo
-          amount={'0'}
-          symbol="TON"
-          price={'0'}
-          image="/img/toncoin.svg"
+          amount={format(weiAmount, token.decimals)}
+          symbol={token.symbol}
+          //   price={'0'}
+          image={token.image}
         />
-        {/* <HomeActions />
-      
+        <ActionsRow>
+          <SendAction asset="TON" />
+          <ReceiveAction />
+        </ActionsRow>
+
+        {/* 
               {!isFetched ? (
                 <CoinHistorySkeleton />
               ) : (
@@ -41,28 +62,23 @@ const TronAsset: FC<{ tron: TronWalletState }> = ({ tron }) => {
   );
 };
 
-const MigrateState = () => {
-  const { mutateAsync } = useTronStateMigration();
+export const TronPage = () => {
   const navigate = useNavigate();
+  const { data: state, isLoading, isError } = useTronWalletState();
 
   useEffect(() => {
-    mutateAsync().catch(() => {
+    if (isError) {
       navigate(AppRoute.home);
-    });
-  });
+    }
+  }, [isError]);
 
-  return <CoinSkeletonPage />;
-};
-
-export const TronPage = () => {
-  const wallet = useWalletContext();
-  if (wallet.tron) {
-    return (
-      <Routes>
-        <Route path=":address" element={<TronAsset tron={wallet.tron} />} />
-      </Routes>
-    );
-  } else {
-    return <MigrateState />;
+  if (isLoading || !state) {
+    return <CoinSkeletonPage />;
   }
+
+  return (
+    <Routes>
+      <Route path=":address" element={<TronAsset tron={state} />} />
+    </Routes>
+  );
 };
