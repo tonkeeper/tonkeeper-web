@@ -1,7 +1,25 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { importTronWallet } from '@tonkeeper/core/dist/service/tronService';
 import { TronApi, TronBalances } from '@tonkeeper/core/dist/tronApi';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
+import { getWalletPassword } from './password';
+
+export const useTronStateMigration = () => {
+  const sdk = useAppSdk();
+  const { tronApi } = useAppContext();
+  const wallet = useWalletContext();
+
+  const query = useQueryClient();
+
+  return useMutation(async () => {
+    const password = await getWalletPassword(sdk, 'confirm');
+    const tron = await importTronWallet(sdk.storage, tronApi, wallet, password);
+    console.log(tron);
+    await query.cancelQueries();
+  });
+};
 
 export const useTronBalances = () => {
   const { tronApi } = useAppContext();

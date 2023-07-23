@@ -16,7 +16,7 @@ import {
   putWalletBackup,
 } from './backupService';
 import { encrypt } from './cryptoService';
-import { getWalletMnemonic } from './menmonicService';
+import { getWalletMnemonic } from './mnemonicService';
 import { createWalletVoucher } from './voucherService';
 import { walletContract } from './wallet/contractService';
 import { setWalletState } from './wallet/storeService';

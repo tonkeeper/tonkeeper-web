@@ -349,7 +349,7 @@ export const Content: FC<{
           />
           <Route path={AppRoute.coins}>
             <Route
-              path=":name"
+              path=":name/*"
               element={
                 <Suspense fallback={<CoinSkeletonPage />}>
                   <Coin />

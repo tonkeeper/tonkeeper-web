@@ -1,16 +1,17 @@
 import BigNumber from 'bignumber.js';
 import { Address, beginCell, Cell, comment, toNano } from 'ton-core';
-import {mnemonicToPrivateKey, sha256_sync} from 'ton-crypto';
+import { mnemonicToPrivateKey } from 'ton-crypto';
 import { RecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
 import { Configuration, Fee, NftItemRepr, SendApi } from '../../tonApiV1';
-import { getWalletMnemonic } from '../menmonicService';
+import { getWalletMnemonic } from '../mnemonicService';
 import {
   checkServiceTimeOrDie,
   checkWalletBalanceOrDie,
   checkWalletPositiveBalanceOrDie,
-  createTransferMessage, getKeyPairAndSeqno,
+  createTransferMessage,
+  getKeyPairAndSeqno,
   getWalletBalance,
 } from './common';
 
@@ -45,19 +46,25 @@ const nftRenewBody = (params?: { queryId?: number }) => {
     .endCell();
 };
 
-const nftLinkBody = (params: { queryId?: number, linkToAddress: string }) => {
-  const addressToDNSAddressFormat = (address: string) => beginCell()
-        .storeUint(0x9fd3, 16)
-        .storeAddress(Address.parse(address))
-        .storeUint(0, 8);
+const nftLinkBody = (params: { queryId?: number; linkToAddress: string }) => {
+  const addressToDNSAddressFormat = (address: string) =>
+    beginCell()
+      .storeUint(0x9fd3, 16)
+      .storeAddress(Address.parse(address))
+      .storeUint(0, 8);
 
   let cell = beginCell()
-      .storeUint(0x4eb1f0f9, 32) // op::change_dns_record,
-      .storeUint(params?.queryId || 0, 64)
-      .storeUint(BigInt('0xe8d44050873dba865aa7c170ab4cce64d90839a34dcfd6cf71d14e0205443b1b'), 256) // DNS_CATEGORY_WALLET
+    .storeUint(0x4eb1f0f9, 32) // op::change_dns_record,
+    .storeUint(params?.queryId || 0, 64)
+    .storeUint(
+      BigInt(
+        '0xe8d44050873dba865aa7c170ab4cce64d90839a34dcfd6cf71d14e0205443b1b'
+      ),
+      256
+    ); // DNS_CATEGORY_WALLET
 
   if (params.linkToAddress) {
-      cell = cell.storeRef(addressToDNSAddressFormat(params.linkToAddress));
+    cell = cell.storeRef(addressToDNSAddressFormat(params.linkToAddress));
   }
 
   return cell.endCell();
@@ -232,12 +239,12 @@ export const sendNftLink = async (options: {
   const body = nftLinkBody(options);
 
   const cell = createTransferMessage(
-      {
-        seqno,
-        state: options.walletState,
-        secretKey: keyPair.secretKey,
-      },
-      { to: options.nftAddress, value: options.amount, body }
+    {
+      seqno,
+      state: options.walletState,
+      secretKey: keyPair.secretKey,
+    },
+    { to: options.nftAddress, value: options.amount, body }
   );
 
   await new SendApi(options.tonApi).sendBoc({
@@ -254,20 +261,20 @@ export const estimateNftLink = async (options: {
 }) => {
   await checkServiceTimeOrDie(options.tonApi);
   const [wallet, seqno] = await getWalletBalance(
-      options.tonApi,
-      options.walletState
+    options.tonApi,
+    options.walletState
   );
   checkWalletPositiveBalanceOrDie(wallet);
 
   const body = nftLinkBody(options);
 
   const cell = createTransferMessage(
-      {
-        seqno,
-        state: options.walletState,
-        secretKey: Buffer.alloc(64),
-      },
-      { to: options.nftAddress, value: options.amount, body }
+    {
+      seqno,
+      state: options.walletState,
+      secretKey: Buffer.alloc(64),
+    },
+    { to: options.nftAddress, value: options.amount, body }
   );
 
   return cell.toString('base64');

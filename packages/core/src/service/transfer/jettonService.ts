@@ -6,7 +6,7 @@ import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
 import { Configuration, Fee, JettonBalance, SendApi } from '../../tonApiV1';
 import { DefaultDecimals } from '../../utils/send';
-import { getWalletMnemonic } from '../menmonicService';
+import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
   checkServiceTimeOrDie,

@@ -58,7 +58,7 @@ const Home = () => {
       ton: { info, jettons: filterTonAssetList(jettons, wallet) },
       tron: tronBalances,
     };
-  }, [info, jettons, stock, wallet]);
+  }, [info, jettons, stock, wallet, tronBalances]);
 
   if (!nfts || !assets) {
     return <HomeSkeleton />;

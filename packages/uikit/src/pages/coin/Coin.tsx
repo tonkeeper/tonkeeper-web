@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { JettonContent } from './Jetton';
 import { TonPage } from './Ton';
+import { TronPage } from './Tron';
 
 const CoinPage = () => {
   const navigate = useNavigate();
@@ -16,7 +17,11 @@ const CoinPage = () => {
 
   if (!name) return <></>;
 
-  if (name === 'ton') {
+  console.log(name);
+
+  if (name === 'tron') {
+    return <TronPage />;
+  } else if (name === 'ton') {
     return <TonPage />;
   } else {
     return <JettonContent jettonAddress={decodeURIComponent(name)} />;

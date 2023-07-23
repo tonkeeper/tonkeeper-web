@@ -23,7 +23,7 @@ import {
   TonProofItemReplySuccess,
 } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
-import { getWalletMnemonic } from '../menmonicService';
+import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import { getCurrentWallet } from '../wallet/storeService';
 import {

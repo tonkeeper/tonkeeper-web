@@ -4,7 +4,7 @@ import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { Configuration } from '../tonApiV1';
 import { encrypt } from './cryptoService';
-import { getWalletMnemonic, validateWalletMnemonic } from './menmonicService';
+import { getWalletMnemonic, validateWalletMnemonic } from './mnemonicService';
 import { importWallet } from './walletService';
 
 export const getAccountState = async (storage: IStorage) => {

@@ -4,9 +4,11 @@ import {
   TronBalances,
   TronToken,
 } from '@tonkeeper/core/dist/tronApi';
-import React, { FC } from 'react';
+import { getTonCoinStockPrice } from '@tonkeeper/core/dist/utils/balance';
+import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
+import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { ListItem } from '../List';
@@ -19,12 +21,12 @@ const TronToken: FC<{
   const { t } = useTranslation();
   const { fiat } = useAppContext();
   const navigate = useNavigate();
-  // const price = useMemo(() => {
-  //   return getTonCoinStockPrice(stock.today, fiat);
-  // }, [stock]);
+  const price = useMemo(() => {
+    return getTonCoinStockPrice(stock.today, fiat);
+  }, [stock]);
 
-  // const format = useFormatCoinValue();
-  // const balance = format(info.balance);
+  const format = useFormatCoinValue();
+  const balance = format(weiAmount, token.decimals);
 
   // const [fiatPrice, fiatAmount] = useMemo(() => {
   //   return [
@@ -45,7 +47,7 @@ const TronToken: FC<{
         <TokenLayout
           name={token.name}
           symbol={token.symbol}
-          balance={weiAmount}
+          balance={balance}
           secondary={null}
           fiatAmount={undefined}
         />

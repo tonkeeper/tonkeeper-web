@@ -10,21 +10,22 @@ import {
   toNano,
 } from 'ton-core';
 
+import { mnemonicToPrivateKey } from 'ton-crypto';
 import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
 import { WalletState } from '../../entries/wallet';
+import { IStorage } from '../../Storage';
 import {
   AccountApi,
   AccountRepr,
-  Configuration, Fee,
+  Configuration,
+  Fee,
   SystemApi,
   WalletApi,
 } from '../../tonApiV1';
+import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
-import {getWalletMnemonic} from "../menmonicService";
-import {mnemonicToPrivateKey} from "ton-crypto";
-import {IStorage} from "../../Storage";
 
 export enum SendMode {
   CARRY_ALL_REMAINING_BALANCE = 128,
@@ -174,17 +175,17 @@ export async function getKeyPairAndSeqno(options: {
 }) {
   await checkServiceTimeOrDie(options.tonApi);
   const mnemonic = await getWalletMnemonic(
-      options.storage,
-      options.walletState.publicKey,
-      options.password
+    options.storage,
+    options.walletState.publicKey,
+    options.password
   );
   const keyPair = await mnemonicToPrivateKey(mnemonic);
 
   const total = options.amount.plus(options.fee.total);
 
   const [wallet, seqno] = await getWalletBalance(
-      options.tonApi,
-      options.walletState
+    options.tonApi,
+    options.walletState
   );
   checkWalletBalanceOrDie(total, wallet);
   return { seqno, keyPair };
@@ -199,17 +200,17 @@ export async function getKeySeqno(options: {
   amount: BigNumber;
 }) {
   const mnemonic = await getWalletMnemonic(
-      options.storage,
-      options.walletState.publicKey,
-      options.password
+    options.storage,
+    options.walletState.publicKey,
+    options.password
   );
   const keyPair = await mnemonicToPrivateKey(mnemonic);
 
   const total = options.amount.plus(options.fee.total);
 
   const [wallet, seqno] = await getWalletBalance(
-      options.tonApi,
-      options.walletState
+    options.tonApi,
+    options.walletState
   );
   checkWalletBalanceOrDie(total, wallet);
   return { seqno, keyPair };
