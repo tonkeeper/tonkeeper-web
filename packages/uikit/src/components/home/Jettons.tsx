@@ -236,11 +236,19 @@ const EditButton = styled(Label2)`
 
 export const JettonList: FC<AssetProps> = ({ info, jettons, stock }) => {
   return (
-    <ListBlock noUserSelect>
-      <TonAsset info={info} stock={stock} />
-      {jettons.balances.map((jetton) => (
-        <JettonAsset key={jetton.jettonAddress} jetton={jetton} stock={stock} />
-      ))}
-    </ListBlock>
+    <>
+      <ListBlock noUserSelect>
+        <TonAsset info={info} stock={stock} />
+      </ListBlock>
+      <ListBlock noUserSelect>
+        {jettons.balances.map((jetton) => (
+          <JettonAsset
+            key={jetton.jettonAddress}
+            jetton={jetton}
+            stock={stock}
+          />
+        ))}
+      </ListBlock>
+    </>
   );
 };
