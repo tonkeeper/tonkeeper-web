@@ -5,15 +5,17 @@
   "description": "Core features and state for tonkeeper web wallet",
   "main": "index.js",
   "scripts": {
-    "build": "rm -fr dist && yarn generate:sdkV1 && yarn generate:sdkV2 && yarn generate:tronApi && tsc",
+    "build": "rm -fr dist && yarn sdk && tsc",
     "start": "tsc -w",
-    "generate:sdkV1": "rm -fr src/tonApiV1 && docker build -f resource/Dockerfile.apiV1 . -t tonapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdk",
-    "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f resource/Dockerfile.apiV2 . -t tonapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdk",
+    "sdk": "npm-run-all -p generate:* --aggregate-output",
+    "generate:sdkV1": "rm -fr src/tonApiV1 && docker build -f resource/Dockerfile.apiV1 . -t tonapisdkv1 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv1",
+    "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f resource/Dockerfile.apiV2 . -t tonapisdkv2 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv2",
     "generate:tronApi": "rm -fr src/tronApi && docker build -f resource/Dockerfile.tronApi . -t tronapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tronapisdk",
     "build:pkg": "yarn build"
   },
   "license": "ISC",
   "devDependencies": {
+    "npm-run-all": "^4.1.5",
     "typescript": "^4.9.4"
   },
   "dependencies": {
