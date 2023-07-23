@@ -23,7 +23,7 @@ import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { ToncoinIcon } from '../Icon';
 import { ListBlock, ListItem } from '../List';
-import { ListItemPayload, TokenLayout } from './TokenLayout';
+import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 import { TronAssets } from './TronAssets';
 
 export interface TonAssetData {
@@ -118,14 +118,6 @@ const TonAsset: FC<{
   );
 };
 
-const Logo = styled.img`
-  width: 44px;
-  height: 44px;
-  border-radius: ${(props) => props.theme.cornerFull};
-
-  pointer-events: none;
-`;
-
 const JettonAsset: FC<{
   jetton: JettonBalance;
   stock: TonendpointStock;
@@ -157,7 +149,7 @@ const JettonAsset: FC<{
       }
     >
       <ListItemPayload>
-        <Logo src={jetton.metadata?.image} />
+        <TokenLogo src={jetton.metadata?.image} />
         <TokenLayout
           name={jetton.metadata?.name ?? t('Unknown_COIN')}
           symbol={jetton.metadata?.symbol}

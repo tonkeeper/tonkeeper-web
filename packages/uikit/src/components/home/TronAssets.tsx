@@ -9,9 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
-import { ToncoinIcon } from '../Icon';
 import { ListItem } from '../List';
-import { ListItemPayload, TokenLayout } from './TokenLayout';
+import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 
 const TronToken: FC<{
   balance: TronBalance;
@@ -42,7 +41,7 @@ const TronToken: FC<{
       onClick={() => navigate(AppRoute.coins + '/tron/' + token.address)}
     >
       <ListItemPayload>
-        <ToncoinIcon />
+        <TokenLogo src={token.image} />
         <TokenLayout
           name={token.name}
           symbol={token.symbol}

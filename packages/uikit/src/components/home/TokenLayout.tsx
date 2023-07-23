@@ -13,6 +13,14 @@ export const ListItemPayload = styled.div`
   width: 100%;
 `;
 
+export const TokenLogo = styled.img`
+  width: 44px;
+  height: 44px;
+  border-radius: ${(props) => props.theme.cornerFull};
+
+  pointer-events: none;
+`;
+
 const Description = styled.div`
   flex-grow: 1;
 
