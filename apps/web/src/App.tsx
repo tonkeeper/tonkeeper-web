@@ -162,7 +162,7 @@ const useLock = () => {
   const [lock, setLock] = useState<boolean | undefined>(undefined);
   useEffect(() => {
     sdk.storage
-      .get<boolean>(AppKey.lock)
+      .get<boolean>(AppKey.LOCK)
       .then((useLock) => setLock(useLock === true));
 
     const unlock = () => {

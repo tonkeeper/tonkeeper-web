@@ -104,8 +104,8 @@ const Splash = styled.div`
 const Content = styled.div<{ standalone: boolean }>`
   width: 100%;
   background-color: ${(props) => props.theme.backgroundPage};
-  border-top-right-radius: ${(props) => props.theme.cornerMedium};
-  border-top-left-radius: ${(props) => props.theme.cornerMedium};
+  border-top-right-radius: ${(props) => props.THEME.cornerMedium};
+  border-top-left-radius: ${(props) => props.THEME.cornerMedium};
   padding: 1rem;
   flex-shrink: 0;
   box-sizing: border-box;

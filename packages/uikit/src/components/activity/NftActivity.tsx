@@ -35,7 +35,7 @@ import {
 
 const NftBlock = styled.div`
   background: ${(props) => props.theme.backgroundContentTint};
-  border-radius: ${(props) => props.theme.cornerExtraSmall};
+  border-radius: ${(props) => props.THEME.cornerExtraSmall};
   overflow: hidden;
   display: inline-flex;
   cursor: pointer;

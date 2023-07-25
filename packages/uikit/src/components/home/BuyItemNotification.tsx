@@ -65,7 +65,7 @@ const ItemPayload = styled(ListItemPayload)`
   transition: color 0.1s ease;
 
   &:hover ${Icon} {
-    color: ${(props) => props.theme.iconPrimary};
+    color: ${(props) => props.THEME.iconPrimary};
   }
 `;
 
@@ -94,7 +94,7 @@ export const DisclaimerBlock = styled.div`
   width: 100%;
 
   background: ${(props) => props.theme.backgroundContent};
-  border-radius: ${(props) => props.theme.cornerSmall};
+  border-radius: ${(props) => props.THEME.cornerSmall};
 `;
 
 const DisclaimerText = styled(Body1)`
@@ -108,7 +108,7 @@ const DisclaimerLink = styled(Body1)`
   transition: color 0.1s ease;
 
   &:hover {
-    color: ${(props) => props.theme.textPrimary};
+    color: ${(props) => props.THEME.textPrimary};
   }
 `;
 

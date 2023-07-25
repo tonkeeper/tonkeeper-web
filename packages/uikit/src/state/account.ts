@@ -37,7 +37,7 @@ export const useMutateAccountState = () => {
   const storage = useStorage();
   const client = useQueryClient();
   return useMutation<void, Error, AccountState>(async (state) => {
-    await storage.set(AppKey.account, state);
+    await storage.set(AppKey.ACCOUNT, state);
     await client.invalidateQueries([QueryKey.account]);
   });
 };

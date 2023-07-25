@@ -49,7 +49,7 @@ const ButtonBlockElement = styled.div<{ standalone: boolean }>`
           `}
     height: calc(100% + 2rem);
     z-index: -1;
-    background: ${(props) => props.theme.gradientBackgroundBottom};
+    background: ${(props) => props.THEME.gradientBackgroundBottom};
   }
 
   ${(props) =>

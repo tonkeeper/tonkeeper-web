@@ -36,7 +36,7 @@ export const NftBlock = styled.div<{
   background-color: ${(props) => props.theme.backgroundContent};
   transition: background-color 0.1s ease;
 
-  border-radius: ${(props) => props.theme.cornerSmall};
+  border-radius: ${(props) => props.THEME.cornerSmall};
 
   overflow: hidden;
 
@@ -44,7 +44,7 @@ export const NftBlock = styled.div<{
     if (props.ios) {
       if (props.isHover) {
         return css`
-          background-color: ${props.theme.backgroundContentTint};
+          background-color: ${props.THEME.backgroundContentTint};
         `;
       }
     } else {
@@ -55,7 +55,7 @@ export const NftBlock = styled.div<{
           cursor: pointer;
 
           &:hover {
-            background-color: ${props.theme.backgroundContentTint};
+            background-color: ${props.THEME.backgroundContentTint};
           }
         `;
       }

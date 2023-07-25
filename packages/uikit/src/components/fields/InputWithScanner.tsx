@@ -26,7 +26,7 @@ const ClearBlock = styled.div`
   color: ${(props) => props.theme.textSecondary};
 
   &:hover {
-    color: ${(props) => props.theme.textTertiary};
+    color: ${(props) => props.THEME.textTertiary};
   }
 `;
 

@@ -34,11 +34,11 @@ const Button = styled(Label1)`
   padding: 12px 20px;
   background-color: ${(props) => props.theme.backgroundContent};
   transition: background-color 0.1s ease;
-  border-radius: ${(props) => props.theme.cornerLarge};
+  border-radius: ${(props) => props.THEME.cornerLarge};
   cursor: pointer;
 
   &:hover {
-    background-color: ${(props) => props.theme.backgroundContentTint};
+    background-color: ${(props) => props.THEME.backgroundContentTint};
   }
 `;
 

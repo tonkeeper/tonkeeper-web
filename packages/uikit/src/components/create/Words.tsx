@@ -72,15 +72,15 @@ const LogoutButtonBlock = styled.div`
   cursor: pointer;
   padding: 6px 12px;
   border-radius: ${(props) => props.theme.cornerMedium};
-  color: ${(props) => props.theme.textPrimary};
-  background-color: ${(props) => props.theme.backgroundContent};
+  color: ${(props) => props.THEME.textPrimary};
+  background-color: ${(props) => props.THEME.backgroundContent};
   transition: background-color 0.1s ease;
   display: flex;
   justify-content: center;
   align-items: center;
 
   &:hover {
-    background-color: ${(props) => props.theme.backgroundContentTint};
+    background-color: ${(props) => props.THEME.backgroundContentTint};
   }
 `;
 
@@ -174,32 +174,32 @@ const InputBlock = styled.label<{
     if (props.submitted) {
       return !props.valid
         ? css`
-            border: 1px solid ${props.theme.fieldErrorBorder};
-            background: ${props.theme.fieldErrorBackground};
+            border: 1px solid ${props.THEME.fieldErrorBorder};
+            background: ${props.THEME.fieldErrorBackground};
           `
         : props.active
         ? css`
-            border: 1px solid ${props.theme.fieldActiveBorder};
-            background: ${props.theme.fieldBackground};
+            border: 1px solid ${props.THEME.fieldActiveBorder};
+            background: ${props.THEME.fieldBackground};
           `
         : css`
-            border: 1px solid ${props.theme.fieldBackground};
-            background: ${props.theme.fieldBackground};
+            border: 1px solid ${props.THEME.fieldBackground};
+            background: ${props.THEME.fieldBackground};
           `;
     } else {
       return props.active
         ? css`
-            border: 1px solid ${props.theme.fieldActiveBorder};
-            background: ${props.theme.fieldBackground};
+            border: 1px solid ${props.THEME.fieldActiveBorder};
+            background: ${props.THEME.fieldBackground};
           `
         : !props.valid
         ? css`
-            border: 1px solid ${props.theme.fieldErrorBorder};
-            background: ${props.theme.fieldErrorBackground};
+            border: 1px solid ${props.THEME.fieldErrorBorder};
+            background: ${props.THEME.fieldErrorBackground};
           `
         : css`
-            border: 1px solid ${props.theme.fieldBackground};
-            background: ${props.theme.fieldBackground};
+            border: 1px solid ${props.THEME.fieldBackground};
+            background: ${props.THEME.fieldBackground};
           `;
     }
   }}

@@ -47,7 +47,7 @@ const useConnectMutation = (
         result.push(toTonAddressItemReply(wallet));
       }
       if (item.name === 'ton_proof') {
-        const auth = await sdk.storage.get<AuthState>(AppKey.password);
+        const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
         if (!auth) {
           throw new Error('Missing Auth');
         }

@@ -85,7 +85,7 @@ const AmountBlock = styled.label`
   position: relative;
   width: 100%;
   border-radius: ${(props) => props.theme.cornerSmall};
-  background: ${(props) => props.theme.backgroundContent};
+  background: ${(props) => props.THEME.backgroundContent};
 `;
 
 const MaxRow = styled.div`
@@ -103,15 +103,15 @@ const MaxButton = styled(Label2)<{ maxValue: boolean }>`
   border-radius: ${(props) => props.theme.cornerMedium};
   background-color: ${(props) =>
     props.maxValue
-      ? props.theme.buttonPrimaryBackground
-      : props.theme.backgroundContent};
+      ? props.THEME.buttonPrimaryBackground
+      : props.THEME.backgroundContent};
   transition: background-color 0.1s ease;
 
   &:hover {
     background-color: ${(props) =>
       props.maxValue
-        ? props.theme.buttonPrimaryBackgroundHighlighted
-        : props.theme.backgroundContentTint};
+        ? props.THEME.buttonPrimaryBackgroundHighlighted
+        : props.THEME.backgroundContentTint};
   }
 `;
 
@@ -153,8 +153,8 @@ const FiatBlock = styled(Body1)`
   padding: 8px 16px;
 
   color: ${(props) => props.theme.textSecondary};
-  border: 1px solid ${(props) => props.theme.buttonTertiaryBackground};
-  border-radius: ${(props) => props.theme.cornerLarge};
+  border: 1px solid ${(props) => props.THEME.buttonTertiaryBackground};
+  border-radius: ${(props) => props.THEME.cornerLarge};
 
   max-width: 80%;
   overflow: hidden;

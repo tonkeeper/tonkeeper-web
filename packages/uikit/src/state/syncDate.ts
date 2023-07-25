@@ -27,7 +27,7 @@ export const cleanSyncDateBanner = async (
   client: QueryClient,
   sdk: IAppSdk
 ) => {
-  await removeCachedStoreValue(sdk, AppKey.syncDate);
+  await removeCachedStoreValue(sdk, AppKey.SYNC_DATE);
   await client.invalidateQueries([QueryKey.system]);
   await client.invalidateQueries([QueryKey.syncDate]);
 };
@@ -35,7 +35,7 @@ export const cleanSyncDateBanner = async (
 export const useSyncDateBanner = () => {
   const sdk = useAppSdk();
   return useQuery([QueryKey.syncDate], async () => {
-    const showBanner = await getCachedStoreValue<boolean>(sdk, AppKey.syncDate);
+    const showBanner = await getCachedStoreValue<boolean>(sdk, AppKey.SYNC_DATE);
     return showBanner === null ? true : showBanner;
   });
 };
@@ -48,7 +48,7 @@ export const useMutateSyncDateBanner = () => {
   return useMutation<void, Error, boolean>(async (value) => {
     await setCachedStoreValue(
       sdk,
-      AppKey.syncDate,
+      AppKey.SYNC_DATE,
       value,
       Date.now() + oneWeek
     );

@@ -10,14 +10,14 @@ export const ButtonMock = styled.div`
 
 export const BackButton = styled(ButtonMock)`
   border-radius: ${(props) => props.theme.cornerFull};
-  color: ${(props) => props.theme.textPrimary};
-  background-color: ${(props) => props.theme.backgroundContent};
+  color: ${(props) => props.THEME.textPrimary};
+  background-color: ${(props) => props.THEME.backgroundContent};
   transition: background-color 0.1s ease;
   display: flex;
   justify-content: center;
   align-items: center;
 
   &:hover {
-    background-color: ${(props) => props.theme.backgroundContentTint};
+    background-color: ${(props) => props.THEME.backgroundContentTint};
   }
 `;

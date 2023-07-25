@@ -38,21 +38,21 @@ export const InputBlock = styled.div<{
   ${(props) =>
     !props.valid
       ? css`
-          border: 1px solid ${props.theme.fieldErrorBorder};
-          background: ${props.theme.fieldErrorBackground};
+          border: 1px solid ${props.THEME.fieldErrorBorder};
+          background: ${props.THEME.fieldErrorBackground};
 
           &:focus-within label {
-            color: ${(props) => props.theme.fieldErrorBorder};
+            color: ${(props) => props.THEME.fieldErrorBorder};
           }
         `
       : props.focus
       ? css`
-          border: 1px solid ${props.theme.fieldActiveBorder};
-          background: ${props.theme.fieldBackground};
+          border: 1px solid ${props.THEME.fieldActiveBorder};
+          background: ${props.THEME.fieldBackground};
         `
       : css`
-          border: 1px solid ${props.theme.fieldBackground};
-          background: ${props.theme.fieldBackground};
+          border: 1px solid ${props.THEME.fieldBackground};
+          background: ${props.THEME.fieldBackground};
         `}
 `;
 
@@ -120,7 +120,7 @@ const ClearBlock = styled.div`
   color: ${(props) => props.theme.textSecondary};
 
   &:hover {
-    color: ${(props) => props.theme.textTertiary};
+    color: ${(props) => props.THEME.textTertiary};
   }
 `;
 

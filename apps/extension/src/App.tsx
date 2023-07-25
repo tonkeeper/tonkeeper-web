@@ -196,7 +196,7 @@ const useLock = () => {
   const [lock, setLock] = useState<boolean | undefined>(undefined);
   useEffect(() => {
     storage
-      .get<boolean>(AppKey.lock)
+      .get<boolean>(AppKey.LOCK)
       .then((useLock) => setLock(useLock === true));
 
     const unlock = () => {

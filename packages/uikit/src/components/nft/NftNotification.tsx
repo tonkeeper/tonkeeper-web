@@ -52,7 +52,7 @@ const Title = styled(H2)`
 
 const SaleBlock = styled(Label4)`
   color: ${(props) => props.theme.textSecondary};
-  border: 1px solid ${(props) => props.theme.buttonTertiaryBackground};
+  border: 1px solid ${(props) => props.THEME.buttonTertiaryBackground};
   border-radius: 6px;
   padding: 3.5px 6px 4.5px;
   text-transform: uppercase;

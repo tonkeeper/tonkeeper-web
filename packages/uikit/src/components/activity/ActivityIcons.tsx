@@ -7,8 +7,8 @@ export const ActivityIcon = styled.span`
   height: 44px;
 
   border-radius: ${(props) => props.theme.cornerFull};
-  color: ${(props) => props.theme.iconSecondary};
-  background: ${(props) => props.theme.backgroundContentTint};
+  color: ${(props) => props.THEME.iconSecondary};
+  background: ${(props) => props.THEME.backgroundContentTint};
 
   display: flex;
   justify-content: center;

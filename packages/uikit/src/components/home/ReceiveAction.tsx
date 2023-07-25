@@ -17,7 +17,7 @@ const Block = styled.div`
   width: 100%;
   box-sizing: border-box;
   border-radius: ${(props) => props.theme.cornerSmall};
-  background: ${(props) => props.theme.backgroundContent};
+  background: ${(props) => props.THEME.backgroundContent};
 
   max-width: 80%;
   overflow: hidden;
@@ -46,8 +46,8 @@ const CopyButton = styled(Label2)`
   transition: background-color 0.1s ease;
 
   &:hover {
-    background-color: ${(props) => props.theme.backgroundContentTint};
-    border-top: 1px solid ${(props) => props.theme.backgroundContentTint};
+    background-color: ${(props) => props.THEME.backgroundContentTint};
+    border-top: 1px solid ${(props) => props.THEME.backgroundContentTint};
   }
 `;
 

@@ -43,7 +43,7 @@ const Block = styled.div<{
       justify-content: center;
     `}
 
-  background-color: ${(props) => props.theme.backgroundPage};
+  background-color: ${(props) => props.THEME.backgroundPage};
 `;
 
 export const HeaderGlobalStyle = createGlobalStyle`
@@ -97,7 +97,7 @@ const Row = styled.div`
   background: ${(props) => props.theme.backgroundContentTint};
 
   &:hover {
-    background: ${(props) => props.theme.backgroundHighlighted};
+    background: ${(props) => props.THEME.backgroundHighlighted};
   }
 `;
 

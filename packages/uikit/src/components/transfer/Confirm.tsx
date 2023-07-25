@@ -20,7 +20,7 @@ export const ImageMock = styled.div<{ full?: boolean }>`
   height: 96px;
   border-radius: ${(props) =>
     props.full ? props.theme.cornerFull : props.theme.cornerMedium};
-  background: ${(props) => props.theme.backgroundContent};
+  background: ${(props) => props.THEME.backgroundContent};
 `;
 
 export const SendingTitle = styled(Body1)`

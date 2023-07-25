@@ -103,11 +103,11 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
     switch (props.size) {
       case 'large':
         return css`
-          border-radius: ${props.theme.cornerSmall};
+          border-radius: ${props.THEME.cornerSmall};
         `;
       default:
         return css`
-          border-radius: ${props.theme.cornerLarge};
+          border-radius: ${props.THEME.cornerLarge};
         `;
     }
   }}
@@ -116,15 +116,15 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
       if (props.disabled) return;
       if (props.primary) {
         return css`
-          background-color: ${props.theme.buttonPrimaryBackgroundHighlighted};
+          background-color: ${props.THEME.buttonPrimaryBackgroundHighlighted};
         `;
       } else if (props.secondary) {
         return css`
-          background-color: ${props.theme.buttonSecondaryBackgroundHighlighted};
+          background-color: ${props.THEME.buttonSecondaryBackgroundHighlighted};
         `;
       } else {
         return css`
-          background-color: ${props.theme.buttonTertiaryBackgroundHighlighted};
+          background-color: ${props.THEME.buttonTertiaryBackgroundHighlighted};
         `;
       }
     }}
@@ -134,37 +134,37 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
     if (props.primary) {
       if (props.disabled) {
         return css`
-          color: ${props.theme.buttonPrimaryForegroundDisabled};
-          background-color: ${props.theme.buttonPrimaryBackgroundDisabled};
+          color: ${props.THEME.buttonPrimaryForegroundDisabled};
+          background-color: ${props.THEME.buttonPrimaryBackgroundDisabled};
         `;
       } else {
         return css`
-          color: ${props.theme.buttonPrimaryForeground};
-          background-color: ${props.theme.buttonPrimaryBackground};
+          color: ${props.THEME.buttonPrimaryForeground};
+          background-color: ${props.THEME.buttonPrimaryBackground};
         `;
       }
     } else if (props.secondary) {
       if (props.disabled) {
         return css`
-          color: ${props.theme.buttonSecondaryForegroundDisabled};
-          background-color: ${props.theme.buttonSecondaryBackgroundDisabled};
+          color: ${props.THEME.buttonSecondaryForegroundDisabled};
+          background-color: ${props.THEME.buttonSecondaryBackgroundDisabled};
         `;
       } else {
         return css`
-          color: ${props.theme.buttonSecondaryForeground};
-          background-color: ${props.theme.buttonSecondaryBackground};
+          color: ${props.THEME.buttonSecondaryForeground};
+          background-color: ${props.THEME.buttonSecondaryBackground};
         `;
       }
     } else {
       if (props.disabled) {
         return css`
-          color: ${props.theme.buttonTertiaryForegroundDisabled};
-          background-color: ${props.theme.buttonTertiaryBackgroundDisabled};
+          color: ${props.THEME.buttonTertiaryForegroundDisabled};
+          background-color: ${props.THEME.buttonTertiaryBackgroundDisabled};
         `;
       } else {
         return css`
-          color: ${props.theme.buttonTertiaryForeground};
-          background-color: ${props.theme.buttonTertiaryBackground};
+          color: ${props.THEME.buttonTertiaryForeground};
+          background-color: ${props.THEME.buttonTertiaryBackground};
         `;
       }
     }

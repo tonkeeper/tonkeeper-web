@@ -51,8 +51,8 @@ const More = styled.span<{ contentColor?: boolean }>`
     rgba(16, 22, 31, 0) 0%,
     ${(props) =>
         props.contentColor
-          ? props.theme.backgroundContent
-          : props.theme.backgroundPage}
+          ? props.THEME.backgroundContent
+          : props.THEME.backgroundPage}
       20%
   );
 `;

@@ -37,12 +37,12 @@ const IconBase = styled.div<{ checked: boolean; disabled?: boolean }>`
   ${(props) =>
     props.checked
       ? css`
-          background: ${props.theme.buttonPrimaryBackground};
-          border-color: ${props.theme.buttonPrimaryBackground};
+          background: ${props.THEME.buttonPrimaryBackground};
+          border-color: ${props.THEME.buttonPrimaryBackground};
         `
       : css`
           background: transparent;
-          border-color: ${props.theme.backgroundContentTint};
+          border-color: ${props.THEME.backgroundContentTint};
         `}
 `;
 const CheckboxItem = styled(IconBase)`

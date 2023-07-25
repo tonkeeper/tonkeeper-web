@@ -24,8 +24,8 @@ const Button = styled.div`
   width: 44px;
   height: 44px;
   border-radius: ${(props) => props.theme.cornerFull};
-  color: ${(props) => props.theme.textPrimary};
-  background-color: ${(props) => props.theme.backgroundContent};
+  color: ${(props) => props.THEME.textPrimary};
+  background-color: ${(props) => props.THEME.backgroundContent};
   display: flex;
   justify-content: center;
   align-items: center;

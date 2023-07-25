@@ -60,11 +60,11 @@ const OtherLink = styled(Label2)`
   padding: 7.5px 1rem 8.5px;
   background-color: ${(props) => props.theme.backgroundContent};
   transition: background-color 0.1s ease;
-  border-radius: ${(props) => props.theme.cornerMedium};
+  border-radius: ${(props) => props.THEME.cornerMedium};
   display: inline-block;
 
   &:hover {
-    background-color: ${(props) => props.theme.backgroundHighlighted};
+    background-color: ${(props) => props.THEME.backgroundHighlighted};
   }
 `;
 

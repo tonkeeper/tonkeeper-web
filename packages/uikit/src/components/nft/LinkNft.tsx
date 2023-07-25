@@ -48,7 +48,7 @@ export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
   const query = useNftDNSLinkData(nft);
   const { data, isLoading } = query;
 
-  const linkedAddress = data?.wallet?.address || '';
+  const linkedAddress = data?.WALLET?.address || '';
 
   const {
     refetch,
@@ -56,7 +56,7 @@ export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
     isCompleted,
   } = useQueryChangeWait(
     query,
-    (current, prev) => !!prev?.wallet?.address !== !!current?.wallet?.address
+    (current, prev) => !!prev?.wallet?.address !== !!current?.WALLET?.address
   );
 
   useEffect(() => {

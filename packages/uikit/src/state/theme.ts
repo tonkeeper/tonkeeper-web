@@ -5,14 +5,14 @@ import { useStorage } from '../hooks/storage';
 
 export const useUserTheme = () => {
   const storage = useStorage();
-  return useQuery([AppKey.theme], async () => {
-    const theme = await storage.get<Theme>(AppKey.theme);
+  return useQuery([AppKey.THEME], async () => {
+    const theme = await storage.get<Theme>(AppKey.THEME);
     return theme ?? userDefaultTheme;
   });
 };
 
 export const useUserThemes = (account = 'account') => {
-  return useQuery([AppKey.theme, account], async () => {
+  return useQuery([AppKey.THEME, account], async () => {
     const items: Theme[] = [
       userDefaultTheme,
       {
@@ -28,7 +28,7 @@ export const useMutateTheme = () => {
   const storage = useStorage();
   const client = useQueryClient();
   return useMutation<void, Error, Theme>(async (theme) => {
-    await storage.set(AppKey.theme, theme);
-    await client.invalidateQueries([AppKey.theme]);
+    await storage.set(AppKey.THEME, theme);
+    await client.invalidateQueries([AppKey.THEME]);
   });
 };

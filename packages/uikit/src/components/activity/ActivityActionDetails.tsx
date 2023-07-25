@@ -46,7 +46,7 @@ const LabelRight = styled(Label1)`
 const Span = styled(Label1)`
   user-select: none;
   color: ${(props) => props.theme.textPrimary};
-  background: ${(props) => props.theme.accentOrange};
+  background: ${(props) => props.THEME.accentOrange};
   padding: 4px 8px;
   border-radius: 8px;
   margin-bottom: 12px;

@@ -62,16 +62,16 @@ const Inner = styled.span<{ checked?: boolean; active: boolean }>`
     content: attr(data-yes);
     text-transform: uppercase;
     padding-left: 10px;
-    background-color: ${(props) => props.theme.buttonPrimaryBackground};
-    color: ${(props) => props.theme.textPrimary};
+    background-color: ${(props) => props.THEME.buttonPrimaryBackground};
+    color: ${(props) => props.THEME.textPrimary};
   }
 
   &:after {
     content: attr(data-no);
     text-transform: uppercase;
     padding-right: 10px;
-    background-color: ${(props) => props.theme.buttonTertiaryBackground};
-    color: ${(props) => props.theme.textPrimary};
+    background-color: ${(props) => props.THEME.buttonTertiaryBackground};
+    color: ${(props) => props.THEME.textPrimary};
     text-align: right;
   }
 
@@ -93,7 +93,7 @@ const Outer = styled.span<{ checked?: boolean; active: boolean }>`
   top: 0;
   bottom: 0;
   right: 18px;
-  border: 0 solid ${(props) => props.theme.textPrimary};
+  border: 0 solid ${(props) => props.THEME.textPrimary};
   border-radius: 20px;
   ${(props) =>
     props.active &&

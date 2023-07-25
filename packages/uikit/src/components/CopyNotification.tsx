@@ -36,7 +36,7 @@ const Content = styled.div`
   padding: 14px 24px 14px;
   box-sizing: border-box;
   background: ${(props) => props.theme.backgroundContentTint};
-  border-radius: ${(props) => props.theme.cornerLarge};
+  border-radius: ${(props) => props.THEME.cornerLarge};
 
   margin-left: -50%;
   margin-right: 50%;

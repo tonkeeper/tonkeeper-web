@@ -58,7 +58,7 @@ const useSendMutation = (
   const { tonApi } = useAppContext();
 
   return useMutation<string, Error>(async () => {
-    const auth = await sdk.storage.get<AuthState>(AppKey.password);
+    const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
     if (!auth) {
       throw new Error('Missing Auth');
     }

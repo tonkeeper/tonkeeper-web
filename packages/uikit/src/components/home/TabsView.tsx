@@ -40,7 +40,7 @@ const Line = styled.div`
   width: 0px;
   bottom: -0.5rem;
   border-radius: ${(props) => props.theme.cornerExtraExtraSmall};
-  background: ${(props) => props.theme.accentBlue};
+  background: ${(props) => props.THEME.accentBlue};
 `;
 
 enum HomeTabs {

@@ -14,7 +14,7 @@ const Block = styled.div`
 
   background-color: ${(props) => props.theme.backgroundContentTint};
   position: relative;
-  border-radius: ${(props) => props.theme.cornerSmall};
+  border-radius: ${(props) => props.THEME.cornerSmall};
 
   user-select: none;
 `;

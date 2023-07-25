@@ -50,15 +50,15 @@ export const ListBlock = styled.div<{
         `
       : undefined}
 
-  border-radius: ${(props) => props.theme.cornerSmall};
+  border-radius: ${(props) => props.THEME.cornerSmall};
 
   > div:first-child {
-    border-top-right-radius: ${(props) => props.theme.cornerSmall};
-    border-top-left-radius: ${(props) => props.theme.cornerSmall};
+    border-top-right-radius: ${(props) => props.THEME.cornerSmall};
+    border-top-left-radius: ${(props) => props.THEME.cornerSmall};
   }
   > div:last-child {
-    border-bottom-right-radius: ${(props) => props.theme.cornerSmall};
-    border-bottom-left-radius: ${(props) => props.theme.cornerSmall};
+    border-bottom-right-radius: ${(props) => props.THEME.cornerSmall};
+    border-bottom-left-radius: ${(props) => props.THEME.cornerSmall};
   }
 `;
 
@@ -95,8 +95,8 @@ export const ListItemElement = styled.div<{
 
   ${(props) => {
     const background = props.dropDown
-      ? props.theme.backgroundHighlighted
-      : props.theme.backgroundContentTint;
+      ? props.THEME.backgroundHighlighted
+      : props.THEME.backgroundContentTint;
 
     if (props.ios) {
       return props.hover !== false && props.isHover
@@ -104,7 +104,7 @@ export const ListItemElement = styled.div<{
             background-color: ${background};
 
             > div {
-              border-top-color: ${props.theme.backgroundHighlighted} !important;
+              border-top-color: ${props.THEME.backgroundHighlighted} !important;
             }
           `
         : undefined;
@@ -116,7 +116,7 @@ export const ListItemElement = styled.div<{
               background-color: ${background};
 
               > div {
-                border-top-color: ${props.theme
+                border-top-color: ${props.THEME
                   .backgroundHighlighted} !important;
               }
             }
@@ -126,7 +126,7 @@ export const ListItemElement = styled.div<{
   }}
 
   & + & > div {
-    border-top: 1px solid ${(props) => props.theme.separatorCommon};
+    border-top: 1px solid ${(props) => props.THEME.separatorCommon};
     padding-top: 15px;
   }
 `;
