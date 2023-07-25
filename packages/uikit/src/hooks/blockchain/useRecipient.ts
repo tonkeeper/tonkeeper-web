@@ -1,13 +1,9 @@
-import {useGetToAccount} from "../../components/transfer/RecipientView";
-import {useEffect, useMemo, useRef} from "react";
+import { useGetToAccount } from '../../components/transfer/RecipientView';
+import { useEffect, useMemo, useRef } from 'react';
 
 export function useRecipient(address: string) {
     const isFirstRender = useRef(true);
-    const {
-        isLoading,
-        data: toAccount,
-        mutate: mutateRecipient,
-    } = useGetToAccount();
+    const { isLoading, data: toAccount, mutate: mutateRecipient } = useGetToAccount();
     useEffect(() => {
         isFirstRender.current = false;
         mutateRecipient({ address });
@@ -17,7 +13,7 @@ export function useRecipient(address: string) {
             address: { address },
             comment: '',
             done: false,
-            toAccount: toAccount!,
+            toAccount: toAccount!
         }),
         [toAccount]
     );
@@ -25,5 +21,5 @@ export function useRecipient(address: string) {
     return {
         recipient,
         isLoading: isFirstRender.current ? true : isLoading
-    }
+    };
 }

@@ -16,247 +16,225 @@ import { Button } from '../fields/Button';
 import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { Gap } from '../Layout';
-import {
-  FullHeightBlock,
-  NotificationCancelButton,
-  NotificationTitleBlock,
-} from '../Notification';
+import { FullHeightBlock, NotificationCancelButton, NotificationTitleBlock } from '../Notification';
 import { Body2, H3 } from '../Text';
 import { ButtonBlock } from './common';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
 
 const Warning = styled(Body2)`
-  user-select: none;
-  display: block;
-  width: 100%;
-  margin-top: -4px;
-  color: ${(props) => props.theme.accentOrange};
+    user-select: none;
+    display: block;
+    width: 100%;
+    margin-top: -4px;
+    color: ${props => props.theme.accentOrange};
 `;
 
 export const useGetToAccount = () => {
-  const { tonApi } = useAppContext();
-  return useMutation<AccountRepr, Error, Recipient>((recipient) => {
-    const account =
-      'dns' in recipient ? recipient.dns.address : recipient.address;
-    return new AccountApi(tonApi).getAccountInfo({ account });
-  });
+    const { tonApi } = useAppContext();
+    return useMutation<AccountRepr, Error, Recipient>(recipient => {
+        const account = 'dns' in recipient ? recipient.dns.address : recipient.address;
+        return new AccountApi(tonApi).getAccountInfo({ account });
+    });
 };
 
 const useToAccount = (isValid: boolean, recipient: Recipient) => {
-  const { tonApi } = useAppContext();
-  const account =
-    'dns' in recipient ? recipient.dns.address : recipient.address;
-  return useQuery<AccountRepr, Error>(
-    [QueryKey.account, account],
-    () => new AccountApi(tonApi).getAccountInfo({ account }),
-    { enabled: isValid }
-  );
+    const { tonApi } = useAppContext();
+    const account = 'dns' in recipient ? recipient.dns.address : recipient.address;
+    return useQuery<AccountRepr, Error>(
+        [QueryKey.account, account],
+        () => new AccountApi(tonApi).getAccountInfo({ account }),
+        { enabled: isValid }
+    );
 };
 
 const useDnsWallet = (value: string) => {
-  const { tonApi } = useAppContext();
+    const { tonApi } = useAppContext();
 
-  const [name, setName] = useState('');
+    const [name, setName] = useState('');
 
-  const update = useMemo(() => {
-    return debounce<[string]>((v) => {
-      let value = v.trim().toLowerCase();
-      if (!value.includes('.')) {
-        value += '.ton';
-      }
-      setName(value);
-    }, 400);
-  }, [setName]);
+    const update = useMemo(() => {
+        return debounce<[string]>(v => {
+            let val = v.trim().toLowerCase();
+            if (!val.includes('.')) {
+                val += '.ton';
+            }
+            setName(val);
+        }, 400);
+    }, [setName]);
 
-  update(value);
+    update(value);
 
-  return useQuery(
-    [QueryKey.dns, value, name],
-    async () => {
-      const result = await new DNSApi(tonApi).dnsResolve({ name });
-      if (!result.wallet) {
-        return null;
-      }
-      return result.wallet;
-    },
-    {
-      enabled: name.length >= 4 && !seeIfValidAddress(name),
-      retry: 0,
-      keepPreviousData: false,
-    }
-  );
+    return useQuery(
+        [QueryKey.dns, value, name],
+        async () => {
+            const result = await new DNSApi(tonApi).dnsResolve({ name });
+            if (!result.wallet) {
+                return null;
+            }
+            return result.wallet;
+        },
+        {
+            enabled: name.length >= 4 && !seeIfValidAddress(name),
+            retry: 0,
+            keepPreviousData: false
+        }
+    );
 };
 
 export const RecipientView: FC<{
-  title: string;
-  data?: RecipientData;
-  onClose: () => void;
-  setRecipient: (options: RecipientData) => void;
-  keyboard?: 'decimal';
-  onScan: (value: string) => void;
-  isExternalLoading?: boolean;
-}> = ({
-  title,
-  data,
-  onClose,
-  setRecipient,
-  keyboard,
-  onScan,
-  isExternalLoading,
-}) => {
-  const sdk = useAppSdk();
-  const [submitted, setSubmit] = useState(false);
-  const { t } = useTranslation();
-  const { standalone, ios } = useAppContext();
-  const ref = useRef<HTMLTextAreaElement | null>(null);
+    title: string;
+    data?: RecipientData;
+    onClose: () => void;
+    setRecipient: (options: RecipientData) => void;
+    keyboard?: 'decimal';
+    onScan: (value: string) => void;
+    isExternalLoading?: boolean;
+}> = ({ title, data, onClose, setRecipient, keyboard, onScan, isExternalLoading }) => {
+    const sdk = useAppSdk();
+    const [submitted, setSubmit] = useState(false);
+    const { t } = useTranslation();
+    const { standalone, ios } = useAppContext();
+    const ref = useRef<HTMLTextAreaElement | null>(null);
 
-  const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } =
-    useGetToAccount();
+    const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } = useGetToAccount();
 
-  const [comment, setComment] = useState(data?.comment ?? '');
-  const [recipient, setAddress] = useState<Recipient>(
-    data?.address ?? {
-      address: '',
-    }
-  );
-
-  const { data: dnsWallet, isFetching: isDnsFetching } = useDnsWallet(
-    recipient.address
-  );
-
-  useEffect(() => {
-    if (dnsWallet) {
-      setAddress((recipient) => ({
-        address: recipient.address,
-        dns: dnsWallet,
-      }));
-    }
-    if (dnsWallet == null) {
-      setAddress((recipient) => {
-        if ('dns' in recipient) {
-          return { address: recipient.address };
+    const [comment, setComment] = useState(data?.comment ?? '');
+    const [recipient, setAddress] = useState<Recipient>(
+        data?.address ?? {
+            address: ''
         }
-        return recipient;
-      });
-    }
-  }, [setAddress, dnsWallet]);
+    );
 
-  const isValid = useMemo(() => {
-    if ('dns' in recipient) {
-      return true;
-    }
-    return seeIfValidAddress(recipient.address);
-  }, [recipient]);
+    const { data: dnsWallet, isFetching: isDnsFetching } = useDnsWallet(recipient.address);
 
-  const { data: toAccount, isFetching: isAccountFetching } = useToAccount(
-    isValid,
-    recipient
-  );
+    useEffect(() => {
+        if (dnsWallet) {
+            setAddress(r => ({
+                address: r.address,
+                dns: dnsWallet
+            }));
+        }
+        if (dnsWallet == null) {
+            setAddress(r => {
+                if ('dns' in r) {
+                    return { address: r.address };
+                }
+                return r;
+            });
+        }
+    }, [setAddress, dnsWallet]);
 
-  const isFetching = isAccountFetching || isAccountLoading || isExternalLoading;
+    const isValid = useMemo(() => {
+        if ('dns' in recipient) {
+            return true;
+        }
+        return seeIfValidAddress(recipient.address);
+    }, [recipient]);
 
-  const isMemoValid = useMemo(() => {
-    if (!toAccount) return true;
-    if (toAccount.memoRequired) {
-      return comment.length > 0;
-    }
-    return true;
-  }, [toAccount, comment]);
+    const { data: toAccount, isFetching: isAccountFetching } = useToAccount(isValid, recipient);
 
-  useEffect(() => {
-    if (sdk.isIOs()) {
-      return;
-    }
-    if (ref.current) {
-      ref.current.focus();
-    }
-  }, [ref.current]);
+    const isFetching = isAccountFetching || isAccountLoading || isExternalLoading;
 
-  const formatted = useMemo(() => {
-    if ('isFavorite' in recipient) {
-      return Address.parse(recipient.address).toString();
-    }
-    return recipient.address;
-  }, [recipient]);
+    const isMemoValid = useMemo(() => {
+        if (!toAccount) return true;
+        if (toAccount.memoRequired) {
+            return comment.length > 0;
+        }
+        return true;
+    }, [toAccount, comment]);
 
-  const showAddress = useShowAddress(ref, formatted, toAccount);
+    useEffect(() => {
+        if (sdk.isIOs()) {
+            return;
+        }
+        if (ref.current) {
+            ref.current.focus();
+        }
+    }, [ref.current]);
 
-  const handleSubmit = () => {
-    setSubmit(true);
-    if (isValid && isMemoValid && toAccount) {
-      if (ios && keyboard) openIosKeyboard(keyboard);
-      setRecipient({ address: recipient, toAccount, comment, done: true });
-    }
-  };
-  const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    handleSubmit();
-  };
+    const formatted = useMemo(() => {
+        if ('isFavorite' in recipient) {
+            return Address.parse(recipient.address).toString();
+        }
+        return recipient.address;
+    }, [recipient]);
 
-  const onSelect = async (item: Suggestion) => {
-    setAddress(item);
-    if (ios && keyboard) openIosKeyboard(keyboard);
-    const toAccount = await getAccountAsync(item);
-    if (toAccount.memoRequired) return;
-    setRecipient({
-      address: item,
-      toAccount,
-      comment,
-      done: true,
-    });
-  };
+    const showAddress = useShowAddress(ref, formatted, toAccount);
 
-  return (
-    <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
-      <NotificationTitleBlock>
-        <ButtonMock />
-        <H3>{title}</H3>
-        <NotificationCancelButton handleClose={onClose} />
-      </NotificationTitleBlock>
-      <ShowAddress value={showAddress}>
-        <InputWithScanner
-          onSubmit={handleSubmit}
-          ref={ref}
-          value={formatted}
-          onScan={onScan}
-          onChange={(address) => setAddress({ address })}
-          label={t('transaction_recipient_address')}
-          isValid={!submitted || isValid}
-          disabled={isExternalLoading}
-        />
-      </ShowAddress>
+    const handleSubmit = () => {
+        setSubmit(true);
+        if (isValid && isMemoValid && toAccount) {
+            if (ios && keyboard) openIosKeyboard(keyboard);
+            setRecipient({ address: recipient, toAccount, comment, done: true });
+        }
+    };
+    const onSubmit: React.FormEventHandler<HTMLFormElement> = e => {
+        e.stopPropagation();
+        e.preventDefault();
+        handleSubmit();
+    };
 
-      <TextArea
-        onSubmit={handleSubmit}
-        value={comment}
-        onChange={setComment}
-        label={t('txActions_signRaw_comment')}
-        isValid={!submitted || isMemoValid}
-        disabled={isExternalLoading}
-      />
-      {toAccount && toAccount.memoRequired && (
-        <Warning>
-          {t('send_screen_steps_comfirm_comment_required_text')}
-        </Warning>
-      )}
+    const onSelect = async (item: Suggestion) => {
+        setAddress(item);
+        if (ios && keyboard) openIosKeyboard(keyboard);
+        const to = await getAccountAsync(item);
+        if (to.memoRequired) return;
+        setRecipient({
+            address: item,
+            toAccount: to,
+            comment,
+            done: true
+        });
+    };
 
-      <SuggestionList onSelect={onSelect} disabled={isExternalLoading} />
+    return (
+        <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
+            <NotificationTitleBlock>
+                <ButtonMock />
+                <H3>{title}</H3>
+                <NotificationCancelButton handleClose={onClose} />
+            </NotificationTitleBlock>
+            <ShowAddress value={showAddress}>
+                <InputWithScanner
+                    onSubmit={handleSubmit}
+                    ref={ref}
+                    value={formatted}
+                    onScan={onScan}
+                    onChange={address => setAddress({ address })}
+                    label={t('transaction_recipient_address')}
+                    isValid={!submitted || isValid}
+                    disabled={isExternalLoading}
+                />
+            </ShowAddress>
 
-      <Gap />
+            <TextArea
+                onSubmit={handleSubmit}
+                value={comment}
+                onChange={setComment}
+                label={t('txActions_signRaw_comment')}
+                isValid={!submitted || isMemoValid}
+                disabled={isExternalLoading}
+            />
+            {toAccount && toAccount.memoRequired && (
+                <Warning>{t('send_screen_steps_comfirm_comment_required_text')}</Warning>
+            )}
 
-      <ButtonBlock>
-        <Button
-          fullWidth
-          size="large"
-          primary
-          type="submit"
-          loading={isFetching || isDnsFetching}
-        >
-          {t('continue')}
-        </Button>
-      </ButtonBlock>
-    </FullHeightBlock>
-  );
+            <SuggestionList onSelect={onSelect} disabled={isExternalLoading} />
+
+            <Gap />
+
+            <ButtonBlock>
+                <Button
+                    fullWidth
+                    size="large"
+                    primary
+                    type="submit"
+                    loading={isFetching || isDnsFetching}
+                >
+                    {t('continue')}
+                </Button>
+            </ButtonBlock>
+        </FullHeightBlock>
+    );
 };

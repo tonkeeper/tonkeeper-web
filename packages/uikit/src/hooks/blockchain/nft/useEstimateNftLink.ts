@@ -2,5 +2,5 @@ import { estimateNftLink } from '@tonkeeper/core/dist/service/transfer/nftServic
 import { useEstimateFee } from '../useEstimateFee';
 
 export const useEstimateNftLink = () => {
-  return useEstimateFee(estimateNftLink);
+    return useEstimateFee(estimateNftLink);
 };

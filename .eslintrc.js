@@ -135,6 +135,8 @@ module.exports = {
                 ],
                 'react-hooks/rules-of-hooks': 'error',
                 'react-hooks/exhaustive-deps': 'off',
+                'react/display-name': 'off',
+                'react/prop-types': 'off'
             },
             settings: {
                 react: {

@@ -6,26 +6,26 @@ import { TonPage } from './Ton';
 import { TronPage } from './Tron';
 
 const CoinPage = () => {
-  const navigate = useNavigate();
-  const { name } = useParams();
+    const navigate = useNavigate();
+    const { name } = useParams();
 
-  useEffect(() => {
-    if (!name) {
-      navigate(AppRoute.home);
+    useEffect(() => {
+        if (!name) {
+            navigate(AppRoute.home);
+        }
+    }, [name]);
+
+    if (!name) return <></>;
+
+    console.log(name);
+
+    if (name === 'tron') {
+        return <TronPage />;
+    } else if (name === 'ton') {
+        return <TonPage />;
+    } else {
+        return <JettonContent jettonAddress={decodeURIComponent(name)} />;
     }
-  }, [name]);
-
-  if (!name) return <></>;
-
-  console.log(name);
-
-  if (name === 'tron') {
-    return <TronPage />;
-  } else if (name === 'ton') {
-    return <TonPage />;
-  } else {
-    return <JettonContent jettonAddress={decodeURIComponent(name)} />;
-  }
 };
 
 export default CoinPage;

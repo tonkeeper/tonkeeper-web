@@ -4,13 +4,13 @@ import { NftsList } from '../nft/Nfts';
 import { AssetData, JettonList } from './Jettons';
 
 export const CompactView: FC<{
-  assets: AssetData;
-  nfts: NFT[];
+    assets: AssetData;
+    nfts: NFT[];
 }> = ({ assets, nfts }) => {
-  return (
-    <>
-      <JettonList assets={assets} />
-      <NftsList nfts={nfts} />
-    </>
-  );
+    return (
+        <>
+            <JettonList assets={assets} />
+            <NftsList nfts={nfts} />
+        </>
+    );
 };

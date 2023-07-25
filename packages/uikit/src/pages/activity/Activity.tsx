@@ -9,56 +9,51 @@ import { ActivitySkeletonPage, SkeletonList } from '../../components/Skeleton';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import {
-  ActivityGroup,
-  groupActivity,
-  groupActivityItems,
-} from '../../state/activity';
+import { ActivityGroup, groupActivity, groupActivityItems } from '../../state/activity';
 
 const pageLimit = 20;
 
 const Activity: FC = () => {
-  const wallet = useWalletContext();
-  const { tonApi, standalone } = useAppContext();
+    const wallet = useWalletContext();
+    const { tonApi, standalone } = useAppContext();
 
-  const ref = useRef<HTMLDivElement>(null);
+    const ref = useRef<HTMLDivElement>(null);
 
-  const { fetchNextPage, hasNextPage, isFetchingNextPage, data, ...result } =
-    useInfiniteQuery({
-      queryKey: [wallet.active.rawAddress, QueryKey.activity, 'all'],
-      queryFn: ({ pageParam = undefined }) =>
-        new EventApi(tonApi).accountEvents({
-          account: wallet.active.rawAddress,
-          limit: pageLimit,
-          beforeLt: pageParam,
-        }),
-      getNextPageParam: (lastPage) =>
-        lastPage.events.length >= pageLimit ? lastPage.nextFrom : undefined,
+    const { fetchNextPage, hasNextPage, isFetchingNextPage, data } = useInfiniteQuery({
+        queryKey: [wallet.active.rawAddress, QueryKey.activity, 'all'],
+        queryFn: ({ pageParam = undefined }) =>
+            new EventApi(tonApi).accountEvents({
+                account: wallet.active.rawAddress,
+                limit: pageLimit,
+                beforeLt: pageParam
+            }),
+        getNextPageParam: lastPage =>
+            lastPage.events.length >= pageLimit ? lastPage.nextFrom : undefined
     });
 
-  useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, ref);
+    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, ref);
 
-  const items = useMemo<ActivityGroup[]>(() => {
-    return data ? groupActivity(groupActivityItems(data)) : [];
-  }, [data]);
+    const items = useMemo<ActivityGroup[]>(() => {
+        return data ? groupActivity(groupActivityItems(data)) : [];
+    }, [data]);
 
-  if (!data) {
-    return <ActivitySkeletonPage />;
-  }
+    if (!data) {
+        return <ActivitySkeletonPage />;
+    }
 
-  if (items.length === 0) {
-    return <EmptyActivity />;
-  }
+    if (items.length === 0) {
+        return <EmptyActivity />;
+    }
 
-  return (
-    <>
-      <ActivityHeader />
-      <InnerBody ref={ref}>
-        <ActivityGroupRaw items={items} />
-        {isFetchingNextPage && <SkeletonList size={3} />}
-      </InnerBody>
-    </>
-  );
+    return (
+        <>
+            <ActivityHeader />
+            <InnerBody ref={ref}>
+                <ActivityGroupRaw items={items} />
+                {isFetchingNextPage && <SkeletonList size={3} />}
+            </InnerBody>
+        </>
+    );
 };
 
 export default Activity;

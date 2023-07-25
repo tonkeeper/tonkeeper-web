@@ -6,22 +6,22 @@ import { ChevronLeftIcon } from './Icon';
 import { H3 } from './Text';
 
 const Block = styled.div`
-  flex-shrink: 0;
+    flex-shrink: 0;
 
-  padding: 1rem;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  position: relative;
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    position: relative;
 
-  position: fixed;
-  z-index: 3;
-  width: var(--app-width);
-  overflow: visible !important;
-  max-width: 548px;
-  top: 0;
+    position: fixed;
+    z-index: 3;
+    width: var(--app-width);
+    overflow: visible !important;
+    max-width: 548px;
+    top: 0;
 
-  background: ${(props) => props.theme.backgroundPage};
+    background: ${props => props.theme.backgroundPage};
 `;
 
 export const SybHeaderGlobalStyle = createGlobalStyle`
@@ -31,7 +31,7 @@ export const SybHeaderGlobalStyle = createGlobalStyle`
       display: block;
       width: 100%;
       height: 1px;
-      background: ${(props) => props.theme.separatorCommon};
+      background: ${props => props.theme.separatorCommon};
       position: absolute;
       top: 100%;
       left: 0;
@@ -40,29 +40,29 @@ export const SybHeaderGlobalStyle = createGlobalStyle`
 `;
 
 export const BackButtonLeft = styled(BackButton)`
-  position: absolute;
-  top: 50%;
-  margin-top: -1rem;
-  left: 1rem;
+    position: absolute;
+    top: 50%;
+    margin-top: -1rem;
+    left: 1rem;
 `;
 
 export interface SubHeaderProps {
-  title: React.ReactNode;
+    title: React.ReactNode;
 }
 
 const Title = styled(H3)`
-  margin-top: 1px;
-  margin-bottom: 2px;
+    margin-top: 1px;
+    margin-bottom: 2px;
 `;
 
 export const SubHeader: FC<SubHeaderProps> = ({ title }) => {
-  const navigate = useNavigate();
-  return (
-    <Block>
-      <BackButtonLeft onClick={() => navigate(-1)}>
-        <ChevronLeftIcon />
-      </BackButtonLeft>
-      <Title>{title}</Title>
-    </Block>
-  );
+    const navigate = useNavigate();
+    return (
+        <Block>
+            <BackButtonLeft onClick={() => navigate(-1)}>
+                <ChevronLeftIcon />
+            </BackButtonLeft>
+            <Title>{title}</Title>
+        </Block>
+    );
 };

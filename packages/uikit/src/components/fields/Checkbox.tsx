@@ -4,101 +4,100 @@ import { CheckboxIcon } from '../Icon';
 import { Body1 } from '../Text';
 
 export interface CheckboxProps {
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  disabled?: boolean;
-  light?: boolean;
+    checked: boolean;
+    onChange: (checked: boolean) => void;
+    disabled?: boolean;
+    light?: boolean;
 }
 
 const Wrapper = styled.div`
-  display: inline-flex;
-  gap: 15px;
-  align-items: center;
+    display: inline-flex;
+    gap: 15px;
+    align-items: center;
 
-  cursor: pointer;
+    cursor: pointer;
 `;
 
 const IconBase = styled.div<{ checked: boolean; disabled?: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-  border-width: 2px;
-  border-style: solid;
-  box-sizing: border-box;
+    border-width: 2px;
+    border-style: solid;
+    box-sizing: border-box;
 
-  ${(props) =>
-    props.disabled
-      ? css`
-          opacity: 0.48;
-        `
-      : undefined}
+    ${props =>
+        props.disabled
+            ? css`
+                  opacity: 0.48;
+              `
+            : undefined}
 
-  ${(props) =>
-    props.checked
-      ? css`
-          background: ${props.THEME.buttonPrimaryBackground};
-          border-color: ${props.THEME.buttonPrimaryBackground};
-        `
-      : css`
-          background: transparent;
-          border-color: ${props.THEME.backgroundContentTint};
-        `}
+    ${props =>
+        props.checked
+            ? css`
+                  background: ${props.theme.buttonPrimaryBackground};
+                  border-color: ${props.theme.buttonPrimaryBackground};
+              `
+            : css`
+                  background: transparent;
+                  border-color: ${props.theme.backgroundContentTint};
+              `}
 `;
 const CheckboxItem = styled(IconBase)`
-  width: 22px;
-  height: 22px;
+    width: 22px;
+    height: 22px;
 
-  border-radius: 6px;
+    border-radius: 6px;
 `;
 
 const RadioItem = styled(IconBase)`
-  width: 24px;
-  height: 24px;
+    width: 24px;
+    height: 24px;
 
-  border-radius: ${(props) => props.theme.cornerFull};
+    border-radius: ${props => props.theme.cornerFull};
 `;
 
 const Text = styled(Body1)<{ light?: boolean }>`
-  color: ${(props) =>
-    props.light ? props.theme.textPrimary : props.theme.textSecondary};
+    color: ${props => (props.light ? props.theme.textPrimary : props.theme.textSecondary)};
 `;
 
 export const Checkbox: FC<PropsWithChildren<CheckboxProps>> = ({
-  checked,
-  onChange,
-  disabled,
-  children,
-  light,
+    checked,
+    onChange,
+    disabled,
+    children,
+    light
 }) => {
-  return (
-    <Wrapper onClick={() => onChange(!checked)}>
-      <CheckboxItem checked={checked} disabled={disabled}>
-        {checked ? <CheckboxIcon /> : undefined}
-      </CheckboxItem>
-      {children && <Text light={light}>{children}</Text>}
-    </Wrapper>
-  );
+    return (
+        <Wrapper onClick={() => onChange(!checked)}>
+            <CheckboxItem checked={checked} disabled={disabled}>
+                {checked ? <CheckboxIcon /> : undefined}
+            </CheckboxItem>
+            {children && <Text light={light}>{children}</Text>}
+        </Wrapper>
+    );
 };
 
 export const Radio: FC<PropsWithChildren<CheckboxProps>> = ({
-  checked,
-  onChange,
-  disabled,
-  children,
+    checked,
+    onChange,
+    disabled,
+    children
 }) => {
-  return (
-    <Wrapper
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        onChange(!checked);
-      }}
-    >
-      <RadioItem checked={checked} disabled={disabled}>
-        {checked ? <CheckboxIcon /> : undefined}
-      </RadioItem>
-      {children && <Text>{children}</Text>}
-    </Wrapper>
-  );
+    return (
+        <Wrapper
+            onClick={e => {
+                e.stopPropagation();
+                e.preventDefault();
+                onChange(!checked);
+            }}
+        >
+            <RadioItem checked={checked} disabled={disabled}>
+                {checked ? <CheckboxIcon /> : undefined}
+            </RadioItem>
+            {children && <Text>{children}</Text>}
+        </Wrapper>
+    );
 };
