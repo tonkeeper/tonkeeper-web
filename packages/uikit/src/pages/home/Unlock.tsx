@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/menmonicService';
+import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';

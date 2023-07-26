@@ -1,5 +1,5 @@
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { getWalletMnemonic } from '@tonkeeper/core/dist/service/menmonicService';
+import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import React, { FC, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';

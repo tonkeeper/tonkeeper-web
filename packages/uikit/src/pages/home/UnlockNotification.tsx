@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { GetPasswordParams, GetPasswordType, IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { MinPasswordLength, getAccountState } from '@tonkeeper/core/dist/service/accountService';
-import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/menmonicService';
+import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';

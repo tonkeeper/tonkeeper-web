@@ -1,31 +1,32 @@
-import { mnemonicToPrivateKey } from 'ton-crypto';
+import { mnemonicToPrivateKey, hmac_sha512 } from 'ton-crypto';
 import { IStorage } from '../Storage';
 import { Network } from '../entries/network';
 import { TronWalletState, TronWalletStorage, WalletState } from '../entries/wallet';
 import { Configuration, TronApi } from '../tronApi';
 import { getWalletMnemonic } from './mnemonicService';
 import { setWalletState } from './wallet/storeService';
-import { ethers, encodeBase58 } from 'ethers';
+import { ethers, encodeBase58, sha256 } from 'ethers';
 
-/**
- * @deprecated
- */
-// TODO заменить на эзерс
-// eslint-disable-next-line @typescript-eslint/no-var-requires,import/extensions
-const TronWeb = require('tronweb/dist/TronWeb.js');
+const getPrivateKey = async (tonMnemonic: string[]): Promise<string> => {
+    // TON-compatible seed
+    const pair = await mnemonicToPrivateKey(tonMnemonic);
+    const seed = pair.secretKey.slice(0, 32);
 
-const getPrivateKey = async (mnemonic: string[]): Promise<string> => {
-    const pair = await mnemonicToPrivateKey(mnemonic);
-    return pair.secretKey.slice(0, 32).toString('hex');
+    // Sub-protocol derivation for ETH-derived keys:
+    // Note that tonweb's definition of hmacSha512 takes in hex-encoded strings
+    const tronSeed = await hmac_sha512(/*key*/ seed, /*data*/ 'BIP32');
+
+    // Plug into BIP39 with TRON path m/44'/195'/0'/0/0:
+    const TRON_BIP39_PATH_INDEX_0 = "m/44'/195'/0'/0/0";
+    const account = ethers.HDNodeWallet.fromSeed(tronSeed).derivePath(TRON_BIP39_PATH_INDEX_0);
+    return account.privateKey.slice(2); // note: this is hex-encoded, remove 0x
 };
 
 const getOwnerAddress = async (mnemonic: string[]): Promise<string> => {
     const wallet = new ethers.Wallet(await getPrivateKey(mnemonic));
-    const addr = encodeBase58('0x' + '41' + wallet.address.slice(2));
-    const ownerAddress = TronWeb.address.fromPrivateKey(await getPrivateKey(mnemonic));
-    console.log(addr === ownerAddress);
-    debugger;
-    return ownerAddress;
+    const tronAddressPayload = '0x' + '41' + wallet.address.slice(2);
+    const checkSumTail = sha256(sha256(tronAddressPayload)).slice(2, 10);
+    return encodeBase58(tronAddressPayload + checkSumTail);
 };
 
 const getTronWallet = async (
