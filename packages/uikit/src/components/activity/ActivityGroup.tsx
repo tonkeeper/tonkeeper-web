@@ -8,6 +8,7 @@ import { ActivityGroup, formatActivityDate, getActivityTitle } from '../../state
 import { ClockIcon } from '../Icon';
 import { NftNotification } from '../nft/NftNotification';
 import { ActionData, ActivityNotification } from './ActivityNotification';
+import { useTranslation } from '../../hooks/translation';
 
 const Group = styled.div`
     margin-bottom: 1.875rem;
@@ -32,6 +33,7 @@ const ProgressIcon = styled.div`
 export const ActivityGroupRaw: FC<{
     items: ActivityGroup[];
 }> = ({ items }) => {
+    const { i18n } = useTranslation();
     const [activity, setActivity] = useState<ActionData | undefined>(undefined);
     const [nft, setNft] = useState<NftItemRepr | undefined>(undefined);
 

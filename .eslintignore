@@ -2,3 +2,5 @@ node_modules
 .yarn
 .vscode
 .idea
+
+apps

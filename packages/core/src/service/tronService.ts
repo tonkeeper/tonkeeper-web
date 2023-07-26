@@ -5,6 +5,7 @@ import { TronWalletState, TronWalletStorage, WalletState } from '../entries/wall
 import { Configuration, TronApi } from '../tronApi';
 import { getWalletMnemonic } from './mnemonicService';
 import { setWalletState } from './wallet/storeService';
+import { ethers, encodeBase58 } from 'ethers';
 
 /**
  * @deprecated
@@ -19,7 +20,11 @@ const getPrivateKey = async (mnemonic: string[]): Promise<string> => {
 };
 
 const getOwnerAddress = async (mnemonic: string[]): Promise<string> => {
+    const wallet = new ethers.Wallet(await getPrivateKey(mnemonic));
+    const addr = encodeBase58('0x' + '41' + wallet.address.slice(2));
     const ownerAddress = TronWeb.address.fromPrivateKey(await getPrivateKey(mnemonic));
+    console.log(addr === ownerAddress);
+    debugger;
     return ownerAddress;
 };
 

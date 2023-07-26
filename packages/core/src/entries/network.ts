@@ -35,9 +35,10 @@ export const getTonClientV2 = (config: TonendpointConfig, current?: Network) => 
 // eslint-disable-next-line unused-imports/no-unused-vars,@typescript-eslint/no-unused-vars
 export const getTronClient = (current?: Network) => {
     return new TronConfiguration({
-        basePath: 'http://localhost:5500'
-        // current === Network.MAINNET
-        //   ? 'https://tron.tonkeeper.com'
-        //   : 'https://testnet-tron.tonkeeper.com',
+        //basePath: 'http://localhost:5500'
+        basePath:
+            current === Network.MAINNET
+                ? 'https://tron.tonkeeper.com'
+                : 'https://testnet-tron.tonkeeper.com'
     });
 };

@@ -148,7 +148,7 @@ export const JettonsSettings = () => {
                                                 ios={true}
                                             >
                                                 <JettonRow
-                                                    dragHandleProps={provided.dragHandleProps}
+                                                    dragHandleProps={p.dragHandleProps}
                                                     jetton={jetton}
                                                 />
                                             </ListItemElement>
