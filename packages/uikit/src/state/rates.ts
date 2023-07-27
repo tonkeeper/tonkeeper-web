@@ -21,18 +21,30 @@ export interface TokenRate {
 export const useRate = (token: string) => {
     const { tonApiV2 } = useAppContext();
     const { fiat } = useAppContext();
-    return useQuery<TokenRate, Error>([QueryKey.rate, token, fiat], async () => {
-        const value = await new RatesApi(tonApiV2).getRates({
-            tokens: token,
-            currencies: fiat
-        });
+    return useQuery<TokenRate, Error>(
+        [QueryKey.rate, token, fiat],
+        async () => {
+            const value = await new RatesApi(tonApiV2).getRates({
+                tokens: token,
+                currencies: fiat
+            });
 
-        const rate: RateByCurrency = value.rates[token];
-        return Object.entries(rate).reduce((acc, [key, value]) => {
-            acc[key] = value[fiat];
-            return acc;
-        }, {} as Record<string, any>) as TokenRate;
-    });
+            if (
+                !value ||
+                !value.rates ||
+                !value.rates[token] ||
+                Object.keys(value.rates[token].prices).length === 0
+            ) {
+                throw new Error(`Missing price for token: ${token}`);
+            }
+            const rate: RateByCurrency = value.rates[token];
+            return Object.entries(rate).reduce((acc, [key, value]) => {
+                acc[key] = value[fiat];
+                return acc;
+            }, {} as Record<string, any>) as TokenRate;
+        },
+        { retry: 0 }
+    );
 };
 
 export const useFormatFiat = (rate: TokenRate | undefined, tokenAmount: BigNumber.Value) => {
