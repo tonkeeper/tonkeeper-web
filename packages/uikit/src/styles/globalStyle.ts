@@ -6,8 +6,8 @@ body {
   font-family: 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: ${(props) => props.theme.backgroundContent};
-  color:  ${(props) => props.theme.textPrimary};
+  background-color: ${props => props.theme.backgroundContent};
+  color:  ${props => props.theme.textPrimary};
 
   overflow-y: scroll;
 }
@@ -44,18 +44,18 @@ body {
 `;
 
 export const Container = styled.div`
-  min-width: 300px;
-  max-width: 550px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  min-height: var(--app-height);
-  background-color: ${(props) => props.theme.backgroundPage};
+    min-width: 300px;
+    max-width: 550px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: var(--app-height);
+    background-color: ${props => props.theme.backgroundPage};
 
-  white-space: pre-wrap;
+    white-space: pre-wrap;
 `;
 
 export const Body = styled.div`
-  flex-grow: 1;
-  padding: 0 1rem;
+    flex-grow: 1;
+    padding: 0 1rem;
 `;

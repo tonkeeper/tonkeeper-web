@@ -13,42 +13,42 @@ import { AppRoute } from '../../libs/routes';
 import { useTronBalance, useTronWalletState } from '../../state/tron';
 
 const TronAsset: FC<{ tron: TronWalletState }> = ({ tron }) => {
-  const { address } = useParams();
-  const navigate = useNavigate();
-  const { data: balance, isLoading, isError } = useTronBalance(tron, address);
-  const format = useFormatCoinValue();
-  useEffect(() => {
-    if (isError) {
-      navigate(AppRoute.home);
+    const { address } = useParams();
+    const navigate = useNavigate();
+    const { data: balance, isLoading, isError } = useTronBalance(tron, address);
+    const format = useFormatCoinValue();
+    useEffect(() => {
+        if (isError) {
+            navigate(AppRoute.home);
+        }
+    }, [isError]);
+
+    console.log(tron);
+
+    const ref = useRef<HTMLDivElement>(null);
+
+    if (isLoading || !balance) {
+        return <CoinSkeletonPage />;
     }
-  }, [isError]);
 
-  console.log(tron);
+    const { token, weiAmount } = balance;
 
-  const ref = useRef<HTMLDivElement>(null);
+    return (
+        <>
+            <SubHeader title={token.name} />
+            <InnerBody ref={ref}>
+                <CoinInfo
+                    amount={format(weiAmount, token.decimals)}
+                    symbol={token.symbol}
+                    //   price={'0'}
+                    image={token.image}
+                />
+                <ActionsRow>
+                    <SendAction asset="TON" />
+                    <ReceiveAction />
+                </ActionsRow>
 
-  if (isLoading || !balance) {
-    return <CoinSkeletonPage />;
-  }
-
-  const { token, weiAmount } = balance;
-
-  return (
-    <>
-      <SubHeader title={token.name} />
-      <InnerBody ref={ref}>
-        <CoinInfo
-          amount={format(weiAmount, token.decimals)}
-          symbol={token.symbol}
-          //   price={'0'}
-          image={token.image}
-        />
-        <ActionsRow>
-          <SendAction asset="TON" />
-          <ReceiveAction />
-        </ActionsRow>
-
-        {/* 
+                {/* 
               {!isFetched ? (
                 <CoinHistorySkeleton />
               ) : (
@@ -57,28 +57,28 @@ const TronAsset: FC<{ tron: TronWalletState }> = ({ tron }) => {
                   {isFetchingNextPage && <SkeletonList size={3} />}
                 </HistoryBlock>
               )} */}
-      </InnerBody>
-    </>
-  );
+            </InnerBody>
+        </>
+    );
 };
 
 export const TronPage = () => {
-  const navigate = useNavigate();
-  const { data: state, isLoading, isError } = useTronWalletState();
+    const navigate = useNavigate();
+    const { data: state, isLoading, isError } = useTronWalletState();
 
-  useEffect(() => {
-    if (isError) {
-      navigate(AppRoute.home);
+    useEffect(() => {
+        if (isError) {
+            navigate(AppRoute.home);
+        }
+    }, [isError]);
+
+    if (isLoading || !state) {
+        return <CoinSkeletonPage />;
     }
-  }, [isError]);
 
-  if (isLoading || !state) {
-    return <CoinSkeletonPage />;
-  }
-
-  return (
-    <Routes>
-      <Route path=":address" element={<TronAsset tron={state} />} />
-    </Routes>
-  );
+    return (
+        <Routes>
+            <Route path=":address" element={<TronAsset tron={state} />} />
+        </Routes>
+    );
 };

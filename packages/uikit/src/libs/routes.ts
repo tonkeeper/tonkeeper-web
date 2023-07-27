@@ -1,35 +1,36 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 export enum AppRoute {
-  import = '/import',
-  settings = '/settings',
-  activity = '/activity',
-  coins = '/coins',
-  home = '/',
+    import = '/import',
+    settings = '/settings',
+    activity = '/activity',
+    coins = '/coins',
+    home = '/'
 }
 
 export enum ImportRoute {
-  import = '/import',
-  create = '/create',
+    import = '/import',
+    create = '/create'
 }
 
 export enum SettingsRoute {
-  index = '/',
-  localization = '/localization',
-  legal = '/legal',
-  theme = '/theme',
-  dev = '/dev',
-  fiat = '/fiat',
-  account = '/account',
-  recovery = '/recovery',
-  version = '/version',
-  jettons = '/jettons',
-  security = '/security',
-  subscriptions = '/subscriptions',
+    index = '/',
+    localization = '/localization',
+    legal = '/legal',
+    theme = '/theme',
+    dev = '/dev',
+    fiat = '/fiat',
+    account = '/account',
+    recovery = '/recovery',
+    version = '/version',
+    jettons = '/jettons',
+    security = '/security',
+    subscriptions = '/subscriptions'
 }
 
 export const any = (route: string): string => {
-  return `${route}/*`;
+    return `${route}/*`;
 };
 
 export const relative = (path: string): string => {
-  return `.${path}`;
+    return `.${path}`;
 };

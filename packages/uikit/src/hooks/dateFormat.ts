@@ -1,8 +1,11 @@
-import {useMemo} from "react";
-import {useTranslation} from "./translation";
+import { useMemo } from 'react';
+import { useTranslation } from './translation';
 
-export function useDateFormat(date: number | Date | undefined | null, options?: Intl.DateTimeFormatOptions): string {
-    const {i18n} = useTranslation();
+export function useDateFormat(
+    date: number | Date | undefined | null,
+    options?: Intl.DateTimeFormatOptions
+): string {
+    const { i18n } = useTranslation();
 
     return useMemo(() => {
         if (!date) {

@@ -2,9 +2,9 @@ import { Action } from '@tonkeeper/core/dist/tonApiV1';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import {
-  ActivityIcon,
-  SubscribeIcon,
-  UnsubscribeIcon,
+    ActivityIcon,
+    SubscribeIcon,
+    UnsubscribeIcon
 } from '../../components/activity/ActivityIcons';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
@@ -13,134 +13,116 @@ import { ListBlock } from '../List';
 import { ActionData } from './ActivityNotification';
 import { ColumnLayout, ErrorAction, ListItemGrid } from './CommonAction';
 import {
-  ActionBeneficiaryDetails,
-  ActionDate,
-  ActionDetailsBlock,
-  ActionFeeDetails,
-  ActionTransactionDetails,
-  ErrorActivityNotification,
-  Title,
+    ActionBeneficiaryDetails,
+    ActionDate,
+    ActionDetailsBlock,
+    ActionFeeDetails,
+    ActionTransactionDetails,
+    ErrorActivityNotification,
+    Title
 } from './NotificationCommon';
 
-export const UnSubscribeActionDetails: FC<ActionData> = ({
-  action,
-  timestamp,
-  event,
-}) => {
-  const { t } = useTranslation();
-  const { unSubscribe } = action;
+export const UnSubscribeActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
+    const { t } = useTranslation();
+    const { unSubscribe } = action;
 
-  const { fiat } = useAppContext();
-  const { data: stock } = useTonenpointStock();
+    const { fiat } = useAppContext();
+    const { data: stock } = useTonenpointStock();
 
-  if (!unSubscribe) {
-    return <ErrorActivityNotification event={event} />;
-  }
+    if (!unSubscribe) {
+        return <ErrorActivityNotification event={event} />;
+    }
 
-  return (
-    <ActionDetailsBlock event={event}>
-      <div>
-        <Title>{t('transaction_type_unsubscription')}</Title>
-        <ActionDate kind="send" timestamp={timestamp} />
-      </div>
-      <ListBlock margin={false} fullWidth>
-        <ActionBeneficiaryDetails beneficiary={unSubscribe.beneficiary} />
-        <ActionTransactionDetails event={event} />
-        <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
-      </ListBlock>
-    </ActionDetailsBlock>
-  );
+    return (
+        <ActionDetailsBlock event={event}>
+            <div>
+                <Title>{t('transaction_type_unsubscription')}</Title>
+                <ActionDate kind="send" timestamp={timestamp} />
+            </div>
+            <ListBlock margin={false} fullWidth>
+                <ActionBeneficiaryDetails beneficiary={unSubscribe.beneficiary} />
+                <ActionTransactionDetails event={event} />
+                <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
+            </ListBlock>
+        </ActionDetailsBlock>
+    );
 };
 
-export const SubscribeActionDetails: FC<ActionData> = ({
-  action,
-  timestamp,
-  event,
-}) => {
-  const { t } = useTranslation();
-  const { subscribe } = action;
+export const SubscribeActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
+    const { t } = useTranslation();
+    const { subscribe } = action;
 
-  const { fiat } = useAppContext();
-  const { data: stock } = useTonenpointStock();
+    const { fiat } = useAppContext();
+    const { data: stock } = useTonenpointStock();
 
-  if (!subscribe) {
-    return <ErrorActivityNotification event={event} />;
-  }
+    if (!subscribe) {
+        return <ErrorActivityNotification event={event} />;
+    }
 
-  return (
-    <ActionDetailsBlock event={event}>
-      <div>
-        <Title>{t('transaction_type_subscription')}</Title>
-        <ActionDate kind="send" timestamp={timestamp} />
-      </div>
-      <ListBlock margin={false} fullWidth>
-        <ActionBeneficiaryDetails beneficiary={subscribe.beneficiary} />
-        <ActionTransactionDetails event={event} />
-        <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
-      </ListBlock>
-    </ActionDetailsBlock>
-  );
+    return (
+        <ActionDetailsBlock event={event}>
+            <div>
+                <Title>{t('transaction_type_subscription')}</Title>
+                <ActionDate kind="send" timestamp={timestamp} />
+            </div>
+            <ListBlock margin={false} fullWidth>
+                <ActionBeneficiaryDetails beneficiary={subscribe.beneficiary} />
+                <ActionTransactionDetails event={event} />
+                <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
+            </ListBlock>
+        </ActionDetailsBlock>
+    );
 };
 
-export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({
-  action,
-  date,
-}) => {
-  const { t } = useTranslation();
-  const { unSubscribe } = action;
-  const wallet = useWalletContext();
+export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({ action, date }) => {
+    const { t } = useTranslation();
+    const { unSubscribe } = action;
+    const wallet = useWalletContext();
 
-  if (!unSubscribe) {
-    return <ErrorAction />;
-  }
-  return (
-    <ListItemGrid>
-      <ActivityIcon>
-        <UnsubscribeIcon />
-      </ActivityIcon>
-      <ColumnLayout
-        title={t('transaction_type_unsubscription')}
-        entry="-"
-        address={
-          unSubscribe.beneficiary.name ??
-          toShortValue(
-            formatAddress(unSubscribe.beneficiary.address, wallet.network)
-          )
-        }
-        date={date}
-      />
-    </ListItemGrid>
-  );
+    if (!unSubscribe) {
+        return <ErrorAction />;
+    }
+    return (
+        <ListItemGrid>
+            <ActivityIcon>
+                <UnsubscribeIcon />
+            </ActivityIcon>
+            <ColumnLayout
+                title={t('transaction_type_unsubscription')}
+                entry="-"
+                address={
+                    unSubscribe.beneficiary.name ??
+                    toShortValue(formatAddress(unSubscribe.beneficiary.address, wallet.network))
+                }
+                date={date}
+            />
+        </ListItemGrid>
+    );
 };
 
-export const SubscribeAction: FC<{ action: Action; date: string }> = ({
-  action,
-  date,
-}) => {
-  const { t } = useTranslation();
-  const { subscribe } = action;
-  const wallet = useWalletContext();
+export const SubscribeAction: FC<{ action: Action; date: string }> = ({ action, date }) => {
+    const { t } = useTranslation();
+    const { subscribe } = action;
+    const wallet = useWalletContext();
 
-  if (!subscribe) {
-    return <ErrorAction />;
-  }
+    if (!subscribe) {
+        return <ErrorAction />;
+    }
 
-  return (
-    <ListItemGrid>
-      <ActivityIcon>
-        <SubscribeIcon />
-      </ActivityIcon>
-      <ColumnLayout
-        title={t('transaction_type_subscription')}
-        entry="-"
-        address={
-          subscribe.beneficiary.name ??
-          toShortValue(
-            formatAddress(subscribe.beneficiary.address, wallet.network)
-          )
-        }
-        date={date}
-      />
-    </ListItemGrid>
-  );
+    return (
+        <ListItemGrid>
+            <ActivityIcon>
+                <SubscribeIcon />
+            </ActivityIcon>
+            <ColumnLayout
+                title={t('transaction_type_subscription')}
+                entry="-"
+                address={
+                    subscribe.beneficiary.name ??
+                    toShortValue(formatAddress(subscribe.beneficiary.address, wallet.network))
+                }
+                date={date}
+            />
+        </ListItemGrid>
+    );
 };

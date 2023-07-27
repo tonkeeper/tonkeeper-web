@@ -9,93 +9,93 @@ import { ScanIcon } from '../Icon';
 import { TonConnectNotification } from './TonConnectNotification';
 
 const ScanBlock = styled.div`
-  position: absolute;
-  right: 1rem;
-  top: 1rem;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
 
-  color: ${(props) => props.theme.accentBlue};
+    color: ${props => props.theme.accentBlue};
 `;
 
 const useGetConnectInfo = () => {
-  const sdk = useAppSdk();
-  const { t } = useTranslation();
+    const sdk = useAppSdk();
+    const { t } = useTranslation();
 
-  return useMutation<null | ConnectRequest, Error, string>(async (url) => {
-    const params = parseTonConnect({ url });
+    return useMutation<null | ConnectRequest, Error, string>(async url => {
+        const params = parseTonConnect({ url });
 
-    if (params === null) {
-      sdk.uiEvents.emit('copy', {
-        method: 'copy',
-        id: Date.now(),
-        params: t('Unexpected_QR_Code'),
-      });
-      return null;
-    }
+        if (params === null) {
+            sdk.uiEvents.emit('copy', {
+                method: 'copy',
+                id: Date.now(),
+                params: t('Unexpected_QR_Code')
+            });
+            return null;
+        }
 
-    sdk.uiEvents.emit('copy', {
-      method: 'copy',
-      id: Date.now(),
-      params: t('loading'),
+        sdk.uiEvents.emit('copy', {
+            method: 'copy',
+            id: Date.now(),
+            params: t('loading')
+        });
+
+        return params.request;
     });
-
-    return params.request;
-  });
 };
 
 export const ScanButton = () => {
-  const sdk = useAppSdk();
-  const [scanId, setScanId] = useState<number | undefined>(undefined);
-  const [params, setParams] = useState<ConnectRequest | null>(null);
+    const sdk = useAppSdk();
+    const [scanId, setScanId] = useState<number | undefined>(undefined);
+    const [params, setParams] = useState<ConnectRequest | null>(null);
 
-  const { mutateAsync, reset } = useGetConnectInfo();
+    const { mutateAsync, reset } = useGetConnectInfo();
 
-  const onScan = useCallback(
-    async (link: string) => {
-      setParams(await mutateAsync(link));
-    },
-    [setParams, mutateAsync]
-  );
+    const onScan = useCallback(
+        async (link: string) => {
+            setParams(await mutateAsync(link));
+        },
+        [setParams, mutateAsync]
+    );
 
-  const onClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const id = Date.now();
-    sdk.uiEvents.emit('scan', {
-      method: 'scan',
-      id: id,
-      params: undefined,
-    });
-    setScanId(id);
-    reset();
-  };
-
-  useEffect(() => {
-    const handler = (options: {
-      method: 'response';
-      id?: number | undefined;
-      params: string;
-    }) => {
-      if (options.id === scanId) {
-        onScan(options.params);
-      }
+    const onClick: React.MouseEventHandler<HTMLDivElement> = e => {
+        e.stopPropagation();
+        e.preventDefault();
+        const id = Date.now();
+        sdk.uiEvents.emit('scan', {
+            method: 'scan',
+            id: id,
+            params: undefined
+        });
+        setScanId(id);
+        reset();
     };
-    sdk.uiEvents.on('response', handler);
 
-    return () => {
-      sdk.uiEvents.off('response', handler);
-    };
-  }, [sdk, scanId, onScan]);
+    useEffect(() => {
+        const handler = (options: {
+            method: 'response';
+            id?: number | undefined;
+            params: string;
+        }) => {
+            if (options.id === scanId) {
+                onScan(options.params);
+            }
+        };
+        sdk.uiEvents.on('response', handler);
 
-  return (
-    <>
-      <ScanBlock onClick={onClick}>
-        <ScanIcon></ScanIcon>
-      </ScanBlock>
-      <TonConnectNotification
-        origin={undefined}
-        params={params}
-        handleClose={() => setParams(null)}
-      />
-    </>
-  );
+        return () => {
+            sdk.uiEvents.off('response', handler);
+        };
+    }, [sdk, scanId, onScan]);
+
+    return (
+        <>
+            <ScanBlock onClick={onClick}>
+                <ScanIcon></ScanIcon>
+            </ScanBlock>
+            <TonConnectNotification
+                origin={undefined}
+                params={params}
+                handleClose={() => setParams(null)}
+            />
+        </>
+    );
 };

@@ -7,18 +7,18 @@ import { BuyAction } from './BuyAction';
 import { ReceiveAction } from './ReceiveAction';
 
 export const HomeActions = () => {
-  const { tonendpoint } = useAppContext();
-  const { data: methods } = useTonenpointFiatMethods(tonendpoint);
+    const { tonendpoint } = useAppContext();
+    const { data: methods } = useTonenpointFiatMethods(tonendpoint);
 
-  const buy = methods && methods.categories[0];
-  const sell = methods && methods.categories[1];
+    const buy = methods && methods.categories[0];
+    // const sell = methods && methods.categories[1];
 
-  return (
-    <ActionsRow>
-      <BuyAction buy={buy} />
-      <SendAction asset="TON" />
-      <ReceiveAction />
-      {/* <SellAction sell={sell} /> */}
-    </ActionsRow>
-  );
+    return (
+        <ActionsRow>
+            <BuyAction buy={buy} />
+            <SendAction asset="TON" />
+            <ReceiveAction />
+            {/* <SellAction sell={sell} /> */}
+        </ActionsRow>
+    );
 };

@@ -1,7 +1,7 @@
-import {notifyError} from "../components/transfer/common";
-import {useTranslation} from "./translation";
-import {useAppSdk} from "./appSdk";
-import {useQueryClient} from "@tanstack/react-query";
+import { notifyError } from '../components/transfer/common';
+import { useTranslation } from './translation';
+import { useAppSdk } from './appSdk';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function useNotification() {
     const { t } = useTranslation();

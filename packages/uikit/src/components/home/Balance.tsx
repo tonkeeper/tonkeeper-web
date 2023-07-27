@@ -2,10 +2,10 @@ import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import {
-  formatDecimals,
-  getJettonStockAmount,
-  getJettonStockPrice,
-  getTonCoinStockPrice,
+    formatDecimals,
+    getJettonStockAmount,
+    getJettonStockPrice,
+    getTonCoinStockPrice
 } from '@tonkeeper/core/dist/utils/balance';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import BigNumber from 'bignumber.js';
@@ -19,116 +19,112 @@ import { SkeletonText } from '../Skeleton';
 import { Body3, Label2, Num2 } from '../Text';
 
 const Block = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 32px;
 `;
 
 const Body = styled(Label2)`
-  color: ${(props) => props.theme.textSecondary};
-  cursor: pointer;
-  user-select: none;
+    color: ${props => props.theme.textSecondary};
+    cursor: pointer;
+    user-select: none;
 `;
 
 const Amount = styled(Num2)`
-  margin-bottom: 0.5rem;
-  user-select: none;
+    margin-bottom: 0.5rem;
+    user-select: none;
 `;
 
 const Error = styled.div`
-  height: 26px;
-  text-align: center;
-  width: 100%;
+    height: 26px;
+    text-align: center;
+    width: 100%;
 `;
 
 const Text = styled(Body3)`
-  line-height: 26px;
-  color: ${(props) => props.theme.textSecondary};
+    line-height: 26px;
+    color: ${props => props.theme.textSecondary};
 `;
-const MessageBlock: FC<{ error?: Error | null; isFetching: boolean }> = ({
-  error,
-}) => {
-  if (error) {
-    return (
-      <Error>
-        <Text>{error.message}</Text>
-      </Error>
-    );
-  }
+const MessageBlock: FC<{ error?: Error | null; isFetching: boolean }> = ({ error }) => {
+    if (error) {
+        return (
+            <Error>
+                <Text>{error.message}</Text>
+            </Error>
+        );
+    }
 
-  return <Error></Error>;
+    return <Error></Error>;
 };
 
 const useBalanceValue = (
-  info: AccountRepr | undefined,
-  stock: TonendpointStock | undefined,
-  jettons: JettonsBalances,
-  currency: FiatCurrencies
+    info: AccountRepr | undefined,
+    stock: TonendpointStock | undefined,
+    jettons: JettonsBalances,
+    currency: FiatCurrencies
 ) => {
-  return useMemo(() => {
-    if (!info || !stock) {
-      return formatFiatCurrency(currency, 0);
-    }
+    return useMemo(() => {
+        if (!info || !stock) {
+            return formatFiatCurrency(currency, 0);
+        }
 
-    const ton = new BigNumber(info.balance).multipliedBy(
-      formatDecimals(getTonCoinStockPrice(stock.today, currency))
-    );
+        const ton = new BigNumber(info.balance).multipliedBy(
+            formatDecimals(getTonCoinStockPrice(stock.today, currency))
+        );
 
-    const all = jettons.balances.reduce((total, jetton) => {
-      const price = getJettonStockPrice(jetton, stock.today, currency);
-      if (!price) return total;
-      const amount = getJettonStockAmount(jetton, price);
-      if (amount) {
-        return total.plus(amount);
-      } else {
-        return total;
-      }
-    }, ton);
+        const all = jettons.balances.reduce((total, jetton) => {
+            const price = getJettonStockPrice(jetton, stock.today, currency);
+            if (!price) return total;
+            const amount = getJettonStockAmount(jetton, price);
+            if (amount) {
+                return total.plus(amount);
+            } else {
+                return total;
+            }
+        }, ton);
 
-    return formatFiatCurrency(currency, all);
-  }, [info, stock, jettons, currency]);
+        return formatFiatCurrency(currency, all);
+    }, [info, stock, jettons, currency]);
 };
 
 export const BalanceSkeleton = () => {
-  return (
-    <Block>
-      <Error></Error>
-      <Amount>
-        <SkeletonText size="large" width="120px" />
-      </Amount>
-      <Body>
-        <SkeletonText size="small" width="60px" />
-      </Body>
-    </Block>
-  );
+    return (
+        <Block>
+            <Error></Error>
+            <Amount>
+                <SkeletonText size="large" width="120px" />
+            </Amount>
+            <Body>
+                <SkeletonText size="small" width="60px" />
+            </Body>
+        </Block>
+    );
 };
 
 export const Balance: FC<{
-  info?: AccountRepr | undefined;
-  error?: Error | null;
-  stock?: TonendpointStock | undefined;
-  jettons?: JettonsBalances | undefined;
-  isFetching: boolean;
+    info?: AccountRepr | undefined;
+    error?: Error | null;
+    stock?: TonendpointStock | undefined;
+    jettons?: JettonsBalances | undefined;
+    isFetching: boolean;
 }> = ({ info, error, stock, jettons, isFetching }) => {
-  const sdk = useAppSdk();
-  const { fiat } = useAppContext();
-  const wallet = useWalletContext();
+    const sdk = useAppSdk();
+    const { fiat } = useAppContext();
+    const wallet = useWalletContext();
 
-  const filtered = useUserJettonList(jettons);
-  const total = useBalanceValue(info, stock, filtered, fiat);
+    const filtered = useUserJettonList(jettons);
+    const total = useBalanceValue(info, stock, filtered, fiat);
 
-  const onClick = useCallback(() => {
-    sdk.copyToClipboard(wallet.active.friendlyAddress);
-  }, [sdk, wallet]);
+    const onClick = useCallback(() => {
+        sdk.copyToClipboard(wallet.active.friendlyAddress);
+    }, [sdk, wallet]);
 
-  return (
-    <Block>
-      <MessageBlock error={error} isFetching={isFetching} />
-      <Amount>{total}</Amount>
-      <Body onClick={onClick}>
-        {toShortValue(wallet.active.friendlyAddress)}
-      </Body>
-    </Block>
-  );
+    return (
+        <Block>
+            <MessageBlock error={error} isFetching={isFetching} />
+            <Amount>{total}</Amount>
+            <Body onClick={onClick}>{toShortValue(wallet.active.friendlyAddress)}</Body>
+        </Block>
+    );
 };

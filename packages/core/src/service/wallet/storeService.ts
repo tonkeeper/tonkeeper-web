@@ -8,39 +8,39 @@ import { CONNECT_EVENT_ERROR_CODES } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 
 export const getWalletState = async (storage: IStorage, publicKey: string) => {
-  const state = await storage.get<WalletState>(`${AppKey.wallet}_${publicKey}`);
+    const state = await storage.get<WalletState>(`${AppKey.WALLET}_${publicKey}`);
 
-  if (state) {
-    state.active.friendlyAddress = Address.parse(
-      state.active.friendlyAddress
-    ).toString({ testOnly: state.network == Network.TESTNET });
-  }
+    if (state) {
+        state.active.friendlyAddress = Address.parse(state.active.friendlyAddress).toString({
+            testOnly: state.network === Network.TESTNET
+        });
+    }
 
-  return state;
+    return state;
 };
 
 export const setWalletState = (storage: IStorage, state: WalletState) => {
-  return storage.set(`${AppKey.wallet}_${state.publicKey}`, state);
+    return storage.set(`${AppKey.WALLET}_${state.publicKey}`, state);
 };
 
 export const getCurrentWallet = async (storage: IStorage) => {
-  const state = await storage.get<AccountState>(AppKey.account);
+    const state = await storage.get<AccountState>(AppKey.ACCOUNT);
 
-  if (!state || !state.activePublicKey) {
-    throw new TonConnectError(
-      'Missing active wallet',
-      CONNECT_EVENT_ERROR_CODES.UNKNOWN_APP_ERROR
-    );
-  }
+    if (!state || !state.activePublicKey) {
+        throw new TonConnectError(
+            'Missing active wallet',
+            CONNECT_EVENT_ERROR_CODES.UNKNOWN_APP_ERROR
+        );
+    }
 
-  const wallet = await getWalletState(storage, state.activePublicKey);
+    const wallet = await getWalletState(storage, state.activePublicKey);
 
-  if (!wallet) {
-    throw new TonConnectError(
-      'Missing wallet state',
-      CONNECT_EVENT_ERROR_CODES.UNKNOWN_APP_ERROR
-    );
-  }
+    if (!wallet) {
+        throw new TonConnectError(
+            'Missing wallet state',
+            CONNECT_EVENT_ERROR_CODES.UNKNOWN_APP_ERROR
+        );
+    }
 
-  return wallet;
+    return wallet;
 };
