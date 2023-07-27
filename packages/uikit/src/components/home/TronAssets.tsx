@@ -6,7 +6,7 @@ import { useFormatBalance } from '../../hooks/balance';
 import { AppRoute } from '../../libs/routes';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { ListItem } from '../List';
-import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
+import { Delta, ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 
 const TronToken: FC<{
     token: TronToken;
@@ -28,7 +28,11 @@ const TronToken: FC<{
                     name={token.name}
                     symbol={token.symbol}
                     balance={balance}
-                    secondary={fiatPrice}
+                    secondary={
+                        <>
+                            {fiatPrice} <Delta data={data} />
+                        </>
+                    }
                     fiatAmount={fiatAmount}
                     label="TRC20"
                 />

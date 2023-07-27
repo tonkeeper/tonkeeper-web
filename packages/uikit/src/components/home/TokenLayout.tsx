@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import { TokenRate } from '../../state/rates';
 import { Body2, Label1, Label4 } from '../Text';
 
 export const ListItemPayload = styled.div`
@@ -91,4 +92,24 @@ export const TokenLayout: FC<{
             </SecondLine>
         </Description>
     );
+};
+
+const DeltaColor = styled.span<{ positive: boolean }>`
+  margin-left: 0.5rem;
+  opacity: 0.64;
+
+  ${props =>
+      props.positive
+          ? css`
+                color: ${props.theme.accentGreen};
+            `
+          : css`
+                color: ${props.theme.accentRed};
+            `}}
+`;
+
+export const Delta: FC<{ data: TokenRate | undefined }> = ({ data }) => {
+    if (!data || data.diff_24h == '0') return null;
+    const positive = data.diff_24h.startsWith('+');
+    return <DeltaColor positive={positive}>{data.diff_24h}</DeltaColor>;
 };
