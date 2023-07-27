@@ -2,21 +2,17 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AccountRepr, JettonBalance, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { TronBalances } from '@tonkeeper/core/dist/tronApi';
-import {
-    formatDecimals,
-    getJettonStockAmount,
-    getJettonStockPrice
-} from '@tonkeeper/core/dist/utils/balance';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../../hooks/appContext';
-import { formatFiatCurrency, useFormatBalance, useFormatCoinValue } from '../../hooks/balance';
+import { Address } from 'ton-core';
+import { useFormatBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { ToncoinIcon } from '../Icon';
 import { ListBlock, ListItem } from '../List';
-import { Delta, ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
+import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 import { TronAssets } from './TronAssets';
 
 export interface TonAssetData {
@@ -54,12 +50,9 @@ const TonAsset: FC<{
                     name={t('Toncoin')}
                     symbol={CryptoCurrency.TON}
                     balance={balance}
-                    secondary={
-                        <>
-                            {fiatPrice} <Delta data={data} />
-                        </>
-                    }
+                    secondary={fiatPrice}
                     fiatAmount={fiatAmount}
+                    rate={data}
                 />
             </ListItemPayload>
         </ListItem>
@@ -72,21 +65,18 @@ const JettonAsset: FC<{
 }> = ({ jetton, stock }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { fiat } = useAppContext();
 
-    const [price, total] = useMemo(() => {
-        if (!stock || !jetton) return [undefined, undefined] as const;
-        const _price = getJettonStockPrice(jetton, stock.today, fiat);
-        if (_price === null) return [undefined, undefined] as const;
-        const amount = getJettonStockAmount(jetton, _price);
-        return [
-            formatFiatCurrency(fiat, _price),
-            amount ? formatFiatCurrency(fiat, amount) : undefined
-        ];
-    }, [jetton, stock, fiat]);
+    const [amount, address] = useMemo(
+        () => [
+            formatDecimals(jetton.balance, jetton.metadata?.decimals),
+            Address.parse(jetton.jettonAddress).toString()
+        ],
+        [jetton]
+    );
+    const balance = useFormatBalance(amount, jetton.metadata?.decimals);
 
-    const format = useFormatCoinValue();
-    const formattedBalance = format(jetton.balance, jetton.metadata?.decimals);
+    const { data } = useRate(address);
+    const { fiatPrice, fiatAmount } = useFormatFiat(data, amount);
 
     return (
         <ListItem
@@ -99,9 +89,10 @@ const JettonAsset: FC<{
                 <TokenLayout
                     name={jetton.metadata?.name ?? t('Unknown_COIN')}
                     symbol={jetton.metadata?.symbol}
-                    balance={formattedBalance}
-                    secondary={price}
-                    fiatAmount={total}
+                    balance={balance}
+                    secondary={fiatPrice}
+                    fiatAmount={fiatAmount}
+                    rate={data}
                 />
             </ListItemPayload>
         </ListItem>

@@ -75,7 +75,8 @@ export const TokenLayout: FC<{
     secondary: React.ReactNode;
     fiatAmount?: string;
     label?: string;
-}> = ({ name, symbol, balance, secondary, fiatAmount, label }) => {
+    rate: TokenRate | undefined;
+}> = ({ name, symbol, balance, secondary, fiatAmount, label, rate }) => {
     return (
         <Description>
             <FirstLine>
@@ -87,7 +88,13 @@ export const TokenLayout: FC<{
                 <Label1>{balance}</Label1>
             </FirstLine>
             <SecondLine>
-                <Secondary>{secondary}</Secondary>
+                <Secondary>
+                    {
+                        <>
+                            {secondary} <Delta data={rate} />
+                        </>
+                    }
+                </Secondary>
                 <Secondary>{fiatAmount}</Secondary>
             </SecondLine>
         </Description>
@@ -108,8 +115,8 @@ const DeltaColor = styled.span<{ positive: boolean }>`
             `}}
 `;
 
-export const Delta: FC<{ data: TokenRate | undefined }> = ({ data }) => {
-    if (!data || data.diff_24h == '0') return null;
+const Delta: FC<{ data: TokenRate | undefined }> = ({ data }) => {
+    if (!data || !data.diff_24h || data.diff_24h == '0') return null;
     const positive = data.diff_24h.startsWith('+');
     return <DeltaColor positive={positive}>{data.diff_24h}</DeltaColor>;
 };

@@ -9,6 +9,7 @@ import { TabsView } from '../../components/home/TabsView';
 import { HomeActions } from '../../components/home/TonActions';
 import { useWalletContext } from '../../hooks/appContext';
 import { filterTonAssetList } from '../../state/jetton';
+import { usePreFetchRates } from '../../state/rates';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { useTronBalances } from '../../state/tron';
 import { useWalletAccountInfo, useWalletJettonList, useWalletNftList } from '../../state/wallet';
@@ -31,6 +32,7 @@ const Home = () => {
     const { data: stock, isFetching: isStockLoading } = useTonenpointStock();
     const wallet = useWalletContext();
 
+    usePreFetchRates();
     const { data: info, error, isFetching: isAccountLoading } = useWalletAccountInfo();
     const { data: jettons, isFetching: isJettonLoading } = useWalletJettonList();
     const { data: nfts, isFetching: isNftLoading } = useWalletNftList();

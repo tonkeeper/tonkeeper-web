@@ -1,4 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { RatesApi } from '@tonkeeper/core/dist/tonApiV2';
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
@@ -18,30 +20,72 @@ export interface TokenRate {
     prices: number;
 }
 
+const toTokenRate = (rate: RateByCurrency, fiat: FiatCurrencies): TokenRate => {
+    return Object.entries(rate).reduce((acc, [key, value]) => {
+        acc[key] = value[fiat];
+        return acc;
+    }, {} as Record<string, any>) as TokenRate;
+};
+
+const popularJettons = [
+    'EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA', // jUSDT
+    'EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728', // jUSDC
+    'EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728' // jWBTC
+];
+
+export const usePreFetchRates = () => {
+    const { tonApiV2 } = useAppContext();
+    const { fiat } = useAppContext();
+    const client = useQueryClient();
+
+    return useQuery(
+        [QueryKey.rate],
+        async () => {
+            const tokens = [CryptoCurrency.TON, CryptoCurrency.USDT, ...popularJettons];
+            const value = await new RatesApi(tonApiV2).getRates({
+                tokens: tokens.join(','),
+                currencies: fiat
+            });
+
+            if (!value || !value.rates) {
+                throw new Error(`Missing price for tokens`);
+            }
+
+            for (let [token, rate] of Object.entries<RateByCurrency>(value.rates)) {
+                try {
+                    const tokenRate = toTokenRate(rate, fiat);
+                    if (tokenRate) {
+                        client.setQueryData([QueryKey.rate, fiat, token], tokenRate);
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        },
+        { retry: 0 }
+    );
+};
+
 export const useRate = (token: string) => {
     const { tonApiV2 } = useAppContext();
     const { fiat } = useAppContext();
     return useQuery<TokenRate, Error>(
-        [QueryKey.rate, token, fiat],
+        [QueryKey.rate, fiat, token],
         async () => {
             const value = await new RatesApi(tonApiV2).getRates({
                 tokens: token,
                 currencies: fiat
             });
 
-            if (
-                !value ||
-                !value.rates ||
-                !value.rates[token] ||
-                Object.keys(value.rates[token].prices).length === 0
-            ) {
-                throw new Error(`Missing price for token: ${token}`);
+            try {
+                const tokenRate = toTokenRate(value.rates[token], fiat);
+                if (!tokenRate) {
+                    throw new Error(`Missing price for token: ${token}`);
+                }
+                return tokenRate;
+            } catch (e) {
+                throw e;
             }
-            const rate: RateByCurrency = value.rates[token];
-            return Object.entries(rate).reduce((acc, [key, value]) => {
-                acc[key] = value[fiat];
-                return acc;
-            }, {} as Record<string, any>) as TokenRate;
         },
         { retry: 0 }
     );
