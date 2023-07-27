@@ -1,31 +1,24 @@
-import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
-import { TronBalance, TronBalances, TronToken } from '@tonkeeper/core/dist/tronApi';
-import React, { FC } from 'react';
+import { TronBalances, TronToken } from '@tonkeeper/core/dist/tronApi';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
+import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFormatCoinValue } from '../../hooks/balance';
+import { useFormatBalance } from '../../hooks/balance';
 import { AppRoute } from '../../libs/routes';
+import { useFormatFiat, useRate } from '../../state/rates';
 import { ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 const TronToken: FC<{
-    balance: TronBalance;
-    stock: TonendpointStock;
-}> = ({ balance: { token, weiAmount } }) => {
+    token: TronToken;
+    weiAmount: string;
+}> = ({ token, weiAmount }) => {
     const navigate = useNavigate();
 
-    const format = useFormatCoinValue();
-    const balance = format(weiAmount, token.decimals);
+    const amount = useMemo(() => formatDecimals(weiAmount, token.decimals), [weiAmount, token]);
+    const balance = useFormatBalance(amount, token.decimals);
 
-    // const [fiatPrice, fiatAmount] = useMemo(() => {
-    //   return [
-    //     formatFiatCurrency(fiat, price),
-    //     formatFiatCurrency(
-    //       fiat,
-    //       formatDecimals(price.multipliedBy(info.balance))
-    //     ),
-    //   ] as const;
-    // }, [fiat, price, info.balance]);
+    const { data } = useRate(token.symbol);
+    const { fiatPrice, fiatAmount } = useFormatFiat(data, amount);
 
     return (
         <ListItem onClick={() => navigate(AppRoute.coins + '/tron/' + token.address)}>
@@ -35,8 +28,8 @@ const TronToken: FC<{
                     name={token.name}
                     symbol={token.symbol}
                     balance={balance}
-                    secondary={null}
-                    fiatAmount={undefined}
+                    secondary={fiatPrice}
+                    fiatAmount={fiatAmount}
                     label="TRC20"
                 />
             </ListItemPayload>
@@ -44,15 +37,12 @@ const TronToken: FC<{
     );
 };
 
-export const TronAssets: FC<{ tokens: TronBalances; stock: TonendpointStock }> = ({
-    tokens,
-    stock
-}) => {
+export const TronAssets: FC<{ tokens: TronBalances }> = React.memo(({ tokens }) => {
     return (
         <>
-            {tokens.balances.map(balance => (
-                <TronToken key={balance.token.address} balance={balance} stock={stock} />
+            {tokens.balances.map(({ token, weiAmount }) => (
+                <TronToken key={token.address} token={token} weiAmount={weiAmount} />
             ))}
         </>
     );
-};
+});

@@ -23,6 +23,15 @@ export const useCoinFullBalance = (balance: number | string, decimals = 9) => {
     );
 };
 
+export const useFormatBalance = (amount: number | string, decimals = 9) => {
+    return useMemo(() => {
+        return formatter.format(amount, {
+            ignoreZeroTruncate: false,
+            decimals
+        });
+    }, [amount, decimals]);
+};
+
 export const useFormatCoinValue = () => {
     return useCallback((amount: number | string, decimals = 9) => {
         return formatter.format(formatDecimals(amount, decimals), {
