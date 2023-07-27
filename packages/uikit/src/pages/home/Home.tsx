@@ -42,13 +42,12 @@ const Home = () => {
         isJettonLoading || isAccountLoading || isNftLoading || isStockLoading || isTronLoading;
 
     const assets = useMemo<AssetData | undefined>(() => {
-        if (!info || !jettons || !stock || !tronBalances) return undefined;
+        if (!info || !jettons || !tronBalances) return undefined;
         return {
-            stock,
             ton: { info, jettons: filterTonAssetList(jettons, wallet) },
             tron: tronBalances
         };
-    }, [info, jettons, stock, wallet, tronBalances]);
+    }, [info, jettons, wallet, tronBalances]);
 
     if (!nfts || !assets) {
         return <HomeSkeleton />;

@@ -41,9 +41,8 @@ export const usePreFetchRates = () => {
     return useQuery(
         [QueryKey.rate],
         async () => {
-            const tokens = [CryptoCurrency.TON, CryptoCurrency.USDT, ...popularJettons];
             const value = await new RatesApi(tonApiV2).getRates({
-                tokens: tokens.join(','),
+                tokens: [CryptoCurrency.TON, CryptoCurrency.USDT, ...popularJettons].join(','),
                 currencies: fiat
             });
 
@@ -61,6 +60,7 @@ export const usePreFetchRates = () => {
                     console.error(e);
                 }
             }
+            return 'ok';
         },
         { retry: 0 }
     );

@@ -1,6 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AccountRepr, JettonBalance, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { TronBalances } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo } from 'react';
@@ -21,7 +20,6 @@ export interface TonAssetData {
 }
 
 export interface AssetData {
-    stock: TonendpointStock;
     ton: TonAssetData;
     tron: TronBalances;
 }
@@ -61,8 +59,7 @@ const TonAsset: FC<{
 
 const JettonAsset: FC<{
     jetton: JettonBalance;
-    stock: TonendpointStock;
-}> = ({ jetton, stock }) => {
+}> = ({ jetton }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -101,7 +98,6 @@ const JettonAsset: FC<{
 
 export const JettonList: FC<AssetProps> = ({
     assets: {
-        stock,
         ton: { info, jettons },
         tron
     }
@@ -114,7 +110,7 @@ export const JettonList: FC<AssetProps> = ({
             </ListBlock>
             <ListBlock noUserSelect>
                 {jettons.balances.map(jetton => (
-                    <JettonAsset key={jetton.jettonAddress} jetton={jetton} stock={stock} />
+                    <JettonAsset key={jetton.jettonAddress} jetton={jetton} />
                 ))}
             </ListBlock>
         </>
