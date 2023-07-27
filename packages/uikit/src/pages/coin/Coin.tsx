@@ -17,8 +17,6 @@ const CoinPage = () => {
 
     if (!name) return <></>;
 
-    console.log(name);
-
     if (name === 'tron') {
         return <TronPage />;
     } else if (name === 'ton') {
