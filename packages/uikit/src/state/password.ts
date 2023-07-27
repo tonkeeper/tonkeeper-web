@@ -2,9 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetPasswordType, IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState, defaultAuthState } from '@tonkeeper/core/dist/entries/password';
-import { addWalletVoucher, deleteWalletVoucher } from '@tonkeeper/core/dist/service/walletService';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
-import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
 import { QueryKey } from '../libs/queryKey';
 import { getPasswordByNotification } from '../pages/home/UnlockNotification';
@@ -40,25 +37,6 @@ export const useMutateLookScreen = () => {
     return useMutation<void, Error, boolean>(async value => {
         await storage.set(AppKey.LOCK, value);
         await client.invalidateQueries([QueryKey.lock]);
-    });
-};
-
-export const useMutateVoucher = () => {
-    const storage = useStorage();
-    const wallet = useWalletContext();
-    const sdk = useAppSdk();
-    const { tonApi } = useAppContext();
-    const client = useQueryClient();
-
-    return useMutation<void, Error, boolean>(async () => {
-        if (wallet.voucher) {
-            await deleteWalletVoucher(tonApi, storage, wallet);
-        } else {
-            const password = await getWalletPassword(sdk);
-            await addWalletVoucher(tonApi, storage, wallet, password);
-        }
-
-        await client.invalidateQueries();
     });
 };
 

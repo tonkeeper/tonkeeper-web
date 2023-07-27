@@ -45,7 +45,6 @@ export interface WalletState {
     name?: string;
 
     revision: number;
-    voucher?: WalletVoucher;
 
     network?: Network;
 

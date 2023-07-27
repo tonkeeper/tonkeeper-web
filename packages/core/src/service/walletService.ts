@@ -4,15 +4,7 @@ import { IStorage } from '../Storage';
 import { Network } from '../entries/network';
 import { WalletAddress, WalletState, WalletVersion, WalletVersions } from '../entries/wallet';
 import { Configuration, WalletApi } from '../tonApiV1';
-import {
-    createWalletBackup,
-    deleteWalletBackup,
-    getWalletBackup,
-    putWalletBackup
-} from './backupService';
 import { encrypt } from './cryptoService';
-import { getWalletMnemonic } from './mnemonicService';
-import { createWalletVoucher } from './voucherService';
 import { walletContract } from './wallet/contractService';
 import { setWalletState } from './wallet/storeService';
 
@@ -25,25 +17,12 @@ export const importWallet = async (
     const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-    const voucher = await createWalletVoucher(keyPair);
     const active = await findWalletAddress(tonApiConfig, keyPair);
 
     const publicKey = keyPair.publicKey.toString('hex');
 
-    if (publicKey === voucher.publicKey) {
-        throw new Error('publicKey is the same');
-    }
-
-    try {
-        const backup = await getWalletBackup(tonApiConfig, publicKey, voucher);
-        console.log(backup);
-    } catch (e) {
-        console.error(e);
-    }
-
     const state: WalletState = {
         publicKey,
-        voucher,
 
         active,
 
@@ -155,14 +134,7 @@ export const updateWalletProperty = async (
     wallet: WalletState,
     props: Pick<
         WalletState,
-        | 'name'
-        | 'hiddenJettons'
-        | 'shownJettons'
-        | 'orderJettons'
-        | 'lang'
-        | 'fiat'
-        | 'network'
-        | 'voucher'
+        'name' | 'hiddenJettons' | 'shownJettons' | 'orderJettons' | 'lang' | 'fiat' | 'network'
     >
 ) => {
     const updated: WalletState = {
@@ -171,43 +143,4 @@ export const updateWalletProperty = async (
         revision: wallet.revision + 1
     };
     await setWalletState(storage, updated);
-
-    if (updated.voucher) {
-        putWalletBackup(
-            tonApi,
-            updated.publicKey,
-            updated.voucher,
-            createWalletBackup(updated)
-        ).catch(() => console.log('fail backup'));
-    }
-};
-
-export const addWalletVoucher = async (
-    tonApi: Configuration,
-    storage: IStorage,
-    wallet: WalletState,
-    password: string
-) => {
-    const mnemonic = await getWalletMnemonic(storage, wallet.publicKey, password);
-    const keyPair = await mnemonicToPrivateKey(mnemonic);
-    await updateWalletProperty(tonApi, storage, wallet, {
-        voucher: await createWalletVoucher(keyPair)
-    });
-};
-
-export const deleteWalletVoucher = async (
-    tonApi: Configuration,
-    storage: IStorage,
-    wallet: WalletState
-) => {
-    if (wallet.voucher) {
-        try {
-            await deleteWalletBackup(tonApi, wallet.publicKey, wallet.voucher);
-        } catch (e) {
-            console.error(e);
-        }
-    }
-    await updateWalletProperty(tonApi, storage, wallet, {
-        voucher: undefined
-    });
 };
