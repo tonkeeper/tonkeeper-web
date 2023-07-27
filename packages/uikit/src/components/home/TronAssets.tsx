@@ -37,6 +37,7 @@ const TronToken: FC<{
                     balance={balance}
                     secondary={null}
                     fiatAmount={undefined}
+                    label="TRC20"
                 />
             </ListItemPayload>
         </ListItem>

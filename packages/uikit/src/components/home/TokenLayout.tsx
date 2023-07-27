@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { Body2, Label1 } from '../Text';
+import { Body2, Label1, Label4 } from '../Text';
 
 export const ListItemPayload = styled.div`
     flex-grow: 1;
@@ -40,6 +40,18 @@ const FirstLine = styled.div`
 const CoinName = styled(Label1)`
     text-overflow: ellipsis;
     overflow: hidden;
+
+    display: flex;
+    align-items: center;
+`;
+
+const CoinLabel = styled(Label4)`
+    display: inline-block;
+    margin-left: 8px;
+    padding: 3px 4px;
+    border-radius: ${props => props.theme.cornerExtraExtraSmall};
+    background: ${props => props.theme.backgroundContentTint};
+    color: ${props => props.theme.textSecondary};
 `;
 
 const SecondLine = styled.div`
@@ -61,12 +73,16 @@ export const TokenLayout: FC<{
     balance: string;
     secondary: React.ReactNode;
     fiatAmount?: string;
-}> = ({ name, symbol, balance, secondary, fiatAmount }) => {
+    label?: string;
+}> = ({ name, symbol, balance, secondary, fiatAmount, label }) => {
     return (
         <Description>
             <FirstLine>
-                <CoinName>{name}</CoinName>
-                <Symbol>{symbol}</Symbol>
+                <CoinName>
+                    {symbol ?? name}
+                    {label ? <CoinLabel>{label}</CoinLabel> : null}
+                </CoinName>
+                <Symbol></Symbol>
                 <Label1>{balance}</Label1>
             </FirstLine>
             <SecondLine>
