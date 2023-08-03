@@ -1,8 +1,13 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Recipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { BaseRecipient, DnsRecipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
 import { AccountApi, AccountRepr, DNSApi } from '@tonkeeper/core/dist/tonApiV1';
-import { debounce, seeIfValidAddress } from '@tonkeeper/core/dist/utils/common';
+import {
+    debounce,
+    seeIfValidTonAddress,
+    seeIfValidTronAddress
+} from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
@@ -11,16 +16,16 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
+import { Gap } from '../Layout';
+import { FullHeightBlock, NotificationCancelButton, NotificationTitleBlock } from '../Notification';
+import { Body2, H3 } from '../Text';
 import { ButtonMock } from '../fields/BackButton';
 import { Button } from '../fields/Button';
 import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
-import { Gap } from '../Layout';
-import { FullHeightBlock, NotificationCancelButton, NotificationTitleBlock } from '../Notification';
-import { Body2, H3 } from '../Text';
-import { ButtonBlock } from './common';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
+import { ButtonBlock } from './common';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -32,13 +37,13 @@ const Warning = styled(Body2)`
 
 export const useGetToAccount = () => {
     const { tonApi } = useAppContext();
-    return useMutation<AccountRepr, Error, Recipient>(recipient => {
+    return useMutation<AccountRepr, Error, BaseRecipient | DnsRecipient>(recipient => {
         const account = 'dns' in recipient ? recipient.dns.address : recipient.address;
         return new AccountApi(tonApi).getAccountInfo({ account });
     });
 };
 
-const useToAccount = (isValid: boolean, recipient: Recipient) => {
+const useToAccount = (isValid: boolean, recipient: BaseRecipient | DnsRecipient) => {
     const { tonApi } = useAppContext();
     const account = 'dns' in recipient ? recipient.dns.address : recipient.address;
     return useQuery<AccountRepr, Error>(
@@ -75,7 +80,7 @@ const useDnsWallet = (value: string) => {
             return result.wallet;
         },
         {
-            enabled: name.length >= 4 && !seeIfValidAddress(name),
+            enabled: name.length >= 4 && !seeIfValidTonAddress(name),
             retry: 0,
             keepPreviousData: false
         }
@@ -99,8 +104,8 @@ export const RecipientView: FC<{
 
     const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } = useGetToAccount();
 
-    const [comment, setComment] = useState(data?.comment ?? '');
-    const [recipient, setAddress] = useState<Recipient>(
+    const [comment, setComment] = useState(data && 'comment' in data ? data.comment : '');
+    const [recipient, setAddress] = useState<BaseRecipient | DnsRecipient>(
         data?.address ?? {
             address: ''
         }
@@ -125,14 +130,22 @@ export const RecipientView: FC<{
         }
     }, [setAddress, dnsWallet]);
 
-    const isValid = useMemo(() => {
-        if ('dns' in recipient) {
-            return true;
+    const isValidForBlockchain = useMemo(() => {
+        if ('dns' in recipient || seeIfValidTonAddress(recipient.address)) {
+            return BLOCKCHAIN_NAME.TON;
         }
-        return seeIfValidAddress(recipient.address);
+
+        if (seeIfValidTronAddress(recipient.address)) {
+            return BLOCKCHAIN_NAME.TRON;
+        }
+
+        return null;
     }, [recipient]);
 
-    const { data: toAccount, isFetching: isAccountFetching } = useToAccount(isValid, recipient);
+    const { data: toAccount, isFetching: isAccountFetching } = useToAccount(
+        isValidForBlockchain === BLOCKCHAIN_NAME.TON,
+        recipient
+    );
 
     const isFetching = isAccountFetching || isAccountLoading || isExternalLoading;
 
@@ -164,9 +177,29 @@ export const RecipientView: FC<{
 
     const handleSubmit = () => {
         setSubmit(true);
-        if (isValid && isMemoValid && toAccount) {
+        let isValid;
+        switch (isValidForBlockchain) {
+            case BLOCKCHAIN_NAME.TON:
+                isValid = isMemoValid && toAccount;
+                break;
+            case BLOCKCHAIN_NAME.TRON:
+                isValid = true;
+        }
+        if (isValid) {
             if (ios && keyboard) openIosKeyboard(keyboard);
-            setRecipient({ address: recipient, toAccount, comment, done: true });
+            if (isValidForBlockchain === BLOCKCHAIN_NAME.TON) {
+                setRecipient({
+                    address: { ...recipient, blockchain: BLOCKCHAIN_NAME.TON },
+                    toAccount: toAccount!,
+                    comment,
+                    done: true
+                });
+            } else {
+                setRecipient({
+                    address: { ...recipient, blockchain: BLOCKCHAIN_NAME.TRON },
+                    done: true
+                });
+            }
         }
     };
     const onSubmit: React.FormEventHandler<HTMLFormElement> = e => {
@@ -178,14 +211,22 @@ export const RecipientView: FC<{
     const onSelect = async (item: Suggestion) => {
         setAddress(item);
         if (ios && keyboard) openIosKeyboard(keyboard);
-        const to = await getAccountAsync(item);
-        if (to.memoRequired) return;
-        setRecipient({
-            address: item,
-            toAccount: to,
-            comment,
-            done: true
-        });
+
+        if (seeIfValidTronAddress(item.address)) {
+            setRecipient({
+                address: { ...item, blockchain: BLOCKCHAIN_NAME.TRON },
+                done: true
+            });
+        } else {
+            const to = await getAccountAsync(item);
+            if (to.memoRequired) return;
+            setRecipient({
+                address: { ...item, blockchain: BLOCKCHAIN_NAME.TON },
+                toAccount: to,
+                comment,
+                done: true
+            });
+        }
     };
 
     return (
@@ -203,7 +244,7 @@ export const RecipientView: FC<{
                     onScan={onScan}
                     onChange={address => setAddress({ address })}
                     label={t('transaction_recipient_address')}
-                    isValid={!submitted || isValid}
+                    isValid={!submitted || !!isValidForBlockchain}
                     disabled={isExternalLoading}
                 />
             </ShowAddress>

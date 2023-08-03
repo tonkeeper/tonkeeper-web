@@ -419,9 +419,9 @@ const todayKeys = [
 
 export interface TonendpointStock {
     today: {
-        [key: typeof todayKeys[number]]: string;
+        [key: (typeof todayKeys)[number]]: string;
     };
     yesterday: {
-        [key: typeof yesterdayKeys[number]]: string;
+        [key: (typeof yesterdayKeys)[number]]: string;
     };
 }

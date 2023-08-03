@@ -1,8 +1,8 @@
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
-    parseTonTransfer,
-    TonTransferParams
+    TonTransferParams,
+    parseTonTransfer
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { seeIfAddressEqual } from '@tonkeeper/core/dist/utils/common';
@@ -14,14 +14,14 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
-import { useWalletAccountInfo, useWalletJettonList } from '../../state/wallet';
+import { useWalletJettonList } from '../../state/wallet';
+import { Notification } from '../Notification';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
-import { Notification } from '../Notification';
-import { AmountView } from './AmountView';
-import { childFactoryCreator, duration, Wrapper } from './common';
 import { ConfirmView } from './ConfirmView';
 import { RecipientView, useGetToAccount } from './RecipientView';
+import { Wrapper, childFactoryCreator, duration } from './common';
+import { AmountView } from './amount-view/AmountView';
 
 const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     onClose,
@@ -31,7 +31,6 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     const { standalone, ios, extension } = useAppContext();
     const { t } = useTranslation();
     const { data: jettons } = useWalletJettonList();
-    const { data: info } = useWalletAccountInfo();
     const filter = useUserJettonList(jettons);
 
     const recipientRef = useRef<HTMLDivElement>(null);
@@ -43,6 +42,20 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
     const [amount, setAmount] = useState<AmountData | undefined>(undefined);
 
     const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } = useGetToAccount();
+
+    /* const setRecipientAndDefaultAmount = (value: RecipientData) => {
+        if (recipient?.address.blockchain !== value.address.blockchain) {
+            if (recipient?.address.blockchain === BLOCKCHAIN_NAME.TON) {
+                setAmount({
+                    jetton: asset !== CryptoCurrency.TRON_USDT ? asset : CryptoCurrency.TON
+                });
+            } else {
+                setAmount({ jetton: CryptoCurrency.TRON_USDT });
+            }
+        }
+
+        setRecipient(value);
+    }; */
 
     const onRecipient = (data: RecipientData) => {
         setRight(true);
@@ -71,25 +84,25 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
         setAmount(value => (value ? { ...value, done: false } : undefined));
     }, [setAmount]);
 
-    const processRecipient = useCallback(
-        async ({ address, text }: TonTransferParams) => {
-            const item = { address: address };
-            const toAccount = await getAccountAsync(item);
+    const processRecipient = async ({ address, text }: TonTransferParams) => {
+        const item = { address: address, blockchain: BLOCKCHAIN_NAME.TON } as const;
+        const toAccount = await getAccountAsync(item);
 
-            const done = !toAccount.memoRequired
-                ? true
-                : toAccount.memoRequired && text
-                ? true
-                : false;
-            setRecipient({
-                address: item,
-                toAccount,
-                comment: text ?? '',
-                done
-            });
-        },
-        [setRecipient, getAccountAsync]
-    );
+        const done = !toAccount.memoRequired ? true : toAccount.memoRequired && text ? true : false;
+        /* setRecipientAndDefaultAmount({
+            address: { ...item, blockchain: BLOCKCHAIN_NAME.TON }, // TODO
+            toAccount,
+            comment: text ?? '',
+            done
+        }); */
+
+        setRecipient({
+            address: item,
+            toAccount,
+            comment: text ?? '',
+            done
+        });
+    };
 
     const processJetton = useCallback(
         async ({ amount: a, jetton }: TonTransferParams) => {
@@ -177,12 +190,9 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                         )}
                         {state === 'amount' && (
                             <AmountView
-                                data={amount}
+                                defaultTokenAmount={{ token: asset }}
                                 onClose={onClose}
                                 onBack={backToRecipient}
-                                asset={asset}
-                                jettons={filter}
-                                info={info}
                                 recipient={recipient!}
                                 setAmount={onAmount}
                             />

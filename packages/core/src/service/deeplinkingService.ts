@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import { seeIfValidAddress } from '../utils/common';
+import { seeIfValidTonAddress } from '../utils/common';
 
 export interface TonTransferParams {
     address: string;
@@ -17,11 +17,11 @@ export function parseTonTransfer(options: { url: string }) {
         let linkAddress: string;
         if (paths.length === 0) {
             throw new Error('Empty link');
-        } else if (paths.length === 1 && seeIfValidAddress(options.url)) {
+        } else if (paths.length === 1 && seeIfValidTonAddress(options.url)) {
             linkAddress = paths[0];
         } else {
             const [operator, address] = paths.slice(-2);
-            if (operator === 'transfer' && seeIfValidAddress(address)) {
+            if (operator === 'transfer' && seeIfValidTonAddress(address)) {
                 linkAddress = address;
             } else {
                 throw new Error('unknown operator ' + data.url);

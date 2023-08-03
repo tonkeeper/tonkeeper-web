@@ -1,5 +1,5 @@
-import { useGetToAccount } from '../../components/transfer/RecipientView';
 import { useEffect, useMemo, useRef } from 'react';
+import { useGetToAccount } from '../../components/transfer/RecipientView';
 
 export function useRecipient(address: string) {
     const isFirstRender = useRef(true);
