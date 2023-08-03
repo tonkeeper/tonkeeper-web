@@ -1,25 +1,25 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { JettonApi, JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV1';
-import { getJettonStockAmount, getJettonStockPrice } from '@tonkeeper/core/dist/utils/balance';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo } from 'react';
-import { ActivityGroupRaw } from '../../components/activity/ActivityGroup';
+import { Address } from 'ton-core';
 import { InnerBody } from '../../components/Body';
+import { CoinHistorySkeleton, CoinSkeletonPage, HistoryBlock } from '../../components/Skeleton';
+import { SubHeader } from '../../components/SubHeader';
+import { ActivityGroupRaw } from '../../components/activity/ton/ActivityGroup';
 import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
-import { CoinHistorySkeleton, CoinSkeletonPage, HistoryBlock } from '../../components/Skeleton';
-import { SubHeader } from '../../components/SubHeader';
 import { SendAction } from '../../components/transfer/SendNotifications';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
-import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { JettonKey, QueryKey } from '../../libs/queryKey';
+import { useJettonBalance, useJettonInfo } from '../../state/jetton';
+import { useFormatFiat, useRate } from '../../state/rates';
 import {
     ActivityGroup,
     groupActivity,
     groupAndFilterJettonActivityItems
-} from '../../state/activity';
-import { useJettonBalance, useJettonInfo } from '../../state/jetton';
-import { useTonenpointStock } from '../../state/tonendpoint';
+} from '../../state/ton/tonActivity';
 
 const JettonHistory: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ balance }) => {
     const { tonApi } = useAppContext();
@@ -54,41 +54,43 @@ const JettonHistory: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ balan
     );
 };
 
+const JettonHeader: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ info, balance }) => {
+    const [amount, address] = useMemo(
+        () => [
+            formatDecimals(balance.balance, info.metadata.decimals),
+            Address.parse(balance.jettonAddress).toString()
+        ],
+        [info, balance]
+    );
+
+    const { data } = useRate(address);
+    const { fiatPrice, fiatAmount } = useFormatFiat(data, amount);
+    const { description, image } = info.metadata;
+
+    return (
+        <CoinInfo
+            amount={amount}
+            symbol={info.metadata.symbol}
+            price={fiatAmount}
+            description={description}
+            image={image}
+        />
+    );
+};
+
 export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) => {
-    const { fiat } = useAppContext();
     const { data: info } = useJettonInfo(jettonAddress);
     const { data: balance } = useJettonBalance(jettonAddress);
-    const { data: stock } = useTonenpointStock();
 
-    const format = useFormatCoinValue();
-
-    const [, total] = useMemo(() => {
-        if (!stock || !balance) return [undefined, undefined] as const;
-        const price = getJettonStockPrice(balance, stock.today, fiat);
-        if (!price) return [undefined, undefined] as const;
-        const amount = getJettonStockAmount(balance, price);
-        return [
-            formatFiatCurrency(fiat, price),
-            amount ? formatFiatCurrency(fiat, amount) : undefined
-        ];
-    }, [balance, stock, fiat]);
-
-    if (!info || !balance || !stock) {
+    if (!info || !balance) {
         return <CoinSkeletonPage />;
     }
 
-    const { description, image, name } = info.metadata;
     return (
         <>
-            <SubHeader title={name} />
+            <SubHeader title={info.metadata.name} />
             <InnerBody>
-                <CoinInfo
-                    amount={format(balance.balance, info.metadata.decimals)}
-                    symbol={info.metadata.symbol}
-                    price={total}
-                    description={description}
-                    image={image}
-                />
+                <JettonHeader balance={balance} info={info} />
                 <ActionsRow>
                     <SendAction asset={info.metadata.address} />
                     <ReceiveAction info={info} />

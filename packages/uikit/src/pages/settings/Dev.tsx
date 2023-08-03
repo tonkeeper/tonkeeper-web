@@ -5,7 +5,7 @@ import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useCleanUpTronStore } from '../../state/tron';
+import { useCleanUpTronStore } from '../../state/tron/tron';
 import { useMutateWalletProperty } from '../../state/wallet';
 
 export const DevSettings = React.memo(() => {

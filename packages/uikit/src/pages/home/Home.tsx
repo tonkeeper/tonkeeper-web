@@ -11,7 +11,7 @@ import { useWalletContext } from '../../hooks/appContext';
 import { filterTonAssetList } from '../../state/jetton';
 import { usePreFetchRates } from '../../state/rates';
 import { useTonenpointStock } from '../../state/tonendpoint';
-import { useTronBalances } from '../../state/tron';
+import { useTronBalances } from '../../state/tron/tron';
 import { useWalletAccountInfo, useWalletJettonList, useWalletNftList } from '../../state/wallet';
 
 const HomeAssets: FC<{

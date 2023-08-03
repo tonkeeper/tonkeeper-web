@@ -5,10 +5,7 @@ import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { formatDecimals, getTonCoinStockPrice } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import React, { useMemo, useRef } from 'react';
-import { ActivityGroupRaw } from '../../components/activity/ActivityGroup';
 import { InnerBody } from '../../components/Body';
-import { HomeActions } from '../../components/home/TonActions';
-import { CoinInfo } from '../../components/jettons/Info';
 import {
     CoinHistorySkeleton,
     CoinSkeletonPage,
@@ -16,12 +13,19 @@ import {
     SkeletonList
 } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
+import { ActivityGroupRaw } from '../../components/activity/ton/ActivityGroup';
+import { HomeActions } from '../../components/home/TonActions';
+import { CoinInfo } from '../../components/jettons/Info';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import { ActivityGroup, groupActivity, groupAndFilterTonActivityItems } from '../../state/activity';
+import {
+    ActivityGroup,
+    groupActivity,
+    groupAndFilterTonActivityItems
+} from '../../state/ton/tonActivity';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { useWalletAccountInfo } from '../../state/wallet';
 

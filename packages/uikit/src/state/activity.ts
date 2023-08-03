@@ -1,6 +1,3 @@
-import { InfiniteData } from '@tanstack/react-query';
-import { AccountEvent, AccountEvents200Response, Action } from '@tonkeeper/core/dist/tonApiV1';
-
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp * 1000);
 
@@ -74,117 +71,55 @@ const getEventGroup = (timestamp: number, today: Date, yesterday: Date): string 
     return `year-${date.getFullYear()}-${date.getMonth() + 1}`;
 };
 
-export interface ActivityItem {
-    timestamp: number;
-    event: AccountEvent;
-}
+export type GenericActivity<T> = { timestamp: number; key: string; event: T };
+export type GenericActivityGroup<T> = [string, GenericActivity<T>[]];
 
-export type ActivityGroup = [string, ActivityItem[]];
-
-export const groupActivityItems = (data: InfiniteData<AccountEvents200Response>) => {
-    const list = [] as ActivityItem[];
-
-    data.pages.forEach(page => {
-        page.events.forEach(event => {
-            list.push({
-                timestamp: event.timestamp,
-                event
-            });
-        });
-    });
-
-    return list;
-};
-export const groupAndFilterJettonActivityItems = (
-    data: InfiniteData<AccountEvents200Response>,
-    walletAddress: string
-) => {
-    const list = [] as ActivityItem[];
-
-    data.pages.forEach(page => {
-        page.events.forEach(event => {
-            if (walletAddress) {
-                event.actions = event.actions.filter(action => {
-                    if (action.tonTransfer) {
-                        return (
-                            action.tonTransfer.sender.address === walletAddress ||
-                            action.tonTransfer.recipient.address === walletAddress
-                        );
-                    } else if (action.contractDeploy) {
-                        return action.contractDeploy.deployer.address === walletAddress;
-                    }
-                    return true;
-                });
-            }
-            list.push({
-                timestamp: event.timestamp,
-                event
-            });
-        });
-    });
-    return list;
-};
-
-const seeIfTonTransfer = (action: Action) => {
-    if (action.type === 'TonTransfer') {
-        return true;
-    } else if (action.type === 'ContractDeploy') {
-        if (action.contractDeploy?.interfaces?.includes('wallet')) {
-            return true;
-        }
-    }
-    return false;
-};
-
-export const groupAndFilterTonActivityItems = (data: InfiniteData<AccountEvents200Response>) => {
-    const list = [] as ActivityItem[];
-
-    data.pages.forEach(page => {
-        page.events.forEach(event => {
-            const tonTransferEvent = event.actions.every(seeIfTonTransfer);
-            if (tonTransferEvent) {
-                list.push({
-                    timestamp: event.timestamp,
-                    event
-                });
-            }
-        });
-    });
-    return list;
-};
-
-export const groupActivity = (list: ActivityItem[]) => {
-    list.sort((a, b) => b.timestamp - a.timestamp);
+export const groupActivityGeneric = <T>(
+    list: T[],
+    toTimestamp: (item: T) => number,
+    toKey: (item: T) => string
+): GenericActivityGroup<T>[] => {
+    list.sort((a, b) => toTimestamp(b) - toTimestamp(a));
 
     const todayDate = new Date();
     const yesterdayDate = new Date();
     yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 
     const { today, yesterday, ...rest } = list.reduce((acc, item) => {
-        const group = getEventGroup(item.timestamp, todayDate, yesterdayDate);
+        const group = getEventGroup(toTimestamp(item), todayDate, yesterdayDate);
         if (acc[group]) {
             acc[group].push(item);
         } else {
             acc[group] = [item];
         }
         return acc;
-    }, {} as Record<string, ActivityItem[]>);
+    }, {} as Record<string, T[]>);
 
-    const result = [] as ActivityGroup[];
+    const mapGroup = (list: T[]): GenericActivity<T>[] => {
+        return list.map(item => ({ timestamp: toTimestamp(item), key: toKey(item), event: item }));
+    };
+
+    const result = [] as GenericActivityGroup<T>[];
     if (today) {
-        result.push(['today', today]);
+        result.push(['today', mapGroup(today)]);
     }
     if (yesterday) {
-        result.push(['yesterday', yesterday]);
+        result.push(['yesterday', mapGroup(yesterday)]);
     }
 
     Object.entries(rest)
         .filter(([key]) => key.startsWith('month'))
-        .forEach(value => result.push(value));
+        .forEach(([key, items]) => {
+            const r: GenericActivityGroup<T> = [key, mapGroup(items)];
+            result.push(r);
+        });
 
     Object.entries(rest)
         .filter(([key]) => key.startsWith('year'))
-        .forEach(value => result.push(value));
+        .forEach(([key, items]) => {
+            const r: GenericActivityGroup<T> = [key, mapGroup(items)];
+            result.push(r);
+        });
 
     return result;
 };

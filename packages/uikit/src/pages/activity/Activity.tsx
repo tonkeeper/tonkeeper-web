@@ -1,15 +1,15 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { EventApi } from '@tonkeeper/core/dist/tonApiV1';
 import React, { FC, useMemo, useRef } from 'react';
-import { ActivityGroupRaw } from '../../components/activity/ActivityGroup';
-import { EmptyActivity } from '../../components/activity/EmptyActivity';
 import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
 import { ActivitySkeletonPage, SkeletonList } from '../../components/Skeleton';
+import { EmptyActivity } from '../../components/activity/EmptyActivity';
+import { ActivityGroupRaw } from '../../components/activity/ton/ActivityGroup';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import { ActivityGroup, groupActivity, groupActivityItems } from '../../state/activity';
+import { ActivityGroup, groupActivity, groupActivityItems } from '../../state/ton/tonActivity';
 
 const pageLimit = 20;
 
