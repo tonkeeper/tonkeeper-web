@@ -6,7 +6,7 @@ import { Address } from 'ton-core';
 import { InnerBody } from '../../components/Body';
 import { CoinHistorySkeleton, CoinSkeletonPage, HistoryBlock } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
-import { ActivityGroupRaw } from '../../components/activity/ton/ActivityGroup';
+import { ActivityGroupRaw } from '../../components/activity/ton/TonActivityGroup';
 import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';

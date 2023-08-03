@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { GenericActivityGroup } from '../../../state/activity';
 import { ListItem } from '../../List';
 import { ActivityBlock, ProgressIcon } from '../ActivityLayout';
+import { TronActivityAction } from './TronActivityAction';
 
 export const TronActivityGroup: FC<{
     items: GenericActivityGroup<TronEvent>[];
@@ -26,12 +27,7 @@ export const TronActivityGroup: FC<{
                                     // })
                                 }
                             >
-                                {/* <ActivityAction
-                            action={action}
-                            isScam={event.isScam}
-                            date={date}
-                            openNft={setNft}
-                        /> */}
+                                <TronActivityAction action={action} date={date} />
                                 {event.inProgress && <ProgressIcon />}
                             </ListItem>
                         ))}

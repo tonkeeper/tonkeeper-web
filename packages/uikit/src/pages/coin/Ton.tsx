@@ -13,7 +13,7 @@ import {
     SkeletonList
 } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
-import { ActivityGroupRaw } from '../../components/activity/ton/ActivityGroup';
+import { ActivityGroupRaw } from '../../components/activity/ton/TonActivityGroup';
 import { HomeActions } from '../../components/home/TonActions';
 import { CoinInfo } from '../../components/jettons/Info';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';

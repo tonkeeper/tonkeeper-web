@@ -5,7 +5,7 @@ import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
 import { ActivitySkeletonPage, SkeletonList } from '../../components/Skeleton';
 import { EmptyActivity } from '../../components/activity/EmptyActivity';
-import { ActivityGroupRaw } from '../../components/activity/ton/ActivityGroup';
+import { ActivityGroupRaw } from '../../components/activity/ton/TonActivityGroup';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
