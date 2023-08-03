@@ -7,22 +7,25 @@ import { DefaultDecimals } from './send';
 
 export const formatDecimals = (
     amount: BigNumber.Value,
-    decimals: number = DefaultDecimals
+    decimals: number | string = DefaultDecimals
 ): number => {
+    decimals = typeof decimals === 'string' ? parseInt(decimals) : decimals;
     return new BigNumber(amount).shiftedBy(-decimals).toNumber();
 };
 
 export const shiftedDecimals = (
     amount: BigNumber.Value,
-    decimals: number = DefaultDecimals
+    decimals: number | string = DefaultDecimals
 ): BigNumber => {
+    decimals = typeof decimals === 'string' ? parseInt(decimals) : decimals;
     return new BigNumber(amount).shiftedBy(-decimals);
 };
 
 export const unShiftedDecimals = (
     amount: BigNumber.Value,
-    decimals: number = DefaultDecimals
+    decimals: number | string = DefaultDecimals
 ): BigNumber => {
+    decimals = typeof decimals === 'string' ? parseInt(decimals) : decimals;
     return new BigNumber(amount).shiftedBy(decimals);
 };
 

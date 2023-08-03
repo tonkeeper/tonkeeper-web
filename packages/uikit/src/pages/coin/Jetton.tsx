@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { JettonApi, JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV1';
+import { JettonApi, JettonBalance } from '@tonkeeper/core/dist/tonApiV1';
+import { JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo } from 'react';
 import { Address } from 'ton-core';

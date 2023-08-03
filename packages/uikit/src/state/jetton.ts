@@ -5,9 +5,9 @@ import {
     AccountEvents,
     JettonApi,
     JettonBalance,
-    JettonInfo,
     JettonsBalances
 } from '@tonkeeper/core/dist/tonApiV1';
+import { JettonInfo, JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useMemo } from 'react';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useStorage } from '../hooks/storage';
@@ -15,12 +15,12 @@ import { JettonKey, QueryKey } from '../libs/queryKey';
 
 export const useJettonInfo = (jettonAddress: string) => {
     const wallet = useWalletContext();
-    const { tonApi } = useAppContext();
+    const { tonApiV2 } = useAppContext();
     return useQuery<JettonInfo, Error>(
         [wallet.active.rawAddress, QueryKey.jettons, JettonKey.info, jettonAddress],
         async () => {
-            const result = await new JettonApi(tonApi).getJettonInfo({
-                account: jettonAddress
+            const result = await new JettonsApi(tonApiV2).getJettonInfo({
+                accountId: jettonAddress
             });
             return result;
         }
