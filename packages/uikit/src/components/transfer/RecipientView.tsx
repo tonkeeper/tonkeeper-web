@@ -249,14 +249,16 @@ export const RecipientView: FC<{
                 />
             </ShowAddress>
 
-            <TextArea
-                onSubmit={handleSubmit}
-                value={comment}
-                onChange={setComment}
-                label={t('txActions_signRaw_comment')}
-                isValid={!submitted || isMemoValid}
-                disabled={isExternalLoading}
-            />
+            {isValidForBlockchain !== BLOCKCHAIN_NAME.TRON && (
+                <TextArea
+                    onSubmit={handleSubmit}
+                    value={comment}
+                    onChange={setComment}
+                    label={t('txActions_signRaw_comment')}
+                    isValid={!submitted || isMemoValid}
+                    disabled={isExternalLoading}
+                />
+            )}
             {toAccount && toAccount.memoRequired && (
                 <Warning>{t('send_screen_steps_comfirm_comment_required_text')}</Warning>
             )}

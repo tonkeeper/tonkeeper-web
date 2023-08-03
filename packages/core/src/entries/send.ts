@@ -13,6 +13,14 @@ export type TonRecipient = (BaseRecipient | DnsRecipient) & { blockchain: BLOCKC
 export type TronRecipient = BaseRecipient & { blockchain: BLOCKCHAIN_NAME.TRON };
 export type Recipient = TonRecipient | TronRecipient;
 
+export function isTonRecipient(recipient: Recipient): recipient is TonRecipient {
+    return recipient.blockchain === BLOCKCHAIN_NAME.TON;
+}
+
+export function isTronRecipient(recipient: Recipient): recipient is TronRecipient {
+    return recipient.blockchain === BLOCKCHAIN_NAME.TRON;
+}
+
 export interface TonRecipientData {
     address: TonRecipient;
     comment: string;
@@ -26,6 +34,18 @@ export interface TronRecipientData {
 }
 
 export type RecipientData = TonRecipientData | TronRecipientData;
+
+export function isTonRecipientData(
+    recipientData: RecipientData
+): recipientData is TonRecipientData {
+    return isTonRecipient(recipientData.address);
+}
+
+export function isTronRecipientData(
+    recipientData: RecipientData
+): recipientData is TronRecipientData {
+    return isTronRecipient(recipientData.address);
+}
 
 export interface AmountValue {
     fiat?: BigNumber;

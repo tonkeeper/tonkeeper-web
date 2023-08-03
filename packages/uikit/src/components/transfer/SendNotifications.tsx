@@ -190,7 +190,7 @@ const SendContent: FC<{ onClose: () => void; asset?: string }> = ({
                         )}
                         {state === 'amount' && (
                             <AmountView
-                                defaultTokenAmount={{ token: asset }}
+                                /* defaultTokenAmount={{ token: asset }} */
                                 onClose={onClose}
                                 onBack={backToRecipient}
                                 recipient={recipient!}

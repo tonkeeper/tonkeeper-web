@@ -4,10 +4,12 @@ import { BLOCKCHAIN_NAME } from '../../crypto';
 import { JettonsBalances } from '../../../tonApiV1';
 import { TON_ASSET } from './constants';
 
-export interface TonAsset extends Asset {
+export interface TonAssetIdentification {
     address: Address | 'TON';
     blockchain: BLOCKCHAIN_NAME.TON;
 }
+
+export interface TonAsset extends Asset, TonAssetIdentification {}
 
 export function jettonToTonAsset(address: string, jettons: JettonsBalances): TonAsset {
     if (address === 'TON') {
@@ -25,7 +27,10 @@ export function jettonToTonAsset(address: string, jettons: JettonsBalances): Ton
     };
 }
 
-export function legacyTonAssetId(tonAsset: TonAsset, options?: { userFriendly?: boolean }): string {
+export function legacyTonAssetId(
+    tonAsset: TonAssetIdentification,
+    options?: { userFriendly?: boolean }
+): string {
     if (tonAsset.address === 'TON') {
         return 'TON';
     }
