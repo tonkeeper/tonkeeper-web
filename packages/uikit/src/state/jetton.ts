@@ -1,12 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
-import {
-    AccountEvents,
-    JettonApi,
-    JettonBalance,
-    JettonsBalances
-} from '@tonkeeper/core/dist/tonApiV1';
+import { JettonApi, JettonBalance, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { JettonInfo, JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useMemo } from 'react';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
@@ -21,21 +16,6 @@ export const useJettonInfo = (jettonAddress: string) => {
         async () => {
             const result = await new JettonsApi(tonApiV2).getJettonInfo({
                 accountId: jettonAddress
-            });
-            return result;
-        }
-    );
-};
-
-export const useJettonHistory = (walletAddress: string) => {
-    const wallet = useWalletContext();
-    const { tonApi } = useAppContext();
-    return useQuery<AccountEvents, Error>(
-        [wallet.active.rawAddress, QueryKey.jettons, JettonKey.history, walletAddress],
-        async () => {
-            const result = await new JettonApi(tonApi).getJettonHistory({
-                account: walletAddress,
-                limit: 100
             });
             return result;
         }
