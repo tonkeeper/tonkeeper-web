@@ -4,9 +4,10 @@ import React, { FC } from 'react';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { Label1 } from '../../Text';
-import { ActivityIcon, SentIcon } from '../ActivityIcons';
+import { ActivityIcon, ContractDeployIcon, SentIcon } from '../ActivityIcons';
 import {
     AmountText,
+    ColumnLayout,
     Description,
     ErrorAction,
     FirstLabel,
@@ -50,6 +51,30 @@ const SendTRC20: FC<{
     );
 };
 
+const ContractDeploy: FC<{
+    action: TronAction;
+    date: string;
+}> = ({ action, date }) => {
+    const { t } = useTranslation();
+
+    const { contractDeploy } = action;
+    if (!contractDeploy) return <ErrorAction />;
+
+    return (
+        <ListItemGrid>
+            <ActivityIcon>
+                <ContractDeployIcon />
+            </ActivityIcon>
+            <ColumnLayout
+                title={t('transaction_type_contract_deploy')}
+                entry="-"
+                address={toShortValue(contractDeploy.ownerAddress!)}
+                date={date}
+            />
+        </ListItemGrid>
+    );
+};
+
 export const TronActivityAction: FC<{
     action: TronAction;
     date: string;
@@ -62,7 +87,7 @@ export const TronActivityAction: FC<{
         case 'SendTRC20':
             return <SendTRC20 action={action} date={date} />;
         case 'ContractDeploy':
-        // return <NftItemTransferAction action={action} date={date} />;
+            return <ContractDeploy action={action} date={date} />;
         default: {
             console.log(action);
             return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;

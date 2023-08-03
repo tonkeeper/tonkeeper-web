@@ -1,5 +1,5 @@
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
-    const date = new Date(timestamp * 1000);
+    const date = new Date(timestamp);
 
     if (date.getFullYear() < new Date().getFullYear()) {
         return new Intl.DateTimeFormat(language, {
@@ -31,7 +31,7 @@ export const getActivityTitle = (language: string, key: string, timestamp: numbe
             new Intl.RelativeTimeFormat(language, { numeric: 'auto' }).format(-1, 'day')
         );
     }
-    const date = new Date(timestamp * 1000);
+    const date = new Date(timestamp);
     if (key.startsWith('month')) {
         return capitalize(
             new Intl.DateTimeFormat(language, {
@@ -56,7 +56,7 @@ export const getActivityTitle = (language: string, key: string, timestamp: numbe
 };
 
 const getEventGroup = (timestamp: number, today: Date, yesterday: Date): string => {
-    const date = new Date(timestamp * 1000);
+    const date = new Date(timestamp);
 
     if (today.toDateString() === date.toDateString()) {
         return 'today';
