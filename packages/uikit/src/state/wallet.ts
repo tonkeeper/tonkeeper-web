@@ -12,10 +12,9 @@ import {
     JettonsBalances,
     NFTApi,
     NftCollection,
-    NftItemRepr,
-    WalletApi
+    NftItemRepr
 } from '@tonkeeper/core/dist/tonApiV1';
-import { BlockchainApi, DNSApi, DnsRecord } from '@tonkeeper/core/dist/tonApiV2';
+import { BlockchainApi, DNSApi, DnsRecord, WalletsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
@@ -82,9 +81,9 @@ export const useMutateWalletProperty = (clearWallet = false) => {
 
 export const useWalletAddresses = () => {
     const wallet = useWalletContext();
-    const { tonApi } = useAppContext();
+    const { tonApiV2 } = useAppContext();
     return useQuery<string[], Error>([wallet.publicKey, QueryKey.addresses], () =>
-        getWalletActiveAddresses(tonApi, wallet)
+        getWalletActiveAddresses(tonApiV2, wallet)
     );
 };
 
@@ -137,15 +136,15 @@ export const useWalletJettonList = () => {
 };
 export const useWalletNftList = () => {
     const wallet = useWalletContext();
-    const { tonApi } = useAppContext();
+    const { tonApiV2, tonApi } = useAppContext();
 
     return useQuery<NFT[], Error>(
         [wallet.publicKey, QueryKey.nft],
         async () => {
-            const { wallets } = await new WalletApi(tonApi).findWalletsByPubKey({
+            const { accounts } = await new WalletsApi(tonApiV2).getWalletsByPublicKey({
                 publicKey: wallet.publicKey
             });
-            const result = wallets
+            const result = accounts
                 .filter(item => item.balance > 0 || item.status === 'active')
                 .map(w => w.address);
 
