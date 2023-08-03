@@ -4,7 +4,7 @@ import React, { FC } from 'react';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { Label1 } from '../../Text';
-import { ActivityIcon, ContractDeployIcon, SentIcon } from '../ActivityIcons';
+import { ActivityIcon, ContractDeployIcon, ReceiveIcon, SentIcon } from '../ActivityIcons';
 import {
     AmountText,
     ColumnLayout,
@@ -16,6 +16,40 @@ import {
     SecondLine,
     SecondaryText
 } from '../CommonAction';
+
+const ReceiveTRC20: FC<{
+    action: TronAction;
+    date: string;
+}> = ({ action, date }) => {
+    const { t } = useTranslation();
+
+    const format = useFormatCoinValue();
+
+    const { receiveTRC20 } = action;
+    if (!receiveTRC20) return <ErrorAction />;
+
+    return (
+        <ListItemGrid>
+            <ActivityIcon>
+                <ReceiveIcon />
+            </ActivityIcon>
+            <Description>
+                <FirstLine>
+                    <FirstLabel>{t('transaction_type_receive')}</FirstLabel>
+                    <AmountText>
+                        +&thinsp;
+                        {format(receiveTRC20.amount, receiveTRC20.token.decimals)}
+                    </AmountText>
+                    <Label1>{receiveTRC20.token.symbol}</Label1>
+                </FirstLine>
+                <SecondLine>
+                    <SecondaryText>{toShortValue(receiveTRC20.sender)}</SecondaryText>
+                    <SecondaryText>{date}</SecondaryText>
+                </SecondLine>
+            </Description>
+        </ListItemGrid>
+    );
+};
 
 const SendTRC20: FC<{
     action: TronAction;
@@ -83,7 +117,7 @@ export const TronActivityAction: FC<{
 
     switch (action.type) {
         case 'ReceiveTRC20':
-        // return <TonTransferAction action={action} date={date} isScam={isScam} />;
+            return <ReceiveTRC20 action={action} date={date} />;
         case 'SendTRC20':
             return <SendTRC20 action={action} date={date} />;
         case 'ContractDeploy':
