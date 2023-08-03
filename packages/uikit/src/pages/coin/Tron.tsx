@@ -48,7 +48,8 @@ const TronActivity: FC<{
         queryFn: ({ pageParam = undefined }) =>
             new TronApi(tronApi).getTransactions({
                 ownerAddress: tron.ownerWalletAddress,
-                fingerprint: pageParam
+                fingerprint: pageParam,
+                limit: 100
             }),
         getNextPageParam: lastPage => lastPage.fingerprint
     });
