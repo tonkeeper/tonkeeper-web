@@ -12,7 +12,7 @@ import {
     SkeletonList
 } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
-import { TronActivityGroup } from '../../components/activity/tron/TronActivityGroup';
+import { MixedActivityGroup } from '../../components/activity/ActivityGroup';
 import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
@@ -21,16 +21,16 @@ import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
 import { AppRoute } from '../../libs/routes';
+import { getMixedActivity } from '../../state/mixedActivity';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useTronBalance, useTronWalletState } from '../../state/tron/tron';
-import { getTronActivityGroup } from '../../state/tron/tronActivity';
 
 const TronHeader: FC<{ tronBalance: TronBalance }> = ({ tronBalance: { token, weiAmount } }) => {
     const amount = useMemo(() => formatDecimals(weiAmount, token.decimals), [weiAmount, token]);
     //const balance = useFormatBalance(amount, token.decimals);
 
     const { data } = useRate(token.symbol);
-    const { fiatPrice, fiatAmount } = useFormatFiat(data, amount);
+    const { fiatAmount } = useFormatFiat(data, amount);
 
     return (
         <CoinInfo amount={amount} symbol={token.symbol} price={fiatAmount} image={token.image} />
@@ -55,7 +55,7 @@ const TronActivity: FC<{
     });
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, innerRef);
-    const items = useMemo(() => (data ? getTronActivityGroup(data) : []), [data]);
+    const items = useMemo(() => (data ? getMixedActivity(undefined, data) : []), [data]);
 
     if (!isFetched) {
         return <CoinHistorySkeleton />;
@@ -63,7 +63,7 @@ const TronActivity: FC<{
 
     return (
         <HistoryBlock>
-            <TronActivityGroup items={items} />
+            <MixedActivityGroup items={items} />
             {isFetchingNextPage && <SkeletonList size={3} />}
         </HistoryBlock>
     );

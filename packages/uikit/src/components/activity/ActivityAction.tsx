@@ -67,7 +67,6 @@ const TonTransferAction: FC<{
 };
 
 const JettonTransferAction: FC<{ action: Action; date: string }> = ({ action, date }) => {
-    const { t } = useTranslation();
     const wallet = useWalletContext();
     const { jettonTransfer } = action;
 

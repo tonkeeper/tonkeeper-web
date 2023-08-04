@@ -74,52 +74,51 @@ const getEventGroup = (timestamp: number, today: Date, yesterday: Date): string 
 export type GenericActivity<T> = { timestamp: number; key: string; event: T };
 export type GenericActivityGroup<T> = [string, GenericActivity<T>[]];
 
-export const groupActivityGeneric = <T>(
-    list: T[],
-    toTimestamp: (item: T) => number,
-    toKey: (item: T) => string
-): GenericActivityGroup<T>[] => {
-    list.sort((a, b) => toTimestamp(b) - toTimestamp(a));
+export const groupGenericActivity = <T>(list: GenericActivity<T>[]) => {
+    list.sort((a, b) => b.timestamp - a.timestamp);
 
     const todayDate = new Date();
     const yesterdayDate = new Date();
     yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 
     const { today, yesterday, ...rest } = list.reduce((acc, item) => {
-        const group = getEventGroup(toTimestamp(item), todayDate, yesterdayDate);
+        const group = getEventGroup(item.timestamp, todayDate, yesterdayDate);
         if (acc[group]) {
             acc[group].push(item);
         } else {
             acc[group] = [item];
         }
         return acc;
-    }, {} as Record<string, T[]>);
-
-    const mapGroup = (list: T[]): GenericActivity<T>[] => {
-        return list.map(item => ({ timestamp: toTimestamp(item), key: toKey(item), event: item }));
-    };
+    }, {} as Record<string, GenericActivity<T>[]>);
 
     const result = [] as GenericActivityGroup<T>[];
     if (today) {
-        result.push(['today', mapGroup(today)]);
+        result.push(['today', today]);
     }
     if (yesterday) {
-        result.push(['yesterday', mapGroup(yesterday)]);
+        result.push(['yesterday', yesterday]);
     }
 
     Object.entries(rest)
         .filter(([key]) => key.startsWith('month'))
-        .forEach(([key, items]) => {
-            const r: GenericActivityGroup<T> = [key, mapGroup(items)];
-            result.push(r);
-        });
+        .forEach(item => result.push(item));
 
     Object.entries(rest)
         .filter(([key]) => key.startsWith('year'))
-        .forEach(([key, items]) => {
-            const r: GenericActivityGroup<T> = [key, mapGroup(items)];
-            result.push(r);
-        });
+        .forEach(item => result.push(item));
 
     return result;
+};
+
+export const groupActivityGeneric = <T>(
+    list: T[],
+    toTimestamp: (item: T) => number,
+    toKey: (item: T) => string
+): GenericActivityGroup<T>[] => {
+    const activity = list.map(item => ({
+        timestamp: toTimestamp(item),
+        key: toKey(item),
+        event: item
+    }));
+    return groupGenericActivity(activity);
 };
