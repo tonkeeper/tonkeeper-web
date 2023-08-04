@@ -33,12 +33,11 @@ const TronHeader: FC<{ tronBalance: TronBalance }> = ({ tronBalance: { token, we
 
 const TronActivity: FC<{
     tron: TronWalletState;
-    tronBalance: TronBalance;
     innerRef: React.RefObject<HTMLDivElement>;
-}> = ({ tron, tronBalance, innerRef }) => {
+}> = ({ tron, innerRef }) => {
     const { standalone, tronApi } = useAppContext();
     const { data, isFetched, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery({
-        queryKey: [tronBalance.token.address, QueryKey.tron],
+        queryKey: [tron.ownerWalletAddress, QueryKey.tron],
         queryFn: ({ pageParam = undefined }) =>
             new TronApi(tronApi).getTransactions({
                 ownerAddress: tron.ownerWalletAddress,
@@ -84,7 +83,7 @@ const TronAsset: FC<{ tron: TronWalletState }> = ({ tron }) => {
                     <SendAction asset="TON" />
                     <ReceiveAction />
                 </ActionsRow>
-                <TronActivity tron={tron} tronBalance={tronBalance} innerRef={ref} />
+                <TronActivity tron={tron} innerRef={ref} />
             </InnerBody>
         </>
     );
