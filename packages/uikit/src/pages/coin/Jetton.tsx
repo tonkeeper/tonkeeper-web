@@ -5,9 +5,9 @@ import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo, useRef } from 'react';
 import { Address } from 'ton-core';
 import { InnerBody } from '../../components/Body';
-import { CoinHistorySkeleton, CoinSkeletonPage, HistoryBlock } from '../../components/Skeleton';
+import { CoinSkeletonPage } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
-import { ActivityGroupRaw } from '../../components/activity/ton/TonActivityGroup';
+import { ActivityList } from '../../components/activity/ActivityGroup';
 import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
@@ -17,11 +17,6 @@ import { useFetchNext } from '../../hooks/useFetchNext';
 import { JettonKey, QueryKey } from '../../libs/queryKey';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
 import { useFormatFiat, useRate } from '../../state/rates';
-import {
-    ActivityGroup,
-    groupActivity,
-    groupAndFilterJettonActivityItems
-} from '../../state/ton/tonActivity';
 
 const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTMLDivElement> }> = ({
     balance,
@@ -30,7 +25,7 @@ const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTML
     const { tonApiV2, standalone } = useAppContext();
     const wallet = useWalletContext();
 
-    const { hasNextPage, data, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
+    const { isFetched, hasNextPage, data, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
         queryKey: [balance.walletAddress.address, QueryKey.activity, JettonKey.history],
         queryFn: ({ pageParam = undefined }) =>
             new AccountsApi(tonApiV2).getJettonsHistoryByID({
@@ -44,20 +39,12 @@ const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTML
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, innerRef);
 
-    const items = useMemo<ActivityGroup[]>(() => {
-        return data
-            ? groupActivity(groupAndFilterJettonActivityItems(data, wallet.active.rawAddress))
-            : [];
-    }, [data, wallet.active.rawAddress]);
-
-    if (items.length === 0) {
-        return <CoinHistorySkeleton />;
-    }
-
     return (
-        <HistoryBlock>
-            <ActivityGroupRaw items={items} />
-        </HistoryBlock>
+        <ActivityList
+            isFetched={isFetched}
+            isFetchingNextPage={isFetchingNextPage}
+            tonEvents={data}
+        />
     );
 };
 

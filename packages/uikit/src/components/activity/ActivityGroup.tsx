@@ -1,12 +1,37 @@
+import { InfiniteData } from '@tanstack/react-query';
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import React, { FC, useState } from 'react';
+import { AccountEvents } from '@tonkeeper/core/dist/tonApiV2';
+import { TronEvents } from '@tonkeeper/core/dist/tronApi';
+import React, { FC, useMemo, useState } from 'react';
 import { GenericActivityGroup } from '../../state/activity';
-import { MixedActivity } from '../../state/mixedActivity';
+import { MixedActivity, getMixedActivity } from '../../state/mixedActivity';
+import { CoinHistorySkeleton, HistoryBlock, SkeletonList } from '../Skeleton';
 import { NftNotification } from '../nft/NftNotification';
 import { ActivityBlock } from './ActivityLayout';
 import { ActionData, ActivityNotification } from './ActivityNotification';
 import { TonActivityEvents } from './ton/TonActivityEvents';
 import { TronActivityEvents } from './tron/TronActivityEvents';
+
+export const ActivityList: FC<{
+    isFetched: boolean;
+    isFetchingNextPage: boolean;
+    tonEvents?: InfiniteData<AccountEvents>;
+    tronEvents?: InfiniteData<TronEvents>;
+}> = ({ isFetched, isFetchingNextPage, tonEvents, tronEvents }) => {
+    const activity = useMemo<GenericActivityGroup<MixedActivity>[]>(() => {
+        return getMixedActivity(tonEvents, tronEvents);
+    }, [tonEvents, tronEvents]);
+
+    if (!isFetched) {
+        return <CoinHistorySkeleton />;
+    }
+    return (
+        <HistoryBlock>
+            <MixedActivityGroup items={activity} />
+            {isFetchingNextPage && <SkeletonList size={3} />}
+        </HistoryBlock>
+    );
+};
 
 export const MixedActivityGroup: FC<{
     items: GenericActivityGroup<MixedActivity>[];

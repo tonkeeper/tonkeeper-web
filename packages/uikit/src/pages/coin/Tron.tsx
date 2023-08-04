@@ -5,14 +5,9 @@ import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { InnerBody } from '../../components/Body';
-import {
-    CoinHistorySkeleton,
-    CoinSkeletonPage,
-    HistoryBlock,
-    SkeletonList
-} from '../../components/Skeleton';
+import { CoinSkeletonPage } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
-import { MixedActivityGroup } from '../../components/activity/ActivityGroup';
+import { ActivityList } from '../../components/activity/ActivityGroup';
 import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
@@ -21,7 +16,6 @@ import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
 import { AppRoute } from '../../libs/routes';
-import { getMixedActivity } from '../../state/mixedActivity';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useTronBalance, useTronWalletState } from '../../state/tron/tron';
 
@@ -55,17 +49,13 @@ const TronActivity: FC<{
     });
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, innerRef);
-    const items = useMemo(() => (data ? getMixedActivity(undefined, data) : []), [data]);
-
-    if (!isFetched) {
-        return <CoinHistorySkeleton />;
-    }
 
     return (
-        <HistoryBlock>
-            <MixedActivityGroup items={items} />
-            {isFetchingNextPage && <SkeletonList size={3} />}
-        </HistoryBlock>
+        <ActivityList
+            isFetched={isFetched}
+            isFetchingNextPage={isFetchingNextPage}
+            tronEvents={data}
+        />
     );
 };
 

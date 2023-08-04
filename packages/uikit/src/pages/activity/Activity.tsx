@@ -4,12 +4,12 @@ import React, { FC, useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
 import { ActivitySkeletonPage, SkeletonList } from '../../components/Skeleton';
+import { MixedActivityGroup } from '../../components/activity/ActivityGroup';
 import { EmptyActivity } from '../../components/activity/EmptyActivity';
-import { ActivityGroupRaw } from '../../components/activity/ton/TonActivityGroup';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import { ActivityGroup, groupActivity, groupActivityItems } from '../../state/ton/tonActivity';
+import { getMixedActivity } from '../../state/mixedActivity';
 
 const pageLimit = 20;
 
@@ -33,15 +33,15 @@ const Activity: FC = () => {
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, ref);
 
-    const items = useMemo<ActivityGroup[]>(() => {
-        return data ? groupActivity(groupActivityItems(data)) : [];
+    const activity = useMemo(() => {
+        return data ? getMixedActivity(data, undefined) : [];
     }, [data]);
 
     if (!data) {
         return <ActivitySkeletonPage />;
     }
 
-    if (items.length === 0) {
+    if (activity.length === 0) {
         return <EmptyActivity />;
     }
 
@@ -49,7 +49,7 @@ const Activity: FC = () => {
         <>
             <ActivityHeader />
             <InnerBody ref={ref}>
-                <ActivityGroupRaw items={items} />
+                <MixedActivityGroup items={activity} />
                 {isFetchingNextPage && <SkeletonList size={3} />}
             </InnerBody>
         </>

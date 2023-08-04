@@ -24,7 +24,7 @@ export const getMixedActivity = (
     if (tonEvents) {
         tonEvents.pages.forEach(page => {
             const tonActivity: GenericActivity<MixedActivity>[] = page.events.map(event => ({
-                timestamp: event.timestamp,
+                timestamp: event.timestamp * 1000,
                 key: event.eventId,
                 event: { kind: 'ton', event }
             }));

@@ -7,14 +7,9 @@ import { formatDecimals, getTonCoinStockPrice } from '@tonkeeper/core/dist/utils
 import BigNumber from 'bignumber.js';
 import React, { useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
-import {
-    CoinHistorySkeleton,
-    CoinSkeletonPage,
-    HistoryBlock,
-    SkeletonList
-} from '../../components/Skeleton';
+import { CoinSkeletonPage } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
-import { ActivityGroupRaw } from '../../components/activity/ton/TonActivityGroup';
+import { ActivityList } from '../../components/activity/ActivityGroup';
 import { HomeActions } from '../../components/home/TonActions';
 import { CoinInfo } from '../../components/jettons/Info';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -22,11 +17,7 @@ import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import {
-    ActivityGroup,
-    groupActivity,
-    groupAndFilterTonActivityItems
-} from '../../state/ton/tonActivity';
+import { groupAndFilterTonActivityItems } from '../../state/ton/tonActivity';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { useWalletAccountInfo } from '../../state/wallet';
 
@@ -63,7 +54,7 @@ export const TonPage = () => {
                 limit: 20,
                 beforeLt: pageParam
             }),
-        getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
+        getNextPageParam: lastPage => lastPage.nextFrom
     });
 
     const format = useFormatCoinValue();
@@ -77,8 +68,8 @@ export const TonPage = () => {
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, ref);
 
-    const activity = useMemo<ActivityGroup[]>(() => {
-        return data ? groupActivity(groupAndFilterTonActivityItems(data)) : [];
+    const activity = useMemo(() => {
+        return data ? groupAndFilterTonActivityItems(data) : undefined;
     }, [data]);
 
     if (!stock || !info) {
@@ -98,14 +89,11 @@ export const TonPage = () => {
                 />
                 <HomeActions />
 
-                {!isFetched ? (
-                    <CoinHistorySkeleton />
-                ) : (
-                    <HistoryBlock>
-                        <ActivityGroupRaw items={activity} />
-                        {isFetchingNextPage && <SkeletonList size={3} />}
-                    </HistoryBlock>
-                )}
+                <ActivityList
+                    isFetched={isFetched}
+                    isFetchingNextPage={isFetchingNextPage}
+                    tonEvents={activity}
+                />
             </InnerBody>
         </>
     );
