@@ -27,8 +27,7 @@ const Activity: FC = () => {
                 limit: pageLimit,
                 beforeLt: pageParam
             }),
-        getNextPageParam: lastPage =>
-            lastPage.events.length >= pageLimit ? lastPage.nextFrom : undefined
+        getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
     });
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, ref);

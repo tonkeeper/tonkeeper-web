@@ -54,7 +54,7 @@ export const TonPage = () => {
                 limit: 20,
                 beforeLt: pageParam
             }),
-        getNextPageParam: lastPage => lastPage.nextFrom
+        getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
     });
 
     const format = useFormatCoinValue();
