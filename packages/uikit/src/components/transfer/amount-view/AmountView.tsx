@@ -1,13 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import {
-    AmountData,
-    AmountValue,
-    RecipientData,
-    isTonRecipientData
-} from '@tonkeeper/core/dist/entries/send';
-import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
-import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import {
     TonAsset,
@@ -17,8 +9,7 @@ import {
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { formatSendValue, isNumeric } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useAppContext, useWalletContext } from '../../../hooks/appContext';
-import { useAppSdk } from '../../../hooks/appSdk';
+import { useAppContext } from '../../../hooks/appContext';
 import { useTranslation } from '../../../hooks/translation';
 import { useUserJettonList } from '../../../state/jetton';
 import { useWalletAccountInfo, useWalletJettonList } from '../../../state/wallet';
@@ -34,7 +25,7 @@ import { Button } from '../../fields/Button';
 import { AssetSelect } from '../AssetSelect';
 import { InputSize, Sentence } from '../Sentence';
 import { defaultSize, getInputSize, useButtonPosition } from '../amountHooks';
-import { ButtonBlock, notifyError } from '../common';
+import { ButtonBlock } from '../common';
 import {
     Address,
     AmountBlock,
@@ -62,66 +53,58 @@ import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset'
 import { useUserAssetBalance } from '../../../state/asset';
 import { formatter } from '../../../hooks/balance';
 
-const useEstimateTransaction = (recipient: RecipientData, token: TonAsset | TronAsset) => {
-    const { t } = useTranslation();
-    const sdk = useAppSdk();
-    const { tonApi } = useAppContext();
-    const wallet = useWalletContext();
-    const client = useQueryClient();
-
-    const { data: notFilteredJettons } = useWalletJettonList();
-    const jettons = useUserJettonList(notFilteredJettons);
-
-    return useMutation(async (options: AmountValue) => {
-        if (token.blockchain === BLOCKCHAIN_NAME.TRON) {
-            throw new Error('');
-        }
-
-        const jetton = legacyTonAssetId(token);
-        try {
-            if (jetton === CryptoCurrency.TON) {
-                return await estimateTonTransfer(tonApi, wallet, recipient, options);
-            } else {
-                const [jettonInfo] = jettons.balances.filter(item => item.jettonAddress === jetton);
-                return await estimateJettonTransfer(tonApi, wallet, recipient, options, jettonInfo);
-            }
-        } catch (e) {
-            await notifyError(client, sdk, t, e);
-            throw e;
-        }
-    });
+export type AmountViewState = {
+    asset: TonAsset | TronAsset;
+    amount: string | BigNumber;
+    isMax: boolean;
+    inFiat: boolean;
 };
+
+function formatStringToInput(value: string): string {
+    value = replaceTypedDecimalSeparator(value);
+
+    if (isNumeric(value)) {
+        value = formatSendValue(value);
+    }
+
+    return value;
+}
 
 export const AmountView: FC<{
     onClose: () => void;
-    onBack: (data: AmountData | undefined) => void;
-    setAmount: (data: AmountData | undefined) => void;
+    onBack: (state: AmountViewState) => void;
+    onConfirm: (state: AmountViewState) => void;
     recipient: RecipientData;
-    defaultTokenAmount?: { token?: TonAsset | TronAsset; amount?: string; max?: boolean };
-}> = ({ recipient, onClose, onBack, setAmount, defaultTokenAmount }) => {
+    defaults?: Partial<AmountViewState>;
+}> = ({ recipient, onClose, onBack, onConfirm, defaults }) => {
     const blockchain = recipient.address.blockchain;
     const { data: notFilteredJettons } = useWalletJettonList();
     const jettons = useUserJettonList(notFilteredJettons);
     const { data: info } = useWalletAccountInfo();
 
     const { fiat, standalone } = useAppContext();
-
     const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
-    const [input, setInput] = useState<string>(defaultTokenAmount?.amount || '0');
-    const [token, setToken] = useState<TonAsset | TronAsset>(
-        defaultTokenAmount?.token ||
-            (blockchain === BLOCKCHAIN_NAME.TON ? TON_ASSET : TRON_USDT_ASSET)
+
+    const [input, setInput] = useState<string>(
+        formatStringToInput(
+            defaults?.amount instanceof BigNumber
+                ? defaults.amount.toFixed()
+                : defaults?.amount || '0'
+        )
     );
-    const [inFiat, setInFiat] = useState(false);
-    const { data: tokenRate } = useRate(
+    const [token, setToken] = useState<TonAsset | TronAsset>(
+        defaults?.asset || (blockchain === BLOCKCHAIN_NAME.TON ? TON_ASSET : TRON_USDT_ASSET)
+    );
+    const [inFiat, setInFiat] = useState(defaults?.inFiat ?? false);
+    const [max, setMax] = useState(defaults?.isMax ?? false);
+
+    const { data: tokenRate, isLoading: rateLoading } = useRate(
         token.blockchain === BLOCKCHAIN_NAME.TRON && token.address === TRON_USDT_ASSET.address
             ? 'USDT'
             : legacyTonAssetId(token as TonAsset, { userFriendly: true })
-    ); // TODO handle loading
+    );
 
-    const { data: balance } = useUserAssetBalance(token); // TODO handle loading
-
-    const [max, setMax] = useState(defaultTokenAmount?.max ?? false);
+    const { data: balance, isLoading: balanceLoading } = useUserAssetBalance(token);
 
     let secondaryAmount: BigNumber | undefined;
     if (tokenRate?.prices) {
@@ -139,8 +122,6 @@ export const AmountView: FC<{
     const ref = useRef<HTMLInputElement>(null);
     const refBlock = useRef<HTMLLabelElement>(null);
     const refButton = useRef<HTMLDivElement>(null);
-
-    const { mutateAsync, isLoading, reset } = useEstimateTransaction(recipient, token);
 
     useButtonPosition(refButton, refBlock);
 
@@ -188,44 +169,23 @@ export const AmountView: FC<{
     }, [enoughBalance, input]);
 
     const handleBack = () => {
-        if (isValid) {
-            const fiatValue = inFiat ? inputToBigNumber(input) : undefined;
-
-            onBack({
-                amount: coinAmount!,
-                fiat: fiatValue,
-                max,
-                done: false,
-                //@ts-ignore
-                jetton: legacyTonAssetId(token), // TODO
-                fee: undefined!
-            });
-        } else {
-            onBack(undefined);
-        }
+        onBack({
+            asset: token,
+            amount: inputToBigNumber(input),
+            isMax: max,
+            inFiat
+        });
     };
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.stopPropagation();
         e.preventDefault();
         if (isValid) {
-            reset();
-            const fiatValue = inFiat ? inputToBigNumber(input) : undefined;
-
-            const fee = await mutateAsync({
-                amount: coinAmount!,
-                fiat: fiatValue,
-                max
-            });
-
-            setAmount({
-                amount: coinAmount!,
-                fiat: fiatValue,
-                max,
-                done: true,
-                // @ts-ignore
-                jetton: legacyTonAssetId(token), // TODO
-                fee
+            onConfirm({
+                asset: token,
+                amount: inputToBigNumber(input),
+                isMax: max,
+                inFiat
             });
         }
     };
@@ -234,20 +194,14 @@ export const AmountView: FC<{
         if (!refBlock.current) return;
 
         const value = balance.relativeAmount.toFixed();
-        let inputValue = inFiat
+        const inputValue = inFiat
             ? new BigNumber(value)
                   .multipliedBy(tokenRate!.prices)
                   .decimalPlaces(2, BigNumber.ROUND_FLOOR)
                   .toFixed()
             : value;
 
-        inputValue = replaceTypedDecimalSeparator(inputValue);
-
-        if (isNumeric(inputValue)) {
-            inputValue = formatSendValue(inputValue);
-        }
-
-        setInput(inputValue);
+        setInput(formatStringToInput(inputValue));
         setMax(state => !state);
     };
 
@@ -329,7 +283,7 @@ export const AmountView: FC<{
                     primary
                     type="submit"
                     disabled={!isValid}
-                    loading={isLoading}
+                    loading={rateLoading || balanceLoading}
                 >
                     {t('continue')}
                 </Button>

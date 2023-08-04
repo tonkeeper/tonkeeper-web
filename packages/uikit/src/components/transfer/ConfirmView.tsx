@@ -1,5 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
-import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
+import {
+    AmountData,
+    isTonRecipientData,
+    isTronRecipientData,
+    RecipientData
+} from '@tonkeeper/core/dist/entries/send';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { DefaultDecimals } from '@tonkeeper/core/dist/utils/send';
 
@@ -225,17 +230,14 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string }>> =
         recipient,
         currencyInfo: { image, title }
     } = useConfirmViewContext();
+
+    const icon = isTonRecipientData(recipient) ? recipient.toAccount.icon : image;
+    const name = isTonRecipientData(recipient) ? recipient.toAccount.name : title;
     return (
         <Info className={className}>
-            {recipient.toAccount.icon ? (
-                <Image full src={recipient.toAccount.icon} />
-            ) : image ? (
-                <Image full src={image} />
-            ) : (
-                <ImageMock full />
-            )}
+            {icon ? <Image full src={image} /> : <ImageMock full />}
             <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
-            <Title>{recipient.toAccount.name ? recipient.toAccount.name : title}</Title>
+            <Title>{name}</Title>
         </Info>
     );
 };
@@ -271,6 +273,9 @@ export const ConfirmViewDetailsFee: FC = () => {
 };
 export const ConfirmViewDetailsComment: FC = () => {
     const { recipient } = useConfirmViewContext();
+    if (!isTonRecipientData(recipient)) {
+        return null;
+    }
     return <TransferComment comment={recipient.comment} />;
 };
 

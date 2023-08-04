@@ -16,7 +16,12 @@ export function jettonToTonAsset(address: string, jettons: JettonsBalances): Ton
         return TON_ASSET;
     }
 
-    const jetton = jettons.balances.find(i => i.metadata?.address === address)!;
+    const jetton = jettons.balances.find(i => i.metadata?.address === address);
+
+    if (!jetton) {
+        throw new Error(`Jetton ${address} not found`);
+    }
+
     return {
         symbol: jetton.metadata!.symbol,
         decimals: jetton.metadata!.decimals,
