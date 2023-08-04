@@ -4,7 +4,7 @@ import { ListItem } from '../../List';
 import { ProgressIcon } from '../ActivityLayout';
 import { TronActivityAction } from './TronActivityAction';
 
-export const TronActivityGroup: FC<{
+export const TronActivityEvents: FC<{
     event: TronEvent;
     date: string;
     timestamp: number;

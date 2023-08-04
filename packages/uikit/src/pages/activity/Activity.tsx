@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { EventApi } from '@tonkeeper/core/dist/tonApiV1';
+import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
@@ -15,15 +15,15 @@ const pageLimit = 20;
 
 const Activity: FC = () => {
     const wallet = useWalletContext();
-    const { tonApi, standalone } = useAppContext();
+    const { tonApiV2, standalone } = useAppContext();
 
     const ref = useRef<HTMLDivElement>(null);
 
     const { fetchNextPage, hasNextPage, isFetchingNextPage, data } = useInfiniteQuery({
         queryKey: [wallet.active.rawAddress, QueryKey.activity, 'all'],
         queryFn: ({ pageParam = undefined }) =>
-            new EventApi(tonApi).accountEvents({
-                account: wallet.active.rawAddress,
+            new AccountsApi(tonApiV2).getEventsByAccount({
+                accountId: wallet.active.rawAddress,
                 limit: pageLimit,
                 beforeLt: pageParam
             }),

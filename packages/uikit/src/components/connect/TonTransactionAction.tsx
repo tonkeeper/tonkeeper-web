@@ -155,7 +155,9 @@ export const TonTransactionAction: FC<{ action: Action }> = ({ action }) => {
                                 return <ErrorDetails />;
                             }
 
-                            return <ActionDeployerDetails deployer={contractDeploy.deployer} />;
+                            return (
+                                <ActionDeployerDetails deployer={contractDeploy.deployer.address} />
+                            );
                         }
                         case 'NftItemTransfer': {
                             const { nftItemTransfer } = action;

@@ -1,10 +1,10 @@
 import { InfiniteData } from '@tanstack/react-query';
-import { AccountEvent, AccountEvents200Response, Action } from '@tonkeeper/core/dist/tonApiV1';
+import { AccountEvent, AccountEvents, Action } from '@tonkeeper/core/dist/tonApiV2';
 import { GenericActivityGroup, groupActivityGeneric } from '../activity';
 
 export type ActivityGroup = GenericActivityGroup<AccountEvent>;
 
-export const groupActivityItems = (data: InfiniteData<AccountEvents200Response>) => {
+export const groupActivityItems = (data: InfiniteData<AccountEvents>) => {
     const list = [] as AccountEvent[];
 
     data.pages.forEach(page => {
@@ -16,7 +16,7 @@ export const groupActivityItems = (data: InfiniteData<AccountEvents200Response>)
     return list;
 };
 export const groupAndFilterJettonActivityItems = (
-    data: InfiniteData<AccountEvents200Response>,
+    data: InfiniteData<AccountEvents>,
     walletAddress: string
 ) => {
     const list = [] as AccountEvent[];
@@ -31,7 +31,7 @@ export const groupAndFilterJettonActivityItems = (
                             action.tonTransfer.recipient.address === walletAddress
                         );
                     } else if (action.contractDeploy) {
-                        return action.contractDeploy.deployer.address === walletAddress;
+                        return action.contractDeploy.address === walletAddress;
                     }
                     return true;
                 });
@@ -53,7 +53,7 @@ const seeIfTonTransfer = (action: Action) => {
     return false;
 };
 
-export const groupAndFilterTonActivityItems = (data: InfiniteData<AccountEvents200Response>) => {
+export const groupAndFilterTonActivityItems = (data: InfiniteData<AccountEvents>) => {
     const list = [] as AccountEvent[];
 
     data.pages.forEach(page => {

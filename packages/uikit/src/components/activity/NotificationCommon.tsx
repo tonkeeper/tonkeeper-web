@@ -1,5 +1,6 @@
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { AccountAddress, AccountEvent, Fee } from '@tonkeeper/core/dist/tonApiV1';
+import { Fee } from '@tonkeeper/core/dist/tonApiV1';
+import { AccountAddress, AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { formatDecimals, getTonCoinStockPrice } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
@@ -210,7 +211,7 @@ export const ActionTransactionDetails: FC<{ event: AccountEvent }> = ({ event })
     );
 };
 
-export const ActionDeployerDetails: FC<{ deployer: AccountAddress }> = ({ deployer }) => {
+export const ActionDeployerDetails: FC<{ deployer: string }> = ({ deployer }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const wallet = useWalletContext();
@@ -219,15 +220,12 @@ export const ActionDeployerDetails: FC<{ deployer: AccountAddress }> = ({ deploy
         <>
             <ListItem
                 onClick={() =>
-                    sdk.copyToClipboard(
-                        Address.parse(deployer.address).toString(),
-                        t('address_copied')
-                    )
+                    sdk.copyToClipboard(Address.parse(deployer).toString(), t('address_copied'))
                 }
             >
                 <ListItemPayload>
                     <Label>{t('add_edit_favorite_address_label')}</Label>
-                    <Label1>{toShortValue(formatAddress(deployer.address, wallet.network))}</Label1>
+                    <Label1>{toShortValue(formatAddress(deployer, wallet.network))}</Label1>
                 </ListItemPayload>
             </ListItem>
         </>

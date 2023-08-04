@@ -3,12 +3,12 @@ import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
-import { ListItemPayload } from '../../components/List';
-import { ActivityIcon, SentIcon } from '../../components/activity/ActivityIcons';
-import { useWalletContext } from '../../hooks/appContext';
-import { useFormatCoinValue } from '../../hooks/balance';
-import { useTranslation } from '../../hooks/translation';
-import { ReceiveActivityAction, SendActivityAction } from './ActivityActionLayout';
+import { ListItemPayload } from '../../../components/List';
+import { ActivityIcon, SentIcon } from '../../../components/activity/ActivityIcons';
+import { useWalletContext } from '../../../hooks/appContext';
+import { useFormatCoinValue } from '../../../hooks/balance';
+import { useTranslation } from '../../../hooks/translation';
+import { ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayout';
 import {
     AmountText,
     Description,
@@ -18,10 +18,10 @@ import {
     ListItemGrid,
     SecondLine,
     SecondaryText
-} from './CommonAction';
-import { ContractDeployAction } from './ContractDeployAction';
-import { NftComment, NftItemTransferAction } from './NftActivity';
-import { SubscribeAction, UnSubscribeAction } from './SubscribeAction';
+} from '../CommonAction';
+import { ContractDeployAction } from '../ContractDeployAction';
+import { NftComment, NftItemTransferAction } from '../NftActivity';
+import { SubscribeAction, UnSubscribeAction } from '../SubscribeAction';
 
 const TonTransferAction: FC<{
     action: Action;

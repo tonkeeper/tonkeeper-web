@@ -1,10 +1,10 @@
-import { Action, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { ActivityIcon, ContractDeployIcon } from '../../components/activity/ActivityIcons';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useTonenpointStock } from '../../state/tonendpoint';
 import { ListBlock } from '../List';
 import { ContractDeployActivityAction, WalletDeployActivityAction } from './ActivityActionLayout';
 import { ActionData } from './ActivityNotification';
@@ -14,7 +14,6 @@ import {
     ActionDate,
     ActionDeployerDetails,
     ActionDetailsBlock,
-    ActionFeeDetails,
     ActionTransactionDetails,
     ErrorActivityNotification,
     Title
@@ -23,8 +22,6 @@ import {
 export const ContractDeployActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
     const { t } = useTranslation();
     const { contractDeploy } = action;
-    const { fiat } = useAppContext();
-    const { data: stock } = useTonenpointStock();
 
     if (!contractDeploy) {
         return <ErrorActivityNotification event={event} />;
@@ -41,9 +38,9 @@ export const ContractDeployActionDetails: FC<ActionData> = ({ action, timestamp,
                 <ActionDate kind="received" timestamp={timestamp} />
             </div>
             <ListBlock margin={false} fullWidth>
-                <ActionDeployerDetails deployer={contractDeploy.deployer} />
+                <ActionDeployerDetails deployer={contractDeploy.address} />
                 <ActionTransactionDetails event={event} />
-                <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
+                {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
             </ListBlock>
         </ActionDetailsBlock>
     );

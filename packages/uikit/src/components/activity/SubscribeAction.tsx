@@ -1,4 +1,4 @@
-import { Action } from '@tonkeeper/core/dist/tonApiV1';
+import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import {
@@ -6,9 +6,8 @@ import {
     SubscribeIcon,
     UnsubscribeIcon
 } from '../../components/activity/ActivityIcons';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useTonenpointStock } from '../../state/tonendpoint';
 import { ListBlock } from '../List';
 import { ActionData } from './ActivityNotification';
 import { ColumnLayout, ErrorAction, ListItemGrid } from './CommonAction';
@@ -16,7 +15,6 @@ import {
     ActionBeneficiaryDetails,
     ActionDate,
     ActionDetailsBlock,
-    ActionFeeDetails,
     ActionTransactionDetails,
     ErrorActivityNotification,
     Title
@@ -25,9 +23,6 @@ import {
 export const UnSubscribeActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
     const { t } = useTranslation();
     const { unSubscribe } = action;
-
-    const { fiat } = useAppContext();
-    const { data: stock } = useTonenpointStock();
 
     if (!unSubscribe) {
         return <ErrorActivityNotification event={event} />;
@@ -42,7 +37,7 @@ export const UnSubscribeActionDetails: FC<ActionData> = ({ action, timestamp, ev
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={unSubscribe.beneficiary} />
                 <ActionTransactionDetails event={event} />
-                <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
+                {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
             </ListBlock>
         </ActionDetailsBlock>
     );
@@ -51,9 +46,6 @@ export const UnSubscribeActionDetails: FC<ActionData> = ({ action, timestamp, ev
 export const SubscribeActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
     const { t } = useTranslation();
     const { subscribe } = action;
-
-    const { fiat } = useAppContext();
-    const { data: stock } = useTonenpointStock();
 
     if (!subscribe) {
         return <ErrorActivityNotification event={event} />;
@@ -68,7 +60,7 @@ export const SubscribeActionDetails: FC<ActionData> = ({ action, timestamp, even
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={subscribe.beneficiary} />
                 <ActionTransactionDetails event={event} />
-                <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
+                {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
             </ListBlock>
         </ActionDetailsBlock>
     );

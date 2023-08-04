@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { AccountRepr, EventApi } from '@tonkeeper/core/dist/tonApiV1';
+import { AccountRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { formatDecimals, getTonCoinStockPrice } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
@@ -46,26 +47,23 @@ const useBalanceValue = (
     }, [info, stock]);
 };
 
-const pageLimit = 20;
-
 export const TonPage = () => {
     const { fiat } = useAppContext();
     const { data: stock } = useTonenpointStock();
     const { data: info } = useWalletAccountInfo();
 
-    const { tonApi, standalone } = useAppContext();
+    const { tonApiV2, standalone } = useAppContext();
     const wallet = useWalletContext();
 
     const { fetchNextPage, hasNextPage, isFetchingNextPage, data, isFetched } = useInfiniteQuery({
         queryKey: [wallet.active.rawAddress, QueryKey.activity, 'ton'],
         queryFn: ({ pageParam = undefined }) =>
-            new EventApi(tonApi).accountEvents({
-                account: wallet.active.rawAddress,
-                limit: pageLimit,
+            new AccountsApi(tonApiV2).getEventsByAccount({
+                accountId: wallet.active.rawAddress,
+                limit: 20,
                 beforeLt: pageParam
             }),
-        getNextPageParam: lastPage =>
-            lastPage.events.length >= pageLimit ? lastPage.nextFrom : undefined
+        getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
     });
 
     const format = useFormatCoinValue();

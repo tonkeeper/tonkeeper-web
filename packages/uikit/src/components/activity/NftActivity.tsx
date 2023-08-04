@@ -1,10 +1,10 @@
-import { Action, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useTonenpointStock } from '../../state/tonendpoint';
 import { useNftItemData } from '../../state/wallet';
 import { VerificationIcon } from '../Icon';
 import { ListBlock } from '../List';
@@ -25,7 +25,6 @@ import {
 import {
     ActionDate,
     ActionDetailsBlock,
-    ActionFeeDetails,
     ActionRecipientDetails,
     ActionSenderDetails,
     ActionTransactionDetails,
@@ -185,8 +184,6 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
     const wallet = useWalletContext();
     const { nftItemTransfer } = action;
 
-    const { fiat } = useAppContext();
-    const { data: stock } = useTonenpointStock();
     const { data } = useNftItemData(nftItemTransfer?.nft);
 
     if (!nftItemTransfer) {
@@ -220,7 +217,7 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
                         <ActionSenderDetails sender={nftItemTransfer.sender} />
                     )}
                     <ActionTransactionDetails event={event} />
-                    <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
+                    {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
                 </ListBlock>
             </ActionDetailsBlock>
         );
@@ -250,7 +247,7 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
                     <ActionRecipientDetails recipient={nftItemTransfer.recipient} />
                 )}
                 <ActionTransactionDetails event={event} />
-                <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} />
+                {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
             </ListBlock>
         </ActionDetailsBlock>
     );
