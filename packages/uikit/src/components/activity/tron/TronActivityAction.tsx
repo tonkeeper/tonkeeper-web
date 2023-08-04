@@ -1,111 +1,61 @@
-import { TronAction } from '@tonkeeper/core/dist/tronApi';
+import {
+    ContractDeployAction,
+    ReceiveTRC20Action,
+    SendTRC20Action,
+    TronAction
+} from '@tonkeeper/core/dist/tronApi';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
-import { Label1 } from '../../Text';
-import { ActivityIcon, ContractDeployIcon, ReceiveIcon, SentIcon } from '../ActivityIcons';
 import {
-    AmountText,
-    ColumnLayout,
-    Description,
-    ErrorAction,
-    FirstLabel,
-    FirstLine,
-    ListItemGrid,
-    SecondLine,
-    SecondaryText
-} from '../CommonAction';
+    ReceiveActivityAction,
+    SendActivityAction,
+    WalletDeployActivityAction
+} from '../ActivityActionLayout';
+import { ErrorAction } from '../CommonAction';
 
 const ReceiveTRC20: FC<{
-    action: TronAction;
+    receiveTRC20: ReceiveTRC20Action;
     date: string;
-}> = ({ action, date }) => {
-    const { t } = useTranslation();
-
+}> = ({ receiveTRC20, date }) => {
     const format = useFormatCoinValue();
 
-    const { receiveTRC20 } = action;
-    if (!receiveTRC20) return <ErrorAction />;
-
     return (
-        <ListItemGrid>
-            <ActivityIcon>
-                <ReceiveIcon />
-            </ActivityIcon>
-            <Description>
-                <FirstLine>
-                    <FirstLabel>{t('transaction_type_receive')}</FirstLabel>
-                    <AmountText>
-                        +&thinsp;
-                        {format(receiveTRC20.amount, receiveTRC20.token.decimals)}
-                    </AmountText>
-                    <Label1>{receiveTRC20.token.symbol}</Label1>
-                </FirstLine>
-                <SecondLine>
-                    <SecondaryText>{toShortValue(receiveTRC20.sender)}</SecondaryText>
-                    <SecondaryText>{date}</SecondaryText>
-                </SecondLine>
-            </Description>
-        </ListItemGrid>
+        <ReceiveActivityAction
+            amount={format(receiveTRC20.amount, receiveTRC20.token.decimals)}
+            symbol={receiveTRC20.token.symbol}
+            sender={toShortValue(receiveTRC20.sender)}
+            date={date}
+        />
     );
 };
 
 const SendTRC20: FC<{
-    action: TronAction;
+    sendTRC20: SendTRC20Action;
     date: string;
-}> = ({ action, date }) => {
-    const { t } = useTranslation();
-
+}> = ({ sendTRC20, date }) => {
     const format = useFormatCoinValue();
 
-    const { sendTRC20 } = action;
-    if (!sendTRC20) return <ErrorAction />;
-
     return (
-        <ListItemGrid>
-            <ActivityIcon>
-                <SentIcon />
-            </ActivityIcon>
-            <Description>
-                <FirstLine>
-                    <FirstLabel>{t('transaction_type_sent')}</FirstLabel>
-                    <AmountText>
-                        -&thinsp;
-                        {format(sendTRC20.amount, sendTRC20.token.decimals)}
-                    </AmountText>
-                    <Label1>{sendTRC20.token.symbol}</Label1>
-                </FirstLine>
-                <SecondLine>
-                    <SecondaryText>{toShortValue(sendTRC20.recipient)}</SecondaryText>
-                    <SecondaryText>{date}</SecondaryText>
-                </SecondLine>
-            </Description>
-        </ListItemGrid>
+        <SendActivityAction
+            amount={format(sendTRC20.amount, sendTRC20.token.decimals)}
+            symbol={sendTRC20.token.symbol}
+            recipient={toShortValue(sendTRC20.recipient)}
+            date={date}
+        />
     );
 };
 
 const ContractDeploy: FC<{
-    action: TronAction;
+    contractDeploy: ContractDeployAction;
     date: string;
-}> = ({ action, date }) => {
-    const { t } = useTranslation();
-
-    const { contractDeploy } = action;
-    if (!contractDeploy) return <ErrorAction />;
-
+}> = ({ contractDeploy, date }) => {
     return (
-        <ListItemGrid>
-            <ActivityIcon>
-                <ContractDeployIcon />
-            </ActivityIcon>
-            <ColumnLayout
-                title={t('transaction_type_contract_deploy')}
-                entry="-"
-                address={toShortValue(contractDeploy.ownerAddress!)}
-                date={date}
-            />
-        </ListItemGrid>
+        <WalletDeployActivityAction
+            address={toShortValue(contractDeploy.ownerAddress!)}
+            date={date}
+        />
     );
 };
 
@@ -115,16 +65,16 @@ export const TronActivityAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
 
-    switch (action.type) {
-        case 'ReceiveTRC20':
-            return <ReceiveTRC20 action={action} date={date} />;
-        case 'SendTRC20':
-            return <SendTRC20 action={action} date={date} />;
-        case 'ContractDeploy':
-            return <ContractDeploy action={action} date={date} />;
-        default: {
-            console.log(action);
-            return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;
-        }
+    if (action.receiveTRC20) {
+        return <ReceiveTRC20 receiveTRC20={action.receiveTRC20} date={date} />;
     }
+    if (action.sendTRC20) {
+        return <SendTRC20 sendTRC20={action.sendTRC20} date={date} />;
+    }
+    if (action.contractDeploy) {
+        return <ContractDeploy contractDeploy={action.contractDeploy} date={date} />;
+    }
+
+    console.log(action);
+    return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;
 };

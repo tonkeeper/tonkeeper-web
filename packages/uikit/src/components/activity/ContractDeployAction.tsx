@@ -1,15 +1,12 @@
 import { Action, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
-import {
-    ActivityIcon,
-    ContractDeployIcon,
-    CreateWalletIcon
-} from '../../components/activity/ActivityIcons';
+import { ActivityIcon, ContractDeployIcon } from '../../components/activity/ActivityIcons';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
 import { ListBlock } from '../List';
+import { ContractDeployActivityAction, WalletDeployActivityAction } from './ActivityActionLayout';
 import { ActionData } from './ActivityNotification';
 import { ColumnLayout, ErrorAction, ListItemGrid } from './CommonAction';
 import { NftComment } from './NftActivity';
@@ -93,32 +90,8 @@ export const ContractDeployAction: FC<{
         );
     }
     if (interfaces.includes('wallet')) {
-        return (
-            <ListItemGrid>
-                <ActivityIcon>
-                    <CreateWalletIcon />
-                </ActivityIcon>
-                <ColumnLayout
-                    title={t('transaction_type_wallet_initialized')}
-                    entry="-"
-                    address={address}
-                    date={date}
-                />
-            </ListItemGrid>
-        );
+        return <WalletDeployActivityAction address={address} date={date} />;
     }
 
-    return (
-        <ListItemGrid>
-            <ActivityIcon>
-                <ContractDeployIcon />
-            </ActivityIcon>
-            <ColumnLayout
-                title={t('transaction_type_contract_deploy')}
-                entry="-"
-                address={address}
-                date={date}
-            />
-        </ListItemGrid>
-    );
+    return <ContractDeployActivityAction address={address} date={date} />;
 };

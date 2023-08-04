@@ -1,15 +1,15 @@
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Action, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { ListItemPayload } from '../../components/List';
-import { ActivityIcon, ReceiveIcon, SentIcon } from '../../components/activity/ActivityIcons';
+import { ActivityIcon, SentIcon } from '../../components/activity/ActivityIcons';
 import { useWalletContext } from '../../hooks/appContext';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
-import { Label1 } from '../Text';
+import { ReceiveActivityAction, SendActivityAction } from './ActivityActionLayout';
 import {
     AmountText,
-    Comment,
     Description,
     ErrorAction,
     FirstLabel,
@@ -27,7 +27,6 @@ const TonTransferAction: FC<{
     date: string;
     isScam: boolean;
 }> = ({ action, date, isScam }) => {
-    const { t } = useTranslation();
     const wallet = useWalletContext();
     const { tonTransfer } = action;
 
@@ -39,63 +38,31 @@ const TonTransferAction: FC<{
 
     if (tonTransfer.recipient.address === wallet.active.rawAddress) {
         return (
-            <ListItemGrid>
-                <ActivityIcon>
-                    <ReceiveIcon />
-                </ActivityIcon>
-                <Description>
-                    <FirstLine>
-                        <FirstLabel>
-                            {tonTransfer.sender.isScam || isScam
-                                ? t('spam_action')
-                                : t('transaction_type_receive')}
-                        </FirstLabel>
-                        <AmountText isScam={tonTransfer.sender.isScam || isScam} green>
-                            +&thinsp;{format(tonTransfer.amount)}
-                        </AmountText>
-                        <AmountText isScam={tonTransfer.sender.isScam || isScam} green>
-                            TON
-                        </AmountText>
-                    </FirstLine>
-                    <SecondLine>
-                        <SecondaryText>
-                            {tonTransfer.sender.name ??
-                                toShortValue(
-                                    formatAddress(tonTransfer.sender.address, wallet.network)
-                                )}
-                        </SecondaryText>
-                        <SecondaryText>{date}</SecondaryText>
-                    </SecondLine>
-                </Description>
-                <Comment comment={isScam ? undefined : tonTransfer.comment} />
-            </ListItemGrid>
+            <ReceiveActivityAction
+                amount={format(tonTransfer.amount)}
+                sender={
+                    tonTransfer.sender.name ??
+                    toShortValue(formatAddress(tonTransfer.sender.address, wallet.network))
+                }
+                symbol={CryptoCurrency.TON}
+                date={date}
+                isScam={tonTransfer.sender.isScam || isScam}
+                comment={tonTransfer.comment}
+            />
         );
     }
     return (
-        <ListItemGrid>
-            <ActivityIcon>
-                <SentIcon />
-            </ActivityIcon>
-            <Description>
-                <FirstLine>
-                    <FirstLabel>
-                        {isScam ? t('spam_action') : t('transaction_type_sent')}
-                    </FirstLabel>
-                    <AmountText isScam={isScam}>-&thinsp;{format(tonTransfer.amount)}</AmountText>
-                    <AmountText isScam={isScam}>TON</AmountText>
-                </FirstLine>
-                <SecondLine>
-                    <SecondaryText>
-                        {tonTransfer.recipient.name ??
-                            toShortValue(
-                                formatAddress(tonTransfer.recipient.address, wallet.network)
-                            )}
-                    </SecondaryText>
-                    <SecondaryText>{date}</SecondaryText>
-                </SecondLine>
-            </Description>
-            <Comment comment={tonTransfer.comment} />
-        </ListItemGrid>
+        <SendActivityAction
+            amount={format(tonTransfer.amount)}
+            symbol={CryptoCurrency.TON}
+            recipient={
+                tonTransfer.recipient.name ??
+                toShortValue(formatAddress(tonTransfer.recipient.address, wallet.network))
+            }
+            date={date}
+            isScam={isScam}
+            comment={tonTransfer.comment}
+        />
     );
 };
 
@@ -112,69 +79,41 @@ const JettonTransferAction: FC<{ action: Action; date: string }> = ({ action, da
 
     if (jettonTransfer.sender?.address === wallet.active.rawAddress) {
         return (
-            <ListItemGrid>
-                <ActivityIcon>
-                    <SentIcon />
-                </ActivityIcon>
-                <Description>
-                    <FirstLine>
-                        <FirstLabel>{t('transaction_type_sent')}</FirstLabel>
-                        <AmountText>
-                            -&thinsp;
-                            {format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
-                        </AmountText>
-                        <Label1>{jettonTransfer.jetton.symbol}</Label1>
-                    </FirstLine>
-                    <SecondLine>
-                        <SecondaryText>
-                            {jettonTransfer.recipient?.name ??
-                                toShortValue(
-                                    formatAddress(
-                                        jettonTransfer.recipient?.address ??
-                                            jettonTransfer.recipientsWallet,
-                                        wallet.network
-                                    )
-                                )}
-                        </SecondaryText>
-                        <SecondaryText>{date}</SecondaryText>
-                    </SecondLine>
-                </Description>
-                <Comment comment={jettonTransfer.comment} />
-            </ListItemGrid>
+            <SendActivityAction
+                amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
+                symbol={jettonTransfer.jetton.symbol}
+                recipient={
+                    jettonTransfer.recipient?.name ??
+                    toShortValue(
+                        formatAddress(
+                            jettonTransfer.recipient?.address ?? jettonTransfer.recipientsWallet,
+                            wallet.network
+                        )
+                    )
+                }
+                date={date}
+                comment={jettonTransfer.comment}
+            />
         );
     }
 
     return (
-        <ListItemGrid>
-            <ActivityIcon>
-                <ReceiveIcon />
-            </ActivityIcon>
-            <Description>
-                <FirstLine>
-                    <FirstLabel>{t('transaction_type_receive')}</FirstLabel>
-                    <AmountText isScam={jettonTransfer.sender?.isScam} green>
-                        +&thinsp;
-                        {format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
-                    </AmountText>
-                    <AmountText isScam={jettonTransfer.sender?.isScam} green>
-                        {jettonTransfer.jetton.symbol}
-                    </AmountText>
-                </FirstLine>
-                <SecondLine>
-                    <SecondaryText>
-                        {jettonTransfer.sender?.name ??
-                            toShortValue(
-                                formatAddress(
-                                    jettonTransfer.sender?.address ?? jettonTransfer.sendersWallet,
-                                    wallet.network
-                                )
-                            )}
-                    </SecondaryText>
-                    <SecondaryText>{date}</SecondaryText>
-                </SecondLine>
-            </Description>
-            <Comment comment={jettonTransfer.comment} />
-        </ListItemGrid>
+        <ReceiveActivityAction
+            amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
+            symbol={jettonTransfer.jetton.symbol}
+            sender={
+                jettonTransfer.sender?.name ??
+                toShortValue(
+                    formatAddress(
+                        jettonTransfer.sender?.address ?? jettonTransfer.sendersWallet,
+                        wallet.network
+                    )
+                )
+            }
+            isScam={jettonTransfer.sender?.isScam}
+            date={date}
+            comment={jettonTransfer.comment}
+        />
     );
 };
 
