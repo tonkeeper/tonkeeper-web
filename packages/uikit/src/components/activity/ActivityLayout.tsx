@@ -44,10 +44,12 @@ export function ActivityBlock<T>({
     const { i18n } = useTranslation();
     return (
         <>
-            {groups.map(([key, events]) => {
+            {groups.map(([eventKey, events]) => {
                 return (
-                    <Group key={key}>
-                        <Title>{getActivityTitle(i18n.language, key, events[0].timestamp)}</Title>
+                    <Group key={eventKey}>
+                        <Title>
+                            {getActivityTitle(i18n.language, eventKey, events[0].timestamp)}
+                        </Title>
                         {events.map(({ timestamp, event, key }) => {
                             const date = formatActivityDate(i18n.language, key, timestamp);
                             return (

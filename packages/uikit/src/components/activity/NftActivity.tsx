@@ -217,8 +217,8 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
                     {nftItemTransfer.sender && (
                         <ActionSenderDetails sender={nftItemTransfer.sender} />
                     )}
-                    <ActionTransactionDetails event={event} />
-                    <ActionExtraDetails event={event} />
+                    <ActionTransactionDetails eventId={event.eventId} />
+                    <ActionExtraDetails extra={event.extra} />
                 </ListBlock>
             </ActionDetailsBlock>
         );
@@ -247,8 +247,8 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
                 {nftItemTransfer.recipient && (
                     <ActionRecipientDetails recipient={nftItemTransfer.recipient} />
                 )}
-                <ActionTransactionDetails event={event} />
-                <ActionExtraDetails event={event} />
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
             </ListBlock>
         </ActionDetailsBlock>
     );

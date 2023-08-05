@@ -40,8 +40,8 @@ export const ContractDeployActionDetails: FC<ActionData> = ({ action, timestamp,
             </div>
             <ListBlock margin={false} fullWidth>
                 <ActionDeployerDetails deployer={contractDeploy.address} />
-                <ActionTransactionDetails event={event} />
-                <ActionExtraDetails event={event} />
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
             </ListBlock>
         </ActionDetailsBlock>
     );

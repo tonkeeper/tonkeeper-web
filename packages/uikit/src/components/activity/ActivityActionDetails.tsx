@@ -1,13 +1,19 @@
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { formatDecimals, getStockPrice } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo } from 'react';
-import styled from 'styled-components';
 import { Address } from 'ton-core';
-import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
+import { ListBlock } from '../../components/List';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
+import { useFormatFiat, useRate } from '../../state/rates';
 import { useTonenpointStock } from '../../state/tonendpoint';
-import { Body1, Label1 } from '../Text';
+import {
+    Amount,
+    ReceiveDetailsHeader,
+    SendDetailsHeader,
+    TransferComment
+} from './ActivityDetailsLayout';
 import { ActionData } from './ActivityNotification';
 import {
     ActionBeneficiaryDetails,
@@ -18,54 +24,9 @@ import {
     ActionSenderDetails,
     ActionTransactionDetails,
     ErrorActivityNotification,
-    Label,
     Title,
     useBalanceValue
 } from './NotificationCommon';
-
-const Amount = styled(Body1)`
-    display: block;
-    user-select: none;
-    color: ${props => props.theme.textSecondary};
-`;
-
-const LabelRight = styled(Label1)`
-    padding-left: 1rem;
-    box-sizing: border-box;
-    text-align: right;
-
-    word-break: break-all;
-
-    white-space: break-spaces;
-    overflow: hidden;
-`;
-
-const Span = styled(Label1)`
-    user-select: none;
-    color: ${props => props.theme.textPrimary};
-    background: ${props => props.theme.accentOrange};
-    padding: 4px 8px;
-    border-radius: 8px;
-    margin-bottom: 12px;
-    display: inline-block;
-`;
-
-export const TransferComment: FC<{ comment?: string }> = ({ comment }) => {
-    const { t } = useTranslation();
-
-    if (comment) {
-        return (
-            <ListItem hover={false}>
-                <ListItemPayload>
-                    <Label>{t('transaction_message')}</Label>
-                    <LabelRight>{comment}</LabelRight>
-                </ListItemPayload>
-            </ListItem>
-        );
-    } else {
-        return null;
-    }
-};
 
 export const TonTransferActionNotification: FC<ActionData> = ({
     action,
@@ -73,15 +34,11 @@ export const TonTransferActionNotification: FC<ActionData> = ({
     event,
     isScam
 }) => {
-    const { t } = useTranslation();
     const wallet = useWalletContext();
     const { tonTransfer } = action;
 
-    const format = useFormatCoinValue();
-    const { fiat } = useAppContext();
-    const { data: stock } = useTonenpointStock();
-
-    const price = useBalanceValue(tonTransfer?.amount, stock, fiat);
+    const { data } = useRate(CryptoCurrency.TON);
+    const { fiatAmount } = useFormatFiat(data, formatDecimals(tonTransfer?.amount ?? 0));
 
     if (!tonTransfer) {
         return <ErrorActivityNotification event={event} />;
@@ -90,16 +47,17 @@ export const TonTransferActionNotification: FC<ActionData> = ({
     if (tonTransfer.recipient.address === wallet.active.rawAddress) {
         return (
             <ActionDetailsBlock event={event}>
-                <div>
-                    {isScam && <Span>{t('spam_action')}</Span>}
-                    <Title>+&thinsp;{format(tonTransfer.amount)} TON</Title>
-                    {price && <Amount>≈&thinsp;{price}</Amount>}
-                    <ActionDate kind="received" timestamp={timestamp} />
-                </div>
+                <ReceiveDetailsHeader
+                    isScam={isScam}
+                    amount={tonTransfer.amount}
+                    symbol={CryptoCurrency.TON}
+                    total={fiatAmount}
+                    timestamp={timestamp}
+                />
                 <ListBlock margin={false} fullWidth>
                     <ActionSenderDetails sender={tonTransfer.sender} />
-                    <ActionTransactionDetails event={event} />
-                    <ActionExtraDetails event={event} />
+                    <ActionTransactionDetails eventId={event.eventId} />
+                    <ActionExtraDetails extra={event.extra} />
                     <TransferComment comment={isScam ? undefined : tonTransfer.comment} />
                 </ListBlock>
             </ActionDetailsBlock>
@@ -108,16 +66,17 @@ export const TonTransferActionNotification: FC<ActionData> = ({
 
     return (
         <ActionDetailsBlock event={event}>
-            <div>
-                {isScam && <Span>{t('spam_action')}</Span>}
-                <Title>-&thinsp;{format(tonTransfer.amount)} TON</Title>
-                {price && <Amount>≈&thinsp;{price}</Amount>}
-                <ActionDate kind="send" timestamp={timestamp} />
-            </div>
+            <SendDetailsHeader
+                isScam={isScam}
+                amount={tonTransfer.amount}
+                symbol={CryptoCurrency.TON}
+                total={fiatAmount}
+                timestamp={timestamp}
+            />
             <ListBlock margin={false} fullWidth>
                 <ActionRecipientDetails recipient={tonTransfer.recipient} />
-                <ActionTransactionDetails event={event} />
-                <ActionExtraDetails event={event} />
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
                 <TransferComment comment={isScam ? undefined : tonTransfer.comment} />
             </ListBlock>
         </ActionDetailsBlock>
@@ -128,7 +87,6 @@ export const JettonTransferActionNotification: FC<ActionData> = ({ action, times
     const wallet = useWalletContext();
     const { jettonTransfer } = action;
 
-    const format = useFormatCoinValue();
     const { fiat } = useAppContext();
     const { data: stock } = useTonenpointStock();
 
@@ -154,21 +112,19 @@ export const JettonTransferActionNotification: FC<ActionData> = ({ action, times
     if (jettonTransfer.sender?.address === wallet.active.rawAddress) {
         return (
             <ActionDetailsBlock event={event}>
-                <div>
-                    <Title>
-                        -&thinsp;
-                        {format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}{' '}
-                        {jettonTransfer.jetton.symbol}
-                    </Title>
-                    {total && <Amount>≈&thinsp;{total}</Amount>}
-                    <ActionDate kind="send" timestamp={timestamp} />
-                </div>
+                <SendDetailsHeader
+                    amount={jettonTransfer.amount}
+                    decimals={jettonTransfer.jetton.decimals}
+                    symbol={jettonTransfer.jetton.symbol}
+                    total={total}
+                    timestamp={timestamp}
+                />
                 <ListBlock margin={false} fullWidth>
                     {jettonTransfer.recipient && (
                         <ActionRecipientDetails recipient={jettonTransfer.recipient} />
                     )}
-                    <ActionTransactionDetails event={event} />
-                    <ActionExtraDetails event={event} />
+                    <ActionTransactionDetails eventId={event.eventId} />
+                    <ActionExtraDetails extra={event.extra} />
                     <TransferComment comment={jettonTransfer.comment} />
                 </ListBlock>
             </ActionDetailsBlock>
@@ -177,19 +133,17 @@ export const JettonTransferActionNotification: FC<ActionData> = ({ action, times
 
     return (
         <ActionDetailsBlock event={event}>
-            <div>
-                <Title>
-                    +&thinsp;
-                    {format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}{' '}
-                    {jettonTransfer.jetton.symbol}
-                </Title>
-                {total && <Amount>≈&thinsp;{total}</Amount>}
-                <ActionDate kind="received" timestamp={timestamp} />
-            </div>
+            <ReceiveDetailsHeader
+                amount={jettonTransfer.amount}
+                decimals={jettonTransfer.jetton.decimals}
+                symbol={jettonTransfer.jetton.symbol}
+                total={total}
+                timestamp={timestamp}
+            />
             <ListBlock margin={false} fullWidth>
                 {jettonTransfer.sender && <ActionSenderDetails sender={jettonTransfer.sender} />}
-                <ActionTransactionDetails event={event} />
-                <ActionExtraDetails event={event} />
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
                 <TransferComment comment={jettonTransfer.comment} />
             </ListBlock>
         </ActionDetailsBlock>
@@ -222,8 +176,8 @@ export const AuctionBidActionDetails: FC<ActionData> = ({ action, timestamp, eve
             </div>
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={auctionBid.bidder} />
-                <ActionTransactionDetails event={event} />
-                <ActionExtraDetails event={event} />
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
             </ListBlock>
         </ActionDetailsBlock>
     );

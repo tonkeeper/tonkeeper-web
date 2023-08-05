@@ -37,8 +37,8 @@ export const UnSubscribeActionDetails: FC<ActionData> = ({ action, timestamp, ev
             </div>
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={unSubscribe.beneficiary} />
-                <ActionTransactionDetails event={event} />
-                <ActionExtraDetails event={event} />
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
             </ListBlock>
         </ActionDetailsBlock>
     );
@@ -60,8 +60,8 @@ export const SubscribeActionDetails: FC<ActionData> = ({ action, timestamp, even
             </div>
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={subscribe.beneficiary} />
-                <ActionTransactionDetails event={event} />
-                <ActionExtraDetails event={event} />
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
             </ListBlock>
         </ActionDetailsBlock>
     );

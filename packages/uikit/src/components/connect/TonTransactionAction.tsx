@@ -7,7 +7,7 @@ import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { H3, Label1 } from '../Text';
-import { TransferComment } from '../activity/ActivityActionDetails';
+import { TransferComment } from '../activity/ActivityDetailsLayout';
 import {
     ActionBeneficiaryDetails,
     ActionDeployerDetails,

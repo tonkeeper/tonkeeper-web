@@ -14,7 +14,7 @@ import { Gap } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { FullHeightBlock, NotificationCancelButton, NotificationTitleBlock } from '../Notification';
 import { Label1, Label2 } from '../Text';
-import { TransferComment } from '../activity/ActivityActionDetails';
+import { TransferComment } from '../activity/ActivityDetailsLayout';
 import { ActionFeeDetails } from '../activity/NotificationCommon';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';

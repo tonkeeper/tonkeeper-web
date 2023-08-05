@@ -200,14 +200,14 @@ export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({ 
     );
 };
 
-export const ActionTransactionDetails: FC<{ event: AccountEvent }> = ({ event }) => {
+export const ActionTransactionDetails: FC<{ eventId: string }> = ({ eventId }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     return (
-        <ListItem onClick={() => sdk.copyToClipboard(event.eventId, t('copied'))}>
+        <ListItem onClick={() => sdk.copyToClipboard(eventId, t('copied'))}>
             <ListItemPayload>
                 <Label>{t('transaction_hash')}</Label>
-                <Label1>{toShortValue(event.eventId, 8)}</Label1>
+                <Label1>{toShortValue(eventId, 8)}</Label1>
             </ListItemPayload>
         </ListItem>
     );
@@ -260,11 +260,11 @@ export const ActionFeeDetails: FC<{
 };
 
 export const ActionExtraDetails: FC<{
-    event: AccountEvent;
-}> = ({ event }) => {
+    extra: number;
+}> = ({ extra }) => {
     const { t } = useTranslation();
 
-    const feeAmount = event.extra < 0 ? event.extra * -1 : event.extra;
+    const feeAmount = extra < 0 ? extra * -1 : extra;
     const amount = useCoinFullBalance(feeAmount);
 
     const { data } = useRate(CryptoCurrency.TON);
@@ -273,7 +273,7 @@ export const ActionExtraDetails: FC<{
     return (
         <ListItem hover={false}>
             <ListItemPayload>
-                <Label>{event.extra > 0 ? t('txActions_refund') : t('transaction_fee')}</Label>
+                <Label>{extra > 0 ? t('txActions_refund') : t('transaction_fee')}</Label>
                 <ColumnText
                     right
                     text={`${amount} ${CryptoCurrency.TON}`}

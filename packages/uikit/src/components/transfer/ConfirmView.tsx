@@ -20,7 +20,7 @@ import { formatter } from '../../hooks/balance';
 import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
 import { useTranslation } from '../../hooks/translation';
 import { useTonenpointStock } from '../../state/tonendpoint';
-import { TransferComment } from '../activity/ActivityActionDetails';
+import { TransferComment } from '../activity/ActivityDetailsLayout';
 import { ActionFeeDetails } from '../activity/NotificationCommon';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
