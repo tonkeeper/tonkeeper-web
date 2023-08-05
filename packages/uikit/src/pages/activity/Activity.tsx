@@ -19,7 +19,7 @@ const Activity: FC = () => {
     const ref = useRef<HTMLDivElement>(null);
 
     const {
-        isFetched: isTonFetched
+        isFetched: isTonFetched,
         fetchNextPage: fetchTonNextPage,
         hasNextPage: hasTonNextPage,
         isFetchingNextPage: isTonFetchingNextPage,
@@ -36,13 +36,13 @@ const Activity: FC = () => {
     });
 
     const {
-        isFetched: isTronFetched
+        isFetched: isTronFetched,
         data: tronEvents,
         isFetchingNextPage: isTronFetchingNextPage,
         hasNextPage: hasTronNextPage,
         fetchNextPage: fetchTronNextPage
     } = useInfiniteQuery({
-        queryKey: [wallet.tron!.ownerWalletAddress, QueryKey.tron],
+        queryKey: [wallet.tron?.ownerWalletAddress, QueryKey.tron],
         queryFn: ({ pageParam = undefined }) =>
             new TronApi(tronApi).getTransactions({
                 ownerAddress: wallet.tron!.ownerWalletAddress,
@@ -62,7 +62,7 @@ const Activity: FC = () => {
         return getMixedActivity(tonEvents, tronEvents);
     }, [tonEvents, tronEvents]);
 
-    if (!isTonFetched || !isTronFetched) {
+    if (!isTonFetched || (wallet.tron !== undefined && !isTronFetched)) {
         return <ActivitySkeletonPage />;
     }
 
