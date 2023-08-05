@@ -22,48 +22,26 @@ const Span = styled(Label1)`
     display: inline-block;
 `;
 
-export const ReceiveDetailsHeader: FC<{
+export const ActivityDetailsHeader: FC<{
     amount: string | number;
     decimals?: number;
     symbol: string;
     total?: string;
     timestamp: number;
     isScam?: boolean;
-}> = ({ amount, decimals, symbol, total, timestamp, isScam }) => {
+    kind: 'received' | 'send';
+}> = ({ amount, decimals, symbol, total, timestamp, isScam, kind }) => {
     const format = useFormatCoinValue();
     const { t } = useTranslation();
     return (
         <div>
             {isScam && <Span>{t('spam_action')}</Span>}
             <Title>
-                +&thinsp;
+                {kind === 'received' ? '+' : '-'}&thinsp;
                 {format(amount, decimals)} {symbol}
             </Title>
             {total && <Amount>≈&thinsp;{total}</Amount>}
-            <ActionDate kind="received" timestamp={timestamp} />
-        </div>
-    );
-};
-
-export const SendDetailsHeader: FC<{
-    amount: string | number;
-    decimals?: number;
-    symbol: string;
-    total?: string;
-    timestamp: number;
-    isScam?: boolean;
-}> = ({ amount, decimals, symbol, total, timestamp, isScam }) => {
-    const format = useFormatCoinValue();
-    const { t } = useTranslation();
-    return (
-        <div>
-            {isScam && <Span>{t('spam_action')}</Span>}
-            <Title>
-                -&thinsp;
-                {format(amount, decimals)} {symbol}
-            </Title>
-            {total && <Amount>≈&thinsp;{total}</Amount>}
-            <ActionDate kind="send" timestamp={timestamp} />
+            <ActionDate kind={kind} timestamp={timestamp} />
         </div>
     );
 };

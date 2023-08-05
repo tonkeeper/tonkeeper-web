@@ -3,15 +3,14 @@ import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { useWalletContext } from '../../hooks/appContext';
-import { useTranslation } from '../../hooks/translation';
-import { useNftItemData } from '../../state/wallet';
-import { VerificationIcon } from '../Icon';
-import { ListBlock } from '../List';
-import { Body1 } from '../Text';
-import { NftCollectionBody2, NftHeaderBody2 } from '../nft/NftHeader';
-import { ActivityIcon, ReceiveIcon, SentIcon } from './ActivityIcons';
-import { ActionData } from './ActivityNotification';
+import { useWalletContext } from '../../../hooks/appContext';
+import { useTranslation } from '../../../hooks/translation';
+import { useNftItemData } from '../../../state/wallet';
+import { VerificationIcon } from '../../Icon';
+import { ListBlock } from '../../List';
+import { Body1 } from '../../Text';
+import { NftCollectionBody2, NftHeaderBody2 } from '../../nft/NftHeader';
+import { ActivityIcon, ReceiveIcon, SentIcon } from '../ActivityIcons';
 import {
     AmountText,
     Description,
@@ -21,7 +20,7 @@ import {
     ListItemGrid,
     SecondLine,
     SecondaryText
-} from './CommonAction';
+} from '../CommonAction';
 import {
     ActionDate,
     ActionDetailsBlock,
@@ -31,7 +30,8 @@ import {
     ActionTransactionDetails,
     ErrorActivityNotification,
     Title
-} from './NotificationCommon';
+} from '../NotificationCommon';
+import { ActionData } from './ActivityNotification';
 
 const NftBlock = styled.div`
     background: ${props => props.theme.backgroundContentTint};

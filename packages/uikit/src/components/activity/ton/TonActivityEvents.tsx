@@ -3,7 +3,7 @@ import { AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC } from 'react';
 import { ListItem } from '../../List';
 import { ProgressIcon } from '../ActivityLayout';
-import { ActionData } from '../ActivityNotification';
+import { ActionData } from './ActivityNotification';
 import { ActivityAction } from './TonActivityAction';
 
 export const TonActivityEvents: FC<{

@@ -255,5 +255,14 @@
     },
     "reset_tron_cache": {
         "message": "Reset Tron cache"
+    },
+    "transaction_type_contract_call": {
+        "message": "Вызов контракта"
+    },
+    "transaction_type_swap": {
+        "message": "Обмен"
+    },
+    "transaction_dex": {
+        "message": "DEX"
     }
 }

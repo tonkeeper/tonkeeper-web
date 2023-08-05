@@ -11,6 +11,7 @@ import { useTranslation } from '../../../hooks/translation';
 import { ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayout';
 import {
     AmountText,
+    Comment,
     Description,
     ErrorAction,
     FirstLabel,
@@ -19,9 +20,10 @@ import {
     SecondLine,
     SecondaryText
 } from '../CommonAction';
-import { ContractDeployAction } from '../ContractDeployAction';
-import { NftComment, NftItemTransferAction } from '../NftActivity';
+import { toDexName } from '../NotificationCommon';
 import { SubscribeAction, UnSubscribeAction } from '../SubscribeAction';
+import { ContractDeployAction } from './ContractDeployAction';
+import { NftComment, NftItemTransferAction } from './NftActivity';
 
 const TonTransferAction: FC<{
     action: Action;
@@ -117,7 +119,79 @@ const JettonTransferAction: FC<{ action: Action; date: string }> = ({ action, da
     );
 };
 
-export const AuctionBidAction: FC<{
+export const SmartContractExecAction: FC<{
+    action: Action;
+    date: string;
+}> = ({ action, date }) => {
+    const { t } = useTranslation();
+    const { smartContractExec } = action;
+    const wallet = useWalletContext();
+    const format = useFormatCoinValue();
+
+    if (!smartContractExec) {
+        return <ErrorAction />;
+    }
+
+    return (
+        <ListItemGrid>
+            <ActivityIcon>
+                <SentIcon />
+            </ActivityIcon>
+            <Description>
+                <FirstLine>
+                    <FirstLabel>{t('transaction_type_contract_call')}</FirstLabel>
+                    <AmountText>-&thinsp;{format(smartContractExec.tonAttached)}</AmountText>
+                    <AmountText>{CryptoCurrency.TON}</AmountText>
+                </FirstLine>
+                <SecondLine>
+                    <SecondaryText>
+                        {toShortValue(
+                            formatAddress(smartContractExec.contract.address, wallet.network)
+                        )}
+                    </SecondaryText>
+                    <SecondaryText>{date}</SecondaryText>
+                </SecondLine>
+            </Description>
+            <Comment comment={smartContractExec.operation} />
+        </ListItemGrid>
+    );
+};
+
+export const JettonSwapAction: FC<{
+    action: Action;
+    date: string;
+}> = ({ action, date }) => {
+    const { t } = useTranslation();
+    const { jettonSwap } = action;
+    const format = useFormatCoinValue();
+
+    if (!jettonSwap) {
+        return <ErrorAction />;
+    }
+
+    return (
+        <ListItemGrid>
+            <ActivityIcon>
+                <SentIcon />
+            </ActivityIcon>
+            <Description>
+                <FirstLine>
+                    <FirstLabel>{t('transaction_type_swap')}</FirstLabel>
+                    <AmountText green>
+                        +&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)}
+                    </AmountText>
+                    <AmountText green>{jettonSwap.jettonMasterIn.symbol}</AmountText>
+                </FirstLine>
+                <SecondLine>
+                    <SecondaryText>{toDexName(jettonSwap.dex)}</SecondaryText>
+                    <SecondaryText>{date}</SecondaryText>
+                </SecondLine>
+            </Description>
+        </ListItemGrid>
+    );
+};
+
+const AuctionBidAction: FC<{
     action: Action;
     date: string;
     openNft: (nft: NftItemRepr) => void;
@@ -178,6 +252,10 @@ export const ActivityAction: FC<{
             return <SubscribeAction action={action} date={date} />;
         case 'AuctionBid':
             return <AuctionBidAction action={action} date={date} openNft={openNft} />;
+        case 'SmartContractExec':
+            return <SmartContractExecAction action={action} date={date} />;
+        case 'JettonSwap':
+            return <JettonSwapAction action={action} date={date} />;
         case 'Unknown':
             return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;
         default: {

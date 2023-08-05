@@ -1,15 +1,17 @@
 import { AccountEvent, Action } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useCallback } from 'react';
-import { Notification } from '../Notification';
+import { Notification } from '../../Notification';
+import { ErrorActivityNotification } from '../NotificationCommon';
+import { SubscribeActionDetails, UnSubscribeActionDetails } from '../SubscribeAction';
 import {
     AuctionBidActionDetails,
     JettonTransferActionNotification,
+    SmartContractExecActionDetails,
+    SwapTokensActionDetails,
     TonTransferActionNotification
 } from './ActivityActionDetails';
 import { ContractDeployActionDetails } from './ContractDeployAction';
 import { NftItemTransferActionDetails } from './NftActivity';
-import { ErrorActivityNotification } from './NotificationCommon';
-import { SubscribeActionDetails, UnSubscribeActionDetails } from './SubscribeAction';
 
 export interface ActionData {
     isScam: boolean;
@@ -34,6 +36,10 @@ const ActivityContent: FC<ActionData> = props => {
             return <SubscribeActionDetails {...props} />;
         case 'AuctionBid':
             return <AuctionBidActionDetails {...props} />;
+        case 'SmartContractExec':
+            return <SmartContractExecActionDetails {...props} />;
+        case 'JettonSwap':
+            return <SwapTokensActionDetails {...props} />;
         case 'Unknown':
             return <ErrorActivityNotification event={props.event} />;
         default: {

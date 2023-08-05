@@ -1,17 +1,19 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { Fee } from '@tonkeeper/core/dist/tonApiV1';
-import { AccountAddress, AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
+import {
+    AccountAddress,
+    AccountEvent,
+    JettonSwapActionDexEnum
+} from '@tonkeeper/core/dist/tonApiV2';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
-import { formatDecimals, getTonCoinStockPrice } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import BigNumber from 'bignumber.js';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { formatFiatCurrency, useCoinFullBalance } from '../../hooks/balance';
+import { useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { ColumnText } from '../Layout';
@@ -62,20 +64,15 @@ export const ActionDate: FC<{
     );
 };
 
-export const useBalanceValue = (
-    amount: BigNumber.Value | undefined,
-    stock: TonendpointStock | undefined,
-    fiat: FiatCurrencies
-) => {
-    return useMemo(() => {
-        if (!stock || !amount) {
-            return undefined;
-        }
-        const ton = new BigNumber(amount).multipliedBy(
-            formatDecimals(getTonCoinStockPrice(stock.today, fiat))
-        );
-        return formatFiatCurrency(fiat, ton);
-    }, [amount, stock]);
+export const toDexName = (dex: JettonSwapActionDexEnum) => {
+    switch (dex) {
+        case 'dedust':
+            return 'DeDust.io';
+        case 'stonfi':
+            return 'STON.fi';
+        default:
+            return dex;
+    }
 };
 
 export const ErrorActivityNotification: FC<PropsWithChildren<{ event: AccountEvent }>> = ({
@@ -238,12 +235,13 @@ export const ActionFeeDetails: FC<{
     fee: Fee;
     stock: TonendpointStock | undefined;
     fiat: FiatCurrencies;
-}> = ({ fee, stock, fiat }) => {
+}> = ({ fee }) => {
     const { t } = useTranslation();
 
     const feeAmount = fee.total < 0 ? fee.total * -1 : fee.total;
     const amount = useCoinFullBalance(feeAmount);
-    const price = useBalanceValue(feeAmount, stock, fiat);
+    const { data } = useRate(CryptoCurrency.TON);
+    const { fiatAmount } = useFormatFiat(data, amount);
 
     return (
         <ListItem hover={false}>
@@ -252,7 +250,7 @@ export const ActionFeeDetails: FC<{
                 <ColumnText
                     right
                     text={`${amount} ${CryptoCurrency.TON}`}
-                    secondary={`≈ ${price}`}
+                    secondary={`≈ ${fiatAmount}`}
                 />
             </ListItemPayload>
         </ListItem>

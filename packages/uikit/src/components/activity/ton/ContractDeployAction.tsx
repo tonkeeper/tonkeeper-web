@@ -2,14 +2,12 @@ import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
-import { ActivityIcon, ContractDeployIcon } from '../../components/activity/ActivityIcons';
-import { useWalletContext } from '../../hooks/appContext';
-import { useTranslation } from '../../hooks/translation';
-import { ListBlock } from '../List';
-import { ContractDeployActivityAction, WalletDeployActivityAction } from './ActivityActionLayout';
-import { ActionData } from './ActivityNotification';
-import { ColumnLayout, ErrorAction, ListItemGrid } from './CommonAction';
-import { NftComment } from './NftActivity';
+import { useWalletContext } from '../../../hooks/appContext';
+import { useTranslation } from '../../../hooks/translation';
+import { ListBlock } from '../../List';
+import { ContractDeployActivityAction, WalletDeployActivityAction } from '../ActivityActionLayout';
+import { ActivityIcon, ContractDeployIcon } from '../ActivityIcons';
+import { ColumnLayout, ErrorAction, ListItemGrid } from '../CommonAction';
 import {
     ActionDate,
     ActionDeployerDetails,
@@ -18,7 +16,9 @@ import {
     ActionTransactionDetails,
     ErrorActivityNotification,
     Title
-} from './NotificationCommon';
+} from '../NotificationCommon';
+import { ActionData } from './ActivityNotification';
+import { NftComment } from './NftActivity';
 
 export const ContractDeployActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
     const { t } = useTranslation();

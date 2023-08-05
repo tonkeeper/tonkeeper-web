@@ -8,7 +8,7 @@ import { MixedActivity, getMixedActivity } from '../../state/mixedActivity';
 import { CoinHistorySkeleton, HistoryBlock, SkeletonList } from '../Skeleton';
 import { NftNotification } from '../nft/NftNotification';
 import { ActivityBlock } from './ActivityLayout';
-import { ActionData, ActivityNotification } from './ActivityNotification';
+import { ActionData, ActivityNotification } from './ton/ActivityNotification';
 import { TonActivityEvents } from './ton/TonActivityEvents';
 import { TronActivityEvents } from './tron/TronActivityEvents';
 

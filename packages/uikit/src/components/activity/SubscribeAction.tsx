@@ -9,7 +9,6 @@ import {
 import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock } from '../List';
-import { ActionData } from './ActivityNotification';
 import { ColumnLayout, ErrorAction, ListItemGrid } from './CommonAction';
 import {
     ActionBeneficiaryDetails,
@@ -20,6 +19,7 @@ import {
     ErrorActivityNotification,
     Title
 } from './NotificationCommon';
+import { ActionData } from './ton/ActivityNotification';
 
 export const UnSubscribeActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
     const { t } = useTranslation();
