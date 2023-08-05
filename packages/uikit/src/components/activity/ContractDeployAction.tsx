@@ -14,6 +14,7 @@ import {
     ActionDate,
     ActionDeployerDetails,
     ActionDetailsBlock,
+    ActionExtraDetails,
     ActionTransactionDetails,
     ErrorActivityNotification,
     Title
@@ -40,7 +41,7 @@ export const ContractDeployActionDetails: FC<ActionData> = ({ action, timestamp,
             <ListBlock margin={false} fullWidth>
                 <ActionDeployerDetails deployer={contractDeploy.address} />
                 <ActionTransactionDetails event={event} />
-                {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
+                <ActionExtraDetails event={event} />
             </ListBlock>
         </ActionDetailsBlock>
     );

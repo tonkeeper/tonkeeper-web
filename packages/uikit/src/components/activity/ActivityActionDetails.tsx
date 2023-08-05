@@ -13,6 +13,7 @@ import {
     ActionBeneficiaryDetails,
     ActionDate,
     ActionDetailsBlock,
+    ActionExtraDetails,
     ActionRecipientDetails,
     ActionSenderDetails,
     ActionTransactionDetails,
@@ -98,7 +99,7 @@ export const TonTransferActionNotification: FC<ActionData> = ({
                 <ListBlock margin={false} fullWidth>
                     <ActionSenderDetails sender={tonTransfer.sender} />
                     <ActionTransactionDetails event={event} />
-                    {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
+                    <ActionExtraDetails event={event} />
                     <TransferComment comment={isScam ? undefined : tonTransfer.comment} />
                 </ListBlock>
             </ActionDetailsBlock>
@@ -116,7 +117,7 @@ export const TonTransferActionNotification: FC<ActionData> = ({
             <ListBlock margin={false} fullWidth>
                 <ActionRecipientDetails recipient={tonTransfer.recipient} />
                 <ActionTransactionDetails event={event} />
-                {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
+                <ActionExtraDetails event={event} />
                 <TransferComment comment={isScam ? undefined : tonTransfer.comment} />
             </ListBlock>
         </ActionDetailsBlock>
@@ -167,7 +168,7 @@ export const JettonTransferActionNotification: FC<ActionData> = ({ action, times
                         <ActionRecipientDetails recipient={jettonTransfer.recipient} />
                     )}
                     <ActionTransactionDetails event={event} />
-                    {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
+                    <ActionExtraDetails event={event} />
                     <TransferComment comment={jettonTransfer.comment} />
                 </ListBlock>
             </ActionDetailsBlock>
@@ -188,7 +189,7 @@ export const JettonTransferActionNotification: FC<ActionData> = ({ action, times
             <ListBlock margin={false} fullWidth>
                 {jettonTransfer.sender && <ActionSenderDetails sender={jettonTransfer.sender} />}
                 <ActionTransactionDetails event={event} />
-                {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
+                <ActionExtraDetails event={event} />
                 <TransferComment comment={jettonTransfer.comment} />
             </ListBlock>
         </ActionDetailsBlock>
@@ -222,7 +223,7 @@ export const AuctionBidActionDetails: FC<ActionData> = ({ action, timestamp, eve
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={auctionBid.bidder} />
                 <ActionTransactionDetails event={event} />
-                {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
+                <ActionExtraDetails event={event} />
             </ListBlock>
         </ActionDetailsBlock>
     );

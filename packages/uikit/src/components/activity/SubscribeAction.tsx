@@ -15,6 +15,7 @@ import {
     ActionBeneficiaryDetails,
     ActionDate,
     ActionDetailsBlock,
+    ActionExtraDetails,
     ActionTransactionDetails,
     ErrorActivityNotification,
     Title
@@ -37,7 +38,7 @@ export const UnSubscribeActionDetails: FC<ActionData> = ({ action, timestamp, ev
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={unSubscribe.beneficiary} />
                 <ActionTransactionDetails event={event} />
-                {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
+                <ActionExtraDetails event={event} />
             </ListBlock>
         </ActionDetailsBlock>
     );
@@ -60,7 +61,7 @@ export const SubscribeActionDetails: FC<ActionData> = ({ action, timestamp, even
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={subscribe.beneficiary} />
                 <ActionTransactionDetails event={event} />
-                {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
+                <ActionExtraDetails event={event} />
             </ListBlock>
         </ActionDetailsBlock>
     );

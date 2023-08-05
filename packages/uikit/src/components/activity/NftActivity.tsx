@@ -25,6 +25,7 @@ import {
 import {
     ActionDate,
     ActionDetailsBlock,
+    ActionExtraDetails,
     ActionRecipientDetails,
     ActionSenderDetails,
     ActionTransactionDetails,
@@ -217,7 +218,7 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
                         <ActionSenderDetails sender={nftItemTransfer.sender} />
                     )}
                     <ActionTransactionDetails event={event} />
-                    {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
+                    <ActionExtraDetails event={event} />
                 </ListBlock>
             </ActionDetailsBlock>
         );
@@ -247,7 +248,7 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
                     <ActionRecipientDetails recipient={nftItemTransfer.recipient} />
                 )}
                 <ActionTransactionDetails event={event} />
-                {/* <ActionFeeDetails fee={event.fee} stock={stock} fiat={fiat} /> */}
+                <ActionExtraDetails event={event} />
             </ListBlock>
         </ActionDetailsBlock>
     );

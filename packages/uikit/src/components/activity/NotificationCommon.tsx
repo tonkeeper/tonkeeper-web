@@ -1,3 +1,4 @@
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { Fee } from '@tonkeeper/core/dist/tonApiV1';
 import { AccountAddress, AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
@@ -12,6 +13,7 @@ import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency, useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
+import { useFormatFiat, useRate } from '../../state/rates';
 import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
 import { Body1, H2, Label1 } from '../Text';
@@ -247,7 +249,36 @@ export const ActionFeeDetails: FC<{
         <ListItem hover={false}>
             <ListItemPayload>
                 <Label>{fee.total < 0 ? t('txActions_refund') : t('transaction_fee')}</Label>
-                <ColumnText right text={`${amount} TON`} secondary={`≈ ${price}`} />
+                <ColumnText
+                    right
+                    text={`${amount} ${CryptoCurrency.TON}`}
+                    secondary={`≈ ${price}`}
+                />
+            </ListItemPayload>
+        </ListItem>
+    );
+};
+
+export const ActionExtraDetails: FC<{
+    event: AccountEvent;
+}> = ({ event }) => {
+    const { t } = useTranslation();
+
+    const feeAmount = event.extra < 0 ? event.extra * -1 : event.extra;
+    const amount = useCoinFullBalance(feeAmount);
+
+    const { data } = useRate(CryptoCurrency.TON);
+    const { fiatAmount } = useFormatFiat(data, amount);
+
+    return (
+        <ListItem hover={false}>
+            <ListItemPayload>
+                <Label>{event.extra > 0 ? t('txActions_refund') : t('transaction_fee')}</Label>
+                <ColumnText
+                    right
+                    text={`${amount} ${CryptoCurrency.TON}`}
+                    secondary={`≈ ${fiatAmount}`}
+                />
             </ListItemPayload>
         </ListItem>
     );
