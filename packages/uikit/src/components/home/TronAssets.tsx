@@ -8,7 +8,7 @@ import { useFormatFiat, useRate } from '../../state/rates';
 import { ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 
-const TronToken: FC<{
+const TronAsset: FC<{
     token: TronToken;
     weiAmount: string;
 }> = ({ token, weiAmount }) => {
@@ -42,7 +42,7 @@ export const TronAssets: FC<{ tokens: TronBalances }> = React.memo(({ tokens }) 
     return (
         <>
             {tokens.balances.map(({ token, weiAmount }) => (
-                <TronToken key={token.address} token={token} weiAmount={weiAmount} />
+                <TronAsset key={token.address} token={token} weiAmount={weiAmount} />
             ))}
         </>
     );
