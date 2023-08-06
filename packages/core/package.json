@@ -1,30 +1,31 @@
 {
-  "name": "@tonkeeper/core",
-  "version": "0.1.0",
-  "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
-  "description": "Core features and state for tonkeeper web wallet",
-  "main": "index.js",
-  "scripts": {
-    "build": "rm -fr dist && yarn sdk && tsc",
-    "start": "tsc -w",
-    "sdk": "npm-run-all -p generate:* --aggregate-output",
-    "generate:sdkV1": "rm -fr src/tonApiV1 && docker build -f resource/Dockerfile.apiV1 . -t tonapisdkv1 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv1",
-    "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f resource/Dockerfile.apiV2 . -t tonapisdkv2 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv2",
-    "generate:tronApi": "rm -fr src/tronApi && docker build -f resource/Dockerfile.tronApi . -t tronapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tronapisdk",
-    "build:pkg": "yarn build"
-  },
-  "license": "ISC",
-  "devDependencies": {
-    "npm-run-all": "^4.1.5",
-    "typescript": "^4.9.4"
-  },
-  "dependencies": {
-    "bignumber.js": "^9.1.1",
-    "ethers": "^6.6.5",
-    "query-string": "^8.1.0",
-    "ton": "^13.4.1",
-    "ton-core": "^0.49.0",
-    "ton-crypto": "^3.2.0",
-    "tweetnacl": "^1.0.3"
-  }
+    "name": "@tonkeeper/core",
+    "version": "0.1.0",
+    "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
+    "description": "Core features and state for tonkeeper web wallet",
+    "main": "index.js",
+    "scripts": {
+        "build": "rm -fr dist && yarn sdk && tsc",
+        "start": "tsc -w",
+        "sdk": "npm-run-all -p generate:*",
+        "generate:sdkV1": "rm -fr src/tonApiV1 && docker build -f resource/Dockerfile.apiV1 . -t tonapisdkv1 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv1",
+        "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f resource/Dockerfile.apiV2 . -t tonapisdkv2 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv2",
+        "generate:tronApi": "rm -fr src/tronApi && docker build -f resource/Dockerfile.tronApi . -t tronapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tronapisdk",
+        "build:pkg": "yarn build"
+    },
+    "license": "ISC",
+    "devDependencies": {
+        "npm-run-all": "^4.1.5",
+        "typescript": "^4.9.4",
+        "yarn-run-all": "^3.1.1"
+    },
+    "dependencies": {
+        "bignumber.js": "^9.1.1",
+        "ethers": "^6.6.5",
+        "query-string": "^8.1.0",
+        "ton": "^13.4.1",
+        "ton-core": "^0.49.0",
+        "ton-crypto": "^3.2.0",
+        "tweetnacl": "^1.0.3"
+    }
 }
