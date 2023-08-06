@@ -11,7 +11,7 @@ import {
     TonTransferActionNotification
 } from './ActivityActionDetails';
 import { ContractDeployActionDetails } from './ContractDeployAction';
-import { NftItemTransferActionDetails } from './NftActivity';
+import { NftItemTransferActionDetails, NftPurchaseActionDetails } from './NftActivity';
 
 export interface ActionData {
     isScam: boolean;
@@ -40,6 +40,8 @@ const ActivityContent: FC<ActionData> = props => {
             return <SmartContractExecActionDetails {...props} />;
         case 'JettonSwap':
             return <SwapTokensActionDetails {...props} />;
+        case 'NftPurchase':
+            return <NftPurchaseActionDetails {...props} />;
         case 'Unknown':
             return <ErrorActivityNotification event={props.event} />;
         default: {

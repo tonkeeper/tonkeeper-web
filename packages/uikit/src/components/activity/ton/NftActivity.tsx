@@ -1,5 +1,6 @@
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { Action } from '@tonkeeper/core/dist/tonApiV2';
+import { Action, Price } from '@tonkeeper/core/dist/tonApiV2';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import styled from 'styled-components';
@@ -13,6 +14,7 @@ import { NftCollectionBody2, NftHeaderBody2 } from '../../nft/NftHeader';
 import { ActivityIcon, ReceiveIcon, SentIcon } from '../ActivityIcons';
 import {
     AmountText,
+    ColumnLayout,
     Description,
     ErrorAction,
     FirstLabel,
@@ -106,25 +108,20 @@ export const NftItemTransferAction: FC<{
                 <ActivityIcon>
                     <ReceiveIcon />
                 </ActivityIcon>
-                <Description>
-                    <FirstLine>
-                        <FirstLabel>{t('transaction_type_receive')}</FirstLabel>
-                        <AmountText></AmountText>
-                        <AmountText>NFT</AmountText>
-                    </FirstLine>
-                    <SecondLine>
-                        <SecondaryText>
-                            {nftItemTransfer.sender?.name ??
-                                toShortValue(
-                                    formatAddress(
-                                        nftItemTransfer.sender?.address ?? nftItemTransfer.nft,
-                                        wallet.network
-                                    )
-                                )}
-                        </SecondaryText>
-                        <SecondaryText>{date}</SecondaryText>
-                    </SecondLine>
-                </Description>
+                <ColumnLayout
+                    title={t('transaction_type_receive')}
+                    entry="NFT"
+                    address={
+                        nftItemTransfer.sender?.name ??
+                        toShortValue(
+                            formatAddress(
+                                nftItemTransfer.sender?.address ?? nftItemTransfer.nft,
+                                wallet.network
+                            )
+                        )
+                    }
+                    date={date}
+                />
                 <NftComment address={nftItemTransfer.nft} openNft={openNft} />
             </ListItemGrid>
         );
@@ -135,26 +132,52 @@ export const NftItemTransferAction: FC<{
             <ActivityIcon>
                 <SentIcon />
             </ActivityIcon>
+            <ColumnLayout
+                title={t('transaction_type_sent')}
+                entry="NFT"
+                address={
+                    nftItemTransfer.recipient?.name ??
+                    toShortValue(
+                        formatAddress(
+                            nftItemTransfer.recipient?.address ?? nftItemTransfer.nft,
+                            wallet.network
+                        )
+                    )
+                }
+                date={date}
+            />
+            <NftComment address={nftItemTransfer.nft} openNft={openNft} />
+        </ListItemGrid>
+    );
+};
+
+export const NftPurchaseAction: FC<{
+    action: Action;
+    date: string;
+    openNft: (nft: NftItemRepr) => void;
+}> = ({ action, date, openNft }) => {
+    const { t } = useTranslation();
+    const { nftPurchase } = action;
+    if (!nftPurchase) {
+        return <ErrorAction />;
+    }
+    return (
+        <ListItemGrid>
+            <ActivityIcon>
+                <SentIcon />
+            </ActivityIcon>
             <Description>
                 <FirstLine>
-                    <FirstLabel>{t('transaction_type_sent')}</FirstLabel>
-                    <AmountText></AmountText>
-                    <AmountText>NFT</AmountText>
+                    <FirstLabel>{t('transaction_type_purchase')}</FirstLabel>
+                    <AmountText>-&thinsp;{formatDecimals(nftPurchase.amount.value)}</AmountText>
+                    <AmountText>{nftPurchase.amount.tokenName}</AmountText>
                 </FirstLine>
                 <SecondLine>
-                    <SecondaryText>
-                        {nftItemTransfer.recipient?.name ??
-                            toShortValue(
-                                formatAddress(
-                                    nftItemTransfer.recipient?.address ?? nftItemTransfer.nft,
-                                    wallet.network
-                                )
-                            )}
-                    </SecondaryText>
+                    <SecondaryText>{nftPurchase.auctionType}</SecondaryText>
                     <SecondaryText>{date}</SecondaryText>
                 </SecondLine>
             </Description>
-            <NftComment address={nftItemTransfer.nft} openNft={openNft} />
+            <NftComment address={nftPurchase.nft.address} openNft={openNft} />
         </ListItemGrid>
     );
 };
@@ -181,6 +204,40 @@ const Icon = styled.span`
     user-select: none;
 `;
 
+const NftActivityHeader: FC<{
+    kind: 'send' | 'received';
+    timestamp: number;
+    data?: NftItemRepr;
+    amount?: Price;
+}> = ({ kind, timestamp, data, amount }) => {
+    const preview = data?.previews?.find(item => item.resolution === '100x100');
+
+    return (
+        <div>
+            {preview && <Image src={preview.url} alt="NFT Preview" />}
+            {data && (
+                <>
+                    <Title>{data.dns ?? data.metadata.name}</Title>
+                    <Amount>
+                        {data.collection?.name ?? data.metadata.description}
+                        {data && data.approvedBy && data.approvedBy.length > 0 && (
+                            <Icon>
+                                <VerificationIcon />
+                            </Icon>
+                        )}
+                    </Amount>
+                </>
+            )}
+            {amount && (
+                <Amount>
+                    {formatDecimals(amount.value)} {amount.tokenName}
+                </Amount>
+            )}
+            <ActionDate kind={kind} timestamp={timestamp} />
+        </div>
+    );
+};
+
 export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
     const wallet = useWalletContext();
     const { nftItemTransfer } = action;
@@ -191,62 +248,42 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
         return <ErrorActivityNotification event={event} />;
     }
 
-    const preview = data?.previews?.find(item => item.resolution === '100x100');
+    const kind =
+        nftItemTransfer.recipient?.address === wallet.active.rawAddress ? 'received' : 'send';
 
-    if (nftItemTransfer.recipient?.address === wallet.active.rawAddress) {
-        return (
-            <ActionDetailsBlock event={event}>
-                <div>
-                    {preview && <Image src={preview.url} alt="NFT Preview" />}
-                    {data && (
-                        <>
-                            <Title>{data.dns ?? data.metadata.name}</Title>
-                            <Amount>
-                                {data.collection?.name ?? data.metadata.description}
-                                {data && data.approvedBy && data.approvedBy.length > 0 && (
-                                    <Icon>
-                                        <VerificationIcon />
-                                    </Icon>
-                                )}
-                            </Amount>
-                        </>
-                    )}
-                    <ActionDate kind="received" timestamp={timestamp} />
-                </div>
-                <ListBlock margin={false} fullWidth>
-                    {nftItemTransfer.sender && (
-                        <ActionSenderDetails sender={nftItemTransfer.sender} />
-                    )}
-                    <ActionTransactionDetails eventId={event.eventId} />
-                    <ActionExtraDetails extra={event.extra} />
-                </ListBlock>
-            </ActionDetailsBlock>
-        );
+    return (
+        <ActionDetailsBlock event={event}>
+            <NftActivityHeader data={data} timestamp={timestamp} kind={kind} />
+            <ListBlock margin={false} fullWidth>
+                {kind == 'received' && nftItemTransfer.sender && (
+                    <ActionSenderDetails sender={nftItemTransfer.sender} />
+                )}
+                {kind == 'send' && nftItemTransfer.recipient && (
+                    <ActionRecipientDetails recipient={nftItemTransfer.recipient} />
+                )}
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
+            </ListBlock>
+        </ActionDetailsBlock>
+    );
+};
+
+export const NftPurchaseActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
+    const { nftPurchase } = action;
+
+    if (!nftPurchase) {
+        return <ErrorActivityNotification event={event} />;
     }
 
     return (
         <ActionDetailsBlock event={event}>
-            <div>
-                {preview && <Image src={preview.url} alt="NFT Preview" />}
-                {data && (
-                    <>
-                        <Title>{data.dns ?? data.metadata.name}</Title>
-                        <Amount>
-                            {data.collection?.name ?? data.metadata.description}
-                            {data && data.approvedBy && data.approvedBy.length > 0 && (
-                                <Icon>
-                                    <VerificationIcon />
-                                </Icon>
-                            )}
-                        </Amount>
-                    </>
-                )}
-                <ActionDate kind="send" timestamp={timestamp} />
-            </div>
+            <NftActivityHeader
+                data={nftPurchase.nft}
+                amount={nftPurchase.amount}
+                timestamp={timestamp}
+                kind="send"
+            />
             <ListBlock margin={false} fullWidth>
-                {nftItemTransfer.recipient && (
-                    <ActionRecipientDetails recipient={nftItemTransfer.recipient} />
-                )}
                 <ActionTransactionDetails eventId={event.eventId} />
                 <ActionExtraDetails extra={event.extra} />
             </ListBlock>

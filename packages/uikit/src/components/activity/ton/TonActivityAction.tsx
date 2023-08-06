@@ -23,7 +23,7 @@ import {
 import { toDexName } from '../NotificationCommon';
 import { SubscribeAction, UnSubscribeAction } from '../SubscribeAction';
 import { ContractDeployAction } from './ContractDeployAction';
-import { NftComment, NftItemTransferAction } from './NftActivity';
+import { NftComment, NftItemTransferAction, NftPurchaseAction } from './NftActivity';
 
 const TonTransferAction: FC<{
     action: Action;
@@ -244,6 +244,8 @@ export const ActivityAction: FC<{
             return <JettonTransferAction action={action} date={date} />;
         case 'NftItemTransfer':
             return <NftItemTransferAction action={action} date={date} openNft={openNft} />;
+        case 'NftPurchase':
+            return <NftPurchaseAction action={action} date={date} openNft={openNft} />;
         case 'ContractDeploy':
             return <ContractDeployAction action={action} date={date} openNft={openNft} />;
         case 'UnSubscribe':

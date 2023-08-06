@@ -266,6 +266,9 @@
     "transaction_type_swap": {
         "message": "Swap"
     },
+    "transaction_type_purchase": {
+        "message": "Purchase"
+    },
     "transaction_dex": {
         "message": "DEX"
     }

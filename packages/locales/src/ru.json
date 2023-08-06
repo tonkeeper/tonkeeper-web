@@ -262,6 +262,9 @@
     "transaction_type_swap": {
         "message": "Обмен"
     },
+    "transaction_type_purchase": {
+        "message": "Покупка"
+    },
     "transaction_dex": {
         "message": "DEX"
     }
