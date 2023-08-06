@@ -10,6 +10,7 @@ import { NftNotification } from '../nft/NftNotification';
 import { ActivityBlock } from './ActivityLayout';
 import { ActionData, ActivityNotification } from './ton/ActivityNotification';
 import { TonActivityEvents } from './ton/TonActivityEvents';
+import { TronActionData, TronActivityNotification } from './tron/ActivityNotification';
 import { TronActivityEvents } from './tron/TronActivityEvents';
 
 export const ActivityList: FC<{
@@ -36,7 +37,8 @@ export const ActivityList: FC<{
 export const MixedActivityGroup: FC<{
     items: GenericActivityGroup<MixedActivity>[];
 }> = ({ items }) => {
-    const [activity, setActivity] = useState<ActionData | undefined>(undefined);
+    const [tonAction, seTonAction] = useState<ActionData | undefined>(undefined);
+    const [tronAction, setTronAction] = useState<TronActionData | undefined>(undefined);
     const [nft, setNft] = useState<NftItemRepr | undefined>(undefined);
 
     return (
@@ -50,6 +52,7 @@ export const MixedActivityGroup: FC<{
                                 event={event.event}
                                 date={date}
                                 timestamp={timestamp}
+                                setTronAction={setTronAction}
                             />
                         );
                     }
@@ -59,7 +62,7 @@ export const MixedActivityGroup: FC<{
                                 event={event.event}
                                 date={date}
                                 timestamp={timestamp}
-                                setActivity={setActivity}
+                                setActivity={seTonAction}
                                 setNft={setNft}
                             />
                         );
@@ -67,8 +70,12 @@ export const MixedActivityGroup: FC<{
                     return <></>;
                 }}
             />
-            <ActivityNotification value={activity} handleClose={() => setActivity(undefined)} />
+            <ActivityNotification value={tonAction} handleClose={() => seTonAction(undefined)} />
             <NftNotification nftItem={nft} handleClose={() => setNft(undefined)} />
+            <TronActivityNotification
+                value={tronAction}
+                handleClose={() => setTronAction(undefined)}
+            />
         </>
     );
 };

@@ -1,5 +1,6 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Fee } from '@tonkeeper/core/dist/tonApiV1';
 import {
     AccountAddress,
@@ -7,6 +8,8 @@ import {
     JettonSwapActionDexEnum
 } from '@tonkeeper/core/dist/tonApiV2';
 import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
+import { TronEvent, TronFee } from '@tonkeeper/core/dist/tronApi';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import styled from 'styled-components';
@@ -75,6 +78,18 @@ export const toDexName = (dex: JettonSwapActionDexEnum) => {
     }
 };
 
+export const TronErrorActivityNotification: FC<PropsWithChildren<{ event: TronEvent }>> = ({
+    children,
+    event
+}) => {
+    const { t } = useTranslation();
+    return (
+        <TronActionDetailsBlock event={event}>
+            <Title>{children ?? t('txActions_signRaw_types_unknownTransaction')}</Title>
+        </TronActionDetailsBlock>
+    );
+};
+
 export const ErrorActivityNotification: FC<PropsWithChildren<{ event: AccountEvent }>> = ({
     children,
     event
@@ -84,6 +99,25 @@ export const ErrorActivityNotification: FC<PropsWithChildren<{ event: AccountEve
         <ActionDetailsBlock event={event}>
             <Title>{children ?? t('txActions_signRaw_types_unknownTransaction')}</Title>
         </ActionDetailsBlock>
+    );
+};
+
+export const ActionRecipientAddress: FC<{ address: string; name?: string }> = ({
+    address,
+    name
+}) => {
+    const { t } = useTranslation();
+    const sdk = useAppSdk();
+
+    return (
+        <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
+            <ListItemPayload>
+                <Label>
+                    {name ? t('transaction_recipient_address') : t('transaction_recipient')}
+                </Label>
+                <Label1>{toShortValue(address)}</Label1>
+            </ListItemPayload>
+        </ListItem>
     );
 };
 
@@ -102,26 +136,25 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress }> = ({ reci
                     </ListItemPayload>
                 </ListItem>
             )}
-            <ListItem
-                onClick={() =>
-                    sdk.copyToClipboard(
-                        Address.parse(recipient.address).toString(),
-                        t('address_copied')
-                    )
-                }
-            >
-                <ListItemPayload>
-                    <Label>
-                        {recipient.name
-                            ? t('transaction_recipient_address')
-                            : t('transaction_recipient')}
-                    </Label>
-                    <Label1>
-                        {toShortValue(formatAddress(recipient.address, wallet.network))}
-                    </Label1>
-                </ListItemPayload>
-            </ListItem>
+            <ActionRecipientAddress
+                address={formatAddress(recipient.address, wallet.network)}
+                name={recipient.name}
+            />
         </>
+    );
+};
+
+export const ActionSenderAddress: FC<{ address: string; name?: string }> = ({ address, name }) => {
+    const { t } = useTranslation();
+    const sdk = useAppSdk();
+
+    return (
+        <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
+            <ListItemPayload>
+                <Label>{name ? t('transaction_sender_address') : t('transaction_sender')}</Label>
+                <Label1>{toShortValue(address)}</Label1>
+            </ListItemPayload>
+        </ListItem>
     );
 };
 
@@ -140,21 +173,10 @@ export const ActionSenderDetails: FC<{ sender: AccountAddress }> = ({ sender }) 
                     </ListItemPayload>
                 </ListItem>
             )}
-            <ListItem
-                onClick={() =>
-                    sdk.copyToClipboard(
-                        Address.parse(sender.address).toString(),
-                        t('address_copied')
-                    )
-                }
-            >
-                <ListItemPayload>
-                    <Label>
-                        {sender.name ? t('transaction_sender_address') : t('transaction_sender')}
-                    </Label>
-                    <Label1>{toShortValue(formatAddress(sender.address, wallet.network))}</Label1>
-                </ListItemPayload>
-            </ListItem>
+            <ActionSenderAddress
+                address={formatAddress(sender.address, wallet.network)}
+                name={sender.name}
+            />
         </>
     );
 };
@@ -210,25 +232,25 @@ export const ActionTransactionDetails: FC<{ eventId: string }> = ({ eventId }) =
     );
 };
 
-export const ActionDeployerDetails: FC<{ deployer: string }> = ({ deployer }) => {
+export const ActionDeployerAddress: FC<{ address?: string }> = ({ address }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+
+    if (!address) return <></>;
 
     return (
-        <>
-            <ListItem
-                onClick={() =>
-                    sdk.copyToClipboard(Address.parse(deployer).toString(), t('address_copied'))
-                }
-            >
-                <ListItemPayload>
-                    <Label>{t('add_edit_favorite_address_label')}</Label>
-                    <Label1>{toShortValue(formatAddress(deployer, wallet.network))}</Label1>
-                </ListItemPayload>
-            </ListItem>
-        </>
+        <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
+            <ListItemPayload>
+                <Label>{t('add_edit_favorite_address_label')}</Label>
+                <Label1>{toShortValue(address)}</Label1>
+            </ListItemPayload>
+        </ListItem>
     );
+};
+
+export const ActionDeployerDetails: FC<{ deployer: string }> = ({ deployer }) => {
+    const wallet = useWalletContext();
+    return <ActionDeployerAddress address={formatAddress(deployer, wallet.network)} />;
 };
 
 export const ActionFeeDetails: FC<{
@@ -282,6 +304,29 @@ export const ActionExtraDetails: FC<{
     );
 };
 
+export const ActionTronFeeDetails: FC<{
+    fees: TronFee;
+}> = ({ fees }) => {
+    const { t } = useTranslation();
+
+    const amount = useMemo(() => formatDecimals(fees.amount, fees.token.decimals), [fees]);
+    const { data } = useRate(fees.token.symbol);
+    const { fiatAmount } = useFormatFiat(data, amount);
+
+    return (
+        <ListItem hover={false}>
+            <ListItemPayload>
+                <Label>{t('transaction_fee')}</Label>
+                <ColumnText
+                    right
+                    text={`${amount} ${fees.token.symbol}`}
+                    secondary={`≈ ${fiatAmount}`}
+                />
+            </ListItemPayload>
+        </ListItem>
+    );
+};
+
 const Block = styled.div`
     text-align: center;
     display: flex;
@@ -294,19 +339,42 @@ export const ActionDetailsBlock: FC<PropsWithChildren<{ event: AccountEvent }>> 
     event,
     children
 }) => {
+    const { config } = useAppContext();
+    const url = config.transactionExplorer ?? 'https://tonviewer.com/transaction/%s';
+    return (
+        <CommonActionDetailsBlock url={url} eventId={event.eventId}>
+            {children}
+        </CommonActionDetailsBlock>
+    );
+};
+
+export const TronActionDetailsBlock: FC<PropsWithChildren<{ event: TronEvent }>> = ({
+    event,
+    children
+}) => {
+    const wallet = useWalletContext();
+    const url =
+        wallet.network === Network.TESTNET
+            ? 'https://nile.tronscan.org/#/transaction/%s'
+            : 'https://tronscan.org/#/transaction/%s';
+    return (
+        <CommonActionDetailsBlock url={url} eventId={event.txHash}>
+            {children}
+        </CommonActionDetailsBlock>
+    );
+};
+
+const CommonActionDetailsBlock: FC<PropsWithChildren<{ eventId: string; url: string }>> = ({
+    children,
+    eventId,
+    url
+}) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const { config } = useAppContext();
-
-    const url = config.transactionExplorer ?? 'https://tonviewer.com/transaction/%s';
     return (
         <Block>
             {children}
-            <Button
-                size="large"
-                fullWidth
-                onClick={() => sdk.openPage(url.replace('%s', event.eventId))}
-            >
+            <Button size="large" fullWidth onClick={() => sdk.openPage(url.replace('%s', eventId))}>
                 {t('nft_view_in_explorer')}
             </Button>
         </Block>
