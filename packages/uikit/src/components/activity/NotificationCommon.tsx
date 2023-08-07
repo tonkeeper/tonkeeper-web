@@ -15,6 +15,9 @@ import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
 import { Body1, H2, Label1 } from '../Text';
 import { Button } from '../fields/Button';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { useAssetAmountFiatEquivalent } from '../../state/asset';
+import { SpinnerIcon } from '../Icon';
 
 export const Title = styled(H2)`
     user-select: none;
@@ -252,6 +255,34 @@ export const ActionFeeDetails: FC<{
                 <ColumnText right text={`${amount} TON`} secondary={`≈ ${price}`} />
             </ListItemPayload>
         </ListItem>
+    );
+};
+
+export const ActionFeeDetailsUniversal: FC<{
+    fee: AssetAmount | undefined;
+}> = ({ fee }) => {
+    const { t } = useTranslation();
+
+    return (
+        <ListItem hover={false}>
+            <ListItemPayload>
+                <Label>{fee?.weiAmount.lt(0) ? t('txActions_refund') : t('transaction_fee')}</Label>
+                {fee ? <ActionFeeDetailsUniversalValue fee={fee} /> : <SpinnerIcon />}
+            </ListItemPayload>
+        </ListItem>
+    );
+};
+
+const ActionFeeDetailsUniversalValue: FC<{ fee: AssetAmount }> = ({ fee }) => {
+    const { fiat } = useAppContext();
+    const { data: fiatAmountBN, isLoading } = useAssetAmountFiatEquivalent(fee);
+
+    const fiatAmount = formatFiatCurrency(fiat, fiatAmountBN?.abs() || '0');
+
+    return isLoading ? (
+        <SpinnerIcon />
+    ) : (
+        <ColumnText right text={fee.stringAssetRelativeAmount} secondary={`≈ ${fiatAmount}`} />
     );
 };
 

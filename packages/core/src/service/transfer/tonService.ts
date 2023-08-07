@@ -2,11 +2,10 @@ import BigNumber from 'bignumber.js';
 import { Address, Cell, internal } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../../Storage';
-import { AmountValue, RecipientData } from '../../entries/send';
+import { AmountValue, RecipientData, TonRecipientData } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import { AccountApi, AccountEvent, AccountRepr, Configuration, Fee, SendApi } from '../../tonApiV1';
-import { DefaultDecimals } from '../../utils/send';
 import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
@@ -76,22 +75,23 @@ const toStateInit = (stateInit?: string): { code: Cell; data: Cell } | undefined
 const createTonTransfer = (
     seqno: number,
     walletState: WalletState,
-    recipient: RecipientData,
-    data: AmountValue,
+    recipient: TonRecipientData,
+    weiAmount: BigNumber,
+    isMax: boolean,
     secretKey: Buffer = Buffer.alloc(64)
 ) => {
     const contract = walletContractFromState(walletState);
     const transfer = contract.createTransfer({
         seqno,
         secretKey,
-        sendMode: data.max
+        sendMode: isMax
             ? SendMode.CARRY_ALL_REMAINING_BALANCE
             : SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
             internal({
                 to: recipient.toAccount.address.raw,
                 bounce: recipient.toAccount.status === 'active',
-                value: BigInt(new BigNumber(data.amount).shiftedBy(DefaultDecimals).toString()),
+                value: BigInt(weiAmount.toFixed()),
                 body: recipient.comment !== '' ? recipient.comment : undefined
             })
         ]
@@ -128,16 +128,17 @@ const createTonConnectTransfer = (
 export const estimateTonTransfer = async (
     tonApi: Configuration,
     walletState: WalletState,
-    recipient: RecipientData,
-    data: AmountValue
+    recipient: TonRecipientData,
+    weiAmount: BigNumber,
+    isMax: boolean
 ) => {
     await checkServiceTimeOrDie(tonApi);
     const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
-    if (!data.max) {
+    if (!isMax) {
         checkWalletPositiveBalanceOrDie(wallet);
     }
 
-    const cell = createTonTransfer(seqno, walletState, recipient, data);
+    const cell = createTonTransfer(seqno, walletState, recipient, weiAmount, isMax);
 
     const { fee } = await new SendApi(tonApi).estimateTx({
         sendBocRequest: { boc: cell.toString('base64') }

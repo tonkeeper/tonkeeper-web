@@ -49,12 +49,12 @@ import {
 import { useRate } from '../../../state/rates';
 import BigNumber from 'bignumber.js';
 import { Label1 } from '../../Text';
-import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { useUserAssetBalance } from '../../../state/asset';
 import { formatter } from '../../../hooks/balance';
+import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 
 export type AmountViewState = {
-    asset: TonAsset | TronAsset;
+    asset: Asset;
     amount: string | BigNumber;
     isMax: boolean;
     inFiat: boolean;
@@ -92,7 +92,7 @@ export const AmountView: FC<{
                 : defaults?.amount || '0'
         )
     );
-    const [token, setToken] = useState<TonAsset | TronAsset>(
+    const [token, setToken] = useState<Asset>(
         defaults?.asset || (blockchain === BLOCKCHAIN_NAME.TON ? TON_ASSET : TRON_USDT_ASSET)
     );
     const [inFiat, setInFiat] = useState(defaults?.inFiat ?? false);

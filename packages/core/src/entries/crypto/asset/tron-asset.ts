@@ -1,9 +1,9 @@
 import { BLOCKCHAIN_NAME } from '../../crypto';
-import { Asset } from './asset';
+import { BasicAsset } from './basic-asset';
 
 export interface TronAssetIdentification {
     address: string; // base53 | 'TRX'
     blockchain: BLOCKCHAIN_NAME.TRON;
 }
 
-export interface TronAsset extends Asset, TronAssetIdentification {}
+export interface TronAsset extends BasicAsset, TronAssetIdentification {}

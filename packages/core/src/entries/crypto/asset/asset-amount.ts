@@ -1,10 +1,11 @@
 import BigNumber from 'bignumber.js';
-import { IAssetAmount } from './i-asset-amount';
-import { Asset } from './asset';
 import { AmountFormatter } from '../../../utils/AmountFormatter';
 import { getDecimalSeparator, getGroupSeparator } from '../../../utils/formatting';
+import { Asset } from './asset';
+import { IAssetAmount } from './i-asset-amount';
+import { BasicAsset } from './basic-asset';
 
-type AssetAmountStruct<T extends Asset> = {
+type AssetAmountStruct<T extends BasicAsset> = {
     asset: T;
     weiAmount: BigNumber.Value;
 };
@@ -16,7 +17,7 @@ const formatter = new AmountFormatter({
     })
 });
 
-export class AssetAmount<T extends Asset = Asset> implements IAssetAmount<T> {
+export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T> {
     static fromRelativeAmount<T extends Asset = Asset>({
         asset,
         amount

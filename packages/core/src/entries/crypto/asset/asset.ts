@@ -1,16 +1,13 @@
 import { BLOCKCHAIN_NAME } from '../../crypto';
+import { TonAsset } from './ton-asset';
+import { TronAsset } from './tron-asset';
 
-export interface Asset {
-    id: string;
-    symbol: string;
-    decimals: number;
-    name?: string;
+export type Asset = TonAsset | TronAsset;
+
+export function isTonAsset(asset: Asset): asset is TonAsset {
+    return asset.blockchain === BLOCKCHAIN_NAME.TON;
 }
 
-export function packAssetId(blockchain: BLOCKCHAIN_NAME, address: string): string {
-    return blockchain + '__' + address;
-}
-
-export function isAsset(value: object): value is Asset {
-    return 'id' in value && 'symbol' in value && 'decimals' in value;
+export function isTronAsset(asset: Asset): asset is TronAsset {
+    return asset.blockchain === BLOCKCHAIN_NAME.TRON;
 }

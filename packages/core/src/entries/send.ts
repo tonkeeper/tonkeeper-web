@@ -1,9 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { AccountRepr, Fee, WalletDNS } from '../tonApiV1';
-import { Suggestion } from './suggestion';
 import { BLOCKCHAIN_NAME } from './crypto';
-import { AssetAmount } from './crypto/asset/asset-amount';
-import { Asset } from './crypto/asset/asset';
+import { Suggestion } from './suggestion';
 
 export type BaseRecipient = Suggestion | { address: string };
 
@@ -61,9 +59,4 @@ export interface AmountData extends AmountValue {
     jetton: string;
     done: boolean;
     fee: Fee;
-}
-
-export interface InputAssetAmount<T extends Asset = Asset> {
-    assetAmount: AssetAmount<T>;
-    isMax: boolean;
 }

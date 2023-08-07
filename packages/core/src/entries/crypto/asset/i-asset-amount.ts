@@ -1,7 +1,8 @@
 import BigNumber from 'bignumber.js';
 import { Asset } from './asset';
+import { BasicAsset } from './basic-asset';
 
-export interface IAssetAmount<T extends Asset = Asset> {
+export interface IAssetAmount<T extends BasicAsset = Asset> {
     readonly asset: T;
 
     readonly weiAmount: BigNumber;

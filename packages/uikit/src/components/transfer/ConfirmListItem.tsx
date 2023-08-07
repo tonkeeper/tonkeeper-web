@@ -1,5 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { Address } from 'ton-core';
@@ -40,6 +40,10 @@ const RecipientItemAddress: FC<{ address: string }> = ({ address }) => {
 
 export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient }) => {
     const { address } = recipient;
+    const addrValue = isTonRecipientData(recipient)
+        ? recipient.toAccount.address.bounceable
+        : address.address;
+
     if ('isFavorite' in address && address.isFavorite) {
         return (
             <>
@@ -47,7 +51,7 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient 
                     name={Address.parse(address.address).toString()}
                     label={address.name}
                 />
-                <RecipientItemAddress address={recipient.toAccount.address.bounceable} />
+                <RecipientItemAddress address={addrValue} />
             </>
         );
     }
@@ -55,27 +59,22 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient 
         return (
             <>
                 <RecipientItem name={recipient.address.address} label={recipient.address.address} />
-                <RecipientItemAddress address={recipient.toAccount.address.bounceable} />
+                <RecipientItemAddress address={addrValue} />
             </>
         );
     }
 
-    const { name } = recipient.toAccount;
-    if (name) {
+    if (isTonRecipientData(recipient) && recipient.toAccount.name) {
+        const name = recipient.toAccount.name;
         return (
             <>
                 <RecipientItem name={name} label={name} />
-                <RecipientItemAddress address={recipient.toAccount.address.bounceable} />
+                <RecipientItemAddress address={addrValue} />
             </>
         );
     }
 
-    return (
-        <RecipientItem
-            name={recipient.toAccount.address.bounceable}
-            label={toShortValue(recipient.toAccount.address.bounceable)}
-        />
-    );
+    return <RecipientItem name={addrValue} label={toShortValue(addrValue)} />;
 };
 
 export const AmountListItem: FC<{

@@ -1,7 +1,7 @@
 import { Address } from 'ton-core';
-import { Asset, packAssetId } from './asset';
-import { BLOCKCHAIN_NAME } from '../../crypto';
 import { JettonsBalances } from '../../../tonApiV1';
+import { BLOCKCHAIN_NAME } from '../../crypto';
+import { BasicAsset, packAssetId } from './basic-asset';
 import { TON_ASSET } from './constants';
 
 export interface TonAssetIdentification {
@@ -9,7 +9,7 @@ export interface TonAssetIdentification {
     blockchain: BLOCKCHAIN_NAME.TON;
 }
 
-export interface TonAsset extends Asset, TonAssetIdentification {}
+export interface TonAsset extends BasicAsset, TonAssetIdentification {}
 
 export function jettonToTonAsset(address: string, jettons: JettonsBalances): TonAsset {
     if (address === 'TON') {

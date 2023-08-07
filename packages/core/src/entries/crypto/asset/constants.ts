@@ -1,5 +1,5 @@
 import { BLOCKCHAIN_NAME } from '../../crypto';
-import { packAssetId } from './asset';
+import { packAssetId } from './basic-asset';
 import { TonAsset } from './ton-asset';
 import { TronAsset } from './tron-asset';
 

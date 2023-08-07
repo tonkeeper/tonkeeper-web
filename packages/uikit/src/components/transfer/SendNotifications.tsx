@@ -17,13 +17,13 @@ import { useWalletJettonList } from '../../state/wallet';
 import { Notification } from '../Notification';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
-import { ConfirmView } from './ConfirmView';
 import { RecipientView, useGetToAccount } from './RecipientView';
 import { Wrapper, childFactoryCreator, duration } from './common';
 import { AmountView, AmountViewState } from './amount-view/AmountView';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { TonAsset, jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { ConfirmTransferView } from './ConfirmTransferView';
 
 const SendContent: FC<{ onClose: () => void; asset?: TonAsset | TronAsset }> = ({
     onClose,
@@ -193,12 +193,15 @@ const SendContent: FC<{ onClose: () => void; asset?: TonAsset | TronAsset }> = (
                             />
                         )}
                         {view === 'confirm' && (
-                            <ConfirmView
+                            <ConfirmTransferView
                                 onClose={onClose}
                                 onBack={backToAmount}
                                 recipient={recipient!}
-                                amount={amount!}
-                                jettons={filter}
+                                assetAmount={AssetAmount.fromRelativeAmount({
+                                    asset: amountViewState!.asset!,
+                                    amount: amountViewState!.amount!
+                                })}
+                                isMax={amountViewState!.isMax!}
                             />
                         )}
                     </div>
