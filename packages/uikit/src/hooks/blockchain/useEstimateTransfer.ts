@@ -13,7 +13,7 @@ import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonSe
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { Address } from 'ton-core';
 import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
-import { estimateTronTransfer } from '@tonkeeper/core/dist/service/tronService';
+import { estimateTronTransfer } from '@tonkeeper/core/dist/service/tron/tronService';
 import { EstimatePayload } from '@tonkeeper/core/dist/tronApi';
 import { notifyError } from '../../components/transfer/common';
 
@@ -24,8 +24,8 @@ export type TransferEstimation<T extends Asset = Asset> = {
 
 export function useEstimateTransfer<T extends Asset>(
     recipient: RecipientData,
-    isMax: boolean,
     amount: AssetAmount<T>,
+    isMax: boolean,
     options?: Omit<UseQueryOptions, 'queryKey' | 'queryFn' | 'initialData'>
 ) {
     const { t } = useTranslation();

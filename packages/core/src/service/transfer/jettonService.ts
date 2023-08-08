@@ -1,10 +1,10 @@
 import BigNumber from 'bignumber.js';
 import { Address, beginCell, Cell, comment, internal, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
-import { AmountValue, RecipientData, TonRecipientData } from '../../entries/send';
+import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration, Fee, JettonBalance, SendApi } from '../../tonApiV1';
+import { Configuration, Fee, SendApi } from '../../tonApiV1';
 import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
@@ -110,9 +110,9 @@ export const sendJettonTransfer = async (
     storage: IStorage,
     tonApi: Configuration,
     walletState: WalletState,
-    recipient: RecipientData,
-    data: AmountValue,
-    jettonInfo: JettonBalance,
+    recipient: TonRecipientData,
+    amount: AssetAmount<TonAsset>,
+    jettonWalletAddress: string,
     fee: Fee,
     password: string
 ) => {
@@ -129,8 +129,8 @@ export const sendJettonTransfer = async (
         seqno,
         walletState,
         recipient.toAccount.address.raw,
-        data,
-        jettonInfo,
+        amount,
+        jettonWalletAddress,
         recipient.comment ? comment(recipient.comment) : null,
         keyPair.secretKey
     );

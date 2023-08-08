@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import { Address, Cell, internal } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../../Storage';
-import { AmountValue, RecipientData, TonRecipientData } from '../../entries/send';
+import { TonRecipientData } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import { AccountApi, AccountEvent, AccountRepr, Configuration, Fee, SendApi } from '../../tonApiV1';
@@ -17,6 +17,7 @@ import {
     getWalletBalance,
     getWalletSeqNo
 } from './common';
+import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 
 export type AccountsMap = Map<string, AccountRepr>;
 
@@ -195,8 +196,9 @@ export const sendTonTransfer = async (
     storage: IStorage,
     tonApi: Configuration,
     walletState: WalletState,
-    recipient: RecipientData,
-    data: AmountValue,
+    recipient: TonRecipientData,
+    amount: AssetAmount,
+    isMax: boolean,
     fee: Fee,
     password: string
 ) => {
@@ -204,14 +206,21 @@ export const sendTonTransfer = async (
     const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-    const total = new BigNumber(fee.total).plus(data.amount);
+    const total = new BigNumber(fee.total).plus(amount.weiAmount);
 
     const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
-    if (!data.max) {
+    if (!isMax) {
         checkWalletBalanceOrDie(total, wallet);
     }
 
-    const cell = createTonTransfer(seqno, walletState, recipient, data, keyPair.secretKey);
+    const cell = createTonTransfer(
+        seqno,
+        walletState,
+        recipient,
+        amount.weiAmount,
+        isMax,
+        keyPair.secretKey
+    );
 
     await new SendApi(tonApi).sendBoc({
         sendBocRequest: { boc: cell.toString('base64') }
