@@ -1,22 +1,18 @@
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
-import {
-    formatDecimals,
-    getJettonStockAmount,
-    getJettonStockPrice,
-    getTonCoinStockPrice
-} from '@tonkeeper/core/dist/utils/balance';
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
+import { Address } from 'ton-core';
+import { useAppContext } from '../../hooks/appContext';
 import { formatFiatCurrency } from '../../hooks/balance';
-import { useUserJettonList } from '../../state/jetton';
+import { QueryKey } from '../../libs/queryKey';
+import { TokenRate, getRateKey } from '../../state/rates';
 import { SkeletonText } from '../Skeleton';
 import { Body3, Label2, Num2 } from '../Text';
+import { AssetData } from './Jettons';
 
 const Block = styled.div`
     display: flex;
@@ -58,36 +54,6 @@ const MessageBlock: FC<{ error?: Error | null; isFetching: boolean }> = ({ error
     return <Error></Error>;
 };
 
-const useBalanceValue = (
-    info: AccountRepr | undefined,
-    stock: TonendpointStock | undefined,
-    jettons: JettonsBalances,
-    currency: FiatCurrencies
-) => {
-    return useMemo(() => {
-        if (!info || !stock) {
-            return formatFiatCurrency(currency, 0);
-        }
-
-        const ton = new BigNumber(info.balance).multipliedBy(
-            formatDecimals(getTonCoinStockPrice(stock.today, currency))
-        );
-
-        const all = jettons.balances.reduce((total, jetton) => {
-            const price = getJettonStockPrice(jetton, stock.today, currency);
-            if (!price) return total;
-            const amount = getJettonStockAmount(jetton, price);
-            if (amount) {
-                return total.plus(amount);
-            } else {
-                return total;
-            }
-        }, ton);
-
-        return formatFiatCurrency(currency, all);
-    }, [info, stock, jettons, currency]);
-};
-
 export const BalanceSkeleton = () => {
     return (
         <Block>
@@ -102,29 +68,73 @@ export const BalanceSkeleton = () => {
     );
 };
 
+const getTonFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
+    const rate = client.getQueryCache().find(getRateKey(fiat, CryptoCurrency.TON))?.state.data as
+        | TokenRate
+        | undefined;
+
+    if (rate) {
+        return shiftedDecimals(assets.ton.info.balance).multipliedBy(rate.prices);
+    } else {
+        return new BigNumber(0);
+    }
+};
+
+const getTRC20FiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
+    return assets.tron.balances.reduce((total, { weiAmount, token }) => {
+        const rate = client.getQueryCache().find(getRateKey(fiat, token.symbol))?.state.data as
+            | TokenRate
+            | undefined;
+
+        if (rate) {
+            return total.plus(shiftedDecimals(weiAmount, token.decimals).multipliedBy(rate.prices));
+        } else {
+            return total;
+        }
+    }, new BigNumber(0));
+};
+
+const getJettonsFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
+    return assets.ton.jettons.balances.reduce((total, { jettonAddress, balance, metadata }) => {
+        const rate = client
+            .getQueryCache()
+            .find(getRateKey(fiat, Address.parse(jettonAddress).toString()))?.state.data as
+            | TokenRate
+            | undefined;
+
+        if (rate) {
+            return total.plus(
+                shiftedDecimals(balance, metadata?.decimals).multipliedBy(rate.prices)
+            );
+        } else {
+            return total;
+        }
+    }, new BigNumber(0));
+};
+
 export const Balance: FC<{
-    info?: AccountRepr | undefined;
     error?: Error | null;
-    stock?: TonendpointStock | undefined;
-    jettons?: JettonsBalances | undefined;
     isFetching: boolean;
-}> = ({ info, error, stock, jettons, isFetching }) => {
-    const sdk = useAppSdk();
+    assets: AssetData;
+}> = ({ assets, error, isFetching }) => {
     const { fiat } = useAppContext();
-    const wallet = useWalletContext();
 
-    const filtered = useUserJettonList(jettons);
-    const total = useBalanceValue(info, stock, filtered, fiat);
+    const client = useQueryClient();
 
-    const onClick = useCallback(() => {
-        sdk.copyToClipboard(wallet.active.friendlyAddress);
-    }, [sdk, wallet]);
+    const { data: total } = useQuery(
+        [QueryKey.total],
+        () => {
+            return getTonFiatAmount(client, fiat, assets)
+                .plus(getTRC20FiatAmount(client, fiat, assets))
+                .plus(getJettonsFiatAmount(client, fiat, assets));
+        },
+        { refetchInterval: 2000, initialData: new BigNumber(0) }
+    );
 
     return (
         <Block>
             <MessageBlock error={error} isFetching={isFetching} />
-            <Amount>{total}</Amount>
-            <Body onClick={onClick}>{toShortValue(wallet.active.friendlyAddress)}</Body>
+            <Amount>{formatFiatCurrency(fiat, total)}</Amount>
         </Block>
     );
 };

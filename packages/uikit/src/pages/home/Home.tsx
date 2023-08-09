@@ -10,7 +10,6 @@ import { HomeActions } from '../../components/home/TonActions';
 import { useWalletContext } from '../../hooks/appContext';
 import { filterTonAssetList } from '../../state/jetton';
 import { usePreFetchRates } from '../../state/rates';
-import { useTonenpointStock } from '../../state/tonendpoint';
 import { useTronBalances } from '../../state/tron/tron';
 import { useWalletAccountInfo, useWalletJettonList, useWalletNftList } from '../../state/wallet';
 
@@ -29,17 +28,15 @@ const HomeAssets: FC<{
 };
 
 const Home = () => {
-    const { data: stock, isFetching: isStockLoading } = useTonenpointStock();
     const wallet = useWalletContext();
 
-    usePreFetchRates();
+    const { isFetched } = usePreFetchRates();
     const { data: info, error, isFetching: isAccountLoading } = useWalletAccountInfo();
     const { data: jettons, isFetching: isJettonLoading } = useWalletJettonList();
     const { data: nfts, isFetching: isNftLoading } = useWalletNftList();
     const { data: tronBalances, isFetching: isTronLoading } = useTronBalances();
 
-    const isLoading =
-        isJettonLoading || isAccountLoading || isNftLoading || isStockLoading || isTronLoading;
+    const isLoading = isJettonLoading || isAccountLoading || isNftLoading || isTronLoading;
 
     const assets = useMemo<AssetData | undefined>(() => {
         if (!info || !jettons || !tronBalances) return undefined;
@@ -49,20 +46,14 @@ const Home = () => {
         };
     }, [info, jettons, wallet, tronBalances]);
 
-    if (!nfts || !assets) {
+    if (!nfts || !assets || !isFetched) {
         return <HomeSkeleton />;
     }
 
     return (
         <>
             <DateSyncBanner />
-            <Balance
-                info={info}
-                error={error}
-                stock={stock}
-                jettons={jettons}
-                isFetching={isLoading}
-            />
+            <Balance assets={assets} error={error} isFetching={isLoading} />
             <HomeActions />
             <HomeAssets assets={assets} nfts={nfts} />
         </>

@@ -55,7 +55,7 @@ export const usePreFetchRates = () => {
                 try {
                     const tokenRate = toTokenRate(rate, fiat);
                     if (tokenRate) {
-                        client.setQueryData([QueryKey.rate, fiat, token], tokenRate);
+                        client.setQueryData(getRateKey(fiat, token), tokenRate);
                     }
                 } catch (e) {
                     console.error(e);
@@ -67,11 +67,13 @@ export const usePreFetchRates = () => {
     );
 };
 
+export const getRateKey = (fiat: FiatCurrencies, token: string) => [QueryKey.rate, fiat, token];
+
 export const useRate = (token: string) => {
     const { tonApiV2 } = useAppContext();
     const { fiat } = useAppContext();
     return useQuery<TokenRate, Error>(
-        [QueryKey.rate, fiat, token],
+        getRateKey(fiat, token),
         async () => {
             const value = await new RatesApi(tonApiV2).getRates({
                 tokens: token,
