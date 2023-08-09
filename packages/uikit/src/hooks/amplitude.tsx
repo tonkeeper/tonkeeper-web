@@ -72,7 +72,8 @@ export type AmplitudeTransactionType =
     | 'send-jetton'
     | 'send-nft'
     | 'renew-dns'
-    | 'link-dns';
+    | 'link-dns'
+    | 'send-trc20';
 
 export const useTransactionAnalytics = () => {
     const enable = useContext(AmplitudeAnalyticsContext);

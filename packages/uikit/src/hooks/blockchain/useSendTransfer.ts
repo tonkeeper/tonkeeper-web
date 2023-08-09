@@ -1,23 +1,23 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TonRecipientData, TronRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
+import { sendTronTransfer } from '@tonkeeper/core/dist/service/tron/tronService';
+import { Fee } from '@tonkeeper/core/dist/tonApiV1';
+import { EstimatePayload } from '@tonkeeper/core/dist/tronApi';
+import { Address } from 'ton-core';
 import { notifyError } from '../../components/transfer/common';
 import { getWalletPassword } from '../../state/password';
+import { useWalletJettonList } from '../../state/wallet';
 import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TransferEstimation } from './useEstimateTransfer';
-import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
-import { Fee } from '@tonkeeper/core/dist/tonApiV1';
-import { useWalletJettonList } from '../../state/wallet';
-import { Address } from 'ton-core';
-import { sendTronTransfer } from '@tonkeeper/core/dist/service/tron/tronService';
-import { EstimatePayload } from '@tonkeeper/core/dist/tronApi';
 
 export function useSendTransfer<T extends Asset>(
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,
@@ -68,6 +68,7 @@ export function useSendTransfer<T extends Asset>(
                     );
                 }
             } else {
+                track2('send-trc20');
                 await sendTronTransfer(
                     {
                         tronApi,
