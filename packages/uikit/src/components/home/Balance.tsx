@@ -122,7 +122,7 @@ export const Balance: FC<{
     const client = useQueryClient();
 
     const { data: total } = useQuery(
-        [QueryKey.total],
+        [QueryKey.total, fiat, assets],
         () => {
             return getTonFiatAmount(client, fiat, assets)
                 .plus(getTRC20FiatAmount(client, fiat, assets))

@@ -61,7 +61,7 @@ export const usePreFetchRates = () => {
                     console.error(e);
                 }
             }
-            await client.invalidateQueries([QueryKey.total]);
+            setTimeout(() => client.invalidateQueries([QueryKey.total]));
             return 'ok';
         },
         { retry: 0 }
@@ -87,7 +87,7 @@ export const useRate = (token: string) => {
                 if (!tokenRate || !tokenRate.prices) {
                     throw new Error(`Missing price for token: ${token}`);
                 }
-                await client.invalidateQueries([QueryKey.total]);
+                setTimeout(() => client.invalidateQueries([QueryKey.total]));
                 return tokenRate;
             } catch (e) {
                 throw e;
