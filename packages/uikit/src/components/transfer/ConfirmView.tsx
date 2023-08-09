@@ -209,7 +209,7 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
 
     const fallbackTitles = {
         [TON_ASSET.id]: t('txActions_signRaw_types_tonTransfer'),
-        [TRON_USDT_ASSET.id]: 'USDT transfer' // TODO
+        [TRON_USDT_ASSET.id]: 'USDT transfer' // TODO i18n
     };
 
     title ||= isTonRecipientData(recipient)
@@ -236,14 +236,9 @@ export const ConfirmViewDetailsRecipient: FC = () => {
 export const ConfirmViewDetailsAmount: FC = () => {
     const { fiat } = useAppContext();
     const { assetAmount } = useConfirmViewContext();
-    const { isLoading, data: fiatAmountBN } = useAssetAmountFiatEquivalent(assetAmount);
+    const { data: fiatAmountBN } = useAssetAmountFiatEquivalent(assetAmount);
 
-    const fiatAmount = formatFiatCurrency(fiat, fiatAmountBN || '0');
-
-    if (isLoading) {
-        // TODO loading
-        return 'LOADING';
-    }
+    const fiatAmount = fiatAmountBN ? formatFiatCurrency(fiat, fiatAmountBN) : undefined;
 
     return (
         <AmountListItem

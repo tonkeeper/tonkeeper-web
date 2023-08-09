@@ -95,7 +95,17 @@ export const RecipientView: FC<{
     keyboard?: 'decimal';
     onScan: (value: string) => void;
     isExternalLoading?: boolean;
-}> = ({ title, data, onClose, setRecipient, keyboard, onScan, isExternalLoading }) => {
+    acceptBlockchains?: BLOCKCHAIN_NAME[];
+}> = ({
+    title,
+    data,
+    onClose,
+    setRecipient,
+    keyboard,
+    onScan,
+    isExternalLoading,
+    acceptBlockchains
+}) => {
     const sdk = useAppSdk();
     const [submitted, setSubmit] = useState(false);
     const { t } = useTranslation();
@@ -131,12 +141,18 @@ export const RecipientView: FC<{
     }, [setAddress, dnsWallet]);
 
     const isValidForBlockchain = useMemo(() => {
+        let validForBlockchain;
         if ('dns' in recipient || seeIfValidTonAddress(recipient.address)) {
-            return BLOCKCHAIN_NAME.TON;
+            validForBlockchain = BLOCKCHAIN_NAME.TON;
+        } else if (seeIfValidTronAddress(recipient.address)) {
+            validForBlockchain = BLOCKCHAIN_NAME.TRON;
         }
 
-        if (seeIfValidTronAddress(recipient.address)) {
-            return BLOCKCHAIN_NAME.TRON;
+        if (
+            !acceptBlockchains ||
+            (validForBlockchain && acceptBlockchains.includes(validForBlockchain))
+        ) {
+            return validForBlockchain;
         }
 
         return null;

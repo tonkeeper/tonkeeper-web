@@ -18,9 +18,15 @@ export type ContractExecutorParams = {
     fee: Fee;
 };
 
-export function useExecuteContract<Args extends ContractExecutorParams>(
-    executor: (params: Args) => Promise<void>,
-    eventName2: AmplitudeTransactionType
+export function useExecuteTonContract<Args extends ContractExecutorParams>(
+    {
+        executor,
+        eventName2
+    }: {
+        executor: (params: Args) => Promise<void>;
+        eventName2: AmplitudeTransactionType;
+    },
+    args: Omit<Args, Exclude<keyof ContractExecutorParams, 'fee'>>
 ) {
     const { t } = useTranslation();
     const sdk = useAppSdk();
@@ -29,7 +35,7 @@ export function useExecuteContract<Args extends ContractExecutorParams>(
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
 
-    return useMutation(async (args: Omit<Args, Exclude<keyof ContractExecutorParams, 'fee'>>) => {
+    return useMutation<boolean, Error>(async () => {
         if (!args.fee) {
             return false;
         }
