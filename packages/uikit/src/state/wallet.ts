@@ -14,7 +14,7 @@ import {
     NftCollection,
     NftItemRepr
 } from '@tonkeeper/core/dist/tonApiV1';
-import { BlockchainApi, DNSApi, DnsRecord, WalletsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { BlockchainApi, DNSApi, DnsRecord, WalletApi } from '@tonkeeper/core/dist/tonApiV2';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
@@ -141,7 +141,7 @@ export const useWalletNftList = () => {
     return useQuery<NFT[], Error>(
         [wallet.publicKey, QueryKey.nft],
         async () => {
-            const { accounts } = await new WalletsApi(tonApiV2).getWalletsByPublicKey({
+            const { accounts } = await new WalletApi(tonApiV2).getWalletsByPublicKey({
                 publicKey: wallet.publicKey
             });
             const result = accounts
@@ -201,7 +201,7 @@ export const useNftDNSExpirationDate = (nft: NFT) => {
         }
 
         try {
-            const result = await new BlockchainApi(tonApiV2).execGetMethod({
+            const result = await new BlockchainApi(tonApiV2).execGetMethodForBlockchainAccount({
                 accountId: nft.address,
                 methodName: 'get_last_fill_up_time'
             });

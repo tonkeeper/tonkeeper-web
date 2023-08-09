@@ -28,7 +28,7 @@ const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTML
     const { isFetched, hasNextPage, data, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
         queryKey: [balance.walletAddress.address, QueryKey.activity, JettonKey.history],
         queryFn: ({ pageParam = undefined }) =>
-            new AccountsApi(tonApiV2).getJettonsHistoryByID({
+            new AccountsApi(tonApiV2).getAccountJettonHistoryByID({
                 accountId: wallet.active.rawAddress,
                 jettonId: balance.jettonAddress,
                 limit: 20,

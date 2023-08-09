@@ -1,4 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Fee } from '@tonkeeper/core/dist/tonApiV1';
@@ -16,16 +17,15 @@ import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useCoinFullBalance } from '../../hooks/balance';
+import { formatFiatCurrency, useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
+import { useAssetAmountFiatEquivalent } from '../../state/asset';
 import { useFormatFiat, useRate } from '../../state/rates';
+import { SpinnerIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
 import { Body1, H2, Label1 } from '../Text';
 import { Button } from '../fields/Button';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { useAssetAmountFiatEquivalent } from '../../state/asset';
-import { SpinnerIcon } from '../Icon';
 
 export const Title = styled(H2)`
     user-select: none;
@@ -275,7 +275,7 @@ export const ActionFeeDetails: FC<{
                 <ColumnText
                     right
                     text={`${amount} ${CryptoCurrency.TON}`}
-                    secondary={`≈ ${fiatAmount}`}
+                    secondary={fiatAmount ? `≈ ${fiatAmount}` : undefined}
                 />
             </ListItemPayload>
         </ListItem>
@@ -300,7 +300,7 @@ export const ActionExtraDetails: FC<{
                 <ColumnText
                     right
                     text={`${amount} ${CryptoCurrency.TON}`}
-                    secondary={`≈ ${fiatAmount}`}
+                    secondary={fiatAmount ? `≈ ${fiatAmount}` : undefined}
                 />
             </ListItemPayload>
         </ListItem>
@@ -323,7 +323,7 @@ export const ActionTronFeeDetails: FC<{
                 <ColumnText
                     right
                     text={`${amount} ${fees.token.symbol}`}
-                    secondary={`≈ ${fiatAmount}`}
+                    secondary={fiatAmount ? `≈ ${fiatAmount}` : undefined}
                 />
             </ListItemPayload>
         </ListItem>

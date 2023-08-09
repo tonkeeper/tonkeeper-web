@@ -6,11 +6,11 @@ import {
 } from '@tonkeeper/core/dist/service/tron/tronService';
 import { setWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { TronApi, TronBalance, TronBalances } from '@tonkeeper/core/dist/tronApi';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
-import { useAppSdk } from '../hooks/appSdk';
-import { QueryKey } from '../libs/queryKey';
-import { getWalletPassword } from './password';
-import { DefaultRefetchInterval } from './tonendpoint';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
+import { QueryKey } from '../../libs/queryKey';
+import { getWalletPassword } from '../password';
+import { DefaultRefetchInterval } from '../tonendpoint';
 
 export const useTronWalletState = () => {
     const sdk = useAppSdk();

@@ -1,6 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 import { isTonRecipientData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 
+import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import React, {
     Children,
     createContext,
@@ -13,9 +16,11 @@ import React, {
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { formatFiatCurrency } from '../../hooks/balance';
-import { useTranslation } from '../../hooks/translation';
 import { TransferEstimation } from '../../hooks/blockchain/useEstimateTransfer';
-import { TransferComment } from '../activity/ActivityActionDetails';
+import { useTranslation } from '../../hooks/translation';
+import { useAssetAmountFiatEquivalent, useAssetImage } from '../../state/asset';
+import { TransferComment } from '../activity/ActivityDetailsLayout';
+import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
 import { CheckmarkCircleIcon, ChevronLeftIcon, ExclamationMarkCircleIcon } from '../Icon';
@@ -26,11 +31,6 @@ import { Label2 } from '../Text';
 import { ButtonBlock, ResultButton } from './common';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { useAssetAmountFiatEquivalent, useAssetImage } from '../../state/asset';
-import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
-import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,

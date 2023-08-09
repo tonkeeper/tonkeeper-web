@@ -1,11 +1,11 @@
 import { WalletState } from '../entries/wallet';
-import { Configuration, WalletsApi } from '../tonApiV2';
+import { Configuration, WalletApi } from '../tonApiV2';
 
 export const getWalletActiveAddresses = async (
     tonApi: Configuration,
     wallet: WalletState
 ): Promise<string[]> => {
-    const { accounts } = await new WalletsApi(tonApi).getWalletsByPublicKey({
+    const { accounts } = await new WalletApi(tonApi).getWalletsByPublicKey({
         publicKey: wallet.publicKey
     });
     const result = accounts

@@ -27,7 +27,7 @@ const Activity: FC = () => {
     } = useInfiniteQuery({
         queryKey: [wallet.active.rawAddress, QueryKey.activity, 'all'],
         queryFn: ({ pageParam = undefined }) =>
-            new AccountsApi(tonApiV2).getEventsByAccount({
+            new AccountsApi(tonApiV2).getAccountEvents({
                 accountId: wallet.active.rawAddress,
                 limit: 20,
                 beforeLt: pageParam
