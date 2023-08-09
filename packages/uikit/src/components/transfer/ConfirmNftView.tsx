@@ -7,7 +7,6 @@ import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { getWalletPassword } from '../../state/password';
-import { useTonenpointStock } from '../../state/tonendpoint';
 import { CheckmarkCircleIcon, ChevronLeftIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Gap } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
@@ -19,10 +18,10 @@ import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
 import { ButtonBlock, Label, ResultButton, notifyError } from './common';
 
+import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { useTransactionAnalytics } from '../../hooks/amplitude';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { RecipientListItem } from './ConfirmListItem';
-import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 
 const useSendNft = (recipient: TonRecipientData, nftItem: NftItemRepr, fee?: Fee) => {
     const { t } = useTranslation();
@@ -57,8 +56,7 @@ export const ConfirmNftView: FC<{
     onBack: () => void;
     onClose: () => void;
 }> = ({ recipient, onBack, onClose, nftItem, fee }) => {
-    const { standalone, fiat } = useAppContext();
-    const { data: stock } = useTonenpointStock();
+    const { standalone } = useAppContext();
     const [done, setDone] = useState(false);
     const { t } = useTranslation();
     const sdk = useAppSdk();
@@ -102,7 +100,7 @@ export const ConfirmNftView: FC<{
             </Info>
             <ListBlock margin={false} fullWidth>
                 <RecipientListItem recipient={recipient} />
-                {fee && <ActionFeeDetails fee={fee} stock={stock} fiat={fiat} />}
+                {fee && <ActionFeeDetails fee={fee} />}
                 <TransferComment comment={recipient.comment} />
             </ListBlock>
 

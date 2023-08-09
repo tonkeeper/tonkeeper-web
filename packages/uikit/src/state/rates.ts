@@ -61,6 +61,7 @@ export const usePreFetchRates = () => {
                     console.error(e);
                 }
             }
+            await client.invalidateQueries([QueryKey.total]);
             return 'ok';
         },
         { retry: 0 }
@@ -72,6 +73,7 @@ export const getRateKey = (fiat: FiatCurrencies, token: string) => [QueryKey.rat
 export const useRate = (token: string) => {
     const { tonApiV2 } = useAppContext();
     const { fiat } = useAppContext();
+    const client = useQueryClient();
     return useQuery<TokenRate, Error>(
         getRateKey(fiat, token),
         async () => {
@@ -85,6 +87,7 @@ export const useRate = (token: string) => {
                 if (!tokenRate || !tokenRate.prices) {
                     throw new Error(`Missing price for token: ${token}`);
                 }
+                await client.invalidateQueries([QueryKey.total]);
                 return tokenRate;
             } catch (e) {
                 throw e;

@@ -1,16 +1,10 @@
 import { QueryClient } from '@tanstack/react-query';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { seeIfBalanceError, seeIfTimeError } from '@tonkeeper/core/dist/service/transfer/common';
-import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { getDecimalSeparator, getGroupSeparator } from '@tonkeeper/core/dist/utils/formatting';
-import { getFiatAmountValue, getFiatPrice } from '@tonkeeper/core/dist/utils/send';
-import BigNumber from 'bignumber.js';
-import React, { PropsWithChildren, useMemo } from 'react';
+import React, { PropsWithChildren } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
-import { formatFiatCurrency } from '../../hooks/balance';
 import { cleanSyncDateBanner } from '../../state/syncDate';
-import { useTonenpointStock } from '../../state/tonendpoint';
 import { Body1 } from '../Text';
 
 export const duration = 300;
@@ -159,25 +153,6 @@ export const childFactoryCreator = (right: boolean) => (child: React.ReactElemen
         classNames: right ? rightToLeft : leftToTight,
         timeout: duration
     });
-
-export const useFiatAmount = (jettons: JettonsBalances, jetton: string, amount: BigNumber) => {
-    const { fiat } = useAppContext();
-    const { data: stock } = useTonenpointStock();
-
-    return useMemo(() => {
-        const price = getFiatPrice(stock, jettons, fiat, jetton);
-        if (!price) return undefined;
-
-        const fiatAmount = getFiatAmountValue(
-            price,
-            amount.toFormat({
-                decimalSeparator: getDecimalSeparator(),
-                groupSeparator: getGroupSeparator()
-            })
-        );
-        return formatFiatCurrency(fiat, fiatAmount);
-    }, [stock, jettons, fiat, jetton, amount]);
-};
 
 export const notifyError = async (
     client: QueryClient,

@@ -128,7 +128,7 @@ export const Balance: FC<{
                 .plus(getTRC20FiatAmount(client, fiat, assets))
                 .plus(getJettonsFiatAmount(client, fiat, assets));
         },
-        { refetchInterval: 2000, initialData: new BigNumber(0) }
+        { initialData: new BigNumber(0) }
     );
 
     return (

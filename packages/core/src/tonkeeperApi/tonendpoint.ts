@@ -1,6 +1,5 @@
 import { Network } from '../entries/network';
 import { FetchAPI } from '../tonApiV1';
-import { TonendpointStock } from './stock';
 
 interface BootParams {
     platform: 'ios' | 'android' | 'web';
@@ -117,10 +116,6 @@ export const getServerConfig = async (tonendpoint: Tonendpoint): Promise<Tonendp
         flags: {},
         ...result
     };
-};
-
-export const getStock = async (tonendpoint: Tonendpoint) => {
-    return tonendpoint.GET<TonendpointStock>('/stock');
 };
 
 export interface TonendpoinFiatButton {

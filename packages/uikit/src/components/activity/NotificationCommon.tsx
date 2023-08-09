@@ -1,6 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Fee } from '@tonkeeper/core/dist/tonApiV1';
 import {
@@ -8,7 +7,6 @@ import {
     AccountEvent,
     JettonSwapActionDexEnum
 } from '@tonkeeper/core/dist/tonApiV2';
-import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
 import { TronEvent, TronFee } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
@@ -258,8 +256,6 @@ export const ActionDeployerDetails: FC<{ deployer: string }> = ({ deployer }) =>
 
 export const ActionFeeDetails: FC<{
     fee: Fee;
-    stock: TonendpointStock | undefined;
-    fiat: FiatCurrencies;
 }> = ({ fee }) => {
     const { t } = useTranslation();
 
