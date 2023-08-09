@@ -24,6 +24,7 @@ const toTokenRate = (rate: RateByCurrency, fiat: FiatCurrencies): TokenRate => {
     return Object.entries(rate).reduce((acc, [key, value]) => {
         acc[key] = value[fiat];
         return acc;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }, {} as Record<string, any>) as TokenRate;
 };
 
@@ -47,10 +48,10 @@ export const usePreFetchRates = () => {
             });
 
             if (!value || !value.rates) {
-                throw new Error(`Missing price for tokens`);
+                throw new Error('Missing price for tokens');
             }
 
-            for (let [token, rate] of Object.entries<RateByCurrency>(value.rates)) {
+            for (const [token, rate] of Object.entries<RateByCurrency>(value.rates)) {
                 try {
                     const tokenRate = toTokenRate(rate, fiat);
                     if (tokenRate) {
@@ -79,7 +80,7 @@ export const useRate = (token: string) => {
 
             try {
                 const tokenRate = toTokenRate(value.rates[token], fiat);
-                if (!tokenRate) {
+                if (!tokenRate || !tokenRate.prices) {
                     throw new Error(`Missing price for token: ${token}`);
                 }
                 return tokenRate;

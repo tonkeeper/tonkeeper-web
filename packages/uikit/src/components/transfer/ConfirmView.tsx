@@ -1,9 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
-import { AmountData, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { DefaultDecimals } from '@tonkeeper/core/dist/utils/send';
+import { isTonRecipientData, RecipientData } from '@tonkeeper/core/dist/entries/send';
 
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import React, {
     Children,
     createContext,
@@ -11,17 +8,14 @@ import React, {
     isValidElement,
     PropsWithChildren,
     useContext,
-    useMemo,
     useState
 } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
-import { formatter } from '../../hooks/balance';
-import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
+import { formatFiatCurrency } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
-import { useTonenpointStock } from '../../state/tonendpoint';
-import { TransferComment } from '../activity/ActivityDetailsLayout';
-import { ActionFeeDetails } from '../activity/NotificationCommon';
+import { TransferEstimation } from '../../hooks/blockchain/useEstimateTransfer';
+import { TransferComment } from '../activity/ActivityActionDetails';
 import { BackButton } from '../fields/BackButton';
 import { Button } from '../fields/Button';
 import { CheckmarkCircleIcon, ChevronLeftIcon, ExclamationMarkCircleIcon } from '../Icon';
@@ -29,9 +23,14 @@ import { Gap } from '../Layout';
 import { ListBlock } from '../List';
 import { FullHeightBlock, NotificationCancelButton, NotificationTitleBlock } from '../Notification';
 import { Label2 } from '../Text';
-import { ButtonBlock, ResultButton, useFiatAmount } from './common';
+import { ButtonBlock, ResultButton } from './common';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { useAssetAmountFiatEquivalent, useAssetImage } from '../../state/asset';
+import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
+import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -40,13 +39,11 @@ type MutationProps = Pick<
 
 type ConfirmViewContextValue = {
     recipient: RecipientData;
-    amount: AmountData;
-    jettons: JettonsBalances;
-    currencyInfo: {
-        image: string | undefined;
-        title: string;
-        symbol: string;
-        decimals: number;
+    assetAmount: AssetAmount;
+    estimation: {
+        data: TransferEstimation | undefined;
+        isLoading: boolean;
+        isFetching: boolean;
     };
     formState: {
         done: boolean;
@@ -61,24 +58,31 @@ export function useConfirmViewContext() {
     return useContext(ConfirmViewContext);
 }
 
-export const ConfirmView: FC<
-    PropsWithChildren<
-        {
-            recipient: RecipientData;
-            amount: AmountData;
-            jettons: JettonsBalances;
-            onBack?: () => void;
-            onClose: (confirmed?: boolean) => void;
-            fitContent?: boolean;
-        } & (MutationProps | Record<never, never>)
-    >
-> = ({ children, recipient, onBack, onClose, amount, jettons, fitContent, ...mutationProps }) => {
-    let mutation: MutationProps = useSendTransfer(recipient, amount, jettons);
+type ConfirmViewProps<T extends Asset> = PropsWithChildren<
+    {
+        recipient: RecipientData;
+        assetAmount: AssetAmount<T>;
+        onBack?: () => void;
+        onClose: (confirmed?: boolean) => void;
+        fitContent?: boolean;
+        estimation: {
+            data: TransferEstimation<T> | undefined;
+            isLoading: boolean;
+            isFetching: boolean;
+        };
+    } & MutationProps
+>;
 
-    if ('mutateAsync' in mutationProps) {
-        mutation = mutationProps;
-    }
-
+export function ConfirmView<T extends Asset = Asset>({
+    children,
+    estimation,
+    recipient,
+    onBack,
+    onClose,
+    assetAmount,
+    fitContent,
+    ...mutation
+}: ConfirmViewProps<T>) {
     const { mutateAsync, isLoading, error, reset } = mutation;
 
     let titleBlock = (
@@ -124,7 +128,6 @@ export const ConfirmView: FC<
         }
     });
     const [done, setDone] = useState(false);
-    const { t } = useTranslation();
 
     const { standalone } = useAppContext();
 
@@ -145,33 +148,12 @@ export const ConfirmView: FC<
         }
     };
 
-    const [jettonImage, title, symbol, decimals] = useMemo(() => {
-        if (amount.jetton === CryptoCurrency.TON) {
-            return [
-                '/img/toncoin.svg',
-                t('txActions_signRaw_types_tonTransfer'),
-                CryptoCurrency.TON.toString(),
-                DefaultDecimals
-            ] as const;
-        }
-
-        const jetton = jettons.balances.find(item => item.jettonAddress === amount.jetton);
-
-        return [
-            jetton?.metadata?.image,
-            t('txActions_signRaw_types_jettonTransfer'),
-            jetton?.metadata?.symbol ?? amount.jetton,
-            jetton?.metadata?.decimals ?? DefaultDecimals
-        ] as const;
-    }, [amount.jetton, jettons, t]);
-
     return (
         <ConfirmViewContext.Provider
             value={{
                 recipient,
-                jettons,
-                amount,
-                currencyInfo: { image: jettonImage, decimals, symbol, title },
+                assetAmount,
+                estimation,
                 formState: { done, isLoading, error },
                 onClose: () => onClose(),
                 onBack
@@ -189,7 +171,7 @@ export const ConfirmView: FC<
             </FullHeightBlock>
         </ConfirmViewContext.Provider>
     );
-};
+}
 
 const ConfirmViewHeadingStyled = styled.div`
     margin-bottom: 1rem;
@@ -217,25 +199,29 @@ export const ConfirmViewHeadingSlot: FC<PropsWithChildren<{ className?: string }
     className
 }) => <ConfirmViewHeadingStyled className={className}>{children}</ConfirmViewHeadingStyled>;
 
-export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string }>> = ({
-    className
+export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; title?: string }>> = ({
+    className,
+    title
 }) => {
     const { t } = useTranslation();
-    const {
-        recipient,
-        currencyInfo: { image, title }
-    } = useConfirmViewContext();
+    const { recipient, assetAmount } = useConfirmViewContext();
+    const { data: image } = useAssetImage(assetAmount.asset);
+
+    const fallbackTitles = {
+        [TON_ASSET.id]: t('txActions_signRaw_types_tonTransfer'),
+        [TRON_USDT_ASSET.id]: 'USDT transfer' // TODO i18n
+    };
+
+    title ||= isTonRecipientData(recipient)
+        ? recipient.toAccount.name
+        : fallbackTitles[assetAmount.asset.id] || t('txActions_signRaw_types_jettonTransfer');
+
+    const icon = isTonRecipientData(recipient) ? recipient.toAccount.icon || image : image;
     return (
         <Info className={className}>
-            {recipient.toAccount.icon ? (
-                <Image full src={recipient.toAccount.icon} />
-            ) : image ? (
-                <Image full src={image} />
-            ) : (
-                <ImageMock full />
-            )}
+            {icon ? <Image full src={image} /> : <ImageMock full />}
             <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
-            <Title>{recipient.toAccount.name ? recipient.toAccount.name : title}</Title>
+            <Title>{title}</Title>
         </Info>
     );
 };
@@ -248,29 +234,32 @@ export const ConfirmViewDetailsRecipient: FC = () => {
 };
 
 export const ConfirmViewDetailsAmount: FC = () => {
-    const {
-        jettons,
-        amount,
-        currencyInfo: { decimals, symbol }
-    } = useConfirmViewContext();
-    const fiatAmount = useFiatAmount(jettons, amount.jetton, amount.amount);
+    const { fiat } = useAppContext();
+    const { assetAmount } = useConfirmViewContext();
+    const { data: fiatAmountBN } = useAssetAmountFiatEquivalent(assetAmount);
 
-    const coinAmount = `${formatter.format(amount.amount, {
-        ignoreZeroTruncate: false,
-        decimals
-    })} ${symbol}`;
+    const fiatAmount = fiatAmountBN ? formatFiatCurrency(fiat, fiatAmountBN) : undefined;
 
-    return <AmountListItem coinAmount={coinAmount} fiatAmount={fiatAmount} />;
+    return (
+        <AmountListItem
+            coinAmount={assetAmount.stringAssetRelativeAmount}
+            fiatAmount={fiatAmount}
+        />
+    );
 };
 
 export const ConfirmViewDetailsFee: FC = () => {
-    const { data: stock } = useTonenpointStock();
-    const { fiat } = useAppContext();
-    const { amount } = useConfirmViewContext();
-    return <ActionFeeDetails fee={amount.fee} stock={stock} fiat={fiat} />;
+    const { estimation } = useConfirmViewContext();
+
+    return (
+        <ActionFeeDetailsUniversal fee={estimation.isFetching ? undefined : estimation.data?.fee} />
+    );
 };
 export const ConfirmViewDetailsComment: FC = () => {
     const { recipient } = useConfirmViewContext();
+    if (!isTonRecipientData(recipient)) {
+        return null;
+    }
     return <TransferComment comment={recipient.comment} />;
 };
 
@@ -287,11 +276,12 @@ const ConfirmViewButtonsContainerStyled = styled.div`
 export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({ withCancelButton }) => {
     const {
         formState: { done, error, isLoading },
+        estimation: { isFetching: estimationLoading },
         onClose
     } = useConfirmViewContext();
     const { t } = useTranslation();
 
-    const isValid = !isLoading;
+    const isValid = !isLoading && !estimationLoading;
 
     if (done) {
         return (

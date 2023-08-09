@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { Address, beginCell, Cell, comment, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
-import { RecipientData } from '../../entries/send';
+import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
 import { Configuration, Fee, NftItemRepr, SendApi } from '../../tonApiV1';
@@ -92,7 +92,7 @@ const createNftTransfer = (
 export const estimateNftTransfer = async (
     tonApi: Configuration,
     walletState: WalletState,
-    recipient: RecipientData,
+    recipient: TonRecipientData,
     nftItem: NftItemRepr
 ) => {
     await checkServiceTimeOrDie(tonApi);
@@ -118,7 +118,7 @@ export const sendNftTransfer = async (
     storage: IStorage,
     tonApi: Configuration,
     walletState: WalletState,
-    recipient: RecipientData,
+    recipient: TonRecipientData,
     nftItem: NftItemRepr,
     fee: Fee,
     password: string

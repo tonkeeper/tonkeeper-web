@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
-    parseTonTransfer,
-    TonTransferParams
+    TonTransferParams,
+    parseTonTransfer
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { checkWalletPositiveBalanceOrDie } from '@tonkeeper/core/dist/service/transfer/common';
 import { estimateNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
@@ -14,11 +14,12 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { Notification } from '../Notification';
-import { childFactoryCreator, duration, notifyError, Wrapper } from './common';
 import { ConfirmNftView } from './ConfirmNftView';
 import { RecipientView, useGetToAccount } from './RecipientView';
+import { Wrapper, childFactoryCreator, duration, notifyError } from './common';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 
-const useNftTransferEstimation = (nftItem: NftItemRepr, data?: RecipientData) => {
+const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { tonApi } = useAppContext();
@@ -26,7 +27,7 @@ const useNftTransferEstimation = (nftItem: NftItemRepr, data?: RecipientData) =>
     const client = useQueryClient();
 
     return useQuery(
-        [QueryKey.estimate, data?.toAccount.address],
+        [QueryKey.estimate, data?.address],
         async () => {
             try {
                 return await estimateNftTransfer(tonApi, wallet, data!, nftItem);
@@ -65,7 +66,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftIte
     const confirmRef = useRef<HTMLDivElement>(null);
 
     const [right, setRight] = useState(true);
-    const [recipient, setRecipient] = useState<RecipientData | undefined>(undefined);
+    const [recipient, setRecipient] = useState<TonRecipientData | undefined>();
 
     const { mutateAsync: getAccountAsync } = useGetToAccount();
 
@@ -76,7 +77,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftIte
     const onRecipient = async (data: RecipientData) => {
         await checkBalanceAsync();
         setRight(true);
-        setRecipient(data);
+        setRecipient(data as TonRecipientData);
     };
 
     const backToRecipient = useCallback(() => {
@@ -97,7 +98,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftIte
             const toAccount = await getAccountAsync(item);
 
             setRecipient({
-                address: item,
+                address: { ...item, blockchain: BLOCKCHAIN_NAME.TON },
                 toAccount,
                 comment: '',
                 done: true
@@ -138,6 +139,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftIte
                                 setRecipient={onRecipient}
                                 onScan={onScan}
                                 isExternalLoading={isChecking}
+                                acceptBlockchains={[BLOCKCHAIN_NAME.TON]}
                             />
                         )}
                         {state === 'confirm' && (

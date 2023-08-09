@@ -1,11 +1,10 @@
 import BigNumber from 'bignumber.js';
 import { Address, beginCell, Cell, comment, internal, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
-import { AmountValue, RecipientData } from '../../entries/send';
+import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration, Fee, JettonBalance, SendApi } from '../../tonApiV1';
-import { DefaultDecimals } from '../../utils/send';
+import { Configuration, Fee, SendApi } from '../../tonApiV1';
 import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
@@ -16,6 +15,8 @@ import {
     getWalletBalance,
     SendMode
 } from './common';
+import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
+import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 
 const jettonTransferAmount = toNano('0.64');
 const jettonTransferForwardAmount = BigInt('1');
@@ -45,18 +46,12 @@ const createJettonTransfer = (
     seqno: number,
     walletState: WalletState,
     recipientAddress: string,
-    data: AmountValue,
-    jettonInfo: JettonBalance,
+    amount: AssetAmount<TonAsset>,
+    jettonWalletAddress: string,
     forwardPayload: Cell | null,
     secretKey: Buffer = Buffer.alloc(64)
 ) => {
-    const jettonAmount = data.max
-        ? BigInt(jettonInfo.balance)
-        : BigInt(
-              new BigNumber(data.amount.toString())
-                  .shiftedBy(jettonInfo.metadata?.decimals ?? DefaultDecimals)
-                  .toFormat({ decimalSeparator: '.', groupSeparator: '' })
-          );
+    const jettonAmount = BigInt(amount.stringWeiAmount);
 
     const body = jettonTransferBody({
         queryId: Date.now(),
@@ -74,7 +69,7 @@ const createJettonTransfer = (
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
             internal({
-                to: Address.parse(jettonInfo.walletAddress.address),
+                to: Address.parse(jettonWalletAddress),
                 bounce: true,
                 value: jettonTransferAmount,
                 body: body
@@ -88,9 +83,9 @@ const createJettonTransfer = (
 export const estimateJettonTransfer = async (
     tonApi: Configuration,
     walletState: WalletState,
-    recipient: RecipientData,
-    data: AmountValue,
-    jettonInfo: JettonBalance
+    recipient: TonRecipientData,
+    amount: AssetAmount<TonAsset>,
+    jettonWalletAddress: string
 ) => {
     await checkServiceTimeOrDie(tonApi);
     const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
@@ -100,8 +95,8 @@ export const estimateJettonTransfer = async (
         seqno,
         walletState,
         recipient.toAccount.address.raw,
-        data,
-        jettonInfo,
+        amount,
+        jettonWalletAddress,
         recipient.comment ? comment(recipient.comment) : null
     );
 
@@ -115,9 +110,9 @@ export const sendJettonTransfer = async (
     storage: IStorage,
     tonApi: Configuration,
     walletState: WalletState,
-    recipient: RecipientData,
-    data: AmountValue,
-    jettonInfo: JettonBalance,
+    recipient: TonRecipientData,
+    amount: AssetAmount<TonAsset>,
+    jettonWalletAddress: string,
     fee: Fee,
     password: string
 ) => {
@@ -134,8 +129,8 @@ export const sendJettonTransfer = async (
         seqno,
         walletState,
         recipient.toAccount.address.raw,
-        data,
-        jettonInfo,
+        amount,
+        jettonWalletAddress,
         recipient.comment ? comment(recipient.comment) : null,
         keyPair.secretKey
     );

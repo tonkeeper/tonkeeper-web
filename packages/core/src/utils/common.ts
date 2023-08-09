@@ -1,5 +1,6 @@
 import { Address } from 'ton-core';
 import { Network } from '../entries/network';
+import { decodeBase58, sha256 } from 'ethers';
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -92,13 +93,28 @@ export const seeIfAddressEqual = (one?: string, two?: string) => {
     return Address.parse(one).toRawString() === Address.parse(two).toRawString();
 };
 
-export const seeIfValidAddress = (value: string): boolean => {
+export const seeIfValidTonAddress = (value: string): boolean => {
     try {
         if (value.includes('://')) {
             return false; // ignore links
         }
         Address.parse(value);
         return true;
+    } catch (e) {
+        return false;
+    }
+};
+
+export const seeIfValidTronAddress = (address: string): boolean => {
+    try {
+        const decoded = decodeBase58(address).toString(16);
+        if (decoded.length !== 50 || !decoded.startsWith('41')) {
+            return false;
+        }
+        const payload = decoded.slice(0, 42);
+        const tail = decoded.slice(42);
+        const checkSumTail = sha256(sha256('0x' + payload)).slice(2, 10);
+        return tail === checkSumTail;
     } catch (e) {
         return false;
     }
