@@ -1,15 +1,15 @@
-import { useMutation } from '@tanstack/react-query';
-import { isTonRecipientData, RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import React, {
     Children,
-    createContext,
     FC,
-    isValidElement,
     PropsWithChildren,
+    createContext,
+    isValidElement,
     useContext,
     useState
 } from 'react';
@@ -19,18 +19,18 @@ import { formatFiatCurrency } from '../../hooks/balance';
 import { TransferEstimation } from '../../hooks/blockchain/useEstimateTransfer';
 import { useTranslation } from '../../hooks/translation';
 import { useAssetAmountFiatEquivalent, useAssetImage } from '../../state/asset';
-import { TransferComment } from '../activity/ActivityDetailsLayout';
-import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
 import { CheckmarkCircleIcon, ChevronLeftIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Gap } from '../Layout';
 import { ListBlock } from '../List';
 import { FullHeightBlock, NotificationCancelButton, NotificationTitleBlock } from '../Notification';
 import { Label2 } from '../Text';
-import { ButtonBlock, ResultButton } from './common';
+import { TransferComment } from '../activity/ActivityDetailsLayout';
+import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
+import { ButtonBlock, ResultButton } from './common';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -84,6 +84,7 @@ export function ConfirmView<T extends Asset = Asset>({
     ...mutation
 }: ConfirmViewProps<T>) {
     const { mutateAsync, isLoading, error, reset } = mutation;
+    const client = useQueryClient();
 
     let titleBlock = (
         <ConfirmViewTitleSlot>
@@ -141,7 +142,10 @@ export function ConfirmView<T extends Asset = Asset>({
             const isDone = await mutateAsync();
             if (isDone) {
                 setDone(true);
-                setTimeout(() => onClose(true), 2000);
+                setTimeout(async () => {
+                    await client.invalidateQueries();
+                    onClose(true);
+                }, 2000);
             }
         } catch (err) {
             console.error(err);

@@ -87,7 +87,6 @@ export function useSendTransfer<T extends Asset>(
         }
 
         await client.invalidateQueries([wallet.active.rawAddress]);
-        await client.invalidateQueries();
         return true;
     });
 }
