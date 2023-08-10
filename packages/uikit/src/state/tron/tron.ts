@@ -21,7 +21,7 @@ export const useTronWalletState = (enabled = true) => {
     const sdk = useAppSdk();
     const { tronApi } = useAppContext();
     const wallet = useWalletContext();
-
+    const client = useQueryClient();
     return useQuery<TronWalletState, Error>(
         [wallet.publicKey, QueryKey.tron, wallet.network, TronKeys.state],
         async () => {
@@ -32,7 +32,10 @@ export const useTronWalletState = (enabled = true) => {
             const password = await getWalletPassword(sdk, 'confirm');
             const tron = await importTronWallet(sdk.storage, tronApi, wallet, password);
 
-            return getTronWalletState(tronApi, tron, wallet.network);
+            const result = await getTronWalletState(tronApi, tron, wallet.network);
+
+            client.invalidateQueries([QueryKey.account, QueryKey.wallet]);
+            return result;
         },
         { enabled }
     );
@@ -43,7 +46,7 @@ export const useTronBalances = () => {
     const wallet = useWalletContext();
 
     return useQuery<TronBalances, Error>(
-        [wallet.publicKey, QueryKey.tron, wallet.network, TronKeys.balance],
+        [wallet.publicKey, QueryKey.tron, wallet.network, TronKeys.balance, wallet.tron],
         async () => {
             const sdk = new TronApi(tronApi);
 
