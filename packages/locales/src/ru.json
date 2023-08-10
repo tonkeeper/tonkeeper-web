@@ -267,5 +267,17 @@
     },
     "transaction_dex": {
         "message": "DEX"
+    },
+    "receive_ton": {
+        "message": "Получить Toncoinn"
+    },
+    "receive_trc20": {
+        "message": "Получить USDT TRC20"
+    },
+    "receive_ton_description": {
+        "message": "Отправляйте на этот адрес только Toncoin TON и токены в сети TON, иначе вы можете потерять свои средства."
+    },
+    "receive_trc20_description": {
+        "message": "Отправляйте на этот адрес только USDT TRC20, иначе вы можете потерять свои средства."
     }
 }

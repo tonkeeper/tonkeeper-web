@@ -3,11 +3,11 @@ import { CSSTransition } from 'react-transition-group';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { Container } from '../styles/globalStyle';
-import { BackButton } from './fields/BackButton';
 import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
+import { BackButton, ButtonMock } from './fields/BackButton';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -115,6 +115,7 @@ const TitleRow = styled.div`
     align-items: center;
     margin-bottom: 1rem;
     user-select: none;
+    width: 100%;
 `;
 
 const RowTitle = styled(H3)`
@@ -131,12 +132,12 @@ const BackShadow = styled.div`
     background-color: ${props => props.theme.backgroundPage};
 `;
 
-export const NotificationTitleRow: FC<PropsWithChildren<{ handleClose: () => void }>> = ({
-    handleClose,
-    children
-}) => {
+export const NotificationTitleRow: FC<
+    PropsWithChildren<{ handleClose: () => void; center?: boolean }>
+> = ({ handleClose, children, center = false }) => {
     return (
         <TitleRow>
+            {center && <ButtonMock />}
             <RowTitle>{children}</RowTitle>
             <NotificationCancelButton handleClose={handleClose} />
         </TitleRow>

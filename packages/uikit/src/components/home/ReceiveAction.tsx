@@ -1,62 +1,31 @@
-import { JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { formatTransferUrl } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useState } from 'react';
 import QRCode from 'react-qr-code';
 import styled from 'styled-components';
-import { useWalletContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { ToncoinIcon } from '../Icon';
-import { Notification, NotificationBlock } from '../Notification';
-import { Body1, H2, Label1, Label2 } from '../Text';
+import { useTronWalletState } from '../../state/tron/tron';
+import { FullHeightBlock, Notification, NotificationTitleRow } from '../Notification';
+import { Tabs } from '../Tabs';
+import { Body1, H3 } from '../Text';
+import { Button } from '../fields/Button';
 import { Action } from './Actions';
 import { ReceiveIcon } from './HomeIcons';
 
-const Block = styled.div`
-    padding: 1rem;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: ${props => props.theme.cornerSmall};
-    background: ${props => props.theme.backgroundContent};
-
-    max-width: 80%;
-    overflow: hidden;
-`;
-
-const CopyBlock = styled(Block)`
-    padding: 0;
-`;
-
-const TextBlock = styled.div`
-    padding: 1rem;
-    box-sizing: border-box;
-`;
-const CopyButton = styled(Label2)`
+const CopyBlock = styled.div`
     display: flex;
-    gap: 0.5rem;
     align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-    padding: 0.875rem 1rem 0.875rem;
-    box-sizing: border-box;
-
-    border-top: 1px solid ${props => props.theme.separatorCommon};
-    text-align: center;
-    transition: background-color 0.1s ease;
-
-    &:hover {
-        background-color: ${props => props.theme.backgroundContentTint};
-        border-top: 1px solid ${props => props.theme.backgroundContentTint};
-    }
 `;
 
 const Background = styled.div`
-    padding: 1.625rem;
+    padding: 24px;
     width: 100%;
     box-sizing: border-box;
-    border-radius: 8px;
+    border-radius: 20px;
     background: ${props => props.theme.textPrimary};
+    max-width: 300px;
 
     svg {
         width: 100%;
@@ -64,25 +33,29 @@ const Background = styled.div`
     }
 `;
 
-const TitleText = styled(Label1)`
-    margin-bottom: 1rem;
-    display: inline-block;
-`;
-
-const Text = styled(Label1)`
-    margin-bottom: 2px;
-    display: inline-block;
-`;
-
 const AddressText = styled(Body1)`
     display: inline-block;
-    color: ${props => props.theme.textSecondary};
     word-break: break-all;
+    color: black;
+    margin-top: 24px;
+    text-align: center;
 `;
 
-const Title = styled(H2)`
+const TextBlock = styled.div`
+    display: flex;
+    padding-bottom: 16px;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+`;
+
+const Title = styled(H3)`
     text-align: center;
-    max-width: 80%;
+`;
+
+const Description = styled(Body1)`
+    text-align: center;
+    color: ${props => props.theme.textSecondary};
 `;
 
 const CopyIcon = () => {
@@ -104,87 +77,113 @@ const CopyIcon = () => {
     );
 };
 
-const Logo = styled.img`
-    width: 72px;
-    height: 72px;
-    border-radius: ${props => props.theme.cornerFull};
+const values = [
+    { name: BLOCKCHAIN_NAME.TON, id: BLOCKCHAIN_NAME.TON },
+    { name: 'TRC20', id: BLOCKCHAIN_NAME.TRON }
+];
 
-    pointer-events: none;
-`;
-
-const ReceiveContent: FC<{ info?: JettonInfo }> = ({ info }) => {
+const ReceiveContent: FC<{ chain?: BLOCKCHAIN_NAME; jetton?: string; handleClose: () => void }> = ({
+    chain = BLOCKCHAIN_NAME.TON,
+    jetton,
+    handleClose
+}) => {
+    const { standalone } = useAppContext();
+    const wallet = useWalletContext();
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+
+    const [active, setActive] = useState(chain);
+    const { data: tron } = useTronWalletState(active === BLOCKCHAIN_NAME.TRON);
+
+    const isTon = active === BLOCKCHAIN_NAME.TON || !tron;
 
     return (
-        <NotificationBlock>
-            {info?.metadata.image ? (
-                <Logo src={info?.metadata.image} />
-            ) : (
-                <ToncoinIcon width="72" height="72" />
-            )}
-            <Title>
-                {info
-                    ? t('receive_title').replace('%{currency}', info.metadata.symbol)
-                    : t('receive_ton_and_jettons')}
-            </Title>
-            <Block>
-                <TitleText>{t('receive_qr_title')}</TitleText>
-                <Background>
+        <FullHeightBlock standalone={standalone}>
+            <NotificationTitleRow handleClose={handleClose} center>
+                <Tabs active={active} setActive={setActive} values={values} />
+            </NotificationTitleRow>
+            <TextBlock>
+                <Title>{isTon ? t('receive_ton') : t('receive_trc20')}</Title>
+                <Description>
+                    {isTon ? t('receive_ton_description') : t('receive_trc20_description')}
+                </Description>
+            </TextBlock>
+            {isTon ? (
+                <Background
+                    onClick={e => {
+                        e.preventDefault();
+                        sdk.copyToClipboard(wallet.active.friendlyAddress, t('address_copied'));
+                    }}
+                >
                     <QRCode
                         size={400}
                         value={formatTransferUrl({
                             address: wallet.active.friendlyAddress,
-                            jetton: info?.metadata.address
+                            jetton: jetton
                         })}
                         strokeLinecap="round"
                         strokeLinejoin="miter"
                     />
+                    <AddressText>{wallet.active.friendlyAddress}</AddressText>
                 </Background>
-            </Block>
+            ) : (
+                <Background
+                    onClick={e => {
+                        e.preventDefault();
+                        sdk.copyToClipboard(tron!.walletAddress, t('address_copied'));
+                    }}
+                >
+                    <QRCode
+                        size={400}
+                        value={tron!.walletAddress}
+                        strokeLinecap="round"
+                        strokeLinejoin="miter"
+                    />
+                    <AddressText>{tron!.walletAddress}</AddressText>
+                </Background>
+            )}
             <CopyBlock>
-                <TextBlock>
-                    <Text>{t('receive_address_title')}</Text>
-                    <AddressText
-                        onClick={() =>
-                            sdk.copyToClipboard(wallet.active.friendlyAddress, t('address_copied'))
+                <Button
+                    secondary
+                    onClick={e => {
+                        e.preventDefault();
+                        if (isTon) {
+                            sdk.copyToClipboard(wallet.active.friendlyAddress, t('address_copied'));
+                        } else {
+                            sdk.copyToClipboard(tron!.walletAddress, t('address_copied'));
                         }
-                    >
-                        {wallet.active.friendlyAddress}
-                    </AddressText>
-                </TextBlock>
-                <CopyButton
-                    onClick={() =>
-                        sdk.copyToClipboard(wallet.active.friendlyAddress, t('address_copied'))
-                    }
+                    }}
                 >
                     <CopyIcon />
                     <span>{t('Copy_address')}</span>
-                </CopyButton>
+                </Button>
             </CopyBlock>
-        </NotificationBlock>
+        </FullHeightBlock>
     );
 };
 
 export const ReceiveNotification: FC<{
     open: boolean;
     handleClose: () => void;
-    info?: JettonInfo;
-}> = ({ open, handleClose, info }) => {
+    chain?: BLOCKCHAIN_NAME;
+    jetton?: string;
+}> = ({ open, handleClose, chain, jetton }) => {
     const Content = useCallback(() => {
         if (!open) return undefined;
-        return <ReceiveContent info={info} />;
-    }, [open, info]);
+        return <ReceiveContent chain={chain} jetton={jetton} handleClose={handleClose} />;
+    }, [open, handleClose]);
 
     return (
-        <Notification isOpen={open} handleClose={handleClose} backShadow>
+        <Notification isOpen={open} handleClose={handleClose} backShadow hideButton>
             {Content}
         </Notification>
     );
 };
 
-export const ReceiveAction: FC<{ info?: JettonInfo }> = ({ info }) => {
+export const ReceiveAction: FC<{ chain?: BLOCKCHAIN_NAME; jetton?: string }> = ({
+    chain,
+    jetton
+}) => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
 
@@ -195,7 +194,12 @@ export const ReceiveAction: FC<{ info?: JettonInfo }> = ({ info }) => {
                 title={t('wallet_receive')}
                 action={() => setOpen(true)}
             />
-            <ReceiveNotification open={open} handleClose={() => setOpen(false)} info={info} />
+            <ReceiveNotification
+                open={open}
+                handleClose={() => setOpen(false)}
+                chain={chain}
+                jetton={jetton}
+            />
         </>
     );
 };

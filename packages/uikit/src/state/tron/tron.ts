@@ -12,7 +12,7 @@ import { QueryKey } from '../../libs/queryKey';
 import { getWalletPassword } from '../password';
 import { DefaultRefetchInterval } from '../tonendpoint';
 
-export const useTronWalletState = () => {
+export const useTronWalletState = (enabled = true) => {
     const sdk = useAppSdk();
     const { tronApi } = useAppContext();
     const wallet = useWalletContext();
@@ -28,7 +28,8 @@ export const useTronWalletState = () => {
             const tron = await importTronWallet(sdk.storage, tronApi, wallet, password);
 
             return getTronWalletState(tronApi, tron, wallet.network);
-        }
+        },
+        { enabled }
     );
 };
 

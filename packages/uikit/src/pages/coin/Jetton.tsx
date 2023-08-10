@@ -88,7 +88,7 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) 
                 <JettonHeader balance={balance} info={info} />
                 <ActionsRow>
                     <SendAction asset={info.metadata.address} />
-                    <ReceiveAction info={info} />
+                    <ReceiveAction jetton={info.metadata.address} />
                 </ActionsRow>
 
                 <JettonHistory balance={balance} innerRef={ref} />

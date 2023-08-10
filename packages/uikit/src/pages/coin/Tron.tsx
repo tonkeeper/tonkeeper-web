@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TronWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { TronApi, TronBalance } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -81,7 +82,7 @@ const TronAsset: FC<{ tron: TronWalletState }> = ({ tron }) => {
                 <TronHeader tronBalance={tronBalance} />
                 <ActionsRow>
                     <SendAction asset="TON" />
-                    <ReceiveAction />
+                    <ReceiveAction chain={BLOCKCHAIN_NAME.TRON} />
                 </ActionsRow>
                 <TronActivity tron={tron} innerRef={ref} />
             </InnerBody>

@@ -271,5 +271,17 @@
     },
     "transaction_dex": {
         "message": "DEX"
+    },
+    "receive_ton": {
+        "message": "Receive Toncoin"
+    },
+    "receive_trc20": {
+        "message": "Receive USDT TRC20"
+    },
+    "receive_ton_description": {
+        "message": "Send only Toncoin TON and tokens in TON network to this address, or you might lose your funds."
+    },
+    "receive_trc20_description": {
+        "message": "Send only USDT TRC20 to this address,\nor you might lose your funds."
     }
 }
