@@ -142,7 +142,7 @@ export function ConfirmView<T extends Asset = Asset>({
             if (isDone) {
                 setDone(true);
                 setTimeout(() => {
-                    setTimeout(() => client.invalidateQueries());
+                    setTimeout(() => client.invalidateQueries(), 100);
                     onClose(true);
                 }, 2000);
             }

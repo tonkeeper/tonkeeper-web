@@ -1,11 +1,9 @@
-import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-
-import React, { FC, PropsWithChildren } from 'react';
-import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
-import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { RecipientData } from '@tonkeeper/core/dist/entries/send';
+import React, { FC, PropsWithChildren } from 'react';
+import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
+import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
 import { ConfirmView } from './ConfirmView';
-import { DefaultRefetchInterval } from '../../state/tonendpoint';
 
 export const ConfirmTransferView: FC<
     PropsWithChildren<{
@@ -17,11 +15,7 @@ export const ConfirmTransferView: FC<
         fitContent?: boolean;
     }>
 > = ({ isMax, ...rest }) => {
-    const estimation = useEstimateTransfer(rest.recipient, rest.assetAmount, isMax, {
-        refetchInterval: DefaultRefetchInterval,
-        refetchOnMount: 'always'
-    });
-
+    const estimation = useEstimateTransfer(rest.recipient, rest.assetAmount, isMax);
     const mutation = useSendTransfer(rest.recipient, rest.assetAmount, isMax, estimation.data!);
 
     return <ConfirmView estimation={estimation} {...mutation} {...rest} />;
