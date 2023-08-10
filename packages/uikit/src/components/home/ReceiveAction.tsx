@@ -1,7 +1,7 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { formatTransferUrl } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useState } from 'react';
-import QRCode from 'react-qr-code';
+import { QRCode } from 'react-qrcode-logo';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -27,9 +27,9 @@ const Background = styled.div`
     background: ${props => props.theme.textPrimary};
     max-width: 300px;
 
-    svg {
-        width: 100%;
-        height: 100%;
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
     }
 `;
 
@@ -121,8 +121,9 @@ const ReceiveContent: FC<{ chain?: BLOCKCHAIN_NAME; jetton?: string; handleClose
                             address: wallet.active.friendlyAddress,
                             jetton: jetton
                         })}
-                        strokeLinecap="round"
-                        strokeLinejoin="miter"
+                        logoImage="/img/toncoin.svg"
+                        logoPadding={15}
+                        logoPaddingStyle="circle"
                     />
                     <AddressText>{wallet.active.friendlyAddress}</AddressText>
                 </Background>
@@ -136,8 +137,8 @@ const ReceiveContent: FC<{ chain?: BLOCKCHAIN_NAME; jetton?: string; handleClose
                     <QRCode
                         size={400}
                         value={tron!.walletAddress}
-                        strokeLinecap="round"
-                        strokeLinejoin="miter"
+                        logoImage="/img/usdt.webp"
+                        logoPadding={15}
                     />
                     <AddressText>{tron!.walletAddress}</AddressText>
                 </Background>
