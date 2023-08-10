@@ -142,8 +142,8 @@ export function ConfirmView<T extends Asset = Asset>({
             const isDone = await mutateAsync();
             if (isDone) {
                 setDone(true);
-                setTimeout(async () => {
-                    await client.invalidateQueries();
+                setTimeout(() => {
+                    setTimeout(() => client.invalidateQueries());
                     onClose(true);
                 }, 2000);
             }
