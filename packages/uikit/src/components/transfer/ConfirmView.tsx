@@ -213,7 +213,7 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
 
     const fallbackTitles = {
         [TON_ASSET.id]: t('txActions_signRaw_types_tonTransfer'),
-        [TRON_USDT_ASSET.id]: 'USDT transfer' // TODO i18n
+        [TRON_USDT_ASSET.id]: t('txActions_USDT_transfer')
     };
 
     title ||= isTonRecipientData(recipient)

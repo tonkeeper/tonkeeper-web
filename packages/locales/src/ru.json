@@ -279,5 +279,8 @@
     },
     "receive_trc20_description": {
         "message": "Отправляйте на этот адрес только USDT TRC20, иначе вы можете потерять свои средства."
+    },
+    "txActions_USDT_transfer": {
+        "message": "Перевод USDT"
     }
 }
