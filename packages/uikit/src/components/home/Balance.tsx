@@ -68,48 +68,66 @@ export const BalanceSkeleton = () => {
     );
 };
 
-const getTonFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
-    const rate = client.getQueryCache().find(getRateKey(fiat, CryptoCurrency.TON))?.state.data as
+const useRateOrDefault = (
+    client: QueryClient,
+    fiat: FiatCurrencies,
+    token: string,
+    useRate: (rate: TokenRate) => BigNumber,
+    defaultValue: BigNumber
+) => {
+    const rate = client.getQueryCache().find(getRateKey(fiat, token))?.state.data as
         | TokenRate
         | undefined;
 
     if (rate) {
-        return shiftedDecimals(assets.ton.info.balance).multipliedBy(rate.prices);
+        return useRate(rate);
     } else {
-        return new BigNumber(0);
+        return defaultValue;
     }
 };
 
-const getTRC20FiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
-    return assets.tron.balances.reduce((total, { weiAmount, token }) => {
-        const rate = client.getQueryCache().find(getRateKey(fiat, token.symbol))?.state.data as
-            | TokenRate
-            | undefined;
+const getTonFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
+    return useRateOrDefault(
+        client,
+        fiat,
+        CryptoCurrency.TON,
+        rate => shiftedDecimals(assets.ton.info.balance).multipliedBy(rate.prices),
+        new BigNumber(0)
+    );
+};
 
-        if (rate) {
-            return total.plus(shiftedDecimals(weiAmount, token.decimals).multipliedBy(rate.prices));
-        } else {
-            return total;
-        }
-    }, new BigNumber(0));
+const getTRC20FiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
+    return assets.tron.balances.reduce(
+        (total, { weiAmount, token }) =>
+            useRateOrDefault(
+                client,
+                fiat,
+                token.symbol,
+                rate =>
+                    total.plus(
+                        shiftedDecimals(weiAmount, token.decimals).multipliedBy(rate.prices)
+                    ),
+                total
+            ),
+        new BigNumber(0)
+    );
 };
 
 const getJettonsFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
-    return assets.ton.jettons.balances.reduce((total, { jettonAddress, balance, metadata }) => {
-        const rate = client
-            .getQueryCache()
-            .find(getRateKey(fiat, Address.parse(jettonAddress).toString()))?.state.data as
-            | TokenRate
-            | undefined;
-
-        if (rate) {
-            return total.plus(
-                shiftedDecimals(balance, metadata?.decimals).multipliedBy(rate.prices)
-            );
-        } else {
-            return total;
-        }
-    }, new BigNumber(0));
+    return assets.ton.jettons.balances.reduce(
+        (total, { jettonAddress, balance, metadata }) =>
+            useRateOrDefault(
+                client,
+                fiat,
+                Address.parse(jettonAddress).toString(),
+                rate =>
+                    total.plus(
+                        shiftedDecimals(balance, metadata?.decimals).multipliedBy(rate.prices)
+                    ),
+                total
+            ),
+        new BigNumber(0)
+    );
 };
 
 export const Balance: FC<{
