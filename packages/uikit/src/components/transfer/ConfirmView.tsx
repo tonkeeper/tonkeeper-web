@@ -68,6 +68,7 @@ type ConfirmViewProps<T extends Asset> = PropsWithChildren<
             data: TransferEstimation<T> | undefined;
             isLoading: boolean;
             isFetching: boolean;
+            error?: Error;
         };
     } & MutationProps
 >;
@@ -82,8 +83,10 @@ export function ConfirmView<T extends Asset = Asset>({
     fitContent,
     ...mutation
 }: ConfirmViewProps<T>) {
-    const { mutateAsync, isLoading, error, reset } = mutation;
+    const { mutateAsync, isLoading, reset } = mutation;
     const client = useQueryClient();
+
+    const error = mutation.error || estimation.error;
 
     let titleBlock = (
         <ConfirmViewTitleSlot>
