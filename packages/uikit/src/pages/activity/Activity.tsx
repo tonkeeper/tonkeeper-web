@@ -42,7 +42,7 @@ const Activity: FC = () => {
         hasNextPage: hasTronNextPage,
         fetchNextPage: fetchTronNextPage
     } = useInfiniteQuery({
-        queryKey: [wallet.tron?.ownerWalletAddress, QueryKey.tron],
+        queryKey: [wallet.tron?.ownerWalletAddress, wallet.network, QueryKey.tron],
         queryFn: ({ pageParam = undefined }) =>
             new TronApi(tronApi).getTransactions({
                 ownerAddress: wallet.tron!.ownerWalletAddress,

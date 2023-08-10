@@ -13,7 +13,7 @@ import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
 import { SendAction } from '../../components/transfer/SendNotifications';
-import { useAppContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
 import { AppRoute } from '../../libs/routes';
@@ -36,9 +36,10 @@ const TronActivity: FC<{
     tron: TronWalletState;
     innerRef: React.RefObject<HTMLDivElement>;
 }> = ({ tron, innerRef }) => {
+    const wallet = useWalletContext();
     const { standalone, tronApi } = useAppContext();
     const { data, isFetched, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery({
-        queryKey: [tron.ownerWalletAddress, QueryKey.tron],
+        queryKey: [tron.ownerWalletAddress, wallet.network, QueryKey.tron],
         queryFn: ({ pageParam = undefined }) =>
             new TronApi(tronApi).getTransactions({
                 ownerAddress: tron.ownerWalletAddress,

@@ -12,13 +12,18 @@ import { QueryKey } from '../../libs/queryKey';
 import { getWalletPassword } from '../password';
 import { DefaultRefetchInterval } from '../tonendpoint';
 
+enum TronKeys {
+    state,
+    balance
+}
+
 export const useTronWalletState = (enabled = true) => {
     const sdk = useAppSdk();
     const { tronApi } = useAppContext();
     const wallet = useWalletContext();
 
     return useQuery<TronWalletState, Error>(
-        [wallet.publicKey, QueryKey.tron, wallet.network],
+        [wallet.publicKey, QueryKey.tron, wallet.network, TronKeys.state],
         async () => {
             if (wallet.tron) {
                 return getTronWalletState(tronApi, wallet.tron, wallet.network);
@@ -38,7 +43,7 @@ export const useTronBalances = () => {
     const wallet = useWalletContext();
 
     return useQuery<TronBalances, Error>(
-        [wallet.publicKey, QueryKey.tron],
+        [wallet.publicKey, QueryKey.tron, wallet.network, TronKeys.balance],
         async () => {
             const sdk = new TronApi(tronApi);
 
