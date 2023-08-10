@@ -1,10 +1,14 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TonAsset, jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
     TonTransferParams,
     parseTonTransfer
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
 import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -17,13 +21,10 @@ import { useWalletJettonList } from '../../state/wallet';
 import { Notification } from '../Notification';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
-import { RecipientView, useGetToAccount } from './RecipientView';
-import { Wrapper, childFactoryCreator, duration } from './common';
-import { AmountView, AmountViewState } from './amount-view/AmountView';
-import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
-import { TonAsset, jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { ConfirmTransferView } from './ConfirmTransferView';
+import { RecipientView, useGetToAccount } from './RecipientView';
+import { AmountView, AmountViewState } from './amount-view/AmountView';
+import { Wrapper, childFactoryCreator, duration } from './common';
 
 const SendContent: FC<{ onClose: () => void; asset?: TonAsset | TronAsset }> = ({
     onClose,
@@ -80,6 +81,16 @@ const SendContent: FC<{ onClose: () => void; asset?: TonAsset | TronAsset }> = (
     const backToAmount = () => {
         if (ios) openIosKeyboard('decimal');
         setRight(false);
+        setView('amount');
+    };
+
+    const processTron = (address: string) => {
+        const item = { address: address, blockchain: BLOCKCHAIN_NAME.TRON } as const;
+
+        setRecipient({
+            address: item,
+            done: true
+        });
         setView('amount');
     };
 
@@ -141,17 +152,23 @@ const SendContent: FC<{ onClose: () => void; asset?: TonAsset | TronAsset }> = (
 
     const onScan = async (signature: string) => {
         const param = parseTonTransfer({ url: signature });
-        if (param === null) {
-            return sdk.uiEvents.emit('copy', {
-                method: 'copy',
-                params: t('Unexpected_QR_Code')
-            });
-        } else {
+
+        if (param) {
             const ok = await processJetton(param);
             if (ok) {
                 await processRecipient(param);
             }
+            return;
         }
+
+        if (seeIfValidTronAddress(signature)) {
+            return processTron(signature);
+        }
+
+        return sdk.uiEvents.emit('copy', {
+            method: 'copy',
+            params: t('Unexpected_QR_Code')
+        });
     };
 
     const nodeRef = {
