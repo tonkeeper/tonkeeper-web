@@ -3,7 +3,7 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { useAppContext } from '../../hooks/appContext';
@@ -149,6 +149,17 @@ export const Balance: FC<{
         { initialData: new BigNumber(0) }
     );
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (total.toString() === '0') {
+                client.invalidateQueries([QueryKey.total]);
+            }
+        }, 500);
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [total]);
     return (
         <Block>
             <MessageBlock error={error} isFetching={isFetching} />
