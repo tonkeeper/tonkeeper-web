@@ -1,9 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
-
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import React, {
     Children,
     FC,
@@ -209,7 +208,7 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
 }) => {
     const { t } = useTranslation();
     const { recipient, assetAmount } = useConfirmViewContext();
-    const { data: image } = useAssetImage(assetAmount.asset);
+    const image = useAssetImage(assetAmount.asset);
 
     const fallbackTitles = {
         [TON_ASSET.id]: t('txActions_signRaw_types_tonTransfer'),

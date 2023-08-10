@@ -1,17 +1,22 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
+import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import {
     TonAsset,
     jettonToTonAsset,
     legacyTonAssetId
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { formatSendValue, isNumeric } from '@tonkeeper/core/dist/utils/send';
+import BigNumber from 'bignumber.js';
 import React, { FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useAppContext } from '../../../hooks/appContext';
+import { formatter } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
+import { useUserAssetBalance } from '../../../state/asset';
 import { useUserJettonList } from '../../../state/jetton';
+import { useRate } from '../../../state/rates';
 import { useWalletAccountInfo, useWalletJettonList } from '../../../state/wallet';
 import { ChevronLeftIcon } from '../../Icon';
 import { Gap } from '../../Layout';
@@ -20,6 +25,7 @@ import {
     NotificationCancelButton,
     NotificationTitleBlock
 } from '../../Notification';
+import { Label1 } from '../../Text';
 import { BackButton } from '../../fields/BackButton';
 import { Button } from '../../fields/Button';
 import { AssetSelect } from '../AssetSelect';
@@ -46,12 +52,6 @@ import {
     replaceTypedDecimalSeparator,
     seeIfValueValid
 } from './AmountViewUI';
-import { useRate } from '../../../state/rates';
-import BigNumber from 'bignumber.js';
-import { Label1 } from '../../Text';
-import { useUserAssetBalance } from '../../../state/asset';
-import { formatter } from '../../../hooks/balance';
-import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 
 export type AmountViewState = {
     asset: Asset;
@@ -98,12 +98,12 @@ export const AmountView: FC<{
     const [inFiat, setInFiat] = useState(defaults?.inFiat ?? false);
     const [max, setMax] = useState(defaults?.isMax ?? false);
 
-    const { data: tokenRate, isLoading: rateLoading } = useRate(
-        token.blockchain === BLOCKCHAIN_NAME.TRON && token.address === TRON_USDT_ASSET.address
-            ? 'USDT'
-            : legacyTonAssetId(token as TonAsset, { userFriendly: true })
-    );
+    const rateAddress =
+        token.blockchain === BLOCKCHAIN_NAME.TRON
+            ? token.symbol
+            : legacyTonAssetId(token as TonAsset, { userFriendly: true });
 
+    const { data: tokenRate, isLoading: rateLoading } = useRate(rateAddress);
     const { data: balance, isLoading: balanceLoading } = useUserAssetBalance(token);
 
     let secondaryAmount: BigNumber | undefined;

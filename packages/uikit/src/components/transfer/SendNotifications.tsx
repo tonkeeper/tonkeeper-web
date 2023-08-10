@@ -1,5 +1,6 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { toTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset, jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
@@ -17,6 +18,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
+import { useTronBalances } from '../../state/tron/tron';
 import { useWalletJettonList } from '../../state/wallet';
 import { Notification } from '../Notification';
 import { Action } from '../home/Actions';
@@ -47,6 +49,8 @@ const SendContent: FC<{ onClose: () => void; asset?: TonAsset | TronAsset }> = (
         asset
     });
 
+    const { data: tronBalances } = useTronBalances();
+
     const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } = useGetToAccount();
 
     const setRecipient = (value: RecipientData) => {
@@ -58,6 +62,9 @@ const SendContent: FC<{ onClose: () => void; asset?: TonAsset | TronAsset }> = (
         }
 
         _setRecipient(value);
+        if (tronBalances && value.address.blockchain === BLOCKCHAIN_NAME.TRON) {
+            setAmountViewState({ asset: toTronAsset(tronBalances.balances[0]) });
+        }
     };
 
     const onRecipient = (data: RecipientData) => {

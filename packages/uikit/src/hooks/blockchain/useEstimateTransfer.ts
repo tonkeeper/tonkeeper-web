@@ -1,21 +1,22 @@
+import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { RecipientData, TonRecipientData, TronRecipient } from '@tonkeeper/core/dist/entries/send';
-import { useTranslation } from '../translation';
-import { useAppSdk } from '../appSdk';
-import { useAppContext, useWalletContext } from '../appContext';
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useWalletJettonList } from '../../state/wallet';
+import { TON_ASSET, toTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { Fee } from '@tonkeeper/core/dist/tonApiV1';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
-import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
-import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { Address } from 'ton-core';
+import { RecipientData, TonRecipientData, TronRecipient } from '@tonkeeper/core/dist/entries/send';
 import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
+import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { estimateTronTransfer } from '@tonkeeper/core/dist/service/tron/tronService';
+import { Fee } from '@tonkeeper/core/dist/tonApiV1';
 import { EstimatePayload } from '@tonkeeper/core/dist/tronApi';
+import { Address } from 'ton-core';
 import { notifyError } from '../../components/transfer/common';
+import { useTronBalances } from '../../state/tron/tron';
+import { useWalletJettonList } from '../../state/wallet';
+import { useAppContext, useWalletContext } from '../appContext';
+import { useAppSdk } from '../appSdk';
+import { useTranslation } from '../translation';
 
 export type TransferEstimation<T extends Asset = Asset> = {
     fee: AssetAmount<T>;
@@ -34,6 +35,7 @@ export function useEstimateTransfer<T extends Asset>(
     const wallet = useWalletContext();
     const client = useQueryClient();
     const { data: jettons } = useWalletJettonList();
+    const { data: balances } = useTronBalances();
 
     return useQuery<TransferEstimation<T>>(
         ['estimate-transfer', recipient, amount],
@@ -75,14 +77,17 @@ export function useEstimateTransfer<T extends Asset>(
                     amount: amount as AssetAmount<TronAsset>
                 });
 
-                if (payload.request.feeToken !== TRON_USDT_ASSET.address) {
+                const feeToken = balances?.balances.find(
+                    item => item.token.address === payload.request.feeToken
+                );
+                if (!feeToken) {
                     throw new Error(
-                        `Expected feeToken is USDT, but actual token's address is ${payload.request.feeToken}`
+                        `Unexpected feeToken, token's address is ${payload.request.feeToken}`
                     );
                 }
 
                 const fee = new AssetAmount({
-                    asset: TRON_USDT_ASSET,
+                    asset: toTronAsset(feeToken),
                     weiAmount: payload.request.fee
                 });
                 return { fee, payload } as TransferEstimation<T>;

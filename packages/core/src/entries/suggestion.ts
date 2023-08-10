@@ -7,6 +7,7 @@ export interface WalletFavorite {
 
 export interface FavoriteSuggestion extends WalletFavorite {
     isFavorite: true;
+    blockchain?: BLOCKCHAIN_NAME;
 }
 
 export interface LatestSuggestion {

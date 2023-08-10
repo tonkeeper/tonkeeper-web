@@ -2,12 +2,13 @@ import BigNumber from 'bignumber.js';
 import { AmountFormatter } from '../../../utils/AmountFormatter';
 import { getDecimalSeparator, getGroupSeparator } from '../../../utils/formatting';
 import { Asset } from './asset';
-import { IAssetAmount } from './i-asset-amount';
 import { BasicAsset } from './basic-asset';
+import { IAssetAmount } from './i-asset-amount';
 
 type AssetAmountStruct<T extends BasicAsset> = {
     asset: T;
     weiAmount: BigNumber.Value;
+    image?: string;
 };
 
 const formatter = new AmountFormatter({
@@ -37,6 +38,8 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
 
     public readonly asset: T;
 
+    public readonly image: string | undefined;
+
     get stringAsset(): string {
         return this.asset.symbol;
     }
@@ -55,9 +58,10 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
 
     protected readonly decimalPlaces = 3;
 
-    constructor({ weiAmount, asset }: AssetAmountStruct<T>) {
+    constructor({ weiAmount, asset, image }: AssetAmountStruct<T>) {
         this.weiAmount = new BigNumber(weiAmount);
         this.asset = asset;
+        this.image = image;
 
         this.relativeAmount = this.weiAmount.div(10 ** this.asset.decimals);
     }

@@ -38,12 +38,15 @@ export function useUserAssetBalance<
         }
     } else {
         isLoading = tronBalances.isLoading;
-        data =
-            tronBalances.data?.balances.find(i => i.token.address === asset.address)?.weiAmount ||
-            '0';
-
-        if (isBasicAsset(asset)) {
-            data = new AssetAmount<TronAsset>({ asset, weiAmount: data });
+        const token = tronBalances.data?.balances.find(i => i.token.address === asset.address);
+        if (token && isBasicAsset(asset)) {
+            data = new AssetAmount<TronAsset>({
+                asset,
+                weiAmount: token.weiAmount,
+                image: token.token.image
+            });
+        } else {
+            data = '0';
         }
     }
 
@@ -53,27 +56,25 @@ export function useUserAssetBalance<
     };
 }
 
-export function useAssetImage(assetIdentification: AssetIdentification): {
-    isLoading: boolean;
-    data: string | undefined;
-} {
-    const id = packAssetId(assetIdentification.blockchain, assetIdentification.address);
-    const { data: jettons, isLoading } = useWalletJettonList();
+export function useAssetImage({ blockchain, address }: AssetIdentification): string | undefined {
+    const id = packAssetId(blockchain, address);
+    const { data: jettons } = useWalletJettonList();
+    const { data: balances } = useTronBalances();
 
     if (id === TON_ASSET.id) {
-        return { isLoading: false, data: '/img/toncoin.svg' };
+        return '/img/toncoin.svg';
     }
 
     if (id === TRON_USDT_ASSET.id) {
-        return { isLoading: false, data: '/img/usdt.webp' };
+        return '/img/usdt.webp';
     }
 
-    return {
-        isLoading,
-        data: jettons?.balances.find(i =>
-            (assetIdentification.address as Address).equals(Address.parse(i.jettonAddress))
-        )?.metadata?.image
-    };
+    if (typeof address === 'string') {
+        return balances?.balances.find(i => i.token.address === address)?.token.image;
+    } else {
+        return jettons?.balances.find(i => address.equals(Address.parse(i.jettonAddress)))?.metadata
+            ?.image;
+    }
 }
 
 export function useAssetAmountFiatEquivalent(assetAmount: AssetAmount): {

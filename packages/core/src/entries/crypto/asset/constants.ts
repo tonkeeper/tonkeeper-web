@@ -1,3 +1,4 @@
+import { TronBalance } from '../../../tronApi';
 import { BLOCKCHAIN_NAME } from '../../crypto';
 import { packAssetId } from './basic-asset';
 import { TonAsset } from './ton-asset';
@@ -10,6 +11,17 @@ export const TRON_USDT_ASSET: TronAsset = {
     decimals: 6,
     address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
     blockchain: BLOCKCHAIN_NAME.TRON
+};
+
+export const toTronAsset = (balance: TronBalance): TronAsset => {
+    return {
+        id: packAssetId(BLOCKCHAIN_NAME.TRON, balance.token.address),
+        symbol: balance.token.symbol,
+        name: balance.token.name,
+        decimals: balance.token.decimals,
+        address: balance.token.address,
+        blockchain: BLOCKCHAIN_NAME.TRON
+    };
 };
 
 export const TON_ASSET: TonAsset = {
