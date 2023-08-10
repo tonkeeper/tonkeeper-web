@@ -36,7 +36,7 @@ export const getMixedActivity = (
         tronEvents.pages.forEach(page => {
             const tronActivity: GenericActivity<MixedActivity>[] = page.events.map(event => ({
                 timestamp: event.timestamp,
-                key: event.txHash,
+                key: `${event.txHash}-${event.actions.map(item => item.type).join('-')}`,
                 event: { kind: 'tron', event }
             }));
             activity.push(...tronActivity);

@@ -9,7 +9,7 @@ import {
     getSuggestionsList,
     hideSuggestions
 } from '@tonkeeper/core/dist/service/suggestionService';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -22,7 +22,11 @@ import { ColumnText } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { SkeletonList } from '../Skeleton';
 import { Label1 } from '../Text';
-import { AddFavoriteNotification, EditFavoriteNotification } from './FavoriteNotification';
+import {
+    AddFavoriteNotification,
+    EditFavoriteNotification,
+    useSuggestionAddress
+} from './FavoriteNotification';
 
 const Label = styled(Label1)`
     user-select: none;
@@ -33,12 +37,12 @@ const Label = styled(Label1)`
 
 const useLatestSuggestion = () => {
     const sdk = useAppSdk();
-    const { tonApi } = useAppContext();
+    const { tonApiV2, tronApi } = useAppContext();
     const wallet = useWalletContext();
 
     return useQuery(
         [wallet.active.rawAddress, QueryKey.activity, 'suggestions'],
-        () => getSuggestionsList(sdk, tonApi, wallet),
+        () => getSuggestionsList(sdk, tonApiV2, tronApi, wallet),
         { keepPreviousData: true }
     );
 };
@@ -60,7 +64,7 @@ const getLatestDate = (language: string, timestamp: number) => {
     return new Intl.DateTimeFormat(language, {
         day: 'numeric',
         month: 'long'
-    }).format(new Date(timestamp * 1000));
+    }).format(new Date(timestamp));
 };
 
 const useDeleteFavorite = (item: FavoriteSuggestion) => {
@@ -84,11 +88,11 @@ const FavoriteItem: FC<{
     onEdit: (item: FavoriteSuggestion) => void;
 }> = ({ item, onSelect, onEdit }) => {
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
 
     const { mutateAsync } = useDeleteFavorite(item);
     const { t } = useTranslation();
 
+    const address = useSuggestionAddress(item);
     return (
         <ListItem key={item.address} onClick={() => onSelect(item)}>
             <ListItemPayload>
@@ -102,7 +106,7 @@ const FavoriteItem: FC<{
                             </IconBlue>
                         </>
                     }
-                    secondary={toShortValue(formatAddress(item.address, wallet.network))}
+                    secondary={toShortValue(address)}
                 />
                 <DropDown
                     payload={onClose => (
@@ -177,13 +181,14 @@ const LatestItem: FC<{
 }> = ({ item, onSelect, onAddFavorite }) => {
     const { mutateAsync } = useHideSuggestion(item);
     const { t, i18n } = useTranslation();
-    const wallet = useWalletContext();
+
+    const address = useSuggestionAddress(item);
 
     return (
         <ListItem key={item.address} onClick={() => onSelect(item)}>
             <ListItemPayload>
                 <ColumnText
-                    text={toShortValue(formatAddress(item.address, wallet.network))}
+                    text={toShortValue(address)}
                     secondary={getLatestDate(i18n.language, item.timestamp)}
                 />
                 <DropDown

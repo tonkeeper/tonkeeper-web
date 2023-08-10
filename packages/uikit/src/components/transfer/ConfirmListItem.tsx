@@ -1,4 +1,4 @@
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
@@ -45,15 +45,24 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient 
         : address.address;
 
     if ('isFavorite' in address && address.isFavorite) {
-        return (
-            <>
-                <RecipientItem
-                    name={Address.parse(address.address).toString()}
-                    label={address.name}
-                />
-                <RecipientItemAddress address={addrValue} />
-            </>
-        );
+        if (address.blockchain === BLOCKCHAIN_NAME.TRON) {
+            return (
+                <>
+                    <RecipientItem name={address.address} label={address.name} />
+                    <RecipientItemAddress address={addrValue} />
+                </>
+            );
+        } else {
+            return (
+                <>
+                    <RecipientItem
+                        name={Address.parse(address.address).toString()}
+                        label={address.name}
+                    />
+                    <RecipientItemAddress address={addrValue} />
+                </>
+            );
+        }
     }
     if ('dns' in recipient.address) {
         return (

@@ -60,11 +60,15 @@ const useDnsWallet = (value: string) => {
 
     const update = useMemo(() => {
         return debounce<[string]>(v => {
-            let val = v.trim().toLowerCase();
-            if (!val.includes('.')) {
-                val += '.ton';
+            if (v === '' || v.length < 4 || seeIfValidTonAddress(v) || seeIfValidTronAddress(v)) {
+                setName('');
+            } else {
+                let val = v.trim().toLowerCase();
+                if (!val.includes('.')) {
+                    val += '.ton';
+                }
+                setName(val);
             }
-            setName(val);
         }, 400);
     }, [setName]);
 
@@ -80,7 +84,7 @@ const useDnsWallet = (value: string) => {
             return result.wallet;
         },
         {
-            enabled: name.length >= 4 && !seeIfValidTonAddress(name),
+            enabled: name.length >= 4,
             retry: 0,
             keepPreviousData: false
         }
@@ -184,7 +188,11 @@ export const RecipientView: FC<{
 
     const formatted = useMemo(() => {
         if ('isFavorite' in recipient) {
-            return Address.parse(recipient.address).toString();
+            if (recipient.blockchain === BLOCKCHAIN_NAME.TRON) {
+                return recipient.address;
+            } else {
+                return Address.parse(recipient.address).toString();
+            }
         }
         return recipient.address;
     }, [recipient]);

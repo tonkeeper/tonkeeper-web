@@ -1,14 +1,18 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FavoriteSuggestion, LatestSuggestion } from '@tonkeeper/core/dist/entries/suggestion';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import {
+    FavoriteSuggestion,
+    LatestSuggestion,
+    Suggestion
+} from '@tonkeeper/core/dist/entries/suggestion';
 import {
     deleteFavoriteSuggestion,
     getFavoriteSuggestions,
     setFavoriteSuggestion
 } from '@tonkeeper/core/dist/service/suggestionService';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Address } from 'ton-core';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -41,6 +45,16 @@ const validateName = (name: string) => {
     return name;
 };
 
+export const useSuggestionAddress = (item: Suggestion) => {
+    const wallet = useWalletContext();
+
+    return useMemo(() => {
+        return item.blockchain === BLOCKCHAIN_NAME.TRON
+            ? item.address
+            : formatAddress(item.address, wallet.network);
+    }, [item]);
+};
+
 const useAddFavorite = (latest: LatestSuggestion) => {
     const sdk = useAppSdk();
     const wallet = useWalletContext();
@@ -52,7 +66,12 @@ const useAddFavorite = (latest: LatestSuggestion) => {
         if (items.some(item => item.name === name)) {
             throw new Error('Name is already taken');
         }
-        items.push({ isFavorite: true, address: latest.address, name });
+        items.push({
+            isFavorite: true,
+            address: latest.address,
+            name,
+            blockchain: latest.blockchain
+        });
         await setFavoriteSuggestion(sdk.storage, wallet.publicKey, items);
         await queryClient.invalidateQueries([
             wallet.active.rawAddress,
@@ -68,9 +87,9 @@ const AddFavoriteContent: FC<{
 }> = ({ latest, onClose }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
 
     const { mutateAsync, reset, isLoading, isError } = useAddFavorite(latest);
+    const address = useSuggestionAddress(latest);
     const ref = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
@@ -111,17 +130,12 @@ const AddFavoriteContent: FC<{
                 <ListItem
                     onClick={e => {
                         e.stopPropagation();
-                        sdk.copyToClipboard(
-                            Address.parse(latest.address).toString(),
-                            t('address_copied')
-                        );
+                        sdk.copyToClipboard(address, t('address_copied'));
                     }}
                 >
                     <ListItemPayload>
                         <Label>{t('add_edit_favorite_address_label')}</Label>
-                        <Label1>
-                            {toShortValue(formatAddress(latest.address, wallet.network))}
-                        </Label1>
+                        <Label1>{toShortValue(address)}</Label1>
                     </ListItemPayload>
                 </ListItem>
             </ListBlock>
@@ -190,7 +204,7 @@ const useEditFavorite = (favorite: FavoriteSuggestion) => {
         }
         items = items.map(item =>
             item.address === favorite.address
-                ? { isFavorite: true, address: favorite.address, name }
+                ? { isFavorite: true, address: favorite.address, name, blockchain: item.blockchain }
                 : item
         );
 
@@ -209,7 +223,8 @@ const EditFavoriteContent: FC<{
 }> = ({ favorite, onClose }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+
+    const address = useSuggestionAddress(favorite);
 
     const {
         mutateAsync: editAsync,
@@ -265,17 +280,12 @@ const EditFavoriteContent: FC<{
                 <ListItem
                     onClick={e => {
                         e.stopPropagation();
-                        sdk.copyToClipboard(
-                            Address.parse(favorite.address).toString(),
-                            t('address_copied')
-                        );
+                        sdk.copyToClipboard(address, t('address_copied'));
                     }}
                 >
                     <ListItemPayload>
                         <Label>{t('add_edit_favorite_address_label')}</Label>
-                        <Label1>
-                            {toShortValue(formatAddress(favorite.address, wallet.network))}
-                        </Label1>
+                        <Label1>{toShortValue(address)}</Label1>
                     </ListItemPayload>
                 </ListItem>
             </ListBlock>
