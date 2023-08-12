@@ -279,10 +279,10 @@
         "message": "Receive USDT TRC20"
     },
     "receive_ton_description": {
-        "message": "Send only Toncoin TON and tokens in TON network to this address, or you might lose your funds."
+        "message": "Send only Toncoin TON and tokens\nin TON network to this address, or you\nmight lose your funds."
     },
     "receive_trc20_description": {
-        "message": "Send only USDT TRC20 to this address,\nor you might lose your funds."
+        "message": "Send only USDT TRC20\nto this address, or you might\nlose your funds."
     },
     "txActions_USDT_transfer": {
         "message": "USDT Transfer"
