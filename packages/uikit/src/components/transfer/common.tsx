@@ -47,9 +47,17 @@ const ButtonBlockElement = styled.div<{ standalone: boolean }>`
               `}
 `;
 
-export const Wrapper = styled.div<{ standalone: boolean; extension: boolean }>`
+export const Wrapper = styled.div<{ standalone: boolean; extension: boolean; fullWidth?: boolean }>`
     position: relative;
     overflow: hidden;
+
+    ${props =>
+        props.fullWidth
+            ? css`
+                  width: 100%;
+              `
+            : undefined}
+
     ${props =>
         props.extension
             ? undefined
