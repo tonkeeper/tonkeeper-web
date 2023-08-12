@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js';
 import { Address, beginCell, Cell, comment, internal, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
+import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
+import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
@@ -15,8 +17,6 @@ import {
     getWalletBalance,
     SendMode
 } from './common';
-import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
-import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 
 const jettonTransferAmount = toNano('0.64');
 const jettonTransferForwardAmount = BigInt('1');
@@ -37,8 +37,7 @@ const jettonTransferBody = (params: {
         .storeAddress(params.responseAddress)
         .storeBit(false) // null custom_payload
         .storeCoins(params.forwardAmount)
-        .storeBit(params.forwardPayload != null) // forward_payload in this slice - false, separate cell - true
-        .storeMaybeRef(params.forwardPayload)
+        .storeMaybeRef(params.forwardPayload) // storeMaybeRef put 1 bit before cell (forward_payload in cell) or 0 for null (forward_payload in slice)
         .endCell();
 };
 

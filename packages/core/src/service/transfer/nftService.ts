@@ -16,8 +16,6 @@ import {
 } from './common';
 
 const initNftTransferAmount = toNano('1');
-// eslint-disable-next-line unused-imports/no-unused-vars,@typescript-eslint/no-unused-vars
-const secondNftTransferAmount = toNano('0.05');
 const nftTransferForwardAmount = BigInt('1');
 
 const nftTransferBody = (params: {
@@ -34,8 +32,7 @@ const nftTransferBody = (params: {
         .storeAddress(params.responseAddress)
         .storeBit(false) // null custom_payload
         .storeCoins(params.forwardAmount)
-        .storeBit(params.forwardPayload != null) // forward_payload in this slice - false, separate cell - true
-        .storeMaybeRef(params.forwardPayload)
+        .storeMaybeRef(params.forwardPayload) // storeMaybeRef put 1 bit before cell (forward_payload in cell) or 0 for null (forward_payload in slice)
         .endCell();
 };
 
@@ -47,10 +44,10 @@ const nftRenewBody = (params?: { queryId?: number }) => {
         .endCell();
 };
 
-const nftLinkBody = (params: { queryId?: number; linkToAddress: string }) => {
-    const addressToDNSAddressFormat = (address: string) =>
-        beginCell().storeUint(0x9fd3, 16).storeAddress(Address.parse(address)).storeUint(0, 8);
+const addressToDNSAddressFormat = (address: string) =>
+    beginCell().storeUint(0x9fd3, 16).storeAddress(Address.parse(address)).storeUint(0, 8);
 
+const nftLinkBody = (params: { queryId?: number; linkToAddress: string }) => {
     let cell = beginCell()
         .storeUint(0x4eb1f0f9, 32) // op::change_dns_record,
         .storeUint(params?.queryId || 0, 64)
