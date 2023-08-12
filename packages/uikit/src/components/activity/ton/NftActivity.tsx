@@ -11,10 +11,12 @@ import { VerificationIcon } from '../../Icon';
 import { ListBlock } from '../../List';
 import { Body1 } from '../../Text';
 import { NftCollectionBody2, NftHeaderBody2 } from '../../nft/NftHeader';
+import { TransferComment } from '../ActivityDetailsLayout';
 import { ActivityIcon, ReceiveIcon, SentIcon } from '../ActivityIcons';
 import {
     AmountText,
     ColumnLayout,
+    Comment,
     Description,
     ErrorAction,
     FirstLabel,
@@ -123,6 +125,7 @@ export const NftItemTransferAction: FC<{
                     date={date}
                 />
                 <NftComment address={nftItemTransfer.nft} openNft={openNft} />
+                <Comment comment={nftItemTransfer.comment} />
             </ListItemGrid>
         );
     }
@@ -147,6 +150,7 @@ export const NftItemTransferAction: FC<{
                 date={date}
             />
             <NftComment address={nftItemTransfer.nft} openNft={openNft} />
+            <Comment comment={nftItemTransfer.comment} />
         </ListItemGrid>
     );
 };
@@ -263,6 +267,7 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
                 )}
                 <ActionTransactionDetails eventId={event.eventId} />
                 <ActionExtraDetails extra={event.extra} />
+                <TransferComment comment={nftItemTransfer.comment} />
             </ListBlock>
         </ActionDetailsBlock>
     );
