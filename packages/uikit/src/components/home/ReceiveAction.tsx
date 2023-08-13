@@ -36,6 +36,11 @@ const Background = styled.div`
     background: ${props => props.theme.textPrimary};
     max-width: 300px;
 
+    @media (max-width: 768px) {
+        max-width: 217px;
+        padding: 16px;
+    }
+
     canvas {
         width: 100% !important;
         height: 100% !important;
@@ -48,6 +53,10 @@ const AddressText = styled(Body1)`
     color: black;
     margin-top: 24px;
     text-align: center;
+
+    @media (max-width: 768px) {
+        margin-top: 8px;
+    }
 `;
 
 const TextBlock = styled.div`
