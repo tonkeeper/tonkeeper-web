@@ -263,14 +263,8 @@
     "transaction_type_contract_call": {
         "message": "Contract Call"
     },
-    "transaction_type_swap": {
-        "message": "Swap"
-    },
     "transaction_type_purchase": {
         "message": "Purchase"
-    },
-    "transaction_dex": {
-        "message": "DEX"
     },
     "receive_ton": {
         "message": "Receive Toncoin"

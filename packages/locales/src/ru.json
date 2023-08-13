@@ -259,14 +259,8 @@
     "transaction_type_contract_call": {
         "message": "Вызов контракта"
     },
-    "transaction_type_swap": {
-        "message": "Обмен"
-    },
     "transaction_type_purchase": {
         "message": "Покупка"
-    },
-    "transaction_dex": {
-        "message": "DEX"
     },
     "receive_ton": {
         "message": "Получить Toncoinn"

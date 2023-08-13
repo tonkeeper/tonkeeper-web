@@ -25,8 +25,9 @@ import { ListItem, ListItemPayload } from '../List';
 import { Body1, H2, Label1 } from '../Text';
 import { Button } from '../fields/Button';
 
-export const Title = styled(H2)`
+export const Title = styled(H2)<{ secondary?: boolean }>`
     user-select: none;
+    color: ${props => (props.secondary ? props.theme.textSecondary : props.theme.textPrimary)};
 `;
 
 const Timestamp = styled(Body1)`

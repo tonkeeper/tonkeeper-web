@@ -1,3 +1,4 @@
+import { ActionStatusEnum } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC } from 'react';
 import { useTranslation } from '../../hooks/translation';
 import {
@@ -18,6 +19,7 @@ import {
     SecondLine,
     SecondaryText
 } from './CommonAction';
+import { FailedNote } from './ton/NftActivity';
 
 export const SendActivityAction: FC<{
     amount: string;
@@ -26,7 +28,8 @@ export const SendActivityAction: FC<{
     date: string;
     isScam?: boolean;
     comment?: string;
-}> = ({ amount, symbol, recipient, date, isScam = false, comment }) => {
+    status: ActionStatusEnum;
+}> = ({ amount, symbol, recipient, date, isScam = false, comment, status }) => {
     const { t } = useTranslation();
 
     return (
@@ -51,6 +54,7 @@ export const SendActivityAction: FC<{
                 </SecondLine>
             </Description>
             <Comment comment={comment} />
+            <FailedNote status={status} />
         </ListItemGrid>
     );
 };
@@ -62,7 +66,8 @@ export const ReceiveActivityAction: FC<{
     date: string;
     isScam?: boolean;
     comment?: string;
-}> = ({ amount, symbol, sender, date, isScam = false, comment }) => {
+    status: ActionStatusEnum;
+}> = ({ amount, symbol, sender, date, isScam = false, comment, status }) => {
     const { t } = useTranslation();
 
     return (
@@ -88,6 +93,7 @@ export const ReceiveActivityAction: FC<{
                 </SecondLine>
             </Description>
             <Comment comment={isScam ? undefined : comment} />
+            <FailedNote status={status} />
         </ListItemGrid>
     );
 };

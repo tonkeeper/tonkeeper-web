@@ -12,8 +12,7 @@ import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { useFormatFiat, useRate } from '../../../state/rates';
-import { ListBlock, ListItem, ListItemPayload } from '../../List';
-import { Label1 } from '../../Text';
+import { ListBlock } from '../../List';
 import { ActivityDetailsHeader, Amount, TransferComment } from '../ActivityDetailsLayout';
 import {
     ActionBeneficiaryDetails,
@@ -24,9 +23,7 @@ import {
     ActionSenderDetails,
     ActionTransactionDetails,
     ErrorActivityNotification,
-    Label,
-    Title,
-    toDexName
+    Title
 } from '../NotificationCommon';
 import { ActionData } from './ActivityNotification';
 
@@ -216,32 +213,22 @@ const SwapTokensActionContent: FC<{
 }> = ({ jettonSwap, event, timestamp }) => {
     const { t } = useTranslation();
     const format = useFormatCoinValue();
-    const { data } = useRate(Address.parse(jettonSwap.jettonMasterIn.address).toString());
-    const { fiatAmount } = useFormatFiat(
-        data,
-        formatDecimals(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)
-    );
 
     return (
         <ActionDetailsBlock event={event}>
             <div>
-                <Title>{t('transaction_type_swap')}</Title>
-                <Amount>
-                    {format(jettonSwap.amountOut, jettonSwap.jettonMasterOut.decimals)}{' '}
-                    {jettonSwap.jettonMasterOut.symbol}&nbsp;&gt;&nbsp;
-                    {format(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)}{' '}
+                <Title>{t('swap_title')}</Title>
+                <Title secondary>
+                    -&thinsp;{format(jettonSwap.amountOut, jettonSwap.jettonMasterOut.decimals)}{' '}
+                    {jettonSwap.jettonMasterOut.symbol}
+                </Title>
+                <Title>
+                    +&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)}{' '}
                     {jettonSwap.jettonMasterIn.symbol}
-                </Amount>
-                {fiatAmount && <Amount>≈&thinsp;{fiatAmount}</Amount>}
+                </Title>
                 <ActionDate kind="send" timestamp={timestamp} />
             </div>
             <ListBlock margin={false} fullWidth>
-                <ListItem hover={false}>
-                    <ListItemPayload>
-                        <Label>{t('transaction_dex')}</Label>
-                        <Label1>{toDexName(jettonSwap.dex)}</Label1>
-                    </ListItemPayload>
-                </ListItem>
                 <ActionTransactionDetails eventId={event.eventId} />
                 <ActionExtraDetails extra={event.extra} />
             </ListBlock>

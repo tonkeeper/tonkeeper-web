@@ -4,14 +4,13 @@ import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { ListItemPayload } from '../../../components/List';
-import { ActivityIcon, SentIcon } from '../../../components/activity/ActivityIcons';
+import { ActivityIcon, SentIcon, SwapIcon } from '../../../components/activity/ActivityIcons';
 import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayout';
 import {
     AmountText,
-    Comment,
     Description,
     ErrorAction,
     FirstLabel,
@@ -23,7 +22,7 @@ import {
 import { toDexName } from '../NotificationCommon';
 import { SubscribeAction, UnSubscribeAction } from '../SubscribeAction';
 import { ContractDeployAction } from './ContractDeployAction';
-import { NftComment, NftItemTransferAction, NftPurchaseAction } from './NftActivity';
+import { FailedNote, NftComment, NftItemTransferAction, NftPurchaseAction } from './NftActivity';
 
 const TonTransferAction: FC<{
     action: Action;
@@ -51,6 +50,7 @@ const TonTransferAction: FC<{
                 date={date}
                 isScam={tonTransfer.sender.isScam || isScam}
                 comment={tonTransfer.comment}
+                status={action.status}
             />
         );
     }
@@ -65,6 +65,7 @@ const TonTransferAction: FC<{
             date={date}
             isScam={isScam}
             comment={tonTransfer.comment}
+            status={action.status}
         />
     );
 };
@@ -79,6 +80,7 @@ const JettonTransferAction: FC<{ action: Action; date: string }> = ({ action, da
         return <ErrorAction />;
     }
 
+    action.status;
     if (jettonTransfer.sender?.address === wallet.active.rawAddress) {
         return (
             <SendActivityAction
@@ -95,6 +97,7 @@ const JettonTransferAction: FC<{ action: Action; date: string }> = ({ action, da
                 }
                 date={date}
                 comment={jettonTransfer.comment}
+                status={action.status}
             />
         );
     }
@@ -115,6 +118,7 @@ const JettonTransferAction: FC<{ action: Action; date: string }> = ({ action, da
             isScam={jettonTransfer.sender?.isScam}
             date={date}
             comment={jettonTransfer.comment}
+            status={action.status}
         />
     );
 };
@@ -152,7 +156,7 @@ export const SmartContractExecAction: FC<{
                     <SecondaryText>{date}</SecondaryText>
                 </SecondLine>
             </Description>
-            <Comment comment={smartContractExec.operation} />
+            <FailedNote status={action.status} />
         </ListItemGrid>
     );
 };
@@ -172,11 +176,11 @@ export const JettonSwapAction: FC<{
     return (
         <ListItemGrid>
             <ActivityIcon>
-                <SentIcon />
+                <SwapIcon />
             </ActivityIcon>
             <Description>
                 <FirstLine>
-                    <FirstLabel>{t('transaction_type_swap')}</FirstLabel>
+                    <FirstLabel>{t('swap_title')}</FirstLabel>
                     <AmountText green>
                         +&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)}
                     </AmountText>
@@ -187,6 +191,7 @@ export const JettonSwapAction: FC<{
                     <SecondaryText>{date}</SecondaryText>
                 </SecondLine>
             </Description>
+            <FailedNote status={action.status} />
         </ListItemGrid>
     );
 };
@@ -225,6 +230,7 @@ const AuctionBidAction: FC<{
                 </SecondLine>
             </Description>
             {auctionBid.nft && <NftComment address={auctionBid.nft.address} openNft={openNft} />}
+            <FailedNote status={action.status} />
         </ListItemGrid>
     );
 };

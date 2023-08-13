@@ -1,5 +1,5 @@
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { Action, Price } from '@tonkeeper/core/dist/tonApiV2';
+import { Action, ActionStatusEnum, Price } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
@@ -9,7 +9,7 @@ import { useTranslation } from '../../../hooks/translation';
 import { useNftItemData } from '../../../state/wallet';
 import { VerificationIcon } from '../../Icon';
 import { ListBlock } from '../../List';
-import { Body1 } from '../../Text';
+import { Body1, Body2 } from '../../Text';
 import { NftCollectionBody2, NftHeaderBody2 } from '../../nft/NftHeader';
 import { TransferComment } from '../ActivityDetailsLayout';
 import { ActivityIcon, ReceiveIcon, SentIcon } from '../ActivityIcons';
@@ -92,6 +92,22 @@ export const NftComment: FC<{
     );
 };
 
+const Note = styled(Body2)`
+    color: ${props => props.theme.accentOrange};
+`;
+export const FailedNote: FC<{ status?: ActionStatusEnum }> = ({ status }) => {
+    const { t } = useTranslation();
+    if (status === 'failed') {
+        return (
+            <Wrapper>
+                <Note>{t('activity_failed_transaction')}</Note>
+            </Wrapper>
+        );
+    } else {
+        return <></>;
+    }
+};
+
 export const NftItemTransferAction: FC<{
     action: Action;
     date: string;
@@ -126,6 +142,7 @@ export const NftItemTransferAction: FC<{
                 />
                 <NftComment address={nftItemTransfer.nft} openNft={openNft} />
                 <Comment comment={nftItemTransfer.comment} />
+                <FailedNote status={action.status} />
             </ListItemGrid>
         );
     }
@@ -151,6 +168,7 @@ export const NftItemTransferAction: FC<{
             />
             <NftComment address={nftItemTransfer.nft} openNft={openNft} />
             <Comment comment={nftItemTransfer.comment} />
+            <FailedNote status={action.status} />
         </ListItemGrid>
     );
 };
@@ -182,6 +200,7 @@ export const NftPurchaseAction: FC<{
                 </SecondLine>
             </Description>
             <NftComment address={nftPurchase.nft.address} openNft={openNft} />
+            <FailedNote status={action.status} />
         </ListItemGrid>
     );
 };
