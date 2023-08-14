@@ -10,6 +10,7 @@ import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { sha512_sync } from 'ton-crypto';
 import { v4 as uuidv4 } from 'uuid';
+import { useBuyAnalytics } from '../../hooks/amplitude';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
@@ -180,6 +181,7 @@ export const BuyItemNotification: FC<{
     item: TonendpoinFiatItem;
     kind: 'buy' | 'sell';
 }> = ({ item, kind }) => {
+    const track = useBuyAnalytics();
     const sdk = useAppSdk();
     const wallet = useWalletContext();
     const { config, fiat } = useAppContext();
@@ -190,6 +192,7 @@ export const BuyItemNotification: FC<{
     const { mutate } = useHideDisclaimerMutation(item.title, kind);
 
     const onForceOpen = () => {
+        track(item.action_button.url);
         sdk.openPage(replacePlaceholders(item.action_button.url, config, wallet, fiat, kind));
         setOpen(false);
     };

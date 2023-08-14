@@ -104,3 +104,18 @@ export const useActionAnalytics = () => {
         [enable]
     );
 };
+
+export const useBuyAnalytics = () => {
+    const enable = useContext(AmplitudeAnalyticsContext);
+
+    return useCallback(
+        (kind: string) => {
+            if (enable === true) {
+                amplitude.track('Navigate Buy', {
+                    kind
+                });
+            }
+        },
+        [enable]
+    );
+};
