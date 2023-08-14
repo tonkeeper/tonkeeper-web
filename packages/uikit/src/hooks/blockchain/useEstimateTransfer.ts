@@ -157,7 +157,7 @@ export function useEstimateTransfer(
     const { data: jettons } = useWalletJettonList();
     const { data: balances } = useTronBalances();
 
-    return useQuery<TransferEstimation<Asset>>(
+    return useQuery<TransferEstimation<Asset>, Error>(
         [QueryKey.estimate, recipient, amount],
         async () => {
             try {

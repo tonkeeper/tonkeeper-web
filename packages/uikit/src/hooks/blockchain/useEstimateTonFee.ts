@@ -1,12 +1,12 @@
 import { QueryKey, UseQueryOptions, useQuery } from '@tanstack/react-query';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { Configuration, SendApi } from '@tonkeeper/core/dist/tonApiV1';
 import { Omit } from 'react-beautiful-dnd';
 import { useAppContext, useWalletContext } from '../appContext';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TransferEstimation } from './useEstimateTransfer';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 export type ContractCallerParams = {
     tonApi: Configuration;
@@ -28,7 +28,7 @@ export function useEstimateTonFee<Args extends ContractCallerParams>(
     const { tonApi } = useAppContext();
     const walletState = useWalletContext();
 
-    return useQuery<TransferEstimation<TonAsset>>(
+    return useQuery<TransferEstimation<TonAsset>, Error>(
         queryKey,
         async () => {
             const boc = await caller({ ...args, walletState, tonApi } as Args);

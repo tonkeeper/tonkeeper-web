@@ -28,7 +28,7 @@ export const SendActivityAction: FC<{
     date: string;
     isScam?: boolean;
     comment?: string;
-    status: ActionStatusEnum;
+    status?: ActionStatusEnum;
 }> = ({ amount, symbol, recipient, date, isScam = false, comment, status }) => {
     const { t } = useTranslation();
 
@@ -66,7 +66,7 @@ export const ReceiveActivityAction: FC<{
     date: string;
     isScam?: boolean;
     comment?: string;
-    status: ActionStatusEnum;
+    status?: ActionStatusEnum;
 }> = ({ amount, symbol, sender, date, isScam = false, comment, status }) => {
     const { t } = useTranslation();
 

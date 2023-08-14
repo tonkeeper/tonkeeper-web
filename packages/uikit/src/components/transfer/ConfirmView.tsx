@@ -47,7 +47,7 @@ type ConfirmViewContextValue = {
     formState: {
         done: boolean;
         isLoading: boolean;
-        error: Error | null;
+        error: Error | null | undefined;
     };
     onClose: () => void;
     onBack?: () => void;
@@ -68,7 +68,7 @@ type ConfirmViewProps<T extends Asset> = PropsWithChildren<
             data: TransferEstimation<T> | undefined;
             isLoading: boolean;
             isFetching: boolean;
-            error?: Error;
+            error?: Error | null;
         };
     } & MutationProps
 >;

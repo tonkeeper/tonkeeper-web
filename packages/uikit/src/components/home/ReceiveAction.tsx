@@ -65,6 +65,10 @@ const TextBlock = styled.div`
     flex-direction: column;
     align-items: center;
     width: 100%;
+
+    @media (max-width: 768px) {
+        padding-bottom: 0;
+    }
 `;
 
 const Title = styled(H3)`
