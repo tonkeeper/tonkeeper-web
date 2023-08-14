@@ -2,6 +2,7 @@ import React, { FC, useContext, useLayoutEffect, useRef, useState } from 'react'
 import styled, { css } from 'styled-components';
 import { useActionAnalytics } from '../../hooks/amplitude';
 import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
+import { useTranslation } from '../../hooks/translation';
 import { Label3 } from '../Text';
 
 interface ActionProps {
@@ -87,6 +88,7 @@ const Block = styled.div<{
 
 export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
     const track = useActionAnalytics();
+    const { t } = useTranslation();
     const selection = useContext(AppSelectionContext);
     const { ios } = useAppContext();
     const [isHover, setHover] = useState(false);
@@ -116,7 +118,7 @@ export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
             ios={ios}
         >
             <Button>{icon}</Button>
-            <Text>{title}</Text>
+            <Text>{t(title)}</Text>
         </Block>
     );
 };

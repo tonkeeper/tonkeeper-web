@@ -236,7 +236,6 @@ const SendContent: FC<{ onClose: () => void; asset?: TonAsset | TronAsset }> = (
 };
 
 export const SendAction: FC<{ asset?: string }> = ({ asset }) => {
-    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const { data: jettons } = useWalletJettonList();
 
@@ -255,7 +254,7 @@ export const SendAction: FC<{ asset?: string }> = ({ asset }) => {
 
     return (
         <>
-            <Action icon={<SendIcon />} title={t('wallet_send')} action={() => setOpen(true)} />
+            <Action icon={<SendIcon />} title={'wallet_send'} action={() => setOpen(true)} />
             <Notification isOpen={open} handleClose={() => setOpen(false)} hideButton backShadow>
                 {Content}
             </Notification>

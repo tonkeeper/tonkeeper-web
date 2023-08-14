@@ -233,16 +233,11 @@ export const ReceiveAction: FC<{ chain?: BLOCKCHAIN_NAME; jetton?: string }> = (
     chain,
     jetton
 }) => {
-    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
 
     return (
         <>
-            <Action
-                icon={<ReceiveIcon />}
-                title={t('wallet_receive')}
-                action={() => setOpen(true)}
-            />
+            <Action icon={<ReceiveIcon />} title={'wallet_receive'} action={() => setOpen(true)} />
             <ReceiveNotification
                 open={open}
                 handleClose={() => setOpen(false)}

@@ -85,11 +85,10 @@ export const BuyNotification: FC<{
 
 export const BuyAction: FC<{ buy: TonendpoinFiatCategory | undefined }> = ({ buy }) => {
     const [open, setOpen] = useState(false);
-    const { t } = useTranslation();
 
     return (
         <>
-            <Action icon={<BuyIcon />} title={t('wallet_buy')} action={() => setOpen(true)} />
+            <Action icon={<BuyIcon />} title={'wallet_buy'} action={() => setOpen(true)} />
             <BuyNotification buy={buy} open={open} handleClose={() => setOpen(false)} />
         </>
     );
@@ -97,7 +96,6 @@ export const BuyAction: FC<{ buy: TonendpoinFiatCategory | undefined }> = ({ buy
 
 export const SellAction: FC<{ sell: TonendpoinFiatCategory | undefined }> = ({ sell }) => {
     const [open, setOpen] = useState(false);
-    const { t } = useTranslation();
 
     const Content = useCallback(() => {
         if (!open || !sell) return undefined;
@@ -105,7 +103,7 @@ export const SellAction: FC<{ sell: TonendpoinFiatCategory | undefined }> = ({ s
     }, [open, sell]);
     return (
         <>
-            <Action icon={<SellIcon />} title={t('wallet_sell')} action={() => setOpen(true)} />
+            <Action icon={<SellIcon />} title={'wallet_sell'} action={() => setOpen(true)} />
             <Notification
                 isOpen={open && sell != null}
                 handleClose={() => setOpen(false)}
