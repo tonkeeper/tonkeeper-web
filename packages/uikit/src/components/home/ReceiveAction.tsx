@@ -4,7 +4,7 @@ import { formatTransferUrl } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -28,7 +28,7 @@ const CopyBlock = styled.div`
     align-items: center;
 `;
 
-const Background = styled.div`
+const Background = styled.div<{ extension?: boolean }>`
     padding: 24px;
     width: 100%;
     box-sizing: border-box;
@@ -36,10 +36,14 @@ const Background = styled.div`
     background: ${props => props.theme.textPrimary};
     max-width: 300px;
 
-    @media (max-width: 768px) {
-        max-width: 217px;
-        padding: 16px;
-    }
+    ${props =>
+        props.extension &&
+        css`
+            @media (max-width: 768px) {
+                max-width: 217px;
+                padding: 16px;
+            }
+        `}
 
     canvas {
         width: 100% !important;
@@ -47,28 +51,35 @@ const Background = styled.div`
     }
 `;
 
-const AddressText = styled(Body1)`
+const AddressText = styled(Body1)<{ extension?: boolean }>`
     display: inline-block;
     word-break: break-all;
     color: black;
     margin-top: 24px;
     text-align: center;
-
-    @media (max-width: 768px) {
-        margin-top: 8px;
-    }
+    ${props =>
+        props.extension &&
+        css`
+            @media (max-width: 768px) {
+                margin-top: 8px;
+            }
+        `}
 `;
 
-const TextBlock = styled.div`
+const TextBlock = styled.div<{ extension?: boolean }>`
     display: flex;
     padding-bottom: 16px;
     flex-direction: column;
     align-items: center;
     width: 100%;
 
-    @media (max-width: 768px) {
-        padding-bottom: 0;
-    }
+    ${props =>
+        props.extension &&
+        css`
+            @media (max-width: 768px) {
+                padding-bottom: 0;
+            }
+        `}
 `;
 
 const Title = styled(H3)`
@@ -86,8 +97,9 @@ const values = [
 ];
 
 const HeaderBlock: FC<{ title: string; description: string }> = ({ title, description }) => {
+    const { extension } = useAppContext();
     return (
-        <TextBlock>
+        <TextBlock extension={extension}>
             <Title>{title}</Title>
             <Description>{description}</Description>
         </TextBlock>
@@ -116,6 +128,7 @@ const CopyButton: FC<{ address: string }> = ({ address }) => {
 
 const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     const sdk = useAppSdk();
+    const { extension } = useAppContext();
     const wallet = useWalletContext();
     const { t } = useTranslation();
 
@@ -123,6 +136,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
         <NotificationBlock>
             <HeaderBlock title={t('receive_ton')} description={t('receive_ton_description')} />
             <Background
+                extension={extension}
                 onClick={e => {
                     e.preventDefault();
                     sdk.copyToClipboard(wallet.active.friendlyAddress, t('address_copied'));
@@ -138,7 +152,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                     logoPadding={15}
                     logoPaddingStyle="circle"
                 />
-                <AddressText>{wallet.active.friendlyAddress}</AddressText>
+                <AddressText extension={extension}>{wallet.active.friendlyAddress}</AddressText>
             </Background>
             <CopyButton address={wallet.active.friendlyAddress} />
         </NotificationBlock>
@@ -148,11 +162,13 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
 const ReceiveTron: FC<{ tron: TronWalletState }> = ({ tron }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
+    const { extension } = useAppContext();
 
     return (
         <NotificationBlock>
             <HeaderBlock title={t('receive_trc20')} description={t('receive_trc20_description')} />
             <Background
+                extension={extension}
                 onClick={e => {
                     e.preventDefault();
                     sdk.copyToClipboard(tron.walletAddress, t('address_copied'));
@@ -164,7 +180,7 @@ const ReceiveTron: FC<{ tron: TronWalletState }> = ({ tron }) => {
                     logoImage="/img/usdt.webp"
                     logoPadding={15}
                 />
-                <AddressText>{tron.walletAddress}</AddressText>
+                <AddressText extension={extension}>{tron.walletAddress}</AddressText>
             </Background>
             <CopyButton address={tron.walletAddress} />
         </NotificationBlock>
