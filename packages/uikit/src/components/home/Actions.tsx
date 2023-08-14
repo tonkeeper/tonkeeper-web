@@ -1,5 +1,6 @@
 import React, { FC, useContext, useLayoutEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useActionAnalytics } from '../../hooks/amplitude';
 import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
 import { Label3 } from '../Text';
 
@@ -85,6 +86,7 @@ const Block = styled.div<{
 `;
 
 export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
+    const track = useActionAnalytics();
     const selection = useContext(AppSelectionContext);
     const { ios } = useAppContext();
     const [isHover, setHover] = useState(false);
@@ -102,7 +104,14 @@ export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
         <Block
             ref={ref}
             disabled={disabled}
-            onClick={!disabled ? action : undefined}
+            onClick={
+                !disabled
+                    ? () => {
+                          track(title);
+                          action();
+                      }
+                    : undefined
+            }
             isHover={isHover}
             ios={ios}
         >

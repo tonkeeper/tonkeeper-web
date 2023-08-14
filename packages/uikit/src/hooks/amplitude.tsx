@@ -89,3 +89,18 @@ export const useTransactionAnalytics = () => {
         [enable]
     );
 };
+
+export const useActionAnalytics = () => {
+    const enable = useContext(AmplitudeAnalyticsContext);
+
+    return useCallback(
+        (kind: string) => {
+            if (enable === true) {
+                amplitude.track('Action', {
+                    kind
+                });
+            }
+        },
+        [enable]
+    );
+};
