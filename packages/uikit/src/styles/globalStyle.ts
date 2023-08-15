@@ -45,6 +45,13 @@ body {
   input::-webkit-strong-password-auto-fill-button {
     display: none !important;
   }
+
+  input::-webkit-contacts-auto-fill-button, 
+  input::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    position: absolute;
+    right: 0;
+  }
 `;
 
 export const Container = styled.div`
