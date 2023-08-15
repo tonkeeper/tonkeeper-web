@@ -351,7 +351,11 @@ const ActionFeeDetailsUniversalValue: FC<{ fee: AssetAmount }> = ({ fee }) => {
     return isLoading ? (
         <SpinnerIcon />
     ) : (
-        <ColumnText right text={fee.stringAssetRelativeAmount} secondary={`≈ ${fiatAmount}`} />
+        <ColumnText
+            right
+            text={fee.stringAssetRelativeAmount}
+            secondary={fiatAmountBN ? `≈ ${fiatAmount}` : undefined}
+        />
     );
 };
 
