@@ -14,7 +14,7 @@ import { getMixedActivity } from '../../state/mixedActivity';
 
 const Activity: FC = () => {
     const wallet = useWalletContext();
-    const { tonApiV2, tronApi, standalone } = useAppContext();
+    const { api, standalone } = useAppContext();
 
     const ref = useRef<HTMLDivElement>(null);
 
@@ -27,7 +27,7 @@ const Activity: FC = () => {
     } = useInfiniteQuery({
         queryKey: [wallet.active.rawAddress, QueryKey.activity, 'all'],
         queryFn: ({ pageParam = undefined }) =>
-            new AccountsApi(tonApiV2).getAccountEvents({
+            new AccountsApi(api.tonApiV2).getAccountEvents({
                 accountId: wallet.active.rawAddress,
                 limit: 20,
                 beforeLt: pageParam
@@ -44,7 +44,7 @@ const Activity: FC = () => {
     } = useInfiniteQuery({
         queryKey: [wallet.tron?.ownerWalletAddress, wallet.network, QueryKey.tron],
         queryFn: ({ pageParam = undefined }) =>
-            new TronApi(tronApi).getTransactions({
+            new TronApi(api.tronApi).getTransactions({
                 ownerAddress: wallet.tron!.ownerWalletAddress,
                 fingerprint: pageParam,
                 limit: 100

@@ -26,7 +26,7 @@ import { RecipientListItem } from './ConfirmListItem';
 const useSendNft = (recipient: TonRecipientData, nftItem: NftItemRepr, fee?: Fee) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const { tonApi } = useAppContext();
+    const { api } = useAppContext();
     const wallet = useWalletContext();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
@@ -38,7 +38,15 @@ const useSendNft = (recipient: TonRecipientData, nftItem: NftItemRepr, fee?: Fee
 
         track2('send-nft');
         try {
-            await sendNftTransfer(sdk.storage, tonApi, wallet, recipient, nftItem, fee, password);
+            await sendNftTransfer(
+                sdk.storage,
+                api.tonApi,
+                wallet,
+                recipient,
+                nftItem,
+                fee,
+                password
+            );
         } catch (e) {
             await notifyError(client, sdk, t, e);
         }

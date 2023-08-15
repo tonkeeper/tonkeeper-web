@@ -8,10 +8,10 @@ import { useAppContext } from '../../hooks/appContext';
 import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { Button } from '../fields/Button';
-import { Input } from '../fields/Input';
 import { CenterContainer } from '../Layout';
 import { Body2, H2 } from '../Text';
+import { Button } from '../fields/Button';
+import { Input } from '../fields/Input';
 
 const Block = styled.form`
     display: flex;
@@ -28,7 +28,7 @@ const Body = styled(Body2)`
 const useUpdateNameMutation = (account: AccountState) => {
     const storage = useStorage();
     const client = useQueryClient();
-    const { tonApi } = useAppContext();
+    const { api } = useAppContext();
     return useMutation<AccountState, Error, string>(async name => {
         if (name.length < 3) {
             throw new Error('Missing name');
@@ -42,7 +42,7 @@ const useUpdateNameMutation = (account: AccountState) => {
             throw new Error('Missing wallet');
         }
 
-        await updateWalletProperty(tonApi, storage, wallet, { name });
+        await updateWalletProperty(api.tonApi, storage, wallet, { name });
         await client.invalidateQueries([QueryKey.account]);
         return account;
     });

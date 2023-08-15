@@ -14,7 +14,7 @@ export enum FiatCurrencies {
     JPY = 'JPY'
 }
 
-export type FiatCurrency = typeof FiatCurrencies[keyof typeof FiatCurrencies];
+export type FiatCurrency = (typeof FiatCurrencies)[keyof typeof FiatCurrencies];
 
 export interface CurrencyState {
     symbol: string;

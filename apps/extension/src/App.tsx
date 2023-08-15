@@ -190,9 +190,11 @@ export const Loader: FC = React.memo(() => {
     const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
 
     const context = {
-        tonApi: getTonClient(config, network),
-        tonApiV2: getTonClientV2(config, network),
-        tronApi: getTronClient(network),
+        api: {
+            tonApi: getTonClient(config, network),
+            tonApiV2: getTonClientV2(config, network),
+            tronApi: getTronClient(network)
+        },
         account,
         auth,
         fiat,

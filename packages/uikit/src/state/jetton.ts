@@ -10,7 +10,9 @@ import { JettonKey, QueryKey } from '../libs/queryKey';
 
 export const useJettonInfo = (jettonAddress: string) => {
     const wallet = useWalletContext();
-    const { tonApiV2 } = useAppContext();
+    const {
+        api: { tonApiV2 }
+    } = useAppContext();
     return useQuery<JettonInfo, Error>(
         [wallet.active.rawAddress, QueryKey.jettons, JettonKey.info, jettonAddress],
         async () => {
@@ -24,7 +26,9 @@ export const useJettonInfo = (jettonAddress: string) => {
 
 export const useJettonBalance = (jettonAddress: string) => {
     const wallet = useWalletContext();
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
     return useQuery<JettonBalance, Error>(
         [wallet.publicKey, QueryKey.jettons, JettonKey.balance, jettonAddress],
         async () => {
@@ -45,7 +49,9 @@ export const useToggleJettonMutation = () => {
     const storage = useStorage();
     const client = useQueryClient();
     const wallet = useWalletContext();
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
     return useMutation<void, Error, JettonBalance>(async jetton => {
         if (jetton.verification === 'whitelist') {
             const hiddenJettons = wallet.hiddenJettons ?? [];

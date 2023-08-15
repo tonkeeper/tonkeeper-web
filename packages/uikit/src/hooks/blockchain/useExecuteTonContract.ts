@@ -30,7 +30,9 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
 ) {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
     const walletState = useWalletContext();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();

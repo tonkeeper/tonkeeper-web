@@ -35,7 +35,9 @@ const popularJettons = [
 ];
 
 export const usePreFetchRates = () => {
-    const { tonApiV2 } = useAppContext();
+    const {
+        api: { tonApiV2 }
+    } = useAppContext();
     const { fiat } = useAppContext();
     const client = useQueryClient();
 
@@ -71,7 +73,9 @@ export const usePreFetchRates = () => {
 export const getRateKey = (fiat: FiatCurrencies, token: string) => [QueryKey.rate, fiat, token];
 
 export const useRate = (token: string) => {
-    const { tonApiV2 } = useAppContext();
+    const {
+        api: { tonApiV2 }
+    } = useAppContext();
     const { fiat } = useAppContext();
     const client = useQueryClient();
     return useQuery<TokenRate, Error>(

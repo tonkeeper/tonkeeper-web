@@ -43,13 +43,13 @@ export const TonPage = () => {
 
     const { data: info } = useWalletAccountInfo();
 
-    const { tonApiV2, standalone } = useAppContext();
+    const { api, standalone } = useAppContext();
     const wallet = useWalletContext();
 
     const { fetchNextPage, hasNextPage, isFetchingNextPage, data, isFetched } = useInfiniteQuery({
         queryKey: [wallet.active.rawAddress, QueryKey.activity, 'ton'],
         queryFn: ({ pageParam = undefined }) =>
-            new AccountsApi(tonApiV2).getAccountEvents({
+            new AccountsApi(api.tonApiV2).getAccountEvents({
                 accountId: wallet.active.rawAddress,
                 limit: 20,
                 beforeLt: pageParam

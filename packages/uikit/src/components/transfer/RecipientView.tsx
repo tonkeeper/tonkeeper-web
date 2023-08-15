@@ -36,25 +36,25 @@ const Warning = styled(Body2)`
 `;
 
 export const useGetToAccount = () => {
-    const { tonApi } = useAppContext();
+    const { api } = useAppContext();
     return useMutation<AccountRepr, Error, BaseRecipient | DnsRecipient>(recipient => {
         const account = 'dns' in recipient ? recipient.dns.address : recipient.address;
-        return new AccountApi(tonApi).getAccountInfo({ account });
+        return new AccountApi(api.tonApi).getAccountInfo({ account });
     });
 };
 
 const useToAccount = (isValid: boolean, recipient: BaseRecipient | DnsRecipient) => {
-    const { tonApi } = useAppContext();
+    const { api } = useAppContext();
     const account = 'dns' in recipient ? recipient.dns.address : recipient.address;
     return useQuery<AccountRepr, Error>(
         [QueryKey.account, account],
-        () => new AccountApi(tonApi).getAccountInfo({ account }),
+        () => new AccountApi(api.tonApi).getAccountInfo({ account }),
         { enabled: isValid }
     );
 };
 
 const useDnsWallet = (value: string) => {
-    const { tonApi } = useAppContext();
+    const { api } = useAppContext();
 
     const [name, setName] = useState('');
 
@@ -77,7 +77,7 @@ const useDnsWallet = (value: string) => {
     return useQuery(
         [QueryKey.dns, value, name],
         async () => {
-            const result = await new DNSApi(tonApi).dnsResolve({ name });
+            const result = await new DNSApi(api.tonApi).dnsResolve({ name });
             if (!result.wallet) {
                 return null;
             }

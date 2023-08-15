@@ -25,7 +25,9 @@ export function useEstimateTonFee<Args extends ContractCallerParams>(
     },
     args: Omit<Args, 'tonApi' | 'walletState'>
 ) {
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
     const walletState = useWalletContext();
 
     return useQuery<TransferEstimation<TonAsset>, Error>(

@@ -40,7 +40,9 @@ export const useWalletState = (publicKey: string) => {
 export const useMutateLogOut = (publicKey: string, remove = false) => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
     return useMutation<void, Error, void>(async () => {
         await accountLogOutWallet(sdk.storage, tonApi, publicKey, remove);
         await client.invalidateQueries([QueryKey.account]);
@@ -50,7 +52,9 @@ export const useMutateLogOut = (publicKey: string, remove = false) => {
 export const useMutateRenameWallet = (wallet: WalletState) => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
     return useMutation<void, Error, string>(async name => {
         if (name.length <= 0) {
             throw new Error('Missing name');
@@ -65,7 +69,9 @@ export const useMutateWalletProperty = (clearWallet = false) => {
     const storage = useStorage();
     const wallet = useWalletContext();
     const client = useQueryClient();
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
     return useMutation<
         void,
         Error,
@@ -81,7 +87,9 @@ export const useMutateWalletProperty = (clearWallet = false) => {
 
 export const useWalletAddresses = () => {
     const wallet = useWalletContext();
-    const { tonApiV2 } = useAppContext();
+    const {
+        api: { tonApiV2 }
+    } = useAppContext();
     return useQuery<string[], Error>([wallet.publicKey, QueryKey.addresses], () =>
         getWalletActiveAddresses(tonApiV2, wallet)
     );
@@ -89,7 +97,9 @@ export const useWalletAddresses = () => {
 
 export const useWalletAccountInfo = () => {
     const wallet = useWalletContext();
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
     return useQuery<AccountRepr, Error>(
         [wallet.publicKey, QueryKey.info],
         async () => {
@@ -108,7 +118,9 @@ export const useWalletAccountInfo = () => {
 
 export const useWalletJettonList = () => {
     const wallet = useWalletContext();
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
     const client = useQueryClient();
     return useQuery<JettonsBalances, Error>(
         [wallet.publicKey, QueryKey.jettons],
@@ -136,7 +148,9 @@ export const useWalletJettonList = () => {
 };
 export const useWalletNftList = () => {
     const wallet = useWalletContext();
-    const { tonApiV2, tonApi } = useAppContext();
+    const {
+        api: { tonApiV2, tonApi }
+    } = useAppContext();
 
     return useQuery<NFT[], Error>(
         [wallet.publicKey, QueryKey.nft],
@@ -173,7 +187,9 @@ export const useWalletNftList = () => {
     );
 };
 export const useNftDNSLinkData = (nft: NFT) => {
-    const { tonApiV2 } = useAppContext();
+    const {
+        api: { tonApiV2 }
+    } = useAppContext();
 
     return useQuery<DnsRecord | null, Error>(
         ['dns_link', nft?.address],
@@ -193,7 +209,9 @@ export const useNftDNSLinkData = (nft: NFT) => {
 
 const MINUTES_IN_YEAR = 60 * 60 * 24 * 366;
 export const useNftDNSExpirationDate = (nft: NFT) => {
-    const { tonApiV2 } = useAppContext();
+    const {
+        api: { tonApiV2 }
+    } = useAppContext();
 
     return useQuery<Date | null, Error>(['dns_expiring', nft.address], async () => {
         if (!nft.owner?.address || !nft.dns || !isTONDNSDomain(nft.dns)) {
@@ -219,7 +237,9 @@ export const useNftDNSExpirationDate = (nft: NFT) => {
 };
 
 export const useNftCollectionData = (nft: NftItemRepr) => {
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
 
     return useQuery<NftCollection | null, Error>(
         [nft?.address, QueryKey.nftCollection],
@@ -236,7 +256,9 @@ export const useNftCollectionData = (nft: NftItemRepr) => {
 };
 
 export const useNftItemData = (address?: string) => {
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
 
     return useQuery<NftItemRepr, Error>(
         [address, QueryKey.nft],

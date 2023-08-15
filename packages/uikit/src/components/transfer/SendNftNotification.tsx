@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
     TonTransferParams,
@@ -17,12 +18,11 @@ import { Notification } from '../Notification';
 import { ConfirmNftView } from './ConfirmNftView';
 import { RecipientView, useGetToAccount } from './RecipientView';
 import { Wrapper, childFactoryCreator, duration, notifyError } from './common';
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 
 const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const { tonApi } = useAppContext();
+    const { api } = useAppContext();
     const wallet = useWalletContext();
     const client = useQueryClient();
 
@@ -30,7 +30,7 @@ const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData)
         [QueryKey.estimate, data?.address],
         async () => {
             try {
-                return await estimateNftTransfer(tonApi, wallet, data!, nftItem);
+                return await estimateNftTransfer(api.tonApi, wallet, data!, nftItem);
             } catch (e) {
                 await notifyError(client, sdk, t, e);
             }
@@ -41,7 +41,9 @@ const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData)
 
 const useMinimalBalance = () => {
     const sdk = useAppSdk();
-    const { tonApi } = useAppContext();
+    const {
+        api: { tonApi }
+    } = useAppContext();
     const walletState = useWalletContext();
     const { t } = useTranslation();
     const client = useQueryClient();

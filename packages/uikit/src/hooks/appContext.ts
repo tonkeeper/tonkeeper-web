@@ -1,4 +1,5 @@
 import { AccountState, defaultAccountState } from '@tonkeeper/core/dist/entries/account';
+import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { AuthState, defaultAuthState } from '@tonkeeper/core/dist/entries/password';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
@@ -13,9 +14,7 @@ import { Configuration as TronConfiguration } from '@tonkeeper/core/dist/tronApi
 import React, { useContext } from 'react';
 
 export const AppContext = React.createContext<{
-    tonApi: Configuration;
-    tonApiV2: ConfigurationV2;
-    tronApi: TronConfiguration;
+    api: APIConfig;
     account: AccountState;
     auth: AuthState;
     fiat: FiatCurrencies;
@@ -25,9 +24,11 @@ export const AppContext = React.createContext<{
     extension: boolean;
     ios: boolean;
 }>({
-    tonApi: new Configuration(),
-    tonApiV2: new ConfigurationV2(),
-    tronApi: new TronConfiguration(),
+    api: {
+        tonApi: new Configuration(),
+        tonApiV2: new ConfigurationV2(),
+        tronApi: new TronConfiguration()
+    },
     account: defaultAccountState,
     auth: defaultAuthState,
     fiat: FiatCurrencies.USD,

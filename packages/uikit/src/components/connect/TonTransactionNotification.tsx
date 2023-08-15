@@ -52,7 +52,7 @@ const ButtonRowFixed = styled(ButtonRow)`
 const useSendMutation = (params: TonConnectTransactionPayload, estimate?: EstimateData) => {
     const wallet = useWalletContext();
     const sdk = useAppSdk();
-    const { tonApi } = useAppContext();
+    const { api } = useAppContext();
 
     return useMutation<string, Error>(async () => {
         const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
@@ -64,7 +64,7 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
             throw new Error('Missing accounts data');
         }
         const password = await getPasswordByNotification(sdk, auth);
-        return sendTonConnectTransfer(sdk.storage, tonApi, wallet, accounts, params, password);
+        return sendTonConnectTransfer(sdk.storage, api.tonApi, wallet, accounts, params, password);
     });
 };
 
@@ -141,7 +141,7 @@ const ConnectContent: FC<{
 const useEstimation = (params: TonConnectTransactionPayload | null) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    const { tonApi } = useAppContext();
+    const { api } = useAppContext();
     const wallet = useWalletContext();
 
     return useQuery<EstimateData, Error>(
@@ -152,9 +152,9 @@ const useEstimation = (params: TonConnectTransactionPayload | null) => {
                 params: t('loading')
             });
 
-            const accounts = await getAccountsMap(tonApi, params!);
+            const accounts = await getAccountsMap(api.tonApi, params!);
             const accountEvent = await estimateTonConnectTransfer(
-                tonApi,
+                api.tonApi,
                 wallet,
                 accounts,
                 params!

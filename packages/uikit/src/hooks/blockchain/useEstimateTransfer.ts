@@ -72,7 +72,7 @@ export function useEstimateTransfer(
 ) {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const { tonApi, tronApi } = useAppContext();
+    const { api } = useAppContext();
     const wallet = useWalletContext();
     const client = useQueryClient();
     const { data: jettons } = useWalletJettonList();
@@ -85,7 +85,7 @@ export function useEstimateTransfer(
                 if (isTonAsset(amount.asset)) {
                     return await estimateTon({
                         amount: amount as AssetAmount<TonAsset>,
-                        tonApi,
+                        tonApi: api.tonApi,
                         wallet,
                         recipient,
                         isMax,
@@ -94,7 +94,7 @@ export function useEstimateTransfer(
                 } else {
                     return await estimateTron({
                         amount: amount as AssetAmount<TronAsset>,
-                        tronApi,
+                        tronApi: api.tronApi,
                         wallet,
                         recipient,
                         isMax,

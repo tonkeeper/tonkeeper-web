@@ -1,18 +1,17 @@
 import { Address, WalletContractV4 } from 'ton';
 import { KeyPair, mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../Storage';
+import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
 import { WalletAddress, WalletState, WalletVersion, WalletVersions } from '../entries/wallet';
 import { Configuration, WalletApi } from '../tonApiV1';
-import { Configuration as TronConfiguration } from '../tronApi';
 import { encrypt } from './cryptoService';
 import { getTronWallet } from './tron/tronService';
 import { walletContract } from './wallet/contractService';
 import { setWalletState } from './wallet/storeService';
 
 export const importWallet = async (
-    tonApiConfig: Configuration,
-    tronApi: TronConfiguration,
+    api: APIConfig,
     mnemonic: string[],
     password: string,
     name?: string
@@ -20,7 +19,7 @@ export const importWallet = async (
     const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-    const active = await findWalletAddress(tonApiConfig, keyPair);
+    const active = await findWalletAddress(api.tonApi, keyPair);
 
     const publicKey = keyPair.publicKey.toString('hex');
 
@@ -31,7 +30,7 @@ export const importWallet = async (
         name
     };
 
-    state.tron = await getTronWallet(tronApi, mnemonic, state).catch(() => undefined);
+    state.tron = await getTronWallet(api.tronApi, mnemonic, state).catch(() => undefined);
 
     return [encryptedMnemonic, state] as const;
 };

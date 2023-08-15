@@ -2,13 +2,12 @@ import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query'
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
+import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import {
     accountSetUpWalletState,
     getAccountState
 } from '@tonkeeper/core/dist/service/accountService';
-import { Configuration } from '@tonkeeper/core/dist/tonApiV1';
-import { Configuration as TronConfiguration } from '@tonkeeper/core/dist/tronApi';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { mnemonicValidate } from 'ton-crypto';
@@ -16,15 +15,13 @@ import { IconPage } from '../../components/Layout';
 import { CheckLottieIcon, ConfettiLottieIcon } from '../../components/lottie/LottieIcons';
 import { useAppContext } from '../../hooks/appContext';
 import { useAfterImportAction, useAppSdk } from '../../hooks/appSdk';
-import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { getPasswordByNotification } from '../home/UnlockNotification';
 
 const createWallet = async (
     client: QueryClient,
-    tonApi: Configuration,
-    tronApi: TronConfiguration,
+    api: APIConfig,
     storage: IStorage,
     mnemonic: string[],
     auth: AuthState,
@@ -34,7 +31,7 @@ const createWallet = async (
     if (!key) {
         throw new Error('Missing encrypt password key');
     }
-    await accountSetUpWalletState(storage, tonApi, tronApi, mnemonic, auth, key);
+    await accountSetUpWalletState(storage, api, mnemonic, auth, key);
 
     await client.invalidateQueries([QueryKey.account]);
     return getAccountState(storage);
@@ -42,8 +39,7 @@ const createWallet = async (
 
 export const useAddWalletMutation = () => {
     const sdk = useAppSdk();
-    const storage = useStorage();
-    const { tonApi, tronApi } = useAppContext();
+    const { api } = useAppContext();
     const client = useQueryClient();
 
     return useMutation<false | AccountState, Error, { mnemonic: string[]; password?: string }>(
@@ -52,20 +48,20 @@ export const useAddWalletMutation = () => {
             if (!valid) {
                 throw new Error('Mnemonic is not valid.');
             }
-            const auth = await storage.get<AuthState>(AppKey.PASSWORD);
+            const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
             if (auth === null) {
                 return false;
             }
 
             if (auth.kind === 'none') {
-                return createWallet(client, tonApi, tronApi, storage, mnemonic, auth);
+                return createWallet(client, api, sdk.storage, mnemonic, auth);
             }
 
             if (!password) {
                 password = await getPasswordByNotification(sdk, auth);
             }
 
-            return createWallet(client, tonApi, tronApi, storage, mnemonic, auth, password);
+            return createWallet(client, api, sdk.storage, mnemonic, auth, password);
         }
     );
 };

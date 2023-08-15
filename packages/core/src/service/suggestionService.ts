@@ -1,11 +1,12 @@
 import { IAppSdk } from '../AppSdk';
+import { APIConfig } from '../entries/apis';
 import { BLOCKCHAIN_NAME } from '../entries/crypto';
 import { FavoriteSuggestion, LatestSuggestion } from '../entries/suggestion';
 import { WalletState } from '../entries/wallet';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
-import { AccountsApi, Configuration } from '../tonApiV2';
-import { Configuration as ConfigurationTron, TronApi } from '../tronApi';
+import { AccountsApi } from '../tonApiV2';
+import { TronApi } from '../tronApi';
 
 export const getHiddenSuggestions = async (storage: IStorage, publicKey: string) => {
     const result = await storage.get<string[]>(`${AppKey.HIDDEN_SUGGESTIONS}_${publicKey}`);
@@ -41,13 +42,8 @@ export const deleteFavoriteSuggestion = async (
     storage.set(`${AppKey.FAVOURITES}_${publicKey}`, items);
 };
 
-export const getSuggestionsList = async (
-    sdk: IAppSdk,
-    tonApiV2: Configuration,
-    tronApi: ConfigurationTron,
-    wallet: WalletState
-) => {
-    const items = await new AccountsApi(tonApiV2).getAccountEvents({
+export const getSuggestionsList = async (sdk: IAppSdk, api: APIConfig, wallet: WalletState) => {
+    const items = await new AccountsApi(api.tonApiV2).getAccountEvents({
         accountId: wallet.active.rawAddress,
         limit: 100
     });
@@ -84,7 +80,7 @@ export const getSuggestionsList = async (
     });
 
     if (wallet.tron) {
-        const tronItems = await new TronApi(tronApi).getTransactions({
+        const tronItems = await new TronApi(api.tronApi).getTransactions({
             ownerAddress: wallet.tron.ownerWalletAddress,
             limit: 100
         });

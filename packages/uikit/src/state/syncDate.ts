@@ -8,8 +8,8 @@ import { QueryKey } from '../libs/queryKey';
 import { getCachedStoreValue, removeCachedStoreValue, setCachedStoreValue } from './cache';
 
 export const useServiceTimeIsSync = () => {
-    const { tonApi } = useAppContext();
-    return useQuery<boolean, Error>([QueryKey.system], () => seeIfServiceTimeSync(tonApi));
+    const { api } = useAppContext();
+    return useQuery<boolean, Error>([QueryKey.system], () => seeIfServiceTimeSync(api.tonApi));
 };
 
 export const cleanSyncDateBanner = async (client: QueryClient, sdk: IAppSdk) => {

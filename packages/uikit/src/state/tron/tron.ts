@@ -19,7 +19,9 @@ enum TronKeys {
 
 export const useTronWalletState = (enabled = true) => {
     const sdk = useAppSdk();
-    const { tronApi } = useAppContext();
+    const {
+        api: { tronApi }
+    } = useAppContext();
     const wallet = useWalletContext();
     const client = useQueryClient();
     return useQuery<TronWalletState, Error>(
@@ -42,7 +44,9 @@ export const useTronWalletState = (enabled = true) => {
 };
 
 export const useTronBalances = () => {
-    const { tronApi } = useAppContext();
+    const {
+        api: { tronApi }
+    } = useAppContext();
     const wallet = useWalletContext();
 
     return useQuery<TronBalances, Error>(
@@ -76,7 +80,9 @@ export const useTronBalances = () => {
 };
 
 export const useTronBalance = (tron: TronWalletState, address: string | undefined) => {
-    const { tronApi } = useAppContext();
+    const {
+        api: { tronApi }
+    } = useAppContext();
     const wallet = useWalletContext();
 
     return useQuery<TronBalance, Error>([wallet.publicKey, QueryKey.tron, address], async () => {

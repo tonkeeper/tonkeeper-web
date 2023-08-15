@@ -1,9 +1,9 @@
 import { AccountState, defaultAccountState } from '../entries/account';
+import { APIConfig } from '../entries/apis';
 import { AuthState } from '../entries/password';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { Configuration } from '../tonApiV1';
-import { Configuration as TronConfiguration } from '../tronApi';
 import { encrypt } from './cryptoService';
 import { getWalletMnemonic, validateWalletMnemonic } from './mnemonicService';
 import { importWallet } from './walletService';
@@ -24,13 +24,12 @@ const accountAppendWallet = async (account: AccountState, publicKey: string) => 
 
 export const accountSetUpWalletState = async (
     storage: IStorage,
-    tonApi: Configuration,
-    tronApi: TronConfiguration,
+    api: APIConfig,
     mnemonic: string[],
     auth: AuthState,
     password: string
 ) => {
-    const [encryptedMnemonic, state] = await importWallet(tonApi, tronApi, mnemonic, password);
+    const [encryptedMnemonic, state] = await importWallet(api, mnemonic, password);
 
     const account = await getAccountState(storage);
     const updatedAccount = await accountAppendWallet(account, state.publicKey);

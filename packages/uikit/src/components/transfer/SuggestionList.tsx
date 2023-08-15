@@ -37,12 +37,12 @@ const Label = styled(Label1)`
 
 const useLatestSuggestion = () => {
     const sdk = useAppSdk();
-    const { tonApiV2, tronApi } = useAppContext();
+    const { api } = useAppContext();
     const wallet = useWalletContext();
 
     return useQuery(
         [wallet.active.rawAddress, QueryKey.activity, 'suggestions'],
-        () => getSuggestionsList(sdk, tonApiV2, tronApi, wallet),
+        () => getSuggestionsList(sdk, api, wallet),
         { keepPreviousData: true }
     );
 };

@@ -37,7 +37,10 @@ const TronActivity: FC<{
     innerRef: React.RefObject<HTMLDivElement>;
 }> = ({ tron, innerRef }) => {
     const wallet = useWalletContext();
-    const { standalone, tronApi } = useAppContext();
+    const {
+        standalone,
+        api: { tronApi }
+    } = useAppContext();
     const { data, isFetched, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery({
         queryKey: [tron.ownerWalletAddress, wallet.network, QueryKey.tron],
         queryFn: ({ pageParam = undefined }) =>

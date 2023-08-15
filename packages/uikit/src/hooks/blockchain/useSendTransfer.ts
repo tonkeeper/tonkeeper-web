@@ -30,7 +30,7 @@ export function useSendTransfer<T extends Asset>(
 ) {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const { tonApi, tronApi } = useAppContext();
+    const { api } = useAppContext();
     const wallet = useWalletContext();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
@@ -45,7 +45,7 @@ export function useSendTransfer<T extends Asset>(
                     track2('send-ton');
                     await sendTonTransfer(
                         sdk.storage,
-                        tonApi,
+                        api.tonApi,
                         wallet,
                         recipient as TonRecipientData,
                         amount,
@@ -61,7 +61,7 @@ export function useSendTransfer<T extends Asset>(
                     )!;
                     await sendJettonTransfer(
                         sdk.storage,
-                        tonApi,
+                        api.tonApi,
                         wallet,
                         recipient as TonRecipientData,
                         amount as AssetAmount<TonAsset>,
@@ -74,7 +74,7 @@ export function useSendTransfer<T extends Asset>(
                 track2('send-trc20');
                 await sendTronTransfer(
                     {
-                        tronApi,
+                        tronApi: api.tronApi,
                         tron: wallet.tron!,
                         request: (estimation.payload as EstimatePayload).request
                     },
