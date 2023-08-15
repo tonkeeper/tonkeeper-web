@@ -132,25 +132,13 @@ export interface InputProps {
     label?: string;
     disabled?: boolean;
     helpText?: string;
-    autoComplete?: string;
     tabIndex?: number;
     clearButton?: boolean;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     (
-        {
-            type,
-            value,
-            onChange,
-            isValid = true,
-            label,
-            disabled,
-            helpText,
-            tabIndex,
-            clearButton,
-            autoComplete
-        },
+        { type, value, onChange, isValid = true, label, disabled, helpText, tabIndex, clearButton },
         ref
     ) => {
         const [focus, setFocus] = useState(false);
@@ -166,7 +154,6 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             <OuterBlock>
                 <InputBlock focus={focus} valid={isValid} clearButton={clearButton}>
                     <InputField
-                        autoComplete={autoComplete}
                         ref={ref}
                         disabled={disabled}
                         type={type}

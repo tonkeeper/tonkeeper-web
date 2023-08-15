@@ -103,7 +103,6 @@ const FillPassword: FC<{
             <Block onSubmit={onCreate}>
                 <H2>{t('Create_password')}</H2>
                 <Input
-                    autoComplete="off"
                     type="password"
                     label={t('Password')}
                     value={password}
@@ -116,7 +115,6 @@ const FillPassword: FC<{
                 />
 
                 <Input
-                    autoComplete="off"
                     type="password"
                     label={t('ConfirmPassword')}
                     value={confirm}
