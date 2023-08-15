@@ -67,8 +67,6 @@ export const InputField = styled.input`
     box-sizing: border-box;
 
     color: ${props => props.theme.textPrimary};
-    -webkit-text-fill-color: ${props => props.theme.textPrimary};
-    -webkit-box-shadow: 0 0 0 2000px rgba(255, 71, 102, 0) inset;
 `;
 
 export const Label = styled.label<{ active?: boolean }>`
