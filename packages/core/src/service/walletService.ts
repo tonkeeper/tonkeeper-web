@@ -51,27 +51,32 @@ const findWalletVersion = (interfaces: string[]): WalletVersion => {
 };
 
 const findWalletAddress = async (tonApiConfig: Configuration, keyPair: KeyPair) => {
-    const result = await new WalletApi(tonApiConfig).findWalletsByPubKey({
-        publicKey: keyPair.publicKey.toString('hex')
-    });
+    try {
+        const result = await new WalletApi(tonApiConfig).findWalletsByPubKey({
+            publicKey: keyPair.publicKey.toString('hex')
+        });
 
-    const [activeWallet] = result.wallets
-        .filter(wallet => {
-            if (wallet.interfaces.some(value => Object.keys(versionMap).includes(value))) {
-                return wallet.balance > 0 || wallet.status === 'active';
-            }
-            return false;
-        })
-        .sort((one, two) => two.balance - one.balance);
+        const [activeWallet] = result.wallets
+            .filter(wallet => {
+                if (wallet.interfaces.some(value => Object.keys(versionMap).includes(value))) {
+                    return wallet.balance > 0 || wallet.status === 'active';
+                }
+                return false;
+            })
+            .sort((one, two) => two.balance - one.balance);
 
-    if (activeWallet) {
-        const wallet: WalletAddress = {
-            rawAddress: activeWallet.address,
-            friendlyAddress: Address.parse(activeWallet.address).toString(),
-            version: findWalletVersion(activeWallet.interfaces)
-        };
+        if (activeWallet) {
+            const wallet: WalletAddress = {
+                rawAddress: activeWallet.address,
+                friendlyAddress: Address.parse(activeWallet.address).toString(),
+                version: findWalletVersion(activeWallet.interfaces)
+            };
 
-        return wallet;
+            return wallet;
+        }
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn(e);
     }
 
     const contact = WalletContractV4.create({
