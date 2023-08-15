@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+import { XmarkIcon } from '../Icon';
 import { Body2 } from '../Text';
 import { TextareaAutosize } from './TextareaAutosize';
-import { XmarkIcon } from '../Icon';
 
 export const InputBlock = styled.div<{
     focus: boolean;
@@ -56,7 +56,7 @@ export const InputBlock = styled.div<{
               `}
 `;
 
-export const InputField = styled.input`
+export const InputField = styled.input<{ focus: boolean; valid: boolean }>`
     outline: none;
     border: none;
     background: transparent;
@@ -67,6 +67,22 @@ export const InputField = styled.input`
     box-sizing: border-box;
 
     color: ${props => props.theme.textPrimary};
+
+    ${props =>
+        !props.valid
+            ? css`
+                  -webkit-text-fill-color: ${props.theme.fieldErrorBackground};
+                  -webkit-box-shadow: 0 0 0 2000px ${props.theme.fieldErrorBackground} inset;
+              `
+            : props.focus
+            ? css`
+                  -webkit-text-fill-color: ${props.theme.fieldBackground};
+                  -webkit-box-shadow: 0 0 0 2000px ${props.theme.fieldBackground} inset;
+              `
+            : css`
+                  -webkit-text-fill-color: ${props.theme.fieldBackground};
+                  -webkit-box-shadow: 0 0 0 2000px ${props.theme.fieldBackground} inset;
+              `}
 `;
 
 export const Label = styled.label<{ active?: boolean }>`
@@ -154,6 +170,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             <OuterBlock>
                 <InputBlock focus={focus} valid={isValid} clearButton={clearButton}>
                     <InputField
+                        focus={focus}
+                        valid={isValid}
                         ref={ref}
                         disabled={disabled}
                         type={type}

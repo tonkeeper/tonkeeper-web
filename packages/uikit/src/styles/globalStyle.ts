@@ -41,6 +41,10 @@ body {
   .disable-hover {
     pointer-events: none;
   }
+
+  input::-webkit-strong-password-auto-fill-button {
+    display: none !important;
+  }
 `;
 
 export const Container = styled.div`
