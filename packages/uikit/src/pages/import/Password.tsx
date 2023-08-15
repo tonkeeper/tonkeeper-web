@@ -1,13 +1,14 @@
 import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
     accountSetUpWalletState,
     getAccountState
 } from '@tonkeeper/core/dist/service/accountService';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { Configuration } from '@tonkeeper/core/dist/tonApiV1';
+import { Configuration as TronConfiguration } from '@tonkeeper/core/dist/tronApi';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { mnemonicValidate } from 'ton-crypto';
@@ -23,6 +24,7 @@ import { getPasswordByNotification } from '../home/UnlockNotification';
 const createWallet = async (
     client: QueryClient,
     tonApi: Configuration,
+    tronApi: TronConfiguration,
     storage: IStorage,
     mnemonic: string[],
     auth: AuthState,
@@ -32,7 +34,7 @@ const createWallet = async (
     if (!key) {
         throw new Error('Missing encrypt password key');
     }
-    await accountSetUpWalletState(storage, tonApi, mnemonic, auth, key);
+    await accountSetUpWalletState(storage, tonApi, tronApi, mnemonic, auth, key);
 
     await client.invalidateQueries([QueryKey.account]);
     return getAccountState(storage);
@@ -41,7 +43,7 @@ const createWallet = async (
 export const useAddWalletMutation = () => {
     const sdk = useAppSdk();
     const storage = useStorage();
-    const { tonApi } = useAppContext();
+    const { tonApi, tronApi } = useAppContext();
     const client = useQueryClient();
 
     return useMutation<false | AccountState, Error, { mnemonic: string[]; password?: string }>(
@@ -56,14 +58,14 @@ export const useAddWalletMutation = () => {
             }
 
             if (auth.kind === 'none') {
-                return createWallet(client, tonApi, storage, mnemonic, auth);
+                return createWallet(client, tonApi, tronApi, storage, mnemonic, auth);
             }
 
             if (!password) {
                 password = await getPasswordByNotification(sdk, auth);
             }
 
-            return createWallet(client, tonApi, storage, mnemonic, auth, password);
+            return createWallet(client, tonApi, tronApi, storage, mnemonic, auth, password);
         }
     );
 };

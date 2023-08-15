@@ -1,24 +1,14 @@
-import { mnemonicToPrivateKey, hmac_sha512 } from 'ton-crypto';
+import { ethers } from 'ethers';
+import { hmac_sha512, mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../../Storage';
 import { Network } from '../../entries/network';
 import { TronWalletState, TronWalletStorage, WalletState } from '../../entries/wallet';
-import {
-    Configuration,
-    EstimatePayload,
-    PublishPayload,
-    RequestData,
-    TronApi
-} from '../../tronApi';
+import { Configuration, TronApi } from '../../tronApi';
 import { getWalletMnemonic } from '../mnemonicService';
 import { setWalletState } from '../wallet/storeService';
-import { ethers } from 'ethers';
-import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
-import { TronAsset } from '../../entries/crypto/asset/tron-asset';
-import { TronRecipient } from '../../entries/send';
 import { TronAddress } from './tronUtils';
-import { hashRequest } from './tronEncoding';
 
-const getPrivateKey = async (tonMnemonic: string[]): Promise<string> => {
+export const getPrivateKey = async (tonMnemonic: string[]): Promise<string> => {
     // TON-compatible seed
     const pair = await mnemonicToPrivateKey(tonMnemonic);
     const seed = pair.secretKey.slice(0, 32);
@@ -38,7 +28,7 @@ const getOwnerAddress = async (mnemonic: string[]): Promise<string> => {
     return TronAddress.hexToBase58(wallet.address);
 };
 
-const getTronWallet = async (
+export const getTronWallet = async (
     tronApi: Configuration,
     mnemonic: string[],
     wallet: WalletState
@@ -100,64 +90,3 @@ export const getTronWalletState = async (
         walletAddress: tronWallet.address
     };
 };
-
-export async function estimateTronTransfer({
-    tronApi,
-    tron,
-    recipient,
-    amount
-}: {
-    tronApi: Configuration;
-    tron: TronWalletStorage;
-    recipient: TronRecipient;
-    amount: AssetAmount<TronAsset>;
-}): Promise<EstimatePayload> {
-    return new TronApi(tronApi).getEstimation({
-        ownerAddress: tron.ownerWalletAddress,
-        getEstimationRequest: {
-            lifeTime: Math.floor(Date.now() / 1000) + 600,
-            messages: [
-                {
-                    to: recipient.address,
-                    value: amount.stringWeiAmount,
-                    assetAddress: amount.asset.address
-                }
-            ]
-        }
-    });
-}
-
-export async function sendTronTransfer(
-    {
-        tronApi,
-        tron,
-        request
-    }: {
-        tronApi: Configuration;
-        tron: TronWalletStorage;
-        request: RequestData;
-    },
-    {
-        password,
-        storage,
-        walletState
-    }: { storage: IStorage; walletState: WalletState; password: string }
-): Promise<PublishPayload> {
-    const settings = await new TronApi(tronApi).getSettings();
-
-    const hash = hashRequest(request, settings.walletImplementation, settings.chainId);
-
-    const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
-    const privateKey = await getPrivateKey(mnemonic);
-    const signingKey = new ethers.SigningKey('0x' + privateKey);
-    const signature = signingKey.sign(hash).serialized;
-
-    return new TronApi(tronApi).publishTransaction({
-        ownerAddress: tron.ownerWalletAddress,
-        publishTransactionRequest: {
-            request,
-            signature,
-            hash
-        }
-    });
-}

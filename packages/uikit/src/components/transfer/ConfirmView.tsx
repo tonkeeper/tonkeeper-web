@@ -2,7 +2,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
+import {
+    RecipientData,
+    TransferEstimation,
+    isTonRecipientData
+} from '@tonkeeper/core/dist/entries/send';
 import React, {
     Children,
     FC,
@@ -15,7 +19,6 @@ import React, {
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { formatFiatCurrency } from '../../hooks/balance';
-import { TransferEstimation } from '../../hooks/blockchain/useEstimateTransfer';
 import { useTranslation } from '../../hooks/translation';
 import { useAssetAmountFiatEquivalent, useAssetImage } from '../../state/asset';
 import { CheckmarkCircleIcon, ChevronLeftIcon, ExclamationMarkCircleIcon } from '../Icon';

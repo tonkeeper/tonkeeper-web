@@ -1,6 +1,10 @@
-import BigNumber from 'bignumber.js';
 import { AccountRepr, Fee, WalletDNS } from '../tonApiV1';
+import { EstimatePayload } from '../tronApi';
 import { BLOCKCHAIN_NAME } from './crypto';
+import { Asset } from './crypto/asset/asset';
+import { AssetAmount } from './crypto/asset/asset-amount';
+import { TonAsset } from './crypto/asset/ton-asset';
+import { TronAsset } from './crypto/asset/tron-asset';
 import { Suggestion } from './suggestion';
 
 export type BaseRecipient = Suggestion | { address: string };
@@ -47,16 +51,7 @@ export function isTronRecipientData(
     return isTronRecipient(recipientData.address);
 }
 
-// @deprecated
-export interface AmountValue {
-    fiat?: BigNumber;
-    amount: BigNumber;
-    max: boolean;
-}
-
-// @deprecated
-export interface AmountData extends AmountValue {
-    jetton: string;
-    done: boolean;
-    fee: Fee;
-}
+export type TransferEstimation<T extends Asset = Asset> = {
+    fee: AssetAmount<T>;
+    payload: T extends TonAsset ? Fee : T extends TronAsset ? EstimatePayload : never;
+};

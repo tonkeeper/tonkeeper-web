@@ -2,11 +2,11 @@ import { QueryKey, UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { TransferEstimation } from '@tonkeeper/core/dist/entries/send';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { Configuration, SendApi } from '@tonkeeper/core/dist/tonApiV1';
 import { Omit } from 'react-beautiful-dnd';
 import { useAppContext, useWalletContext } from '../appContext';
-import { TransferEstimation } from './useEstimateTransfer';
 
 export type ContractCallerParams = {
     tonApi: Configuration;

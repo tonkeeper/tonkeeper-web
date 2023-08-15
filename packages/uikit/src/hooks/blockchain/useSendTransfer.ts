@@ -3,10 +3,14 @@ import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ass
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TonRecipientData, TronRecipientData } from '@tonkeeper/core/dist/entries/send';
+import {
+    TonRecipientData,
+    TransferEstimation,
+    TronRecipientData
+} from '@tonkeeper/core/dist/entries/send';
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
-import { sendTronTransfer } from '@tonkeeper/core/dist/service/tron/tronService';
+import { sendTronTransfer } from '@tonkeeper/core/dist/service/tron/tronTransferService';
 import { Fee } from '@tonkeeper/core/dist/tonApiV1';
 import { EstimatePayload } from '@tonkeeper/core/dist/tronApi';
 import { Address } from 'ton-core';
@@ -17,7 +21,6 @@ import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import { TransferEstimation } from './useEstimateTransfer';
 
 export function useSendTransfer<T extends Asset>(
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,

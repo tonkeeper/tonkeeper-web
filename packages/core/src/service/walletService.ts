@@ -4,12 +4,15 @@ import { IStorage } from '../Storage';
 import { Network } from '../entries/network';
 import { WalletAddress, WalletState, WalletVersion, WalletVersions } from '../entries/wallet';
 import { Configuration, WalletApi } from '../tonApiV1';
+import { Configuration as TronConfiguration } from '../tronApi';
 import { encrypt } from './cryptoService';
+import { getTronWallet } from './tron/tronService';
 import { walletContract } from './wallet/contractService';
 import { setWalletState } from './wallet/storeService';
 
 export const importWallet = async (
     tonApiConfig: Configuration,
+    tronApi: TronConfiguration,
     mnemonic: string[],
     password: string,
     name?: string
@@ -23,12 +26,13 @@ export const importWallet = async (
 
     const state: WalletState = {
         publicKey,
-
         active,
-
         revision: 0,
         name
     };
+
+    state.tron = await getTronWallet(tronApi, mnemonic, state).catch(() => undefined);
+
     return [encryptedMnemonic, state] as const;
 };
 
@@ -102,7 +106,7 @@ export const getWalletAddress = (
 export const getWalletsAddresses = (
     publicKey: Buffer | string,
     network?: Network
-): Record<typeof WalletVersions[number], WalletAddress> => {
+): Record<(typeof WalletVersions)[number], WalletAddress> => {
     if (typeof publicKey === 'string') {
         publicKey = Buffer.from(publicKey, 'hex');
     }
@@ -112,7 +116,7 @@ export const getWalletsAddresses = (
             version,
             getWalletAddress(publicKey as Buffer, version, network)
         ])
-    ) as Record<typeof WalletVersions[number], WalletAddress>;
+    ) as Record<(typeof WalletVersions)[number], WalletAddress>;
 };
 
 export const updateWalletVersion = async (
