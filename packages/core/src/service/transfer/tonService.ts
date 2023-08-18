@@ -123,7 +123,7 @@ const createTonConnectTransfer = (
             })
         )
     });
-    return externalMessage(contract, seqno, transfer).toBoc();
+    return externalMessage(contract, seqno, transfer).toBoc({ idx: false });
 };
 
 export const estimateTonTransfer = async (
