@@ -212,7 +212,7 @@ export const sendTonConnectTransfer = async (
     sendBocRequest: { boc: external.toString('base64') },
   });
 
-  return internal.toString();
+  return internal.toBoc({ idx: false }).toString('base64');
 };
 
 export const sendTonTransfer = async (
