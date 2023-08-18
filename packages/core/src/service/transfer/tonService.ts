@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 import { Address, Cell, internal } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../../Storage';
+import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipientData } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
@@ -17,7 +18,6 @@ import {
     getWalletBalance,
     getWalletSeqNo
 } from './common';
-import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 
 export type AccountsMap = Map<string, AccountRepr>;
 
@@ -189,7 +189,7 @@ export const sendTonConnectTransfer = async (
         sendBocRequest: { boc: external.toString('base64') }
     });
 
-    return _internal.toString();
+    return _internal.toBoc({ idx: false }).toString('base64');
 };
 
 export const sendTonTransfer = async (
