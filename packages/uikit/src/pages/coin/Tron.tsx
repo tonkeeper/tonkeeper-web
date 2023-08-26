@@ -14,6 +14,7 @@ import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
 import { SendAction } from '../../components/transfer/SendNotifications';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useFormatBalance } from '../../hooks/balance';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
 import { AppRoute } from '../../libs/routes';
@@ -22,14 +23,12 @@ import { useTronBalance, useTronWalletState } from '../../state/tron/tron';
 
 const TronHeader: FC<{ tronBalance: TronBalance }> = ({ tronBalance: { token, weiAmount } }) => {
     const amount = useMemo(() => formatDecimals(weiAmount, token.decimals), [weiAmount, token]);
-    //const balance = useFormatBalance(amount, token.decimals);
+    const total = useFormatBalance(amount, token.decimals);
 
     const { data } = useRate(token.symbol);
     const { fiatAmount } = useFormatFiat(data, amount);
 
-    return (
-        <CoinInfo amount={amount} symbol={token.symbol} price={fiatAmount} image={token.image} />
-    );
+    return <CoinInfo amount={total} symbol={token.symbol} price={fiatAmount} image={token.image} />;
 };
 
 const TronActivity: FC<{

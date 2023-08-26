@@ -13,7 +13,7 @@ type AmountFormatterOptions = {
 };
 
 type AmountFormatOptions = {
-    decimals?: number;
+    decimals?: number | string;
     currency?: FiatCurrency;
     ignoreZeroTruncate?: boolean;
 };
@@ -95,10 +95,14 @@ export class AmountFormatter {
 
         // truncate decimals 1.00 -> 1
         if (!options.ignoreZeroTruncate && bn.isLessThan('0.01')) {
-            bn = bn.decimalPlaces(decimals, BigNumber.ROUND_DOWN);
+            bn = bn.decimalPlaces(new BigNumber(decimals).toNumber(), BigNumber.ROUND_DOWN);
             return bn.toFormat(formatConf);
         }
 
-        return bn.toFormat(Math.min(decimals, 2), BigNumber.ROUND_DOWN, formatConf);
+        return bn.toFormat(
+            Math.min(new BigNumber(decimals).toNumber(), 2),
+            BigNumber.ROUND_DOWN,
+            formatConf
+        );
     }
 }

@@ -11,6 +11,7 @@ import { ActivityList } from '../../components/activity/ActivityGroup';
 import { HomeActions } from '../../components/home/TonActions';
 import { CoinInfo } from '../../components/jettons/Info';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useFormatBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
@@ -22,13 +23,14 @@ const TonHeader: FC<{ info: AccountRepr }> = ({ info: { balance } }) => {
     const { t } = useTranslation();
 
     const amount = useMemo(() => formatDecimals(balance), [balance]);
+    const total = useFormatBalance(amount);
 
     const { data } = useRate(CryptoCurrency.TON);
     const { fiatAmount } = useFormatFiat(data, amount);
 
     return (
         <CoinInfo
-            amount={amount}
+            amount={total}
             symbol="TON"
             price={fiatAmount}
             description={t('Ton_page_description')}

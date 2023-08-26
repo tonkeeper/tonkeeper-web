@@ -13,6 +13,7 @@ import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
 import { SendAction } from '../../components/transfer/SendNotifications';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useFormatBalance } from '../../hooks/balance';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { JettonKey, QueryKey } from '../../libs/queryKey';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
@@ -58,12 +59,13 @@ const JettonHeader: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ info, 
     );
 
     const { data } = useRate(address);
+    const total = useFormatBalance(amount, info.metadata.decimals);
     const { fiatAmount } = useFormatFiat(data, amount);
     const { description, image } = info.metadata;
 
     return (
         <CoinInfo
-            amount={amount}
+            amount={total}
             symbol={info.metadata.symbol}
             price={fiatAmount}
             description={description}
