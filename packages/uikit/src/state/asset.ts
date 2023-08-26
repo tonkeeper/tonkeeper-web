@@ -66,7 +66,7 @@ export function useAssetImage({ blockchain, address }: AssetIdentification): str
     }
 
     if (id === TRON_USDT_ASSET.id) {
-        return '/img/usdt.webp';
+        return '/img/usdt.svg';
     }
 
     if (typeof address === 'string') {

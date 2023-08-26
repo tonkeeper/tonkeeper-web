@@ -177,7 +177,7 @@ const ReceiveTron: FC<{ tron: TronWalletState }> = ({ tron }) => {
                 <QRCode
                     size={400}
                     value={tron.walletAddress}
-                    logoImage="/img/usdt.webp"
+                    logoImage="/img/usdt.svg"
                     logoPadding={15}
                 />
                 <AddressText extension={extension}>{tron.walletAddress}</AddressText>
