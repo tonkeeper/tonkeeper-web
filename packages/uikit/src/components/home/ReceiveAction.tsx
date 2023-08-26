@@ -179,6 +179,7 @@ const ReceiveTron: FC<{ tron: TronWalletState }> = ({ tron }) => {
                     value={tron.walletAddress}
                     logoImage="/img/usdt.svg"
                     logoPadding={15}
+                    logoPaddingStyle="circle"
                 />
                 <AddressText extension={extension}>{tron.walletAddress}</AddressText>
             </Background>
