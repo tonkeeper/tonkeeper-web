@@ -263,7 +263,7 @@ export const ActionFeeDetails: FC<{
     const feeAmount = fee.total < 0 ? fee.total * -1 : fee.total;
     const amount = useCoinFullBalance(feeAmount);
     const { data } = useRate(CryptoCurrency.TON);
-    const { fiatAmount } = useFormatFiat(data, amount);
+    const { fiatAmount } = useFormatFiat(data, formatDecimals(feeAmount));
 
     return (
         <ListItem hover={false}>
@@ -288,7 +288,7 @@ export const ActionExtraDetails: FC<{
     const amount = useCoinFullBalance(feeAmount);
 
     const { data } = useRate(CryptoCurrency.TON);
-    const { fiatAmount } = useFormatFiat(data, amount);
+    const { fiatAmount } = useFormatFiat(data, formatDecimals(feeAmount));
 
     return (
         <ListItem hover={false}>
