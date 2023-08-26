@@ -201,7 +201,7 @@ export const AmountView: FC<{
                   .toFixed()
             : value;
 
-        setInput(formatStringToInput(inputValue));
+        setInput(formatStringToInput(formatter.format(inputValue)));
         setMax(state => !state);
     };
 
