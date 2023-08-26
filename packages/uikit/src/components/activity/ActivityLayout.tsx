@@ -51,7 +51,7 @@ export function ActivityBlock<T>({
                             {getActivityTitle(i18n.language, eventKey, events[0].timestamp)}
                         </Title>
                         {events.map(({ timestamp, event, key }) => {
-                            const date = formatActivityDate(i18n.language, key, timestamp);
+                            const date = formatActivityDate(i18n.language, eventKey, timestamp);
                             return (
                                 <List key={key}>
                                     <RenderItem event={event} date={date} timestamp={timestamp} />
