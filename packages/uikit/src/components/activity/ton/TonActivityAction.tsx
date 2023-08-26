@@ -182,9 +182,9 @@ export const JettonSwapAction: FC<{
                 <FirstLine>
                     <FirstLabel>{t('swap_title')}</FirstLabel>
                     <AmountText green>
-                        +&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)}
+                        +&thinsp;{format(jettonSwap.amountOut, jettonSwap.jettonMasterOut.decimals)}
                     </AmountText>
-                    <AmountText green>{jettonSwap.jettonMasterIn.symbol}</AmountText>
+                    <AmountText green>{jettonSwap.jettonMasterOut.symbol}</AmountText>
                 </FirstLine>
                 <SecondLine>
                     <SecondaryText>{toDexName(jettonSwap.dex)}</SecondaryText>

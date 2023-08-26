@@ -219,12 +219,12 @@ const SwapTokensActionContent: FC<{
             <div>
                 <Title>{t('swap_title')}</Title>
                 <Title secondary>
-                    -&thinsp;{format(jettonSwap.amountOut, jettonSwap.jettonMasterOut.decimals)}{' '}
-                    {jettonSwap.jettonMasterOut.symbol}
+                    -&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)}{' '}
+                    {jettonSwap.jettonMasterIn.symbol}
                 </Title>
                 <Title>
-                    +&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)}{' '}
-                    {jettonSwap.jettonMasterIn.symbol}
+                    +&thinsp;{format(jettonSwap.amountOut, jettonSwap.jettonMasterOut.decimals)}{' '}
+                    {jettonSwap.jettonMasterOut.symbol}
                 </Title>
                 <ActionDate kind="send" timestamp={timestamp} />
             </div>
