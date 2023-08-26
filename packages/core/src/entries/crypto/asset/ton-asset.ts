@@ -16,6 +16,8 @@ export function jettonToTonAsset(address: string, jettons: JettonsBalances): Ton
         return TON_ASSET;
     }
 
+    address = Address.parse(address).toRawString();
+
     const jetton = jettons.balances.find(i => i.metadata?.address === address);
 
     if (!jetton) {
