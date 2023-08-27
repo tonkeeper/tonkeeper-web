@@ -8,7 +8,7 @@ import { ActivityIcon, SentIcon, SwapIcon } from '../../../components/activity/A
 import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
-import { ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayout';
+import { FailedNote, ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayout';
 import {
     AmountText,
     Description,
@@ -22,7 +22,7 @@ import {
 import { toDexName } from '../NotificationCommon';
 import { SubscribeAction, UnSubscribeAction } from '../SubscribeAction';
 import { ContractDeployAction } from './ContractDeployAction';
-import { FailedNote, NftComment, NftItemTransferAction, NftPurchaseAction } from './NftActivity';
+import { NftComment, NftItemTransferAction, NftPurchaseAction } from './NftActivity';
 
 const TonTransferAction: FC<{
     action: Action;

@@ -1,6 +1,8 @@
 import { ActionStatusEnum } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
+import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
+import { Body2 } from '../Text';
 import {
     ActivityIcon,
     ContractDeployIcon,
@@ -19,7 +21,6 @@ import {
     SecondLine,
     SecondaryText
 } from './CommonAction';
-import { FailedNote } from './ton/NftActivity';
 
 export const SendActivityAction: FC<{
     amount: string;
@@ -140,4 +141,29 @@ export const ContractDeployActivityAction: FC<{ address: string; date: string }>
             />
         </ListItemGrid>
     );
+};
+
+const Wrapper = styled.div`
+    grid-column: 2 / 3;
+    overflow: hidden;
+`;
+
+const Note = styled(Body2)`
+    color: ${props => props.theme.accentOrange};
+`;
+
+export const FailedNote: FC<PropsWithChildren<{ status?: ActionStatusEnum }>> = ({
+    status,
+    children
+}) => {
+    const { t } = useTranslation();
+    if (status === 'failed') {
+        return (
+            <Wrapper>
+                <Note>{t('activity_failed_transaction')}</Note>
+            </Wrapper>
+        );
+    } else {
+        return <>{children}</>;
+    }
 };

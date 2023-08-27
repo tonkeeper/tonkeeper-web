@@ -2,16 +2,17 @@ import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { Action, ActionStatusEnum, Price } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, PropsWithChildren } from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components';
 import { useWalletContext } from '../../../hooks/appContext';
 import { useTranslation } from '../../../hooks/translation';
 import { useNftItemData } from '../../../state/wallet';
 import { VerificationIcon } from '../../Icon';
 import { ListBlock } from '../../List';
-import { Body1, Body2 } from '../../Text';
+import { Body1 } from '../../Text';
 import { NftCollectionBody2, NftHeaderBody2 } from '../../nft/NftHeader';
-import { TransferComment } from '../ActivityDetailsLayout';
+import { FailedNote } from '../ActivityActionLayout';
+import { FailedDetail, TransferComment } from '../ActivityDetailsLayout';
 import { ActivityIcon, ReceiveIcon, SentIcon } from '../ActivityIcons';
 import {
     AmountText,
@@ -90,26 +91,6 @@ export const NftComment: FC<{
             </NftBlock>
         </Wrapper>
     );
-};
-
-const Note = styled(Body2)`
-    color: ${props => props.theme.accentOrange};
-`;
-
-export const FailedNote: FC<PropsWithChildren<{ status?: ActionStatusEnum }>> = ({
-    status,
-    children
-}) => {
-    const { t } = useTranslation();
-    if (status === 'failed') {
-        return (
-            <Wrapper>
-                <Note>{t('activity_failed_transaction')}</Note>
-            </Wrapper>
-        );
-    } else {
-        return <>{children}</>;
-    }
 };
 
 export const NftItemTransferAction: FC<{
@@ -239,7 +220,8 @@ const NftActivityHeader: FC<{
     timestamp: number;
     data?: NftItemRepr;
     amount?: Price;
-}> = ({ kind, timestamp, data, amount }) => {
+    status?: ActionStatusEnum;
+}> = ({ kind, timestamp, data, amount, status }) => {
     const preview = data?.previews?.find(item => item.resolution === '100x100');
 
     return (
@@ -264,6 +246,7 @@ const NftActivityHeader: FC<{
                 </Amount>
             )}
             <ActionDate kind={kind} timestamp={timestamp} />
+            <FailedDetail status={status} />
         </div>
     );
 };
@@ -283,7 +266,12 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
 
     return (
         <ActionDetailsBlock event={event}>
-            <NftActivityHeader data={data} timestamp={timestamp} kind={kind} />
+            <NftActivityHeader
+                data={data}
+                timestamp={timestamp}
+                kind={kind}
+                status={action.status}
+            />
             <ListBlock margin={false} fullWidth>
                 {kind === 'received' && nftItemTransfer.sender && (
                     <ActionSenderDetails sender={nftItemTransfer.sender} />
@@ -313,6 +301,7 @@ export const NftPurchaseActionDetails: FC<ActionData> = ({ action, timestamp, ev
                 amount={nftPurchase.amount}
                 timestamp={timestamp}
                 kind="send"
+                status={action.status}
             />
             <ListBlock margin={false} fullWidth>
                 <ActionTransactionDetails eventId={event.eventId} />

@@ -1,6 +1,7 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
     AccountEvent,
+    ActionStatusEnum,
     JettonSwapAction,
     JettonTransferAction,
     TonTransferAction
@@ -13,7 +14,12 @@ import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { useFormatFiat, useRate } from '../../../state/rates';
 import { ListBlock } from '../../List';
-import { ActivityDetailsHeader, Amount, TransferComment } from '../ActivityDetailsLayout';
+import {
+    ActivityDetailsHeader,
+    Amount,
+    FailedDetail,
+    TransferComment
+} from '../ActivityDetailsLayout';
 import {
     ActionBeneficiaryDetails,
     ActionDate,
@@ -32,7 +38,8 @@ const TonTransferActionContent: FC<{
     timestamp: number;
     event: AccountEvent;
     isScam: boolean;
-}> = ({ tonTransfer, timestamp, event, isScam }) => {
+    status?: ActionStatusEnum;
+}> = ({ tonTransfer, timestamp, event, isScam, status }) => {
     const wallet = useWalletContext();
     const { data } = useRate(CryptoCurrency.TON);
     const { fiatAmount } = useFormatFiat(data, formatDecimals(tonTransfer.amount));
@@ -48,6 +55,7 @@ const TonTransferActionContent: FC<{
                 total={fiatAmount}
                 timestamp={timestamp}
                 kind={kind}
+                status={status}
             />
             <ListBlock margin={false} fullWidth>
                 {kind === 'received' && <ActionSenderDetails sender={tonTransfer.sender} />}
@@ -76,6 +84,7 @@ export const TonTransferActionNotification: FC<ActionData> = ({
             event={event}
             isScam={isScam}
             timestamp={timestamp}
+            status={action.status}
         />
     );
 };
@@ -85,7 +94,8 @@ const JettonTransferActionContent: FC<{
     timestamp: number;
     event: AccountEvent;
     isScam: boolean;
-}> = ({ jettonTransfer, timestamp, event, isScam }) => {
+    status?: ActionStatusEnum;
+}> = ({ jettonTransfer, timestamp, event, isScam, status }) => {
     const wallet = useWalletContext();
     const { data } = useRate(Address.parse(jettonTransfer.jetton.address).toString());
     const { fiatAmount } = useFormatFiat(
@@ -105,6 +115,7 @@ const JettonTransferActionContent: FC<{
                 total={fiatAmount}
                 timestamp={timestamp}
                 kind={kind}
+                status={status}
             />
             <ListBlock margin={false} fullWidth>
                 {kind === 'send' && jettonTransfer.recipient && (
@@ -138,6 +149,7 @@ export const JettonTransferActionNotification: FC<ActionData> = ({
                 timestamp={timestamp}
                 event={event}
                 isScam={isScam}
+                status={action.status}
             />
         );
     }
@@ -164,6 +176,7 @@ export const AuctionBidActionDetails: FC<ActionData> = ({ action, timestamp, eve
                 </Amount>
                 {fiatAmount && <Amount>≈&thinsp;{fiatAmount}</Amount>}
                 <ActionDate kind="send" timestamp={timestamp} />
+                <FailedDetail status={action.status} />
             </div>
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={auctionBid.bidder} />
@@ -195,6 +208,7 @@ export const SmartContractExecActionDetails: FC<ActionData> = ({ action, timesta
                 </Amount>
                 {fiatAmount && <Amount>≈&thinsp;{fiatAmount}</Amount>}
                 <ActionDate kind="send" timestamp={timestamp} />
+                <FailedDetail status={action.status} />
             </div>
             <ListBlock margin={false} fullWidth>
                 <ActionRecipientDetails recipient={smartContractExec.contract} />
@@ -210,7 +224,8 @@ const SwapTokensActionContent: FC<{
     jettonSwap: JettonSwapAction;
     timestamp: number;
     event: AccountEvent;
-}> = ({ jettonSwap, event, timestamp }) => {
+    status?: ActionStatusEnum;
+}> = ({ jettonSwap, event, timestamp, status }) => {
     const { t } = useTranslation();
     const format = useFormatCoinValue();
 
@@ -227,6 +242,7 @@ const SwapTokensActionContent: FC<{
                     {jettonSwap.jettonMasterOut.symbol}
                 </Title>
                 <ActionDate kind="send" timestamp={timestamp} />
+                <FailedDetail status={status} />
             </div>
             <ListBlock margin={false} fullWidth>
                 <ActionTransactionDetails eventId={event.eventId} />
@@ -242,5 +258,12 @@ export const SwapTokensActionDetails: FC<ActionData> = ({ action, timestamp, eve
     if (!jettonSwap) {
         return <ErrorActivityNotification event={event} />;
     }
-    return <SwapTokensActionContent jettonSwap={jettonSwap} event={event} timestamp={timestamp} />;
+    return (
+        <SwapTokensActionContent
+            jettonSwap={jettonSwap}
+            event={event}
+            timestamp={timestamp}
+            status={action.status}
+        />
+    );
 };

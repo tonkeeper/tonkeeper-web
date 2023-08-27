@@ -1,3 +1,4 @@
+import { ActionStatusEnum } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { useFormatCoinValue } from '../../hooks/balance';
@@ -30,7 +31,8 @@ export const ActivityDetailsHeader: FC<{
     timestamp: number;
     isScam?: boolean;
     kind: 'received' | 'send';
-}> = ({ amount, decimals, symbol, total, timestamp, isScam, kind }) => {
+    status?: ActionStatusEnum;
+}> = ({ amount, decimals, symbol, total, timestamp, isScam, kind, status }) => {
     const format = useFormatCoinValue();
     const { t } = useTranslation();
     return (
@@ -42,6 +44,7 @@ export const ActivityDetailsHeader: FC<{
             </Title>
             {total && <Amount>≈&thinsp;{total}</Amount>}
             <ActionDate kind={kind} timestamp={timestamp} />
+            <FailedDetail status={status} />
         </div>
     );
 };
@@ -71,5 +74,19 @@ export const TransferComment: FC<{ comment?: string }> = ({ comment }) => {
         );
     } else {
         return null;
+    }
+};
+
+const Note = styled(Body1)`
+    display: block;
+    color: ${props => props.theme.accentOrange};
+`;
+
+export const FailedDetail: FC<{ status?: ActionStatusEnum }> = ({ status }) => {
+    const { t } = useTranslation();
+    if (status === 'failed') {
+        return <Note>{t('activity_failed_transaction')}</Note>;
+    } else {
+        return <></>;
     }
 };

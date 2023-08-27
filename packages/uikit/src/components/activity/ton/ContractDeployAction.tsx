@@ -6,6 +6,7 @@ import { useWalletContext } from '../../../hooks/appContext';
 import { useTranslation } from '../../../hooks/translation';
 import { ListBlock } from '../../List';
 import { ContractDeployActivityAction, WalletDeployActivityAction } from '../ActivityActionLayout';
+import { FailedDetail } from '../ActivityDetailsLayout';
 import { ActivityIcon, ContractDeployIcon } from '../ActivityIcons';
 import { ColumnLayout, ErrorAction, ListItemGrid } from '../CommonAction';
 import {
@@ -37,6 +38,7 @@ export const ContractDeployActionDetails: FC<ActionData> = ({ action, timestamp,
                         : t('transaction_type_contract_deploy')}
                 </Title>
                 <ActionDate kind="received" timestamp={timestamp} />
+                <FailedDetail status={action.status} />
             </div>
             <ListBlock margin={false} fullWidth>
                 <ActionDeployerDetails deployer={contractDeploy.address} />

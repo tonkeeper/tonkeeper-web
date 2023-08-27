@@ -9,6 +9,7 @@ import {
 import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock } from '../List';
+import { FailedDetail } from './ActivityDetailsLayout';
 import { ColumnLayout, ErrorAction, ListItemGrid } from './CommonAction';
 import {
     ActionBeneficiaryDetails,
@@ -34,6 +35,7 @@ export const UnSubscribeActionDetails: FC<ActionData> = ({ action, timestamp, ev
             <div>
                 <Title>{t('transaction_type_unsubscription')}</Title>
                 <ActionDate kind="send" timestamp={timestamp} />
+                <FailedDetail status={action.status} />
             </div>
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={unSubscribe.beneficiary} />
@@ -57,6 +59,7 @@ export const SubscribeActionDetails: FC<ActionData> = ({ action, timestamp, even
             <div>
                 <Title>{t('transaction_type_subscription')}</Title>
                 <ActionDate kind="send" timestamp={timestamp} />
+                <FailedDetail status={action.status} />
             </div>
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={subscribe.beneficiary} />
