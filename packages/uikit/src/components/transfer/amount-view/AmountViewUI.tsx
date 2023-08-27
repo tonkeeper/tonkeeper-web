@@ -1,11 +1,10 @@
+import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
+import { getDecimalSeparator, getNotDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
+import { isNumeric, removeGroupSeparator, seeIfLargeTail } from '@tonkeeper/core/dist/utils/send';
+import BigNumber from 'bignumber.js';
+import React, { FC } from 'react';
 import styled from 'styled-components';
 import { Body1, Body2, H3, Label2, Num2 } from '../../Text';
-import BigNumber from 'bignumber.js';
-import { isNumeric, removeGroupSeparator, seeIfLargeTail } from '@tonkeeper/core/dist/utils/send';
-import { getDecimalSeparator, getNotDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
-import { FC } from 'react';
-import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import React from 'react';
 
 export const Center = styled.div`
     text-align: center;
@@ -130,12 +129,12 @@ export const AssetBadge = styled.div`
 export const RecipientName: FC<{ recipient: RecipientData }> = ({ recipient }) => {
     const { address } = recipient;
 
-    if (!isTonRecipientData(recipient)) {
-        return null;
-    }
-
     if ('isFavorite' in address && address.isFavorite) {
         return <Name>{address.name}</Name>;
+    }
+
+    if (!isTonRecipientData(recipient)) {
+        return null;
     }
 
     if (recipient.toAccount.name) {
