@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { WalletState, WalletVersion, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
@@ -14,13 +14,20 @@ import {
     NftCollection,
     NftItemRepr
 } from '@tonkeeper/core/dist/tonApiV1';
-import { BlockchainApi, DNSApi, DnsRecord, WalletApi } from '@tonkeeper/core/dist/tonApiV2';
+import {
+    Account,
+    BlockchainApi,
+    DNSApi,
+    DnsRecord,
+    WalletApi
+} from '@tonkeeper/core/dist/tonApiV2';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
 import { DefaultRefetchInterval } from './tonendpoint';
+
 export const useActiveWallet = () => {
     const sdk = useAppSdk();
     return useQuery<WalletState | null, Error>([QueryKey.account, QueryKey.wallet], async () => {
@@ -146,6 +153,20 @@ export const useWalletJettonList = () => {
         }
     );
 };
+
+const getActiveWallet = (accounts: Account[], version: WalletVersion) => {
+    return accounts.find(
+        item =>
+            (item.balance > 0 || item.status === 'active') &&
+            item.interfaces &&
+            item.interfaces.some(
+                v =>
+                    v === `wallet_${walletVersionText(version)}` ||
+                    v === `wallet_${walletVersionText(version).toLowerCase()}`
+            )
+    );
+};
+
 export const useWalletNftList = () => {
     const wallet = useWalletContext();
     const {
@@ -158,9 +179,17 @@ export const useWalletNftList = () => {
             const { accounts } = await new WalletApi(tonApiV2).getWalletsByPublicKey({
                 publicKey: wallet.publicKey
             });
-            const result = accounts
-                .filter(item => item.balance > 0 || item.status === 'active')
-                .map(w => w.address);
+
+            const result = [WalletVersion.V4R2, WalletVersion.V3R2, WalletVersion.V3R1].reduce(
+                (acc, version) => {
+                    const wallet = getActiveWallet(accounts, version);
+                    if (wallet) {
+                        acc.push(wallet.address);
+                    }
+                    return acc;
+                },
+                [] as string[]
+            );
 
             const items = await Promise.all(
                 result.map(owner =>
