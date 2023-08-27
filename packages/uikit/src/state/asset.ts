@@ -66,7 +66,7 @@ export function useAssetImage({ blockchain, address }: AssetIdentification): str
     }
 
     if (id === TRON_USDT_ASSET.id) {
-        return 'https://cdn.worldvectorlogo.com/logos/tether.svg';
+        return 'https://wallet-dev.tonkeeper.com/img/usdt.svg';
     }
 
     if (typeof address === 'string') {
