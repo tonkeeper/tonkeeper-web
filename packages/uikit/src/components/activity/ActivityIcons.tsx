@@ -1,7 +1,8 @@
-import React from 'react';
+import { ActionStatusEnum } from '@tonkeeper/core/dist/tonApiV2';
+import React, { FC, PropsWithChildren } from 'react';
 import styled from 'styled-components';
 
-export const ActivityIcon = styled.span`
+const ActivityIconWrapper = styled.span`
     display: flex;
     width: 44px;
     height: 44px;
@@ -14,6 +15,41 @@ export const ActivityIcon = styled.span`
     justify-content: center;
     align-items: center;
 `;
+
+export const ActivityIcon: FC<PropsWithChildren<{ status?: ActionStatusEnum }>> = ({
+    status,
+    children
+}) => {
+    return (
+        <ActivityIconWrapper>{status === 'failed' ? <FailedIcon /> : children}</ActivityIconWrapper>
+    );
+};
+
+const FailedIcon = () => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            viewBox="0 0 28 28"
+            fill="none"
+        >
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M14 25.25C20.2132 25.25 25.25 20.2132 25.25 14C25.25 7.7868 20.2132 2.75 14 2.75C7.7868 2.75 2.75 7.7868 2.75 14C2.75 20.2132 7.7868 25.25 14 25.25ZM12.3528 8.74698C12.297 7.79921 13.0506 7 14 7C14.9494 7 15.703 7.79921 15.6472 8.74698L15.3234 14.2522C15.2822 14.9529 14.7019 15.5 14 15.5C13.2981 15.5 12.7178 14.9529 12.6766 14.2522L12.3528 8.74698ZM15.75 19.25C15.75 20.2165 14.9665 21 14 21C13.0335 21 12.25 20.2165 12.25 19.25C12.25 18.2835 13.0335 17.5 14 17.5C14.9665 17.5 15.75 18.2835 15.75 19.25Z"
+                fill="currentColor"
+            />
+            <path
+                opacity="0.32"
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M14 7C13.0506 7 12.297 7.79921 12.3528 8.74698L12.6766 14.2522C12.7178 14.9529 13.2981 15.5 14 15.5C14.7019 15.5 15.2822 14.9529 15.3234 14.2522L15.6472 8.74698C15.703 7.79921 14.9494 7 14 7ZM14 21C14.9665 21 15.75 20.2165 15.75 19.25C15.75 18.2835 14.9665 17.5 14 17.5C13.0335 17.5 12.25 18.2835 12.25 19.25C12.25 20.2165 13.0335 21 14 21Z"
+                fill="currentColor"
+            />
+        </svg>
+    );
+};
 
 export const SentIcon = () => {
     return (

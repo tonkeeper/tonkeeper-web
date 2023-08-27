@@ -80,7 +80,6 @@ const JettonTransferAction: FC<{ action: Action; date: string }> = ({ action, da
         return <ErrorAction />;
     }
 
-    action.status;
     if (jettonTransfer.sender?.address === wallet.active.rawAddress) {
         return (
             <SendActivityAction
@@ -138,7 +137,7 @@ export const SmartContractExecAction: FC<{
 
     return (
         <ListItemGrid>
-            <ActivityIcon>
+            <ActivityIcon status={action.status}>
                 <SentIcon />
             </ActivityIcon>
             <Description>
@@ -175,7 +174,7 @@ export const JettonSwapAction: FC<{
 
     return (
         <ListItemGrid>
-            <ActivityIcon>
+            <ActivityIcon status={action.status}>
                 <SwapIcon />
             </ActivityIcon>
             <Description>
@@ -212,7 +211,7 @@ const AuctionBidAction: FC<{
 
     return (
         <ListItemGrid>
-            <ActivityIcon>
+            <ActivityIcon status={action.status}>
                 <SentIcon />
             </ActivityIcon>
             <Description>

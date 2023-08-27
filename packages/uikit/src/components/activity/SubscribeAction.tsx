@@ -77,7 +77,7 @@ export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({ action
     }
     return (
         <ListItemGrid>
-            <ActivityIcon>
+            <ActivityIcon status={action.status}>
                 <UnsubscribeIcon />
             </ActivityIcon>
             <ColumnLayout
@@ -104,7 +104,7 @@ export const SubscribeAction: FC<{ action: Action; date: string }> = ({ action, 
 
     return (
         <ListItemGrid>
-            <ActivityIcon>
+            <ActivityIcon status={action.status}>
                 <SubscribeIcon />
             </ActivityIcon>
             <ColumnLayout

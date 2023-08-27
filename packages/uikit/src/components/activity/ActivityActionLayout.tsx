@@ -34,7 +34,7 @@ export const SendActivityAction: FC<{
 
     return (
         <ListItemGrid>
-            <ActivityIcon>
+            <ActivityIcon status={status}>
                 <SentIcon />
             </ActivityIcon>
             <Description>
@@ -53,8 +53,10 @@ export const SendActivityAction: FC<{
                     <SecondaryText>{date}</SecondaryText>
                 </SecondLine>
             </Description>
-            <Comment comment={comment} />
-            <FailedNote status={status} />
+
+            <FailedNote status={status}>
+                <Comment comment={isScam ? undefined : comment} />
+            </FailedNote>
         </ListItemGrid>
     );
 };
@@ -72,7 +74,7 @@ export const ReceiveActivityAction: FC<{
 
     return (
         <ListItemGrid>
-            <ActivityIcon>
+            <ActivityIcon status={status}>
                 <ReceiveIcon />
             </ActivityIcon>
             <Description>
@@ -92,8 +94,9 @@ export const ReceiveActivityAction: FC<{
                     <SecondaryText>{date}</SecondaryText>
                 </SecondLine>
             </Description>
-            <Comment comment={isScam ? undefined : comment} />
-            <FailedNote status={status} />
+            <FailedNote status={status}>
+                <Comment comment={isScam ? undefined : comment} />
+            </FailedNote>
         </ListItemGrid>
     );
 };

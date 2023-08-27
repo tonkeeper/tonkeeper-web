@@ -2,7 +2,7 @@ import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { Action, ActionStatusEnum, Price } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import { useWalletContext } from '../../../hooks/appContext';
 import { useTranslation } from '../../../hooks/translation';
@@ -95,7 +95,11 @@ export const NftComment: FC<{
 const Note = styled(Body2)`
     color: ${props => props.theme.accentOrange};
 `;
-export const FailedNote: FC<{ status?: ActionStatusEnum }> = ({ status }) => {
+
+export const FailedNote: FC<PropsWithChildren<{ status?: ActionStatusEnum }>> = ({
+    status,
+    children
+}) => {
     const { t } = useTranslation();
     if (status === 'failed') {
         return (
@@ -104,7 +108,7 @@ export const FailedNote: FC<{ status?: ActionStatusEnum }> = ({ status }) => {
             </Wrapper>
         );
     } else {
-        return <></>;
+        return <>{children}</>;
     }
 };
 
@@ -123,7 +127,7 @@ export const NftItemTransferAction: FC<{
     if (nftItemTransfer.recipient?.address === wallet.active.rawAddress) {
         return (
             <ListItemGrid>
-                <ActivityIcon>
+                <ActivityIcon status={action.status}>
                     <ReceiveIcon />
                 </ActivityIcon>
                 <ColumnLayout
@@ -140,16 +144,17 @@ export const NftItemTransferAction: FC<{
                     }
                     date={date}
                 />
-                <NftComment address={nftItemTransfer.nft} openNft={openNft} />
-                <Comment comment={nftItemTransfer.comment} />
-                <FailedNote status={action.status} />
+                <FailedNote status={action.status}>
+                    <NftComment address={nftItemTransfer.nft} openNft={openNft} />
+                    <Comment comment={nftItemTransfer.comment} />
+                </FailedNote>
             </ListItemGrid>
         );
     }
 
     return (
         <ListItemGrid>
-            <ActivityIcon>
+            <ActivityIcon status={action.status}>
                 <SentIcon />
             </ActivityIcon>
             <ColumnLayout
@@ -166,9 +171,10 @@ export const NftItemTransferAction: FC<{
                 }
                 date={date}
             />
-            <NftComment address={nftItemTransfer.nft} openNft={openNft} />
-            <Comment comment={nftItemTransfer.comment} />
-            <FailedNote status={action.status} />
+            <FailedNote status={action.status}>
+                <NftComment address={nftItemTransfer.nft} openNft={openNft} />
+                <Comment comment={nftItemTransfer.comment} />
+            </FailedNote>
         </ListItemGrid>
     );
 };
@@ -185,7 +191,7 @@ export const NftPurchaseAction: FC<{
     }
     return (
         <ListItemGrid>
-            <ActivityIcon>
+            <ActivityIcon status={action.status}>
                 <SentIcon />
             </ActivityIcon>
             <Description>
@@ -199,8 +205,9 @@ export const NftPurchaseAction: FC<{
                     <SecondaryText>{date}</SecondaryText>
                 </SecondLine>
             </Description>
-            <NftComment address={nftPurchase.nft.address} openNft={openNft} />
-            <FailedNote status={action.status} />
+            <FailedNote status={action.status}>
+                <NftComment address={nftPurchase.nft.address} openNft={openNft} />{' '}
+            </FailedNote>
         </ListItemGrid>
     );
 };
@@ -278,10 +285,10 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
         <ActionDetailsBlock event={event}>
             <NftActivityHeader data={data} timestamp={timestamp} kind={kind} />
             <ListBlock margin={false} fullWidth>
-                {kind == 'received' && nftItemTransfer.sender && (
+                {kind === 'received' && nftItemTransfer.sender && (
                     <ActionSenderDetails sender={nftItemTransfer.sender} />
                 )}
-                {kind == 'send' && nftItemTransfer.recipient && (
+                {kind === 'send' && nftItemTransfer.recipient && (
                     <ActionRecipientDetails recipient={nftItemTransfer.recipient} />
                 )}
                 <ActionTransactionDetails eventId={event.eventId} />

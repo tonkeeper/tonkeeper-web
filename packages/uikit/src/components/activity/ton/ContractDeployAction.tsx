@@ -64,7 +64,7 @@ export const ContractDeployAction: FC<{
     if (interfaces.includes('nft_item')) {
         return (
             <ListItemGrid>
-                <ActivityIcon>
+                <ActivityIcon status={action.status}>
                     <ContractDeployIcon />
                 </ActivityIcon>
                 <ColumnLayout title={t('NFT_creation')} entry="-" address={address} date={date} />
@@ -75,7 +75,7 @@ export const ContractDeployAction: FC<{
     if (interfaces.includes('nft_collection')) {
         return (
             <ListItemGrid>
-                <ActivityIcon>
+                <ActivityIcon status={action.status}>
                     <ContractDeployIcon />
                 </ActivityIcon>
                 <ColumnLayout
