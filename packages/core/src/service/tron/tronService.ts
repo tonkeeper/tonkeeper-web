@@ -68,7 +68,7 @@ export const importTronWallet = async (
 };
 
 export const getTronWalletState = (tron: TronWalletStorage, network?: Network): TronWalletState => {
-    const chainId = network === Network.MAINNET ? TronChain.MAINNET : TronChain.NILE;
+    const chainId = network !== Network.TESTNET ? TronChain.MAINNET : TronChain.NILE;
 
     if (tron.walletByChain[chainId]) {
         return {
