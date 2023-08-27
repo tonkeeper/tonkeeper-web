@@ -25,7 +25,7 @@ export function hashRequest(request: RequestData, contractAddress: string, chain
             request.deadline,
             request.nonce,
             request.messages.map(m => [
-                '0x' + TronAddress.base58Tohex(m.to).slice(2),
+                '0x' + TronAddress.base58ToHex(m.to).slice(2),
                 m.value,
                 m.data
             ])

@@ -5,7 +5,7 @@ import {
     importTronWallet
 } from '@tonkeeper/core/dist/service/tron/tronService';
 import { setWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
-import { TronApi, TronBalance, TronBalances } from '@tonkeeper/core/dist/tronApi';
+import { TronApi, TronBalance, TronBalances, TronToken } from '@tonkeeper/core/dist/tronApi';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { QueryKey } from '../../libs/queryKey';
@@ -28,18 +28,33 @@ export const useTronWalletState = (enabled = true) => {
         [wallet.publicKey, QueryKey.tron, wallet.network, TronKeys.state],
         async () => {
             if (wallet.tron) {
-                return getTronWalletState(tronApi, wallet.tron, wallet.network);
+                return getTronWalletState(wallet.tron, wallet.network);
             }
 
             const password = await getWalletPassword(sdk, 'confirm');
             const tron = await importTronWallet(sdk.storage, tronApi, wallet, password);
 
-            const result = await getTronWalletState(tronApi, tron, wallet.network);
+            const result = getTronWalletState(tron, wallet.network);
 
             client.invalidateQueries([QueryKey.account, QueryKey.wallet]);
             return result;
         },
         { enabled }
+    );
+};
+
+export const useTronTokens = () => {
+    const {
+        api: { tronApi }
+    } = useAppContext();
+    const wallet = useWalletContext();
+    return useQuery<TronToken[], Error>(
+        [QueryKey.tron, wallet.network, TronKeys.balance, wallet.tron],
+        async () => {
+            const sdk = new TronApi(tronApi);
+            const { tokens } = await sdk.getSettings();
+            return tokens;
+        }
     );
 };
 
@@ -55,11 +70,7 @@ export const useTronBalances = () => {
             const sdk = new TronApi(tronApi);
 
             if (wallet.tron) {
-                const { walletAddress } = await getTronWalletState(
-                    tronApi,
-                    wallet.tron,
-                    wallet.network
-                );
+                const { walletAddress } = getTronWalletState(wallet.tron, wallet.network);
                 return sdk.getWalletBalances({
                     walletAddress
                 });

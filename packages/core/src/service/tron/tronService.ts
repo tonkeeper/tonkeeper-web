@@ -2,10 +2,12 @@ import { ethers } from 'ethers';
 import { hmac_sha512, mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../../Storage';
 import { Network } from '../../entries/network';
+import { Factories, TronChain, WalletImplementations } from '../../entries/tron';
 import { TronWalletState, TronWalletStorage, WalletState } from '../../entries/wallet';
 import { Configuration, TronApi } from '../../tronApi';
 import { getWalletMnemonic } from '../mnemonicService';
 import { setWalletState } from '../wallet/storeService';
+import { calculateCreate2 } from './addressCalculation';
 import { TronAddress } from './tronUtils';
 
 export const getPrivateKey = async (tonMnemonic: string[]): Promise<string> => {
@@ -65,12 +67,8 @@ export const importTronWallet = async (
     return tron;
 };
 
-export const getTronWalletState = async (
-    tronApi: Configuration,
-    tron: TronWalletStorage,
-    network?: Network
-): Promise<TronWalletState> => {
-    const chainId = network === Network.MAINNET ? '0x2b6653dc' : '0xcd8690dc';
+export const getTronWalletState = (tron: TronWalletStorage, network?: Network): TronWalletState => {
+    const chainId = network === Network.MAINNET ? TronChain.MAINNET : TronChain.NILE;
 
     if (tron.walletByChain[chainId]) {
         return {
@@ -80,13 +78,15 @@ export const getTronWalletState = async (
         };
     }
 
-    const tronWallet = await new TronApi(tronApi).getWallet({
-        ownerAddress: tron.ownerWalletAddress
+    const predictedAddress = calculateCreate2({
+        factoryAddress: Factories[chainId],
+        ownerAddress: tron.ownerWalletAddress,
+        implementationAddress: WalletImplementations[chainId]
     });
 
     return {
         ownerWalletAddress: tron.ownerWalletAddress,
-        chainId: tronWallet.chainId,
-        walletAddress: tronWallet.address
+        chainId: chainId,
+        walletAddress: predictedAddress
     };
 };

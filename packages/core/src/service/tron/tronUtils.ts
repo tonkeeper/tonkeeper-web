@@ -1,4 +1,4 @@
-import { ethers, AbiCoder, sha256, encodeBase58, decodeBase58 } from 'ethers';
+import { AbiCoder, decodeBase58, encodeBase58, ethers, sha256 } from 'ethers';
 export const ADDRESS_PREFIX_REGEX = /^(41)/;
 
 export const TronAddress = {
@@ -7,7 +7,7 @@ export const TronAddress = {
         const checkSumTail = sha256(sha256(tronAddressPayload)).slice(2, 10);
         return encodeBase58(tronAddressPayload + checkSumTail);
     },
-    base58Tohex(address: string): string {
+    base58ToHex(address: string): string {
         const decoded = decodeBase58(address).toString(16);
         return decoded.slice(0, -8);
     }
@@ -23,7 +23,7 @@ export function keccak256(value: string) {
 export function encodeTronParams(types: string[], values: unknown[]) {
     for (let i = 0; i < types.length; i++) {
         if (types[i] === 'address') {
-            values[i] = TronAddress.base58Tohex(values[i] as string).replace(
+            values[i] = TronAddress.base58ToHex(values[i] as string).replace(
                 ADDRESS_PREFIX_REGEX,
                 '0x'
             );
