@@ -9,7 +9,6 @@ import { useFormatBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { useFormatFiat, useRate } from '../../state/rates';
-import { ToncoinIcon } from '../Icon';
 import { ListBlock, ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 import { TronAssets } from './TronAssets';
@@ -43,7 +42,7 @@ const TonAsset: FC<{
     return (
         <ListItem onClick={() => navigate(AppRoute.coins + '/ton')}>
             <ListItemPayload>
-                <ToncoinIcon />
+                <TokenLogo src="/img/toncoin.svg" />
                 <TokenLayout
                     name={t('Toncoin')}
                     symbol={CryptoCurrency.TON}
