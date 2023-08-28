@@ -29,7 +29,7 @@ const CopyBlock = styled.div`
 `;
 
 const Background = styled.div<{ extension?: boolean }>`
-    padding: 24px;
+    padding: 20px;
     width: 100%;
     box-sizing: border-box;
     border-radius: 20px;
@@ -55,7 +55,7 @@ const AddressText = styled(Body1)<{ extension?: boolean }>`
     display: inline-block;
     word-break: break-all;
     color: black;
-    margin-top: 24px;
+    margin: 16px 4px 0;
     text-align: center;
     ${props =>
         props.extension &&
