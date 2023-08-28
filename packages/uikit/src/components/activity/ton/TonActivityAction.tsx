@@ -185,8 +185,15 @@ export const JettonSwapAction: FC<{
                     </AmountText>
                     <AmountText green>{jettonSwap.jettonMasterOut.symbol}</AmountText>
                 </FirstLine>
-                <SecondLine>
+                <FirstLine>
                     <SecondaryText>{toDexName(jettonSwap.dex)}</SecondaryText>
+                    <AmountText>
+                        -&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)}
+                    </AmountText>
+                    <AmountText>{jettonSwap.jettonMasterIn.symbol}</AmountText>
+                </FirstLine>
+                <SecondLine>
+                    <SecondaryText></SecondaryText>
                     <SecondaryText>{date}</SecondaryText>
                 </SecondLine>
             </Description>

@@ -10,6 +10,8 @@ export const ListItemGrid = styled(ListItemPayload)`
     grid-template-columns: min-content 1fr;
     column-gap: 1rem;
     row-gap: 0.5rem;
+
+    align-items: flex-start;
 `;
 
 export const Description = styled.div`
