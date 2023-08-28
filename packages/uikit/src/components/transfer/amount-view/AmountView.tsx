@@ -8,6 +8,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { getDecimalSeparator, getGroupSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { formatSendValue, isNumeric } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import React, { FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -60,14 +61,21 @@ export type AmountViewState = {
     inFiat: boolean;
 };
 
-function formatStringToInput(value: string): string {
-    value = replaceTypedDecimalSeparator(value);
+function formatStringToInput(value: BigNumber | string): string {
+    if (value instanceof BigNumber) {
+        return value.toFormat({
+            groupSeparator: getGroupSeparator(),
+            decimalSeparator: getDecimalSeparator()
+        });
+    } else {
+        value = replaceTypedDecimalSeparator(value);
 
-    if (isNumeric(value)) {
-        value = formatSendValue(value);
+        if (isNumeric(value)) {
+            value = formatSendValue(value);
+        }
+
+        return value;
     }
-
-    return value;
 }
 
 export const AmountView: FC<{
@@ -85,13 +93,7 @@ export const AmountView: FC<{
     const { fiat, standalone } = useAppContext();
     const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
 
-    const [input, setInput] = useState<string>(
-        formatStringToInput(
-            defaults?.amount instanceof BigNumber
-                ? defaults.amount.toFixed()
-                : defaults?.amount || '0'
-        )
-    );
+    const [input, setInput] = useState<string>(formatStringToInput(defaults?.amount || '0'));
     const [token, setToken] = useState<Asset>(
         defaults?.asset || (blockchain === BLOCKCHAIN_NAME.TON ? TON_ASSET : TRON_USDT_ASSET)
     );
