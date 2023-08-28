@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
-import { BackButton } from './fields/BackButton';
 import { ChevronLeftIcon } from './Icon';
 import { H3 } from './Text';
+import { BackButton } from './fields/BackButton';
 
 const Block = styled.div`
     flex-shrink: 0;

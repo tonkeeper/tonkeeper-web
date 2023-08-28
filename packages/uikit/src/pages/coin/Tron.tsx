@@ -5,9 +5,11 @@ import { TronApi, TronBalance } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { CoinSkeletonPage } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
+import { Body2 } from '../../components/Text';
 import { ActivityList } from '../../components/activity/ActivityGroup';
 import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
@@ -62,6 +64,17 @@ const TronActivity: FC<{
     );
 };
 
+const Layout = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 22px;
+`;
+
+const Label = styled(Body2)`
+    color: ${props => props.theme.textSecondary};
+`;
+
 const TronAsset: FC<{ tron: TronWalletState }> = ({ tron }) => {
     const { address } = useParams();
     const navigate = useNavigate();
@@ -80,7 +93,14 @@ const TronAsset: FC<{ tron: TronWalletState }> = ({ tron }) => {
 
     return (
         <>
-            <SubHeader title={tronBalance.token.name} />
+            <SubHeader
+                title={
+                    <Layout>
+                        <div>{tronBalance.token.name}</div>
+                        <Label>TRC20</Label>
+                    </Layout>
+                }
+            />
             <InnerBody ref={ref}>
                 <TronHeader tronBalance={tronBalance} />
                 <ActionsRow>
