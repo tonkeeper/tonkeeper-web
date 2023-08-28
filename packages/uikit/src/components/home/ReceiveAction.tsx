@@ -149,8 +149,9 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                         jetton: jetton
                     })}
                     logoImage="/img/toncoin.svg"
-                    logoPadding={15}
-                    logoPaddingStyle="circle"
+                    logoPadding={8}
+                    qrStyle="dots"
+                    eyeRadius={6}
                 />
                 <AddressText extension={extension}>{wallet.active.friendlyAddress}</AddressText>
             </Background>
@@ -178,8 +179,9 @@ const ReceiveTron: FC<{ tron: TronWalletState }> = ({ tron }) => {
                     size={400}
                     value={tron.walletAddress}
                     logoImage="https://wallet-dev.tonkeeper.com/img/usdt.svg"
-                    logoPadding={15}
-                    logoPaddingStyle="circle"
+                    logoPadding={8}
+                    qrStyle="dots"
+                    eyeRadius={8}
                 />
                 <AddressText extension={extension}>{tron.walletAddress}</AddressText>
             </Background>
