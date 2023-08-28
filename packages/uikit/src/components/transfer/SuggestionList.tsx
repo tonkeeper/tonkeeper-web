@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import {
     FavoriteSuggestion,
     LatestSuggestion,
@@ -35,14 +36,14 @@ const Label = styled(Label1)`
     margin-bottom: -4px;
 `;
 
-const useLatestSuggestion = () => {
+const useLatestSuggestion = (acceptBlockchains?: BLOCKCHAIN_NAME[]) => {
     const sdk = useAppSdk();
     const { api } = useAppContext();
     const wallet = useWalletContext();
 
     return useQuery(
-        [wallet.active.rawAddress, QueryKey.activity, 'suggestions'],
-        () => getSuggestionsList(sdk, api, wallet),
+        [wallet.active.rawAddress, QueryKey.activity, 'suggestions', acceptBlockchains],
+        () => getSuggestionsList(sdk, api, wallet, acceptBlockchains),
         { keepPreviousData: true }
     );
 };
@@ -236,9 +237,10 @@ const LatestItem: FC<{
 export const SuggestionList: FC<{
     onSelect: (item: Suggestion) => void;
     disabled?: boolean;
-}> = ({ onSelect, disabled }) => {
+    acceptBlockchains?: BLOCKCHAIN_NAME[];
+}> = ({ onSelect, disabled, acceptBlockchains }) => {
     const { t } = useTranslation();
-    const { data } = useLatestSuggestion();
+    const { data } = useLatestSuggestion(acceptBlockchains);
     const [addFavorite, setAdd] = useState<LatestSuggestion | undefined>(undefined);
     const [editFavorite, setEdit] = useState<FavoriteSuggestion | undefined>(undefined);
 

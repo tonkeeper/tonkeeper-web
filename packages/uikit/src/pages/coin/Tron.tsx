@@ -104,7 +104,7 @@ const TronAsset: FC<{ tron: TronWalletState }> = ({ tron }) => {
             <InnerBody ref={ref}>
                 <TronHeader tronBalance={tronBalance} />
                 <ActionsRow>
-                    <SendAction asset="TON" />
+                    <SendAction asset="TON" chain={BLOCKCHAIN_NAME.TRON} />
                     <ReceiveAction chain={BLOCKCHAIN_NAME.TRON} />
                 </ActionsRow>
                 <TronActivity tron={tron} innerRef={ref} />

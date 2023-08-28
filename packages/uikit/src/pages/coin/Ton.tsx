@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AccountRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -75,7 +75,7 @@ export const TonPage = () => {
             <SubHeader title={t('Toncoin')} />
             <InnerBody ref={ref}>
                 <TonHeader info={info} />
-                <HomeActions />
+                <HomeActions chain={BLOCKCHAIN_NAME.TON} />
                 <ActivityList
                     isFetched={isFetched}
                     isFetchingNextPage={isFetchingNextPage}

@@ -287,7 +287,11 @@ export const RecipientView: FC<{
                 <Warning>{t('send_screen_steps_comfirm_comment_required_text')}</Warning>
             )}
 
-            <SuggestionList onSelect={onSelect} disabled={isExternalLoading} />
+            <SuggestionList
+                onSelect={onSelect}
+                disabled={isExternalLoading}
+                acceptBlockchains={acceptBlockchains}
+            />
 
             <Gap />
 

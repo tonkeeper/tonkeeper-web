@@ -42,23 +42,48 @@ export const deleteFavoriteSuggestion = async (
     storage.set(`${AppKey.FAVOURITES}_${publicKey}`, items);
 };
 
-export const getSuggestionsList = async (sdk: IAppSdk, api: APIConfig, wallet: WalletState) => {
+const getTronSuggestionsList = async (
+    api: APIConfig,
+    wallet: WalletState,
+    seeIfAddressIsAdded: (list: LatestSuggestion[], address: string) => boolean
+) => {
+    const list = [] as LatestSuggestion[];
+
+    if (wallet.tron) {
+        const tronItems = await new TronApi(api.tronApi).getTransactions({
+            ownerAddress: wallet.tron.ownerWalletAddress,
+            limit: 100
+        });
+
+        tronItems.events.forEach(event => {
+            event.actions.forEach(({ sendTRC20 }) => {
+                if (sendTRC20 && !seeIfAddressIsAdded(list, sendTRC20.recipient)) {
+                    list.push({
+                        isFavorite: false,
+                        timestamp: event.timestamp,
+                        address: sendTRC20.recipient,
+                        blockchain: BLOCKCHAIN_NAME.TRON
+                    });
+                }
+            });
+        });
+    }
+
+    return list;
+};
+
+const getTonSuggestionsList = async (
+    api: APIConfig,
+    wallet: WalletState,
+    seeIfAddressIsAdded: (list: LatestSuggestion[], address: string) => boolean
+) => {
+    const list = [] as LatestSuggestion[];
+
     const items = await new AccountsApi(api.tonApiV2).getAccountEvents({
         accountId: wallet.active.rawAddress,
         limit: 100,
         subjectOnly: true
     });
-
-    const favorites = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);
-    const hidden = await getHiddenSuggestions(sdk.storage, wallet.publicKey);
-
-    const list = [] as LatestSuggestion[];
-
-    const seeIfAddressIsAdded = (address: string) => {
-        if ([...favorites, ...list].some(item => item.address === address)) return true;
-        if (hidden.some(item => item === address)) return true;
-        return false;
-    };
 
     items.events.forEach(event => {
         const tonTransferEvent = event.actions.every(item => item.type === 'TonTransfer');
@@ -71,34 +96,54 @@ export const getSuggestionsList = async (sdk: IAppSdk, api: APIConfig, wallet: W
 
         const address = recipient.tonTransfer!.recipient.address;
 
-        if (seeIfAddressIsAdded(address)) return;
+        if (seeIfAddressIsAdded(list, address)) return;
 
         list.push({
             isFavorite: false,
             timestamp: event.timestamp * 1000,
-            address
+            address,
+            blockchain: BLOCKCHAIN_NAME.TON
         });
     });
 
-    if (wallet.tron) {
-        const tronItems = await new TronApi(api.tronApi).getTransactions({
-            ownerAddress: wallet.tron.ownerWalletAddress,
-            limit: 100
-        });
+    return list;
+};
 
-        tronItems.events.forEach(event => {
-            event.actions.forEach(({ sendTRC20 }) => {
-                if (sendTRC20 && !seeIfAddressIsAdded(sendTRC20.recipient)) {
-                    list.push({
-                        isFavorite: false,
-                        timestamp: event.timestamp,
-                        address: sendTRC20.recipient,
-                        blockchain: BLOCKCHAIN_NAME.TRON
-                    });
-                }
-            });
-        });
-    }
+export const getSuggestionsList = async (
+    sdk: IAppSdk,
+    api: APIConfig,
+    wallet: WalletState,
+    acceptBlockchains: BLOCKCHAIN_NAME[] = [BLOCKCHAIN_NAME.TON, BLOCKCHAIN_NAME.TRON]
+) => {
+    const favorites = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);
+    const hidden = await getHiddenSuggestions(sdk.storage, wallet.publicKey);
 
-    return [...favorites, ...list.sort((a, b) => b.timestamp - a.timestamp).slice(0, 10)];
+    const seeIfAddressIsAdded = (list: LatestSuggestion[], address: string) => {
+        if ([...favorites, ...list].some(item => item.address === address)) return true;
+        if (hidden.some(item => item === address)) return true;
+        return false;
+    };
+
+    const items = await Promise.all(
+        acceptBlockchains.map(name => {
+            switch (name) {
+                case BLOCKCHAIN_NAME.TON:
+                    return getTonSuggestionsList(api, wallet, seeIfAddressIsAdded);
+                case BLOCKCHAIN_NAME.TRON:
+                    return getTronSuggestionsList(api, wallet, seeIfAddressIsAdded);
+                default:
+                    throw new Error('Unexpected chain');
+            }
+        })
+    );
+
+    return [
+        ...favorites.filter(item =>
+            acceptBlockchains.includes(item.blockchain ?? BLOCKCHAIN_NAME.TON)
+        ),
+        ...items
+            .flat()
+            .sort((a, b) => b.timestamp - a.timestamp)
+            .slice(0, 10)
+    ];
 };

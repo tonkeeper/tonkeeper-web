@@ -28,10 +28,11 @@ import { RecipientView, useGetToAccount } from './RecipientView';
 import { AmountView, AmountViewState } from './amount-view/AmountView';
 import { Wrapper, childFactoryCreator, duration } from './common';
 
-const SendContent: FC<{ onClose: () => void; asset?: TonAsset | TronAsset }> = ({
-    onClose,
-    asset
-}) => {
+const SendContent: FC<{
+    onClose: () => void;
+    asset?: TonAsset | TronAsset;
+    chain?: BLOCKCHAIN_NAME;
+}> = ({ onClose, asset, chain }) => {
     const sdk = useAppSdk();
     const { standalone, ios, extension } = useAppContext();
     const { t } = useTranslation();
@@ -205,6 +206,7 @@ const SendContent: FC<{ onClose: () => void; asset?: TonAsset | TronAsset }> = (
                                 onScan={onScan}
                                 keyboard="decimal"
                                 isExternalLoading={isAccountLoading}
+                                acceptBlockchains={chain ? [chain] : undefined}
                             />
                         )}
                         {view === 'amount' && (
@@ -235,7 +237,7 @@ const SendContent: FC<{ onClose: () => void; asset?: TonAsset | TronAsset }> = (
     );
 };
 
-export const SendAction: FC<{ asset?: string }> = ({ asset }) => {
+export const SendAction: FC<{ asset?: string; chain?: BLOCKCHAIN_NAME }> = ({ asset, chain }) => {
     const [open, setOpen] = useState(false);
     const { data: jettons } = useWalletJettonList();
 
@@ -249,8 +251,8 @@ export const SendAction: FC<{ asset?: string }> = ({ asset }) => {
         } catch {
             //
         }
-        return <SendContent onClose={() => setOpen(false)} asset={token} />;
-    }, [open, asset, jettons]);
+        return <SendContent onClose={() => setOpen(false)} asset={token} chain={chain} />;
+    }, [open, asset, jettons, chain]);
 
     return (
         <>
