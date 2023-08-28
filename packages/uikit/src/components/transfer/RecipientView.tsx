@@ -145,6 +145,10 @@ export const RecipientView: FC<{
     }, [setAddress, dnsWallet]);
 
     const isValidForBlockchain = useMemo(() => {
+        if (acceptBlockchains && acceptBlockchains.length === 1) {
+            return acceptBlockchains[0];
+        }
+
         let validForBlockchain;
         if ('dns' in recipient || seeIfValidTonAddress(recipient.address)) {
             validForBlockchain = BLOCKCHAIN_NAME.TON;
