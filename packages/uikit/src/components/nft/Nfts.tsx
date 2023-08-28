@@ -152,7 +152,10 @@ export const NftsList: FC<{ nfts: NFT[] | undefined }> = ({ nfts }) => {
         <>
             <Grid>
                 {(nfts ?? []).map(item => {
-                    if (!item.metadata || Object.entries(item.metadata).length === 0) {
+                    if (
+                        (!item.metadata || Object.entries(item.metadata).length === 0) &&
+                        !item.dns
+                    ) {
                         return <></>;
                     }
                     return (
