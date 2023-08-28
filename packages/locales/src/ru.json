@@ -263,7 +263,7 @@
         "message": "Покупка"
     },
     "receive_ton": {
-        "message": "Получить Toncoinn"
+        "message": "Получить Toncoin"
     },
     "receive_trc20": {
         "message": "Получить USDT TRC20"
