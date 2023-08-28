@@ -27,7 +27,7 @@ import {
 import { toDexName } from '../NotificationCommon';
 import { SubscribeAction, UnSubscribeAction } from '../SubscribeAction';
 import { ContractDeployAction } from './ContractDeployAction';
-import { NftComment, NftItemTransferAction, NftPurchaseAction } from './NftActivity';
+import { NftItemTransferAction, NftPurchaseAction } from './NftActivity';
 
 const TonTransferAction: FC<{
     action: Action;
@@ -210,8 +210,7 @@ export const JettonSwapAction: FC<{
 const AuctionBidAction: FC<{
     action: Action;
     date: string;
-    openNft: (nft: NftItemRepr) => void;
-}> = ({ action, date, openNft }) => {
+}> = ({ action, date }) => {
     const { t } = useTranslation();
     const { auctionBid } = action;
     const wallet = useWalletContext();
@@ -234,13 +233,15 @@ const AuctionBidAction: FC<{
                 </FirstLine>
                 <SecondLine>
                     <SecondaryText>
-                        {auctionBid.auctionType ??
-                            toShortValue(formatAddress(auctionBid.bidder.address, wallet.network))}
+                        {(auctionBid.auctionType as string) !== ''
+                            ? auctionBid.auctionType
+                            : toShortValue(
+                                  formatAddress(auctionBid.auction.address, wallet.network)
+                              )}
                     </SecondaryText>
                     <SecondaryText>{date}</SecondaryText>
                 </SecondLine>
             </Description>
-            {auctionBid.nft && <NftComment address={auctionBid.nft.address} openNft={openNft} />}
             <FailedNote status={action.status} />
         </ListItemGrid>
     );
@@ -270,7 +271,7 @@ export const ActivityAction: FC<{
         case 'Subscribe':
             return <SubscribeAction action={action} date={date} />;
         case 'AuctionBid':
-            return <AuctionBidAction action={action} date={date} openNft={openNft} />;
+            return <AuctionBidAction action={action} date={date} />;
         case 'SmartContractExec':
             return <SmartContractExecAction action={action} date={date} />;
         case 'JettonSwap':

@@ -180,7 +180,7 @@ export const AuctionBidActionDetails: FC<ActionData> = ({ action, timestamp, eve
                 <FailedDetail status={action.status} />
             </div>
             <ListBlock margin={false} fullWidth>
-                <ActionBeneficiaryDetails beneficiary={auctionBid.bidder} />
+                <ActionBeneficiaryDetails beneficiary={auctionBid.auction} />
                 <ActionTransactionDetails eventId={event.eventId} />
                 <ActionExtraDetails extra={event.extra} />
             </ListBlock>
