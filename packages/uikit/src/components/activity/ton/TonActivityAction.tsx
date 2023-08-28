@@ -4,7 +4,12 @@ import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { ListItemPayload } from '../../../components/List';
-import { ActivityIcon, SentIcon, SwapIcon } from '../../../components/activity/ActivityIcons';
+import {
+    ActivityIcon,
+    ContractDeployIcon,
+    SentIcon,
+    SwapIcon
+} from '../../../components/activity/ActivityIcons';
 import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
@@ -138,7 +143,7 @@ export const SmartContractExecAction: FC<{
     return (
         <ListItemGrid>
             <ActivityIcon status={action.status}>
-                <SentIcon />
+                <ContractDeployIcon />
             </ActivityIcon>
             <Description>
                 <FirstLine>
