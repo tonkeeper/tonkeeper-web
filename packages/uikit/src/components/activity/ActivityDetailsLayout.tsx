@@ -67,7 +67,7 @@ export const TransferComment: FC<{ comment?: string }> = ({ comment }) => {
         return (
             <ListItem hover={false}>
                 <ListItemPayload>
-                    <Label>{t('transaction_message')}</Label>
+                    <Label>{t('txActions_signRaw_comment')}</Label>
                     <LabelRight>{comment}</LabelRight>
                 </ListItemPayload>
             </ListItem>
@@ -75,6 +75,19 @@ export const TransferComment: FC<{ comment?: string }> = ({ comment }) => {
     } else {
         return null;
     }
+};
+
+export const TransferOpCode: FC<{ operation: string }> = ({ operation }) => {
+    const { t } = useTranslation();
+
+    return (
+        <ListItem hover={false}>
+            <ListItemPayload>
+                <Label>{t('Operation')}</Label>
+                <LabelRight>{operation}</LabelRight>
+            </ListItemPayload>
+        </ListItem>
+    );
 };
 
 const Note = styled(Body1)`

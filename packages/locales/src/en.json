@@ -280,5 +280,8 @@
     },
     "txActions_USDT_transfer": {
         "message": "USDT Transfer"
+    },
+    "Operation": {
+        "message": "Operation"
     }
 }

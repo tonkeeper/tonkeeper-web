@@ -18,7 +18,8 @@ import {
     ActivityDetailsHeader,
     Amount,
     FailedDetail,
-    TransferComment
+    TransferComment,
+    TransferOpCode
 } from '../ActivityDetailsLayout';
 import {
     ActionBeneficiaryDetails,
@@ -214,7 +215,7 @@ export const SmartContractExecActionDetails: FC<ActionData> = ({ action, timesta
                 <ActionRecipientDetails recipient={smartContractExec.contract} />
                 <ActionTransactionDetails eventId={event.eventId} />
                 <ActionExtraDetails extra={event.extra} />
-                <TransferComment comment={smartContractExec.operation} />
+                <TransferOpCode operation={smartContractExec.operation} />
             </ListBlock>
         </ActionDetailsBlock>
     );

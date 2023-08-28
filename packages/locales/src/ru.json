@@ -276,5 +276,8 @@
     },
     "txActions_USDT_transfer": {
         "message": "Перевод USDT"
+    },
+    "Operation": {
+        "message": "Operation"
     }
 }
