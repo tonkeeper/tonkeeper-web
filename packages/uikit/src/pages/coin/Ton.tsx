@@ -54,7 +54,8 @@ export const TonPage = () => {
             new AccountsApi(api.tonApiV2).getAccountEvents({
                 accountId: wallet.active.rawAddress,
                 limit: 20,
-                beforeLt: pageParam
+                beforeLt: pageParam,
+                subjectOnly: true
             }),
         getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
     });

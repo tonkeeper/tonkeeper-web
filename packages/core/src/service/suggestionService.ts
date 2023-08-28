@@ -45,7 +45,8 @@ export const deleteFavoriteSuggestion = async (
 export const getSuggestionsList = async (sdk: IAppSdk, api: APIConfig, wallet: WalletState) => {
     const items = await new AccountsApi(api.tonApiV2).getAccountEvents({
         accountId: wallet.active.rawAddress,
-        limit: 100
+        limit: 100,
+        subjectOnly: true
     });
 
     const favorites = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);
