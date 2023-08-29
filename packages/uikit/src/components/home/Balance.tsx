@@ -24,7 +24,6 @@ const Block = styled.div`
 
 const Body = styled(Label2)`
     color: ${props => props.theme.textSecondary};
-    cursor: pointer;
     user-select: none;
 `;
 
