@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { useAppContext } from '../../hooks/appContext';
 import { formatFiatCurrency } from '../../hooks/balance';
+import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { TokenRate, getRateKey } from '../../state/rates';
 import { SkeletonText } from '../Skeleton';
@@ -135,6 +136,8 @@ export const Balance: FC<{
     isFetching: boolean;
     assets: AssetData;
 }> = ({ assets, error, isFetching }) => {
+    const { t } = useTranslation();
+
     const { fiat } = useAppContext();
 
     const client = useQueryClient();
@@ -160,10 +163,12 @@ export const Balance: FC<{
             clearTimeout(timer);
         };
     }, [total]);
+
     return (
         <Block>
             <MessageBlock error={error} isFetching={isFetching} />
             <Amount>{formatFiatCurrency(fiat, total)}</Amount>
+            <Body>{t('total_balance')}</Body>
         </Block>
     );
 };

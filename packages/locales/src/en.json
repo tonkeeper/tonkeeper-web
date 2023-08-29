@@ -283,5 +283,8 @@
     },
     "Operation": {
         "message": "Operation"
+    },
+    "total_balance": {
+        "message": "total balance"
     }
 }
