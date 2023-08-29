@@ -10,6 +10,10 @@ import { ListItem, ListItemPayload } from '../List';
 import { Label1 } from '../Text';
 import { Label } from './common';
 
+export const cropName = (name: string) => {
+    return name.length > 30 ? toShortValue(name, 8) : name;
+};
+
 const RecipientItem: FC<{ name: string; label: string }> = ({ name, label }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
@@ -18,7 +22,7 @@ const RecipientItem: FC<{ name: string; label: string }> = ({ name, label }) => 
         <ListItem onClick={() => sdk.copyToClipboard(name)}>
             <ListItemPayload>
                 <Label>{t('txActions_signRaw_recipient')}</Label>
-                <Label1>{label}</Label1>
+                <Label1>{cropName(label)}</Label1>
             </ListItemPayload>
         </ListItem>
     );

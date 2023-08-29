@@ -87,6 +87,12 @@ const useDnsWallet = (value: string) => {
     );
 };
 
+const seeIfValidTonRecipient = (recipient: BaseRecipient | DnsRecipient) => {
+    return 'dns' in recipient || seeIfValidTonAddress(recipient.address);
+};
+
+const defaultRecipient = { address: '' };
+
 export const RecipientView: FC<{
     title: string;
     data?: RecipientData;
@@ -116,9 +122,7 @@ export const RecipientView: FC<{
 
     const [comment, setComment] = useState(data && 'comment' in data ? data.comment : '');
     const [recipient, setAddress] = useState<BaseRecipient | DnsRecipient>(
-        data?.address ?? {
-            address: ''
-        }
+        data?.address ?? defaultRecipient
     );
 
     const { data: dnsWallet, isFetching: isDnsFetching } = useDnsWallet(recipient.address);
@@ -146,7 +150,7 @@ export const RecipientView: FC<{
         }
 
         let validForBlockchain;
-        if ('dns' in recipient || seeIfValidTonAddress(recipient.address)) {
+        if (seeIfValidTonRecipient(recipient)) {
             validForBlockchain = BLOCKCHAIN_NAME.TON;
         } else if (seeIfValidTronAddress(recipient.address)) {
             validForBlockchain = BLOCKCHAIN_NAME.TRON;
@@ -162,8 +166,18 @@ export const RecipientView: FC<{
         return null;
     }, [recipient]);
 
+    const isValidAddress = useMemo(() => {
+        if (acceptBlockchains && acceptBlockchains.length === 1) {
+            return acceptBlockchains[0] === BLOCKCHAIN_NAME.TON
+                ? seeIfValidTonRecipient(recipient)
+                : seeIfValidTronAddress(recipient.address);
+        } else {
+            return true;
+        }
+    }, [acceptBlockchains, recipient]);
+
     const { data: toAccount, isFetching: isAccountFetching } = useToAccount(
-        isValidForBlockchain === BLOCKCHAIN_NAME.TON,
+        isValidForBlockchain === BLOCKCHAIN_NAME.TON && seeIfValidTonRecipient(recipient),
         recipient
     );
 
@@ -207,7 +221,7 @@ export const RecipientView: FC<{
                 isValid = isMemoValid && toAccount;
                 break;
             case BLOCKCHAIN_NAME.TRON:
-                isValid = true;
+                isValid = seeIfValidTronAddress(recipient.address);
         }
         if (isValid) {
             if (ios && keyboard) openIosKeyboard(keyboard);
@@ -268,7 +282,7 @@ export const RecipientView: FC<{
                     onScan={onScan}
                     onChange={address => setAddress({ address })}
                     label={t('transaction_recipient_address')}
-                    isValid={!submitted || !!isValidForBlockchain}
+                    isValid={!submitted || (!!isValidForBlockchain && isValidAddress)}
                     disabled={isExternalLoading}
                 />
             </ShowAddress>

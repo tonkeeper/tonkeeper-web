@@ -74,7 +74,7 @@ function formatStringToInput(value: BigNumber | string): string {
             value = formatSendValue(value);
         }
 
-        return value;
+        return value as string;
     }
 }
 
