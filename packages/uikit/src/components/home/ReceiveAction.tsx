@@ -152,7 +152,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                     logoPadding={8}
                     qrStyle="dots"
                     eyeRadius={{
-                        inner: 4,
+                        inner: 2,
                         outer: 16
                     }}
                 />
@@ -185,7 +185,7 @@ const ReceiveTron: FC<{ tron: TronWalletState }> = ({ tron }) => {
                     logoPadding={8}
                     qrStyle="dots"
                     eyeRadius={{
-                        inner: 4,
+                        inner: 2,
                         outer: 16
                     }}
                 />
