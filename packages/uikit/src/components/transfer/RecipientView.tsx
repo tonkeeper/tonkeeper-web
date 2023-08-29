@@ -63,11 +63,7 @@ const useDnsWallet = (value: string) => {
             if (v === '' || v.length < 4 || seeIfValidTonAddress(v) || seeIfValidTronAddress(v)) {
                 setName('');
             } else {
-                let val = v.trim().toLowerCase();
-                if (!val.includes('.')) {
-                    val += '.ton';
-                }
-                setName(val);
+                setName(v.trim().toLowerCase());
             }
         }, 400);
     }, [setName]);
