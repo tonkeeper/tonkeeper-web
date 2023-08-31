@@ -53,8 +53,14 @@ const useToAccount = (isValid: boolean, recipient: BaseRecipient | DnsRecipient)
     );
 };
 
-const seeIfInvalidSize = (value: string) => {
-    return value.length < 4 || value.length >= 48; // Min value 4 and max 48 - ton address length
+const seeIfInvalidDns = (value: string) => {
+    return (
+        value.length < 8 ||
+        value.length === 48 ||
+        value.length === 52 ||
+        seeIfValidTonAddress(value) ||
+        seeIfValidTronAddress(value)
+    );
 };
 
 const useDnsWallet = (value: string) => {
@@ -63,18 +69,7 @@ const useDnsWallet = (value: string) => {
     const [name, setName] = useState('');
 
     const update = useMemo(() => {
-        return debounce<[string]>(v => {
-            v = v.trim();
-            if (seeIfInvalidSize(v) || seeIfValidTonAddress(v) || seeIfValidTronAddress(v)) {
-                setName('');
-            } else {
-                let val = v.toLowerCase();
-                if (!val.includes('.')) {
-                    val += '.ton';
-                }
-                setName(val);
-            }
-        }, 400);
+        return debounce<[string]>(v => setName(v), 400);
     }, [setName]);
 
     update(value);
@@ -82,10 +77,14 @@ const useDnsWallet = (value: string) => {
     return useQuery(
         [QueryKey.dns, value, name],
         async () => {
-            if (seeIfInvalidSize(name)) {
+            if (value !== name) {
                 return null;
             }
-            const result = await new DNSApi(api.tonApi).dnsResolve({ name });
+            const dns = name.trim();
+            if (seeIfInvalidDns(dns)) {
+                return null;
+            }
+            const result = await new DNSApi(api.tonApi).dnsResolve({ name: dns });
             if (!result.wallet) {
                 return null;
             }
