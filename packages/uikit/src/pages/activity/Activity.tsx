@@ -29,7 +29,7 @@ const Activity: FC = () => {
         queryFn: ({ pageParam = undefined }) =>
             new AccountsApi(api.tonApiV2).getAccountEvents({
                 accountId: wallet.active.rawAddress,
-                limit: 80,
+                limit: 40,
                 beforeLt: pageParam,
                 subjectOnly: true
             }),
@@ -48,7 +48,7 @@ const Activity: FC = () => {
             new TronApi(api.tronApi).getTransactions({
                 ownerAddress: wallet.tron!.ownerWalletAddress,
                 fingerprint: pageParam,
-                limit: 80
+                limit: 40
             }),
         getNextPageParam: lastPage => lastPage.fingerprint,
         enabled: wallet.tron !== undefined
