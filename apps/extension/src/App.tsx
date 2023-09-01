@@ -113,6 +113,8 @@ export const App: FC = () => {
 };
 
 const PageWrapper = styled(Container)`
+    min-width: 385px;
+
     > * {
         overflow: auto;
         width: var(--app-width);
