@@ -13,6 +13,34 @@ export interface TonActivity {
     event: AccountEvent;
 }
 
+const cutOffTronEvents = (
+    tonEvents: InfiniteData<AccountEvents> | undefined,
+    tronEvents: InfiniteData<TronEvents>
+): InfiniteData<TronEvents> => {
+    if (!tonEvents || !tonEvents.pages.length) {
+        return tronEvents;
+    }
+
+    if (tonEvents.pageParams.length) {
+        const pastPageParam = tonEvents.pageParams[tonEvents.pageParams.length - 1];
+        if (pastPageParam === undefined || pastPageParam === 0) {
+            return tronEvents;
+        }
+    }
+
+    const { events } = tonEvents.pages[tonEvents.pages.length - 1];
+    const lastEvents = events[events.length - 1];
+
+    const lastTime = lastEvents.timestamp * 1000;
+
+    return {
+        pageParams: tronEvents.pageParams,
+        pages: tronEvents.pages.map(page => {
+            return { ...page, events: page.events.filter(event => event.timestamp > lastTime) };
+        })
+    };
+};
+
 export type MixedActivity = TronActivity | TonActivity;
 
 export const getMixedActivity = (
@@ -33,7 +61,8 @@ export const getMixedActivity = (
     }
 
     if (tronEvents) {
-        tronEvents.pages.forEach(page => {
+        const events = cutOffTronEvents(tonEvents, tronEvents);
+        events.pages.forEach(page => {
             const tronActivity: GenericActivity<MixedActivity>[] = page.events.map(event => ({
                 timestamp: event.timestamp,
                 key: `${event.txHash}-${event.actions.map(item => item.type).join('-')}`,
