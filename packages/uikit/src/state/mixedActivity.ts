@@ -29,6 +29,8 @@ const cutOffTronEvents = (
     }
 
     const { events } = tonEvents.pages[tonEvents.pages.length - 1];
+    if (!events.length) return tronEvents;
+
     const lastEvents = events[events.length - 1];
 
     const lastTime = lastEvents.timestamp * 1000;
