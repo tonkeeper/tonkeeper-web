@@ -92,7 +92,7 @@ const createTonTransfer = (
             internal({
                 to: recipient.toAccount.address.raw,
                 bounce: recipient.toAccount.status === 'active',
-                value: BigInt(weiAmount.toFixed()),
+                value: BigInt(weiAmount.toFixed(0)),
                 body: recipient.comment !== '' ? recipient.comment : undefined
             })
         ]
