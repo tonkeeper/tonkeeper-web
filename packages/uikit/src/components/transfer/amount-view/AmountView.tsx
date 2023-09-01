@@ -56,7 +56,8 @@ import {
 
 export type AmountViewState = {
     asset: Asset;
-    amount: string | BigNumber;
+    amount: BigNumber;
+    fiatAmount?: BigNumber;
     isMax: boolean;
     inFiat: boolean;
 };
@@ -93,12 +94,16 @@ export const AmountView: FC<{
     const { fiat, standalone } = useAppContext();
     const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
 
-    const [input, setInput] = useState<string>(formatStringToInput(defaults?.amount || '0'));
+    const [inFiat, setInFiat] = useState(defaults?.inFiat ?? false);
+    const [max, setMax] = useState(defaults?.isMax ?? false);
+
+    const [input, setInput] = useState<string>(
+        formatStringToInput((inFiat ? defaults?.fiatAmount : defaults?.amount) || '0')
+    );
+
     const [token, setToken] = useState<Asset>(
         defaults?.asset || (blockchain === BLOCKCHAIN_NAME.TON ? TON_ASSET : TRON_USDT_ASSET)
     );
-    const [inFiat, setInFiat] = useState(defaults?.inFiat ?? false);
-    const [max, setMax] = useState(defaults?.isMax ?? false);
 
     const rateAddress =
         token.blockchain === BLOCKCHAIN_NAME.TRON
@@ -114,11 +119,12 @@ export const AmountView: FC<{
             tokenRate.prices
         );
     }
-    const coinAmount = inFiat ? secondaryAmount : inputToBigNumber(input);
+    const coinAmount = inFiat ? secondaryAmount! : inputToBigNumber(input);
 
     const toggleFiat = () => {
+        if (!secondaryAmount) return;
         setInFiat(v => !v);
-        onInput(secondaryAmount!.decimalPlaces(2, BigNumber.ROUND_FLOOR).toFixed());
+        onInput(formatStringToInput(secondaryAmount.decimalPlaces(2, BigNumber.ROUND_FLOOR)));
     };
 
     const ref = useRef<HTMLInputElement>(null);
@@ -173,7 +179,8 @@ export const AmountView: FC<{
     const handleBack = () => {
         onBack({
             asset: token,
-            amount: inputToBigNumber(input),
+            amount: coinAmount,
+            fiatAmount: inFiat ? inputToBigNumber(input) : undefined,
             isMax: max,
             inFiat
         });
@@ -185,7 +192,8 @@ export const AmountView: FC<{
         if (isValid) {
             onConfirm({
                 asset: token,
-                amount: inputToBigNumber(input),
+                amount: coinAmount,
+                fiatAmount: inFiat ? inputToBigNumber(input) : undefined,
                 isMax: max,
                 inFiat
             });

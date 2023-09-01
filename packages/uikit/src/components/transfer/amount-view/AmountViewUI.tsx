@@ -90,7 +90,7 @@ export const FiatBlock = styled(Body1)`
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, 54px);
+    transform: translate(-50%, 38px);
     z-index: 2;
 
     padding: 8px 16px;
