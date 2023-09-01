@@ -203,15 +203,14 @@ export const AmountView: FC<{
     const onMax = () => {
         if (!refBlock.current) return;
 
-        const value = balance.relativeAmount.toFixed();
+        const value = balance.relativeAmount;
         const inputValue = inFiat
             ? new BigNumber(value)
                   .multipliedBy(tokenRate!.prices)
                   .decimalPlaces(2, BigNumber.ROUND_FLOOR)
-                  .toFixed()
             : value;
 
-        setInput(formatStringToInput(formatter.format(inputValue)));
+        setInput(formatStringToInput(inputValue));
         setMax(state => !state);
     };
 
