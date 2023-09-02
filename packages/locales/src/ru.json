@@ -184,6 +184,9 @@
     "choose_currency_currencies_KZT": {
         "message": "Казахстанский тенге"
     },
+    "choose_currency_currencies_TON": {
+        "message": "Toncoin"
+    },
     "Unexpected_QR_Code": {
         "message": "Неожиданный QR-код"
     },
