@@ -11,7 +11,9 @@ export enum FiatCurrencies {
     KRW = 'KRW',
     IDR = 'IDR',
     INR = 'INR',
-    JPY = 'JPY'
+    JPY = 'JPY',
+
+    TON = 'TON'
 }
 
 export type FiatCurrency = (typeof FiatCurrencies)[keyof typeof FiatCurrencies];
@@ -86,6 +88,11 @@ export const FiatCurrencySymbolsConfig: Record<FiatCurrency, CurrencyState> = {
     [FiatCurrencies.JPY]: {
         symbol: '¥',
         side: 'start',
+        maximumFractionDigits: 2
+    },
+    [FiatCurrencies.TON]: {
+        symbol: 'TON',
+        side: 'end',
         maximumFractionDigits: 2
     }
 };
