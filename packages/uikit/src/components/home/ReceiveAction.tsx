@@ -16,7 +16,6 @@ import {
     NotificationBlock,
     NotificationTitleRow
 } from '../Notification';
-import { Tabs } from '../Tabs';
 import { Body1, H3 } from '../Text';
 import { Button } from '../fields/Button';
 import { Wrapper, childFactoryCreator, duration } from '../transfer/common';
@@ -214,7 +213,8 @@ const ReceiveContent: FC<{ chain?: BLOCKCHAIN_NAME; jetton?: string; handleClose
     return (
         <FullHeightBlock standalone={standalone}>
             <NotificationTitleRow handleClose={handleClose} center>
-                <Tabs active={active} setActive={setActive} values={values} />
+                {/* TODO: ENABLE TRON */}
+                {/* <Tabs active={active} setActive={setActive} values={values} /> */}
             </NotificationTitleRow>
             <Wrapper standalone={false} extension fullWidth>
                 <TransitionGroup childFactory={childFactoryCreator(!isTon)}>

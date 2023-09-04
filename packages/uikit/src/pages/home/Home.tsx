@@ -1,3 +1,4 @@
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import React, { FC, useMemo } from 'react';
 import { HomeSkeleton } from '../../components/Skeleton';
@@ -54,7 +55,8 @@ const Home = () => {
         <>
             <DateSyncBanner />
             <Balance assets={assets} error={error} isFetching={isLoading} />
-            <HomeActions />
+            {/* TODO: ENABLE TRON */}
+            <HomeActions chain={BLOCKCHAIN_NAME.TON} />
             <HomeAssets assets={assets} nfts={nfts} />
         </>
     );
