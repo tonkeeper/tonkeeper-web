@@ -9,7 +9,6 @@ import {
     parseTonTransfer
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
 import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -169,9 +168,10 @@ const SendContent: FC<{
             return;
         }
 
-        if (seeIfValidTronAddress(signature)) {
-            return processTron(signature);
-        }
+        // TODO: ENABLE TRON
+        // if (seeIfValidTronAddress(signature)) {
+        //     return processTron(signature);
+        // }
 
         return sdk.uiEvents.emit('copy', {
             method: 'copy',
