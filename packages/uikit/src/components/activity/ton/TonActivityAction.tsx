@@ -7,8 +7,7 @@ import { ListItemPayload } from '../../../components/List';
 import {
     ActivityIcon,
     ContractDeployIcon,
-    SentIcon,
-    SwapIcon
+    SentIcon
 } from '../../../components/activity/ActivityIcons';
 import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
@@ -24,10 +23,10 @@ import {
     SecondLine,
     SecondaryText
 } from '../CommonAction';
-import { toDexName } from '../NotificationCommon';
-import { SubscribeAction, UnSubscribeAction } from '../SubscribeAction';
 import { ContractDeployAction } from './ContractDeployAction';
+import { JettonBurnAction, JettonMintAction, JettonSwapAction } from './JettonActivity';
 import { NftItemTransferAction, NftPurchaseAction } from './NftActivity';
+import { SubscribeAction, UnSubscribeAction } from './SubscribeAction';
 
 const TonTransferAction: FC<{
     action: Action;
@@ -165,48 +164,6 @@ export const SmartContractExecAction: FC<{
     );
 };
 
-export const JettonSwapAction: FC<{
-    action: Action;
-    date: string;
-}> = ({ action, date }) => {
-    const { t } = useTranslation();
-    const { jettonSwap } = action;
-    const format = useFormatCoinValue();
-
-    if (!jettonSwap) {
-        return <ErrorAction />;
-    }
-
-    return (
-        <ListItemGrid>
-            <ActivityIcon status={action.status}>
-                <SwapIcon />
-            </ActivityIcon>
-            <Description>
-                <FirstLine>
-                    <FirstLabel>{t('swap_title')}</FirstLabel>
-                    <AmountText green>
-                        +&thinsp;{format(jettonSwap.amountOut, jettonSwap.jettonMasterOut.decimals)}
-                    </AmountText>
-                    <AmountText green>{jettonSwap.jettonMasterOut.symbol}</AmountText>
-                </FirstLine>
-                <FirstLine>
-                    <SecondaryText>{toDexName(jettonSwap.dex)}</SecondaryText>
-                    <AmountText>
-                        -&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)}
-                    </AmountText>
-                    <AmountText>{jettonSwap.jettonMasterIn.symbol}</AmountText>
-                </FirstLine>
-                <SecondLine>
-                    <SecondaryText></SecondaryText>
-                    <SecondaryText>{date}</SecondaryText>
-                </SecondLine>
-            </Description>
-            <FailedNote status={action.status} />
-        </ListItemGrid>
-    );
-};
-
 const AuctionBidAction: FC<{
     action: Action;
     date: string;
@@ -276,11 +233,15 @@ export const ActivityAction: FC<{
             return <SmartContractExecAction action={action} date={date} />;
         case 'JettonSwap':
             return <JettonSwapAction action={action} date={date} />;
+        case 'JettonBurn':
+            return <JettonBurnAction action={action} date={date} />;
+        case 'JettonMint':
+            return <JettonMintAction action={action} date={date} />;
         case 'Unknown':
             return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;
         default: {
             console.log(action);
-            return <ListItemPayload>{action.type}</ListItemPayload>;
+            return <ListItemPayload>{action.simplePreview.description}</ListItemPayload>;
         }
     }
 };

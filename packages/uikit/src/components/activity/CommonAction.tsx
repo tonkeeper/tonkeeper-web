@@ -106,13 +106,15 @@ export const ColumnLayout: FC<{
     entry: string;
     address: string;
     date: string;
-}> = ({ title, entry, address, date }) => {
+    amount?: React.ReactNode;
+    green?: boolean;
+}> = ({ title, entry, address, date, amount, green }) => {
     return (
         <Description>
             <FirstLine>
                 <FirstLabel>{title}</FirstLabel>
-                <AmountText></AmountText>
-                <AmountText>{entry}</AmountText>
+                <AmountText green={green}>{amount}</AmountText>
+                <AmountText green={green}>{entry}</AmountText>
             </FirstLine>
             <SecondLine>
                 <SecondaryText>{address}</SecondaryText>

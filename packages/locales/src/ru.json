@@ -265,6 +265,12 @@
     "transaction_type_purchase": {
         "message": "Покупка"
     },
+    "transaction_type_mint": {
+        "message": "Создание"
+    },
+    "transaction_type_burn": {
+        "message": "Сжигание"
+    },
     "receive_ton": {
         "message": "Получить Toncoin"
     },

@@ -182,9 +182,9 @@ export const useWalletNftList = () => {
 
             const result = [WalletVersion.V4R2, WalletVersion.V3R2, WalletVersion.V3R1].reduce(
                 (acc, version) => {
-                    const wallet = getActiveWallet(accounts, version);
-                    if (wallet) {
-                        acc.push(wallet.address);
+                    const account = getActiveWallet(accounts, version);
+                    if (account) {
+                        acc.push(account.address);
                     }
                     return acc;
                 },

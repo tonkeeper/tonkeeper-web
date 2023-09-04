@@ -269,6 +269,12 @@
     "transaction_type_purchase": {
         "message": "Purchase"
     },
+    "transaction_type_mint": {
+        "message": "Mint"
+    },
+    "transaction_type_burn": {
+        "message": "Burn"
+    },
     "receive_ton": {
         "message": "Receive Toncoin"
     },

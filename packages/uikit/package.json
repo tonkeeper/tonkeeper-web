@@ -19,7 +19,6 @@
         "@tanstack/react-query": "4.3.4",
         "@tonkeeper/core": "0.1.0",
         "bignumber.js": "^9.1.1",
-        "firebase": "9.16.0",
         "react": "^18.2.0",
         "react-beautiful-dnd": "^13.1.1",
         "react-dom": "^18.2.0",

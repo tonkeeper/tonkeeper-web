@@ -2,16 +2,20 @@ import { AccountEvent, Action } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useCallback } from 'react';
 import { Notification } from '../../Notification';
 import { ErrorActivityNotification } from '../NotificationCommon';
-import { SubscribeActionDetails, UnSubscribeActionDetails } from '../SubscribeAction';
 import {
     AuctionBidActionDetails,
-    JettonTransferActionNotification,
     SmartContractExecActionDetails,
-    SwapTokensActionDetails,
     TonTransferActionNotification
 } from './ActivityActionDetails';
 import { ContractDeployActionDetails } from './ContractDeployAction';
+import {
+    JettonBurnActionNotification,
+    JettonMintActionNotification,
+    JettonTransferActionNotification,
+    SwapTokensActionDetails
+} from './JettonNotifications';
 import { NftItemTransferActionDetails, NftPurchaseActionDetails } from './NftActivity';
+import { SubscribeActionDetails, UnSubscribeActionDetails } from './SubscribeAction';
 
 export interface ActionData {
     isScam: boolean;
@@ -24,8 +28,6 @@ const ActivityContent: FC<ActionData> = props => {
     switch (props.action.type) {
         case 'TonTransfer':
             return <TonTransferActionNotification {...props} />;
-        case 'JettonTransfer':
-            return <JettonTransferActionNotification {...props} />;
         case 'NftItemTransfer':
             return <NftItemTransferActionDetails {...props} />;
         case 'ContractDeploy':
@@ -38,8 +40,14 @@ const ActivityContent: FC<ActionData> = props => {
             return <AuctionBidActionDetails {...props} />;
         case 'SmartContractExec':
             return <SmartContractExecActionDetails {...props} />;
+        case 'JettonTransfer':
+            return <JettonTransferActionNotification {...props} />;
         case 'JettonSwap':
             return <SwapTokensActionDetails {...props} />;
+        case 'JettonMint':
+            return <JettonMintActionNotification {...props} />;
+        case 'JettonBurn':
+            return <JettonBurnActionNotification {...props} />;
         case 'NftPurchase':
             return <NftPurchaseActionDetails {...props} />;
         case 'Unknown':

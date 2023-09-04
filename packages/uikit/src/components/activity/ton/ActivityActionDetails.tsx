@@ -1,14 +1,7 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import {
-    AccountEvent,
-    ActionStatusEnum,
-    JettonSwapAction,
-    JettonTransferAction,
-    TonTransferAction
-} from '@tonkeeper/core/dist/tonApiV2';
+import { AccountEvent, ActionStatusEnum, TonTransferAction } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC } from 'react';
-import { Address } from 'ton-core';
 import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
@@ -90,72 +83,6 @@ export const TonTransferActionNotification: FC<ActionData> = ({
     );
 };
 
-const JettonTransferActionContent: FC<{
-    jettonTransfer: JettonTransferAction;
-    timestamp: number;
-    event: AccountEvent;
-    isScam: boolean;
-    status?: ActionStatusEnum;
-}> = ({ jettonTransfer, timestamp, event, isScam, status }) => {
-    const wallet = useWalletContext();
-    const { data } = useRate(Address.parse(jettonTransfer.jetton.address).toString());
-    const { fiatAmount } = useFormatFiat(
-        data,
-        formatDecimals(jettonTransfer.amount, jettonTransfer.jetton.decimals)
-    );
-
-    const kind = jettonTransfer.sender?.address === wallet.active.rawAddress ? 'send' : 'received';
-
-    return (
-        <ActionDetailsBlock event={event}>
-            <ActivityDetailsHeader
-                isScam={isScam}
-                amount={jettonTransfer.amount}
-                decimals={jettonTransfer.jetton.decimals}
-                symbol={jettonTransfer.jetton.symbol}
-                total={fiatAmount}
-                timestamp={timestamp}
-                kind={kind}
-                status={status}
-            />
-            <ListBlock margin={false} fullWidth>
-                {kind === 'send' && jettonTransfer.recipient && (
-                    <ActionRecipientDetails recipient={jettonTransfer.recipient} />
-                )}
-                {kind === 'received' && jettonTransfer.sender && (
-                    <ActionSenderDetails sender={jettonTransfer.sender} />
-                )}
-                <ActionTransactionDetails eventId={event.eventId} />
-                <ActionExtraDetails extra={event.extra} />
-                <TransferComment comment={jettonTransfer.comment} />
-            </ListBlock>
-        </ActionDetailsBlock>
-    );
-};
-
-export const JettonTransferActionNotification: FC<ActionData> = ({
-    action,
-    timestamp,
-    event,
-    isScam
-}) => {
-    const { jettonTransfer } = action;
-
-    if (!jettonTransfer) {
-        return <ErrorActivityNotification event={event} />;
-    } else {
-        return (
-            <JettonTransferActionContent
-                jettonTransfer={jettonTransfer}
-                timestamp={timestamp}
-                event={event}
-                isScam={isScam}
-                status={action.status}
-            />
-        );
-    }
-};
-
 export const AuctionBidActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
     const { t } = useTranslation();
     const { auctionBid } = action;
@@ -218,53 +145,5 @@ export const SmartContractExecActionDetails: FC<ActionData> = ({ action, timesta
                 <TransferOpCode operation={smartContractExec.operation} />
             </ListBlock>
         </ActionDetailsBlock>
-    );
-};
-
-const SwapTokensActionContent: FC<{
-    jettonSwap: JettonSwapAction;
-    timestamp: number;
-    event: AccountEvent;
-    status?: ActionStatusEnum;
-}> = ({ jettonSwap, event, timestamp, status }) => {
-    const { t } = useTranslation();
-    const format = useFormatCoinValue();
-
-    return (
-        <ActionDetailsBlock event={event}>
-            <div>
-                <Title>{t('swap_title')}</Title>
-                <Title secondary>
-                    -&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)}{' '}
-                    {jettonSwap.jettonMasterIn.symbol}
-                </Title>
-                <Title>
-                    +&thinsp;{format(jettonSwap.amountOut, jettonSwap.jettonMasterOut.decimals)}{' '}
-                    {jettonSwap.jettonMasterOut.symbol}
-                </Title>
-                <ActionDate kind="send" timestamp={timestamp} />
-                <FailedDetail status={status} />
-            </div>
-            <ListBlock margin={false} fullWidth>
-                <ActionTransactionDetails eventId={event.eventId} />
-                <ActionExtraDetails extra={event.extra} />
-            </ListBlock>
-        </ActionDetailsBlock>
-    );
-};
-
-export const SwapTokensActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
-    const { jettonSwap } = action;
-
-    if (!jettonSwap) {
-        return <ErrorActivityNotification event={event} />;
-    }
-    return (
-        <SwapTokensActionContent
-            jettonSwap={jettonSwap}
-            event={event}
-            timestamp={timestamp}
-            status={action.status}
-        />
     );
 };
