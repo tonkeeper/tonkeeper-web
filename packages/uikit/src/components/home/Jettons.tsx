@@ -11,6 +11,7 @@ import { AppRoute } from '../../libs/routes';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { ListBlock, ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
+import { TronAssets } from './TronAssets';
 
 export interface TonAssetData {
     info: AccountRepr;
@@ -97,15 +98,14 @@ const JettonAsset: FC<{
 export const JettonList: FC<AssetProps> = ({
     assets: {
         ton: { info, jettons },
-        tron: _tron
+        tron
     }
 }) => {
     return (
         <>
             <ListBlock noUserSelect>
                 <TonAsset info={info} />
-                {/* TODO: ENABLE TRON */}
-                {/* <TronAssets tokens={tron} /> */}
+                <TronAssets tokens={tron} />
             </ListBlock>
             <ListBlock noUserSelect>
                 {jettons.balances.map(jetton => (

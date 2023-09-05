@@ -26,7 +26,8 @@ export const DevSettings = React.memo(() => {
         ];
     }, [t, wallet]);
 
-    const _items2 = useMemo<SettingsItem[]>(() => {
+    const items2 = useMemo<SettingsItem[]>(() => {
+        console.log(wallet.tron);
         return [
             {
                 name: t('reset_tron_cache'),
@@ -41,8 +42,7 @@ export const DevSettings = React.memo(() => {
             <SubHeader title="Dev Menu" />
             <InnerBody>
                 <SettingsList items={items} />
-                {/* TODO: ENABLE TRON */}
-                {/* <SettingsList items={items2} /> */}
+                <SettingsList items={items2} />
             </InnerBody>
         </>
     );
