@@ -43,16 +43,17 @@ export const JettonSwapAction: FC<JettonActionProps> = ({ action, date }) => {
                 <FirstLine>
                     <FirstLabel>{t('swap_title')}</FirstLabel>
                     <AmountText green>
-                        +&thinsp;{format(jettonSwap.amountOut, jettonSwap.jettonMasterOut.decimals)}
+                        +&thinsp;
+                        {format(jettonSwap.amountOut, jettonSwap.jettonMasterOut?.decimals)}
                     </AmountText>
-                    <AmountText green>{jettonSwap.jettonMasterOut.symbol}</AmountText>
+                    <AmountText green>{jettonSwap.jettonMasterOut?.symbol}</AmountText>
                 </FirstLine>
                 <FirstLine>
                     <SecondaryText>{toDexName(jettonSwap.dex)}</SecondaryText>
                     <AmountText>
-                        -&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn.decimals)}
+                        -&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn?.decimals)}
                     </AmountText>
-                    <AmountText>{jettonSwap.jettonMasterIn.symbol}</AmountText>
+                    <AmountText>{jettonSwap.jettonMasterIn?.symbol}</AmountText>
                 </FirstLine>
                 <SecondLine>
                     <SecondaryText></SecondaryText>
