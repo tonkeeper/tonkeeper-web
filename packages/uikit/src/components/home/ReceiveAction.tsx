@@ -47,7 +47,14 @@ const Background = styled.div<{ extension?: boolean }>`
     canvas {
         width: 100% !important;
         height: 100% !important;
+        position: absolute;
     }
+`;
+
+const QrWrapper = styled.div`
+    width: 100%;
+    padding-bottom: 100%;
+    position: relative;
 `;
 
 const AddressText = styled(Body1)<{ extension?: boolean }>`
@@ -141,20 +148,22 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                     sdk.copyToClipboard(wallet.active.friendlyAddress, t('address_copied'));
                 }}
             >
-                <QRCode
-                    size={400}
-                    value={formatTransferUrl({
-                        address: wallet.active.friendlyAddress,
-                        jetton: jetton
-                    })}
-                    logoImage="/img/toncoin.svg"
-                    logoPadding={8}
-                    qrStyle="dots"
-                    eyeRadius={{
-                        inner: 2,
-                        outer: 16
-                    }}
-                />
+                <QrWrapper>
+                    <QRCode
+                        size={400}
+                        value={formatTransferUrl({
+                            address: wallet.active.friendlyAddress,
+                            jetton: jetton
+                        })}
+                        logoImage="/img/toncoin.svg"
+                        logoPadding={8}
+                        qrStyle="dots"
+                        eyeRadius={{
+                            inner: 2,
+                            outer: 16
+                        }}
+                    />
+                </QrWrapper>
                 <AddressText extension={extension}>{wallet.active.friendlyAddress}</AddressText>
             </Background>
             <CopyButton address={wallet.active.friendlyAddress} />
