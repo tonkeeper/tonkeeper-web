@@ -186,17 +186,19 @@ const ReceiveTron: FC<{ tron: TronWalletState }> = ({ tron }) => {
                     sdk.copyToClipboard(tron.walletAddress, t('address_copied'));
                 }}
             >
-                <QRCode
-                    size={400}
-                    value={tron.walletAddress}
-                    logoImage="https://wallet-dev.tonkeeper.com/img/usdt.svg"
-                    logoPadding={8}
-                    qrStyle="dots"
-                    eyeRadius={{
-                        inner: 2,
-                        outer: 16
-                    }}
-                />
+                <QrWrapper>
+                    <QRCode
+                        size={400}
+                        value={tron.walletAddress}
+                        logoImage="https://wallet-dev.tonkeeper.com/img/usdt.svg"
+                        logoPadding={8}
+                        qrStyle="dots"
+                        eyeRadius={{
+                            inner: 2,
+                            outer: 16
+                        }}
+                    />
+                </QrWrapper>
                 <AddressText extension={extension}>{tron.walletAddress}</AddressText>
             </Background>
             <CopyButton address={tron.walletAddress} />
