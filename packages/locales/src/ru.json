@@ -259,6 +259,9 @@
     "reset_tron_cache": {
         "message": "Reset Tron cache"
     },
+    "transaction_call_date": {
+        "message": "Вызов контракта %{date}"
+    },
     "transaction_type_contract_call": {
         "message": "Вызов контракта"
     },

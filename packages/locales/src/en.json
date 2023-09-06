@@ -263,6 +263,9 @@
     "reset_tron_cache": {
         "message": "Reset Tron cache"
     },
+    "transaction_call_date": {
+        "message": "Contract Call %{date}"
+    },
     "transaction_type_contract_call": {
         "message": "Contract Call"
     },

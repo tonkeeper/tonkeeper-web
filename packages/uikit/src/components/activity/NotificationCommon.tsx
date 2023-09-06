@@ -41,7 +41,7 @@ export const Label = styled(Body1)`
 `;
 
 export const ActionDate: FC<{
-    kind: 'received' | 'send';
+    kind: 'received' | 'send' | 'call';
     timestamp: number;
 }> = ({ kind, timestamp }) => {
     const { t, i18n } = useTranslation();
@@ -61,10 +61,18 @@ export const ActionDate: FC<{
 
     return (
         <Timestamp>
-            {(kind === 'received'
-                ? t('transaction_receive_date')
-                : t('transaction_sent_date')
-            ).replace('%{date}', date)}
+            {(() => {
+                switch (kind) {
+                    case 'received':
+                        return t('transaction_receive_date');
+                    case 'call':
+                        return t('transaction_call_date');
+                    case 'send':
+                        return t('transaction_sent_date');
+                    default:
+                        return t('transaction_sent_date');
+                }
+            })().replace('%{date}', date)}
         </Timestamp>
     );
 };
