@@ -104,9 +104,10 @@ export const ErrorActivityNotification: FC<PropsWithChildren<{ event: AccountEve
     );
 };
 
-export const ActionRecipientAddress: FC<{ address: string; name?: string }> = ({
+export const ActionRecipientAddress: FC<{ address: string; name?: string; label?: string }> = ({
     address,
-    name
+    name,
+    label
 }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
@@ -115,7 +116,8 @@ export const ActionRecipientAddress: FC<{ address: string; name?: string }> = ({
         <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
             <ListItemPayload>
                 <Label>
-                    {name ? t('transaction_recipient_address') : t('transaction_recipient')}
+                    {label ??
+                        (name ? t('transaction_recipient_address') : t('transaction_recipient'))}
                 </Label>
                 <Label1>{toShortValue(address)}</Label1>
             </ListItemPayload>
@@ -141,6 +143,25 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress }> = ({ reci
             <ActionRecipientAddress
                 address={formatAddress(recipient.address, wallet.network)}
                 name={recipient.name}
+            />
+        </>
+    );
+};
+
+export const ActionPoolDetails: FC<{ pool: AccountAddress }> = ({ pool }) => {
+    const { t } = useTranslation();
+    const wallet = useWalletContext();
+    return (
+        <>
+            <ListItem>
+                <ListItemPayload>
+                    <Label>{t('transaction_bid_dns')}</Label>
+                    <Label1>{pool.name}</Label1>
+                </ListItemPayload>
+            </ListItem>
+            <ActionRecipientAddress
+                address={formatAddress(pool.address, wallet.network)}
+                label={t('staking_details_pool_address_label')}
             />
         </>
     );

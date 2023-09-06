@@ -15,6 +15,11 @@ import {
     SwapTokensActionDetails
 } from './JettonNotifications';
 import { NftItemTransferActionDetails, NftPurchaseActionDetails } from './NftActivity';
+import {
+    DepositStakeActionNotification,
+    WithdrawRequestStakeActionNotification,
+    WithdrawStakeActionNotification
+} from './StakeNotifications';
 import { SubscribeActionDetails, UnSubscribeActionDetails } from './SubscribeAction';
 
 export interface ActionData {
@@ -48,6 +53,12 @@ const ActivityContent: FC<ActionData> = props => {
             return <JettonMintActionNotification {...props} />;
         case 'JettonBurn':
             return <JettonBurnActionNotification {...props} />;
+        case 'DepositStake':
+            return <DepositStakeActionNotification {...props} />;
+        case 'WithdrawStake':
+            return <WithdrawStakeActionNotification {...props} />;
+        case 'WithdrawStakeRequest':
+            return <WithdrawRequestStakeActionNotification {...props} />;
         case 'NftPurchase':
             return <NftPurchaseActionDetails {...props} />;
         case 'Unknown':

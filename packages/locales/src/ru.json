@@ -271,6 +271,15 @@
     "transaction_type_burn": {
         "message": "Сжигание"
     },
+    "transaction_type_deposit": {
+        "message": "Депозит"
+    },
+    "transaction_type_withdraw": {
+        "message": "Вывод"
+    },
+    "transaction_type_withdraw_request": {
+        "message": "Запрос вывода"
+    },
     "receive_ton": {
         "message": "Получить Toncoin"
     },
