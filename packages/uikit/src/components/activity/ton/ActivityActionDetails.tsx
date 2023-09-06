@@ -116,9 +116,7 @@ export const AuctionBidActionDetails: FC<ActionData> = ({ action, timestamp, eve
 };
 
 export const SmartContractExecActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
-    const { t } = useTranslation();
     const { smartContractExec } = action;
-
     const format = useFormatCoinValue();
     const { data } = useRate(CryptoCurrency.TON);
     const { fiatAmount } = useFormatFiat(data, formatDecimals(smartContractExec?.tonAttached ?? 0));
@@ -130,12 +128,11 @@ export const SmartContractExecActionDetails: FC<ActionData> = ({ action, timesta
     return (
         <ActionDetailsBlock event={event}>
             <div>
-                <Title>{t('transaction_type_contract_call')}</Title>
-                <Amount>
-                    {format(smartContractExec.tonAttached)} {CryptoCurrency.TON}
-                </Amount>
+                <Title>
+                    -&thinsp;{format(smartContractExec.tonAttached)} {CryptoCurrency.TON}
+                </Title>
                 {fiatAmount && <Amount>≈&thinsp;{fiatAmount}</Amount>}
-                <ActionDate kind="send" timestamp={timestamp} />
+                <ActionDate kind="call" timestamp={timestamp} />
                 <FailedDetail status={action.status} />
             </div>
             <ListBlock margin={false} fullWidth>

@@ -5,7 +5,7 @@ import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { SendIcon } from '../../home/HomeIcons';
-import { FailedNote } from '../ActivityActionLayout';
+import { FailedNote, ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayout';
 import { ActivityIcon, ReceiveIcon, SwapIcon } from '../ActivityIcons';
 import {
     AmountText,
@@ -24,6 +24,58 @@ export interface JettonActionProps {
     action: Action;
     date: string;
 }
+
+export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ action, date }) => {
+    const wallet = useWalletContext();
+    const { jettonTransfer } = action;
+
+    const format = useFormatCoinValue();
+
+    if (!jettonTransfer) {
+        return <ErrorAction />;
+    }
+
+    if (jettonTransfer.sender?.address === wallet.active.rawAddress) {
+        return (
+            <SendActivityAction
+                amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
+                symbol={jettonTransfer.jetton.symbol}
+                recipient={
+                    jettonTransfer.recipient?.name ??
+                    toShortValue(
+                        formatAddress(
+                            jettonTransfer.recipient?.address ?? jettonTransfer.recipientsWallet,
+                            wallet.network
+                        )
+                    )
+                }
+                date={date}
+                comment={jettonTransfer.comment}
+                status={action.status}
+            />
+        );
+    }
+
+    return (
+        <ReceiveActivityAction
+            amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
+            symbol={jettonTransfer.jetton.symbol}
+            sender={
+                jettonTransfer.sender?.name ??
+                toShortValue(
+                    formatAddress(
+                        jettonTransfer.sender?.address ?? jettonTransfer.sendersWallet,
+                        wallet.network
+                    )
+                )
+            }
+            isScam={jettonTransfer.sender?.isScam}
+            date={date}
+            comment={jettonTransfer.comment}
+            status={action.status}
+        />
+    );
+};
 
 export const JettonSwapAction: FC<JettonActionProps> = ({ action, date }) => {
     const { t } = useTranslation();

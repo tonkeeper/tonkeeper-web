@@ -14,15 +14,6 @@ export const useAuthState = () => {
     });
 };
 
-export const useMutateAuthState = () => {
-    const storage = useStorage();
-    const client = useQueryClient();
-    return useMutation<void, Error, AuthState>(async state => {
-        await storage.set(AppKey.PASSWORD, state);
-        await client.invalidateQueries([QueryKey.password]);
-    });
-};
-
 export const useLookScreen = () => {
     const storage = useStorage();
     return useQuery([QueryKey.lock], async () => {

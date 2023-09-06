@@ -263,6 +263,9 @@
     "reset_tron_cache": {
         "message": "Reset Tron cache"
     },
+    "transaction_call_date": {
+        "message": "Contract Call %{date}"
+    },
     "transaction_type_contract_call": {
         "message": "Contract Call"
     },
@@ -274,6 +277,15 @@
     },
     "transaction_type_burn": {
         "message": "Burn"
+    },
+    "transaction_type_deposit": {
+        "message": "Deposit"
+    },
+    "transaction_type_withdraw": {
+        "message": "Withdraw"
+    },
+    "transaction_type_withdraw_request": {
+        "message": "Withdraw Request"
     },
     "receive_ton": {
         "message": "Receive Toncoin"

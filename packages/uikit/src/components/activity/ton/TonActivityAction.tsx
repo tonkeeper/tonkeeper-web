@@ -15,6 +15,7 @@ import { useTranslation } from '../../../hooks/translation';
 import { FailedNote, ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayout';
 import {
     AmountText,
+    ColumnLayout,
     Description,
     ErrorAction,
     FirstLabel,
@@ -24,8 +25,18 @@ import {
     SecondaryText
 } from '../CommonAction';
 import { ContractDeployAction } from './ContractDeployAction';
-import { JettonBurnAction, JettonMintAction, JettonSwapAction } from './JettonActivity';
+import {
+    JettonBurnAction,
+    JettonMintAction,
+    JettonSwapAction,
+    JettonTransferAction
+} from './JettonActivity';
 import { NftItemTransferAction, NftPurchaseAction } from './NftActivity';
+import {
+    DepositStakeAction,
+    WithdrawRequestStakeAction,
+    WithdrawStakeAction
+} from './StakeActivity';
 import { SubscribeAction, UnSubscribeAction } from './SubscribeAction';
 
 const TonTransferAction: FC<{
@@ -74,58 +85,6 @@ const TonTransferAction: FC<{
     );
 };
 
-const JettonTransferAction: FC<{ action: Action; date: string }> = ({ action, date }) => {
-    const wallet = useWalletContext();
-    const { jettonTransfer } = action;
-
-    const format = useFormatCoinValue();
-
-    if (!jettonTransfer) {
-        return <ErrorAction />;
-    }
-
-    if (jettonTransfer.sender?.address === wallet.active.rawAddress) {
-        return (
-            <SendActivityAction
-                amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
-                symbol={jettonTransfer.jetton.symbol}
-                recipient={
-                    jettonTransfer.recipient?.name ??
-                    toShortValue(
-                        formatAddress(
-                            jettonTransfer.recipient?.address ?? jettonTransfer.recipientsWallet,
-                            wallet.network
-                        )
-                    )
-                }
-                date={date}
-                comment={jettonTransfer.comment}
-                status={action.status}
-            />
-        );
-    }
-
-    return (
-        <ReceiveActivityAction
-            amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
-            symbol={jettonTransfer.jetton.symbol}
-            sender={
-                jettonTransfer.sender?.name ??
-                toShortValue(
-                    formatAddress(
-                        jettonTransfer.sender?.address ?? jettonTransfer.sendersWallet,
-                        wallet.network
-                    )
-                )
-            }
-            isScam={jettonTransfer.sender?.isScam}
-            date={date}
-            comment={jettonTransfer.comment}
-            status={action.status}
-        />
-    );
-};
-
 export const SmartContractExecAction: FC<{
     action: Action;
     date: string;
@@ -144,21 +103,15 @@ export const SmartContractExecAction: FC<{
             <ActivityIcon status={action.status}>
                 <ContractDeployIcon />
             </ActivityIcon>
-            <Description>
-                <FirstLine>
-                    <FirstLabel>{t('transaction_type_contract_call')}</FirstLabel>
-                    <AmountText>-&thinsp;{format(smartContractExec.tonAttached)}</AmountText>
-                    <AmountText>{CryptoCurrency.TON}</AmountText>
-                </FirstLine>
-                <SecondLine>
-                    <SecondaryText>
-                        {toShortValue(
-                            formatAddress(smartContractExec.contract.address, wallet.network)
-                        )}
-                    </SecondaryText>
-                    <SecondaryText>{date}</SecondaryText>
-                </SecondLine>
-            </Description>
+            <ColumnLayout
+                title={t('transaction_type_contract_call')}
+                amount={<>-&thinsp;{format(smartContractExec.tonAttached)}</>}
+                entry={CryptoCurrency.TON}
+                address={toShortValue(
+                    formatAddress(smartContractExec.contract.address, wallet.network)
+                )}
+                date={date}
+            />
             <FailedNote status={action.status} />
         </ListItemGrid>
     );
@@ -215,8 +168,6 @@ export const ActivityAction: FC<{
     switch (action.type) {
         case 'TonTransfer':
             return <TonTransferAction action={action} date={date} isScam={isScam} />;
-        case 'JettonTransfer':
-            return <JettonTransferAction action={action} date={date} />;
         case 'NftItemTransfer':
             return <NftItemTransferAction action={action} date={date} openNft={openNft} />;
         case 'NftPurchase':
@@ -231,12 +182,20 @@ export const ActivityAction: FC<{
             return <AuctionBidAction action={action} date={date} />;
         case 'SmartContractExec':
             return <SmartContractExecAction action={action} date={date} />;
+        case 'JettonTransfer':
+            return <JettonTransferAction action={action} date={date} />;
         case 'JettonSwap':
             return <JettonSwapAction action={action} date={date} />;
         case 'JettonBurn':
             return <JettonBurnAction action={action} date={date} />;
         case 'JettonMint':
             return <JettonMintAction action={action} date={date} />;
+        case 'DepositStake':
+            return <DepositStakeAction action={action} date={date} />;
+        case 'WithdrawStake':
+            return <WithdrawStakeAction action={action} date={date} />;
+        case 'WithdrawStakeRequest':
+            return <WithdrawRequestStakeAction action={action} date={date} />;
         case 'Unknown':
             return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;
         default: {

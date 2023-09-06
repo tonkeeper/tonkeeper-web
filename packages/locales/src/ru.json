@@ -259,6 +259,9 @@
     "reset_tron_cache": {
         "message": "Reset Tron cache"
     },
+    "transaction_call_date": {
+        "message": "Вызов контракта %{date}"
+    },
     "transaction_type_contract_call": {
         "message": "Вызов контракта"
     },
@@ -270,6 +273,15 @@
     },
     "transaction_type_burn": {
         "message": "Сжигание"
+    },
+    "transaction_type_deposit": {
+        "message": "Депозит"
+    },
+    "transaction_type_withdraw": {
+        "message": "Вывод"
+    },
+    "transaction_type_withdraw_request": {
+        "message": "Запрос вывода"
     },
     "receive_ton": {
         "message": "Получить Toncoin"
