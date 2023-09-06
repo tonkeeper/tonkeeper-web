@@ -5,7 +5,7 @@
     "description": "Core features and state for tonkeeper web wallet",
     "main": "index.js",
     "scripts": {
-        "build": "rm -fr dist && yarn sdk && tsc",
+        "build": "rm -fr dist && tsc",
         "start": "tsc -w",
         "sdk": "npm-run-all -p generate:*",
         "generate:sdkV1": "rm -fr src/tonApiV1 && docker build -f resource/Dockerfile.apiV1 . -t tonapisdkv1 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv1",
