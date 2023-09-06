@@ -1,18 +1,18 @@
 export type AuthState = AuthNone | AuthPassword | WebAuthn;
 
 export interface AuthNone {
-  kind: 'none';
+    kind: 'none';
 }
 
 export interface AuthPassword {
-  kind: 'password';
+    kind: 'password';
 }
 
 export interface WebAuthn {
-  kind: 'webauthn';
-  type: 'largeBlob' | 'credBlob' | 'userHandle';
-  credentialId: string;
-  transports?: AuthenticatorTransport[];
+    kind: 'webauthn';
+    type: 'largeBlob' | 'credBlob' | 'userHandle';
+    credentialId: string;
+    transports?: AuthenticatorTransport[];
 }
 
 export const defaultAuthState: AuthState = { kind: 'none' };

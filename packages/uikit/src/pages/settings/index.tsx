@@ -16,34 +16,34 @@ import { UserTheme } from './Theme';
 import { WalletVersion } from './Version';
 
 const SettingsRouter = () => {
-  return (
-    <Routes>
-      <Route path={SettingsRoute.localization} element={<Localization />} />
-      <Route path={SettingsRoute.legal} element={<Legal />} />
-      <Route path={SettingsRoute.theme} element={<UserTheme />} />
-      <Route path={SettingsRoute.dev} element={<DevSettings />} />
-      <Route path={SettingsRoute.fiat} element={<FiatCurrency />} />
-      <Route path={SettingsRoute.account} element={<Account />} />
-      <Route path={SettingsRoute.recovery}>
-        <Route path=":publicKey" element={<Recovery />} />
-        <Route index element={<ActiveRecovery />} />
-      </Route>
-      <Route path={SettingsRoute.version} element={<WalletVersion />} />
-      <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
-      <Route path={SettingsRoute.security} element={<SecuritySettings />} />
-      <Route
-        path="*"
-        element={
-          <>
-            <SettingsHeader />
-            <InnerBody>
-              <Settings />
-            </InnerBody>
-          </>
-        }
-      />
-    </Routes>
-  );
+    return (
+        <Routes>
+            <Route path={SettingsRoute.localization} element={<Localization />} />
+            <Route path={SettingsRoute.legal} element={<Legal />} />
+            <Route path={SettingsRoute.theme} element={<UserTheme />} />
+            <Route path={SettingsRoute.dev} element={<DevSettings />} />
+            <Route path={SettingsRoute.fiat} element={<FiatCurrency />} />
+            <Route path={SettingsRoute.account} element={<Account />} />
+            <Route path={SettingsRoute.recovery}>
+                <Route path=":publicKey" element={<Recovery />} />
+                <Route index element={<ActiveRecovery />} />
+            </Route>
+            <Route path={SettingsRoute.version} element={<WalletVersion />} />
+            <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
+            <Route path={SettingsRoute.security} element={<SecuritySettings />} />
+            <Route
+                path="*"
+                element={
+                    <>
+                        <SettingsHeader />
+                        <InnerBody>
+                            <Settings />
+                        </InnerBody>
+                    </>
+                }
+            />
+        </Routes>
+    );
 };
 
 export default SettingsRouter;

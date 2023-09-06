@@ -1,15 +1,15 @@
 export enum AppKey {
-  account = 'account',
-  wallet = 'wallet',
-  mnemonic = 'mnemonic',
+    ACCOUNT = 'account',
+    WALLET = 'wallet',
+    MNEMONIC = 'mnemonic',
 
-  theme = 'theme',
+    THEME = 'theme',
 
-  password = 'password',
-  lock = 'lock',
+    PASSWORD = 'password',
+    LOCK = 'lock',
 
-  favorites = 'favorites',
-  connections = 'connections',
-  hiddenSuggestions = 'hiddenSuggestions',
-  syncDate = 'syncDate',
+    FAVOURITES = 'favourites',
+    CONNECTIONS = 'connections',
+    HIDDEN_SUGGESTIONS = 'hidden_suggestions',
+    SYNC_DATE = 'sync_date'
 }

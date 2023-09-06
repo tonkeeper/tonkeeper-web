@@ -6,13 +6,13 @@ import { SettingsSocialList } from '../../components/settings/SettingsSocialList
 import { ThemeSettings } from '../../components/settings/ThemeSettings';
 
 export const Settings: FC = () => {
-  return (
-    <>
-      <AccountSettings />
-      <ThemeSettings />
-      <SettingsSocialList />
-      <ClearSettings />
-      <SettingsNetwork />
-    </>
-  );
+    return (
+        <>
+            <AccountSettings />
+            <ThemeSettings />
+            <SettingsSocialList />
+            <ClearSettings />
+            <SettingsNetwork />
+        </>
+    );
 };

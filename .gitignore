@@ -39,6 +39,8 @@ testem.log
 Thumbs.db
 
 .turbo
+.yarn
+.history
 
 .env
 .env.local

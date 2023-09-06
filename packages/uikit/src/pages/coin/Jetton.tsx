@@ -1,124 +1,101 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import {
-  JettonApi,
-  JettonBalance,
-  JettonInfo,
-} from '@tonkeeper/core/dist/tonApiV1';
-import {
-  getJettonStockAmount,
-  getJettonStockPrice,
-} from '@tonkeeper/core/dist/utils/balance';
-import React, { FC, useMemo } from 'react';
-import { ActivityGroupRaw } from '../../components/activity/ActivityGroup';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { JettonBalance } from '@tonkeeper/core/dist/tonApiV1';
+import { AccountsApi, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
+import React, { FC, useMemo, useRef } from 'react';
+import { Address } from 'ton-core';
 import { InnerBody } from '../../components/Body';
+import { CoinSkeletonPage } from '../../components/Skeleton';
+import { SubHeader } from '../../components/SubHeader';
+import { ActivityList } from '../../components/activity/ActivityGroup';
 import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
-import {
-  CoinHistorySkeleton,
-  CoinSkeletonPage,
-  HistoryBlock,
-} from '../../components/Skeleton';
-import { SubHeader } from '../../components/SubHeader';
 import { SendAction } from '../../components/transfer/SendNotifications';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
-import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
-import { useTranslation } from '../../hooks/translation';
+import { useFormatBalance } from '../../hooks/balance';
+import { useFetchNext } from '../../hooks/useFetchNext';
 import { JettonKey, QueryKey } from '../../libs/queryKey';
-import {
-  ActivityGroup,
-  groupActivity,
-  groupAndFilterJettonActivityItems,
-} from '../../state/activity';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
-import { useTonenpointStock } from '../../state/tonendpoint';
+import { useFormatFiat, useRate } from '../../state/rates';
 
-const JettonHistory: FC<{ info: JettonInfo; balance: JettonBalance }> = ({
-  balance,
+const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTMLDivElement> }> = ({
+    balance,
+    innerRef
 }) => {
-  const { tonApi } = useAppContext();
-  const wallet = useWalletContext();
+    const { api, standalone } = useAppContext();
+    const wallet = useWalletContext();
 
-  const { data } = useInfiniteQuery({
-    queryKey: [
-      balance.walletAddress.address,
-      QueryKey.activity,
-      JettonKey.history,
-    ],
-    queryFn: ({ pageParam = undefined }) =>
-      new JettonApi(tonApi).getJettonHistory({
-        account: wallet.active.rawAddress,
-        jettonMaster: balance.walletAddress.address,
-        limit: 200,
-        // beforeLt: pageParam,
-      }),
-    getNextPageParam: (lastPage) => lastPage.nextFrom,
-  });
+    const { isFetched, hasNextPage, data, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
+        queryKey: [balance.walletAddress.address, QueryKey.activity, JettonKey.history],
+        queryFn: ({ pageParam = undefined }) =>
+            new AccountsApi(api.tonApiV2).getAccountJettonHistoryByID({
+                accountId: wallet.active.rawAddress,
+                jettonId: balance.jettonAddress,
+                limit: 20,
+                beforeLt: pageParam
+            }),
+        getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
+    });
 
-  const items = useMemo<ActivityGroup[]>(() => {
-    return data
-      ? groupActivity(
-          groupAndFilterJettonActivityItems(data, wallet.active.rawAddress)
-        )
-      : [];
-  }, [data, wallet.active.rawAddress]);
+    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, innerRef);
 
-  if (items.length === 0) {
-    return <CoinHistorySkeleton />;
-  }
-
-  return (
-    <HistoryBlock>
-      <ActivityGroupRaw items={items} />
-    </HistoryBlock>
-  );
+    return (
+        <ActivityList
+            isFetched={isFetched}
+            isFetchingNextPage={isFetchingNextPage}
+            tonEvents={data}
+        />
+    );
 };
 
-export const JettonContent: FC<{ jettonAddress: string }> = ({
-  jettonAddress,
-}) => {
-  const { t } = useTranslation();
-  const { fiat } = useAppContext();
-  const { data: info } = useJettonInfo(jettonAddress);
-  const { data: balance } = useJettonBalance(jettonAddress);
-  const { data: stock } = useTonenpointStock();
+const JettonHeader: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ info, balance }) => {
+    const [amount, address] = useMemo(
+        () => [
+            formatDecimals(balance.balance, info.metadata.decimals),
+            Address.parse(balance.jettonAddress).toString()
+        ],
+        [info, balance]
+    );
 
-  const format = useFormatCoinValue();
+    const { data } = useRate(address);
+    const total = useFormatBalance(amount, info.metadata.decimals);
+    const { fiatAmount } = useFormatFiat(data, amount);
+    const { description, image } = info.metadata;
 
-  const [price, total] = useMemo(() => {
-    if (!stock || !balance) return [undefined, undefined] as const;
-    const price = getJettonStockPrice(balance, stock.today, fiat);
-    if (!price) return [undefined, undefined] as const;
-    const amount = getJettonStockAmount(balance, price);
-    return [
-      formatFiatCurrency(fiat, price),
-      amount ? formatFiatCurrency(fiat, amount) : undefined,
-    ];
-  }, [balance, stock, fiat]);
-
-  if (!info || !balance || !stock) {
-    return <CoinSkeletonPage />;
-  }
-
-  const { description, image, name } = info.metadata;
-  return (
-    <>
-      <SubHeader title={name} />
-      <InnerBody>
+    return (
         <CoinInfo
-          amount={format(balance.balance, info.metadata.decimals)}
-          symbol={info.metadata.symbol}
-          price={total}
-          description={description}
-          image={image}
+            amount={total}
+            symbol={info.metadata.symbol}
+            price={fiatAmount}
+            description={description}
+            image={image}
         />
-        <ActionsRow>
-          <SendAction asset={info.metadata.address} />
-          <ReceiveAction info={info} />
-        </ActionsRow>
+    );
+};
 
-        <JettonHistory info={info} balance={balance} />
-      </InnerBody>
-    </>
-  );
+export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) => {
+    const { data: info } = useJettonInfo(jettonAddress);
+    const { data: balance } = useJettonBalance(jettonAddress);
+
+    const ref = useRef<HTMLDivElement>(null);
+    if (!info || !balance) {
+        return <CoinSkeletonPage />;
+    }
+
+    return (
+        <>
+            <SubHeader title={info.metadata.name} />
+            <InnerBody ref={ref}>
+                <JettonHeader balance={balance} info={info} />
+                <ActionsRow>
+                    <SendAction asset={info.metadata.address} chain={BLOCKCHAIN_NAME.TON} />
+                    <ReceiveAction jetton={info.metadata.address} />
+                </ActionsRow>
+
+                <JettonHistory balance={balance} innerRef={ref} />
+            </InnerBody>
+        </>
+    );
 };

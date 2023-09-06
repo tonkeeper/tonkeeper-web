@@ -1,110 +1,121 @@
 import { Address } from 'ton-core';
 import { Network } from '../entries/network';
+import { decodeBase58, sha256 } from 'ethers';
 
-export const delay = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export function throttle<Args extends unknown[]>(
-  fn: (...args: Args) => void,
-  cooldown: number
-) {
-  let lastArgs: Args | undefined;
+export function throttle<Args extends unknown[]>(fn: (...args: Args) => void, cooldown: number) {
+    let lastArgs: Args | undefined;
 
-  const run = () => {
-    if (lastArgs) {
-      fn(...lastArgs);
-      lastArgs = undefined;
-    }
-  };
+    const run = () => {
+        if (lastArgs) {
+            fn(...lastArgs);
+            lastArgs = undefined;
+        }
+    };
 
-  const throttled = (...args: Args) => {
-    const isOnCooldown = !!lastArgs;
+    const throttled = (...args: Args) => {
+        const isOnCooldown = !!lastArgs;
 
-    lastArgs = args;
+        lastArgs = args;
 
-    if (isOnCooldown) {
-      return;
-    }
+        if (isOnCooldown) {
+            return;
+        }
 
-    window.setTimeout(run, cooldown);
-  };
+        window.setTimeout(run, cooldown);
+    };
 
-  return throttled;
+    return throttled;
 }
 
-export function debounce<Args extends unknown[]>(
-  fn: (...args: Args) => void,
-  ms = 300
-) {
-  let timeoutId: ReturnType<typeof setTimeout>;
-  function debounced(this: any, ...args: Args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => fn.apply(this, args), ms);
-  }
+export function debounce<Args extends unknown[]>(fn: (...args: Args) => void, ms = 300) {
+    let timeoutId: ReturnType<typeof setTimeout>;
 
-  debounced.clear = () => {
-    clearTimeout(timeoutId);
-  };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function debounced(this: any, ...args: Args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn.apply(this, args), ms);
+    }
 
-  return debounced;
+    debounced.clear = () => {
+        clearTimeout(timeoutId);
+    };
+
+    return debounced;
 }
 
 export const areEqAddresses = (address1: string, address2: string) => {
-  try {
-    return Address.parse(address1).equals(Address.parse(address2));
-  } catch {
-    return false;
-  }
+    try {
+        return Address.parse(address1).equals(Address.parse(address2));
+    } catch {
+        return false;
+    }
 };
 
 export const toShortValue = (value: string, length = 4): string => {
-  return value.slice(0, length) + '...' + value.slice(-length);
+    return value.slice(0, length) + '...' + value.slice(-length);
 };
 
 export const formatAddress = (value: string, network?: Network) => {
-  return Address.parse(value).toString({
-    testOnly: network == Network.TESTNET,
-  });
+    return Address.parse(value).toString({
+        testOnly: network === Network.TESTNET
+    });
 };
 
 export function formatTransferUrl(options: {
-  address: string;
-  amount?: string;
-  text?: string;
-  jetton?: string;
+    address: string;
+    amount?: string;
+    text?: string;
+    jetton?: string;
 }) {
-  let url = 'ton://transfer/' + Address.parse(options.address).toString();
+    const url = 'ton://transfer/' + Address.parse(options.address).toString();
 
-  const params = [];
+    const params = [];
 
-  if (options.amount) {
-    params.push('amount=' + options.amount);
-  }
-  if (options.text) {
-    params.push('text=' + encodeURIComponent(options.text));
-  }
-  if (options.jetton) {
-    params.push('jetton=' + Address.parse(options.jetton).toString());
-  }
+    if (options.amount) {
+        params.push('amount=' + options.amount);
+    }
+    if (options.text) {
+        params.push('text=' + encodeURIComponent(options.text));
+    }
+    if (options.jetton) {
+        params.push('jetton=' + Address.parse(options.jetton).toString());
+    }
 
-  if (params.length === 0) return url;
+    if (params.length === 0) return url;
 
-  return url + '?' + params.join('&');
+    return url + '?' + params.join('&');
 }
 
 export const seeIfAddressEqual = (one?: string, two?: string) => {
-  if (!one || !two) return false;
-  return Address.parse(one).toRawString() === Address.parse(two).toRawString();
+    if (!one || !two) return false;
+    return Address.parse(one).toRawString() === Address.parse(two).toRawString();
 };
 
-export const seeIfValidAddress = (value: string): boolean => {
-  try {
-    if (value.includes('://')) {
-      return false; // ignore links
+export const seeIfValidTonAddress = (value: string): boolean => {
+    try {
+        if (value.includes('://')) {
+            return false; // ignore links
+        }
+        Address.parse(value);
+        return true;
+    } catch (e) {
+        return false;
     }
-    Address.parse(value);
-    return true;
-  } catch (e) {
-    return false;
-  }
+};
+
+export const seeIfValidTronAddress = (address: string): boolean => {
+    try {
+        const decoded = decodeBase58(address).toString(16);
+        if (decoded.length !== 50 || !decoded.startsWith('41')) {
+            return false;
+        }
+        const payload = decoded.slice(0, 42);
+        const tail = decoded.slice(42);
+        const checkSumTail = sha256(sha256('0x' + payload)).slice(2, 10);
+        return tail === checkSumTail;
+    } catch (e) {
+        return false;
+    }
 };

@@ -1,260 +1,311 @@
 {
-  "appName": {
-    "message": "Tonkeeper",
-    "description": "The name of the application"
-  },
-  "appExtensionDescription": {
-    "message": "Your extension wallet on The Open Network",
-    "description": "The description of the application"
-  },
-  "actionTitle": {
-    "message": "Open the wallet",
-    "description": "The action title of the application"
-  },
-  "Activity": {
-    "message": "Activity",
-    "description": "Activity footer button"
-  },
-  "Collectibles": {
-    "message": "Collectibles",
-    "description": "Collectibles button"
-  },
-  "Edit_jettons": {
-    "message": "Edit"
-  },
-  "Toncoin": {
-    "message": "Toncoin"
-  },
-  "About_collection": {
-    "message": "About collection",
-    "description": "About collection nft preview title"
-  },
-  "NFT_creation": {
-    "message": "NFT creation",
-    "description": "NFT_creation activity title"
-  },
-  "Manage": {
-    "message": "Manage",
-    "description": "Manage button in header"
-  },
-  "Manage_wallets": {
-    "message": "Manage wallets",
-    "description": "Manage wallets settings button"
-  },
-  "Localization": {
-    "message": "Language",
-    "description": "Localization settings button"
-  },
-  "settings_news_url_discuss": {
-    "message": "https://t.me/tonkeeper_discuss"
-  },
-  "Delete_all_accounts_and_logout": {
-    "message": "Delete all accounts and logout",
-    "description": "Delete all accounts and logout settings button"
-  },
-  "Rename": {
-    "message": "Rename",
-    "description": "Rename settings button"
-  },
-  "Wallet_name": {
-    "message": "Wallet name",
-    "description": "Wallet name input label"
-  },
-  "I_have_a_backup_copy_of_recovery_phrase": {
-    "message": "I have a backup copy of recovery phrase",
-    "description": "Dangerous notification for clear actions"
-  },
-  "Back_up_now": {
-    "message": "Back up now",
-    "description": "Back up now button label"
-  },
-  "Delete_wallet_data": {
-    "message": "Delete wallet data",
-    "description": "Delete wallet data notification title"
-  },
-  "Delete_wallet_data_description": {
-    "message": "Wallet keys and all personal data will be erased from this device.",
-    "description": "Delete wallet data notification description"
-  },
-  "enter_password": {
-    "message": "Enter password"
-  },
-  "Create_password": {
-    "message": "Create password",
-    "description": "Initialize screen Create password title"
-  },
-  "Change_password": {
-    "message": "Change password",
-    "description": "Settings Change password title"
-  },
-  "Old_password": {
-    "message": "Current password",
-    "description": "Settings Old password label"
-  },
-  "Password": {
-    "message": "Password",
-    "description": "Password input label"
-  },
-  "ConfirmPassword": {
-    "message": "Re-enter password",
-    "description": "Password input label"
-  },
-  "MinPassword": {
-    "message": "Must be at least 6 characters."
-  },
-  "IncorrectCurrentPassword": {
-    "message": "Incorrect current password."
-  },
-  "PasswordDoNotMatch": {
-    "message": "Passwords do not match."
-  },
-  "PasswordChanged": {
-    "message": "Password Changed"
-  },
-  "Unlock": {
-    "message": "Unlock",
-    "description": "Unlock button label"
-  },
-  "check_words_caption": {
-    "message": "To check whether you’ve written down your recovery phrase correctly, please enter the %1%, %2%, and  %3% words."
-  },
-  "Lock_screen": {
-    "message": "Lock screen",
-    "description": "Lock screen option label"
-  },
-  "Name_your_wallet": {
-    "message": "Name your wallet",
-    "description": "Name your wallet notification title"
-  },
-  "Name_your_wallet_description": {
-    "message": "Name your wallet to easily identify it while using the Tonkeeper. These names are stored locally, and can only be seen by you.",
-    "description": "Name your wallet notification description"
-  },
-  "Ton_page_description": {
-    "message": "TON is a fully decentralized layer-1 blockchain designed by Telegram to onboard billions of users. It boasts ultra-fast transactions, tiny fees, easy-to-use apps, and is environmentally friendly.",
-    "description": "The description of the ton coin"
-  },
-  "wallet_sell": {
-    "message": "Sell"
-  },
-  "Other_ways_to_buy_TON": {
-    "message": "Other ways to buy",
-    "description": "Other ways to buy TON link"
-  },
-  "Other_ways_to_buy_TON_link": {
-    "message": "https://t.me/toncoin/703",
-    "description": "Other ways to buy TON link"
-  },
-  "Other_ways_to_sell_TON": {
-    "message": "Other ways to sell",
-    "description": "Other ways to sell TON link"
-  },
-  "Change": {
-    "message": "Change"
-  },
-  "Enable_storing_config": {
-    "message": "Enable storing config"
-  },
-  "Copy_address": {
-    "message": "Copy address"
-  },
-  "App_version_copied": {
-    "message": "App version copied"
-  },
-  "Your_activity_will_be_shown_here": {
-    "message": "Your activity will be shown here"
-  },
-  "Make_your_first_transaction": {
-    "message": "Make your first transaction"
-  },
-  "Incorrect_phrase": {
-    "message": "Incorrect phrase"
-  },
-  "Remaining": {
-    "message": "Remaining: %1%"
-  },
-  "Max": {
-    "message": "Max"
-  },
-  "NFT_item_id": {
-    "message": "NFT item ID"
-  },
-  "NFT_collection_id": {
-    "message": "NFT collection ID"
-  },
-  "choose_currency_currencies_UAH": {
-    "message": "Ukrainian hryvnia"
-  },
-  "choose_currency_currencies_KZT": {
-    "message": "Kazakhstani tenge"
-  },
-  "Unexpected_QR_Code": {
-    "message": "Unexpected QR Code"
-  },
-  "logout_on_unlock_one": {
-    "message": "This will erase keys to the wallet. Make sure you have backed up your secret recovery phrase."
-  },
-  "logout_on_unlock_many": {
-    "message": "This will erase keys to all your wallets. Make sure you have backed up your secret recovery phrases."
-  },
-  "renew_nft": {
-    "message": "Renew until %1%"
-  },
-  "renew_nft_in_progress": {
-    "message": "Domain renew in progress…"
-  },
-  "renew_nft_renewed": {
-    "message": "Domain renewed for 1 year"
-  },
-  "renew_nft_expiration_date": {
-    "message": "Expires %1%"
-  },
-  "expiration_date": {
-    "message": "Expiration date"
-  },
-  "cancel": {
-    "message": "Cancel"
-  },
-  "link_domain": {
-    "message": "Link domain"
-  },
-  "link_tme": {
-    "message": "Link name"
-  },
-  "address_linked": {
-    "message": "Address linked"
-  },
-  "address_unlinked": {
-    "message": "Address unlinked"
-  },
-  "confirm_tx": {
-    "message": "Confirm transaction"
-  },
-  "confirm_unlink": {
-    "message": "Confirm unlink"
-  },
-  "wallet_address": {
-    "message": "Wallet address"
-  },
-  "current_address": {
-    "message": "Your current address"
-  },
-  "linked_with": {
-    "message": "Linked with %1%"
-  },
-  "add_dns_address": {
-    "message": "Add wallet address that domain %1% will link to."
-  },
-  "replace": {
-    "message": "Replace"
-  },
-  "dns_linked_with_another_address_warn": {
-    "message": "The domain is not linked to your current address. Be careful with transactions to this domain."
-  },
-  "tme_linked_with_another_address_warn": {
-    "message": "The name is not linked to your current address. Be careful with transactions to this name."
-  },
-  "nft_on_sale_text": {
-    "message": "NFT is on sale at the marketplace now.\nFor transfer, you should remove it from sale first."
-  }
+    "appName": {
+        "message": "Tonkeeper",
+        "description": "The name of the application"
+    },
+    "appExtensionDescription": {
+        "message": "Your extension wallet on The Open Network",
+        "description": "The description of the application"
+    },
+    "actionTitle": {
+        "message": "Open the wallet",
+        "description": "The action title of the application"
+    },
+    "Activity": {
+        "message": "Activity",
+        "description": "Activity footer button"
+    },
+    "Collectibles": {
+        "message": "Collectibles",
+        "description": "Collectibles button"
+    },
+    "Edit_jettons": {
+        "message": "Edit"
+    },
+    "Toncoin": {
+        "message": "Toncoin"
+    },
+    "About_collection": {
+        "message": "About collection",
+        "description": "About collection nft preview title"
+    },
+    "NFT_creation": {
+        "message": "NFT creation",
+        "description": "NFT_creation activity title"
+    },
+    "Manage": {
+        "message": "Manage",
+        "description": "Manage button in header"
+    },
+    "Manage_wallets": {
+        "message": "Manage wallets",
+        "description": "Manage wallets settings button"
+    },
+    "Localization": {
+        "message": "Language",
+        "description": "Localization settings button"
+    },
+    "settings_news_url_discuss": {
+        "message": "https://t.me/tonkeeper_discuss"
+    },
+    "Delete_all_accounts_and_logout": {
+        "message": "Delete all accounts and logout",
+        "description": "Delete all accounts and logout settings button"
+    },
+    "Rename": {
+        "message": "Rename",
+        "description": "Rename settings button"
+    },
+    "Wallet_name": {
+        "message": "Wallet name",
+        "description": "Wallet name input label"
+    },
+    "I_have_a_backup_copy_of_recovery_phrase": {
+        "message": "I have a backup copy of recovery phrase",
+        "description": "Dangerous notification for clear actions"
+    },
+    "Back_up_now": {
+        "message": "Back up now",
+        "description": "Back up now button label"
+    },
+    "Delete_wallet_data": {
+        "message": "Delete wallet data",
+        "description": "Delete wallet data notification title"
+    },
+    "Delete_wallet_data_description": {
+        "message": "Wallet keys and all personal data will be erased from this device.",
+        "description": "Delete wallet data notification description"
+    },
+    "enter_password": {
+        "message": "Enter password"
+    },
+    "Create_password": {
+        "message": "Create password",
+        "description": "Initialize screen Create password title"
+    },
+    "Change_password": {
+        "message": "Change password",
+        "description": "Settings Change password title"
+    },
+    "Old_password": {
+        "message": "Current password",
+        "description": "Settings Old password label"
+    },
+    "Password": {
+        "message": "Password",
+        "description": "Password input label"
+    },
+    "ConfirmPassword": {
+        "message": "Re-enter password",
+        "description": "Password input label"
+    },
+    "MinPassword": {
+        "message": "Must be at least 6 characters."
+    },
+    "IncorrectCurrentPassword": {
+        "message": "Incorrect current password."
+    },
+    "PasswordDoNotMatch": {
+        "message": "Passwords do not match."
+    },
+    "PasswordChanged": {
+        "message": "Password Changed"
+    },
+    "Unlock": {
+        "message": "Unlock",
+        "description": "Unlock button label"
+    },
+    "check_words_caption": {
+        "message": "To check whether you’ve written down your recovery phrase correctly, please enter the %1%, %2%, and  %3% words."
+    },
+    "Lock_screen": {
+        "message": "Lock screen",
+        "description": "Lock screen option label"
+    },
+    "Name_your_wallet": {
+        "message": "Name your wallet",
+        "description": "Name your wallet notification title"
+    },
+    "Name_your_wallet_description": {
+        "message": "Name your wallet to easily identify it while using the Tonkeeper. These names are stored locally, and can only be seen by you.",
+        "description": "Name your wallet notification description"
+    },
+    "Ton_page_description": {
+        "message": "TON is a fully decentralized layer-1 blockchain designed by Telegram to onboard billions of users. It boasts ultra-fast transactions, tiny fees, easy-to-use apps, and is environmentally friendly.",
+        "description": "The description of the ton coin"
+    },
+    "wallet_sell": {
+        "message": "Sell"
+    },
+    "Other_ways_to_buy_TON": {
+        "message": "Other ways to buy",
+        "description": "Other ways to buy TON link"
+    },
+    "Other_ways_to_buy_TON_link": {
+        "message": "https://t.me/toncoin/703",
+        "description": "Other ways to buy TON link"
+    },
+    "Other_ways_to_sell_TON": {
+        "message": "Other ways to sell",
+        "description": "Other ways to sell TON link"
+    },
+    "Change": {
+        "message": "Change"
+    },
+    "Enable_storing_config": {
+        "message": "Enable storing config"
+    },
+    "Copy_address": {
+        "message": "Copy address"
+    },
+    "App_version_copied": {
+        "message": "App version copied"
+    },
+    "Your_activity_will_be_shown_here": {
+        "message": "Your activity will be shown here"
+    },
+    "Make_your_first_transaction": {
+        "message": "Make your first transaction"
+    },
+    "Incorrect_phrase": {
+        "message": "Incorrect phrase"
+    },
+    "Remaining": {
+        "message": "Remaining: %1%"
+    },
+    "Max": {
+        "message": "Max"
+    },
+    "NFT_item_id": {
+        "message": "NFT item ID"
+    },
+    "NFT_collection_id": {
+        "message": "NFT collection ID"
+    },
+    "choose_currency_currencies_UAH": {
+        "message": "Ukrainian hryvnia"
+    },
+    "choose_currency_currencies_KZT": {
+        "message": "Kazakhstani tenge"
+    },
+    "choose_currency_currencies_TON": {
+        "message": "Toncoin"
+    },
+    "Unexpected_QR_Code": {
+        "message": "Unexpected QR Code"
+    },
+    "logout_on_unlock_one": {
+        "message": "This will erase keys to the wallet. Make sure you have backed up your secret recovery phrase."
+    },
+    "logout_on_unlock_many": {
+        "message": "This will erase keys to all your wallets. Make sure you have backed up your secret recovery phrases."
+    },
+    "renew_nft": {
+        "message": "Renew until %1%"
+    },
+    "renew_nft_in_progress": {
+        "message": "Domain renew in progress…"
+    },
+    "renew_nft_renewed": {
+        "message": "Domain renewed for 1 year"
+    },
+    "renew_nft_expiration_date": {
+        "message": "Expires %1%"
+    },
+    "expiration_date": {
+        "message": "Expiration date"
+    },
+    "cancel": {
+        "message": "Cancel"
+    },
+    "link_domain": {
+        "message": "Link domain"
+    },
+    "link_tme": {
+        "message": "Link name"
+    },
+    "address_linked": {
+        "message": "Address linked"
+    },
+    "address_unlinked": {
+        "message": "Address unlinked"
+    },
+    "confirm_tx": {
+        "message": "Confirm transaction"
+    },
+    "confirm_unlink": {
+        "message": "Confirm unlink"
+    },
+    "wallet_address": {
+        "message": "Wallet address"
+    },
+    "current_address": {
+        "message": "Your current address"
+    },
+    "linked_with": {
+        "message": "Linked with %1%"
+    },
+    "add_dns_address": {
+        "message": "Add wallet address that domain %1% will link to."
+    },
+    "replace": {
+        "message": "Replace"
+    },
+    "dns_linked_with_another_address_warn": {
+        "message": "The domain is not linked to your current address. Be careful with transactions to this domain."
+    },
+    "tme_linked_with_another_address_warn": {
+        "message": "The name is not linked to your current address. Be careful with transactions to this name."
+    },
+    "nft_on_sale_text": {
+        "message": "NFT is on sale at the marketplace now.\nFor transfer, you should remove it from sale first."
+    },
+    "reset_tron_cache": {
+        "message": "Reset Tron cache"
+    },
+    "transaction_call_date": {
+        "message": "Contract Call %{date}"
+    },
+    "transaction_type_contract_call": {
+        "message": "Contract Call"
+    },
+    "transaction_type_purchase": {
+        "message": "Purchase"
+    },
+    "transaction_type_mint": {
+        "message": "Mint"
+    },
+    "transaction_type_burn": {
+        "message": "Burn"
+    },
+    "transaction_type_deposit": {
+        "message": "Deposit"
+    },
+    "transaction_type_withdraw": {
+        "message": "Withdraw"
+    },
+    "transaction_type_withdraw_request": {
+        "message": "Withdraw Request"
+    },
+    "receive_ton": {
+        "message": "Receive Toncoin"
+    },
+    "receive_trc20": {
+        "message": "Receive USDT TRC20"
+    },
+    "receive_ton_description": {
+        "message": "Send only Toncoin TON and tokens\nin TON network to this address, or you\nmight lose your funds."
+    },
+    "receive_trc20_description": {
+        "message": "Send only USDT TRC20\nto this address, or you might\nlose your funds."
+    },
+    "txActions_USDT_transfer": {
+        "message": "USDT Transfer"
+    },
+    "Operation": {
+        "message": "Operation"
+    },
+    "total_balance": {
+        "message": "Total balance"
+    }
 }

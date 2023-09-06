@@ -1,64 +1,85 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { EventApi } from '@tonkeeper/core/dist/tonApiV1';
+import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { TronApi } from '@tonkeeper/core/dist/tronApi';
 import React, { FC, useMemo, useRef } from 'react';
-import { ActivityGroupRaw } from '../../components/activity/ActivityGroup';
-import { EmptyActivity } from '../../components/activity/EmptyActivity';
 import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
 import { ActivitySkeletonPage, SkeletonList } from '../../components/Skeleton';
+import { MixedActivityGroup } from '../../components/activity/ActivityGroup';
+import { EmptyActivity } from '../../components/activity/EmptyActivity';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import {
-  ActivityGroup,
-  groupActivity,
-  groupActivityItems,
-} from '../../state/activity';
-
-const pageLimit = 20;
+import { getMixedActivity } from '../../state/mixedActivity';
 
 const Activity: FC = () => {
-  const wallet = useWalletContext();
-  const { tonApi, standalone } = useAppContext();
+    const wallet = useWalletContext();
+    const { api, standalone } = useAppContext();
 
-  const ref = useRef<HTMLDivElement>(null);
+    const ref = useRef<HTMLDivElement>(null);
 
-  const { fetchNextPage, hasNextPage, isFetchingNextPage, data, ...result } =
-    useInfiniteQuery({
-      queryKey: [wallet.active.rawAddress, QueryKey.activity, 'all'],
-      queryFn: ({ pageParam = undefined }) =>
-        new EventApi(tonApi).accountEvents({
-          account: wallet.active.rawAddress,
-          limit: pageLimit,
-          beforeLt: pageParam,
-        }),
-      getNextPageParam: (lastPage) =>
-        lastPage.events.length >= pageLimit ? lastPage.nextFrom : undefined,
+    const {
+        isFetched: isTonFetched,
+        fetchNextPage: fetchTonNextPage,
+        hasNextPage: hasTonNextPage,
+        isFetchingNextPage: isTonFetchingNextPage,
+        data: tonEvents
+    } = useInfiniteQuery({
+        queryKey: [wallet.active.rawAddress, QueryKey.activity, 'all'],
+        queryFn: ({ pageParam = undefined }) =>
+            new AccountsApi(api.tonApiV2).getAccountEvents({
+                accountId: wallet.active.rawAddress,
+                limit: 20,
+                beforeLt: pageParam,
+                subjectOnly: true
+            }),
+        getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
     });
 
-  useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, ref);
+    const {
+        isFetched: isTronFetched,
+        data: tronEvents,
+        isFetchingNextPage: isTronFetchingNextPage,
+        hasNextPage: hasTronNextPage,
+        fetchNextPage: fetchTronNextPage
+    } = useInfiniteQuery({
+        queryKey: [wallet.tron?.ownerWalletAddress, wallet.network, QueryKey.tron],
+        queryFn: ({ pageParam = undefined }) =>
+            new TronApi(api.tronApi).getTransactions({
+                ownerAddress: wallet.tron!.ownerWalletAddress,
+                fingerprint: pageParam,
+                limit: 100
+            }),
+        getNextPageParam: lastPage => lastPage.fingerprint,
+        enabled: wallet.tron !== undefined
+    });
 
-  const items = useMemo<ActivityGroup[]>(() => {
-    return data ? groupActivity(groupActivityItems(data)) : [];
-  }, [data]);
+    useFetchNext(hasTonNextPage, isTonFetchingNextPage, fetchTonNextPage, standalone, ref);
+    useFetchNext(hasTronNextPage, isTronFetchingNextPage, fetchTronNextPage, standalone, ref);
 
-  if (!data) {
-    return <ActivitySkeletonPage />;
-  }
+    const isFetchingNextPage = isTonFetchingNextPage || isTronFetchingNextPage;
 
-  if (items.length === 0) {
-    return <EmptyActivity />;
-  }
+    const activity = useMemo(() => {
+        return getMixedActivity(tonEvents, tronEvents);
+    }, [tonEvents, tronEvents]);
 
-  return (
-    <>
-      <ActivityHeader />
-      <InnerBody ref={ref}>
-        <ActivityGroupRaw items={items} />
-        {isFetchingNextPage && <SkeletonList size={3} />}
-      </InnerBody>
-    </>
-  );
+    if (!isTonFetched || (wallet.tron !== undefined && !isTronFetched)) {
+        return <ActivitySkeletonPage />;
+    }
+
+    if (activity.length === 0) {
+        return <EmptyActivity />;
+    }
+
+    return (
+        <>
+            <ActivityHeader />
+            <InnerBody ref={ref}>
+                <MixedActivityGroup items={activity} />
+                {isFetchingNextPage && <SkeletonList size={3} />}
+            </InnerBody>
+        </>
+    );
 };
 
 export default Activity;

@@ -1,14 +1,16 @@
-import { UseQueryResult } from "@tanstack/react-query";
-import {useCallback, useEffect, useRef, useState} from "react";
+import { UseQueryResult } from '@tanstack/react-query';
+import { useEffect, useRef, useState } from 'react';
 
-export function useQueryChangeWait<T>(query:  Pick<UseQueryResult<T, Error>, 'data' | 'refetch'>, shouldExit: ((data: T, prevData: T | undefined) => boolean)) {
+export function useQueryChangeWait<T>(
+    query: Pick<UseQueryResult<T, Error>, 'data' | 'refetch'>,
+    shouldExit: (data: T, prevData: T | undefined) => boolean
+) {
     const [isLoading, setIsLoading] = useState(false);
     const [isCompleted, setIsCompleted] = useState(false);
     const [dispose, setDispose] = useState(false);
     const prev = useRef(query.data);
 
-
-    const waitRecursive =async () => {
+    const waitRecursive = async () => {
         const result = await query.refetch();
 
         if (dispose) {
@@ -25,9 +27,9 @@ export function useQueryChangeWait<T>(query:  Pick<UseQueryResult<T, Error>, 'da
         setTimeout(waitRecursive, 1000);
     };
 
-    useEffect(() => () => setDispose(true), [])
+    useEffect(() => () => setDispose(true), []);
 
-   return {
+    return {
         isLoading,
         isCompleted,
         data: query.data,
@@ -43,5 +45,5 @@ export function useQueryChangeWait<T>(query:  Pick<UseQueryResult<T, Error>, 'da
             }, timeLimit);
             waitRecursive();
         }
-   }
+    };
 }

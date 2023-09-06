@@ -1,6 +1,6 @@
 export enum WalletProxy {
-  off = 0,
-  in1TonOrg = 1,
-  in2TonOrg = 2,
-  in3TonOrg = 3,
+    OFF = 0,
+    IN1_TON_ORG = 1,
+    IN2_TON_ORG = 2,
+    IN3_TON_ORG = 3
 }

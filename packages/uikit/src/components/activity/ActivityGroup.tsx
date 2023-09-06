@@ -1,94 +1,81 @@
+import { InfiniteData } from '@tanstack/react-query';
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import React, { FC, useState } from 'react';
-import styled from 'styled-components';
-import { ListBlock, ListItem } from '../../components/List';
-import { H3 } from '../../components/Text';
-import { ActivityAction } from '../../components/activity/ActivityAction';
-import { useTranslation } from '../../hooks/translation';
-import {
-  ActivityGroup,
-  formatActivityDate,
-  getActivityTitle,
-} from '../../state/activity';
-import { ClockIcon } from '../Icon';
+import { AccountEvents } from '@tonkeeper/core/dist/tonApiV2';
+import { TronEvents } from '@tonkeeper/core/dist/tronApi';
+import React, { FC, useMemo, useState } from 'react';
+import { GenericActivityGroup } from '../../state/activity';
+import { MixedActivity, getMixedActivity } from '../../state/mixedActivity';
+import { CoinHistorySkeleton, HistoryBlock, SkeletonList } from '../Skeleton';
 import { NftNotification } from '../nft/NftNotification';
-import { ActionData, ActivityNotification } from './ActivityNotification';
+import { ActivityBlock } from './ActivityLayout';
+import { ActionData, ActivityNotification } from './ton/ActivityNotification';
+import { TonActivityEvents } from './ton/TonActivityEvents';
+import { TronActionData, TronActivityNotification } from './tron/ActivityNotification';
+import { TronActivityEvents } from './tron/TronActivityEvents';
 
-const Group = styled.div`
-  margin-bottom: 1.875rem;
-`;
-const List = styled(ListBlock)`
-  margin: 0.5rem 0;
-`;
+export const ActivityList: FC<{
+    isFetched: boolean;
+    isFetchingNextPage: boolean;
+    tonEvents?: InfiniteData<AccountEvents>;
+    tronEvents?: InfiniteData<TronEvents>;
+}> = ({ isFetched, isFetchingNextPage, tonEvents, tronEvents }) => {
+    const activity = useMemo<GenericActivityGroup<MixedActivity>[]>(() => {
+        return getMixedActivity(tonEvents, tronEvents);
+    }, [tonEvents, tronEvents]);
 
-const Title = styled(H3)`
-  margin: 0 0 0.875rem;
-  user-select: none;
-`;
+    if (!isFetched) {
+        return <CoinHistorySkeleton />;
+    }
+    return (
+        <HistoryBlock>
+            <MixedActivityGroup items={activity} />
+            {isFetchingNextPage && <SkeletonList size={3} />}
+        </HistoryBlock>
+    );
+};
 
-const ProgressIcon = styled.div`
-  position: absolute;
-  left: 45px;
-  top: 45px;
-  color: ${(props) => props.theme.iconSecondary};
-  padding: 0 !important;
-`;
-
-export const ActivityGroupRaw: FC<{
-  items: ActivityGroup[];
+export const MixedActivityGroup: FC<{
+    items: GenericActivityGroup<MixedActivity>[];
 }> = ({ items }) => {
-  const { t, i18n } = useTranslation();
-  const [activity, setActivity] = useState<ActionData | undefined>(undefined);
-  const [nft, setNft] = useState<NftItemRepr | undefined>(undefined);
+    const [tonAction, seTonAction] = useState<ActionData | undefined>(undefined);
+    const [tronAction, setTronAction] = useState<TronActionData | undefined>(undefined);
+    const [nft, setNft] = useState<NftItemRepr | undefined>(undefined);
 
-  return (
-    <>
-      {items.map(([key, events]) => {
-        return (
-          <Group key={key}>
-            <Title>
-              {getActivityTitle(i18n.language, key, events[0].timestamp)}
-            </Title>
-            {events.map(({ timestamp, event }) => {
-              const date = formatActivityDate(i18n.language, key, timestamp);
-              return (
-                <List key={event.eventId}>
-                  {event.actions.map((action, index) => (
-                    <ListItem
-                      key={index}
-                      onClick={() =>
-                        setActivity({
-                          isScam: event.isScam,
-                          action,
-                          timestamp: timestamp * 1000,
-                          event,
-                        })
-                      }
-                    >
-                      <ActivityAction
-                        action={action}
-                        isScam={event.isScam}
-                        date={date}
-                        openNft={setNft}
-                      />
-                      {event.inProgress && (
-                        <ProgressIcon>
-                          <ClockIcon />
-                        </ProgressIcon>
-                      )}
-                    </ListItem>
-                  ))}
-                </List>
-              );
-            })}
-          </Group>
-        );
-      })}
-      <ActivityNotification
-        value={activity}
-        handleClose={() => setActivity(undefined)}
-      />
-      <NftNotification nftItem={nft} handleClose={() => setNft(undefined)} />
-    </>
-  );
+    return (
+        <>
+            <ActivityBlock
+                groups={items}
+                RenderItem={({ event, date, timestamp }) => {
+                    if (event.kind === 'tron') {
+                        return (
+                            <TronActivityEvents
+                                event={event.event}
+                                date={date}
+                                timestamp={timestamp}
+                                setTronAction={setTronAction}
+                            />
+                        );
+                    }
+                    if (event.kind === 'ton') {
+                        return (
+                            <TonActivityEvents
+                                event={event.event}
+                                date={date}
+                                timestamp={timestamp}
+                                setActivity={seTonAction}
+                                setNft={setNft}
+                            />
+                        );
+                    }
+                    return <></>;
+                }}
+            />
+            <ActivityNotification value={tonAction} handleClose={() => seTonAction(undefined)} />
+            <NftNotification nftItem={nft} handleClose={() => setNft(undefined)} />
+            <TronActivityNotification
+                value={tronAction}
+                handleClose={() => setTronAction(undefined)}
+            />
+        </>
+    );
 };

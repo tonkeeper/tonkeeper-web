@@ -1,75 +1,65 @@
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
-import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { TonendpointStock } from '@tonkeeper/core/dist/tonkeeperApi/stock';
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { HomeSkeleton } from '../../components/Skeleton';
 import { Balance } from '../../components/home/Balance';
 import { CompactView } from '../../components/home/CompactView';
+import { AssetData } from '../../components/home/Jettons';
 import { DateSyncBanner } from '../../components/home/SyncBunner';
 import { TabsView } from '../../components/home/TabsView';
 import { HomeActions } from '../../components/home/TonActions';
-import { useUserJettonList } from '../../state/jetton';
-import { useTonenpointStock } from '../../state/tonendpoint';
-import {
-  useWalletAccountInfo,
-  useWalletJettonList,
-  useWalletNftList,
-} from '../../state/wallet';
+import { useWalletContext } from '../../hooks/appContext';
+import { filterTonAssetList } from '../../state/jetton';
+import { usePreFetchRates } from '../../state/rates';
+import { useTronBalances } from '../../state/tron/tron';
+import { useWalletAccountInfo, useWalletJettonList, useWalletNftList } from '../../state/wallet';
 
 const HomeAssets: FC<{
-  stock: TonendpointStock;
-  jettons: JettonsBalances;
-  info: AccountRepr;
-  nfts: NFT[];
-}> = ({ stock, jettons, info, nfts }) => {
-  const filtered = useUserJettonList(jettons);
-
-  if (
-    filtered.balances.length + nfts.length < 10 ||
-    filtered.balances.length < 3
-  ) {
-    return (
-      <CompactView info={info} jettons={filtered} nfts={nfts} stock={stock} />
-    );
-  } else {
-    return (
-      <TabsView info={info} jettons={filtered} nfts={nfts} stock={stock} />
-    );
-  }
+    assets: AssetData;
+    nfts: NFT[];
+}> = ({ assets, nfts }) => {
+    if (
+        assets.ton.jettons.balances.length + nfts.length < 10 ||
+        assets.ton.jettons.balances.length < 3
+    ) {
+        return <CompactView assets={assets} nfts={nfts} />;
+    } else {
+        return <TabsView assets={assets} nfts={nfts} />;
+    }
 };
 
 const Home = () => {
-  const { data: stock, isFetching: isStockLoading } = useTonenpointStock();
+    const wallet = useWalletContext();
 
-  const {
-    data: info,
-    error,
-    isFetching: isAccountLoading,
-  } = useWalletAccountInfo();
-  const { data: jettons, isFetching: isJettonLoading } = useWalletJettonList();
-  const { data: nfts, isFetching: isNftLoading } = useWalletNftList();
+    const { isFetched } = usePreFetchRates();
+    const { data: info, error, isFetching: isAccountLoading } = useWalletAccountInfo();
+    const { data: jettons, isFetching: isJettonLoading } = useWalletJettonList();
+    const { data: nfts, isFetching: isNftLoading } = useWalletNftList();
+    const { data: tronBalances, isFetching: isTronLoading } = useTronBalances();
 
-  const isLoading =
-    isJettonLoading || isAccountLoading || isNftLoading || isStockLoading;
+    const isLoading = isJettonLoading || isAccountLoading || isNftLoading || isTronLoading;
 
-  if (!stock || !nfts || !jettons || !info) {
-    return <HomeSkeleton />;
-  }
+    const assets = useMemo<AssetData | undefined>(() => {
+        if (!info || !jettons || !tronBalances) return undefined;
+        return {
+            ton: { info, jettons: filterTonAssetList(jettons, wallet) },
+            tron: tronBalances
+        };
+    }, [info, jettons, wallet, tronBalances]);
 
-  return (
-    <>
-      <DateSyncBanner />
-      <Balance
-        info={info}
-        error={error}
-        stock={stock}
-        jettons={jettons}
-        isFetching={isLoading}
-      />
-      <HomeActions />
-      <HomeAssets info={info} jettons={jettons} nfts={nfts} stock={stock} />
-    </>
-  );
+    if (!nfts || !assets || !isFetched) {
+        return <HomeSkeleton />;
+    }
+
+    return (
+        <>
+            <DateSyncBanner />
+            <Balance assets={assets} error={error} isFetching={isLoading} />
+            {/* TODO: ENABLE TRON */}
+            <HomeActions chain={BLOCKCHAIN_NAME.TON} />
+            <HomeAssets assets={assets} nfts={nfts} />
+        </>
+    );
 };
 
 export default Home;
