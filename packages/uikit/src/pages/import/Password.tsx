@@ -48,10 +48,6 @@ export const useAddWalletMutation = () => {
             if (!valid) {
                 throw new Error('Mnemonic is not valid.');
             }
-            const account = await sdk.storage.get<AccountState>(AppKey.ACCOUNT);
-            if (account === null || account.publicKeys.length === 0) {
-                return false;
-            }
             const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
             if (auth === null) {
                 return false;
