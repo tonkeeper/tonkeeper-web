@@ -1,14 +1,14 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { languages, localizationText } from '@tonkeeper/core/dist/entries/language';
 import {
+    Network,
     getTonClient,
     getTonClientV2,
-    getTronClient,
-    Network
+    getTronClient
 } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -31,15 +31,16 @@ import {
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
-import { any, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
-import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
+import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 
 import {
     AmplitudeAnalyticsContext,
     useAmplitudeAnalytics
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
-import { Initialize, InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
+import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
+import { Initialize } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/ThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
@@ -49,7 +50,7 @@ import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAppHeight, useAppWidth } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
@@ -130,38 +131,13 @@ const useLock = () => {
     return lock;
 };
 
-const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
-    ${props =>
-        props.standalone
-            ? css`
-                  position: fixed;
-                  top: 0;
-                  height: calc(var(--app-height) - 2px);
-                  -webkit-overflow-scrolling: touch;
-              `
-            : css`
-                  @media (min-width: 600px) {
-                      border-left: 1px solid ${props.theme.separatorCommon};
-                      border-right: 1px solid ${props.theme.separatorCommon};
-                  }
-              `};
+const FullSizeWrapper = styled(Container)``;
 
-    > * {
-        ${props =>
-            props.standalone &&
-            css`
-                overflow: auto;
-                width: var(--app-width);
-                max-width: 548px;
-                box-sizing: border-box;
-            `}
-    }
-`;
+const Wrapper = styled(FullSizeWrapper)`
+    height: var(--fixed-height);
 
-const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
     box-sizing: border-box;
     padding-top: 64px;
-    padding-bottom: ${props => (props.standalone ? '96' : '80')}px;
 `;
 
 export const Loader: FC = () => {
@@ -182,7 +158,7 @@ export const Loader: FC = () => {
     const navigate = useNavigate();
     useAppHeight();
 
-    const enable = useAmplitudeAnalytics('Web', account, activeWallet);
+    const enable = useAmplitudeAnalytics('Twa', account, activeWallet);
 
     useEffect(() => {
         if (
@@ -237,6 +213,29 @@ export const Loader: FC = () => {
     );
 };
 
+const InitWrapper = styled(Container)`
+    height: var(--app-height);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1rem;
+    box-sizing: border-box;
+    position: relative;
+`;
+
+const InitPages = () => {
+    return (
+        <InitWrapper>
+            <Suspense fallback={<Loading />}>
+                <Routes>
+                    <Route path={any(AppRoute.import)} element={<ImportRouter />} />
+                    <Route path="*" element={<Initialize />} />
+                </Routes>
+            </Suspense>
+        </InitWrapper>
+    );
+};
+
 export const Content: FC<{
     activeWallet?: WalletState | null;
     lock: boolean;
@@ -245,32 +244,22 @@ export const Content: FC<{
     const location = useLocation();
     useWindowsScroll();
     useAppWidth(standalone);
+    useKeyboardHeight();
 
     if (lock) {
         return (
-            <FullSizeWrapper standalone={standalone}>
+            <FullSizeWrapper>
                 <Unlock />
             </FullSizeWrapper>
         );
     }
 
     if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
-        return (
-            <FullSizeWrapper standalone={false}>
-                <Suspense fallback={<Loading />}>
-                    <InitializeContainer fullHeight={false}>
-                        <Routes>
-                            <Route path={any(AppRoute.import)} element={<ImportRouter />} />
-                            <Route path="*" element={<Initialize />} />
-                        </Routes>
-                    </InitializeContainer>
-                </Suspense>
-            </FullSizeWrapper>
-        );
+        return <InitPages />;
     }
 
     return (
-        <Wrapper standalone={standalone}>
+        <Wrapper>
             <WalletStateContext.Provider value={activeWallet}>
                 <Routes>
                     <Route
@@ -313,7 +302,7 @@ export const Content: FC<{
                         }
                     />
                 </Routes>
-                <Footer standalone={standalone} />
+                <Footer standalone={standalone} sticky />
                 <MemoryScroll />
             </WalletStateContext.Provider>
         </Wrapper>

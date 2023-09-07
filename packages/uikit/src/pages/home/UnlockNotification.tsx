@@ -4,12 +4,14 @@ import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { MinPasswordLength, getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { debounce } from '@tonkeeper/core/dist/utils/common';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { Notification } from '../../components/Notification';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
+import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 
 export const getPasswordByNotification = async (
@@ -88,7 +90,7 @@ const PasswordUnlock: FC<{
     isError: boolean;
     isLoading: boolean;
     reason?: GetPasswordType;
-}> = ({ sdk, onClose, onSubmit, isError, isLoading }) => {
+}> = ({ onClose, onSubmit, isError, isLoading }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLInputElement | null>(null);
     const [password, setPassword] = useState('');
@@ -104,7 +106,7 @@ const PasswordUnlock: FC<{
     }, [location]);
 
     useEffect(() => {
-        if (sdk.isIOs()) return;
+        //if (sdk.isIOs()) return;
         if (ref.current) {
             ref.current.focus();
         }
@@ -156,6 +158,10 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const [auth, setAuth] = useState<AuthState | undefined>(undefined);
     const [requestId, setId] = useState<number | undefined>(undefined);
 
+    const setRequest = useMemo(() => {
+        return debounce<[number | undefined]>(v => setId(v), 300);
+    }, [setId]);
+
     const { mutateAsync, isLoading, isError, reset } = useMutateUnlock(sdk, requestId);
 
     const close = useCallback(() => {
@@ -170,7 +176,6 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     };
 
     const onCancel = () => {
-        console.log('cancel');
         sdk.uiEvents.emit('response', {
             method: 'response',
             id: requestId,
@@ -185,9 +190,12 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
             id?: number | undefined;
             params: GetPasswordParams;
         }) => {
+            openIosKeyboard('text');
+
             setType(options.params.type);
             setAuth(options.params?.auth);
-            setId(options.id);
+
+            setRequest(options.id);
         };
         sdk.uiEvents.on('getPassword', handler);
 

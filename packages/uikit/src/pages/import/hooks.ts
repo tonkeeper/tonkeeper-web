@@ -1,6 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-
+import { debounce } from '@tonkeeper/core/dist/utils/common';
 import { useEffect } from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 
@@ -12,36 +10,43 @@ export const useKeyboardHeight = () => {
             sdk.uiEvents.emit('copy', { method: 'copy', params: value });
 
         const innerHeight = window.innerHeight;
+        const viewport = window.visualViewport;
 
-        function resizeHandler(this: VisualViewport) {
-            const doc = document.documentElement;
-            doc.style.setProperty('--app-height', `${this.height}px`);
-            doc.style.overflow = 'hidden';
-            doc.style.height = `${this.height}px`;
-            document.body.style.overflow = 'hidden';
-            document.body.style.height = `${this.height}px`;
-            document.getElementById('root')!.style.overflow = 'hidden';
-            document.getElementById('root')!.style.height = `${this.height}px`;
-            message(`${this.height}px`);
+        function callback() {
+            message('callback');
+            if (viewport) {
+                resizeHandler.call(viewport);
+            }
         }
 
-        const viewport = window.visualViewport;
+        function releaseHandler() {
+            const doc = document.documentElement;
+            doc.style.setProperty('--app-height', `${innerHeight}px`);
+            doc.style.setProperty('--fixed-height', 'auto');
+            message('release');
+        }
+
+        const resizeHandler = debounce(function (this: VisualViewport) {
+            if (this.height > 500) {
+                return releaseHandler();
+            } else {
+                const doc = document.documentElement;
+                doc.style.setProperty('--app-height', `${this.height}px`);
+                doc.style.setProperty('--fixed-height', `${this.height}px`);
+                message(`${this.height}px`);
+            }
+        }, 200);
+
         if (viewport) {
-            setTimeout(() => resizeHandler.call(viewport), 300);
+            resizeHandler.call(viewport);
             viewport.addEventListener('resize', resizeHandler);
+            window.addEventListener('resize', callback);
         }
 
         return () => {
-            const doc = document.documentElement;
-            doc.style.setProperty('--app-height', `${innerHeight}px`);
-            message(`${innerHeight}px`);
-
-            delete doc.style.overflow;
-            delete doc.style.height;
-            delete document.body.style.overflow;
-            delete document.body.style.height;
-            delete document.getElementById('root')!.style.overflow;
-            delete document.getElementById('root')!.style.height;
+            viewport?.removeEventListener('resize', resizeHandler);
+            window.removeEventListener('resize', callback);
+            releaseHandler();
         };
     }, []);
 };
