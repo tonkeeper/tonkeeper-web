@@ -1,19 +1,18 @@
 import { debounce } from '@tonkeeper/core/dist/utils/common';
 import { useEffect } from 'react';
-import { useAppSdk } from '../../hooks/appSdk';
 
 export const useKeyboardHeight = () => {
-    const sdk = useAppSdk();
+    // const sdk = useAppSdk();
 
     useEffect(() => {
-        const message = (value: string) =>
-            sdk.uiEvents.emit('copy', { method: 'copy', params: value });
+        // const message = (value: string) =>
+        //     sdk.uiEvents.emit('copy', { method: 'copy', params: value });
 
         const innerHeight = window.innerHeight;
         const viewport = window.visualViewport;
 
         function callback() {
-            message('callback');
+            // message('callback');
             if (viewport) {
                 resizeHandler.call(viewport);
             }
@@ -23,7 +22,7 @@ export const useKeyboardHeight = () => {
             const doc = document.documentElement;
             doc.style.setProperty('--app-height', `${innerHeight}px`);
             doc.style.setProperty('--fixed-height', 'auto');
-            message('release');
+            // message('release');
         }
 
         const resizeHandler = debounce(function (this: VisualViewport) {
@@ -33,7 +32,7 @@ export const useKeyboardHeight = () => {
                 const doc = document.documentElement;
                 doc.style.setProperty('--app-height', `${this.height}px`);
                 doc.style.setProperty('--fixed-height', `${this.height}px`);
-                message(`${this.height}px`);
+                // message(`${this.height}px`);
             }
         }, 200);
 
