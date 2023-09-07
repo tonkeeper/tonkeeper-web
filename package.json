@@ -4,6 +4,7 @@
     "scripts": {
         "build": "npx turbo build",
         "build:web": "npx turbo build:web",
+        "build:twa": "npx turbo build:twa",
         "build:extension": "npx turbo build:extension"
     },
     "private": true,
@@ -24,13 +25,15 @@
         "prettier": "^2.6.2",
         "turbo": "^1.10.13",
         "webpack": "^5.80.0",
-        "webpack-cli": "^5.0.1"
+        "webpack-cli": "^5.0.1",
+        "wrangler": "^3.7.0"
     },
     "workspaces": {
         "packages": [
             "packages/*",
             "apps/web",
-            "apps/extension"
+            "apps/extension",
+            "apps/twa"
         ]
     }
 }
