@@ -5,6 +5,7 @@
         "build": "npx turbo build",
         "build:web": "npx turbo build:web",
         "build:twa": "npx turbo build:twa",
+        "deploy:twa": "npx wrangler pages deploy apps/twa/build",
         "build:extension": "npx turbo build:extension"
     },
     "private": true,
