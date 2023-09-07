@@ -4775,6 +4775,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@testing-library/dom@npm:^9.3.1":
+  version: 9.3.1
+  resolution: "@testing-library/dom@npm:9.3.1"
+  dependencies:
+    "@babel/code-frame": ^7.10.4
+    "@babel/runtime": ^7.12.5
+    "@types/aria-query": ^5.0.1
+    aria-query: 5.1.3
+    chalk: ^4.1.0
+    dom-accessibility-api: ^0.5.9
+    lz-string: ^1.5.0
+    pretty-format: ^27.0.2
+  checksum: 8ee3136451644e39990edea93709c38cf1e8ce5306f3c66273ca00935963faa51ca74e8d92b02eb442ccb842cfa28ca62833e393e075eb269cf9bef6f5600663
+  languageName: node
+  linkType: hard
+
 "@testing-library/jest-dom@npm:^5.16.5":
   version: 5.17.0
   resolution: "@testing-library/jest-dom@npm:5.17.0"
@@ -4912,10 +4928,12 @@ __metadata:
     react: ^18.2.0
     react-beautiful-dnd: ^13.1.1
     react-dom: ^18.2.0
+    react-is: ^18.2.0
     react-lottie: ^1.2.3
     react-qrcode-logo: ^2.9.0
     react-router-dom: ^6.4.5
     react-transition-group: ^4.4.5
+    require-from-string: ^2.0.2
     storybook-addon-turbo-build: ^1.1.0
     styled-components: ^5.3.6
     ton: ^13.4.1
@@ -4923,6 +4941,7 @@ __metadata:
     ton-crypto: ^3.2.0
     typescript: ^4.9.4
     uuid: ^9.0.0
+    webpack: ^5.88.2
   languageName: unknown
   linkType: soft
 
@@ -4930,12 +4949,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/web@workspace:apps/web"
   dependencies:
+    "@testing-library/dom": ^9.3.1
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
     "@testing-library/user-event": ^13.5.0
     "@tonkeeper/core": 0.1.0
     "@tonkeeper/locales": 0.1.0
     "@tonkeeper/uikit": 0.1.0
+    "@types/fs-extra": ^11.0.1
     "@types/jest": ^27.5.2
     "@types/node": ^16.18.6
     "@types/react": ^18.0.26
@@ -4949,6 +4970,7 @@ __metadata:
     react-app-rewired: ^2.2.1
     react-dom: ^18.2.0
     react-i18next: ^12.1.1
+    react-is: ^18.2.0
     react-router-dom: ^6.4.5
     react-scripts: 5.0.1
     styled-components: ^5.3.6
@@ -5167,6 +5189,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/fs-extra@npm:^11.0.1":
+  version: 11.0.1
+  resolution: "@types/fs-extra@npm:11.0.1"
+  dependencies:
+    "@types/jsonfile": "*"
+    "@types/node": "*"
+  checksum: 3e930346e5d84f419deb8ced1c582beef8cb20d0bd8a0eb145a37d75bab0572a1895f0e48a0d681d386b3a58b9a992b2d2acecc464bcaec2548f53ea00718651
+  languageName: node
+  linkType: hard
+
 "@types/glob@npm:*":
   version: 8.1.0
   resolution: "@types/glob@npm:8.1.0"
@@ -5308,6 +5340,15 @@ __metadata:
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
   checksum: e60b153664572116dfea673c5bda7778dbff150498f44f998e34b5886d8afc47f16799280e4b6e241c0472aef1bc36add771c569c68fc5125fc2ae519a3eb9ac
+  languageName: node
+  linkType: hard
+
+"@types/jsonfile@npm:*":
+  version: 6.1.1
+  resolution: "@types/jsonfile@npm:6.1.1"
+  dependencies:
+    "@types/node": "*"
+  checksum: 0f8fe0a9221a00e8413cffba723dfe16553868724b830237256fb0052ecd5cac96498189d1235a001cfa815f352008261c9ceb373f0aa58227f891e0c7a12c4d
   languageName: node
   linkType: hard
 
@@ -17879,7 +17920,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:^18.0.0":
+"react-is@npm:^18.0.0, react-is@npm:^18.2.0":
   version: 18.2.0
   resolution: "react-is@npm:18.2.0"
   checksum: e72d0ba81b5922759e4aff17e0252bd29988f9642ed817f56b25a3e217e13eea8a7f2322af99a06edb779da12d5d636e9fda473d620df9a3da0df2a74141d53e
@@ -21887,7 +21928,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:>=4.43.0 <6.0.0, webpack@npm:^5.64.4, webpack@npm:^5.80.0":
+"webpack@npm:>=4.43.0 <6.0.0, webpack@npm:^5.64.4, webpack@npm:^5.80.0, webpack@npm:^5.88.2":
   version: 5.88.2
   resolution: "webpack@npm:5.88.2"
   dependencies:
