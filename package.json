@@ -29,11 +29,8 @@
     "workspaces": {
         "packages": [
             "packages/*",
-            "apps/*"
-        ],
-        "nohoist": [
-            "**/electron",
-            "**/electron**"
+            "apps/web",
+            "apps/extension"
         ]
     }
 }
