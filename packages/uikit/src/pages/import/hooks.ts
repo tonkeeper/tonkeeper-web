@@ -23,7 +23,7 @@ export const useKeyboardHeight = () => {
             const doc = document.documentElement;
             doc.style.setProperty('--app-height', `${innerHeight}px`);
             doc.style.setProperty('--fixed-height', 'auto');
-            message('release');
+            // message('release');
         }
 
         const resizeHandler = debounce(function (this: VisualViewport) {
@@ -33,7 +33,7 @@ export const useKeyboardHeight = () => {
                 const doc = document.documentElement;
                 doc.style.setProperty('--app-height', `${this.height}px`);
                 doc.style.setProperty('--fixed-height', `${this.height}px`);
-                message(`${this.height}px`);
+                // message(`${this.height}px`);
             }
         }, 200);
 
