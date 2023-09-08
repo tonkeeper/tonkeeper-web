@@ -5134,6 +5134,7 @@ __metadata:
     "@tonkeeper/core": 0.1.0
     "@tonkeeper/locales": 0.1.0
     "@tonkeeper/uikit": 0.1.0
+    "@twa.js/sdk-react": ^0.3.20
     "@types/fs-extra": ^11.0.1
     "@types/jest": ^27.5.2
     "@types/node": ^16.18.6
@@ -5285,6 +5286,58 @@ __metadata:
   version: 1.0.4
   resolution: "@tsconfig/node16@npm:1.0.4"
   checksum: 202319785901f942a6e1e476b872d421baec20cf09f4b266a1854060efbf78cde16a4d256e8bc949d31e6cd9a90f1e8ef8fb06af96a65e98338a2b6b0de0a0ff
+  languageName: node
+  linkType: hard
+
+"@twa.js/bridge@npm:1.2.0":
+  version: 1.2.0
+  resolution: "@twa.js/bridge@npm:1.2.0"
+  dependencies:
+    "@twa.js/utils": 0.5.0
+  checksum: ef1cd0cb6c9394eac4fa31fa6f9c4c05e64434fcd9f53cc560a5ca05e295ea7f73880226d0bf1d3126726029d295cf96937acebb44c2c9981e6910cb15b543c1
+  languageName: node
+  linkType: hard
+
+"@twa.js/init-data@npm:0.2.11":
+  version: 0.2.11
+  resolution: "@twa.js/init-data@npm:0.2.11"
+  dependencies:
+    "@twa.js/utils": 0.5.0
+  checksum: f5c9837242ba9d5c98b4dd5017d66ec9bf59a47f42745e2abc3d68eb4081e55555ce00e1dff8510123da53ea158e4cbac121c667da5b8966acb009163e35f7c9
+  languageName: node
+  linkType: hard
+
+"@twa.js/sdk-react@npm:^0.3.20":
+  version: 0.3.20
+  resolution: "@twa.js/sdk-react@npm:0.3.20"
+  dependencies:
+    "@twa.js/bridge": 1.2.0
+    "@twa.js/sdk": 0.10.0
+  peerDependencies:
+    "@types/react": ^17.0.0 || ^18.0.0
+    react: ^17.0.0 || ^18.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 7d056be6ff4256921a73e00db130bc8a8739af6c8f25e92a6b4fb373b3bf2c0b50147320032aad941b2e18fa8ee26c069e4231ba1e3834749b7e7af7d302a741
+  languageName: node
+  linkType: hard
+
+"@twa.js/sdk@npm:0.10.0":
+  version: 0.10.0
+  resolution: "@twa.js/sdk@npm:0.10.0"
+  dependencies:
+    "@twa.js/bridge": 1.2.0
+    "@twa.js/init-data": 0.2.11
+    "@twa.js/utils": 0.5.0
+  checksum: a730acd4ce458ea1e06c0e3f5d4fd1464494db41e1dcfc6df10693b681dbd92876440d6bac1a8a3f7562bd5e83602097226d82f4989e949881323f487f2ad3c1
+  languageName: node
+  linkType: hard
+
+"@twa.js/utils@npm:0.5.0":
+  version: 0.5.0
+  resolution: "@twa.js/utils@npm:0.5.0"
+  checksum: 02866c99387563a072cb0253af699f42aca8400d6f726a6e7d50ab4cd50d2f55dab9b82a9bb5b0bac809078fb03430e29b260efda37fa013afdca08e532bd400
   languageName: node
   linkType: hard
 

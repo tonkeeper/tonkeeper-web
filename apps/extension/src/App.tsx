@@ -60,7 +60,6 @@ const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings')
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
-const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 
 const queryClient = new QueryClient({
     defaultOptions: {

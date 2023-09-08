@@ -47,10 +47,12 @@ import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo, useState } from 'react';
+import { SDKProvider, useLaunchParams } from '@twa.js/sdk-react';
+import React, { FC, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { TwaQrScanner } from './components/TwaQrScanner';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAppHeight, useAppWidth } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
@@ -73,7 +75,15 @@ const queryClient = new QueryClient({
 const storage = new BrowserStorage();
 const sdk = new BrowserAppSdk(storage);
 
-export const App: FC<PropsWithChildren> = () => {
+export const App = () => {
+    return (
+        <SDKProvider>
+            <TwaApp />
+        </SDKProvider>
+    );
+};
+
+const TwaApp = () => {
     const { t, i18n } = useTranslation();
 
     const translation = useMemo(() => {
@@ -89,6 +99,25 @@ export const App: FC<PropsWithChildren> = () => {
         };
         return client;
     }, [t, i18n]);
+
+    const launchParams = useLaunchParams();
+
+    useEffect(() => {
+        translation.i18n.languages.forEach((lang: string) => {
+            if (launchParams.initData?.user?.languageCode === lang) {
+                translation.i18n.changeLanguage(lang);
+            }
+        });
+    }, [launchParams]);
+
+    useEffect(() => {
+        if (launchParams.initData?.user) {
+            sdk.uiEvents.emit('copy', {
+                method: 'copy',
+                params: `${launchParams.initData?.user?.languageCode} ${launchParams.initData?.user?.username}`
+            });
+        }
+    }, [launchParams.initData]);
 
     return (
         <BrowserRouter>
@@ -203,9 +232,7 @@ export const Loader: FC = () => {
                     <AppContext.Provider value={context}>
                         <Content activeWallet={activeWallet} lock={lock} standalone={standalone} />
                         <CopyNotification />
-                        <Suspense fallback={<></>}>
-                            <QrScanner />
-                        </Suspense>
+                        <TwaQrScanner />
                     </AppContext.Provider>
                 </AfterImportAction.Provider>
             </OnImportAction.Provider>
