@@ -259,23 +259,23 @@ export const RecipientView: FC<{
 
     const onSelect = async (item: Suggestion) => {
         setAddress(item);
-        if (ios && keyboard) openIosKeyboard(keyboard);
+        // if (ios && keyboard) openIosKeyboard(keyboard);
 
-        if (seeIfValidTronAddress(item.address)) {
-            setRecipient({
-                address: { ...item, blockchain: BLOCKCHAIN_NAME.TRON },
-                done: false
-            });
-        } else {
-            const to = await getAccountAsync(item);
-            if (to.memoRequired) return;
-            setRecipient({
-                address: { ...item, blockchain: BLOCKCHAIN_NAME.TON },
-                toAccount: to,
-                comment,
-                done: false
-            });
-        }
+        // if (seeIfValidTronAddress(item.address)) {
+        //     setRecipient({
+        //         address: { ...item, blockchain: BLOCKCHAIN_NAME.TRON },
+        //         done: false
+        //     });
+        // } else {
+        //     const to = await getAccountAsync(item);
+        //     if (to.memoRequired) return;
+        //     setRecipient({
+        //         address: { ...item, blockchain: BLOCKCHAIN_NAME.TON },
+        //         toAccount: to,
+        //         comment,
+        //         done: false
+        //     });
+        // }
     };
 
     return (
