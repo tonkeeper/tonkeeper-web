@@ -84,7 +84,7 @@ const useDnsWallet = (value: string) => {
             if (seeIfInvalidDns(dns)) {
                 return null;
             }
-            dns = dns.toLowerCase();
+            dns = dns.toString().toLowerCase();
             const result = await new DNSApi(api.tonApi).dnsResolve({ name: dns });
             if (!result.wallet) {
                 return null;

@@ -275,7 +275,7 @@ export const AmountView: FC<{
                 </MaxButton>
                 {enoughBalance ? (
                     <Remaining>
-                        {t('Remaining').replace('%1%', formatter.format(remaining))}
+                        {t('Remaining').replace('%1%', formatter.format(remaining))} {token.symbol}
                     </Remaining>
                 ) : (
                     <RemainingInvalid>
