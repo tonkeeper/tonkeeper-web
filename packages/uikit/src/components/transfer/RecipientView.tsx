@@ -264,7 +264,7 @@ export const RecipientView: FC<{
         if (seeIfValidTronAddress(item.address)) {
             setRecipient({
                 address: { ...item, blockchain: BLOCKCHAIN_NAME.TRON },
-                done: true
+                done: false
             });
         } else {
             const to = await getAccountAsync(item);
@@ -273,7 +273,7 @@ export const RecipientView: FC<{
                 address: { ...item, blockchain: BLOCKCHAIN_NAME.TON },
                 toAccount: to,
                 comment,
-                done: true
+                done: false
             });
         }
     };
