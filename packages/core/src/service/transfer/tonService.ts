@@ -2,13 +2,11 @@ import BigNumber from 'bignumber.js';
 import { Address, Cell, internal } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../../Storage';
-import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipientData } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import { AccountApi, AccountEvent, AccountRepr, Configuration, Fee, SendApi } from '../../tonApiV1';
-import { EmulationApi } from '../../tonApiV2';
 import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
@@ -129,25 +127,24 @@ const createTonConnectTransfer = (
 };
 
 export const estimateTonTransfer = async (
-    api: APIConfig,
+    tonApi: Configuration,
     walletState: WalletState,
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean
 ) => {
-    await checkServiceTimeOrDie(api.tonApi);
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    await checkServiceTimeOrDie(tonApi);
+    const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
     if (!isMax) {
         checkWalletPositiveBalanceOrDie(wallet);
     }
 
     const cell = createTonTransfer(seqno, walletState, recipient, weiAmount, isMax);
 
-    const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-        emulateMessageToEventRequest: { boc: cell.toString('base64') }
+    const { fee } = await new SendApi(tonApi).estimateTx({
+        sendBocRequest: { boc: cell.toString('base64') }
     });
-
-    return emulation;
+    return fee;
 };
 
 export const estimateTonConnectTransfer = async (
