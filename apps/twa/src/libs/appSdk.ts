@@ -15,7 +15,7 @@ function iOS() {
     );
 }
 
-export class BrowserAppSdk implements IAppSdk {
+export class TwaAppSdk implements IAppSdk {
     constructor(public storage: IStorage) {}
     copyToClipboard = (value: string, notification?: string) => {
         copyToClipboard(value);

@@ -1,8 +1,8 @@
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { useQRScanner, useSDK } from '@twa.js/sdk-react';
-import { useEffect } from 'react';
+import { useQRScanner } from '@twa.js/sdk-react';
+import React, { useEffect } from 'react';
 
-const Watcher = () => {
+export const TwaQrScanner = () => {
     const scanner = useQRScanner();
 
     const sdk = useAppSdk();
@@ -26,14 +26,4 @@ const Watcher = () => {
     }, []);
 
     return <></>;
-};
-
-export const TwaQrScanner = () => {
-    const { didInit, components } = useSDK();
-
-    if (didInit && components) {
-        return <Watcher />;
-    } else {
-        return <></>;
-    }
 };

@@ -47,14 +47,14 @@ import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import { SDKProvider } from '@twa.js/sdk-react';
+import { SDKProvider, useSDK } from '@twa.js/sdk-react';
 import React, { FC, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { InitDataLogger } from './components/InitData';
 import { TwaQrScanner } from './components/TwaQrScanner';
-import { BrowserAppSdk } from './libs/appSdk';
+import { TwaAppSdk } from './libs/appSdk';
 import { useAppHeight, useAppWidth } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
 
@@ -73,7 +73,7 @@ const queryClient = new QueryClient({
     }
 });
 const storage = new BrowserStorage();
-const sdk = new BrowserAppSdk(storage);
+const sdk = new TwaAppSdk(storage);
 
 export const App = () => {
     return (
@@ -157,6 +157,7 @@ export const Loader: FC = () => {
         return [sdk.isIOs(), sdk.isStandalone()] as const;
     }, []);
 
+    const { didInit, components } = useSDK();
     const lock = useLock();
     const { i18n } = useTranslation();
     const { data: account } = useAccountState();
@@ -182,7 +183,14 @@ export const Loader: FC = () => {
         }
     }, [activeWallet, i18n]);
 
-    if (auth === undefined || account === undefined || config === undefined || lock === undefined) {
+    if (
+        auth === undefined ||
+        account === undefined ||
+        config === undefined ||
+        lock === undefined ||
+        !didInit ||
+        components == null
+    ) {
         return <Loading />;
     }
 

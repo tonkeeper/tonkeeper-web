@@ -1,10 +1,8 @@
-import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { useLaunchParams, useSDK } from '@twa.js/sdk-react';
-import { useEffect } from 'react';
+import { useLaunchParams } from '@twa.js/sdk-react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const Watcher = () => {
-    const sdk = useAppSdk();
+export const InitDataLogger = () => {
     const launchParams = useLaunchParams();
     const { t, i18n } = useTranslation();
 
@@ -25,14 +23,4 @@ const Watcher = () => {
     // }, [launchParams]);
 
     return <></>;
-};
-
-export const InitDataLogger = () => {
-    const { didInit, components } = useSDK();
-
-    if (didInit && components) {
-        return <Watcher />;
-    } else {
-        return <></>;
-    }
 };
