@@ -297,7 +297,7 @@ export const ActionFeeDetails: FC<{
     return (
         <ListItem hover={false}>
             <ListItemPayload>
-                <Label>{fee.event.extra < 0 ? t('txActions_refund') : t('transaction_fee')}</Label>
+                <Label>{fee.event.extra > 0 ? t('txActions_refund') : t('transaction_fee')}</Label>
                 <ColumnText
                     right
                     text={`${amount} ${CryptoCurrency.TON}`}
