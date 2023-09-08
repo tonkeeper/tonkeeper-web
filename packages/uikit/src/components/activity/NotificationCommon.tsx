@@ -1,11 +1,11 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { Fee } from '@tonkeeper/core/dist/tonApiV1';
 import {
     AccountAddress,
     AccountEvent,
-    JettonSwapActionDexEnum
+    JettonSwapActionDexEnum,
+    MessageConsequences
 } from '@tonkeeper/core/dist/tonApiV2';
 import { TronEvent, TronFee } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -285,11 +285,11 @@ export const ActionDeployerDetails: FC<{ deployer: string }> = ({ deployer }) =>
 };
 
 export const ActionFeeDetails: FC<{
-    fee: Fee;
+    fee: MessageConsequences;
 }> = ({ fee }) => {
     const { t } = useTranslation();
 
-    const feeAmount = fee.total < 0 ? fee.total * -1 : fee.total;
+    const feeAmount = fee.event.extra < 0 ? fee.event.extra * -1 : fee.event.extra;
     const amount = useCoinFullBalance(feeAmount);
     const { data } = useRate(CryptoCurrency.TON);
     const { fiatAmount } = useFormatFiat(data, formatDecimals(feeAmount));
@@ -297,7 +297,7 @@ export const ActionFeeDetails: FC<{
     return (
         <ListItem hover={false}>
             <ListItemPayload>
-                <Label>{fee.total < 0 ? t('txActions_refund') : t('transaction_fee')}</Label>
+                <Label>{fee.event.extra < 0 ? t('txActions_refund') : t('transaction_fee')}</Label>
                 <ColumnText
                     right
                     text={`${amount} ${CryptoCurrency.TON}`}

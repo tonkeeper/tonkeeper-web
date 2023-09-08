@@ -30,7 +30,7 @@ const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData)
         [QueryKey.estimate, data?.address],
         async () => {
             try {
-                return await estimateNftTransfer(api.tonApi, wallet, data!, nftItem);
+                return await estimateNftTransfer(api, wallet, data!, nftItem);
             } catch (e) {
                 await notifyError(client, sdk, t, e);
             }
