@@ -23,10 +23,6 @@ import {
     SettingsSkeletonPage
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
-import {
-    AmplitudeAnalyticsContext,
-    useAmplitudeAnalytics
-} from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
@@ -37,18 +33,27 @@ import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
 import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
+import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
+
+import {
+    AmplitudeAnalyticsContext,
+    useAmplitudeAnalytics
+} from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import { Initialize, InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
+import { Initialize } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/ThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo, useState } from 'react';
+import { SDKProvider } from '@twa.js/sdk-react';
+import React, { FC, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
+import { InitDataLogger } from './components/InitData';
+import { TwaQrScanner } from './components/TwaQrScanner';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAppHeight, useAppWidth } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
@@ -58,7 +63,6 @@ const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings')
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
-const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -71,7 +75,15 @@ const queryClient = new QueryClient({
 const storage = new BrowserStorage();
 const sdk = new BrowserAppSdk(storage);
 
-export const App: FC<PropsWithChildren> = () => {
+export const App = () => {
+    return (
+        <SDKProvider>
+            <TwaApp />
+        </SDKProvider>
+    );
+};
+
+const TwaApp = () => {
     const { t, i18n } = useTranslation();
 
     const translation = useMemo(() => {
@@ -129,38 +141,13 @@ const useLock = () => {
     return lock;
 };
 
-const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
-    ${props =>
-        props.standalone
-            ? css`
-                  position: fixed;
-                  top: 0;
-                  height: calc(var(--app-height) - 2px);
-                  -webkit-overflow-scrolling: touch;
-              `
-            : css`
-                  @media (min-width: 600px) {
-                      border-left: 1px solid ${props.theme.separatorCommon};
-                      border-right: 1px solid ${props.theme.separatorCommon};
-                  }
-              `};
+const FullSizeWrapper = styled(Container)``;
 
-    > * {
-        ${props =>
-            props.standalone &&
-            css`
-                overflow: auto;
-                width: var(--app-width);
-                max-width: 548px;
-                box-sizing: border-box;
-            `}
-    }
-`;
+const Wrapper = styled(FullSizeWrapper)`
+    height: var(--fixed-height);
 
-const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
     box-sizing: border-box;
     padding-top: 64px;
-    padding-bottom: ${props => (props.standalone ? '96' : '80')}px;
 `;
 
 export const Loader: FC = () => {
@@ -181,7 +168,7 @@ export const Loader: FC = () => {
     const navigate = useNavigate();
     useAppHeight();
 
-    const enable = useAmplitudeAnalytics('Web', account, activeWallet);
+    const enable = useAmplitudeAnalytics('Twa', account, activeWallet);
 
     useEffect(() => {
         if (
@@ -226,13 +213,35 @@ export const Loader: FC = () => {
                     <AppContext.Provider value={context}>
                         <Content activeWallet={activeWallet} lock={lock} standalone={standalone} />
                         <CopyNotification />
-                        <Suspense fallback={<></>}>
-                            <QrScanner />
-                        </Suspense>
+                        <TwaQrScanner />
+                        <InitDataLogger />
                     </AppContext.Provider>
                 </AfterImportAction.Provider>
             </OnImportAction.Provider>
         </AmplitudeAnalyticsContext.Provider>
+    );
+};
+
+const InitWrapper = styled(Container)`
+    height: var(--app-height);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1rem;
+    box-sizing: border-box;
+    position: relative;
+`;
+
+const InitPages = () => {
+    return (
+        <InitWrapper>
+            <Suspense fallback={<Loading />}>
+                <Routes>
+                    <Route path={any(AppRoute.import)} element={<ImportRouter />} />
+                    <Route path="*" element={<Initialize />} />
+                </Routes>
+            </Suspense>
+        </InitWrapper>
     );
 };
 
@@ -244,32 +253,22 @@ export const Content: FC<{
     const location = useLocation();
     useWindowsScroll();
     useAppWidth(standalone);
+    useKeyboardHeight();
 
     if (lock) {
         return (
-            <FullSizeWrapper standalone={standalone}>
+            <FullSizeWrapper>
                 <Unlock />
             </FullSizeWrapper>
         );
     }
 
     if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
-        return (
-            <FullSizeWrapper standalone={false}>
-                <Suspense fallback={<Loading />}>
-                    <InitializeContainer fullHeight={false}>
-                        <Routes>
-                            <Route path={any(AppRoute.import)} element={<ImportRouter />} />
-                            <Route path="*" element={<Initialize />} />
-                        </Routes>
-                    </InitializeContainer>
-                </Suspense>
-            </FullSizeWrapper>
-        );
+        return <InitPages />;
     }
 
     return (
-        <Wrapper standalone={standalone}>
+        <Wrapper>
             <WalletStateContext.Provider value={activeWallet}>
                 <Routes>
                     <Route
@@ -312,7 +311,7 @@ export const Content: FC<{
                         }
                     />
                 </Routes>
-                <Footer standalone={standalone} />
+                <Footer standalone={standalone} sticky />
                 <MemoryScroll />
             </WalletStateContext.Provider>
         </Wrapper>
