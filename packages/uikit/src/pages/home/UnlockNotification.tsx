@@ -159,7 +159,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const [requestId, setId] = useState<number | undefined>(undefined);
 
     const setRequest = useMemo(() => {
-        return debounce<[number | undefined]>(v => setId(v), 300);
+        return debounce<[number | undefined]>(v => setId(v), 500);
     }, [setId]);
 
     const { mutateAsync, isLoading, isError, reset } = useMutateUnlock(sdk, requestId);
