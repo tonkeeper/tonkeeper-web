@@ -1,12 +1,14 @@
 import BigNumber from 'bignumber.js';
 import { Address, beginCell, Cell, comment, internal, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
+import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
 import { Configuration, Fee, SendApi } from '../../tonApiV1';
+import { EmulationApi } from '../../tonApiV2';
 import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
@@ -80,14 +82,14 @@ const createJettonTransfer = (
 };
 
 export const estimateJettonTransfer = async (
-    tonApi: Configuration,
+    api: APIConfig,
     walletState: WalletState,
     recipient: TonRecipientData,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string
 ) => {
-    await checkServiceTimeOrDie(tonApi);
-    const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+    await checkServiceTimeOrDie(api.tonApi);
+    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = createJettonTransfer(
@@ -99,10 +101,10 @@ export const estimateJettonTransfer = async (
         recipient.comment ? comment(recipient.comment) : null
     );
 
-    const { fee } = await new SendApi(tonApi).estimateTx({
-        sendBocRequest: { boc: cell.toString('base64') }
+    const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+        emulateMessageToEventRequest: { boc: cell.toString('base64') }
     });
-    return fee;
+    return emulation;
 };
 
 export const sendJettonTransfer = async (
