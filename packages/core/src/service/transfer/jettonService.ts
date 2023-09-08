@@ -7,8 +7,7 @@ import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration, Fee, SendApi } from '../../tonApiV1';
-import { EmulationApi } from '../../tonApiV2';
+import { BlockchainApi, EmulationApi, MessageConsequences } from '../../tonApiV2';
 import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
@@ -109,21 +108,23 @@ export const estimateJettonTransfer = async (
 
 export const sendJettonTransfer = async (
     storage: IStorage,
-    tonApi: Configuration,
+    api: APIConfig,
     walletState: WalletState,
     recipient: TonRecipientData,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string,
-    fee: Fee,
+    fee: MessageConsequences,
     password: string
 ) => {
-    await checkServiceTimeOrDie(tonApi);
+    await checkServiceTimeOrDie(api.tonApi);
     const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-    const total = new BigNumber(fee.total).plus(jettonTransferAmount.toString());
+    const total = new BigNumber(fee.event.extra)
+        .multipliedBy(-1)
+        .plus(jettonTransferAmount.toString());
 
-    const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
     const cell = createJettonTransfer(
@@ -136,7 +137,7 @@ export const sendJettonTransfer = async (
         keyPair.secretKey
     );
 
-    await new SendApi(tonApi).sendBoc({
-        sendBocRequest: { boc: cell.toString('base64') }
+    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
+        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
     });
 };

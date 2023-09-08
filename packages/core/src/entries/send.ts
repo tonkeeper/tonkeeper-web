@@ -1,4 +1,5 @@
-import { AccountRepr, Fee, WalletDNS } from '../tonApiV1';
+import { AccountRepr, WalletDNS } from '../tonApiV1';
+import { MessageConsequences } from '../tonApiV2';
 import { EstimatePayload } from '../tronApi';
 import { BLOCKCHAIN_NAME } from './crypto';
 import { Asset } from './crypto/asset/asset';
@@ -53,5 +54,9 @@ export function isTronRecipientData(
 
 export type TransferEstimation<T extends Asset = Asset> = {
     fee: AssetAmount<T>;
-    payload: T extends TonAsset ? Fee : T extends TronAsset ? EstimatePayload : never;
+    payload: T extends TonAsset
+        ? MessageConsequences
+        : T extends TronAsset
+        ? EstimatePayload
+        : never;
 };
