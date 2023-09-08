@@ -213,9 +213,6 @@ export const Loader: FC = React.memo(() => {
                     <AppContext.Provider value={context}>
                         <Content activeWallet={activeWallet} lock={lock} />
                         <CopyNotification />
-                        <Suspense fallback={<></>}>
-                            <QrScanner />
-                        </Suspense>
                     </AppContext.Provider>
                 </AfterImportAction.Provider>
             </OnImportAction.Provider>
