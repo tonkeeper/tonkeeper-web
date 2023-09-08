@@ -38,5 +38,5 @@ export const useFetchNext = (
         return () => {
             element.removeEventListener('scroll', handler);
         };
-    }, [fetchNextPage, hasNextPage, isFetchingNextPage, standalone, ref]);
+    }, [hasNextPage, standalone, ref]);
 };
