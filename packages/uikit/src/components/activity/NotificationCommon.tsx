@@ -382,7 +382,7 @@ const ActionFeeDetailsUniversalValue: FC<{ fee: AssetAmount }> = ({ fee }) => {
     ) : (
         <ColumnText
             right
-            text={fee.stringAssetRelativeAmount}
+            text={fee.stringAssetAbsoluteRelativeAmount}
             secondary={fiatAmountBN ? `≈ ${fiatAmount}` : undefined}
         />
     );
