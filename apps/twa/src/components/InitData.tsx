@@ -16,13 +16,13 @@ const Watcher = () => {
         });
     }, [launchParams]);
 
-    useEffect(() => {
-        if (launchParams.initData?.user?.username)
-            sdk.uiEvents.emit('copy', {
-                method: 'copy',
-                params: `Welcome ${launchParams.initData?.user.username}`
-            });
-    }, [launchParams]);
+    // useEffect(() => {
+    //     if (launchParams.initData?.user?.username)
+    //         sdk.uiEvents.emit('copy', {
+    //             method: 'copy',
+    //             params: `Welcome ${launchParams.initData?.user.username}`
+    //         });
+    // }, [launchParams]);
 
     return <></>;
 };

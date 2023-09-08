@@ -36,5 +36,6 @@
             "apps/extension",
             "apps/twa"
         ]
-    }
+    },
+    "packageManager": "yarn@3.6.3"
 }
