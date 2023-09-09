@@ -72,6 +72,7 @@ const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
 
         const isValid = await validateWalletMnemonic(sdk.storage, publicKey, password);
         if (!isValid) {
+            sdk.hapticNotification('error');
             throw new Error('Mnemonic not valid');
         }
 
