@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import { Notification } from '../../components/Notification';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
-import { openIosKeyboard } from '../../hooks/ios';
+import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 
 export const getPasswordByNotification = async (
@@ -107,10 +107,20 @@ const PasswordUnlock: FC<{
     }, [location]);
 
     useEffect(() => {
-        if (!ref.current) return;
-        const input = ref.current;
-        input.focus();
-    }, [ref.current]);
+        if (ref.current) {
+            ref.current.focus();
+
+            ref.current.onblur = () => {
+                openIosKeyboard('text', 'password', 360); // almost infinity
+            };
+        }
+        return () => {
+            if (ref.current) {
+                ref.current.onblur = undefined!;
+            }
+            hideIosKeyboard();
+        };
+    }, [ref]);
 
     const onChange = (value: string) => {
         setPassword(value);
