@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
-import { Viewport } from '@twa.js/sdk';
+import { HapticFeedback, Viewport } from '@twa.js/sdk';
 import React, { useContext, useEffect } from 'react';
 import { TwaAppSdk } from './appSdk';
 
@@ -14,6 +14,8 @@ export const useSyncedViewport = (sdk: TwaAppSdk) => {
             viewport.expand();
             return undefined;
         });
+
+        sdk.setHapticFeedback(new HapticFeedback('6.3'));
 
         return viewport;
     });

@@ -1,19 +1,10 @@
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { EventEmitter } from '@tonkeeper/core/dist/entries/eventEmitter';
+import { HapticFeedback } from '@twa.js/sdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
-
-function iOS() {
-    return (
-        ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'].includes(
-            navigator.platform
-        ) ||
-        // iPad on iOS 13 detection
-        (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
-    );
-}
 
 export class TwaAppSdk implements IAppSdk {
     constructor(public storage: IStorage) {}
@@ -36,6 +27,15 @@ export class TwaAppSdk implements IAppSdk {
     setTwaExpand = (fn: () => undefined) => {
         this.twaExpand = fn;
     };
+    hapticFeedback: HapticFeedback | undefined;
+    hapticNotification = (type: 'success' | 'error') => {
+        if (this.hapticFeedback) {
+            this.hapticFeedback.notificationOccurred(type);
+        }
+    };
+    setHapticFeedback = (hapticFeedback: HapticFeedback) => {
+        this.hapticFeedback = hapticFeedback;
+    };
 
     disableScroll = disableScroll;
     enableScroll = enableScroll;
@@ -43,7 +43,7 @@ export class TwaAppSdk implements IAppSdk {
     getKeyboardHeight = () => 0;
 
     isIOs = () => true;
-    isStandalone = () => iOS() && ((window.navigator as any).standalone as boolean);
+    isStandalone = () => false;
 
     uiEvents = new EventEmitter();
     version = packageJson.version ?? 'Unknown';

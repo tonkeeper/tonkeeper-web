@@ -38,6 +38,7 @@ export interface IAppSdk {
 
     requestExtensionPermission: () => Promise<void>;
     twaExpand?: () => void;
+    hapticNotification: (type: 'success' | 'error') => void;
 }
 
 export class MockAppSdk implements IAppSdk {
@@ -74,4 +75,6 @@ export class MockAppSdk implements IAppSdk {
     requestExtensionPermission = async () => void 0;
 
     twaExpand = () => void 0;
+
+    hapticNotification = () => void 0;
 }

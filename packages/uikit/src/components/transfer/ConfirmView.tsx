@@ -14,10 +14,12 @@ import React, {
     createContext,
     isValidElement,
     useContext,
+    useEffect,
     useState
 } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useAssetAmountFiatEquivalent, useAssetImage } from '../../state/asset';
@@ -283,6 +285,8 @@ const ConfirmViewButtonsContainerStyled = styled.div`
 `;
 
 export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({ withCancelButton }) => {
+    const sdk = useAppSdk();
+
     const {
         formState: { done, error, isLoading },
         estimation: { isFetching: estimationLoading },
@@ -291,6 +295,18 @@ export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({ withCan
     const { t } = useTranslation();
 
     const isValid = !isLoading && !estimationLoading;
+
+    useEffect(() => {
+        if (done) {
+            sdk.hapticNotification('success');
+        }
+    }, [done]);
+
+    useEffect(() => {
+        if (error) {
+            sdk.hapticNotification('error');
+        }
+    }, [error]);
 
     if (done) {
         return (
