@@ -13,10 +13,15 @@ const toWalletType = (wallet?: WalletState | null): string => {
     return walletVersionText(wallet.active.version);
 };
 
-const initGA = () => {
+const initGA = (application: string, walletType: string) => {
     const key = process.env.REACT_APP_MEASUREMENT_ID;
     if (!key) return false;
     ReactGA.initialize(key);
+
+    ReactGA.event('Init', {
+        application,
+        walletType
+    });
 
     return true;
 };
@@ -28,7 +33,7 @@ const useInitAnalytics = (
     return useQuery(
         [QueryKey.analytics, account?.activePublicKey],
         async () => {
-            const ga = initGA();
+            const ga = initGA(application ?? 'Unknown', toWalletType(wallet));
 
             const key = process.env.REACT_APP_AMPLITUDE;
             if (!key) return [ga, false];
