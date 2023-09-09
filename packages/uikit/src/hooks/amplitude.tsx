@@ -18,7 +18,7 @@ const initGA = (application: string, walletType: string) => {
     if (!key) return false;
     ReactGA.initialize(key);
 
-    ReactGA.event('Init', {
+    ReactGA.gtag('set', 'user_properties', {
         application,
         walletType
     });
