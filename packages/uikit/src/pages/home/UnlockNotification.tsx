@@ -87,11 +87,11 @@ const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
 const PasswordUnlock: FC<{
     sdk: IAppSdk;
     onClose: () => void;
-    onSubmit: (password: string) => void;
+    onSubmit: (password: string) => Promise<boolean>;
     isError: boolean;
     isLoading: boolean;
     reason?: GetPasswordType;
-}> = ({ onClose, onSubmit, isError, isLoading }) => {
+}> = ({ sdk, onClose, onSubmit, isError, isLoading }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLInputElement | null>(null);
     const [password, setPassword] = useState('');
@@ -107,10 +107,9 @@ const PasswordUnlock: FC<{
     }, [location]);
 
     useEffect(() => {
-        //if (sdk.isIOs()) return;
-        if (ref.current) {
-            ref.current.focus();
-        }
+        if (!ref.current) return;
+        const input = ref.current;
+        input.focus();
     }, [ref.current]);
 
     const onChange = (value: string) => {
@@ -119,7 +118,16 @@ const PasswordUnlock: FC<{
 
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
-        onSubmit(password);
+
+        if (sdk.isIOs()) {
+            openIosKeyboard('text', 'password');
+        }
+
+        const result = await onSubmit(password);
+
+        if (result === false) {
+            ref.current?.focus();
+        }
     };
 
     return (
@@ -172,11 +180,17 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
 
     const onSubmit = async (password: string) => {
         reset();
-        await mutateAsync(password);
-        close();
+        try {
+            await mutateAsync(password);
+            close();
+            return true;
+        } catch (e) {
+            return false;
+        }
     };
 
     const onCancel = () => {
+        reset();
         sdk.uiEvents.emit('response', {
             method: 'response',
             id: requestId,

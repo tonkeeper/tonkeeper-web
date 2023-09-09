@@ -5,7 +5,6 @@ import { MinPasswordLength } from '@tonkeeper/core/dist/service/accountService';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
 import { H2 } from '../Text';
@@ -54,21 +53,23 @@ const SelectAuthType: FC<{
 };
 
 const useCreatePassword = () => {
-    const storage = useStorage();
+    const sdk = useAppSdk();
 
     return useMutation<string | undefined, Error, { password: string; confirm: string }>(
         async ({ password, confirm }) => {
             if (password.length < MinPasswordLength) {
+                sdk.hapticNotification('error');
                 return 'password';
             }
             if (password !== confirm) {
+                sdk.hapticNotification('error');
                 return 'confirm';
             }
 
             const state: AuthPassword = {
                 kind: 'password'
             };
-            await storage.set(AppKey.PASSWORD, state);
+            await sdk.storage.set(AppKey.PASSWORD, state);
         }
     );
 };
