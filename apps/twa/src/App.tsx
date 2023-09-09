@@ -54,7 +54,7 @@ import styled from 'styled-components';
 import { InitDataLogger } from './components/InitData';
 import { TwaQrScanner } from './components/TwaQrScanner';
 import { TwaAppSdk } from './libs/appSdk';
-import { ViewportContext, useAppViewport, useSyncedViewport } from './libs/hooks';
+import { ViewportContext, useAppViewport } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -154,16 +154,11 @@ const Wrapper = styled(FullSizeWrapper)`
 export const Loader: FC = () => {
     const { data: activeWallet } = useActiveWallet();
 
-    const [ios, standalone] = useMemo(() => {
-        return [sdk.isIOs(), sdk.isStandalone()] as const;
-    }, []);
-
     const { didInit, components } = useSDK();
     const lock = useLock();
     const { i18n } = useTranslation();
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
-    const { data: viewport } = useSyncedViewport(sdk);
 
     const tonendpoint = useTonendpoint(sdk.version, activeWallet?.network, activeWallet?.lang);
     const { data: config } = useTonenpointConfig(tonendpoint);
@@ -183,12 +178,22 @@ export const Loader: FC = () => {
         }
     }, [activeWallet, i18n]);
 
+    useEffect(() => {
+        if (components) {
+            sdk.setTwaExpand(() => {
+                components.viewport.expand();
+                return undefined;
+            });
+
+            sdk.setHapticFeedback(components.haptic);
+        }
+    }, [components]);
+
     if (
         auth === undefined ||
         account === undefined ||
         config === undefined ||
         lock === undefined ||
-        viewport === undefined ||
         !didInit ||
         components == null
     ) {
@@ -208,13 +213,13 @@ export const Loader: FC = () => {
         account,
         config,
         tonendpoint,
-        standalone,
+        standalone: false,
         extension: false,
-        ios
+        ios: true
     };
 
     return (
-        <ViewportContext.Provider value={viewport}>
+        <ViewportContext.Provider value={components.viewport}>
             <AmplitudeAnalyticsContext.Provider value={enable}>
                 <OnImportAction.Provider value={navigate}>
                     <AfterImportAction.Provider

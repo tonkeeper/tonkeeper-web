@@ -6,13 +6,9 @@ export function openIosKeyboard(keyboard: string, type = 'text', timerSeconds = 
     document.body.appendChild(input);
     input.focus();
     // it's safe to remove the fake input after a 30s timeout
-
-    const clean = () => {
+    setTimeout(() => {
         document.body.removeChild(input);
-    };
-    setTimeout(clean, timerSeconds * 1000);
-
-    return clean;
+    }, timerSeconds * 1000);
 }
 
 export function hideIosKeyboard() {
