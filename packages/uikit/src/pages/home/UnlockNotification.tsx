@@ -159,7 +159,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const [requestId, setId] = useState<number | undefined>(undefined);
 
     const setRequest = useMemo(() => {
-        return debounce<[number | undefined]>(v => setId(v), 400);
+        return debounce<[number | undefined]>(v => setId(v), 450);
     }, [setId]);
 
     const { mutateAsync, isLoading, isError, reset } = useMutateUnlock(sdk, requestId);
@@ -195,7 +195,11 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
             setType(options.params.type);
             setAuth(options.params?.auth);
 
-            setRequest(options.id);
+            if (sdk.isIOs()) {
+                setRequest(options.id);
+            } else {
+                setId(options.id);
+            }
         };
         sdk.uiEvents.on('getPassword', handler);
 
