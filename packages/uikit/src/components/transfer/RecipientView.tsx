@@ -129,8 +129,6 @@ export const RecipientView: FC<{
     const { standalone, ios } = useAppContext();
     const ref = useRef<HTMLTextAreaElement | null>(null);
 
-    const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } = useGetToAccount();
-
     const [comment, setComment] = useState(data && 'comment' in data ? data.comment : '');
     const [recipient, setAddress] = useState<BaseRecipient | DnsRecipient>(
         data?.address ?? defaultRecipient
@@ -192,7 +190,7 @@ export const RecipientView: FC<{
         recipient
     );
 
-    const isFetching = isAccountFetching || isAccountLoading || isExternalLoading;
+    const isFetching = isAccountFetching || isExternalLoading;
 
     const isMemoValid = useMemo(() => {
         if (!toAccount) return true;
@@ -259,6 +257,7 @@ export const RecipientView: FC<{
 
     const onSelect = async (item: Suggestion) => {
         setAddress(item);
+        ref.current?.focus();
         // if (ios && keyboard) openIosKeyboard(keyboard);
 
         // if (seeIfValidTronAddress(item.address)) {
