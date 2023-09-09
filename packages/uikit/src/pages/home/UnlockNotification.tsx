@@ -127,6 +127,7 @@ const PasswordUnlock: FC<{
 
         if (result === false) {
             ref.current?.focus();
+            ref.current?.select();
         }
     };
 
