@@ -1,6 +1,6 @@
-export function openIosKeyboard(keyboard: string) {
+export function openIosKeyboard(keyboard: string, type = 'text') {
     const input = document.createElement('input');
-    input.setAttribute('type', 'text');
+    input.setAttribute('type', type);
     input.setAttribute('inputMode', keyboard);
     input.setAttribute('style', 'position: fixed; top: -100px; left: -100px;');
     document.body.appendChild(input);
