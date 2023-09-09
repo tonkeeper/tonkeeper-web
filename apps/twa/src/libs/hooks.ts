@@ -3,11 +3,21 @@ import { debounce } from '@tonkeeper/core/dist/utils/common';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { Viewport } from '@twa.js/sdk';
 import React, { useContext, useEffect } from 'react';
+import { TwaAppSdk } from './appSdk';
 
 export const ViewportContext = React.createContext<Viewport>(undefined!);
 
-export const useSyncedViewport = () => {
-    return useQuery(['viewport'], () => Viewport.synced());
+export const useSyncedViewport = (sdk: TwaAppSdk) => {
+    return useQuery(['viewport'], async () => {
+        const viewport = await Viewport.synced();
+
+        sdk.setTwaExpand(() => {
+            viewport.expand();
+            return undefined;
+        });
+
+        return viewport;
+    });
 };
 
 export const useAppViewport = () => {

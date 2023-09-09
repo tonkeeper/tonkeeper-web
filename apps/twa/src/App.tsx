@@ -163,7 +163,7 @@ export const Loader: FC = () => {
     const { i18n } = useTranslation();
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
-    const { data: viewport } = useSyncedViewport();
+    const { data: viewport } = useSyncedViewport(sdk);
 
     const tonendpoint = useTonendpoint(sdk.version, activeWallet?.network, activeWallet?.lang);
     const { data: config } = useTonenpointConfig(tonendpoint);

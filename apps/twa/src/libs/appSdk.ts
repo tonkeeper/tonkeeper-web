@@ -32,6 +32,11 @@ export class TwaAppSdk implements IAppSdk {
     alert = async (text: string) => window.alert(text);
     requestExtensionPermission = async () => void 0;
 
+    twaExpand = () => void 0;
+    setTwaExpand = (fn: () => undefined) => {
+        this.twaExpand = fn;
+    };
+
     disableScroll = disableScroll;
     enableScroll = enableScroll;
     getScrollbarWidth = getScrollbarWidth;

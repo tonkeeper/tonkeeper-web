@@ -37,6 +37,7 @@ export interface IAppSdk {
     alert: (text: string) => Promise<void>;
 
     requestExtensionPermission: () => Promise<void>;
+    twaExpand?: () => void;
 }
 
 export class MockAppSdk implements IAppSdk {
@@ -71,4 +72,6 @@ export class MockAppSdk implements IAppSdk {
     alert = async () => void 0;
 
     requestExtensionPermission = async () => void 0;
+
+    twaExpand = () => void 0;
 }
