@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
-import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { Viewport } from '@twa.js/sdk';
 import React, { useContext, useEffect } from 'react';
 import { TwaAppSdk } from './appSdk';
@@ -21,7 +20,7 @@ export const useSyncedViewport = (sdk: TwaAppSdk) => {
 };
 
 export const useAppViewport = () => {
-    const sdk = useAppSdk();
+    //const sdk = useAppSdk();
     const viewport = useContext(ViewportContext);
 
     useEffect(() => {
@@ -33,7 +32,7 @@ export const useAppViewport = () => {
         };
 
         const setHeight = (value: number) => {
-            sdk.uiEvents.emit('copy', { method: 'copy', params: `height ${value}px` });
+            // sdk.uiEvents.emit('copy', { method: 'copy', params: `height ${value}px` });
 
             doc.style.setProperty('--app-height', `${value}px`);
         };
