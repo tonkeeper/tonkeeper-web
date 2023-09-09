@@ -33,7 +33,6 @@ import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
 import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
-import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 
 import {
     AmplitudeAnalyticsContext,
@@ -55,7 +54,7 @@ import styled from 'styled-components';
 import { InitDataLogger } from './components/InitData';
 import { TwaQrScanner } from './components/TwaQrScanner';
 import { TwaAppSdk } from './libs/appSdk';
-import { useAppHeight, useAppWidth } from './libs/hooks';
+import { ViewportContext, useAppViewport, useSyncedViewport } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -144,7 +143,9 @@ const useLock = () => {
 const FullSizeWrapper = styled(Container)``;
 
 const Wrapper = styled(FullSizeWrapper)`
-    height: var(--fixed-height);
+    height: var(--app-height);
+
+    transition: height 0.4s ease;
 
     box-sizing: border-box;
     padding-top: 64px;
@@ -162,13 +163,12 @@ export const Loader: FC = () => {
     const { i18n } = useTranslation();
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
+    const { data: viewport } = useSyncedViewport();
 
     const tonendpoint = useTonendpoint(sdk.version, activeWallet?.network, activeWallet?.lang);
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
-    useAppHeight();
-
     const enable = useAmplitudeAnalytics('Twa', account, activeWallet);
 
     useEffect(() => {
@@ -188,6 +188,7 @@ export const Loader: FC = () => {
         account === undefined ||
         config === undefined ||
         lock === undefined ||
+        viewport === undefined ||
         !didInit ||
         components == null
     ) {
@@ -213,25 +214,30 @@ export const Loader: FC = () => {
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={enable}>
-            <OnImportAction.Provider value={navigate}>
-                <AfterImportAction.Provider
-                    value={() => navigate(AppRoute.home, { replace: true })}
-                >
-                    <AppContext.Provider value={context}>
-                        <Content activeWallet={activeWallet} lock={lock} standalone={standalone} />
-                        <CopyNotification />
-                        <TwaQrScanner />
-                        <InitDataLogger />
-                    </AppContext.Provider>
-                </AfterImportAction.Provider>
-            </OnImportAction.Provider>
-        </AmplitudeAnalyticsContext.Provider>
+        <ViewportContext.Provider value={viewport}>
+            <AmplitudeAnalyticsContext.Provider value={enable}>
+                <OnImportAction.Provider value={navigate}>
+                    <AfterImportAction.Provider
+                        value={() => navigate(AppRoute.home, { replace: true })}
+                    >
+                        <AppContext.Provider value={context}>
+                            <Content activeWallet={activeWallet} lock={lock} />
+                            <CopyNotification />
+                            <TwaQrScanner />
+                            <InitDataLogger />
+                        </AppContext.Provider>
+                    </AfterImportAction.Provider>
+                </OnImportAction.Provider>
+            </AmplitudeAnalyticsContext.Provider>
+        </ViewportContext.Provider>
     );
 };
 
 const InitWrapper = styled(Container)`
     height: var(--app-height);
+
+    transition: height 0.4s ease;
+
     overflow: auto;
     display: flex;
     flex-direction: column;
@@ -256,12 +262,10 @@ const InitPages = () => {
 export const Content: FC<{
     activeWallet?: WalletState | null;
     lock: boolean;
-    standalone: boolean;
-}> = ({ activeWallet, lock, standalone }) => {
+}> = ({ activeWallet, lock }) => {
     const location = useLocation();
     useWindowsScroll();
-    useAppWidth(standalone);
-    useKeyboardHeight();
+    useAppViewport();
 
     if (lock) {
         return (
@@ -319,7 +323,7 @@ export const Content: FC<{
                         }
                     />
                 </Routes>
-                <Footer standalone={standalone} sticky />
+                <Footer sticky />
                 <MemoryScroll />
             </WalletStateContext.Provider>
         </Wrapper>

@@ -5,6 +5,7 @@ import { mnemonicValidate } from 'ton-crypto';
 import { wordlist } from 'ton-crypto/dist/mnemonic/wordlist';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
+import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { ChevronLeftIcon } from '../Icon';
@@ -453,7 +454,9 @@ export const ImportWords: FC<{
             focusInput(ref.current, mnemonic.length - 1);
             notify();
         }
-
+        if (sdk.isIOs()) {
+            openIosKeyboard('text');
+        }
         const valid = await mnemonicValidate(mnemonic);
         if (!valid) {
             notify();

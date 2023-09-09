@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthNone, AuthPassword, AuthState } from '@tonkeeper/core/dist/entries/password';
 import { MinPasswordLength } from '@tonkeeper/core/dist/service/accountService';
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
@@ -81,6 +81,8 @@ const FillPassword: FC<{
 
     const { mutateAsync, isLoading: isCreating, reset } = useCreatePassword();
 
+    const ref = useRef<HTMLInputElement>(null);
+
     const [error, setError] = useState<string | undefined>(undefined);
 
     const [password, setPassword] = useState('');
@@ -98,11 +100,18 @@ const FillPassword: FC<{
         }
     };
 
+    useEffect(() => {
+        if (ref.current) {
+            ref.current.focus();
+        }
+    }, [ref]);
+
     return (
         <CenterContainer>
             <Block onSubmit={onCreate}>
                 <H2>{t('Create_password')}</H2>
                 <Input
+                    ref={ref}
                     type="password"
                     label={t('Password')}
                     value={password}
