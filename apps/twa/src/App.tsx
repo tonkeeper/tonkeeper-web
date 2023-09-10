@@ -23,7 +23,11 @@ import {
     SettingsSkeletonPage
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
-import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
+import {
+    AppContext,
+    IAppContext,
+    WalletStateContext
+} from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
     AppSdkContext,
@@ -46,6 +50,7 @@ import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { Platform as TwaPlatform } from '@twa.js/sdk';
 import { SDKProvider, useSDK } from '@twa.js/sdk-react';
 import React, { FC, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -151,6 +156,18 @@ const Wrapper = styled(FullSizeWrapper)`
     padding-top: 64px;
 `;
 
+const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
+    switch (platform) {
+        case 'ios':
+        case 'macos':
+        case 'android':
+        case 'android_x':
+            return true;
+        default:
+            return false;
+    }
+};
+
 export const Loader: FC = () => {
     const { data: activeWallet } = useActiveWallet();
 
@@ -200,9 +217,11 @@ export const Loader: FC = () => {
         return <Loading />;
     }
 
+    const showQrScan = seeIfShowQrScanner(components.webApp.platform);
+
     const network = activeWallet?.network ?? Network.MAINNET;
     const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
-    const context = {
+    const context: IAppContext = {
         api: {
             tonApi: getTonClient(config, network),
             tonApiV2: getTonClientV2(config, network),
@@ -215,7 +234,8 @@ export const Loader: FC = () => {
         tonendpoint,
         standalone: false,
         extension: false,
-        ios: true
+        ios: true,
+        hideQrScanner: !showQrScan
     };
 
     return (
@@ -226,9 +246,13 @@ export const Loader: FC = () => {
                         value={() => navigate(AppRoute.home, { replace: true })}
                     >
                         <AppContext.Provider value={context}>
-                            <Content activeWallet={activeWallet} lock={lock} />
+                            <Content
+                                activeWallet={activeWallet}
+                                lock={lock}
+                                showQrScan={showQrScan}
+                            />
                             <CopyNotification />
-                            <TwaQrScanner />
+                            {showQrScan && <TwaQrScanner />}
                             <InitDataLogger />
                         </AppContext.Provider>
                     </AfterImportAction.Provider>
@@ -267,7 +291,8 @@ const InitPages = () => {
 export const Content: FC<{
     activeWallet?: WalletState | null;
     lock: boolean;
-}> = ({ activeWallet, lock }) => {
+    showQrScan: boolean;
+}> = ({ activeWallet, lock, showQrScan }) => {
     const location = useLocation();
     useWindowsScroll();
     useAppViewport();
@@ -318,7 +343,7 @@ export const Content: FC<{
                         path="*"
                         element={
                             <>
-                                <Header />
+                                <Header showQrScan={showQrScan} />
                                 <InnerBody>
                                     <Suspense fallback={<HomeSkeleton />}>
                                         <Home />
