@@ -1,5 +1,6 @@
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { AuthState } from './entries/password';
+import { TonTransferParams } from './service/deeplinkingService';
 import { IStorage, MemoryStorage } from './Storage';
 
 export type GetPasswordType = 'confirm' | 'unlock';
@@ -16,6 +17,7 @@ export interface UIEvents {
     resize: void;
     getPassword: GetPasswordParams;
     loading: void;
+    transfer: TonTransferParams;
     /*eslint-disable @typescript-eslint/no-explicit-any*/
     response: any;
 }

@@ -1,16 +1,16 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { toTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { TonAsset, jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
-import { RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
     TonTransferParams,
     parseTonTransfer
 } from '@tonkeeper/core/dist/service/deeplinkingService';
+import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import React, { FC, useCallback, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -29,9 +29,10 @@ import { Wrapper, childFactoryCreator, duration } from './common';
 
 const SendContent: FC<{
     onClose: () => void;
-    asset?: TonAsset | TronAsset;
     chain?: BLOCKCHAIN_NAME;
-}> = ({ onClose, asset, chain }) => {
+    initRecipient?: RecipientData;
+    initAmountState?: Partial<AmountViewState>;
+}> = ({ onClose, chain, initRecipient, initAmountState }) => {
     const sdk = useAppSdk();
     const { standalone, ios, extension } = useAppContext();
     const { t } = useTranslation();
@@ -44,10 +45,10 @@ const SendContent: FC<{
 
     const [view, setView] = useState<'recipient' | 'amount' | 'confirm'>('recipient');
     const [right, setRight] = useState(true);
-    const [recipient, _setRecipient] = useState<RecipientData | undefined>(undefined);
-    const [amountViewState, setAmountViewState] = useState<Partial<AmountViewState> | undefined>({
-        asset
-    });
+    const [recipient, _setRecipient] = useState<RecipientData | undefined>(initRecipient);
+    const [amountViewState, setAmountViewState] = useState<Partial<AmountViewState> | undefined>(
+        initAmountState
+    );
 
     const { data: tronBalances } = useTronBalances();
 
@@ -146,7 +147,7 @@ const SendContent: FC<{
             } else {
                 setAmountViewState({
                     amount: a ? shiftedDecimals(a) : new BigNumber('0'),
-                    asset,
+                    asset: initAmountState?.asset,
                     inFiat: false,
                     isMax: false
                 });
@@ -154,7 +155,7 @@ const SendContent: FC<{
 
             return true;
         },
-        [sdk, filter, asset]
+        [sdk, filter, initAmountState?.asset]
     );
 
     const onScan = async (signature: string) => {
@@ -237,27 +238,108 @@ const SendContent: FC<{
     );
 };
 
+export interface InitTransferData {
+    initRecipient?: TonRecipientData;
+    initAmountState?: Partial<AmountViewState>;
+}
+
+const getInitData = (
+    tonTransfer: TonTransferParams,
+    toAccount: AccountRepr,
+    jettons: JettonsBalances | undefined
+): InitTransferData => {
+    const initRecipient: TonRecipientData = {
+        address: {
+            blockchain: BLOCKCHAIN_NAME.TON,
+            address: tonTransfer.address
+        },
+        toAccount,
+        comment: tonTransfer.text ?? '',
+        done: toAccount.memoRequired ? tonTransfer.text !== '' && tonTransfer.text !== null : true
+    };
+
+    const { initAmountState } = getJetton(tonTransfer.jetton, jettons);
+
+    return {
+        initRecipient,
+        initAmountState
+    };
+};
+
+const getJetton = (
+    asset: string | undefined,
+    jettons: JettonsBalances | undefined
+): InitTransferData => {
+    try {
+        if (asset) {
+            const token = jettonToTonAsset(asset, jettons || { balances: [] });
+
+            return {
+                initAmountState: { asset: token }
+            };
+        }
+    } catch {
+        return {};
+    }
+    return {};
+};
+
 export const SendAction: FC<{ asset?: string; chain?: BLOCKCHAIN_NAME }> = ({ asset, chain }) => {
     const [open, setOpen] = useState(false);
+    const [tonTransfer, setTonTransfer] = useState<InitTransferData | undefined>(undefined);
     const { data: jettons } = useWalletJettonList();
+
+    const { mutateAsync: getAccountAsync, reset } = useGetToAccount();
+
+    const sdk = useAppSdk();
+
+    useEffect(() => {
+        const handler = (options: {
+            method: 'transfer';
+            id?: number | undefined;
+            params: TonTransferParams;
+        }) => {
+            if (sdk.twaExpand) {
+                sdk.twaExpand();
+            }
+            reset();
+            getAccountAsync({ address: options.params.address }).then(account => {
+                setTonTransfer(getInitData(options.params, account, jettons));
+                setOpen(true);
+            });
+        };
+
+        sdk.uiEvents.on('transfer', handler);
+        return () => {
+            sdk.uiEvents.off('transfer', handler);
+        };
+    }, []);
+
+    const onClose = useCallback(() => {
+        setTonTransfer(undefined);
+        setOpen(false);
+    }, []);
+
+    const initData = useMemo(() => {
+        return tonTransfer ? tonTransfer : getJetton(asset, jettons);
+    }, [tonTransfer, asset, jettons]);
 
     const Content = useCallback(() => {
         if (!open) return undefined;
-        let token;
-        try {
-            if (asset) {
-                token = jettonToTonAsset(asset, jettons || { balances: [] });
-            }
-        } catch {
-            //
-        }
-        return <SendContent onClose={() => setOpen(false)} asset={token} chain={chain} />;
-    }, [open, asset, jettons, chain]);
+        return (
+            <SendContent
+                onClose={onClose}
+                chain={chain}
+                initAmountState={initData.initAmountState}
+                initRecipient={initData.initRecipient}
+            />
+        );
+    }, [open, initData, chain]);
 
     return (
         <>
             <Action icon={<SendIcon />} title={'wallet_send'} action={() => setOpen(true)} />
-            <Notification isOpen={open} handleClose={() => setOpen(false)} hideButton backShadow>
+            <Notification isOpen={open} handleClose={onClose} hideButton backShadow>
                 {Content}
             </Notification>
         </>

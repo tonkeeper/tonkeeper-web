@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { ConnectRequest } from '@tonkeeper/core/dist/entries/tonConnect';
+import { parseTonTransfer } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { parseTonConnect } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -21,6 +22,22 @@ const useGetConnectInfo = () => {
     const { t } = useTranslation();
 
     return useMutation<null | ConnectRequest, Error, string>(async url => {
+        const transfer = parseTonTransfer({ url });
+
+        if (transfer) {
+            sdk.uiEvents.emit('copy', {
+                method: 'copy',
+                id: Date.now(),
+                params: t('loading')
+            });
+
+            sdk.uiEvents.emit('transfer', {
+                method: 'transfer',
+                id: Date.now(),
+                params: transfer
+            });
+            return null;
+        }
         const params = parseTonConnect({ url });
 
         if (params === null) {
