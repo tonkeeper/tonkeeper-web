@@ -115,11 +115,11 @@ export const Name = styled.span`
     color: ${props => props.theme.textPrimary};
     margin-left: 4px;
 
-    max-width: 90px;
+    max-width: 130px;
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 10px;
+    vertical-align: bottom;
 `;
 
 export const Address = styled.span`
