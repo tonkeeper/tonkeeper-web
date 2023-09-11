@@ -219,7 +219,7 @@ export const RecipientView: FC<{
             }
         }
 
-        if ('dnsName' in recipient) {
+        if ('dnsName' in recipient && typeof recipient.dnsName === 'string') {
             return recipient.dnsName;
         }
 

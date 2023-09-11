@@ -68,7 +68,7 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient 
             );
         }
     }
-    if ('dnsName' in recipient.address) {
+    if ('dnsName' in recipient.address && typeof recipient.address.dnsName === 'string') {
         return (
             <>
                 <RecipientItem name={recipient.address.dnsName} label={recipient.address.dnsName} />
