@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { Body1, Body2, H3, Label2, Num2 } from '../../Text';
+import { cropName } from '../ConfirmListItem';
 
 export const Center = styled.div`
     text-align: center;
@@ -114,12 +115,6 @@ export const InputBlock = styled.div`
 export const Name = styled.span`
     color: ${props => props.theme.textPrimary};
     margin-left: 4px;
-
-    max-width: 130px;
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: bottom;
 `;
 
 export const Address = styled.span`
@@ -136,7 +131,7 @@ export const RecipientName: FC<{ recipient: RecipientData }> = ({ recipient }) =
     const { address } = recipient;
 
     if ('isFavorite' in address && address.isFavorite) {
-        return <Name>{address.name}</Name>;
+        return <Name>{cropName(address.name)}</Name>;
     }
 
     if (!isTonRecipientData(recipient)) {
@@ -144,11 +139,11 @@ export const RecipientName: FC<{ recipient: RecipientData }> = ({ recipient }) =
     }
 
     if (recipient.toAccount.name) {
-        return <Name>{recipient.toAccount.name}</Name>;
+        return <Name>{cropName(recipient.toAccount.name)}</Name>;
     }
 
     if ('dns' in address && address.dns.names === null) {
-        return <Name>{address.address}</Name>;
+        return <Name>{cropName(address.address)}</Name>;
     }
 
     return <></>;
