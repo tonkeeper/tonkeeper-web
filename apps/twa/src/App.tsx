@@ -159,7 +159,6 @@ const Wrapper = styled(FullSizeWrapper)`
 const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
     switch (platform) {
         case 'ios':
-        case 'macos':
         case 'android':
         case 'android_x':
             return true;
