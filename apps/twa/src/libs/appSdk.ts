@@ -14,6 +14,10 @@ export class TwaAppSdk implements IAppSdk {
             method: 'copy',
             params: notification
         });
+
+        if (this.hapticFeedback) {
+            this.hapticFeedback.notificationOccurred('success');
+        }
     };
     openPage = async (url: string) => {
         window.open(url, '_black');
