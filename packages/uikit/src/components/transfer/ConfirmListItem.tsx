@@ -11,7 +11,7 @@ import { Label1 } from '../Text';
 import { Label } from './common';
 
 export const cropName = (name: string) => {
-    return name.length > 16 ? toShortValue(name, 8) : name;
+    return name.length > 19 ? toShortValue(name, 8) : name;
 };
 
 const RecipientItem: FC<{ name: string; label: string }> = ({ name, label }) => {
