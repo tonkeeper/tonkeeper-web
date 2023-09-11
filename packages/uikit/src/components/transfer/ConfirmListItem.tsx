@@ -68,10 +68,10 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient 
             );
         }
     }
-    if ('dns' in recipient.address) {
+    if ('dnsName' in recipient.address) {
         return (
             <>
-                <RecipientItem name={recipient.address.address} label={recipient.address.address} />
+                <RecipientItem name={recipient.address.dnsName} label={recipient.address.dnsName} />
                 <RecipientItemAddress address={addrValue} />
             </>
         );

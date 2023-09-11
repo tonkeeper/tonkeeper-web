@@ -142,8 +142,8 @@ export const RecipientName: FC<{ recipient: RecipientData }> = ({ recipient }) =
         return <Name>{cropName(recipient.toAccount.name)}</Name>;
     }
 
-    if ('dns' in address && address.dns.names === null) {
-        return <Name>{cropName(address.address)}</Name>;
+    if ('dnsName' in address) {
+        return <Name>{cropName(address.dnsName)}</Name>;
     }
 
     return <></>;

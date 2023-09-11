@@ -140,7 +140,8 @@ export const RecipientView: FC<{
         if (dnsWallet) {
             setAddress(r => ({
                 address: r.address,
-                dns: dnsWallet
+                dns: dnsWallet,
+                dnsName: r.address.toLowerCase()
             }));
         }
         if (dnsWallet == null) {
@@ -217,6 +218,11 @@ export const RecipientView: FC<{
                 return Address.parse(recipient.address).toString();
             }
         }
+
+        if ('dnsName' in recipient) {
+            return recipient.dnsName;
+        }
+
         return recipient.address;
     }, [recipient]);
 
