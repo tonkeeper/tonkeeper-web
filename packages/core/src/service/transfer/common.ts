@@ -140,7 +140,8 @@ export const createTransferMessage = (
                 value: BigInt(value),
                 body: transaction.body
             })
-        ]
+        ],
+        timeout: Math.floor(Date.now() / 1e3) + 60 * 10
     });
 
     return externalMessage(contract, wallet.seqno, transfer).toBoc();

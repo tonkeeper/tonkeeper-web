@@ -107,6 +107,8 @@ export const estimateNftTransfer = async (
         recipient.comment ? comment(recipient.comment) : null
     );
 
+    console.log({ boc: cell.toString('base64') });
+
     const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
         emulateMessageToEventRequest: { boc: cell.toString('base64') }
     });

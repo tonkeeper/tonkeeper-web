@@ -97,7 +97,8 @@ const createTonTransfer = (
                 value: BigInt(weiAmount.toFixed(0)),
                 body: recipient.comment !== '' ? recipient.comment : undefined
             })
-        ]
+        ],
+        timeout: Math.floor(Date.now() / 1e3) + 60 * 10
     });
     return externalMessage(contract, seqno, transfer).toBoc();
 };
@@ -142,6 +143,8 @@ export const estimateTonTransfer = async (
     }
 
     const cell = createTonTransfer(seqno, walletState, recipient, weiAmount, isMax);
+
+    console.log({ boc: cell.toString('base64') });
 
     const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
         emulateMessageToEventRequest: { boc: cell.toString('base64') }

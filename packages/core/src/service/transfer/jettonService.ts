@@ -74,7 +74,8 @@ const createJettonTransfer = (
                 value: jettonTransferAmount,
                 body: body
             })
-        ]
+        ],
+        timeout: Math.floor(Date.now() / 1e3) + 60 * 10
     });
 
     return externalMessage(contract, seqno, transfer).toBoc();
@@ -99,6 +100,8 @@ export const estimateJettonTransfer = async (
         jettonWalletAddress,
         recipient.comment ? comment(recipient.comment) : null
     );
+
+    console.log({ boc: cell.toString('base64') });
 
     const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
         emulateMessageToEventRequest: { boc: cell.toString('base64') }
