@@ -4,9 +4,8 @@ import React, { FC } from 'react';
 import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
-import { SendIcon } from '../../home/HomeIcons';
 import { FailedNote, ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayout';
-import { ActivityIcon, ReceiveIcon, SwapIcon } from '../ActivityIcons';
+import { ActivityIcon, ReceiveIcon, SentIcon, SwapIcon } from '../ActivityIcons';
 import {
     AmountText,
     ColumnLayout,
@@ -129,7 +128,7 @@ export const JettonBurnAction: FC<JettonActionProps> = ({ action, date }) => {
     return (
         <ListItemGrid>
             <ActivityIcon status={action.status}>
-                <SendIcon />
+                <SentIcon />
             </ActivityIcon>
             <ColumnLayout
                 title={t('transaction_type_burn')}

@@ -17,6 +17,7 @@ import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
 import { AccountApi, AccountRepr, Configuration, Fee, SystemApi, WalletApi } from '../../tonApiV1';
+import { MessageConsequences } from '../../tonApiV2';
 import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 
@@ -149,7 +150,7 @@ export async function getKeyPairAndSeqno(options: {
     storage: IStorage;
     tonApi: Configuration;
     walletState: WalletState;
-    fee: Fee;
+    fee: MessageConsequences;
     password: string;
     amount: BigNumber;
 }) {
@@ -161,7 +162,7 @@ export async function getKeyPairAndSeqno(options: {
     );
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-    const total = options.amount.plus(options.fee.total);
+    const total = options.amount.plus(options.fee.event.extra * -1);
 
     const [wallet, seqno] = await getWalletBalance(options.tonApi, options.walletState);
     checkWalletBalanceOrDie(total, wallet);

@@ -52,6 +52,10 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
         return this.toStringAssetRelativeAmount();
     }
 
+    get stringAssetAbsoluteRelativeAmount(): string {
+        return this.toStringAssetAbsoluteRelativeAmount();
+    }
+
     get stringWeiAmount(): string {
         return this.weiAmount.toFixed(0);
     }
@@ -100,6 +104,17 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
 
     toStringAssetRelativeAmount(decimalPlaces?: number): string {
         return `${this.toStringRelativeAmount(decimalPlaces)} ${this.stringAsset}`;
+    }
+
+    toStringAbsoluteRelativeAmount(decimalPlaces?: number): string {
+        if (decimalPlaces === undefined) {
+            decimalPlaces = this.decimalPlaces;
+        }
+        return formatter.format(this.relativeAmount.abs(), { decimals: decimalPlaces });
+    }
+
+    toStringAssetAbsoluteRelativeAmount(decimalPlaces?: number): string {
+        return `${this.toStringAbsoluteRelativeAmount(decimalPlaces)} ${this.stringAsset}`;
     }
 
     protected checkIfCanCompareCurrencies(assetAmount: IAssetAmount): never | void {

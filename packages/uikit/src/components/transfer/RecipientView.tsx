@@ -80,10 +80,11 @@ const useDnsWallet = (value: string) => {
             if (value !== name) {
                 return null;
             }
-            const dns = name.trim();
+            let dns = name.trim();
             if (seeIfInvalidDns(dns)) {
                 return null;
             }
+            dns = dns.toString().toLowerCase();
             const result = await new DNSApi(api.tonApi).dnsResolve({ name: dns });
             if (!result.wallet) {
                 return null;
@@ -127,8 +128,6 @@ export const RecipientView: FC<{
     const { t } = useTranslation();
     const { standalone, ios } = useAppContext();
     const ref = useRef<HTMLTextAreaElement | null>(null);
-
-    const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } = useGetToAccount();
 
     const [comment, setComment] = useState(data && 'comment' in data ? data.comment : '');
     const [recipient, setAddress] = useState<BaseRecipient | DnsRecipient>(
@@ -191,7 +190,7 @@ export const RecipientView: FC<{
         recipient
     );
 
-    const isFetching = isAccountFetching || isAccountLoading || isExternalLoading;
+    const isFetching = isAccountFetching || isExternalLoading;
 
     const isMemoValid = useMemo(() => {
         if (!toAccount) return true;
@@ -258,23 +257,24 @@ export const RecipientView: FC<{
 
     const onSelect = async (item: Suggestion) => {
         setAddress(item);
-        if (ios && keyboard) openIosKeyboard(keyboard);
+        ref.current?.focus();
+        // if (ios && keyboard) openIosKeyboard(keyboard);
 
-        if (seeIfValidTronAddress(item.address)) {
-            setRecipient({
-                address: { ...item, blockchain: BLOCKCHAIN_NAME.TRON },
-                done: true
-            });
-        } else {
-            const to = await getAccountAsync(item);
-            if (to.memoRequired) return;
-            setRecipient({
-                address: { ...item, blockchain: BLOCKCHAIN_NAME.TON },
-                toAccount: to,
-                comment,
-                done: true
-            });
-        }
+        // if (seeIfValidTronAddress(item.address)) {
+        //     setRecipient({
+        //         address: { ...item, blockchain: BLOCKCHAIN_NAME.TRON },
+        //         done: false
+        //     });
+        // } else {
+        //     const to = await getAccountAsync(item);
+        //     if (to.memoRequired) return;
+        //     setRecipient({
+        //         address: { ...item, blockchain: BLOCKCHAIN_NAME.TON },
+        //         toAccount: to,
+        //         comment,
+        //         done: false
+        //     });
+        // }
     };
 
     return (

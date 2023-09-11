@@ -2,11 +2,13 @@ import BigNumber from 'bignumber.js';
 import { Address, Cell, internal } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../../Storage';
+import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipientData } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
-import { AccountApi, AccountEvent, AccountRepr, Configuration, Fee, SendApi } from '../../tonApiV1';
+import { AccountApi, AccountEvent, AccountRepr, Configuration, SendApi } from '../../tonApiV1';
+import { BlockchainApi, EmulationApi, MessageConsequences } from '../../tonApiV2';
 import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
@@ -127,24 +129,25 @@ const createTonConnectTransfer = (
 };
 
 export const estimateTonTransfer = async (
-    tonApi: Configuration,
+    api: APIConfig,
     walletState: WalletState,
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean
 ) => {
-    await checkServiceTimeOrDie(tonApi);
-    const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+    await checkServiceTimeOrDie(api.tonApi);
+    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
     if (!isMax) {
         checkWalletPositiveBalanceOrDie(wallet);
     }
 
     const cell = createTonTransfer(seqno, walletState, recipient, weiAmount, isMax);
 
-    const { fee } = await new SendApi(tonApi).estimateTx({
-        sendBocRequest: { boc: cell.toString('base64') }
+    const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+        emulateMessageToEventRequest: { boc: cell.toString('base64') }
     });
-    return fee;
+
+    return emulation;
 };
 
 export const estimateTonConnectTransfer = async (
@@ -196,21 +199,21 @@ export const sendTonConnectTransfer = async (
 
 export const sendTonTransfer = async (
     storage: IStorage,
-    tonApi: Configuration,
+    api: APIConfig,
     walletState: WalletState,
     recipient: TonRecipientData,
     amount: AssetAmount,
     isMax: boolean,
-    fee: Fee,
+    fee: MessageConsequences,
     password: string
 ) => {
-    await checkServiceTimeOrDie(tonApi);
+    await checkServiceTimeOrDie(api.tonApi);
     const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-    const total = new BigNumber(fee.total).plus(amount.weiAmount);
+    const total = new BigNumber(fee.event.extra).multipliedBy(-1).plus(amount.weiAmount);
 
-    const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
+    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
     if (!isMax) {
         checkWalletBalanceOrDie(total, wallet);
     }
@@ -224,7 +227,7 @@ export const sendTonTransfer = async (
         keyPair.secretKey
     );
 
-    await new SendApi(tonApi).sendBoc({
-        sendBocRequest: { boc: cell.toString('base64') }
+    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
+        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
     });
 };

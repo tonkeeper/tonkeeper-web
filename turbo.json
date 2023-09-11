@@ -1,25 +1,29 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**"]
-    },
-    "build:pkg": {
-      "dependsOn": ["^build:pkg"],
-      "outputs": [".next/**", "dist/**"]
-    },
-    "build:web": {
-      "dependsOn": ["^build:pkg"],
-      "outputs": [".next/**", "dist/**"]
-    },
-    "build:extension": {
-      "dependsOn": ["^build:pkg"],
-      "outputs": [".next/**", "dist/**"]
-    },
-    "dev": {
-      "dependsOn": ["^dev"],
-      "outputs": [".next/**", "dist/**"]
+    "$schema": "https://turbo.build/schema.json",
+    "pipeline": {
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": [".next/**", "dist/**"]
+        },
+        "build:pkg": {
+            "dependsOn": ["^build:pkg"],
+            "outputs": [".next/**", "dist/**"]
+        },
+        "build:twa": {
+            "dependsOn": ["^build:pkg"],
+            "outputs": [".next/**", "dist/**"]
+        },
+        "build:web": {
+            "dependsOn": ["^build:pkg"],
+            "outputs": [".next/**", "dist/**"]
+        },
+        "build:extension": {
+            "dependsOn": ["^build:pkg"],
+            "outputs": [".next/**", "dist/**"]
+        },
+        "dev": {
+            "dependsOn": ["^dev"],
+            "outputs": [".next/**", "dist/**"]
+        }
     }
-  }
 }

@@ -1,14 +1,14 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { languages, localizationText } from '@tonkeeper/core/dist/entries/language';
 import {
+    Network,
     getTonClient,
     getTonClientV2,
-    getTronClient,
-    Network
+    getTronClient
 } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -23,6 +23,10 @@ import {
     SettingsSkeletonPage
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
+import {
+    AmplitudeAnalyticsContext,
+    useAmplitudeAnalytics
+} from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
@@ -31,14 +35,9 @@ import {
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
-import { any, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-
-import {
-    AmplitudeAnalyticsContext,
-    useAmplitudeAnalytics
-} from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { Initialize, InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/ThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
