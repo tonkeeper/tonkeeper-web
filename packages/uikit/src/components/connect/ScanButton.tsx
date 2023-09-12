@@ -34,7 +34,7 @@ const useGetConnectInfo = () => {
             sdk.uiEvents.emit('transfer', {
                 method: 'transfer',
                 id: Date.now(),
-                params: transfer
+                params: { transfer }
             });
             return null;
         }

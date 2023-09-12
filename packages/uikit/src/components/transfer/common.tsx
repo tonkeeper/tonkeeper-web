@@ -1,11 +1,17 @@
 import { QueryClient } from '@tanstack/react-query';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
+import { TonTransferParams } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { seeIfBalanceError, seeIfTimeError } from '@tonkeeper/core/dist/service/transfer/common';
+import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import React, { PropsWithChildren } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { cleanSyncDateBanner } from '../../state/syncDate';
 import { Body1 } from '../Text';
+import { AmountViewState } from './amount-view/AmountView';
 
 export const duration = 300;
 export const timingFunction = 'ease-in-out';
@@ -181,4 +187,50 @@ export const notifyError = async (
     }
 
     throw error;
+};
+
+export interface InitTransferData {
+    initRecipient?: TonRecipientData;
+    initAmountState?: Partial<AmountViewState>;
+}
+
+export const getInitData = (
+    tonTransfer: TonTransferParams,
+    toAccount: AccountRepr,
+    jettons: JettonsBalances | undefined
+): InitTransferData => {
+    const initRecipient: TonRecipientData = {
+        address: {
+            blockchain: BLOCKCHAIN_NAME.TON,
+            address: tonTransfer.address
+        },
+        toAccount,
+        comment: tonTransfer.text ?? '',
+        done: toAccount.memoRequired ? tonTransfer.text !== '' && tonTransfer.text !== null : true
+    };
+
+    const { initAmountState } = getJetton(tonTransfer.jetton, jettons);
+
+    return {
+        initRecipient,
+        initAmountState
+    };
+};
+
+export const getJetton = (
+    asset: string | undefined,
+    jettons: JettonsBalances | undefined
+): InitTransferData => {
+    try {
+        if (asset) {
+            const token = jettonToTonAsset(asset, jettons || { balances: [] });
+
+            return {
+                initAmountState: { asset: token }
+            };
+        }
+    } catch {
+        return {};
+    }
+    return {};
 };

@@ -64,6 +64,9 @@ const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings')
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
+const SendActionNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -317,6 +320,9 @@ export const Content: FC<{
                 </Routes>
                 <Footer />
                 <MemoryScroll />
+                <Suspense>
+                    <SendActionNotification />
+                </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>
     );

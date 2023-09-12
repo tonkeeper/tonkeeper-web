@@ -1,3 +1,4 @@
+import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { AuthState } from './entries/password';
 import { TonTransferParams } from './service/deeplinkingService';
@@ -10,6 +11,12 @@ export type GetPasswordParams = {
     type?: GetPasswordType;
 };
 
+export type TransferInitParams = {
+    transfer?: TonTransferParams;
+    asset?: string;
+    chain?: BLOCKCHAIN_NAME;
+};
+
 export interface UIEvents {
     unlock: void;
     copy: string;
@@ -17,7 +24,7 @@ export interface UIEvents {
     resize: void;
     getPassword: GetPasswordParams;
     loading: void;
-    transfer: TonTransferParams;
+    transfer: TransferInitParams;
     /*eslint-disable @typescript-eslint/no-explicit-any*/
     response: any;
 }
