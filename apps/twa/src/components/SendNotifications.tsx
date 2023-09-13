@@ -11,6 +11,11 @@ import {
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { ConfirmTransferView } from '@tonkeeper/uikit/dist/components/transfer/ConfirmTransferView';
 import {
+    ConfirmViewButtons,
+    ConfirmViewButtonsSlot,
+    ConfirmViewTitleSlot
+} from '@tonkeeper/uikit/dist/components/transfer/ConfirmView';
+import {
     RecipientView,
     useGetToAccount
 } from '@tonkeeper/uikit/dist/components/transfer/RecipientView';
@@ -36,6 +41,22 @@ import { useWalletJettonList } from '@tonkeeper/uikit/dist/state/wallet';
 import BigNumber from 'bignumber.js';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import styled from 'styled-components';
+import {
+    AmountTwaMainButton,
+    ConfirmTwaMainButton,
+    HideTwaMainButton,
+    RecipientTwaMainButton
+} from './SendNotificationButtons';
+import {
+    AmountTwaHeaderBlock,
+    HideTwaBackButton,
+    RecipientTwaHeaderBlock
+} from './SendNotificationHeader';
+
+const PageWrapper = styled(Wrapper)`
+    padding: 0 16px;
+`;
 
 const SendContent: FC<{
     onClose: () => void;
@@ -44,7 +65,7 @@ const SendContent: FC<{
     initAmountState?: Partial<AmountViewState>;
 }> = ({ onClose, chain, initRecipient, initAmountState }) => {
     const sdk = useAppSdk();
-    const { standalone, ios, extension } = useAppContext();
+    const { ios } = useAppContext();
     const { t } = useTranslation();
     const { data: jettons } = useWalletJettonList();
     const filter = useUserJettonList(jettons);
@@ -197,7 +218,9 @@ const SendContent: FC<{
     }[view];
 
     return (
-        <Wrapper standalone={standalone} extension={extension}>
+        <PageWrapper standalone={false} extension={false}>
+            <HideTwaMainButton />
+            <HideTwaBackButton />
             <TransitionGroup childFactory={childFactoryCreator(right)}>
                 <CSSTransition
                     key={view}
@@ -210,14 +233,15 @@ const SendContent: FC<{
                     <div ref={nodeRef}>
                         {view === 'recipient' && (
                             <RecipientView
-                                title={t('transaction_recipient')}
                                 data={recipient}
-                                onClose={onClose}
                                 setRecipient={onRecipient}
                                 onScan={onScan}
                                 keyboard="decimal"
                                 isExternalLoading={isAccountLoading}
                                 acceptBlockchains={chain ? [chain] : undefined}
+                                MainButton={RecipientTwaMainButton}
+                                HeaderBlock={() => <RecipientTwaHeaderBlock onClose={onClose} />}
+                                fitContent
                             />
                         )}
                         {view === 'amount' && (
@@ -227,6 +251,8 @@ const SendContent: FC<{
                                 onBack={backToRecipient}
                                 recipient={recipient!}
                                 onConfirm={onConfirmAmount}
+                                MainButton={AmountTwaMainButton}
+                                HeaderBlock={AmountTwaHeaderBlock}
                             />
                         )}
                         {view === 'confirm' && (
@@ -239,12 +265,19 @@ const SendContent: FC<{
                                     amount: amountViewState!.amount!
                                 })}
                                 isMax={amountViewState!.isMax!}
-                            />
+                            >
+                                <ConfirmViewTitleSlot>
+                                    <RecipientTwaHeaderBlock onClose={backToAmount} />
+                                </ConfirmViewTitleSlot>
+                                <ConfirmViewButtonsSlot>
+                                    <ConfirmViewButtons MainButton={ConfirmTwaMainButton} />
+                                </ConfirmViewButtonsSlot>
+                            </ConfirmTransferView>
                         )}
                     </div>
                 </CSSTransition>
             </TransitionGroup>
-        </Wrapper>
+        </PageWrapper>
     );
 };
 

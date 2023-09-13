@@ -6,12 +6,18 @@ import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { TonTransferParams } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { seeIfBalanceError, seeIfTimeError } from '@tonkeeper/core/dist/service/transfer/common';
 import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import React, { PropsWithChildren } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
+import { useTranslation } from '../../hooks/translation';
 import { cleanSyncDateBanner } from '../../state/syncDate';
-import { Body1 } from '../Text';
+import { ChevronLeftIcon } from '../Icon';
+import { NotificationCancelButton, NotificationTitleBlock } from '../Notification';
+import { Body1, H3 } from '../Text';
+import { BackButton, ButtonMock } from '../fields/BackButton';
+import { Button } from '../fields/Button';
 import { AmountViewState } from './amount-view/AmountView';
+import { Center, Title } from './amount-view/AmountViewUI';
 
 export const duration = 300;
 export const timingFunction = 'ease-in-out';
@@ -146,6 +152,109 @@ export const ButtonBlock = React.forwardRef<HTMLDivElement, PropsWithChildren>(
     }
 );
 ButtonBlock.displayName = 'ButtonBlock';
+
+export const MainButton = ({ isLoading }: { isLoading: boolean; onClick: () => void }) => {
+    const { t } = useTranslation();
+
+    return (
+        <ButtonBlock>
+            <Button fullWidth size="large" primary type="submit" loading={isLoading}>
+                {t('continue')}
+            </Button>
+        </ButtonBlock>
+    );
+};
+
+export type AmountMainButtonComponent = (props: {
+    isLoading: boolean;
+    isDisabled: boolean;
+    onClick: () => void;
+    ref: React.RefObject<HTMLDivElement>;
+}) => JSX.Element;
+
+interface AmountMainButtonProps {
+    isLoading: boolean;
+    isDisabled: boolean;
+    onClick: () => void;
+}
+export const AmountMainButton = React.forwardRef<HTMLDivElement, AmountMainButtonProps>(
+    ({ isLoading, isDisabled }, refButton) => {
+        const { t } = useTranslation();
+
+        return (
+            <ButtonBlock ref={refButton}>
+                <Button
+                    fullWidth
+                    size="large"
+                    primary
+                    type="submit"
+                    disabled={isDisabled}
+                    loading={isLoading}
+                >
+                    {t('continue')}
+                </Button>
+            </ButtonBlock>
+        );
+    }
+) as AmountMainButtonComponent;
+
+export type ConfirmMainButtonProps = (props: {
+    isLoading: boolean;
+    isDisabled: boolean;
+    onClick: () => void;
+}) => JSX.Element;
+
+export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled }) => {
+    const { t } = useTranslation();
+    return (
+        <Button
+            fullWidth
+            size="large"
+            primary
+            type="submit"
+            disabled={isDisabled}
+            loading={isLoading}
+        >
+            {t('confirm_sending_submit')}
+        </Button>
+    );
+};
+
+export const RecipientHeaderBlock: FC<{ title: string; onClose: () => void }> = ({
+    title,
+    onClose
+}) => {
+    return (
+        <NotificationTitleBlock>
+            <ButtonMock />
+            <H3>{title}</H3>
+            <NotificationCancelButton handleClose={onClose} />
+        </NotificationTitleBlock>
+    );
+};
+
+export type AmountHeaderBlockComponent = (
+    props: PropsWithChildren<{
+        onBack: () => void;
+        onClose: () => void;
+    }>
+) => JSX.Element;
+
+export const AmountHeaderBlock: AmountHeaderBlockComponent = ({ onBack, onClose, children }) => {
+    const { t } = useTranslation();
+    return (
+        <NotificationTitleBlock>
+            <BackButton onClick={onBack}>
+                <ChevronLeftIcon />
+            </BackButton>
+            <Center>
+                <Title>{t('txActions_amount')}</Title>
+                {children}
+            </Center>
+            <NotificationCancelButton handleClose={onClose} />
+        </NotificationTitleBlock>
+    );
+};
 
 export const ResultButton = styled.div<{ done?: boolean }>`
     display: flex;

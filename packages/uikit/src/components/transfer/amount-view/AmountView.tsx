@@ -26,25 +26,17 @@ import { useUserAssetBalance } from '../../../state/asset';
 import { useUserJettonList } from '../../../state/jetton';
 import { useRate } from '../../../state/rates';
 import { useWalletAccountInfo, useWalletJettonList } from '../../../state/wallet';
-import { ChevronLeftIcon } from '../../Icon';
 import { Gap } from '../../Layout';
-import {
-    FullHeightBlock,
-    NotificationCancelButton,
-    NotificationTitleBlock
-} from '../../Notification';
+import { FullHeightBlock } from '../../Notification';
 import { Label1 } from '../../Text';
-import { BackButton } from '../../fields/BackButton';
-import { Button } from '../../fields/Button';
 import { AssetSelect } from '../AssetSelect';
 import { InputSize, Sentence } from '../Sentence';
 import { defaultSize, getInputSize, useAutoFocusOnChange, useButtonPosition } from '../amountHooks';
-import { ButtonBlock } from '../common';
+import { AmountHeaderBlockComponent, AmountMainButtonComponent } from '../common';
 import {
     Address,
     AmountBlock,
     AssetBadge,
-    Center,
     FiatBlock,
     InputBlock,
     MaxButton,
@@ -80,9 +72,9 @@ export const AmountView: FC<{
     onConfirm: (state: AmountViewState) => void;
     recipient: RecipientData;
     defaults?: Partial<AmountViewState>;
-}> = ({ recipient, onClose, onBack, onConfirm, defaults }) => {
-    const { t } = useTranslation();
-    const { fiat, standalone } = useAppContext();
+    MainButton: AmountMainButtonComponent;
+    HeaderBlock: AmountHeaderBlockComponent;
+}> = ({ recipient, onClose, onBack, onConfirm, defaults, MainButton, HeaderBlock }) => {
     const blockchain = recipient.address.blockchain;
 
     const { data: notFilteredJettons } = useWalletJettonList();
@@ -168,9 +160,7 @@ export const AmountView: FC<{
         });
     };
 
-    const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
-        e.stopPropagation();
-        e.preventDefault();
+    const handleSubmit = () => {
         if (isValid) {
             onConfirm({
                 asset: amountState.token,
@@ -182,6 +172,11 @@ export const AmountView: FC<{
         }
     };
 
+    const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
+        e.stopPropagation();
+        e.preventDefault();
+        handleSubmit();
+    };
     const address = toShortValue(
         isTonRecipientData(recipient)
             ? recipient.toAccount.address.bounceable
@@ -190,20 +185,13 @@ export const AmountView: FC<{
 
     return (
         <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
-            <NotificationTitleBlock>
-                <BackButton onClick={handleBack}>
-                    <ChevronLeftIcon />
-                </BackButton>
-                <Center>
-                    <Title>{t('txActions_amount')}</Title>
-                    <SubTitle>
-                        {t('send_screen_steps_done_to').replace('%{name}', '')}
-                        <RecipientName recipient={recipient} />
-                        <Address>{address}</Address>
-                    </SubTitle>
-                </Center>
-                <NotificationCancelButton handleClose={onClose} />
-            </NotificationTitleBlock>
+            <HeaderBlock onClose={onClose} onBack={handleBack}>
+                <SubTitle>
+                    {t('send_screen_steps_done_to').replace('%{name}', '')}
+                    <RecipientName recipient={recipient} />
+                    <Address>{address}</Address>
+                </SubTitle>
+            </HeaderBlock>
 
             <AmountBlock ref={refBlock}>
                 <SelectCenter>
@@ -260,18 +248,13 @@ export const AmountView: FC<{
             </MaxRow>
 
             <Gap />
-            <ButtonBlock ref={refButton}>
-                <Button
-                    fullWidth
-                    size="large"
-                    primary
-                    type="submit"
-                    disabled={!isValid}
-                    loading={rateLoading || balanceLoading}
-                >
-                    {t('continue')}
-                </Button>
-            </ButtonBlock>
+
+            <MainButton
+                ref={refButton}
+                isDisabled={!isValid}
+                isLoading={rateLoading || balanceLoading}
+                onClick={handleSubmit}
+            />
         </FullHeightBlock>
     );
 };

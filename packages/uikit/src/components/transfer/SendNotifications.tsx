@@ -21,10 +21,21 @@ import { useTronBalances } from '../../state/tron/tron';
 import { useWalletJettonList } from '../../state/wallet';
 import { Notification } from '../Notification';
 import { ConfirmTransferView } from './ConfirmTransferView';
+import {
+    ConfirmViewButtons,
+    ConfirmViewButtonsSlot,
+    ConfirmViewTitle,
+    ConfirmViewTitleSlot
+} from './ConfirmView';
 import { RecipientView, useGetToAccount } from './RecipientView';
 import { AmountView, AmountViewState } from './amount-view/AmountView';
 import {
+    AmountHeaderBlock,
+    AmountMainButton,
+    ConfirmMainButton,
     InitTransferData,
+    MainButton,
+    RecipientHeaderBlock,
     Wrapper,
     childFactoryCreator,
     duration,
@@ -205,14 +216,19 @@ const SendContent: FC<{
                     <div ref={nodeRef}>
                         {view === 'recipient' && (
                             <RecipientView
-                                title={t('transaction_recipient')}
                                 data={recipient}
-                                onClose={onClose}
                                 setRecipient={onRecipient}
                                 onScan={onScan}
                                 keyboard="decimal"
                                 isExternalLoading={isAccountLoading}
                                 acceptBlockchains={chain ? [chain] : undefined}
+                                MainButton={MainButton}
+                                HeaderBlock={() => (
+                                    <RecipientHeaderBlock
+                                        title={t('transaction_recipient')}
+                                        onClose={onClose}
+                                    />
+                                )}
                             />
                         )}
                         {view === 'amount' && (
@@ -222,6 +238,8 @@ const SendContent: FC<{
                                 onBack={backToRecipient}
                                 recipient={recipient!}
                                 onConfirm={onConfirmAmount}
+                                MainButton={AmountMainButton}
+                                HeaderBlock={AmountHeaderBlock}
                             />
                         )}
                         {view === 'confirm' && (
@@ -234,7 +252,14 @@ const SendContent: FC<{
                                     amount: amountViewState!.amount!
                                 })}
                                 isMax={amountViewState!.isMax!}
-                            />
+                            >
+                                <ConfirmViewTitleSlot>
+                                    <ConfirmViewTitle />
+                                </ConfirmViewTitleSlot>
+                                <ConfirmViewButtonsSlot>
+                                    <ConfirmViewButtons MainButton={ConfirmMainButton} />
+                                </ConfirmViewButtonsSlot>
+                            </ConfirmTransferView>
                         )}
                     </div>
                 </CSSTransition>

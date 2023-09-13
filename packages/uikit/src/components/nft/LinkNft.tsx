@@ -38,6 +38,7 @@ import {
     ConfirmViewHeadingSlot,
     ConfirmViewTitleSlot
 } from '../transfer/ConfirmView';
+import { ConfirmMainButton } from '../transfer/common';
 
 export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
     const toast = useToast();
@@ -180,7 +181,7 @@ const LinkNftUnlinked: FC<{
                 <ConfirmViewDetailsFee />
             </ConfirmViewDetailsSlot>
             <ConfirmViewButtonsSlot>
-                <ConfirmViewButtons withCancelButton />
+                <ConfirmViewButtons withCancelButton MainButton={ConfirmMainButton} />
             </ConfirmViewButtonsSlot>
         </ConfirmView>
     );
@@ -352,7 +353,7 @@ const LinkNftLinked: FC<{
                 <ConfirmViewDetailsFee />
             </ConfirmViewDetailsSlot>
             <ConfirmViewButtonsSlot>
-                <ConfirmViewButtons withCancelButton />
+                <ConfirmViewButtons withCancelButton MainButton={ConfirmMainButton} />
             </ConfirmViewButtonsSlot>
         </ConfirmView>
     );

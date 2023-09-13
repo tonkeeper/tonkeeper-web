@@ -38,13 +38,14 @@ import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/tra
 import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
+import { defaultTheme } from '@tonkeeper/uikit';
 import {
     AmplitudeAnalyticsContext,
     useAmplitudeAnalytics
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { Initialize } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/ThemeProvider';
+import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
@@ -57,9 +58,10 @@ import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { InitDataLogger } from './components/InitData';
+import { SendAction } from './components/SendNotifications';
 import { TwaQrScanner } from './components/TwaQrScanner';
 import { TwaAppSdk } from './libs/appSdk';
-import { ViewportContext, useAppViewport } from './libs/hooks';
+import { ViewportContext } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -202,6 +204,7 @@ export const Loader: FC = () => {
             });
 
             sdk.setHapticFeedback(components.haptic);
+            components.webApp.setBackgroundColor((defaultTheme as any).backgroundPage);
         }
     }, [components]);
 
@@ -262,7 +265,7 @@ export const Loader: FC = () => {
 };
 
 const InitWrapper = styled(Container)`
-    height: var(--app-height);
+    height: var(--tg-viewport-stable-height);
 
     transition: height 0.4s ease;
 
@@ -275,6 +278,8 @@ const InitWrapper = styled(Container)`
 `;
 
 const InitPages = () => {
+    // useAppViewport();
+
     return (
         <InitWrapper>
             <Suspense fallback={<Loading />}>
@@ -294,7 +299,6 @@ export const Content: FC<{
 }> = ({ activeWallet, lock, showQrScan }) => {
     const location = useLocation();
     useWindowsScroll();
-    useAppViewport();
 
     if (lock) {
         return (
@@ -309,52 +313,54 @@ export const Content: FC<{
     }
 
     return (
-        <Wrapper>
-            <WalletStateContext.Provider value={activeWallet}>
-                <Routes>
-                    <Route
-                        path={AppRoute.activity}
-                        element={
-                            <Suspense fallback={<ActivitySkeletonPage />}>
-                                <Activity />
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path={any(AppRoute.settings)}
-                        element={
-                            <Suspense fallback={<SettingsSkeletonPage />}>
-                                <Settings />
-                            </Suspense>
-                        }
-                    />
-                    <Route path={AppRoute.coins}>
+        <WalletStateContext.Provider value={activeWallet}>
+            <SendAction>
+                <Wrapper>
+                    <Routes>
                         <Route
-                            path=":name/*"
+                            path={AppRoute.activity}
                             element={
-                                <Suspense fallback={<CoinSkeletonPage />}>
-                                    <Coin />
+                                <Suspense fallback={<ActivitySkeletonPage />}>
+                                    <Activity />
                                 </Suspense>
                             }
                         />
-                    </Route>
-                    <Route
-                        path="*"
-                        element={
-                            <>
-                                <Header showQrScan={showQrScan} />
-                                <InnerBody>
-                                    <Suspense fallback={<HomeSkeleton />}>
-                                        <Home />
+                        <Route
+                            path={any(AppRoute.settings)}
+                            element={
+                                <Suspense fallback={<SettingsSkeletonPage />}>
+                                    <Settings />
+                                </Suspense>
+                            }
+                        />
+                        <Route path={AppRoute.coins}>
+                            <Route
+                                path=":name/*"
+                                element={
+                                    <Suspense fallback={<CoinSkeletonPage />}>
+                                        <Coin />
                                     </Suspense>
-                                </InnerBody>
-                            </>
-                        }
-                    />
-                </Routes>
-                <Footer sticky />
-                <MemoryScroll />
-            </WalletStateContext.Provider>
-        </Wrapper>
+                                }
+                            />
+                        </Route>
+                        <Route
+                            path="*"
+                            element={
+                                <>
+                                    <Header showQrScan={showQrScan} />
+                                    <InnerBody>
+                                        <Suspense fallback={<HomeSkeleton />}>
+                                            <Home />
+                                        </Suspense>
+                                    </InnerBody>
+                                </>
+                            }
+                        />
+                    </Routes>
+                    <Footer sticky />
+                    <MemoryScroll />
+                </Wrapper>
+            </SendAction>
+        </WalletStateContext.Provider>
     );
 };

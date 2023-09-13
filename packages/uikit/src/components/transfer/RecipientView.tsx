@@ -17,15 +17,12 @@ import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { Gap } from '../Layout';
-import { FullHeightBlock, NotificationCancelButton, NotificationTitleBlock } from '../Notification';
-import { Body2, H3 } from '../Text';
-import { ButtonMock } from '../fields/BackButton';
-import { Button } from '../fields/Button';
+import { FullHeightBlock } from '../Notification';
+import { Body2 } from '../Text';
 import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
-import { ButtonBlock } from './common';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -105,23 +102,25 @@ const seeIfValidTonRecipient = (recipient: BaseRecipient | DnsRecipient) => {
 const defaultRecipient = { address: '' };
 
 export const RecipientView: FC<{
-    title: string;
     data?: RecipientData;
-    onClose: () => void;
     setRecipient: (options: RecipientData) => void;
     keyboard?: 'decimal';
     onScan: (value: string) => void;
     isExternalLoading?: boolean;
     acceptBlockchains?: BLOCKCHAIN_NAME[];
+    MainButton: (props: { isLoading: boolean; onClick: () => void }) => JSX.Element;
+    HeaderBlock: () => JSX.Element;
+    fitContent?: boolean;
 }> = ({
-    title,
     data,
-    onClose,
     setRecipient,
     keyboard,
     onScan,
     isExternalLoading,
-    acceptBlockchains
+    acceptBlockchains,
+    MainButton,
+    HeaderBlock,
+    fitContent
 }) => {
     const sdk = useAppSdk();
     const [submitted, setSubmit] = useState(false);
@@ -284,12 +283,8 @@ export const RecipientView: FC<{
     };
 
     return (
-        <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
-            <NotificationTitleBlock>
-                <ButtonMock />
-                <H3>{title}</H3>
-                <NotificationCancelButton handleClose={onClose} />
-            </NotificationTitleBlock>
+        <FullHeightBlock onSubmit={onSubmit} standalone={standalone} fitContent={fitContent}>
+            <HeaderBlock />
             <ShowAddress value={showAddress}>
                 <InputWithScanner
                     onSubmit={handleSubmit}
@@ -325,17 +320,7 @@ export const RecipientView: FC<{
 
             <Gap />
 
-            <ButtonBlock>
-                <Button
-                    fullWidth
-                    size="large"
-                    primary
-                    type="submit"
-                    loading={isFetching || isDnsFetching}
-                >
-                    {t('continue')}
-                </Button>
-            </ButtonBlock>
+            <MainButton isLoading={isFetching || isDnsFetching} onClick={handleSubmit} />
         </FullHeightBlock>
     );
 };
