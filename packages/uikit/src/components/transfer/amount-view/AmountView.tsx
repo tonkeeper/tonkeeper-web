@@ -47,7 +47,6 @@ import {
     SelectCenter,
     SubTitle,
     Symbol,
-    Title,
     inputToBigNumber
 } from './AmountViewUI';
 import { AmountState2, amountStateReducer, toInitAmountState } from './amountState';
@@ -75,6 +74,8 @@ export const AmountView: FC<{
     MainButton: AmountMainButtonComponent;
     HeaderBlock: AmountHeaderBlockComponent;
 }> = ({ recipient, onClose, onBack, onConfirm, defaults, MainButton, HeaderBlock }) => {
+    const { t } = useTranslation();
+    const { standalone, fiat } = useAppContext();
     const blockchain = recipient.address.blockchain;
 
     const { data: notFilteredJettons } = useWalletJettonList();
