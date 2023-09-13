@@ -16,7 +16,8 @@ export const HideTwaBackButton = () => {
 };
 
 const Padding = styled.div`
-    padding: 4px 0;
+    padding-top: 12px;
+    margin-bottom: -4px;
 `;
 export const RecipientTwaHeaderBlock: FC<{ onClose: () => void }> = ({ onClose }) => {
     const backButton = useBackButton();
