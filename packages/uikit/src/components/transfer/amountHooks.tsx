@@ -1,3 +1,4 @@
+import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { useEffect } from 'react';
 import { useAppContext } from '../../hooks/appContext';
 import { getTextWidth } from '../../hooks/textWidth';
@@ -69,4 +70,17 @@ export const getInputSize = (value: string, parent: HTMLLabelElement) => {
         width: Math.max(Math.round(width) + 5, value.length * 6, 30),
         size: size
     };
+};
+
+export const useAutoFocusOnChange = (ref: React.RefObject<HTMLInputElement>, token: Asset) => {
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (ref.current) {
+                ref.current.focus();
+            }
+        }, 300);
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [ref.current, token]);
 };

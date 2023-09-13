@@ -56,8 +56,6 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
         return this.weiAmount.toFixed(0);
     }
 
-    protected readonly decimalPlaces = 3;
-
     constructor({ weiAmount, asset, image }: AssetAmountStruct<T>) {
         this.weiAmount = new BigNumber(weiAmount);
         this.asset = asset;
@@ -93,7 +91,7 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
 
     toStringRelativeAmount(decimalPlaces?: number): string {
         if (decimalPlaces === undefined) {
-            decimalPlaces = this.decimalPlaces;
+            decimalPlaces = this.asset.decimals;
         }
         return formatter.format(this.relativeAmount, { decimals: decimalPlaces });
     }

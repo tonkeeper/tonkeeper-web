@@ -1,6 +1,5 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
-import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import {
     TonAsset,
     jettonToTonAsset,
@@ -8,10 +7,18 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { getDecimalSeparator, getGroupSeparator } from '@tonkeeper/core/dist/utils/formatting';
-import { formatSendValue, isNumeric } from '@tonkeeper/core/dist/utils/send';
+import { isNumeric } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
-import React, { FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, {
+    FC,
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+    useReducer,
+    useRef,
+    useState
+} from 'react';
 import { useAppContext } from '../../../hooks/appContext';
 import { formatter } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
@@ -31,7 +38,7 @@ import { BackButton } from '../../fields/BackButton';
 import { Button } from '../../fields/Button';
 import { AssetSelect } from '../AssetSelect';
 import { InputSize, Sentence } from '../Sentence';
-import { defaultSize, getInputSize, useButtonPosition } from '../amountHooks';
+import { defaultSize, getInputSize, useAutoFocusOnChange, useButtonPosition } from '../amountHooks';
 import { ButtonBlock } from '../common';
 import {
     Address,
@@ -49,10 +56,9 @@ import {
     SubTitle,
     Symbol,
     Title,
-    inputToBigNumber,
-    replaceTypedDecimalSeparator,
-    seeIfValueValid
+    inputToBigNumber
 } from './AmountViewUI';
+import { AmountState2, amountStateReducer, toInitAmountState } from './amountState';
 
 export type AmountViewState = {
     asset: Asset;
@@ -62,22 +68,11 @@ export type AmountViewState = {
     inFiat: boolean;
 };
 
-function formatStringToInput(value: BigNumber | string): string {
-    if (value instanceof BigNumber) {
-        return value.toFormat({
-            groupSeparator: getGroupSeparator(),
-            decimalSeparator: getDecimalSeparator()
-        });
-    } else {
-        value = replaceTypedDecimalSeparator(value);
-
-        if (isNumeric(value)) {
-            value = formatSendValue(value);
-        }
-
-        return value as string;
-    }
-}
+const toTokenRateSymbol = (amountState: AmountState2) => {
+    return amountState.token.blockchain === BLOCKCHAIN_NAME.TRON
+        ? amountState.token.symbol
+        : legacyTonAssetId(amountState.token as TonAsset, { userFriendly: true });
+};
 
 export const AmountView: FC<{
     onClose: () => void;
@@ -86,103 +81,90 @@ export const AmountView: FC<{
     recipient: RecipientData;
     defaults?: Partial<AmountViewState>;
 }> = ({ recipient, onClose, onBack, onConfirm, defaults }) => {
+    const { t } = useTranslation();
+    const { fiat, standalone } = useAppContext();
     const blockchain = recipient.address.blockchain;
+
     const { data: notFilteredJettons } = useWalletJettonList();
     const jettons = useUserJettonList(notFilteredJettons);
     const { data: info } = useWalletAccountInfo();
 
-    const { fiat, standalone } = useAppContext();
-    const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
-
-    const [inFiat, setInFiat] = useState(defaults?.inFiat ?? false);
-    const [max, setMax] = useState(defaults?.isMax ?? false);
-
-    const [input, setInput] = useState<string>(
-        formatStringToInput((inFiat ? defaults?.fiatAmount : defaults?.amount) || '0')
+    const [amountState, dispatch] = useReducer(
+        amountStateReducer,
+        toInitAmountState(defaults, blockchain)
     );
 
-    const [token, setToken] = useState<Asset>(
-        defaults?.asset || (blockchain === BLOCKCHAIN_NAME.TON ? TON_ASSET : TRON_USDT_ASSET)
-    );
+    const { data: tokenRate, isLoading: rateLoading } = useRate(toTokenRateSymbol(amountState));
+    const { data: balance, isLoading: balanceLoading } = useUserAssetBalance(amountState.token);
 
-    const rateAddress =
-        token.blockchain === BLOCKCHAIN_NAME.TRON
-            ? token.symbol
-            : legacyTonAssetId(token as TonAsset, { userFriendly: true });
-
-    const { data: tokenRate, isLoading: rateLoading } = useRate(rateAddress);
-    const { data: balance, isLoading: balanceLoading } = useUserAssetBalance(token);
-
-    let secondaryAmount: BigNumber | undefined;
-    if (tokenRate?.prices) {
-        secondaryAmount = inputToBigNumber(input)[inFiat ? 'div' : 'multipliedBy'](
-            tokenRate.prices
-        );
-    }
-    const coinAmount = inFiat ? secondaryAmount! : inputToBigNumber(input);
-
-    const toggleFiat = () => {
-        if (!secondaryAmount) return;
-        setInFiat(v => !v);
-        onInput(formatStringToInput(secondaryAmount.decimalPlaces(2, BigNumber.ROUND_FLOOR)));
-    };
+    const secondaryAmount: BigNumber | undefined = amountState.inFiat
+        ? amountState.coinValue
+        : amountState.fiatValue;
 
     const ref = useRef<HTMLInputElement>(null);
     const refBlock = useRef<HTMLLabelElement>(null);
     const refButton = useRef<HTMLDivElement>(null);
 
     useButtonPosition(refButton, refBlock);
+    useAutoFocusOnChange(ref, amountState.token);
 
+    const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
     useLayoutEffect(() => {
         if (refBlock.current) {
-            setFontSize(getInputSize(input, refBlock.current));
+            setFontSize(getInputSize(amountState.inputValue, refBlock.current));
         }
-    }, [refBlock.current, input]);
+    }, [refBlock.current, amountState.inputValue]);
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            if (ref.current) {
-                ref.current.focus();
-            }
-        }, 300);
-        return () => {
-            clearTimeout(timeout);
-        };
-    }, [ref.current, token]);
+        dispatch({ kind: 'price', payload: { prices: tokenRate?.prices } });
+    }, [dispatch, tokenRate]);
 
-    const { t } = useTranslation();
+    const toggleFiat = useCallback(() => {
+        dispatch({ kind: 'toggle', payload: undefined });
+    }, []);
 
-    const onInput = (value: string) => {
-        const decimals = inFiat ? 2 : token.decimals;
+    const onInput = useCallback(
+        (value: string) => {
+            dispatch({ kind: 'input', payload: { value, prices: tokenRate?.prices } });
+        },
+        [dispatch, tokenRate]
+    );
 
-        value = replaceTypedDecimalSeparator(value);
+    const onMax = useCallback(() => {
+        dispatch({
+            kind: 'max',
+            payload: { value: balance.relativeAmount, prices: tokenRate?.prices }
+        });
+    }, [dispatch, balance, tokenRate]);
 
-        if (!seeIfValueValid(value, decimals)) {
-            value = input;
-        }
+    const onJetton = useCallback(
+        (address: string) => {
+            dispatch({
+                kind: 'select',
+                payload: { token: jettonToTonAsset(address, jettons) }
+            });
+        },
+        [dispatch, jettons]
+    );
 
-        if (isNumeric(value)) {
-            value = formatSendValue(value);
-        }
-
-        setInput(value);
-        setMax(false);
-    };
-
-    const remaining = balance.relativeAmount.minus(coinAmount || '0');
+    const remaining = balance.relativeAmount.minus(amountState.coinValue);
     const enoughBalance = remaining.gte(0);
 
     const isValid = useMemo(() => {
-        return enoughBalance && isNumeric(input) && inputToBigNumber(input).isGreaterThan(0);
-    }, [enoughBalance, input]);
+        return (
+            enoughBalance &&
+            isNumeric(amountState.inputValue) &&
+            inputToBigNumber(amountState.inputValue).isGreaterThan(0)
+        );
+    }, [enoughBalance, amountState.inputValue]);
 
     const handleBack = () => {
         onBack({
-            asset: token,
-            amount: coinAmount,
-            fiatAmount: inFiat ? inputToBigNumber(input) : undefined,
-            isMax: max,
-            inFiat
+            asset: amountState.token,
+            amount: amountState.coinValue,
+            fiatAmount: amountState.fiatValue,
+            isMax: amountState.isMax,
+            inFiat: amountState.inFiat
         });
     };
 
@@ -191,33 +173,13 @@ export const AmountView: FC<{
         e.preventDefault();
         if (isValid) {
             onConfirm({
-                asset: token,
-                amount: coinAmount,
-                fiatAmount: inFiat ? inputToBigNumber(input) : undefined,
-                isMax: max,
-                inFiat
+                asset: amountState.token,
+                amount: amountState.coinValue,
+                fiatAmount: amountState.fiatValue,
+                isMax: amountState.isMax,
+                inFiat: amountState.inFiat
             });
         }
-    };
-
-    const onMax = () => {
-        if (!refBlock.current) return;
-
-        const value = balance.relativeAmount;
-        const inputValue = inFiat
-            ? new BigNumber(value)
-                  .multipliedBy(tokenRate!.prices)
-                  .decimalPlaces(2, BigNumber.ROUND_FLOOR)
-            : value;
-
-        setInput(formatStringToInput(inputValue));
-        setMax(state => !state);
-    };
-
-    const onJetton = (address: string) => {
-        setToken(jettonToTonAsset(address, jettons));
-        setMax(false);
-        setInFiat(false);
     };
 
     const address = toShortValue(
@@ -248,7 +210,7 @@ export const AmountView: FC<{
                     {blockchain === BLOCKCHAIN_NAME.TON ? (
                         <AssetSelect
                             info={info}
-                            jetton={legacyTonAssetId(token as TonAsset)}
+                            jetton={legacyTonAssetId(amountState.token as TonAsset)}
                             setJetton={onJetton}
                             jettons={jettons}
                         />
@@ -259,23 +221,36 @@ export const AmountView: FC<{
                     )}
                 </SelectCenter>
                 <InputBlock>
-                    <Sentence ref={ref} value={input} setValue={onInput} inputSize={fontSize} />
-                    <Symbol>{inFiat ? fiat : token.symbol}</Symbol>
+                    <Sentence
+                        ref={ref}
+                        value={amountState.inputValue}
+                        setValue={onInput}
+                        inputSize={fontSize}
+                    />
+                    <Symbol>{amountState.inFiat ? fiat : amountState.token.symbol}</Symbol>
                 </InputBlock>
 
                 {secondaryAmount && (
                     <FiatBlock onClick={toggleFiat}>
-                        {formatter.format(secondaryAmount)} {inFiat ? token.symbol : fiat}
+                        {formatter.format(secondaryAmount, {
+                            ignoreZeroTruncate: !amountState.inFiat,
+                            decimals: amountState.inFiat ? amountState.token.decimals : 2
+                        })}{' '}
+                        {amountState.inFiat ? amountState.token.symbol : fiat}
                     </FiatBlock>
                 )}
             </AmountBlock>
             <MaxRow>
-                <MaxButton maxValue={max} onClick={onMax}>
+                <MaxButton maxValue={amountState.isMax} onClick={onMax}>
                     {t('Max')}
                 </MaxButton>
                 {enoughBalance ? (
                     <Remaining>
-                        {t('Remaining').replace('%1%', formatter.format(remaining))} {token.symbol}
+                        {t('Remaining').replace(
+                            '%1%',
+                            formatter.format(remaining, { decimals: amountState.token.decimals })
+                        )}{' '}
+                        {amountState.token.symbol}
                     </Remaining>
                 ) : (
                     <RemainingInvalid>
