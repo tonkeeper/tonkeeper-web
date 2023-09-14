@@ -6,6 +6,7 @@ interface BootParams {
     lang: 'en' | 'ru';
     build: string; // "2.8.0"
     network: Network;
+    countryCode?: string;
 }
 interface BootOptions {
     fetchApi?: FetchAPI;
@@ -68,11 +69,12 @@ export class Tonendpoint {
             lang = 'en',
             build = '3.0.0',
             network = Network.MAINNET,
-            platform = 'web'
+            platform = 'web',
+            countryCode
         }: Partial<BootParams>,
         { fetchApi = defaultFetch, basePath = defaultTonendpoint }: BootOptions
     ) {
-        this.params = { lang, build, network, platform };
+        this.params = { lang, build, network, platform, countryCode };
         this.fetchApi = fetchApi;
         this.basePath = basePath;
     }
@@ -84,6 +86,9 @@ export class Tonendpoint {
             chainName: this.params.network === Network.TESTNET ? 'testnet' : 'mainnet',
             platform: this.params.platform
         });
+        if (this.params.countryCode) {
+            params.append('countryCode', this.params.countryCode);
+        }
         return params.toString();
     };
 
