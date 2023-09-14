@@ -22,6 +22,7 @@ export interface UIEvents {
     copy: string;
     scan: void;
     resize: void;
+    navigate: void;
     getPassword: GetPasswordParams;
     loading: void;
     transfer: TransferInitParams;

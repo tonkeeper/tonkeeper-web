@@ -252,8 +252,11 @@ export const RecipientView: FC<{
                     done: true
                 });
             }
+        } else {
+            sdk.hapticNotification('error');
         }
     };
+
     const onSubmit: React.FormEventHandler<HTMLFormElement> = e => {
         e.stopPropagation();
         e.preventDefault();

@@ -201,7 +201,8 @@ export const AmountMainButton = React.forwardRef<HTMLDivElement, AmountMainButto
 export type ConfirmMainButtonProps = (props: {
     isLoading: boolean;
     isDisabled: boolean;
-    onClick: () => void;
+    onClick: () => Promise<void>;
+    onClose: () => void;
 }) => JSX.Element;
 
 export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled }) => {
@@ -217,6 +218,32 @@ export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisable
         >
             {t('confirm_sending_submit')}
         </Button>
+    );
+};
+
+const ConfirmViewButtonsContainerStyled = styled.div`
+    display: flex;
+    gap: 1rem;
+    & > * {
+        flex: 1;
+    }
+`;
+
+export const ConfirmAndCancelMainButton: ConfirmMainButtonProps = ({
+    isLoading,
+    isDisabled,
+    onClose
+}) => {
+    const { t } = useTranslation();
+    return (
+        <ConfirmViewButtonsContainerStyled>
+            <Button size="large" secondary onClick={onClose}>
+                {t('cancel')}
+            </Button>
+            <Button size="large" primary type="submit" disabled={isDisabled} loading={isLoading}>
+                {t('confirm')}
+            </Button>
+        </ConfirmViewButtonsContainerStyled>
     );
 };
 

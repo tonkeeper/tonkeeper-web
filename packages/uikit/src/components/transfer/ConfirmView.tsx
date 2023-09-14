@@ -31,7 +31,6 @@ import { Label2 } from '../Text';
 import { TransferComment } from '../activity/ActivityDetailsLayout';
 import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
 import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
@@ -54,7 +53,7 @@ type ConfirmViewContextValue = {
         isLoading: boolean;
         error: Error | null | undefined;
     };
-    handleSubmit: () => void;
+    handleSubmit: () => Promise<void>;
     onClose: () => void;
     onBack?: () => void;
 };
@@ -142,18 +141,14 @@ export function ConfirmView<T extends Asset = Asset>({
 
     const handleSubmit = async () => {
         if (isLoading) return;
-        try {
-            reset();
-            const isDone = await mutateAsync();
-            if (isDone) {
-                setDone(true);
-                setTimeout(() => {
-                    setTimeout(() => client.invalidateQueries(), 100);
-                    onClose(true);
-                }, 2000);
-            }
-        } catch (err) {
-            console.error(err);
+        reset();
+        const isDone = await mutateAsync();
+        if (isDone) {
+            setDone(true);
+            setTimeout(() => {
+                setTimeout(() => client.invalidateQueries(), 100);
+                onClose(true);
+            }, 2000);
         }
     };
 
@@ -290,9 +285,8 @@ const ConfirmViewButtonsContainerStyled = styled.div`
 `;
 
 export const ConfirmViewButtons: FC<{
-    withCancelButton?: boolean;
     MainButton: ConfirmMainButtonProps;
-}> = ({ withCancelButton, MainButton }) => {
+}> = ({ MainButton }) => {
     const sdk = useAppSdk();
 
     const {
@@ -335,18 +329,12 @@ export const ConfirmViewButtons: FC<{
         );
     }
 
-    if (withCancelButton) {
-        return (
-            <ConfirmViewButtonsContainerStyled>
-                <Button size="large" secondary onClick={onClose}>
-                    {t('notifications_alert_cancel')}
-                </Button>
-                <Button size="large" primary type="submit" disabled={!isValid} loading={isLoading}>
-                    {t('confirm')}
-                </Button>
-            </ConfirmViewButtonsContainerStyled>
-        );
-    }
-
-    return <MainButton isDisabled={!isValid} isLoading={isLoading} onClick={handleSubmit} />;
+    return (
+        <MainButton
+            isDisabled={!isValid}
+            isLoading={isLoading}
+            onClick={handleSubmit}
+            onClose={onClose}
+        />
+    );
 };

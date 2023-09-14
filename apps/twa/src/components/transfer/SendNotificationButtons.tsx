@@ -101,7 +101,7 @@ export const ConfirmTwaMainButton = ({
 }: {
     isLoading: boolean;
     isDisabled: boolean;
-    onClick: () => void;
+    onClick: () => Promise<void>;
 }) => {
     const button = useMainButton();
     const { t } = useTranslation();
@@ -111,9 +111,17 @@ export const ConfirmTwaMainButton = ({
     }, []);
 
     useEffect(() => {
-        button.on('click', onClick);
+        const handler = async () => {
+            try {
+                button.hide();
+                await onClick();
+            } catch (e) {
+                button.show();
+            }
+        };
+        button.on('click', handler);
         return () => {
-            button.off('click', onClick);
+            button.off('click', handler);
         };
     }, [onClick, button]);
 

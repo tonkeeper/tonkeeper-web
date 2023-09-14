@@ -1,4 +1,5 @@
 import { AmountHeaderBlockComponent } from '@tonkeeper/uikit/dist/components/transfer/common';
+import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useBackButton } from '@twa.js/sdk-react';
 import { FC, useEffect } from 'react';
 import styled from 'styled-components';
@@ -6,8 +7,15 @@ import styled from 'styled-components';
 export const HideTwaBackButton = () => {
     const button = useBackButton();
 
+    const sdk = useAppSdk();
+
     useEffect(() => {
+        const handler = () => {
+            sdk.uiEvents.emit('navigate', { method: 'navigate', params: undefined });
+        };
+        button.on('click', handler);
         return () => {
+            button.off('click', handler);
             button.hide();
         };
     }, []);

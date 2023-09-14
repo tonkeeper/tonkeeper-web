@@ -39,7 +39,7 @@ export const TwaUnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
         }
     };
 
-    const onCancel = () => {
+    const onCancel = useCallback(() => {
         reset();
         sdk.uiEvents.emit('response', {
             method: 'response',
@@ -47,7 +47,14 @@ export const TwaUnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
             params: new Error('Cancel auth request')
         });
         close();
-    };
+    }, [reset, sdk, requestId, close]);
+
+    useEffect(() => {
+        sdk.uiEvents.on('navigate', onCancel);
+        return () => {
+            sdk.uiEvents.off('navigate', onCancel);
+        };
+    }, [sdk, onCancel]);
 
     useEffect(() => {
         const handler = (options: {

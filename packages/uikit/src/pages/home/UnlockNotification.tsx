@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import { Notification } from '../../components/Notification';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
-import { openIosKeyboard } from '../../hooks/ios';
+import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 
 export const getPasswordByNotification = async (
@@ -122,10 +122,6 @@ export const PasswordUnlock: FC<{
     //     };
     // }, [ref]);
 
-    const onChange = (value: string) => {
-        setPassword(value);
-    };
-
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
 
@@ -138,6 +134,8 @@ export const PasswordUnlock: FC<{
         if (result === false) {
             ref.current?.focus();
             ref.current?.select();
+        } else {
+            hideIosKeyboard();
         }
     };
 
@@ -146,7 +144,7 @@ export const PasswordUnlock: FC<{
             <Input
                 ref={ref}
                 value={password}
-                onChange={onChange}
+                onChange={setPassword}
                 type="password"
                 label={t('Password')}
                 isValid={!isError}
