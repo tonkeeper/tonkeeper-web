@@ -7,10 +7,6 @@ import { SettingsRoute, relative } from '../../libs/routes';
 import { ContactSupportIcon, LegalDocumentsIcon, TelegramIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
 
-export interface SettingsSocialProps {
-    appPage?: string;
-}
-
 export const SettingsSocialList: FC = React.memo(() => {
     const navigate = useNavigate();
     const sdk = useAppSdk();

@@ -27,6 +27,7 @@ export interface TonendpointConfig {
 
     exchangePostUrl?: string;
     supportLink?: string;
+    tonkeeperNewsUrl?: string;
 
     mercuryoSecret?: string;
     neocryptoWebView?: string;
