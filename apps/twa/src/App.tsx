@@ -43,7 +43,7 @@ import {
     AmplitudeAnalyticsContext,
     useAmplitudeAnalytics
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
-import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
+
 import { Initialize } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
@@ -60,6 +60,7 @@ import styled from 'styled-components';
 import { InitDataLogger } from './components/InitData';
 import { SendAction } from './components/SendNotifications';
 import { TwaQrScanner } from './components/TwaQrScanner';
+import { TwaUnlockNotification } from './components/TwaUnlockNotification';
 import { TwaAppSdk } from './libs/appSdk';
 import { ViewportContext } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
@@ -119,7 +120,7 @@ const TwaApp = () => {
                                     <SybHeaderGlobalStyle />
                                     <GlobalListStyle />
                                     <Loader />
-                                    <UnlockNotification sdk={sdk} />
+                                    <TwaUnlockNotification sdk={sdk} />
                                 </UserThemeProvider>
                             </StorageContext.Provider>
                         </TranslationContext.Provider>
@@ -220,7 +221,6 @@ export const Loader: FC = () => {
     }
 
     const showQrScan = seeIfShowQrScanner(components.webApp.platform);
-
     const network = activeWallet?.network ?? Network.MAINNET;
     const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
     const context: IAppContext = {

@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import { Notification } from '../../components/Notification';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
-import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
+import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 
 export const getPasswordByNotification = async (
@@ -58,7 +58,7 @@ const Block = styled.form`
     width: 100%;
 `;
 
-const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
+export const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
     return useMutation<void, Error, string>(async password => {
         const account = await getAccountState(sdk.storage);
         if (account.publicKeys.length === 0) {
@@ -84,7 +84,7 @@ const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
     });
 };
 
-const PasswordUnlock: FC<{
+export const PasswordUnlock: FC<{
     sdk: IAppSdk;
     onClose: () => void;
     onSubmit: (password: string) => Promise<boolean>;
@@ -106,21 +106,21 @@ const PasswordUnlock: FC<{
         }
     }, [location]);
 
-    useEffect(() => {
-        if (ref.current) {
-            ref.current.focus();
+    // useEffect(() => {
+    //     if (ref.current) {
+    //         ref.current.focus();
 
-            ref.current.onblur = () => {
-                openIosKeyboard('text', 'password', 360); // almost infinity
-            };
-        }
-        return () => {
-            if (ref.current) {
-                ref.current.onblur = undefined!;
-            }
-            hideIosKeyboard();
-        };
-    }, [ref]);
+    //         ref.current.onblur = () => {
+    //             openIosKeyboard('text', 'password', 360); // almost infinity
+    //         };
+    //     }
+    //     return () => {
+    //         if (ref.current) {
+    //             ref.current.onblur = undefined!;
+    //         }
+    //         hideIosKeyboard();
+    //     };
+    // }, [ref]);
 
     const onChange = (value: string) => {
         setPassword(value);
@@ -250,7 +250,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
 
     return (
         <Notification
-            isOpen={auth != null}
+            isOpen={auth != null && requestId != null}
             hideButton
             handleClose={onCancel}
             title={t('enter_password')}
