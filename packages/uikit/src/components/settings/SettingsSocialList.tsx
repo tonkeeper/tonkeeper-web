@@ -33,7 +33,7 @@ export const SettingsSocialList: FC = React.memo(() => {
             {
                 name: t('settings_contact_support'),
                 icon: <ContactSupportIcon />,
-                action: () => sdk.openPage('mailto:support@tonkeeper.com')
+                action: () => config.supportLink && sdk.openPage(config.supportLink)
             },
             {
                 name: t('settings_legal_documents'),
