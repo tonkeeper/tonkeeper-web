@@ -11,7 +11,7 @@ const Splash = styled.div`
     background-color: rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
-    transition: all 0.3s ease-in-out;
+    transition: all 0.1s ease-in-out;
     overflow: hidden;
     -webkit-overflow-scrolling: touch;
     z-index: 10;
@@ -96,7 +96,7 @@ export const Notification2: FC<{
         <ReactPortal wrapperId="react-portal-modal-container">
             <CSSTransition
                 in={isOpen}
-                timeout={{ enter: 0, exit: 300 }}
+                timeout={{ enter: 0, exit: 100 }}
                 unmountOnExit
                 nodeRef={nodeRef}
                 onEntered={() => setEntered(true)}

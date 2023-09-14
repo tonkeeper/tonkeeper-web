@@ -1,3 +1,4 @@
+import { ConfirmMainButtonProps } from '@tonkeeper/uikit/dist/components/transfer/common';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
 import { useMainButton } from '@twa.js/sdk-react';
@@ -94,14 +95,10 @@ export const AmountTwaMainButton = ({
     return <></>;
 };
 
-export const ConfirmTwaMainButton = ({
+export const ConfirmTwaMainButton: ConfirmMainButtonProps = ({
     isLoading,
     isDisabled,
     onClick
-}: {
-    isLoading: boolean;
-    isDisabled: boolean;
-    onClick: () => Promise<void>;
 }) => {
     const button = useMainButton();
     const { t } = useTranslation();
@@ -114,7 +111,10 @@ export const ConfirmTwaMainButton = ({
         const handler = async () => {
             try {
                 button.hide();
-                await onClick();
+                const ok = await onClick();
+                if (!ok) {
+                    button.show();
+                }
             } catch (e) {
                 button.show();
             }

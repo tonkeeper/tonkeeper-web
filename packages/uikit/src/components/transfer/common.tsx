@@ -201,7 +201,7 @@ export const AmountMainButton = React.forwardRef<HTMLDivElement, AmountMainButto
 export type ConfirmMainButtonProps = (props: {
     isLoading: boolean;
     isDisabled: boolean;
-    onClick: () => Promise<void>;
+    onClick: () => Promise<boolean>;
     onClose: () => void;
 }) => JSX.Element;
 

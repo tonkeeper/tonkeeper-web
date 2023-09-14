@@ -53,7 +53,7 @@ type ConfirmViewContextValue = {
         isLoading: boolean;
         error: Error | null | undefined;
     };
-    handleSubmit: () => Promise<void>;
+    handleSubmit: () => Promise<boolean>;
     onClose: () => void;
     onBack?: () => void;
 };
@@ -140,7 +140,7 @@ export function ConfirmView<T extends Asset = Asset>({
     const { standalone } = useAppContext();
 
     const handleSubmit = async () => {
-        if (isLoading) return;
+        if (isLoading) return false;
         reset();
         const isDone = await mutateAsync();
         if (isDone) {
@@ -150,6 +150,7 @@ export function ConfirmView<T extends Asset = Asset>({
                 onClose(true);
             }, 2000);
         }
+        return isDone;
     };
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {

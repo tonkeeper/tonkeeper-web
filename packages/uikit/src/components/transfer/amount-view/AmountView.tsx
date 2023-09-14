@@ -20,6 +20,7 @@ import React, {
     useState
 } from 'react';
 import { useAppContext } from '../../../hooks/appContext';
+import { useAppSdk } from '../../../hooks/appSdk';
 import { formatter } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { useUserAssetBalance } from '../../../state/asset';
@@ -75,6 +76,7 @@ export const AmountView: FC<{
     HeaderBlock: AmountHeaderBlockComponent;
 }> = ({ recipient, onClose, onBack, onConfirm, defaults, MainButton, HeaderBlock }) => {
     const { t } = useTranslation();
+    const sdk = useAppSdk();
     const { standalone, fiat } = useAppContext();
     const blockchain = recipient.address.blockchain;
 
@@ -89,10 +91,6 @@ export const AmountView: FC<{
 
     const { data: tokenRate, isLoading: rateLoading } = useRate(toTokenRateSymbol(amountState));
     const { data: balance, isLoading: balanceLoading } = useUserAssetBalance(amountState.token);
-
-    const secondaryAmount: BigNumber | undefined = amountState.inFiat
-        ? amountState.coinValue
-        : amountState.fiatValue;
 
     const ref = useRef<HTMLInputElement>(null);
     const refBlock = useRef<HTMLLabelElement>(null);
@@ -170,6 +168,8 @@ export const AmountView: FC<{
                 isMax: amountState.isMax,
                 inFiat: amountState.inFiat
             });
+        } else {
+            sdk.hapticNotification('error');
         }
     };
 
@@ -183,6 +183,10 @@ export const AmountView: FC<{
             ? recipient.toAccount.address.bounceable
             : recipient.address.address
     );
+
+    const secondaryAmount: BigNumber | undefined = amountState.inFiat
+        ? amountState.coinValue
+        : amountState.fiatValue;
 
     return (
         <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
