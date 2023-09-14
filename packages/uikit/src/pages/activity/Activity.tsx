@@ -54,10 +54,10 @@ const Activity: FC = () => {
         enabled: wallet.tron !== undefined
     });
 
-    useFetchNext(hasTonNextPage, isTonFetchingNextPage, fetchTonNextPage, standalone, ref);
-    useFetchNext(hasTronNextPage, isTronFetchingNextPage, fetchTronNextPage, standalone, ref);
-
     const isFetchingNextPage = isTonFetchingNextPage || isTronFetchingNextPage;
+
+    useFetchNext(hasTonNextPage, isFetchingNextPage, fetchTonNextPage, standalone, ref);
+    useFetchNext(hasTronNextPage, isFetchingNextPage, fetchTronNextPage, standalone, ref);
 
     const activity = useMemo(() => {
         return getMixedActivity(tonEvents, tronEvents);

@@ -11,7 +11,7 @@ import { Label1 } from '../Text';
 import { Label } from './common';
 
 export const cropName = (name: string) => {
-    return name.length > 30 ? toShortValue(name, 8) : name;
+    return name.length > 19 ? toShortValue(name, 8) : name;
 };
 
 const RecipientItem: FC<{ name: string; label: string }> = ({ name, label }) => {
@@ -68,10 +68,10 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient 
             );
         }
     }
-    if ('dns' in recipient.address) {
+    if ('dnsName' in recipient.address && typeof recipient.address.dnsName === 'string') {
         return (
             <>
-                <RecipientItem name={recipient.address.address} label={recipient.address.address} />
+                <RecipientItem name={recipient.address.dnsName} label={recipient.address.dnsName} />
                 <RecipientItemAddress address={addrValue} />
             </>
         );

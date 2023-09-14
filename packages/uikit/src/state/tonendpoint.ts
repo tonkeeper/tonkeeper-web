@@ -11,9 +11,14 @@ import {
 import { useMemo } from 'react';
 import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
 
-export const useTonendpoint = (build: string, network?: Network, lang?: Language) => {
+export const useTonendpoint = (
+    build: string,
+    network?: Network,
+    lang?: Language,
+    countryCode?: string
+) => {
     return useMemo(() => {
-        return new Tonendpoint({ build, network, lang: localizationText(lang) }, {});
+        return new Tonendpoint({ build, network, lang: localizationText(lang), countryCode }, {});
     }, [build, network, lang]);
 };
 

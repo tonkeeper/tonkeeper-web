@@ -13,6 +13,7 @@ export interface UIEvents {
     unlock: void;
     copy: string;
     scan: void;
+    resize: void;
     getPassword: GetPasswordParams;
     loading: void;
     /*eslint-disable @typescript-eslint/no-explicit-any*/

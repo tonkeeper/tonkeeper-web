@@ -94,11 +94,10 @@ const Button = styled.div<{ active: boolean }>`
         `}
 `;
 
-const Block = styled.div<{ standalone?: boolean }>`
+const Block = styled.div<{ standalone?: boolean; sticky?: boolean }>`
     flex-shrink: 0;
     display: flex;
     justify-content: space-around;
-    position: fixed;
     bottom: 0;
     padding: 1rem;
     width: var(--app-width);
@@ -107,6 +106,15 @@ const Block = styled.div<{ standalone?: boolean }>`
     overflow: visible !important;
 
     background-color: ${props => props.theme.backgroundPage};
+
+    ${props =>
+        props.sticky
+            ? css`
+                  position: sticky;
+              `
+            : css`
+                  position: fixed;
+              `}
 
     ${props =>
         props.standalone &&
@@ -129,7 +137,7 @@ export const FooterGlobalStyle = createGlobalStyle`
   }
 `;
 
-export const Footer: FC<{ standalone?: boolean }> = ({ standalone }) => {
+export const Footer: FC<{ standalone?: boolean; sticky?: boolean }> = ({ standalone, sticky }) => {
     const { t } = useTranslation();
     const location = useLocation();
     const navigate = useNavigate();
@@ -166,7 +174,7 @@ export const Footer: FC<{ standalone?: boolean }> = ({ standalone }) => {
     );
 
     return (
-        <Block standalone={standalone}>
+        <Block standalone={standalone} sticky={sticky}>
             <Button active={active === AppRoute.home} onClick={() => handleClick(AppRoute.home)}>
                 <WalletIcon />
                 <Label3>{t('wallet_title')}</Label3>

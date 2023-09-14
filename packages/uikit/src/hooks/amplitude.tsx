@@ -4,6 +4,7 @@ import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletState, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import React, { useCallback, useContext, useEffect } from 'react';
+import ReactGA from 'react-ga4';
 import { useLocation } from 'react-router-dom';
 import { QueryKey } from '../libs/queryKey';
 
@@ -12,6 +13,18 @@ const toWalletType = (wallet?: WalletState | null): string => {
     return walletVersionText(wallet.active.version);
 };
 
+const initGA = (application: string, walletType: string) => {
+    const key = process.env.REACT_APP_MEASUREMENT_ID;
+    if (!key) return false;
+    ReactGA.initialize(key);
+
+    ReactGA.gtag('set', 'user_properties', {
+        application,
+        walletType
+    });
+
+    return true;
+};
 const useInitAnalytics = (
     application: string | undefined,
     account?: AccountState,
@@ -20,8 +33,10 @@ const useInitAnalytics = (
     return useQuery(
         [QueryKey.analytics, account?.activePublicKey],
         async () => {
+            const ga = initGA(application ?? 'Unknown', toWalletType(wallet));
+
             const key = process.env.REACT_APP_AMPLITUDE;
-            if (!key) return false;
+            if (!key) return [ga, false];
 
             amplitude.init(key, undefined, {
                 defaultTracking: {
@@ -40,7 +55,7 @@ const useInitAnalytics = (
 
             amplitude.identify(event);
 
-            return true;
+            return [ga, true];
         },
         { enabled: account != null }
     );
@@ -54,18 +69,23 @@ export const useAmplitudeAnalytics = (
     const location = useLocation();
     const { data } = useInitAnalytics(application, account, wallet);
     useEffect(() => {
-        if (data === true) {
-            const eventProperties = {
-                pathname: location.pathname
-            };
-            amplitude.track('Page View', eventProperties);
+        if (data) {
+            if (data[0] === true) {
+                ReactGA.send({ hitType: 'pageview', page: location.pathname });
+            }
+            if (data[1] === true) {
+                const eventProperties = {
+                    pathname: location.pathname
+                };
+                amplitude.track('Page View', eventProperties);
+            }
         }
     }, [data, location.pathname]);
 
     return data;
 };
 
-export const AmplitudeAnalyticsContext = React.createContext<boolean | undefined>(undefined);
+export const AmplitudeAnalyticsContext = React.createContext<boolean[] | undefined>(undefined);
 
 export type AmplitudeTransactionType =
     | 'send-ton'
@@ -80,10 +100,17 @@ export const useTransactionAnalytics = () => {
 
     return useCallback(
         (kind: AmplitudeTransactionType) => {
-            if (enable === true) {
-                amplitude.track('Send Transaction', {
-                    kind
-                });
+            if (enable) {
+                if (enable[0] === true) {
+                    ReactGA.event('Send_Transaction', {
+                        kind
+                    });
+                }
+                if (enable[1] === true) {
+                    amplitude.track('Send Transaction', {
+                        kind
+                    });
+                }
             }
         },
         [enable]
@@ -95,10 +122,17 @@ export const useActionAnalytics = () => {
 
     return useCallback(
         (kind: string) => {
-            if (enable === true) {
-                amplitude.track('Action', {
-                    kind
-                });
+            if (enable) {
+                if (enable[0] === true) {
+                    ReactGA.event('Action', {
+                        kind
+                    });
+                }
+                if (enable[1] === true) {
+                    amplitude.track('Action', {
+                        kind
+                    });
+                }
             }
         },
         [enable]
@@ -110,10 +144,17 @@ export const useBuyAnalytics = () => {
 
     return useCallback(
         (kind: string) => {
-            if (enable === true) {
-                amplitude.track('Navigate Buy', {
-                    kind
-                });
+            if (enable) {
+                if (enable[0] === true) {
+                    ReactGA.event('Navigate_Buy', {
+                        kind
+                    });
+                }
+                if (enable[1] === true) {
+                    amplitude.track('Navigate Buy', {
+                        kind
+                    });
+                }
             }
         },
         [enable]
