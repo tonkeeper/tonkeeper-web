@@ -28,7 +28,8 @@ import {
     ConfirmViewTitleSlot
 } from './ConfirmView';
 import { RecipientView, useGetToAccount } from './RecipientView';
-import { AmountView, AmountViewState } from './amount-view/AmountView';
+import { AmountView } from './amountView/AmountView';
+import { AmountState } from './amountView/amountState';
 import {
     AmountHeaderBlock,
     AmountMainButton,
@@ -47,7 +48,7 @@ const SendContent: FC<{
     onClose: () => void;
     chain?: BLOCKCHAIN_NAME;
     initRecipient?: RecipientData;
-    initAmountState?: Partial<AmountViewState>;
+    initAmountState?: Partial<AmountState>;
 }> = ({ onClose, chain, initRecipient, initAmountState }) => {
     const sdk = useAppSdk();
     const { standalone, ios, extension } = useAppContext();
@@ -62,7 +63,7 @@ const SendContent: FC<{
     const [view, setView] = useState<'recipient' | 'amount' | 'confirm'>('recipient');
     const [right, setRight] = useState(true);
     const [recipient, _setRecipient] = useState<RecipientData | undefined>(initRecipient);
-    const [amountViewState, setAmountViewState] = useState<Partial<AmountViewState> | undefined>(
+    const [amountViewState, setAmountViewState] = useState<Partial<AmountState> | undefined>(
         initAmountState
     );
 
@@ -72,15 +73,15 @@ const SendContent: FC<{
 
     const setRecipient = (value: RecipientData) => {
         if (
-            amountViewState?.asset?.blockchain &&
-            amountViewState?.asset?.blockchain !== value.address.blockchain
+            amountViewState?.token?.blockchain &&
+            amountViewState?.token?.blockchain !== value.address.blockchain
         ) {
             setAmountViewState(undefined);
         }
 
         _setRecipient(value);
         if (tronBalances && value.address.blockchain === BLOCKCHAIN_NAME.TRON) {
-            setAmountViewState({ asset: toTronAsset(tronBalances.balances[0]) });
+            setAmountViewState({ token: toTronAsset(tronBalances.balances[0]) });
         }
     };
 
@@ -90,13 +91,13 @@ const SendContent: FC<{
         setView('amount');
     };
 
-    const onConfirmAmount = (data: AmountViewState) => {
+    const onConfirmAmount = (data: AmountState) => {
         setRight(true);
         setAmountViewState(data);
         setView('confirm');
     };
 
-    const backToRecipient = (data?: AmountViewState) => {
+    const backToRecipient = (data?: AmountState) => {
         setRight(false);
         setAmountViewState(data);
         setView('recipient');
@@ -155,15 +156,15 @@ const SendContent: FC<{
                 });
 
                 setAmountViewState({
-                    amount: assetAmount.relativeAmount,
-                    asset: actualAsset,
+                    coinValue: assetAmount.relativeAmount,
+                    token: actualAsset,
                     inFiat: false,
                     isMax: false
                 });
             } else {
                 setAmountViewState({
-                    amount: a ? shiftedDecimals(a) : new BigNumber('0'),
-                    asset: initAmountState?.asset,
+                    coinValue: a ? shiftedDecimals(a) : new BigNumber('0'),
+                    token: initAmountState?.token,
                     inFiat: false,
                     isMax: false
                 });
@@ -171,7 +172,7 @@ const SendContent: FC<{
 
             return true;
         },
-        [sdk, filter, initAmountState?.asset]
+        [sdk, filter, initAmountState?.token]
     );
 
     const onScan = async (signature: string) => {
@@ -248,8 +249,8 @@ const SendContent: FC<{
                                 onBack={backToAmount}
                                 recipient={recipient!}
                                 assetAmount={AssetAmount.fromRelativeAmount({
-                                    asset: amountViewState!.asset!,
-                                    amount: amountViewState!.amount!
+                                    asset: amountViewState!.token!,
+                                    amount: amountViewState!.coinValue!
                                 })}
                                 isMax={amountViewState!.isMax!}
                             >

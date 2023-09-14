@@ -16,8 +16,8 @@ import { NotificationCancelButton, NotificationTitleBlock } from '../Notificatio
 import { Body1, H3 } from '../Text';
 import { BackButton, ButtonMock } from '../fields/BackButton';
 import { Button } from '../fields/Button';
-import { AmountViewState } from './amount-view/AmountView';
-import { Center, Title } from './amount-view/AmountViewUI';
+import { Center, Title } from './amountView/AmountViewUI';
+import { AmountState } from './amountView/amountState';
 
 export const duration = 300;
 export const timingFunction = 'ease-in-out';
@@ -327,7 +327,7 @@ export const notifyError = async (
 
 export interface InitTransferData {
     initRecipient?: TonRecipientData;
-    initAmountState?: Partial<AmountViewState>;
+    initAmountState?: Partial<AmountState>;
 }
 
 export const getInitData = (
@@ -362,7 +362,7 @@ export const getJetton = (
             const token = jettonToTonAsset(asset, jettons || { balances: [] });
 
             return {
-                initAmountState: { asset: token }
+                initAmountState: { token: token }
             };
         }
     } catch {

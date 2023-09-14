@@ -3,11 +3,11 @@ import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { useFormatCoinValue } from '../../hooks/balance';
-import { DropDown } from '../DropDown';
-import { DoneIcon, DownIcon } from '../Icon';
-import { ListBlock, ListItem, ListItemPayload } from '../List';
-import { Body1, Label1 } from '../Text';
+import { useFormatCoinValue } from '../../../hooks/balance';
+import { DropDown } from '../../DropDown';
+import { DoneIcon, DownIcon } from '../../Icon';
+import { ListBlock, ListItem, ListItemPayload } from '../../List';
+import { Body1, Label1 } from '../../Text';
 
 const AssetValue = styled.div`
     background: ${props => props.theme.buttonTertiaryBackground};

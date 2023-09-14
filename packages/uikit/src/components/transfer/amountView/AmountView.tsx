@@ -1,5 +1,4 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import {
     TonAsset,
     jettonToTonAsset,
@@ -30,9 +29,7 @@ import { useWalletAccountInfo, useWalletJettonList } from '../../../state/wallet
 import { Gap } from '../../Layout';
 import { FullHeightBlock } from '../../Notification';
 import { Label1 } from '../../Text';
-import { AssetSelect } from '../AssetSelect';
 import { InputSize, Sentence } from '../Sentence';
-import { defaultSize, getInputSize, useAutoFocusOnChange, useButtonPosition } from '../amountHooks';
 import { AmountHeaderBlockComponent, AmountMainButtonComponent } from '../common';
 import {
     Address,
@@ -50,28 +47,21 @@ import {
     Symbol,
     inputToBigNumber
 } from './AmountViewUI';
-import { AmountState2, amountStateReducer, toInitAmountState } from './amountState';
-
-export type AmountViewState = {
-    asset: Asset;
-    amount: BigNumber;
-    fiatAmount?: BigNumber;
-    isMax: boolean;
-    inFiat: boolean;
-};
-
-const toTokenRateSymbol = (amountState: AmountState2) => {
-    return amountState.token.blockchain === BLOCKCHAIN_NAME.TRON
-        ? amountState.token.symbol
-        : legacyTonAssetId(amountState.token as TonAsset, { userFriendly: true });
-};
+import { AssetSelect } from './AssetSelect';
+import { defaultSize, getInputSize, useAutoFocusOnChange, useButtonPosition } from './amountHooks';
+import {
+    AmountState,
+    amountStateReducer,
+    toInitAmountState,
+    toTokenRateSymbol
+} from './amountState';
 
 export const AmountView: FC<{
     onClose: () => void;
-    onBack: (state: AmountViewState) => void;
-    onConfirm: (state: AmountViewState) => void;
+    onBack: (state: AmountState) => void;
+    onConfirm: (state: AmountState) => void;
     recipient: RecipientData;
-    defaults?: Partial<AmountViewState>;
+    defaults?: Partial<AmountState>;
     MainButton: AmountMainButtonComponent;
     HeaderBlock: AmountHeaderBlockComponent;
 }> = ({ recipient, onClose, onBack, onConfirm, defaults, MainButton, HeaderBlock }) => {
@@ -150,24 +140,12 @@ export const AmountView: FC<{
     }, [enoughBalance, amountState.inputValue]);
 
     const handleBack = useCallback(() => {
-        onBack({
-            asset: amountState.token,
-            amount: amountState.coinValue,
-            fiatAmount: amountState.fiatValue,
-            isMax: amountState.isMax,
-            inFiat: amountState.inFiat
-        });
+        onBack(amountState);
     }, [onBack, amountState]);
 
     const handleSubmit = useCallback(() => {
         if (isValid) {
-            onConfirm({
-                asset: amountState.token,
-                amount: amountState.coinValue,
-                fiatAmount: amountState.fiatValue,
-                isMax: amountState.isMax,
-                inFiat: amountState.inFiat
-            });
+            onConfirm(amountState);
         } else {
             sdk.hapticNotification('error');
         }
