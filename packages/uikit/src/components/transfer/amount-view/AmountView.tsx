@@ -149,7 +149,7 @@ export const AmountView: FC<{
         );
     }, [enoughBalance, amountState.inputValue]);
 
-    const handleBack = () => {
+    const handleBack = useCallback(() => {
         onBack({
             asset: amountState.token,
             amount: amountState.coinValue,
@@ -157,9 +157,9 @@ export const AmountView: FC<{
             isMax: amountState.isMax,
             inFiat: amountState.inFiat
         });
-    };
+    }, [onBack, amountState]);
 
-    const handleSubmit = () => {
+    const handleSubmit = useCallback(() => {
         if (isValid) {
             onConfirm({
                 asset: amountState.token,
@@ -171,7 +171,7 @@ export const AmountView: FC<{
         } else {
             sdk.hapticNotification('error');
         }
-    };
+    }, [isValid, onConfirm, amountState, sdk]);
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.stopPropagation();

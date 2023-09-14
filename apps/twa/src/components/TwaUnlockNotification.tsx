@@ -1,6 +1,5 @@
 import { GetPasswordParams, IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { debounce } from '@tonkeeper/core/dist/utils/common';
 import { Notification2 } from '@tonkeeper/uikit/dist/components/Notification2';
 import { openIosKeyboard } from '@tonkeeper/uikit/dist/hooks/ios';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
@@ -8,7 +7,7 @@ import {
     PasswordUnlock,
     useMutateUnlock
 } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 
 export const TwaUnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { t } = useTranslation();
@@ -16,10 +15,6 @@ export const TwaUnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const [type, setType] = useState<'confirm' | 'unlock' | undefined>(undefined);
     const [auth, setAuth] = useState<AuthState | undefined>(undefined);
     const [requestId, setId] = useState<number | undefined>(undefined);
-
-    const setRequest = useMemo(() => {
-        return debounce<[number | undefined]>(v => setId(v), 450);
-    }, [setId]);
 
     const { mutateAsync, isLoading, isError, reset } = useMutateUnlock(sdk, requestId);
 
@@ -66,12 +61,7 @@ export const TwaUnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
 
             setType(options.params.type);
             setAuth(options.params?.auth);
-
-            if (sdk.isIOs()) {
-                setRequest(options.id);
-            } else {
-                setId(options.id);
-            }
+            setId(options.id);
         };
         sdk.uiEvents.on('getPassword', handler);
 
