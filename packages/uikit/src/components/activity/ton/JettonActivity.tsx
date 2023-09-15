@@ -1,3 +1,4 @@
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
@@ -97,14 +98,18 @@ export const JettonSwapAction: FC<JettonActionProps> = ({ action, date }) => {
                         +&thinsp;
                         {format(jettonSwap.amountOut, jettonSwap.jettonMasterOut?.decimals)}
                     </AmountText>
-                    <AmountText green>{jettonSwap.jettonMasterOut?.symbol}</AmountText>
+                    <AmountText green>
+                        {jettonSwap.jettonMasterOut?.symbol ?? CryptoCurrency.TON}
+                    </AmountText>
                 </FirstLine>
                 <FirstLine>
                     <SecondaryText>{toDexName(jettonSwap.dex)}</SecondaryText>
                     <AmountText>
                         -&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn?.decimals)}
                     </AmountText>
-                    <AmountText>{jettonSwap.jettonMasterIn?.symbol}</AmountText>
+                    <AmountText>
+                        {jettonSwap.jettonMasterIn?.symbol ?? CryptoCurrency.TON}
+                    </AmountText>
                 </FirstLine>
                 <SecondLine>
                     <SecondaryText></SecondaryText>

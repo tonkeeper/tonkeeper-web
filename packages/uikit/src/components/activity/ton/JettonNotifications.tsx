@@ -1,3 +1,4 @@
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
     AccountEvent,
     ActionStatusEnum,
@@ -108,11 +109,11 @@ const SwapTokensActionContent: FC<{
                 <Title>{t('swap_title')}</Title>
                 <Title secondary>
                     -&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn?.decimals)}{' '}
-                    {jettonSwap.jettonMasterIn?.symbol}
+                    {jettonSwap.jettonMasterIn?.symbol ?? CryptoCurrency.TON}
                 </Title>
                 <Title>
                     +&thinsp;{format(jettonSwap.amountOut, jettonSwap.jettonMasterOut?.decimals)}{' '}
-                    {jettonSwap.jettonMasterOut?.symbol}
+                    {jettonSwap.jettonMasterOut?.symbol ?? CryptoCurrency.TON}
                 </Title>
                 <ActionDate kind="send" timestamp={timestamp} />
                 <FailedDetail status={status} />
