@@ -8,7 +8,7 @@ import {
     JettonTransferAction
 } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Address } from 'ton-core';
 import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
@@ -94,6 +94,35 @@ export const JettonTransferActionNotification: FC<ActionData> = ({
     }
 };
 
+export const useSwapValue = (jettonSwap: JettonSwapAction | undefined) => {
+    const format = useFormatCoinValue();
+    return useMemo(() => {
+        if (!jettonSwap) return ['', ''];
+
+        const result: string[] = [];
+
+        if (jettonSwap.tonIn) {
+            result.push(`${format(jettonSwap.tonIn)} ${CryptoCurrency.TON}`);
+        } else {
+            result.push(
+                `${format(jettonSwap.amountIn, jettonSwap.jettonMasterIn?.decimals)} ${
+                    jettonSwap.jettonMasterIn?.symbol
+                }`
+            );
+        }
+
+        if (jettonSwap.tonOut) {
+            result.push(`${format(jettonSwap.tonOut)} ${CryptoCurrency.TON}`);
+        } else {
+            result.push(
+                `${format(jettonSwap.amountOut, jettonSwap.jettonMasterOut?.decimals)} ${
+                    jettonSwap.jettonMasterOut?.symbol
+                }`
+            );
+        }
+        return result;
+    }, [format, jettonSwap]);
+};
 const SwapTokensActionContent: FC<{
     jettonSwap: JettonSwapAction;
     timestamp: number;
@@ -101,20 +130,15 @@ const SwapTokensActionContent: FC<{
     status?: ActionStatusEnum;
 }> = ({ jettonSwap, event, timestamp, status }) => {
     const { t } = useTranslation();
-    const format = useFormatCoinValue();
+
+    const [valueIn, valueOut] = useSwapValue(jettonSwap);
 
     return (
         <ActionDetailsBlock event={event}>
             <div>
                 <Title>{t('swap_title')}</Title>
-                <Title secondary>
-                    -&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn?.decimals)}{' '}
-                    {jettonSwap.jettonMasterIn?.symbol ?? CryptoCurrency.TON}
-                </Title>
-                <Title>
-                    +&thinsp;{format(jettonSwap.amountOut, jettonSwap.jettonMasterOut?.decimals)}{' '}
-                    {jettonSwap.jettonMasterOut?.symbol ?? CryptoCurrency.TON}
-                </Title>
+                <Title secondary>-&thinsp;{valueIn}</Title>
+                <Title>+&thinsp;{valueOut}</Title>
                 <ActionDate kind="send" timestamp={timestamp} />
                 <FailedDetail status={status} />
             </div>
