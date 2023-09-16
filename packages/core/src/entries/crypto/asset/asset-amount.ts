@@ -106,7 +106,7 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
 
     toStringAbsoluteRelativeAmount(decimalPlaces?: number): string {
         if (decimalPlaces === undefined) {
-            decimalPlaces = this.decimalPlaces;
+            decimalPlaces = this.asset.decimals;
         }
         return formatter.format(this.relativeAmount.abs(), { decimals: decimalPlaces });
     }
