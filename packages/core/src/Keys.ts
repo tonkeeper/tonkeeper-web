@@ -7,6 +7,7 @@ export enum AppKey {
 
     PASSWORD = 'password',
     LOCK = 'lock',
+    COUNTRY = 'country',
 
     FAVOURITES = 'favourites',
     CONNECTIONS = 'connections',

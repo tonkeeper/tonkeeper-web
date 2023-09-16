@@ -3,6 +3,7 @@ export enum QueryKey {
     account = 'account',
     wallet = 'wallet',
     lock = 'lock',
+    country = 'country',
     password = 'password',
     addresses = 'addresses',
     info = 'info',
@@ -30,5 +31,6 @@ export enum JettonKey {
 
 export enum TonkeeperApiKey {
     config,
-    stock
+    stock,
+    fiat
 }

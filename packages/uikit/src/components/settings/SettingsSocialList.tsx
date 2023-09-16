@@ -3,18 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { relative, SettingsRoute } from '../../libs/routes';
+import { SettingsRoute, relative } from '../../libs/routes';
 import { ContactSupportIcon, LegalDocumentsIcon, TelegramIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
-
-export interface SettingsSocialProps {
-    appPage?: string;
-}
 
 export const SettingsSocialList: FC = React.memo(() => {
     const navigate = useNavigate();
     const sdk = useAppSdk();
     const { config } = useAppContext();
+
     const { t } = useTranslation();
     const items = useMemo(() => {
         const result = [] as SettingsItem[];
@@ -27,12 +24,12 @@ export const SettingsSocialList: FC = React.memo(() => {
             {
                 name: t('settings_news'),
                 icon: <TelegramIcon />,
-                action: () => sdk.openPage(t('settings_news_url'))
+                action: () => config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)
             },
             {
                 name: t('settings_contact_support'),
                 icon: <ContactSupportIcon />,
-                action: () => sdk.openPage('mailto:support@tonkeeper.com')
+                action: () => config.supportLink && sdk.openPage(config.supportLink)
             },
             {
                 name: t('settings_legal_documents'),

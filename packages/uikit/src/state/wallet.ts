@@ -191,6 +191,10 @@ export const useWalletNftList = () => {
                 [] as string[]
             );
 
+            if (result.length === 0) {
+                result.push(wallet.active.rawAddress);
+            }
+
             const items = await Promise.all(
                 result.map(owner =>
                     new NFTApi(tonApi).searchNFTItems({

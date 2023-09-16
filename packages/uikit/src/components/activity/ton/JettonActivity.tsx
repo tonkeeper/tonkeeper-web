@@ -18,6 +18,7 @@ import {
     SecondaryText
 } from '../CommonAction';
 import { toDexName } from '../NotificationCommon';
+import { useSwapValue } from './JettonNotifications';
 
 export interface JettonActionProps {
     action: Action;
@@ -79,7 +80,8 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
 export const JettonSwapAction: FC<JettonActionProps> = ({ action, date }) => {
     const { t } = useTranslation();
     const { jettonSwap } = action;
-    const format = useFormatCoinValue();
+
+    const [valueIn, valueOut] = useSwapValue(jettonSwap);
 
     if (!jettonSwap) {
         return <ErrorAction />;
@@ -93,18 +95,16 @@ export const JettonSwapAction: FC<JettonActionProps> = ({ action, date }) => {
             <Description>
                 <FirstLine>
                     <FirstLabel>{t('swap_title')}</FirstLabel>
+                    <AmountText green></AmountText>
                     <AmountText green>
                         +&thinsp;
-                        {format(jettonSwap.amountOut, jettonSwap.jettonMasterOut?.decimals)}
+                        {valueOut}
                     </AmountText>
-                    <AmountText green>{jettonSwap.jettonMasterOut?.symbol}</AmountText>
                 </FirstLine>
                 <FirstLine>
                     <SecondaryText>{toDexName(jettonSwap.dex)}</SecondaryText>
-                    <AmountText>
-                        -&thinsp;{format(jettonSwap.amountIn, jettonSwap.jettonMasterIn?.decimals)}
-                    </AmountText>
-                    <AmountText>{jettonSwap.jettonMasterIn?.symbol}</AmountText>
+                    <AmountText></AmountText>
+                    <AmountText>-&thinsp;{valueIn}</AmountText>
                 </FirstLine>
                 <SecondLine>
                     <SecondaryText></SecondaryText>

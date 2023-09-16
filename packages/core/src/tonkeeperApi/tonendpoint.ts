@@ -6,6 +6,7 @@ interface BootParams {
     lang: 'en' | 'ru';
     build: string; // "2.8.0"
     network: Network;
+    countryCode?: string | null;
 }
 interface BootOptions {
     fetchApi?: FetchAPI;
@@ -26,6 +27,7 @@ export interface TonendpointConfig {
 
     exchangePostUrl?: string;
     supportLink?: string;
+    tonkeeperNewsUrl?: string;
 
     mercuryoSecret?: string;
     neocryptoWebView?: string;
@@ -68,11 +70,12 @@ export class Tonendpoint {
             lang = 'en',
             build = '3.0.0',
             network = Network.MAINNET,
-            platform = 'web'
+            platform = 'web',
+            countryCode
         }: Partial<BootParams>,
         { fetchApi = defaultFetch, basePath = defaultTonendpoint }: BootOptions
     ) {
-        this.params = { lang, build, network, platform };
+        this.params = { lang, build: '3.5.0', network, platform, countryCode };
         this.fetchApi = fetchApi;
         this.basePath = basePath;
     }
@@ -84,6 +87,9 @@ export class Tonendpoint {
             chainName: this.params.network === Network.TESTNET ? 'testnet' : 'mainnet',
             platform: this.params.platform
         });
+        if (this.params.countryCode) {
+            params.append('countryCode', this.params.countryCode);
+        }
         return params.toString();
     };
 
@@ -141,7 +147,16 @@ export interface TonendpoinFiatCategory {
     subtitle: string;
     title: string;
 }
+
+export interface LayoutByCountry {
+    countryCode: string;
+    currency: string;
+    methods: string[];
+}
+
 export interface TonendpoinFiatMethods {
+    layoutByCountry: LayoutByCountry[];
+    defaultLayout: { methods: string[] };
     categories: TonendpoinFiatCategory[];
 }
 

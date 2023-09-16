@@ -102,7 +102,7 @@ export const useTransactionAnalytics = () => {
         (kind: AmplitudeTransactionType) => {
             if (enable) {
                 if (enable[0] === true) {
-                    ReactGA.event('Send Transaction', {
+                    ReactGA.event('Send_Transaction', {
                         kind
                     });
                 }
@@ -146,7 +146,7 @@ export const useBuyAnalytics = () => {
         (kind: string) => {
             if (enable) {
                 if (enable[0] === true) {
-                    ReactGA.event('Navigate Buy', {
+                    ReactGA.event('Navigate_Buy', {
                         kind
                     });
                 }
