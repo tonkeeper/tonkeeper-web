@@ -6,6 +6,7 @@ import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { ListBlock } from '../List';
 import { Notification } from '../Notification';
 import { Label2 } from '../Text';
@@ -83,8 +84,9 @@ export const BuyNotification: FC<{
     );
 };
 
-export const BuyAction: FC<{ buy: TonendpoinFiatCategory | undefined }> = ({ buy }) => {
+export const BuyAction: FC = () => {
     const [open, setOpen] = useState(false);
+    const { data: buy } = useTonendpointBuyMethods();
 
     return (
         <>
