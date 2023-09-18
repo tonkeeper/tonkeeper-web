@@ -24,7 +24,7 @@
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-unused-imports": "^2.0.0",
         "prettier": "^2.6.2",
-        "turbo": "^1.10.13",
+        "turbo": "latest",
         "webpack": "^5.80.0",
         "webpack-cli": "^5.0.1",
         "wrangler": "^3.7.0"
