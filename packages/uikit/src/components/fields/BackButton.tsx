@@ -25,7 +25,7 @@ export const CountryIcon: FC<{ country: string }> = ({ country }) => {
     return (
         <CountryElement
             style={{
-                backgroundImage: `url('http://purecatamphetamine.github.io/country-flag-icons/3x2/${country}.svg')`
+                backgroundImage: `url('https://purecatamphetamine.github.io/country-flag-icons/3x2/${country}.svg')`
             }}
         />
     );
