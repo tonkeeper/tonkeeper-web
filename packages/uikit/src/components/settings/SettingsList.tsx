@@ -9,6 +9,7 @@ export interface SettingsItem {
     action: (item: SettingsItem) => void;
     icon: React.ReactNode;
     iconColor?: string;
+    preIcon?: React.ReactNode;
 }
 
 export interface SettingsListProps {
@@ -23,22 +24,23 @@ const Icon = styled(Label1)`
 `;
 
 const Secondary = styled(Body1)`
-    margin-left: 0.5rem;
     color: ${props => props.theme.textSecondary};
 `;
 
 const Text = styled.span`
     display: flex;
+    align-items: center;
+    gap: 0.5rem;
 `;
 
 export const SettingsList: FC<SettingsListProps> = React.memo(({ items }) => {
-    // TODO handle loading
     return (
         <ListBlock>
             {items.map(item => (
                 <ListItem key={item.name} onClick={() => item.action(item)}>
                     <ListItemPayload>
                         <Text>
+                            {item.preIcon}
                             <Label1>{item.name}</Label1>
                             {item.secondary && <Secondary>{item.secondary}</Secondary>}
                         </Text>

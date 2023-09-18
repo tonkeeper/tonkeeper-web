@@ -2,14 +2,18 @@ import {
     TonendpoinFiatCategory,
     TonendpoinFiatItem
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { useUserCountry } from '../../state/country';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { ListBlock } from '../List';
-import { Notification } from '../Notification';
-import { Label2 } from '../Text';
+import { Notification, NotificationCancelButton, NotificationTitleBlock } from '../Notification';
+import { H3, Label2 } from '../Text';
+import { CommonCountryButton } from '../fields/BackButton';
 import { Action } from './Actions';
 import { BuyItemNotification } from './BuyItemNotification';
 import { BuyIcon, SellIcon } from './HomeIcons';
@@ -26,27 +30,45 @@ const BuyList: FC<{ items: TonendpoinFiatItem[]; kind: 'buy' | 'sell' }> = ({ it
     );
 };
 
+const Block = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+`;
 const ActionNotification: FC<{
     item: TonendpoinFiatCategory;
     kind: 'buy' | 'sell';
     handleClose: () => void;
-}> = ({ item, kind }) => {
+}> = ({ item, kind, handleClose }) => {
+    const navigate = useNavigate();
     const sdk = useAppSdk();
+
+    const { data: country } = useUserCountry();
+
     const { t } = useTranslation();
+
     return (
-        <div>
+        <Block>
+            <NotificationTitleBlock>
+                <CommonCountryButton
+                    country={country}
+                    onClick={() => navigate(AppRoute.settings + SettingsRoute.country)}
+                />
+                <H3>{item.title}</H3>
+                <NotificationCancelButton handleClose={handleClose} />
+            </NotificationTitleBlock>
             <BuyList items={item.items} kind={kind} />
             <OtherBlock>
                 <OtherLink onClick={() => sdk.openPage(t('Other_ways_to_buy_TON_link'))}>
                     {kind === 'buy' ? t('Other_ways_to_buy_TON') : t('Other_ways_to_sell_TON')}
                 </OtherLink>
             </OtherBlock>
-        </div>
+        </Block>
     );
 };
+
 const OtherBlock = styled.div`
     text-align: center;
-    margin: 1rem 0 0;
 `;
 
 const OtherLink = styled(Label2)`
@@ -73,20 +95,35 @@ export const BuyNotification: FC<{
     }, [open, buy]);
 
     return (
-        <Notification
-            isOpen={open && buy != null}
-            handleClose={handleClose}
-            hideButton
-            title={buy?.title}
-        >
+        <Notification isOpen={open && buy != null} handleClose={handleClose} hideButton>
             {Content}
         </Notification>
     );
 };
 
 export const BuyAction: FC = () => {
-    const [open, setOpen] = useState(false);
     const { data: buy } = useTonendpointBuyMethods();
+
+    const location = useLocation();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const open = useMemo(() => {
+        return new URLSearchParams(searchParams).get('buy') === 'open';
+    }, [searchParams, location]);
+
+    const setOpen = useCallback(
+        (open: boolean) => {
+            if (open) {
+                if (!searchParams.has('buy')) {
+                    searchParams.append('buy', 'open');
+                }
+            } else {
+                searchParams.delete('buy');
+            }
+            setSearchParams(searchParams, { replace: true });
+        },
+        [searchParams, setSearchParams]
+    );
 
     return (
         <>

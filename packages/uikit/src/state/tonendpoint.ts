@@ -67,8 +67,6 @@ export const useTonendpointBuyMethods = () => {
                 return acc;
             };
 
-            console.log(layout);
-
             return {
                 ...buy,
                 items: layout

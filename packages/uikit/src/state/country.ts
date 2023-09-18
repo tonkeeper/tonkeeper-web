@@ -17,9 +17,23 @@ const getMyCountryCode = async () => {
         return null;
     }
 };
+
+export const useCountrySetting = () => {
+    const sdk = useAppSdk();
+    return useQuery<string | null, Error>([QueryKey.country, 'store'], async () => {
+        return await sdk.storage.get<string>(AppKey.COUNTRY);
+    });
+};
+
+export const useAutoCountry = () => {
+    return useQuery<string | null, Error>([QueryKey.country, 'detect'], async () => {
+        return await getMyCountryCode();
+    });
+};
+
 export const useUserCountry = () => {
     const sdk = useAppSdk();
-    return useQuery([QueryKey.country], async () => {
+    return useQuery<string | null, Error>([QueryKey.country], async () => {
         let code = await sdk.storage.get<string>(AppKey.COUNTRY);
         if (!code) {
             code = await getMyCountryCode();

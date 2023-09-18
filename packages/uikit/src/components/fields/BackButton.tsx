@@ -1,4 +1,6 @@
+import React, { FC } from 'react';
 import styled from 'styled-components';
+import { GlobIcon } from '../Icon';
 
 export const ButtonMock = styled.div`
     flex-shrink: 0;
@@ -6,10 +8,41 @@ export const ButtonMock = styled.div`
     cursor: pointer;
     width: 2rem;
     height: 2rem;
+
+    border-radius: ${props => props.theme.cornerFull};
 `;
 
-export const BackButton = styled(ButtonMock)`
+const CountryElement = styled.div`
+    width: 16px;
+    height: 16px;
     border-radius: ${props => props.theme.cornerFull};
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+`;
+
+export const CountryIcon: FC<{ country: string }> = ({ country }) => {
+    return (
+        <CountryElement
+            style={{
+                backgroundImage: `url('http://purecatamphetamine.github.io/country-flag-icons/3x2/${country}.svg')`
+            }}
+        />
+    );
+};
+
+export const CommonCountryButton: FC<{
+    country: string | undefined | null;
+    onClick: () => void;
+}> = ({ country, onClick }) => {
+    return (
+        <BackButton onClick={onClick}>
+            {country ? <CountryIcon country={country} /> : <GlobIcon />}
+        </BackButton>
+    );
+};
+
+export const BackButton = styled(ButtonMock)`
     color: ${props => props.theme.textPrimary};
     background-color: ${props => props.theme.backgroundContent};
     transition: background-color 0.1s ease;
