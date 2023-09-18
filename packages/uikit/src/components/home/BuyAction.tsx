@@ -111,24 +111,19 @@ export const BuyAction: FC = () => {
         return new URLSearchParams(searchParams).get('buy') === 'open';
     }, [searchParams, location]);
 
-    const setOpen = useCallback(
-        (open: boolean) => {
-            if (open) {
-                if (!searchParams.has('buy')) {
-                    searchParams.append('buy', 'open');
-                }
-            } else {
-                searchParams.delete('buy');
-            }
-            setSearchParams(searchParams, { replace: true });
-        },
-        [searchParams, setSearchParams]
-    );
+    const toggle = useCallback(() => {
+        if (!searchParams.has('buy')) {
+            searchParams.append('buy', 'open');
+        } else {
+            searchParams.delete('buy');
+        }
+        setSearchParams(searchParams, { replace: true });
+    }, [searchParams, setSearchParams]);
 
     return (
         <>
-            <Action icon={<BuyIcon />} title={'wallet_buy'} action={() => setOpen(true)} />
-            <BuyNotification buy={buy} open={open} handleClose={() => setOpen(false)} />
+            <Action icon={<BuyIcon />} title={'wallet_buy'} action={toggle} />
+            <BuyNotification buy={buy} open={open} handleClose={toggle} />
         </>
     );
 };
