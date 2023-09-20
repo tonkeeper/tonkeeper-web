@@ -138,7 +138,7 @@ const main = async () => {
             }
 
             const namespaceFile = fs.readFileSync(path.join(dist, source, namespace, file), 'utf8');
-            console.log(namespaceFile);
+            console.log(namespaceFile.length);
             const namespaceJson: Record<string, string | object> = JSON.parse(namespaceFile);
             const translation = toDict(undefined, namespaceJson);
 
