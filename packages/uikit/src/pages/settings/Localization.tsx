@@ -2,8 +2,8 @@ import { localizationFrom, localizationSecondaryText } from '@tonkeeper/core/dis
 import React, { useCallback, useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
-import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { SubHeader } from '../../components/SubHeader';
+import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useTranslation } from '../../hooks/translation';
 import { useMutateWalletProperty } from '../../state/wallet';
 
@@ -21,7 +21,7 @@ export const Localization = () => {
 
     const items = useMemo<SettingsItem[]>(() => {
         return i18n.languages.map(language => ({
-            name: language.toUpperCase(),
+            name: language.length === 2 ? language.toUpperCase() : language,
             secondary: localizationSecondaryText(localizationFrom(language)),
             icon: language === i18n.language ? <CheckIcon /> : undefined,
             action: () => onChange(language)
