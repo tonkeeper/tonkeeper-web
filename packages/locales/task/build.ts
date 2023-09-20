@@ -32,12 +32,6 @@ const loadTransactions = async () => {
         `https://app.tolgee.io/v2/projects/export?ak=${process.env.TOLGEE_TOKEN}`
     );
 
-    if (fs.existsSync(path.join(dist, source))) {
-        fs.rmSync(path.join(dist, source), { recursive: true, force: true });
-    }
-
-    fs.mkdirSync(path.join(dist, source));
-
     const zipFile = path.join(dist, source, 'translations.zip');
     fs.writeFileSync(zipFile, await file.buffer());
 
@@ -114,9 +108,9 @@ const main = async () => {
     if (!fs.existsSync(dist)) {
         fs.mkdirSync(dist);
     }
-
-    await loadTransactions();
-
+    if (!fs.existsSync(path.join(dist, source))) {
+        fs.mkdirSync(path.join(dist, source));
+    }
     if (!fs.existsSync(path.join(dist, extension))) {
         fs.mkdirSync(path.join(dist, extension));
     }
@@ -126,6 +120,8 @@ const main = async () => {
     if (!fs.existsSync(path.join(dist, locales))) {
         fs.mkdirSync(path.join(dist, locales));
     }
+
+    await loadTransactions();
 
     let resources: Record<string, { translation: Record<string, string> }> = {};
     let defaultResource: Record<string, string> = {};
@@ -141,6 +137,7 @@ const main = async () => {
                 resources[locale] = { translation: {} };
             }
 
+            console.log('start reading file');
             const namespaceJson: Record<string, string | object> = JSON.parse(
                 fs.readFileSync(path.join(dist, source, namespace, file)).toString('utf8')
             );
