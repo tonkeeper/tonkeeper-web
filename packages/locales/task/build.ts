@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import fetch from 'node-fetch';
 import * as path from 'path';
-import * as unzipper from 'unzipper';
+const unzipper = require('unzipper');
 
 dotenv.config();
 
@@ -137,12 +137,7 @@ const main = async () => {
                 resources[locale] = { translation: {} };
             }
 
-            if (fs.existsSync(path.join(dist, source, namespace, file))) {
-                console.log('start exist');
-            }
-            console.log('start reading file', path.join(dist, source, namespace, file));
             const namespaceFile = fs.readFileSync(path.join(dist, source, namespace, file), 'utf8');
-            console.log('end reading file');
             console.log(namespaceFile);
             const namespaceJson: Record<string, string | object> = JSON.parse(namespaceFile);
             const translation = toDict(undefined, namespaceJson);
