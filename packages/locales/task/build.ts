@@ -137,9 +137,13 @@ const main = async () => {
                 resources[locale] = { translation: {} };
             }
 
+            if (fs.existsSync(path.join(dist, source, namespace, file))) {
+                console.log('start exist');
+            }
             console.log('start reading file');
+            const namespaceFile = fs.readFileSync(path.join(dist, source, namespace, file));
             const namespaceJson: Record<string, string | object> = JSON.parse(
-                fs.readFileSync(path.join(dist, source, namespace, file)).toString('utf8')
+                namespaceFile.toString('utf8')
             );
             const translation = toDict(undefined, namespaceJson);
 
