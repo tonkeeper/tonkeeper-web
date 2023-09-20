@@ -303,5 +303,11 @@
     },
     "total_balance": {
         "message": "Баланс"
+    },
+    "country": {
+        "message": "Страна"
+    },
+    "auto": {
+        "message": "Авто"
     }
 }

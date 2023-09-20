@@ -6,7 +6,7 @@ interface BootParams {
     lang: 'en' | 'ru';
     build: string; // "2.8.0"
     network: Network;
-    countryCode?: string;
+    countryCode?: string | null;
 }
 interface BootOptions {
     fetchApi?: FetchAPI;
@@ -75,7 +75,7 @@ export class Tonendpoint {
         }: Partial<BootParams>,
         { fetchApi = defaultFetch, basePath = defaultTonendpoint }: BootOptions
     ) {
-        this.params = { lang, build, network, platform, countryCode };
+        this.params = { lang, build: '3.5.0', network, platform, countryCode };
         this.fetchApi = fetchApi;
         this.basePath = basePath;
     }
@@ -147,7 +147,16 @@ export interface TonendpoinFiatCategory {
     subtitle: string;
     title: string;
 }
+
+export interface LayoutByCountry {
+    countryCode: string;
+    currency: string;
+    methods: string[];
+}
+
 export interface TonendpoinFiatMethods {
+    layoutByCountry: LayoutByCountry[];
+    defaultLayout: { methods: string[] };
     categories: TonendpoinFiatCategory[];
 }
 

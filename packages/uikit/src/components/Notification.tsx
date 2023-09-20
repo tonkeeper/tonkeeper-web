@@ -261,8 +261,13 @@ export const Notification: FC<{
     backShadow?: boolean;
     title?: string;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
-}> = React.memo(({ children, isOpen, hideButton, backShadow, handleClose, title }) => {
+}> = ({ children, isOpen, hideButton, backShadow, handleClose, title }) => {
     const [entered, setEntered] = useState(false);
+    const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        setTimeout(() => setOpen(isOpen));
+    }, [isOpen]);
 
     const sdk = useAppSdk();
     const nodeRef = useRef<HTMLDivElement>(null);
@@ -276,12 +281,12 @@ export const Notification: FC<{
     }, [handleClose]);
 
     const Child = useMemo(() => {
-        if (!isOpen) return undefined;
+        if (!open) return undefined;
         return children((afterClose?: () => void) => {
             setTimeout(() => afterClose && afterClose(), 300);
             handleClose();
         });
-    }, [isOpen, children, handleClose]);
+    }, [open, children, handleClose]);
 
     useEffect(() => {
         const handler = () => {
@@ -302,7 +307,7 @@ export const Notification: FC<{
             clearTimeout(timer);
             handler();
         };
-    }, [isOpen, entered, sdk]);
+    }, [open, entered, sdk]);
 
     const standalone = useMemo(() => {
         return sdk.isIOs() && sdk.isStandalone();
@@ -311,7 +316,7 @@ export const Notification: FC<{
     return (
         <ReactPortal wrapperId="react-portal-modal-container">
             <CSSTransition
-                in={isOpen}
+                in={open}
                 timeout={{ enter: 0, exit: 300 }}
                 unmountOnExit
                 nodeRef={nodeRef}
@@ -345,5 +350,5 @@ export const Notification: FC<{
             </CSSTransition>
         </ReactPortal>
     );
-});
+};
 Notification.displayName = 'Notification';

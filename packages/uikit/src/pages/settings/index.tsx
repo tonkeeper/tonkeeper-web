@@ -4,6 +4,7 @@ import { InnerBody } from '../../components/Body';
 import { SettingsHeader } from '../../components/Header';
 import { SettingsRoute } from '../../libs/routes';
 import { Account } from './Account';
+import { CountrySettings } from './Country';
 import { DevSettings } from './Dev';
 import { FiatCurrency } from './FiatCurrency';
 import { JettonsSettings } from './Jettons';
@@ -31,6 +32,7 @@ const SettingsRouter = () => {
             <Route path={SettingsRoute.version} element={<WalletVersion />} />
             <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
             <Route path={SettingsRoute.security} element={<SecuritySettings />} />
+            <Route path={SettingsRoute.country} element={<CountrySettings />} />
             <Route
                 path="*"
                 element={

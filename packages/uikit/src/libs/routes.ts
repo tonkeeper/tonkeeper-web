@@ -24,7 +24,8 @@ export enum SettingsRoute {
     version = '/version',
     jettons = '/jettons',
     security = '/security',
-    subscriptions = '/subscriptions'
+    subscriptions = '/subscriptions',
+    country = '/country'
 }
 
 export const any = (route: string): string => {

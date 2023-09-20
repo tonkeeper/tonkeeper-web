@@ -307,5 +307,11 @@
     },
     "total_balance": {
         "message": "Total balance"
+    },
+    "country": {
+        "message": "Country"
+    },
+    "auto": {
+        "message": "Auto"
     }
 }
