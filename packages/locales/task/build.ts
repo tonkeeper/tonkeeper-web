@@ -140,12 +140,11 @@ const main = async () => {
             if (fs.existsSync(path.join(dist, source, namespace, file))) {
                 console.log('start exist');
             }
-            console.log('start reading file');
-            const namespaceFile = fs.readFileSync(path.join(dist, source, namespace, file));
+            console.log('start reading file', path.join(dist, source, namespace, file));
+            const namespaceFile = fs.readFileSync(path.join(dist, source, namespace, file), 'utf8');
             console.log('end reading file');
-            const namespaceJson: Record<string, string | object> = JSON.parse(
-                namespaceFile.toString('utf8')
-            );
+            console.log(namespaceFile);
+            const namespaceJson: Record<string, string | object> = JSON.parse(namespaceFile);
             const translation = toDict(undefined, namespaceJson);
 
             resources[locale].translation = {
