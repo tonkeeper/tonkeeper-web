@@ -142,6 +142,7 @@ const main = async () => {
             }
             console.log('start reading file');
             const namespaceFile = fs.readFileSync(path.join(dist, source, namespace, file));
+            console.log('end reading file');
             const namespaceJson: Record<string, string | object> = JSON.parse(
                 namespaceFile.toString('utf8')
             );

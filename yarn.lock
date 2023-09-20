@@ -5118,6 +5118,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/locales@workspace:packages/locales"
   dependencies:
+    "@types/node": ^20.6.3
     dotenv: ^16.3.1
     node-fetch: 2.6.6
     ts-node: ^10.9.1
@@ -5743,6 +5744,13 @@ __metadata:
   version: 16.18.48
   resolution: "@types/node@npm:16.18.48"
   checksum: 5b725fe918197e4395cc88de17d67efeb02436e29c0d3b212ed63dfc51509ed398e9155ae15d1a8cd6f1c891463f2cf074dcea320d8cd392e25a9a11ce53dd6c
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.6.3":
+  version: 20.6.3
+  resolution: "@types/node@npm:20.6.3"
+  checksum: 444a6f1f41cfa8d3e20ce0108e6e43960fb2ae0e481f233bb1c14d6252aa63a92e021de561cd317d9fdb411688f871065f40175a1f18763282dee2613a08f8a3
   languageName: node
   linkType: hard
 
