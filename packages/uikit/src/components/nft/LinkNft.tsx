@@ -217,10 +217,14 @@ const LinkNftUnlinked: FC<{
                 loading={estimation.isFetching || isRecipientLoading || isLoading}
                 onClick={onOpen}
             >
-                {isTME ? t('link_tme') : t('link_domain')}
+                {isTME ? t('nft_link_username_button') : t('nft_link_domain_button')}
             </Button>
             <Notification
-                title={openedView === 'wallet' ? t('wallet_address') : t('confirm_tx')}
+                title={
+                    openedView === 'wallet'
+                        ? t('wallet_address')
+                        : t('send_screen_steps_comfirm_title')
+                }
                 isOpen={!!openedView}
                 hideButton
                 handleClose={() => onClose()}
