@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import fetch from 'node-fetch';
 import * as path from 'path';
-const unzipper = require('unzipper');
+import * as unzipper from 'unzipper';
 
 dotenv.config();
 
@@ -13,8 +13,7 @@ const localeMap = {
 };
 
 const dist = './dist';
-
-const source = 'source';
+const src = './source';
 
 const extension = 'extension';
 const i18n = 'i18n';
@@ -27,23 +26,29 @@ interface Message {
     description?: string;
 }
 
-const loadTransactions = async () => {
-    const file = await fetch(
-        `https://app.tolgee.io/v2/projects/export?ak=${process.env.TOLGEE_TOKEN}`
-    );
-
-    const zipFile = path.join(dist, source, 'translations.zip');
-    fs.writeFileSync(zipFile, await file.buffer());
-
+const unzip = (zipFile: string) => {
     return new Promise((resolve, reject) => {
         fs.createReadStream(zipFile)
-            .pipe(unzipper.Extract({ path: path.join(dist, source) }))
+            .pipe(unzipper.Extract({ path: path.join(src) }))
             .on('close', () => {
                 console.log('Files loaded and unzipped successfully');
                 resolve(undefined);
             })
             .on('error', reject);
     });
+};
+
+const loadTransactions = async () => {
+    const file = await fetch(
+        `https://app.tolgee.io/v2/projects/export?ak=${process.env.TOLGEE_TOKEN}`
+    );
+
+    const zipFile = path.join(src, 'translations.zip');
+    fs.writeFileSync(zipFile, await file.buffer());
+
+    await unzip(zipFile);
+
+    fs.unlinkSync(zipFile);
 };
 
 const fillMissingLocales = (
@@ -105,11 +110,11 @@ const toDict = (parentKey: string | undefined, value: object): Record<string, st
 const main = async () => {
     console.log('----------Build Locales----------');
 
+    if (!fs.existsSync(src)) {
+        fs.mkdirSync(src);
+    }
     if (!fs.existsSync(dist)) {
         fs.mkdirSync(dist);
-    }
-    if (!fs.existsSync(path.join(dist, source))) {
-        fs.mkdirSync(path.join(dist, source));
     }
     if (!fs.existsSync(path.join(dist, extension))) {
         fs.mkdirSync(path.join(dist, extension));
@@ -127,7 +132,7 @@ const main = async () => {
     let defaultResource: Record<string, string> = {};
 
     for (let namespace of namespaces) {
-        fs.readdirSync(path.join(dist, source, namespace)).forEach(file => {
+        fs.readdirSync(path.join(src, namespace)).forEach(file => {
             const [externalLocale] = file.split('.');
 
             const locale = localeMap[externalLocale] ?? externalLocale;
@@ -137,7 +142,7 @@ const main = async () => {
                 resources[locale] = { translation: {} };
             }
 
-            const namespaceFile = fs.readFileSync(path.join(dist, source, namespace, file), 'utf8');
+            const namespaceFile = fs.readFileSync(path.join(src, namespace, file), 'utf8');
             const namespaceJson: Record<string, string | object> = JSON.parse(namespaceFile);
             const translation = toDict(undefined, namespaceJson);
 
