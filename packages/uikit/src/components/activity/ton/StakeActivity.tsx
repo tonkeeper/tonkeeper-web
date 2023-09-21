@@ -28,7 +28,7 @@ export const DepositStakeAction: FC<{
                 <SentIcon />
             </ActivityIcon>
             <ColumnLayout
-                title={t('transaction_type_deposit')}
+                title={t('transactions_deposit')}
                 amount={<>-&thinsp;{format(depositStake.amount)}</>}
                 entry={CryptoCurrency.TON}
                 address={
