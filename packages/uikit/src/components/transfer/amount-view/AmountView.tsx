@@ -242,12 +242,12 @@ export const AmountView: FC<{
             </AmountBlock>
             <MaxRow>
                 <MaxButton maxValue={amountState.isMax} onClick={onMax}>
-                    {t('Max')}
+                    {t('send_screen_steps_amount_max')}
                 </MaxButton>
                 {enoughBalance ? (
                     <Remaining>
-                        {t('Remaining').replace(
-                            '%1%',
+                        {t('send_screen_steps_amount_remaining').replace(
+                            '%{amount}',
                             formatter.format(remaining, { decimals: amountState.token.decimals })
                         )}{' '}
                         {amountState.token.symbol}

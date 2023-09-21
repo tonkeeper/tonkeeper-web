@@ -218,7 +218,7 @@ export const ActivityHeader = () => {
 
     return (
         <Block second>
-            <H1>{t('Activity')}</H1>
+            <H1>{t('activity_screen_title')}</H1>
         </Block>
     );
 };

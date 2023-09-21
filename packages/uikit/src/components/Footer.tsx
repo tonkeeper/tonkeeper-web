@@ -184,7 +184,7 @@ export const Footer: FC<{ standalone?: boolean; sticky?: boolean }> = ({ standal
                 onClick={() => handleClick(AppRoute.activity)}
             >
                 <ActivityIcon />
-                <Label3>{t('Activity')}</Label3>
+                <Label3>{t('activity_screen_title')}</Label3>
             </Button>
             <Button
                 active={active === AppRoute.settings}
