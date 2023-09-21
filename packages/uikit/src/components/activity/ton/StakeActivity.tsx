@@ -28,7 +28,7 @@ export const DepositStakeAction: FC<{
                 <SentIcon />
             </ActivityIcon>
             <ColumnLayout
-                title={t('transactions_deposit')}
+                title={t('staking_deposit')}
                 amount={<>-&thinsp;{format(depositStake.amount)}</>}
                 entry={CryptoCurrency.TON}
                 address={
@@ -59,7 +59,7 @@ export const WithdrawStakeAction: FC<{
                 <ReceiveIcon />
             </ActivityIcon>
             <ColumnLayout
-                title={t('transaction_type_withdraw')}
+                title={t('staking_withdraw')}
                 amount={<>+&thinsp;{format(withdrawStake.amount)}</>}
                 entry={CryptoCurrency.TON}
                 green
@@ -92,7 +92,7 @@ export const WithdrawRequestStakeAction: FC<{
                 <ReceiveIcon />
             </ActivityIcon>
             <ColumnLayout
-                title={t('transaction_type_withdraw_request')}
+                title={t('activityActionModal_withdrawal_request')}
                 amount={
                     withdrawStakeRequest.amount ? (
                         <>+&thinsp;{format(withdrawStakeRequest.amount)}</>

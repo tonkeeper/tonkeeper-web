@@ -134,7 +134,7 @@ const PasswordUnlock: FC<{
             />
             <ButtonRow>
                 <Button size="large" fullWidth onClick={onClose} type="button" loading={isLoading}>
-                    {t('cancel')}
+                    {t('notifications_alert_cancel')}
                 </Button>
                 <Button
                     size="large"

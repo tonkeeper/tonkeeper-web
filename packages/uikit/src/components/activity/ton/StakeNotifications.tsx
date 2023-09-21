@@ -39,7 +39,7 @@ const DepositStakeActionContent: FC<{
     return (
         <ActionDetailsBlock event={event}>
             <div>
-                <Title>{t('transactions_deposit')}</Title>
+                <Title>{t('staking_deposit')}</Title>
                 <Amount>
                     -&thinsp;{format(depositStake.amount)} {CryptoCurrency.TON}
                 </Amount>
@@ -94,7 +94,7 @@ const WithdrawStakeActionContent: FC<{
     return (
         <ActionDetailsBlock event={event}>
             <div>
-                <Title>{t('transaction_type_withdraw')}</Title>
+                <Title>{t('staking_withdraw')}</Title>
                 <Amount>
                     +&thinsp;{format(withdrawStake.amount)} {CryptoCurrency.TON}
                 </Amount>
@@ -149,7 +149,7 @@ const WithdrawRequestStakeActionContent: FC<{
     return (
         <ActionDetailsBlock event={event}>
             <div>
-                <Title>{t('transaction_type_withdraw')}</Title>
+                <Title>{t('activityActionModal_withdrawal_request')}</Title>
                 {withdrawStakeRequest.amount && (
                     <>
                         <Amount>
