@@ -9,19 +9,6 @@ export const defaultLanguage: Language = Language.EN;
 
 export const languages = [Language.EN, Language.RU, Language.IT, Language['zh-Hans-CN']];
 
-export const localizationSecondaryText = (lang: Language): string => {
-    switch (lang) {
-        case Language.EN:
-            return 'English';
-        case Language.RU:
-            return 'Русский';
-        case Language.IT:
-            return 'Italiano';
-        case Language['zh-Hans-CN']:
-            return '简体中文（中国）';
-    }
-};
-
 export const localizationText = (lang?: Language) => {
     switch (lang) {
         case Language.EN:
