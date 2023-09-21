@@ -314,7 +314,7 @@ export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({ withCan
         return (
             <ConfirmViewButtonsContainerStyled>
                 <Button size="large" secondary onClick={onClose}>
-                    {t('cancel')}
+                    {t('notifications_alert_cancel')}
                 </Button>
                 <Button size="large" primary type="submit" disabled={!isValid} loading={isLoading}>
                     {t('confirm')}
