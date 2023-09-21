@@ -119,7 +119,7 @@ const ConnectContent: FC<{
                             disabled={isLoading}
                             onClick={() => handleClose()}
                         >
-                            {t('cancel')}
+                            {t('notifications_alert_cancel')}
                         </Button>
                         <Button
                             size="large"

@@ -1,7 +1,7 @@
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
-import { Fee } from '@tonkeeper/core/dist/tonApiV1';
+import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import React, { FC, useEffect, useState } from 'react';
@@ -94,7 +94,7 @@ export const RenewNft: FC<{
     const mutation = useRenewNft({
         nftAddress: nft.address,
         amount: unShiftedDecimals(dnsRenewAmount),
-        fee: estimation.data?.payload as Fee
+        fee: estimation.data?.payload as MessageConsequences
     });
 
     const onOpen = () => {
@@ -140,7 +140,7 @@ export const RenewNft: FC<{
                 >
                     {isWaitingForUpdate
                         ? t('renew_nft_in_progress')
-                        : t('renew_nft').replace('%1%', renewUntilFormatted)}
+                        : t('dns_renew_until_btn').replace('%{untilDate}', renewUntilFormatted)}
                 </RenewDNSButton>
 
                 {daysLeft !== '' && (

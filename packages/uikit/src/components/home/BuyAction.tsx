@@ -5,6 +5,7 @@ import {
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
@@ -46,7 +47,7 @@ const ActionNotification: FC<{
     const { data: country } = useUserCountry();
 
     const { t } = useTranslation();
-
+    const { config } = useAppContext();
     return (
         <Block>
             <NotificationTitleBlock>
@@ -59,8 +60,12 @@ const ActionNotification: FC<{
             </NotificationTitleBlock>
             <BuyList items={item.items} kind={kind} />
             <OtherBlock>
-                <OtherLink onClick={() => sdk.openPage(t('Other_ways_to_buy_TON_link'))}>
-                    {kind === 'buy' ? t('Other_ways_to_buy_TON') : t('Other_ways_to_sell_TON')}
+                <OtherLink
+                    onClick={() => config.exchangePostUrl && sdk.openPage(config.exchangePostUrl)}
+                >
+                    {kind === 'buy'
+                        ? t('exchange_modal_other_ways_to_buy')
+                        : t('exchange_other_ways')}
                 </OtherLink>
             </OtherBlock>
         </Block>

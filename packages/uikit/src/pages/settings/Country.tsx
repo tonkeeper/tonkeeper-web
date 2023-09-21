@@ -16,7 +16,7 @@ const Block = styled.div`
 `;
 
 export const CountrySettings = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const { data: selected } = useCountrySetting();
     const { data: detected } = useAutoCountry();
@@ -53,7 +53,9 @@ export const CountrySettings = () => {
             )
             .map(([key, value]) => {
                 return {
-                    name: value.name,
+                    name:
+                        new Intl.DisplayNames([i18n.language], { type: 'region' }).of(key) ??
+                        value.name,
                     preIcon: <CountryIcon country={key} />,
                     icon: selected == key ? <CheckIcon /> : undefined,
                     action: () => mutate(key)

@@ -4,7 +4,7 @@
     "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
     "description": "Tonkeeper locales",
     "scripts": {
-        "build": "rm -fr source && ts-node ./task/build",
+        "build": "rm -fr dist && rm -fr source && ts-node ./task/build",
         "build:pkg": "yarn build"
     },
     "devDependencies": {

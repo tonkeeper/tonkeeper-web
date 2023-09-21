@@ -76,7 +76,7 @@ export const NftDetails: FC<{ nftItem: NftItemRepr; kind: NFTKind }> = React.mem
                 {!!(expirationDate || isExpirationDateLoading) && (
                     <ListItem hover={false}>
                         <ListItemPayload>
-                            <RightText>{t('expiration_date')}</RightText>
+                            <RightText>{t('dns_expiration_date')}</RightText>
                             {expirationDate ? (
                                 <Label1>{expirationDateFormatted}</Label1>
                             ) : (
