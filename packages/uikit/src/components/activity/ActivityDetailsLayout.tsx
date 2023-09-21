@@ -83,7 +83,7 @@ export const TransferOpCode: FC<{ operation: string }> = ({ operation }) => {
     return (
         <ListItem hover={false}>
             <ListItemPayload>
-                <Label>{t('Operation')}</Label>
+                <Label>{t('transactionDetails_operation')}</Label>
                 <LabelRight>{operation}</LabelRight>
             </ListItemPayload>
         </ListItem>

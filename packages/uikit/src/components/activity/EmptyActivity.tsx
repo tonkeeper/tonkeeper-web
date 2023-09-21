@@ -54,8 +54,8 @@ export const EmptyActivity = () => {
 
     return (
         <EmptyBody>
-            <Header>{t('Your_activity_will_be_shown_here')}</Header>
-            <BodyText>{t('Make_your_first_transaction')}</BodyText>
+            <Header>{t('activity_empty_transaction_title')}</Header>
+            <BodyText>{t('activity_empty_transaction_caption')}</BodyText>
             <ButtonRow>
                 <Button onClick={() => setOpenBuy(true)}>{t('exchange_title')}</Button>
                 <Button onClick={() => setOpenReceive(true)}>{t('wallet_receive')}</Button>
