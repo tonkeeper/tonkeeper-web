@@ -4,15 +4,14 @@ import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 
 export interface CountryIs {
-    country: string;
-    ip: string;
+    countryCode: string;
 }
 
 const getMyCountryCode = async () => {
     try {
-        const response = await fetch('https://api.country.is');
+        const response = await fetch('http://ip-api.com/json');
         const json: CountryIs = await response.json();
-        return json.country;
+        return json.countryCode;
     } catch (e) {
         return null;
     }
