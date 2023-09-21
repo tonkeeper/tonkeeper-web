@@ -131,7 +131,7 @@ export const JettonBurnAction: FC<JettonActionProps> = ({ action, date }) => {
                 <SentIcon />
             </ActivityIcon>
             <ColumnLayout
-                title={t('transaction_type_burn')}
+                title={t('transactions_burned')}
                 amount={<>-&thinsp;{format(jettonBurn.amount, jettonBurn.jetton.decimals)}</>}
                 entry={jettonBurn.jetton.symbol}
                 address={toShortValue(formatAddress(jettonBurn.jetton.address, wallet.network))}

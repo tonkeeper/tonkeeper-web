@@ -39,7 +39,7 @@ const DepositStakeActionContent: FC<{
     return (
         <ActionDetailsBlock event={event}>
             <div>
-                <Title>{t('transaction_type_deposit')}</Title>
+                <Title>{t('transactions_deposit')}</Title>
                 <Amount>
                     -&thinsp;{format(depositStake.amount)} {CryptoCurrency.TON}
                 </Amount>
