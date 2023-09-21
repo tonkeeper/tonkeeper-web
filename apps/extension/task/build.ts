@@ -1,5 +1,6 @@
 import * as child_process from 'child_process';
 import * as fs from 'fs-extra';
+import * as path from 'path';
 import chrome from './chrome';
 import common from './common';
 import firefox from './fireFox';
@@ -27,6 +28,10 @@ common.notify('Copy Locales');
 const srcDir = `../../packages/locales/dist/extension`;
 const destDir = `build/_locales`;
 fs.copySync(srcDir, destDir, { overwrite: true });
+
+fs.rmdirSync(path.join(destDir, 'it'), { recursive: true });
+fs.rmdirSync(path.join(destDir, 'tr-TR'), { recursive: true });
+fs.rmdirSync(path.join(destDir, 'zh-Hans-CN'), { recursive: true });
 
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
