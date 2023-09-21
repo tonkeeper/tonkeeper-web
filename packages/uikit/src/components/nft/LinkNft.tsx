@@ -158,7 +158,9 @@ const LinkNftUnlinked: FC<{
                 <ListItem hover={false}>
                     <ListItemPayload>
                         <Label>
-                            {isSelectedCurrentAddress ? t('current_address') : t('wallet_address')}
+                            {isSelectedCurrentAddress
+                                ? t('dns_current_address')
+                                : t('wallet_address')}
                         </Label>
                         <ColumnText
                             right
