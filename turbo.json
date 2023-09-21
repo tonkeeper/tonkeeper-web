@@ -18,6 +18,7 @@
             "outputs": [".next/**", "dist/**"]
         },
         "build:extension": {
+            "cache": false,
             "dependsOn": ["^build:pkg"],
             "outputs": [".next/**", "dist/**"]
         },

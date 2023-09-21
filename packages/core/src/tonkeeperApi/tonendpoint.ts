@@ -3,7 +3,7 @@ import { FetchAPI } from '../tonApiV1';
 
 interface BootParams {
     platform: 'ios' | 'android' | 'web';
-    lang: 'en' | 'ru';
+    lang: 'en' | 'ru' | string;
     build: string; // "2.8.0"
     network: Network;
     countryCode?: string | null;

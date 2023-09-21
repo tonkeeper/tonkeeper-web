@@ -80,7 +80,7 @@ const Tabs: FC<{ tab: HomeTabs; onTab: (value: HomeTabs) => void }> = ({ tab, on
                 active={tab === HomeTabs.COLLECTIBLES}
                 onClick={() => onTab(HomeTabs.COLLECTIBLES)}
             >
-                <Label1>{t('Collectibles')}</Label1>
+                <Label1>{t('wallet_collectibles_tab_lable')}</Label1>
             </TabsButton>
             <Line ref={lineRef} />
         </TabsBlock>
