@@ -70,6 +70,9 @@ const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings')
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
+const TonConnectSubscription = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -359,6 +362,9 @@ export const Content: FC<{
                     </Routes>
                     <Footer sticky />
                     <MemoryScroll />
+                    <Suspense>
+                        <TonConnectSubscription />
+                    </Suspense>
                 </Wrapper>
             </SendAction>
         </WalletStateContext.Provider>
