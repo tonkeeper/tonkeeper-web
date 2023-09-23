@@ -18,6 +18,10 @@ import {
     ConnectRequest,
     DAppManifest,
     DeviceInfo,
+    DisconnectEvent,
+    SEND_TRANSACTION_ERROR_CODES,
+    SendTransactionRpcResponseError,
+    SendTransactionRpcResponseSuccess,
     TonAddressItemReply,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
@@ -318,7 +322,7 @@ export const saveWalletTonConnect = async (options: {
     };
 };
 
-export const walletRejectResponse = (): ConnectEvent => {
+export const connectRejectResponse = (): ConnectEvent => {
     return {
         id: Date.now(),
         event: 'connect_error',
@@ -326,5 +330,33 @@ export const walletRejectResponse = (): ConnectEvent => {
             code: CONNECT_EVENT_ERROR_CODES.USER_REJECTS_ERROR,
             message: 'Reject Request'
         }
+    };
+};
+
+export const disconnectResponse = (id: string): DisconnectEvent => {
+    return {
+        event: 'disconnect',
+        id,
+        payload: {}
+    };
+};
+
+export const sendTransactionErrorResponse = (id: string): SendTransactionRpcResponseError => {
+    return {
+        id,
+        error: {
+            code: SEND_TRANSACTION_ERROR_CODES.USER_REJECTS_ERROR,
+            message: 'Reject Request'
+        }
+    };
+};
+
+export const sendTransactionSuccessResponse = (
+    id: string,
+    boc: string
+): SendTransactionRpcResponseSuccess => {
+    return {
+        id,
+        result: boc
     };
 };

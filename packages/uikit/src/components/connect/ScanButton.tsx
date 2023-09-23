@@ -2,9 +2,9 @@ import { useMutation } from '@tanstack/react-query';
 import { ConnectItemReply, DAppManifest } from '@tonkeeper/core/dist/entries/tonConnect';
 import { parseTonTransfer } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
+    connectRejectResponse,
     parseTonConnect,
-    saveWalletTonConnect,
-    walletRejectResponse
+    saveWalletTonConnect
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { sendEventToBridge } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
@@ -97,7 +97,7 @@ const responseConnectionMutation = () => {
                 });
             } else {
                 await sendEventToBridge({
-                    response: walletRejectResponse(),
+                    response: connectRejectResponse(),
                     sessionKeyPair: params.sessionKeyPair,
                     clientSessionId: params.clientSessionId
                 });

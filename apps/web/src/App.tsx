@@ -62,6 +62,9 @@ const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrSc
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
 );
+const TonConnectSubscription = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -320,6 +323,7 @@ export const Content: FC<{
                 <MemoryScroll />
                 <Suspense>
                     <SendActionNotification />
+                    <TonConnectSubscription />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>

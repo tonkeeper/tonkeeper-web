@@ -60,6 +60,9 @@ export const saveAccountConnection = async (options: {
     await setAccountConnection(options.storage, options.wallet, connections);
 };
 
+/**
+ * Disconnect by url, for js bridge
+ */
 export const disconnectAccountConnection = async (options: {
     storage: IStorage;
     wallet: WalletState;
@@ -70,4 +73,22 @@ export const disconnectAccountConnection = async (options: {
     connections = connections.filter(item => item.webViewUrl !== options.webViewUrl);
 
     await setAccountConnection(options.storage, options.wallet, connections);
+};
+
+/**
+ * Disconnect by session id, for http bridge
+ */
+export const disconnectAppConnection = async (options: {
+    storage: IStorage;
+    wallet: WalletState;
+    clientSessionId: string;
+}) => {
+    let connections = await getAccountConnection(options.storage, options.wallet);
+
+    const disconnect = connections.find(item => item.clientSessionId !== options.clientSessionId);
+    connections = connections.filter(item => item.clientSessionId !== options.clientSessionId);
+
+    await setAccountConnection(options.storage, options.wallet, connections);
+
+    return disconnect;
 };

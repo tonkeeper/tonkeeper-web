@@ -12,5 +12,7 @@ export enum AppKey {
     FAVOURITES = 'favourites',
     CONNECTIONS = 'connections',
     HIDDEN_SUGGESTIONS = 'hidden_suggestions',
-    SYNC_DATE = 'sync_date'
+    SYNC_DATE = 'sync_date',
+
+    LAST_HTTP_EVENT_ID = 'last_event_id'
 }

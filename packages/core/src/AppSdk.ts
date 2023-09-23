@@ -1,6 +1,7 @@
 import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { AuthState } from './entries/password';
+import { TonConnectAppRequest } from './entries/tonConnect';
 import { TonTransferParams } from './service/deeplinkingService';
 import { IStorage, MemoryStorage } from './Storage';
 
@@ -26,7 +27,7 @@ export interface UIEvents {
     getPassword: GetPasswordParams;
     loading: void;
     transfer: TransferInitParams;
-    /*eslint-disable @typescript-eslint/no-explicit-any*/
+    tonConnect: TonConnectAppRequest;
     response: any;
 }
 
