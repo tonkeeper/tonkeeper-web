@@ -16,7 +16,7 @@ import {
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -133,11 +133,18 @@ const ConnectContent: FC<{
     manifest: DAppManifest;
     handleClose: (result?: ConnectItemReply[], manifest?: DAppManifest) => void;
 }> = ({ params, manifest, origin, handleClose }) => {
+    const sdk = useAppSdk();
     const [done, setDone] = useState(false);
 
     const wallet = useWalletContext();
 
     const { t } = useTranslation();
+
+    useEffect(() => {
+        if (sdk.twaExpand) {
+            sdk.twaExpand();
+        }
+    }, []);
 
     const { mutateAsync, isLoading } = useConnectMutation(params, manifest, origin);
 

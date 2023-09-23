@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ConnectItemReply, DAppManifest } from '@tonkeeper/core/dist/entries/tonConnect';
 import { parseTonTransfer } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { QueryKey } from '../../libs/queryKey';
 import { ScanIcon } from '../Icon';
 import { TonConnectNotification } from './TonConnectNotification';
 
@@ -78,6 +79,8 @@ interface AppConnectionProps {
 const responseConnectionMutation = () => {
     const sdk = useAppSdk();
     const wallet = useWalletContext();
+    const client = useQueryClient();
+
     return useMutation<undefined, Error, AppConnectionProps>(
         async ({ params, replyItems, manifest }) => {
             if (replyItems && manifest) {
@@ -95,6 +98,8 @@ const responseConnectionMutation = () => {
                     sessionKeyPair: params.sessionKeyPair,
                     clientSessionId: params.clientSessionId
                 });
+
+                await client.invalidateQueries([wallet.publicKey, QueryKey.connection]);
             } else {
                 await sendEventToBridge({
                     response: connectRejectResponse(),
