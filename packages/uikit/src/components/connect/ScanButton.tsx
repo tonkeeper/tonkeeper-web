@@ -1,9 +1,16 @@
 import { useMutation } from '@tanstack/react-query';
-import { ConnectRequest } from '@tonkeeper/core/dist/entries/tonConnect';
+import { ConnectItemReply, DAppManifest } from '@tonkeeper/core/dist/entries/tonConnect';
 import { parseTonTransfer } from '@tonkeeper/core/dist/service/deeplinkingService';
-import { parseTonConnect } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import {
+    parseTonConnect,
+    saveWalletTonConnect,
+    walletRejectResponse
+} from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { sendEventToBridge } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { ScanIcon } from '../Icon';
@@ -21,7 +28,7 @@ const useGetConnectInfo = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
 
-    return useMutation<null | ConnectRequest, Error, string>(async url => {
+    return useMutation<null | TonConnectParams, Error, string>(async url => {
         const transfer = parseTonTransfer({ url });
 
         if (transfer) {
@@ -38,6 +45,7 @@ const useGetConnectInfo = () => {
             });
             return null;
         }
+
         const params = parseTonConnect({ url });
 
         if (params === null) {
@@ -49,22 +57,65 @@ const useGetConnectInfo = () => {
             return null;
         }
 
+        // TODO: handle auto connect
+
         sdk.uiEvents.emit('copy', {
             method: 'copy',
             id: Date.now(),
             params: t('loading')
         });
 
-        return params.request;
+        return params;
     });
+};
+
+interface AppConnectionProps {
+    params: TonConnectParams;
+    replyItems?: ConnectItemReply[];
+    manifest?: DAppManifest;
+}
+
+const responseConnectionMutation = () => {
+    const sdk = useAppSdk();
+    const wallet = useWalletContext();
+    return useMutation<undefined, Error, AppConnectionProps>(
+        async ({ params, replyItems, manifest }) => {
+            if (replyItems && manifest) {
+                const response = await saveWalletTonConnect({
+                    storage: sdk.storage,
+                    wallet,
+                    manifest,
+                    params,
+                    replyItems,
+                    appVersion: sdk.version
+                });
+
+                await sendEventToBridge({
+                    response,
+                    sessionKeyPair: params.sessionKeyPair,
+                    clientSessionId: params.clientSessionId
+                });
+            } else {
+                await sendEventToBridge({
+                    response: walletRejectResponse(),
+                    sessionKeyPair: params.sessionKeyPair,
+                    clientSessionId: params.clientSessionId
+                });
+            }
+
+            return undefined;
+        }
+    );
 };
 
 export const ScanButton = () => {
     const sdk = useAppSdk();
     const [scanId, setScanId] = useState<number | undefined>(undefined);
-    const [params, setParams] = useState<ConnectRequest | null>(null);
+    const [params, setParams] = useState<TonConnectParams | null>(null);
 
     const { mutateAsync, reset } = useGetConnectInfo();
+    const { mutateAsync: responseConnectionAsync, reset: responseReset } =
+        responseConnectionMutation();
 
     const onScan = useCallback(
         async (link: string) => {
@@ -72,6 +123,16 @@ export const ScanButton = () => {
         },
         [setParams, mutateAsync]
     );
+
+    const handlerClose = async (replyItems?: ConnectItemReply[], manifest?: DAppManifest) => {
+        if (!params) return;
+        responseReset();
+        try {
+            await responseConnectionAsync({ params, replyItems, manifest });
+        } finally {
+            setParams(null);
+        }
+    };
 
     const onClick: React.MouseEventHandler<HTMLDivElement> = e => {
         e.stopPropagation();
@@ -106,12 +167,12 @@ export const ScanButton = () => {
     return (
         <>
             <ScanBlock onClick={onClick}>
-                <ScanIcon></ScanIcon>
+                <ScanIcon />
             </ScanBlock>
             <TonConnectNotification
                 origin={undefined}
-                params={params}
-                handleClose={() => setParams(null)}
+                params={params?.request ?? null}
+                handleClose={handlerClose}
             />
         </>
     );

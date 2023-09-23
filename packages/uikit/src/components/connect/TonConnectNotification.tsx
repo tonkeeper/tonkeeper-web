@@ -131,7 +131,7 @@ const ConnectContent: FC<{
     origin?: string;
     params: ConnectRequest;
     manifest: DAppManifest;
-    handleClose: (result?: ConnectItemReply[]) => void;
+    handleClose: (result?: ConnectItemReply[], manifest?: DAppManifest) => void;
 }> = ({ params, manifest, origin, handleClose }) => {
     const [done, setDone] = useState(false);
 
@@ -145,7 +145,7 @@ const ConnectContent: FC<{
         e.preventDefault();
         const result = await mutateAsync();
         setDone(true);
-        setTimeout(() => handleClose(result), 300);
+        setTimeout(() => handleClose(result, manifest), 300);
     };
 
     return (
@@ -212,7 +212,7 @@ const useManifest = (params: ConnectRequest | null) => {
 export const TonConnectNotification: FC<{
     origin?: string;
     params: ConnectRequest | null;
-    handleClose: (result?: ConnectItemReply[]) => void;
+    handleClose: (result?: ConnectItemReply[], manifest?: DAppManifest) => void;
 }> = ({ params, origin, handleClose }) => {
     const { data: manifest } = useManifest(params);
 
