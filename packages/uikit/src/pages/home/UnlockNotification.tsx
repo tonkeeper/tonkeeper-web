@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import { Notification } from '../../components/Notification';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
-import { openIosKeyboard } from '../../hooks/ios';
+import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 
 export const getPasswordByNotification = async (
@@ -58,7 +58,7 @@ const Block = styled.form`
     width: 100%;
 `;
 
-const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
+export const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
     return useMutation<void, Error, string>(async password => {
         const account = await getAccountState(sdk.storage);
         if (account.publicKeys.length === 0) {
@@ -72,6 +72,7 @@ const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
 
         const isValid = await validateWalletMnemonic(sdk.storage, publicKey, password);
         if (!isValid) {
+            sdk.hapticNotification('error');
             throw new Error('Mnemonic not valid');
         }
 
@@ -83,14 +84,14 @@ const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
     });
 };
 
-const PasswordUnlock: FC<{
+export const PasswordUnlock: FC<{
     sdk: IAppSdk;
     onClose: () => void;
-    onSubmit: (password: string) => void;
+    onSubmit: (password: string) => Promise<boolean>;
     isError: boolean;
     isLoading: boolean;
     reason?: GetPasswordType;
-}> = ({ onClose, onSubmit, isError, isLoading }) => {
+}> = ({ sdk, onClose, onSubmit, isError, isLoading }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLInputElement | null>(null);
     const [password, setPassword] = useState('');
@@ -105,20 +106,37 @@ const PasswordUnlock: FC<{
         }
     }, [location]);
 
-    useEffect(() => {
-        //if (sdk.isIOs()) return;
-        if (ref.current) {
-            ref.current.focus();
-        }
-    }, [ref.current]);
+    // useEffect(() => {
+    //     if (ref.current) {
+    //         ref.current.focus();
 
-    const onChange = (value: string) => {
-        setPassword(value);
-    };
+    //         ref.current.onblur = () => {
+    //             openIosKeyboard('text', 'password', 360); // almost infinity
+    //         };
+    //     }
+    //     return () => {
+    //         if (ref.current) {
+    //             ref.current.onblur = undefined!;
+    //         }
+    //         hideIosKeyboard();
+    //     };
+    // }, [ref]);
 
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
-        onSubmit(password);
+
+        if (sdk.isIOs()) {
+            openIosKeyboard('text', 'password');
+        }
+
+        const result = await onSubmit(password);
+
+        if (result === false) {
+            ref.current?.focus();
+            ref.current?.select();
+        } else {
+            hideIosKeyboard();
+        }
     };
 
     return (
@@ -126,7 +144,7 @@ const PasswordUnlock: FC<{
             <Input
                 ref={ref}
                 value={password}
-                onChange={onChange}
+                onChange={setPassword}
                 type="password"
                 label={t('Password')}
                 isValid={!isError}
@@ -159,7 +177,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const [requestId, setId] = useState<number | undefined>(undefined);
 
     const setRequest = useMemo(() => {
-        return debounce<[number | undefined]>(v => setId(v), 400);
+        return debounce<[number | undefined]>(v => setId(v), 450);
     }, [setId]);
 
     const { mutateAsync, isLoading, isError, reset } = useMutateUnlock(sdk, requestId);
@@ -171,11 +189,17 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
 
     const onSubmit = async (password: string) => {
         reset();
-        await mutateAsync(password);
-        close();
+        try {
+            await mutateAsync(password);
+            close();
+            return true;
+        } catch (e) {
+            return false;
+        }
     };
 
     const onCancel = () => {
+        reset();
         sdk.uiEvents.emit('response', {
             method: 'response',
             id: requestId,
@@ -190,12 +214,16 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
             id?: number | undefined;
             params: GetPasswordParams;
         }) => {
-            openIosKeyboard('text');
+            openIosKeyboard('text', 'password');
 
             setType(options.params.type);
             setAuth(options.params?.auth);
 
-            setRequest(options.id);
+            if (sdk.isIOs()) {
+                setRequest(options.id);
+            } else {
+                setId(options.id);
+            }
         };
         sdk.uiEvents.on('getPassword', handler);
 
@@ -220,7 +248,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
 
     return (
         <Notification
-            isOpen={auth != null}
+            isOpen={auth != null && requestId != null}
             hideButton
             handleClose={onCancel}
             title={t('enter_password')}

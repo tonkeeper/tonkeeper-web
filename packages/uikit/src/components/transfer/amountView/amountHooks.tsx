@@ -1,8 +1,8 @@
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { useEffect } from 'react';
-import { useAppContext } from '../../hooks/appContext';
-import { getTextWidth } from '../../hooks/textWidth';
-import { InputSize } from './Sentence';
+import { useAppContext } from '../../../hooks/appContext';
+import { getTextWidth } from '../../../hooks/textWidth';
+import { InputSize } from '../Sentence';
 
 export const useButtonPosition = (
     ref: React.RefObject<HTMLDivElement>,

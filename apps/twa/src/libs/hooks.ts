@@ -1,42 +1,55 @@
-import { throttle } from '@tonkeeper/core/dist/utils/common';
-import { useEffect } from 'react';
+import { debounce } from '@tonkeeper/core/dist/utils/common';
+import { Viewport } from '@twa.js/sdk';
+import React, { useContext, useEffect } from 'react';
 
-export const useAppHeight = () => {
-  useEffect(() => {
-    const appHeight = throttle(() => {
-      const doc = document.documentElement;
-      doc.style.setProperty('--app-height', `${window.innerHeight}px`);
-    }, 50);
-    window.addEventListener('resize', appHeight);
-    appHeight();
+export const ViewportContext = React.createContext<Viewport>(undefined!);
 
-    return () => {
-      window.removeEventListener('resize', appHeight);
-    };
-  }, []);
-};
+export const useAppViewport = () => {
+    //const sdk = useAppSdk();
+    const viewport = useContext(ViewportContext);
 
-export const useAppWidth = (standalone: boolean) => {
-  useEffect(() => {
-    const appWidth = throttle(() => {
-      if (standalone) {
+    useEffect(() => {
         const doc = document.documentElement;
-        doc.style.setProperty('--app-width', `${window.innerWidth}px`);
-      } else {
-        const doc = document.documentElement;
-        const app = (
-          document.getElementById('root') as HTMLDivElement
-        ).childNodes.item(0) as HTMLDivElement;
+        const visualViewport = window.visualViewport;
 
-        doc.style.setProperty('--app-width', `${app.clientWidth}px`);
-      }
-    }, 50);
-    window.addEventListener('resize', appWidth);
+        const setWidth = (value: number) => {
+            doc.style.setProperty('--app-width', `${value}px`);
+        };
 
-    appWidth();
+        const setHeight = (value: number) => {
+            // sdk.uiEvents.emit('copy', { method: 'copy', params: `height ${value}px` });
 
-    return () => {
-      window.removeEventListener('resize', appWidth);
-    };
-  }, [standalone]);
+            doc.style.setProperty('--app-height', `${value}px`);
+        };
+
+        const callback = () => {
+            if (visualViewport) {
+                resizeHandler.call(visualViewport);
+            }
+        };
+
+        const resizeHandler = debounce(function (this: VisualViewport) {
+            setHeight(this.height);
+        }, 200);
+
+        setHeight(viewport.height);
+        setWidth(viewport.width);
+
+        viewport.on('heightChanged', setHeight);
+        viewport.on('widthChanged', setWidth);
+
+        if (visualViewport) {
+            resizeHandler.call(viewport);
+            visualViewport.addEventListener('resize', resizeHandler);
+            window.addEventListener('resize', callback);
+        }
+
+        return () => {
+            viewport.off('heightChanged', setHeight);
+            viewport.off('widthChanged', setWidth);
+
+            visualViewport?.removeEventListener('resize', resizeHandler);
+            window.removeEventListener('resize', callback);
+        };
+    }, []);
 };

@@ -2,10 +2,9 @@ import { useMutation } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthNone, AuthPassword, AuthState } from '@tonkeeper/core/dist/entries/password';
 import { MinPasswordLength } from '@tonkeeper/core/dist/service/accountService';
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
 import { H2 } from '../Text';
@@ -54,21 +53,23 @@ const SelectAuthType: FC<{
 };
 
 const useCreatePassword = () => {
-    const storage = useStorage();
+    const sdk = useAppSdk();
 
     return useMutation<string | undefined, Error, { password: string; confirm: string }>(
         async ({ password, confirm }) => {
             if (password.length < MinPasswordLength) {
+                sdk.hapticNotification('error');
                 return 'password';
             }
             if (password !== confirm) {
+                sdk.hapticNotification('error');
                 return 'confirm';
             }
 
             const state: AuthPassword = {
                 kind: 'password'
             };
-            await storage.set(AppKey.PASSWORD, state);
+            await sdk.storage.set(AppKey.PASSWORD, state);
         }
     );
 };
@@ -80,6 +81,8 @@ const FillPassword: FC<{
     const { t } = useTranslation();
 
     const { mutateAsync, isLoading: isCreating, reset } = useCreatePassword();
+
+    const ref = useRef<HTMLInputElement>(null);
 
     const [error, setError] = useState<string | undefined>(undefined);
 
@@ -98,11 +101,18 @@ const FillPassword: FC<{
         }
     };
 
+    useEffect(() => {
+        if (ref.current) {
+            ref.current.focus();
+        }
+    }, [ref]);
+
     return (
         <CenterContainer>
             <Block onSubmit={onCreate}>
                 <H2>{t('Create_password')}</H2>
                 <Input
+                    ref={ref}
                     type="password"
                     label={t('Password')}
                     value={password}

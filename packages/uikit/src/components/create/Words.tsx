@@ -1,10 +1,11 @@
-import React, { FC, useCallback, useMemo, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { mnemonicValidate } from 'ton-crypto';
 import { wordlist } from 'ton-crypto/dist/mnemonic/wordlist';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
+import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { ChevronLeftIcon } from '../Icon';
@@ -117,9 +118,17 @@ export const Worlds: FC<{
     onBack: () => void;
     onCheck: () => void;
 }> = ({ mnemonic, onBack, onCheck }) => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
+
+    useEffect(() => {
+        if (sdk.twaExpand) {
+            sdk.twaExpand();
+        }
+    }, []);
+
     return (
-        <>
+        <CenterContainer>
             <BackBlock>
                 <BackButton onClick={onBack}>
                     <ChevronLeftIcon />
@@ -143,7 +152,7 @@ export const Worlds: FC<{
             <Button size="large" fullWidth primary marginTop onClick={onCheck}>
                 {t('continue')}
             </Button>
-        </>
+        </CenterContainer>
     );
 };
 
@@ -453,7 +462,9 @@ export const ImportWords: FC<{
             focusInput(ref.current, mnemonic.length - 1);
             notify();
         }
-
+        if (sdk.isIOs()) {
+            openIosKeyboard('text');
+        }
         const valid = await mnemonicValidate(mnemonic);
         if (!valid) {
             notify();
