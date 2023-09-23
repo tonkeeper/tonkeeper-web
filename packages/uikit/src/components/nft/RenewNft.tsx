@@ -140,7 +140,7 @@ export const RenewNft: FC<{
                 >
                     {isWaitingForUpdate
                         ? t('renew_nft_in_progress')
-                        : t('renew_nft').replace('%1%', renewUntilFormatted)}
+                        : t('dns_renew_until_btn').replace('%{untilDate}', renewUntilFormatted)}
                 </RenewDNSButton>
 
                 {daysLeft !== '' && (

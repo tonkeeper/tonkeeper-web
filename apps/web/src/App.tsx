@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { languages, localizationText } from '@tonkeeper/core/dist/entries/language';
+import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import {
     Network,
     getTonClient,
@@ -75,6 +75,7 @@ export const App: FC<PropsWithChildren> = () => {
     const { t, i18n } = useTranslation();
 
     const translation = useMemo(() => {
+        const languages = process.env.REACT_APP_LOCALES!.split(',');
         const client: I18nContext = {
             t,
             i18n: {
@@ -82,7 +83,7 @@ export const App: FC<PropsWithChildren> = () => {
                 reloadResources: i18n.reloadResources,
                 changeLanguage: i18n.changeLanguage as any,
                 language: i18n.language,
-                languages: [...languages].map(localizationText)
+                languages: languages
             }
         };
         return client;

@@ -123,7 +123,7 @@ const NftPreview: FC<{
                     <>
                         <Delimiter />
                         <Text>
-                            <CollectionTitle>{t('About_collection')}</CollectionTitle>
+                            <CollectionTitle>{t('nft_about_collection')}</CollectionTitle>
                             <CroppedBodyText
                                 text={collection.metadata.description}
                                 margin="last"

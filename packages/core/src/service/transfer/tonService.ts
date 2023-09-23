@@ -144,8 +144,6 @@ export const estimateTonTransfer = async (
 
     const cell = createTonTransfer(seqno, walletState, recipient, weiAmount, isMax);
 
-    console.log({ boc: cell.toString('base64') });
-
     const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
         emulateMessageToEventRequest: { boc: cell.toString('base64') }
     });

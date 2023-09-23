@@ -82,7 +82,12 @@ export const useMutateWalletProperty = (clearWallet = false) => {
     return useMutation<
         void,
         Error,
-        Pick<WalletState, 'name' | 'hiddenJettons' | 'orderJettons' | 'lang' | 'fiat' | 'network'>
+        Partial<
+            Pick<
+                WalletState,
+                'name' | 'hiddenJettons' | 'orderJettons' | 'lang' | 'fiat' | 'network'
+            >
+        >
     >(async props => {
         await updateWalletProperty(tonApi, storage, wallet, props);
         await client.invalidateQueries([QueryKey.account]);

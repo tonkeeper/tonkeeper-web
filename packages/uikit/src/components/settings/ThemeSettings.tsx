@@ -4,6 +4,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { relative, SettingsRoute } from '../../libs/routes';
 import { useUserThemes } from '../../state/theme';
+import { MessageIcon } from '../Icon';
 import { LocalizationIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
 
@@ -26,10 +27,16 @@ export const ThemeSettings = () => {
         if (i18n.enable) {
             items.push({
                 name: t('Localization'),
-                icon: <LocalizationIcon />,
+                icon: <MessageIcon />,
                 action: () => navigate(relative(SettingsRoute.localization))
             });
         }
+
+        items.push({
+            name: t('country'),
+            icon: <LocalizationIcon />,
+            action: () => navigate(relative(SettingsRoute.country))
+        });
 
         // if (themes && themes.length > 1) {
         //   items.push({

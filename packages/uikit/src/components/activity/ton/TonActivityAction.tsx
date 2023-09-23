@@ -104,7 +104,7 @@ export const SmartContractExecAction: FC<{
                 <ContractDeployIcon />
             </ActivityIcon>
             <ColumnLayout
-                title={t('transaction_type_contract_call')}
+                title={t('transactions_smartcontract_exec')}
                 amount={<>-&thinsp;{format(smartContractExec.tonAttached)}</>}
                 entry={CryptoCurrency.TON}
                 address={toShortValue(

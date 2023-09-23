@@ -4,22 +4,35 @@ import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 
 export interface CountryIs {
-    country: string;
-    ip: string;
+    countryCode: string;
 }
 
 const getMyCountryCode = async () => {
     try {
-        const response = await fetch('https://api.country.is');
+        const response = await fetch('http://ip-api.com/json');
         const json: CountryIs = await response.json();
-        return json.country;
+        return json.countryCode;
     } catch (e) {
         return null;
     }
 };
+
+export const useCountrySetting = () => {
+    const sdk = useAppSdk();
+    return useQuery<string | null, Error>([QueryKey.country, 'store'], async () => {
+        return await sdk.storage.get<string>(AppKey.COUNTRY);
+    });
+};
+
+export const useAutoCountry = () => {
+    return useQuery<string | null, Error>([QueryKey.country, 'detect'], async () => {
+        return await getMyCountryCode();
+    });
+};
+
 export const useUserCountry = () => {
     const sdk = useAppSdk();
-    return useQuery([QueryKey.country], async () => {
+    return useQuery<string | null, Error>([QueryKey.country], async () => {
         let code = await sdk.storage.get<string>(AppKey.COUNTRY);
         if (!code) {
             code = await getMyCountryCode();

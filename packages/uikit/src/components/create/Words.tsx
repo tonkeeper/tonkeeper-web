@@ -7,11 +7,11 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
-import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
 import { ChevronLeftIcon } from '../Icon';
 import { CenterContainer } from '../Layout';
 import { Body1, Body2, H2, Label2 } from '../Text';
+import { BackButton } from '../fields/BackButton';
+import { Button } from '../fields/Button';
 
 const Block = styled.div`
     display: flex;
@@ -440,7 +440,7 @@ export const ImportWords: FC<{
     const notify = () => {
         sdk.uiEvents.emit('copy', {
             method: 'copy',
-            params: t('Incorrect_phrase')
+            params: t('import_wallet_wrong_words_err')
         });
     };
     const onSubmit = async () => {

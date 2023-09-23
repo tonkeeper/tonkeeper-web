@@ -58,7 +58,7 @@ export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
 
     useEffect(() => {
         if (isCompleted) {
-            toast(linkedAddress ? t('address_linked') : t('address_unlinked'));
+            toast(linkedAddress ? t('dns_address_linked') : t('dns_address_unlinked'));
         }
     }, [isCompleted, linkedAddress]);
 
@@ -158,7 +158,9 @@ const LinkNftUnlinked: FC<{
                 <ListItem hover={false}>
                     <ListItemPayload>
                         <Label>
-                            {isSelectedCurrentAddress ? t('current_address') : t('wallet_address')}
+                            {isSelectedCurrentAddress
+                                ? t('dns_current_address')
+                                : t('wallet_address')}
                         </Label>
                         <ColumnText
                             right
@@ -217,10 +219,14 @@ const LinkNftUnlinked: FC<{
                 loading={estimation.isFetching || isRecipientLoading || isLoading}
                 onClick={onOpen}
             >
-                {isTME ? t('link_tme') : t('link_domain')}
+                {isTME ? t('nft_link_username_button') : t('nft_link_domain_button')}
             </Button>
             <Notification
-                title={openedView === 'wallet' ? t('wallet_address') : t('confirm_tx')}
+                title={
+                    openedView === 'wallet'
+                        ? t('wallet_address')
+                        : t('send_screen_steps_comfirm_title')
+                }
                 isOpen={!!openedView}
                 hideButton
                 handleClose={() => onClose()}
@@ -377,8 +383,8 @@ const LinkNftLinked: FC<{
                 loading={estimation.isFetching || isRecipientLoading || isLoading}
                 onClick={onOpen}
             >
-                {t('linked_with').replace(
-                    '%1%',
+                {t('nft_unlink_domain_button').replace(
+                    '{{address}}',
                     toShortValue(formatAddress(linkedAddress, walletState.network))
                 )}
             </Button>

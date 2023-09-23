@@ -1,55 +1,118 @@
+import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import fetch from 'node-fetch';
 import * as path from 'path';
+import * as unzipper from 'unzipper';
 
-const pathToWallet =
-    'https://raw.githubusercontent.com/tonkeeper/wallet/main/packages/mobile/src/translation/locales/';
-const all = ['en', 'ru'];
+dotenv.config();
 
-const src = './src/';
+const namespaces = ['tonkeeper', 'tonkeeper-web'];
+
+const localeMap = {
+    'ru-RU': 'ru'
+};
+
 const dist = './dist';
-
-const wallet = 'wallet-translation';
+const src = './source';
 
 const extension = 'extension';
 const i18n = 'i18n';
 const locales = 'locales';
 
-const defaultLocales = ['en'];
+const defaultLocale = 'en';
 
 interface Message {
     message: string;
     description?: string;
 }
 
-const toDict = (parentKey: string | undefined, value: object): Record<string, Message> => {
+const unzip = (zipFile: string) => {
+    return new Promise((resolve, reject) => {
+        fs.createReadStream(zipFile)
+            .pipe(unzipper.Extract({ path: path.join(src) }))
+            .on('close', () => {
+                console.log('Files loaded and unzipped successfully');
+                resolve(undefined);
+            })
+            .on('error', reject);
+    });
+};
+
+const loadTransactions = async () => {
+    const file = await fetch(
+        `https://app.tolgee.io/v2/projects/export?ak=${process.env.TOLGEE_TOKEN}`
+    );
+
+    const zipFile = path.join(src, 'translations.zip');
+    fs.writeFileSync(zipFile, await file.buffer());
+
+    await unzip(zipFile);
+
+    fs.unlinkSync(zipFile);
+};
+
+const fillMissingLocales = (
+    resources: Record<string, { translation: Record<string, string> }>,
+    defaultResource: Record<string, string>
+) => {
+    Object.entries(resources).forEach(([locale, { translation }]) => {
+        Object.entries(defaultResource).forEach(([key, value]) => {
+            if (translation[key] == undefined) {
+                translation[key] = value;
+            }
+        });
+    });
+};
+const writeFiles = (
+    resources: Record<string, { translation: Record<string, string> }>,
+    defaultResource: Record<string, string>
+) => {
+    Object.entries(resources).forEach(([locale, { translation }]) => {
+        const extensionFormat = Object.entries(translation).reduce((acc, [key, message]) => {
+            acc[key] = { message };
+            return acc;
+        }, {} as Record<string, Message>);
+
+        fs.mkdirSync(path.join(dist, extension, locale));
+        fs.writeFileSync(
+            path.join(dist, extension, locale, 'messages.json'),
+            JSON.stringify(extensionFormat, null, 2)
+        );
+
+        fs.mkdirSync(path.join(dist, locales, locale));
+        fs.writeFileSync(
+            path.join(dist, locales, locale, 'translation.json'),
+            JSON.stringify(translation, null, 2)
+        );
+    });
+
+    fs.writeFileSync(
+        path.join(dist, i18n, 'default.json'),
+        JSON.stringify({ [defaultLocale]: { translation: defaultResource } }, null, 2)
+    );
+
+    fs.writeFileSync(path.join(dist, i18n, 'resources.json'), JSON.stringify(resources, null, 2));
+};
+
+const toDict = (parentKey: string | undefined, value: object): Record<string, string> => {
     return Object.entries(value).reduce((acc, [key, message]) => {
         const item_key = parentKey ? `${parentKey}_${key}` : key;
         if (typeof message === 'string') {
-            acc[item_key] = { message };
+            acc[item_key] = message;
             return acc;
         } else {
             const dict = toDict(item_key, message);
             return { ...acc, ...dict };
         }
-    }, {} as Record<string, Message>);
+    }, {} as Record<string, string>);
 };
 
 const main = async () => {
     console.log('----------Build Locales----------');
 
-    for (let locale of all) {
-        const response = await fetch(`${pathToWallet}${locale}.json`);
-        const content = await response.json();
-        if (!fs.existsSync(path.join(src, wallet))) {
-            fs.mkdirSync(path.join(src, wallet));
-        }
-        fs.writeFileSync(
-            path.join(src, wallet, `${locale}.json`),
-            JSON.stringify(content, null, 2)
-        );
+    if (!fs.existsSync(src)) {
+        fs.mkdirSync(src);
     }
-
     if (!fs.existsSync(dist)) {
         fs.mkdirSync(dist);
     }
@@ -63,61 +126,39 @@ const main = async () => {
         fs.mkdirSync(path.join(dist, locales));
     }
 
+    await loadTransactions();
+
     let resources: Record<string, { translation: Record<string, string> }> = {};
-    let defaultResources: Record<string, { translation: Record<string, string> }> = {};
+    let defaultResource: Record<string, string> = {};
 
-    fs.readdirSync(src).forEach(file => {
-        const [locale] = file.split('.');
-        if (locale == wallet) return;
-        console.log(locale);
+    for (let namespace of namespaces) {
+        fs.readdirSync(path.join(src, namespace)).forEach(file => {
+            const [externalLocale] = file.split('.');
 
-        const walletData = fs.readFileSync(path.join(src, wallet, file));
-        const walletJson: Record<string, string | object> = JSON.parse(walletData.toString('utf8'));
+            const locale = localeMap[externalLocale] ?? externalLocale;
+            console.log(namespace, locale);
 
-        const walletDict = toDict(undefined, walletJson);
+            if (!resources[locale]) {
+                resources[locale] = { translation: {} };
+            }
 
-        let rawdata = fs.readFileSync(path.join(src, file));
+            const namespaceFile = fs.readFileSync(path.join(src, namespace, file), 'utf8');
+            const namespaceJson: Record<string, string | object> = JSON.parse(namespaceFile);
+            const translation = toDict(undefined, namespaceJson);
 
-        // copy to i18n
-        let data: Record<string, Message> = {
-            ...walletDict,
-            ...JSON.parse(rawdata.toString('utf8'))
-        };
-
-        // copy to extension
-        fs.mkdirSync(path.join(dist, extension, locale));
-        fs.writeFileSync(
-            path.join(dist, extension, locale, 'messages.json'),
-            JSON.stringify(data, null, 2)
-        );
-
-        const translation = Object.entries(data).reduce((acc, [key, { message }]) => {
-            acc[key] = message;
-            return acc;
-        }, {} as Record<string, string>);
-
-        resources[locale] = {
-            translation
-        };
-        if (defaultLocales.includes(locale)) {
-            defaultResources[locale] = {
-                translation
+            resources[locale].translation = {
+                ...resources[locale].translation,
+                ...translation
             };
-        }
 
-        fs.mkdirSync(path.join(dist, locales, locale));
-        fs.writeFileSync(
-            path.join(dist, locales, locale, 'translation.json'),
-            JSON.stringify(translation, null, 2)
-        );
-    });
+            if (defaultLocale === locale) {
+                defaultResource = resources[locale].translation;
+            }
+        });
+    }
 
-    fs.writeFileSync(
-        path.join(dist, i18n, 'default.json'),
-        JSON.stringify(defaultResources, null, 2)
-    );
-
-    fs.writeFileSync(path.join(dist, i18n, 'resources.json'), JSON.stringify(resources, null, 2));
+    fillMissingLocales(resources, defaultResource);
+    writeFiles(resources, defaultResource);
 
     console.log('----------End Build Locales----------');
 };
