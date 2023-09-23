@@ -1,12 +1,10 @@
 import BigNumber from 'bignumber.js';
 import { Address, beginCell, Cell, comment, toNano } from 'ton-core';
 import { mnemonicToPrivateKey } from 'ton-crypto';
-import { APIConfig } from '../../entries/apis';
 import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration, NftItemRepr, SendApi } from '../../tonApiV1';
-import { BlockchainApi, EmulationApi, MessageConsequences } from '../../tonApiV2';
+import { Configuration, Fee, NftItemRepr, SendApi } from '../../tonApiV1';
 import { getWalletMnemonic } from '../mnemonicService';
 import {
     checkServiceTimeOrDie,
@@ -89,13 +87,13 @@ const createNftTransfer = (
 };
 
 export const estimateNftTransfer = async (
-    api: APIConfig,
+    tonApi: Configuration,
     walletState: WalletState,
     recipient: TonRecipientData,
     nftItem: NftItemRepr
 ) => {
-    await checkServiceTimeOrDie(api.tonApi);
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    await checkServiceTimeOrDie(tonApi);
+    const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = createNftTransfer(
@@ -107,37 +105,37 @@ export const estimateNftTransfer = async (
         recipient.comment ? comment(recipient.comment) : null
     );
 
-    const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-        emulateMessageToEventRequest: { boc: cell.toString('base64') }
+    const { fee } = await new SendApi(tonApi).estimateTx({
+        sendBocRequest: { boc: cell.toString('base64') }
     });
-    return emulation;
+    return fee;
 };
 
 export const sendNftTransfer = async (
     storage: IStorage,
-    api: APIConfig,
+    tonApi: Configuration,
     walletState: WalletState,
     recipient: TonRecipientData,
     nftItem: NftItemRepr,
-    fee: MessageConsequences,
+    fee: Fee,
     password: string
 ) => {
-    await checkServiceTimeOrDie(api.tonApi);
+    await checkServiceTimeOrDie(tonApi);
     const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const min = toNano('0.05').toString();
-    let nftTransferAmount = new BigNumber(fee.event.extra).multipliedBy(-1).plus(min);
+    let nftTransferAmount = new BigNumber(fee.deposit).minus(fee.refund).plus(min);
 
     nftTransferAmount = nftTransferAmount.isLessThan(min) ? new BigNumber(min) : nftTransferAmount;
 
-    const total = nftTransferAmount.plus(fee.event.extra * -1);
+    const total = nftTransferAmount.plus(fee.total);
 
     if (nftTransferAmount.isLessThanOrEqualTo(0)) {
         throw new Error(`Unexpected nft transfer amount: ${nftTransferAmount.toString()}`);
     }
 
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    const [wallet, seqno] = await getWalletBalance(tonApi, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
     const cell = createNftTransfer(
@@ -150,8 +148,8 @@ export const sendNftTransfer = async (
         keyPair.secretKey
     );
 
-    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
+    await new SendApi(tonApi).sendBoc({
+        sendBocRequest: { boc: cell.toString('base64') }
     });
 };
 
@@ -160,7 +158,7 @@ export const sendNftRenew = async (options: {
     tonApi: Configuration;
     walletState: WalletState;
     nftAddress: string;
-    fee: MessageConsequences;
+    fee: Fee;
     password: string;
     amount: BigNumber;
 }) => {
@@ -212,7 +210,7 @@ export const sendNftLink = async (options: {
     walletState: WalletState;
     nftAddress: string;
     linkToAddress: string;
-    fee: MessageConsequences;
+    fee: Fee;
     password: string;
     amount: BigNumber;
 }) => {

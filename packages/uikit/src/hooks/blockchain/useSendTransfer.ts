@@ -11,7 +11,7 @@ import {
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { sendTronTransfer } from '@tonkeeper/core/dist/service/tron/tronTransferService';
-import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
+import { Fee } from '@tonkeeper/core/dist/tonApiV1';
 import { EstimatePayload } from '@tonkeeper/core/dist/tronApi';
 import { Address } from 'ton-core';
 import { notifyError } from '../../components/transfer/common';
@@ -45,12 +45,12 @@ export function useSendTransfer<T extends Asset>(
                     track2('send-ton');
                     await sendTonTransfer(
                         sdk.storage,
-                        api,
+                        api.tonApi,
                         wallet,
                         recipient as TonRecipientData,
                         amount,
                         isMax,
-                        estimation.payload as MessageConsequences,
+                        estimation.payload as Fee,
                         password
                     );
                 } else {
@@ -61,12 +61,12 @@ export function useSendTransfer<T extends Asset>(
                     )!;
                     await sendJettonTransfer(
                         sdk.storage,
-                        api,
+                        api.tonApi,
                         wallet,
                         recipient as TonRecipientData,
                         amount as AssetAmount<TonAsset>,
                         jettonInfo!.walletAddress.address,
-                        estimation.payload as MessageConsequences,
+                        estimation.payload as Fee,
                         password
                     );
                 }

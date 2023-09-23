@@ -1,5 +1,4 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
@@ -14,8 +13,7 @@ import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { estimateTron } from '@tonkeeper/core/dist/service/tron/tronTransferService';
-import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
+import { Configuration, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
 import { Address } from 'ton-core';
 import { notifyError } from '../../components/transfer/common';
 import { QueryKey } from '../../libs/queryKey';
@@ -30,21 +28,21 @@ async function estimateTon({
     recipient,
     amount,
     isMax,
-    api,
+    tonApi,
     wallet,
     jettons
 }: {
     recipient: RecipientData;
     amount: AssetAmount<TonAsset>;
     isMax: boolean;
-    api: APIConfig;
+    tonApi: Configuration;
     wallet: WalletState;
     jettons: JettonsBalances | undefined;
 }): Promise<TransferEstimation<TonAsset>> {
-    let payload: MessageConsequences;
+    let payload;
     if (amount.asset.id === TON_ASSET.id) {
         payload = await estimateTonTransfer(
-            api,
+            tonApi,
             wallet,
             recipient as TonRecipientData,
             amount.weiAmount,
@@ -55,7 +53,7 @@ async function estimateTon({
             jetton => (amount.asset.address as Address).toRawString() === jetton.jettonAddress
         )!;
         payload = await estimateJettonTransfer(
-            api,
+            tonApi,
             wallet,
             recipient as TonRecipientData,
             amount as AssetAmount<TonAsset>,
@@ -63,7 +61,7 @@ async function estimateTon({
         );
     }
 
-    const fee = new AssetAmount({ asset: TON_ASSET, weiAmount: payload.event.extra * -1 });
+    const fee = new AssetAmount({ asset: TON_ASSET, weiAmount: payload.total });
     return { fee, payload };
 }
 
@@ -87,7 +85,7 @@ export function useEstimateTransfer(
                 if (isTonAsset(amount.asset)) {
                     return await estimateTon({
                         amount: amount as AssetAmount<TonAsset>,
-                        api: api,
+                        tonApi: api.tonApi,
                         wallet,
                         recipient,
                         isMax,

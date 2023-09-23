@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { sendNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { Fee, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -19,16 +19,11 @@ import { Button } from '../fields/Button';
 import { ButtonBlock, Label, ResultButton, notifyError } from './common';
 
 import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
 import { useTransactionAnalytics } from '../../hooks/amplitude';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { RecipientListItem } from './ConfirmListItem';
 
-const useSendNft = (
-    recipient: TonRecipientData,
-    nftItem: NftItemRepr,
-    fee?: MessageConsequences
-) => {
+const useSendNft = (recipient: TonRecipientData, nftItem: NftItemRepr, fee?: Fee) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
@@ -43,7 +38,15 @@ const useSendNft = (
 
         track2('send-nft');
         try {
-            await sendNftTransfer(sdk.storage, api, wallet, recipient, nftItem, fee, password);
+            await sendNftTransfer(
+                sdk.storage,
+                api.tonApi,
+                wallet,
+                recipient,
+                nftItem,
+                fee,
+                password
+            );
         } catch (e) {
             await notifyError(client, sdk, t, e);
         }
@@ -57,7 +60,7 @@ const useSendNft = (
 export const ConfirmNftView: FC<{
     recipient: TonRecipientData;
     nftItem: NftItemRepr;
-    fee?: MessageConsequences;
+    fee?: Fee;
     onBack: () => void;
     onClose: () => void;
 }> = ({ recipient, onBack, onClose, nftItem, fee }) => {

@@ -1,11 +1,11 @@
 import { sendNftLink } from '@tonkeeper/core/dist/service/transfer/nftService';
-import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
-import BigNumber from 'bignumber.js';
 import { useExecuteTonContract } from '../useExecuteTonContract';
+import BigNumber from 'bignumber.js';
+import { Fee } from '@tonkeeper/core/dist/tonApiV1';
 
 export const useLinkNft = (args: {
     nftAddress: string;
     linkToAddress: string;
     amount: BigNumber;
-    fee: MessageConsequences;
+    fee: Fee;
 }) => useExecuteTonContract({ executor: sendNftLink, eventName2: 'link-dns' }, args);
