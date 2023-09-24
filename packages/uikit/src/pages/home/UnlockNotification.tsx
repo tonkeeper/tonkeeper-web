@@ -63,7 +63,7 @@ const Block = styled.form<{ padding: number }>`
     width: 100%;
 
     @media (max-width: 440px) {
-        padding-bottom: ${props => (props.padding > 0 ? props.padding + 40 : 0)}px;
+        padding-bottom: ${props => props.padding}px;
     }
 `;
 
@@ -109,10 +109,15 @@ export const PasswordUnlock: FC<{
     const location = useLocation();
 
     useEffect(() => {
-        if (ref.current) {
-            ref.current.focus();
-        }
-    }, [ref]);
+        const timeout = setTimeout(() => {
+            if (ref.current) {
+                ref.current.focus();
+            }
+        }, 750);
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [ref.current]);
 
     useEffect(() => {
         if (!active) {
@@ -177,7 +182,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const [requestId, setId] = useState<number | undefined>(undefined);
 
     const setRequest = useMemo(() => {
-        return debounce<[number | undefined]>(v => setId(v), 450);
+        return debounce<[number | undefined]>(v => setId(v), 200);
     }, [setId]);
 
     const { mutateAsync, isLoading, isError, reset } = useMutateUnlock(sdk, requestId);
@@ -214,7 +219,9 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
             id?: number | undefined;
             params: KeyboardParams;
         }) => {
-            setPadding(options.params.total - options.params.viewport);
+            setPadding(oldValue =>
+                Math.max(options.params.total - options.params.viewport, oldValue)
+            );
         };
 
         const handler = (options: {
@@ -222,7 +229,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
             id?: number | undefined;
             params: GetPasswordParams;
         }) => {
-            openIosKeyboard('text', 'password');
+            openIosKeyboard('text');
 
             setType(options.params.type);
             setAuth(options.params?.auth);
