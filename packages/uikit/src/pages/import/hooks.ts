@@ -1,8 +1,8 @@
-import { debounce } from '@tonkeeper/core/dist/utils/common';
 import { useEffect } from 'react';
+import { useAppSdk } from '../../hooks/appSdk';
 
 export const useKeyboardHeight = () => {
-    // const sdk = useAppSdk();
+    const sdk = useAppSdk();
 
     useEffect(() => {
         // const message = (value: string) =>
@@ -18,23 +18,12 @@ export const useKeyboardHeight = () => {
             }
         }
 
-        function releaseHandler() {
-            const doc = document.documentElement;
-            doc.style.setProperty('--app-height', `${innerHeight}px`);
-            doc.style.setProperty('--fixed-height', 'auto');
-            // message('release');
-        }
-
-        const resizeHandler = debounce(function (this: VisualViewport) {
-            if (this.height > 500) {
-                return releaseHandler();
-            } else {
-                const doc = document.documentElement;
-                doc.style.setProperty('--app-height', `${this.height}px`);
-                doc.style.setProperty('--fixed-height', `${this.height}px`);
-                // message(`${this.height}px`);
-            }
-        }, 200);
+        const resizeHandler = function (this: VisualViewport) {
+            sdk.uiEvents.emit('keyboard', {
+                method: 'keyboard',
+                params: { total: innerHeight, viewport: this.height }
+            });
+        };
 
         if (viewport) {
             resizeHandler.call(viewport);
@@ -45,7 +34,6 @@ export const useKeyboardHeight = () => {
         return () => {
             viewport?.removeEventListener('resize', resizeHandler);
             window.removeEventListener('resize', callback);
-            releaseHandler();
         };
     }, []);
 };

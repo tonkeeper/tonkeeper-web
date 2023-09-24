@@ -1,11 +1,10 @@
-import { debounce } from '@tonkeeper/core/dist/utils/common';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { Viewport } from '@twa.js/sdk';
 import React, { useContext, useEffect } from 'react';
 
 export const ViewportContext = React.createContext<Viewport>(undefined!);
 
-export const useAppViewport = () => {
+export const useTwaAppViewport = () => {
     const sdk = useAppSdk();
     const viewport = useContext(ViewportContext);
 
@@ -25,7 +24,7 @@ export const useAppViewport = () => {
                 params: { total, viewport: value }
             });
 
-            doc.style.setProperty('--app-height', `${value}px`);
+            // doc.style.setProperty('--app-height', `${value}px`);
         };
 
         const callback = () => {
@@ -34,9 +33,9 @@ export const useAppViewport = () => {
             }
         };
 
-        const resizeHandler = debounce(function (this: VisualViewport) {
+        const resizeHandler = function (this: VisualViewport) {
             setHeight(this.height);
-        }, 200);
+        };
 
         setHeight(viewport.height);
         setWidth(viewport.width);
@@ -45,7 +44,6 @@ export const useAppViewport = () => {
         viewport.on('widthChanged', setWidth);
 
         if (visualViewport) {
-            resizeHandler.call(viewport);
             visualViewport.addEventListener('resize', resizeHandler);
             window.addEventListener('resize', callback);
         }

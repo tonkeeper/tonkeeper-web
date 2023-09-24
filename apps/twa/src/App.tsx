@@ -62,7 +62,7 @@ import { InitDataLogger } from './components/InitData';
 import { TwaQrScanner } from './components/TwaQrScanner';
 import { SendAction } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
-import { ViewportContext } from './libs/hooks';
+import { ViewportContext, useTwaAppViewport } from './libs/hooks';
 import { BrowserStorage } from './libs/storage';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -302,6 +302,7 @@ export const Content: FC<{
 }> = ({ activeWallet, lock, showQrScan }) => {
     const location = useLocation();
     useWindowsScroll();
+    useTwaAppViewport();
 
     if (lock) {
         return (
