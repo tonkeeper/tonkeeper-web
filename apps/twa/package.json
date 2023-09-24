@@ -1,8 +1,8 @@
 {
     "name": "@tonkeeper/twa",
-    "version": "3.1.15",
+    "version": "3.3.0",
     "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
-    "description": "Your web wallet on The Open Network",
+    "description": "Your telegram mini app wallet on The Open Network",
     "dependencies": {
         "@tonkeeper/core": "0.1.0",
         "@tonkeeper/locales": "0.1.0",
