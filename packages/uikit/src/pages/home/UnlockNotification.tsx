@@ -1,5 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
-import { GetPasswordParams, GetPasswordType, IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import {
+    GetPasswordParams,
+    GetPasswordType,
+    IAppSdk,
+    KeyboardParams
+} from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { MinPasswordLength, getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
@@ -48,7 +53,7 @@ export const getPasswordByNotification = async (
     });
 };
 
-const Block = styled.form`
+const Block = styled.form<{ padding: number }>`
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
@@ -58,7 +63,7 @@ const Block = styled.form`
     width: 100%;
 
     @media (max-width: 440px) {
-        padding-bottom: 270px;
+        padding-bottom: ${props => props.padding}px;
     }
 `;
 
@@ -94,13 +99,20 @@ export const PasswordUnlock: FC<{
     onSubmit: (password: string) => Promise<boolean>;
     isError: boolean;
     isLoading: boolean;
+    padding: number;
     reason?: GetPasswordType;
-}> = ({ sdk, onClose, onSubmit, isError, isLoading }) => {
+}> = ({ sdk, onClose, onSubmit, isError, isLoading, padding }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLInputElement | null>(null);
     const [password, setPassword] = useState('');
     const [active, setActive] = useState(false);
     const location = useLocation();
+
+    useEffect(() => {
+        if (ref.current) {
+            ref.current.focus();
+        }
+    }, [ref]);
 
     useEffect(() => {
         if (!active) {
@@ -110,27 +122,11 @@ export const PasswordUnlock: FC<{
         }
     }, [location]);
 
-    // useEffect(() => {
-    //     if (ref.current) {
-    //         ref.current.focus();
-
-    //         ref.current.onblur = () => {
-    //             openIosKeyboard('text', 'password', 360); // almost infinity
-    //         };
-    //     }
-    //     return () => {
-    //         if (ref.current) {
-    //             ref.current.onblur = undefined!;
-    //         }
-    //         hideIosKeyboard();
-    //     };
-    // }, [ref]);
-
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
 
         if (sdk.isIOs()) {
-            openIosKeyboard('text', 'password');
+            openIosKeyboard('text');
         }
 
         const result = await onSubmit(password);
@@ -144,7 +140,7 @@ export const PasswordUnlock: FC<{
     };
 
     return (
-        <Block onSubmit={handleSubmit}>
+        <Block onSubmit={handleSubmit} padding={padding}>
             <Input
                 ref={ref}
                 value={password}
@@ -175,7 +171,7 @@ export const PasswordUnlock: FC<{
 
 export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { t } = useTranslation();
-
+    const [padding, setPadding] = useState(0);
     const [type, setType] = useState<'confirm' | 'unlock' | undefined>(undefined);
     const [auth, setAuth] = useState<AuthState | undefined>(undefined);
     const [requestId, setId] = useState<number | undefined>(undefined);
@@ -213,26 +209,32 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     };
 
     useEffect(() => {
+        const handlerKeyboard = (options: {
+            method: 'keyboard';
+            id?: number | undefined;
+            params: KeyboardParams;
+        }) => {
+            setPadding(options.params.total - options.params.viewport);
+        };
+
         const handler = (options: {
             method: 'getPassword';
             id?: number | undefined;
             params: GetPasswordParams;
         }) => {
-            openIosKeyboard('text', 'password');
+            openIosKeyboard('text');
 
             setType(options.params.type);
             setAuth(options.params?.auth);
 
-            if (sdk.isIOs()) {
-                setRequest(options.id);
-            } else {
-                setId(options.id);
-            }
+            setRequest(options.id);
         };
-        sdk.uiEvents.on('getPassword', handler);
 
+        sdk.uiEvents.on('getPassword', handler);
+        sdk.uiEvents.on('keyboard', handlerKeyboard);
         return () => {
             sdk.uiEvents.off('getPassword', handler);
+            sdk.uiEvents.off('keyboard', handlerKeyboard);
         };
     }, [sdk]);
 
@@ -246,6 +248,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
                 isLoading={isLoading}
                 isError={isError}
                 reason={type}
+                padding={padding}
             />
         );
     }, [sdk, auth, requestId, onSubmit, type]);
