@@ -37,7 +37,7 @@ import {
 } from './connectionService';
 import { SessionCrypto } from './protocol';
 
-const TC_PREFIX = ['https://app.tonkeeper.com/ton-connect', "'tc://"];
+const TC_PREFIX = ['https://app.tonkeeper.com/ton-connect', 'tc://'];
 
 export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
