@@ -42,13 +42,13 @@ const TC_PREFIX = ['https://app.tonkeeper.com/ton-connect', "'tc://"];
 export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
         if (!TC_PREFIX.some(prefix => !options.url.startsWith(prefix))) {
-            throw new Error(`must starts with ${TC_PREFIX} ${options.url}`);
+            throw new Error(`Wrong ton connect prefix ${options.url}`);
         }
 
         const { query } = queryString.parseUrl(options.url);
 
         if (query.v !== '2') {
-            throw Error('Unknown version' + options.url);
+            throw Error(`Unknown protocol version: ${query.v}`);
         }
         if (typeof query.id !== 'string') {
             throw Error('missing id ' + options.url);
