@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { languages, localizationText } from '@tonkeeper/core/dist/entries/language';
 import {
     Network,
     getTonClient,
@@ -100,11 +99,11 @@ const TwaApp = () => {
         const client: I18nContext = {
             t,
             i18n: {
-                enable: true,
+                enable: false,
                 reloadResources: i18n.reloadResources,
                 changeLanguage: i18n.changeLanguage as any,
                 language: i18n.language,
-                languages: [...languages].map(localizationText)
+                languages: []
             }
         };
         return client;
@@ -189,18 +188,6 @@ export const Loader: FC = () => {
     const enable = useAmplitudeAnalytics('Twa', account, activeWallet);
 
     useEffect(() => {
-        if (
-            activeWallet &&
-            activeWallet.lang &&
-            i18n.language !== localizationText(activeWallet.lang)
-        ) {
-            i18n.reloadResources([localizationText(activeWallet.lang)]).then(() =>
-                i18n.changeLanguage(localizationText(activeWallet.lang))
-            );
-        }
-    }, [activeWallet, i18n]);
-
-    useEffect(() => {
         if (components) {
             sdk.setTwaExpand(() => {
                 components.viewport.expand();
@@ -251,6 +238,21 @@ export const Loader: FC = () => {
                         value={() => navigate(AppRoute.home, { replace: true })}
                     >
                         <AppContext.Provider value={context}>
+                            {/* <div
+                                onClick={() => sdk.copyToClipboard(window.location.hash.slice(1))}
+                                style={{
+                                    paddingTop: '100px',
+                                    minHeight: '200px',
+                                    width: '200px',
+                                    position: 'fixed',
+                                    zIndex: '100',
+                                    color: 'white'
+                                }}
+                            >
+                                {components.initDataRaw}
+                                {components.initData?.startParam}
+                                {window.location.hash.slice(1)}
+                            </div> */}
                             <Content
                                 activeWallet={activeWallet}
                                 lock={lock}

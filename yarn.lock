@@ -5138,7 +5138,8 @@ __metadata:
     "@tonkeeper/core": 0.1.0
     "@tonkeeper/locales": 0.1.0
     "@tonkeeper/uikit": 0.1.0
-    "@twa.js/sdk-react": ^0.3.20
+    "@twa.js/sdk": latest
+    "@twa.js/sdk-react": latest
     "@types/fs-extra": ^11.0.1
     "@types/jest": ^27.5.2
     "@types/node": ^16.18.6
@@ -5297,55 +5298,98 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@twa.js/bridge@npm:1.2.0":
-  version: 1.2.0
-  resolution: "@twa.js/bridge@npm:1.2.0"
+"@twa.js/bridge@npm:1.3.1":
+  version: 1.3.1
+  resolution: "@twa.js/bridge@npm:1.3.1"
   dependencies:
-    "@twa.js/utils": 0.5.0
-  checksum: ef1cd0cb6c9394eac4fa31fa6f9c4c05e64434fcd9f53cc560a5ca05e295ea7f73880226d0bf1d3126726029d295cf96937acebb44c2c9981e6910cb15b543c1
+    "@twa.js/colors": 0.0.1
+    "@twa.js/event-emitter": 0.0.1
+    "@twa.js/parsing": 0.0.1
+    "@twa.js/util-types": 0.0.1
+    "@twa.js/utils": 0.5.1
+  checksum: 2d6516bc3969ae7a63a5f472843ec844bfd69788324daf19a6f42c88a734096e1f10e1b7f5f250bf59fd91e423d41eed7fa099cf40b5957ed3a0f6945b3f5e5c
   languageName: node
   linkType: hard
 
-"@twa.js/init-data@npm:0.2.11":
-  version: 0.2.11
-  resolution: "@twa.js/init-data@npm:0.2.11"
-  dependencies:
-    "@twa.js/utils": 0.5.0
-  checksum: f5c9837242ba9d5c98b4dd5017d66ec9bf59a47f42745e2abc3d68eb4081e55555ce00e1dff8510123da53ea158e4cbac121c667da5b8966acb009163e35f7c9
+"@twa.js/colors@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@twa.js/colors@npm:0.0.1"
+  checksum: 1879cd3640a4e417c2fc8fafa8d119150bca6ae66e939a91e04d83754011aa3938c1251dba34c5b7ec06961994884db2ffd5fd59214cbe12355063eb16a67d4e
   languageName: node
   linkType: hard
 
-"@twa.js/sdk-react@npm:^0.3.20":
-  version: 0.3.20
-  resolution: "@twa.js/sdk-react@npm:0.3.20"
+"@twa.js/event-emitter@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@twa.js/event-emitter@npm:0.0.1"
   dependencies:
-    "@twa.js/bridge": 1.2.0
-    "@twa.js/sdk": 0.10.0
+    "@twa.js/util-types": 0.0.1
+  checksum: d7e5aa45d0b56243c8dac8ab4a0a2217edb25c2f1243c143707c5e7462a2223f3dfdf6df2aeaa13e24431ce41f2526e4b8dae4447b8fdbca426aad63e73b11f8
+  languageName: node
+  linkType: hard
+
+"@twa.js/init-data@npm:0.2.13":
+  version: 0.2.13
+  resolution: "@twa.js/init-data@npm:0.2.13"
+  dependencies:
+    "@twa.js/parsing": 0.0.1
+  checksum: 2004e0bcfb81bd70260227b9560a2d54e8e69ec26e0af20133b01961ea4d6a36af640fe5e8c35342653dfd517a019059a4c92ffabefbe211f11304b1bc5e5243
+  languageName: node
+  linkType: hard
+
+"@twa.js/parsing@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@twa.js/parsing@npm:0.0.1"
+  dependencies:
+    "@twa.js/colors": 0.0.1
+    "@twa.js/util-types": 0.0.1
+  checksum: 3e7ec41b275ee72d7b43859f27412121f89ff0d5eb269fa1a6ab2be3cbb58c5efd42e195fb9ebea1b01c6e4922a9d3c460314b9344ef92ced30cffe4f2b2d1f1
+  languageName: node
+  linkType: hard
+
+"@twa.js/sdk-react@npm:latest":
+  version: 0.4.2
+  resolution: "@twa.js/sdk-react@npm:0.4.2"
+  dependencies:
+    "@twa.js/bridge": 1.3.1
+    "@twa.js/sdk": 0.11.2
   peerDependencies:
     "@types/react": ^17.0.0 || ^18.0.0
     react: ^17.0.0 || ^18.0.0
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 7d056be6ff4256921a73e00db130bc8a8739af6c8f25e92a6b4fb373b3bf2c0b50147320032aad941b2e18fa8ee26c069e4231ba1e3834749b7e7af7d302a741
+  checksum: 4fd411a4c0169eee404a82626d46dbfe987ed56750cade9d529ebe5d76bd719a5903e57112bb82f4c5a4081b2d90ff938cbfe688dcf952d2246dfa83f56226fd
   languageName: node
   linkType: hard
 
-"@twa.js/sdk@npm:0.10.0":
-  version: 0.10.0
-  resolution: "@twa.js/sdk@npm:0.10.0"
+"@twa.js/sdk@npm:0.11.2, @twa.js/sdk@npm:latest":
+  version: 0.11.2
+  resolution: "@twa.js/sdk@npm:0.11.2"
   dependencies:
-    "@twa.js/bridge": 1.2.0
-    "@twa.js/init-data": 0.2.11
-    "@twa.js/utils": 0.5.0
-  checksum: a730acd4ce458ea1e06c0e3f5d4fd1464494db41e1dcfc6df10693b681dbd92876440d6bac1a8a3f7562bd5e83602097226d82f4989e949881323f487f2ad3c1
+    "@twa.js/bridge": 1.3.1
+    "@twa.js/colors": 0.0.1
+    "@twa.js/event-emitter": 0.0.1
+    "@twa.js/init-data": 0.2.13
+    "@twa.js/parsing": 0.0.1
+    "@twa.js/util-types": 0.0.1
+    "@twa.js/utils": 0.5.1
+  checksum: 89ff31140ab62f3b181d0a1709bfceef1e0b0a23873b1d09a384c245b47a0714868aa69d9e8f85d54c750cfb27c079528d8880e0226464ac1660f0239fcacccf
   languageName: node
   linkType: hard
 
-"@twa.js/utils@npm:0.5.0":
-  version: 0.5.0
-  resolution: "@twa.js/utils@npm:0.5.0"
-  checksum: 02866c99387563a072cb0253af699f42aca8400d6f726a6e7d50ab4cd50d2f55dab9b82a9bb5b0bac809078fb03430e29b260efda37fa013afdca08e532bd400
+"@twa.js/util-types@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@twa.js/util-types@npm:0.0.1"
+  checksum: 5144241b34407704e9bcc28f1bffab22a1158f705b0256d2c697a0770954688d1aa7367dd1d4f6b50a34d8314a4e6efe3bd63215d3bf20026d85b97abfa6054f
+  languageName: node
+  linkType: hard
+
+"@twa.js/utils@npm:0.5.1":
+  version: 0.5.1
+  resolution: "@twa.js/utils@npm:0.5.1"
+  dependencies:
+    "@twa.js/util-types": 0.0.1
+  checksum: d208868925af7d2113ae0927a8b82f45c768cab77c8e4b098153415b3bc742c2a4b2128a972292b4d52237bcce777ed018709a5297aefd8b5b34c470e60f58a7
   languageName: node
   linkType: hard
 
