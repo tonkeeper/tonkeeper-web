@@ -6,6 +6,7 @@ import {
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     disconnectResponse,
+    sendBadRequestResponse,
     sendTransactionErrorResponse,
     sendTransactionSuccessResponse
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
@@ -19,7 +20,7 @@ import {
     sendEventToBridge,
     subscribeTonConnect
 } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { QueryKey } from '../../libs/queryKey';
@@ -36,20 +37,32 @@ const useConnections = (sdk: IAppSdk) => {
 
 const useDisconnectMutation = (sdk: IAppSdk) => {
     const wallet = useWalletContext();
-    return useMutation(async ({ clientSessionId, id }: { clientSessionId: string; id: string }) => {
-        const disconnect = await disconnectAppConnection({
-            storage: sdk.storage,
-            wallet,
-            clientSessionId
-        });
-        if (disconnect) {
+    return useMutation<void, Error, TonConnectAppRequest>(
+        async ({ connection, request: { id } }) => {
+            await disconnectAppConnection({
+                storage: sdk.storage,
+                wallet,
+                clientSessionId: connection.clientSessionId
+            });
             await sendEventToBridge({
                 response: disconnectResponse(id),
-                sessionKeyPair: disconnect.sessionKeyPair,
-                clientSessionId
+                sessionKeyPair: connection.sessionKeyPair,
+                clientSessionId: connection.clientSessionId
             });
         }
-    });
+    );
+};
+
+const useUnSupportMethodMutation = () => {
+    return useMutation<void, Error, TonConnectAppRequest>(
+        async ({ connection, request: { id, method } }) => {
+            await sendEventToBridge({
+                response: sendBadRequestResponse(id, method),
+                sessionKeyPair: connection.sessionKeyPair,
+                clientSessionId: connection.clientSessionId
+            });
+        }
+    );
 };
 
 interface ResponseSendProps {
@@ -86,12 +99,37 @@ const TonConnectSubscription = () => {
     const sdk = useAppSdk();
     const { data } = useConnections(sdk);
 
-    const { mutate } = useDisconnectMutation(sdk);
-
+    const { mutate: disconnect } = useDisconnectMutation(sdk);
+    const { mutate: badRequestResponse } = useUnSupportMethodMutation();
     const { mutateAsync: responseSendAsync } = responseSendMutation();
+
     useEffect(() => {
+        const handleMessage = (params: TonConnectAppRequest) => {
+            switch (params.request.method) {
+                case 'disconnect': {
+                    return disconnect(params);
+                }
+                case 'sendTransaction': {
+                    setRequest(undefined);
+                    const value = {
+                        connection: params.connection,
+                        id: params.request.id,
+                        payload: JSON.parse(params.request.params[0])
+                    };
+                    setTimeout(() => {
+                        setRequest(value);
+                    }, 100);
+                    return;
+                }
+                default: {
+                    return badRequestResponse(params);
+                }
+            }
+        };
+
         const close = subscribeTonConnect({
             sdk,
+            handleMessage,
             connections: data?.connections,
             lastEventId: data?.lastEventId
         });
@@ -99,44 +137,19 @@ const TonConnectSubscription = () => {
         return () => {
             close();
         };
-    }, [sdk, data]);
+    }, [sdk, data, disconnect, setRequest, badRequestResponse]);
 
-    useEffect(() => {
-        const handler = ({ params }: { method: 'tonConnect'; params: TonConnectAppRequest }) => {
-            console.log(params);
-            switch (params.request.method) {
-                case 'disconnect': {
-                    return mutate({
-                        clientSessionId: params.connection.clientSessionId,
-                        id: params.request.id
-                    });
-                }
-                case 'sendTransaction': {
-                    return setRequest({
-                        connection: params.connection,
-                        id: params.request.id,
-                        payload: JSON.parse(params.request.params[0])
-                    });
-                }
-                case 'signData': {
-                    return; // TODO: UNDONE, is it really need to someone?
-                }
+    const handleClose = useCallback(
+        async (boc?: string) => {
+            if (!request) return;
+            try {
+                await responseSendAsync({ request, boc });
+            } finally {
+                setRequest(undefined);
             }
-        };
-        sdk.uiEvents.on('tonConnect', handler);
-        return () => {
-            sdk.uiEvents.off('tonConnect', handler);
-        };
-    }, [sdk, data]);
-
-    const handleClose = async (boc?: string) => {
-        if (!request) return;
-        try {
-            await responseSendAsync({ request, boc });
-        } finally {
-            setRequest(undefined);
-        }
-    };
+        },
+        [request, responseSendAsync, setRequest]
+    );
 
     return (
         <>

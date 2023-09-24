@@ -7,6 +7,7 @@ import {
     DisconnectEvent,
     KeyPair,
     RpcMethod,
+    TonConnectAppRequest,
     WalletResponse
 } from '../../entries/tonConnect';
 import { AccountConnection } from './connectionService';
@@ -59,11 +60,13 @@ interface TonConnectRequest {
 
 export const subscribeTonConnect = ({
     sdk,
+    handleMessage,
     connections,
     lastEventId,
     bridgeUrl = defaultBridgeUrl
 }: {
     sdk: IAppSdk;
+    handleMessage: (params: TonConnectAppRequest) => void;
     lastEventId?: string;
     connections?: AccountConnection[];
     bridgeUrl?: string;
@@ -103,11 +106,7 @@ export const subscribeTonConnect = ({
             )
         );
 
-        sdk.uiEvents.emit('tonConnect', {
-            method: 'tonConnect',
-            id: Date.now(),
-            params: { request, connection }
-        });
+        handleMessage({ request, connection });
     };
 
     const onOpen = () => {

@@ -44,6 +44,7 @@ import {
     useAmplitudeAnalytics
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
 
+import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { Initialize } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
@@ -59,7 +60,6 @@ import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-ro
 import styled from 'styled-components';
 import { InitDataLogger } from './components/InitData';
 import { TwaQrScanner } from './components/TwaQrScanner';
-import { TwaUnlockNotification } from './components/TwaUnlockNotification';
 import { SendAction } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { ViewportContext } from './libs/hooks';
@@ -123,7 +123,7 @@ const TwaApp = () => {
                                     <SybHeaderGlobalStyle />
                                     <GlobalListStyle />
                                     <Loader />
-                                    <TwaUnlockNotification sdk={sdk} />
+                                    <UnlockNotification sdk={sdk} />
                                 </UserThemeProvider>
                             </StorageContext.Provider>
                         </TranslationContext.Provider>

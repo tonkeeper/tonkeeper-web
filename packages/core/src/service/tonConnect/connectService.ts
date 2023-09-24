@@ -360,3 +360,16 @@ export const sendTransactionSuccessResponse = (
         result: boc
     };
 };
+
+export const sendBadRequestResponse = (
+    id: string,
+    name: string
+): SendTransactionRpcResponseError => {
+    return {
+        error: {
+            code: SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR,
+            message: `Method "${name}" does not supported by the wallet app`
+        },
+        id
+    };
+};
