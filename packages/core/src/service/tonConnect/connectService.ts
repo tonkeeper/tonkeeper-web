@@ -37,11 +37,11 @@ import {
 } from './connectionService';
 import { SessionCrypto } from './protocol';
 
-const TC_PREFIX = 'tc://';
+const TC_PREFIX = ['https://app.tonkeeper.com/ton-connect', "'tc://"];
 
 export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
-        if (!options.url.startsWith(TC_PREFIX)) {
+        if (!TC_PREFIX.some(prefix => !options.url.startsWith(prefix))) {
             throw new Error(`must starts with ${TC_PREFIX} ${options.url}`);
         }
 
