@@ -229,7 +229,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
             id?: number | undefined;
             params: GetPasswordParams;
         }) => {
-            openIosKeyboard('text');
+            openIosKeyboard('text', 'password');
 
             setType(options.params.type);
             setAuth(options.params?.auth);

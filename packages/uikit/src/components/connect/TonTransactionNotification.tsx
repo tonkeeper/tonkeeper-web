@@ -31,11 +31,10 @@ const ButtonGap = styled.div`
 
 const ButtonRowFixed = styled(ButtonRow)`
     position: fixed;
-    left: 0;
-    right: 0;
     bottom: 16px;
     padding: 0 16px;
     box-sizing: border-box;
+    width: var(--app-width);
 
     &:after {
         content: '';
