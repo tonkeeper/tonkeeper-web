@@ -162,15 +162,24 @@ export const useBuyAnalytics = () => {
     );
 };
 
+const getOrigin = (url: string) => {
+    try {
+        let item = new URL(url);
+        return item.origin;
+    } catch (e) {
+        return url;
+    }
+};
+
 export const useSendNotificationAnalytics = (manifest?: DAppManifest) => {
     return useNotificationAnalytics(
-        manifest ? { kind: 'tonConnectSend', origin: manifest.url } : undefined
+        manifest ? { kind: 'tonConnectSend', origin: getOrigin(manifest.url) } : undefined
     );
 };
 
 export const useRequestNotificationAnalytics = (manifestUrl?: string) => {
     return useNotificationAnalytics(
-        manifestUrl ? { kind: 'tonConnectRequest', origin: manifestUrl } : undefined
+        manifestUrl ? { kind: 'tonConnectRequest', origin: getOrigin(manifestUrl) } : undefined
     );
 };
 

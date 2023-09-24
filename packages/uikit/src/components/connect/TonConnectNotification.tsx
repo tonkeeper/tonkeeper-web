@@ -200,15 +200,25 @@ const useManifest = (params: ConnectRequest | null) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
 
-    return useQuery(
+    return useQuery<DAppManifest, Error>(
         [QueryKey.estimate, params],
-        () => {
+        async () => {
             sdk.uiEvents.emit('copy', {
                 method: 'copy',
                 params: t('loading')
             });
 
-            return getManifest(params!);
+            try {
+                return await getManifest(params!);
+            } catch (e) {
+                if (e instanceof Error) {
+                    sdk.uiEvents.emit('copy', {
+                        method: 'copy',
+                        params: e.message
+                    });
+                }
+                throw e;
+            }
         },
         {
             enabled: params != null

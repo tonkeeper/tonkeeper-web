@@ -9,7 +9,7 @@ import {
     sendTonConnectTransfer
 } from '@tonkeeper/core/dist/service/transfer/tonService';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
@@ -29,9 +29,18 @@ const ButtonGap = styled.div`
     height: 56px;
 `;
 
-const ButtonRowFixed = styled(ButtonRow)`
+const ButtonRowFixed = styled(ButtonRow)<{ standalone: boolean }>`
     position: fixed;
-    bottom: 16px;
+
+    ${props =>
+        props.standalone
+            ? css`
+                  bottom: 32px;
+              `
+            : css`
+                  bottom: 16px;
+              `}
+
     padding: 0 16px;
     box-sizing: border-box;
     width: var(--app-width);
@@ -40,9 +49,10 @@ const ButtonRowFixed = styled(ButtonRow)`
         content: '';
         position: absolute;
         width: 100%;
+        top: 0;
         left: 0;
-        bottom: -1rem;
-        height: calc(100% + 1rem);
+        bottom: -32px;
+        height: calc(100% + 2rem);
         z-index: -1;
         background: ${props => props.theme.gradientBackgroundBottom};
     }
@@ -73,6 +83,7 @@ const ConnectContent: FC<{
     handleClose: (result?: string) => void;
 }> = ({ params, estimate, handleClose }) => {
     const sdk = useAppSdk();
+    const { standalone } = useAppContext();
     const [done, setDone] = useState(false);
 
     const { t } = useTranslation();
@@ -109,7 +120,7 @@ const ConnectContent: FC<{
                 <TonTransactionAction key={index} action={action} />
             ))}
             <ButtonGap />
-            <ButtonRowFixed>
+            <ButtonRowFixed standalone={standalone}>
                 {done && (
                     <ResultButton done>
                         <CheckmarkCircleIcon />

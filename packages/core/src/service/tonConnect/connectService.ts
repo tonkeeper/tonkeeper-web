@@ -37,18 +37,18 @@ import {
 } from './connectionService';
 import { SessionCrypto } from './protocol';
 
-const TC_PREFIX = 'tc://';
+const TC_PREFIX = ['https://app.tonkeeper.com/ton-connect', "'tc://"];
 
-export function parseTonConnect(options: { url: string }): TonConnectParams | null {
+export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
-        if (!options.url.startsWith(TC_PREFIX)) {
-            throw new Error('must starts with ' + TC_PREFIX);
+        if (!TC_PREFIX.some(prefix => !options.url.startsWith(prefix))) {
+            throw new Error(`Wrong ton connect prefix ${options.url}`);
         }
 
         const { query } = queryString.parseUrl(options.url);
 
         if (query.v !== '2') {
-            throw Error('Unknown version' + options.url);
+            throw Error(`Unknown protocol version: ${query.v}`);
         }
         if (typeof query.id !== 'string') {
             throw Error('missing id ' + options.url);
@@ -69,7 +69,10 @@ export function parseTonConnect(options: { url: string }): TonConnectParams | nu
             sessionKeyPair: sessionCrypto.stringifyKeypair()
         };
     } catch (e) {
-        return null;
+        if (e instanceof Error) {
+            return e.message;
+        }
+        return 'Unknown Error';
     }
 }
 
@@ -92,13 +95,26 @@ export const getTonConnectParams = async (
     };
 };
 
+const getManifestResponse = async (manifestUrl: string) => {
+    try {
+        return await fetch(manifestUrl);
+    } catch (e) {
+        /**
+         * Request file with CORS header;
+         */
+        return await fetch(`https://cors-anywhere.herokuapp.com/${manifestUrl}`);
+    }
+};
+
 export const getManifest = async (request: ConnectRequest) => {
     // TODO: get fetch from context
-    const response = await window.fetch(request.manifestUrl, {
-        method: 'GET'
-    });
+    const response = await getManifestResponse(request.manifestUrl);
 
-    const manifest = (await response.json()) as DAppManifest;
+    if (response.status != 200) {
+        throw new Error('Failed to load Manifest');
+    }
+
+    const manifest: DAppManifest = await response.json();
 
     const isValid =
         manifest &&
