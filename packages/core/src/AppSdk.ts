@@ -17,6 +17,10 @@ export type TransferInitParams = {
     chain?: BLOCKCHAIN_NAME;
 };
 
+export interface KeyboardParams {
+    total: number;
+    viewport: number;
+}
 export interface UIEvents {
     unlock: void;
     copy: string;
@@ -26,6 +30,7 @@ export interface UIEvents {
     getPassword: GetPasswordParams;
     loading: void;
     transfer: TransferInitParams;
+    keyboard: KeyboardParams;
     response: any;
 }
 

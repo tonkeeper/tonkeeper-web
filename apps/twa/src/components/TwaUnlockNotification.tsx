@@ -80,6 +80,7 @@ export const TwaUnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
                 isLoading={isLoading}
                 isError={isError}
                 reason={type}
+                padding={0}
             />
         );
     }, [sdk, auth, requestId, onSubmit, type]);

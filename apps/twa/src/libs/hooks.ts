@@ -1,15 +1,18 @@
 import { debounce } from '@tonkeeper/core/dist/utils/common';
+import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { Viewport } from '@twa.js/sdk';
 import React, { useContext, useEffect } from 'react';
 
 export const ViewportContext = React.createContext<Viewport>(undefined!);
 
 export const useAppViewport = () => {
-    //const sdk = useAppSdk();
+    const sdk = useAppSdk();
     const viewport = useContext(ViewportContext);
 
     useEffect(() => {
+        const total = window.innerHeight;
         const doc = document.documentElement;
+
         const visualViewport = window.visualViewport;
 
         const setWidth = (value: number) => {
@@ -17,7 +20,10 @@ export const useAppViewport = () => {
         };
 
         const setHeight = (value: number) => {
-            // sdk.uiEvents.emit('copy', { method: 'copy', params: `height ${value}px` });
+            sdk.uiEvents.emit('keyboard', {
+                method: 'keyboard',
+                params: { total, viewport: value }
+            });
 
             doc.style.setProperty('--app-height', `${value}px`);
         };
