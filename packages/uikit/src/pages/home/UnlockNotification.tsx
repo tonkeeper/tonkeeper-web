@@ -58,7 +58,7 @@ const Block = styled.form`
     width: 100%;
 
     @media (max-width: 440px) {
-        padding-bottom: 200px;
+        padding-bottom: 270px;
     }
 `;
 
