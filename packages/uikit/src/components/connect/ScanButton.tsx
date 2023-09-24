@@ -10,6 +10,7 @@ import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connec
 import { sendEventToBridge } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useRequestNotificationAnalytics } from '../../hooks/amplitude';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -168,6 +169,8 @@ export const ScanButton = () => {
             sdk.uiEvents.off('response', handler);
         };
     }, [sdk, scanId, onScan]);
+
+    useRequestNotificationAnalytics(params?.request?.manifestUrl);
 
     return (
         <>

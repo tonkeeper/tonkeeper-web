@@ -21,6 +21,7 @@ import {
     subscribeTonConnect
 } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useSendNotificationAnalytics } from '../../hooks/amplitude';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { QueryKey } from '../../libs/queryKey';
@@ -102,6 +103,8 @@ const TonConnectSubscription = () => {
     const { mutate: disconnect } = useDisconnectMutation(sdk);
     const { mutate: badRequestResponse } = useUnSupportMethodMutation();
     const { mutateAsync: responseSendAsync } = responseSendMutation();
+
+    useSendNotificationAnalytics(request?.connection?.manifest);
 
     useEffect(() => {
         const handleMessage = (params: TonConnectAppRequest) => {
