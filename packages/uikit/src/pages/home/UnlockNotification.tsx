@@ -63,7 +63,7 @@ const Block = styled.form<{ padding: number }>`
     width: 100%;
 
     @media (max-width: 440px) {
-        padding-bottom: ${props => props.padding}px;
+        padding-bottom: ${props => (props.padding > 0 ? props.padding + 40 : 0)}px;
     }
 `;
 
@@ -126,7 +126,7 @@ export const PasswordUnlock: FC<{
         e.preventDefault();
 
         if (sdk.isIOs()) {
-            openIosKeyboard('text');
+            openIosKeyboard('text', 'password');
         }
 
         const result = await onSubmit(password);
@@ -222,7 +222,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
             id?: number | undefined;
             params: GetPasswordParams;
         }) => {
-            openIosKeyboard('text');
+            openIosKeyboard('text', 'password');
 
             setType(options.params.type);
             setAuth(options.params?.auth);
