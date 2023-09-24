@@ -94,11 +94,13 @@ export const getTonConnectParams = async (
 
 export const getManifest = async (request: ConnectRequest) => {
     // TODO: get fetch from context
-    const response = await window.fetch(request.manifestUrl, {
-        method: 'GET'
-    });
+    const response = await fetch(request.manifestUrl);
 
-    const manifest = (await response.json()) as DAppManifest;
+    if (response.status != 200) {
+        throw new Error('Failed to load Manifest');
+    }
+
+    const manifest: DAppManifest = await response.json();
 
     const isValid =
         manifest &&
