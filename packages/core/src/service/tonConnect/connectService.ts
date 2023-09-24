@@ -39,10 +39,10 @@ import { SessionCrypto } from './protocol';
 
 const TC_PREFIX = 'tc://';
 
-export function parseTonConnect(options: { url: string }): TonConnectParams | null {
+export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
         if (!options.url.startsWith(TC_PREFIX)) {
-            throw new Error('must starts with ' + TC_PREFIX);
+            throw new Error(`must starts with ${TC_PREFIX} ${options.url}`);
         }
 
         const { query } = queryString.parseUrl(options.url);
@@ -69,7 +69,10 @@ export function parseTonConnect(options: { url: string }): TonConnectParams | nu
             sessionKeyPair: sessionCrypto.stringifyKeypair()
         };
     } catch (e) {
-        return null;
+        if (e instanceof Error) {
+            return e.message;
+        }
+        return 'Unknown Error';
     }
 }
 
