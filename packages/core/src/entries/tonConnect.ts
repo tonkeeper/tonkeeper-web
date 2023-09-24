@@ -1,3 +1,5 @@
+import { AccountConnection } from '../service/tonConnect/connectionService';
+
 export interface DAppManifest {
     url: string;
     name: string;
@@ -92,7 +94,7 @@ export enum DISCONNECT_ERROR_CODES {
 
 export interface DisconnectEvent {
     event: 'disconnect';
-    id: number;
+    id: number | string;
     payload: Record<string, never>;
 }
 
@@ -270,6 +272,8 @@ export type WalletResponseError<T extends RpcMethod> = RpcResponses[T]['error'];
 
 export type WalletResponseSuccess<T extends RpcMethod> = RpcResponses[T]['success'];
 
+export type AppRequest<T extends RpcMethod> = RpcRequests[T];
+
 export interface WalletResponseTemplateError {
     error: {
         code: number;
@@ -282,4 +286,9 @@ export interface WalletResponseTemplateError {
 export interface WalletResponseTemplateSuccess {
     result: string;
     id: string;
+}
+
+export interface TonConnectAppRequest {
+    request: AppRequest<RpcMethod>;
+    connection: AccountConnection;
 }

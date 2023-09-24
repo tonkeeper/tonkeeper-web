@@ -39,7 +39,8 @@ import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { Initialize, InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/ThemeProvider';
+import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
+import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
@@ -59,6 +60,12 @@ const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/A
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
+const SendActionNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
+);
+const TonConnectSubscription = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -245,6 +252,7 @@ export const Content: FC<{
     const location = useLocation();
     useWindowsScroll();
     useAppWidth(standalone);
+    useKeyboardHeight();
 
     if (lock) {
         return (
@@ -315,6 +323,10 @@ export const Content: FC<{
                 </Routes>
                 <Footer standalone={standalone} />
                 <MemoryScroll />
+                <Suspense>
+                    <SendActionNotification />
+                    <TonConnectSubscription />
+                </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>
     );

@@ -1,5 +1,7 @@
+import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { AuthState } from './entries/password';
+import { TonTransferParams } from './service/deeplinkingService';
 import { IStorage, MemoryStorage } from './Storage';
 
 export type GetPasswordType = 'confirm' | 'unlock';
@@ -9,14 +11,26 @@ export type GetPasswordParams = {
     type?: GetPasswordType;
 };
 
+export type TransferInitParams = {
+    transfer?: TonTransferParams;
+    asset?: string;
+    chain?: BLOCKCHAIN_NAME;
+};
+
+export interface KeyboardParams {
+    total: number;
+    viewport: number;
+}
 export interface UIEvents {
     unlock: void;
     copy: string;
     scan: void;
     resize: void;
+    navigate: void;
     getPassword: GetPasswordParams;
     loading: void;
-    /*eslint-disable @typescript-eslint/no-explicit-any*/
+    transfer: TransferInitParams;
+    keyboard: KeyboardParams;
     response: any;
 }
 
@@ -37,6 +51,8 @@ export interface IAppSdk {
     alert: (text: string) => Promise<void>;
 
     requestExtensionPermission: () => Promise<void>;
+    twaExpand?: () => void;
+    hapticNotification: (type: 'success' | 'error') => void;
 }
 
 export class MockAppSdk implements IAppSdk {
@@ -71,4 +87,8 @@ export class MockAppSdk implements IAppSdk {
     alert = async () => void 0;
 
     requestExtensionPermission = async () => void 0;
+
+    twaExpand = () => void 0;
+
+    hapticNotification = () => void 0;
 }

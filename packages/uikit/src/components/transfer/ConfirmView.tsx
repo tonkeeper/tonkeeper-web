@@ -14,10 +14,12 @@ import React, {
     createContext,
     isValidElement,
     useContext,
+    useEffect,
     useState
 } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useAssetAmountFiatEquivalent, useAssetImage } from '../../state/asset';
@@ -29,10 +31,9 @@ import { Label2 } from '../Text';
 import { TransferComment } from '../activity/ActivityDetailsLayout';
 import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
 import { BackButton } from '../fields/BackButton';
-import { Button } from '../fields/Button';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
-import { ButtonBlock, ResultButton } from './common';
+import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -52,6 +53,7 @@ type ConfirmViewContextValue = {
         isLoading: boolean;
         error: Error | null | undefined;
     };
+    handleSubmit: () => Promise<boolean>;
     onClose: () => void;
     onBack?: () => void;
 };
@@ -111,7 +113,7 @@ export function ConfirmView<T extends Asset = Asset>({
     );
     let buttons = (
         <ConfirmViewButtonsSlot>
-            <ConfirmViewButtons />
+            <ConfirmViewButtons MainButton={ConfirmMainButton} />
         </ConfirmViewButtonsSlot>
     );
 
@@ -137,24 +139,24 @@ export function ConfirmView<T extends Asset = Asset>({
 
     const { standalone } = useAppContext();
 
+    const handleSubmit = async () => {
+        if (isLoading) return false;
+        reset();
+        const isDone = await mutateAsync();
+        if (isDone) {
+            setDone(true);
+            setTimeout(() => {
+                setTimeout(() => client.invalidateQueries(), 100);
+                onClose(true);
+            }, 2000);
+        }
+        return isDone;
+    };
+
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.stopPropagation();
         e.preventDefault();
-
-        if (isLoading) return;
-        try {
-            reset();
-            const isDone = await mutateAsync();
-            if (isDone) {
-                setDone(true);
-                setTimeout(() => {
-                    setTimeout(() => client.invalidateQueries(), 100);
-                    onClose(true);
-                }, 2000);
-            }
-        } catch (err) {
-            console.error(err);
-        }
+        handleSubmit();
     };
 
     return (
@@ -165,7 +167,8 @@ export function ConfirmView<T extends Asset = Asset>({
                 estimation,
                 formState: { done, isLoading, error },
                 onClose: () => onClose(),
-                onBack
+                onBack,
+                handleSubmit
             }}
         >
             <FullHeightBlock onSubmit={onSubmit} standalone={standalone} fitContent={fitContent}>
@@ -282,15 +285,32 @@ const ConfirmViewButtonsContainerStyled = styled.div`
     }
 `;
 
-export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({ withCancelButton }) => {
+export const ConfirmViewButtons: FC<{
+    MainButton: ConfirmMainButtonProps;
+}> = ({ MainButton }) => {
+    const sdk = useAppSdk();
+
     const {
         formState: { done, error, isLoading },
         estimation: { isFetching: estimationLoading },
-        onClose
+        onClose,
+        handleSubmit
     } = useConfirmViewContext();
     const { t } = useTranslation();
 
     const isValid = !isLoading && !estimationLoading;
+
+    useEffect(() => {
+        if (done) {
+            sdk.hapticNotification('success');
+        }
+    }, [done]);
+
+    useEffect(() => {
+        if (error) {
+            sdk.hapticNotification('error');
+        }
+    }, [error]);
 
     if (done) {
         return (
@@ -310,29 +330,12 @@ export const ConfirmViewButtons: FC<{ withCancelButton?: boolean }> = ({ withCan
         );
     }
 
-    if (withCancelButton) {
-        return (
-            <ConfirmViewButtonsContainerStyled>
-                <Button size="large" secondary onClick={onClose}>
-                    {t('notifications_alert_cancel')}
-                </Button>
-                <Button size="large" primary type="submit" disabled={!isValid} loading={isLoading}>
-                    {t('confirm')}
-                </Button>
-            </ConfirmViewButtonsContainerStyled>
-        );
-    }
-
     return (
-        <Button
-            fullWidth
-            size="large"
-            primary
-            type="submit"
-            disabled={!isValid}
-            loading={isLoading}
-        >
-            {t('confirm_sending_submit')}
-        </Button>
+        <MainButton
+            isDisabled={!isValid}
+            isLoading={isLoading}
+            onClick={handleSubmit}
+            onClose={onClose}
+        />
     );
 };

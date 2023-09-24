@@ -2,6 +2,7 @@ import React, { FC, useContext, useLayoutEffect, useRef, useState } from 'react'
 import styled, { css } from 'styled-components';
 import { useActionAnalytics } from '../../hooks/amplitude';
 import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Label3 } from '../Text';
 
@@ -90,6 +91,7 @@ export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
     const track = useActionAnalytics();
     const { t } = useTranslation();
     const selection = useContext(AppSelectionContext);
+    const sdk = useAppSdk();
     const { ios } = useAppContext();
     const [isHover, setHover] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -102,21 +104,18 @@ export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
         }
     }, [ref.current, selection, setHover]);
 
+    const onClick = () => {
+        if (disabled) return;
+
+        if (sdk.twaExpand) {
+            sdk.twaExpand();
+        }
+        track(title);
+        action();
+    };
+
     return (
-        <Block
-            ref={ref}
-            disabled={disabled}
-            onClick={
-                !disabled
-                    ? () => {
-                          track(title);
-                          action();
-                      }
-                    : undefined
-            }
-            isHover={isHover}
-            ios={ios}
-        >
+        <Block ref={ref} disabled={disabled} onClick={onClick} isHover={isHover} ios={ios}>
             <Button>{icon}</Button>
             <Text>{t(title)}</Text>
         </Block>

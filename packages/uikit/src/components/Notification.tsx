@@ -224,7 +224,7 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> = 
             const handlerTouchMoveWindow = function (event: TouchEvent) {
                 if (startY === 0) return;
                 const top = event.touches[0].clientY;
-                if (startScroll <= 0 && startY - top < -220) {
+                if (startScroll <= 0 && startY - top < -180) {
                     window.addEventListener('touchend', handleClose);
                     window.addEventListener('touchcancel', handleClose);
                 }

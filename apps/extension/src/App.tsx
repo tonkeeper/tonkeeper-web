@@ -27,7 +27,11 @@ import {
     AmplitudeAnalyticsContext,
     useAmplitudeAnalytics
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
-import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
+import {
+    AppContext,
+    IAppContext,
+    WalletStateContext
+} from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
     AppSdkContext,
@@ -60,6 +64,9 @@ const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings')
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
+const SendActionNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -190,7 +197,7 @@ export const Loader: FC = React.memo(() => {
     const network = activeWallet?.network ?? Network.MAINNET;
     const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
 
-    const context = {
+    const context: IAppContext = {
         api: {
             tonApi: getTonClient(config, network),
             tonApiV2: getTonClientV2(config, network),
@@ -203,7 +210,8 @@ export const Loader: FC = React.memo(() => {
         tonendpoint,
         ios: false,
         standalone: true,
-        extension: true
+        extension: true,
+        hideQrScanner: true
     };
 
     return (
@@ -312,6 +320,9 @@ export const Content: FC<{
                 </Routes>
                 <Footer />
                 <MemoryScroll />
+                <Suspense>
+                    <SendActionNotification />
+                </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>
     );
@@ -320,7 +331,7 @@ export const Content: FC<{
 const IndexPage = () => {
     return (
         <>
-            <Header />
+            <Header showQrScan={false} />
             <InnerBody>
                 <Suspense fallback={<HomeSkeleton />}>
                     <Home />

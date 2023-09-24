@@ -9,40 +9,52 @@ import {
     parseTonTransfer
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import BigNumber from 'bignumber.js';
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { useAppContext } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
-import { openIosKeyboard } from '../../hooks/ios';
-import { useTranslation } from '../../hooks/translation';
-import { useUserJettonList } from '../../state/jetton';
-import { useTronBalances } from '../../state/tron/tron';
-import { useWalletJettonList } from '../../state/wallet';
-import { Notification } from '../Notification';
-import { ConfirmTransferView } from './ConfirmTransferView';
+import { ConfirmTransferView } from '@tonkeeper/uikit/dist/components/transfer/ConfirmTransferView';
 import {
     ConfirmViewButtons,
     ConfirmViewButtonsSlot,
-    ConfirmViewTitle,
     ConfirmViewTitleSlot
-} from './ConfirmView';
-import { RecipientView, useGetToAccount } from './RecipientView';
-import { AmountView } from './amountView/AmountView';
-import { AmountState } from './amountView/amountState';
+} from '@tonkeeper/uikit/dist/components/transfer/ConfirmView';
 import {
-    AmountHeaderBlock,
-    AmountMainButton,
-    ConfirmMainButton,
+    RecipientView,
+    useGetToAccount
+} from '@tonkeeper/uikit/dist/components/transfer/RecipientView';
+import { AmountView } from '@tonkeeper/uikit/dist/components/transfer/amountView/AmountView';
+import { AmountState } from '@tonkeeper/uikit/dist/components/transfer/amountView/amountState';
+import {
     InitTransferData,
-    MainButton,
-    RecipientHeaderBlock,
     Wrapper,
     childFactoryCreator,
     duration,
     getInitData,
     getJetton
-} from './common';
+} from '@tonkeeper/uikit/dist/components/transfer/common';
+import { useAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
+import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { openIosKeyboard } from '@tonkeeper/uikit/dist/hooks/ios';
+import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
+import { useUserJettonList } from '@tonkeeper/uikit/dist/state/jetton';
+import { useTronBalances } from '@tonkeeper/uikit/dist/state/tron/tron';
+import { useWalletJettonList } from '@tonkeeper/uikit/dist/state/wallet';
+import BigNumber from 'bignumber.js';
+import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import styled from 'styled-components';
+import {
+    AmountTwaMainButton,
+    ConfirmTwaMainButton,
+    HideTwaMainButton,
+    RecipientTwaMainButton
+} from './SendNotificationButtons';
+import {
+    AmountTwaHeaderBlock,
+    HideTwaBackButton,
+    RecipientTwaHeaderBlock
+} from './SendNotificationHeader';
+
+const PageWrapper = styled(Wrapper)`
+    padding: 0 16px;
+`;
 
 const SendContent: FC<{
     onClose: () => void;
@@ -51,7 +63,7 @@ const SendContent: FC<{
     initAmountState?: Partial<AmountState>;
 }> = ({ onClose, chain, initRecipient, initAmountState }) => {
     const sdk = useAppSdk();
-    const { standalone, ios, extension } = useAppContext();
+    const { ios } = useAppContext();
     const { t } = useTranslation();
     const { data: jettons } = useWalletJettonList();
     const filter = useUserJettonList(jettons);
@@ -204,7 +216,9 @@ const SendContent: FC<{
     }[view];
 
     return (
-        <Wrapper standalone={standalone} extension={extension}>
+        <PageWrapper standalone={false} extension={false}>
+            <HideTwaMainButton />
+            <HideTwaBackButton />
             <TransitionGroup childFactory={childFactoryCreator(right)}>
                 <CSSTransition
                     key={view}
@@ -223,13 +237,9 @@ const SendContent: FC<{
                                 keyboard="decimal"
                                 isExternalLoading={isAccountLoading}
                                 acceptBlockchains={chain ? [chain] : undefined}
-                                MainButton={MainButton}
-                                HeaderBlock={() => (
-                                    <RecipientHeaderBlock
-                                        title={t('transaction_recipient')}
-                                        onClose={onClose}
-                                    />
-                                )}
+                                MainButton={RecipientTwaMainButton}
+                                HeaderBlock={() => <RecipientTwaHeaderBlock onClose={onClose} />}
+                                fitContent
                             />
                         )}
                         {view === 'amount' && (
@@ -239,8 +249,8 @@ const SendContent: FC<{
                                 onBack={backToRecipient}
                                 recipient={recipient!}
                                 onConfirm={onConfirmAmount}
-                                MainButton={AmountMainButton}
-                                HeaderBlock={AmountHeaderBlock}
+                                MainButton={AmountTwaMainButton}
+                                HeaderBlock={AmountTwaHeaderBlock}
                             />
                         )}
                         {view === 'confirm' && (
@@ -255,27 +265,28 @@ const SendContent: FC<{
                                 isMax={amountViewState!.isMax!}
                             >
                                 <ConfirmViewTitleSlot>
-                                    <ConfirmViewTitle />
+                                    <RecipientTwaHeaderBlock onClose={backToAmount} />
                                 </ConfirmViewTitleSlot>
                                 <ConfirmViewButtonsSlot>
-                                    <ConfirmViewButtons MainButton={ConfirmMainButton} />
+                                    <ConfirmViewButtons MainButton={ConfirmTwaMainButton} />
                                 </ConfirmViewButtonsSlot>
                             </ConfirmTransferView>
                         )}
                     </div>
                 </CSSTransition>
             </TransitionGroup>
-        </Wrapper>
+        </PageWrapper>
     );
 };
 
-const SendActionNotification = () => {
+export const SendAction: FC<PropsWithChildren> = ({ children }) => {
     const [open, setOpen] = useState(false);
     const [chain, setChain] = useState<BLOCKCHAIN_NAME | undefined>(undefined);
     const [tonTransfer, setTonTransfer] = useState<InitTransferData | undefined>(undefined);
     const { data: jettons } = useWalletJettonList();
 
     const { mutateAsync: getAccountAsync, reset } = useGetToAccount();
+
     const sdk = useAppSdk();
 
     useEffect(() => {
@@ -284,10 +295,12 @@ const SendActionNotification = () => {
             id?: number | undefined;
             params: TransferInitParams;
         }) => {
+            if (sdk.twaExpand) {
+                sdk.twaExpand();
+            }
             reset();
-
-            const { transfer, asset } = options.params;
-            setChain(options.params.chain);
+            const { transfer, asset, chain } = options.params;
+            setChain(chain);
             if (transfer) {
                 getAccountAsync({ address: transfer.address }).then(account => {
                     setTonTransfer(getInitData(transfer, account, jettons));
@@ -310,8 +323,7 @@ const SendActionNotification = () => {
         setOpen(false);
     }, []);
 
-    const Content = useCallback(() => {
-        if (!open) return undefined;
+    if (open) {
         return (
             <SendContent
                 onClose={onClose}
@@ -320,13 +332,7 @@ const SendActionNotification = () => {
                 initRecipient={tonTransfer?.initRecipient}
             />
         );
-    }, [open, tonTransfer, chain]);
-
-    return (
-        <Notification isOpen={open} handleClose={onClose} hideButton backShadow>
-            {Content}
-        </Notification>
-    );
+    } else {
+        return <>{children}</>;
+    }
 };
-
-export default SendActionNotification;

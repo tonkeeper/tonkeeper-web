@@ -6,7 +6,7 @@ import { ScanIcon, XmarkIcon } from '../Icon';
 import { InputBlock, Label } from './Input';
 import { TextareaAutosize } from './TextareaAutosize';
 
-export interface InputWithScanner {
+export interface IInputWithScanner {
     value: string;
     onScan: (signature: string) => void;
     onChange?: (value: string) => void;
@@ -41,13 +41,12 @@ const ScanBlock = styled.div`
     color: ${props => props.theme.accentBlue};
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const InputWithScanner = React.forwardRef<HTMLTextAreaElement, InputWithScanner>(
+export const InputWithScanner = React.forwardRef<HTMLTextAreaElement, IInputWithScanner>(
     ({ value, onChange, isValid = true, label, disabled, onScan, onSubmit }, ref) => {
         const [focus, setFocus] = useState(false);
         const [scanId, setScanId] = useState<number | undefined>(undefined);
         const sdk = useAppSdk();
-        const { extension } = useAppContext();
+        const { hideQrScanner } = useAppContext();
 
         const onClear: React.MouseEventHandler<HTMLDivElement> = e => {
             e.stopPropagation();
@@ -100,7 +99,7 @@ export const InputWithScanner = React.forwardRef<HTMLTextAreaElement, InputWithS
                 {label && <Label active={value !== ''}>{label}</Label>}
 
                 {value === '' ? (
-                    extension ? (
+                    hideQrScanner === true ? (
                         <></>
                     ) : (
                         <ScanBlock onClick={onClick}>

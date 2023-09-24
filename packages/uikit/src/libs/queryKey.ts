@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 export enum QueryKey {
     account = 'account',
     wallet = 'wallet',
@@ -17,6 +16,8 @@ export enum QueryKey {
     system = 'system',
     syncDate = 'syncDate',
     analytics = 'analytics',
+
+    connection = 'connection',
 
     tron = 'tron',
     rate = 'rate',

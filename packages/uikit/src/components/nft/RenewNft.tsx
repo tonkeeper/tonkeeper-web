@@ -20,6 +20,7 @@ import { Notification } from '../Notification';
 import { Body2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ConfirmView, ConfirmViewButtons, ConfirmViewButtonsSlot } from '../transfer/ConfirmView';
+import { ConfirmAndCancelMainButton } from '../transfer/common';
 
 const RenewDNSBlock = styled.div`
     width: 100%;
@@ -119,7 +120,7 @@ export const RenewNft: FC<{
             {...mutation}
         >
             <ConfirmViewButtonsSlot>
-                <ConfirmViewButtons withCancelButton />
+                <ConfirmViewButtons MainButton={ConfirmAndCancelMainButton} />
             </ConfirmViewButtonsSlot>
         </ConfirmView>
     );

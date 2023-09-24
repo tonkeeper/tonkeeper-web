@@ -60,7 +60,7 @@ const QrScanner = () => {
     const Content = useCallback(() => {
         return (
             <FullHeightBlock standalone={standalone}>
-                <Block ios={ios}>
+                <Block ios={window.innerWidth <= 440}>
                     <QrScanSignature
                         onScan={onScan}
                         onError={e => {

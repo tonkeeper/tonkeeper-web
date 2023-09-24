@@ -1,7 +1,6 @@
 import queryString from 'query-string';
 import { Address, beginCell, storeStateInit } from 'ton-core';
 import {
-    KeyPair,
     getSecureRandomBytes,
     keyPairFromSeed,
     mnemonicToPrivateKey,
@@ -19,6 +18,10 @@ import {
     ConnectRequest,
     DAppManifest,
     DeviceInfo,
+    DisconnectEvent,
+    SEND_TRANSACTION_ERROR_CODES,
+    SendTransactionRpcResponseError,
+    SendTransactionRpcResponseSuccess,
     TonAddressItemReply,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
@@ -32,6 +35,7 @@ import {
     getAccountConnection,
     saveAccountConnection
 } from './connectionService';
+import { SessionCrypto } from './protocol';
 
 const TC_PREFIX = 'tc://';
 
@@ -56,12 +60,13 @@ export function parseTonConnect(options: { url: string }): TonConnectParams | nu
         const protocolVersion = parseInt(query.v);
         const request = JSON.parse(decodeURIComponent(query.r)) as ConnectRequest;
         const clientSessionId = query.id;
-        //const sessionCrypto = new SessionCrypto();
+        const sessionCrypto = new SessionCrypto();
+
         return {
             protocolVersion,
             request,
             clientSessionId,
-            sessionKeyPair: undefined!
+            sessionKeyPair: sessionCrypto.stringifyKeypair()
         };
     } catch (e) {
         return null;
@@ -74,15 +79,15 @@ export const getTonConnectParams = async (
     clientSessionId?: string
 ): Promise<TonConnectParams> => {
     const randomBytes: Buffer = await getSecureRandomBytes(32);
-    const keypair: KeyPair = keyPairFromSeed(randomBytes);
+    const keyPair = keyPairFromSeed(randomBytes);
 
     return {
         protocolVersion: protocolVersion ?? 2,
         request,
         clientSessionId: clientSessionId ?? (await getSecureRandomBytes(32)).toString('hex'),
         sessionKeyPair: {
-            secretKey: keypair.secretKey.toString('hex'),
-            publicKey: keypair.publicKey.toString('hex')
+            secretKey: keyPair.secretKey.toString('hex'),
+            publicKey: keyPair.publicKey.toString('hex')
         }
     };
 };
@@ -297,14 +302,14 @@ export const tonDisconnectRequest = async (options: { storage: IStorage; webView
     await disconnectAccountConnection({ ...options, wallet });
 };
 
-export const walletTonConnect = async (options: {
+export const saveWalletTonConnect = async (options: {
     storage: IStorage;
     wallet: WalletState;
     manifest: DAppManifest;
     params: TonConnectParams;
     replyItems: ConnectItemReply[];
     appVersion: string;
-    webViewUrl: string;
+    webViewUrl?: string;
 }): Promise<ConnectEvent> => {
     await saveAccountConnection(options);
     return {
@@ -314,5 +319,57 @@ export const walletTonConnect = async (options: {
             items: options.replyItems,
             device: getDeviceInfo(options.appVersion)
         }
+    };
+};
+
+export const connectRejectResponse = (): ConnectEvent => {
+    return {
+        id: Date.now(),
+        event: 'connect_error',
+        payload: {
+            code: CONNECT_EVENT_ERROR_CODES.USER_REJECTS_ERROR,
+            message: 'Reject Request'
+        }
+    };
+};
+
+export const disconnectResponse = (id: string): DisconnectEvent => {
+    return {
+        event: 'disconnect',
+        id,
+        payload: {}
+    };
+};
+
+export const sendTransactionErrorResponse = (id: string): SendTransactionRpcResponseError => {
+    return {
+        id,
+        error: {
+            code: SEND_TRANSACTION_ERROR_CODES.USER_REJECTS_ERROR,
+            message: 'Reject Request'
+        }
+    };
+};
+
+export const sendTransactionSuccessResponse = (
+    id: string,
+    boc: string
+): SendTransactionRpcResponseSuccess => {
+    return {
+        id,
+        result: boc
+    };
+};
+
+export const sendBadRequestResponse = (
+    id: string,
+    name: string
+): SendTransactionRpcResponseError => {
+    return {
+        error: {
+            code: SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR,
+            message: `Method "${name}" does not supported by the wallet app`
+        },
+        id
     };
 };

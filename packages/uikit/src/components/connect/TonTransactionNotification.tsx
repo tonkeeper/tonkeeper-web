@@ -8,7 +8,7 @@ import {
     getAccountsMap,
     sendTonConnectTransfer
 } from '@tonkeeper/core/dist/service/transfer/tonService';
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -31,11 +31,10 @@ const ButtonGap = styled.div`
 
 const ButtonRowFixed = styled(ButtonRow)`
     position: fixed;
-    left: 0;
-    right: 0;
     bottom: 16px;
     padding: 0 16px;
     box-sizing: border-box;
+    width: var(--app-width);
 
     &:after {
         content: '';
@@ -73,11 +72,18 @@ const ConnectContent: FC<{
     estimate?: EstimateData;
     handleClose: (result?: string) => void;
 }> = ({ params, estimate, handleClose }) => {
+    const sdk = useAppSdk();
     const [done, setDone] = useState(false);
 
     const { t } = useTranslation();
 
     const { mutateAsync, isLoading } = useSendMutation(params, estimate);
+
+    useEffect(() => {
+        if (sdk.twaExpand) {
+            sdk.twaExpand();
+        }
+    }, []);
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();

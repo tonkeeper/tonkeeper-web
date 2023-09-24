@@ -12,7 +12,7 @@ import { ActivityList } from '../../components/activity/ActivityGroup';
 import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
-import { SendAction } from '../../components/transfer/SendNotifications';
+import { SendAction } from '../../components/transfer/SendActionButton';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFormatBalance } from '../../hooks/balance';
 import { useFetchNext } from '../../hooks/useFetchNext';

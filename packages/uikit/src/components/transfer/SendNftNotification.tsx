@@ -17,7 +17,14 @@ import { QueryKey } from '../../libs/queryKey';
 import { Notification } from '../Notification';
 import { ConfirmNftView } from './ConfirmNftView';
 import { RecipientView, useGetToAccount } from './RecipientView';
-import { Wrapper, childFactoryCreator, duration, notifyError } from './common';
+import {
+    MainButton,
+    RecipientHeaderBlock,
+    Wrapper,
+    childFactoryCreator,
+    duration,
+    notifyError
+} from './common';
 
 const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData) => {
     const { t } = useTranslation();
@@ -135,13 +142,18 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftIte
                     <div ref={nodeRef}>
                         {state === 'recipient' && (
                             <RecipientView
-                                title={t('nft_transfer_title')}
                                 data={recipient}
-                                onClose={onClose}
                                 setRecipient={onRecipient}
                                 onScan={onScan}
                                 isExternalLoading={isChecking}
                                 acceptBlockchains={[BLOCKCHAIN_NAME.TON]}
+                                MainButton={MainButton}
+                                HeaderBlock={() => (
+                                    <RecipientHeaderBlock
+                                        title={t('nft_transfer_title')}
+                                        onClose={onClose}
+                                    />
+                                )}
                             />
                         )}
                         {state === 'confirm' && (

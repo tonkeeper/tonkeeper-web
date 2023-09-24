@@ -12,6 +12,7 @@ import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1 } from './Text';
+import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 
 const Block = styled.div<{
@@ -185,7 +186,7 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
     }
 };
 
-export const Header = () => {
+export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const { t } = useTranslation();
     const wallet = useWalletContext();
     const [isOpen, setOpen] = useState(false);
@@ -206,7 +207,7 @@ export const Header = () => {
                 </Title>
             </DropDown>
 
-            {/* <ScanButton /> */}
+            {showQrScan && <ScanButton />}
 
             <ImportNotification isOpen={isOpen} setOpen={setOpen} />
         </Block>

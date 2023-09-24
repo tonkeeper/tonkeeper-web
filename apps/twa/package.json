@@ -42,6 +42,7 @@
         "build": "GENERATE_SOURCEMAP=false react-app-rewired build && yarn locales",
         "test": "react-app-rewired test",
         "eject": "react-app-rewired eject",
+        "deploy": "yarn build && npx wrangler pages deploy build",
         "build:twa": "yarn build"
     },
     "browserslist": {
