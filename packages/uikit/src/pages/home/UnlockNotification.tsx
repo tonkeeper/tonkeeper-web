@@ -56,6 +56,10 @@ const Block = styled.form`
     justify-content: center;
     gap: 2rem;
     width: 100%;
+
+    @media (max-width: 440px) {
+        padding-bottom: 200px;
+    }
 `;
 
 export const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
