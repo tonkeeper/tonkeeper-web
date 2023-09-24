@@ -95,9 +95,20 @@ export const getTonConnectParams = async (
     };
 };
 
+const getManifestResponse = async (manifestUrl: string) => {
+    try {
+        return await fetch(manifestUrl);
+    } catch (e) {
+        /**
+         * Request file with CORS header;
+         */
+        return await fetch(`https://cors-anywhere.herokuapp.com/${manifestUrl}`);
+    }
+};
+
 export const getManifest = async (request: ConnectRequest) => {
     // TODO: get fetch from context
-    const response = await fetch(request.manifestUrl);
+    const response = await getManifestResponse(request.manifestUrl);
 
     if (response.status != 200) {
         throw new Error('Failed to load Manifest');
