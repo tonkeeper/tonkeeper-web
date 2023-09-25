@@ -109,6 +109,13 @@ export const PasswordUnlock: FC<{
     const location = useLocation();
 
     useEffect(() => {
+        sdk.uiEvents.on('navigate', onClose);
+        return () => {
+            sdk.uiEvents.off('navigate', onClose);
+        };
+    }, [sdk, onClose]);
+
+    useEffect(() => {
         const timeout = setTimeout(() => {
             if (ref.current) {
                 ref.current.focus();
@@ -203,15 +210,17 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
         }
     };
 
-    const onCancel = () => {
+    const onCancel = useCallback(() => {
         reset();
-        sdk.uiEvents.emit('response', {
-            method: 'response',
-            id: requestId,
-            params: new Error('Cancel auth request')
-        });
+        if (requestId) {
+            sdk.uiEvents.emit('response', {
+                method: 'response',
+                id: requestId,
+                params: new Error('Cancel auth request')
+            });
+        }
         close();
-    };
+    }, [reset, requestId, sdk, close]);
 
     useEffect(() => {
         const handlerKeyboard = (options: {
@@ -239,6 +248,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
 
         sdk.uiEvents.on('getPassword', handler);
         sdk.uiEvents.on('keyboard', handlerKeyboard);
+
         return () => {
             sdk.uiEvents.off('getPassword', handler);
             sdk.uiEvents.off('keyboard', handlerKeyboard);
@@ -258,7 +268,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
                 padding={padding}
             />
         );
-    }, [sdk, auth, requestId, onSubmit, type]);
+    }, [sdk, auth, requestId, onCancel, onSubmit, type]);
 
     return (
         <Notification

@@ -1,5 +1,5 @@
 import { useLaunchParams } from '@twa.js/sdk-react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const InitDataLogger = () => {
@@ -9,7 +9,7 @@ export const InitDataLogger = () => {
     useEffect(() => {
         i18n.languages.forEach(lang => {
             if (launchParams.initData?.user?.languageCode === lang) {
-                i18n.changeLanguage(lang);
+                i18n.reloadResources([lang]).then(() => i18n.changeLanguage(lang));
             }
         });
     }, [launchParams]);

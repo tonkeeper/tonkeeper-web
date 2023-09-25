@@ -1,13 +1,13 @@
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { EventEmitter } from '@tonkeeper/core/dist/entries/eventEmitter';
-import { HapticFeedback } from '@twa.js/sdk';
+import { InitResult } from '@twa.js/sdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
 
 export class TwaAppSdk implements IAppSdk {
-    constructor(public storage: IStorage) {}
+    constructor(public storage: IStorage, private components: InitResult) {}
     copyToClipboard = (value: string, notification?: string) => {
         copyToClipboard(value);
         this.uiEvents.emit('copy', {
@@ -15,9 +15,7 @@ export class TwaAppSdk implements IAppSdk {
             params: notification
         });
 
-        if (this.hapticFeedback) {
-            this.hapticFeedback.notificationOccurred('success');
-        }
+        this.components.haptic.notificationOccurred('success');
     };
     openPage = async (url: string) => {
         window.open(url, '_black');
@@ -27,18 +25,9 @@ export class TwaAppSdk implements IAppSdk {
     alert = async (text: string) => window.alert(text);
     requestExtensionPermission = async () => void 0;
 
-    twaExpand = () => void 0;
-    setTwaExpand = (fn: () => undefined) => {
-        this.twaExpand = fn;
-    };
-    hapticFeedback: HapticFeedback | undefined;
+    twaExpand = () => this.components.viewport.expand();
     hapticNotification = (type: 'success' | 'error') => {
-        if (this.hapticFeedback) {
-            this.hapticFeedback.notificationOccurred(type);
-        }
-    };
-    setHapticFeedback = (hapticFeedback: HapticFeedback) => {
-        this.hapticFeedback = hapticFeedback;
+        this.components.haptic.notificationOccurred(type);
     };
 
     disableScroll = disableScroll;

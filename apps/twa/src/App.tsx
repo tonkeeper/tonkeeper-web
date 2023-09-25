@@ -43,6 +43,7 @@ import {
     useAmplitudeAnalytics
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
 
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { Initialize } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
@@ -52,7 +53,7 @@ import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { Platform as TwaPlatform } from '@twa.js/sdk';
-import { SDKProvider, useSDK } from '@twa.js/sdk-react';
+import { SDKProvider, useSDK, useWebApp } from '@twa.js/sdk-react';
 import React, { FC, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -62,7 +63,7 @@ import { TwaQrScanner } from './components/TwaQrScanner';
 import { SendAction } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { ViewportContext, useTwaAppViewport } from './libs/hooks';
-import { BrowserStorage } from './libs/storage';
+import { TwaStorage } from './libs/storage';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -81,18 +82,43 @@ const queryClient = new QueryClient({
         }
     }
 });
-const storage = new BrowserStorage();
-const sdk = new TwaAppSdk(storage);
 
 export const App = () => {
     return (
         <SDKProvider>
-            <TwaApp />
+            <TwaLoader />
         </SDKProvider>
     );
 };
 
-const TwaApp = () => {
+const TwaLoader = () => {
+    const { didInit, components, error } = useSDK();
+
+    const sdk = useMemo(() => {
+        if (!components) return undefined;
+
+        components.webApp.setBackgroundColor((defaultTheme as any).backgroundPage);
+
+        const storage = new TwaStorage(components.cloudStorage);
+        return new TwaAppSdk(storage, components);
+    }, [components]);
+
+    if (error instanceof Error) {
+        return <div>{error.message}</div>;
+    }
+
+    if (!didInit || components == null || sdk == null) {
+        return <></>;
+    }
+
+    return (
+        <ViewportContext.Provider value={components.viewport}>
+            <TwaApp sdk={sdk} />
+        </ViewportContext.Provider>
+    );
+};
+
+const TwaApp: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { t, i18n } = useTranslation();
 
     const translation = useMemo(() => {
@@ -112,16 +138,17 @@ const TwaApp = () => {
     return (
         <BrowserRouter>
             <QueryClientProvider client={queryClient}>
-                <Suspense fallback={<div></div>}>
+                <Suspense>
                     <AppSdkContext.Provider value={sdk}>
                         <TranslationContext.Provider value={translation}>
-                            <StorageContext.Provider value={storage}>
+                            <StorageContext.Provider value={sdk.storage}>
                                 <UserThemeProvider>
                                     <HeaderGlobalStyle />
                                     <FooterGlobalStyle />
                                     <SybHeaderGlobalStyle />
                                     <GlobalListStyle />
-                                    <Loader />
+                                    <InitDataLogger />
+                                    <Loader sdk={sdk} />
                                     <UnlockNotification sdk={sdk} />
                                 </UserThemeProvider>
                             </StorageContext.Provider>
@@ -133,7 +160,7 @@ const TwaApp = () => {
     );
 };
 
-const useLock = () => {
+const useLock = (sdk: IAppSdk) => {
     const [lock, setLock] = useState<boolean | undefined>(undefined);
     useEffect(() => {
         sdk.storage.get<boolean>(AppKey.LOCK).then(useLock => setLock(useLock === true));
@@ -172,12 +199,11 @@ const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
     }
 };
 
-export const Loader: FC = () => {
+export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { data: activeWallet } = useActiveWallet();
+    const webApp = useWebApp();
 
-    const { didInit, components } = useSDK();
-    const lock = useLock();
-    const { i18n } = useTranslation();
+    const lock = useLock(sdk);
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
@@ -187,30 +213,12 @@ export const Loader: FC = () => {
     const navigate = useNavigate();
     const enable = useAmplitudeAnalytics('Twa', account, activeWallet);
 
-    useEffect(() => {
-        if (components) {
-            sdk.setTwaExpand(() => {
-                components.viewport.expand();
-                return undefined;
-            });
-
-            sdk.setHapticFeedback(components.haptic);
-            components.webApp.setBackgroundColor((defaultTheme as any).backgroundPage);
-        }
-    }, [components]);
-
-    if (
-        auth === undefined ||
-        account === undefined ||
-        config === undefined ||
-        lock === undefined ||
-        !didInit ||
-        components == null
-    ) {
+    if (auth === undefined || account === undefined || config === undefined || lock === undefined) {
         return <Loading />;
     }
 
-    const showQrScan = seeIfShowQrScanner(components.webApp.platform);
+    const showQrScan = seeIfShowQrScanner(webApp.platform);
+
     const network = activeWallet?.network ?? Network.MAINNET;
     const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
     const context: IAppContext = {
@@ -231,14 +239,13 @@ export const Loader: FC = () => {
     };
 
     return (
-        <ViewportContext.Provider value={components.viewport}>
-            <AmplitudeAnalyticsContext.Provider value={enable}>
-                <OnImportAction.Provider value={navigate}>
-                    <AfterImportAction.Provider
-                        value={() => navigate(AppRoute.home, { replace: true })}
-                    >
-                        <AppContext.Provider value={context}>
-                            {/* <div
+        <AmplitudeAnalyticsContext.Provider value={enable}>
+            <OnImportAction.Provider value={navigate}>
+                <AfterImportAction.Provider
+                    value={() => navigate(AppRoute.home, { replace: true })}
+                >
+                    <AppContext.Provider value={context}>
+                        {/* <div
                                 onClick={() => sdk.copyToClipboard(window.location.hash.slice(1))}
                                 style={{
                                     paddingTop: '100px',
@@ -253,19 +260,13 @@ export const Loader: FC = () => {
                                 {components.initData?.startParam}
                                 {window.location.hash.slice(1)}
                             </div> */}
-                            <Content
-                                activeWallet={activeWallet}
-                                lock={lock}
-                                showQrScan={showQrScan}
-                            />
-                            <CopyNotification />
-                            {showQrScan && <TwaQrScanner />}
-                            <InitDataLogger />
-                        </AppContext.Provider>
-                    </AfterImportAction.Provider>
-                </OnImportAction.Provider>
-            </AmplitudeAnalyticsContext.Provider>
-        </ViewportContext.Provider>
+                        <Content activeWallet={activeWallet} lock={lock} showQrScan={showQrScan} />
+                        <CopyNotification />
+                        {showQrScan && <TwaQrScanner />}
+                    </AppContext.Provider>
+                </AfterImportAction.Provider>
+            </OnImportAction.Provider>
+        </AmplitudeAnalyticsContext.Provider>
     );
 };
 
@@ -283,8 +284,6 @@ const InitWrapper = styled(Container)`
 `;
 
 const InitPages = () => {
-    // useAppViewport();
-
     return (
         <InitWrapper>
             <Suspense fallback={<Loading />}>
