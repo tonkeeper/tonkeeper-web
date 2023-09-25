@@ -1,11 +1,11 @@
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import React, { useEffect, useState } from 'react';
 import { mnemonicNew } from 'ton-crypto';
+import { IconPage } from '../../components/Layout';
 import { CreateAuthState } from '../../components/create/CreateAuth';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { Check, Worlds } from '../../components/create/Words';
 import { Button } from '../../components/fields/Button';
-import { IconPage } from '../../components/Layout';
 import {
     CheckLottieIcon,
     GearLottieIcon,
@@ -16,7 +16,6 @@ import { useActiveWallet } from '../../state/wallet';
 import { FinalView, useAddWalletMutation } from './Password';
 
 export const Create = () => {
-    //useKeyboardHeight();
     const { t } = useTranslation();
     const {
         mutateAsync: checkPasswordAndCreateWalletAsync,

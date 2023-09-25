@@ -15,7 +15,7 @@ export const switchNetwork = (current: Network): Network => {
     return current === Network.MAINNET ? Network.TESTNET : Network.MAINNET;
 };
 
-export const getTonClient = (config: TonendpointConfig, current?: Network) => {
+const getTonClient = (config: TonendpointConfig, current?: Network) => {
     return new Configuration({
         basePath: current === Network.MAINNET ? 'https://tonapi.io' : 'https://testnet.tonapi.io',
         headers: {
@@ -24,7 +24,7 @@ export const getTonClient = (config: TonendpointConfig, current?: Network) => {
     });
 };
 
-export const getTonClientV2 = (config: TonendpointConfig, current?: Network) => {
+const getTonClientV2 = (config: TonendpointConfig, current?: Network) => {
     return new ConfigurationV2({
         basePath:
             current === Network.MAINNET ? 'https://keeper.tonapi.io' : 'https://testnet.tonapi.io',
@@ -34,8 +34,16 @@ export const getTonClientV2 = (config: TonendpointConfig, current?: Network) => 
     });
 };
 
-export const getTronClient = (current?: Network) => {
+const getTronClient = (current?: Network) => {
     return new TronConfiguration({
         basePath: TronApi[current === Network.MAINNET ? TronChain.MAINNET : TronChain.NILE]
     });
+};
+
+export const getApiConfig = (config: TonendpointConfig, network?: Network) => {
+    return {
+        tonApi: getTonClient(config, network),
+        tonApiV2: getTonClientV2(config, network),
+        tronApi: getTronClient(network)
+    };
 };

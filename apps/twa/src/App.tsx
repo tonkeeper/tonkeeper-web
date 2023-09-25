@@ -1,12 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import {
-    Network,
-    getTonClient,
-    getTonClientV2,
-    getTronClient
-} from '@tonkeeper/core/dist/entries/network';
+import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -32,6 +26,7 @@ import {
     AppSdkContext,
     OnImportAction
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
 import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
@@ -54,7 +49,7 @@ import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { Platform as TwaPlatform } from '@twa.js/sdk';
 import { SDKProvider, useSDK, useWebApp } from '@twa.js/sdk-react';
-import React, { FC, Suspense, useEffect, useMemo, useState } from 'react';
+import React, { FC, Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -62,8 +57,7 @@ import { InitDataLogger } from './components/InitData';
 import { TwaQrScanner } from './components/TwaQrScanner';
 import { SendAction } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
-import { ViewportContext, useTwaAppViewport } from './libs/hooks';
-import { TwaStorage } from './libs/storage';
+import { useTwaAppViewport } from './libs/hooks';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -98,9 +92,9 @@ const TwaLoader = () => {
         if (!components) return undefined;
 
         components.webApp.setBackgroundColor((defaultTheme as any).backgroundPage);
+        components.webApp.setHeaderColor((defaultTheme as any).backgroundPage);
 
-        const storage = new TwaStorage(components.cloudStorage);
-        return new TwaAppSdk(storage, components);
+        return new TwaAppSdk(components);
     }, [components]);
 
     if (error instanceof Error) {
@@ -112,9 +106,9 @@ const TwaLoader = () => {
     }
 
     return (
-        <ViewportContext.Provider value={components.viewport}>
+        <AppSdkContext.Provider value={sdk}>
             <TwaApp sdk={sdk} />
-        </ViewportContext.Provider>
+        </AppSdkContext.Provider>
     );
 };
 
@@ -139,49 +133,29 @@ const TwaApp: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
         <BrowserRouter>
             <QueryClientProvider client={queryClient}>
                 <Suspense>
-                    <AppSdkContext.Provider value={sdk}>
-                        <TranslationContext.Provider value={translation}>
-                            <StorageContext.Provider value={sdk.storage}>
-                                <UserThemeProvider>
-                                    <HeaderGlobalStyle />
-                                    <FooterGlobalStyle />
-                                    <SybHeaderGlobalStyle />
-                                    <GlobalListStyle />
-                                    <InitDataLogger />
-                                    <Loader sdk={sdk} />
-                                    <UnlockNotification sdk={sdk} />
-                                </UserThemeProvider>
-                            </StorageContext.Provider>
-                        </TranslationContext.Provider>
-                    </AppSdkContext.Provider>
+                    <TranslationContext.Provider value={translation}>
+                        <StorageContext.Provider value={sdk.storage}>
+                            <UserThemeProvider>
+                                <HeaderGlobalStyle />
+                                <FooterGlobalStyle />
+                                <SybHeaderGlobalStyle />
+                                <GlobalListStyle />
+                                <InitDataLogger />
+                                <Loader sdk={sdk} />
+                                <UnlockNotification sdk={sdk} />
+                            </UserThemeProvider>
+                        </StorageContext.Provider>
+                    </TranslationContext.Provider>
                 </Suspense>
             </QueryClientProvider>
         </BrowserRouter>
     );
 };
 
-const useLock = (sdk: IAppSdk) => {
-    const [lock, setLock] = useState<boolean | undefined>(undefined);
-    useEffect(() => {
-        sdk.storage.get<boolean>(AppKey.LOCK).then(useLock => setLock(useLock === true));
-
-        const unlock = () => {
-            setLock(false);
-        };
-        sdk.uiEvents.on('unlock', unlock);
-
-        return () => {
-            sdk.uiEvents.off('unlock', unlock);
-        };
-    }, []);
-    return lock;
-};
-
 const FullSizeWrapper = styled(Container)``;
 
 const Wrapper = styled(FullSizeWrapper)`
     height: var(--app-height);
-
     transition: height 0.4s ease;
 
     box-sizing: border-box;
@@ -222,11 +196,7 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const network = activeWallet?.network ?? Network.MAINNET;
     const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
     const context: IAppContext = {
-        api: {
-            tonApi: getTonClient(config, network),
-            tonApiV2: getTonClientV2(config, network),
-            tronApi: getTronClient(network)
-        },
+        api: getApiConfig(config, network),
         auth,
         fiat,
         account,
@@ -271,19 +241,21 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
 };
 
 const InitWrapper = styled(Container)`
-    height: var(--tg-viewport-stable-height);
+    height: var(--app-height);
+    min-height: auto;
 
     transition: height 0.4s ease;
 
     overflow: auto;
     display: flex;
     flex-direction: column;
-    padding: 1rem 1rem;
+    padding: 16px;
     box-sizing: border-box;
     position: relative;
 `;
 
 const InitPages = () => {
+    useTwaAppViewport(true);
     return (
         <InitWrapper>
             <Suspense fallback={<Loading />}>
@@ -296,14 +268,13 @@ const InitPages = () => {
     );
 };
 
-export const Content: FC<{
+const Content: FC<{
     activeWallet?: WalletState | null;
     lock: boolean;
     showQrScan: boolean;
 }> = ({ activeWallet, lock, showQrScan }) => {
     const location = useLocation();
     useWindowsScroll();
-    useTwaAppViewport();
 
     if (lock) {
         return (
@@ -319,56 +290,63 @@ export const Content: FC<{
 
     return (
         <WalletStateContext.Provider value={activeWallet}>
-            <SendAction>
-                <Wrapper>
-                    <Routes>
-                        <Route
-                            path={AppRoute.activity}
-                            element={
-                                <Suspense fallback={<ActivitySkeletonPage />}>
-                                    <Activity />
-                                </Suspense>
-                            }
-                        />
-                        <Route
-                            path={any(AppRoute.settings)}
-                            element={
-                                <Suspense fallback={<SettingsSkeletonPage />}>
-                                    <Settings />
-                                </Suspense>
-                            }
-                        />
-                        <Route path={AppRoute.coins}>
-                            <Route
-                                path=":name/*"
-                                element={
-                                    <Suspense fallback={<CoinSkeletonPage />}>
-                                        <Coin />
-                                    </Suspense>
-                                }
-                            />
-                        </Route>
-                        <Route
-                            path="*"
-                            element={
-                                <>
-                                    <Header showQrScan={showQrScan} />
-                                    <InnerBody>
-                                        <Suspense fallback={<HomeSkeleton />}>
-                                            <Home />
-                                        </Suspense>
-                                    </InnerBody>
-                                </>
-                            }
-                        />
-                    </Routes>
-                    <Footer sticky />
-                    <MemoryScroll />
-                    <Suspense>
-                        <TonConnectSubscription />
-                    </Suspense>
-                </Wrapper>
-            </SendAction>
+            <MainPages showQrScan={showQrScan} />
         </WalletStateContext.Provider>
+    );
+};
+
+const MainPages: FC<{ showQrScan: boolean }> = ({ showQrScan }) => {
+    useTwaAppViewport(false);
+    return (
+        <SendAction>
+            <Wrapper>
+                <Routes>
+                    <Route
+                        path={AppRoute.activity}
+                        element={
+                            <Suspense fallback={<ActivitySkeletonPage />}>
+                                <Activity />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path={any(AppRoute.settings)}
+                        element={
+                            <Suspense fallback={<SettingsSkeletonPage />}>
+                                <Settings />
+                            </Suspense>
+                        }
+                    />
+                    <Route path={AppRoute.coins}>
+                        <Route
+                            path=":name/*"
+                            element={
+                                <Suspense fallback={<CoinSkeletonPage />}>
+                                    <Coin />
+                                </Suspense>
+                            }
+                        />
+                    </Route>
+                    <Route
+                        path="*"
+                        element={
+                            <>
+                                <Header showQrScan={showQrScan} />
+                                <InnerBody>
+                                    <Suspense fallback={<HomeSkeleton />}>
+                                        <Home />
+                                    </Suspense>
+                                </InnerBody>
+                            </>
+                        }
+                    />
+                </Routes>
+                <Footer sticky />
+                <MemoryScroll />
+                <Suspense>
+                    <TonConnectSubscription />
+                </Suspense>
+            </Wrapper>
+        </SendAction>
     );
 };

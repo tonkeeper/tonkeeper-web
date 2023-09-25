@@ -1,3 +1,4 @@
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -89,28 +90,68 @@ export const ButtonRow = styled.div`
     display: flex;
 `;
 
-export const LogoutBlock = styled.div`
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 5;
-`;
-
-export const BackBlock = styled.div`
+const BackBlock = styled.div`
     position: absolute;
     top: 1rem;
     left: 1rem;
     z-index: 5;
 `;
 
+const useNativeBackButton = (sdk: IAppSdk, onClick: () => void) => {
+    useEffect(() => {
+        const { nativeBackButton } = sdk;
+        if (!nativeBackButton) return () => {};
+        nativeBackButton.show();
+
+        nativeBackButton.on('click', onClick);
+        return () => {
+            nativeBackButton.off('click', onClick);
+            nativeBackButton.hide();
+        };
+    }, [sdk, onClick]);
+};
+
+export const BackButtonBlock: FC<{ onClick: () => void }> = ({ onClick }) => {
+    const sdk = useAppSdk();
+    useNativeBackButton(sdk, onClick);
+    if (sdk.nativeBackButton) {
+        return <></>;
+    } else {
+        return (
+            <BackBlock>
+                <BackButton onClick={onClick}>
+                    <ChevronLeftIcon />
+                </BackButton>
+            </BackBlock>
+        );
+    }
+};
+
+const LogoutBlock = styled.div`
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 5;
+`;
+
 export const LogoutButton = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    return (
-        <LogoutButtonBlock onClick={() => navigate(AppRoute.home)}>
-            <Label2>{t('settings_reset')}</Label2>
-        </LogoutButtonBlock>
-    );
+    const sdk = useAppSdk();
+    const back = useCallback(() => navigate(AppRoute.home), [navigate]);
+    useNativeBackButton(sdk, back);
+
+    if (sdk.nativeBackButton) {
+        return <></>;
+    } else {
+        return (
+            <LogoutBlock>
+                <LogoutButtonBlock onClick={back}>
+                    <Label2>{t('settings_reset')}</Label2>
+                </LogoutButtonBlock>
+            </LogoutBlock>
+        );
+    }
 };
 
 export const Worlds: FC<{
@@ -129,11 +170,7 @@ export const Worlds: FC<{
 
     return (
         <CenterContainer>
-            <BackBlock>
-                <BackButton onClick={onBack}>
-                    <ChevronLeftIcon />
-                </BackButton>
-            </BackBlock>
+            <BackButtonBlock onClick={onBack} />
             <Block>
                 <div>
                     <Header>{t('secret_words_title')}</Header>
@@ -326,11 +363,7 @@ export const Check: FC<{
 
     return (
         <CenterContainer>
-            <BackBlock>
-                <BackButton onClick={onBack}>
-                    <ChevronLeftIcon />
-                </BackButton>
-            </BackBlock>
+            <BackButtonBlock onClick={onBack} />
             <Block>
                 <div>
                     <Header>{t('check_words_title')}</Header>
@@ -447,11 +480,10 @@ export const ImportWords: FC<{
     }, [mnemonic]);
 
     const notify = () => {
-        sdk.uiEvents.emit('copy', {
-            method: 'copy',
-            params: t('import_wallet_wrong_words_err')
-        });
+        sdk.topMessage(t('import_wallet_wrong_words_err'));
+        sdk.hapticNotification('error');
     };
+
     const onSubmit = async () => {
         const invalid = mnemonic.findIndex(work => !seeIfValidWord(work));
         if (invalid !== -1) {
@@ -475,11 +507,7 @@ export const ImportWords: FC<{
 
     return (
         <>
-            <BackBlock>
-                <BackButton onClick={() => navigate(AppRoute.home)}>
-                    <ChevronLeftIcon />
-                </BackButton>
-            </BackBlock>
+            <BackButtonBlock onClick={() => navigate(AppRoute.home)} />
             <Block>
                 <div>
                     <Header>{t('import_wallet_title')}</Header>

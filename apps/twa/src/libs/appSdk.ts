@@ -1,31 +1,35 @@
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { EventEmitter } from '@tonkeeper/core/dist/entries/eventEmitter';
+import { BaseApp, NativeBackButton } from '@tonkeeper/core/dist/AppSdk';
 import { InitResult } from '@twa.js/sdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
+import { TwaStorage } from './storage';
 
-export class TwaAppSdk implements IAppSdk {
-    constructor(public storage: IStorage, private components: InitResult) {}
+export class TwaAppSdk extends BaseApp {
+    nativeBackButton: NativeBackButton;
+
+    constructor(private components: InitResult) {
+        super(new TwaStorage(components.cloudStorage));
+
+        this.nativeBackButton = components.backButton;
+    }
+
     copyToClipboard = (value: string, notification?: string) => {
         copyToClipboard(value);
-        this.uiEvents.emit('copy', {
-            method: 'copy',
-            params: notification
-        });
 
+        this.topMessage(notification);
         this.components.haptic.notificationOccurred('success');
     };
+
     openPage = async (url: string) => {
         window.open(url, '_black');
     };
 
     confirm = async (text: string) => window.confirm(text);
     alert = async (text: string) => window.alert(text);
-    requestExtensionPermission = async () => void 0;
 
     twaExpand = () => this.components.viewport.expand();
+
     hapticNotification = (type: 'success' | 'error') => {
         this.components.haptic.notificationOccurred(type);
     };
@@ -38,6 +42,5 @@ export class TwaAppSdk implements IAppSdk {
     isIOs = () => true;
     isStandalone = () => false;
 
-    uiEvents = new EventEmitter();
     version = packageJson.version ?? 'Unknown';
 }

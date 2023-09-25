@@ -1,12 +1,13 @@
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { Viewport } from '@twa.js/sdk';
-import React, { useContext, useEffect } from 'react';
+import { useViewport } from '@twa.js/sdk-react';
+import React, { useEffect } from 'react';
 
 export const ViewportContext = React.createContext<Viewport>(undefined!);
 
-export const useTwaAppViewport = () => {
+export const useTwaAppViewport = (setAppHeight: boolean) => {
     const sdk = useAppSdk();
-    const viewport = useContext(ViewportContext);
+    const viewport = useViewport();
 
     useEffect(() => {
         const total = window.innerHeight;
@@ -24,7 +25,11 @@ export const useTwaAppViewport = () => {
                 params: { total, viewport: value }
             });
 
-            // doc.style.setProperty('--app-height', `${value}px`);
+            //  sdk.topMessage(`${value}px`);
+
+            if (setAppHeight) {
+                doc.style.setProperty('--app-height', `${value}px`);
+            }
         };
 
         const callback = () => {
@@ -55,5 +60,5 @@ export const useTwaAppViewport = () => {
             visualViewport?.removeEventListener('resize', resizeHandler);
             window.removeEventListener('resize', callback);
         };
-    }, []);
+    }, [sdk, viewport]);
 };

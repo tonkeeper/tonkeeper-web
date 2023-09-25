@@ -69,11 +69,6 @@ export const Initialize: FC = () => {
                     title={t('intro_item2_title')}
                     description={t('intro_item2_caption')}
                 />
-                {/* <Description
-          icon={<TicketIcon />}
-          title={t('intro_item3_title')}
-          description={t('intro_item3_caption')}
-        /> */}
             </div>
             <Button size="large" fullWidth primary marginTop onClick={onClick}>
                 {t('intro_continue_btn')}

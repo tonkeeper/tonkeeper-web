@@ -3,10 +3,8 @@ import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService'
 import React, { FC, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { BackBlock, WorldNumber, WorldsGrid } from '../../components/create/Words';
-import { BackButton } from '../../components/fields/BackButton';
-import { ChevronLeftIcon } from '../../components/Icon';
 import { Body1, Body2, H2 } from '../../components/Text';
+import { BackButtonBlock, WorldNumber, WorldsGrid } from '../../components/create/Words';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
@@ -94,11 +92,7 @@ const RecoveryContent: FC<{ publicKey: string }> = ({ publicKey }) => {
 
     return (
         <Wrapper>
-            <BackBlock>
-                <BackButton onClick={onBack}>
-                    <ChevronLeftIcon />
-                </BackButton>
-            </BackBlock>
+            <BackButtonBlock onClick={onBack} />
             <Block>
                 <Title>{t('secret_words_title')}</Title>
                 <Body>{t('secret_words_caption')}</Body>

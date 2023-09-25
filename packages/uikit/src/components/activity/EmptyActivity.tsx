@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useTonenpointFiatMethods } from '../../state/tonendpoint';
+import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { Body1, H3, Label1 } from '../Text';
 import { BuyNotification } from '../home/BuyAction';
 import { ReceiveNotification } from '../home/ReceiveAction';
@@ -48,9 +47,7 @@ export const EmptyActivity = () => {
     const [openReceive, setOpenReceive] = useState(false);
     const [openBuy, setOpenBuy] = useState(false);
 
-    const { tonendpoint } = useAppContext();
-    const { data: methods } = useTonenpointFiatMethods(tonendpoint);
-    const buy = methods && methods.categories[0];
+    const { data: buy } = useTonendpointBuyMethods();
 
     return (
         <EmptyBody>

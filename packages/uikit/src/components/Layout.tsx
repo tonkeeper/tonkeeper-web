@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
-import { LogoutBlock, LogoutButton } from './create/Words';
 import { Body2, H2, Label1 } from './Text';
+import { LogoutButton } from './create/Words';
 
 export const Gap = styled.div`
     flex-grow: 1;
@@ -38,11 +38,7 @@ export const IconPage: FC<{
 }> = ({ icon, title, description, button, logOut }) => {
     return (
         <CenterContainer>
-            {logOut && (
-                <LogoutBlock>
-                    <LogoutButton />
-                </LogoutBlock>
-            )}
+            {logOut && <LogoutButton />}
             <Block>
                 {icon}
                 <TextBlock>

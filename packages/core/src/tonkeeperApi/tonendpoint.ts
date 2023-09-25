@@ -163,10 +163,3 @@ export interface TonendpoinFiatMethods {
 export const getFiatMethods = async (tonendpoint: Tonendpoint) => {
     return tonendpoint.GET<TonendpoinFiatMethods>('/fiat/methods');
 };
-
-export interface TonendpoinTime {
-    time: number;
-}
-export const getServerTime = async (tonendpoint: Tonendpoint) => {
-    return tonendpoint.GET<TonendpoinTime>('/v1/system/time');
-};

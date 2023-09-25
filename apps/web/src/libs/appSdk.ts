@@ -1,9 +1,8 @@
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { EventEmitter } from '@tonkeeper/core/dist/entries/eventEmitter';
+import { BaseApp } from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
+import { BrowserStorage } from './storage';
 
 function iOS() {
     return (
@@ -15,14 +14,14 @@ function iOS() {
     );
 }
 
-export class BrowserAppSdk implements IAppSdk {
-    constructor(public storage: IStorage) {}
+export class BrowserAppSdk extends BaseApp {
+    constructor() {
+        super(new BrowserStorage());
+    }
     copyToClipboard = (value: string, notification?: string) => {
         copyToClipboard(value);
-        this.uiEvents.emit('copy', {
-            method: 'copy',
-            params: notification
-        });
+
+        this.topMessage(notification);
     };
     openPage = async (url: string) => {
         window.open(url, '_black');
@@ -30,7 +29,6 @@ export class BrowserAppSdk implements IAppSdk {
 
     confirm = async (text: string) => window.confirm(text);
     alert = async (text: string) => window.alert(text);
-    requestExtensionPermission = async () => void 0;
 
     disableScroll = disableScroll;
     enableScroll = enableScroll;
@@ -40,7 +38,5 @@ export class BrowserAppSdk implements IAppSdk {
     isIOs = iOS;
     isStandalone = () => iOS() && ((window.navigator as any).standalone as boolean);
 
-    uiEvents = new EventEmitter();
     version = packageJson.version ?? 'Unknown';
-    hapticNotification = () => void 0;
 }

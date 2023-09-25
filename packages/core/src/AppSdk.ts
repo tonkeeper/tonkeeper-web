@@ -34,8 +34,17 @@ export interface UIEvents {
     response: any;
 }
 
+export interface NativeBackButton {
+    on: (event: 'click', listener: () => void) => void;
+    off: (event: 'click', listener: () => void) => void;
+    show(): void;
+    hide(): void;
+}
 export interface IAppSdk {
     storage: IStorage;
+    nativeBackButton?: NativeBackButton;
+
+    topMessage: (text: string) => void;
     copyToClipboard: (value: string, notification?: string) => void;
     openPage: (url: string) => Promise<unknown>;
     disableScroll: () => void;
@@ -55,11 +64,19 @@ export interface IAppSdk {
     hapticNotification: (type: 'success' | 'error') => void;
 }
 
-export class MockAppSdk implements IAppSdk {
-    storage = new MemoryStorage();
+export abstract class BaseApp implements IAppSdk {
+    uiEvents = new EventEmitter();
+
+    constructor(public storage: IStorage) {}
+
+    topMessage = (text?: string) => {
+        this.uiEvents.emit('copy', { method: 'copy', id: Date.now(), params: text });
+    };
 
     copyToClipboard = (value: string, notification?: string) => {
         console.log(value, notification);
+
+        this.topMessage(notification);
     };
 
     openPage = async (url: string): Promise<void> => {
@@ -78,17 +95,21 @@ export class MockAppSdk implements IAppSdk {
 
     isStandalone = () => false;
 
-    uiEvents = new EventEmitter();
-
     version = '0.0.0';
 
-    confirm = async () => false;
+    confirm = async (_: string) => false;
 
-    alert = async () => void 0;
+    alert = async (_: string) => {};
 
-    requestExtensionPermission = async () => void 0;
+    requestExtensionPermission = async () => {};
 
-    twaExpand = () => void 0;
+    twaExpand = () => {};
 
-    hapticNotification = () => void 0;
+    hapticNotification = (type: 'success' | 'error') => {};
+}
+
+export class MockAppSdk extends BaseApp {
+    constructor() {
+        super(new MemoryStorage());
+    }
 }
