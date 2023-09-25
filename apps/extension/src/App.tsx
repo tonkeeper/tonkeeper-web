@@ -61,6 +61,9 @@ const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
 );
+const ReceiveNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/home/ReceiveNotification')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -295,6 +298,7 @@ export const Content: FC<{
                 <MemoryScroll />
                 <Suspense>
                     <SendActionNotification />
+                    <ReceiveNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>

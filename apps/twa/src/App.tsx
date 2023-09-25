@@ -49,11 +49,12 @@ import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { Platform as TwaPlatform } from '@twa.js/sdk';
 import { SDKProvider, useSDK, useWebApp } from '@twa.js/sdk-react';
-import React, { FC, Suspense, useMemo } from 'react';
+import React, { FC, PropsWithChildren, Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { InitDataLogger } from './components/InitData';
+import { TwaReceiveNotification } from './components/ReceiveNotifications';
 import { TwaQrScanner } from './components/TwaQrScanner';
 import { SendAction } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
@@ -295,10 +296,18 @@ const Content: FC<{
     );
 };
 
+const TwaNotification: FC<PropsWithChildren> = ({ children }) => {
+    return (
+        <TwaReceiveNotification>
+            <SendAction>{children}</SendAction>
+        </TwaReceiveNotification>
+    );
+};
+
 const MainPages: FC<{ showQrScan: boolean }> = ({ showQrScan }) => {
     useTwaAppViewport(false);
     return (
-        <SendAction>
+        <TwaNotification>
             <Wrapper>
                 <Routes>
                     <Route
@@ -347,6 +356,6 @@ const MainPages: FC<{ showQrScan: boolean }> = ({ showQrScan }) => {
                     <TonConnectSubscription />
                 </Suspense>
             </Wrapper>
-        </SendAction>
+        </TwaNotification>
     );
 };

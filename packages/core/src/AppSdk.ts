@@ -17,6 +17,11 @@ export type TransferInitParams = {
     chain?: BLOCKCHAIN_NAME;
 };
 
+export type ReceiveInitParams = {
+    chain?: BLOCKCHAIN_NAME;
+    jetton?: string;
+};
+
 export interface KeyboardParams {
     total: number;
     viewport: number;
@@ -30,6 +35,7 @@ export interface UIEvents {
     getPassword: GetPasswordParams;
     loading: void;
     transfer: TransferInitParams;
+    receive: ReceiveInitParams;
     keyboard: KeyboardParams;
     response: any;
 }

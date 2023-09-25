@@ -60,6 +60,9 @@ const SendActionNotification = React.lazy(
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
 );
+const ReceiveNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/home/ReceiveNotification')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -298,6 +301,7 @@ export const Content: FC<{
                 <MemoryScroll />
                 <Suspense>
                     <SendActionNotification />
+                    <ReceiveNotification />
                     <TonConnectSubscription />
                 </Suspense>
             </WalletStateContext.Provider>

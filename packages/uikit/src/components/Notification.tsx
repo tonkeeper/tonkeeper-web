@@ -133,13 +133,13 @@ const BackShadow = styled.div`
 `;
 
 export const NotificationTitleRow: FC<
-    PropsWithChildren<{ handleClose: () => void; center?: boolean }>
+    PropsWithChildren<{ handleClose?: () => void; center?: boolean }>
 > = ({ handleClose, children, center = false }) => {
     return (
         <TitleRow>
             {center && <ButtonMock />}
             <RowTitle>{children}</RowTitle>
-            <NotificationCancelButton handleClose={handleClose} />
+            {handleClose ? <NotificationCancelButton handleClose={handleClose} /> : <ButtonMock />}
         </TitleRow>
     );
 };
