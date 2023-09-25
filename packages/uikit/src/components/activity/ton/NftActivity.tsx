@@ -5,6 +5,7 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { useWalletContext } from '../../../hooks/appContext';
+import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
 import { useNftItemData } from '../../../state/wallet';
 import { VerificationIcon } from '../../Icon';
@@ -67,8 +68,8 @@ const NftImage = styled.img`
 
 export const NftComment: FC<{
     address: string;
-    openNft: (nft: NftItemRepr) => void;
-}> = ({ address, openNft }) => {
+}> = ({ address }) => {
+    const sdk = useAppSdk();
     const { data } = useNftItemData(address);
 
     if (!data) return <></>;
@@ -79,7 +80,7 @@ export const NftComment: FC<{
                 onClick={e => {
                     e.stopPropagation();
                     if (data) {
-                        openNft(data);
+                        sdk.openNft(data);
                     }
                 }}
             >
@@ -96,8 +97,7 @@ export const NftComment: FC<{
 export const NftItemTransferAction: FC<{
     action: Action;
     date: string;
-    openNft: (nft: NftItemRepr) => void;
-}> = ({ action, date, openNft }) => {
+}> = ({ action, date }) => {
     const { t } = useTranslation();
     const wallet = useWalletContext();
     const { nftItemTransfer } = action;
@@ -126,7 +126,7 @@ export const NftItemTransferAction: FC<{
                     date={date}
                 />
                 <FailedNote status={action.status}>
-                    <NftComment address={nftItemTransfer.nft} openNft={openNft} />
+                    <NftComment address={nftItemTransfer.nft} />
                     <Comment comment={nftItemTransfer.comment} />
                 </FailedNote>
             </ListItemGrid>
@@ -153,7 +153,7 @@ export const NftItemTransferAction: FC<{
                 date={date}
             />
             <FailedNote status={action.status}>
-                <NftComment address={nftItemTransfer.nft} openNft={openNft} />
+                <NftComment address={nftItemTransfer.nft} />
                 <Comment comment={nftItemTransfer.comment} />
             </FailedNote>
         </ListItemGrid>
@@ -163,8 +163,7 @@ export const NftItemTransferAction: FC<{
 export const NftPurchaseAction: FC<{
     action: Action;
     date: string;
-    openNft: (nft: NftItemRepr) => void;
-}> = ({ action, date, openNft }) => {
+}> = ({ action, date }) => {
     const { t } = useTranslation();
     const { nftPurchase } = action;
     if (!nftPurchase) {
@@ -187,7 +186,7 @@ export const NftPurchaseAction: FC<{
                 </SecondLine>
             </Description>
             <FailedNote status={action.status}>
-                <NftComment address={nftPurchase.nft.address} openNft={openNft} />{' '}
+                <NftComment address={nftPurchase.nft.address} />
             </FailedNote>
         </ListItemGrid>
     );

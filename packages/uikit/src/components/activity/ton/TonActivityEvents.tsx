@@ -1,4 +1,3 @@
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC } from 'react';
 import { ListItem } from '../../List';
@@ -11,8 +10,7 @@ export const TonActivityEvents: FC<{
     date: string;
     timestamp: number;
     setActivity: (item: ActionData) => void;
-    setNft: (nft: NftItemRepr) => void;
-}> = ({ event, date, timestamp, setActivity, setNft }) => {
+}> = ({ event, date, timestamp, setActivity }) => {
     return (
         <>
             {event.actions.map((action, index) => (
@@ -27,12 +25,7 @@ export const TonActivityEvents: FC<{
                         })
                     }
                 >
-                    <ActivityAction
-                        action={action}
-                        date={date}
-                        isScam={event.isScam}
-                        openNft={setNft}
-                    />
+                    <ActivityAction action={action} date={date} isScam={event.isScam} />
                     {event.inProgress && <ProgressIcon />}
                 </ListItem>
             ))}

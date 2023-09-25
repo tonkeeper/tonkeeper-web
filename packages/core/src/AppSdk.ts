@@ -1,5 +1,6 @@
 import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
+import { NFT } from './entries/nft';
 import { AuthState } from './entries/password';
 import { TonTransferParams } from './service/deeplinkingService';
 import { IStorage, MemoryStorage } from './Storage';
@@ -36,6 +37,7 @@ export interface UIEvents {
     loading: void;
     transfer: TransferInitParams;
     receive: ReceiveInitParams;
+    nft: NFT;
     keyboard: KeyboardParams;
     response: any;
 }
@@ -53,6 +55,8 @@ export interface IAppSdk {
     topMessage: (text: string) => void;
     copyToClipboard: (value: string, notification?: string) => void;
     openPage: (url: string) => Promise<unknown>;
+    openNft: (nft: NFT) => void;
+
     disableScroll: () => void;
     enableScroll: () => void;
     getScrollbarWidth: () => number;
@@ -74,6 +78,7 @@ export abstract class BaseApp implements IAppSdk {
     uiEvents = new EventEmitter();
 
     constructor(public storage: IStorage) {}
+    nativeBackButton?: NativeBackButton | undefined;
 
     topMessage = (text?: string) => {
         this.uiEvents.emit('copy', { method: 'copy', id: Date.now(), params: text });
@@ -87,6 +92,10 @@ export abstract class BaseApp implements IAppSdk {
 
     openPage = async (url: string): Promise<void> => {
         console.log(url);
+    };
+
+    openNft = (nft: NFT) => {
+        this.uiEvents.emit('nft', { method: 'nft', id: Date.now(), params: nft });
     };
 
     disableScroll = () => {};

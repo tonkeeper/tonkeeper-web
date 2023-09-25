@@ -1,5 +1,4 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
@@ -161,19 +160,18 @@ export const ActivityAction: FC<{
     action: Action;
     date: string;
     isScam: boolean;
-    openNft: (nft: NftItemRepr) => void;
-}> = ({ action, isScam, date, openNft }) => {
+}> = ({ action, isScam, date }) => {
     const { t } = useTranslation();
 
     switch (action.type) {
         case 'TonTransfer':
             return <TonTransferAction action={action} date={date} isScam={isScam} />;
         case 'NftItemTransfer':
-            return <NftItemTransferAction action={action} date={date} openNft={openNft} />;
+            return <NftItemTransferAction action={action} date={date} />;
         case 'NftPurchase':
-            return <NftPurchaseAction action={action} date={date} openNft={openNft} />;
+            return <NftPurchaseAction action={action} date={date} />;
         case 'ContractDeploy':
-            return <ContractDeployAction action={action} date={date} openNft={openNft} />;
+            return <ContractDeployAction action={action} date={date} />;
         case 'UnSubscribe':
             return <UnSubscribeAction action={action} date={date} />;
         case 'Subscribe':
