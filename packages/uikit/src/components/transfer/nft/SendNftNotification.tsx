@@ -1,71 +1,30 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
     TonTransferParams,
     parseTonTransfer
 } from '@tonkeeper/core/dist/service/deeplinkingService';
-import { checkWalletPositiveBalanceOrDie } from '@tonkeeper/core/dist/service/transfer/common';
-import { estimateNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
-import { AccountApi, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import React, { FC, useCallback, useRef, useState } from 'react';
+import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
-import { useTranslation } from '../../hooks/translation';
-import { QueryKey } from '../../libs/queryKey';
-import { Notification } from '../Notification';
-import { ConfirmNftView } from './ConfirmNftView';
-import { RecipientView, useGetToAccount } from './RecipientView';
+import { useAppContext } from '../../../hooks/appContext';
+import { useAppSdk } from '../../../hooks/appSdk';
+import { useTranslation } from '../../../hooks/translation';
+import { Notification } from '../../Notification';
+import { ConfirmViewButtons } from '../ConfirmView';
+import { RecipientView, useGetToAccount } from '../RecipientView';
 import {
+    ConfirmMainButton,
     MainButton,
     RecipientHeaderBlock,
     Wrapper,
     childFactoryCreator,
-    duration,
-    notifyError
-} from './common';
-
-const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData) => {
-    const { t } = useTranslation();
-    const sdk = useAppSdk();
-    const { api } = useAppContext();
-    const wallet = useWalletContext();
-    const client = useQueryClient();
-
-    return useQuery(
-        [QueryKey.estimate, data?.address],
-        async () => {
-            try {
-                return await estimateNftTransfer(api, wallet, data!, nftItem);
-            } catch (e) {
-                await notifyError(client, sdk, t, e);
-            }
-        },
-        { enabled: data != null }
-    );
-};
-
-const useMinimalBalance = () => {
-    const sdk = useAppSdk();
-    const {
-        api: { tonApi }
-    } = useAppContext();
-    const walletState = useWalletContext();
-    const { t } = useTranslation();
-    const client = useQueryClient();
-
-    return useMutation(async () => {
-        const wallet = await new AccountApi(tonApi).getAccountInfo({
-            account: walletState.active.rawAddress
-        });
-        try {
-            checkWalletPositiveBalanceOrDie(wallet);
-        } catch (e) {
-            await notifyError(client, sdk, t, e);
-        }
-    });
-};
+    duration
+} from '../common';
+import { ConfirmHeaderBlock } from './Common';
+import { ConfirmNftView } from './ConfirmNftView';
+import { useMinimalBalance } from './hooks';
 
 const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftItem, onClose }) => {
     const sdk = useAppSdk();
@@ -80,8 +39,6 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftIte
     const { mutateAsync: getAccountAsync } = useGetToAccount();
 
     const { mutateAsync: checkBalanceAsync, isLoading: isChecking } = useMinimalBalance();
-
-    const { data: fee } = useNftTransferEstimation(nftItem, recipient);
 
     const onRecipient = async (data: RecipientData) => {
         await checkBalanceAsync();
@@ -159,10 +116,17 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftIte
                         {state === 'confirm' && (
                             <ConfirmNftView
                                 onClose={onClose}
-                                onBack={backToRecipient}
                                 recipient={recipient!}
-                                fee={fee}
                                 nftItem={nftItem}
+                                MainButton={() => (
+                                    <ConfirmViewButtons MainButton={ConfirmMainButton} />
+                                )}
+                                HeaderBlock={() => (
+                                    <ConfirmHeaderBlock
+                                        onBack={backToRecipient}
+                                        onClose={onClose}
+                                    />
+                                )}
                             />
                         )}
                     </div>
@@ -172,10 +136,23 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftIte
     );
 };
 
-export const SendNftAction: FC<{
-    nftItem?: NftItemRepr;
-    onClose: () => void;
-}> = ({ nftItem, onClose }) => {
+const SendNftNotification = () => {
+    const sdk = useAppSdk();
+
+    const [nftItem, setNft] = useState<NFT | undefined>();
+    const onClose = useCallback(() => {
+        setNft(undefined);
+    }, [setNft]);
+    useEffect(() => {
+        const handler = (options: { method: 'transferNft'; params: NFT }) => {
+            setNft(options.params);
+        };
+        sdk.uiEvents.on('transferNft', handler);
+        return () => {
+            sdk.uiEvents.off('transferNft', handler);
+        };
+    }, []);
+
     const Content = useCallback(() => {
         if (!nftItem) return undefined;
         return <SendContent onClose={onClose} nftItem={nftItem} />;
@@ -187,3 +164,5 @@ export const SendNftAction: FC<{
         </Notification>
     );
 };
+
+export default SendNftNotification;

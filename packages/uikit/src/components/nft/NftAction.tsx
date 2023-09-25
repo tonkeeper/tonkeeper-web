@@ -1,6 +1,6 @@
 import { NFT, isNFTDNS } from '@tonkeeper/core/dist/entries/nft';
 import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { useWalletContext } from '../../hooks/appContext';
@@ -8,7 +8,6 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Body2 } from '../Text';
 import { Button } from '../fields/Button';
-import { SendNftAction } from '../transfer/SendNftNotification';
 import { LinkNft } from './LinkNft';
 import { RenewNft } from './RenewNft';
 
@@ -47,8 +46,8 @@ const ViewOnMarketButton: FC<{ url: string }> = ({ url }) => {
 const ActionTransfer: FC<{
     nftItem: NFT;
 }> = ({ nftItem }) => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
-    const [open, setOpen] = useState(false);
     const wallet = useWalletContext();
 
     return (
@@ -64,13 +63,12 @@ const ActionTransfer: FC<{
                 onClick={e => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setOpen(true);
+                    sdk.uiEvents.emit('transferNft', { method: 'transferNft', params: nftItem });
                 }}
             >
                 {t('nft_transfer_nft')}
             </Button>
             {nftItem.sale && <DNSSaleText>{t('nft_on_sale_text')}</DNSSaleText>}
-            <SendNftAction nftItem={open ? nftItem : undefined} onClose={() => setOpen(false)} />
         </>
     );
 };

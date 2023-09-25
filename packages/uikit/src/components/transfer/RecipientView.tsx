@@ -15,6 +15,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
+import { scrollToTop } from '../../libs/common';
 import { QueryKey } from '../../libs/queryKey';
 import { Gap } from '../Layout';
 import { FullHeightBlock } from '../Notification';
@@ -134,6 +135,13 @@ export const RecipientView: FC<{
     );
 
     const { data: dnsWallet, isFetching: isDnsFetching } = useDnsWallet(recipient.address);
+
+    useEffect(() => {
+        const timer = setTimeout(() => scrollToTop(), 300);
+        return () => {
+            clearTimeout(timer);
+        };
+    }, []);
 
     useEffect(() => {
         if (dnsWallet) {
@@ -286,7 +294,12 @@ export const RecipientView: FC<{
     };
 
     return (
-        <FullHeightBlock onSubmit={onSubmit} standalone={standalone} fitContent={fitContent}>
+        <FullHeightBlock
+            onSubmit={onSubmit}
+            standalone={standalone}
+            fitContent={fitContent}
+            noPadding
+        >
             <HeaderBlock />
             <ShowAddress value={showAddress}>
                 <InputWithScanner

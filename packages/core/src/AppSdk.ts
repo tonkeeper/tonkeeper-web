@@ -38,6 +38,7 @@ export interface UIEvents {
     transfer: TransferInitParams;
     receive: ReceiveInitParams;
     nft: NFT;
+    transferNft: NFT;
     keyboard: KeyboardParams;
     response: any;
 }

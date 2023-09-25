@@ -67,6 +67,9 @@ const ReceiveNotification = React.lazy(
 const NftNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/nft/NftNotification')
 );
+const SendNftNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/transfer/SendNftNotification')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -303,6 +306,7 @@ export const Content: FC<{
                     <SendActionNotification />
                     <ReceiveNotification />
                     <NftNotification />
+                    <SendNftNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>
