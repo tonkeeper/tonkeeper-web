@@ -22,7 +22,11 @@ export class TwaAppSdk extends BaseApp {
     };
 
     openPage = async (url: string) => {
-        window.open(url, '_black');
+        if (url.includes('t.me')) {
+            this.components.webApp.openTelegramLink(url);
+        } else {
+            this.components.webApp.openLink(url);
+        }
     };
 
     confirm = async (text: string) => window.confirm(text);
