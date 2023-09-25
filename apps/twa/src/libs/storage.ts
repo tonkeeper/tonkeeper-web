@@ -33,8 +33,6 @@ export class TwaStorage implements IStorage {
 
     clear = async () => {
         const keys = await this.cloudStorage.getKeys();
-        for (let key of keys) {
-            await this.cloudStorage.deleteKeys([key]);
-        }
+        await this.cloudStorage.deleteKeys(keys);
     };
 }
