@@ -15,7 +15,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useActiveWallet } from '../../state/wallet';
 import { FinalView, useAddWalletMutation } from './Password';
 
-export const Create = () => {
+const Create = () => {
     const { t } = useTranslation();
     const {
         mutateAsync: checkPasswordAndCreateWalletAsync,
@@ -125,3 +125,5 @@ export const Create = () => {
 
     return <FinalView />;
 };
+
+export default Create;

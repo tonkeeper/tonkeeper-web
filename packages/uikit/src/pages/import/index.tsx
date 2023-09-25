@@ -1,8 +1,8 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { ImportRoute } from '../../libs/routes';
-import { Create } from './Create';
-import { Import } from './Import';
+import Create from './Create';
+import Import from './Import';
 
 const ImportRouter = () => {
     return (

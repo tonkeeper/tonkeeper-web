@@ -37,7 +37,7 @@ import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/tra
 import { AppRoute, SettingsRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import { Initialize, InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
+import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/ThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';

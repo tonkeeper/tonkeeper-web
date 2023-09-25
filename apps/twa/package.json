@@ -34,6 +34,7 @@
         "react-app-rewired": "^2.2.1",
         "react-is": "^18.2.0",
         "react-scripts": "5.0.1",
+        "source-map-explorer": "^2.5.3",
         "ts-node": "^10.9.1",
         "typescript": "^4.9.4"
     },
@@ -43,6 +44,7 @@
         "build": "GENERATE_SOURCEMAP=false react-app-rewired build && yarn locales",
         "test": "react-app-rewired test",
         "eject": "react-app-rewired eject",
+        "analyze": "source-map-explorer 'build/static/js/*.js'",
         "deploy": "yarn build && npx wrangler pages deploy build",
         "build:twa": "yarn build"
     },

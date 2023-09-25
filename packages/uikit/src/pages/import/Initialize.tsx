@@ -43,7 +43,7 @@ const Title = styled(H1)`
     user-select: none;
 `;
 
-export const Initialize: FC = () => {
+const Initialize: FC = () => {
     const { t } = useTranslation();
     const [isOpen, setOpen] = useState(false);
     const sdk = useAppSdk();
@@ -77,3 +77,5 @@ export const Initialize: FC = () => {
         </CenterContainer>
     );
 };
+
+export default Initialize;

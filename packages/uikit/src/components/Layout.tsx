@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
+import { LogoutButton } from './BackButton';
 import { Body2, H2, Label1 } from './Text';
-import { LogoutButton } from './create/Words';
 
 export const Gap = styled.div`
     flex-grow: 1;

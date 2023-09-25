@@ -6,7 +6,7 @@ import { ImportWords } from '../../components/create/Words';
 import { useActiveWallet } from '../../state/wallet';
 import { FinalView, useAddWalletMutation } from './Password';
 
-export const Import = () => {
+const Import = () => {
     //useKeyboardHeight();
     const [mnemonic, setMnemonic] = useState<string[]>([]);
     const [account, setAccount] = useState<AccountState | undefined>(undefined);
@@ -62,3 +62,5 @@ export const Import = () => {
 
     return <FinalView />;
 };
+
+export default Import;

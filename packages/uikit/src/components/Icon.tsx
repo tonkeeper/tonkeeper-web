@@ -1,13 +1,18 @@
-import React, { FC } from 'react';
+import React, { FC, Suspense } from 'react';
 import styled from 'styled-components';
-import { TonkeeperLogoLottieIcon } from './lottie/LottieIcons';
+
+const TonkeeperLottieIcon = React.lazy(() => import('./lottie/TonkeeperLottie'));
 
 export const TonkeeperIcon: FC<{
     width?: string;
     height?: string;
     loop?: boolean;
 }> = ({ width = '128', height = '128', loop = false }) => {
-    return <TonkeeperLogoLottieIcon width={width} height={height} loop={loop} />;
+    return (
+        <Suspense fallback={<div style={{ width, height }}></div>}>
+            <TonkeeperLottieIcon width={width} height={height} loop={loop} />
+        </Suspense>
+    );
 };
 
 export const ChevronLeftIcon = () => {
