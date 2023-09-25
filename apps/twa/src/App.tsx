@@ -57,7 +57,7 @@ import { InitDataLogger } from './components/InitData';
 import { TwaReceiveNotification } from './components/ReceiveNotifications';
 import { TwaQrScanner } from './components/TwaQrScanner';
 import { TwaNftNotification } from './components/nft/NftNotification';
-import { SendAction } from './components/transfer/SendNotifications';
+import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useTwaAppViewport } from './libs/hooks';
 
@@ -301,7 +301,7 @@ const TwaNotification: FC<PropsWithChildren> = ({ children }) => {
     return (
         <TwaNftNotification>
             <TwaReceiveNotification>
-                <SendAction>{children}</SendAction>
+                <TwaSendNotification>{children}</TwaSendNotification>
             </TwaReceiveNotification>
         </TwaNftNotification>
     );

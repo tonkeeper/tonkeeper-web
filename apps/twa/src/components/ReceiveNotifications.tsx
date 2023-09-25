@@ -2,25 +2,15 @@ import { ReceiveInitParams } from '@tonkeeper/core/dist/AppSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { ReceiveContent } from '@tonkeeper/uikit/dist/components/home/AccountView';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { useBackButton } from '@twa.js/sdk-react';
 import { FC, PropsWithChildren, useEffect, useState } from 'react';
+import { useHandleBackButton } from '../libs/twaHooks';
 
 const Content: FC<{
     chain?: BLOCKCHAIN_NAME | undefined;
     jetton?: string | undefined;
     handleClose: () => void;
 }> = ({ chain, jetton, handleClose }) => {
-    const backButton = useBackButton();
-
-    useEffect(() => {
-        backButton.show();
-        backButton.on('click', handleClose);
-        return () => {
-            backButton.off('click', handleClose);
-            backButton.hide();
-        };
-    }, [handleClose, backButton]);
-
+    useHandleBackButton(handleClose);
     return <ReceiveContent chain={chain} jetton={jetton} />;
 };
 

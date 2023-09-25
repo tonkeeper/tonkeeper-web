@@ -279,7 +279,7 @@ const SendContent: FC<{
     );
 };
 
-export const SendAction: FC<PropsWithChildren> = ({ children }) => {
+export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
     const [open, setOpen] = useState(false);
     const [chain, setChain] = useState<BLOCKCHAIN_NAME | undefined>(undefined);
     const [tonTransfer, setTonTransfer] = useState<InitTransferData | undefined>(undefined);

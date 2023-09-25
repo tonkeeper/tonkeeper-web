@@ -1,5 +1,6 @@
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { Label1 } from '../Text';
@@ -86,17 +87,46 @@ const Tabs: FC<{ tab: HomeTabs; onTab: (value: HomeTabs) => void }> = ({ tab, on
         </TabsBlock>
     );
 };
+
+const collectibles = 'collectibles';
+
 export const TabsView: FC<{
     assets: AssetData;
     nfts: NFT[];
 }> = ({ assets, nfts }) => {
-    const [tab, setTab] = useState<HomeTabs>(HomeTabs.TOKENS);
+    const location = useLocation();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const tab = useMemo(() => {
+        return new URLSearchParams(searchParams).get(collectibles) === 'open'
+            ? HomeTabs.COLLECTIBLES
+            : HomeTabs.TOKENS;
+    }, [searchParams, location]);
+
+    const onTab = useCallback(
+        (value: HomeTabs) => {
+            if (value === HomeTabs.COLLECTIBLES) {
+                if (!searchParams.has(collectibles)) {
+                    searchParams.append(collectibles, 'open');
+                }
+            } else {
+                if (searchParams.has(collectibles)) {
+                    searchParams.delete(collectibles);
+                }
+            }
+            setSearchParams(searchParams, { replace: true });
+        },
+        [searchParams, setSearchParams]
+    );
 
     return (
         <>
-            <Tabs tab={tab} onTab={setTab} />
-            {tab === HomeTabs.TOKENS && <JettonList assets={assets} />}
-            {tab === HomeTabs.COLLECTIBLES && <NftsList nfts={nfts} />}
+            <Tabs tab={tab} onTab={onTab} />
+            {tab === HomeTabs.COLLECTIBLES ? (
+                <NftsList nfts={nfts} />
+            ) : (
+                <JettonList assets={assets} />
+            )}
         </>
     );
 };

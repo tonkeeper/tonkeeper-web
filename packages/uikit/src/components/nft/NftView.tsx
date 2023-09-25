@@ -85,17 +85,15 @@ export const NftPreview: FC<{
 
     return (
         <NotificationBlock>
-            <NotificationTitleBlock>
-                {onClose ? (
+            {onClose && (
+                <NotificationTitleBlock>
                     <BackButton onClick={onClose}>
                         <ChevronDownIcon />
                     </BackButton>
-                ) : (
+                    <H3>{nftItem.dns ?? nftItem.metadata.name}</H3>
                     <ButtonMock />
-                )}
-                <H3>{nftItem.dns ?? nftItem.metadata.name}</H3>
-                <ButtonMock />
-            </NotificationTitleBlock>
+                </NotificationTitleBlock>
+            )}
             <NftBlock>
                 {image && <Image ref={ref} url={image.url} />}
                 <Text>
