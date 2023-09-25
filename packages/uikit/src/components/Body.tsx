@@ -46,7 +46,7 @@ export const useWindowsScroll = (addHidden = true) => {
         let timer: NodeJS.Timeout | undefined;
 
         const handler = throttle(() => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10) {
+            if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 10) {
                 setBottom();
             } else {
                 removeBottom();
