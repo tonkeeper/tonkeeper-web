@@ -1,6 +1,6 @@
+import { decodeBase58, sha256 } from 'ethers';
 import { Address } from 'ton-core';
 import { Network } from '../entries/network';
-import { decodeBase58, sha256 } from 'ethers';
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -57,9 +57,10 @@ export const toShortValue = (value: string, length = 4): string => {
     return value.slice(0, length) + '...' + value.slice(-length);
 };
 
-export const formatAddress = (value: string, network?: Network) => {
+export const formatAddress = (value: string, network?: Network, bounceable = false) => {
     return Address.parse(value).toString({
-        testOnly: network === Network.TESTNET
+        testOnly: network === Network.TESTNET,
+        bounceable
     });
 };
 
