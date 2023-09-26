@@ -16,7 +16,7 @@ const Fee = styled.div`
     display: flex;
     justify-content: space-between;
     color: ${props => props.theme.textSecondary};
-    padding: 0 16px 12px;
+    padding: 0 32px 12px;
 `;
 
 const ExtraDetails: FC<{
