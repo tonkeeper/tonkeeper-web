@@ -6,8 +6,6 @@ import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import { getWalletActiveAddresses } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
 import {
-    AccountApi,
-    AccountRepr,
     JettonApi,
     JettonsBalances,
     NFTApi,
@@ -16,6 +14,7 @@ import {
 } from '@tonkeeper/core/dist/tonApiV1';
 import {
     Account,
+    AccountsApi,
     BlockchainApi,
     DNSApi,
     DnsRecord,
@@ -102,14 +101,12 @@ export const useWalletAddresses = () => {
 
 export const useWalletAccountInfo = () => {
     const wallet = useWalletContext();
-    const {
-        api: { tonApi }
-    } = useAppContext();
-    return useQuery<AccountRepr, Error>(
+    const { api } = useAppContext();
+    return useQuery<Account, Error>(
         [wallet.publicKey, QueryKey.info],
         async () => {
-            return new AccountApi(tonApi).getAccountInfo({
-                account: wallet.active.rawAddress
+            return new AccountsApi(api.tonApiV2).getAccount({
+                accountId: wallet.active.rawAddress
             });
         },
         {
