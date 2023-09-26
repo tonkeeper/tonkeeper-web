@@ -12,7 +12,6 @@ import {
 } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
@@ -217,7 +216,7 @@ export const RecipientView: FC<{
             if (recipient.blockchain === BLOCKCHAIN_NAME.TRON) {
                 return recipient.address;
             } else {
-                return Address.parse(recipient.address).toString();
+                return formatAddress(recipient.address, wallet.network);
             }
         }
 
