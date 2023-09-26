@@ -1,5 +1,5 @@
-import { AccountRepr, WalletDNS } from '../tonApiV1';
-import { MessageConsequences } from '../tonApiV2';
+import { WalletDNS } from '../tonApiV1';
+import { Account, MessageConsequences } from '../tonApiV2';
 import { EstimatePayload } from '../tronApi';
 import { BLOCKCHAIN_NAME } from './crypto';
 import { Asset } from './crypto/asset/asset';
@@ -30,7 +30,7 @@ export interface TonRecipientData {
     address: TonRecipient;
     comment: string;
     done: boolean;
-    toAccount: AccountRepr;
+    toAccount: Account;
 }
 
 export interface TronRecipientData {

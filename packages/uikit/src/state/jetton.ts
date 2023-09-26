@@ -49,9 +49,7 @@ export const useToggleJettonMutation = () => {
     const storage = useStorage();
     const client = useQueryClient();
     const wallet = useWalletContext();
-    const {
-        api: { tonApi }
-    } = useAppContext();
+
     return useMutation<void, Error, JettonBalance>(async jetton => {
         if (jetton.verification === 'whitelist') {
             const hiddenJettons = wallet.hiddenJettons ?? [];
@@ -60,7 +58,7 @@ export const useToggleJettonMutation = () => {
                 ? hiddenJettons.filter(item => item !== jetton.jettonAddress)
                 : hiddenJettons.concat([jetton.jettonAddress]);
 
-            await updateWalletProperty(tonApi, storage, wallet, {
+            await updateWalletProperty(storage, wallet, {
                 hiddenJettons: updated
             });
         } else {
@@ -70,7 +68,7 @@ export const useToggleJettonMutation = () => {
                 ? shownJettons.filter(item => item !== jetton.jettonAddress)
                 : shownJettons.concat([jetton.jettonAddress]);
 
-            await updateWalletProperty(tonApi, storage, wallet, {
+            await updateWalletProperty(storage, wallet, {
                 shownJettons: updated
             });
         }

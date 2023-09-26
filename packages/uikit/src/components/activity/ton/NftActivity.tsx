@@ -119,7 +119,8 @@ export const NftItemTransferAction: FC<{
                         toShortValue(
                             formatAddress(
                                 nftItemTransfer.sender?.address ?? nftItemTransfer.nft,
-                                wallet.network
+                                wallet.network,
+                                !nftItemTransfer.sender?.address
                             )
                         )
                     }
@@ -146,7 +147,8 @@ export const NftItemTransferAction: FC<{
                     toShortValue(
                         formatAddress(
                             nftItemTransfer.recipient?.address ?? nftItemTransfer.nft,
-                            wallet.network
+                            wallet.network,
+                            !nftItemTransfer.recipient?.address
                         )
                     )
                 }

@@ -6,6 +6,7 @@ import {
     TonendpoinFiatItem,
     TonendpointConfig
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { sha512_sync } from 'ton-crypto';
@@ -160,8 +161,9 @@ const replacePlaceholders = (
     kind: 'buy' | 'sell'
 ) => {
     const [CUR_FROM, CUR_TO] = kind === 'buy' ? [fiat, 'TON'] : ['TON', fiat];
+    const address = formatAddress(wallet.active.rawAddress, wallet.network);
     url = url
-        .replace('{ADDRESS}', wallet.active.friendlyAddress)
+        .replace('{ADDRESS}', address)
         .replace('{CUR_FROM}', CUR_FROM)
         .replace('{CUR_TO}', CUR_TO);
 
@@ -169,9 +171,9 @@ const replacePlaceholders = (
         const txId = 'mercuryo_' + uuidv4();
         url = url.replace(/\{TX_ID\}/g, txId);
         url = url.replace(/\=TON\&/gi, '=TONCOIN&');
-        url += `&signature=${sha512_sync(
-            `${wallet.active.friendlyAddress}${config.mercuryoSecret ?? ''}`
-        ).toString('hex')}`;
+        url += `&signature=${sha512_sync(`${address}${config.mercuryoSecret ?? ''}`).toString(
+            'hex'
+        )}`;
     }
 
     return url;

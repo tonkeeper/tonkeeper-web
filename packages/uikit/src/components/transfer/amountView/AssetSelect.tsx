@@ -1,5 +1,6 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
+import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
+import { Account } from '@tonkeeper/core/dist/tonApiV2';
 import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useEffect, useRef } from 'react';
 import styled from 'styled-components';
@@ -49,7 +50,7 @@ const Icon = styled.span`
 `;
 
 const AssetDropDown: FC<{
-    info?: AccountRepr;
+    info?: Account;
     onClose: () => void;
     jetton: string;
     jettons: JettonsBalances;
@@ -118,7 +119,7 @@ const AssetDropDown: FC<{
 };
 
 export const AssetSelect: FC<{
-    info?: AccountRepr;
+    info?: Account;
     jetton: string;
     jettons: JettonsBalances;
     setJetton: (value: string) => void;

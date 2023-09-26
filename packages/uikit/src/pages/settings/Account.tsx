@@ -1,4 +1,4 @@
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import {
     DragDropContext,
@@ -60,6 +60,8 @@ const WalletRow: FC<{
         return <SkeletonListPayload />;
     }
 
+    const address = formatAddress(wallet.active.rawAddress, wallet.network);
+
     return (
         <>
             <ListItemPayload>
@@ -70,7 +72,7 @@ const WalletRow: FC<{
                     <ColumnText
                         noWrap
                         text={wallet.name ? wallet.name : t('wallet_title')}
-                        secondary={toShortValue(wallet.active.friendlyAddress)}
+                        secondary={toShortValue(address)}
                     />
                     <DropDown
                         payload={onClose => (

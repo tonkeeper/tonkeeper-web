@@ -1,5 +1,6 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { AccountRepr, JettonBalance, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
+import { JettonBalance, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
+import { Account } from '@tonkeeper/core/dist/tonApiV2';
 import { TronBalances } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo } from 'react';
@@ -13,7 +14,7 @@ import { ListBlock, ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 
 export interface TonAssetData {
-    info: AccountRepr;
+    info: Account;
     jettons: JettonsBalances;
 }
 
@@ -27,7 +28,7 @@ export interface AssetProps {
 }
 
 const TonAsset: FC<{
-    info: AccountRepr;
+    info: Account;
 }> = ({ info }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();

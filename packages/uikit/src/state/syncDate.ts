@@ -9,7 +9,7 @@ import { getCachedStoreValue, removeCachedStoreValue, setCachedStoreValue } from
 
 export const useServiceTimeIsSync = () => {
     const { api } = useAppContext();
-    return useQuery<boolean, Error>([QueryKey.system], () => seeIfServiceTimeSync(api.tonApi));
+    return useQuery<boolean, Error>([QueryKey.system], () => seeIfServiceTimeSync(api));
 };
 
 export const cleanSyncDateBanner = async (client: QueryClient, sdk: IAppSdk) => {

@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { AccountRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+
+import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
@@ -19,7 +19,7 @@ import { useFormatFiat, useRate } from '../../state/rates';
 import { groupAndFilterTonActivityItems } from '../../state/ton/tonActivity';
 import { useWalletAccountInfo } from '../../state/wallet';
 
-const TonHeader: FC<{ info: AccountRepr }> = ({ info: { balance } }) => {
+const TonHeader: FC<{ info: Account }> = ({ info: { balance } }) => {
     const { t } = useTranslation();
 
     const amount = useMemo(() => formatDecimals(balance), [balance]);

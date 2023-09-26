@@ -30,7 +30,7 @@ const Message = styled.div`
 
 const Content = styled.div`
     width: auto;
-    max-width: calc(var(--app-width) - 2rem);
+    max-width: calc(var(--app-width) - 1rem);
     word-break: break-all;
     text-align: center;
     padding: 14px 24px 14px;

@@ -15,7 +15,7 @@ import {
     tonConnectProofPayload
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
@@ -54,7 +54,7 @@ const useConnectMutation = (
                 const password = await getPasswordByNotification(sdk, auth);
                 const proof = tonConnectProofPayload(
                     webViewUrl ?? manifest.url,
-                    wallet.active.friendlyAddress,
+                    wallet.active.rawAddress,
                     item.payload
                 );
                 result.push(
@@ -155,6 +155,8 @@ const ConnectContent: FC<{
         setTimeout(() => handleClose(result, manifest), 300);
     };
 
+    const address = formatAddress(wallet.active.rawAddress, wallet.network);
+
     return (
         <NotificationBlock onSubmit={onSubmit}>
             <ImageRow>
@@ -166,7 +168,7 @@ const ConnectContent: FC<{
                 <Title>{t('ton_login_title').replace('%{name}', manifest.name)}</Title>
                 <SubTitle>
                     {t('ton_login_caption').replace('%{name}', getDomain(manifest.url))}{' '}
-                    <Address>{toShortValue(wallet.active.friendlyAddress)}</Address>{' '}
+                    <Address>{toShortValue(address)}</Address>{' '}
                     {walletVersionText(wallet.active.version)}
                 </SubTitle>
             </div>
