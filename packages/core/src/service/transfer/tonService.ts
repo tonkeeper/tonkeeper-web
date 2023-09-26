@@ -139,7 +139,7 @@ export const estimateTonTransfer = async (
     isMax: boolean
 ) => {
     await checkServiceTimeOrDie(api);
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     if (!isMax) {
         checkWalletPositiveBalanceOrDie(wallet);
     }
@@ -160,7 +160,7 @@ export const estimateTonConnectTransfer = async (
     params: TonConnectTransactionPayload
 ) => {
     await checkServiceTimeOrDie(api);
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = createTonConnectTransfer(seqno, walletState, accounts, params);
@@ -181,7 +181,7 @@ export const sendTonConnectTransfer = async (
     await checkServiceTimeOrDie(api);
     const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
-    const seqno = await getWalletSeqNo(api.tonApi, walletState.active.rawAddress);
+    const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
 
     const external = createTonConnectTransfer(
         seqno,
@@ -216,7 +216,7 @@ export const sendTonTransfer = async (
 
     const total = new BigNumber(fee.event.extra).multipliedBy(-1).plus(amount.weiAmount);
 
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     if (!isMax) {
         checkWalletBalanceOrDie(total, wallet);
     }

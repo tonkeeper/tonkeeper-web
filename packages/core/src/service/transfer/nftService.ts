@@ -95,7 +95,7 @@ export const estimateNftTransfer = async (
     nftItem: NftItemRepr
 ) => {
     await checkServiceTimeOrDie(api);
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = createNftTransfer(
@@ -137,7 +137,7 @@ export const sendNftTransfer = async (
         throw new Error(`Unexpected nft transfer amount: ${nftTransferAmount.toString()}`);
     }
 
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
     const cell = createNftTransfer(
@@ -189,7 +189,7 @@ export const estimateNftRenew = async (options: {
     amount: BigNumber;
 }) => {
     await checkServiceTimeOrDie(options.api);
-    const [wallet, seqno] = await getWalletBalance(options.api.tonApi, options.walletState);
+    const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const body = nftRenewBody();
@@ -242,7 +242,7 @@ export const estimateNftLink = async (options: {
     amount: BigNumber;
 }) => {
     await checkServiceTimeOrDie(options.api);
-    const [wallet, seqno] = await getWalletBalance(options.api.tonApi, options.walletState);
+    const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const body = nftLinkBody(options);

@@ -88,7 +88,7 @@ export const estimateJettonTransfer = async (
     jettonWalletAddress: string
 ) => {
     await checkServiceTimeOrDie(api);
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = createJettonTransfer(
@@ -124,7 +124,7 @@ export const sendJettonTransfer = async (
         .multipliedBy(-1)
         .plus(jettonTransferAmount.toString());
 
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
     const cell = createJettonTransfer(
