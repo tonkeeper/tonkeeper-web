@@ -6,13 +6,14 @@ import { DNSApi } from '@tonkeeper/core/dist/tonApiV1';
 import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import {
     debounce,
+    formatAddress,
     seeIfValidTonAddress,
     seeIfValidTronAddress
 } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
-import { useAppContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
@@ -125,6 +126,7 @@ export const RecipientView: FC<{
 }) => {
     const sdk = useAppSdk();
     const [submitted, setSubmit] = useState(false);
+    const wallet = useWalletContext();
     const { t } = useTranslation();
     const { standalone, ios } = useAppContext();
     const ref = useRef<HTMLTextAreaElement | null>(null);
@@ -265,6 +267,9 @@ export const RecipientView: FC<{
     };
 
     const onSelect = async (item: Suggestion) => {
+        if (item.blockchain === BLOCKCHAIN_NAME.TON) {
+            item.address = formatAddress(item.address, wallet.network);
+        }
         setAddress(item);
         ref.current?.focus();
         // if (ios && keyboard) openIosKeyboard(keyboard);
