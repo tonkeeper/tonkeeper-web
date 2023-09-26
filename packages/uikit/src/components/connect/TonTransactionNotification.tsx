@@ -82,6 +82,7 @@ const NotificationSkeleton: FC<{ handleClose: (result?: string) => void }> = ({ 
     return (
         <NotificationBlock>
             <SkeletonList size={3} margin fullWidth />
+            <ButtonGap />
             <ButtonRowFixed standalone={standalone}>
                 <Button size="large" type="button" onClick={() => handleClose()}>
                     {t('notifications_alert_cancel')}
