@@ -44,7 +44,7 @@ const RecipientItemAddress: FC<{ address: string }> = ({ address }) => {
 
 export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient }) => {
     const { address } = recipient;
-    const addrValue = isTonRecipientData(recipient) ? recipient.toAccount.address : address.address;
+    const addrValue = address.address;
 
     if ('isFavorite' in address && address.isFavorite) {
         if (address.blockchain === BLOCKCHAIN_NAME.TRON) {
