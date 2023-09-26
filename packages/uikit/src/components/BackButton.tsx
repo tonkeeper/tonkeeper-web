@@ -90,3 +90,15 @@ export const LogoutButton = () => {
         );
     }
 };
+
+export const LaterButton: FC<{ skip: () => void }> = ({ skip }) => {
+    const { t } = useTranslation();
+
+    return (
+        <LogoutBlock>
+            <LogoutButtonBlock onClick={skip}>
+                <Label2>{t('reminder_notifications_later_button')}</Label2>
+            </LogoutButtonBlock>
+        </LogoutBlock>
+    );
+};

@@ -1,16 +1,40 @@
-import { BaseApp, NativeBackButton } from '@tonkeeper/core/dist/AppSdk';
+import { BaseApp, NativeBackButton, NotificationService } from '@tonkeeper/core/dist/AppSdk';
+import { delay } from '@tonkeeper/core/dist/utils/common';
 import { InitResult } from '@twa.js/sdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
 import { TwaStorage } from './storage';
 
+class TwaNotification implements NotificationService {
+    constructor(private components: InitResult) {}
+    subscribe = async (wallet: string, mnemonic: string[]) => {
+        console.log(this.components.initDataRaw);
+        await delay(1000);
+    };
+    unsubscribe = async (wallet: string, mnemonic: string[]) => {
+        console.log(this.components.initDataRaw);
+        await delay(1000);
+    };
+
+    subscribeTonConnect = async (sessionKey: string) => {
+        console.log(this.components.initDataRaw);
+        await delay(1000);
+    };
+    unsubscribeTonConnect = async (sessionKey: string) => {
+        console.log(this.components.initDataRaw);
+        await delay(1000);
+    };
+}
+
 export class TwaAppSdk extends BaseApp {
     nativeBackButton: NativeBackButton;
+    notifications: NotificationService;
 
     constructor(private components: InitResult) {
         super(new TwaStorage(components.cloudStorage));
 
+        this.notifications = new TwaNotification(components);
         this.nativeBackButton = components.backButton;
     }
 

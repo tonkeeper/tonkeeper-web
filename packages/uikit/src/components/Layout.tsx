@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
-import { LogoutButton } from './BackButton';
+import { LaterButton, LogoutButton } from './BackButton';
 import { Body2, H2, Label1 } from './Text';
 
 export const Gap = styled.div`
@@ -35,10 +35,12 @@ export const IconPage: FC<{
     description?: string;
     button?: React.ReactNode;
     logOut?: boolean;
-}> = ({ icon, title, description, button, logOut }) => {
+    skip?: () => void;
+}> = ({ icon, title, description, button, logOut, skip }) => {
     return (
         <CenterContainer>
             {logOut && <LogoutButton />}
+            {skip && <LaterButton skip={skip} />}
             <Block>
                 {icon}
                 <TextBlock>

@@ -11,11 +11,14 @@ import {
     GearLottieIcon,
     WriteLottieIcon
 } from '../../components/lottie/LottieIcons';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveWallet } from '../../state/wallet';
 import { FinalView, useAddWalletMutation } from './Password';
+import { Subscribe } from './Subscribe';
 
 const Create = () => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
     const {
         mutateAsync: checkPasswordAndCreateWalletAsync,
@@ -32,6 +35,7 @@ const Create = () => {
     const [check, setCheck] = useState(false);
     const [checked, setChecked] = useState(false);
     const [hasPassword, setHasPassword] = useState(false);
+    const [passNotifications, setPassNotification] = useState(false);
 
     useEffect(() => {
         setTimeout(() => {
@@ -121,6 +125,16 @@ const Create = () => {
 
     if (account && account.publicKeys.length > 1 && wallet && wallet.name == null) {
         return <UpdateWalletName account={account} onUpdate={setAccount} />;
+    }
+
+    if (sdk.notifications && !passNotifications) {
+        return (
+            <Subscribe
+                wallet={wallet!.active.rawAddress}
+                mnemonic={mnemonic}
+                onDone={() => setPassNotification(true)}
+            />
+        );
     }
 
     return <FinalView />;

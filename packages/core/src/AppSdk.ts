@@ -49,6 +49,15 @@ export interface NativeBackButton {
     show(): void;
     hide(): void;
 }
+
+export interface NotificationService {
+    subscribe: (wallet: string, mnemonic: string[]) => Promise<void>;
+    unsubscribe: (wallet: string, mnemonic: string[]) => Promise<void>;
+
+    subscribeTonConnect: (sessionKey: string) => Promise<void>;
+    unsubscribeTonConnect: (sessionKey: string) => Promise<void>;
+}
+
 export interface IAppSdk {
     storage: IStorage;
     nativeBackButton?: NativeBackButton;
@@ -73,6 +82,8 @@ export interface IAppSdk {
     requestExtensionPermission: () => Promise<void>;
     twaExpand?: () => void;
     hapticNotification: (type: 'success' | 'error') => void;
+
+    notifications?: NotificationService;
 }
 
 export abstract class BaseApp implements IAppSdk {
