@@ -8,22 +8,20 @@ import {
     getAccountsMap,
     sendTonConnectTransfer
 } from '@tonkeeper/core/dist/service/transfer/tonService';
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { getPasswordByNotification } from '../../pages/home/UnlockNotification';
 import { CheckmarkCircleIcon } from '../Icon';
-import { ListBlock } from '../List';
 import { Notification, NotificationBlock } from '../Notification';
+import { SkeletonList } from '../Skeleton';
 import { Label2 } from '../Text';
 import { Button, ButtonRow } from '../fields/Button';
-import { FeeListItem } from '../transfer/ConfirmListItem';
 import { ResultButton } from '../transfer/common';
-import { TonTransactionAction } from './TonTransactionAction';
+import { EmulationList } from './EstimationLayout';
 
 const ButtonGap = styled.div`
     height: 56px;
@@ -73,21 +71,40 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
             throw new Error('Missing accounts data');
         }
         const password = await getPasswordByNotification(sdk, auth);
-        return sendTonConnectTransfer(sdk.storage, api.tonApi, wallet, accounts, params, password);
+        return sendTonConnectTransfer(sdk.storage, api, wallet, accounts, params, password);
     });
+};
+
+const NotificationSkeleton: FC<{ handleClose: (result?: string) => void }> = ({ handleClose }) => {
+    const { standalone } = useAppContext();
+    const { t } = useTranslation();
+
+    return (
+        <NotificationBlock>
+            <SkeletonList size={3} margin fullWidth />
+            <ButtonRowFixed standalone={standalone}>
+                <Button size="large" type="button" onClick={() => handleClose()}>
+                    {t('notifications_alert_cancel')}
+                </Button>
+                <Button size="large" type="submit" primary fullWidth loading>
+                    {t('confirm')}
+                </Button>
+            </ButtonRowFixed>
+        </NotificationBlock>
+    );
 };
 
 const ConnectContent: FC<{
     params: TonConnectTransactionPayload;
-    estimate?: EstimateData;
     handleClose: (result?: string) => void;
-}> = ({ params, estimate, handleClose }) => {
+}> = ({ params, handleClose }) => {
     const sdk = useAppSdk();
     const { standalone } = useAppContext();
     const [done, setDone] = useState(false);
 
     const { t } = useTranslation();
 
+    const { data: estimate, isLoading: isEstimating, isError } = useEstimation(params);
     const { mutateAsync, isLoading } = useSendMutation(params, estimate);
 
     useEffect(() => {
@@ -103,22 +120,13 @@ const ConnectContent: FC<{
         setTimeout(() => handleClose(result), 300);
     };
 
-    const format = useFormatCoinValue();
-    const feeAmount = useMemo(
-        () => (estimate ? format(estimate.accountEvent.fee.total) : undefined),
-        [format, estimate]
-    );
+    if (isEstimating) {
+        return <NotificationSkeleton handleClose={handleClose} />;
+    }
 
     return (
         <NotificationBlock onSubmit={onSubmit}>
-            {feeAmount && (
-                <ListBlock margin={false} fullWidth>
-                    <FeeListItem feeAmount={feeAmount} />
-                </ListBlock>
-            )}
-            {(estimate?.accountEvent.actions ?? []).map((action, index) => (
-                <TonTransactionAction key={index} action={action} />
-            ))}
+            <EmulationList isError={isError} estimate={estimate} />
             <ButtonGap />
             <ButtonRowFixed standalone={standalone}>
                 {done && (
@@ -155,33 +163,15 @@ const ConnectContent: FC<{
     );
 };
 
-const useEstimation = (params: TonConnectTransactionPayload | null) => {
-    const sdk = useAppSdk();
-    const { t } = useTranslation();
+const useEstimation = (params: TonConnectTransactionPayload) => {
     const { api } = useAppContext();
     const wallet = useWalletContext();
 
-    return useQuery<EstimateData, Error>(
-        [QueryKey.estimate, params],
-        async () => {
-            sdk.uiEvents.emit('copy', {
-                method: 'copy',
-                params: t('loading')
-            });
-
-            const accounts = await getAccountsMap(api.tonApi, params!);
-            const accountEvent = await estimateTonConnectTransfer(
-                api.tonApi,
-                wallet,
-                accounts,
-                params!
-            );
-            return { accounts, accountEvent };
-        },
-        {
-            enabled: params != null
-        }
-    );
+    return useQuery<EstimateData, Error>([QueryKey.estimate, params], async () => {
+        const accounts = await getAccountsMap(api, params);
+        const accountEvent = await estimateTonConnectTransfer(api, wallet, accounts, params);
+        return { accounts, accountEvent };
+    });
 };
 
 export const TonTransactionNotification: FC<{
@@ -189,16 +179,15 @@ export const TonTransactionNotification: FC<{
     handleClose: (result?: string) => void;
 }> = ({ params, handleClose }) => {
     const { t } = useTranslation();
-    const { data: accountEvent, isLoading } = useEstimation(params);
 
     const Content = useCallback(() => {
         if (!params) return undefined;
-        return <ConnectContent params={params} estimate={accountEvent} handleClose={handleClose} />;
-    }, [origin, params, accountEvent, handleClose]);
+        return <ConnectContent params={params} handleClose={handleClose} />;
+    }, [origin, params, handleClose]);
 
     return (
         <Notification
-            isOpen={!isLoading && params != null}
+            isOpen={params != null}
             handleClose={() => handleClose()}
             title={t('txActions_signRaw_title')}
             hideButton

@@ -5,7 +5,7 @@ import { APIConfig } from '../../entries/apis';
 import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { Configuration, NftItemRepr, SendApi } from '../../tonApiV1';
+import { NftItemRepr } from '../../tonApiV1';
 import { BlockchainApi, EmulationApi, MessageConsequences } from '../../tonApiV2';
 import { getWalletMnemonic } from '../mnemonicService';
 import {
@@ -94,7 +94,7 @@ export const estimateNftTransfer = async (
     recipient: TonRecipientData,
     nftItem: NftItemRepr
 ) => {
-    await checkServiceTimeOrDie(api.tonApi);
+    await checkServiceTimeOrDie(api);
     const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
@@ -122,7 +122,7 @@ export const sendNftTransfer = async (
     fee: MessageConsequences,
     password: string
 ) => {
-    await checkServiceTimeOrDie(api.tonApi);
+    await checkServiceTimeOrDie(api);
     const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
@@ -157,7 +157,7 @@ export const sendNftTransfer = async (
 
 export const sendNftRenew = async (options: {
     storage: IStorage;
-    tonApi: Configuration;
+    api: APIConfig;
     walletState: WalletState;
     nftAddress: string;
     fee: MessageConsequences;
@@ -177,19 +177,19 @@ export const sendNftRenew = async (options: {
         { to: options.nftAddress, value: options.amount, body }
     );
 
-    await new SendApi(options.tonApi).sendBoc({
-        sendBocRequest: { boc: cell.toString('base64') }
+    await new BlockchainApi(options.api.tonApiV2).sendBlockchainMessage({
+        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
     });
 };
 
 export const estimateNftRenew = async (options: {
-    tonApi: Configuration;
+    api: APIConfig;
     walletState: WalletState;
     nftAddress: string;
     amount: BigNumber;
 }) => {
-    await checkServiceTimeOrDie(options.tonApi);
-    const [wallet, seqno] = await getWalletBalance(options.tonApi, options.walletState);
+    await checkServiceTimeOrDie(options.api);
+    const [wallet, seqno] = await getWalletBalance(options.api.tonApi, options.walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const body = nftRenewBody();
@@ -208,7 +208,7 @@ export const estimateNftRenew = async (options: {
 
 export const sendNftLink = async (options: {
     storage: IStorage;
-    tonApi: Configuration;
+    api: APIConfig;
     walletState: WalletState;
     nftAddress: string;
     linkToAddress: string;
@@ -229,20 +229,20 @@ export const sendNftLink = async (options: {
         { to: options.nftAddress, value: options.amount, body }
     );
 
-    await new SendApi(options.tonApi).sendBoc({
-        sendBocRequest: { boc: cell.toString('base64') }
+    await new BlockchainApi(options.api.tonApiV2).sendBlockchainMessage({
+        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
     });
 };
 
 export const estimateNftLink = async (options: {
-    tonApi: Configuration;
+    api: APIConfig;
     walletState: WalletState;
     nftAddress: string;
     linkToAddress: string;
     amount: BigNumber;
 }) => {
-    await checkServiceTimeOrDie(options.tonApi);
-    const [wallet, seqno] = await getWalletBalance(options.tonApi, options.walletState);
+    await checkServiceTimeOrDie(options.api);
+    const [wallet, seqno] = await getWalletBalance(options.api.tonApi, options.walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const body = nftLinkBody(options);

@@ -14,10 +14,11 @@ import { mnemonicToPrivateKey } from 'ton-crypto';
 import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
+import { APIConfig } from '../../entries/apis';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { AccountApi, AccountRepr, Configuration, Fee, SystemApi, WalletApi } from '../../tonApiV1';
-import { MessageConsequences } from '../../tonApiV2';
+import { AccountApi, AccountRepr, Configuration, Fee, WalletApi } from '../../tonApiV1';
+import { LiteServerApi, MessageConsequences } from '../../tonApiV2';
 import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 
@@ -96,10 +97,9 @@ export const getWalletBalance = async (tonApi: Configuration, walletState: Walle
     return [wallet, seqno] as const;
 };
 
-export const seeIfServiceTimeSync = async (tonApi: Configuration) => {
-    const { time } = await new SystemApi(tonApi).currentTime();
+export const seeIfServiceTimeSync = async (api: APIConfig) => {
+    const { time } = await new LiteServerApi(api.tonApiV2).getRawTime();
     const isSynced = Math.abs(Date.now() - time * 1000) <= 7000;
-
     return isSynced;
 };
 
@@ -107,8 +107,8 @@ export const seeIfTimeError = (e: unknown): e is Error => {
     return e instanceof Error && e.message.startsWith('Time and date are incorrect');
 };
 
-export const checkServiceTimeOrDie = async (tonApi: Configuration) => {
-    const isSynced = await seeIfServiceTimeSync(tonApi);
+export const checkServiceTimeOrDie = async (api: APIConfig) => {
+    const isSynced = await seeIfServiceTimeSync(api);
     if (!isSynced) {
         throw new Error('Time and date are incorrect');
     }
@@ -148,13 +148,13 @@ export const createTransferMessage = (
 
 export async function getKeyPairAndSeqno(options: {
     storage: IStorage;
-    tonApi: Configuration;
+    api: APIConfig;
     walletState: WalletState;
     fee: MessageConsequences;
     password: string;
     amount: BigNumber;
 }) {
-    await checkServiceTimeOrDie(options.tonApi);
+    await checkServiceTimeOrDie(options.api);
     const mnemonic = await getWalletMnemonic(
         options.storage,
         options.walletState.publicKey,
@@ -164,7 +164,7 @@ export async function getKeyPairAndSeqno(options: {
 
     const total = options.amount.plus(options.fee.event.extra * -1);
 
-    const [wallet, seqno] = await getWalletBalance(options.tonApi, options.walletState);
+    const [wallet, seqno] = await getWalletBalance(options.api.tonApi, options.walletState);
     checkWalletBalanceOrDie(total, wallet);
     return { seqno, keyPair };
 }

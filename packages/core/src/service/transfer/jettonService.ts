@@ -87,7 +87,7 @@ export const estimateJettonTransfer = async (
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string
 ) => {
-    await checkServiceTimeOrDie(api.tonApi);
+    await checkServiceTimeOrDie(api);
     const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
@@ -116,7 +116,7 @@ export const sendJettonTransfer = async (
     fee: MessageConsequences,
     password: string
 ) => {
-    await checkServiceTimeOrDie(api.tonApi);
+    await checkServiceTimeOrDie(api);
     const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
