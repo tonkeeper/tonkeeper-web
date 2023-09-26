@@ -38,7 +38,7 @@ export const NftDetailsBlock: FC<{ nftItem: NFT }> = ({ nftItem }) => {
                 <ListItem
                     onClick={() =>
                         sdk.copyToClipboard(
-                            formatAddress(nftItem.collection!.address, wallet.network)
+                            formatAddress(nftItem.collection!.address, wallet.network, true)
                         )
                     }
                 >
@@ -46,18 +46,22 @@ export const NftDetailsBlock: FC<{ nftItem: NFT }> = ({ nftItem }) => {
                         <Label>{t('NFT_collection_id')}</Label>
                         <Label1>
                             {toShortValue(
-                                formatAddress(nftItem.collection!.address, wallet.network)
+                                formatAddress(nftItem.collection!.address, wallet.network, true)
                             )}
                         </Label1>
                     </ListItemPayload>
                 </ListItem>
             )}
             <ListItem
-                onClick={() => sdk.copyToClipboard(formatAddress(nftItem.address, wallet.network))}
+                onClick={() =>
+                    sdk.copyToClipboard(formatAddress(nftItem.address, wallet.network, true))
+                }
             >
                 <ListItemPayload>
                     <Label>{t('NFT_item_id')}</Label>
-                    <Label1>{toShortValue(formatAddress(nftItem.address, wallet.network))}</Label1>
+                    <Label1>
+                        {toShortValue(formatAddress(nftItem.address, wallet.network, true))}
+                    </Label1>
                 </ListItemPayload>
             </ListItem>
         </ListBlock>
