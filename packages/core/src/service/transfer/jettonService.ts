@@ -94,7 +94,7 @@ export const estimateJettonTransfer = async (
     const cell = createJettonTransfer(
         seqno,
         walletState,
-        recipient.toAccount.address.raw,
+        recipient.toAccount.address,
         amount,
         jettonWalletAddress,
         recipient.comment ? comment(recipient.comment) : null
@@ -130,7 +130,7 @@ export const sendJettonTransfer = async (
     const cell = createJettonTransfer(
         seqno,
         walletState,
-        recipient.toAccount.address.raw,
+        recipient.toAccount.address,
         amount,
         jettonWalletAddress,
         recipient.comment ? comment(recipient.comment) : null,

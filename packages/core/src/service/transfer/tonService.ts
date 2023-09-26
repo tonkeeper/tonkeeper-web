@@ -95,7 +95,7 @@ const createTonTransfer = (
             : SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
             internal({
-                to: recipient.toAccount.address.raw,
+                to: recipient.toAccount.address,
                 bounce: recipient.toAccount.status === 'active',
                 value: BigInt(weiAmount.toFixed(0)),
                 body: recipient.comment !== '' ? recipient.comment : undefined

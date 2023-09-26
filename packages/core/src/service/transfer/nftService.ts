@@ -101,7 +101,7 @@ export const estimateNftTransfer = async (
     const cell = createNftTransfer(
         seqno,
         walletState,
-        recipient.toAccount.address.raw,
+        recipient.toAccount.address,
         nftItem.address,
         initNftTransferAmount,
         recipient.comment ? comment(recipient.comment) : null
@@ -143,7 +143,7 @@ export const sendNftTransfer = async (
     const cell = createNftTransfer(
         seqno,
         walletState,
-        recipient.toAccount.address.raw,
+        recipient.toAccount.address,
         nftItem.address,
         BigInt(nftTransferAmount.toString()),
         recipient.comment ? comment(recipient.comment) : null,
