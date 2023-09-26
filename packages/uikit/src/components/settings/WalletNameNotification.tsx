@@ -1,10 +1,11 @@
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useState } from 'react';
 import { useTranslation } from '../../hooks/translation';
 import { useMutateRenameWallet } from '../../state/wallet';
+import { Notification, NotificationBlock } from '../Notification';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
-import { Notification, NotificationBlock } from '../Notification';
 
 const RenameWalletContent: FC<{
     wallet: WalletState;
@@ -21,14 +22,12 @@ const RenameWalletContent: FC<{
         afterClose(() => null);
     };
 
+    const address = formatAddress(wallet.active.rawAddress, wallet.network);
+
     return (
         <NotificationBlock onSubmit={onSubmit}>
             <Input value={name} onChange={setName} isValid={!isError} label={t('Wallet_name')} />
-            <Input
-                value={wallet.active.friendlyAddress}
-                disabled
-                label={t('add_edit_favorite_address_label')}
-            />
+            <Input value={address} disabled label={t('add_edit_favorite_address_label')} />
 
             <Button
                 size="large"
