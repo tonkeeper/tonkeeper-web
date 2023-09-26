@@ -77,14 +77,6 @@ export const AmountTwaMainButton = ({
     }, [onClick, button]);
 
     useEffect(() => {
-        if (isDisabled) {
-            button.disable();
-        } else {
-            button.enable();
-        }
-    }, [isDisabled]);
-
-    useEffect(() => {
         if (isLoading) {
             button.showProgress();
         } else {

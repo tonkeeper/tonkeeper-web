@@ -4,8 +4,11 @@ import { isNumeric, removeGroupSeparator, seeIfLargeTail } from '@tonkeeper/core
 import BigNumber from 'bignumber.js';
 import React, { FC } from 'react';
 import styled from 'styled-components';
+import { useAppContext } from '../../../hooks/appContext';
+import { formatter } from '../../../hooks/balance';
 import { Body1, Body2, H3, Label2, Num2 } from '../../Text';
 import { cropName } from '../ConfirmListItem';
+import { AmountState } from './amountState';
 
 export const Center = styled.div`
     text-align: center;
@@ -173,4 +176,29 @@ export const seeIfValueValid = (value: string, decimals: number) => {
 
 export const inputToBigNumber = (value: string): BigNumber => {
     return new BigNumber(removeGroupSeparator(value).replace(',', '.') || '0');
+};
+
+export const SecondaryAmount: FC<{ amountState: AmountState; toggleFiat: () => void }> = ({
+    amountState,
+    toggleFiat
+}) => {
+    const { fiat } = useAppContext();
+
+    const secondaryAmount: BigNumber | undefined = amountState.inFiat
+        ? amountState.coinValue
+        : amountState.fiatValue;
+
+    if (!secondaryAmount) {
+        return <></>;
+    }
+
+    return (
+        <FiatBlock onClick={toggleFiat}>
+            {formatter.format(secondaryAmount, {
+                ignoreZeroTruncate: !amountState.inFiat,
+                decimals: amountState.inFiat ? amountState.token.decimals : 2
+            })}{' '}
+            {amountState.inFiat ? amountState.token.symbol : fiat}
+        </FiatBlock>
+    );
 };

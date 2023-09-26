@@ -7,7 +7,6 @@ import {
 import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { isNumeric } from '@tonkeeper/core/dist/utils/send';
-import BigNumber from 'bignumber.js';
 import React, {
     FC,
     useCallback,
@@ -35,13 +34,13 @@ import {
     Address,
     AmountBlock,
     AssetBadge,
-    FiatBlock,
     InputBlock,
     MaxButton,
     MaxRow,
     RecipientName,
     Remaining,
     RemainingInvalid,
+    SecondaryAmount,
     SelectCenter,
     SubTitle,
     Symbol,
@@ -162,10 +161,6 @@ export const AmountView: FC<{
             : recipient.address.address
     );
 
-    const secondaryAmount: BigNumber | undefined = amountState.inFiat
-        ? amountState.coinValue
-        : amountState.fiatValue;
-
     return (
         <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
             <HeaderBlock onClose={onClose} onBack={handleBack}>
@@ -201,15 +196,7 @@ export const AmountView: FC<{
                     <Symbol>{amountState.inFiat ? fiat : amountState.token.symbol}</Symbol>
                 </InputBlock>
 
-                {secondaryAmount && (
-                    <FiatBlock onClick={toggleFiat}>
-                        {formatter.format(secondaryAmount, {
-                            ignoreZeroTruncate: !amountState.inFiat,
-                            decimals: amountState.inFiat ? amountState.token.decimals : 2
-                        })}{' '}
-                        {amountState.inFiat ? amountState.token.symbol : fiat}
-                    </FiatBlock>
-                )}
+                <SecondaryAmount amountState={amountState} toggleFiat={toggleFiat} />
             </AmountBlock>
             <MaxRow>
                 <MaxButton maxValue={amountState.isMax} onClick={onMax}>

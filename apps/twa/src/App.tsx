@@ -115,15 +115,15 @@ const TwaLoader = () => {
     );
 };
 
-const getMainButtonHeight = (platform: TwaPlatform): number => {
+const getMainButtonHeight = (platform: TwaPlatform): number | undefined => {
     switch (platform) {
         case 'ios':
             return 60;
         case 'android':
         case 'android_x':
-            return 0;
+            return undefined;
         default:
-            return 0;
+            return undefined;
     }
 };
 
