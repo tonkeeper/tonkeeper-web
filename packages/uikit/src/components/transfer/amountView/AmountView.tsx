@@ -4,7 +4,7 @@ import {
     jettonToTonAsset,
     legacyTonAssetId
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
+import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { isNumeric } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
@@ -156,11 +156,6 @@ export const AmountView: FC<{
         e.preventDefault();
         handleSubmit();
     };
-    const address = toShortValue(
-        isTonRecipientData(recipient)
-            ? recipient.toAccount.address.bounceable
-            : recipient.address.address
-    );
 
     const secondaryAmount: BigNumber | undefined = amountState.inFiat
         ? amountState.coinValue
@@ -172,7 +167,7 @@ export const AmountView: FC<{
                 <SubTitle>
                     {t('send_screen_steps_done_to').replace('%{name}', '')}
                     <RecipientName recipient={recipient} />
-                    <Address>{address}</Address>
+                    <Address>{toShortValue(recipient.address.address)}</Address>
                 </SubTitle>
             </HeaderBlock>
 
