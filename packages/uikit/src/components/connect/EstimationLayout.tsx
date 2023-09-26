@@ -14,7 +14,7 @@ import { TonActivityEvents } from '../activity/ton/TonActivityEvents';
 const Fee = styled.div`
     width: 100%;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     color: ${props => props.theme.textSecondary};
     padding: 0 16px 12px;
 `;
