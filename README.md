@@ -2,13 +2,14 @@
 
 Tonkeeper Web is a non-custodial crypto wallet and gateway to blockchain dApps.
 
-Tonkeeper Extension supports Firefox 109.0 or higher version, Google Chrome, and Chromium-based browsers. We recommend using the latest available browser version.
+Tonkeeper Extension supports Firefox 109.0 or higher version, Google Chrome, and Chromium-based
+browsers. We recommend using the latest available browser version.
 
 ## Building locally
 
-- Install `Node.js` version 16 or 19
-- Install `Yarn` version 1.18.0
-- Install and run `Docker Desktop`
+-   Install `Node.js` version 19.7.0
+-   Install `Yarn` version 3.6.3
+-   Install and run `Docker Desktop`
 
 ### Build web script
 
@@ -28,7 +29,8 @@ yarn
 yarn build:extension
 ```
 
-Compressed builds can be found in `/apps/extension/dist/chrome` and `/apps/extension/dist/firefox` once they're built.
+Compressed builds can be found in `/apps/extension/dist/chrome` and `/apps/extension/dist/firefox`
+once they're built.
 
 ## License
 
