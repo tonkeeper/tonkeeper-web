@@ -108,7 +108,7 @@ export const SmartContractExecAction: FC<{
                 amount={<>-&thinsp;{format(smartContractExec.tonAttached)}</>}
                 entry={CryptoCurrency.TON}
                 address={toShortValue(
-                    formatAddress(smartContractExec.contract.address, wallet.network)
+                    formatAddress(smartContractExec.contract.address, wallet.network, true)
                 )}
                 date={date}
             />
@@ -146,7 +146,7 @@ const AuctionBidAction: FC<{
                         {(auctionBid.auctionType as string) !== ''
                             ? auctionBid.auctionType
                             : toShortValue(
-                                  formatAddress(auctionBid.auction.address, wallet.network)
+                                  formatAddress(auctionBid.auction.address, wallet.network, true)
                               )}
                     </SecondaryText>
                     <SecondaryText>{date}</SecondaryText>

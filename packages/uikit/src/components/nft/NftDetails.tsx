@@ -53,6 +53,8 @@ export const NftDetails: FC<{ nftItem: NftItemRepr; kind: NFTKind }> = React.mem
     const address = Address.parse(item.address).toString();
 
     const url = config.NFTOnExplorerUrl ?? 'https://tonviewer.com/nft/%s';
+    const ownerAddress = owner ? formatAddress(owner, wallet.network) : undefined;
+    const nftAddress = formatAddress(address, wallet.network, true);
 
     return (
         <Block>
@@ -64,12 +66,10 @@ export const NftDetails: FC<{ nftItem: NftItemRepr; kind: NFTKind }> = React.mem
             </Row>
             <ListBlock margin={false}>
                 {owner && (
-                    <ListItem
-                        onClick={() => sdk.copyToClipboard(formatAddress(owner, wallet.network))}
-                    >
+                    <ListItem onClick={() => sdk.copyToClipboard(ownerAddress)}>
                         <ListItemPayload>
                             <RightText>{t('nft_owner_address')}</RightText>
-                            <Label1>{toShortValue(formatAddress(owner, wallet.network))}</Label1>
+                            <Label1>{toShortValue(ownerAddress)}</Label1>
                         </ListItemPayload>
                     </ListItem>
                 )}
@@ -85,12 +85,10 @@ export const NftDetails: FC<{ nftItem: NftItemRepr; kind: NFTKind }> = React.mem
                         </ListItemPayload>
                     </ListItem>
                 )}
-                <ListItem
-                    onClick={() => sdk.copyToClipboard(formatAddress(address, wallet.network))}
-                >
+                <ListItem onClick={() => sdk.copyToClipboard(nftAddress)}>
                     <ListItemPayload>
                         <RightText>{t('nft_contract_address')}</RightText>
-                        <Label1>{toShortValue(formatAddress(address, wallet.network))}</Label1>
+                        <Label1>{toShortValue(nftAddress)}</Label1>
                     </ListItemPayload>
                 </ListItem>
             </ListBlock>

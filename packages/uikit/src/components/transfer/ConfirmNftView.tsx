@@ -114,7 +114,7 @@ export const ConfirmNftView: FC<{
                     <ListItem
                         onClick={() =>
                             sdk.copyToClipboard(
-                                formatAddress(nftItem.collection!.address, wallet.network)
+                                formatAddress(nftItem.collection!.address, wallet.network, true)
                             )
                         }
                     >
@@ -122,7 +122,7 @@ export const ConfirmNftView: FC<{
                             <Label>{t('NFT_collection_id')}</Label>
                             <Label1>
                                 {toShortValue(
-                                    formatAddress(nftItem.collection!.address, wallet.network)
+                                    formatAddress(nftItem.collection!.address, wallet.network, true)
                                 )}
                             </Label1>
                         </ListItemPayload>
@@ -130,13 +130,13 @@ export const ConfirmNftView: FC<{
                 )}
                 <ListItem
                     onClick={() =>
-                        sdk.copyToClipboard(formatAddress(nftItem.address, wallet.network))
+                        sdk.copyToClipboard(formatAddress(nftItem.address, wallet.network, true))
                     }
                 >
                     <ListItemPayload>
                         <Label>{t('NFT_item_id')}</Label>
                         <Label1>
-                            {toShortValue(formatAddress(nftItem.address, wallet.network))}
+                            {toShortValue(formatAddress(nftItem.address, wallet.network, true))}
                         </Label1>
                     </ListItemPayload>
                 </ListItem>
