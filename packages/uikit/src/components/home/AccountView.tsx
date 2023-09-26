@@ -1,6 +1,6 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TronWalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { formatTransferUrl } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, formatTransferUrl } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useRef, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -131,6 +131,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     const wallet = useWalletContext();
     const { t } = useTranslation();
 
+    const address = formatAddress(wallet.active.rawAddress, wallet.network);
     return (
         <NotificationBlock>
             <HeaderBlock title={t('receive_ton')} description={t('receive_ton_description')} />
@@ -138,15 +139,15 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                 extension={extension}
                 onClick={e => {
                     e.preventDefault();
-                    sdk.copyToClipboard(wallet.active.friendlyAddress, t('address_copied'));
+                    sdk.copyToClipboard(address, t('address_copied'));
                 }}
             >
                 <QrWrapper>
                     <QRCode
                         size={400}
                         value={formatTransferUrl({
-                            address: wallet.active.friendlyAddress,
-                            jetton: jetton
+                            address,
+                            jetton
                         })}
                         logoImage="/img/toncoin.svg"
                         logoPadding={8}
@@ -157,9 +158,9 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                         }}
                     />
                 </QrWrapper>
-                <AddressText extension={extension}>{wallet.active.friendlyAddress}</AddressText>
+                <AddressText extension={extension}>{address}</AddressText>
             </Background>
-            <CopyButton address={wallet.active.friendlyAddress} />
+            <CopyButton address={address} />
         </NotificationBlock>
     );
 };
