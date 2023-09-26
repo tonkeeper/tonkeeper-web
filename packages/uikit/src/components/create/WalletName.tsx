@@ -4,8 +4,7 @@ import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
-import { useStorage } from '../../hooks/storage';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { CenterContainer } from '../Layout';
@@ -26,9 +25,9 @@ const Body = styled(Body2)`
 `;
 
 const useUpdateNameMutation = (account: AccountState) => {
-    const storage = useStorage();
+    const sdk = useAppSdk();
     const client = useQueryClient();
-    const { api } = useAppContext();
+
     return useMutation<AccountState, Error, string>(async name => {
         if (name.length < 3) {
             throw new Error('Missing name');
@@ -37,12 +36,12 @@ const useUpdateNameMutation = (account: AccountState) => {
         if (!account.activePublicKey) {
             throw new Error('Missing activePublicKey');
         }
-        const wallet = await getWalletState(storage, account.activePublicKey);
+        const wallet = await getWalletState(sdk.storage, account.activePublicKey);
         if (!wallet) {
             throw new Error('Missing wallet');
         }
 
-        await updateWalletProperty(api.tonApi, storage, wallet, { name });
+        await updateWalletProperty(sdk.storage, wallet, { name });
         await client.invalidateQueries([QueryKey.account]);
         return account;
     });

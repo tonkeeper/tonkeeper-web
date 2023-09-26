@@ -47,11 +47,8 @@ export const useWalletState = (publicKey: string) => {
 export const useMutateLogOut = (publicKey: string, remove = false) => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const {
-        api: { tonApi }
-    } = useAppContext();
     return useMutation<void, Error, void>(async () => {
-        await accountLogOutWallet(sdk.storage, tonApi, publicKey, remove);
+        await accountLogOutWallet(sdk.storage, publicKey, remove);
         await client.invalidateQueries([QueryKey.account]);
     });
 };
@@ -59,15 +56,13 @@ export const useMutateLogOut = (publicKey: string, remove = false) => {
 export const useMutateRenameWallet = (wallet: WalletState) => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const {
-        api: { tonApi }
-    } = useAppContext();
+
     return useMutation<void, Error, string>(async name => {
         if (name.length <= 0) {
             throw new Error('Missing name');
         }
 
-        await updateWalletProperty(tonApi, sdk.storage, wallet, { name });
+        await updateWalletProperty(sdk.storage, wallet, { name });
         await client.invalidateQueries([QueryKey.account]);
     });
 };
@@ -76,9 +71,7 @@ export const useMutateWalletProperty = (clearWallet = false) => {
     const storage = useStorage();
     const wallet = useWalletContext();
     const client = useQueryClient();
-    const {
-        api: { tonApi }
-    } = useAppContext();
+
     return useMutation<
         void,
         Error,
@@ -89,7 +82,7 @@ export const useMutateWalletProperty = (clearWallet = false) => {
             >
         >
     >(async props => {
-        await updateWalletProperty(tonApi, storage, wallet, props);
+        await updateWalletProperty(storage, wallet, props);
         await client.invalidateQueries([QueryKey.account]);
         if (clearWallet) {
             await client.invalidateQueries([wallet.publicKey]);
