@@ -105,7 +105,7 @@ export const getManifest = async (request: ConnectRequest) => {
     const response = await getManifestResponse(request.manifestUrl);
 
     if (response.status != 200) {
-        throw new Error('Failed to load Manifest');
+        throw new Error(`Failed to load Manifest: ${response.status}`);
     }
 
     const manifest: DAppManifest = await response.json();
