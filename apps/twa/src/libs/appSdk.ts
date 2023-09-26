@@ -8,6 +8,7 @@ import { TwaStorage } from './storage';
 
 class TwaNotification implements NotificationService {
     constructor(private components: InitResult) {}
+
     subscribe = async (wallet: string, mnemonic: string[]) => {
         console.log(this.components.initDataRaw);
         await delay(1000);
@@ -24,6 +25,11 @@ class TwaNotification implements NotificationService {
     unsubscribeTonConnect = async (sessionKey: string) => {
         console.log(this.components.initDataRaw);
         await delay(1000);
+    };
+
+    subscribed = async (wallet: string) => {
+        await delay(1000);
+        return false;
     };
 }
 

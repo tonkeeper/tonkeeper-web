@@ -67,7 +67,7 @@ const NftNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/nft/NftNotification')
 );
 const SendNftNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/transfer/SendNftNotification')
+    () => import('@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification')
 );
 
 const queryClient = new QueryClient({

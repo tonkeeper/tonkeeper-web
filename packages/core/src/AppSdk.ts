@@ -56,6 +56,8 @@ export interface NotificationService {
 
     subscribeTonConnect: (sessionKey: string) => Promise<void>;
     unsubscribeTonConnect: (sessionKey: string) => Promise<void>;
+
+    subscribed: (wallet: string) => Promise<boolean>;
 }
 
 export interface IAppSdk {
