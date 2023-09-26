@@ -5,7 +5,8 @@ import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-
 import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { TonTransferParams } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { seeIfBalanceError, seeIfTimeError } from '@tonkeeper/core/dist/service/transfer/common';
-import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
+import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
+import { Account } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, PropsWithChildren } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
@@ -332,7 +333,7 @@ export interface InitTransferData {
 
 export const getInitData = (
     tonTransfer: TonTransferParams,
-    toAccount: AccountRepr,
+    toAccount: Account,
     jettons: JettonsBalances | undefined
 ): InitTransferData => {
     const initRecipient: TonRecipientData = {

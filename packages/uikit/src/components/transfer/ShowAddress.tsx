@@ -1,4 +1,4 @@
-import { AccountRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { Account } from '@tonkeeper/core/dist/tonApiV2';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -13,9 +13,9 @@ interface ShowAddressProps {
 export const useShowAddress = (
     ref: React.MutableRefObject<HTMLTextAreaElement | null>,
     value: string,
-    toAccount?: AccountRepr
+    toAccount?: Account
 ) => {
-    const address = toAccount?.address?.bounceable ?? undefined;
+    const address = toAccount?.address ?? undefined;
 
     const [showAddress, setShowAddress] = useState<ShowAddressProps | undefined>(undefined);
 
@@ -39,7 +39,7 @@ export const useShowAddress = (
             setShowAddress({
                 inputTextWidth,
                 addressTextWidth,
-                value: toShortValue(toAccount.address.bounceable)
+                value: toShortValue(toAccount.address)
             });
         } else {
             setShowAddress(undefined);

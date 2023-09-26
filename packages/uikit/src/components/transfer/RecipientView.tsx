@@ -2,7 +2,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { BaseRecipient, DnsRecipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
-import { AccountApi, AccountRepr, DNSApi } from '@tonkeeper/core/dist/tonApiV1';
+import { DNSApi } from '@tonkeeper/core/dist/tonApiV1';
+import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import {
     debounce,
     seeIfValidTonAddress,
@@ -34,18 +35,18 @@ const Warning = styled(Body2)`
 
 export const useGetToAccount = () => {
     const { api } = useAppContext();
-    return useMutation<AccountRepr, Error, BaseRecipient | DnsRecipient>(recipient => {
-        const account = 'dns' in recipient ? recipient.dns.address : recipient.address;
-        return new AccountApi(api.tonApi).getAccountInfo({ account });
+    return useMutation<Account, Error, BaseRecipient | DnsRecipient>(recipient => {
+        const accountId = 'dns' in recipient ? recipient.dns.address : recipient.address;
+        return new AccountsApi(api.tonApiV2).getAccount({ accountId });
     });
 };
 
 const useToAccount = (isValid: boolean, recipient: BaseRecipient | DnsRecipient) => {
     const { api } = useAppContext();
-    const account = 'dns' in recipient ? recipient.dns.address : recipient.address;
-    return useQuery<AccountRepr, Error>(
-        [QueryKey.account, account],
-        () => new AccountApi(api.tonApi).getAccountInfo({ account }),
+    const accountId = 'dns' in recipient ? recipient.dns.address : recipient.address;
+    return useQuery<Account, Error>(
+        [QueryKey.account, accountId],
+        () => new AccountsApi(api.tonApiV2).getAccount({ accountId }),
         { enabled: isValid }
     );
 };
