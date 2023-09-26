@@ -47,7 +47,7 @@ import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import { Platform as TwaPlatform } from '@twa.js/sdk';
+import { Platform as TwaPlatform, WebApp } from '@twa.js/sdk';
 import { SDKProvider, useSDK, useWebApp } from '@twa.js/sdk-react';
 import React, { FC, PropsWithChildren, Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -110,12 +110,24 @@ const TwaLoader = () => {
 
     return (
         <AppSdkContext.Provider value={sdk}>
-            <TwaApp sdk={sdk} />
+            <TwaApp sdk={sdk} webApp={components.webApp} />
         </AppSdkContext.Provider>
     );
 };
 
-const TwaApp: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
+const getMainButtonHeight = (platform: TwaPlatform): number => {
+    switch (platform) {
+        case 'ios':
+            return 60;
+        case 'android':
+        case 'android_x':
+            return 0;
+        default:
+            return 0;
+    }
+};
+
+const TwaApp: FC<{ sdk: IAppSdk; webApp: WebApp }> = ({ sdk, webApp }) => {
     const { t, i18n } = useTranslation();
 
     const translation = useMemo(() => {
@@ -145,7 +157,10 @@ const TwaApp: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
                                 <GlobalListStyle />
                                 <InitDataLogger />
                                 <Loader sdk={sdk} />
-                                <UnlockNotification sdk={sdk} />
+                                <UnlockNotification
+                                    sdk={sdk}
+                                    delta={getMainButtonHeight(webApp.platform)}
+                                />
                             </UserThemeProvider>
                         </StorageContext.Provider>
                     </TranslationContext.Provider>

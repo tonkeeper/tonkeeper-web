@@ -120,7 +120,7 @@ export const PasswordUnlock: FC<{
             if (ref.current) {
                 ref.current.focus();
             }
-        }, 750);
+        }, 350);
         return () => {
             clearTimeout(timeout);
         };
@@ -181,7 +181,7 @@ export const PasswordUnlock: FC<{
     );
 };
 
-export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
+export const UnlockNotification: FC<{ sdk: IAppSdk; delta?: number }> = ({ sdk, delta = 0 }) => {
     const { t } = useTranslation();
     const [padding, setPadding] = useState(0);
     const [type, setType] = useState<'confirm' | 'unlock' | undefined>(undefined);
@@ -265,7 +265,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
                 isLoading={isLoading}
                 isError={isError}
                 reason={type}
-                padding={padding}
+                padding={padding - delta}
             />
         );
     }, [sdk, auth, requestId, onCancel, onSubmit, type]);
