@@ -1,5 +1,5 @@
 import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import {
     DragDropContext,
     Draggable,
@@ -101,9 +101,11 @@ export const JettonsSettings = () => {
     const wallet = useWalletContext();
     const { data } = useWalletJettonList();
 
-    const jettons = useMemo(() => {
+    const [jettons, setJettons] = useState<JettonBalance[]>([]);
+
+    useEffect(() => {
         const sort = sortJettons(wallet.orderJettons, data?.balances ?? []);
-        return hideEmptyJettons(sort);
+        setJettons(hideEmptyJettons(sort));
     }, [data, wallet.orderJettons]);
 
     const { mutate } = useMutateWalletProperty();
@@ -113,6 +115,11 @@ export const JettonsSettings = () => {
             const updatedList = [...jettons];
             const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
             updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
+
+            // Optimistic sync update;
+            setJettons(updatedList);
+
+            // Pessimistic async update:
             mutate({ orderJettons: updatedList.map(item => item.jetton.address) });
         },
         [jettons, mutate]
