@@ -27,9 +27,6 @@ export class BrowserAppSdk extends BaseApp {
         window.open(url, '_black');
     };
 
-    confirm = async (text: string) => window.confirm(text);
-    alert = async (text: string) => window.alert(text);
-
     disableScroll = disableScroll;
     enableScroll = enableScroll;
     getScrollbarWidth = getScrollbarWidth;

@@ -29,11 +29,6 @@ export class ExtensionAppSdk extends BaseApp {
         });
     };
 
-    confirm = async (text: string) => window.confirm(text);
-    alert = async (text: string) => window.alert(text);
-
-    version = packageJson.version ?? 'Unknown';
-
     disableScroll = () => null;
     enableScroll = () => null;
     getScrollbarWidth = () => 0;
@@ -82,4 +77,6 @@ export class ExtensionAppSdk extends BaseApp {
 
         window.close();
     };
+
+    version = packageJson.version ?? 'Unknown';
 }

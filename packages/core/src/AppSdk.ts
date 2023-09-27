@@ -2,6 +2,7 @@ import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
 import { AuthState } from './entries/password';
+import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
 import { TonTransferParams } from './service/deeplinkingService';
 import { IStorage, MemoryStorage } from './Storage';
 
@@ -40,6 +41,8 @@ export interface UIEvents {
     nft: NFT;
     transferNft: NFT;
     keyboard: KeyboardParams;
+    addSuggestion: LatestSuggestion;
+    editSuggestion: FavoriteSuggestion;
     response: any;
 }
 
@@ -78,8 +81,9 @@ export interface IAppSdk {
     uiEvents: IEventEmitter<UIEvents>;
     version: string;
 
-    confirm: (text: string) => Promise<boolean>;
-    alert: (text: string) => Promise<void>;
+    confirm: (text: string) => boolean;
+    alert: (text: string) => void;
+    prompt: (message: string, defaultValue?: string) => string | null;
 
     requestExtensionPermission: () => Promise<void>;
     twaExpand?: () => void;
@@ -124,17 +128,17 @@ export abstract class BaseApp implements IAppSdk {
 
     isStandalone = () => false;
 
-    version = '0.0.0';
-
-    confirm = async (_: string) => false;
-
-    alert = async (_: string) => {};
+    confirm = (text: string) => window.confirm(text);
+    alert = (text: string) => window.alert(text);
+    prompt = (message: string, defaultValue?: string) => window.prompt(message, defaultValue);
 
     requestExtensionPermission = async () => {};
 
     twaExpand = () => {};
 
     hapticNotification = (type: 'success' | 'error') => {};
+
+    version = '0.0.0';
 }
 
 export class MockAppSdk extends BaseApp {

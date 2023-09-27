@@ -59,9 +59,6 @@ export class TwaAppSdk extends BaseApp {
         }
     };
 
-    confirm = async (text: string) => window.confirm(text);
-    alert = async (text: string) => window.alert(text);
-
     twaExpand = () => this.components.viewport.expand();
 
     hapticNotification = (type: 'success' | 'error') => {

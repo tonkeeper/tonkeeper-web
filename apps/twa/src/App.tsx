@@ -53,6 +53,10 @@ import React, { FC, PropsWithChildren, Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import {
+    AddFavoriteNotification,
+    EditFavoriteNotification
+} from './components/FavoriteNotification';
 import { InitDataLogger } from './components/InitData';
 import { TwaReceiveNotification } from './components/ReceiveNotifications';
 import { TwaQrScanner } from './components/TwaQrScanner';
@@ -373,6 +377,8 @@ const MainPages: FC<{ showQrScan: boolean }> = ({ showQrScan }) => {
                 <MemoryScroll />
                 <Suspense>
                     <TonConnectSubscription />
+                    <AddFavoriteNotification />
+                    <EditFavoriteNotification />
                 </Suspense>
             </Wrapper>
         </TwaNotification>

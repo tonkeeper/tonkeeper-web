@@ -18,6 +18,10 @@ import {
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import {
+    AddFavoriteNotification,
+    EditFavoriteNotification
+} from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
+import {
     AmplitudeAnalyticsContext,
     useAmplitudeAnalytics
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
@@ -311,6 +315,8 @@ export const Content: FC<{
                     <TonConnectSubscription />
                     <NftNotification />
                     <SendNftNotification />
+                    <AddFavoriteNotification />
+                    <EditFavoriteNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>

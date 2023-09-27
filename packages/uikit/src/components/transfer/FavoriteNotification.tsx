@@ -1,22 +1,16 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import {
     FavoriteSuggestion,
     LatestSuggestion,
     Suggestion
 } from '@tonkeeper/core/dist/entries/suggestion';
-import {
-    deleteFavoriteSuggestion,
-    getFavoriteSuggestions,
-    setFavoriteSuggestion
-} from '@tonkeeper/core/dist/service/suggestionService';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { QueryKey } from '../../libs/queryKey';
+import { useAddFavorite, useDeleteFavorite, useEditFavorite } from '../../state/suggestions';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Notification } from '../Notification';
 import { Label1 } from '../Text';
@@ -34,17 +28,6 @@ const Block = styled.form`
     width: 100%;
 `;
 
-const validateName = (name: string) => {
-    name = name.trim();
-    if (name.length < 1) {
-        throw new Error('Name is to short');
-    }
-    if (name.length > 24) {
-        throw new Error('Name is to large');
-    }
-    return name;
-};
-
 export const useSuggestionAddress = (item: Suggestion) => {
     const wallet = useWalletContext();
 
@@ -55,32 +38,6 @@ export const useSuggestionAddress = (item: Suggestion) => {
     }, [item]);
 };
 
-const useAddFavorite = (latest: LatestSuggestion) => {
-    const sdk = useAppSdk();
-    const wallet = useWalletContext();
-    const queryClient = useQueryClient();
-
-    return useMutation<void, Error, string>(async name => {
-        name = validateName(name);
-        const items = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);
-        if (items.some(item => item.name === name)) {
-            throw new Error('Name is already taken');
-        }
-        items.push({
-            isFavorite: true,
-            address: latest.address,
-            name,
-            blockchain: latest.blockchain
-        });
-        await setFavoriteSuggestion(sdk.storage, wallet.publicKey, items);
-        await queryClient.invalidateQueries([
-            wallet.active.rawAddress,
-            QueryKey.activity,
-            'suggestions'
-        ]);
-    });
-};
-
 const AddFavoriteContent: FC<{
     latest: LatestSuggestion;
     onClose: () => void;
@@ -88,7 +45,7 @@ const AddFavoriteContent: FC<{
     const { t } = useTranslation();
     const sdk = useAppSdk();
 
-    const { mutateAsync, reset, isLoading, isError } = useAddFavorite(latest);
+    const { mutateAsync, reset, isLoading, isError } = useAddFavorite();
     const address = useSuggestionAddress(latest);
     const ref = useRef<HTMLInputElement | null>(null);
 
@@ -112,7 +69,7 @@ const AddFavoriteContent: FC<{
         e.preventDefault();
         e.stopPropagation();
 
-        await mutateAsync(name);
+        await mutateAsync({ latest, name });
         onClose();
     };
 
@@ -154,11 +111,24 @@ const AddFavoriteContent: FC<{
     );
 };
 
-export const AddFavoriteNotification: FC<{
-    latest?: LatestSuggestion;
-    onClose: () => void;
-}> = ({ latest, onClose }) => {
+export const AddFavoriteNotification = () => {
+    const [latest, setLatest] = useState<LatestSuggestion | undefined>(undefined);
     const { t } = useTranslation();
+    const sdk = useAppSdk();
+
+    const onClose = () => {
+        setLatest(undefined);
+    };
+
+    useEffect(() => {
+        const handler = (options: { method: 'addSuggestion'; params: LatestSuggestion }) => {
+            setLatest(options.params);
+        };
+        sdk.uiEvents.on('addSuggestion', handler);
+        return () => {
+            sdk.uiEvents.off('addSuggestion', handler);
+        };
+    }, []);
 
     const Content = useCallback(() => {
         if (!latest) return undefined;
@@ -177,46 +147,6 @@ export const AddFavoriteNotification: FC<{
     );
 };
 
-const useDeleteFavorite = (favorite: FavoriteSuggestion) => {
-    const sdk = useAppSdk();
-    const wallet = useWalletContext();
-    const queryClient = useQueryClient();
-
-    return useMutation<void, Error>(async () => {
-        await deleteFavoriteSuggestion(sdk.storage, wallet.publicKey, favorite.address);
-        await queryClient.invalidateQueries([
-            wallet.active.rawAddress,
-            QueryKey.activity,
-            'suggestions'
-        ]);
-    });
-};
-const useEditFavorite = (favorite: FavoriteSuggestion) => {
-    const sdk = useAppSdk();
-    const wallet = useWalletContext();
-    const queryClient = useQueryClient();
-
-    return useMutation<void, Error, string>(async name => {
-        name = validateName(name);
-        let items = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);
-        if (items.some(item => item.name === name && item.address !== favorite.address)) {
-            throw new Error('Name is already taken');
-        }
-        items = items.map(item =>
-            item.address === favorite.address
-                ? { isFavorite: true, address: favorite.address, name, blockchain: item.blockchain }
-                : item
-        );
-
-        await setFavoriteSuggestion(sdk.storage, wallet.publicKey, items);
-        await queryClient.invalidateQueries([
-            wallet.active.rawAddress,
-            QueryKey.activity,
-            'suggestions'
-        ]);
-    });
-};
-
 const EditFavoriteContent: FC<{
     favorite: FavoriteSuggestion;
     onClose: () => void;
@@ -226,13 +156,8 @@ const EditFavoriteContent: FC<{
 
     const address = useSuggestionAddress(favorite);
 
-    const {
-        mutateAsync: editAsync,
-        reset,
-        isLoading: isEditLoading,
-        isError
-    } = useEditFavorite(favorite);
-    const { mutateAsync: deleteAsync, isLoading: isDeleteLoading } = useDeleteFavorite(favorite);
+    const { mutateAsync: editAsync, reset, isLoading: isEditLoading, isError } = useEditFavorite();
+    const { mutateAsync: deleteAsync, isLoading: isDeleteLoading } = useDeleteFavorite();
 
     const ref = useRef<HTMLInputElement | null>(null);
 
@@ -254,7 +179,7 @@ const EditFavoriteContent: FC<{
     };
 
     const onDelete = async () => {
-        await deleteAsync();
+        await deleteAsync(favorite);
         onClose();
     };
 
@@ -262,7 +187,7 @@ const EditFavoriteContent: FC<{
         e.preventDefault();
         e.stopPropagation();
 
-        await editAsync(name);
+        await editAsync({ favorite, name });
         onClose();
     };
 
@@ -316,11 +241,24 @@ const EditFavoriteContent: FC<{
     );
 };
 
-export const EditFavoriteNotification: FC<{
-    favorite?: FavoriteSuggestion;
-    onClose: () => void;
-}> = ({ favorite, onClose }) => {
+export const EditFavoriteNotification = () => {
+    const [favorite, setFavorite] = useState<FavoriteSuggestion | undefined>(undefined);
     const { t } = useTranslation();
+    const sdk = useAppSdk();
+
+    const onClose = () => {
+        setFavorite(undefined);
+    };
+
+    useEffect(() => {
+        const handler = (options: { method: 'editSuggestion'; params: FavoriteSuggestion }) => {
+            setFavorite(options.params);
+        };
+        sdk.uiEvents.on('editSuggestion', handler);
+        return () => {
+            sdk.uiEvents.off('editSuggestion', handler);
+        };
+    }, []);
 
     const Content = useCallback(() => {
         if (!favorite) return undefined;
