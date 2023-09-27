@@ -31,6 +31,8 @@ const DropDownListContainer = styled.div<{ center?: boolean }>`
     max-height: 368px;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
+
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.16);
 `;
 
 export const DropDownListPayload = styled.div`

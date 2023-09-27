@@ -22,6 +22,8 @@ const Block = styled.form`
 
     box-sizing: border-box;
     padding-top: 16px;
+
+    height: var(--tg-viewport-height);
 `;
 
 const EditFavoriteContent: FC<{

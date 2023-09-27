@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Theme, userDefaultTheme } from '@tonkeeper/core/dist/entries/theme';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { useStorage } from '../hooks/storage';
+import { Theme, userDefaultTheme } from '@tonkeeper/core/dist/entries/theme';
+import { useAppSdk } from '../hooks/appSdk';
 
 export const useUserTheme = () => {
-    const storage = useStorage();
+    const sdk = useAppSdk();
     return useQuery([AppKey.THEME], async () => {
-        const theme = await storage.get<Theme>(AppKey.THEME);
+        const theme = await sdk.storage.get<Theme>(AppKey.THEME);
         return theme ?? userDefaultTheme;
     });
 };
@@ -25,10 +25,10 @@ export const useUserThemes = (account = 'account') => {
 };
 
 export const useMutateTheme = () => {
-    const storage = useStorage();
+    const sdk = useAppSdk();
     const client = useQueryClient();
     return useMutation<void, Error, Theme>(async theme => {
-        await storage.set(AppKey.THEME, theme);
+        await sdk.storage.set(AppKey.THEME, theme);
         await client.invalidateQueries([AppKey.THEME]);
     });
 };

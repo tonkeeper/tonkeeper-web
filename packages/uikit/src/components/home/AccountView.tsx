@@ -25,7 +25,7 @@ const Background = styled.div<{ extension?: boolean }>`
     width: 100%;
     box-sizing: border-box;
     border-radius: 20px;
-    background: ${props => props.theme.textPrimary};
+    background: ${props => props.theme.backgroundContent};
     max-width: 300px;
 
     ${props =>

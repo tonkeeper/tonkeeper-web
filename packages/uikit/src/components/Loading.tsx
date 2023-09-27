@@ -8,6 +8,8 @@ const Block = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+
+    background-color: ${props => props.theme.backgroundPage};
 `;
 
 export const Loading = React.forwardRef<HTMLDivElement>(({}, ref) => {

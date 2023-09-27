@@ -62,6 +62,7 @@ const ButtonBlockElement = styled.div<{ standalone: boolean }>`
 export const Wrapper = styled.div<{ standalone: boolean; extension: boolean; fullWidth?: boolean }>`
     position: relative;
     overflow: hidden;
+    background-color: ${props => props.theme.backgroundPage};
 
     ${props =>
         props.fullWidth

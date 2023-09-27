@@ -1,6 +1,5 @@
 import { ConfirmMainButtonProps } from '@tonkeeper/uikit/dist/components/transfer/common';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
-import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
 import { useMainButton } from '@twa.js/sdk-react';
 import { useEffect } from 'react';
 
@@ -39,8 +38,6 @@ export const RecipientTwaMainButton = ({
 
     useEffect(() => {
         button.setText(t('continue'));
-        button.setBackgroundColor((defaultTheme as any).buttonPrimaryBackground);
-        button.setTextColor((defaultTheme as any).textPrimary);
         button.show();
         button.enable();
     }, []);

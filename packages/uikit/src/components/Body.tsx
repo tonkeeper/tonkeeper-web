@@ -8,6 +8,7 @@ const BodyElement = styled.div`
     flex-grow: 1;
     padding: 0 1rem;
     -webkit-overflow-scrolling: touch;
+    background-color: ${props => props.theme.backgroundPage};
 `;
 
 const setTop = () => {

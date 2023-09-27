@@ -165,6 +165,8 @@ export const FullHeightBlock = styled(NotificationBlock)<{
         props.fitContent ? 'unset' : `calc(var(--app-height) - ${props.standalone ? 3 : 2}rem)`};
     padding-bottom: ${props => (props.noPadding ? 0 : 'calc(56px + 1rem)')};
     box-sizing: border-box;
+
+    background-color: ${props => props.theme.backgroundPage};
 `;
 
 export const NotificationTitleBlock = styled.div`

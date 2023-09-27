@@ -32,11 +32,12 @@ import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/tra
 import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
-import { defaultTheme } from '@tonkeeper/uikit';
 import {
     AmplitudeAnalyticsContext,
     useAmplitudeAnalytics
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
+import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
 
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -49,7 +50,7 @@ import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { Platform as TwaPlatform, WebApp } from '@twa.js/sdk';
 import { SDKProvider, useSDK, useWebApp } from '@twa.js/sdk-react';
-import React, { FC, PropsWithChildren, Suspense, useMemo } from 'react';
+import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -93,12 +94,19 @@ const TwaLoader = () => {
 
     const sdk = useMemo(() => {
         if (!components) return undefined;
-
-        components.webApp.setBackgroundColor((defaultTheme as any).backgroundPage);
-        components.webApp.setHeaderColor((defaultTheme as any).backgroundPage);
-
         return new TwaAppSdk(components);
     }, [components]);
+
+    useEffect(() => {
+        if (!components) return undefined;
+
+        const theme = components.themeParams.isDark ? defaultTheme : lightTheme;
+
+        components.webApp.setBackgroundColor((theme as any).backgroundPage);
+        components.webApp.setHeaderColor((theme as any).backgroundPage);
+        components.mainButton.setBackgroundColor((theme as any).buttonPrimaryBackground);
+        components.mainButton.setTextColor((theme as any).buttonPrimaryForeground);
+    }, [components?.themeParams.isDark]);
 
     if (error instanceof Error) {
         return <div>{error.message}</div>;
@@ -110,7 +118,11 @@ const TwaLoader = () => {
 
     return (
         <AppSdkContext.Provider value={sdk}>
-            <TwaApp sdk={sdk} webApp={components.webApp} />
+            <QueryClientProvider client={queryClient}>
+                <UserThemeProvider isDark={components.themeParams.isDark}>
+                    <TwaApp sdk={sdk} webApp={components.webApp} />
+                </UserThemeProvider>
+            </QueryClientProvider>
         </AppSdkContext.Provider>
     );
 };
@@ -146,26 +158,22 @@ const TwaApp: FC<{ sdk: IAppSdk; webApp: WebApp }> = ({ sdk, webApp }) => {
 
     return (
         <BrowserRouter>
-            <QueryClientProvider client={queryClient}>
-                <Suspense>
-                    <TranslationContext.Provider value={translation}>
-                        <StorageContext.Provider value={sdk.storage}>
-                            <UserThemeProvider>
-                                <HeaderGlobalStyle />
-                                <FooterGlobalStyle />
-                                <SybHeaderGlobalStyle />
-                                <GlobalListStyle />
-                                <InitDataLogger />
-                                <Loader sdk={sdk} />
-                                <UnlockNotification
-                                    sdk={sdk}
-                                    delta={getMainButtonHeight(webApp.platform)}
-                                />
-                            </UserThemeProvider>
-                        </StorageContext.Provider>
-                    </TranslationContext.Provider>
-                </Suspense>
-            </QueryClientProvider>
+            <Suspense>
+                <TranslationContext.Provider value={translation}>
+                    <StorageContext.Provider value={sdk.storage}>
+                        <HeaderGlobalStyle />
+                        <FooterGlobalStyle />
+                        <SybHeaderGlobalStyle />
+                        <GlobalListStyle />
+                        <InitDataLogger />
+                        <Loader sdk={sdk} />
+                        <UnlockNotification
+                            sdk={sdk}
+                            delta={getMainButtonHeight(webApp.platform)}
+                        />
+                    </StorageContext.Provider>
+                </TranslationContext.Provider>
+            </Suspense>
         </BrowserRouter>
     );
 };
