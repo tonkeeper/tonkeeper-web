@@ -115,15 +115,13 @@ const getTRC20FiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: A
 
 const getJettonsFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
     return assets.ton.jettons.balances.reduce(
-        (total, { jettonAddress, balance, metadata }) =>
+        (total, { jetton, balance }) =>
             useRateOrDefault(
                 client,
                 fiat,
-                Address.parse(jettonAddress).toString(),
+                Address.parse(jetton.address).toString(),
                 rate =>
-                    total.plus(
-                        shiftedDecimals(balance, metadata?.decimals).multipliedBy(rate.prices)
-                    ),
+                    total.plus(shiftedDecimals(balance, jetton.decimals).multipliedBy(rate.prices)),
                 total
             ),
         new BigNumber(0)

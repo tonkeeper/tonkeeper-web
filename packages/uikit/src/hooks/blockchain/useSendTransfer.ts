@@ -57,7 +57,8 @@ export function useSendTransfer<T extends Asset>(
                     track2('send-jetton');
                     const jettonInfo = jettons!.balances.find(
                         jetton =>
-                            (amount.asset.address as Address).toRawString() === jetton.jettonAddress
+                            (amount.asset.address as Address).toRawString() ===
+                            jetton.jetton.address
                     )!;
                     await sendJettonTransfer(
                         sdk.storage,

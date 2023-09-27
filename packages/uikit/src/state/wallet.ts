@@ -5,19 +5,14 @@ import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/servi
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import { getWalletActiveAddresses } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
-import {
-    JettonApi,
-    JettonsBalances,
-    NFTApi,
-    NftCollection,
-    NftItemRepr
-} from '@tonkeeper/core/dist/tonApiV1';
+import { NFTApi, NftCollection, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import {
     Account,
     AccountsApi,
     BlockchainApi,
     DNSApi,
     DnsRecord,
+    JettonsBalances,
     WalletApi
 } from '@tonkeeper/core/dist/tonApiV2';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
@@ -120,20 +115,18 @@ export const useWalletAccountInfo = () => {
 
 export const useWalletJettonList = () => {
     const wallet = useWalletContext();
-    const {
-        api: { tonApi }
-    } = useAppContext();
+    const { api } = useAppContext();
     const client = useQueryClient();
     return useQuery<JettonsBalances, Error>(
         [wallet.publicKey, QueryKey.jettons],
         async () => {
-            const result = await new JettonApi(tonApi).getJettonsBalances({
-                account: wallet.active.rawAddress
+            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
+                accountId: wallet.active.rawAddress
             });
 
             result.balances.forEach(item => {
                 client.setQueryData(
-                    [wallet.publicKey, QueryKey.jettons, JettonKey.balance, item.jettonAddress],
+                    [wallet.publicKey, QueryKey.jettons, JettonKey.balance, item.jetton.address],
                     item
                 );
             });

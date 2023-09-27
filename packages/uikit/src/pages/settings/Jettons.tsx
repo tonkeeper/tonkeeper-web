@@ -1,5 +1,5 @@
-import { JettonBalance } from '@tonkeeper/core/dist/tonApiV1';
-import React, { FC, useCallback, useMemo } from 'react';
+import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import {
     DragDropContext,
     Draggable,
@@ -9,9 +9,9 @@ import {
 } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
-import { Radio } from '../../components/fields/Checkbox';
 import { ReorderIcon } from '../../components/Icon';
 import { ColumnText } from '../../components/Layout';
+import { Radio } from '../../components/fields/Checkbox';
 
 import { ListBlock, ListItemElement, ListItemPayload } from '../../components/List';
 import { SkeletonList } from '../../components/Skeleton';
@@ -57,14 +57,14 @@ const JettonRow: FC<{
     }, [jetton]);
 
     const checked = useMemo(() => {
-        if (jetton.verification === 'whitelist') {
-            return (wallet.hiddenJettons ?? []).every(item => item !== jetton.jettonAddress);
+        if (jetton.jetton.verification === 'whitelist') {
+            return (wallet.hiddenJettons ?? []).every(item => item !== jetton.jetton.address);
         } else {
-            return (wallet.shownJettons ?? []).some(item => item === jetton.jettonAddress);
+            return (wallet.shownJettons ?? []).some(item => item === jetton.jetton.address);
         }
     }, [wallet.hiddenJettons, wallet.shownJettons]);
 
-    const balance = useCoinFullBalance(jetton.balance, jetton.metadata?.decimals);
+    const balance = useCoinFullBalance(jetton.balance, jetton.jetton.decimals);
 
     return (
         <ListItemPayload>
@@ -73,10 +73,10 @@ const JettonRow: FC<{
                     <Radio checked={checked} onChange={onChange} />
                 </RadioWrapper>
 
-                <Logo src={jetton.metadata?.image} />
+                <Logo src={jetton.jetton.image} />
                 <ColumnText
-                    text={jetton.metadata?.name ?? t('Unknown_COIN')}
-                    secondary={`${balance} ${jetton.metadata?.symbol}`}
+                    text={jetton.jetton.name ?? t('Unknown_COIN')}
+                    secondary={`${balance} ${jetton.jetton.symbol}`}
                 />
             </Row>
             <Icon {...dragHandleProps}>
@@ -101,9 +101,11 @@ export const JettonsSettings = () => {
     const wallet = useWalletContext();
     const { data } = useWalletJettonList();
 
-    const jettons = useMemo(() => {
+    const [jettons, setJettons] = useState<JettonBalance[]>([]);
+
+    useEffect(() => {
         const sort = sortJettons(wallet.orderJettons, data?.balances ?? []);
-        return hideEmptyJettons(sort);
+        setJettons(hideEmptyJettons(sort));
     }, [data, wallet.orderJettons]);
 
     const { mutate } = useMutateWalletProperty();
@@ -113,7 +115,12 @@ export const JettonsSettings = () => {
             const updatedList = [...jettons];
             const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
             updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
-            mutate({ orderJettons: updatedList.map(item => item.jettonAddress) });
+
+            // Optimistic sync update;
+            setJettons(updatedList);
+
+            // Pessimistic async update:
+            mutate({ orderJettons: updatedList.map(item => item.jetton.address) });
         },
         [jettons, mutate]
     );
@@ -136,8 +143,8 @@ export const JettonsSettings = () => {
                             >
                                 {jettons.map((jetton, index) => (
                                     <Draggable
-                                        key={jetton.jettonAddress}
-                                        draggableId={jetton.jettonAddress}
+                                        key={jetton.jetton.address}
+                                        draggableId={jetton.jetton.address}
                                         index={index}
                                     >
                                         {p => (

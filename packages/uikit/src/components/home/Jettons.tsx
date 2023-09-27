@@ -1,6 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { JettonBalance, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { Account } from '@tonkeeper/core/dist/tonApiV2';
+import { Account, JettonBalance, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import { TronBalances } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo } from 'react';
@@ -64,12 +63,12 @@ const JettonAsset: FC<{
 
     const [amount, address] = useMemo(
         () => [
-            formatDecimals(jetton.balance, jetton.metadata?.decimals),
-            Address.parse(jetton.jettonAddress).toString()
+            formatDecimals(jetton.balance, jetton.jetton.decimals),
+            Address.parse(jetton.jetton.address).toString()
         ],
         [jetton]
     );
-    const balance = useFormatBalance(amount, jetton.metadata?.decimals);
+    const balance = useFormatBalance(amount, jetton.jetton.decimals);
 
     const { data } = useRate(address);
     const { fiatPrice, fiatAmount } = useFormatFiat(data, amount);
@@ -77,14 +76,14 @@ const JettonAsset: FC<{
     return (
         <ListItem
             onClick={() =>
-                navigate(AppRoute.coins + `/${encodeURIComponent(jetton.jettonAddress)}`)
+                navigate(AppRoute.coins + `/${encodeURIComponent(jetton.jetton.address)}`)
             }
         >
             <ListItemPayload>
-                <TokenLogo src={jetton.metadata?.image} />
+                <TokenLogo src={jetton.jetton.image} />
                 <TokenLayout
-                    name={jetton.metadata?.name ?? t('Unknown_COIN')}
-                    symbol={jetton.metadata?.symbol}
+                    name={jetton.jetton.name ?? t('Unknown_COIN')}
+                    symbol={jetton.jetton.symbol}
                     balance={balance}
                     secondary={fiatPrice}
                     fiatAmount={fiatAmount}
@@ -110,7 +109,7 @@ export const JettonList: FC<AssetProps> = ({
             </ListBlock>
             <ListBlock noUserSelect>
                 {jettons.balances.map(jetton => (
-                    <JettonAsset key={jetton.jettonAddress} jetton={jetton} />
+                    <JettonAsset key={jetton.jetton.address} jetton={jetton} />
                 ))}
             </ListBlock>
         </>
