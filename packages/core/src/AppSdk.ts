@@ -81,9 +81,9 @@ export interface IAppSdk {
     uiEvents: IEventEmitter<UIEvents>;
     version: string;
 
-    confirm: (text: string) => boolean;
-    alert: (text: string) => void;
-    prompt: (message: string, defaultValue?: string) => string | null;
+    confirm: (text: string) => Promise<boolean>;
+    alert: (text: string) => Promise<void>;
+    prompt: (message: string, defaultValue?: string) => Promise<string | null>;
 
     requestExtensionPermission: () => Promise<void>;
     twaExpand?: () => void;
@@ -128,9 +128,9 @@ export abstract class BaseApp implements IAppSdk {
 
     isStandalone = () => false;
 
-    confirm = (text: string) => window.confirm(text);
-    alert = (text: string) => window.alert(text);
-    prompt = (message: string, defaultValue?: string) => window.prompt(message, defaultValue);
+    confirm = async (text: string) => window.confirm(text);
+    alert = async (text: string) => window.alert(text);
+    prompt = async (message: string, defaultValue?: string) => window.prompt(message, defaultValue);
 
     requestExtensionPermission = async () => {};
 

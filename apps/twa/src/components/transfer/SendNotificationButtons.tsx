@@ -16,6 +16,17 @@ export const HideTwaMainButton = () => {
     return <></>;
 };
 
+export const useMainButtonLoading = (isLoading: boolean) => {
+    const button = useMainButton();
+    useEffect(() => {
+        if (isLoading) {
+            button.showProgress();
+        } else {
+            button.hideProgress();
+        }
+    }, [button, isLoading]);
+};
+
 export const RecipientTwaMainButton = ({
     isLoading,
     onClick
@@ -41,13 +52,7 @@ export const RecipientTwaMainButton = ({
         };
     }, [onClick, button]);
 
-    useEffect(() => {
-        if (isLoading) {
-            button.showProgress();
-        } else {
-            button.hideProgress();
-        }
-    }, [isLoading]);
+    useMainButtonLoading(isLoading);
 
     return <></>;
 };
@@ -76,13 +81,7 @@ export const AmountTwaMainButton = ({
         };
     }, [onClick, button]);
 
-    useEffect(() => {
-        if (isLoading) {
-            button.showProgress();
-        } else {
-            button.hideProgress();
-        }
-    }, [isLoading]);
+    useMainButtonLoading(isLoading);
 
     return <></>;
 };
@@ -125,13 +124,7 @@ export const ConfirmTwaMainButton: ConfirmMainButtonProps = ({
         }
     }, [isDisabled]);
 
-    useEffect(() => {
-        if (isLoading) {
-            button.showProgress();
-        } else {
-            button.hideProgress();
-        }
-    }, [isLoading]);
+    useMainButtonLoading(isLoading);
 
     return <></>;
 };

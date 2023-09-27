@@ -4,6 +4,7 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import { toTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { FavoriteSuggestion, LatestSuggestion } from '@tonkeeper/core/dist/entries/suggestion';
 import {
     TonTransferParams,
     parseTonTransfer
@@ -40,6 +41,7 @@ import BigNumber from 'bignumber.js';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
+import { FavoriteState, FavoriteView } from './FavoriteNotification';
 import {
     AmountTwaMainButton,
     ConfirmTwaMainButton,
@@ -70,9 +72,11 @@ const SendContent: FC<{
 
     const recipientRef = useRef<HTMLDivElement>(null);
     const amountRef = useRef<HTMLDivElement>(null);
+    const favoriteRef = useRef<HTMLDivElement>(null);
     const confirmRef = useRef<HTMLDivElement>(null);
 
-    const [view, setView] = useState<'recipient' | 'amount' | 'confirm'>('recipient');
+    const [favoriteState, setFavorite] = useState<FavoriteState | undefined>(undefined);
+    const [view, setView] = useState<'recipient' | 'amount' | 'favorite' | 'confirm'>('recipient');
     const [right, setRight] = useState(true);
     const [recipient, _setRecipient] = useState<RecipientData | undefined>(initRecipient);
     const [amountViewState, setAmountViewState] = useState<Partial<AmountState> | undefined>(
@@ -209,9 +213,31 @@ const SendContent: FC<{
         });
     };
 
+    useEffect(() => {
+        const edit = async (options: { method: 'editSuggestion'; params: FavoriteSuggestion }) => {
+            openIosKeyboard('text');
+            setRight(true);
+            setFavorite({ favorite: options.params });
+            setView('favorite');
+        };
+        const add = async (options: { method: 'addSuggestion'; params: LatestSuggestion }) => {
+            openIosKeyboard('text');
+            setRight(true);
+            setFavorite({ latest: options.params });
+            setView('favorite');
+        };
+        sdk.uiEvents.on('addSuggestion', add);
+        sdk.uiEvents.on('editSuggestion', edit);
+        return () => {
+            sdk.uiEvents.off('addSuggestion', add);
+            sdk.uiEvents.off('editSuggestion', edit);
+        };
+    }, []);
+
     const nodeRef = {
         recipient: recipientRef,
         amount: amountRef,
+        favorite: favoriteRef,
         confirm: confirmRef
     }[view];
 
@@ -241,6 +267,9 @@ const SendContent: FC<{
                                 HeaderBlock={() => <RecipientTwaHeaderBlock onClose={onClose} />}
                                 fitContent
                             />
+                        )}
+                        {view === 'favorite' && (
+                            <FavoriteView state={favoriteState} onClose={backToRecipient} />
                         )}
                         {view === 'amount' && (
                             <AmountView

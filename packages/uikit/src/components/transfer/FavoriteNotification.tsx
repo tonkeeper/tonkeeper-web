@@ -1,22 +1,14 @@
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import {
-    FavoriteSuggestion,
-    LatestSuggestion,
-    Suggestion
-} from '@tonkeeper/core/dist/entries/suggestion';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FavoriteSuggestion, LatestSuggestion } from '@tonkeeper/core/dist/entries/suggestion';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
+import { useInputRefAutoFocus } from '../../hooks/input';
 import { useTranslation } from '../../hooks/translation';
 import { useAddFavorite, useDeleteFavorite, useEditFavorite } from '../../state/suggestions';
-import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Notification } from '../Notification';
-import { Label1 } from '../Text';
 import { Button, ButtonRow } from '../fields/Button';
 import { Input } from '../fields/Input';
-import { Label } from './common';
+import { SuggestionAddress } from './SuggestionAddress';
 
 const Block = styled.form`
     display: flex;
@@ -28,35 +20,14 @@ const Block = styled.form`
     width: 100%;
 `;
 
-export const useSuggestionAddress = (item: Suggestion) => {
-    const wallet = useWalletContext();
-
-    return useMemo(() => {
-        return item.blockchain === BLOCKCHAIN_NAME.TRON
-            ? item.address
-            : formatAddress(item.address, wallet.network);
-    }, [item]);
-};
-
 const AddFavoriteContent: FC<{
     latest: LatestSuggestion;
     onClose: () => void;
 }> = ({ latest, onClose }) => {
     const { t } = useTranslation();
-    const sdk = useAppSdk();
 
     const { mutateAsync, reset, isLoading, isError } = useAddFavorite();
-    const address = useSuggestionAddress(latest);
-    const ref = useRef<HTMLInputElement | null>(null);
-
-    useEffect(() => {
-        if (/iPhone|iPad|iPod/.test(window.navigator.userAgent)) {
-            return;
-        }
-        if (ref.current) {
-            ref.current.focus();
-        }
-    }, [ref.current]);
+    const ref = useInputRefAutoFocus();
 
     const [name, setName] = useState('');
 
@@ -83,19 +54,7 @@ const AddFavoriteContent: FC<{
                 isValid={!isError}
                 disabled={isLoading}
             />
-            <ListBlock margin={false}>
-                <ListItem
-                    onClick={e => {
-                        e.stopPropagation();
-                        sdk.copyToClipboard(address, t('address_copied'));
-                    }}
-                >
-                    <ListItemPayload>
-                        <Label>{t('add_edit_favorite_address_label')}</Label>
-                        <Label1>{toShortValue(address)}</Label1>
-                    </ListItemPayload>
-                </ListItem>
-            </ListBlock>
+            <SuggestionAddress item={latest} />
             <Button
                 size="large"
                 primary
@@ -152,24 +111,12 @@ const EditFavoriteContent: FC<{
     onClose: () => void;
 }> = ({ favorite, onClose }) => {
     const { t } = useTranslation();
-    const sdk = useAppSdk();
-
-    const address = useSuggestionAddress(favorite);
 
     const { mutateAsync: editAsync, reset, isLoading: isEditLoading, isError } = useEditFavorite();
     const { mutateAsync: deleteAsync, isLoading: isDeleteLoading } = useDeleteFavorite();
 
-    const ref = useRef<HTMLInputElement | null>(null);
-
+    const ref = useInputRefAutoFocus();
     const isLoading = isEditLoading || isDeleteLoading;
-    useEffect(() => {
-        if (/iPhone|iPad|iPod/.test(window.navigator.userAgent)) {
-            return;
-        }
-        if (ref.current) {
-            ref.current.focus();
-        }
-    }, [ref.current]);
 
     const [name, setName] = useState(favorite.name);
 
@@ -201,19 +148,7 @@ const EditFavoriteContent: FC<{
                 isValid={!isError}
                 disabled={isLoading}
             />
-            <ListBlock margin={false}>
-                <ListItem
-                    onClick={e => {
-                        e.stopPropagation();
-                        sdk.copyToClipboard(address, t('address_copied'));
-                    }}
-                >
-                    <ListItemPayload>
-                        <Label>{t('add_edit_favorite_address_label')}</Label>
-                        <Label1>{toShortValue(address)}</Label1>
-                    </ListItemPayload>
-                </ListItem>
-            </ListBlock>
+            <SuggestionAddress item={favorite} />
 
             <ButtonRow>
                 <Button

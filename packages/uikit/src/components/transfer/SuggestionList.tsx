@@ -23,7 +23,7 @@ import { ColumnText } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { SkeletonList } from '../Skeleton';
 import { Label1 } from '../Text';
-import { useSuggestionAddress } from './FavoriteNotification';
+import { useSuggestionAddress } from './SuggestionAddress';
 
 const Label = styled(Label1)`
     user-select: none;
