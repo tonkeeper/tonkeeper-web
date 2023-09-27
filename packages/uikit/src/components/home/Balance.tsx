@@ -142,9 +142,11 @@ export const Balance: FC<{
     const { data: total } = useQuery(
         [QueryKey.total, fiat, assets],
         () => {
-            return getTonFiatAmount(client, fiat, assets)
-                .plus(getTRC20FiatAmount(client, fiat, assets))
-                .plus(getJettonsFiatAmount(client, fiat, assets));
+            return (
+                getTonFiatAmount(client, fiat, assets)
+                    // .plus(getTRC20FiatAmount(client, fiat, assets)) // TODO: ENABLE TRON
+                    .plus(getJettonsFiatAmount(client, fiat, assets))
+            );
         },
         { initialData: new BigNumber(0) }
     );
