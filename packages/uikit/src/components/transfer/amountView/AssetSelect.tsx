@@ -1,6 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { Account } from '@tonkeeper/core/dist/tonApiV2';
+import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useEffect, useRef } from 'react';
 import styled from 'styled-components';
@@ -92,20 +91,20 @@ const AssetDropDown: FC<{
                 return (
                     <ListItem
                         dropDown
-                        key={item.jettonAddress}
+                        key={item.jetton.address}
                         onClick={() => {
-                            setJetton(item.jettonAddress);
+                            setJetton(item.jetton.address);
                             onClose();
                         }}
                     >
                         <ListItemPayload>
                             <AssetInfo>
-                                <AssetImage src={item.metadata?.image}></AssetImage>
-                                <Label1>{item.metadata?.symbol}</Label1>
-                                <Amount>{format(item.balance, item.metadata?.decimals)}</Amount>
+                                <AssetImage src={item.jetton.image}></AssetImage>
+                                <Label1>{item.jetton.symbol}</Label1>
+                                <Amount>{format(item.balance, item.jetton.decimals)}</Amount>
                             </AssetInfo>
 
-                            {item.jettonAddress === jetton ? (
+                            {item.jetton.address === jetton ? (
                                 <Icon ref={ref}>
                                     <DoneIcon />
                                 </Icon>

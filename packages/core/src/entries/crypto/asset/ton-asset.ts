@@ -1,5 +1,5 @@
 import { Address } from 'ton-core';
-import { JettonsBalances } from '../../../tonApiV1';
+import { JettonsBalances } from '../../../tonApiV2';
 import { BLOCKCHAIN_NAME } from '../../crypto';
 import { BasicAsset, packAssetId } from './basic-asset';
 import { TON_ASSET } from './constants';
@@ -18,16 +18,16 @@ export function jettonToTonAsset(address: string, jettons: JettonsBalances): Ton
 
     address = Address.parse(address).toRawString();
 
-    const jetton = jettons.balances.find(i => i.metadata?.address === address);
+    const jetton = jettons.balances.find(i => i.jetton.address === address);
 
     if (!jetton) {
         throw new Error(`Jetton ${address} not found`);
     }
 
     return {
-        symbol: jetton.metadata!.symbol,
-        decimals: jetton.metadata!.decimals,
-        name: jetton.metadata!.name,
+        symbol: jetton.jetton.symbol,
+        decimals: jetton.jetton.decimals,
+        name: jetton.jetton.name,
         blockchain: BLOCKCHAIN_NAME.TON,
         address: Address.parseRaw(address),
         id: packAssetId(BLOCKCHAIN_NAME.TON, address)
