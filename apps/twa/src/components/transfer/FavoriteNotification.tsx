@@ -1,6 +1,7 @@
 import { FavoriteSuggestion, LatestSuggestion } from '@tonkeeper/core/dist/entries/suggestion';
 import { Input } from '@tonkeeper/uikit/dist/components/fields/Input';
 import { SuggestionAddress } from '@tonkeeper/uikit/dist/components/transfer/SuggestionAddress';
+import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useInputRefAutoFocus } from '@tonkeeper/uikit/dist/hooks/input';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useAddFavorite, useEditFavorite } from '@tonkeeper/uikit/dist/state/suggestions';
@@ -18,7 +19,9 @@ const Block = styled.form`
     justify-content: center;
     gap: 1rem;
     width: 100%;
-    padding-ton: 16px;
+
+    box-sizing: border-box;
+    padding-top: 16px;
 `;
 
 const EditFavoriteContent: FC<{
@@ -138,4 +141,28 @@ export const FavoriteView: FC<{
     } else {
         return <></>;
     }
+};
+
+export const useFavoriteNotification = (setFavoriteView: () => void) => {
+    const sdk = useAppSdk();
+    const [favoriteState, setFavorite] = useState<FavoriteState | undefined>(undefined);
+
+    useEffect(() => {
+        const edit = async (options: { method: 'editSuggestion'; params: FavoriteSuggestion }) => {
+            setFavorite({ favorite: options.params });
+            setFavoriteView();
+        };
+        const add = async (options: { method: 'addSuggestion'; params: LatestSuggestion }) => {
+            setFavorite({ latest: options.params });
+            setFavoriteView();
+        };
+        sdk.uiEvents.on('addSuggestion', add);
+        sdk.uiEvents.on('editSuggestion', edit);
+        return () => {
+            sdk.uiEvents.off('addSuggestion', add);
+            sdk.uiEvents.off('editSuggestion', edit);
+        };
+    }, [sdk, setFavoriteView]);
+
+    return favoriteState;
 };

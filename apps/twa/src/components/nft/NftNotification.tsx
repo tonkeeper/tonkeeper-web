@@ -18,11 +18,13 @@ import {
 import { ConfirmNftView } from '@tonkeeper/uikit/dist/components/transfer/nft/ConfirmNftView';
 import { useMinimalBalance } from '@tonkeeper/uikit/dist/components/transfer/nft/hooks';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { openIosKeyboard } from '@tonkeeper/uikit/dist/hooks/ios';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useMainButton } from '@twa.js/sdk-react';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
+import { FavoriteView, useFavoriteNotification } from '../transfer/FavoriteNotification';
 import {
     ConfirmTwaMainButton,
     HideTwaMainButton,
@@ -39,7 +41,7 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const [right, setRight] = useState(true);
-    const [view, setView] = useState<'index' | 'recipient' | 'confirm'>('index');
+    const [view, setView] = useState<'index' | 'recipient' | 'favorite' | 'confirm'>('index');
     const [recipient, setRecipient] = useState<TonRecipientData | undefined>();
 
     const mainButton = useMainButton();
@@ -49,12 +51,21 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
     const indexRef = useRef<HTMLDivElement>(null);
     const recipientRef = useRef<HTMLDivElement>(null);
     const confirmRef = useRef<HTMLDivElement>(null);
+    const favoriteRef = useRef<HTMLDivElement>(null);
 
     const backToIndex = useCallback(() => {
         setRight(false);
         setView('index');
         mainButton.hide();
     }, [mainButton]);
+
+    const onFavorite = useCallback(() => {
+        openIosKeyboard('text');
+        setRight(true);
+        setView('favorite');
+    }, [setRight, setView]);
+
+    const favoriteState = useFavoriteNotification(onFavorite);
 
     const onRecipient = async (data: RecipientData) => {
         await checkBalanceAsync();
@@ -110,6 +121,7 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
     const nodeRef = {
         index: indexRef,
         recipient: recipientRef,
+        favorite: favoriteRef,
         confirm: confirmRef
     }[view];
 
@@ -143,6 +155,9 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
                                 )}
                             />
                         )}
+                        {view === 'favorite' && (
+                            <FavoriteView state={favoriteState} onClose={backToRecipient} />
+                        )}
                         {view === 'confirm' && (
                             <ConfirmNftView
                                 onClose={handleClose}
@@ -172,7 +187,7 @@ export const TwaNftNotification: FC<PropsWithChildren> = ({ children }) => {
     }, [setNft]);
 
     useEffect(() => {
-        const handler = (options: { method: 'nft'; id?: number | undefined; params: NFT }) => {
+        const handler = (options: { method: 'nft'; params: NFT }) => {
             setNft(options.params);
         };
 
