@@ -47,6 +47,12 @@ export const ThemeSettings = () => {
             action: () => navigate(relative(SettingsRoute.country))
         });
 
+        items.push({
+            name: 'Address Update',
+            icon: 'EQ » UQ',
+            action: () => sdk.openPage('https://t.me/tonkeeper_news/49')
+        });
+
         // if (themes && themes.length > 1) {
         //   items.push({
         //     name: t('Theme'),
