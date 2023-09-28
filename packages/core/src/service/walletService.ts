@@ -104,7 +104,8 @@ export const getWalletAddress = (
     return {
         rawAddress: address.toRawString(),
         friendlyAddress: address.toString({
-            testOnly: network === Network.TESTNET
+            testOnly: network === Network.TESTNET,
+            bounceable: false
         }),
         version
     };
