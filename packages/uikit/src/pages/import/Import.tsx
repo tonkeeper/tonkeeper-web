@@ -67,7 +67,7 @@ const Import = () => {
     if (sdk.notifications && !passNotifications) {
         return (
             <Subscribe
-                wallet={wallet!.active.rawAddress}
+                wallet={wallet!}
                 mnemonic={mnemonic}
                 onDone={() => setPassNotification(true)}
             />

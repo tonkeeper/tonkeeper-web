@@ -1,5 +1,4 @@
 import { BaseApp, NativeBackButton, NotificationService } from '@tonkeeper/core/dist/AppSdk';
-import { getSubscribed, setSubscribed } from '@tonkeeper/core/dist/service/subscriptionService';
 import {
     toTonProofItem,
     tonConnectProofPayload
@@ -15,7 +14,7 @@ const apiConfig = new Configuration({ basePath: 'https://twa-api-dev.tonkeeper.c
 const twaApi = new DefaultApi(apiConfig);
 
 class TwaNotification implements NotificationService {
-    constructor(private components: InitResult, private storage: TwaStorage) {}
+    constructor(private components: InitResult) {}
 
     get twaInitData() {
         const { initDataRaw } = this.components;
@@ -26,14 +25,18 @@ class TwaNotification implements NotificationService {
     }
 
     private getTonConnectProof = async (address: string, mnemonic: string[]) => {
-        const domain = 'twa.tonkeeper.com';
+        const domain = 'https://twa.tonkeeper.com/';
         const { payload } = await twaApi.getTonConnectPayload();
         const proofPayload = tonConnectProofPayload(domain, address, payload);
         return await toTonProofItem(mnemonic, proofPayload);
     };
 
     subscribe = async (address: string, mnemonic: string[]) => {
-        await this.components.webApp.requestWriteAccess();
+        try {
+            await this.components.webApp.requestWriteAccess();
+        } catch (e) {
+            console.error(e);
+        }
 
         const proof = await this.getTonConnectProof(address, mnemonic);
         await twaApi.subscribeToAccountEvents({
@@ -43,16 +46,14 @@ class TwaNotification implements NotificationService {
                 proof
             }
         });
-        await setSubscribed(this.storage, address, true);
     };
 
-    unsubscribe = async (address: string) => {
+    unsubscribe = async (address?: string) => {
         await twaApi.unsubscribeFromAccountEvents({
             unsubscribeFromAccountEventsRequest: {
                 twaInitData: this.twaInitData
             }
         });
-        await setSubscribed(this.storage, address, false);
     };
 
     subscribeTonConnect = async (clientId: string, origin: string) => {
@@ -73,10 +74,6 @@ class TwaNotification implements NotificationService {
             }
         });
     };
-
-    subscribed = async (address: string) => {
-        return getSubscribed(this.storage, address);
-    };
 }
 
 export class TwaAppSdk extends BaseApp {
@@ -84,10 +81,9 @@ export class TwaAppSdk extends BaseApp {
     notifications: NotificationService;
 
     constructor(private components: InitResult) {
-        const storage = new TwaStorage(components.cloudStorage);
-        super(storage);
+        super(new TwaStorage(components.cloudStorage));
 
-        this.notifications = new TwaNotification(components, storage);
+        this.notifications = new TwaNotification(components);
         this.nativeBackButton = components.backButton;
     }
 

@@ -1,3 +1,4 @@
+import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import React, { FC } from 'react';
 import { IconPage } from '../../components/Layout';
 import { Button } from '../../components/fields/Button';
@@ -5,7 +6,7 @@ import { NotificationIcon } from '../../components/lottie/LottieIcons';
 import { useTranslation } from '../../hooks/translation';
 import { useSubscribeMutation } from '../../state/subscribe';
 
-export const Subscribe: FC<{ wallet: string; mnemonic: string[]; onDone: () => void }> = ({
+export const Subscribe: FC<{ wallet: WalletState; mnemonic: string[]; onDone: () => void }> = ({
     wallet,
     mnemonic,
     onDone

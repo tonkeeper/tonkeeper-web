@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
+import { getSubscribed, setSubscribed } from '@tonkeeper/core/dist/service/subscriptionService';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
@@ -16,20 +18,14 @@ import { getWalletPassword } from '../../state/password';
 const useSubscribed = () => {
     const sdk = useAppSdk();
     const wallet = useWalletContext();
-    return useQuery<boolean, Error>([wallet.active.rawAddress, QueryKey.subscribed], async () => {
-        if (!sdk.notifications) {
-            sdk.topMessage('missing sdk');
-        }
 
-        try {
-            const value = await sdk.notifications!.subscribed(wallet.active.rawAddress);
-            sdk.topMessage(value ? 'subscribed' : 'unsubscribed');
-            return value;
-        } catch (e) {
-            sdk.topMessage('failed');
-            throw e;
+    return useQuery<boolean, Error>(
+        [wallet.active.rawAddress, wallet.network, QueryKey.subscribed],
+        async () => {
+            const address = formatAddress(wallet.active.rawAddress, wallet.network);
+            return getSubscribed(sdk.storage, address);
         }
-    });
+    );
 };
 
 const useToggleSubscribe = () => {
@@ -38,26 +34,32 @@ const useToggleSubscribe = () => {
     const client = useQueryClient();
 
     return useMutation<void, Error, boolean>(async checked => {
+        const address = formatAddress(wallet.active.rawAddress, wallet.network);
+
         if (checked) {
             const password = await getWalletPassword(sdk);
             const mnemonic = await getWalletMnemonic(sdk.storage, wallet.publicKey, password);
             try {
-                await sdk.notifications?.subscribe(wallet.active.rawAddress, mnemonic);
-                sdk.topMessage('subscribed');
+                await sdk.notifications!.subscribe(address, mnemonic);
+                await setSubscribed(sdk.storage, address, true);
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);
                 throw e;
             }
         } else {
             try {
-                await sdk.notifications?.unsubscribe(wallet.active.rawAddress);
-                sdk.topMessage('unsubscribed');
+                await sdk.notifications!.unsubscribe(address);
+                await setSubscribed(sdk.storage, address, false);
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);
                 throw e;
             }
         }
-        await client.invalidateQueries([wallet.active.rawAddress, QueryKey.subscribed]);
+        await client.invalidateQueries([
+            wallet.active.rawAddress,
+            wallet.network,
+            QueryKey.subscribed
+        ]);
     });
 };
 
@@ -83,7 +85,7 @@ const SwitchNotification = () => {
                         <Label1>{t('reminder_notifications_title')}</Label1>
                         <Secondary>{t('reminder_notifications_caption')}</Secondary>
                     </Block>
-                    <Switch checked={!!data} onChange={toggle} disabled={isLoading} />
+                    <Switch checked={!!data} onChange={toggle} disabled={isFetching || isLoading} />
                 </ListItemPayload>
             </ListItem>
         </ListBlock>
