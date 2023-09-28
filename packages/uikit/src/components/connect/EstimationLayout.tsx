@@ -80,6 +80,7 @@ export const EmulationList: FC<{ isError: boolean; estimate: EstimateData | unde
             <>
                 <ListBlock noUserSelect fullWidth margin={false}>
                     <TonActivityEvents
+                        hover={false}
                         event={estimate.accountEvent.event}
                         date={date}
                         timestamp={timestamp}
