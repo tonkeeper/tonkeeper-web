@@ -26,34 +26,32 @@ import {
     AppSdkContext,
     OnImportAction
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
 import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import {
     AmplitudeAnalyticsContext,
     useAmplitudeAnalytics
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
-import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
-import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
-
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-
-import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import { Platform as TwaPlatform, WebApp } from '@twa.js/sdk';
+import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
+import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
+import { Platform as TwaPlatform } from '@twa.js/sdk';
 import { SDKProvider, useSDK, useWebApp } from '@twa.js/sdk-react';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
+import StandardErrorBoundary from './components/ErrorBoundary';
 import { InitDataLogger } from './components/InitData';
 import { TwaReceiveNotification } from './components/ReceiveNotifications';
 import { TwaQrScanner } from './components/TwaQrScanner';
@@ -83,9 +81,11 @@ const queryClient = new QueryClient({
 
 export const App = () => {
     return (
-        <SDKProvider>
-            <TwaLoader />
-        </SDKProvider>
+        <StandardErrorBoundary>
+            <SDKProvider>
+                <TwaLoader />
+            </SDKProvider>
+        </StandardErrorBoundary>
     );
 };
 
@@ -102,8 +102,12 @@ const TwaLoader = () => {
 
         const theme = components.themeParams.isDark ? defaultTheme : lightTheme;
 
-        components.webApp.setBackgroundColor((theme as any).backgroundPage);
-        components.webApp.setHeaderColor((theme as any).backgroundPage);
+        if (components.webApp.supports('setBackgroundColor')) {
+            components.webApp.setBackgroundColor((theme as any).backgroundPage);
+        }
+        if (components.webApp.supports('setHeaderColor')) {
+            components.webApp.setHeaderColor((theme as any).backgroundPage);
+        }
         components.mainButton.setBackgroundColor((theme as any).buttonPrimaryBackground);
         components.mainButton.setTextColor((theme as any).buttonPrimaryForeground);
 
@@ -115,15 +119,16 @@ const TwaLoader = () => {
     }
 
     if (!didInit || components == null || sdk == null) {
-        return <></>;
+        return <div></div>;
     }
 
     return (
         <AppSdkContext.Provider value={sdk}>
             <QueryClientProvider client={queryClient}>
-                <UserThemeProvider isDark={components.themeParams.isDark}>
-                    <TwaApp sdk={sdk} webApp={components.webApp} />
-                </UserThemeProvider>
+                <ThemeProvider theme={components.themeParams.isDark ? defaultTheme : lightTheme}>
+                    <GlobalStyle />
+                    <TwaApp sdk={sdk} />
+                </ThemeProvider>
             </QueryClientProvider>
         </AppSdkContext.Provider>
     );
@@ -141,9 +146,9 @@ const getMainButtonHeight = (platform: TwaPlatform): number | undefined => {
     }
 };
 
-const TwaApp: FC<{ sdk: IAppSdk; webApp: WebApp }> = ({ sdk, webApp }) => {
+const TwaApp: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { t, i18n } = useTranslation();
-
+    const webApp = useWebApp();
     const translation = useMemo(() => {
         const client: I18nContext = {
             t,
@@ -160,22 +165,18 @@ const TwaApp: FC<{ sdk: IAppSdk; webApp: WebApp }> = ({ sdk, webApp }) => {
 
     return (
         <BrowserRouter>
-            <Suspense>
-                <TranslationContext.Provider value={translation}>
-                    <StorageContext.Provider value={sdk.storage}>
-                        <HeaderGlobalStyle />
-                        <FooterGlobalStyle />
-                        <SybHeaderGlobalStyle />
-                        <GlobalListStyle />
-                        <Loader sdk={sdk} />
-                        <InitDataLogger />
-                        <UnlockNotification
-                            sdk={sdk}
-                            delta={getMainButtonHeight(webApp.platform)}
-                        />
-                    </StorageContext.Provider>
-                </TranslationContext.Provider>
-            </Suspense>
+            <TranslationContext.Provider value={translation}>
+                <StorageContext.Provider value={sdk.storage}>
+                    <HeaderGlobalStyle />
+                    <FooterGlobalStyle />
+                    <SybHeaderGlobalStyle />
+                    <GlobalListStyle />
+
+                    <Loader sdk={sdk} />
+                    <InitDataLogger />
+                    <UnlockNotification sdk={sdk} delta={getMainButtonHeight(webApp.platform)} />
+                </StorageContext.Provider>
+            </TranslationContext.Provider>
         </BrowserRouter>
     );
 };
