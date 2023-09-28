@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import { useOnImportAction } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, ImportRoute } from '../../libs/routes';
-import { Button } from '../fields/Button';
 import { TonkeeperIcon } from '../Icon';
 import { Notification } from '../Notification';
 import { Body1, H2 } from '../Text';
+import { Button } from '../fields/Button';
 
 const Title = styled(H2)`
     user-select: none;
@@ -25,6 +25,8 @@ const NotificationIcon = styled.div`
     justify-content: center;
     align-items: center;
     margin-bottom: 0.75rem;
+
+    color: ${props => props.theme.accentBlue};
 `;
 
 export const ImportNotification: FC<{

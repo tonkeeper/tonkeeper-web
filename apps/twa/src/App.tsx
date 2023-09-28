@@ -6,6 +6,7 @@ import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Bo
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
 import { Header, HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
+import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
@@ -126,8 +127,10 @@ const TwaLoader = () => {
         <AppSdkContext.Provider value={sdk}>
             <QueryClientProvider client={queryClient}>
                 <ThemeProvider theme={components.themeParams.isDark ? defaultTheme : lightTheme}>
-                    <GlobalStyle />
-                    <TwaApp sdk={sdk} />
+                    <DarkThemeContext.Provider value={components.themeParams.isDark}>
+                        <GlobalStyle />
+                        <TwaApp sdk={sdk} />
+                    </DarkThemeContext.Provider>
                 </ThemeProvider>
             </QueryClientProvider>
         </AppSdkContext.Provider>

@@ -1,18 +1,40 @@
-import React, { FC, Suspense } from 'react';
+import React, { FC, Suspense, useContext } from 'react';
 import styled from 'styled-components';
 
 const TonkeeperLottieIcon = React.lazy(() => import('./lottie/TonkeeperLottie'));
 
+export const DarkThemeContext = React.createContext<boolean>(true);
+
+const TonkeeperSvgIcon: FC<{ size?: string }> = ({ size = '128' }) => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={size}
+            height={size}
+            viewBox="0 0 128 128"
+            fill="none"
+        >
+            <path opacity="0.5" d="M64 58L118 34L64 118V58Z" fill="currentColor" />
+            <path opacity="0.75" d="M64 58L10 34L64 118V58Z" fill="currentColor" />
+            <path d="M64 58L10 34L64 10L118 34L64 58Z" fill="currentColor" />
+        </svg>
+    );
+};
 export const TonkeeperIcon: FC<{
     width?: string;
     height?: string;
     loop?: boolean;
 }> = ({ width = '128', height = '128', loop = false }) => {
-    return (
-        <Suspense fallback={<div style={{ width, height }}></div>}>
-            <TonkeeperLottieIcon width={width} height={height} loop={loop} />
-        </Suspense>
-    );
+    const isDark = useContext(DarkThemeContext);
+    if (isDark) {
+        return (
+            <Suspense fallback={<div style={{ width, height }}></div>}>
+                <TonkeeperLottieIcon width={width} height={height} loop={loop} />
+            </Suspense>
+        );
+    } else {
+        return <TonkeeperSvgIcon size={width} />;
+    }
 };
 
 export const ChevronLeftIcon = () => {
