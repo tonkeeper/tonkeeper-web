@@ -1,4 +1,4 @@
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -111,7 +111,9 @@ const WalletRow: FC<{
     const { mutate } = useMutateActiveWallet();
     const { t } = useTranslation();
     const { data: wallet } = useWalletState(publicKey);
-    const address = wallet ? formatAddress(wallet.active.rawAddress, wallet.network) : undefined;
+    const address = wallet
+        ? toShortValue(formatAddress(wallet.active.rawAddress, wallet.network))
+        : undefined;
     return (
         <ListItem
             dropDown

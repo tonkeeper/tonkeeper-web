@@ -70,7 +70,7 @@ export function formatTransferUrl(options: {
     text?: string;
     jetton?: string;
 }) {
-    const url = 'ton://transfer/' + Address.parse(options.address).toString();
+    const url = 'ton://transfer/' + options.address;
 
     const params = [];
 
