@@ -31,9 +31,9 @@ export const lightTheme: DefaultTheme = {
     buttonSecondaryBackgroundDisabled: '#ECECF0',
     buttonTertiaryBackgroundDisabled: '#FFFFFF',
 
-    buttonTertiaryForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
-    buttonSecondaryForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
-    buttonPrimaryForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
+    buttonTertiaryForegroundDisabled: 'rgba(0, 0, 0, 0.48)',
+    buttonSecondaryForegroundDisabled: 'rgba(0, 0, 0, 0.48)',
+    buttonPrimaryForegroundDisabled: 'rgba(0, 0, 0, 0.48)',
 
     buttonPrimaryBackgroundHighlighted: '#3297FB',
     buttonSecondaryBackgroundHighlighted: '#D7D7DB',

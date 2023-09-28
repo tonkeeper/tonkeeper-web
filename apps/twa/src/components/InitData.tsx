@@ -11,13 +11,17 @@ export const InitDataLogger = () => {
     useEffect(() => {
         button.hide();
         backButton.hide();
-
-        i18n.languages.forEach(lang => {
-            if (launchParams.initData?.user?.languageCode === lang) {
-                i18n.reloadResources([lang]).then(() => i18n.changeLanguage(lang));
-            }
-        });
     }, []);
+
+    useEffect(() => {
+        if (launchParams.initData?.user?.languageCode) {
+            i18n.languages.forEach(lang => {
+                if (launchParams.initData?.user?.languageCode === lang) {
+                    i18n.reloadResources([lang]).then(() => i18n.changeLanguage(lang));
+                }
+            });
+        }
+    }, [launchParams.initData?.user?.languageCode]);
 
     // useEffect(() => {
     //     if (launchParams.initData?.user?.username)

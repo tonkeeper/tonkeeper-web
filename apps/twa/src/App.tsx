@@ -106,6 +106,8 @@ const TwaLoader = () => {
         components.webApp.setHeaderColor((theme as any).backgroundPage);
         components.mainButton.setBackgroundColor((theme as any).buttonPrimaryBackground);
         components.mainButton.setTextColor((theme as any).buttonPrimaryForeground);
+
+        document.body.style.backgroundColor = (theme as any).backgroundPage;
     }, [components?.themeParams.isDark]);
 
     if (error instanceof Error) {
@@ -165,8 +167,8 @@ const TwaApp: FC<{ sdk: IAppSdk; webApp: WebApp }> = ({ sdk, webApp }) => {
                         <FooterGlobalStyle />
                         <SybHeaderGlobalStyle />
                         <GlobalListStyle />
-                        <InitDataLogger />
                         <Loader sdk={sdk} />
+                        <InitDataLogger />
                         <UnlockNotification
                             sdk={sdk}
                             delta={getMainButtonHeight(webApp.platform)}

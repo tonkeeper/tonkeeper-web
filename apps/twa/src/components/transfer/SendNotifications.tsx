@@ -272,6 +272,7 @@ const SendContent: FC<{
                                 onClose={onClose}
                                 onBack={backToAmount}
                                 recipient={recipient!}
+                                fitContent
                                 assetAmount={AssetAmount.fromRelativeAmount({
                                     asset: amountViewState!.token!,
                                     amount: amountViewState!.coinValue!
