@@ -54,13 +54,13 @@ export interface NativeBackButton {
 }
 
 export interface NotificationService {
-    subscribe: (wallet: string, mnemonic: string[]) => Promise<void>;
-    unsubscribe: (wallet: string, mnemonic: string[]) => Promise<void>;
+    subscribe: (address: string, mnemonic: string[]) => Promise<void>;
+    unsubscribe: (address: string) => Promise<void>;
 
-    subscribeTonConnect: (sessionKey: string) => Promise<void>;
-    unsubscribeTonConnect: (sessionKey: string) => Promise<void>;
+    subscribeTonConnect: (clientId: string, origin: string) => Promise<void>;
+    unsubscribeTonConnect: (clientId?: string) => Promise<void>;
 
-    subscribed: (wallet: string) => Promise<boolean>;
+    subscribed: (address: string) => Promise<boolean>;
 }
 
 export interface IAppSdk {

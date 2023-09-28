@@ -6,10 +6,11 @@ export const useSubscribeMutation = (wallet: string, mnemonic: string[], onDone:
     return useMutation(async () => {
         try {
             await sdk.notifications!.subscribe(wallet, mnemonic);
+            sdk.topMessage('subscribed');
             onDone();
         } catch (e) {
             if (e instanceof Error) {
-                sdk.topMessage(e.message);
+                sdk.topMessage(e.message + ' ' + e.stack);
             }
             throw e;
         }

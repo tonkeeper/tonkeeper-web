@@ -16,9 +16,20 @@ import { getWalletPassword } from '../../state/password';
 const useSubscribed = () => {
     const sdk = useAppSdk();
     const wallet = useWalletContext();
-    return useQuery<boolean, Error>([wallet.active.rawAddress, QueryKey.subscribed], () =>
-        sdk.notifications!.subscribed(wallet.active.rawAddress)
-    );
+    return useQuery<boolean, Error>([wallet.active.rawAddress, QueryKey.subscribed], async () => {
+        if (!sdk.notifications) {
+            sdk.topMessage('missing sdk');
+        }
+
+        try {
+            const value = await sdk.notifications!.subscribed(wallet.active.rawAddress);
+            sdk.topMessage(value ? 'subscribed' : 'unsubscribed');
+            return value;
+        } catch (e) {
+            sdk.topMessage('failed');
+            throw e;
+        }
+    });
 };
 
 const useToggleSubscribe = () => {
@@ -27,12 +38,24 @@ const useToggleSubscribe = () => {
     const client = useQueryClient();
 
     return useMutation<void, Error, boolean>(async checked => {
-        const password = await getWalletPassword(sdk);
-        const mnemonic = await getWalletMnemonic(sdk.storage, wallet.publicKey, password);
         if (checked) {
-            await sdk.notifications?.subscribe(wallet.active.rawAddress, mnemonic);
+            const password = await getWalletPassword(sdk);
+            const mnemonic = await getWalletMnemonic(sdk.storage, wallet.publicKey, password);
+            try {
+                await sdk.notifications?.subscribe(wallet.active.rawAddress, mnemonic);
+                sdk.topMessage('subscribed');
+            } catch (e) {
+                if (e instanceof Error) sdk.topMessage(e.message);
+                throw e;
+            }
         } else {
-            await sdk.notifications?.unsubscribe(wallet.active.rawAddress, mnemonic);
+            try {
+                await sdk.notifications?.unsubscribe(wallet.active.rawAddress);
+                sdk.topMessage('unsubscribed');
+            } catch (e) {
+                if (e instanceof Error) sdk.topMessage(e.message);
+                throw e;
+            }
         }
         await client.invalidateQueries([wallet.active.rawAddress, QueryKey.subscribed]);
     });
@@ -60,7 +83,7 @@ const SwitchNotification = () => {
                         <Label1>{t('reminder_notifications_title')}</Label1>
                         <Secondary>{t('reminder_notifications_caption')}</Secondary>
                     </Block>
-                    <Switch checked={!!data} onChange={toggle} disabled={isFetching || isLoading} />
+                    <Switch checked={!!data} onChange={toggle} disabled={isLoading} />
                 </ListItemPayload>
             </ListItem>
         </ListBlock>

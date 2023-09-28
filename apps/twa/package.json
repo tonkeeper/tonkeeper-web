@@ -44,6 +44,7 @@
         "build": "GENERATE_SOURCEMAP=false react-app-rewired build && yarn locales",
         "test": "react-app-rewired test",
         "eject": "react-app-rewired eject",
+        "generate:twaApi": "rm -fr src/twaApi && docker build -f task/Dockerfile.twaApi . -t twaapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local twaapisdk",
         "analyze": "source-map-explorer 'build/static/js/*.js'",
         "deploy": "yarn build && npx wrangler pages deploy build",
         "build:twa": "yarn build"
