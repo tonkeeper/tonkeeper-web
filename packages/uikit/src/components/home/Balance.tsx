@@ -2,11 +2,13 @@ import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import BigNumber from 'bignumber.js';
 import React, { FC, useEffect } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
-import { useAppContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
@@ -134,10 +136,12 @@ export const Balance: FC<{
     assets: AssetData;
 }> = ({ assets, error, isFetching }) => {
     const { t } = useTranslation();
-
+    const sdk = useAppSdk();
     const { fiat } = useAppContext();
-
+    const wallet = useWalletContext();
     const client = useQueryClient();
+
+    const address = formatAddress(wallet.active.rawAddress, wallet.network);
 
     const { data: total } = useQuery(
         [QueryKey.total, fiat, assets],
@@ -167,7 +171,7 @@ export const Balance: FC<{
         <Block>
             <MessageBlock error={error} isFetching={isFetching} />
             <Amount>{formatFiatCurrency(fiat, total)}</Amount>
-            <Body>{t('total_balance')}</Body>
+            <Body onClick={() => sdk.copyToClipboard(address)}>{toShortValue(address)}</Body>
         </Block>
     );
 };

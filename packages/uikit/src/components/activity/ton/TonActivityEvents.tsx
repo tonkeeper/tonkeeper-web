@@ -9,6 +9,7 @@ export const TonActivityEvents: FC<{
     event: AccountEvent;
     date: string;
     timestamp: number;
+    hover?: boolean;
     setActivity: (item: ActionData) => void;
 }> = ({ event, date, timestamp, setActivity }) => {
     return (
@@ -16,6 +17,7 @@ export const TonActivityEvents: FC<{
             {event.actions.map((action, index) => (
                 <ListItem
                     key={index}
+                    hover={hover}
                     onClick={() =>
                         setActivity({
                             isScam: event.isScam,

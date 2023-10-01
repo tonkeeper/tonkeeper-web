@@ -5,7 +5,6 @@ import {
     legacyTonAssetId
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { isNumeric } from '@tonkeeper/core/dist/utils/send';
 import React, {
     FC,
@@ -31,12 +30,12 @@ import { Label1 } from '../../Text';
 import { InputSize, Sentence } from '../Sentence';
 import { AmountHeaderBlockComponent, AmountMainButtonComponent } from '../common';
 import {
-    Address,
     AmountBlock,
     AssetBadge,
     InputBlock,
     MaxButton,
     MaxRow,
+    RecipientAddress,
     RecipientName,
     Remaining,
     RemainingInvalid,
@@ -162,7 +161,7 @@ export const AmountView: FC<{
                 <SubTitle>
                     {t('send_screen_steps_done_to').replace('%{name}', '')}
                     <RecipientName recipient={recipient} />
-                    <Address>{toShortValue(recipient.address.address)}</Address>
+                    <RecipientAddress recipient={recipient} />
                 </SubTitle>
             </HeaderBlock>
 
