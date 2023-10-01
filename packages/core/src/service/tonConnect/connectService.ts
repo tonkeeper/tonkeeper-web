@@ -269,23 +269,6 @@ export const tonConnectProofPayload = (
     };
 };
 
-const toTonProofItemReplySuccess = (proof: ConnectProofPayload, signature: Buffer) => {
-    const result: TonProofItemReplySuccess = {
-        name: 'ton_proof',
-        proof: {
-            timestamp: proof.timestamp, // 64-bit unix epoch time of the signing operation (seconds)
-            domain: {
-                lengthBytes: proof.domainBuffer.byteLength, // AppDomain Length
-                value: proof.domainBuffer.toString('utf8') // app domain name (as url part, without encoding)
-            },
-            signature: signature.toString('base64'), // base64-encoded signature
-            payload: proof.payload // payload from the request
-        }
-    };
-
-    return result;
-};
-
 export const toTonProofItemReply = async (options: {
     storage: IStorage;
     wallet: WalletState;

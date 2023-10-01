@@ -15,6 +15,8 @@
 
 import * as runtime from '../runtime';
 import type {
+  AccountEventsSubscriptionStatus200Response,
+  AccountEventsSubscriptionStatusRequest,
   BridgeWebhookRequest,
   GetTonConnectPayload200Response,
   GetTonConnectPayloadDefaultResponse,
@@ -24,6 +26,10 @@ import type {
   UnsubscribeFromBridgeEventsRequest,
 } from '../models/index';
 import {
+    AccountEventsSubscriptionStatus200ResponseFromJSON,
+    AccountEventsSubscriptionStatus200ResponseToJSON,
+    AccountEventsSubscriptionStatusRequestFromJSON,
+    AccountEventsSubscriptionStatusRequestToJSON,
     BridgeWebhookRequestFromJSON,
     BridgeWebhookRequestToJSON,
     GetTonConnectPayload200ResponseFromJSON,
@@ -39,6 +45,10 @@ import {
     UnsubscribeFromBridgeEventsRequestFromJSON,
     UnsubscribeFromBridgeEventsRequestToJSON,
 } from '../models/index';
+
+export interface AccountEventsSubscriptionStatusOperationRequest {
+    accountEventsSubscriptionStatusRequest: AccountEventsSubscriptionStatusRequest;
+}
 
 export interface BridgeWebhookOperationRequest {
     clientId: string;
@@ -68,6 +78,20 @@ export interface UnsubscribeFromBridgeEventsOperationRequest {
  * @interface DefaultApiInterface
  */
 export interface DefaultApiInterface {
+    /**
+     * Get a status of account events subscription.
+     * @param {AccountEventsSubscriptionStatusRequest} accountEventsSubscriptionStatusRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    accountEventsSubscriptionStatusRaw(requestParameters: AccountEventsSubscriptionStatusOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEventsSubscriptionStatus200Response>>;
+
+    /**
+     * Get a status of account events subscription.
+     */
+    accountEventsSubscriptionStatus(requestParameters: AccountEventsSubscriptionStatusOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEventsSubscriptionStatus200Response>;
+
     /**
      * 
      * @param {string} clientId 
@@ -159,6 +183,39 @@ export interface DefaultApiInterface {
 export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
     /**
+     * Get a status of account events subscription.
+     */
+    async accountEventsSubscriptionStatusRaw(requestParameters: AccountEventsSubscriptionStatusOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEventsSubscriptionStatus200Response>> {
+        if (requestParameters.accountEventsSubscriptionStatusRequest === null || requestParameters.accountEventsSubscriptionStatusRequest === undefined) {
+            throw new runtime.RequiredError('accountEventsSubscriptionStatusRequest','Required parameter requestParameters.accountEventsSubscriptionStatusRequest was null or undefined when calling accountEventsSubscriptionStatus.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/account-events/subscription-status`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AccountEventsSubscriptionStatusRequestToJSON(requestParameters.accountEventsSubscriptionStatusRequest),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccountEventsSubscriptionStatus200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Get a status of account events subscription.
+     */
+    async accountEventsSubscriptionStatus(requestParameters: AccountEventsSubscriptionStatusOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEventsSubscriptionStatus200Response> {
+        const response = await this.accountEventsSubscriptionStatusRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      */
     async bridgeWebhookRaw(requestParameters: BridgeWebhookOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.clientId === null || requestParameters.clientId === undefined) {
@@ -176,7 +233,7 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/bridge/webhook/client_id`.replace(`{${"client_id"}}`, encodeURIComponent(String(requestParameters.clientId))),
+            path: `/bridge/webhook/{client_id}`.replace(`{${"client_id"}}`, encodeURIComponent(String(requestParameters.clientId))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,

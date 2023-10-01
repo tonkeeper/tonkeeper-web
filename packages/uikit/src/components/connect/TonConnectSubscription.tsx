@@ -50,6 +50,13 @@ const useDisconnectMutation = (sdk: IAppSdk) => {
                 sessionKeyPair: connection.sessionKeyPair,
                 clientSessionId: connection.clientSessionId
             });
+            if (sdk.notifications) {
+                try {
+                    await sdk.notifications.unsubscribeTonConnect(connection.clientSessionId);
+                } catch (e) {
+                    if (e instanceof Error) sdk.topMessage(e.message);
+                }
+            }
         }
     );
 };

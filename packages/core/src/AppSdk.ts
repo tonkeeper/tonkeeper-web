@@ -59,6 +59,8 @@ export interface NotificationService {
 
     subscribeTonConnect: (clientId: string, origin: string) => Promise<void>;
     unsubscribeTonConnect: (clientId?: string) => Promise<void>;
+
+    subscribed: (address: string) => Promise<boolean>;
 }
 
 export interface IAppSdk {

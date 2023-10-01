@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
-import { getSubscribed, setSubscribed } from '@tonkeeper/core/dist/service/subscriptionService';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React from 'react';
 import styled from 'styled-components';
@@ -22,8 +21,12 @@ const useSubscribed = () => {
     return useQuery<boolean, Error>(
         [wallet.active.rawAddress, wallet.network, QueryKey.subscribed],
         async () => {
+            const { notifications } = sdk;
+            if (!notifications) {
+                throw new Error('Missing notifications');
+            }
             const address = formatAddress(wallet.active.rawAddress, wallet.network);
-            return getSubscribed(sdk.storage, address);
+            return notifications.subscribed(address);
         }
     );
 };
@@ -36,25 +39,28 @@ const useToggleSubscribe = () => {
     return useMutation<void, Error, boolean>(async checked => {
         const address = formatAddress(wallet.active.rawAddress, wallet.network);
 
+        const { notifications } = sdk;
+        if (!notifications) {
+            throw new Error('Missing notifications');
+        }
         if (checked) {
             const password = await getWalletPassword(sdk);
             const mnemonic = await getWalletMnemonic(sdk.storage, wallet.publicKey, password);
             try {
-                await sdk.notifications!.subscribe(address, mnemonic);
-                await setSubscribed(sdk.storage, address, true);
+                await notifications.subscribe(address, mnemonic);
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);
                 throw e;
             }
         } else {
             try {
-                await sdk.notifications!.unsubscribe(address);
-                await setSubscribed(sdk.storage, address, false);
+                await notifications.unsubscribe(address);
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);
                 throw e;
             }
         }
+
         await client.invalidateQueries([
             wallet.active.rawAddress,
             wallet.network,

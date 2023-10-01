@@ -76,6 +76,21 @@ const useConnectMutation = (
             webViewUrl
         });
 
+        if (sdk.notifications) {
+            try {
+                const address = formatAddress(wallet.active.rawAddress, wallet.network);
+                const enable = await sdk.notifications.subscribed(address);
+                if (enable) {
+                    await sdk.notifications.subscribeTonConnect(
+                        params.clientSessionId,
+                        new URL(manifest.url).host
+                    );
+                }
+            } catch (e) {
+                if (e instanceof Error) sdk.topMessage(e.message);
+            }
+        }
+
         return result;
     });
 };
