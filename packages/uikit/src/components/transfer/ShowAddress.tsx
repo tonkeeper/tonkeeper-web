@@ -1,7 +1,8 @@
 import { Account } from '@tonkeeper/core/dist/tonApiV2';
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useWalletContext } from '../../hooks/appContext';
 import useTextWidth from '../../hooks/textWidth';
 import { Body1 } from '../Text';
 
@@ -15,6 +16,7 @@ export const useShowAddress = (
     value: string,
     toAccount?: Account
 ) => {
+    const wallet = useWalletContext();
     const address = toAccount?.address ?? undefined;
 
     const [showAddress, setShowAddress] = useState<ShowAddressProps | undefined>(undefined);
@@ -39,7 +41,7 @@ export const useShowAddress = (
             setShowAddress({
                 inputTextWidth,
                 addressTextWidth,
-                value: toShortValue(toAccount.address)
+                value: toShortValue(formatAddress(toAccount.address, wallet.network))
             });
         } else {
             setShowAddress(undefined);

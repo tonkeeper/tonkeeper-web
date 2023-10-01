@@ -3,11 +3,13 @@ import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { Address } from 'ton-core';
+import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
 import { Label1 } from '../Text';
+import { getRecipientAddress } from './amountView/AmountViewUI';
 import { Label } from './common';
 
 export const cropName = (name: string) => {
@@ -44,7 +46,8 @@ const RecipientItemAddress: FC<{ address: string }> = ({ address }) => {
 
 export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient }) => {
     const { address } = recipient;
-    const addrValue = address.address;
+    const wallet = useWalletContext();
+    const addrValue = getRecipientAddress(recipient, wallet);
 
     if ('isFavorite' in address && address.isFavorite) {
         if (address.blockchain === BLOCKCHAIN_NAME.TRON) {
