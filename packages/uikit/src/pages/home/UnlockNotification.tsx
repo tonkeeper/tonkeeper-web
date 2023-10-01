@@ -268,7 +268,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; delta?: number }> = ({ sdk, 
                 padding={typeof delta === 'number' ? padding - delta : 0}
             />
         );
-    }, [sdk, auth, requestId, onCancel, onSubmit, type]);
+    }, [sdk, auth, requestId, padding, onCancel, onSubmit, type]);
 
     return (
         <Notification
