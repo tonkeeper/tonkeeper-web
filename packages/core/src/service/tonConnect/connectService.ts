@@ -96,7 +96,7 @@ const getManifestResponse = async (manifestUrl: string) => {
         /**
          * Request file with CORS header;
          */
-        return await fetch(`https://cors-anywhere.herokuapp.com/${manifestUrl}`);
+        return await fetch(`https://manifest-proxy.nkuznetsov.workers.dev/${manifestUrl}`);
     }
 };
 
