@@ -137,21 +137,22 @@ const TwaLoader = () => {
     );
 };
 
-const getMainButtonHeight = (platform: TwaPlatform): number | undefined => {
+const getUsePadding = (platform: TwaPlatform): boolean => {
     switch (platform) {
         case 'ios':
-            return 60;
+            return true;
         case 'android':
         case 'android_x':
-            return undefined;
+            return false;
         default:
-            return undefined;
+            return false;
     }
 };
 
 const TwaApp: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { t, i18n } = useTranslation();
     const webApp = useWebApp();
+
     const translation = useMemo(() => {
         const client: I18nContext = {
             t,
@@ -177,7 +178,7 @@ const TwaApp: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
 
                     <Loader sdk={sdk} />
                     <InitDataLogger />
-                    <UnlockNotification sdk={sdk} delta={getMainButtonHeight(webApp.platform)} />
+                    <UnlockNotification sdk={sdk} usePadding={getUsePadding(webApp.platform)} />
                 </StorageContext.Provider>
             </TranslationContext.Provider>
         </BrowserRouter>

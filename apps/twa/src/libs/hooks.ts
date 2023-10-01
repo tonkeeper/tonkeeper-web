@@ -1,6 +1,6 @@
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { Viewport } from '@twa.js/sdk';
-import { useViewport } from '@twa.js/sdk-react';
+import { useMainButton, useViewport } from '@twa.js/sdk-react';
 import React, { useEffect } from 'react';
 
 export const ViewportContext = React.createContext<Viewport>(undefined!);
@@ -8,6 +8,7 @@ export const ViewportContext = React.createContext<Viewport>(undefined!);
 export const useTwaAppViewport = (setAppHeight: boolean) => {
     const sdk = useAppSdk();
     const viewport = useViewport();
+    const mainButton = useMainButton();
 
     useEffect(() => {
         const total = window.innerHeight;
@@ -20,9 +21,10 @@ export const useTwaAppViewport = (setAppHeight: boolean) => {
         };
 
         const setHeight = (value: number) => {
+            const fixed = mainButton.isVisible ? value + 60 : value;
             sdk.uiEvents.emit('keyboard', {
                 method: 'keyboard',
-                params: { total, viewport: value }
+                params: { total, viewport: fixed }
             });
 
             //  sdk.topMessage(`${value}px`);

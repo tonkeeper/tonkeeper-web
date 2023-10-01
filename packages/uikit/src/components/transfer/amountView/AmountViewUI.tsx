@@ -6,7 +6,7 @@ import { isNumeric, removeGroupSeparator, seeIfLargeTail } from '@tonkeeper/core
 import BigNumber from 'bignumber.js';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { useAppContext } from '../../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../../hooks/appContext';
 import { formatter } from '../../../hooks/balance';
 import { Body1, Body2, H3, Label2, Num2 } from '../../Text';
 import { cropName } from '../ConfirmListItem';

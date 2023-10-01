@@ -181,7 +181,10 @@ export const PasswordUnlock: FC<{
     );
 };
 
-export const UnlockNotification: FC<{ sdk: IAppSdk; delta?: number }> = ({ sdk, delta }) => {
+export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
+    sdk,
+    usePadding = false
+}) => {
     const { t } = useTranslation();
     const [padding, setPadding] = useState(0);
     const [type, setType] = useState<'confirm' | 'unlock' | undefined>(undefined);
@@ -265,7 +268,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; delta?: number }> = ({ sdk, 
                 isLoading={isLoading}
                 isError={isError}
                 reason={type}
-                padding={typeof delta === 'number' ? padding - delta : 0}
+                padding={usePadding ? padding : 0}
             />
         );
     }, [sdk, auth, requestId, padding, onCancel, onSubmit, type]);

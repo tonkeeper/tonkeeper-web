@@ -11,7 +11,7 @@ export const TonActivityEvents: FC<{
     timestamp: number;
     hover?: boolean;
     setActivity: (item: ActionData) => void;
-}> = ({ event, date, timestamp, setActivity }) => {
+}> = ({ event, date, timestamp, setActivity, hover }) => {
     return (
         <>
             {event.actions.map((action, index) => (
