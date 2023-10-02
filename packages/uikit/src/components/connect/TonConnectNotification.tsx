@@ -15,6 +15,7 @@ import {
     tonConnectProofPayload
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { SessionCrypto } from '@tonkeeper/core/dist/service/tonConnect/protocol';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -82,7 +83,7 @@ const useConnectMutation = (
                 const enable = await sdk.notifications.subscribed(address);
                 if (enable) {
                     await sdk.notifications.subscribeTonConnect(
-                        params.clientSessionId,
+                        new SessionCrypto(params.sessionKeyPair).sessionId,
                         new URL(manifest.url).host
                     );
                 }
