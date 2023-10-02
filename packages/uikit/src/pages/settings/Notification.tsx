@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
@@ -25,8 +24,7 @@ const useSubscribed = () => {
             if (!notifications) {
                 throw new Error('Missing notifications');
             }
-            const address = formatAddress(wallet.active.rawAddress, wallet.network);
-            return notifications.subscribed(address);
+            return notifications.subscribed(wallet.active.rawAddress);
         }
     );
 };
@@ -37,8 +35,6 @@ const useToggleSubscribe = () => {
     const client = useQueryClient();
 
     return useMutation<void, Error, boolean>(async checked => {
-        const address = formatAddress(wallet.active.rawAddress, wallet.network);
-
         const { notifications } = sdk;
         if (!notifications) {
             throw new Error('Missing notifications');
@@ -47,14 +43,14 @@ const useToggleSubscribe = () => {
             const password = await getWalletPassword(sdk);
             const mnemonic = await getWalletMnemonic(sdk.storage, wallet.publicKey, password);
             try {
-                await notifications.subscribe(address, mnemonic);
+                await notifications.subscribe(wallet.active.rawAddress, mnemonic);
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);
                 throw e;
             }
         } else {
             try {
-                await notifications.unsubscribe(address);
+                await notifications.unsubscribe(wallet.active.rawAddress);
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);
                 throw e;
