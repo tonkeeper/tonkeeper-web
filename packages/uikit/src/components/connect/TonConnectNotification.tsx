@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import {
@@ -15,7 +15,6 @@ import {
     tonConnectProofPayload
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { SessionCrypto } from '@tonkeeper/core/dist/service/tonConnect/protocol';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -37,6 +36,7 @@ const useConnectMutation = (
 ) => {
     const wallet = useWalletContext();
     const sdk = useAppSdk();
+    const client = useQueryClient();
 
     return useMutation<ConnectItemReply[], Error>(async () => {
         const params = await getTonConnectParams(request);
@@ -79,11 +79,10 @@ const useConnectMutation = (
 
         if (sdk.notifications) {
             try {
-                const address = formatAddress(wallet.active.rawAddress, wallet.network);
-                const enable = await sdk.notifications.subscribed(address);
+                const enable = await sdk.notifications.subscribed(wallet.active.rawAddress);
                 if (enable) {
                     await sdk.notifications.subscribeTonConnect(
-                        new SessionCrypto(params.sessionKeyPair).sessionId,
+                        params.clientSessionId,
                         new URL(manifest.url).host
                     );
                 }
@@ -91,6 +90,8 @@ const useConnectMutation = (
                 if (e instanceof Error) sdk.topMessage(e.message);
             }
         }
+
+        await client.invalidateQueries([wallet.publicKey, QueryKey.connection]);
 
         return result;
     });

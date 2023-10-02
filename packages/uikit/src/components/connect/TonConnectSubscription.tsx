@@ -105,6 +105,7 @@ const TonConnectSubscription = () => {
     const [request, setRequest] = useState<SendTransactionAppRequest | undefined>(undefined);
 
     const sdk = useAppSdk();
+    const wallet = useWalletContext();
     const { data } = useConnections(sdk);
 
     const { mutate: disconnect } = useDisconnectMutation(sdk);
@@ -136,6 +137,25 @@ const TonConnectSubscription = () => {
                 }
             }
         };
+
+        const { notifications } = sdk;
+        (async () => {
+            if (notifications && data) {
+                try {
+                    const enable = await notifications.subscribed(wallet.active.rawAddress);
+                    if (enable) {
+                        for (let connection of data.connections) {
+                            await notifications.subscribeTonConnect(
+                                connection.clientSessionId,
+                                new URL(connection.manifest.url).host
+                            );
+                        }
+                    }
+                } catch (e) {
+                    if (e instanceof Error) sdk.topMessage(e.message);
+                }
+            }
+        })();
 
         const close = subscribeTonConnect({
             sdk,

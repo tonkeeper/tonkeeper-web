@@ -85,10 +85,7 @@ export const disconnectAppConnection = async (options: {
 }) => {
     let connections = await getAccountConnection(options.storage, options.wallet);
 
-    const disconnect = connections.find(item => item.clientSessionId !== options.clientSessionId);
     connections = connections.filter(item => item.clientSessionId !== options.clientSessionId);
 
     await setAccountConnection(options.storage, options.wallet, connections);
-
-    return disconnect;
 };
