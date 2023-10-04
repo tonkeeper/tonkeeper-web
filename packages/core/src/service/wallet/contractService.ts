@@ -1,4 +1,4 @@
-import { beginCell } from 'ton-core';
+import { beginCell, storeStateInit } from 'ton-core';
 import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
@@ -26,9 +26,9 @@ export const walletContract = (publicKey: Buffer, version: WalletVersion) => {
 
 export const walletStateInitFromState = (wallet: WalletState) => {
     const contract = walletContractFromState(wallet);
+
     return beginCell()
-        .storeRef(contract.init.code)
-        .storeRef(contract.init.data)
+        .store(storeStateInit(contract.init))
         .endCell()
         .toBoc({ idx: false })
         .toString('base64');
