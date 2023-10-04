@@ -288,7 +288,11 @@ export const toTonProofItemReply = async (options: {
     return result;
 };
 
-export const toTonProofItem = async (mnemonic: string[], proof: ConnectProofPayload) => {
+export const toTonProofItem = async (
+    mnemonic: string[],
+    proof: ConnectProofPayload,
+    stateInit?: string
+) => {
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const signature = nacl.sign.detached(
@@ -303,7 +307,8 @@ export const toTonProofItem = async (mnemonic: string[], proof: ConnectProofPayl
             value: proof.domainBuffer.toString('utf8') // app domain name (as url part, without encoding)
         },
         signature: Buffer.from(signature).toString('base64'), // base64-encoded signature
-        payload: proof.payload // payload from the request
+        payload: proof.payload, // payload from the request,
+        stateInit: stateInit // state init for a wallet
     };
 };
 

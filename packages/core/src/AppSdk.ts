@@ -3,6 +3,7 @@ import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
 import { AuthState } from './entries/password';
 import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
+import { WalletState } from './entries/wallet';
 import { TonTransferParams } from './service/deeplinkingService';
 import { IStorage, MemoryStorage } from './Storage';
 
@@ -54,7 +55,7 @@ export interface NativeBackButton {
 }
 
 export interface NotificationService {
-    subscribe: (address: string, mnemonic: string[]) => Promise<void>;
+    subscribe: (wallet: WalletState, mnemonic: string[]) => Promise<void>;
     unsubscribe: (address?: string) => Promise<void>;
 
     subscribeTonConnect: (clientId: string, origin: string) => Promise<void>;

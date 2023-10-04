@@ -1,8 +1,10 @@
 import { NotificationService } from '@tonkeeper/core/dist/AppSdk';
+import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
     toTonProofItem,
     tonConnectProofPayload
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { walletStateInitFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
 import { InitResult } from '@twa.js/sdk';
 import { Configuration, DefaultApi } from '../twaApi';
 
@@ -20,25 +22,26 @@ export class TwaNotification implements NotificationService {
         return Buffer.from(initDataRaw, 'utf8').toString('base64');
     }
 
-    private getTonConnectProof = async (address: string, mnemonic: string[]) => {
+    private getTonConnectProof = async (wallet: WalletState, mnemonic: string[]) => {
         const domain = 'https://twa.tonkeeper.com/';
         const { payload } = await twaApi.getTonConnectPayload();
-        const proofPayload = tonConnectProofPayload(domain, address, payload);
-        return await toTonProofItem(mnemonic, proofPayload);
+        const proofPayload = tonConnectProofPayload(domain, wallet.active.rawAddress, payload);
+        const stateInit = walletStateInitFromState(wallet);
+        return await toTonProofItem(mnemonic, proofPayload, stateInit);
     };
 
-    subscribe = async (address: string, mnemonic: string[]) => {
+    subscribe = async (wallet: WalletState, mnemonic: string[]) => {
         try {
             await this.components.webApp.requestWriteAccess();
         } catch (e) {
             console.error(e);
         }
 
-        const proof = await this.getTonConnectProof(address, mnemonic);
+        const proof = await this.getTonConnectProof(wallet, mnemonic);
         await twaApi.subscribeToAccountEvents({
             subscribeToAccountEventsRequest: {
                 twaInitData: this.twaInitData,
-                address,
+                address: wallet.active.rawAddress,
                 proof
             }
         });

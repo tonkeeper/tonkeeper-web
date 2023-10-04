@@ -43,7 +43,7 @@ const useToggleSubscribe = () => {
             const password = await getWalletPassword(sdk);
             const mnemonic = await getWalletMnemonic(sdk.storage, wallet.publicKey, password);
             try {
-                await notifications.subscribe(wallet.active.rawAddress, mnemonic);
+                await notifications.subscribe(wallet, mnemonic);
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);
                 throw e;

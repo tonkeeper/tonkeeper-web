@@ -15,7 +15,7 @@ export const useSubscribeMutation = (
         }
 
         try {
-            await notifications.subscribe(wallet.active.rawAddress, mnemonic);
+            await notifications.subscribe(wallet, mnemonic);
 
             onDone();
         } catch (e) {
