@@ -1,6 +1,6 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import React, { FC } from 'react';
-import { SendAction } from '../transfer/SendNotifications';
+import { SendAction } from '../transfer/SendActionButton';
 import { ActionsRow } from './Actions';
 import { BuyAction } from './BuyAction';
 import { ReceiveAction } from './ReceiveAction';

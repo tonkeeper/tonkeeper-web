@@ -1,13 +1,13 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { AccountRepr, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
+import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { useFormatCoinValue } from '../../hooks/balance';
-import { DropDown } from '../DropDown';
-import { DoneIcon, DownIcon } from '../Icon';
-import { ListBlock, ListItem, ListItemPayload } from '../List';
-import { Body1, Label1 } from '../Text';
+import { useFormatCoinValue } from '../../../hooks/balance';
+import { DropDown } from '../../DropDown';
+import { DoneIcon, DownIcon } from '../../Icon';
+import { ListBlock, ListItem, ListItemPayload } from '../../List';
+import { Body1, Label1 } from '../../Text';
 
 const AssetValue = styled.div`
     background: ${props => props.theme.buttonTertiaryBackground};
@@ -49,7 +49,7 @@ const Icon = styled.span`
 `;
 
 const AssetDropDown: FC<{
-    info?: AccountRepr;
+    info?: Account;
     onClose: () => void;
     jetton: string;
     jettons: JettonsBalances;
@@ -91,20 +91,20 @@ const AssetDropDown: FC<{
                 return (
                     <ListItem
                         dropDown
-                        key={item.jettonAddress}
+                        key={item.jetton.address}
                         onClick={() => {
-                            setJetton(item.jettonAddress);
+                            setJetton(item.jetton.address);
                             onClose();
                         }}
                     >
                         <ListItemPayload>
                             <AssetInfo>
-                                <AssetImage src={item.metadata?.image}></AssetImage>
-                                <Label1>{item.metadata?.symbol}</Label1>
-                                <Amount>{format(item.balance, item.metadata?.decimals)}</Amount>
+                                <AssetImage src={item.jetton.image}></AssetImage>
+                                <Label1>{item.jetton.symbol}</Label1>
+                                <Amount>{format(item.balance, item.jetton.decimals)}</Amount>
                             </AssetInfo>
 
-                            {item.jettonAddress === jetton ? (
+                            {item.jetton.address === jetton ? (
                                 <Icon ref={ref}>
                                     <DoneIcon />
                                 </Icon>
@@ -118,7 +118,7 @@ const AssetDropDown: FC<{
 };
 
 export const AssetSelect: FC<{
-    info?: AccountRepr;
+    info?: Account;
     jetton: string;
     jettons: JettonsBalances;
     setJetton: (value: string) => void;

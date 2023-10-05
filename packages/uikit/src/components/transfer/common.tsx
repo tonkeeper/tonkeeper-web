@@ -1,11 +1,23 @@
 import { QueryClient } from '@tanstack/react-query';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
+import { TonTransferParams } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { seeIfBalanceError, seeIfTimeError } from '@tonkeeper/core/dist/service/transfer/common';
-import React, { PropsWithChildren } from 'react';
+import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
+import React, { FC, PropsWithChildren } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
+import { useTranslation } from '../../hooks/translation';
 import { cleanSyncDateBanner } from '../../state/syncDate';
-import { Body1 } from '../Text';
+import { ChevronLeftIcon } from '../Icon';
+import { NotificationCancelButton, NotificationTitleBlock } from '../Notification';
+import { Body1, H3 } from '../Text';
+import { BackButton, ButtonMock } from '../fields/BackButton';
+import { Button } from '../fields/Button';
+import { Center, Title } from './amountView/AmountViewUI';
+import { AmountState } from './amountView/amountState';
 
 export const duration = 300;
 export const timingFunction = 'ease-in-out';
@@ -141,6 +153,136 @@ export const ButtonBlock = React.forwardRef<HTMLDivElement, PropsWithChildren>(
 );
 ButtonBlock.displayName = 'ButtonBlock';
 
+export const MainButton = ({ isLoading }: { isLoading: boolean; onClick: () => void }) => {
+    const { t } = useTranslation();
+
+    return (
+        <ButtonBlock>
+            <Button fullWidth size="large" primary type="submit" loading={isLoading}>
+                {t('continue')}
+            </Button>
+        </ButtonBlock>
+    );
+};
+
+export type AmountMainButtonComponent = (props: {
+    isLoading: boolean;
+    isDisabled: boolean;
+    onClick: () => void;
+    ref: React.RefObject<HTMLDivElement>;
+}) => JSX.Element;
+
+interface AmountMainButtonProps {
+    isLoading: boolean;
+    isDisabled: boolean;
+    onClick: () => void;
+}
+export const AmountMainButton = React.forwardRef<HTMLDivElement, AmountMainButtonProps>(
+    ({ isLoading, isDisabled }, refButton) => {
+        const { t } = useTranslation();
+
+        return (
+            <ButtonBlock ref={refButton}>
+                <Button
+                    fullWidth
+                    size="large"
+                    primary
+                    type="submit"
+                    disabled={isDisabled}
+                    loading={isLoading}
+                >
+                    {t('continue')}
+                </Button>
+            </ButtonBlock>
+        );
+    }
+) as AmountMainButtonComponent;
+
+export type ConfirmMainButtonProps = (props: {
+    isLoading: boolean;
+    isDisabled: boolean;
+    onClick: () => Promise<boolean>;
+    onClose: () => void;
+}) => JSX.Element;
+
+export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled }) => {
+    const { t } = useTranslation();
+    return (
+        <Button
+            fullWidth
+            size="large"
+            primary
+            type="submit"
+            disabled={isDisabled}
+            loading={isLoading}
+        >
+            {t('confirm_sending_submit')}
+        </Button>
+    );
+};
+
+const ConfirmViewButtonsContainerStyled = styled.div`
+    display: flex;
+    gap: 1rem;
+    & > * {
+        flex: 1;
+    }
+`;
+
+export const ConfirmAndCancelMainButton: ConfirmMainButtonProps = ({
+    isLoading,
+    isDisabled,
+    onClose
+}) => {
+    const { t } = useTranslation();
+    return (
+        <ConfirmViewButtonsContainerStyled>
+            <Button size="large" secondary onClick={onClose}>
+                {t('cancel')}
+            </Button>
+            <Button size="large" primary type="submit" disabled={isDisabled} loading={isLoading}>
+                {t('confirm')}
+            </Button>
+        </ConfirmViewButtonsContainerStyled>
+    );
+};
+
+export const RecipientHeaderBlock: FC<{ title: string; onClose: () => void }> = ({
+    title,
+    onClose
+}) => {
+    return (
+        <NotificationTitleBlock>
+            <ButtonMock />
+            <H3>{title}</H3>
+            <NotificationCancelButton handleClose={onClose} />
+        </NotificationTitleBlock>
+    );
+};
+
+export type AmountHeaderBlockComponent = (
+    props: PropsWithChildren<{
+        onBack: () => void;
+        onClose: () => void;
+    }>
+) => JSX.Element;
+
+export const AmountHeaderBlock: AmountHeaderBlockComponent = ({ onBack, onClose, children }) => {
+    const { t } = useTranslation();
+    return (
+        <NotificationTitleBlock>
+            <BackButton onClick={onBack}>
+                <ChevronLeftIcon />
+            </BackButton>
+            <Center>
+                <Title>{t('txActions_amount')}</Title>
+                {children}
+            </Center>
+            <NotificationCancelButton handleClose={onClose} />
+        </NotificationTitleBlock>
+    );
+};
+
 export const ResultButton = styled.div<{ done?: boolean }>`
     display: flex;
     flex-direction: column;
@@ -181,4 +323,50 @@ export const notifyError = async (
     }
 
     throw error;
+};
+
+export interface InitTransferData {
+    initRecipient?: TonRecipientData;
+    initAmountState?: Partial<AmountState>;
+}
+
+export const getInitData = (
+    tonTransfer: TonTransferParams,
+    toAccount: Account,
+    jettons: JettonsBalances | undefined
+): InitTransferData => {
+    const initRecipient: TonRecipientData = {
+        address: {
+            blockchain: BLOCKCHAIN_NAME.TON,
+            address: tonTransfer.address
+        },
+        toAccount,
+        comment: tonTransfer.text ?? '',
+        done: toAccount.memoRequired ? tonTransfer.text !== '' && tonTransfer.text !== null : true
+    };
+
+    const { initAmountState } = getJetton(tonTransfer.jetton, jettons);
+
+    return {
+        initRecipient,
+        initAmountState
+    };
+};
+
+export const getJetton = (
+    asset: string | undefined,
+    jettons: JettonsBalances | undefined
+): InitTransferData => {
+    try {
+        if (asset) {
+            const token = jettonToTonAsset(asset, jettons || { balances: [] });
+
+            return {
+                initAmountState: { token: token }
+            };
+        }
+    } catch {
+        return {};
+    }
+    return {};
 };

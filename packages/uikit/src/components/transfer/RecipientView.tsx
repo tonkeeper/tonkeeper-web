@@ -2,30 +2,28 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { BaseRecipient, DnsRecipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
-import { AccountApi, AccountRepr, DNSApi } from '@tonkeeper/core/dist/tonApiV1';
+import { DNSApi } from '@tonkeeper/core/dist/tonApiV1';
+import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import {
     debounce,
+    formatAddress,
     seeIfValidTonAddress,
     seeIfValidTronAddress
 } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Address } from 'ton-core';
-import { useAppContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { Gap } from '../Layout';
-import { FullHeightBlock, NotificationCancelButton, NotificationTitleBlock } from '../Notification';
-import { Body2, H3 } from '../Text';
-import { ButtonMock } from '../fields/BackButton';
-import { Button } from '../fields/Button';
+import { FullHeightBlock } from '../Notification';
+import { Body2 } from '../Text';
 import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
-import { ButtonBlock } from './common';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -37,18 +35,18 @@ const Warning = styled(Body2)`
 
 export const useGetToAccount = () => {
     const { api } = useAppContext();
-    return useMutation<AccountRepr, Error, BaseRecipient | DnsRecipient>(recipient => {
-        const account = 'dns' in recipient ? recipient.dns.address : recipient.address;
-        return new AccountApi(api.tonApi).getAccountInfo({ account });
+    return useMutation<Account, Error, BaseRecipient | DnsRecipient>(recipient => {
+        const accountId = 'dns' in recipient ? recipient.dns.address : recipient.address;
+        return new AccountsApi(api.tonApiV2).getAccount({ accountId });
     });
 };
 
 const useToAccount = (isValid: boolean, recipient: BaseRecipient | DnsRecipient) => {
     const { api } = useAppContext();
-    const account = 'dns' in recipient ? recipient.dns.address : recipient.address;
-    return useQuery<AccountRepr, Error>(
-        [QueryKey.account, account],
-        () => new AccountApi(api.tonApi).getAccountInfo({ account }),
+    const accountId = 'dns' in recipient ? recipient.dns.address : recipient.address;
+    return useQuery<Account, Error>(
+        [QueryKey.account, accountId],
+        () => new AccountsApi(api.tonApiV2).getAccount({ accountId }),
         { enabled: isValid }
     );
 };
@@ -105,26 +103,29 @@ const seeIfValidTonRecipient = (recipient: BaseRecipient | DnsRecipient) => {
 const defaultRecipient = { address: '' };
 
 export const RecipientView: FC<{
-    title: string;
     data?: RecipientData;
-    onClose: () => void;
     setRecipient: (options: RecipientData) => void;
     keyboard?: 'decimal';
     onScan: (value: string) => void;
     isExternalLoading?: boolean;
     acceptBlockchains?: BLOCKCHAIN_NAME[];
+    MainButton: (props: { isLoading: boolean; onClick: () => void }) => JSX.Element;
+    HeaderBlock: () => JSX.Element;
+    fitContent?: boolean;
 }> = ({
-    title,
     data,
-    onClose,
     setRecipient,
     keyboard,
     onScan,
     isExternalLoading,
-    acceptBlockchains
+    acceptBlockchains,
+    MainButton,
+    HeaderBlock,
+    fitContent
 }) => {
     const sdk = useAppSdk();
     const [submitted, setSubmit] = useState(false);
+    const wallet = useWalletContext();
     const { t } = useTranslation();
     const { standalone, ios } = useAppContext();
     const ref = useRef<HTMLTextAreaElement | null>(null);
@@ -215,7 +216,7 @@ export const RecipientView: FC<{
             if (recipient.blockchain === BLOCKCHAIN_NAME.TRON) {
                 return recipient.address;
             } else {
-                return Address.parse(recipient.address).toString();
+                return formatAddress(recipient.address, wallet.network);
             }
         }
 
@@ -253,8 +254,11 @@ export const RecipientView: FC<{
                     done: true
                 });
             }
+        } else {
+            sdk.hapticNotification('error');
         }
     };
+
     const onSubmit: React.FormEventHandler<HTMLFormElement> = e => {
         e.stopPropagation();
         e.preventDefault();
@@ -262,6 +266,9 @@ export const RecipientView: FC<{
     };
 
     const onSelect = async (item: Suggestion) => {
+        if (item.blockchain === BLOCKCHAIN_NAME.TON) {
+            item.address = formatAddress(item.address, wallet.network);
+        }
         setAddress(item);
         ref.current?.focus();
         // if (ios && keyboard) openIosKeyboard(keyboard);
@@ -284,12 +291,8 @@ export const RecipientView: FC<{
     };
 
     return (
-        <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
-            <NotificationTitleBlock>
-                <ButtonMock />
-                <H3>{title}</H3>
-                <NotificationCancelButton handleClose={onClose} />
-            </NotificationTitleBlock>
+        <FullHeightBlock onSubmit={onSubmit} standalone={standalone} fitContent={fitContent}>
+            <HeaderBlock />
             <ShowAddress value={showAddress}>
                 <InputWithScanner
                     onSubmit={handleSubmit}
@@ -325,17 +328,7 @@ export const RecipientView: FC<{
 
             <Gap />
 
-            <ButtonBlock>
-                <Button
-                    fullWidth
-                    size="large"
-                    primary
-                    type="submit"
-                    loading={isFetching || isDnsFetching}
-                >
-                    {t('continue')}
-                </Button>
-            </ButtonBlock>
+            <MainButton isLoading={isFetching || isDnsFetching} onClick={handleSubmit} />
         </FullHeightBlock>
     );
 };

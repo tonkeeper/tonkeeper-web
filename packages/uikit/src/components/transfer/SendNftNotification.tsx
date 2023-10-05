@@ -7,7 +7,8 @@ import {
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { checkWalletPositiveBalanceOrDie } from '@tonkeeper/core/dist/service/transfer/common';
 import { estimateNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
-import { AccountApi, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -17,7 +18,14 @@ import { QueryKey } from '../../libs/queryKey';
 import { Notification } from '../Notification';
 import { ConfirmNftView } from './ConfirmNftView';
 import { RecipientView, useGetToAccount } from './RecipientView';
-import { Wrapper, childFactoryCreator, duration, notifyError } from './common';
+import {
+    MainButton,
+    RecipientHeaderBlock,
+    Wrapper,
+    childFactoryCreator,
+    duration,
+    notifyError
+} from './common';
 
 const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData) => {
     const { t } = useTranslation();
@@ -41,16 +49,14 @@ const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData)
 
 const useMinimalBalance = () => {
     const sdk = useAppSdk();
-    const {
-        api: { tonApi }
-    } = useAppContext();
+    const { api } = useAppContext();
     const walletState = useWalletContext();
     const { t } = useTranslation();
     const client = useQueryClient();
 
     return useMutation(async () => {
-        const wallet = await new AccountApi(tonApi).getAccountInfo({
-            account: walletState.active.rawAddress
+        const wallet = await new AccountsApi(api.tonApiV2).getAccount({
+            accountId: walletState.active.rawAddress
         });
         try {
             checkWalletPositiveBalanceOrDie(wallet);
@@ -135,13 +141,18 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftIte
                     <div ref={nodeRef}>
                         {state === 'recipient' && (
                             <RecipientView
-                                title={t('nft_transfer_title')}
                                 data={recipient}
-                                onClose={onClose}
                                 setRecipient={onRecipient}
                                 onScan={onScan}
                                 isExternalLoading={isChecking}
                                 acceptBlockchains={[BLOCKCHAIN_NAME.TON]}
+                                MainButton={MainButton}
+                                HeaderBlock={() => (
+                                    <RecipientHeaderBlock
+                                        title={t('nft_transfer_title')}
+                                        onClose={onClose}
+                                    />
+                                )}
                             />
                         )}
                         {state === 'confirm' && (

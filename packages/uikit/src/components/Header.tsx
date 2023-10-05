@@ -1,4 +1,4 @@
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -12,6 +12,7 @@ import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1 } from './Text';
+import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 
 const Block = styled.div<{
@@ -110,6 +111,9 @@ const WalletRow: FC<{
     const { mutate } = useMutateActiveWallet();
     const { t } = useTranslation();
     const { data: wallet } = useWalletState(publicKey);
+    const address = wallet
+        ? toShortValue(formatAddress(wallet.active.rawAddress, wallet.network))
+        : undefined;
     return (
         <ListItem
             dropDown
@@ -122,7 +126,7 @@ const WalletRow: FC<{
                 <ColumnText
                     noWrap
                     text={wallet?.name ? wallet.name : `${t('wallet_title')} ${index + 1}`}
-                    secondary={wallet && toShortValue(wallet.active.friendlyAddress)}
+                    secondary={address}
                 />
                 {activePublicKey === publicKey ? (
                     <Icon>
@@ -185,7 +189,7 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
     }
 };
 
-export const Header = () => {
+export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const { t } = useTranslation();
     const wallet = useWalletContext();
     const [isOpen, setOpen] = useState(false);
@@ -206,7 +210,7 @@ export const Header = () => {
                 </Title>
             </DropDown>
 
-            {/* <ScanButton /> */}
+            {showQrScan && <ScanButton />}
 
             <ImportNotification isOpen={isOpen} setOpen={setOpen} />
         </Block>

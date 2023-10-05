@@ -2,6 +2,7 @@ import * as amplitude from '@amplitude/analytics-browser';
 import { useQuery } from '@tanstack/react-query';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { DAppManifest } from '@tonkeeper/core/dist/entries/tonConnect';
 import { WalletState, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import React, { useCallback, useContext, useEffect } from 'react';
 import ReactGA from 'react-ga4';
@@ -159,4 +160,46 @@ export const useBuyAnalytics = () => {
         },
         [enable]
     );
+};
+
+const getOrigin = (url: string) => {
+    try {
+        let item = new URL(url);
+        return item.origin;
+    } catch (e) {
+        return url;
+    }
+};
+
+export const useSendNotificationAnalytics = (manifest?: DAppManifest) => {
+    return useNotificationAnalytics(
+        manifest ? { kind: 'tonConnectSend', origin: getOrigin(manifest.url) } : undefined
+    );
+};
+
+export const useRequestNotificationAnalytics = (manifestUrl?: string) => {
+    return useNotificationAnalytics(
+        manifestUrl ? { kind: 'tonConnectRequest', origin: getOrigin(manifestUrl) } : undefined
+    );
+};
+
+export const useNotificationAnalytics = (item: { kind: string; origin: string } | undefined) => {
+    const enable = useContext(AmplitudeAnalyticsContext);
+
+    useEffect(() => {
+        if (enable && item != null) {
+            if (enable[0] === true) {
+                ReactGA.event('Notification', {
+                    name: item.kind,
+                    origin: item.origin
+                });
+            }
+            if (enable[1] === true) {
+                amplitude.track('Notification', {
+                    name: item.kind,
+                    origin: item.origin
+                });
+            }
+        }
+    }, [enable, item]);
 };

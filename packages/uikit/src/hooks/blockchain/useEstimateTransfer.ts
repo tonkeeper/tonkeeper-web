@@ -14,8 +14,7 @@ import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { estimateTron } from '@tonkeeper/core/dist/service/tron/tronTransferService';
-import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
+import { JettonsBalances, MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
 import { Address } from 'ton-core';
 import { notifyError } from '../../components/transfer/common';
 import { QueryKey } from '../../libs/queryKey';
@@ -52,7 +51,7 @@ async function estimateTon({
         );
     } else {
         const jettonInfo = jettons!.balances.find(
-            jetton => (amount.asset.address as Address).toRawString() === jetton.jettonAddress
+            jetton => (amount.asset.address as Address).toRawString() === jetton.jetton.address
         )!;
         payload = await estimateJettonTransfer(
             api,

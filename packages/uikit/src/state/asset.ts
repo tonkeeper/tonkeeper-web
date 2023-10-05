@@ -30,7 +30,7 @@ export function useUserAssetBalance<
         } else {
             isLoading = jettons.isLoading;
             data =
-                jettons.data?.balances.find(i => i.jettonAddress === legacyTonAssetId(asset))
+                jettons.data?.balances.find(i => i.jetton.address === legacyTonAssetId(asset))
                     ?.balance || '0';
         }
         if (isBasicAsset(asset)) {
@@ -72,8 +72,8 @@ export function useAssetImage({ blockchain, address }: AssetIdentification): str
     if (typeof address === 'string') {
         return balances?.balances.find(i => i.token.address === address)?.token.image;
     } else {
-        return jettons?.balances.find(i => address.equals(Address.parse(i.jettonAddress)))?.metadata
-            ?.image;
+        return jettons?.balances.find(i => address.equals(Address.parse(i.jetton.address)))?.jetton
+            .image;
     }
 }
 

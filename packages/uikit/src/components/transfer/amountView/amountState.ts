@@ -1,28 +1,18 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { TonAsset, legacyTonAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { getDecimalSeparator, getGroupSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { formatSendValue, isNumeric } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import { Reducer } from 'react';
-import { AmountViewState } from './AmountView';
 import { inputToBigNumber, replaceTypedDecimalSeparator, seeIfValueValid } from './AmountViewUI';
 
-export function formatStringToInput(value: BigNumber | string): string {
-    if (value instanceof BigNumber) {
-        return value.toFormat({
-            groupSeparator: getGroupSeparator(),
-            decimalSeparator: getDecimalSeparator()
-        });
-    } else {
-        value = replaceTypedDecimalSeparator(value);
-
-        if (isNumeric(value)) {
-            value = formatSendValue(value);
-        }
-
-        return value as string;
-    }
+function formatStringToInput(value: BigNumber): string {
+    return value.toFormat({
+        groupSeparator: getGroupSeparator(),
+        decimalSeparator: getDecimalSeparator()
+    });
 }
 
 export type AmountStateAction =
@@ -32,7 +22,7 @@ export type AmountStateAction =
     | { kind: 'price'; payload: { prices?: number } }
     | { kind: 'toggle'; payload: undefined };
 
-export type AmountState2 = {
+export type AmountState = {
     inputValue: string;
     coinValue: BigNumber;
     fiatValue?: BigNumber;
@@ -41,8 +31,8 @@ export type AmountState2 = {
     isMax: boolean;
 };
 
-export const amountStateReducer: Reducer<AmountState2, AmountStateAction> = (
-    state: AmountState2,
+export const amountStateReducer: Reducer<AmountState, AmountStateAction> = (
+    state: AmountState,
     action: AmountStateAction
 ) => {
     const { kind, payload } = action;
@@ -124,7 +114,7 @@ export const amountStateReducer: Reducer<AmountState2, AmountStateAction> = (
             const inputValue = formatStringToInput(
                 state.inFiat
                     ? state.coinValue.decimalPlaces(state.token.decimals, BigNumber.ROUND_FLOOR)
-                    : state.fiatValue?.decimalPlaces(2, BigNumber.ROUND_FLOOR) ?? '0'
+                    : state.fiatValue?.decimalPlaces(2, BigNumber.ROUND_FLOOR) ?? new BigNumber(0)
             );
 
             return {
@@ -140,18 +130,28 @@ export const amountStateReducer: Reducer<AmountState2, AmountStateAction> = (
 };
 
 export const toInitAmountState = (
-    defaults: Partial<AmountViewState> | undefined,
+    defaults: Partial<AmountState> | undefined,
     blockchain: BLOCKCHAIN_NAME
-): AmountState2 => {
+): AmountState => {
     const inFiat = defaults?.inFiat ?? false;
 
     return {
-        inputValue: formatStringToInput((inFiat ? defaults?.fiatAmount : defaults?.amount) || '0'),
-        coinValue: defaults?.amount ?? new BigNumber(0),
-        fiatValue: defaults?.fiatAmount,
+        inputValue:
+            defaults?.inputValue ??
+            formatStringToInput(
+                (inFiat ? defaults?.fiatValue : defaults?.coinValue) || new BigNumber(0)
+            ),
+        coinValue: defaults?.coinValue ?? new BigNumber(0),
+        fiatValue: defaults?.fiatValue,
         token:
-            defaults?.asset || (blockchain === BLOCKCHAIN_NAME.TON ? TON_ASSET : TRON_USDT_ASSET),
+            defaults?.token || (blockchain === BLOCKCHAIN_NAME.TON ? TON_ASSET : TRON_USDT_ASSET),
         inFiat,
         isMax: defaults?.isMax ?? false
     };
+};
+
+export const toTokenRateSymbol = (amountState: AmountState) => {
+    return amountState.token.blockchain === BLOCKCHAIN_NAME.TRON
+        ? amountState.token.symbol
+        : legacyTonAssetId(amountState.token as TonAsset, { userFriendly: true });
 };

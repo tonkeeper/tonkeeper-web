@@ -1,7 +1,6 @@
 import queryString from 'query-string';
 import { Address, beginCell, storeStateInit } from 'ton-core';
 import {
-    KeyPair,
     getSecureRandomBytes,
     keyPairFromSeed,
     mnemonicToPrivateKey,
@@ -19,6 +18,10 @@ import {
     ConnectRequest,
     DAppManifest,
     DeviceInfo,
+    DisconnectEvent,
+    SEND_TRANSACTION_ERROR_CODES,
+    SendTransactionRpcResponseError,
+    SendTransactionRpcResponseSuccess,
     TonAddressItemReply,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
@@ -32,19 +35,14 @@ import {
     getAccountConnection,
     saveAccountConnection
 } from './connectionService';
+import { SessionCrypto } from './protocol';
 
-const TC_PREFIX = 'tc://';
-
-export function parseTonConnect(options: { url: string }): TonConnectParams | null {
+export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
-        if (!options.url.startsWith(TC_PREFIX)) {
-            throw new Error('must starts with ' + TC_PREFIX);
-        }
-
         const { query } = queryString.parseUrl(options.url);
 
         if (query.v !== '2') {
-            throw Error('Unknown version' + options.url);
+            throw Error(`Unknown protocol version: ${query.v}`);
         }
         if (typeof query.id !== 'string') {
             throw Error('missing id ' + options.url);
@@ -56,15 +54,19 @@ export function parseTonConnect(options: { url: string }): TonConnectParams | nu
         const protocolVersion = parseInt(query.v);
         const request = JSON.parse(decodeURIComponent(query.r)) as ConnectRequest;
         const clientSessionId = query.id;
-        //const sessionCrypto = new SessionCrypto();
+        const sessionCrypto = new SessionCrypto();
+
         return {
             protocolVersion,
             request,
             clientSessionId,
-            sessionKeyPair: undefined!
+            sessionKeyPair: sessionCrypto.stringifyKeypair()
         };
     } catch (e) {
-        return null;
+        if (e instanceof Error) {
+            return e.message;
+        }
+        return 'Unknown Error';
     }
 }
 
@@ -74,26 +76,39 @@ export const getTonConnectParams = async (
     clientSessionId?: string
 ): Promise<TonConnectParams> => {
     const randomBytes: Buffer = await getSecureRandomBytes(32);
-    const keypair: KeyPair = keyPairFromSeed(randomBytes);
+    const keyPair = keyPairFromSeed(randomBytes);
 
     return {
         protocolVersion: protocolVersion ?? 2,
         request,
         clientSessionId: clientSessionId ?? (await getSecureRandomBytes(32)).toString('hex'),
         sessionKeyPair: {
-            secretKey: keypair.secretKey.toString('hex'),
-            publicKey: keypair.publicKey.toString('hex')
+            secretKey: keyPair.secretKey.toString('hex'),
+            publicKey: keyPair.publicKey.toString('hex')
         }
     };
 };
 
+const getManifestResponse = async (manifestUrl: string) => {
+    try {
+        return await fetch(manifestUrl);
+    } catch (e) {
+        /**
+         * Request file with CORS header;
+         */
+        return await fetch(`https://manifest-proxy.nkuznetsov.workers.dev/${manifestUrl}`);
+    }
+};
+
 export const getManifest = async (request: ConnectRequest) => {
     // TODO: get fetch from context
-    const response = await window.fetch(request.manifestUrl, {
-        method: 'GET'
-    });
+    const response = await getManifestResponse(request.manifestUrl);
 
-    const manifest = (await response.json()) as DAppManifest;
+    if (response.status != 200) {
+        throw new Error(`Failed to load Manifest: ${response.status}`);
+    }
+
+    const manifest: DAppManifest = await response.json();
 
     const isValid =
         manifest &&
@@ -297,14 +312,14 @@ export const tonDisconnectRequest = async (options: { storage: IStorage; webView
     await disconnectAccountConnection({ ...options, wallet });
 };
 
-export const walletTonConnect = async (options: {
+export const saveWalletTonConnect = async (options: {
     storage: IStorage;
     wallet: WalletState;
     manifest: DAppManifest;
     params: TonConnectParams;
     replyItems: ConnectItemReply[];
     appVersion: string;
-    webViewUrl: string;
+    webViewUrl?: string;
 }): Promise<ConnectEvent> => {
     await saveAccountConnection(options);
     return {
@@ -314,5 +329,57 @@ export const walletTonConnect = async (options: {
             items: options.replyItems,
             device: getDeviceInfo(options.appVersion)
         }
+    };
+};
+
+export const connectRejectResponse = (): ConnectEvent => {
+    return {
+        id: Date.now(),
+        event: 'connect_error',
+        payload: {
+            code: CONNECT_EVENT_ERROR_CODES.USER_REJECTS_ERROR,
+            message: 'Reject Request'
+        }
+    };
+};
+
+export const disconnectResponse = (id: string): DisconnectEvent => {
+    return {
+        event: 'disconnect',
+        id,
+        payload: {}
+    };
+};
+
+export const sendTransactionErrorResponse = (id: string): SendTransactionRpcResponseError => {
+    return {
+        id,
+        error: {
+            code: SEND_TRANSACTION_ERROR_CODES.USER_REJECTS_ERROR,
+            message: 'Reject Request'
+        }
+    };
+};
+
+export const sendTransactionSuccessResponse = (
+    id: string,
+    boc: string
+): SendTransactionRpcResponseSuccess => {
+    return {
+        id,
+        result: boc
+    };
+};
+
+export const sendBadRequestResponse = (
+    id: string,
+    name: string
+): SendTransactionRpcResponseError => {
+    return {
+        error: {
+            code: SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR,
+            message: `Method "${name}" does not supported by the wallet app`
+        },
+        id
     };
 };

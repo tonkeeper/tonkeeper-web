@@ -14,10 +14,16 @@ import { mnemonicToPrivateKey } from 'ton-crypto';
 import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
+import { APIConfig } from '../../entries/apis';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { AccountApi, AccountRepr, Configuration, Fee, SystemApi, WalletApi } from '../../tonApiV1';
-import { MessageConsequences } from '../../tonApiV2';
+import {
+    Account,
+    AccountsApi,
+    LiteServerApi,
+    MessageConsequences,
+    WalletApi
+} from '../../tonApiV2';
 import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 
@@ -57,28 +63,26 @@ export const seeIfBalanceError = (e: unknown): e is Error => {
     return e instanceof Error && e.message.startsWith('Not enough account');
 };
 
-export const checkWalletBalanceOrDie = (total: BigNumber, wallet: AccountRepr) => {
+export const checkWalletBalanceOrDie = (total: BigNumber, wallet: Account) => {
     if (total.isGreaterThanOrEqualTo(wallet.balance)) {
         throw new Error(
-            `Not enough account "${wallet.address.bounceable}" amount: "${
+            `Not enough account "${wallet.address}" amount: "${
                 wallet.balance
             }", transaction total: ${total.toString()}`
         );
     }
 };
 
-export const checkWalletPositiveBalanceOrDie = (wallet: AccountRepr) => {
+export const checkWalletPositiveBalanceOrDie = (wallet: Account) => {
     if (new BigNumber(wallet.balance).isLessThan(toNano('0.01').toString())) {
-        throw new Error(
-            `Not enough account "${wallet.address.bounceable}" amount: "${wallet.balance}"`
-        );
+        throw new Error(`Not enough account "${wallet.address}" amount: "${wallet.balance}"`);
     }
 };
 
-export const getWalletSeqNo = async (tonApi: Configuration, account: string) => {
-    const { seqno } = await new WalletApi(tonApi)
-        .getWalletSeqno({
-            account
+export const getWalletSeqNo = async (api: APIConfig, accountId: string) => {
+    const { seqno } = await new WalletApi(api.tonApiV2)
+        .getAccountSeqno({
+            accountId
         })
         .catch(() => ({
             seqno: 0
@@ -87,19 +91,18 @@ export const getWalletSeqNo = async (tonApi: Configuration, account: string) => 
     return seqno;
 };
 
-export const getWalletBalance = async (tonApi: Configuration, walletState: WalletState) => {
-    const wallet = await new AccountApi(tonApi).getAccountInfo({
-        account: walletState.active.rawAddress
+export const getWalletBalance = async (api: APIConfig, walletState: WalletState) => {
+    const wallet = await new AccountsApi(api.tonApiV2).getAccount({
+        accountId: walletState.active.rawAddress
     });
-    const seqno = await getWalletSeqNo(tonApi, walletState.active.rawAddress);
+    const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
 
     return [wallet, seqno] as const;
 };
 
-export const seeIfServiceTimeSync = async (tonApi: Configuration) => {
-    const { time } = await new SystemApi(tonApi).currentTime();
+export const seeIfServiceTimeSync = async (api: APIConfig) => {
+    const { time } = await new LiteServerApi(api.tonApiV2).getRawTime();
     const isSynced = Math.abs(Date.now() - time * 1000) <= 7000;
-
     return isSynced;
 };
 
@@ -107,8 +110,8 @@ export const seeIfTimeError = (e: unknown): e is Error => {
     return e instanceof Error && e.message.startsWith('Time and date are incorrect');
 };
 
-export const checkServiceTimeOrDie = async (tonApi: Configuration) => {
-    const isSynced = await seeIfServiceTimeSync(tonApi);
+export const checkServiceTimeOrDie = async (api: APIConfig) => {
+    const isSynced = await seeIfServiceTimeSync(api);
     if (!isSynced) {
         throw new Error('Time and date are incorrect');
     }
@@ -148,13 +151,13 @@ export const createTransferMessage = (
 
 export async function getKeyPairAndSeqno(options: {
     storage: IStorage;
-    tonApi: Configuration;
+    api: APIConfig;
     walletState: WalletState;
     fee: MessageConsequences;
     password: string;
     amount: BigNumber;
 }) {
-    await checkServiceTimeOrDie(options.tonApi);
+    await checkServiceTimeOrDie(options.api);
     const mnemonic = await getWalletMnemonic(
         options.storage,
         options.walletState.publicKey,
@@ -164,29 +167,7 @@ export async function getKeyPairAndSeqno(options: {
 
     const total = options.amount.plus(options.fee.event.extra * -1);
 
-    const [wallet, seqno] = await getWalletBalance(options.tonApi, options.walletState);
-    checkWalletBalanceOrDie(total, wallet);
-    return { seqno, keyPair };
-}
-
-export async function getKeySeqno(options: {
-    storage: IStorage;
-    tonApi: Configuration;
-    walletState: WalletState;
-    fee: Fee;
-    password: string;
-    amount: BigNumber;
-}) {
-    const mnemonic = await getWalletMnemonic(
-        options.storage,
-        options.walletState.publicKey,
-        options.password
-    );
-    const keyPair = await mnemonicToPrivateKey(mnemonic);
-
-    const total = options.amount.plus(options.fee.total);
-
-    const [wallet, seqno] = await getWalletBalance(options.tonApi, options.walletState);
+    const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
     checkWalletBalanceOrDie(total, wallet);
     return { seqno, keyPair };
 }

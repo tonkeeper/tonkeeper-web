@@ -5,20 +5,14 @@ import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/servi
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import { getWalletActiveAddresses } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
-import {
-    AccountApi,
-    AccountRepr,
-    JettonApi,
-    JettonsBalances,
-    NFTApi,
-    NftCollection,
-    NftItemRepr
-} from '@tonkeeper/core/dist/tonApiV1';
+import { NFTApi, NftCollection, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import {
     Account,
+    AccountsApi,
     BlockchainApi,
     DNSApi,
     DnsRecord,
+    JettonsBalances,
     WalletApi
 } from '@tonkeeper/core/dist/tonApiV2';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
@@ -47,11 +41,8 @@ export const useWalletState = (publicKey: string) => {
 export const useMutateLogOut = (publicKey: string, remove = false) => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const {
-        api: { tonApi }
-    } = useAppContext();
     return useMutation<void, Error, void>(async () => {
-        await accountLogOutWallet(sdk.storage, tonApi, publicKey, remove);
+        await accountLogOutWallet(sdk.storage, publicKey, remove);
         await client.invalidateQueries([QueryKey.account]);
     });
 };
@@ -59,15 +50,13 @@ export const useMutateLogOut = (publicKey: string, remove = false) => {
 export const useMutateRenameWallet = (wallet: WalletState) => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const {
-        api: { tonApi }
-    } = useAppContext();
+
     return useMutation<void, Error, string>(async name => {
         if (name.length <= 0) {
             throw new Error('Missing name');
         }
 
-        await updateWalletProperty(tonApi, sdk.storage, wallet, { name });
+        await updateWalletProperty(sdk.storage, wallet, { name });
         await client.invalidateQueries([QueryKey.account]);
     });
 };
@@ -76,9 +65,7 @@ export const useMutateWalletProperty = (clearWallet = false) => {
     const storage = useStorage();
     const wallet = useWalletContext();
     const client = useQueryClient();
-    const {
-        api: { tonApi }
-    } = useAppContext();
+
     return useMutation<
         void,
         Error,
@@ -89,7 +76,7 @@ export const useMutateWalletProperty = (clearWallet = false) => {
             >
         >
     >(async props => {
-        await updateWalletProperty(tonApi, storage, wallet, props);
+        await updateWalletProperty(storage, wallet, props);
         await client.invalidateQueries([QueryKey.account]);
         if (clearWallet) {
             await client.invalidateQueries([wallet.publicKey]);
@@ -109,14 +96,12 @@ export const useWalletAddresses = () => {
 
 export const useWalletAccountInfo = () => {
     const wallet = useWalletContext();
-    const {
-        api: { tonApi }
-    } = useAppContext();
-    return useQuery<AccountRepr, Error>(
+    const { api } = useAppContext();
+    return useQuery<Account, Error>(
         [wallet.publicKey, QueryKey.info],
         async () => {
-            return new AccountApi(tonApi).getAccountInfo({
-                account: wallet.active.rawAddress
+            return new AccountsApi(api.tonApiV2).getAccount({
+                accountId: wallet.active.rawAddress
             });
         },
         {
@@ -130,20 +115,18 @@ export const useWalletAccountInfo = () => {
 
 export const useWalletJettonList = () => {
     const wallet = useWalletContext();
-    const {
-        api: { tonApi }
-    } = useAppContext();
+    const { api } = useAppContext();
     const client = useQueryClient();
     return useQuery<JettonsBalances, Error>(
         [wallet.publicKey, QueryKey.jettons],
         async () => {
-            const result = await new JettonApi(tonApi).getJettonsBalances({
-                account: wallet.active.rawAddress
+            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
+                accountId: wallet.active.rawAddress
             });
 
             result.balances.forEach(item => {
                 client.setQueryData(
-                    [wallet.publicKey, QueryKey.jettons, JettonKey.balance, item.jettonAddress],
+                    [wallet.publicKey, QueryKey.jettons, JettonKey.balance, item.jetton.address],
                     item
                 );
             });

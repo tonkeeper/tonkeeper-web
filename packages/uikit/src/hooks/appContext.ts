@@ -13,7 +13,7 @@ import {
 import { Configuration as TronConfiguration } from '@tonkeeper/core/dist/tronApi';
 import React, { useContext } from 'react';
 
-export const AppContext = React.createContext<{
+export interface IAppContext {
     api: APIConfig;
     account: AccountState;
     auth: AuthState;
@@ -23,7 +23,10 @@ export const AppContext = React.createContext<{
     standalone: boolean;
     extension: boolean;
     ios: boolean;
-}>({
+    hideQrScanner?: boolean;
+}
+
+export const AppContext = React.createContext<IAppContext>({
     api: {
         tonApi: new Configuration(),
         tonApiV2: new ConfigurationV2(),
@@ -36,7 +39,8 @@ export const AppContext = React.createContext<{
     tonendpoint: new Tonendpoint({}, {}),
     standalone: false,
     extension: false,
-    ios: false
+    ios: false,
+    hideQrScanner: false
 });
 
 export const useAppContext = () => {

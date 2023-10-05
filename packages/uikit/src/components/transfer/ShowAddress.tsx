@@ -1,7 +1,8 @@
-import { AccountRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { Account } from '@tonkeeper/core/dist/tonApiV2';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useWalletContext } from '../../hooks/appContext';
 import useTextWidth from '../../hooks/textWidth';
 import { Body1 } from '../Text';
 
@@ -13,9 +14,10 @@ interface ShowAddressProps {
 export const useShowAddress = (
     ref: React.MutableRefObject<HTMLTextAreaElement | null>,
     value: string,
-    toAccount?: AccountRepr
+    toAccount?: Account
 ) => {
-    const address = toAccount?.address?.bounceable ?? undefined;
+    const wallet = useWalletContext();
+    const address = toAccount?.address ?? undefined;
 
     const [showAddress, setShowAddress] = useState<ShowAddressProps | undefined>(undefined);
 
@@ -39,7 +41,7 @@ export const useShowAddress = (
             setShowAddress({
                 inputTextWidth,
                 addressTextWidth,
-                value: toShortValue(toAccount.address.bounceable)
+                value: toShortValue(formatAddress(toAccount.address, wallet.network))
             });
         } else {
             setShowAddress(undefined);

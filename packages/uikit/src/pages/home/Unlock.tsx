@@ -3,9 +3,9 @@ import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicSer
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { TonkeeperIcon } from '../../components/Icon';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
-import { TonkeeperIcon } from '../../components/Icon';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';

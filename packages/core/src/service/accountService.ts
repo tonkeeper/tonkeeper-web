@@ -3,7 +3,6 @@ import { APIConfig } from '../entries/apis';
 import { AuthState } from '../entries/password';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
-import { Configuration } from '../tonApiV1';
 import { encrypt } from './cryptoService';
 import { getWalletMnemonic, validateWalletMnemonic } from './mnemonicService';
 import { importWallet } from './walletService';
@@ -60,8 +59,6 @@ export const accountSelectWallet = async (storage: IStorage, publicKey: string) 
 
 export const accountLogOutWallet = async (
     storage: IStorage,
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    tonApi: Configuration,
     publicKey: string,
     removeRemove = false
 ) => {

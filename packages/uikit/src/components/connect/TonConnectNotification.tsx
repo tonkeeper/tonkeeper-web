@@ -15,8 +15,8 @@ import {
     tonConnectProofPayload
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useCallback, useState } from 'react';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -54,7 +54,7 @@ const useConnectMutation = (
                 const password = await getPasswordByNotification(sdk, auth);
                 const proof = tonConnectProofPayload(
                     webViewUrl ?? manifest.url,
-                    wallet.active.friendlyAddress,
+                    wallet.active.rawAddress,
                     item.payload
                 );
                 result.push(
@@ -131,13 +131,20 @@ const ConnectContent: FC<{
     origin?: string;
     params: ConnectRequest;
     manifest: DAppManifest;
-    handleClose: (result?: ConnectItemReply[]) => void;
+    handleClose: (result?: ConnectItemReply[], manifest?: DAppManifest) => void;
 }> = ({ params, manifest, origin, handleClose }) => {
+    const sdk = useAppSdk();
     const [done, setDone] = useState(false);
 
     const wallet = useWalletContext();
 
     const { t } = useTranslation();
+
+    useEffect(() => {
+        if (sdk.twaExpand) {
+            sdk.twaExpand();
+        }
+    }, []);
 
     const { mutateAsync, isLoading } = useConnectMutation(params, manifest, origin);
 
@@ -145,8 +152,10 @@ const ConnectContent: FC<{
         e.preventDefault();
         const result = await mutateAsync();
         setDone(true);
-        setTimeout(() => handleClose(result), 300);
+        setTimeout(() => handleClose(result, manifest), 300);
     };
+
+    const address = formatAddress(wallet.active.rawAddress, wallet.network);
 
     return (
         <NotificationBlock onSubmit={onSubmit}>
@@ -159,7 +168,7 @@ const ConnectContent: FC<{
                 <Title>{t('ton_login_title').replace('%{name}', manifest.name)}</Title>
                 <SubTitle>
                     {t('ton_login_caption').replace('%{name}', getDomain(manifest.url))}{' '}
-                    <Address>{toShortValue(wallet.active.friendlyAddress)}</Address>{' '}
+                    <Address>{toShortValue(address)}</Address>{' '}
                     {walletVersionText(wallet.active.version)}
                 </SubTitle>
             </div>
@@ -193,15 +202,25 @@ const useManifest = (params: ConnectRequest | null) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
 
-    return useQuery(
+    return useQuery<DAppManifest, Error>(
         [QueryKey.estimate, params],
-        () => {
+        async () => {
             sdk.uiEvents.emit('copy', {
                 method: 'copy',
                 params: t('loading')
             });
 
-            return getManifest(params!);
+            try {
+                return await getManifest(params!);
+            } catch (e) {
+                if (e instanceof Error) {
+                    sdk.uiEvents.emit('copy', {
+                        method: 'copy',
+                        params: e.message
+                    });
+                }
+                throw e;
+            }
         },
         {
             enabled: params != null
@@ -212,7 +231,7 @@ const useManifest = (params: ConnectRequest | null) => {
 export const TonConnectNotification: FC<{
     origin?: string;
     params: ConnectRequest | null;
-    handleClose: (result?: ConnectItemReply[]) => void;
+    handleClose: (result?: ConnectItemReply[], manifest?: DAppManifest) => void;
 }> = ({ params, origin, handleClose }) => {
     const { data: manifest } = useManifest(params);
 

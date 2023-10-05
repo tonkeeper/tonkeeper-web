@@ -1,12 +1,10 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import {
     TonAsset,
     jettonToTonAsset,
     legacyTonAssetId
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { isNumeric } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import React, {
@@ -20,69 +18,55 @@ import React, {
     useState
 } from 'react';
 import { useAppContext } from '../../../hooks/appContext';
+import { useAppSdk } from '../../../hooks/appSdk';
 import { formatter } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { useUserAssetBalance } from '../../../state/asset';
 import { useUserJettonList } from '../../../state/jetton';
 import { useRate } from '../../../state/rates';
 import { useWalletAccountInfo, useWalletJettonList } from '../../../state/wallet';
-import { ChevronLeftIcon } from '../../Icon';
 import { Gap } from '../../Layout';
-import {
-    FullHeightBlock,
-    NotificationCancelButton,
-    NotificationTitleBlock
-} from '../../Notification';
+import { FullHeightBlock } from '../../Notification';
 import { Label1 } from '../../Text';
-import { BackButton } from '../../fields/BackButton';
-import { Button } from '../../fields/Button';
-import { AssetSelect } from '../AssetSelect';
 import { InputSize, Sentence } from '../Sentence';
-import { defaultSize, getInputSize, useAutoFocusOnChange, useButtonPosition } from '../amountHooks';
-import { ButtonBlock } from '../common';
+import { AmountHeaderBlockComponent, AmountMainButtonComponent } from '../common';
 import {
-    Address,
     AmountBlock,
     AssetBadge,
-    Center,
     FiatBlock,
     InputBlock,
     MaxButton,
     MaxRow,
+    RecipientAddress,
     RecipientName,
     Remaining,
     RemainingInvalid,
     SelectCenter,
     SubTitle,
     Symbol,
-    Title,
     inputToBigNumber
 } from './AmountViewUI';
-import { AmountState2, amountStateReducer, toInitAmountState } from './amountState';
-
-export type AmountViewState = {
-    asset: Asset;
-    amount: BigNumber;
-    fiatAmount?: BigNumber;
-    isMax: boolean;
-    inFiat: boolean;
-};
-
-const toTokenRateSymbol = (amountState: AmountState2) => {
-    return amountState.token.blockchain === BLOCKCHAIN_NAME.TRON
-        ? amountState.token.symbol
-        : legacyTonAssetId(amountState.token as TonAsset, { userFriendly: true });
-};
+import { AssetSelect } from './AssetSelect';
+import { defaultSize, getInputSize, useAutoFocusOnChange, useButtonPosition } from './amountHooks';
+import {
+    AmountState,
+    amountStateReducer,
+    toInitAmountState,
+    toTokenRateSymbol
+} from './amountState';
 
 export const AmountView: FC<{
     onClose: () => void;
-    onBack: (state: AmountViewState) => void;
-    onConfirm: (state: AmountViewState) => void;
+    onBack: (state: AmountState) => void;
+    onConfirm: (state: AmountState) => void;
     recipient: RecipientData;
-    defaults?: Partial<AmountViewState>;
-}> = ({ recipient, onClose, onBack, onConfirm, defaults }) => {
+    defaults?: Partial<AmountState>;
+    MainButton: AmountMainButtonComponent;
+    HeaderBlock: AmountHeaderBlockComponent;
+}> = ({ recipient, onClose, onBack, onConfirm, defaults, MainButton, HeaderBlock }) => {
     const { t } = useTranslation();
-    const { fiat, standalone } = useAppContext();
+    const sdk = useAppSdk();
+    const { standalone, fiat } = useAppContext();
     const blockchain = recipient.address.blockchain;
 
     const { data: notFilteredJettons } = useWalletJettonList();
@@ -96,10 +80,6 @@ export const AmountView: FC<{
 
     const { data: tokenRate, isLoading: rateLoading } = useRate(toTokenRateSymbol(amountState));
     const { data: balance, isLoading: balanceLoading } = useUserAssetBalance(amountState.token);
-
-    const secondaryAmount: BigNumber | undefined = amountState.inFiat
-        ? amountState.coinValue
-        : amountState.fiatValue;
 
     const ref = useRef<HTMLInputElement>(null);
     const refBlock = useRef<HTMLLabelElement>(null);
@@ -158,52 +138,37 @@ export const AmountView: FC<{
         );
     }, [enoughBalance, amountState.inputValue]);
 
-    const handleBack = () => {
-        onBack({
-            asset: amountState.token,
-            amount: amountState.coinValue,
-            fiatAmount: amountState.fiatValue,
-            isMax: amountState.isMax,
-            inFiat: amountState.inFiat
-        });
-    };
+    const handleBack = useCallback(() => {
+        onBack(amountState);
+    }, [onBack, amountState]);
+
+    const handleSubmit = useCallback(() => {
+        if (isValid) {
+            onConfirm(amountState);
+        } else {
+            sdk.hapticNotification('error');
+        }
+    }, [isValid, onConfirm, amountState, sdk]);
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.stopPropagation();
         e.preventDefault();
-        if (isValid) {
-            onConfirm({
-                asset: amountState.token,
-                amount: amountState.coinValue,
-                fiatAmount: amountState.fiatValue,
-                isMax: amountState.isMax,
-                inFiat: amountState.inFiat
-            });
-        }
+        handleSubmit();
     };
 
-    const address = toShortValue(
-        isTonRecipientData(recipient)
-            ? recipient.toAccount.address.bounceable
-            : recipient.address.address
-    );
+    const secondaryAmount: BigNumber | undefined = amountState.inFiat
+        ? amountState.coinValue
+        : amountState.fiatValue;
 
     return (
         <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
-            <NotificationTitleBlock>
-                <BackButton onClick={handleBack}>
-                    <ChevronLeftIcon />
-                </BackButton>
-                <Center>
-                    <Title>{t('txActions_amount')}</Title>
-                    <SubTitle>
-                        {t('send_screen_steps_done_to').replace('%{name}', '')}
-                        <RecipientName recipient={recipient} />
-                        <Address>{address}</Address>
-                    </SubTitle>
-                </Center>
-                <NotificationCancelButton handleClose={onClose} />
-            </NotificationTitleBlock>
+            <HeaderBlock onClose={onClose} onBack={handleBack}>
+                <SubTitle>
+                    {t('send_screen_steps_done_to').replace('%{name}', '')}
+                    <RecipientName recipient={recipient} />
+                    <RecipientAddress recipient={recipient} />
+                </SubTitle>
+            </HeaderBlock>
 
             <AmountBlock ref={refBlock}>
                 <SelectCenter>
@@ -260,18 +225,13 @@ export const AmountView: FC<{
             </MaxRow>
 
             <Gap />
-            <ButtonBlock ref={refButton}>
-                <Button
-                    fullWidth
-                    size="large"
-                    primary
-                    type="submit"
-                    disabled={!isValid}
-                    loading={rateLoading || balanceLoading}
-                >
-                    {t('continue')}
-                </Button>
-            </ButtonBlock>
+
+            <MainButton
+                ref={refButton}
+                isDisabled={!isValid}
+                isLoading={rateLoading || balanceLoading}
+                onClick={handleSubmit}
+            />
         </FullHeightBlock>
     );
 };

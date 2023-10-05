@@ -1,8 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
-import { JettonApi, JettonBalance, JettonsBalances } from '@tonkeeper/core/dist/tonApiV1';
-import { JettonInfo, JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
+import {
+    AccountsApi,
+    JettonBalance,
+    JettonInfo,
+    JettonsApi,
+    JettonsBalances
+} from '@tonkeeper/core/dist/tonApiV2';
 import { useMemo } from 'react';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useStorage } from '../hooks/storage';
@@ -26,17 +31,15 @@ export const useJettonInfo = (jettonAddress: string) => {
 
 export const useJettonBalance = (jettonAddress: string) => {
     const wallet = useWalletContext();
-    const {
-        api: { tonApi }
-    } = useAppContext();
+    const { api } = useAppContext();
     return useQuery<JettonBalance, Error>(
         [wallet.publicKey, QueryKey.jettons, JettonKey.balance, jettonAddress],
         async () => {
-            const result = await new JettonApi(tonApi).getJettonsBalances({
-                account: wallet.active.rawAddress
+            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
+                accountId: wallet.active.rawAddress
             });
 
-            const balance = result.balances.find(item => item.jettonAddress === jettonAddress);
+            const balance = result.balances.find(item => item.jetton.address === jettonAddress);
             if (!balance) {
                 throw new Error('Missing jetton balance');
             }
@@ -49,28 +52,26 @@ export const useToggleJettonMutation = () => {
     const storage = useStorage();
     const client = useQueryClient();
     const wallet = useWalletContext();
-    const {
-        api: { tonApi }
-    } = useAppContext();
+
     return useMutation<void, Error, JettonBalance>(async jetton => {
-        if (jetton.verification === 'whitelist') {
+        if (jetton.jetton.verification === 'whitelist') {
             const hiddenJettons = wallet.hiddenJettons ?? [];
 
-            const updated = hiddenJettons.includes(jetton.jettonAddress)
-                ? hiddenJettons.filter(item => item !== jetton.jettonAddress)
-                : hiddenJettons.concat([jetton.jettonAddress]);
+            const updated = hiddenJettons.includes(jetton.jetton.address)
+                ? hiddenJettons.filter(item => item !== jetton.jetton.address)
+                : hiddenJettons.concat([jetton.jetton.address]);
 
-            await updateWalletProperty(tonApi, storage, wallet, {
+            await updateWalletProperty(storage, wallet, {
                 hiddenJettons: updated
             });
         } else {
             const shownJettons = wallet.shownJettons ?? [];
 
-            const updated = shownJettons.includes(jetton.jettonAddress)
-                ? shownJettons.filter(item => item !== jetton.jettonAddress)
-                : shownJettons.concat([jetton.jettonAddress]);
+            const updated = shownJettons.includes(jetton.jetton.address)
+                ? shownJettons.filter(item => item !== jetton.jetton.address)
+                : shownJettons.concat([jetton.jetton.address]);
 
-            await updateWalletProperty(tonApi, storage, wallet, {
+            await updateWalletProperty(storage, wallet, {
                 shownJettons: updated
             });
         }
@@ -82,7 +83,7 @@ export const useToggleJettonMutation = () => {
 export const sortJettons = (orderJettons: string[] | undefined, jettons: JettonBalance[]) => {
     if (!orderJettons) return jettons;
     return jettons.sort(
-        (a, b) => orderJettons.indexOf(a.jettonAddress) - orderJettons.indexOf(b.jettonAddress)
+        (a, b) => orderJettons.indexOf(a.jetton.address) - orderJettons.indexOf(b.jetton.address)
     );
 };
 
@@ -92,10 +93,10 @@ export const hideJettons = (
     jettons: JettonBalance[]
 ) => {
     return jettons.filter(jetton => {
-        if (jetton.verification === 'whitelist') {
-            return hiddenJettons ? !hiddenJettons.includes(jetton.jettonAddress) : true;
+        if (jetton.jetton.verification === 'whitelist') {
+            return hiddenJettons ? !hiddenJettons.includes(jetton.jetton.address) : true;
         } else {
-            return shownJettons ? shownJettons.includes(jetton.jettonAddress) : false;
+            return shownJettons ? shownJettons.includes(jetton.jetton.address) : false;
         }
     });
 };
