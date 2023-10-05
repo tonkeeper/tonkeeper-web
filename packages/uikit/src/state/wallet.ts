@@ -98,7 +98,7 @@ export const useWalletAccountInfo = () => {
     const wallet = useWalletContext();
     const { api } = useAppContext();
     return useQuery<Account, Error>(
-        [wallet.publicKey, QueryKey.info],
+        [wallet.active.rawAddress, QueryKey.info],
         async () => {
             return new AccountsApi(api.tonApiV2).getAccount({
                 accountId: wallet.active.rawAddress
@@ -118,7 +118,7 @@ export const useWalletJettonList = () => {
     const { api } = useAppContext();
     const client = useQueryClient();
     return useQuery<JettonsBalances, Error>(
-        [wallet.publicKey, QueryKey.jettons],
+        [wallet.active.rawAddress, QueryKey.jettons],
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                 accountId: wallet.active.rawAddress

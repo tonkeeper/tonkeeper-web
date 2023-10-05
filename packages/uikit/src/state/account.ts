@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { accountSelectWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { updateWalletVersion } from '@tonkeeper/core/dist/service/walletService';
@@ -61,8 +61,9 @@ export const useMutateWalletVersion = () => {
     const client = useQueryClient();
     const wallet = useWalletContext();
     return useMutation<void, Error, WalletVersion>(async version => {
-        await client.invalidateQueries([wallet.publicKey]);
         await updateWalletVersion(storage, wallet, version);
+        await client.invalidateQueries([wallet.publicKey]);
+        await client.invalidateQueries([wallet.active.rawAddress]);
         await client.invalidateQueries([QueryKey.account]);
     });
 };
