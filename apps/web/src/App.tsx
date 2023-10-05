@@ -63,6 +63,7 @@ const TonConnectSubscription = React.lazy(
 );
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
+);
 const ReceiveNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/home/ReceiveNotification')
 );
