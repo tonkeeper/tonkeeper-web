@@ -8,7 +8,7 @@ import { walletStateInitFromState } from '@tonkeeper/core/dist/service/wallet/co
 import { InitResult } from '@twa.js/sdk';
 import { Configuration, DefaultApi } from '../twaApi';
 
-const apiConfig = new Configuration({ basePath: 'https://twa-api-dev.tonkeeper.com' });
+const apiConfig = new Configuration({ basePath: 'https://twa-api.tonkeeper.com' });
 const twaApi = new DefaultApi(apiConfig);
 
 export class TwaNotification implements NotificationService {
