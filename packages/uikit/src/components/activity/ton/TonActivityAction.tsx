@@ -128,7 +128,7 @@ export const SmartContractExecAction: FC<{
                     amount={<>-&thinsp;{format(smartContractExec.tonAttached)}</>}
                     entry={CryptoCurrency.TON}
                     address={toShortValue(
-                        formatAddress(smartContractExec.contract.address, wallet.network, true)
+                        formatAddress(smartContractExec.contract.address, wallet.network)
                     )}
                     date={date}
                 />
