@@ -139,6 +139,7 @@ export const JettonBurnAction: FC<JettonActionProps> = ({ action, date }) => {
                 )}
                 date={date}
             />
+            <FailedNote status={action.status} />
         </ListItemGrid>
     );
 };
@@ -167,6 +168,7 @@ export const JettonMintAction: FC<JettonActionProps> = ({ action, date }) => {
                 date={date}
                 green
             />
+            <FailedNote status={action.status} />
         </ListItemGrid>
     );
 };
