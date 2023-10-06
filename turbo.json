@@ -6,6 +6,7 @@
             "outputs": [".next/**", "dist/**"]
         },
         "build:pkg": {
+            "cache": false,
             "dependsOn": ["^build:pkg"],
             "outputs": [".next/**", "dist/**"]
         },
