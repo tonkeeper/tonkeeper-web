@@ -134,9 +134,12 @@ export const JettonBurnAction: FC<JettonActionProps> = ({ action, date }) => {
                 title={t('transactions_burned')}
                 amount={<>-&thinsp;{format(jettonBurn.amount, jettonBurn.jetton.decimals)}</>}
                 entry={jettonBurn.jetton.symbol}
-                address={toShortValue(formatAddress(jettonBurn.jetton.address, wallet.network))}
+                address={toShortValue(
+                    formatAddress(jettonBurn.jetton.address, wallet.network, true)
+                )}
                 date={date}
             />
+            <FailedNote status={action.status} />
         </ListItemGrid>
     );
 };
@@ -159,10 +162,13 @@ export const JettonMintAction: FC<JettonActionProps> = ({ action, date }) => {
                 title={t('transaction_type_mint')}
                 amount={<>+&thinsp;{format(jettonMint.amount, jettonMint.jetton.decimals)}</>}
                 entry={jettonMint.jetton.symbol}
-                address={toShortValue(formatAddress(jettonMint.jetton.address, wallet.network))}
+                address={toShortValue(
+                    formatAddress(jettonMint.jetton.address, wallet.network, true)
+                )}
                 date={date}
                 green
             />
+            <FailedNote status={action.status} />
         </ListItemGrid>
     );
 };

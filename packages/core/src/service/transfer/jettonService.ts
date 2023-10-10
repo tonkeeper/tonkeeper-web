@@ -88,14 +88,14 @@ export const estimateJettonTransfer = async (
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string
 ) => {
-    await checkServiceTimeOrDie(api.tonApi);
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    await checkServiceTimeOrDie(api);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = createJettonTransfer(
         seqno,
         walletState,
-        recipient.toAccount.address.raw,
+        recipient.toAccount.address,
         amount,
         jettonWalletAddress,
         recipient.comment ? comment(recipient.comment) : null
@@ -117,7 +117,7 @@ export const sendJettonTransfer = async (
     fee: MessageConsequences,
     password: string
 ) => {
-    await checkServiceTimeOrDie(api.tonApi);
+    await checkServiceTimeOrDie(api);
     const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
@@ -125,13 +125,13 @@ export const sendJettonTransfer = async (
         .multipliedBy(-1)
         .plus(jettonTransferAmount.toString());
 
-    const [wallet, seqno] = await getWalletBalance(api.tonApi, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
     const cell = createJettonTransfer(
         seqno,
         walletState,
-        recipient.toAccount.address.raw,
+        recipient.toAccount.address,
         amount,
         jettonWalletAddress,
         recipient.comment ? comment(recipient.comment) : null,

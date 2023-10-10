@@ -33,7 +33,7 @@ export const DepositStakeAction: FC<{
                 entry={CryptoCurrency.TON}
                 address={
                     depositStake.pool.name ??
-                    toShortValue(formatAddress(depositStake.pool.address, wallet.network))
+                    toShortValue(formatAddress(depositStake.pool.address, wallet.network, true))
                 }
                 date={date}
             />
@@ -65,7 +65,7 @@ export const WithdrawStakeAction: FC<{
                 green
                 address={
                     withdrawStake.pool.name ??
-                    toShortValue(formatAddress(withdrawStake.pool.address, wallet.network))
+                    toShortValue(formatAddress(withdrawStake.pool.address, wallet.network, true))
                 }
                 date={date}
             />
@@ -101,7 +101,9 @@ export const WithdrawRequestStakeAction: FC<{
                 entry={withdrawStakeRequest.amount ? CryptoCurrency.TON : ''}
                 address={
                     withdrawStakeRequest.pool.name ??
-                    toShortValue(formatAddress(withdrawStakeRequest.pool.address, wallet.network))
+                    toShortValue(
+                        formatAddress(withdrawStakeRequest.pool.address, wallet.network, true)
+                    )
                 }
                 date={date}
             />

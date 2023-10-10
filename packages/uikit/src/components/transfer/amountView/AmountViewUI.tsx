@@ -1,9 +1,12 @@
 import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
+import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { getDecimalSeparator, getNotDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { isNumeric, removeGroupSeparator, seeIfLargeTail } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import React, { FC } from 'react';
 import styled from 'styled-components';
+import { useWalletContext } from '../../../hooks/appContext';
 import { Body1, Body2, H3, Label2, Num2 } from '../../Text';
 import { cropName } from '../ConfirmListItem';
 
@@ -147,6 +150,21 @@ export const RecipientName: FC<{ recipient: RecipientData }> = ({ recipient }) =
     }
 
     return <></>;
+};
+
+export const getRecipientAddress = (recipient: RecipientData, wallet: WalletState) => {
+    if (isTonRecipientData(recipient)) {
+        if ('dns' in recipient.address) {
+            return formatAddress(recipient.toAccount.address, wallet.network);
+        }
+    }
+    return recipient.address.address;
+};
+
+export const RecipientAddress: FC<{ recipient: RecipientData }> = ({ recipient }) => {
+    const wallet = useWalletContext();
+    const address = getRecipientAddress(recipient, wallet);
+    return <Address>{toShortValue(address)}</Address>;
 };
 
 export const replaceTypedDecimalSeparator = (value: string): string => {

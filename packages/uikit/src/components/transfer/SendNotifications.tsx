@@ -303,7 +303,7 @@ const SendActionNotification = () => {
         return () => {
             sdk.uiEvents.off('transfer', handler);
         };
-    }, []);
+    }, [jettons]);
 
     const onClose = useCallback(() => {
         setTonTransfer(undefined);

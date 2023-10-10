@@ -4,9 +4,8 @@ import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
 import { WalletAddress, WalletState, WalletVersion, WalletVersions } from '../entries/wallet';
-import { Configuration, WalletApi } from '../tonApiV1';
+import { WalletApi } from '../tonApiV2';
 import { encrypt } from './cryptoService';
-import { getTronWallet } from './tron/tronService';
 import { walletContract } from './wallet/contractService';
 import { setWalletState } from './wallet/storeService';
 
@@ -19,7 +18,7 @@ export const importWallet = async (
     const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-    const active = await findWalletAddress(api.tonApi, keyPair);
+    const active = await findWalletAddress(api, keyPair);
 
     const publicKey = keyPair.publicKey.toString('hex');
 
@@ -30,7 +29,7 @@ export const importWallet = async (
         name
     };
 
-    state.tron = await getTronWallet(api.tronApi, mnemonic, state).catch(() => undefined);
+    // state.tron = await getTronWallet(api.tronApi, mnemonic, state).catch(() => undefined);
 
     return [encryptedMnemonic, state] as const;
 };
@@ -38,10 +37,13 @@ export const importWallet = async (
 const versionMap: Record<string, WalletVersion> = {
     wallet_v3R1: WalletVersion.V3R1,
     wallet_v3R2: WalletVersion.V3R2,
-    wallet_v4R2: WalletVersion.V4R2
+    wallet_v4r2: WalletVersion.V4R2
 };
 
-const findWalletVersion = (interfaces: string[]): WalletVersion => {
+const findWalletVersion = (interfaces?: string[]): WalletVersion => {
+    if (!interfaces) {
+        throw new Error('Unexpected wallet version');
+    }
     for (const value of interfaces) {
         if (versionMap[value] !== undefined) {
             return versionMap[value];
@@ -50,15 +52,15 @@ const findWalletVersion = (interfaces: string[]): WalletVersion => {
     throw new Error('Unexpected wallet version');
 };
 
-const findWalletAddress = async (tonApiConfig: Configuration, keyPair: KeyPair) => {
+const findWalletAddress = async (api: APIConfig, keyPair: KeyPair) => {
     try {
-        const result = await new WalletApi(tonApiConfig).findWalletsByPubKey({
+        const result = await new WalletApi(api.tonApiV2).getWalletsByPublicKey({
             publicKey: keyPair.publicKey.toString('hex')
         });
 
-        const [activeWallet] = result.wallets
+        const [activeWallet] = result.accounts
             .filter(wallet => {
-                if (wallet.interfaces.some(value => Object.keys(versionMap).includes(value))) {
+                if (wallet.interfaces?.some(value => Object.keys(versionMap).includes(value))) {
                     return wallet.balance > 0 || wallet.status === 'active';
                 }
                 return false;
@@ -101,7 +103,8 @@ export const getWalletAddress = (
     return {
         rawAddress: address.toRawString(),
         friendlyAddress: address.toString({
-            testOnly: network === Network.TESTNET
+            testOnly: network === Network.TESTNET,
+            bounceable: false
         }),
         version
     };
@@ -137,7 +140,6 @@ export const updateWalletVersion = async (
 };
 
 export const updateWalletProperty = async (
-    tonApi: Configuration,
     storage: IStorage,
     wallet: WalletState,
     props: Pick<

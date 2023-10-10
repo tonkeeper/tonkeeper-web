@@ -136,7 +136,7 @@ export const SmartContractExecActionDetails: FC<ActionData> = ({ action, timesta
                 <FailedDetail status={action.status} />
             </div>
             <ListBlock margin={false} fullWidth>
-                <ActionRecipientDetails recipient={smartContractExec.contract} />
+                <ActionRecipientDetails recipient={smartContractExec.contract} bounced />
                 <ActionTransactionDetails eventId={event.eventId} />
                 <ActionExtraDetails extra={event.extra} />
                 <TransferOpCode operation={smartContractExec.operation} />

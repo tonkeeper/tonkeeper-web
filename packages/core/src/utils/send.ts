@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { JettonsBalances } from '../tonApiV1';
+import { JettonsBalances } from '../tonApiV2';
 import { getBrowserLocale, getDecimalSeparator, getGroupSeparator } from './formatting';
 
 export const DefaultDecimals = 9;
@@ -55,6 +55,6 @@ export function formatSendValue(str: string) {
 }
 
 export const getJettonSymbol = (address: string, jettons: JettonsBalances): string => {
-    const jetton = jettons.balances.find(item => item.jettonAddress === address);
-    return jetton?.metadata?.symbol ?? address;
+    const jetton = jettons.balances.find(item => item.jetton.address === address);
+    return jetton?.jetton.symbol ?? address;
 };

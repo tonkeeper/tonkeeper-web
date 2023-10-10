@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
+import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { Configuration } from '@tonkeeper/core/dist/tonApiV1';
 import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
 import { Omit } from 'react-beautiful-dnd';
 import { notifyError } from '../../components/transfer/common';
@@ -13,7 +13,7 @@ import { useTranslation } from '../translation';
 
 export type ContractExecutorParams = {
     storage: IStorage;
-    tonApi: Configuration;
+    api: APIConfig;
     walletState: WalletState;
     password: string;
     fee: MessageConsequences;
@@ -31,9 +31,7 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
 ) {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const {
-        api: { tonApi }
-    } = useAppContext();
+    const { api } = useAppContext();
     const walletState = useWalletContext();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
@@ -50,7 +48,7 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
         try {
             await executor({
                 storage: sdk.storage,
-                tonApi,
+                api,
                 walletState,
                 password,
                 ...args

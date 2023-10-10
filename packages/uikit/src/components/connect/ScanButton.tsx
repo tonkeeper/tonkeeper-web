@@ -50,11 +50,11 @@ const useGetConnectInfo = () => {
 
         const params = parseTonConnect({ url });
 
-        if (params === null) {
+        if (typeof params === 'string') {
             sdk.uiEvents.emit('copy', {
                 method: 'copy',
                 id: Date.now(),
-                params: t('Unexpected_QR_Code')
+                params: params
             });
             return null;
         }

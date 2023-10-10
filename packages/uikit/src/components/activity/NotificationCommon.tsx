@@ -12,7 +12,6 @@ import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import styled from 'styled-components';
-import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency, useCoinFullBalance } from '../../hooks/balance';
@@ -133,7 +132,10 @@ export const ActionRecipientAddress: FC<{ address: string; name?: string; label?
     );
 };
 
-export const ActionRecipientDetails: FC<{ recipient: AccountAddress }> = ({ recipient }) => {
+export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: boolean }> = ({
+    recipient,
+    bounced
+}) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const wallet = useWalletContext();
@@ -149,7 +151,7 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress }> = ({ reci
                 </ListItem>
             )}
             <ActionRecipientAddress
-                address={formatAddress(recipient.address, wallet.network)}
+                address={formatAddress(recipient.address, wallet.network, bounced)}
                 name={recipient.name}
             />
         </>
@@ -230,7 +232,7 @@ export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({ 
             <ListItem
                 onClick={() =>
                     sdk.copyToClipboard(
-                        Address.parse(beneficiary.address).toString(),
+                        formatAddress(beneficiary.address, wallet.network),
                         t('address_copied')
                     )
                 }

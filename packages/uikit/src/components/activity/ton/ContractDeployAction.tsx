@@ -61,7 +61,9 @@ export const ContractDeployAction: FC<{
         return <ErrorAction />;
     }
     const interfaces = contractDeploy.interfaces ?? [];
-    const address = toShortValue(formatAddress(contractDeploy.address, wallet.network));
+    const address = toShortValue(
+        formatAddress(contractDeploy.address, wallet.network, !interfaces.includes('wallet'))
+    );
 
     if (interfaces.includes('nft_item')) {
         return (

@@ -1,7 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { JettonBalance } from '@tonkeeper/core/dist/tonApiV1';
-import { AccountsApi, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountsApi, JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo, useRef } from 'react';
 import { Address } from 'ton-core';
@@ -32,7 +31,7 @@ const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTML
         queryFn: ({ pageParam = undefined }) =>
             new AccountsApi(api.tonApiV2).getAccountJettonHistoryByID({
                 accountId: wallet.active.rawAddress,
-                jettonId: balance.jettonAddress,
+                jettonId: balance.jetton.address,
                 limit: 20,
                 beforeLt: pageParam
             }),
@@ -54,7 +53,7 @@ const JettonHeader: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ info, 
     const [amount, address] = useMemo(
         () => [
             formatDecimals(balance.balance, info.metadata.decimals),
-            Address.parse(balance.jettonAddress).toString()
+            Address.parse(balance.jetton.address).toString()
         ],
         [info, balance]
     );
