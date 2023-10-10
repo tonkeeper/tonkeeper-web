@@ -1,6 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { Action } from '@tonkeeper/core/dist/tonApiV2';
+import { Action, NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, seeIfAddressEqual, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { ListItemPayload } from '../../../components/List';
@@ -182,7 +181,7 @@ export const ActivityAction: FC<{
     action: Action;
     date: string;
     isScam: boolean;
-    openNft: (nft: NftItemRepr) => void;
+    openNft: (nft: NftItem) => void;
 }> = ({ action, isScam, date, openNft }) => {
     const { t } = useTranslation();
 

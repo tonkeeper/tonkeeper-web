@@ -1,5 +1,4 @@
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { Action } from '@tonkeeper/core/dist/tonApiV2';
+import { Action, NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { useWalletContext } from '../../../hooks/appContext';
@@ -52,7 +51,7 @@ export const ContractDeployActionDetails: FC<ActionData> = ({ action, timestamp,
 export const ContractDeployAction: FC<{
     action: Action;
     date: string;
-    openNft: (nft: NftItemRepr) => void;
+    openNft: (nft: NftItem) => void;
 }> = ({ action, date, openNft }) => {
     const { t } = useTranslation();
     const { contractDeploy } = action;

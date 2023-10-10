@@ -1,6 +1,5 @@
 import { InfiniteData } from '@tanstack/react-query';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { AccountEvents } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountEvents, NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import { TronEvents } from '@tonkeeper/core/dist/tronApi';
 import React, { FC, useMemo, useState } from 'react';
 import { GenericActivityGroup } from '../../state/activity';
@@ -39,7 +38,7 @@ export const MixedActivityGroup: FC<{
 }> = ({ items }) => {
     const [tonAction, seTonAction] = useState<ActionData | undefined>(undefined);
     const [tronAction, setTronAction] = useState<TronActionData | undefined>(undefined);
-    const [nft, setNft] = useState<NftItemRepr | undefined>(undefined);
+    const [nft, setNft] = useState<NftItem | undefined>(undefined);
 
     return (
         <>

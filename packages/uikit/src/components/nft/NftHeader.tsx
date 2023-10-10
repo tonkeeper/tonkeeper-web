@@ -1,4 +1,4 @@
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { VerificationIcon } from '../Icon';
@@ -22,7 +22,7 @@ const LabelHeader = styled(Label2)`
     text-overflow: ellipsis;
 `;
 
-export const NftHeaderLabel2: FC<{ nft: NftItemRepr }> = React.memo(({ nft }) => {
+export const NftHeaderLabel2: FC<{ nft: NftItem }> = React.memo(({ nft }) => {
     return <LabelHeader>{nft.dns ?? nft.metadata.name}</LabelHeader>;
 });
 
@@ -48,7 +48,7 @@ const IconBody = styled.span`
     right: 0;
 `;
 
-export const NftCollectionBody3: FC<{ nft: NftItemRepr }> = React.memo(({ nft }) => {
+export const NftCollectionBody3: FC<{ nft: NftItem }> = React.memo(({ nft }) => {
     const verified = nft.approvedBy && nft.approvedBy.length > 0;
     return (
         <HeaderBody3Secondary verified={verified}>
@@ -67,7 +67,7 @@ const BodyHeader = styled(Body2)`
     text-overflow: ellipsis;
 `;
 
-export const NftHeaderBody2: FC<{ nft: NftItemRepr }> = React.memo(({ nft }) => {
+export const NftHeaderBody2: FC<{ nft: NftItem }> = React.memo(({ nft }) => {
     return <BodyHeader>{nft.dns ?? nft.metadata.name}</BodyHeader>;
 });
 
@@ -87,7 +87,7 @@ const HeaderBody2Secondary = styled(Body2)<{ verified?: boolean }>`
         `}
 `;
 
-export const NftCollectionBody2: FC<{ nft: NftItemRepr }> = React.memo(({ nft }) => {
+export const NftCollectionBody2: FC<{ nft: NftItem }> = React.memo(({ nft }) => {
     const verified = nft.approvedBy && nft.approvedBy.length > 0;
     return (
         <HeaderBody2Secondary verified={verified}>

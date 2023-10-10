@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { sendNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -24,11 +24,7 @@ import { useTransactionAnalytics } from '../../hooks/amplitude';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { RecipientListItem } from './ConfirmListItem';
 
-const useSendNft = (
-    recipient: TonRecipientData,
-    nftItem: NftItemRepr,
-    fee?: MessageConsequences
-) => {
+const useSendNft = (recipient: TonRecipientData, nftItem: NftItem, fee?: MessageConsequences) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
@@ -56,7 +52,7 @@ const useSendNft = (
 
 export const ConfirmNftView: FC<{
     recipient: TonRecipientData;
-    nftItem: NftItemRepr;
+    nftItem: NftItem;
     fee?: MessageConsequences;
     onBack: () => void;
     onClose: () => void;

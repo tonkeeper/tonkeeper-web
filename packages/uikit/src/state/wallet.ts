@@ -5,7 +5,6 @@ import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/servi
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import { getWalletActiveAddresses } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
-import { NFTApi, NftCollection, NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
 import {
     Account,
     AccountsApi,
@@ -13,6 +12,9 @@ import {
     DNSApi,
     DnsRecord,
     JettonsBalances,
+    NFTApi,
+    NftCollection,
+    NftItem,
     WalletApi
 } from '@tonkeeper/core/dist/tonApiV2';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
@@ -185,19 +187,16 @@ export const useWalletNftList = () => {
 
             const items = await Promise.all(
                 result.map(owner =>
-                    new NFTApi(tonApi).searchNFTItems({
-                        owner: owner,
+                    new AccountsApi(tonApiV2).getAccountNftItems({
+                        accountId: owner,
                         offset: 0,
                         limit: 1000,
-                        includeOnSale: true
+                        indirectOwnership: true
                     })
                 )
             );
 
-            return items.reduce(
-                (acc, account) => acc.concat(account.nftItems),
-                [] as NftItemRepr[]
-            );
+            return items.reduce((acc, account) => acc.concat(account.nftItems), [] as NftItem[]);
         },
         {
             refetchInterval: DefaultRefetchInterval,
@@ -257,9 +256,9 @@ export const useNftDNSExpirationDate = (nft: NFT) => {
     });
 };
 
-export const useNftCollectionData = (nft: NftItemRepr) => {
+export const useNftCollectionData = (nft: NftItem) => {
     const {
-        api: { tonApi }
+        api: { tonApiV2 }
     } = useAppContext();
 
     return useQuery<NftCollection | null, Error>(
@@ -268,8 +267,8 @@ export const useNftCollectionData = (nft: NftItemRepr) => {
             const { collection } = nft!;
             if (!collection) return null;
 
-            return new NFTApi(tonApi).getNftCollection({
-                account: collection.address
+            return new NFTApi(tonApiV2).getNftCollection({
+                accountId: collection.address
             });
         },
         { enabled: nft.collection != null }
@@ -278,19 +277,16 @@ export const useNftCollectionData = (nft: NftItemRepr) => {
 
 export const useNftItemData = (address?: string) => {
     const {
-        api: { tonApi }
+        api: { tonApiV2 }
     } = useAppContext();
 
-    return useQuery<NftItemRepr, Error>(
+    return useQuery<NftItem, Error>(
         [address, QueryKey.nft],
         async () => {
-            const result = await new NFTApi(tonApi).getNFTItems({
-                addresses: [address!]
+            const result = await new NFTApi(tonApiV2).getNftItemByAddress({
+                accountId: address!
             });
-            if (!result.nftItems.length) {
-                throw new Error('missing nft data');
-            }
-            return result.nftItems[0];
+            return result;
         },
         { enabled: address !== undefined }
     );

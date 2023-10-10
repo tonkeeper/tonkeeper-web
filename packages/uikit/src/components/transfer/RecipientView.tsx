@@ -2,8 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { BaseRecipient, DnsRecipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
-import { DNSApi } from '@tonkeeper/core/dist/tonApiV1';
-import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { Account, AccountsApi, DNSApi } from '@tonkeeper/core/dist/tonApiV2';
 import {
     debounce,
     formatAddress,
@@ -83,7 +82,7 @@ const useDnsWallet = (value: string) => {
                 return null;
             }
             dns = dns.toString().toLowerCase();
-            const result = await new DNSApi(api.tonApi).dnsResolve({ name: dns });
+            const result = await new DNSApi(api.tonApiV2).dnsResolve({ domainName: dns });
             if (!result.wallet) {
                 return null;
             }

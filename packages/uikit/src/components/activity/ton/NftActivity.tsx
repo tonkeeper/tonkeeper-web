@@ -1,5 +1,4 @@
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { Action, ActionStatusEnum, Price } from '@tonkeeper/core/dist/tonApiV2';
+import { Action, ActionStatusEnum, NftItem, Price } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
@@ -67,7 +66,7 @@ const NftImage = styled.img`
 
 export const NftComment: FC<{
     address: string;
-    openNft: (nft: NftItemRepr) => void;
+    openNft: (nft: NftItem) => void;
 }> = ({ address, openNft }) => {
     const { data } = useNftItemData(address);
 
@@ -96,7 +95,7 @@ export const NftComment: FC<{
 export const NftItemTransferAction: FC<{
     action: Action;
     date: string;
-    openNft: (nft: NftItemRepr) => void;
+    openNft: (nft: NftItem) => void;
 }> = ({ action, date, openNft }) => {
     const { t } = useTranslation();
     const wallet = useWalletContext();
@@ -165,7 +164,7 @@ export const NftItemTransferAction: FC<{
 export const NftPurchaseAction: FC<{
     action: Action;
     date: string;
-    openNft: (nft: NftItemRepr) => void;
+    openNft: (nft: NftItem) => void;
 }> = ({ action, date, openNft }) => {
     const { t } = useTranslation();
     const { nftPurchase } = action;
@@ -220,7 +219,7 @@ const Icon = styled.span`
 const NftActivityHeader: FC<{
     kind: 'send' | 'received';
     timestamp: number;
-    data?: NftItemRepr;
+    data?: NftItem;
     amount?: Price;
     status?: ActionStatusEnum;
 }> = ({ kind, timestamp, data, amount, status }) => {

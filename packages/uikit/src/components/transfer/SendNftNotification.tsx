@@ -7,8 +7,7 @@ import {
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { checkWalletPositiveBalanceOrDie } from '@tonkeeper/core/dist/service/transfer/common';
 import { estimateNftTransfer } from '@tonkeeper/core/dist/service/transfer/nftService';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountsApi, NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -27,7 +26,7 @@ import {
     notifyError
 } from './common';
 
-const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData) => {
+const useNftTransferEstimation = (nftItem: NftItem, data?: TonRecipientData) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
@@ -66,7 +65,7 @@ const useMinimalBalance = () => {
     });
 };
 
-const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftItem, onClose }) => {
+const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, onClose }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { standalone, extension } = useAppContext();
@@ -172,7 +171,7 @@ const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftIte
 };
 
 export const SendNftAction: FC<{
-    nftItem?: NftItemRepr;
+    nftItem?: NftItem;
     onClose: () => void;
 }> = ({ nftItem, onClose }) => {
     const Content = useCallback(() => {
