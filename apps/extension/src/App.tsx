@@ -1,8 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
-import { Network, getTonClientV2, getTronClient } from '@tonkeeper/core/dist/entries/network';
+import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -19,6 +18,10 @@ import {
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import {
+    AddFavoriteNotification,
+    EditFavoriteNotification
+} from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
+import {
     AmplitudeAnalyticsContext,
     useAmplitudeAnalytics
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
@@ -32,19 +35,20 @@ import {
     AppSdkContext,
     OnImportAction
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
 import { AppRoute, SettingsRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import { Initialize, InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
+import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
+import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/ThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo, useState } from 'react';
+import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
@@ -52,7 +56,6 @@ import { Notifications } from './components/Notifications';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk, extensionType } from './libs/appSdk';
 import { useAppWidth } from './libs/hoolks';
-import { ExtensionStorage } from './libs/storage';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -62,6 +65,15 @@ const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
 );
+const ReceiveNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/home/ReceiveNotification')
+);
+const NftNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/nft/NftNotification')
+);
+const SendNftNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -70,8 +82,8 @@ const queryClient = new QueryClient({
         }
     }
 });
-const storage = new ExtensionStorage();
-const sdk = new ExtensionAppSdk(storage);
+
+const sdk = new ExtensionAppSdk();
 connectToBackground();
 
 export const App: FC = () => {
@@ -94,7 +106,7 @@ export const App: FC = () => {
             <MemoryRouter>
                 <InitialRedirect>
                     <AppSdkContext.Provider value={sdk}>
-                        <StorageContext.Provider value={storage}>
+                        <StorageContext.Provider value={sdk.storage}>
                             <TranslationContext.Provider value={translation}>
                                 <UserThemeProvider>
                                     <HeaderGlobalStyle />
@@ -149,27 +161,10 @@ const Wrapper = styled(FullSizeWrapper)<{
     padding-bottom: 80px;
 `;
 
-const useLock = () => {
-    const [lock, setLock] = useState<boolean | undefined>(undefined);
-    useEffect(() => {
-        storage.get<boolean>(AppKey.LOCK).then(useLock => setLock(useLock === true));
-
-        const unlock = () => {
-            setLock(false);
-        };
-        sdk.uiEvents.on('unlock', unlock);
-
-        return () => {
-            sdk.uiEvents.off('unlock', unlock);
-        };
-    }, []);
-    return lock;
-};
-
 export const Loader: FC = React.memo(() => {
     const { data: activeWallet } = useActiveWallet();
 
-    const lock = useLock();
+    const lock = useLock(sdk);
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
     const tonendpoint = useTonendpoint(
@@ -193,10 +188,7 @@ export const Loader: FC = React.memo(() => {
     const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
 
     const context: IAppContext = {
-        api: {
-            tonApiV2: getTonClientV2(config, network),
-            tronApi: getTronClient(network)
-        },
+        api: getApiConfig(config, network),
         account,
         auth,
         fiat,
@@ -316,6 +308,11 @@ export const Content: FC<{
                 <MemoryScroll />
                 <Suspense>
                     <SendActionNotification />
+                    <ReceiveNotification />
+                    <NftNotification />
+                    <SendNftNotification />
+                    <AddFavoriteNotification />
+                    <EditFavoriteNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>

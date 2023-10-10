@@ -1,44 +1,41 @@
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { EventEmitter } from '@tonkeeper/core/dist/entries/eventEmitter';
-import { HapticFeedback } from '@twa.js/sdk';
+import { BaseApp, NativeBackButton, NotificationService } from '@tonkeeper/core/dist/AppSdk';
+import { InitResult } from '@twa.js/sdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
+import { TwaStorage } from './storage';
+import { TwaNotification } from './twaNotification';
 
-export class TwaAppSdk implements IAppSdk {
-    constructor(public storage: IStorage) {}
+export class TwaAppSdk extends BaseApp {
+    nativeBackButton: NativeBackButton;
+    notifications: NotificationService;
+
+    constructor(private components: InitResult) {
+        super(new TwaStorage(components.cloudStorage));
+
+        this.notifications = new TwaNotification(components);
+        this.nativeBackButton = components.backButton;
+    }
+
     copyToClipboard = (value: string, notification?: string) => {
         copyToClipboard(value);
-        this.uiEvents.emit('copy', {
-            method: 'copy',
-            params: notification
-        });
 
-        if (this.hapticFeedback) {
-            this.hapticFeedback.notificationOccurred('success');
-        }
+        this.topMessage(notification);
+        this.components.haptic.notificationOccurred('success');
     };
+
     openPage = async (url: string) => {
-        window.open(url, '_black');
-    };
-
-    confirm = async (text: string) => window.confirm(text);
-    alert = async (text: string) => window.alert(text);
-    requestExtensionPermission = async () => void 0;
-
-    twaExpand = () => void 0;
-    setTwaExpand = (fn: () => undefined) => {
-        this.twaExpand = fn;
-    };
-    hapticFeedback: HapticFeedback | undefined;
-    hapticNotification = (type: 'success' | 'error') => {
-        if (this.hapticFeedback) {
-            this.hapticFeedback.notificationOccurred(type);
+        if (url.includes('t.me')) {
+            this.components.webApp.openTelegramLink(url);
+        } else {
+            this.components.webApp.openLink(url);
         }
     };
-    setHapticFeedback = (hapticFeedback: HapticFeedback) => {
-        this.hapticFeedback = hapticFeedback;
+
+    twaExpand = () => this.components.viewport.expand();
+
+    hapticNotification = (type: 'success' | 'error') => {
+        this.components.haptic.notificationOccurred(type);
     };
 
     disableScroll = disableScroll;
@@ -49,6 +46,5 @@ export class TwaAppSdk implements IAppSdk {
     isIOs = () => true;
     isStandalone = () => false;
 
-    uiEvents = new EventEmitter();
     version = packageJson.version ?? 'Unknown';
 }

@@ -10,10 +10,7 @@ export const useAppSdk = () => {
 export function useToast() {
     const sdk = useAppSdk();
     return (content: string) => {
-        sdk.uiEvents.emit('copy', {
-            method: 'copy',
-            params: content
-        });
+        sdk.topMessage(content);
     };
 }
 

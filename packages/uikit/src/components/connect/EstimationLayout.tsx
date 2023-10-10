@@ -85,7 +85,6 @@ export const EmulationList: FC<{ isError: boolean; estimate: EstimateData | unde
                         date={date}
                         timestamp={timestamp}
                         setActivity={() => null}
-                        setNft={() => null}
                     />
                 </ListBlock>
                 <ExtraDetails extra={estimate.accountEvent.event.extra} />

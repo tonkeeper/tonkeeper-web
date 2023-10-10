@@ -1,13 +1,40 @@
-import React, { FC } from 'react';
+import React, { FC, Suspense, useContext } from 'react';
 import styled from 'styled-components';
-import { TonkeeperLogoLottieIcon } from './lottie/LottieIcons';
 
+const TonkeeperLottieIcon = React.lazy(() => import('./lottie/TonkeeperLottie'));
+
+export const DarkThemeContext = React.createContext<boolean>(true);
+
+const TonkeeperSvgIcon: FC<{ size?: string }> = ({ size = '128' }) => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={size}
+            height={size}
+            viewBox="0 0 128 128"
+            fill="none"
+        >
+            <path opacity="0.5" d="M64 58L118 34L64 118V58Z" fill="currentColor" />
+            <path opacity="0.75" d="M64 58L10 34L64 118V58Z" fill="currentColor" />
+            <path d="M64 58L10 34L64 10L118 34L64 58Z" fill="currentColor" />
+        </svg>
+    );
+};
 export const TonkeeperIcon: FC<{
     width?: string;
     height?: string;
     loop?: boolean;
 }> = ({ width = '128', height = '128', loop = false }) => {
-    return <TonkeeperLogoLottieIcon width={width} height={height} loop={loop} />;
+    const isDark = useContext(DarkThemeContext);
+    if (isDark) {
+        return (
+            <Suspense fallback={<div style={{ width, height }}></div>}>
+                <TonkeeperLottieIcon width={width} height={height} loop={loop} />
+            </Suspense>
+        );
+    } else {
+        return <TonkeeperSvgIcon size={width} />;
+    }
 };
 
 export const ChevronLeftIcon = () => {
@@ -742,6 +769,28 @@ export const MessageIcon = () => {
                 fillRule="evenodd"
                 clipRule="evenodd"
                 d="M9.5 9C8.67157 9 8 9.67157 8 10.5C8 11.3284 8.67157 12 9.5 12H18.5C19.3284 12 20 11.3284 20 10.5C20 9.67157 19.3284 9 18.5 9H9.5ZM9.5 14C8.67157 14 8 14.6716 8 15.5C8 16.3284 8.67157 17 9.5 17H14.5C15.3284 17 16 16.3284 16 15.5C16 14.6716 15.3284 14 14.5 14H9.5Z"
+                fill="currentColor"
+            />
+        </svg>
+    );
+};
+
+export const NotificationIcon = () => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            viewBox="0 0 28 28"
+            fill="none"
+        >
+            <path
+                d="M23.9985 9.46572C23.4105 9.80554 22.728 10 22 10C19.7909 10 18 8.20914 18 6C18 5.27203 18.1945 4.58948 18.5343 4.00147C18.2461 4 17.9356 4 17.6 4H10.4C8.15979 4 7.03968 4 6.18404 4.43597C5.43139 4.81947 4.81947 5.43139 4.43597 6.18404C4 7.03969 4 8.15979 4 10.4V17.6C4 19.8402 4 20.9603 4.43597 21.816C4.81947 22.5686 5.43139 23.1805 6.18404 23.564C7.03968 24 8.15979 24 10.4 24H17.6C19.8402 24 20.9603 24 21.816 23.564C22.5686 23.1805 23.1805 22.5686 23.564 21.816C24 20.9603 24 19.8402 24 17.6V10.4C24 10.0644 24 9.75393 23.9985 9.46572Z"
+                fill="currentColor"
+            />
+            <path
+                opacity="0.32"
+                d="M26 6C26 8.20914 24.2091 10 22 10C19.7909 10 18 8.20914 18 6C18 3.79086 19.7909 2 22 2C24.2091 2 26 3.79086 26 6Z"
                 fill="currentColor"
             />
         </svg>

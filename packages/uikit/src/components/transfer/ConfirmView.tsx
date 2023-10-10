@@ -57,7 +57,10 @@ type ConfirmViewContextValue = {
     onClose: () => void;
     onBack?: () => void;
 };
-const ConfirmViewContext = createContext<ConfirmViewContextValue>({} as ConfirmViewContextValue);
+export const ConfirmViewContext = createContext<ConfirmViewContextValue>(
+    {} as ConfirmViewContextValue
+);
+
 export function useConfirmViewContext() {
     return useContext(ConfirmViewContext);
 }
@@ -276,14 +279,6 @@ export const ConfirmViewDetailsComment: FC = () => {
 };
 
 export const ConfirmViewButtonsSlot: FC<PropsWithChildren> = ({ children }) => <>{children}</>;
-
-const ConfirmViewButtonsContainerStyled = styled.div`
-    display: flex;
-    gap: 1rem;
-    & > * {
-        flex: 1;
-    }
-`;
 
 export const ConfirmViewButtons: FC<{
     MainButton: ConfirmMainButtonProps;

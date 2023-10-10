@@ -5,7 +5,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { relative, SettingsRoute } from '../../libs/routes';
 import { useUserThemes } from '../../state/theme';
-import { MessageIcon } from '../Icon';
+import { MessageIcon, NotificationIcon } from '../Icon';
 import { LocalizationIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
 
@@ -18,13 +18,20 @@ export const ThemeSettings = () => {
     const { data: themes } = useUserThemes();
 
     const secondaryItems = useMemo(() => {
-        const items: SettingsItem[] = [
-            {
-                name: t('settings_primary_currency'),
-                icon: fiat,
-                action: () => navigate(relative(SettingsRoute.fiat))
-            }
-        ];
+        const items: SettingsItem[] = [];
+
+        if (sdk.notifications) {
+            items.push({
+                name: t('settings_notifications'),
+                icon: <NotificationIcon />,
+                action: () => navigate(relative(SettingsRoute.notification))
+            });
+        }
+        items.push({
+            name: t('settings_primary_currency'),
+            icon: fiat,
+            action: () => navigate(relative(SettingsRoute.fiat))
+        });
 
         if (i18n.enable) {
             items.push({

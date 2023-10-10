@@ -3,13 +3,11 @@ import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService'
 import React, { FC, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { BackBlock, WorldNumber, WorldsGrid } from '../../components/create/Words';
-import { BackButton } from '../../components/fields/BackButton';
-import { ChevronLeftIcon } from '../../components/Icon';
+import { BackButtonBlock } from '../../components/BackButton';
 import { Body1, Body2, H2 } from '../../components/Text';
+import { WorldNumber, WorldsGrid } from '../../components/create/Words';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
 import { getPasswordByNotification } from '../home/UnlockNotification';
 
@@ -29,7 +27,6 @@ export const Recovery = () => {
 
 const useMnemonic = (publicKey: string, auth: AuthState) => {
     const [mnemonic, setMnemonic] = useState<string[] | undefined>(undefined);
-    const storage = useStorage();
     const sdk = useAppSdk();
     const navigate = useNavigate();
 
@@ -39,7 +36,7 @@ const useMnemonic = (publicKey: string, auth: AuthState) => {
                 const password =
                     auth.kind === 'none' ? auth.kind : await getPasswordByNotification(sdk, auth);
 
-                setMnemonic(await getWalletMnemonic(storage, publicKey, password));
+                setMnemonic(await getWalletMnemonic(sdk.storage, publicKey, password));
             } catch (e) {
                 navigate(-1);
             }
@@ -94,11 +91,7 @@ const RecoveryContent: FC<{ publicKey: string }> = ({ publicKey }) => {
 
     return (
         <Wrapper>
-            <BackBlock>
-                <BackButton onClick={onBack}>
-                    <ChevronLeftIcon />
-                </BackButton>
-            </BackBlock>
+            <BackButtonBlock onClick={onBack} />
             <Block>
                 <Title>{t('secret_words_title')}</Title>
                 <Body>{t('secret_words_caption')}</Body>

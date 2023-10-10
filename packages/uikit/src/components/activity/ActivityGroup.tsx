@@ -5,7 +5,6 @@ import React, { FC, useMemo, useState } from 'react';
 import { GenericActivityGroup } from '../../state/activity';
 import { MixedActivity, getMixedActivity } from '../../state/mixedActivity';
 import { CoinHistorySkeleton, HistoryBlock, SkeletonList } from '../Skeleton';
-import { NftNotification } from '../nft/NftNotification';
 import { ActivityBlock } from './ActivityLayout';
 import { ActionData, ActivityNotification } from './ton/ActivityNotification';
 import { TonActivityEvents } from './ton/TonActivityEvents';
@@ -38,7 +37,6 @@ export const MixedActivityGroup: FC<{
 }> = ({ items }) => {
     const [tonAction, seTonAction] = useState<ActionData | undefined>(undefined);
     const [tronAction, setTronAction] = useState<TronActionData | undefined>(undefined);
-    const [nft, setNft] = useState<NftItem | undefined>(undefined);
 
     return (
         <>
@@ -62,7 +60,6 @@ export const MixedActivityGroup: FC<{
                                 date={date}
                                 timestamp={timestamp}
                                 setActivity={seTonAction}
-                                setNft={setNft}
                             />
                         );
                     }
@@ -70,7 +67,6 @@ export const MixedActivityGroup: FC<{
                 }}
             />
             <ActivityNotification value={tonAction} handleClose={() => seTonAction(undefined)} />
-            <NftNotification nftItem={nft} handleClose={() => setNft(undefined)} />
             <TronActivityNotification
                 value={tronAction}
                 handleClose={() => setTronAction(undefined)}

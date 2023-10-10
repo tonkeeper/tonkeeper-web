@@ -1,6 +1,8 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
+import { useAppSdk } from '../hooks/appSdk';
+import { useNativeBackButton } from './BackButton';
 import { ChevronLeftIcon } from './Icon';
 import { H3 } from './Text';
 import { BackButton } from './fields/BackButton';
@@ -55,13 +57,27 @@ const Title = styled(H3)`
     margin-bottom: 2px;
 `;
 
-export const SubHeader: FC<SubHeaderProps> = ({ title }) => {
+const SubHeaderBackButton = () => {
+    const sdk = useAppSdk();
     const navigate = useNavigate();
-    return (
-        <Block>
+    const back = useCallback(() => navigate(-1), [navigate]);
+    useNativeBackButton(sdk, back);
+
+    if (sdk.nativeBackButton) {
+        return <></>;
+    } else {
+        return (
             <BackButtonLeft onClick={() => navigate(-1)}>
                 <ChevronLeftIcon />
             </BackButtonLeft>
+        );
+    }
+};
+
+export const SubHeader: FC<SubHeaderProps> = ({ title }) => {
+    return (
+        <Block>
+            <SubHeaderBackButton />
             <Title>{title}</Title>
         </Block>
     );

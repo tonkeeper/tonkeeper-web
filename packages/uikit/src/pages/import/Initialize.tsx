@@ -43,7 +43,7 @@ const Title = styled(H1)`
     user-select: none;
 `;
 
-export const Initialize: FC = () => {
+const Initialize: FC = () => {
     const { t } = useTranslation();
     const [isOpen, setOpen] = useState(false);
     const sdk = useAppSdk();
@@ -69,11 +69,6 @@ export const Initialize: FC = () => {
                     title={t('intro_item2_title')}
                     description={t('intro_item2_caption')}
                 />
-                {/* <Description
-          icon={<TicketIcon />}
-          title={t('intro_item3_title')}
-          description={t('intro_item3_caption')}
-        /> */}
             </div>
             <Button size="large" fullWidth primary marginTop onClick={onClick}>
                 {t('intro_continue_btn')}
@@ -82,3 +77,5 @@ export const Initialize: FC = () => {
         </CenterContainer>
     );
 };
+
+export default Initialize;

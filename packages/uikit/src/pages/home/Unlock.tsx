@@ -37,6 +37,8 @@ const Logo = styled.div`
     font-size: 400%;
 
     margin-bottom: 2rem;
+
+    color: ${props => props.theme.accentBlue};
 `;
 
 const useMutateUnlock = () => {

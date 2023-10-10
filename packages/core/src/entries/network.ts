@@ -24,8 +24,15 @@ export const getTonClientV2 = (config: TonendpointConfig, current?: Network) => 
     });
 };
 
-export const getTronClient = (current?: Network) => {
+const getTronClient = (current?: Network) => {
     return new TronConfiguration({
         basePath: TronApi[current === Network.MAINNET ? TronChain.MAINNET : TronChain.NILE]
     });
+};
+
+export const getApiConfig = (config: TonendpointConfig, network?: Network) => {
+    return {
+        tonApiV2: getTonClientV2(config, network),
+        tronApi: getTronClient(network)
+    };
 };

@@ -34,14 +34,19 @@ export const RecipientTwaHeaderBlock: FC<{ onClose: () => void }> = ({ onClose }
         backButton.show();
     }, []);
 
+    useNativeBack(onClose);
+
+    return <Padding />;
+};
+
+export const useNativeBack = (onClose: () => void) => {
+    const backButton = useBackButton();
     useEffect(() => {
         backButton.on('click', onClose);
         return () => {
             backButton.off('click', onClose);
         };
     }, [onClose, backButton]);
-
-    return <Padding />;
 };
 
 export const AmountTwaHeaderBlock: AmountHeaderBlockComponent = ({ children, onBack }) => {
@@ -51,12 +56,7 @@ export const AmountTwaHeaderBlock: AmountHeaderBlockComponent = ({ children, onB
         backButton.show();
     }, []);
 
-    useEffect(() => {
-        backButton.on('click', onBack);
-        return () => {
-            backButton.off('click', onBack);
-        };
-    }, [onBack, backButton]);
+    useNativeBack(onBack);
 
     return <Padding>{children}</Padding>;
 };

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useTonenpointFiatMethods } from '../../state/tonendpoint';
+import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { Body1, H3, Label1 } from '../Text';
 import { BuyNotification } from '../home/BuyAction';
-import { ReceiveNotification } from '../home/ReceiveAction';
 
 const Header = styled(H3)`
     text-align: center;
@@ -42,15 +41,13 @@ const Button = styled(Label1)`
     }
 `;
 
-export const EmptyActivity = () => {
+const EmptyActivity = () => {
     const { t } = useTranslation();
+    const sdk = useAppSdk();
 
-    const [openReceive, setOpenReceive] = useState(false);
     const [openBuy, setOpenBuy] = useState(false);
 
-    const { tonendpoint } = useAppContext();
-    const { data: methods } = useTonenpointFiatMethods(tonendpoint);
-    const buy = methods && methods.categories[0];
+    const { data: buy } = useTonendpointBuyMethods();
 
     return (
         <EmptyBody>
@@ -58,10 +55,15 @@ export const EmptyActivity = () => {
             <BodyText>{t('activity_empty_transaction_caption')}</BodyText>
             <ButtonRow>
                 <Button onClick={() => setOpenBuy(true)}>{t('exchange_title')}</Button>
-                <Button onClick={() => setOpenReceive(true)}>{t('wallet_receive')}</Button>
+                <Button
+                    onClick={() => sdk.uiEvents.emit('receive', { method: 'receive', params: {} })}
+                >
+                    {t('wallet_receive')}
+                </Button>
             </ButtonRow>
-            <ReceiveNotification open={openReceive} handleClose={() => setOpenReceive(false)} />
             <BuyNotification buy={buy} open={openBuy} handleClose={() => setOpenBuy(false)} />
         </EmptyBody>
     );
 };
+
+export default EmptyActivity;

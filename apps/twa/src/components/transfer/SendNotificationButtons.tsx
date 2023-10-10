@@ -1,6 +1,5 @@
 import { ConfirmMainButtonProps } from '@tonkeeper/uikit/dist/components/transfer/common';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
-import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
 import { useMainButton } from '@twa.js/sdk-react';
 import { useEffect } from 'react';
 
@@ -16,6 +15,17 @@ export const HideTwaMainButton = () => {
     return <></>;
 };
 
+export const useMainButtonLoading = (isLoading: boolean) => {
+    const button = useMainButton();
+    useEffect(() => {
+        if (isLoading) {
+            button.showProgress();
+        } else {
+            button.hideProgress();
+        }
+    }, [button, isLoading]);
+};
+
 export const RecipientTwaMainButton = ({
     isLoading,
     onClick
@@ -28,8 +38,6 @@ export const RecipientTwaMainButton = ({
 
     useEffect(() => {
         button.setText(t('continue'));
-        button.setBackgroundColor((defaultTheme as any).buttonPrimaryBackground);
-        button.setTextColor((defaultTheme as any).textPrimary);
         button.show();
         button.enable();
     }, []);
@@ -41,13 +49,7 @@ export const RecipientTwaMainButton = ({
         };
     }, [onClick, button]);
 
-    useEffect(() => {
-        if (isLoading) {
-            button.showProgress();
-        } else {
-            button.hideProgress();
-        }
-    }, [isLoading]);
+    useMainButtonLoading(isLoading);
 
     return <></>;
 };
@@ -76,21 +78,7 @@ export const AmountTwaMainButton = ({
         };
     }, [onClick, button]);
 
-    useEffect(() => {
-        if (isDisabled) {
-            button.disable();
-        } else {
-            button.enable();
-        }
-    }, [isDisabled]);
-
-    useEffect(() => {
-        if (isLoading) {
-            button.showProgress();
-        } else {
-            button.hideProgress();
-        }
-    }, [isLoading]);
+    useMainButtonLoading(isLoading);
 
     return <></>;
 };
@@ -133,13 +121,7 @@ export const ConfirmTwaMainButton: ConfirmMainButtonProps = ({
         }
     }, [isDisabled]);
 
-    useEffect(() => {
-        if (isLoading) {
-            button.showProgress();
-        } else {
-            button.hideProgress();
-        }
-    }, [isLoading]);
+    useMainButtonLoading(isLoading);
 
     return <></>;
 };

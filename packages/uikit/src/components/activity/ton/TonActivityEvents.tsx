@@ -11,8 +11,7 @@ export const TonActivityEvents: FC<{
     timestamp: number;
     hover?: boolean;
     setActivity: (item: ActionData) => void;
-    setNft: (nft: NftItem) => void;
-}> = ({ event, date, timestamp, setActivity, setNft, hover }) => {
+}> = ({ event, date, timestamp, setActivity, hover }) => {
     return (
         <>
             {event.actions.map((action, index) => (
@@ -28,12 +27,7 @@ export const TonActivityEvents: FC<{
                         })
                     }
                 >
-                    <ActivityAction
-                        action={action}
-                        date={date}
-                        isScam={event.isScam}
-                        openNft={setNft}
-                    />
+                    <ActivityAction action={action} date={date} isScam={event.isScam} />
                     {event.inProgress && <ProgressIcon />}
                 </ListItem>
             ))}
