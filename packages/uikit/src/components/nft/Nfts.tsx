@@ -153,7 +153,7 @@ export const NftsList: FC<{ nfts: NFT[] | undefined }> = ({ nfts }) => {
                     return <></>;
                 }
                 return (
-                    <NftItem
+                    <NftItemView
                         key={item.address}
                         nft={item}
                         resolution="500x500"

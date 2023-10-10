@@ -120,7 +120,7 @@ export const NftPreview: FC<{
                         <CroppedBodyText text={description} margin="last" contentColor />
                     )}
                 </Text>
-                {collection && collection.metadata.description && (
+                {collection && collection.metadata?.description && (
                     <>
                         <Delimiter />
                         <Text>

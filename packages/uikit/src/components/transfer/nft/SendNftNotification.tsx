@@ -5,7 +5,7 @@ import {
     TonTransferParams,
     parseTonTransfer
 } from '@tonkeeper/core/dist/service/deeplinkingService';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext } from '../../../hooks/appContext';

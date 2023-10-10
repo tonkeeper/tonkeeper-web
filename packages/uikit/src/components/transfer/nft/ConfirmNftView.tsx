@@ -3,7 +3,7 @@ import {
     estimateNftTransfer,
     sendNftTransfer
 } from '@tonkeeper/core/dist/service/transfer/nftService';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useState } from 'react';
 import { useAppContext, useWalletContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
@@ -35,7 +35,7 @@ const assetAmount = new AssetAmount({
     weiAmount: 0
 });
 
-const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData) => {
+const useNftTransferEstimation = (nftItem: NftItem, data?: TonRecipientData) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
@@ -61,11 +61,7 @@ const useNftTransferEstimation = (nftItem: NftItemRepr, data?: TonRecipientData)
     );
 };
 
-const useSendNft = (
-    recipient: TonRecipientData,
-    nftItem: NftItemRepr,
-    fee?: MessageConsequences
-) => {
+const useSendNft = (recipient: TonRecipientData, nftItem: NftItem, fee?: MessageConsequences) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
@@ -93,7 +89,7 @@ const useSendNft = (
 
 export const ConfirmNftView: FC<{
     recipient: TonRecipientData;
-    nftItem: NftItemRepr;
+    nftItem: NftItem;
     onClose: () => void;
     HeaderBlock: () => JSX.Element;
     MainButton: () => JSX.Element;
