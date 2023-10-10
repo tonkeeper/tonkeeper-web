@@ -2,12 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { languages, localizationText } from '@tonkeeper/core/dist/entries/language';
-import {
-    Network,
-    getTonClient,
-    getTonClientV2,
-    getTronClient
-} from '@tonkeeper/core/dist/entries/network';
+import { Network, getTonClientV2, getTronClient } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -228,7 +223,6 @@ export const Loader: FC = () => {
     const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
     const context: IAppContext = {
         api: {
-            tonApi: getTonClient(config, network),
             tonApiV2: getTonClientV2(config, network),
             tronApi: getTronClient(network)
         },

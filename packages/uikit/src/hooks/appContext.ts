@@ -3,7 +3,6 @@ import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { AuthState, defaultAuthState } from '@tonkeeper/core/dist/entries/password';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { Configuration } from '@tonkeeper/core/dist/tonApiV1';
 import { Configuration as ConfigurationV2 } from '@tonkeeper/core/dist/tonApiV2';
 import {
     Tonendpoint,
@@ -28,7 +27,6 @@ export interface IAppContext {
 
 export const AppContext = React.createContext<IAppContext>({
     api: {
-        tonApi: new Configuration(),
         tonApiV2: new ConfigurationV2(),
         tronApi: new TronConfiguration()
     },

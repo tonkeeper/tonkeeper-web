@@ -160,7 +160,7 @@ const getActiveWallet = (accounts: Account[], version: WalletVersion) => {
 export const useWalletNftList = () => {
     const wallet = useWalletContext();
     const {
-        api: { tonApiV2, tonApi }
+        api: { tonApiV2 }
     } = useAppContext();
 
     return useQuery<NFT[], Error>(
