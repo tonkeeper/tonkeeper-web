@@ -119,6 +119,7 @@ const createTonConnectTransfer = (
         seqno,
         secretKey,
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+        timeout: Math.floor(Date.now() / 1e3) + 60 * 10,
         messages: params.messages.map(item =>
             internal({
                 to: item.address,
@@ -165,6 +166,8 @@ export const estimateTonConnectTransfer = async (
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = createTonConnectTransfer(seqno, walletState, accounts, params);
+
+    console.log({ boc: cell.toString('base64') });
 
     return await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
         emulateMessageToEventRequest: { boc: cell.toString('base64') }
