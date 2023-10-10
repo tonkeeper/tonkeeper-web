@@ -38,7 +38,7 @@ export const importWallet = async (
 const versionMap: Record<string, WalletVersion> = {
     wallet_v3R1: WalletVersion.V3R1,
     wallet_v3R2: WalletVersion.V3R2,
-    wallet_v4R2: WalletVersion.V4R2
+    wallet_v4r2: WalletVersion.V4R2
 };
 
 const findWalletVersion = (interfaces?: string[]): WalletVersion => {
