@@ -1,5 +1,4 @@
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import { Action, ActionStatusEnum, Price } from '@tonkeeper/core/dist/tonApiV2';
+import { Action, ActionStatusEnum, NftItem, Price } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
@@ -219,7 +218,7 @@ const Icon = styled.span`
 const NftActivityHeader: FC<{
     kind: 'send' | 'received';
     timestamp: number;
-    data?: NftItemRepr;
+    data?: NftItem;
     amount?: Price;
     status?: ActionStatusEnum;
 }> = ({ kind, timestamp, data, amount, status }) => {

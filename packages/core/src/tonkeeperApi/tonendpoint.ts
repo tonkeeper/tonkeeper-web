@@ -1,5 +1,5 @@
 import { Network } from '../entries/network';
-import { FetchAPI } from '../tonApiV1';
+import { FetchAPI } from '../tonApiV2';
 
 interface BootParams {
     platform: 'ios' | 'android' | 'web';

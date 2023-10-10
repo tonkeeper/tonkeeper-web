@@ -1,4 +1,4 @@
-import { AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountEvent, NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC } from 'react';
 import { ListItem } from '../../List';
 import { ProgressIcon } from '../ActivityLayout';

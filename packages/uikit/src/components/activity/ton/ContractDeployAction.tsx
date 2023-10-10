@@ -1,4 +1,4 @@
-import { Action } from '@tonkeeper/core/dist/tonApiV2';
+import { Action, NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { useWalletContext } from '../../../hooks/appContext';

@@ -62,8 +62,9 @@ export const useMutateWalletVersion = () => {
     const client = useQueryClient();
     const wallet = useWalletContext();
     return useMutation<void, Error, WalletVersion>(async version => {
-        await client.invalidateQueries([wallet.publicKey]);
         await updateWalletVersion(sdk.storage, wallet, version);
+        await client.invalidateQueries([wallet.publicKey]);
+        await client.invalidateQueries([wallet.active.rawAddress]);
         await client.invalidateQueries([QueryKey.account]);
     });
 };

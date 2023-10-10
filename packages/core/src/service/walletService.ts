@@ -7,7 +7,6 @@ import { Network } from '../entries/network';
 import { WalletAddress, WalletState, WalletVersion, WalletVersions } from '../entries/wallet';
 import { WalletApi } from '../tonApiV2';
 import { encrypt } from './cryptoService';
-import { getTronWallet } from './tron/tronService';
 import { walletContract } from './wallet/contractService';
 import { setWalletState } from './wallet/storeService';
 
@@ -31,15 +30,15 @@ export const importWallet = async (
         name
     };
 
-    state.tron = await getTronWallet(api.tronApi, mnemonic, state).catch(() => undefined);
+    // state.tron = await getTronWallet(api.tronApi, mnemonic, state).catch(() => undefined);
 
     return [encryptedMnemonic, state] as const;
 };
 
 const versionMap: Record<string, WalletVersion> = {
-    wallet_v3R1: WalletVersion.V3R1,
-    wallet_v3R2: WalletVersion.V3R2,
-    wallet_v4R2: WalletVersion.V4R2
+    wallet_v3r1: WalletVersion.V3R1,
+    wallet_v3r2: WalletVersion.V3R2,
+    wallet_v4r2: WalletVersion.V4R2
 };
 
 const findWalletVersion = (interfaces?: string[]): WalletVersion => {

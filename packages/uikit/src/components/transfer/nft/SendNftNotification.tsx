@@ -26,7 +26,7 @@ import { ConfirmHeaderBlock } from './Common';
 import { ConfirmNftView } from './ConfirmNftView';
 import { useMinimalBalance } from './hooks';
 
-const SendContent: FC<{ nftItem: NftItemRepr; onClose: () => void }> = ({ nftItem, onClose }) => {
+const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, onClose }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { standalone, extension } = useAppContext();

@@ -96,6 +96,7 @@ const writeFiles = (
 
 const toDict = (parentKey: string | undefined, value: object): Record<string, string> => {
     return Object.entries(value).reduce((acc, [key, message]) => {
+        key = key.replace('.', '_');
         const item_key = parentKey ? `${parentKey}_${key}` : key;
         if (typeof message === 'string') {
             acc[item_key] = message;

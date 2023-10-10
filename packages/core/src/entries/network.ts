@@ -1,4 +1,3 @@
-import { Configuration } from '../tonApiV1';
 import { Configuration as ConfigurationV2 } from '../tonApiV2';
 import { TonendpointConfig } from '../tonkeeperApi/tonendpoint';
 import { Configuration as TronConfiguration } from '../tronApi';
@@ -15,16 +14,7 @@ export const switchNetwork = (current: Network): Network => {
     return current === Network.MAINNET ? Network.TESTNET : Network.MAINNET;
 };
 
-const getTonClient = (config: TonendpointConfig, current?: Network) => {
-    return new Configuration({
-        basePath: current === Network.MAINNET ? 'https://tonapi.io' : 'https://testnet.tonapi.io',
-        headers: {
-            Authorization: `Bearer ${config.tonApiKey}`
-        }
-    });
-};
-
-const getTonClientV2 = (config: TonendpointConfig, current?: Network) => {
+export const getTonClientV2 = (config: TonendpointConfig, current?: Network) => {
     return new ConfigurationV2({
         basePath:
             current === Network.MAINNET ? 'https://keeper.tonapi.io' : 'https://testnet.tonapi.io',
@@ -42,7 +32,6 @@ const getTronClient = (current?: Network) => {
 
 export const getApiConfig = (config: TonendpointConfig, network?: Network) => {
     return {
-        tonApi: getTonClient(config, network),
         tonApiV2: getTonClientV2(config, network),
         tronApi: getTronClient(network)
     };

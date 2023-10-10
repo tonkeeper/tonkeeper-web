@@ -1,5 +1,5 @@
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useContext, useLayoutEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
@@ -95,10 +95,10 @@ const ExpiringBlock = styled.div`
     width: 32px;
 `;
 
-export const NftItem: FC<{
-    nft: NftItemRepr;
+export const NftItemView: FC<{
+    nft: NftItem;
     resolution: string;
-    onOpen: (nft: NftItemRepr) => void;
+    onOpen: (nft: NftItem) => void;
 }> = React.memo(({ nft, resolution, onOpen }) => {
     const isSale = nft.sale !== undefined;
     const image = nft.previews?.find(item => item.resolution === resolution);
@@ -141,12 +141,15 @@ export const NftItem: FC<{
     );
 });
 
+const TonstakersNftCollection =
+    '0:5cf052ad8dfb6f5b67d1e7c6ecdfc36c9accc76b730268dcabf12e46718ce09b';
+
 export const NftsList: FC<{ nfts: NFT[] | undefined }> = ({ nfts }) => {
     const sdk = useAppSdk();
     return (
         <Grid>
             {(nfts ?? []).map(item => {
-                if ((!item.metadata || Object.entries(item.metadata).length === 0) && !item.dns) {
+                if (item.collection?.address === TonstakersNftCollection) {
                     return <></>;
                 }
                 return (

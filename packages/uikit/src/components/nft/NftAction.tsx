@@ -1,6 +1,6 @@
 import { NFT, isNFTDNS } from '@tonkeeper/core/dist/entries/nft';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
-import React, { FC } from 'react';
+import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
+import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 import { Address } from 'ton-core';
 import { useWalletContext } from '../../hooks/appContext';
@@ -11,7 +11,7 @@ import { Button } from '../fields/Button';
 import { LinkNft } from './LinkNft';
 import { RenewNft } from './RenewNft';
 
-const getMarketplaceUrl = (nftItem: NftItemRepr) => {
+const getMarketplaceUrl = (nftItem: NftItem) => {
     const { marketplace } = nftItem.metadata;
     const address = Address.parse(nftItem.address).toString();
 
