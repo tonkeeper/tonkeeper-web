@@ -141,15 +141,12 @@ export const NftItemView: FC<{
     );
 });
 
-const TonstakersNftCollection =
-    '0:5cf052ad8dfb6f5b67d1e7c6ecdfc36c9accc76b730268dcabf12e46718ce09b';
-
 export const NftsList: FC<{ nfts: NFT[] | undefined }> = ({ nfts }) => {
     const sdk = useAppSdk();
     return (
         <Grid>
             {(nfts ?? []).map(item => {
-                if (item.collection?.address === TonstakersNftCollection) {
+                if (item.metadata?.render_type === 'hidden') {
                     return <></>;
                 }
                 return (
