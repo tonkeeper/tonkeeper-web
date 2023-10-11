@@ -35,6 +35,8 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
         return <ErrorAction />;
     }
 
+    const isScam = jettonTransfer.jetton.verification === 'blacklist';
+
     if (jettonTransfer.sender?.address === wallet.active.rawAddress) {
         return (
             <SendActivityAction
@@ -49,6 +51,7 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
                         )
                     )
                 }
+                isScam={isScam}
                 date={date}
                 comment={jettonTransfer.comment}
                 status={action.status}
@@ -69,7 +72,7 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
                     )
                 )
             }
-            isScam={jettonTransfer.sender?.isScam}
+            isScam={jettonTransfer.sender?.isScam || isScam}
             date={date}
             comment={jettonTransfer.comment}
             status={action.status}
