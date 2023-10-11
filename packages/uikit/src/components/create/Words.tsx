@@ -8,10 +8,9 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
-import { ChevronLeftIcon } from '../Icon';
+import { BackButtonBlock } from '../BackButton';
 import { CenterContainer } from '../Layout';
-import { Body1, Body2, H2, Label2 } from '../Text';
-import { BackButton } from '../fields/BackButton';
+import { Body1, Body2, H2 } from '../Text';
 import { Button } from '../fields/Button';
 
 const Block = styled.div`
@@ -67,51 +66,9 @@ const Number1 = styled(Body1)`
     color: ${props => props.theme.textSecondary};
 `;
 
-const LogoutButtonBlock = styled.div`
-    flex-shrink: 0;
-
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: ${props => props.theme.cornerMedium};
-    color: ${props => props.theme.textPrimary};
-    background-color: ${props => props.theme.backgroundContent};
-    transition: background-color 0.1s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    &:hover {
-        background-color: ${props => props.theme.backgroundContentTint};
-    }
-`;
-
 export const ButtonRow = styled.div`
     display: flex;
 `;
-
-export const LogoutBlock = styled.div`
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 5;
-`;
-
-export const BackBlock = styled.div`
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    z-index: 5;
-`;
-
-export const LogoutButton = () => {
-    const navigate = useNavigate();
-    const { t } = useTranslation();
-    return (
-        <LogoutButtonBlock onClick={() => navigate(AppRoute.home)}>
-            <Label2>{t('settings_reset')}</Label2>
-        </LogoutButtonBlock>
-    );
-};
 
 export const Worlds: FC<{
     mnemonic: string[];
@@ -129,11 +86,7 @@ export const Worlds: FC<{
 
     return (
         <CenterContainer>
-            <BackBlock>
-                <BackButton onClick={onBack}>
-                    <ChevronLeftIcon />
-                </BackButton>
-            </BackBlock>
+            <BackButtonBlock onClick={onBack} />
             <Block>
                 <div>
                     <Header>{t('secret_words_title')}</Header>
@@ -326,11 +279,7 @@ export const Check: FC<{
 
     return (
         <CenterContainer>
-            <BackBlock>
-                <BackButton onClick={onBack}>
-                    <ChevronLeftIcon />
-                </BackButton>
-            </BackBlock>
+            <BackButtonBlock onClick={onBack} />
             <Block>
                 <div>
                     <Header>{t('check_words_title')}</Header>
@@ -447,11 +396,10 @@ export const ImportWords: FC<{
     }, [mnemonic]);
 
     const notify = () => {
-        sdk.uiEvents.emit('copy', {
-            method: 'copy',
-            params: t('import_wallet_wrong_words_err')
-        });
+        sdk.topMessage(t('import_wallet_wrong_words_err'));
+        sdk.hapticNotification('error');
     };
+
     const onSubmit = async () => {
         const invalid = mnemonic.findIndex(work => !seeIfValidWord(work));
         if (invalid !== -1) {
@@ -475,11 +423,7 @@ export const ImportWords: FC<{
 
     return (
         <>
-            <BackBlock>
-                <BackButton onClick={() => navigate(AppRoute.home)}>
-                    <ChevronLeftIcon />
-                </BackButton>
-            </BackBlock>
+            <BackButtonBlock onClick={() => navigate(AppRoute.home)} />
             <Block>
                 <div>
                     <Header>{t('import_wallet_title')}</Header>

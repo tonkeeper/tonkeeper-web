@@ -1,0 +1,3 @@
+FROM openapitools/openapi-generator-cli
+
+CMD ["generate", "-i", "https://raw.githubusercontent.com/tonkeeper/tonkeeper-twa-api/main/api/tonkeeper-twa-api.yml", "-g", "typescript-fetch", "-o", "/local/src/twaApi", "-p", "supportsES6=true,withInterfaces=true"]

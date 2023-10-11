@@ -15,6 +15,7 @@ export enum ImportRoute {
 export enum SettingsRoute {
     index = '/',
     localization = '/localization',
+    notification = '/notification',
     legal = '/legal',
     theme = '/theme',
     dev = '/dev',

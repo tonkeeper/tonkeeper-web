@@ -1,8 +1,8 @@
-import { NftItemRepr } from '../tonApiV1';
+import { NftItem } from '../tonApiV2';
 
-export type NFT = NftItemRepr | NFTDNS;
+export type NFT = NftItem | NFTDNS;
 
-export type NFTDNS = NftItemRepr & {
+export type NFTDNS = NftItem & {
     dns: string;
 };
 

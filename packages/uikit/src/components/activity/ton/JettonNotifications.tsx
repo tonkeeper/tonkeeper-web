@@ -41,13 +41,13 @@ const JettonTransferActionContent: FC<{
         data,
         formatDecimals(jettonTransfer.amount, jettonTransfer.jetton.decimals)
     );
-
+    const blacklist = jettonTransfer.jetton.verification === 'blacklist';
     const kind = jettonTransfer.sender?.address === wallet.active.rawAddress ? 'send' : 'received';
 
     return (
         <ActionDetailsBlock event={event}>
             <ActivityDetailsHeader
-                isScam={isScam}
+                isScam={isScam || blacklist}
                 amount={jettonTransfer.amount}
                 decimals={jettonTransfer.jetton.decimals}
                 symbol={jettonTransfer.jetton.symbol}

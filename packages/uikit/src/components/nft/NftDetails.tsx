@@ -1,8 +1,8 @@
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { Address } from 'ton';
+import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useDateFormat } from '../../hooks/dateFormat';
@@ -33,7 +33,7 @@ const RightText = styled(Body1)`
     color: ${props => props.theme.textSecondary};
 `;
 
-export const NftDetails: FC<{ nftItem: NftItemRepr; kind: NFTKind }> = React.memo(({ nftItem }) => {
+export const NftDetails: FC<{ nftItem: NftItem; kind: NFTKind }> = React.memo(({ nftItem }) => {
     const wallet = useWalletContext();
     const { t } = useTranslation();
     const { data } = useNftItemData(nftItem.address);

@@ -133,13 +133,13 @@ const BackShadow = styled.div`
 `;
 
 export const NotificationTitleRow: FC<
-    PropsWithChildren<{ handleClose: () => void; center?: boolean }>
+    PropsWithChildren<{ handleClose?: () => void; center?: boolean }>
 > = ({ handleClose, children, center = false }) => {
     return (
         <TitleRow>
             {center && <ButtonMock />}
             <RowTitle>{children}</RowTitle>
-            <NotificationCancelButton handleClose={handleClose} />
+            {handleClose ? <NotificationCancelButton handleClose={handleClose} /> : <ButtonMock />}
         </TitleRow>
     );
 };
@@ -159,11 +159,14 @@ export const NotificationBlock = styled.form`
 export const FullHeightBlock = styled(NotificationBlock)<{
     standalone: boolean;
     fitContent?: boolean;
+    noPadding?: boolean;
 }>`
     min-height: ${props =>
         props.fitContent ? 'unset' : `calc(var(--app-height) - ${props.standalone ? 3 : 2}rem)`};
-    padding-bottom: calc(56px + 1rem);
+    padding-bottom: ${props => (props.noPadding ? 0 : 'calc(56px + 1rem)')};
     box-sizing: border-box;
+
+    background-color: ${props => props.theme.backgroundPage};
 `;
 
 export const NotificationTitleBlock = styled.div`

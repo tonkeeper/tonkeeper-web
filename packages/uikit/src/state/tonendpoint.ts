@@ -4,7 +4,6 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import {
     TonendpoinFiatCategory,
     TonendpoinFiatItem,
-    TonendpoinFiatMethods,
     Tonendpoint,
     TonendpointConfig,
     getFiatMethods,
@@ -32,15 +31,6 @@ export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
 };
 
 export const DefaultRefetchInterval = 60000; // 60 sec
-
-export const useTonenpointFiatMethods = (tonendpoint: Tonendpoint) => {
-    return useQuery<TonendpoinFiatMethods, Error>(
-        [QueryKey.tonkeeperApi, TonkeeperApiKey.stock, tonendpoint.params.lang],
-        async () => {
-            return getFiatMethods(tonendpoint);
-        }
-    );
-};
 
 export const useTonendpointBuyMethods = () => {
     const { tonendpoint } = useAppContext();

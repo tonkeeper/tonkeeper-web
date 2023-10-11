@@ -1,7 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { Address } from 'ton-core';
 import { FiatCurrencies } from '../entries/fiat';
-import { JettonBalance } from '../tonApiV1';
 import { DefaultDecimals } from './send';
 
 export const formatDecimals = (
@@ -39,17 +37,4 @@ export const getStockPrice = (
     if (!btcPrice || !btcInFiat) return null;
 
     return new BigNumber(btcInFiat).div(new BigNumber(btcPrice));
-};
-
-export const getJettonStockAmount = (jetton: JettonBalance, price: BigNumber | null) => {
-    if (!price) return null;
-    return formatDecimals(price.multipliedBy(jetton.balance), jetton.metadata?.decimals);
-};
-
-export const getJettonStockPrice = (
-    jetton: JettonBalance,
-    rates: { [key: string]: string },
-    currency: FiatCurrencies
-) => {
-    return getStockPrice(Address.parse(jetton.jettonAddress).toString(), rates, currency);
 };

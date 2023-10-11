@@ -2,6 +2,7 @@ import React, { FC, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useTranslation } from '../hooks/translation';
+import { scrollToTop } from '../libs/common';
 import { AppRoute } from '../libs/routes';
 import { Label3 } from './Text';
 
@@ -156,18 +157,8 @@ export const Footer: FC<{ standalone?: boolean; sticky?: boolean }> = ({ standal
         (route: AppRoute) => {
             if (location.pathname !== route) {
                 return navigate(route);
-            }
-            if (!document.body.classList.contains('top')) {
-                const body = document.getElementById('body');
-                if (body) {
-                    window.requestAnimationFrame(() => {
-                        body.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
-                    });
-                } else {
-                    window.requestAnimationFrame(() => {
-                        window.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
-                    });
-                }
+            } else {
+                scrollToTop();
             }
         },
         [location.pathname]

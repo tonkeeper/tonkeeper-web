@@ -5,8 +5,7 @@ import { APIConfig } from '../../entries/apis';
 import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { IStorage } from '../../Storage';
-import { NftItemRepr } from '../../tonApiV1';
-import { BlockchainApi, EmulationApi, MessageConsequences } from '../../tonApiV2';
+import { BlockchainApi, EmulationApi, MessageConsequences, NftItem } from '../../tonApiV2';
 import { getWalletMnemonic } from '../mnemonicService';
 import {
     checkServiceTimeOrDie,
@@ -92,7 +91,7 @@ export const estimateNftTransfer = async (
     api: APIConfig,
     walletState: WalletState,
     recipient: TonRecipientData,
-    nftItem: NftItemRepr
+    nftItem: NftItem
 ) => {
     await checkServiceTimeOrDie(api);
     const [wallet, seqno] = await getWalletBalance(api, walletState);
@@ -118,7 +117,7 @@ export const sendNftTransfer = async (
     api: APIConfig,
     walletState: WalletState,
     recipient: TonRecipientData,
-    nftItem: NftItemRepr,
+    nftItem: NftItem,
     fee: MessageConsequences,
     password: string
 ) => {

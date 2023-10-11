@@ -1,6 +1,9 @@
 import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
+import { NFT } from './entries/nft';
 import { AuthState } from './entries/password';
+import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
+import { WalletState } from './entries/wallet';
 import { TonTransferParams } from './service/deeplinkingService';
 import { IStorage, MemoryStorage } from './Storage';
 
@@ -17,6 +20,11 @@ export type TransferInitParams = {
     chain?: BLOCKCHAIN_NAME;
 };
 
+export type ReceiveInitParams = {
+    chain?: BLOCKCHAIN_NAME;
+    jetton?: string;
+};
+
 export interface KeyboardParams {
     total: number;
     viewport: number;
@@ -30,14 +38,41 @@ export interface UIEvents {
     getPassword: GetPasswordParams;
     loading: void;
     transfer: TransferInitParams;
+    receive: ReceiveInitParams;
+    nft: NFT;
+    transferNft: NFT;
     keyboard: KeyboardParams;
+    addSuggestion: LatestSuggestion;
+    editSuggestion: FavoriteSuggestion;
     response: any;
+}
+
+export interface NativeBackButton {
+    on: (event: 'click', listener: () => void) => void;
+    off: (event: 'click', listener: () => void) => void;
+    show(): void;
+    hide(): void;
+}
+
+export interface NotificationService {
+    subscribe: (wallet: WalletState, mnemonic: string[]) => Promise<void>;
+    unsubscribe: (address?: string) => Promise<void>;
+
+    subscribeTonConnect: (clientId: string, origin: string) => Promise<void>;
+    unsubscribeTonConnect: (clientId?: string) => Promise<void>;
+
+    subscribed: (address: string) => Promise<boolean>;
 }
 
 export interface IAppSdk {
     storage: IStorage;
+    nativeBackButton?: NativeBackButton;
+
+    topMessage: (text: string) => void;
     copyToClipboard: (value: string, notification?: string) => void;
     openPage: (url: string) => Promise<unknown>;
+    openNft: (nft: NFT) => void;
+
     disableScroll: () => void;
     enableScroll: () => void;
     getScrollbarWidth: () => number;
@@ -49,21 +84,37 @@ export interface IAppSdk {
 
     confirm: (text: string) => Promise<boolean>;
     alert: (text: string) => Promise<void>;
+    prompt: (message: string, defaultValue?: string) => Promise<string | null>;
 
     requestExtensionPermission: () => Promise<void>;
     twaExpand?: () => void;
     hapticNotification: (type: 'success' | 'error') => void;
+
+    notifications?: NotificationService;
 }
 
-export class MockAppSdk implements IAppSdk {
-    storage = new MemoryStorage();
+export abstract class BaseApp implements IAppSdk {
+    uiEvents = new EventEmitter();
+
+    constructor(public storage: IStorage) {}
+    nativeBackButton?: NativeBackButton | undefined;
+
+    topMessage = (text?: string) => {
+        this.uiEvents.emit('copy', { method: 'copy', id: Date.now(), params: text });
+    };
 
     copyToClipboard = (value: string, notification?: string) => {
         console.log(value, notification);
+
+        this.topMessage(notification);
     };
 
     openPage = async (url: string): Promise<void> => {
         console.log(url);
+    };
+
+    openNft = (nft: NFT) => {
+        this.uiEvents.emit('nft', { method: 'nft', id: Date.now(), params: nft });
     };
 
     disableScroll = () => {};
@@ -78,17 +129,21 @@ export class MockAppSdk implements IAppSdk {
 
     isStandalone = () => false;
 
-    uiEvents = new EventEmitter();
+    confirm = async (text: string) => window.confirm(text);
+    alert = async (text: string) => window.alert(text);
+    prompt = async (message: string, defaultValue?: string) => window.prompt(message, defaultValue);
+
+    requestExtensionPermission = async () => {};
+
+    twaExpand = () => {};
+
+    hapticNotification = (type: 'success' | 'error') => {};
 
     version = '0.0.0';
+}
 
-    confirm = async () => false;
-
-    alert = async () => void 0;
-
-    requestExtensionPermission = async () => void 0;
-
-    twaExpand = () => void 0;
-
-    hapticNotification = () => void 0;
+export class MockAppSdk extends BaseApp {
+    constructor() {
+        super(new MemoryStorage());
+    }
 }

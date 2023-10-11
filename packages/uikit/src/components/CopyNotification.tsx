@@ -80,7 +80,7 @@ export const CopyNotification: FC = React.memo(() => {
             >
                 <Message ref={nodeRef}>
                     <Content>
-                        <Label2>{text}</Label2>
+                        <Label2 onClick={() => sdk.copyToClipboard(text)}>{text}</Label2>
                     </Content>
                 </Message>
             </CSSTransition>

@@ -8,7 +8,6 @@
         "build": "rm -fr dist && tsc",
         "start": "tsc -w",
         "sdk": "npm-run-all -p generate:*",
-        "generate:sdkV1": "rm -fr src/tonApiV1 && docker build -f resource/Dockerfile.apiV1 . -t tonapisdkv1 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv1",
         "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f resource/Dockerfile.apiV2 . -t tonapisdkv2 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv2",
         "generate:tronApi": "rm -fr src/tronApi && docker build -f resource/Dockerfile.tronApi . -t tronapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tronapisdk",
         "build:pkg": "yarn build"

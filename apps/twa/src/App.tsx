@@ -1,18 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { languages, localizationText } from '@tonkeeper/core/dist/entries/language';
-import {
-    Network,
-    getTonClient,
-    getTonClientV2,
-    getTronClient
-} from '@tonkeeper/core/dist/entries/network';
+import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
 import { Header, HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
+import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
@@ -38,33 +32,36 @@ import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/tra
 import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
-import { defaultTheme } from '@tonkeeper/uikit';
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import {
     AmplitudeAnalyticsContext,
     useAmplitudeAnalytics
 } from '@tonkeeper/uikit/dist/hooks/amplitude';
-
+import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import { Initialize } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
+import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
 import { Platform as TwaPlatform } from '@twa.js/sdk';
-import { SDKProvider, useSDK } from '@twa.js/sdk-react';
-import React, { FC, Suspense, useEffect, useMemo, useState } from 'react';
+import { SDKProvider, useSDK, useWebApp } from '@twa.js/sdk-react';
+import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
+import StandardErrorBoundary from './components/ErrorBoundary';
 import { InitDataLogger } from './components/InitData';
+import { TwaReceiveNotification } from './components/ReceiveNotifications';
 import { TwaQrScanner } from './components/TwaQrScanner';
-import { SendAction } from './components/transfer/SendNotifications';
+import { TwaNftNotification } from './components/nft/NftNotification';
+import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
-import { ViewportContext, useTwaAppViewport } from './libs/hooks';
-import { BrowserStorage } from './libs/storage';
+import { useTwaAppViewport } from './libs/hooks';
 
+const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
@@ -82,29 +79,89 @@ const queryClient = new QueryClient({
         }
     }
 });
-const storage = new BrowserStorage();
-const sdk = new TwaAppSdk(storage);
 
 export const App = () => {
     return (
-        <SDKProvider>
-            <TwaApp />
-        </SDKProvider>
+        <StandardErrorBoundary>
+            <SDKProvider>
+                <TwaLoader />
+            </SDKProvider>
+        </StandardErrorBoundary>
     );
 };
 
-const TwaApp = () => {
+const TwaLoader = () => {
+    const { didInit, components, error } = useSDK();
+
+    const sdk = useMemo(() => {
+        if (!components) return undefined;
+        return new TwaAppSdk(components);
+    }, [components]);
+
+    useEffect(() => {
+        if (!components) return undefined;
+
+        const theme = components.themeParams.isDark ? defaultTheme : lightTheme;
+
+        if (components.webApp.supports('setBackgroundColor')) {
+            components.webApp.setBackgroundColor((theme as any).backgroundPage);
+        }
+        if (components.webApp.supports('setHeaderColor')) {
+            components.webApp.setHeaderColor((theme as any).backgroundPage);
+        }
+        components.mainButton.setBackgroundColor((theme as any).buttonPrimaryBackground);
+        components.mainButton.setTextColor((theme as any).buttonPrimaryForeground);
+
+        document.body.style.backgroundColor = (theme as any).backgroundPage;
+    }, [components?.themeParams.isDark]);
+
+    if (error instanceof Error) {
+        return <div>{error.message}</div>;
+    }
+
+    if (!didInit || components == null || sdk == null) {
+        return <div></div>;
+    }
+
+    return (
+        <AppSdkContext.Provider value={sdk}>
+            <QueryClientProvider client={queryClient}>
+                <ThemeProvider theme={components.themeParams.isDark ? defaultTheme : lightTheme}>
+                    <DarkThemeContext.Provider value={components.themeParams.isDark}>
+                        <GlobalStyle />
+                        <TwaApp sdk={sdk} />
+                    </DarkThemeContext.Provider>
+                </ThemeProvider>
+            </QueryClientProvider>
+        </AppSdkContext.Provider>
+    );
+};
+
+const getUsePadding = (platform: TwaPlatform): boolean => {
+    switch (platform) {
+        case 'ios':
+            return true;
+        case 'android':
+        case 'android_x':
+            return false;
+        default:
+            return false;
+    }
+};
+
+const TwaApp: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { t, i18n } = useTranslation();
+    const webApp = useWebApp();
 
     const translation = useMemo(() => {
         const client: I18nContext = {
             t,
             i18n: {
-                enable: true,
+                enable: false,
                 reloadResources: i18n.reloadResources,
                 changeLanguage: i18n.changeLanguage as any,
                 language: i18n.language,
-                languages: [...languages].map(localizationText)
+                languages: []
             }
         };
         return client;
@@ -112,50 +169,26 @@ const TwaApp = () => {
 
     return (
         <BrowserRouter>
-            <QueryClientProvider client={queryClient}>
-                <Suspense fallback={<div></div>}>
-                    <AppSdkContext.Provider value={sdk}>
-                        <TranslationContext.Provider value={translation}>
-                            <StorageContext.Provider value={storage}>
-                                <UserThemeProvider>
-                                    <HeaderGlobalStyle />
-                                    <FooterGlobalStyle />
-                                    <SybHeaderGlobalStyle />
-                                    <GlobalListStyle />
-                                    <Loader />
-                                    <UnlockNotification sdk={sdk} />
-                                </UserThemeProvider>
-                            </StorageContext.Provider>
-                        </TranslationContext.Provider>
-                    </AppSdkContext.Provider>
-                </Suspense>
-            </QueryClientProvider>
+            <TranslationContext.Provider value={translation}>
+                <StorageContext.Provider value={sdk.storage}>
+                    <HeaderGlobalStyle />
+                    <FooterGlobalStyle />
+                    <SybHeaderGlobalStyle />
+                    <GlobalListStyle />
+
+                    <Loader sdk={sdk} />
+                    <InitDataLogger />
+                    <UnlockNotification sdk={sdk} usePadding={getUsePadding(webApp.platform)} />
+                </StorageContext.Provider>
+            </TranslationContext.Provider>
         </BrowserRouter>
     );
-};
-
-const useLock = () => {
-    const [lock, setLock] = useState<boolean | undefined>(undefined);
-    useEffect(() => {
-        sdk.storage.get<boolean>(AppKey.LOCK).then(useLock => setLock(useLock === true));
-
-        const unlock = () => {
-            setLock(false);
-        };
-        sdk.uiEvents.on('unlock', unlock);
-
-        return () => {
-            sdk.uiEvents.off('unlock', unlock);
-        };
-    }, []);
-    return lock;
 };
 
 const FullSizeWrapper = styled(Container)``;
 
 const Wrapper = styled(FullSizeWrapper)`
     height: var(--app-height);
-
     transition: height 0.4s ease;
 
     box-sizing: border-box;
@@ -173,12 +206,11 @@ const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
     }
 };
 
-export const Loader: FC = () => {
+export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { data: activeWallet } = useActiveWallet();
+    const webApp = useWebApp();
 
-    const { didInit, components } = useSDK();
-    const lock = useLock();
-    const { i18n } = useTranslation();
+    const lock = useLock(sdk);
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
@@ -188,50 +220,16 @@ export const Loader: FC = () => {
     const navigate = useNavigate();
     const enable = useAmplitudeAnalytics('Twa', account, activeWallet);
 
-    useEffect(() => {
-        if (
-            activeWallet &&
-            activeWallet.lang &&
-            i18n.language !== localizationText(activeWallet.lang)
-        ) {
-            i18n.reloadResources([localizationText(activeWallet.lang)]).then(() =>
-                i18n.changeLanguage(localizationText(activeWallet.lang))
-            );
-        }
-    }, [activeWallet, i18n]);
-
-    useEffect(() => {
-        if (components) {
-            sdk.setTwaExpand(() => {
-                components.viewport.expand();
-                return undefined;
-            });
-
-            sdk.setHapticFeedback(components.haptic);
-            components.webApp.setBackgroundColor((defaultTheme as any).backgroundPage);
-        }
-    }, [components]);
-
-    if (
-        auth === undefined ||
-        account === undefined ||
-        config === undefined ||
-        lock === undefined ||
-        !didInit ||
-        components == null
-    ) {
+    if (auth === undefined || account === undefined || config === undefined || lock === undefined) {
         return <Loading />;
     }
 
-    const showQrScan = seeIfShowQrScanner(components.webApp.platform);
+    const showQrScan = seeIfShowQrScanner(webApp.platform);
+
     const network = activeWallet?.network ?? Network.MAINNET;
     const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
     const context: IAppContext = {
-        api: {
-            tonApi: getTonClient(config, network),
-            tonApiV2: getTonClientV2(config, network),
-            tronApi: getTronClient(network)
-        },
+        api: getApiConfig(config, network),
         auth,
         fiat,
         account,
@@ -244,45 +242,53 @@ export const Loader: FC = () => {
     };
 
     return (
-        <ViewportContext.Provider value={components.viewport}>
-            <AmplitudeAnalyticsContext.Provider value={enable}>
-                <OnImportAction.Provider value={navigate}>
-                    <AfterImportAction.Provider
-                        value={() => navigate(AppRoute.home, { replace: true })}
-                    >
-                        <AppContext.Provider value={context}>
-                            <Content
-                                activeWallet={activeWallet}
-                                lock={lock}
-                                showQrScan={showQrScan}
-                            />
-                            <CopyNotification />
-                            {showQrScan && <TwaQrScanner />}
-                            <InitDataLogger />
-                        </AppContext.Provider>
-                    </AfterImportAction.Provider>
-                </OnImportAction.Provider>
-            </AmplitudeAnalyticsContext.Provider>
-        </ViewportContext.Provider>
+        <AmplitudeAnalyticsContext.Provider value={enable}>
+            <OnImportAction.Provider value={navigate}>
+                <AfterImportAction.Provider
+                    value={() => navigate(AppRoute.home, { replace: true })}
+                >
+                    <AppContext.Provider value={context}>
+                        {/* <div
+                                onClick={() => sdk.copyToClipboard(window.location.hash.slice(1))}
+                                style={{
+                                    paddingTop: '100px',
+                                    minHeight: '200px',
+                                    width: '200px',
+                                    position: 'fixed',
+                                    zIndex: '100',
+                                    color: 'white'
+                                }}
+                            >
+                                {components.initDataRaw}
+                                {components.initData?.startParam}
+                                {window.location.hash.slice(1)}
+                            </div> */}
+                        <Content activeWallet={activeWallet} lock={lock} showQrScan={showQrScan} />
+                        <CopyNotification />
+                        {showQrScan && <TwaQrScanner />}
+                    </AppContext.Provider>
+                </AfterImportAction.Provider>
+            </OnImportAction.Provider>
+        </AmplitudeAnalyticsContext.Provider>
     );
 };
 
 const InitWrapper = styled(Container)`
-    height: var(--tg-viewport-stable-height);
+    height: var(--app-height);
+    min-height: auto;
 
     transition: height 0.4s ease;
 
     overflow: auto;
     display: flex;
     flex-direction: column;
-    padding: 1rem 1rem;
+    padding: 16px;
     box-sizing: border-box;
     position: relative;
 `;
 
 const InitPages = () => {
-    // useAppViewport();
-
+    useTwaAppViewport(true);
     return (
         <InitWrapper>
             <Suspense fallback={<Loading />}>
@@ -295,14 +301,13 @@ const InitPages = () => {
     );
 };
 
-export const Content: FC<{
+const Content: FC<{
     activeWallet?: WalletState | null;
     lock: boolean;
     showQrScan: boolean;
 }> = ({ activeWallet, lock, showQrScan }) => {
     const location = useLocation();
     useWindowsScroll();
-    useTwaAppViewport();
 
     if (lock) {
         return (
@@ -318,56 +323,73 @@ export const Content: FC<{
 
     return (
         <WalletStateContext.Provider value={activeWallet}>
-            <SendAction>
-                <Wrapper>
-                    <Routes>
-                        <Route
-                            path={AppRoute.activity}
-                            element={
-                                <Suspense fallback={<ActivitySkeletonPage />}>
-                                    <Activity />
-                                </Suspense>
-                            }
-                        />
-                        <Route
-                            path={any(AppRoute.settings)}
-                            element={
-                                <Suspense fallback={<SettingsSkeletonPage />}>
-                                    <Settings />
-                                </Suspense>
-                            }
-                        />
-                        <Route path={AppRoute.coins}>
-                            <Route
-                                path=":name/*"
-                                element={
-                                    <Suspense fallback={<CoinSkeletonPage />}>
-                                        <Coin />
-                                    </Suspense>
-                                }
-                            />
-                        </Route>
-                        <Route
-                            path="*"
-                            element={
-                                <>
-                                    <Header showQrScan={showQrScan} />
-                                    <InnerBody>
-                                        <Suspense fallback={<HomeSkeleton />}>
-                                            <Home />
-                                        </Suspense>
-                                    </InnerBody>
-                                </>
-                            }
-                        />
-                    </Routes>
-                    <Footer sticky />
-                    <MemoryScroll />
-                    <Suspense>
-                        <TonConnectSubscription />
-                    </Suspense>
-                </Wrapper>
-            </SendAction>
+            <MainPages showQrScan={showQrScan} />
         </WalletStateContext.Provider>
+    );
+};
+
+const TwaNotification: FC<PropsWithChildren> = ({ children }) => {
+    return (
+        <TwaNftNotification>
+            <TwaReceiveNotification>
+                <TwaSendNotification>{children}</TwaSendNotification>
+            </TwaReceiveNotification>
+        </TwaNftNotification>
+    );
+};
+
+const MainPages: FC<{ showQrScan: boolean }> = ({ showQrScan }) => {
+    useTwaAppViewport(false);
+    return (
+        <TwaNotification>
+            <Wrapper>
+                <Routes>
+                    <Route
+                        path={AppRoute.activity}
+                        element={
+                            <Suspense fallback={<ActivitySkeletonPage />}>
+                                <Activity />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path={any(AppRoute.settings)}
+                        element={
+                            <Suspense fallback={<SettingsSkeletonPage />}>
+                                <Settings />
+                            </Suspense>
+                        }
+                    />
+                    <Route path={AppRoute.coins}>
+                        <Route
+                            path=":name/*"
+                            element={
+                                <Suspense fallback={<CoinSkeletonPage />}>
+                                    <Coin />
+                                </Suspense>
+                            }
+                        />
+                    </Route>
+                    <Route
+                        path="*"
+                        element={
+                            <>
+                                <Header showQrScan={showQrScan} />
+                                <InnerBody>
+                                    <Suspense fallback={<HomeSkeleton />}>
+                                        <Home />
+                                    </Suspense>
+                                </InnerBody>
+                            </>
+                        }
+                    />
+                </Routes>
+                <Footer sticky />
+                <MemoryScroll />
+                <Suspense>
+                    <TonConnectSubscription />
+                </Suspense>
+            </Wrapper>
+        </TwaNotification>
     );
 };

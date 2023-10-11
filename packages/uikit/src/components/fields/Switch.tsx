@@ -70,7 +70,7 @@ const Inner = styled.span<{ checked?: boolean; active: boolean }>`
         content: attr(data-no);
         text-transform: uppercase;
         padding-right: 10px;
-        background-color: ${props => props.theme.buttonTertiaryBackground};
+        background-color: ${props => props.theme.backgroundContentTint};
         color: ${props => props.theme.textPrimary};
         text-align: right;
     }
