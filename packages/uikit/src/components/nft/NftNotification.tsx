@@ -29,7 +29,12 @@ const NftNotification = () => {
     }, [nftItem, handleClose]);
 
     return (
-        <Notification isOpen={nftItem !== undefined} hideButton handleClose={handleClose}>
+        <Notification
+            isOpen={nftItem !== undefined}
+            hideButton
+            handleClose={handleClose}
+            backShadow
+        >
             {Content}
         </Notification>
     );
