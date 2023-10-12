@@ -1,18 +1,27 @@
-import { useLaunchParams } from '@twa.js/sdk-react';
-import React, { useEffect } from 'react';
+import { useBackButton, useLaunchParams, useMainButton } from '@twa.js/sdk-react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const InitDataLogger = () => {
     const launchParams = useLaunchParams();
     const { t, i18n } = useTranslation();
+    const button = useMainButton();
+    const backButton = useBackButton();
 
     useEffect(() => {
-        i18n.languages.forEach(lang => {
-            if (launchParams.initData?.user?.languageCode === lang) {
-                i18n.changeLanguage(lang);
-            }
-        });
-    }, [launchParams]);
+        button.hide();
+        backButton.hide();
+    }, []);
+
+    useEffect(() => {
+        if (launchParams.initData?.user?.languageCode) {
+            i18n.languages.forEach(lang => {
+                if (launchParams.initData?.user?.languageCode === lang) {
+                    i18n.reloadResources([lang]).then(() => i18n.changeLanguage(lang));
+                }
+            });
+        }
+    }, [launchParams.initData?.user?.languageCode]);
 
     // useEffect(() => {
     //     if (launchParams.initData?.user?.username)

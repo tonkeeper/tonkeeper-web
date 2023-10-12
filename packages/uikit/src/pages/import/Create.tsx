@@ -1,22 +1,24 @@
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import React, { useEffect, useState } from 'react';
 import { mnemonicNew } from 'ton-crypto';
+import { IconPage } from '../../components/Layout';
 import { CreateAuthState } from '../../components/create/CreateAuth';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { Check, Worlds } from '../../components/create/Words';
 import { Button } from '../../components/fields/Button';
-import { IconPage } from '../../components/Layout';
 import {
     CheckLottieIcon,
     GearLottieIcon,
     WriteLottieIcon
 } from '../../components/lottie/LottieIcons';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveWallet } from '../../state/wallet';
 import { FinalView, useAddWalletMutation } from './Password';
+import { Subscribe } from './Subscribe';
 
-export const Create = () => {
-    //useKeyboardHeight();
+const Create = () => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
     const {
         mutateAsync: checkPasswordAndCreateWalletAsync,
@@ -33,6 +35,7 @@ export const Create = () => {
     const [check, setCheck] = useState(false);
     const [checked, setChecked] = useState(false);
     const [hasPassword, setHasPassword] = useState(false);
+    const [passNotifications, setPassNotification] = useState(false);
 
     useEffect(() => {
         setTimeout(() => {
@@ -124,5 +127,17 @@ export const Create = () => {
         return <UpdateWalletName account={account} onUpdate={setAccount} />;
     }
 
+    if (sdk.notifications && !passNotifications) {
+        return (
+            <Subscribe
+                wallet={wallet!}
+                mnemonic={mnemonic}
+                onDone={() => setPassNotification(true)}
+            />
+        );
+    }
+
     return <FinalView />;
 };
+
+export default Create;

@@ -18,6 +18,7 @@ export enum QueryKey {
     analytics = 'analytics',
 
     connection = 'connection',
+    subscribed = 'subscribed',
 
     tron = 'tron',
     rate = 'rate',

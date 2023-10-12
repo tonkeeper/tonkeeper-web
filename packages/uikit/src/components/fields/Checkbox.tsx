@@ -37,10 +37,12 @@ const IconBase = styled.div<{ checked: boolean; disabled?: boolean }>`
     ${props =>
         props.checked
             ? css`
+                  color: ${props.theme.buttonPrimaryForeground};
                   background: ${props.theme.buttonPrimaryBackground};
                   border-color: ${props.theme.buttonPrimaryBackground};
               `
             : css`
+                  color: transparent;
                   background: transparent;
                   border-color: ${props.theme.backgroundContentTint};
               `}

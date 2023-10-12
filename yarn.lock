@@ -5138,7 +5138,8 @@ __metadata:
     "@tonkeeper/core": 0.1.0
     "@tonkeeper/locales": 0.1.0
     "@tonkeeper/uikit": 0.1.0
-    "@twa.js/sdk-react": ^0.3.20
+    "@twa.js/sdk": latest
+    "@twa.js/sdk-react": latest
     "@types/fs-extra": ^11.0.1
     "@types/jest": ^27.5.2
     "@types/node": ^16.18.6
@@ -5156,6 +5157,7 @@ __metadata:
     react-is: ^18.2.0
     react-router-dom: ^6.4.5
     react-scripts: 5.0.1
+    source-map-explorer: ^2.5.3
     styled-components: ^5.3.6
     ts-node: ^10.9.1
     typescript: ^4.9.4
@@ -5297,55 +5299,98 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@twa.js/bridge@npm:1.2.0":
-  version: 1.2.0
-  resolution: "@twa.js/bridge@npm:1.2.0"
+"@twa.js/bridge@npm:1.3.1":
+  version: 1.3.1
+  resolution: "@twa.js/bridge@npm:1.3.1"
   dependencies:
-    "@twa.js/utils": 0.5.0
-  checksum: ef1cd0cb6c9394eac4fa31fa6f9c4c05e64434fcd9f53cc560a5ca05e295ea7f73880226d0bf1d3126726029d295cf96937acebb44c2c9981e6910cb15b543c1
+    "@twa.js/colors": 0.0.1
+    "@twa.js/event-emitter": 0.0.1
+    "@twa.js/parsing": 0.0.1
+    "@twa.js/util-types": 0.0.1
+    "@twa.js/utils": 0.5.1
+  checksum: 2d6516bc3969ae7a63a5f472843ec844bfd69788324daf19a6f42c88a734096e1f10e1b7f5f250bf59fd91e423d41eed7fa099cf40b5957ed3a0f6945b3f5e5c
   languageName: node
   linkType: hard
 
-"@twa.js/init-data@npm:0.2.11":
-  version: 0.2.11
-  resolution: "@twa.js/init-data@npm:0.2.11"
-  dependencies:
-    "@twa.js/utils": 0.5.0
-  checksum: f5c9837242ba9d5c98b4dd5017d66ec9bf59a47f42745e2abc3d68eb4081e55555ce00e1dff8510123da53ea158e4cbac121c667da5b8966acb009163e35f7c9
+"@twa.js/colors@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@twa.js/colors@npm:0.0.1"
+  checksum: 1879cd3640a4e417c2fc8fafa8d119150bca6ae66e939a91e04d83754011aa3938c1251dba34c5b7ec06961994884db2ffd5fd59214cbe12355063eb16a67d4e
   languageName: node
   linkType: hard
 
-"@twa.js/sdk-react@npm:^0.3.20":
-  version: 0.3.20
-  resolution: "@twa.js/sdk-react@npm:0.3.20"
+"@twa.js/event-emitter@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@twa.js/event-emitter@npm:0.0.1"
   dependencies:
-    "@twa.js/bridge": 1.2.0
-    "@twa.js/sdk": 0.10.0
+    "@twa.js/util-types": 0.0.1
+  checksum: d7e5aa45d0b56243c8dac8ab4a0a2217edb25c2f1243c143707c5e7462a2223f3dfdf6df2aeaa13e24431ce41f2526e4b8dae4447b8fdbca426aad63e73b11f8
+  languageName: node
+  linkType: hard
+
+"@twa.js/init-data@npm:0.2.13":
+  version: 0.2.13
+  resolution: "@twa.js/init-data@npm:0.2.13"
+  dependencies:
+    "@twa.js/parsing": 0.0.1
+  checksum: 2004e0bcfb81bd70260227b9560a2d54e8e69ec26e0af20133b01961ea4d6a36af640fe5e8c35342653dfd517a019059a4c92ffabefbe211f11304b1bc5e5243
+  languageName: node
+  linkType: hard
+
+"@twa.js/parsing@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@twa.js/parsing@npm:0.0.1"
+  dependencies:
+    "@twa.js/colors": 0.0.1
+    "@twa.js/util-types": 0.0.1
+  checksum: 3e7ec41b275ee72d7b43859f27412121f89ff0d5eb269fa1a6ab2be3cbb58c5efd42e195fb9ebea1b01c6e4922a9d3c460314b9344ef92ced30cffe4f2b2d1f1
+  languageName: node
+  linkType: hard
+
+"@twa.js/sdk-react@npm:latest":
+  version: 0.4.2
+  resolution: "@twa.js/sdk-react@npm:0.4.2"
+  dependencies:
+    "@twa.js/bridge": 1.3.1
+    "@twa.js/sdk": 0.11.2
   peerDependencies:
     "@types/react": ^17.0.0 || ^18.0.0
     react: ^17.0.0 || ^18.0.0
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 7d056be6ff4256921a73e00db130bc8a8739af6c8f25e92a6b4fb373b3bf2c0b50147320032aad941b2e18fa8ee26c069e4231ba1e3834749b7e7af7d302a741
+  checksum: 4fd411a4c0169eee404a82626d46dbfe987ed56750cade9d529ebe5d76bd719a5903e57112bb82f4c5a4081b2d90ff938cbfe688dcf952d2246dfa83f56226fd
   languageName: node
   linkType: hard
 
-"@twa.js/sdk@npm:0.10.0":
-  version: 0.10.0
-  resolution: "@twa.js/sdk@npm:0.10.0"
+"@twa.js/sdk@npm:0.11.2, @twa.js/sdk@npm:latest":
+  version: 0.11.2
+  resolution: "@twa.js/sdk@npm:0.11.2"
   dependencies:
-    "@twa.js/bridge": 1.2.0
-    "@twa.js/init-data": 0.2.11
-    "@twa.js/utils": 0.5.0
-  checksum: a730acd4ce458ea1e06c0e3f5d4fd1464494db41e1dcfc6df10693b681dbd92876440d6bac1a8a3f7562bd5e83602097226d82f4989e949881323f487f2ad3c1
+    "@twa.js/bridge": 1.3.1
+    "@twa.js/colors": 0.0.1
+    "@twa.js/event-emitter": 0.0.1
+    "@twa.js/init-data": 0.2.13
+    "@twa.js/parsing": 0.0.1
+    "@twa.js/util-types": 0.0.1
+    "@twa.js/utils": 0.5.1
+  checksum: 89ff31140ab62f3b181d0a1709bfceef1e0b0a23873b1d09a384c245b47a0714868aa69d9e8f85d54c750cfb27c079528d8880e0226464ac1660f0239fcacccf
   languageName: node
   linkType: hard
 
-"@twa.js/utils@npm:0.5.0":
-  version: 0.5.0
-  resolution: "@twa.js/utils@npm:0.5.0"
-  checksum: 02866c99387563a072cb0253af699f42aca8400d6f726a6e7d50ab4cd50d2f55dab9b82a9bb5b0bac809078fb03430e29b260efda37fa013afdca08e532bd400
+"@twa.js/util-types@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@twa.js/util-types@npm:0.0.1"
+  checksum: 5144241b34407704e9bcc28f1bffab22a1158f705b0256d2c697a0770954688d1aa7367dd1d4f6b50a34d8314a4e6efe3bd63215d3bf20026d85b97abfa6054f
+  languageName: node
+  linkType: hard
+
+"@twa.js/utils@npm:0.5.1":
+  version: 0.5.1
+  resolution: "@twa.js/utils@npm:0.5.1"
+  dependencies:
+    "@twa.js/util-types": 0.0.1
+  checksum: d208868925af7d2113ae0927a8b82f45c768cab77c8e4b098153415b3bc742c2a4b2128a972292b4d52237bcce777ed018709a5297aefd8b5b34c470e60f58a7
   languageName: node
   linkType: hard
 
@@ -8106,6 +8151,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"btoa@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "btoa@npm:1.2.1"
+  bin:
+    btoa: bin/btoa.js
+  checksum: afbf004fb1b1d530e053ffa66ef5bd3878b101c59d808ac947fcff96810b4452abba2b54be687adadea2ba9efc7af48b04228742789bf824ef93f103767e690c
+  languageName: node
+  linkType: hard
+
 "buffer-from@npm:^1.0.0":
   version: 1.1.2
   resolution: "buffer-from@npm:1.1.2"
@@ -10268,7 +10322,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ejs@npm:^3.1.6":
+"ejs@npm:^3.1.5, ejs@npm:^3.1.6":
   version: 3.1.9
   resolution: "ejs@npm:3.1.9"
   dependencies:
@@ -10774,7 +10828,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"escape-html@npm:~1.0.3":
+"escape-html@npm:^1.0.3, escape-html@npm:~1.0.3":
   version: 1.0.3
   resolution: "escape-html@npm:1.0.3"
   checksum: 6213ca9ae00d0ab8bccb6d8d4e0a98e76237b2410302cf7df70aaa6591d509a2a37ce8998008cbecae8fc8ffaadf3fb0229535e6a145f3ce0b211d060decbb24
@@ -16765,7 +16819,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"open@npm:^7.0.3":
+"open@npm:^7.0.3, open@npm:^7.3.1":
   version: 7.4.2
   resolution: "open@npm:7.4.2"
   dependencies:
@@ -19756,6 +19810,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rimraf@npm:~2.6.2":
+  version: 2.6.3
+  resolution: "rimraf@npm:2.6.3"
+  dependencies:
+    glob: ^7.1.3
+  bin:
+    rimraf: ./bin.js
+  checksum: 3ea587b981a19016297edb96d1ffe48af7e6af69660e3b371dbfc73722a73a0b0e9be5c88089fbeeb866c389c1098e07f64929c7414290504b855f54f901ab10
+  languageName: node
+  linkType: hard
+
 "ripemd160@npm:^2.0.0, ripemd160@npm:^2.0.1":
   version: 2.0.2
   resolution: "ripemd160@npm:2.0.2"
@@ -20453,6 +20518,29 @@ __metadata:
   version: 2.0.1
   resolution: "source-list-map@npm:2.0.1"
   checksum: 806efc6f75e7cd31e4815e7a3aaf75a45c704871ea4075cb2eb49882c6fca28998f44fc5ac91adb6de03b2882ee6fb02f951fdc85e6a22b338c32bfe19557938
+  languageName: node
+  linkType: hard
+
+"source-map-explorer@npm:^2.5.3":
+  version: 2.5.3
+  resolution: "source-map-explorer@npm:2.5.3"
+  dependencies:
+    btoa: ^1.2.1
+    chalk: ^4.1.0
+    convert-source-map: ^1.7.0
+    ejs: ^3.1.5
+    escape-html: ^1.0.3
+    glob: ^7.1.6
+    gzip-size: ^6.0.0
+    lodash: ^4.17.20
+    open: ^7.3.1
+    source-map: ^0.7.4
+    temp: ^0.9.4
+    yargs: ^16.2.0
+  bin:
+    sme: bin/cli.js
+    source-map-explorer: bin/cli.js
+  checksum: 1d4e619d7eb224f38a3dadfb20eb34a56cfc29bd237b4815b60257e7fe5ee9f791fda3e0bba91318e0f2beffec5cca573abb8b5030a95f305ce4abee93296065
   languageName: node
   linkType: hard
 
@@ -21462,6 +21550,16 @@ __metadata:
   version: 2.0.0
   resolution: "temp-dir@npm:2.0.0"
   checksum: cc4f0404bf8d6ae1a166e0e64f3f409b423f4d1274d8c02814a59a5529f07db6cd070a749664141b992b2c1af337fa9bb451a460a43bb9bcddc49f235d3115aa
+  languageName: node
+  linkType: hard
+
+"temp@npm:^0.9.4":
+  version: 0.9.4
+  resolution: "temp@npm:0.9.4"
+  dependencies:
+    mkdirp: ^0.5.1
+    rimraf: ~2.6.2
+  checksum: 8709d4d63278bd309ca0e49e80a268308dea543a949e71acd427b3314cd9417da9a2cc73425dd9c21c6780334dbffd67e05e7be5aaa73e9affe8479afc6f20e3
   languageName: node
   linkType: hard
 

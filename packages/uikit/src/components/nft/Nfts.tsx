@@ -1,13 +1,13 @@
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
-import { NftItemRepr } from '@tonkeeper/core/dist/tonApiV1';
+import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useContext, useLayoutEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 import { toDaysLeft } from '../../hooks/dateFormat';
 import { useNftDNSExpirationDate } from '../../state/wallet';
 import { FireBadgeIcon, SaleIcon } from '../Icon';
 import { NftCollectionBody3, NftHeaderLabel2 } from './NftHeader';
-import { NftNotification } from './NftNotification';
 
 const Grid = styled.div`
     display: grid;
@@ -95,10 +95,10 @@ const ExpiringBlock = styled.div`
     width: 32px;
 `;
 
-export const NftItem: FC<{
-    nft: NftItemRepr;
+export const NftItemView: FC<{
+    nft: NftItem;
     resolution: string;
-    onOpen: (nft: NftItemRepr) => void;
+    onOpen: (nft: NftItem) => void;
 }> = React.memo(({ nft, resolution, onOpen }) => {
     const isSale = nft.sale !== undefined;
     const image = nft.previews?.find(item => item.resolution === resolution);
@@ -142,36 +142,22 @@ export const NftItem: FC<{
 });
 
 export const NftsList: FC<{ nfts: NFT[] | undefined }> = ({ nfts }) => {
-    const [nftItemAddress, setNftItemAddress] = useState<string | undefined>(undefined);
-
-    const selectedNft = nftItemAddress
-        ? nfts?.find(nft => nft.address === nftItemAddress)
-        : undefined;
-
+    const sdk = useAppSdk();
     return (
-        <>
-            <Grid>
-                {(nfts ?? []).map(item => {
-                    if (
-                        (!item.metadata || Object.entries(item.metadata).length === 0) &&
-                        !item.dns
-                    ) {
-                        return <></>;
-                    }
-                    return (
-                        <NftItem
-                            key={item.address}
-                            nft={item}
-                            resolution="500x500"
-                            onOpen={() => setNftItemAddress(item.address)}
-                        />
-                    );
-                })}
-            </Grid>
-            <NftNotification
-                nftItem={selectedNft}
-                handleClose={() => setNftItemAddress(undefined)}
-            />
-        </>
+        <Grid>
+            {(nfts ?? []).map(item => {
+                if (item.metadata?.render_type === 'hidden') {
+                    return <></>;
+                }
+                return (
+                    <NftItemView
+                        key={item.address}
+                        nft={item}
+                        resolution="500x500"
+                        onOpen={() => sdk.openNft(item)}
+                    />
+                );
+            })}
+        </Grid>
     );
 };

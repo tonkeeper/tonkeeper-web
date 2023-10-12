@@ -11,7 +11,7 @@ import {
     hideSuggestions
 } from '@tonkeeper/core/dist/service/suggestionService';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -23,11 +23,7 @@ import { ColumnText } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { SkeletonList } from '../Skeleton';
 import { Label1 } from '../Text';
-import {
-    AddFavoriteNotification,
-    EditFavoriteNotification,
-    useSuggestionAddress
-} from './FavoriteNotification';
+import { useSuggestionAddress } from './SuggestionAddress';
 
 const Label = styled(Label1)`
     user-select: none;
@@ -239,10 +235,9 @@ export const SuggestionList: FC<{
     disabled?: boolean;
     acceptBlockchains?: BLOCKCHAIN_NAME[];
 }> = ({ onSelect, disabled, acceptBlockchains }) => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
     const { data } = useLatestSuggestion(acceptBlockchains);
-    const [addFavorite, setAdd] = useState<LatestSuggestion | undefined>(undefined);
-    const [editFavorite, setEdit] = useState<FavoriteSuggestion | undefined>(undefined);
 
     if (!data) {
         return (
@@ -266,7 +261,14 @@ export const SuggestionList: FC<{
                                 key={item.address}
                                 item={item}
                                 onSelect={value => !disabled && onSelect(value)}
-                                onEdit={value => !disabled && setEdit(value)}
+                                onEdit={value => {
+                                    if (!disabled) {
+                                        sdk.uiEvents.emit('editSuggestion', {
+                                            method: 'editSuggestion',
+                                            params: value
+                                        });
+                                    }
+                                }}
                             />
                         );
                     }
@@ -275,13 +277,18 @@ export const SuggestionList: FC<{
                             key={item.address}
                             item={item}
                             onSelect={value => !disabled && onSelect(value)}
-                            onAddFavorite={value => !disabled && setAdd(value)}
+                            onAddFavorite={value => {
+                                if (!disabled) {
+                                    sdk.uiEvents.emit('addSuggestion', {
+                                        method: 'addSuggestion',
+                                        params: value
+                                    });
+                                }
+                            }}
                         />
                     );
                 })}
             </ListBlock>
-            <AddFavoriteNotification latest={addFavorite} onClose={() => setAdd(undefined)} />
-            <EditFavoriteNotification favorite={editFavorite} onClose={() => setEdit(undefined)} />
         </>
     );
 };

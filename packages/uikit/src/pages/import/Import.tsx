@@ -3,14 +3,18 @@ import React, { useState } from 'react';
 import { CreateAuthState } from '../../components/create/CreateAuth';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { ImportWords } from '../../components/create/Words';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useActiveWallet } from '../../state/wallet';
 import { FinalView, useAddWalletMutation } from './Password';
+import { Subscribe } from './Subscribe';
 
-export const Import = () => {
-    //useKeyboardHeight();
+const Import = () => {
+    const sdk = useAppSdk();
+
     const [mnemonic, setMnemonic] = useState<string[]>([]);
     const [account, setAccount] = useState<AccountState | undefined>(undefined);
     const [hasPassword, setHasPassword] = useState(false);
+    const [passNotifications, setPassNotification] = useState(false);
 
     const { data: wallet } = useActiveWallet();
 
@@ -60,5 +64,17 @@ export const Import = () => {
         return <UpdateWalletName account={account} onUpdate={setAccount} />;
     }
 
+    if (sdk.notifications && !passNotifications) {
+        return (
+            <Subscribe
+                wallet={wallet!}
+                mnemonic={mnemonic}
+                onDone={() => setPassNotification(true)}
+            />
+        );
+    }
+
     return <FinalView />;
 };
+
+export default Import;

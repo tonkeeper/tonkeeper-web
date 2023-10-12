@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
-import { Address, Cell, internal } from 'ton-core';
+import { Address, Cell, internal, loadStateInit } from 'ton-core';
+import { Maybe } from 'ton-core/dist/utils/maybe';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../../Storage';
 import { APIConfig } from '../../entries/apis';
@@ -67,14 +68,14 @@ const seeIfBounceable = (accounts: AccountsMap, address: string) => {
     return bounceableAddress || activeContract;
 };
 
-const toStateInit = (stateInit?: string): { code: Cell; data: Cell } | undefined => {
+const toStateInit = (stateInit?: string): { code: Maybe<Cell>; data: Maybe<Cell> } | undefined => {
     if (!stateInit) {
         return undefined;
     }
-    const initSlice = Cell.fromBase64(stateInit).asSlice();
+    const { code, data } = loadStateInit(Cell.fromBase64(stateInit).asSlice());
     return {
-        code: initSlice.loadRef(),
-        data: initSlice.loadRef()
+        code,
+        data
     };
 };
 

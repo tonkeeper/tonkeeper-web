@@ -1,5 +1,4 @@
-import { WalletDNS } from '../tonApiV1';
-import { Account, MessageConsequences } from '../tonApiV2';
+import { Account, MessageConsequences, WalletDNS } from '../tonApiV2';
 import { EstimatePayload } from '../tronApi';
 import { BLOCKCHAIN_NAME } from './crypto';
 import { Asset } from './crypto/asset/asset';

@@ -109,11 +109,18 @@ export const PasswordUnlock: FC<{
     const location = useLocation();
 
     useEffect(() => {
+        sdk.uiEvents.on('navigate', onClose);
+        return () => {
+            sdk.uiEvents.off('navigate', onClose);
+        };
+    }, [sdk, onClose]);
+
+    useEffect(() => {
         const timeout = setTimeout(() => {
             if (ref.current) {
                 ref.current.focus();
             }
-        }, 750);
+        }, 350);
         return () => {
             clearTimeout(timeout);
         };
@@ -174,7 +181,10 @@ export const PasswordUnlock: FC<{
     );
 };
 
-export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
+export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
+    sdk,
+    usePadding = false
+}) => {
     const { t } = useTranslation();
     const [padding, setPadding] = useState(0);
     const [type, setType] = useState<'confirm' | 'unlock' | undefined>(undefined);
@@ -203,15 +213,17 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
         }
     };
 
-    const onCancel = () => {
+    const onCancel = useCallback(() => {
         reset();
-        sdk.uiEvents.emit('response', {
-            method: 'response',
-            id: requestId,
-            params: new Error('Cancel auth request')
-        });
+        if (requestId) {
+            sdk.uiEvents.emit('response', {
+                method: 'response',
+                id: requestId,
+                params: new Error('Cancel auth request')
+            });
+        }
         close();
-    };
+    }, [reset, requestId, sdk, close]);
 
     useEffect(() => {
         const handlerKeyboard = (options: {
@@ -239,6 +251,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
 
         sdk.uiEvents.on('getPassword', handler);
         sdk.uiEvents.on('keyboard', handlerKeyboard);
+
         return () => {
             sdk.uiEvents.off('getPassword', handler);
             sdk.uiEvents.off('keyboard', handlerKeyboard);
@@ -255,10 +268,10 @@ export const UnlockNotification: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
                 isLoading={isLoading}
                 isError={isError}
                 reason={type}
-                padding={padding}
+                padding={usePadding ? padding : 0}
             />
         );
-    }, [sdk, auth, requestId, onSubmit, type]);
+    }, [sdk, auth, requestId, padding, onCancel, onSubmit, type]);
 
     return (
         <Notification

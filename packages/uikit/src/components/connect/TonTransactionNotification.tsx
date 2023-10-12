@@ -112,12 +112,14 @@ const ConnectContent: FC<{
         if (sdk.twaExpand) {
             sdk.twaExpand();
         }
+        sdk.hapticNotification('success');
     }, []);
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
         const result = await mutateAsync();
         setDone(true);
+        sdk.hapticNotification('success');
         setTimeout(() => handleClose(result), 300);
     };
 

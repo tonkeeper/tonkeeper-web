@@ -1,5 +1,6 @@
-import { Address, WalletContractV4 } from 'ton';
+import { Address } from 'ton-core';
 import { KeyPair, mnemonicToPrivateKey } from 'ton-crypto';
+import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
 import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
@@ -35,8 +36,8 @@ export const importWallet = async (
 };
 
 const versionMap: Record<string, WalletVersion> = {
-    wallet_v3R1: WalletVersion.V3R1,
-    wallet_v3R2: WalletVersion.V3R2,
+    wallet_v3r1: WalletVersion.V3R1,
+    wallet_v3r2: WalletVersion.V3R2,
     wallet_v4r2: WalletVersion.V4R2
 };
 

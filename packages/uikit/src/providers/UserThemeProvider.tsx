@@ -4,15 +4,21 @@ import { DefaultTheme, ThemeProvider } from 'styled-components';
 import { useUserTheme } from '../state/theme';
 import { defaultTheme } from '../styles/defaultTheme';
 import { GlobalStyle } from '../styles/globalStyle';
+import { lightTheme } from '../styles/lightTheme';
 
-export const UserThemeProvider: FC<PropsWithChildren> = ({ children }) => {
+export const UserThemeProvider: FC<PropsWithChildren<{ isDark?: boolean }>> = ({
+    children,
+    isDark = true
+}) => {
     const { data, isFetched } = useUserTheme();
 
     const currentTheme = useMemo(() => {
+        const theme = isDark ? defaultTheme : lightTheme;
+
         if (!data || data.name === 'default') {
-            return defaultTheme;
+            return theme;
         } else {
-            return Object.entries(defaultTheme)
+            return Object.entries(theme)
                 .map(
                     ([key, value]: [string, string]) =>
                         [key, value === userDefaultTheme.color ? data.color : value] as const
@@ -22,7 +28,7 @@ export const UserThemeProvider: FC<PropsWithChildren> = ({ children }) => {
                     return acc;
                 }, {} as Record<string, string>);
         }
-    }, [data]);
+    }, [data, isDark]);
 
     if (!isFetched) {
         return <div></div>;

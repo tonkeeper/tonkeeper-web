@@ -1,9 +1,10 @@
 {
-  "editor.codeActionsOnSave": {
-    "source.fixAll": true,
-    "source.fixAll.eslint": true,
-    "source.organizeImports": true
-  },
-  "javascript.format.enable": true,
-  "editor.formatOnSave": true
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true,
+        "source.fixAll.eslint": true,
+        "source.organizeImports": true
+    },
+    "javascript.format.enable": true,
+    "editor.formatOnSave": true,
+    "cSpell.words": ["Tonendpoint"]
 }

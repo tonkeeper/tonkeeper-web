@@ -8,6 +8,7 @@ const BodyElement = styled.div`
     flex-grow: 1;
     padding: 0 1rem;
     -webkit-overflow-scrolling: touch;
+    background-color: ${props => props.theme.backgroundPage};
 `;
 
 const setTop = () => {
@@ -46,7 +47,7 @@ export const useWindowsScroll = (addHidden = true) => {
         let timer: NodeJS.Timeout | undefined;
 
         const handler = throttle(() => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10) {
+            if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 10) {
                 setBottom();
             } else {
                 removeBottom();

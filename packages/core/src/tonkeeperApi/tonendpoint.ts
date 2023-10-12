@@ -1,5 +1,5 @@
 import { Network } from '../entries/network';
-import { FetchAPI } from '../tonApiV1';
+import { FetchAPI } from '../tonApiV2';
 
 interface BootParams {
     platform: 'ios' | 'android' | 'web';
@@ -162,11 +162,4 @@ export interface TonendpoinFiatMethods {
 
 export const getFiatMethods = async (tonendpoint: Tonendpoint) => {
     return tonendpoint.GET<TonendpoinFiatMethods>('/fiat/methods');
-};
-
-export interface TonendpoinTime {
-    time: number;
-}
-export const getServerTime = async (tonendpoint: Tonendpoint) => {
-    return tonendpoint.GET<TonendpoinTime>('/v1/system/time');
 };

@@ -1,16 +1,18 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { TronApi } from '@tonkeeper/core/dist/tronApi';
-import React, { FC, useMemo, useRef } from 'react';
+import React, { FC, Suspense, useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
 import { ActivitySkeletonPage, SkeletonList } from '../../components/Skeleton';
 import { MixedActivityGroup } from '../../components/activity/ActivityGroup';
-import { EmptyActivity } from '../../components/activity/EmptyActivity';
+
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
 import { getMixedActivity } from '../../state/mixedActivity';
+
+const EmptyActivity = React.lazy(() => import('../../components/activity/EmptyActivity'));
 
 const Activity: FC = () => {
     const wallet = useWalletContext();
@@ -68,7 +70,11 @@ const Activity: FC = () => {
     }
 
     if (activity.length === 0) {
-        return <EmptyActivity />;
+        return (
+            <Suspense fallback={<ActivitySkeletonPage />}>
+                <EmptyActivity />
+            </Suspense>
+        );
     }
 
     return (

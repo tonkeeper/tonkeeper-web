@@ -10,6 +10,7 @@ import { FiatCurrency } from './FiatCurrency';
 import { JettonsSettings } from './Jettons';
 import { Legal } from './Legal';
 import { Localization } from './Localization';
+import { Notifications } from './Notification';
 import { ActiveRecovery, Recovery } from './Recovery';
 import { SecuritySettings } from './Security';
 import { Settings } from './Settings';
@@ -25,6 +26,7 @@ const SettingsRouter = () => {
             <Route path={SettingsRoute.dev} element={<DevSettings />} />
             <Route path={SettingsRoute.fiat} element={<FiatCurrency />} />
             <Route path={SettingsRoute.account} element={<Account />} />
+            <Route path={SettingsRoute.notification} element={<Notifications />} />
             <Route path={SettingsRoute.recovery}>
                 <Route path=":publicKey" element={<Recovery />} />
                 <Route index element={<ActiveRecovery />} />

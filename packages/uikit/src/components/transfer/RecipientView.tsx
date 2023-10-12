@@ -2,8 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { BaseRecipient, DnsRecipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
-import { DNSApi } from '@tonkeeper/core/dist/tonApiV1';
-import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { Account, AccountsApi, DNSApi } from '@tonkeeper/core/dist/tonApiV2';
 import {
     debounce,
     formatAddress,
@@ -16,6 +15,7 @@ import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
+import { scrollToTop } from '../../libs/common';
 import { QueryKey } from '../../libs/queryKey';
 import { Gap } from '../Layout';
 import { FullHeightBlock } from '../Notification';
@@ -83,7 +83,7 @@ const useDnsWallet = (value: string) => {
                 return null;
             }
             dns = dns.toString().toLowerCase();
-            const result = await new DNSApi(api.tonApi).dnsResolve({ name: dns });
+            const result = await new DNSApi(api.tonApiV2).dnsResolve({ domainName: dns });
             if (!result.wallet) {
                 return null;
             }
@@ -136,6 +136,13 @@ export const RecipientView: FC<{
     );
 
     const { data: dnsWallet, isFetching: isDnsFetching } = useDnsWallet(recipient.address);
+
+    useEffect(() => {
+        const timer = setTimeout(() => scrollToTop(), 300);
+        return () => {
+            clearTimeout(timer);
+        };
+    }, []);
 
     useEffect(() => {
         if (dnsWallet) {
@@ -291,7 +298,12 @@ export const RecipientView: FC<{
     };
 
     return (
-        <FullHeightBlock onSubmit={onSubmit} standalone={standalone} fitContent={fitContent}>
+        <FullHeightBlock
+            onSubmit={onSubmit}
+            standalone={standalone}
+            fitContent={fitContent}
+            noPadding
+        >
             <HeaderBlock />
             <ShowAddress value={showAddress}>
                 <InputWithScanner

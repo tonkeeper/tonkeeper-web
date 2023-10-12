@@ -40,6 +40,7 @@ import BigNumber from 'bignumber.js';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
+import { FavoriteView, useFavoriteNotification } from './FavoriteNotification';
 import {
     AmountTwaMainButton,
     ConfirmTwaMainButton,
@@ -70,9 +71,10 @@ const SendContent: FC<{
 
     const recipientRef = useRef<HTMLDivElement>(null);
     const amountRef = useRef<HTMLDivElement>(null);
+    const favoriteRef = useRef<HTMLDivElement>(null);
     const confirmRef = useRef<HTMLDivElement>(null);
 
-    const [view, setView] = useState<'recipient' | 'amount' | 'confirm'>('recipient');
+    const [view, setView] = useState<'recipient' | 'amount' | 'favorite' | 'confirm'>('recipient');
     const [right, setRight] = useState(true);
     const [recipient, _setRecipient] = useState<RecipientData | undefined>(initRecipient);
     const [amountViewState, setAmountViewState] = useState<Partial<AmountState> | undefined>(
@@ -96,6 +98,14 @@ const SendContent: FC<{
             setAmountViewState({ token: toTronAsset(tronBalances.balances[0]) });
         }
     };
+
+    const onFavorite = useCallback(() => {
+        openIosKeyboard('text');
+        setRight(true);
+        setView('favorite');
+    }, [setRight, setView]);
+
+    const favoriteState = useFavoriteNotification(onFavorite);
 
     const onRecipient = (data: RecipientData) => {
         setRight(true);
@@ -212,6 +222,7 @@ const SendContent: FC<{
     const nodeRef = {
         recipient: recipientRef,
         amount: amountRef,
+        favorite: favoriteRef,
         confirm: confirmRef
     }[view];
 
@@ -242,6 +253,9 @@ const SendContent: FC<{
                                 fitContent
                             />
                         )}
+                        {view === 'favorite' && (
+                            <FavoriteView state={favoriteState} onClose={backToRecipient} />
+                        )}
                         {view === 'amount' && (
                             <AmountView
                                 defaults={amountViewState}
@@ -258,6 +272,7 @@ const SendContent: FC<{
                                 onClose={onClose}
                                 onBack={backToAmount}
                                 recipient={recipient!}
+                                fitContent
                                 assetAmount={AssetAmount.fromRelativeAmount({
                                     asset: amountViewState!.token!,
                                     amount: amountViewState!.coinValue!
@@ -279,7 +294,7 @@ const SendContent: FC<{
     );
 };
 
-export const SendAction: FC<PropsWithChildren> = ({ children }) => {
+export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
     const [open, setOpen] = useState(false);
     const [chain, setChain] = useState<BLOCKCHAIN_NAME | undefined>(undefined);
     const [tonTransfer, setTonTransfer] = useState<InitTransferData | undefined>(undefined);

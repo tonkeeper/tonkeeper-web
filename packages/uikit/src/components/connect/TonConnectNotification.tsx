@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import {
@@ -36,6 +36,7 @@ const useConnectMutation = (
 ) => {
     const wallet = useWalletContext();
     const sdk = useAppSdk();
+    const client = useQueryClient();
 
     return useMutation<ConnectItemReply[], Error>(async () => {
         const params = await getTonConnectParams(request);
@@ -75,6 +76,22 @@ const useConnectMutation = (
             params,
             webViewUrl
         });
+
+        if (sdk.notifications) {
+            try {
+                const enable = await sdk.notifications.subscribed(wallet.active.rawAddress);
+                if (enable) {
+                    await sdk.notifications.subscribeTonConnect(
+                        params.clientSessionId,
+                        new URL(manifest.url).host
+                    );
+                }
+            } catch (e) {
+                if (e instanceof Error) sdk.topMessage(e.message);
+            }
+        }
+
+        await client.invalidateQueries([wallet.publicKey, QueryKey.connection]);
 
         return result;
     });
