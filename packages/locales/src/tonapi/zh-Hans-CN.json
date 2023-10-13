@@ -1,0 +1,19 @@
+{
+  "auctionBidMessage" : "为 {{.NftName}} 出价 {{.Amount}}",
+  "contractDeployAction" : "使用接口 {{.Interfaces}}{{ end }} 部署合约 {{ if .Interfaces }}",
+  "depositStakeAction" : "向质押池存入{{.Value}}",
+  "electionsDepositStakeAction" : "存入 {{.Amount}} 进行质押",
+  "electionsRecoverStakeAction" : "收回 {{.Amount}} 质押",
+  "helloWorld" : "世界你好！",
+  "jettonBurnAction" : "销毁 {{.Value}} {{.JettonName}}",
+  "jettonMintAction" : "铸造 {{.Value}} {{.JettonName}}",
+  "jettonSwapAction" : "将 {{.AmountIn}} {{.JettonIn}} 兑换成 {{.AmountOut}} {{.JettonOut}}",
+  "jettonTransferAction" : "发送 {{.Value}}{{.JettonName}}",
+  "nftPurchaseAction" : "购买{{.Name}}",
+  "nftTransferAction" : "转移 1 个 NFT",
+  "poolImplementationDescription" : "最低存款额 {{.Deposit}} TON",
+  "smartContractExecMessage" : "执行智能合约",
+  "subscriptionAction" : "支付 {{.Value}} 订阅费用",
+  "tonTransferAction" : "转移 {{.Value}}",
+  "withdrawStakeAction" : "从质押池中提取 {{.Value}}"
+}

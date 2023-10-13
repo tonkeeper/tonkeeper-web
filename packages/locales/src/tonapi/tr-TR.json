@@ -1,0 +1,20 @@
+{
+  "auctionBidMessage" : "{{.NftName}} için {{.Amount}} teklif veriliyor",
+  "contractDeployAction" : "{{.Interfaces}}{{ end }} arabirimleri olan bir sözleşme{{ if .Interfaces }} dağıtılıyor",
+  "depositStakeAction" : "Staking havuzuna {{.Value}} yatırın",
+  "electionsDepositStakeAction" : "Staking havuzuna {{.Amount}} yatırılıyor",
+  "electionsRecoverStakeAction" : "Staking havuzundan {{.Amount}} geri çekiliyor",
+  "helloWorld" : "Merhaba dünya!",
+  "jettonBurnAction" : "{{.Value}} {{.JettonName}} yakılıyor",
+  "jettonMintAction" : "{{.Value}} {{.JettonName}} mintleniyor",
+  "jettonSwapAction" : "{{.AmountOut}} {{.JettonOut}} karşılığında {{.AmountIn}} {{.JettonIn}} takas ediliyor",
+  "jettonTransferAction" : "{{.Value}} {{.JettonName}} transfer ediliyor",
+  "nftPurchaseAction" : "{{.Name}} satın alın",
+  "nftTransferAction" : "1 NFT transfer ediliyor",
+  "poolImplementationDescription" : "Minimum yatırabilecek tutar {{.Deposit}} TON'dur",
+  "smartContractExecMessage" : "Akıllı sözleşmenin yürütülmesi",
+  "subscriptionAction" : "Üyelik için {{.Value}} ödeme yapılıyor",
+  "tonTransferAction" : "{{.Value}} transfer ediliyor",
+  "withdrawStakeAction" : "Staking havuzundan {{.Value}} çekin",
+  "withdrawStakeRequestAction" : "Staking havuzundan {{.Value}} çekme talebi."
+}

@@ -1,0 +1,20 @@
+{
+  "auctionBidMessage" : "Bidding {{.Amount}} for {{.NftName}}",
+  "contractDeployAction" : "Deploying a contract{{ if .Interfaces }} with interfaces {{.Interfaces}}{{ end }}",
+  "depositStakeAction" : "Deposit {{.Value}} to staking pool",
+  "electionsDepositStakeAction" : "Depositing {{.Amount}} for stake",
+  "electionsRecoverStakeAction" : "Recover {{.Amount}} stake",
+  "helloWorld" : "Hello world!",
+  "jettonBurnAction" : "Burning {{.Value}} {{.JettonName}}",
+  "jettonMintAction" : "Minting {{.Value}} {{.JettonName}}",
+  "jettonSwapAction" : "Swapping {{.AmountIn}} {{.JettonIn}} for {{.AmountOut}} {{.JettonOut}}",
+  "jettonTransferAction" : "Transferring {{.Value}} {{.JettonName}}",
+  "nftPurchaseAction" : "Purchase {{.Name}}",
+  "nftTransferAction" : "Transferring 1 NFT",
+  "poolImplementationDescription" : "Minimum deposit {{.Deposit}} TON",
+  "smartContractExecMessage" : "Execution of smart contract",
+  "subscriptionAction" : "Paying {{.Value}} for subscription",
+  "tonTransferAction" : "Transferring {{.Value}}",
+  "withdrawStakeAction" : "Withdraw {{.Value}} from staking pool",
+  "withdrawStakeRequestAction" : "Request to withdraw {{.Value}} from staking pool."
+}
