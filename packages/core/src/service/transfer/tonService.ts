@@ -5,7 +5,7 @@ import { mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../../Storage';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
-import { TonRecipientData } from '../../entries/send';
+import { TonRecipient, TonRecipientData } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import {
@@ -79,6 +79,17 @@ const toStateInit = (stateInit?: string): { code: Maybe<Cell>; data: Maybe<Cell>
     };
 };
 
+const seeIfTransferBounceable = (account: Account, recipient: TonRecipient) => {
+    if ('dns' in recipient) {
+        return false;
+    }
+    if (!seeIfAddressBounceable(recipient.address)) {
+        return false;
+    }
+
+    return account.status === 'active';
+};
+
 const createTonTransfer = (
     seqno: number,
     walletState: WalletState,
@@ -97,7 +108,7 @@ const createTonTransfer = (
         messages: [
             internal({
                 to: recipient.toAccount.address,
-                bounce: recipient.toAccount.status === 'active',
+                bounce: seeIfTransferBounceable(recipient.toAccount, recipient.address),
                 value: BigInt(weiAmount.toFixed(0)),
                 body: recipient.comment !== '' ? recipient.comment : undefined
             })

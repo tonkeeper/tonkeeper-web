@@ -13,7 +13,7 @@ const localeMap = {
 };
 
 const dist = './dist';
-const src = './source';
+const src = './src';
 
 const extension = 'extension';
 const i18n = 'i18n';
@@ -39,6 +39,15 @@ const unzip = (zipFile: string) => {
 };
 
 const loadTransactions = async () => {
+    if (process.env.TOLGEE_TOKEN == undefined) return;
+
+    if (fs.existsSync(src)) {
+        fs.rmSync(src, { recursive: true, force: true });
+    }
+    if (!fs.existsSync(src)) {
+        fs.mkdirSync(src);
+    }
+
     const file = await fetch(
         `https://app.tolgee.io/v2/projects/export?ak=${process.env.TOLGEE_TOKEN}`
     );
@@ -51,6 +60,17 @@ const loadTransactions = async () => {
     fs.unlinkSync(zipFile);
 };
 
+const createDirFolders = () => {
+    if (fs.existsSync(dist)) {
+        fs.rmSync(dist, { recursive: true, force: true });
+    }
+    if (!fs.existsSync(dist)) {
+        fs.mkdirSync(dist);
+        fs.mkdirSync(path.join(dist, extension));
+        fs.mkdirSync(path.join(dist, i18n));
+        fs.mkdirSync(path.join(dist, locales));
+    }
+};
 const fillMissingLocales = (
     resources: Record<string, { translation: Record<string, string> }>,
     defaultResource: Record<string, string>
@@ -111,22 +131,7 @@ const toDict = (parentKey: string | undefined, value: object): Record<string, st
 const main = async () => {
     console.log('----------Build Locales----------');
 
-    if (!fs.existsSync(src)) {
-        fs.mkdirSync(src);
-    }
-    if (!fs.existsSync(dist)) {
-        fs.mkdirSync(dist);
-    }
-    if (!fs.existsSync(path.join(dist, extension))) {
-        fs.mkdirSync(path.join(dist, extension));
-    }
-    if (!fs.existsSync(path.join(dist, i18n))) {
-        fs.mkdirSync(path.join(dist, i18n));
-    }
-    if (!fs.existsSync(path.join(dist, locales))) {
-        fs.mkdirSync(path.join(dist, locales));
-    }
-
+    createDirFolders();
     await loadTransactions();
 
     let resources: Record<string, { translation: Record<string, string> }> = {};
