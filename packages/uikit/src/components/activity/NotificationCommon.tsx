@@ -191,7 +191,10 @@ export const ActionSenderAddress: FC<{ address: string; name?: string }> = ({ ad
     );
 };
 
-export const ActionSenderDetails: FC<{ sender: AccountAddress }> = ({ sender }) => {
+export const ActionSenderDetails: FC<{ sender: AccountAddress; bounced?: boolean }> = ({
+    sender,
+    bounced
+}) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const wallet = useWalletContext();
@@ -207,7 +210,7 @@ export const ActionSenderDetails: FC<{ sender: AccountAddress }> = ({ sender }) 
                 </ListItem>
             )}
             <ActionSenderAddress
-                address={formatAddress(sender.address, wallet.network)}
+                address={formatAddress(sender.address, wallet.network, bounced)}
                 name={sender.name}
             />
         </>

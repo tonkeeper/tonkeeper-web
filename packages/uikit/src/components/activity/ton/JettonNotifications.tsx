@@ -249,7 +249,7 @@ const JettonBurnActionContent: FC<{
                 status={status}
             />
             <ListBlock margin={false} fullWidth>
-                <ActionSenderDetails sender={jettonBurn.sender} />
+                <ActionSenderDetails sender={jettonBurn.sender} bounced />
                 <ActionTransactionDetails eventId={event.eventId} />
                 <ActionExtraDetails extra={event.extra} />
             </ListBlock>
