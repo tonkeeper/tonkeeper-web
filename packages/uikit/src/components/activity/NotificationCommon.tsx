@@ -219,6 +219,7 @@ export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({ 
     const sdk = useAppSdk();
     const wallet = useWalletContext();
 
+    const address = formatAddress(beneficiary.address, wallet.network, true);
     return (
         <>
             {beneficiary.name && (
@@ -229,23 +230,14 @@ export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({ 
                     </ListItemPayload>
                 </ListItem>
             )}
-            <ListItem
-                onClick={() =>
-                    sdk.copyToClipboard(
-                        formatAddress(beneficiary.address, wallet.network),
-                        t('address_copied')
-                    )
-                }
-            >
+            <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
                 <ListItemPayload>
                     <Label>
                         {beneficiary.name
                             ? t('add_edit_favorite_address_label')
                             : t('transaction_merchant')}
                     </Label>
-                    <Label1>
-                        {toShortValue(formatAddress(beneficiary.address, wallet.network))}
-                    </Label1>
+                    <Label1>{toShortValue(address)}</Label1>
                 </ListItemPayload>
             </ListItem>
         </>

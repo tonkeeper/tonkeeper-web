@@ -1,5 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { Action, NftItem } from '@tonkeeper/core/dist/tonApiV2';
+import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, seeIfAddressEqual, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { ListItemPayload } from '../../../components/List';
@@ -127,7 +127,7 @@ export const SmartContractExecAction: FC<{
                     amount={<>-&thinsp;{format(smartContractExec.tonAttached)}</>}
                     entry={CryptoCurrency.TON}
                     address={toShortValue(
-                        formatAddress(smartContractExec.contract.address, wallet.network)
+                        formatAddress(smartContractExec.contract.address, wallet.network, true)
                     )}
                     date={date}
                 />
