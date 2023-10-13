@@ -170,7 +170,7 @@ export const ActionPoolDetails: FC<{ pool: AccountAddress }> = ({ pool }) => {
                 </ListItemPayload>
             </ListItem>
             <ActionRecipientAddress
-                address={formatAddress(pool.address, wallet.network)}
+                address={formatAddress(pool.address, wallet.network, true)}
                 label={t('staking_details_pool_address_label')}
             />
         </>
