@@ -1,4 +1,4 @@
-import { Action, NftItem } from '@tonkeeper/core/dist/tonApiV2';
+import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { useWalletContext } from '../../../hooks/appContext';
@@ -60,7 +60,11 @@ export const ContractDeployAction: FC<{
     }
     const interfaces = contractDeploy.interfaces ?? [];
     const address = toShortValue(
-        formatAddress(contractDeploy.address, wallet.network, !interfaces.includes('wallet'))
+        formatAddress(
+            contractDeploy.address,
+            wallet.network,
+            !interfaces.some(value => value.includes('wallet'))
+        )
     );
 
     if (interfaces.includes('nft_item')) {

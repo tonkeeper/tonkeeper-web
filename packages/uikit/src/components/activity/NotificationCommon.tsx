@@ -170,7 +170,7 @@ export const ActionPoolDetails: FC<{ pool: AccountAddress }> = ({ pool }) => {
                 </ListItemPayload>
             </ListItem>
             <ActionRecipientAddress
-                address={formatAddress(pool.address, wallet.network)}
+                address={formatAddress(pool.address, wallet.network, true)}
                 label={t('staking_details_pool_address_label')}
             />
         </>
@@ -191,7 +191,10 @@ export const ActionSenderAddress: FC<{ address: string; name?: string }> = ({ ad
     );
 };
 
-export const ActionSenderDetails: FC<{ sender: AccountAddress }> = ({ sender }) => {
+export const ActionSenderDetails: FC<{ sender: AccountAddress; bounced?: boolean }> = ({
+    sender,
+    bounced
+}) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const wallet = useWalletContext();
@@ -207,7 +210,7 @@ export const ActionSenderDetails: FC<{ sender: AccountAddress }> = ({ sender }) 
                 </ListItem>
             )}
             <ActionSenderAddress
-                address={formatAddress(sender.address, wallet.network)}
+                address={formatAddress(sender.address, wallet.network, bounced)}
                 name={sender.name}
             />
         </>
@@ -219,6 +222,7 @@ export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({ 
     const sdk = useAppSdk();
     const wallet = useWalletContext();
 
+    const address = formatAddress(beneficiary.address, wallet.network, true);
     return (
         <>
             {beneficiary.name && (
@@ -229,23 +233,14 @@ export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({ 
                     </ListItemPayload>
                 </ListItem>
             )}
-            <ListItem
-                onClick={() =>
-                    sdk.copyToClipboard(
-                        formatAddress(beneficiary.address, wallet.network),
-                        t('address_copied')
-                    )
-                }
-            >
+            <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
                 <ListItemPayload>
                     <Label>
                         {beneficiary.name
                             ? t('add_edit_favorite_address_label')
                             : t('transaction_merchant')}
                     </Label>
-                    <Label1>
-                        {toShortValue(formatAddress(beneficiary.address, wallet.network))}
-                    </Label1>
+                    <Label1>{toShortValue(address)}</Label1>
                 </ListItemPayload>
             </ListItem>
         </>
