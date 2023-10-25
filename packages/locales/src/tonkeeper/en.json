@@ -122,6 +122,34 @@
   },
   "auth_failed" : "Authentication failed",
   "balances_setup_wallet" : "Set up wallet",
+  "battery" : {
+    "description" : {
+      "almost_empty" : "You have enough charge battery for more than 300 transactions.",
+      "empty" : "You have enough charge battery for more than 5 transactions.",
+      "full" : "You have enough charge battery for more than 700 transactions."
+    },
+    "packages" : {
+      "buy" : "Buy",
+      "disclaimer" : "This is approximate transactions number. Some your transactions may cost more.",
+      "ok" : "OK",
+      "refilled" : "Your battery is charged",
+      "subtitle" : {
+        "large" : "Large gas fees pack",
+        "medium" : "Medium gas fees pack",
+        "small" : "Small gas fees pack"
+      },
+      "title" : {
+        "large" : "700 transactions for {{price}}",
+        "medium" : "400 transactions for {{price}}",
+        "small" : "100 transactions for {{price}}"
+      }
+    },
+    "title" : {
+      "almost_empty" : "Battery for gas fees is half full",
+      "empty" : "Battery for gas fees is almost empty",
+      "full" : "Battery for gas fees is full"
+    }
+  },
   "browser" : {
     "about_dapps_caption" : "Explore apps and services where you can use Tonkeeper for sign-in and payments.",
     "about_dapps_learn_more" : "Learn more",

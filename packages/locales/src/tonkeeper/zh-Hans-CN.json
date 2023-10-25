@@ -280,7 +280,6 @@
   "migration_new_wallet" : "新地址",
   "migration_old_wallet" : "旧地址",
   "migration_title" : "升级您的钱包",
-  "nft_about_collection" : "关于 {{collection}}",
   "nft_about_dns" : "TON DNS 是一项服务，允许用户为加密钱包、智能合约和网站分配人类可读的名称。\n\n 使用 TON DNS，像访问互联网上一样访问去中心化服务的网站。",
   "nft_browse_markets" : "浏览市场",
   "nft_chain" : "链",
