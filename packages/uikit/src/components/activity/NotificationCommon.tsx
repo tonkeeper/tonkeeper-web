@@ -1,5 +1,6 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import {
     AccountAddress,
@@ -46,7 +47,7 @@ export const ActionDate: FC<{
     const { t, i18n } = useTranslation();
 
     const date = useMemo(() => {
-        return new Intl.DateTimeFormat(i18n.language, {
+        return new Intl.DateTimeFormat(intlLocale(i18n.language), {
             month: 'short',
             day: 'numeric',
             year:

@@ -1,4 +1,4 @@
-import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
+import { intlLocale, localizationFrom } from '@tonkeeper/core/dist/entries/language';
 import React, { useCallback, useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
@@ -9,14 +9,10 @@ import { useMutateWalletProperty } from '../../state/wallet';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-const localeMap: Record<string, string> = {
-    zh_CN: 'zh-Hans'
-};
-
 const getLanguageName = (language: string, locale: string) => {
     return capitalize(
-        new Intl.DisplayNames([localeMap[locale] ?? locale], { type: 'language' }).of(
-            localeMap[language] ?? language
+        new Intl.DisplayNames([intlLocale(locale)], { type: 'language' }).of(
+            intlLocale(language)
         ) ?? language
     );
 };

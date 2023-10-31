@@ -1,4 +1,5 @@
 import { FiatCurrencies, FiatCurrencySymbolsConfig } from '@tonkeeper/core/dist/entries/fiat';
+import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import React, { useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
@@ -20,7 +21,9 @@ export const FiatCurrency = () => {
             secondary:
                 key === 'TON'
                     ? t(`Toncoin`)
-                    : new Intl.DisplayNames([i18n.language], { type: 'currency' }).of(key),
+                    : new Intl.DisplayNames([intlLocale(i18n.language)], { type: 'currency' }).of(
+                          key
+                      ),
             icon: key === fiat ? <CheckIcon /> : undefined,
             action: () => mutate({ fiat: key as FiatCurrencies })
         }));

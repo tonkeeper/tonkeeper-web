@@ -43,3 +43,11 @@ export const localizationFrom = (lang: string) => {
             return Language.EN;
     }
 };
+
+const localeMap: Record<string, string> = {
+    zh_CN: 'zh-Hans'
+};
+
+export const intlLocale = (locale: string) => {
+    return localeMap[locale] ?? locale;
+};
