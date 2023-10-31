@@ -54,6 +54,7 @@
     "why_change" : "Для чего это обновление?",
     "your_wallet" : "Ваш кошелёк"
   },
+  "all_regions" : "Все регионы",
   "appearance_accent_name" : {
     "andromeda" : "Андромеда",
     "arctic" : "Арктика",
@@ -139,8 +140,13 @@
       "refresh" : "Обновить",
       "share" : "Поделиться"
     },
+    "apps_all" : "Все",
+    "connected" : "Подключённые",
+    "connected_empty_text" : "Исследуйте приложения и сервисы в браузере Tonkeeper.",
+    "connected_empty_title" : "Подключённые приложения будут отображаться здесь",
     "connected_title" : "Подключённые",
     "empty_search" : "По вашему запросу ничего не найдено",
+    "explore" : "Витрина",
     "explore_all" : "Другие",
     "more_description" : "Маркеты, биржи и другие",
     "more_title" : "Исследуйте все сервисы",
@@ -419,6 +425,7 @@
   "nft_unlink_domain_button" : "Связан с {{address}}",
   "nft_unnamed_collection" : "Коллекция без названия",
   "nft_view_in_explorer" : "Подробнее",
+  "nokyc" : "без KYC",
   "notifications" : {
     "alert" : {
       "cancel" : "Отмена",
@@ -501,6 +508,7 @@
   "receive_title" : "Получить %{currency}",
   "receive_ton_and_jettons" : "Получить TON и другие токены",
   "refresh_app" : "Перезапустить",
+  "region_nokyc" : "Нейтральные воды",
   "reminder_notifications_caption" : "Получайте уведомления при получении TON, токенов и NFT.",
   "reminder_notifications_enable_button" : "Включить уведомления",
   "reminder_notifications_later_button" : "Позже",

@@ -54,6 +54,7 @@
     "why_change" : "Why change?",
     "your_wallet" : "Your wallet"
   },
+  "all_regions" : "All Regions",
   "appearance_accent_name" : {
     "andromeda" : "Andromeda",
     "arctic" : "Arctic",
@@ -161,8 +162,13 @@
       "refresh" : "Refresh",
       "share" : "Share"
     },
+    "apps_all" : "All",
+    "connected" : "Connected",
+    "connected_empty_text" : "Explore apps and services in Tonkeeper browser.",
+    "connected_empty_title" : "Connected apps will be shown here",
     "connected_title" : "Connected",
     "empty_search" : "Your search returned no results",
+    "explore" : "Explore",
     "explore_all" : "Explore all",
     "more_description" : "Markets, exchanges and more",
     "more_title" : "Explore all services",
@@ -222,6 +228,7 @@
       "NGN" : "Nigerian Naira",
       "RUB" : "Russian Ruble",
       "THB" : "Thai Baht",
+      "TON" : "Toncoin",
       "TRY" : "Turkish Lira",
       "UAH" : "Ukrainian hryvnia",
       "USD" : "United States Dollar",
@@ -435,6 +442,7 @@
   "nft_unlink_domain_button" : "Linked with {{address}}",
   "nft_unnamed_collection" : "Unnamed collection",
   "nft_view_in_explorer" : "View in explorer",
+  "nokyc" : "no KYC",
   "notifications" : {
     "alert" : {
       "cancel" : "Cancel",
@@ -517,6 +525,7 @@
   "receive_title" : "Receive %{currency}",
   "receive_ton_and_jettons" : "Receive TON and other tokens",
   "refresh_app" : "Restart",
+  "region_nokyc" : "Neutral Waters",
   "reminder_notifications_caption" : "Get notifications when you receive TON, tokens and NFTs.",
   "reminder_notifications_enable_button" : "Enable notifications",
   "reminder_notifications_later_button" : "Later",
