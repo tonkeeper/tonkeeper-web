@@ -9,9 +9,15 @@ import { useMutateWalletProperty } from '../../state/wallet';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
+const localeMap: Record<string, string> = {
+    zh_CN: 'zh-Hans'
+};
+
 const getLanguageName = (language: string, locale: string) => {
     return capitalize(
-        new Intl.DisplayNames([locale], { type: 'language' }).of(language) ?? language
+        new Intl.DisplayNames([localeMap[locale] ?? locale], { type: 'language' }).of(
+            localeMap[language] ?? language
+        ) ?? language
     );
 };
 export const Localization = () => {

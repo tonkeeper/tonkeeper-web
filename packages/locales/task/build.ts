@@ -11,7 +11,7 @@ const namespaces = ['tonkeeper', 'tonkeeper-web'];
 const localeMap = {
     'ru-RU': 'ru',
     'tr-TR': 'tr',
-    'zh-Hans-CN': 'zh-Hans'
+    'zh-Hans-CN': 'zh_CN'
 };
 
 const dist = './dist';
