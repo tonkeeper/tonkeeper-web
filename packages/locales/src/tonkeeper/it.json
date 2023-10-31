@@ -214,7 +214,6 @@
   "migration_new_wallet" : "Nuovo indirizzo",
   "migration_old_wallet" : "Vecchio indirizzo",
   "migration_title" : "Aggiorna il tuo wallet",
-  "nft_about_collection" : "Riguardo {{collection}}",
   "nft_about_dns" : "TON DNS è un servizio che consente agli utenti di assegnare un nome leggibile all'uomo a Wallet, Smart Contract e siti Web. \n\nCon TON DNS, l'accesso ai servizi decentralizzati è analogo all'accesso ai siti Web su Internet.",
   "nft_browse_markets" : "Esplora i Mercati",
   "nft_chain" : "Chain",
