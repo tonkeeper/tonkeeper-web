@@ -1,3 +1,4 @@
+import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { useMemo } from 'react';
 import { useTranslation } from './translation';
 
@@ -12,7 +13,7 @@ export function useDateFormat(
             return '';
         }
 
-        return new Intl.DateTimeFormat(i18n.language, {
+        return new Intl.DateTimeFormat(intlLocale(i18n.language), {
             month: 'short',
             day: 'numeric',
             year:
