@@ -1,4 +1,4 @@
-import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
+import { intlLocale, localizationFrom } from '@tonkeeper/core/dist/entries/language';
 import React, { useCallback, useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
@@ -11,7 +11,9 @@ const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const getLanguageName = (language: string, locale: string) => {
     return capitalize(
-        new Intl.DisplayNames([locale], { type: 'language' }).of(language) ?? language
+        new Intl.DisplayNames([intlLocale(locale)], { type: 'language' }).of(
+            intlLocale(language)
+        ) ?? language
     );
 };
 export const Localization = () => {

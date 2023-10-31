@@ -1,3 +1,4 @@
+import { intlLocale } from '../entries/language';
 import { Network } from '../entries/network';
 import { FetchAPI } from '../tonApiV2';
 
@@ -80,9 +81,13 @@ export class Tonendpoint {
         this.basePath = basePath;
     }
 
+    setCountryCode = (countryCode?: string | null | undefined) => {
+        this.params.countryCode = countryCode;
+    };
+
     toSearchParams = () => {
         const params = new URLSearchParams({
-            lang: this.params.lang,
+            lang: intlLocale(this.params.lang),
             build: this.params.build,
             chainName: this.params.network === Network.TESTNET ? 'testnet' : 'mainnet',
             platform: this.params.platform
@@ -160,6 +165,10 @@ export interface TonendpoinFiatMethods {
     categories: TonendpoinFiatCategory[];
 }
 
-export const getFiatMethods = async (tonendpoint: Tonendpoint) => {
+export const getFiatMethods = async (
+    tonendpoint: Tonendpoint,
+    countryCode: string | null | undefined
+) => {
+    tonendpoint.setCountryCode(countryCode);
     return tonendpoint.GET<TonendpoinFiatMethods>('/fiat/methods');
 };

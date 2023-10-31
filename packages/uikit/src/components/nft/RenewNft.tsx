@@ -1,5 +1,6 @@
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
 import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -55,7 +56,7 @@ export const RenewNft: FC<{
         t,
         i18n: { language }
     } = useTranslation();
-    const rtf = new Intl.RelativeTimeFormat(language, { style: 'long' });
+    const rtf = new Intl.RelativeTimeFormat(intlLocale(language), { style: 'long' });
 
     const query = useNftDNSExpirationDate(nft);
     const { data: expirationDate, isLoading: isExpirationInfoLoading } = query;

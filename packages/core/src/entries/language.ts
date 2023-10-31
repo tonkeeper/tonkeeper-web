@@ -2,19 +2,13 @@ export enum Language {
     EN = 0,
     RU = 1,
     IT = 2,
-    'zh-Hans-CN' = 3,
-    'tr-TR' = 4
+    'zh_CN' = 3,
+    TR = 4
 }
 
 export const defaultLanguage: Language = Language.EN;
 
-export const languages = [
-    Language.EN,
-    Language.RU,
-    Language.IT,
-    Language['zh-Hans-CN'],
-    Language['tr-TR']
-];
+export const languages = [Language.EN, Language.RU, Language.IT, Language['zh_CN'], Language.TR];
 
 export const localizationText = (lang?: Language) => {
     switch (lang) {
@@ -24,10 +18,10 @@ export const localizationText = (lang?: Language) => {
             return 'ru';
         case Language.IT:
             return 'it';
-        case Language['zh-Hans-CN']:
-            return 'zh-Hans-CN';
-        case Language['tr-TR']:
-            return 'tr-TR';
+        case Language['zh_CN']:
+            return 'zh_CN';
+        case Language.TR:
+            return 'tr';
         default:
             return 'en';
     }
@@ -41,11 +35,19 @@ export const localizationFrom = (lang: string) => {
             return Language.RU;
         case 'it':
             return Language.IT;
-        case 'zh-Hans-CN':
-            return Language['zh-Hans-CN'];
-        case 'tr-TR':
-            return Language['tr-TR'];
+        case 'zh_CN':
+            return Language['zh_CN'];
+        case 'tr':
+            return Language.TR;
         default:
             return Language.EN;
     }
+};
+
+const localeMap: Record<string, string> = {
+    zh_CN: 'zh-Hans'
+};
+
+export const intlLocale = (locale: string) => {
+    return localeMap[locale] ?? locale;
 };

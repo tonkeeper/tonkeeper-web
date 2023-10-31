@@ -1,3 +1,4 @@
+import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import country from 'country-list-js';
 import React, { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -54,8 +55,9 @@ export const CountrySettings = () => {
             .map(([key, value]) => {
                 return {
                     name:
-                        new Intl.DisplayNames([i18n.language], { type: 'region' }).of(key) ??
-                        value.name,
+                        new Intl.DisplayNames([intlLocale(i18n.language)], { type: 'region' }).of(
+                            key
+                        ) ?? value.name,
                     preIcon: <CountryIcon country={key} />,
                     icon: selected == key ? <CheckIcon /> : undefined,
                     action: () => mutate(key)

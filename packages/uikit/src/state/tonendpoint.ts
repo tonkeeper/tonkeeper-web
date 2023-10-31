@@ -15,10 +15,9 @@ import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
 import { useUserCountry } from './country';
 
 export const useTonendpoint = (build: string, network?: Network, lang?: Language) => {
-    const { data: countryCode } = useUserCountry();
     return useMemo(() => {
-        return new Tonendpoint({ build, network, lang: localizationText(lang), countryCode }, {});
-    }, [build, network, lang, countryCode]);
+        return new Tonendpoint({ build, network, lang: localizationText(lang) }, {});
+    }, [build, network, lang]);
 };
 
 export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
@@ -34,20 +33,14 @@ export const DefaultRefetchInterval = 60000; // 60 sec
 
 export const useTonendpointBuyMethods = () => {
     const { tonendpoint } = useAppContext();
+    const { data: countryCode } = useUserCountry();
     return useQuery<TonendpoinFiatCategory, Error>(
-        [
-            QueryKey.tonkeeperApi,
-            TonkeeperApiKey.fiat,
-            tonendpoint.params.lang,
-            tonendpoint.params.countryCode
-        ],
+        [QueryKey.tonkeeperApi, TonkeeperApiKey.fiat, tonendpoint.params.lang, countryCode],
         async () => {
-            const methods = await getFiatMethods(tonendpoint);
+            const methods = await getFiatMethods(tonendpoint, countryCode);
             const buy = methods.categories[0];
 
-            const layout = methods.layoutByCountry.find(
-                item => item.countryCode === tonendpoint.params.countryCode
-            );
+            const layout = methods.layoutByCountry.find(item => item.countryCode === countryCode);
 
             const buildMethods = (acc: TonendpoinFiatItem[], id: string) => {
                 const method = buy.items.find(item => item.id === id);
