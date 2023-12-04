@@ -30,7 +30,8 @@
         "start": "yarn electron:dev",
         "build": "yarn clean && yarn electron:build",
         "test": "react-app-rewired test",
-        "eject": "react-app-rewired eject"
+        "eject": "react-app-rewired eject",
+        "build:desktop": "yarn build"
     },
     "dependencies": {
         "@tonkeeper/core": "0.1.0",

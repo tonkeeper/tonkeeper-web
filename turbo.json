@@ -23,6 +23,11 @@
             "dependsOn": ["^build:pkg"],
             "outputs": [".next/**", "dist/**"]
         },
+        "build:desktop": {
+            "cache": false,
+            "dependsOn": ["^build:pkg"],
+            "outputs": [".next/**", "dist/**"]
+        },
         "dev": {
             "dependsOn": ["^dev"],
             "outputs": [".next/**", "dist/**"]
