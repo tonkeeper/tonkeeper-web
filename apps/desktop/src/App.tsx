@@ -51,6 +51,7 @@ import styled from 'styled-components';
 import { DesktopAppSdk } from './libs/appSdk';
 import { useAppHeight, useAppWidth } from './libs/hooks';
 
+import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import TonConnectSubscription from '@tonkeeper/uikit/dist/components/connect/TonConnectSubscription';
 import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
@@ -75,6 +76,7 @@ const queryClient = new QueryClient({
 const sdk = new DesktopAppSdk();
 
 const langs = 'en,zh_CN,ru,it,tr';
+const listOfAuth: AuthState['kind'][] = ['keychain'];
 
 export const App: FC<PropsWithChildren> = () => {
     const { t, i18n } = useTranslation();
@@ -213,7 +215,10 @@ export const Content: FC<{
                 <Suspense fallback={<Loading />}>
                     <InitializeContainer fullHeight={false}>
                         <Routes>
-                            <Route path={any(AppRoute.import)} element={<ImportRouter />} />
+                            <Route
+                                path={any(AppRoute.import)}
+                                element={<ImportRouter listOfAuth={listOfAuth} />}
+                            />
                             <Route path="*" element={<Initialize />} />
                         </Routes>
                     </InitializeContainer>

@@ -54,6 +54,11 @@ export interface NativeBackButton {
     hide(): void;
 }
 
+export interface KeychainPassword {
+    setPassword: (publicKey: string, mnemonic: string) => Promise<void>;
+    getPassword: (publicKey: string) => Promise<string>;
+}
+
 export interface NotificationService {
     subscribe: (wallet: WalletState, mnemonic: string[]) => Promise<void>;
     unsubscribe: (address?: string) => Promise<void>;
@@ -67,6 +72,7 @@ export interface NotificationService {
 export interface IAppSdk {
     storage: IStorage;
     nativeBackButton?: NativeBackButton;
+    keychain?: KeychainPassword;
 
     topMessage: (text: string) => void;
     copyToClipboard: (value: string, notification?: string) => void;

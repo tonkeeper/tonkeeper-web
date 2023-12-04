@@ -3,7 +3,7 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 
-export const getMnemonic = async (sdk: IAppSdk, publicKey: string) => {
+export const getMnemonic = async (sdk: IAppSdk, publicKey: string): Promise<string[]> => {
     const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
     if (!auth) {
         throw new Error('Missing Auth');
@@ -16,6 +16,13 @@ export const getMnemonic = async (sdk: IAppSdk, publicKey: string) => {
         case 'password': {
             const password = await getPasswordByNotification(sdk, auth);
             return await getWalletMnemonic(sdk.storage, publicKey, password);
+        }
+        case 'keychain': {
+            if (!sdk.keychain) {
+                throw Error('Keychain is undefined');
+            }
+            const mnemonic = await sdk.keychain.getPassword(publicKey);
+            return mnemonic.split(' ');
         }
         default:
             throw new Error('Unexpected auth method');

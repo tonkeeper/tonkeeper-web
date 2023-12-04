@@ -5222,6 +5222,7 @@ __metadata:
     "@tonkeeper/uikit": 0.1.0
     "@types/electron-devtools-installer": ^2.2.2
     "@types/jest": ^27.5.2
+    "@types/keychain": ^1.4.4
     "@types/node": ^16.18.6
     "@types/react": ^18.0.26
     "@types/react-dom": ^18.0.9
@@ -5231,7 +5232,7 @@ __metadata:
     electron-builder: ^23.6.0
     electron-devtools-installer: ^3.2.0
     electron-is-dev: ^2.0.0
-    electron-reload: ^2.0.0-alpha.1
+    keychain: ^1.5.0
     react: ^18.2.0
     react-app-rewired: ^2.2.1
     react-dom: ^18.2.0
@@ -5934,6 +5935,13 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: 0f8fe0a9221a00e8413cffba723dfe16553868724b830237256fb0052ecd5cac96498189d1235a001cfa815f352008261c9ceb373f0aa58227f891e0c7a12c4d
+  languageName: node
+  linkType: hard
+
+"@types/keychain@npm:^1.4.4":
+  version: 1.4.4
+  resolution: "@types/keychain@npm:1.4.4"
+  checksum: 95e61618df88c6560ff0088e384a9343a606673346c85236913a37cf36d049a2a4f725e25e169c3b1d5596ea9146a7bb3ed69461d76ef38dad9424d5abba4410
   languageName: node
   linkType: hard
 
@@ -9098,7 +9106,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:^3.4.0, chokidar@npm:^3.4.1, chokidar@npm:^3.4.2, chokidar@npm:^3.5.2, chokidar@npm:^3.5.3":
+"chokidar@npm:^3.4.0, chokidar@npm:^3.4.1, chokidar@npm:^3.4.2, chokidar@npm:^3.5.3":
   version: 3.5.3
   resolution: "chokidar@npm:3.5.3"
   dependencies:
@@ -11070,15 +11078,6 @@ __metadata:
     lazy-val: ^1.0.5
     mime: ^2.5.2
   checksum: 70473d800f0607b5ffc32473e87004079fe3e5f133242bb498dcff0be89bfaa4ce967860809e12b97ce216b1e907649a8a916b7483daf7a00ea28db3d665878e
-  languageName: node
-  linkType: hard
-
-"electron-reload@npm:^2.0.0-alpha.1":
-  version: 2.0.0-alpha.1
-  resolution: "electron-reload@npm:2.0.0-alpha.1"
-  dependencies:
-    chokidar: ^3.5.2
-  checksum: d21cf22ad8af2695e960444f18800db2fc29aa3fd4be304fd55894186559a9f64d590aac19dbe492887a962ab7aaf0be93f8b3b2226926654f6010c65e9bd9dc
   languageName: node
   linkType: hard
 
@@ -16125,6 +16124,13 @@ __metadata:
   version: 3.1.0
   resolution: "junk@npm:3.1.0"
   checksum: 6c4d68e8f8bc25b546baed802cd0e7be6a971e92f1e885c92cbfe98946d5690b961a32f8e7909e77765d3204c3e556d13c17f73e31697ffae1db07a58b9e68c0
+  languageName: node
+  linkType: hard
+
+"keychain@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "keychain@npm:1.5.0"
+  checksum: ee1cd1c377efa501f632ac3b690c4743ed22f59159b8bd86a8393a67e35252d6367d8918f9c57a28e7a4d090912501d6fcc876ddae25831421704922151ab328
   languageName: node
   linkType: hard
 

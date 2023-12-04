@@ -1,4 +1,5 @@
 import { shell } from 'electron';
+import * as keychain from 'keychain';
 import { Message } from '../../src/libs/message';
 import {
     storageClear,
@@ -7,6 +8,8 @@ import {
     storageSet,
     storageSetBatch
 } from './storageService';
+
+const service = 'tonkeeper.com';
 
 export const handleBackgroundMessage = async (message: Message): Promise<unknown> => {
     switch (message.king) {
@@ -22,6 +25,39 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
             return storageClear(message);
         case 'open-page':
             return shell.openExternal(message.url);
+        case 'set-keychain':
+            return new Promise((resolve, reject) => {
+                keychain.setPassword(
+                    {
+                        account: `Wallet-${message.publicKey}`,
+                        service,
+                        password: message.mnemonic
+                    },
+                    error => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(undefined);
+                        }
+                    }
+                );
+            });
+        case 'get-keychain':
+            return new Promise((resolve, reject) => {
+                keychain.getPassword(
+                    {
+                        account: `Wallet-${message.publicKey}`,
+                        service
+                    },
+                    (error, password) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(password);
+                        }
+                    }
+                );
+            });
         default:
             throw new Error(`Unknown message: ${JSON.stringify(message)}`);
     }

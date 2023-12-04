@@ -28,10 +28,23 @@ export interface OpenPageMessage {
     url: string;
 }
 
+export interface SetKeychainMessage {
+    king: 'set-keychain';
+    publicKey: string;
+    mnemonic: string;
+}
+
+export interface GetKeychainMessage {
+    king: 'get-keychain';
+    publicKey: string;
+}
+
 export type Message =
     | GetStorageMessage
     | SetStorageMessage
     | SetBatchStorageMessage
     | DeleteStorageMessage
     | ClearStorageMessage
-    | OpenPageMessage;
+    | OpenPageMessage
+    | SetKeychainMessage
+    | GetKeychainMessage;
