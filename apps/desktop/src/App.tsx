@@ -44,34 +44,24 @@ import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
+import { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { DesktopAppSdk } from './libs/appSdk';
 import { useAppHeight, useAppWidth } from './libs/hooks';
 
-const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
-const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
-const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
-const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
-const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
-const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
-const TonConnectSubscription = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
-);
-const SendActionNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
-);
-const ReceiveNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/home/ReceiveNotification')
-);
-const NftNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/nft/NftNotification')
-);
-const SendNftNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification')
-);
+import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
+import TonConnectSubscription from '@tonkeeper/uikit/dist/components/connect/TonConnectSubscription';
+import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
+import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
+import SendActionNotification from '@tonkeeper/uikit/dist/components/transfer/SendNotifications';
+import SendNftNotification from '@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification';
+import Activity from '@tonkeeper/uikit/dist/pages/activity/Activity';
+import Coin from '@tonkeeper/uikit/dist/pages/coin/Coin';
+import Home from '@tonkeeper/uikit/dist/pages/home/Home';
+import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
+import Settings from '@tonkeeper/uikit/dist/pages/settings';
 
 const queryClient = new QueryClient({
     defaultOptions: {

@@ -6,7 +6,7 @@
     "homepage": ".",
     "main": "build/electron/main.js",
     "build": {
-        "appId": "com.electron.tonkeeper",
+        "appId": "com.electron.tonkeeper-web",
         "productName": "Tonkeeper",
         "extends": null,
         "files": [
@@ -16,7 +16,8 @@
             "buildResources": "assets"
         },
         "mac": {
-            "icon": "build/icon.icns"
+            "icon": "build/icon.icns",
+            "identity": "Mac Developer: Nikita Kuznetsov (S7LDLXX9G7)"
         }
     },
     "scripts": {
