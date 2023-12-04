@@ -15,7 +15,7 @@ import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
 import { EstimatePayload } from '@tonkeeper/core/dist/tronApi';
 import { Address } from 'ton-core';
 import { notifyError } from '../../components/transfer/common';
-import { getWalletPassword } from '../../state/password';
+import { getMnemonic } from '../../state/mnemonic';
 import { useWalletJettonList } from '../../state/wallet';
 import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
@@ -37,21 +37,20 @@ export function useSendTransfer<T extends Asset>(
     const { data: jettons } = useWalletJettonList();
 
     return useMutation<boolean, Error>(async () => {
-        const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
-        if (password === null) return false;
+        const mnemonic = await getMnemonic(sdk, wallet.publicKey).catch(() => null);
+        if (mnemonic === null) return false;
         try {
             if (isTonAsset(amount.asset)) {
                 if (amount.asset.id === TON_ASSET.id) {
                     track2('send-ton');
                     await sendTonTransfer(
-                        sdk.storage,
                         api,
                         wallet,
                         recipient as TonRecipientData,
                         amount,
                         isMax,
                         estimation.payload as MessageConsequences,
-                        password
+                        mnemonic
                     );
                 } else {
                     track2('send-jetton');
@@ -61,14 +60,13 @@ export function useSendTransfer<T extends Asset>(
                             jetton.jetton.address
                     )!;
                     await sendJettonTransfer(
-                        sdk.storage,
                         api,
                         wallet,
                         recipient as TonRecipientData,
                         amount as AssetAmount<TonAsset>,
                         jettonInfo!.walletAddress.address,
                         estimation.payload as MessageConsequences,
-                        password
+                        mnemonic
                     );
                 }
             } else {
@@ -80,9 +78,7 @@ export function useSendTransfer<T extends Asset>(
                         request: (estimation.payload as EstimatePayload).request
                     },
                     {
-                        password,
-                        storage: sdk.storage,
-                        walletState: wallet
+                        mnemonic
                     }
                 );
             }

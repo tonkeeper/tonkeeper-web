@@ -2,7 +2,6 @@ import BigNumber from 'bignumber.js';
 import { Address, Cell, internal, loadStateInit } from 'ton-core';
 import { Maybe } from 'ton-core/dist/utils/maybe';
 import { mnemonicToPrivateKey } from 'ton-crypto';
-import { IStorage } from '../../Storage';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipient, TonRecipientData } from '../../entries/send';
@@ -15,7 +14,6 @@ import {
     EmulationApi,
     MessageConsequences
 } from '../../tonApiV2';
-import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     SendMode,
@@ -183,15 +181,13 @@ export const estimateTonConnectTransfer = async (
 };
 
 export const sendTonConnectTransfer = async (
-    storage: IStorage,
     api: APIConfig,
     walletState: WalletState,
     accounts: AccountsMap,
     params: TonConnectTransactionPayload,
-    password: string
+    mnemonic: string[]
 ) => {
     await checkServiceTimeOrDie(api);
-    const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
     const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
 
@@ -213,17 +209,15 @@ export const sendTonConnectTransfer = async (
 };
 
 export const sendTonTransfer = async (
-    storage: IStorage,
     api: APIConfig,
     walletState: WalletState,
     recipient: TonRecipientData,
     amount: AssetAmount,
     isMax: boolean,
     fee: MessageConsequences,
-    password: string
+    mnemonic: string[]
 ) => {
     await checkServiceTimeOrDie(api);
-    const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const total = new BigNumber(fee.event.extra).multipliedBy(-1).plus(amount.weiAmount);

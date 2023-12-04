@@ -4,9 +4,7 @@ import { mnemonicToPrivateKey } from 'ton-crypto';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
-import { IStorage } from '../../Storage';
 import { BlockchainApi, EmulationApi, MessageConsequences, NftItem } from '../../tonApiV2';
-import { getWalletMnemonic } from '../mnemonicService';
 import {
     checkServiceTimeOrDie,
     checkWalletBalanceOrDie,
@@ -113,16 +111,14 @@ export const estimateNftTransfer = async (
 };
 
 export const sendNftTransfer = async (
-    storage: IStorage,
     api: APIConfig,
     walletState: WalletState,
     recipient: TonRecipientData,
     nftItem: NftItem,
     fee: MessageConsequences,
-    password: string
+    mnemonic: string[]
 ) => {
     await checkServiceTimeOrDie(api);
-    const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const min = toNano('0.05').toString();
@@ -155,12 +151,11 @@ export const sendNftTransfer = async (
 };
 
 export const sendNftRenew = async (options: {
-    storage: IStorage;
     api: APIConfig;
     walletState: WalletState;
     nftAddress: string;
     fee: MessageConsequences;
-    password: string;
+    mnemonic: string[];
     amount: BigNumber;
 }) => {
     const { seqno, keyPair } = await getKeyPairAndSeqno(options);
@@ -206,13 +201,12 @@ export const estimateNftRenew = async (options: {
 };
 
 export const sendNftLink = async (options: {
-    storage: IStorage;
     api: APIConfig;
     walletState: WalletState;
     nftAddress: string;
     linkToAddress: string;
     fee: MessageConsequences;
-    password: string;
+    mnemonic: string[];
     amount: BigNumber;
 }) => {
     const { seqno, keyPair } = await getKeyPairAndSeqno(options);

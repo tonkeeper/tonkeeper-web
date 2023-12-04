@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import React from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
@@ -11,7 +10,7 @@ import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { getWalletPassword } from '../../state/password';
+import { getMnemonic } from '../../state/mnemonic';
 
 const useSubscribed = () => {
     const sdk = useAppSdk();
@@ -40,8 +39,7 @@ const useToggleSubscribe = () => {
             throw new Error('Missing notifications');
         }
         if (checked) {
-            const password = await getWalletPassword(sdk);
-            const mnemonic = await getWalletMnemonic(sdk.storage, wallet.publicKey, password);
+            const mnemonic = await getMnemonic(sdk, wallet.publicKey);
             try {
                 await notifications.subscribe(wallet, mnemonic);
             } catch (e) {

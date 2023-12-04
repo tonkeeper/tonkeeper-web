@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
-import { IStorage } from '../../Storage';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { toTronAsset } from '../../entries/crypto/asset/constants';
 import { TronAsset } from '../../entries/crypto/asset/tron-asset';
@@ -14,7 +13,6 @@ import {
     TronApi,
     TronBalances
 } from '../../tronApi';
-import { getWalletMnemonic } from '../mnemonicService';
 import { hashRequest } from './tronEncoding';
 import { getPrivateKey } from './tronService';
 
@@ -54,17 +52,12 @@ export async function sendTronTransfer(
         tron: TronWalletStorage;
         request: RequestData;
     },
-    {
-        password,
-        storage,
-        walletState
-    }: { storage: IStorage; walletState: WalletState; password: string }
+    { mnemonic }: { mnemonic: string[] }
 ): Promise<PublishPayload> {
     const settings = await new TronApi(tronApi).getSettings();
 
     const hash = hashRequest(request, settings.walletImplementation, settings.chainId);
 
-    const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const privateKey = await getPrivateKey(mnemonic);
     const signingKey = new ethers.SigningKey('0x' + privateKey);
     const signature = signingKey.sign(hash).serialized;

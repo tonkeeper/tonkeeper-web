@@ -17,7 +17,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAfterImportAction, useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { getPasswordByNotification } from '../home/UnlockNotification';
+import { getPasswordByNotification } from '../../state/mnemonic';
 
 const createWallet = async (
     client: QueryClient,

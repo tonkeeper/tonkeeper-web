@@ -6,9 +6,7 @@ import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
-import { IStorage } from '../../Storage';
 import { BlockchainApi, EmulationApi, MessageConsequences } from '../../tonApiV2';
-import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     checkServiceTimeOrDie,
@@ -107,17 +105,15 @@ export const estimateJettonTransfer = async (
 };
 
 export const sendJettonTransfer = async (
-    storage: IStorage,
     api: APIConfig,
     walletState: WalletState,
     recipient: TonRecipientData,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string,
     fee: MessageConsequences,
-    password: string
+    mnemonic: string[]
 ) => {
     await checkServiceTimeOrDie(api);
-    const mnemonic = await getWalletMnemonic(storage, walletState.publicKey, password);
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const total = new BigNumber(fee.event.extra)

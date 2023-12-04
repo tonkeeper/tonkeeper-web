@@ -10,13 +10,7 @@ import { encrypt } from './cryptoService';
 import { walletContract } from './wallet/contractService';
 import { setWalletState } from './wallet/storeService';
 
-export const importWallet = async (
-    api: APIConfig,
-    mnemonic: string[],
-    password: string,
-    name?: string
-): Promise<readonly [string, WalletState]> => {
-    const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
+export const createNewWalletState = async (api: APIConfig, mnemonic: string[], name?: string) => {
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const active = await findWalletAddress(api, keyPair);
@@ -32,7 +26,11 @@ export const importWallet = async (
 
     // state.tron = await getTronWallet(api.tronApi, mnemonic, state).catch(() => undefined);
 
-    return [encryptedMnemonic, state] as const;
+    return state;
+};
+
+export const encryptWalletMnemonic = async (mnemonic: string[], password: string) => {
+    return await encrypt(mnemonic.join(' '), password);
 };
 
 const versionMap: Record<string, WalletVersion> = {

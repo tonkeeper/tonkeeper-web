@@ -5,7 +5,6 @@ import { Network } from '../../entries/network';
 import { Factories, TronChain, WalletImplementations } from '../../entries/tron';
 import { TronWalletState, TronWalletStorage, WalletState } from '../../entries/wallet';
 import { Configuration, TronApi } from '../../tronApi';
-import { getWalletMnemonic } from '../mnemonicService';
 import { setWalletState } from '../wallet/storeService';
 import { calculateCreate2 } from './addressCalculation';
 import { TronAddress } from './tronUtils';
@@ -54,10 +53,8 @@ export const importTronWallet = async (
     storage: IStorage,
     tronApi: Configuration,
     wallet: WalletState,
-    password: string
+    mnemonic: string[]
 ): Promise<TronWalletStorage> => {
-    const mnemonic = await getWalletMnemonic(storage, wallet.publicKey, password);
-
     const tron = await getTronWallet(tronApi, mnemonic, wallet);
 
     const updated = { ...wallet, tron };

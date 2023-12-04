@@ -5,7 +5,7 @@ import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { encrypt } from './cryptoService';
 import { getWalletMnemonic, validateWalletMnemonic } from './mnemonicService';
-import { importWallet } from './walletService';
+import { createNewWalletState, encryptWalletMnemonic } from './walletService';
 
 export const getAccountState = async (storage: IStorage) => {
     const state = await storage.get<AccountState>(AppKey.ACCOUNT);
@@ -28,7 +28,8 @@ export const accountSetUpWalletState = async (
     auth: AuthState,
     password: string
 ) => {
-    const [encryptedMnemonic, state] = await importWallet(api, mnemonic, password);
+    const encryptedMnemonic = await encryptWalletMnemonic(mnemonic, password);
+    const state = await createNewWalletState(api, mnemonic);
 
     const account = await getAccountState(storage);
     const updatedAccount = await accountAppendWallet(account, state.publicKey);

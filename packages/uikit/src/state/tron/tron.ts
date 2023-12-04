@@ -9,7 +9,7 @@ import { TronApi, TronBalance, TronBalances, TronToken } from '@tonkeeper/core/d
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { QueryKey } from '../../libs/queryKey';
-import { getWalletPassword } from '../password';
+import { getMnemonic } from '../mnemonic';
 import { DefaultRefetchInterval } from '../tonendpoint';
 
 enum TronKeys {
@@ -31,8 +31,8 @@ export const useTronWalletState = (enabled = true) => {
                 return getTronWalletState(wallet.tron, wallet.network);
             }
 
-            const password = await getWalletPassword(sdk, 'confirm');
-            const tron = await importTronWallet(sdk.storage, tronApi, wallet, password);
+            const mnemonic = await getMnemonic(sdk, wallet.publicKey);
+            const tron = await importTronWallet(sdk.storage, tronApi, wallet, mnemonic);
 
             const result = getTronWalletState(tron, wallet.network);
 

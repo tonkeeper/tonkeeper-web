@@ -26,7 +26,6 @@ import {
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
-import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 import { getCurrentWallet } from '../wallet/storeService';
 import {
@@ -272,18 +271,12 @@ export const tonConnectProofPayload = (
 export const toTonProofItemReply = async (options: {
     storage: IStorage;
     wallet: WalletState;
-    password: string;
+    mnemonic: string[];
     proof: ConnectProofPayload;
 }): Promise<TonProofItemReplySuccess> => {
-    const mnemonic = await getWalletMnemonic(
-        options.storage,
-        options.wallet.publicKey,
-        options.password
-    );
-
     const result: TonProofItemReplySuccess = {
         name: 'ton_proof',
-        proof: await toTonProofItem(mnemonic, options.proof)
+        proof: await toTonProofItem(options.mnemonic, options.proof)
     };
     return result;
 };
