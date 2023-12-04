@@ -140,7 +140,7 @@ export const Loader: FC = () => {
     const navigate = useNavigate();
     useAppHeight();
 
-    const enable = useAmplitudeAnalytics('Web', account, activeWallet);
+    const enable = useAmplitudeAnalytics('Desktop', account, activeWallet);
 
     useEffect(() => {
         if (

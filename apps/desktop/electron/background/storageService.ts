@@ -23,7 +23,6 @@ console.log('configPath', configPath);
 
 const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
-const unlinkAsync = util.promisify(fs.unlink);
 
 const getConfig = async (): Promise<Record<string, unknown>> => {
     if (!fs.existsSync(configPath)) {
@@ -68,7 +67,5 @@ export const storageDelete = async ({ key }: DeleteStorageMessage) => {
 };
 
 export const storageClear = async ({}: ClearStorageMessage) => {
-    if (!fs.existsSync(configPath)) {
-        await unlinkAsync(configPath);
-    }
+    await setConfig({});
 };
