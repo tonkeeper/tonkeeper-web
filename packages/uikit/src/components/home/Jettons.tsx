@@ -41,7 +41,7 @@ const TonAsset: FC<{
     return (
         <ListItem onClick={() => navigate(AppRoute.coins + '/ton')}>
             <ListItemPayload>
-                <TokenLogo src="/img/toncoin.svg" />
+                <TokenLogo src="https://wallet.tonkeeper.com/img/toncoin.svg" />
                 <TokenLayout
                     name={t('Toncoin')}
                     symbol={CryptoCurrency.TON}

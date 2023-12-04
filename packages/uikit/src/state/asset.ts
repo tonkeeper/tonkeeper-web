@@ -62,7 +62,7 @@ export function useAssetImage({ blockchain, address }: AssetIdentification): str
     const { data: balances } = useTronBalances();
 
     if (id === TON_ASSET.id) {
-        return '/img/toncoin.svg';
+        return 'https://wallet.tonkeeper.com/img/toncoin.svg';
     }
 
     if (id === TRON_USDT_ASSET.id) {

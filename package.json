@@ -34,7 +34,8 @@
             "packages/*",
             "apps/web",
             "apps/extension",
-            "apps/twa"
+            "apps/twa",
+            "apps/desktop"
         ]
     },
     "packageManager": "yarn@3.6.3"

@@ -76,7 +76,7 @@ const AssetDropDown: FC<{
             >
                 <ListItemPayload>
                     <AssetInfo>
-                        <AssetImage src="/img/toncoin.svg"></AssetImage>
+                        <AssetImage src="https://wallet.tonkeeper.com/img/toncoin.svg"></AssetImage>
                         <Label1>{CryptoCurrency.TON}</Label1>
                         <Amount>{format(info?.balance ?? 0)}</Amount>
                     </AssetInfo>

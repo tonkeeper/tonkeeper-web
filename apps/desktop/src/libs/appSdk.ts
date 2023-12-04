@@ -1,26 +1,24 @@
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { EventEmitter } from '@tonkeeper/core/dist/entries/eventEmitter';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
+import { BaseApp, IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
+import { sendBackground } from './backgroudService';
+import { DesktopStorage } from './storage';
 
-export class DesktopAppSdk implements IAppSdk {
-  constructor(public storage: IStorage) {}
-  copyToClipboard = () => {};
-  openPage = async (url: string) => {
-    console.log(url);
-  };
+export class DesktopAppSdk extends BaseApp implements IAppSdk {
+    constructor() {
+        super(new DesktopStorage());
+    }
+    copyToClipboard = (value: string, notification?: string) => {
+        copyToClipboard(value);
 
-  confirm = async (text: string) => false;
-  alert = async (text: string) => window.alert(text);
+        this.topMessage(notification);
+    };
+    openPage = async (url: string) => {
+        sendBackground({ king: 'open-page', url });
+    };
 
-  uiEvents = new EventEmitter();
-  version = packageJson.version ?? 'Unknown';
-  disableScroll = () => null;
-  enableScroll = () => null;
-  getScrollbarWidth = () => 0;
-  getKeyboardHeight = () => 0;
-  isIOs = () => false;
-  isStandalone = () => false;
+    version = packageJson.version ?? 'Unknown';
 
-  requestExtensionPermission = async () => void 0;
+    isIOs = () => false;
+    isStandalone = () => false;
 }
