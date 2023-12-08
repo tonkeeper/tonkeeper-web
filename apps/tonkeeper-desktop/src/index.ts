@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import * as isDev from 'electron-is-dev';
+import isDev from 'electron-is-dev';
+import path from 'path';
 import { handleBackgroundMessage } from './electron/background';
 import { Message } from './libs/message';
 
@@ -17,6 +18,7 @@ if (require('electron-squirrel-startup')) {
 const createWindow = (): void => {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
+        icon: path.join(process.cwd(), 'public', 'icon.icns'),
         width: isDev ? 1200 : 550,
         height: 800,
         webPreferences: {

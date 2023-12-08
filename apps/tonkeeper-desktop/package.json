@@ -4,10 +4,11 @@
     "description": "Your desktop wallet on The Open Network",
     "main": ".webpack/main",
     "scripts": {
-        "start": "electron-forge start",
-        "package": "electron-forge package",
-        "make": "electron-forge make",
-        "publish": "electron-forge publish",
+        "locales": "ts-node ./task/locales",
+        "start": "ELECTRON_IS_DEV=1 electron-forge start",
+        "package": "ELECTRON_IS_DEV=0 electron-forge package",
+        "make": "ELECTRON_IS_DEV=0 electron-forge make",
+        "publish": "ELECTRON_IS_DEV=0 electron-forge publish",
         "lint": "eslint --ext .ts,.tsx ."
     },
     "keywords": [],
