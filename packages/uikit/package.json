@@ -6,6 +6,9 @@
     "main": "./lib/cjs/index.js",
     "module": "./lib/esm/index.js",
     "types": "./lib/esm/index.d.ts",
+    "files": [
+        "/lib"
+    ],
     "scripts": {
         "build": "yarn build:esm && yarn build:cjs",
         "start": "tsc -w",
@@ -54,8 +57,8 @@
     },
     "peerDependencies": {
         "@tanstack/react-query": "4.3.4",
-        "styled-components": "^5.3.6",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "styled-components": "^5.3.6"
     }
 }

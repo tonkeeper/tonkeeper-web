@@ -3,48 +3,48 @@ import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
-import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
-import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
-import { Header, HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
-import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
-import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
-import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
+import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/lib/esm/components/Body';
+import { CopyNotification } from '@tonkeeper/uikit/lib/esm/components/CopyNotification';
+import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/lib/esm/components/Footer';
+import { Header, HeaderGlobalStyle } from '@tonkeeper/uikit/lib/esm/components/Header';
+import { GlobalListStyle } from '@tonkeeper/uikit/lib/esm/components/List';
+import { Loading } from '@tonkeeper/uikit/lib/esm/components/Loading';
+import MemoryScroll from '@tonkeeper/uikit/lib/esm/components/MemoryScroll';
 import {
     ActivitySkeletonPage,
     CoinSkeletonPage,
     HomeSkeleton,
     SettingsSkeletonPage
-} from '@tonkeeper/uikit/dist/components/Skeleton';
-import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
+} from '@tonkeeper/uikit/lib/esm/components/Skeleton';
+import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/lib/esm/components/SubHeader';
 import {
     AddFavoriteNotification,
     EditFavoriteNotification
-} from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
+} from '@tonkeeper/uikit/lib/esm/components/transfer/FavoriteNotification';
 import {
     AmplitudeAnalyticsContext,
     useAmplitudeAnalytics
-} from '@tonkeeper/uikit/dist/hooks/amplitude';
-import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
+} from '@tonkeeper/uikit/lib/esm/hooks/amplitude';
+import { AppContext, WalletStateContext } from '@tonkeeper/uikit/lib/esm/hooks/appContext';
 import {
     AfterImportAction,
     AppSdkContext,
     OnImportAction
-} from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
-import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
-import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
-import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
-import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
-import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
-import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
-import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
+} from '@tonkeeper/uikit/lib/esm/hooks/appSdk';
+import { useLock } from '@tonkeeper/uikit/lib/esm/hooks/lock';
+import { StorageContext } from '@tonkeeper/uikit/lib/esm/hooks/storage';
+import { I18nContext, TranslationContext } from '@tonkeeper/uikit/lib/esm/hooks/translation';
+import { AppRoute, any } from '@tonkeeper/uikit/lib/esm/libs/routes';
+import { Unlock } from '@tonkeeper/uikit/lib/esm/pages/home/Unlock';
+import { UnlockNotification } from '@tonkeeper/uikit/lib/esm/pages/home/UnlockNotification';
+import Initialize, { InitializeContainer } from '@tonkeeper/uikit/lib/esm/pages/import/Initialize';
+import { useKeyboardHeight } from '@tonkeeper/uikit/lib/esm/pages/import/hooks';
+import { UserThemeProvider } from '@tonkeeper/uikit/lib/esm/providers/UserThemeProvider';
+import { useAccountState } from '@tonkeeper/uikit/lib/esm/state/account';
+import { useAuthState } from '@tonkeeper/uikit/lib/esm/state/password';
+import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/lib/esm/state/tonendpoint';
+import { useActiveWallet } from '@tonkeeper/uikit/lib/esm/state/wallet';
+import { Container } from '@tonkeeper/uikit/lib/esm/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -52,26 +52,26 @@ import styled, { css } from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAppHeight, useAppWidth } from './libs/hooks';
 
-const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
-const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
-const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
-const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
-const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
-const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
+const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/lib/esm/pages/import'));
+const Settings = React.lazy(() => import('@tonkeeper/uikit/lib/esm/pages/settings'));
+const Activity = React.lazy(() => import('@tonkeeper/uikit/lib/esm/pages/activity/Activity'));
+const Home = React.lazy(() => import('@tonkeeper/uikit/lib/esm/pages/home/Home'));
+const Coin = React.lazy(() => import('@tonkeeper/uikit/lib/esm/pages/coin/Coin'));
+const QrScanner = React.lazy(() => import('@tonkeeper/uikit/lib/esm/components/QrScanner'));
 const TonConnectSubscription = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
+    () => import('@tonkeeper/uikit/lib/esm/components/connect/TonConnectSubscription')
 );
 const SendActionNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
+    () => import('@tonkeeper/uikit/lib/esm/components/transfer/SendNotifications')
 );
 const ReceiveNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/home/ReceiveNotification')
+    () => import('@tonkeeper/uikit/lib/esm/components/home/ReceiveNotification')
 );
 const NftNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/nft/NftNotification')
+    () => import('@tonkeeper/uikit/lib/esm/components/nft/NftNotification')
 );
 const SendNftNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification')
+    () => import('@tonkeeper/uikit/lib/esm/components/transfer/nft/SendNftNotification')
 );
 
 const queryClient = new QueryClient({
@@ -254,7 +254,10 @@ export const Content: FC<{
                 <Suspense fallback={<Loading />}>
                     <InitializeContainer fullHeight={false}>
                         <Routes>
-                            <Route path={any(AppRoute.import)} element={<ImportRouter />} />
+                            <Route
+                                path={any(AppRoute.import)}
+                                element={<ImportRouter listOfAuth={[]} />}
+                            />
                             <Route path="*" element={<Initialize />} />
                         </Routes>
                     </InitializeContainer>

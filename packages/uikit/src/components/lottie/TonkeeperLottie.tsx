@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import Lottie from 'react-lottie';
-const animationTonkeeperLogoData = require('./TonkeeperLogo.json');
+
+import animationTonkeeperLogoData from './TonkeeperLogo.json';
 
 const defaultTonkeeperLogoOptions = {
     autoplay: true,

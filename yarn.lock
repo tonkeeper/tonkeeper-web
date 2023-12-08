@@ -3520,6 +3520,11 @@ __metadata:
     typescript: ^4.9.4
     uuid: ^9.0.0
     webpack: ^5.88.2
+  peerDependencies:
+    "@tanstack/react-query": 4.3.4
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    styled-components: ^5.3.6
   languageName: unknown
   linkType: soft
 
@@ -3544,6 +3549,7 @@ __metadata:
     i18next: ^22.1.4
     i18next-browser-languagedetector: ^7.0.2
     i18next-http-backend: ^2.0.2
+    process: ^0.11.10
     react: ^18.2.0
     react-app-rewired: ^2.2.1
     react-dom: ^18.2.0
@@ -13656,6 +13662,13 @@ __metadata:
   version: 2.0.1
   resolution: "process-nextick-args@npm:2.0.1"
   checksum: 1d38588e520dab7cea67cbbe2efdd86a10cc7a074c09657635e34f035277b59fbb57d09d8638346bf7090f8e8ebc070c96fa5fd183b777fff4f5edff5e9466cf
+  languageName: node
+  linkType: hard
+
+"process@npm:^0.11.10":
+  version: 0.11.10
+  resolution: "process@npm:0.11.10"
+  checksum: bfcce49814f7d172a6e6a14d5fa3ac92cc3d0c3b9feb1279774708a719e19acd673995226351a082a9ae99978254e320ccda4240ddc474ba31a76c79491ca7c3
   languageName: node
   linkType: hard
 
