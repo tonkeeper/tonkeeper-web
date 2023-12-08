@@ -5678,6 +5678,57 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@tonkeeper/desktop@workspace:apps/desktop":
+  version: 0.0.0-use.local
+  resolution: "@tonkeeper/desktop@workspace:apps/desktop"
+  dependencies:
+    "@electron-forge/cli": "npm:^7.2.0"
+    "@electron-forge/maker-deb": "npm:^7.2.0"
+    "@electron-forge/maker-rpm": "npm:^7.2.0"
+    "@electron-forge/maker-squirrel": "npm:^7.2.0"
+    "@electron-forge/maker-zip": "npm:^7.2.0"
+    "@electron-forge/plugin-auto-unpack-natives": "npm:^7.2.0"
+    "@electron-forge/plugin-webpack": "npm:^7.2.0"
+    "@electron-forge/shared-types": "npm:^7.2.0"
+    "@tanstack/react-query": "npm:4.3.4"
+    "@tonkeeper/core": "workspace:0.1.0"
+    "@tonkeeper/locales": "workspace:0.1.0"
+    "@tonkeeper/uikit": "workspace:0.1.0"
+    "@types/node": "npm:^20.10.3"
+    "@types/react": "npm:18.2.21"
+    "@types/react-dom": "npm:18.2.7"
+    "@typescript-eslint/eslint-plugin": "npm:^5.0.0"
+    "@typescript-eslint/parser": "npm:^5.0.0"
+    "@vercel/webpack-asset-relocator-loader": "npm:1.7.3"
+    buffer: "npm:^6.0.3"
+    copy-to-clipboard: "npm:^3.3.3"
+    css-loader: "npm:^6.0.0"
+    electron: "npm:28.0.0"
+    electron-is-dev: "npm:^2.0.0"
+    electron-squirrel-startup: "npm:^1.0.0"
+    eslint: "npm:^8.0.1"
+    eslint-plugin-import: "npm:^2.25.0"
+    fork-ts-checker-webpack-plugin: "npm:^7.2.13"
+    i18next: "npm:^23.7.7"
+    i18next-http-backend: "npm:^2.4.2"
+    keytar: "npm:^7.9.0"
+    node-loader: "npm:^2.0.0"
+    npm-run-all: "npm:^4.1.5"
+    process: "npm:^0.11.10"
+    react: "npm:18.2.0"
+    react-dom: "npm:18.2.0"
+    react-i18next: "npm:^13.5.0"
+    react-router-dom: "npm:^6.20.1"
+    style-loader: "npm:^3.0.0"
+    styled-components: "npm:^6.1.1"
+    ts-loader: "npm:^9.2.2"
+    ts-node: "npm:^10.0.0"
+    typescript: "npm:^4.9.4"
+    webpack: "npm:^5.89.0"
+    yarn-run-all: "npm:^3.1.1"
+  languageName: unknown
+  linkType: soft
+
 "@tonkeeper/extension@workspace:apps/extension":
   version: 0.0.0-use.local
   resolution: "@tonkeeper/extension@workspace:apps/extension"
@@ -24120,57 +24171,6 @@ __metadata:
   checksum: 54e4b64e1a52c55257213c5472bfe7f2e7b81b843572f5ce3b8de70a0f91fce4b77ae155df209a2f2145d5adebf8602f88fceac774ec69b694307095fd4dfd35
   languageName: node
   linkType: hard
-
-"tonkeeper-desktop@workspace:apps/tonkeeper-desktop":
-  version: 0.0.0-use.local
-  resolution: "tonkeeper-desktop@workspace:apps/tonkeeper-desktop"
-  dependencies:
-    "@electron-forge/cli": "npm:^7.2.0"
-    "@electron-forge/maker-deb": "npm:^7.2.0"
-    "@electron-forge/maker-rpm": "npm:^7.2.0"
-    "@electron-forge/maker-squirrel": "npm:^7.2.0"
-    "@electron-forge/maker-zip": "npm:^7.2.0"
-    "@electron-forge/plugin-auto-unpack-natives": "npm:^7.2.0"
-    "@electron-forge/plugin-webpack": "npm:^7.2.0"
-    "@electron-forge/shared-types": "npm:^7.2.0"
-    "@tanstack/react-query": "npm:4.3.4"
-    "@tonkeeper/core": "workspace:0.1.0"
-    "@tonkeeper/locales": "workspace:0.1.0"
-    "@tonkeeper/uikit": "workspace:0.1.0"
-    "@types/node": "npm:^20.10.3"
-    "@types/react": "npm:18.2.21"
-    "@types/react-dom": "npm:18.2.7"
-    "@typescript-eslint/eslint-plugin": "npm:^5.0.0"
-    "@typescript-eslint/parser": "npm:^5.0.0"
-    "@vercel/webpack-asset-relocator-loader": "npm:1.7.3"
-    buffer: "npm:^6.0.3"
-    copy-to-clipboard: "npm:^3.3.3"
-    css-loader: "npm:^6.0.0"
-    electron: "npm:28.0.0"
-    electron-is-dev: "npm:^2.0.0"
-    electron-squirrel-startup: "npm:^1.0.0"
-    eslint: "npm:^8.0.1"
-    eslint-plugin-import: "npm:^2.25.0"
-    fork-ts-checker-webpack-plugin: "npm:^7.2.13"
-    i18next: "npm:^23.7.7"
-    i18next-http-backend: "npm:^2.4.2"
-    keytar: "npm:^7.9.0"
-    node-loader: "npm:^2.0.0"
-    npm-run-all: "npm:^4.1.5"
-    process: "npm:^0.11.10"
-    react: "npm:18.2.0"
-    react-dom: "npm:18.2.0"
-    react-i18next: "npm:^13.5.0"
-    react-router-dom: "npm:^6.20.1"
-    style-loader: "npm:^3.0.0"
-    styled-components: "npm:^6.1.1"
-    ts-loader: "npm:^9.2.2"
-    ts-node: "npm:^10.0.0"
-    typescript: "npm:^4.9.4"
-    webpack: "npm:^5.89.0"
-    yarn-run-all: "npm:^3.1.1"
-  languageName: unknown
-  linkType: soft
 
 "tonkeeper-web@workspace:.":
   version: 0.0.0-use.local

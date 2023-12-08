@@ -1,82 +1,73 @@
 {
     "name": "@tonkeeper/desktop",
     "version": "3.0.0",
-    "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
     "description": "Your desktop wallet on The Open Network",
-    "homepage": ".",
-    "main": "build/electron/main.js",
-    "build": {
-        "appId": "com.electron.tonkeeper-web",
-        "productName": "Tonkeeper",
-        "extends": null,
-        "files": [
-            "build/**/*"
-        ],
-        "directories": {
-            "buildResources": "assets"
-        },
-        "mac": {
-            "icon": "build/icon.icns",
-            "identity": "Mac Developer: Nikita Kuznetsov (S7LDLXX9G7)"
-        }
-    },
+    "main": ".webpack/main",
     "scripts": {
-        "clean": "rm -fr dist && rm -fr build",
         "locales": "ts-node ./task/locales",
-        "react:start": "yarn locales && PORT=3005 react-app-rewired start",
-        "react:build": "react-app-rewired build && yarn locales",
-        "postinstall": "electron-builder install-app-deps",
-        "electron:dev": "concurrently \"cross-env BROWSER=none yarn react:start\" \"wait-on http://127.0.0.1:3005 && tsc -p electron -w\" \"wait-on http://127.0.0.1:3005 && tsc -p electron && electron .\"",
-        "electron:build": "yarn react:build && tsc -p electron && electron-builder",
-        "start": "yarn electron:dev",
-        "build": "yarn clean && yarn electron:build",
-        "test": "react-app-rewired test",
-        "eject": "react-app-rewired eject",
-        "build:desktop": "yarn build"
+        "start": "ELECTRON_IS_DEV=1 electron-forge start",
+        "package": "ELECTRON_IS_DEV=0 electron-forge package",
+        "make": "ELECTRON_IS_DEV=0 electron-forge make",
+        "publish": "ELECTRON_IS_DEV=0 electron-forge publish",
+        "lint": "eslint --ext .ts,.tsx .",
+        "build:win32": "npm run make -- --platform win32",
+        "build:linux": "npm run make -- --platform linux",
+        "build:darwin": "npm run make -- --platform darwin",
+        "build": "npm-run-all -p build:*",
+        "build:desktop": "npm-run-all -p build:*"
     },
-    "dependencies": {
-        "@tonkeeper/core": "0.1.0",
-        "@tonkeeper/locales": "0.1.0",
-        "@tonkeeper/uikit": "0.1.0",
-        "electron-devtools-installer": "^3.2.0",
-        "electron-is-dev": "^2.0.0",
-        "keychain": "^1.5.0",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "react-router-dom": "^6.4.5"
+    "keywords": [],
+    "author": {
+        "name": "Nikita Kuznetsov",
+        "email": "nkuz915@gmail.com"
     },
     "devDependencies": {
-        "@testing-library/jest-dom": "^5.16.5",
-        "@testing-library/react": "^13.4.0",
-        "@testing-library/user-event": "^13.5.0",
-        "@types/electron-devtools-installer": "^2.2.2",
-        "@types/jest": "^27.5.2",
-        "@types/keychain": "^1.4.4",
-        "@types/node": "^16.18.6",
-        "@types/react": "^18.0.26",
-        "@types/react-dom": "^18.0.9",
-        "concurrently": "^7.6.0",
-        "cross-env": "^7.0.3",
-        "electron": "22.0.0",
-        "electron-builder": "^23.6.0",
-        "react-app-rewired": "^2.2.1",
-        "react-scripts": "5.0.1",
+        "@electron-forge/cli": "^7.2.0",
+        "@electron-forge/maker-deb": "^7.2.0",
+        "@electron-forge/maker-rpm": "^7.2.0",
+        "@electron-forge/maker-squirrel": "^7.2.0",
+        "@electron-forge/maker-zip": "^7.2.0",
+        "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
+        "@electron-forge/plugin-webpack": "^7.2.0",
+        "@electron-forge/shared-types": "^7.2.0",
+        "@types/node": "^20.10.3",
+        "@types/react": "18.2.21",
+        "@types/react-dom": "18.2.7",
+        "@typescript-eslint/eslint-plugin": "^5.0.0",
+        "@typescript-eslint/parser": "^5.0.0",
+        "@vercel/webpack-asset-relocator-loader": "1.7.3",
+        "css-loader": "^6.0.0",
+        "electron": "28.0.0",
+        "eslint": "^8.0.1",
+        "eslint-plugin-import": "^2.25.0",
+        "fork-ts-checker-webpack-plugin": "^7.2.13",
+        "node-loader": "^2.0.0",
+        "npm-run-all": "^4.1.5",
+        "style-loader": "^3.0.0",
+        "ts-loader": "^9.2.2",
+        "ts-node": "^10.0.0",
         "typescript": "^4.9.4",
-        "wait-on": "^6.0.1",
-        "web-vitals": "^2.1.4"
+        "webpack": "^5.89.0",
+        "yarn-run-all": "^3.1.1"
     },
-    "eslintConfig": {
-        "extends": [
-            "react-app",
-            "react-app/jest"
-        ]
+    "dependencies": {
+        "@tanstack/react-query": "4.3.4",
+        "@tonkeeper/core": "workspace:0.1.0",
+        "@tonkeeper/locales": "workspace:0.1.0",
+        "@tonkeeper/uikit": "workspace:0.1.0",
+        "buffer": "^6.0.3",
+        "copy-to-clipboard": "^3.3.3",
+        "electron-is-dev": "^2.0.0",
+        "electron-squirrel-startup": "^1.0.0",
+        "i18next": "^23.7.7",
+        "i18next-http-backend": "^2.4.2",
+        "keytar": "^7.9.0",
+        "process": "^0.11.10",
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "react-i18next": "^13.5.0",
+        "react-router-dom": "^6.20.1",
+        "styled-components": "^6.1.1"
     },
-    "browserslist": {
-        "production": [
-            "last 1 electron version"
-        ],
-        "development": [
-            "last 1 electron version"
-        ]
-    }
+    "packageManager": "yarn@4.0.2"
 }

@@ -33,10 +33,7 @@
     "workspaces": {
         "packages": [
             "packages/*",
-            "apps/web",
-            "apps/extension",
-            "apps/twa",
-            "apps/tonkeeper-desktop"
+            "apps/*"
         ]
     },
     "packageManager": "yarn@4.0.2"
