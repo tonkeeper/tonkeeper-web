@@ -1,5 +1,5 @@
 import { shell } from 'electron';
-import * as keychain from 'keychain';
+import keytar from 'keytar';
 import { Message } from '../libs/message';
 import {
     storageClear,
@@ -26,38 +26,13 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
         case 'open-page':
             return shell.openExternal(message.url);
         case 'set-keychain':
-            return new Promise((resolve, reject) => {
-                keychain.setPassword(
-                    {
-                        account: `Wallet-${message.publicKey}`,
-                        service,
-                        password: message.mnemonic
-                    },
-                    error => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(undefined);
-                        }
-                    }
-                );
-            });
+            return await keytar.setPassword(
+                service,
+                `Wallet-${message.publicKey}`,
+                message.mnemonic
+            );
         case 'get-keychain':
-            return new Promise((resolve, reject) => {
-                keychain.getPassword(
-                    {
-                        account: `Wallet-${message.publicKey}`,
-                        service
-                    },
-                    (error, password) => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(password);
-                        }
-                    }
-                );
-            });
+            return await keytar.getPassword(service, `Wallet-${message.publicKey}`);
         default:
             throw new Error(`Unknown message: ${JSON.stringify(message)}`);
     }

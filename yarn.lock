@@ -6359,13 +6359,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/keychain@npm:^1":
-  version: 1.4.4
-  resolution: "@types/keychain@npm:1.4.4"
-  checksum: fe40308c24c04cca92afa0d6d4571bfae6b11d199f10e4fcddcc8a473158db1d7e1a314a3456e20718d39c0c9ac9c089b16493d6d0f89cd6ec90e2a4beaedfd2
-  languageName: node
-  linkType: hard
-
 "@types/keyv@npm:^3.1.4":
   version: 3.1.4
   resolution: "@types/keyv@npm:3.1.4"
@@ -16671,10 +16664,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keychain@npm:^1.5.0":
-  version: 1.5.0
-  resolution: "keychain@npm:1.5.0"
-  checksum: 80cc9539d7212b144ac73e3faa51c1d239b41f3a683caff92b72489b7cffa1f160bed61f4b984e2d5e0de08507268037c33798a9729cab64dbe78c0c65aa07e5
+"keytar@npm:^7.9.0":
+  version: 7.9.0
+  resolution: "keytar@npm:7.9.0"
+  dependencies:
+    node-addon-api: "npm:^4.3.0"
+    node-gyp: "npm:latest"
+    prebuild-install: "npm:^7.0.1"
+  checksum: 904795bc304f8ad89b80f915c869a941a383312b58584212a199473d18647035cfda92a9c53e6c53bf13ea0fed23037c9597eb418a5c71ee9454f140f026fac9
   languageName: node
   linkType: hard
 
@@ -18112,6 +18109,15 @@ __metadata:
   version: 3.1.1
   resolution: "node-abort-controller@npm:3.1.1"
   checksum: 0a2cdb7ec0aeaf3cb31e1ca0e192f5add48f1c5c9c9ed822129f9dddbd9432f69b7425982f94ce803c56a2104884530aa67cd57696e5774b2e5b8ec2f58de042
+  languageName: node
+  linkType: hard
+
+"node-addon-api@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "node-addon-api@npm:4.3.0"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: d3b38d16cb9ad0714d965331d0e38cef1c27750c2c3343cd3464a9ed8158501a2910ccbf2fd9fdc476e806a19dbc9e0524ff9d66a7c779d42a9752a63ba30b80
   languageName: node
   linkType: hard
 
@@ -20227,7 +20233,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prebuild-install@npm:^7.1.1":
+"prebuild-install@npm:^7.0.1, prebuild-install@npm:^7.1.1":
   version: 7.1.1
   resolution: "prebuild-install@npm:7.1.1"
   dependencies:
@@ -24131,7 +24137,6 @@ __metadata:
     "@tonkeeper/core": "workspace:0.1.0"
     "@tonkeeper/locales": "workspace:0.1.0"
     "@tonkeeper/uikit": "workspace:0.1.0"
-    "@types/keychain": "npm:^1"
     "@types/node": "npm:^20.10.3"
     "@types/react": "npm:18.2.21"
     "@types/react-dom": "npm:18.2.7"
@@ -24149,7 +24154,7 @@ __metadata:
     fork-ts-checker-webpack-plugin: "npm:^7.2.13"
     i18next: "npm:^23.7.7"
     i18next-http-backend: "npm:^2.4.2"
-    keychain: "npm:^1.5.0"
+    keytar: "npm:^7.9.0"
     node-loader: "npm:^2.0.0"
     process: "npm:^0.11.10"
     react: "npm:18.2.0"
