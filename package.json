@@ -36,8 +36,8 @@
             "apps/web",
             "apps/extension",
             "apps/twa",
-            "apps/desktop"
+            "apps/tonkeeper-desktop"
         ]
     },
-    "packageManager": "yarn@3.6.3"
+    "packageManager": "yarn@4.0.2"
 }
