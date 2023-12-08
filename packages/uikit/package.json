@@ -3,11 +3,14 @@
     "version": "0.1.0",
     "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
     "description": "UI Kit for tonkeeper wallet",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "./lib/cjs/index.js",
+    "module": "./lib/esm/index.js",
+    "types": "./lib/esm/index.d.ts",
     "scripts": {
-        "build": "rm -fr dist && tsc",
+        "build": "yarn build:esm && yarn build:cjs",
         "start": "tsc -w",
+        "build:esm": "tsc",
+        "build:cjs": "tsc --module commonjs --outDir lib/cjs",
         "build:pkg": "yarn build"
     },
     "license": "ISC",
@@ -48,5 +51,11 @@
         "require-from-string": "^2.0.2",
         "typescript": "^4.9.4",
         "webpack": "^5.88.2"
+    },
+    "peerDependencies": {
+        "@tanstack/react-query": "4.3.4",
+        "styled-components": "^5.3.6",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
     }
 }

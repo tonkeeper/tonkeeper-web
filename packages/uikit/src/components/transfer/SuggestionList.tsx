@@ -135,6 +135,7 @@ const FavoriteItem: FC<{
                                             if (value) {
                                                 return mutateAsync();
                                             }
+                                            return;
                                         })
                                         .finally(() => {
                                             onClose();

@@ -285,6 +285,7 @@ export const TextareaAutosize = React.forwardRef(function TextareaAutosize(
             }
             return false;
         }
+        return;
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {

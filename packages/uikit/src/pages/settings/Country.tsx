@@ -49,7 +49,7 @@ export const CountrySettings = () => {
 
     const countries = useMemo<SettingsItem[]>(() => {
         return Object.entries(country.all)
-            .filter(([key, value]) =>
+            .filter(([_key, value]) =>
                 value.name.toLowerCase().includes(search.trim().toLowerCase())
             )
             .map(([key, value]) => {

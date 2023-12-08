@@ -109,15 +109,15 @@ const SendContent: FC<{
         setView('amount');
     };
 
-    const processTron = (address: string) => {
-        const item = { address: address, blockchain: BLOCKCHAIN_NAME.TRON } as const;
+    // const processTron = (address: string) => {
+    //     const item = { address: address, blockchain: BLOCKCHAIN_NAME.TRON } as const;
 
-        setRecipient({
-            address: item,
-            done: true
-        });
-        setView('amount');
-    };
+    //     setRecipient({
+    //         address: item,
+    //         done: true
+    //     });
+    //     setView('amount');
+    // };
 
     const processRecipient = async ({ address, text }: TonTransferParams) => {
         const item = { address: address, blockchain: BLOCKCHAIN_NAME.TON } as const;

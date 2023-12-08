@@ -24,7 +24,7 @@ export const Recovery = () => {
     }
 };
 
-const useMnemonic = (publicKey: string, auth: AuthState) => {
+const useMnemonic = (publicKey: string, _auth: AuthState) => {
     const [mnemonic, setMnemonic] = useState<string[] | undefined>(undefined);
     const sdk = useAppSdk();
     const navigate = useNavigate();

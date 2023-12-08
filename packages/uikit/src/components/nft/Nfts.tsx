@@ -40,6 +40,8 @@ export const NftBlock = styled.div<{
                 return css`
                     background-color: ${props.theme.backgroundContentTint};
                 `;
+            } else {
+                return undefined;
             }
         } else {
             if (!props.hover) {

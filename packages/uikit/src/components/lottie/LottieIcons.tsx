@@ -1,9 +1,10 @@
 import React, { FC } from 'react';
 import Lottie from 'react-lottie';
-import * as animationCheckData from './Check.json';
-import * as animationConfettiData from './Confetti.json';
-import * as animationGearData from './Gear.json';
-import * as animationWriteData from './Write.json';
+
+const animationCheckData = require('./Check.json');
+const animationConfettiData = require('./Confetti.json');
+const animationGearData = require('./Gear.json');
+const animationWriteData = require('./Write.json');
 
 const defaultCheckOptions = {
     loop: false,

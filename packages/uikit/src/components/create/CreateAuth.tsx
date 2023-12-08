@@ -70,6 +70,7 @@ const useCreatePassword = () => {
                 kind: 'password'
             };
             await sdk.storage.set(AppKey.PASSWORD, state);
+            return;
         }
     );
 };

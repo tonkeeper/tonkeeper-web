@@ -5,7 +5,6 @@ import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useCleanUpTronStore } from '../../state/tron/tron';
 import { useMutateWalletProperty } from '../../state/wallet';
 
 export const DevSettings = React.memo(() => {
@@ -13,7 +12,7 @@ export const DevSettings = React.memo(() => {
 
     const wallet = useWalletContext();
     const { mutate } = useMutateWalletProperty(true);
-    const { mutate: mutateTron } = useCleanUpTronStore();
+    //const { mutate: mutateTron } = useCleanUpTronStore();
 
     const items = useMemo<SettingsItem[]>(() => {
         const network = wallet.network ?? Network.MAINNET;
@@ -26,15 +25,15 @@ export const DevSettings = React.memo(() => {
         ];
     }, [t, wallet]);
 
-    const _items2 = useMemo<SettingsItem[]>(() => {
-        return [
-            {
-                name: t('reset_tron_cache'),
-                icon: wallet.tron ? 'Active' : 'Inactive',
-                action: () => mutateTron()
-            }
-        ];
-    }, [t, wallet, mutateTron]);
+    // const _items2 = useMemo<SettingsItem[]>(() => {
+    //     return [
+    //         {
+    //             name: t('reset_tron_cache'),
+    //             icon: wallet.tron ? 'Active' : 'Inactive',
+    //             action: () => mutateTron()
+    //         }
+    //     ];
+    // }, [t, wallet, mutateTron]);
 
     return (
         <>

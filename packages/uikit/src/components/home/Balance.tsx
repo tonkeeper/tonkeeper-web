@@ -10,7 +10,6 @@ import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
-import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { TokenRate, getRateKey } from '../../state/rates';
 import { SkeletonText } from '../Skeleton';
@@ -98,22 +97,22 @@ const getTonFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: Ass
     );
 };
 
-const getTRC20FiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
-    return assets.tron.balances.reduce(
-        (total, { weiAmount, token }) =>
-            useRateOrDefault(
-                client,
-                fiat,
-                token.symbol,
-                rate =>
-                    total.plus(
-                        shiftedDecimals(weiAmount, token.decimals).multipliedBy(rate.prices)
-                    ),
-                total
-            ),
-        new BigNumber(0)
-    );
-};
+// const getTRC20FiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
+//     return assets.tron.balances.reduce(
+//         (total, { weiAmount, token }) =>
+//             useRateOrDefault(
+//                 client,
+//                 fiat,
+//                 token.symbol,
+//                 rate =>
+//                     total.plus(
+//                         shiftedDecimals(weiAmount, token.decimals).multipliedBy(rate.prices)
+//                     ),
+//                 total
+//             ),
+//         new BigNumber(0)
+//     );
+// };
 
 const getJettonsFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
     return assets.ton.jettons.balances.reduce(
@@ -135,7 +134,6 @@ export const Balance: FC<{
     isFetching: boolean;
     assets: AssetData;
 }> = ({ assets, error, isFetching }) => {
-    const { t } = useTranslation();
     const sdk = useAppSdk();
     const { fiat } = useAppContext();
     const wallet = useWalletContext();

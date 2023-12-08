@@ -90,10 +90,10 @@ const Description = styled(Body1)`
     color: ${props => props.theme.textSecondary};
 `;
 
-const values = [
-    { name: BLOCKCHAIN_NAME.TON, id: BLOCKCHAIN_NAME.TON },
-    { name: 'TRC20', id: BLOCKCHAIN_NAME.TRON }
-];
+// const values = [
+//     { name: BLOCKCHAIN_NAME.TON, id: BLOCKCHAIN_NAME.TON },
+//     { name: 'TRC20', id: BLOCKCHAIN_NAME.TRON }
+// ];
 
 const HeaderBlock: FC<{ title: string; description: string }> = ({ title, description }) => {
     const { extension } = useAppContext();
@@ -206,7 +206,7 @@ export const ReceiveContent: FC<{
     handleClose?: () => void;
 }> = ({ chain = BLOCKCHAIN_NAME.TON, jetton, handleClose }) => {
     const { standalone } = useAppContext();
-    const [active, setActive] = useState(chain);
+    const [active] = useState(chain);
     const { data: tron } = useTronWalletState(active === BLOCKCHAIN_NAME.TRON);
     const tonRef = useRef<HTMLDivElement>(null);
     const tronRef = useRef<HTMLDivElement>(null);
