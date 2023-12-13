@@ -135,6 +135,7 @@ export const createTransferMessage = (
     const transfer = contract.createTransfer({
         seqno: wallet.seqno,
         secretKey: wallet.secretKey,
+        timeout: getTTL(),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
             internal({
@@ -171,3 +172,7 @@ export async function getKeyPairAndSeqno(options: {
     checkWalletBalanceOrDie(total, wallet);
     return { seqno, keyPair };
 }
+
+export const getTTL = () => {
+    return Math.floor(Date.now() / 1e3) + 300; // 5min
+};
