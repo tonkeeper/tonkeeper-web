@@ -5676,7 +5676,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tonkeeper/core@npm:0.1.0, @tonkeeper/core@workspace:0.1.0, @tonkeeper/core@workspace:packages/core":
+"@tonkeeper/core@npm:0.1.0, @tonkeeper/core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@tonkeeper/core@workspace:packages/core"
   dependencies:
@@ -5707,9 +5707,9 @@ __metadata:
     "@electron-forge/plugin-webpack": "npm:^7.2.0"
     "@electron-forge/shared-types": "npm:^7.2.0"
     "@tanstack/react-query": "npm:4.3.4"
-    "@tonkeeper/core": "workspace:0.1.0"
-    "@tonkeeper/locales": "workspace:0.1.0"
-    "@tonkeeper/uikit": "workspace:0.1.0"
+    "@tonkeeper/core": "npm:0.1.0"
+    "@tonkeeper/locales": "npm:0.1.0"
+    "@tonkeeper/uikit": "npm:0.1.0"
     "@types/node": "npm:^20.10.3"
     "@types/react": "npm:18.2.21"
     "@types/react-dom": "npm:18.2.7"
@@ -5789,7 +5789,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@tonkeeper/locales@npm:0.1.0, @tonkeeper/locales@workspace:0.1.0, @tonkeeper/locales@workspace:packages/locales":
+"@tonkeeper/locales@npm:0.1.0, @tonkeeper/locales@workspace:packages/locales":
   version: 0.0.0-use.local
   resolution: "@tonkeeper/locales@workspace:packages/locales"
   dependencies:
@@ -5840,7 +5840,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@tonkeeper/uikit@npm:0.1.0, @tonkeeper/uikit@workspace:0.1.0, @tonkeeper/uikit@workspace:packages/uikit":
+"@tonkeeper/uikit@npm:0.1.0, @tonkeeper/uikit@workspace:packages/uikit":
   version: 0.0.0-use.local
   resolution: "@tonkeeper/uikit@workspace:packages/uikit"
   dependencies:

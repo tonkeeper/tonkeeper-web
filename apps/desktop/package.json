@@ -54,9 +54,9 @@
     },
     "dependencies": {
         "@tanstack/react-query": "4.3.4",
-        "@tonkeeper/core": "workspace:0.1.0",
-        "@tonkeeper/locales": "workspace:0.1.0",
-        "@tonkeeper/uikit": "workspace:0.1.0",
+        "@tonkeeper/core": "0.1.0",
+        "@tonkeeper/locales": "0.1.0",
+        "@tonkeeper/uikit": "0.1.0",
         "buffer": "^6.0.3",
         "copy-to-clipboard": "^3.3.3",
         "electron-is-dev": "^2.0.0",
