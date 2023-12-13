@@ -14,7 +14,8 @@
         "build:linux": "npm run make -- --platform linux",
         "build:darwin": "npm run make -- --platform darwin",
         "build": "npm-run-all -p build:*",
-        "build:desktop": "npm-run-all -p build:*"
+        "build:desktop": "npm-run-all -p build:*",
+        "debug": "export DEBUG=electron*"
     },
     "keywords": [],
     "author": {
