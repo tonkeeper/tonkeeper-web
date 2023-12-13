@@ -21,6 +21,7 @@ import {
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
     externalMessage,
+    getTTL,
     getWalletBalance,
     getWalletSeqNo
 } from './common';
@@ -100,6 +101,7 @@ const createTonTransfer = (
     const transfer = contract.createTransfer({
         seqno,
         secretKey,
+        timeout: getTTL(),
         sendMode: isMax
             ? SendMode.CARRY_ALL_REMAINING_BALANCE
             : SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
@@ -127,6 +129,7 @@ const createTonConnectTransfer = (
     const transfer = contract.createTransfer({
         seqno,
         secretKey,
+        timeout: getTTL(),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: params.messages.map(item =>
             internal({

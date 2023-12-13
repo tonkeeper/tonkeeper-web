@@ -13,6 +13,7 @@ import {
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
     externalMessage,
+    getTTL,
     getWalletBalance,
     SendMode
 } from './common';
@@ -64,6 +65,7 @@ const createJettonTransfer = (
     const transfer = contract.createTransfer({
         seqno,
         secretKey,
+        timeout: getTTL(),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
             internal({
