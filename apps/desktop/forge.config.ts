@@ -5,6 +5,7 @@ import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
+import { PublisherGithub } from '@electron-forge/publisher-github';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import type { NotaryToolCredentials } from '@electron/notarize/lib/types';
 import dotenv from 'dotenv';
@@ -59,6 +60,15 @@ const config: ForgeConfig = {
                     }
                 ]
             }
+        })
+    ],
+    publishers: [
+        new PublisherGithub({
+            repository: {
+                owner: 'tonkeeper',
+                name: 'tonkeeper-web'
+            },
+            draft: true
         })
     ]
 };
