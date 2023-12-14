@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerDMG } from '@electron-forge/maker-dmg';
 import { MakerRpm } from '@electron-forge/maker-rpm';
@@ -9,21 +7,30 @@ import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-nati
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import type { NotaryToolCredentials } from '@electron/notarize/lib/types';
+import dotenv from 'dotenv';
 
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
+
+const { parsed } = dotenv.config();
 
 const config: ForgeConfig = {
     packagerConfig: {
         asar: true,
         icon: './public/icon',
         name: 'Tonkeeper Pro',
-        appBundleId: process.env.APPLE_BUILD_ID,
-        osxSign: {},
+        appBundleId: parsed!.APPLE_BUILD_ID,
+        osxSign: {
+            optionsForFile: (optionsForFile: string) => {
+                return {
+                    entitlements: 'entitlements.plist'
+                };
+            }
+        },
         osxNotarize: {
-            appleId: process.env.APPLE_ID,
-            appleIdPassword: process.env.APPLE_PASSWORD,
-            teamId: process.env.APPLE_TEAM_ID
+            appleApiKey: parsed!.APPLE_API_KEY,
+            appleApiKeyId: parsed!.APPLE_API_KEY_ID,
+            appleApiIssuer: parsed!.APPLE_API_ISSUER
         } as NotaryToolCredentials
     },
     rebuildConfig: {},

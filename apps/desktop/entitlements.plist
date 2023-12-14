@@ -20,5 +20,7 @@
     <true/>
     <key>com.apple.security.cs.allow-dyld-environment-variables</key>
     <false/>
+    <key>com.apple.security.application-groups</key>
+    <string>CT523DK2KC.com.jbig.tonkeeperpro</string>
   </dict>
 </plist>
