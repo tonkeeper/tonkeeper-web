@@ -1,3 +1,4 @@
+import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { app } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -37,35 +38,59 @@ const setConfig = async (config: Record<string, unknown>) => {
     await writeFileAsync(configPath, JSON.stringify(config));
 };
 
-export const storageSet = async ({ key, value }: SetStorageMessage) => {
+export const storageSet = async <R>({ key, value }: SetStorageMessage) => {
     const config = await getConfig();
     config[key] = value;
     await setConfig(config);
-    return value;
+    return value as R;
 };
 
-export const storageGet = async ({ key }: GetStorageMessage) => {
+export const storageGet = async <R>({ key }: GetStorageMessage) => {
     const config = await getConfig();
-    return config[key] ?? null;
+    return (config[key] ?? null) as R | null;
 };
 
-export const storageSetBatch = async ({ value }: SetBatchStorageMessage) => {
+export const storageSetBatch = async <V>({ value }: SetBatchStorageMessage) => {
     const config = await getConfig();
     Object.assign(config, value);
     await setConfig(config);
-    return value;
+    return value as V;
 };
 
-export const storageDelete = async ({ key }: DeleteStorageMessage) => {
+export const storageDelete = async <R>({ key }: DeleteStorageMessage) => {
     const config = await getConfig();
     const value = config[key];
     if (value) {
         delete config[key];
     }
     await setConfig(config);
-    return value ?? null;
+    return (value ?? null) as R | null;
 };
 
 export const storageClear = async ({}: ClearStorageMessage) => {
     await setConfig({});
 };
+
+export class NodeStorage implements IStorage {
+    get = async <R>(key: string) => {
+        return storageGet<R>({ king: 'storage-get', key });
+    };
+
+    set = async <R>(key: string, value: R) => {
+        return storageSet<R>({ king: 'storage-set', key, value });
+    };
+
+    setBatch = async <V extends Record<string, unknown>>(value: V) => {
+        return storageSetBatch<V>({ king: 'storage-set-batch', value });
+    };
+
+    delete = async <R>(key: string) => {
+        return storageDelete<R>({ king: 'storage-delete', key });
+    };
+
+    clear = async () => {
+        await storageClear({ king: 'storage-clear' });
+    };
+}
+
+export const mainStorage = new NodeStorage();

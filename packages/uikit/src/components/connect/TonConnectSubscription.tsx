@@ -1,23 +1,16 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { TonConnectAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
-    TonConnectAppRequest,
-    TonConnectTransactionPayload
-} from '@tonkeeper/core/dist/entries/tonConnect';
+    replyBadRequestResponse,
+    replyDisconnectResponse
+} from '@tonkeeper/core/dist/service/tonConnect/actionService';
 import {
-    disconnectResponse,
-    sendBadRequestResponse,
-    sendTransactionErrorResponse,
-    sendTransactionSuccessResponse
-} from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import {
-    AccountConnection,
     disconnectAppConnection,
     getAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import {
     getLastEventId,
-    sendEventToBridge,
     subscribeTonConnect
 } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -26,6 +19,7 @@ import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { QueryKey } from '../../libs/queryKey';
 import { TonTransactionNotification } from './TonTransactionNotification';
+import { SendTransactionAppRequest, responseSendMutation } from './connectHook';
 
 const useConnections = (sdk: IAppSdk) => {
     const wallet = useWalletContext();
@@ -38,68 +32,27 @@ const useConnections = (sdk: IAppSdk) => {
 
 const useDisconnectMutation = (sdk: IAppSdk) => {
     const wallet = useWalletContext();
-    return useMutation<void, Error, TonConnectAppRequest>(
-        async ({ connection, request: { id } }) => {
-            await disconnectAppConnection({
-                storage: sdk.storage,
-                wallet,
-                clientSessionId: connection.clientSessionId
-            });
-            await sendEventToBridge({
-                response: disconnectResponse(id),
-                sessionKeyPair: connection.sessionKeyPair,
-                clientSessionId: connection.clientSessionId
-            });
-            if (sdk.notifications) {
-                try {
-                    await sdk.notifications.unsubscribeTonConnect(connection.clientSessionId);
-                } catch (e) {
-                    if (e instanceof Error) sdk.topMessage(e.message);
-                }
+    return useMutation<void, Error, TonConnectAppRequest>(async ({ connection, request }) => {
+        await disconnectAppConnection({
+            storage: sdk.storage,
+            wallet,
+            clientSessionId: connection.clientSessionId
+        });
+        await replyDisconnectResponse({ connection, request });
+
+        if (sdk.notifications) {
+            try {
+                await sdk.notifications.unsubscribeTonConnect(connection.clientSessionId);
+            } catch (e) {
+                if (e instanceof Error) sdk.topMessage(e.message);
             }
         }
-    );
+    });
 };
 
 const useUnSupportMethodMutation = () => {
-    return useMutation<void, Error, TonConnectAppRequest>(
-        async ({ connection, request: { id, method } }) => {
-            await sendEventToBridge({
-                response: sendBadRequestResponse(id, method),
-                sessionKeyPair: connection.sessionKeyPair,
-                clientSessionId: connection.clientSessionId
-            });
-        }
-    );
+    return useMutation<void, Error, TonConnectAppRequest>(replyBadRequestResponse);
 };
-
-interface ResponseSendProps {
-    request: SendTransactionAppRequest;
-    boc?: string;
-}
-const responseSendMutation = () => {
-    return useMutation<undefined, Error, ResponseSendProps>(
-        async ({ request: { connection, id }, boc }) => {
-            const response = boc
-                ? sendTransactionSuccessResponse(id, boc)
-                : sendTransactionErrorResponse(id);
-
-            await sendEventToBridge({
-                response,
-                sessionKeyPair: connection.sessionKeyPair,
-                clientSessionId: connection.clientSessionId
-            });
-
-            return undefined;
-        }
-    );
-};
-
-interface SendTransactionAppRequest {
-    id: string;
-    connection: AccountConnection;
-    payload: TonConnectTransactionPayload;
-}
 
 const TonConnectSubscription = () => {
     const [request, setRequest] = useState<SendTransactionAppRequest | undefined>(undefined);
@@ -158,7 +111,7 @@ const TonConnectSubscription = () => {
         })();
 
         const close = subscribeTonConnect({
-            sdk,
+            storage: sdk.storage,
             handleMessage,
             connections: data?.connections,
             lastEventId: data?.lastEventId

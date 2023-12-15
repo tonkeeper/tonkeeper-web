@@ -1,12 +1,21 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ConnectItemReply, DAppManifest } from '@tonkeeper/core/dist/entries/tonConnect';
+import {
+    ConnectItemReply,
+    DAppManifest,
+    TonConnectTransactionPayload
+} from '@tonkeeper/core/dist/entries/tonConnect';
 import { parseTonTransfer } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
     connectRejectResponse,
     parseTonConnect,
-    saveWalletTonConnect
+    saveWalletTonConnect,
+    sendTransactionErrorResponse,
+    sendTransactionSuccessResponse
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import {
+    AccountConnection,
+    TonConnectParams
+} from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { sendEventToBridge } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -95,6 +104,35 @@ export const responseConnectionMutation = () => {
                     clientSessionId: params.clientSessionId
                 });
             }
+
+            return undefined;
+        }
+    );
+};
+
+export interface SendTransactionAppRequest {
+    id: string;
+    connection: AccountConnection;
+    payload: TonConnectTransactionPayload;
+}
+
+export interface ResponseSendProps {
+    request: SendTransactionAppRequest;
+    boc?: string;
+}
+
+export const responseSendMutation = () => {
+    return useMutation<undefined, Error, ResponseSendProps>(
+        async ({ request: { connection, id }, boc }) => {
+            const response = boc
+                ? sendTransactionSuccessResponse(id, boc)
+                : sendTransactionErrorResponse(id);
+
+            await sendEventToBridge({
+                response,
+                sessionKeyPair: connection.sessionKeyPair,
+                clientSessionId: connection.clientSessionId
+            });
 
             return undefined;
         }

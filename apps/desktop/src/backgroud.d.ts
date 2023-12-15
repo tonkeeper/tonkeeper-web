@@ -3,7 +3,8 @@ interface BackgroundApi {
     chrome: () => string;
     electron: () => string;
     message: <Result>(message: Message) => Promise<Result>;
-    onTonConnect: (callback: (ur: string) => void) => void;
+    onTonConnect: (callback: (url: string) => void) => void;
+    onTonConnectTransaction: (callback: (value: SendTransactionAppRequest) => void) => void;
 }
 
 declare global {

@@ -5742,6 +5742,7 @@ __metadata:
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
     "@tonkeeper/uikit": "npm:0.1.0"
+    "@types/eventsource": "npm:^1.1.15"
     "@types/node": "npm:^20.10.3"
     "@types/react": "npm:^18.0.26"
     "@types/react-dom": "npm:^18.0.9"
@@ -5757,6 +5758,7 @@ __metadata:
     electron-squirrel-startup: "npm:^1.0.0"
     eslint: "npm:^8.0.1"
     eslint-plugin-import: "npm:^2.25.0"
+    eventsource: "npm:^2.0.2"
     fork-ts-checker-webpack-plugin: "npm:^7.2.13"
     i18next: "npm:^23.7.7"
     i18next-http-backend: "npm:^2.4.2"
@@ -6252,6 +6254,13 @@ __metadata:
   version: 0.0.51
   resolution: "@types/estree@npm:0.0.51"
   checksum: b566c7a3fc8a81ca3d9e00a717e90b8f5d567e2476b4f6d76a20ec6da33ec28165b8f989ed8dd0c9df41405199777ec36a4f85f32a347fbc6c3f696a3128b6e7
+  languageName: node
+  linkType: hard
+
+"@types/eventsource@npm:^1.1.15":
+  version: 1.1.15
+  resolution: "@types/eventsource@npm:1.1.15"
+  checksum: 52e024f5aebfd6bc166f2162d6e408cf788886007e571519c75f8c3623feaa3c5a74681fd3a128de6d21b28ef88dd683421264f10d5c98728959b99b1229b85e
   languageName: node
   linkType: hard
 
@@ -12684,6 +12693,13 @@ __metadata:
   version: 3.3.0
   resolution: "events@npm:3.3.0"
   checksum: a3d47e285e28d324d7180f1e493961a2bbb4cad6412090e4dec114f4db1f5b560c7696ee8e758f55e23913ede856e3689cd3aa9ae13c56b5d8314cd3b3ddd1be
+  languageName: node
+  linkType: hard
+
+"eventsource@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "eventsource@npm:2.0.2"
+  checksum: e1c4c3664cebf9efdd55c90818ef847099f298bf521768d479cf22d8a681e666b3042de85327711ba6a8414ac6a04c70d2aeb4f405bba8239a8c36e06a019374
   languageName: node
   linkType: hard
 

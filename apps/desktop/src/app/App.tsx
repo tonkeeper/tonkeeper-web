@@ -19,7 +19,6 @@ import {
     SettingsSkeletonPage
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
-import TonConnectSubscription from '@tonkeeper/uikit/dist/components/connect/TonConnectSubscription';
 import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
 import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
 import {
@@ -63,6 +62,7 @@ import styled from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
 import { useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
+import { TonConnectSubscription } from './components/TonConnectSubscription';
 
 const queryClient = new QueryClient({
     defaultOptions: {

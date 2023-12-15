@@ -1,5 +1,5 @@
 import nacl, { BoxKeyPair } from 'tweetnacl';
-import { concatUint8Arrays, hexToByteArray, splitToUint8Arrays, toHexString } from './utils';
+import { concatUint8Arrays, toHexString } from './utils';
 
 export interface KeyPair {
     publicKey: string;
@@ -24,8 +24,8 @@ export class SessionCrypto {
 
     private createKeypairFromString(keyPair: KeyPair): BoxKeyPair {
         return {
-            publicKey: hexToByteArray(keyPair.publicKey),
-            secretKey: hexToByteArray(keyPair.secretKey)
+            publicKey: Buffer.from(keyPair.publicKey, 'hex'),
+            secretKey: Buffer.from(keyPair.secretKey, 'hex')
         };
     }
 
@@ -45,8 +45,10 @@ export class SessionCrypto {
         return concatUint8Arrays(nonce, encrypted);
     }
 
-    public decrypt(message: Uint8Array, senderPublicKey: Uint8Array): string {
-        const [nonce, internalMessage] = splitToUint8Arrays(message, this.nonceLength);
+    public decrypt(message: Buffer, senderPublicKey: Buffer): string {
+        const nonce = message.subarray(0, this.nonceLength);
+        const internalMessage = message.subarray(this.nonceLength);
+        console.log('senderPublicKey', senderPublicKey.length);
 
         const decrypted = nacl.box.open(
             internalMessage,
@@ -66,8 +68,8 @@ export class SessionCrypto {
 
     public stringifyKeypair(): KeyPair {
         return {
-            publicKey: toHexString(this.keyPair.publicKey),
-            secretKey: toHexString(this.keyPair.secretKey)
+            publicKey: Buffer.from(this.keyPair.publicKey).toString('hex'),
+            secretKey: Buffer.from(this.keyPair.secretKey).toString('hex')
         };
     }
 }
