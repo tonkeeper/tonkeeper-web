@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import isDev from 'electron-is-dev';
 import path from 'path';
-import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
+import { updateElectronApp } from 'update-electron-app';
 import { handleBackgroundMessage } from './electron/background';
 import { Message } from './libs/message';
 
@@ -74,9 +74,5 @@ app.on('activate', () => {
 // code. You can also put them in separate files and import them here.
 
 updateElectronApp({
-    updateSource: {
-        type: UpdateSourceType.ElectronPublicUpdateService,
-        repo: 'https://github.com/tonkeeper/tonkeeper-web'
-    }
     // updateInterval: '1 hour'
 });
