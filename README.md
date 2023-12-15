@@ -7,9 +7,8 @@ browsers. We recommend using the latest available browser version.
 
 ## Building locally
 
--   Install `Node.js` version 19.7.0
+-   Install `Node.js` version v20.7.0
 -   Install `Yarn` version 4.0.2
--   Install and run `Docker Desktop`
 
 ### Build web script
 

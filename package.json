@@ -1,6 +1,10 @@
 {
     "name": "tonkeeper-web",
     "version": "3.0.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tonkeeper/tonkeeper-web.git"
+    },
     "scripts": {
         "build": "npx turbo build",
         "build:web": "npx turbo build:web",

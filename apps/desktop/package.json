@@ -3,6 +3,10 @@
     "version": "3.4.1",
     "description": "Your desktop wallet on The Open Network",
     "main": ".webpack/main",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tonkeeper/tonkeeper-web.git"
+    },
     "scripts": {
         "locales": "ts-node ./task/locales",
         "start": "electron-forge start",
@@ -13,8 +17,8 @@
         "build:win32": "npm run make -- --platform win32",
         "build:linux": "npm run make -- --platform linux",
         "build:darwin": "npm run make -- --platform darwin",
-        "build": "npm-run-all -p build:*",
-        "build:desktop": "npm-run-all -p build:*",
+        "build": "yarn make",
+        "build:desktop": "yarn make",
         "debug": "export DEBUG=electron*"
     },
     "keywords": [],
@@ -46,13 +50,11 @@
         "eslint-plugin-import": "^2.25.0",
         "fork-ts-checker-webpack-plugin": "^7.2.13",
         "node-loader": "^2.0.0",
-        "npm-run-all": "^4.1.5",
         "style-loader": "^3.0.0",
         "ts-loader": "^9.2.2",
         "ts-node": "^10.0.0",
         "typescript": "^4.9.4",
-        "webpack": "^5.89.0",
-        "yarn-run-all": "^3.1.1"
+        "webpack": "^5.89.0"
     },
     "dependencies": {
         "@tanstack/react-query": "4.3.4",
