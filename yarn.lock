@@ -5762,7 +5762,6 @@ __metadata:
     i18next-http-backend: "npm:^2.4.2"
     keytar: "npm:^7.9.0"
     node-loader: "npm:^2.0.0"
-    npm-run-all: "npm:^4.1.5"
     process: "npm:^0.11.10"
     react: "npm:18.2.0"
     react-dom: "npm:18.2.0"
@@ -5775,7 +5774,6 @@ __metadata:
     typescript: "npm:^4.9.4"
     update-electron-app: "npm:^3.0.0"
     webpack: "npm:^5.89.0"
-    yarn-run-all: "npm:^3.1.1"
   languageName: unknown
   linkType: soft
 
