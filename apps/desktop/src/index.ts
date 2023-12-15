@@ -61,6 +61,7 @@ const createWindow = (): void => {
         width: isDev ? 1200 : 550,
         height: 800,
         webPreferences: {
+            zoomFactor: 0.8,
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
         }
     });
