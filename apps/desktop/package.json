@@ -71,7 +71,8 @@
         "react-dom": "18.2.0",
         "react-i18next": "^13.5.0",
         "react-router-dom": "^6.20.1",
-        "styled-components": "^6.1.1"
+        "styled-components": "^6.1.1",
+        "update-electron-app": "^3.0.0"
     },
     "packageManager": "yarn@4.0.2"
 }
