@@ -76,7 +76,7 @@ app.on('activate', () => {
 updateElectronApp({
     updateSource: {
         type: UpdateSourceType.ElectronPublicUpdateService,
-        repo: 'tonkeeper/tonkeeper-web'
+        repo: 'https://github.com/tonkeeper/tonkeeper-web'
     }
     // updateInterval: '1 hour'
 });
