@@ -62,6 +62,7 @@ import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-rou
 import styled from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
 import { useAppHeight, useAppWidth } from '../libs/hooks';
+import { DeepLinkSubscription } from './components/DeepLink';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -272,15 +273,14 @@ export const Content: FC<{
                 </Routes>
                 <Footer standalone={false} />
                 <MemoryScroll />
-                <Suspense>
-                    <SendActionNotification />
-                    <ReceiveNotification />
-                    <TonConnectSubscription />
-                    <NftNotification />
-                    <SendNftNotification />
-                    <AddFavoriteNotification />
-                    <EditFavoriteNotification />
-                </Suspense>
+                <SendActionNotification />
+                <ReceiveNotification />
+                <TonConnectSubscription />
+                <NftNotification />
+                <SendNftNotification />
+                <AddFavoriteNotification />
+                <EditFavoriteNotification />
+                <DeepLinkSubscription />
             </WalletStateContext.Provider>
         </Wrapper>
     );

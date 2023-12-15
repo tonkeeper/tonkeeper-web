@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { BrowserWindow, app, ipcMain, shell } from 'electron';
 import isDev from 'electron-is-dev';
 import path from 'path';
 import { updateElectronApp } from 'update-electron-app';
@@ -11,6 +11,43 @@ import { Message } from './libs/message';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+let mainWindow: BrowserWindow | undefined = undefined;
+
+if (process.defaultApp) {
+    if (process.argv.length >= 2) {
+        app.setAsDefaultProtocolClient('tc', process.execPath, [path.resolve(process.argv[1])]);
+    }
+} else {
+    app.setAsDefaultProtocolClient('tc');
+}
+
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+    app.quit();
+} else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+        // Someone tried to run a second instance, we should focus our window.
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.focus();
+        }
+
+        mainWindow.webContents.send('tc', commandLine.pop().slice(0, -1));
+        //   dialog.showErrorBox('Welcome Back', `You arrived from: ${commandLine.pop().slice(0, -1)}`);
+    });
+
+    // Create mainWindow, load the rest of the app, etc...
+    app.whenReady().then(() => {
+        createWindow();
+    });
+
+    app.on('open-url', (event, url) => {
+        mainWindow.webContents.send('tc', url);
+        // dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`);
+    });
+}
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     app.quit();
@@ -18,7 +55,7 @@ if (require('electron-squirrel-startup')) {
 
 const createWindow = (): void => {
     // Create the browser window.
-    const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         icon: path.join(process.cwd(), 'public', 'icon.icns'),
         width: isDev ? 1200 : 550,
         height: 800,
@@ -73,6 +110,11 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
-updateElectronApp({
-    // updateInterval: '1 hour'
+updateElectronApp();
+
+// Handle window controls via IPC
+ipcMain.on('shell:open', () => {
+    const pageDirectory = __dirname.replace('app.asar', 'app.asar.unpacked');
+    const pagePath = path.join('file://', pageDirectory, 'index.html');
+    shell.openExternal(pagePath);
 });

@@ -20,6 +20,12 @@ const config: ForgeConfig = {
         asar: true,
         icon: './public/icon',
         name: 'Tonkeeper Pro',
+        protocols: [
+            {
+                name: 'Tonkeeper Protocol',
+                schemes: ['tc', 'tonkeeper', 'tonkeeper-tc']
+            }
+        ],
         appBundleId: parsed!.APPLE_BUILD_ID,
         osxSign: {
             optionsForFile: (optionsForFile: string) => {
