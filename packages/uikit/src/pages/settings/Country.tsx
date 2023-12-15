@@ -50,14 +50,14 @@ export const CountrySettings = () => {
     const countries = useMemo<SettingsItem[]>(() => {
         return Object.entries(country.all)
             .filter(([key, value]) =>
-                value.name.toLowerCase().includes(search.trim().toLowerCase())
+                (value as any).name.toLowerCase().includes(search.trim().toLowerCase())
             )
             .map(([key, value]) => {
                 return {
                     name:
                         new Intl.DisplayNames([intlLocale(i18n.language)], { type: 'region' }).of(
                             key
-                        ) ?? value.name,
+                        ) ?? (value as any).name,
                     preIcon: <CountryIcon country={key} />,
                     icon: selected == key ? <CheckIcon /> : undefined,
                     action: () => mutate(key)
