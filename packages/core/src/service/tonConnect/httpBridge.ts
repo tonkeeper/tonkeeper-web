@@ -34,7 +34,7 @@ export const sendEventToBridge = async <T extends RpcMethod>({
 
     const encodedResponse = sessionCrypto.encrypt(
         JSON.stringify(response),
-        new Uint8Array(Buffer.from(clientSessionId, 'hex').buffer)
+        Buffer.from(clientSessionId, 'hex')
     );
 
     await fetch(url, {

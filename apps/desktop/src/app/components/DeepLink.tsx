@@ -6,6 +6,8 @@ import {
     useGetConnectInfo
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
+import { sendBackground } from '../../libs/backgroudService';
+import { TonConnectMessage } from '../../libs/message';
 
 export const DeepLinkSubscription = () => {
     const [params, setParams] = useState<TonConnectParams | null>(null);
@@ -21,6 +23,7 @@ export const DeepLinkSubscription = () => {
             await responseConnectionAsync({ params, replyItems, manifest });
         } finally {
             setParams(null);
+            sendBackground({ king: 'reconnect' } as TonConnectMessage);
         }
     };
 
@@ -32,12 +35,10 @@ export const DeepLinkSubscription = () => {
     }, []);
 
     return (
-        <>
-            <TonConnectNotification
-                origin={undefined}
-                params={params?.request ?? null}
-                handleClose={handlerClose}
-            />
-        </>
+        <TonConnectNotification
+            origin={undefined}
+            params={params?.request ?? null}
+            handleClose={handlerClose}
+        />
     );
 };

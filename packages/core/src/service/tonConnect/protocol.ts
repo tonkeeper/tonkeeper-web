@@ -33,7 +33,7 @@ export class SessionCrypto {
         return nacl.randomBytes(this.nonceLength);
     }
 
-    public encrypt(message: string, receiverPublicKey: Uint8Array): Uint8Array {
+    public encrypt(message: string, receiverPublicKey: Buffer): Uint8Array {
         const encodedMessage = new TextEncoder().encode(message);
         const nonce = this.createNonce();
         const encrypted = nacl.box(

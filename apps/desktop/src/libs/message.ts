@@ -39,6 +39,10 @@ export interface GetKeychainMessage {
     publicKey: string;
 }
 
+export interface TonConnectMessage {
+    king: 'reconnect';
+}
+
 export type Message =
     | GetStorageMessage
     | SetStorageMessage
@@ -47,4 +51,5 @@ export type Message =
     | ClearStorageMessage
     | OpenPageMessage
     | SetKeychainMessage
-    | GetKeychainMessage;
+    | GetKeychainMessage
+    | TonConnectMessage;

@@ -5,6 +5,7 @@ import {
     replyDisconnectResponse
 } from '@tonkeeper/core/dist/service/tonConnect/actionService';
 import {
+    AccountConnection,
     disconnectAppConnection,
     getAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
@@ -18,30 +19,64 @@ import { BrowserWindow } from 'electron';
 import EventSourcePolyfill from 'eventsource';
 import { mainStorage } from './storageService';
 
-declare var Buffer: typeof BufferPolyfill;
 globalThis.Buffer = BufferPolyfill;
 
-export const subscribeSSE = async (mainWindow: BrowserWindow) => {
-    const account = await getAccountState(mainStorage);
-    if (!account.activePublicKey) return null;
-    const wallet = await getWalletState(mainStorage, account.activePublicKey);
+export class TonConnectSSE {
+    private lastEventId: string;
+    private connections: AccountConnection[];
+    private dist: Record<string, string>;
+    private closeConnection: () => void | null = null;
 
-    const lastEventId = await getLastEventId(mainStorage);
-    const connections = await getAccountConnection(mainStorage, wallet);
+    private static instance: TonConnectSSE = null;
 
-    const disconnect = async ({ connection, request }: TonConnectAppRequest) => {
+    static getInstance(mainWindow: BrowserWindow) {
+        if (this.instance != null) return this.instance;
+        return (this.instance = new TonConnectSSE(mainWindow));
+    }
+
+    constructor(private mainWindow: BrowserWindow) {
+        this.reconnect();
+    }
+
+    public reconnect() {
+        console.log('reconnect');
+        return this.init().then(() => this.connect());
+    }
+
+    public async init() {
+        this.lastEventId = await getLastEventId(mainStorage);
+
+        const account = await getAccountState(mainStorage);
+
+        this.connections = [];
+        this.dist = {};
+
+        for (let key of account.publicKeys) {
+            const wallet = await getWalletState(mainStorage, key);
+            const walletConnections = await getAccountConnection(mainStorage, wallet);
+
+            this.connections = this.connections.concat(walletConnections);
+            walletConnections.forEach(item => {
+                this.dist[item.clientSessionId] = key;
+            });
+        }
+    }
+
+    private disconnect = async ({ connection, request }: TonConnectAppRequest) => {
+        const wallet = await getWalletState(mainStorage, this.dist[connection.clientSessionId]);
         await disconnectAppConnection({
             storage: mainStorage,
             wallet,
             clientSessionId: connection.clientSessionId
         });
         await replyDisconnectResponse({ connection, request });
+        await this.reconnect();
     };
 
-    const handleMessage = (params: TonConnectAppRequest) => {
+    private handleMessage = (params: TonConnectAppRequest) => {
         switch (params.request.method) {
             case 'disconnect': {
-                return disconnect(params);
+                return this.disconnect(params);
             }
             case 'sendTransaction': {
                 const value = {
@@ -50,12 +85,10 @@ export const subscribeSSE = async (mainWindow: BrowserWindow) => {
                     payload: JSON.parse(params.request.params[0])
                 };
 
-                console.log(value);
-
-                mainWindow.show();
+                this.mainWindow.show();
                 setTimeout(() => {
-                    mainWindow.webContents.send('sendTransaction', value);
-                }, 100);
+                    this.mainWindow.webContents.send('sendTransaction', value);
+                }, 200);
                 return;
             }
             default: {
@@ -64,13 +97,20 @@ export const subscribeSSE = async (mainWindow: BrowserWindow) => {
         }
     };
 
-    const close = subscribeTonConnect({
-        storage: mainStorage,
-        handleMessage,
-        connections: connections,
-        lastEventId: lastEventId,
-        EventSourceClass: EventSourcePolyfill as any
-    });
+    public async connect() {
+        this.destroy();
+        this.closeConnection = subscribeTonConnect({
+            storage: mainStorage,
+            handleMessage: this.handleMessage,
+            connections: this.connections,
+            lastEventId: this.lastEventId,
+            EventSourceClass: EventSourcePolyfill as any
+        });
+    }
 
-    return close;
-};
+    public destroy() {
+        if (this.closeConnection) {
+            this.closeConnection();
+        }
+    }
+}
