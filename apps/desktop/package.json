@@ -66,6 +66,7 @@
         "copy-to-clipboard": "^3.3.3",
         "electron-is-dev": "^2.0.0",
         "electron-squirrel-startup": "^1.0.0",
+        "electron-store": "^8.1.0",
         "eventsource": "^2.0.2",
         "i18next": "^23.7.7",
         "i18next-http-backend": "^2.4.2",
