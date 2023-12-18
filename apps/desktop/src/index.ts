@@ -13,6 +13,8 @@ import { Message } from './libs/message';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+app.setName('Tonkeeper Desktop');
+
 // Optional, initialize the logger for any renderer process
 log.initialize({ preload: true });
 log.info('Application start-up');
@@ -30,8 +32,6 @@ if (process.defaultApp) {
     app.setAsDefaultProtocolClient('tc');
     app.setAsDefaultProtocolClient('tonkeeper-tc');
 }
-
-app.setName('Tonkeeper Desktop');
 
 const gotTheLock = app.requestSingleInstanceLock();
 
