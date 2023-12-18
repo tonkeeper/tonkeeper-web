@@ -183,9 +183,7 @@ export const Loader: FC = () => {
                     <AppContext.Provider value={context}>
                         <Content activeWallet={activeWallet} lock={lock} />
                         <CopyNotification />
-                        <Suspense fallback={<></>}>
-                            <QrScanner />
-                        </Suspense>
+                        <QrScanner />
                     </AppContext.Provider>
                 </AfterImportAction.Provider>
             </OnImportAction.Provider>
