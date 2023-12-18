@@ -20,7 +20,8 @@ const config: ForgeConfig = {
     packagerConfig: {
         asar: true,
         icon: './public/icon',
-        name: 'Tonkeeper Pro',
+        name: 'Tonkeeper',
+        executableName: 'Tonkeeper',
         protocols: [
             {
                 name: 'Tonkeeper Protocol',

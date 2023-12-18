@@ -31,6 +31,8 @@ if (process.defaultApp) {
     app.setAsDefaultProtocolClient('tonkeeper-tc');
 }
 
+app.setName('Tonkeeper Desktop');
+
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
