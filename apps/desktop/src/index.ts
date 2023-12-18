@@ -1,5 +1,6 @@
 import { BrowserWindow, app, ipcMain, shell } from 'electron';
 import isDev from 'electron-is-dev';
+import log from 'electron-log/main';
 import path from 'path';
 import { updateElectronApp } from 'update-electron-app';
 import { handleBackgroundMessage } from './electron/background';
@@ -12,14 +13,22 @@ import { Message } from './libs/message';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+// Optional, initialize the logger for any renderer process
+log.initialize({ preload: true });
+log.info('Log from the main process');
+
 let mainWindow: BrowserWindow | undefined = undefined;
 
 if (process.defaultApp) {
     if (process.argv.length >= 2) {
         app.setAsDefaultProtocolClient('tc', process.execPath, [path.resolve(process.argv[1])]);
+        app.setAsDefaultProtocolClient('tonkeeper-tc', process.execPath, [
+            path.resolve(process.argv[1])
+        ]);
     }
 } else {
     app.setAsDefaultProtocolClient('tc');
+    app.setAsDefaultProtocolClient('tonkeeper-tc');
 }
 
 const gotTheLock = app.requestSingleInstanceLock();
@@ -115,7 +124,7 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
-updateElectronApp();
+updateElectronApp({ logger: log });
 
 // Handle window controls via IPC
 ipcMain.on('shell:open', () => {

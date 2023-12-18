@@ -7,8 +7,5 @@ const ForkTsCheckerWebpackPlugin: typeof IForkTsCheckerWebpackPlugin = require('
 export const plugins = [
     new ForkTsCheckerWebpackPlugin({
         logger: 'webpack-infrastructure'
-    }),
-    new webpack.ProvidePlugin({
-        process: 'process/browser'
     })
 ];

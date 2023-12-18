@@ -65,6 +65,7 @@
         "buffer": "^6.0.3",
         "copy-to-clipboard": "^3.3.3",
         "electron-is-dev": "^2.0.0",
+        "electron-log": "^5.0.1",
         "electron-squirrel-startup": "^1.0.0",
         "electron-store": "^8.1.0",
         "eventsource": "^2.0.2",
