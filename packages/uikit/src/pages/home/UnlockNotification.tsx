@@ -1,10 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import {
-    GetPasswordParams,
-    GetPasswordType,
-    IAppSdk,
-    KeyboardParams
-} from '@tonkeeper/core/dist/AppSdk';
+import { GetPasswordParams, IAppSdk, KeyboardParams } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { MinPasswordLength, getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
@@ -18,40 +13,6 @@ import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
 import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
-
-export const getPasswordByNotification = async (
-    sdk: IAppSdk,
-    auth: AuthState,
-    type?: GetPasswordType
-): Promise<string> => {
-    const id = Date.now();
-    return new Promise<string>((resolve, reject) => {
-        sdk.uiEvents.emit('getPassword', {
-            method: 'getPassword',
-            id,
-            params: { type, auth }
-        });
-
-        const onCallback = (message: {
-            method: 'response';
-            id?: number | undefined;
-            params: string | Error;
-        }) => {
-            if (message.id === id) {
-                const { params } = message;
-                sdk.uiEvents.off('response', onCallback);
-
-                if (typeof params === 'string') {
-                    resolve(params);
-                } else {
-                    reject(params);
-                }
-            }
-        };
-
-        sdk.uiEvents.on('response', onCallback);
-    });
-};
 
 const Block = styled.form<{ padding: number }>`
     display: flex;
@@ -100,7 +61,6 @@ export const PasswordUnlock: FC<{
     isError: boolean;
     isLoading: boolean;
     padding: number;
-    reason?: GetPasswordType;
 }> = ({ sdk, onClose, onSubmit, isError, isLoading, padding }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLInputElement | null>(null);
@@ -187,7 +147,6 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
 }) => {
     const { t } = useTranslation();
     const [padding, setPadding] = useState(0);
-    const [type, setType] = useState<'confirm' | 'unlock' | undefined>(undefined);
     const [auth, setAuth] = useState<AuthState | undefined>(undefined);
     const [requestId, setId] = useState<number | undefined>(undefined);
 
@@ -243,7 +202,6 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
         }) => {
             openIosKeyboard('text', 'password');
 
-            setType(options.params.type);
             setAuth(options.params?.auth);
 
             setRequest(options.id);
@@ -267,11 +225,10 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
                 onSubmit={onSubmit}
                 isLoading={isLoading}
                 isError={isError}
-                reason={type}
                 padding={usePadding ? padding : 0}
             />
         );
-    }, [sdk, auth, requestId, padding, onCancel, onSubmit, type]);
+    }, [sdk, auth, requestId, padding, onCancel, onSubmit]);
 
     return (
         <Notification

@@ -1,5 +1,6 @@
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
-import React, { useEffect, useState } from 'react';
+import { AuthState } from '@tonkeeper/core/dist/entries/password';
+import React, { FC, useEffect, useState } from 'react';
 import { mnemonicNew } from 'ton-crypto';
 import { IconPage } from '../../components/Layout';
 import { CreateAuthState } from '../../components/create/CreateAuth';
@@ -17,7 +18,7 @@ import { useActiveWallet } from '../../state/wallet';
 import { FinalView, useAddWalletMutation } from './Password';
 import { Subscribe } from './Subscribe';
 
-const Create = () => {
+const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const {
@@ -91,7 +92,7 @@ const Create = () => {
                 mnemonic={mnemonic}
                 onBack={() => setCheck(false)}
                 onConfirm={() =>
-                    checkPasswordAndCreateWalletAsync({ mnemonic }).then(state => {
+                    checkPasswordAndCreateWalletAsync({ mnemonic, listOfAuth }).then(state => {
                         setChecked(true);
                         if (state === false) {
                             setHasPassword(false);

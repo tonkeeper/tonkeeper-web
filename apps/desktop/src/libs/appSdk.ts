@@ -1,26 +1,34 @@
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { EventEmitter } from '@tonkeeper/core/dist/entries/eventEmitter';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
+import { BaseApp, IAppSdk, KeychainPassword } from '@tonkeeper/core/dist/AppSdk';
+import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
+import { sendBackground } from './backgroudService';
+import { DesktopStorage } from './storage';
 
-export class DesktopAppSdk implements IAppSdk {
-  constructor(public storage: IStorage) {}
-  copyToClipboard = () => {};
-  openPage = async (url: string) => {
-    console.log(url);
-  };
+export class KeychainDesktop implements KeychainPassword {
+    setPassword = async (publicKey: string, mnemonic: string) => {
+        return sendBackground<void>({ king: 'set-keychain', publicKey, mnemonic });
+    };
+    getPassword = async (publicKey: string) => {
+        return sendBackground<string>({ king: 'get-keychain', publicKey });
+    };
+}
 
-  confirm = async (text: string) => false;
-  alert = async (text: string) => window.alert(text);
+export class DesktopAppSdk extends BaseApp implements IAppSdk {
+    keychain = new KeychainDesktop();
 
-  uiEvents = new EventEmitter();
-  version = packageJson.version ?? 'Unknown';
-  disableScroll = () => null;
-  enableScroll = () => null;
-  getScrollbarWidth = () => 0;
-  getKeyboardHeight = () => 0;
-  isIOs = () => false;
-  isStandalone = () => false;
+    constructor() {
+        super(new DesktopStorage());
+    }
 
-  requestExtensionPermission = async () => void 0;
+    copyToClipboard = (value: string, notification?: string) => {
+        copyToClipboard(value);
+
+        this.topMessage(notification);
+    };
+
+    openPage = async (url: string) => {
+        return sendBackground<void>({ king: 'open-page', url });
+    };
+
+    version = packageJson.version ?? 'Unknown';
 }

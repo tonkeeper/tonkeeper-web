@@ -1,12 +1,17 @@
 {
     "name": "tonkeeper-web",
     "version": "3.0.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tonkeeper/tonkeeper-web.git"
+    },
     "scripts": {
         "build": "npx turbo build",
         "build:web": "npx turbo build:web",
         "build:twa": "npx turbo build:twa && yarn deploy:twa",
         "deploy:twa": "npx wrangler pages deploy apps/twa/build",
-        "build:extension": "npx turbo build:extension"
+        "build:extension": "npx turbo build:extension",
+        "build:desktop": "npx turbo build:desktop"
     },
     "private": true,
     "devDependencies": {
@@ -32,10 +37,8 @@
     "workspaces": {
         "packages": [
             "packages/*",
-            "apps/web",
-            "apps/extension",
-            "apps/twa"
+            "apps/*"
         ]
     },
-    "packageManager": "yarn@3.6.3"
+    "packageManager": "yarn@4.0.2"
 }

@@ -1,5 +1,6 @@
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
-import React, { useState } from 'react';
+import { AuthState } from '@tonkeeper/core/dist/entries/password';
+import React, { FC, useState } from 'react';
 import { CreateAuthState } from '../../components/create/CreateAuth';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { ImportWords } from '../../components/create/Words';
@@ -8,7 +9,7 @@ import { useActiveWallet } from '../../state/wallet';
 import { FinalView, useAddWalletMutation } from './Password';
 import { Subscribe } from './Subscribe';
 
-const Import = () => {
+const Import: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
     const sdk = useAppSdk();
 
     const [mnemonic, setMnemonic] = useState<string[]>([]);
@@ -29,7 +30,7 @@ const Import = () => {
             <ImportWords
                 isLoading={isConfirmLoading}
                 onMnemonic={m => {
-                    checkPasswordAndCreateWalletAsync({ mnemonic: m }).then(state => {
+                    checkPasswordAndCreateWalletAsync({ mnemonic: m, listOfAuth }).then(state => {
                         setMnemonic(m);
                         if (state === false) {
                             setHasPassword(false);

@@ -1,6 +1,4 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     EstimateData,
@@ -14,7 +12,7 @@ import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { getPasswordByNotification } from '../../pages/home/UnlockNotification';
+import { getMnemonic } from '../../state/mnemonic';
 import { CheckmarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { SkeletonList } from '../Skeleton';
@@ -62,16 +60,12 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
     const { api } = useAppContext();
 
     return useMutation<string, Error>(async () => {
-        const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
-        if (!auth) {
-            throw new Error('Missing Auth');
-        }
         const accounts = estimate?.accounts;
         if (!accounts) {
             throw new Error('Missing accounts data');
         }
-        const password = await getPasswordByNotification(sdk, auth);
-        return sendTonConnectTransfer(sdk.storage, api, wallet, accounts, params, password);
+        const mnemonic = await getMnemonic(sdk, wallet.publicKey);
+        return sendTonConnectTransfer(api, wallet, accounts, params, mnemonic);
     });
 };
 

@@ -16,7 +16,6 @@ import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
 import { APIConfig } from '../../entries/apis';
 import { WalletState } from '../../entries/wallet';
-import { IStorage } from '../../Storage';
 import {
     Account,
     AccountsApi,
@@ -24,7 +23,6 @@ import {
     MessageConsequences,
     WalletApi
 } from '../../tonApiV2';
-import { getWalletMnemonic } from '../mnemonicService';
 import { walletContractFromState } from '../wallet/contractService';
 
 export enum SendMode {
@@ -151,20 +149,14 @@ export const createTransferMessage = (
 };
 
 export async function getKeyPairAndSeqno(options: {
-    storage: IStorage;
     api: APIConfig;
     walletState: WalletState;
     fee: MessageConsequences;
-    password: string;
+    mnemonic: string[];
     amount: BigNumber;
 }) {
     await checkServiceTimeOrDie(options.api);
-    const mnemonic = await getWalletMnemonic(
-        options.storage,
-        options.walletState.publicKey,
-        options.password
-    );
-    const keyPair = await mnemonicToPrivateKey(mnemonic);
+    const keyPair = await mnemonicToPrivateKey(options.mnemonic);
 
     const total = options.amount.plus(options.fee.event.extra * -1);
 

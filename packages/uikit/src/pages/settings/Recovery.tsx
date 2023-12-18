@@ -1,5 +1,4 @@
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import React, { FC, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -9,7 +8,7 @@ import { WorldNumber, WorldsGrid } from '../../components/create/Words';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { getPasswordByNotification } from '../home/UnlockNotification';
+import { getMnemonic } from '../../state/mnemonic';
 
 export const ActiveRecovery = () => {
     const wallet = useWalletContext();
@@ -33,10 +32,7 @@ const useMnemonic = (publicKey: string, auth: AuthState) => {
     useEffect(() => {
         (async () => {
             try {
-                const password =
-                    auth.kind === 'none' ? auth.kind : await getPasswordByNotification(sdk, auth);
-
-                setMnemonic(await getWalletMnemonic(sdk.storage, publicKey, password));
+                setMnemonic(await getMnemonic(sdk, publicKey));
             } catch (e) {
                 navigate(-1);
             }

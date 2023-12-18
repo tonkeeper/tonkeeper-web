@@ -8,7 +8,6 @@ import React, { FC, useState } from 'react';
 import { useAppContext, useWalletContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
-import { getWalletPassword } from '../../../state/password';
 import { Gap } from '../../Layout';
 import { ListBlock } from '../../List';
 import { FullHeightBlock } from '../../Notification';
@@ -21,6 +20,7 @@ import { TonRecipientData, TransferEstimation } from '@tonkeeper/core/dist/entri
 import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
 import { useTransactionAnalytics } from '../../../hooks/amplitude';
 import { QueryKey } from '../../../libs/queryKey';
+import { getMnemonic } from '../../../state/mnemonic';
 import { Image, ImageMock, Info, SendingTitle, Title } from '../Confirm';
 import {
     ConfirmViewContext,
@@ -71,12 +71,13 @@ const useSendNft = (recipient: TonRecipientData, nftItem: NftItem, fee?: Message
 
     return useMutation<boolean, Error>(async () => {
         if (!fee) return false;
-        const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
-        if (password === null) return false;
+
+        const mnemonic = await getMnemonic(sdk, wallet.publicKey).catch(() => null);
+        if (mnemonic === null) return false;
 
         track2('send-nft');
         try {
-            await sendNftTransfer(sdk.storage, api, wallet, recipient, nftItem, fee, password);
+            await sendNftTransfer(api, wallet, recipient, nftItem, fee, mnemonic);
         } catch (e) {
             await notifyError(client, sdk, t, e);
         }

@@ -1,21 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
 import { Omit } from 'react-beautiful-dnd';
 import { notifyError } from '../../components/transfer/common';
-import { getWalletPassword } from '../../state/password';
+import { getMnemonic } from '../../state/mnemonic';
 import { AmplitudeTransactionType, useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
 
 export type ContractExecutorParams = {
-    storage: IStorage;
     api: APIConfig;
     walletState: WalletState;
-    password: string;
+    mnemonic: string[];
     fee: MessageConsequences;
 };
 
@@ -41,16 +39,15 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
             return false;
         }
 
-        const password = await getWalletPassword(sdk, 'confirm').catch(() => null);
-        if (password === null) return false;
+        const mnemonic = await getMnemonic(sdk, walletState.publicKey).catch(() => null);
+        if (mnemonic === null) return false;
 
         track2(eventName2);
         try {
             await executor({
-                storage: sdk.storage,
                 api,
                 walletState,
-                password,
+                mnemonic,
                 ...args
             } as Args);
         } catch (e) {

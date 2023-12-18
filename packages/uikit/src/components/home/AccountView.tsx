@@ -149,7 +149,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                             address,
                             jetton
                         })}
-                        logoImage="/img/toncoin.svg"
+                        logoImage="https://wallet.tonkeeper.com/img/toncoin.svg"
                         logoPadding={8}
                         qrStyle="dots"
                         eyeRadius={{

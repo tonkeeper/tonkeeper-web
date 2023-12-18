@@ -34,7 +34,7 @@ const TonHeader: FC<{ info: Account }> = ({ info: { balance } }) => {
             symbol="TON"
             price={fiatAmount}
             description={t('Ton_page_description')}
-            image="/img/toncoin.svg"
+            image="https://wallet.tonkeeper.com/img/toncoin.svg"
         />
     );
 };

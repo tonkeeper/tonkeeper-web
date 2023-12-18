@@ -1,11 +1,10 @@
 import { AccountState, defaultAccountState } from '../entries/account';
-import { APIConfig } from '../entries/apis';
 import { AuthState } from '../entries/password';
+import { WalletState } from '../entries/wallet';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { encrypt } from './cryptoService';
 import { getWalletMnemonic, validateWalletMnemonic } from './mnemonicService';
-import { importWallet } from './walletService';
 
 export const getAccountState = async (storage: IStorage) => {
     const state = await storage.get<AccountState>(AppKey.ACCOUNT);
@@ -23,13 +22,10 @@ const accountAppendWallet = async (account: AccountState, publicKey: string) => 
 
 export const accountSetUpWalletState = async (
     storage: IStorage,
-    api: APIConfig,
-    mnemonic: string[],
+    state: WalletState,
     auth: AuthState,
-    password: string
+    encryptedMnemonic?: string
 ) => {
-    const [encryptedMnemonic, state] = await importWallet(api, mnemonic, password);
-
     const account = await getAccountState(storage);
     const updatedAccount = await accountAppendWallet(account, state.publicKey);
     if (account.publicKeys.includes(state.publicKey)) {
@@ -39,12 +35,17 @@ export const accountSetUpWalletState = async (
             [`${AppKey.WALLET}_${state.publicKey}`]: { ...state, name: undefined }
         });
     } else {
-        await storage.setBatch({
+        const data = {
             [AppKey.ACCOUNT]: updatedAccount,
             [AppKey.PASSWORD]: auth,
-            [`${AppKey.WALLET}_${state.publicKey}`]: state,
-            [`${AppKey.MNEMONIC}_${state.publicKey}`]: encryptedMnemonic
-        });
+            [`${AppKey.WALLET}_${state.publicKey}`]: state
+        };
+
+        if (encryptedMnemonic) {
+            Object.assign(data, { [`${AppKey.MNEMONIC}_${state.publicKey}`]: encryptedMnemonic });
+        }
+
+        await storage.setBatch(data);
     }
 };
 

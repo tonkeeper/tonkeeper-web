@@ -1,4 +1,4 @@
-export type AuthState = AuthNone | AuthPassword | WebAuthn;
+export type AuthState = AuthNone | AuthPassword | WebAuthn | KeychainPassword;
 
 export interface AuthNone {
     kind: 'none';
@@ -6,6 +6,10 @@ export interface AuthNone {
 
 export interface AuthPassword {
     kind: 'password';
+}
+
+export interface KeychainPassword {
+    kind: 'keychain';
 }
 
 export interface WebAuthn {

@@ -292,3 +292,9 @@ export interface TonConnectAppRequest {
     request: AppRequest<RpcMethod>;
     connection: AccountConnection;
 }
+
+export interface TonConnectMessageRequest {
+    message: string;
+    from: string;
+    connection: AccountConnection;
+}
