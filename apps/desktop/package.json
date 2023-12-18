@@ -70,7 +70,6 @@
         "electron-store": "^8.1.0",
         "eventsource": "^2.0.2",
         "i18next": "^23.7.7",
-        "i18next-http-backend": "^2.4.2",
         "keytar": "^7.9.0",
         "process": "^0.11.10",
         "react": "18.2.0",
