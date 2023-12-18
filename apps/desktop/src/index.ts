@@ -15,7 +15,7 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 // Optional, initialize the logger for any renderer process
 log.initialize({ preload: true });
-log.info('Log from the main process');
+log.info('Application start-up');
 
 let mainWindow: BrowserWindow | undefined = undefined;
 
@@ -67,8 +67,8 @@ const createWindow = (): void => {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         icon: path.join(process.cwd(), 'public', 'icon.icns'),
-        width: isDev ? 1100 : 500,
-        height: 800,
+        width: isDev ? 1100 : 450,
+        height: 700,
         webPreferences: {
             zoomFactor: 0.8,
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY

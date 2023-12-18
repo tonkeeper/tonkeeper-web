@@ -26,6 +26,14 @@
  * ```
  */
 
-import './App';
+import { Buffer as BufferPolyfill } from 'buffer';
+declare var Buffer: typeof BufferPolyfill;
+globalThis.Buffer = BufferPolyfill;
 
+import log from 'electron-log/renderer';
+
+log.info('UI Start-up');
+Object.assign(console, log.functions);
 console.log('👋 This message is being logged by "renderer.js", included via webpack');
+
+import './App';
