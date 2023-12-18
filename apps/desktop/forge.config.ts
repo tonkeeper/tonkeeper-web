@@ -9,6 +9,7 @@ import { PublisherGithub } from '@electron-forge/publisher-github';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import type { NotaryToolCredentials } from '@electron/notarize/lib/types';
 import dotenv from 'dotenv';
+import path from 'path';
 
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
@@ -44,7 +45,13 @@ const config: ForgeConfig = {
     makers: [
         new MakerSquirrel({}),
         new MakerZIP({}, ['darwin']),
-        new MakerDMG({}, ['darwin']),
+        new MakerDMG(
+            {
+                icon: path.join(process.cwd(), 'public', 'icon.icns'),
+                format: 'ULFO'
+            },
+            ['darwin']
+        ),
         new MakerRpm({}),
         new MakerDeb({})
     ],

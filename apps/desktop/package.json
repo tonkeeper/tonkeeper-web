@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/desktop",
-    "version": "3.4.3",
+    "version": "3.4.4",
     "description": "Your desktop wallet on The Open Network",
     "main": ".webpack/main",
     "repository": {
