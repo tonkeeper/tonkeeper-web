@@ -20,7 +20,6 @@ const config: ForgeConfig = {
     packagerConfig: {
         asar: true,
         icon: './public/icon',
-        extraResource: ['./public'],
         name: 'Tonkeeper',
         executableName: 'Tonkeeper',
         protocols: [
@@ -49,8 +48,18 @@ const config: ForgeConfig = {
         new MakerZIP({}, ['darwin']),
         new MakerDMG(
             {
+                background: path.join(process.cwd(), 'public', 'dmg-bg.png'),
                 icon: path.join(process.cwd(), 'public', 'icon.icns'),
-                format: 'ULFO'
+                format: 'ULFO',
+                contents: [
+                    {
+                        x: 185,
+                        y: 165,
+                        type: 'file',
+                        path: `${process.cwd()}/out/Tonkeeper-darwin-arm64/Tonkeeper.app`
+                    },
+                    { x: 400, y: 165, type: 'link', path: '/Applications' }
+                ]
             },
             ['darwin']
         ),
