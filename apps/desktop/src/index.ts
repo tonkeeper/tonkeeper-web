@@ -1,3 +1,4 @@
+import { delay } from '@tonkeeper/core/dist/utils/common';
 import { BrowserWindow, app, ipcMain, shell } from 'electron';
 import isDev from 'electron-is-dev';
 import log from 'electron-log/main';
@@ -24,12 +25,16 @@ let mainWindow: BrowserWindow | undefined = undefined;
 if (process.defaultApp) {
     if (process.argv.length >= 2) {
         app.setAsDefaultProtocolClient('tc', process.execPath, [path.resolve(process.argv[1])]);
+        app.setAsDefaultProtocolClient('tonkeeper', process.execPath, [
+            path.resolve(process.argv[1])
+        ]);
         app.setAsDefaultProtocolClient('tonkeeper-tc', process.execPath, [
             path.resolve(process.argv[1])
         ]);
     }
 } else {
     app.setAsDefaultProtocolClient('tc');
+    app.setAsDefaultProtocolClient('tonkeeper');
     app.setAsDefaultProtocolClient('tonkeeper-tc');
 }
 
@@ -54,7 +59,11 @@ if (!gotTheLock) {
         createWindow();
     });
 
-    app.on('open-url', (event, url) => {
+    app.on('open-url', async (event, url) => {
+        if (!mainWindow) {
+            createWindow();
+            await delay(500);
+        }
         mainWindow.webContents.send('tc', url);
         // dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`);
     });
@@ -91,6 +100,7 @@ const createWindow = (): void => {
     mainWindow.on('closed', () => {
         ipcMain.removeHandler('message');
         tonConnect.destroy();
+        mainWindow = null;
     });
 
     ipcMain.handle('message', async (event, message: Message) => {
