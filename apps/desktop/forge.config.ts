@@ -47,20 +47,21 @@ const config: ForgeConfig = {
         new MakerSquirrel({}),
         new MakerZIP({}, ['darwin']),
         new MakerDMG(
-            {
+            arch => ({
                 background: path.join(process.cwd(), 'public', 'dmg-bg.png'),
                 icon: path.join(process.cwd(), 'public', 'icon.icns'),
                 format: 'ULFO',
+                additionalDMGOptions: { window: { size: { width: 600, height: 372 } } },
                 contents: [
                     {
-                        x: 185,
-                        y: 165,
+                        x: 200,
+                        y: 170,
                         type: 'file',
-                        path: `${process.cwd()}/out/Tonkeeper-darwin-arm64/Tonkeeper.app`
+                        path: `${process.cwd()}/out/Tonkeeper-darwin-${arch}/Tonkeeper.app`
                     },
-                    { x: 400, y: 165, type: 'link', path: '/Applications' }
+                    { x: 400, y: 170, type: 'link', path: '/Applications' }
                 ]
-            },
+            }),
             ['darwin']
         ),
         new MakerRpm({}),

@@ -13,6 +13,8 @@
         "package": "electron-forge package",
         "make": "electron-forge make",
         "publish": "electron-forge publish",
+        "publish:universal": "electron-forge publish --arch=universal --platform=darwin",
+        "publish:intel": "electron-forge publish --arch=x64 --platform=darwin",
         "lint": "eslint --ext .ts,.tsx .",
         "build:win32": "npm run make -- --platform win32",
         "build:linux": "npm run make -- --platform linux",
