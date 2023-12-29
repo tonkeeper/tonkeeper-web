@@ -7,5 +7,6 @@ const ForkTsCheckerWebpackPlugin: typeof IForkTsCheckerWebpackPlugin = require('
 export const plugins = [
     new ForkTsCheckerWebpackPlugin({
         logger: 'webpack-infrastructure'
-    })
+    }),
+    new webpack.EnvironmentPlugin(['REACT_APP_MEASUREMENT_ID', 'REACT_APP_GA_SECRET'])
 ];

@@ -5840,6 +5840,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/twa@workspace:apps/twa"
   dependencies:
+    "@tanstack/react-query": "npm:4.3.4"
     "@testing-library/dom": "npm:^9.3.1"
     "@testing-library/jest-dom": "npm:^5.16.5"
     "@testing-library/react": "npm:^13.4.0"
@@ -5928,6 +5929,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/web@workspace:apps/web"
   dependencies:
+    "@amplitude/analytics-browser": "npm:^2.1.0"
+    "@tanstack/react-query": "npm:4.3.4"
     "@testing-library/dom": "npm:^9.3.1"
     "@testing-library/jest-dom": "npm:^5.16.5"
     "@testing-library/react": "npm:^13.4.0"
