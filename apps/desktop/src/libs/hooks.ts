@@ -44,7 +44,11 @@ export const useAppWidth = () => {
 
 declare const REACT_APP_MEASUREMENT_ID: string;
 
-export const useAnalytics = (account?: AccountState, wallet?: WalletState | null) => {
+export const useAnalytics = (
+    version: string,
+    account?: AccountState,
+    wallet?: WalletState | null
+) => {
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
@@ -54,7 +58,7 @@ export const useAnalytics = (account?: AccountState, wallet?: WalletState | null
                 toWalletType(wallet),
                 account,
                 wallet,
-                window.backgroundApi.version(),
+                version,
                 `${window.backgroundApi.platform()}-${window.backgroundApi.arch()}`
             );
 

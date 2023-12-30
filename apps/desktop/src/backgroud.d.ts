@@ -1,7 +1,6 @@
 interface BackgroundApi {
     platform: () => string;
     arch: () => string;
-    version: () => string;
     node: () => string;
     chrome: () => string;
     electron: () => string;
