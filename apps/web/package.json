@@ -4,6 +4,8 @@
     "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
     "description": "Your web wallet on The Open Network",
     "dependencies": {
+        "@amplitude/analytics-browser": "^2.1.0",
+        "@tanstack/react-query": "4.3.4",
         "@tonkeeper/core": "0.1.0",
         "@tonkeeper/locales": "0.1.0",
         "@tonkeeper/uikit": "0.1.0",

@@ -27,10 +27,7 @@ import {
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
 import SendActionNotification from '@tonkeeper/uikit/dist/components/transfer/SendNotifications';
 import SendNftNotification from '@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification';
-import {
-    AmplitudeAnalyticsContext,
-    useAmplitudeAnalytics
-} from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
@@ -60,7 +57,7 @@ import { useTranslation } from 'react-i18next';
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
-import { useAppHeight, useAppWidth } from '../libs/hooks';
+import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 
@@ -142,7 +139,7 @@ export const Loader: FC = () => {
     const navigate = useNavigate();
     useAppHeight();
 
-    const enable = useAmplitudeAnalytics('Desktop', account, activeWallet);
+    const { data: tracker } = useAnalytics(account, activeWallet);
 
     useEffect(() => {
         if (
@@ -175,7 +172,7 @@ export const Loader: FC = () => {
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={enable}>
+        <AmplitudeAnalyticsContext.Provider value={tracker}>
             <OnImportAction.Provider value={navigate}>
                 <AfterImportAction.Provider
                     value={() => navigate(AppRoute.home, { replace: true })}
@@ -198,6 +195,7 @@ export const Content: FC<{
     const location = useLocation();
     useWindowsScroll();
     useAppWidth();
+    useTrackLocation();
 
     if (lock) {
         return (

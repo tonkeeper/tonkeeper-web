@@ -2,10 +2,13 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { SendTransactionAppRequest } from '@tonkeeper/uikit/dist/components/connect/connectHook';
-import { contextBridge, ipcRenderer } from 'electron';
+import { app, contextBridge, ipcRenderer } from 'electron';
 import { Message } from './libs/message';
 
 contextBridge.exposeInMainWorld('backgroundApi', {
+    platform: () => process.platform,
+    arch: () => process.arch,
+    version: () => app.getVersion(),
     node: () => process.versions.node,
     chrome: () => process.versions.chrome,
     electron: () => process.versions.electron,

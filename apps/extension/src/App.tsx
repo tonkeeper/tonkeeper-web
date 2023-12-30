@@ -21,10 +21,7 @@ import {
     AddFavoriteNotification,
     EditFavoriteNotification
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
-import {
-    AmplitudeAnalyticsContext,
-    useAmplitudeAnalytics
-} from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import {
     AppContext,
     IAppContext,
@@ -54,8 +51,8 @@ import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
 import { Notifications } from './components/Notifications';
 import { connectToBackground } from './event';
-import { ExtensionAppSdk, extensionType } from './libs/appSdk';
-import { useAppWidth } from './libs/hoolks';
+import { ExtensionAppSdk } from './libs/appSdk';
+import { useAnalytics, useAppWidth } from './libs/hoolks';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -174,7 +171,7 @@ export const Loader: FC = React.memo(() => {
     );
     const { data: config } = useTonenpointConfig(tonendpoint);
 
-    const enable = useAmplitudeAnalytics(extensionType, account, activeWallet);
+    const { data: tracker } = useAnalytics(sdk.storage, account, activeWallet);
 
     if (!account || !auth || !config || lock === undefined) {
         return (
@@ -201,7 +198,7 @@ export const Loader: FC = React.memo(() => {
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={enable}>
+        <AmplitudeAnalyticsContext.Provider value={tracker}>
             <OnImportAction.Provider value={sdk.openExtensionInBrowser}>
                 <AfterImportAction.Provider value={sdk.closeExtensionInBrowser}>
                     <AppContext.Provider value={context}>
@@ -236,6 +233,7 @@ export const Content: FC<{
 
     useWindowsScroll(!pageView);
     useAppWidth();
+    useTrackLocation();
 
     if (lock) {
         return (
@@ -254,7 +252,7 @@ export const Content: FC<{
                             path={any(AppRoute.import)}
                             element={
                                 <InitializeContainer fullHeight={false}>
-                                    <ImportRouter />
+                                    <ImportRouter listOfAuth={[]} />
                                 </InitializeContainer>
                             }
                         />

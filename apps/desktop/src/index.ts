@@ -1,5 +1,5 @@
 import { delay } from '@tonkeeper/core/dist/utils/common';
-import { BrowserWindow, app, ipcMain, shell } from 'electron';
+import { BrowserWindow, app, ipcMain } from 'electron';
 import isDev from 'electron-is-dev';
 import log from 'electron-log/main';
 import path from 'path';
@@ -80,7 +80,7 @@ const createWindow = (): void => {
         icon: path.join(process.cwd(), 'public', 'icon.icns'),
         width: isDev ? 1100 : 450,
         height: 700,
-        resizable: false,
+        resizable: isDev,
         webPreferences: {
             zoomFactor: 0.8,
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
@@ -138,10 +138,3 @@ app.on('activate', () => {
 // code. You can also put them in separate files and import them here.
 
 updateElectronApp({ logger: log });
-
-// Handle window controls via IPC
-ipcMain.on('shell:open', () => {
-    const pageDirectory = __dirname.replace('app.asar', 'app.asar.unpacked');
-    const pagePath = path.join('file://', pageDirectory, 'index.html');
-    shell.openExternal(pagePath);
-});

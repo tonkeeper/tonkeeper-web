@@ -33,10 +33,7 @@ import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import {
-    AmplitudeAnalyticsContext,
-    useAmplitudeAnalytics
-} from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
@@ -59,7 +56,7 @@ import { TwaQrScanner } from './components/TwaQrScanner';
 import { TwaNftNotification } from './components/nft/NftNotification';
 import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
-import { useTwaAppViewport } from './libs/hooks';
+import { useAnalytics, useTwaAppViewport } from './libs/hooks';
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -218,7 +215,7 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
-    const enable = useAmplitudeAnalytics('Twa', account, activeWallet);
+    const { data: tracker } = useAnalytics(account, activeWallet);
 
     if (auth === undefined || account === undefined || config === undefined || lock === undefined) {
         return <Loading />;
@@ -242,7 +239,7 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={enable}>
+        <AmplitudeAnalyticsContext.Provider value={tracker}>
             <OnImportAction.Provider value={navigate}>
                 <AfterImportAction.Provider
                     value={() => navigate(AppRoute.home, { replace: true })}
@@ -293,7 +290,7 @@ const InitPages = () => {
         <InitWrapper>
             <Suspense fallback={<Loading />}>
                 <Routes>
-                    <Route path={any(AppRoute.import)} element={<ImportRouter />} />
+                    <Route path={any(AppRoute.import)} element={<ImportRouter listOfAuth={[]} />} />
                     <Route path="*" element={<Initialize />} />
                 </Routes>
             </Suspense>
@@ -308,6 +305,7 @@ const Content: FC<{
 }> = ({ activeWallet, lock, showQrScan }) => {
     const location = useLocation();
     useWindowsScroll();
+    useTrackLocation();
 
     if (lock) {
         return (
