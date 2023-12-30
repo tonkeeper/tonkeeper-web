@@ -80,7 +80,7 @@ const createWindow = (): void => {
         icon: path.join(process.cwd(), 'public', 'icon.icns'),
         width: isDev ? 1100 : 450,
         height: 700,
-        resizable: false,
+        resizable: isDev,
         webPreferences: {
             zoomFactor: 0.8,
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY

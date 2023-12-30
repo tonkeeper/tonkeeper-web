@@ -11,7 +11,8 @@ export class Amplitude implements Analytics {
         application: string,
         walletType: string,
         account?: AccountState,
-        wallet?: WalletState | null
+        wallet?: WalletState | null,
+        version?: string
     ) {
         amplitude.init(this.key, undefined, {
             defaultTracking: {
@@ -27,6 +28,7 @@ export class Amplitude implements Analytics {
         event.set('walletType', walletType);
         event.set('network', wallet?.network === Network.TESTNET ? 'testnet' : 'mainnet');
         event.set('accounts', account!.publicKeys.length);
+        event.set('version', version ?? 'Unknown');
 
         amplitude.identify(event);
     }

@@ -4,7 +4,7 @@ import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
-import { GoogleAnalytics4 } from '@tonkeeper/uikit/dist/hooks/analytics/google';
+import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
 
@@ -43,6 +43,8 @@ export const useAppWidth = () => {
     }, []);
 };
 
+declare const REACT_APP_MEASUREMENT_ID: string;
+
 export const useAnalytics = (
     storage: IStorage,
     account?: AccountState,
@@ -51,17 +53,14 @@ export const useAnalytics = (
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
-            const tracker = new GoogleAnalytics4(
-                process.env.REACT_APP_MEASUREMENT_ID!,
-                process.env.REACT_APP_GA_SECRET!,
-                storage
-            );
-
+            const tracker = new Gtag(REACT_APP_MEASUREMENT_ID);
+            const version = `Desktop-${window.backgroundApi.platform()}-${window.backgroundApi.arch()}`;
             tracker.init(
-                `Desktop-${process.platform}-${process.arch}`,
+                version,
                 toWalletType(wallet),
                 account,
-                wallet
+                wallet,
+                window.backgroundApi.version()
             );
 
             return tracker;

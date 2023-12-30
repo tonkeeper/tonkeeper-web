@@ -8,7 +8,8 @@ export interface Analytics {
         application: string,
         walletType: string,
         account?: AccountState,
-        wallet?: WalletState | null
+        wallet?: WalletState | null,
+        version?: string
     ) => void;
     track: (name: string, params: Record<string, any>) => Promise<void>;
 }
@@ -27,9 +28,10 @@ export class AnalyticsGroup implements Analytics {
         application: string,
         walletType: string,
         account?: AccountState,
-        wallet?: WalletState | null
+        wallet?: WalletState | null,
+        version?: string
     ) {
-        this.analytics.forEach(c => c.init(application, walletType, account, wallet));
+        this.analytics.forEach(c => c.init(application, walletType, account, wallet, version));
     }
 
     async track(name: string, params: Record<string, any>) {
