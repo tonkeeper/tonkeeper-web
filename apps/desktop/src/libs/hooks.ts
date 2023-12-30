@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
@@ -45,22 +44,18 @@ export const useAppWidth = () => {
 
 declare const REACT_APP_MEASUREMENT_ID: string;
 
-export const useAnalytics = (
-    storage: IStorage,
-    account?: AccountState,
-    wallet?: WalletState | null
-) => {
+export const useAnalytics = (account?: AccountState, wallet?: WalletState | null) => {
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
             const tracker = new Gtag(REACT_APP_MEASUREMENT_ID);
-            const version = `Desktop-${window.backgroundApi.platform()}-${window.backgroundApi.arch()}`;
             tracker.init(
-                version,
+                'Desktop',
                 toWalletType(wallet),
                 account,
                 wallet,
-                window.backgroundApi.version()
+                window.backgroundApi.version(),
+                `${window.backgroundApi.platform()}-${window.backgroundApi.arch()}`
             );
 
             return tracker;

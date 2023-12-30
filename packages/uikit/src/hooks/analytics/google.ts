@@ -35,7 +35,8 @@ export class GoogleAnalytics4 implements Analytics {
         walletType: string,
         account?: AccountState,
         wallet?: WalletState | null,
-        version?: string
+        version?: string,
+        platform?: string
     ) {
         this.user_properties['application'] = { value: application };
         this.user_properties['walletType'] = { value: walletType };
@@ -44,6 +45,7 @@ export class GoogleAnalytics4 implements Analytics {
         };
         this.user_properties['accounts'] = { value: account!.publicKeys.length };
         this.user_properties['version'] = { value: version };
+        this.user_properties['platform'] = { value: platform };
     }
 
     pageView(location: string) {

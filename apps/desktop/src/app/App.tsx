@@ -139,7 +139,7 @@ export const Loader: FC = () => {
     const navigate = useNavigate();
     useAppHeight();
 
-    const { data: tracker } = useAnalytics(sdk.storage, account, activeWallet);
+    const { data: tracker } = useAnalytics(account, activeWallet);
 
     useEffect(() => {
         if (

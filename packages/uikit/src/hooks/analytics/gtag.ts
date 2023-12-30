@@ -14,14 +14,16 @@ export class Gtag implements Analytics {
         walletType: string,
         account?: AccountState,
         wallet?: WalletState | null,
-        version?: string
+        version?: string,
+        platform?: string
     ) {
         ReactGA.gtag('set', 'user_properties', {
             application,
             walletType,
             network: wallet?.network === Network.TESTNET ? 'testnet' : 'mainnet',
             accounts: account!.publicKeys.length,
-            version
+            version,
+            platform
         });
     }
 
