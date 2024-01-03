@@ -3,7 +3,7 @@ import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
-import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
+import { Amplitude } from '@tonkeeper/uikit/dist/hooks/analytics/amplitude';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
 
@@ -42,7 +42,7 @@ export const useAppWidth = () => {
     }, []);
 };
 
-declare const REACT_APP_MEASUREMENT_ID: string;
+declare const REACT_APP_AMPLITUDE: string;
 
 export const useAnalytics = (
     version: string,
@@ -52,7 +52,7 @@ export const useAnalytics = (
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
-            const tracker = new Gtag(REACT_APP_MEASUREMENT_ID);
+            const tracker = new Amplitude(REACT_APP_AMPLITUDE);
             tracker.init(
                 'Desktop',
                 toWalletType(wallet),

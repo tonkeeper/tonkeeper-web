@@ -12,6 +12,6 @@ export const plugins = [
         logger: 'webpack-infrastructure'
     }),
     new webpack.DefinePlugin({
-        REACT_APP_MEASUREMENT_ID: JSON.stringify(parsed!.REACT_APP_MEASUREMENT_ID)
+        REACT_APP_AMPLITUDE: JSON.stringify(parsed!.REACT_APP_AMPLITUDE)
     })
 ];
