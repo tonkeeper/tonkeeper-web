@@ -15,8 +15,8 @@ import {
 } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { Buffer as BufferPolyfill } from 'buffer';
-import { BrowserWindow } from 'electron';
 import EventSourcePolyfill from 'eventsource';
+import { MainWindow } from './mainWindow';
 import { mainStorage } from './storageService';
 
 globalThis.Buffer = BufferPolyfill;
@@ -29,12 +29,12 @@ export class TonConnectSSE {
 
     private static instance: TonConnectSSE = null;
 
-    static getInstance(mainWindow: BrowserWindow) {
+    static getInstance() {
         if (this.instance != null) return this.instance;
-        return (this.instance = new TonConnectSSE(mainWindow));
+        return (this.instance = new TonConnectSSE());
     }
 
-    constructor(private mainWindow: BrowserWindow) {
+    constructor() {
         this.reconnect();
     }
 
@@ -85,9 +85,9 @@ export class TonConnectSSE {
                     payload: JSON.parse(params.request.params[0])
                 };
 
-                this.mainWindow.show();
+                MainWindow.mainWindow.show();
                 setTimeout(() => {
-                    this.mainWindow.webContents.send('sendTransaction', value);
+                    MainWindow.mainWindow.webContents.send('sendTransaction', value);
                 }, 200);
                 return;
             }
@@ -99,6 +99,9 @@ export class TonConnectSSE {
 
     public async connect() {
         this.destroy();
+        if (this.connections.length === 0) {
+            console.log('Missing connection.');
+        }
         this.closeConnection = subscribeTonConnect({
             storage: mainStorage,
             handleMessage: this.handleMessage,
@@ -110,6 +113,7 @@ export class TonConnectSSE {
 
     public destroy() {
         if (this.closeConnection) {
+            console.log('Close connection.');
             this.closeConnection();
         }
     }

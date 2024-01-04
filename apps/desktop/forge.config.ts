@@ -16,6 +16,18 @@ import { rendererConfig } from './webpack.renderer.config';
 
 const { parsed } = dotenv.config();
 
+const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc'];
+
+const devAndRpmOptions = {
+    name: 'Tonkeeper',
+    productName: 'Tonkeeper',
+    genericName: 'Tonkeeper',
+    description: 'Your desktop wallet on The Open Network',
+    homepage: 'https://tonkeeper.com',
+    icon: path.join(process.cwd(), 'public', 'icon.png'),
+    mimeType: schemes.map(schema => `x-scheme-handler/${schema}`)
+};
+
 const config: ForgeConfig = {
     packagerConfig: {
         asar: true,
@@ -25,7 +37,7 @@ const config: ForgeConfig = {
         protocols: [
             {
                 name: 'Tonkeeper Protocol',
-                schemes: ['tc', 'tonkeeper', 'tonkeeper-tc']
+                schemes: schemes
             }
         ],
         appBundleId: parsed!.APPLE_BUILD_ID,
@@ -65,26 +77,10 @@ const config: ForgeConfig = {
             ['darwin']
         ),
         new MakerRpm({
-            options: {
-                name: "Tonkeeper",
-                productName: "Tonkeeper",
-                genericName: "Tonkeeper",
-                description: "Your desktop wallet on The Open Network",
-                homepage: "https://tonkeeper.com",
-                icon: path.join(process.cwd(), 'public', 'icon.png'),
-                mimeType: ['x-scheme-handler/tc', 'x-scheme-handler/tonkeeper', 'x-scheme-handler/tonkeeper-tc']
-            }
+            options: devAndRpmOptions
         }),
         new MakerDeb({
-            options: {
-                name: "Tonkeeper",
-                productName: "Tonkeeper",
-                genericName: "Tonkeeper",
-                description: "Your desktop wallet on The Open Network",
-                homepage: "https://tonkeeper.com",
-                icon: path.join(process.cwd(), 'public', 'icon.png'),
-                mimeType: ['x-scheme-handler/tc', 'x-scheme-handler/tonkeeper', 'x-scheme-handler/tonkeeper-tc']
-            }
+            options: devAndRpmOptions
         })
     ],
     plugins: [

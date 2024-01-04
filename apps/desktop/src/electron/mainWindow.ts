@@ -17,7 +17,11 @@ export abstract class MainWindow {
     static async openMainWindow() {
         // Create the browser window.
         this.mainWindow = new BrowserWindow({
-            icon: path.join(process.cwd(), 'public', process.platform === "darwin" ? 'icon.icns' : "icon.png"),
+            icon: path.join(
+                process.cwd(),
+                'public',
+                process.platform === 'darwin' ? 'icon.icns' : 'icon.png'
+            ),
             width: isDev ? 1100 : 450,
             height: 700,
             resizable: isDev,
@@ -34,7 +38,6 @@ export abstract class MainWindow {
             // Open the DevTools.
             this.mainWindow.webContents.openDevTools();
         }
-
 
         this.mainWindow.on('closed', () => {
             ipcMain.removeHandler('message');

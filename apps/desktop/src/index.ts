@@ -2,8 +2,12 @@ import { BrowserWindow, app } from 'electron';
 import log from 'electron-log/main';
 import { updateElectronApp } from 'update-electron-app';
 import { MainWindow } from './electron/mainWindow';
-import { setDefaultProtocolClient, setProtocolHandlerOSX, setProtocolHandlerWindowsLinux } from './electron/protocol';
-
+import {
+    setDefaultProtocolClient,
+    setProtocolHandlerOSX,
+    setProtocolHandlerWindowsLinux
+} from './electron/protocol';
+import { TonConnectSSE } from './electron/sseEvetns';
 
 app.setName('Tonkeeper Desktop');
 
@@ -11,6 +15,10 @@ app.setName('Tonkeeper Desktop');
 log.initialize({ preload: true });
 log.info('Application start-up');
 
+const connection = TonConnectSSE.getInstance();
+app.on('before-quit', e => {
+    connection.destroy();
+});
 
 setDefaultProtocolClient();
 
