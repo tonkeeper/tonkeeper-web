@@ -1,14 +1,13 @@
 import { shell } from 'electron';
 import keytar from 'keytar';
 import { Message } from '../libs/message';
-import { TonConnectSSE } from './sseEvetns';
 import { mainStorage } from './storageService';
 
 const service = 'tonkeeper.com';
 
 export const handleBackgroundMessage = async (
-    message: Message,
-    tonConnect: TonConnectSSE
+    message: Message
+    // tonConnect: TonConnectSSE
 ): Promise<unknown> => {
     switch (message.king) {
         case 'storage-set':
@@ -32,7 +31,7 @@ export const handleBackgroundMessage = async (
         case 'get-keychain':
             return await keytar.getPassword(service, `Wallet-${message.publicKey}`);
         case 'reconnect':
-            return await tonConnect.reconnect();
+            return; // await tonConnect.reconnect();
         default:
             throw new Error(`Unknown message: ${JSON.stringify(message)}`);
     }

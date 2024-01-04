@@ -64,8 +64,28 @@ const config: ForgeConfig = {
             }),
             ['darwin']
         ),
-        new MakerRpm({}),
-        new MakerDeb({})
+        new MakerRpm({
+            options: {
+                name: "Tonkeeper",
+                productName: "Tonkeeper",
+                genericName: "Tonkeeper",
+                description: "Your desktop wallet on The Open Network",
+                homepage: "https://tonkeeper.com",
+                icon: path.join(process.cwd(), 'public', 'icon.png'),
+                mimeType: ['x-scheme-handler/tc', 'x-scheme-handler/tonkeeper', 'x-scheme-handler/tonkeeper-tc']
+            }
+        }),
+        new MakerDeb({
+            options: {
+                name: "Tonkeeper",
+                productName: "Tonkeeper",
+                genericName: "Tonkeeper",
+                description: "Your desktop wallet on The Open Network",
+                homepage: "https://tonkeeper.com",
+                icon: path.join(process.cwd(), 'public', 'icon.png'),
+                mimeType: ['x-scheme-handler/tc', 'x-scheme-handler/tonkeeper', 'x-scheme-handler/tonkeeper-tc']
+            }
+        })
     ],
     plugins: [
         new AutoUnpackNativesPlugin({}),
