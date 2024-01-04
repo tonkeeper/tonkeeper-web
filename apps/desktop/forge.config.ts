@@ -22,17 +22,19 @@ const devAndRpmOptions = {
     name: 'Tonkeeper',
     productName: 'Tonkeeper',
     genericName: 'Tonkeeper',
+    license: "Apache-2.0",
+    maintainer: "Ton Apps Group",
     bin: "Tonkeeper", // bin name
     description: 'Your desktop wallet on The Open Network',
     homepage: 'https://tonkeeper.com',
-    icon: path.join(process.cwd(), 'public', 'icon.png'),
+    icon: path.join(__dirname, 'public', 'icon.png'),
     mimeType: schemes.map(schema => `x-scheme-handler/${schema}`)
 };
 
 const config: ForgeConfig = {
     packagerConfig: {
         asar: true,
-        icon: './public/icon',
+        icon: path.join(__dirname, 'public', 'icon'),
         name: 'Tonkeeper',
         executableName: 'Tonkeeper',
         protocols: [

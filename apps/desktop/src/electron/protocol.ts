@@ -14,22 +14,23 @@ export const setDefaultProtocolClient = () => {
  * @description Create logic (WIN32 and Linux) for open url from protocol
  */
 export const setProtocolHandlerWindowsLinux = () => {
-    log.info('setProtocolHandlerWindowsLinux');
     // Force Single Instance Application
     const gotTheLock = app.requestSingleInstanceLock();
 
-    app.on('second-instance', (e: Electron.Event, argv: string[]) => {
+    app.on('second-instance', async (e: Electron.Event, argv: string[]) => {
         // Someone tried to run a second instance, we should focus our window.
         if (MainWindow.mainWindow) {
             if (MainWindow.mainWindow.isMinimized()) MainWindow.mainWindow.restore();
             MainWindow.mainWindow.focus();
         } else {
             // Open main windows
-            MainWindow.openMainWindow();
+            await MainWindow.openMainWindow();
         }
 
+        const url = process.platform === "linux" ? argv.pop() : argv.pop().slice(0, -1);
+        log.info({ secondInsUrl: url });
         app.whenReady().then(() => {
-            MainWindow.mainWindow.webContents.send('tc', argv.pop().slice(0, -1));
+            MainWindow.mainWindow.webContents.send('tc', url);
         });
     });
 
@@ -47,15 +48,13 @@ export const setProtocolHandlerWindowsLinux = () => {
  * @description Create logic (OSX) for open url from protocol
  */
 export const setProtocolHandlerOSX = () => {
-    log.info('setProtocolHandlerOSX');
-
     app.whenReady().then(() => {
         initMainWindow();
     });
 
     app.on('open-url', (event: Electron.Event, url: string) => {
         event.preventDefault();
-        log.info({ url });
+        log.info({ openUrl: url });
 
         app.whenReady().then(async () => {
             const window = await MainWindow.openMainWindow();
@@ -73,8 +72,8 @@ const initMainWindow = async () => {
 
     if (process.argv.length == 1) return;
     try {
-        const url = process.argv.pop().slice(0, -1);
-        log.info({ url });
+        const url = process.platform === "linux" ? process.argv.pop() : process.argv.pop().slice(0, -1);
+        log.info({ initUrl: url });
 
         if (url != null) {
             window.webContents.send('tc', url);
