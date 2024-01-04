@@ -1,5 +1,5 @@
 {
-    "name": "Tonkeeper",
+    "name": "@tonkeeper/desktop",
     "license": "Apache-2.0",
     "version": "3.4.10",
     "description": "Your desktop wallet on The Open Network",

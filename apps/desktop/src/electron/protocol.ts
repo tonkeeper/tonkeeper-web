@@ -1,24 +1,20 @@
 import { app } from 'electron';
+import log from 'electron-log/main';
 import { MainWindow } from './mainWindow';
 
 export const setDefaultProtocolClient = () => {
-    console.log("setDefaultProtocolClient");
-
     if (!app.isDefaultProtocolClient('tc')) {
-
-        console.log("setDefaultProtocolClient, tc...");
-
         app.setAsDefaultProtocolClient('tc');
         app.setAsDefaultProtocolClient('tonkeeper');
         app.setAsDefaultProtocolClient('tonkeeper-tc');
     }
-}
+};
 
 /**
-  * @description Create logic (WIN32 and Linux) for open url from protocol
-  */
+ * @description Create logic (WIN32 and Linux) for open url from protocol
+ */
 export const setProtocolHandlerWindowsLinux = () => {
-    console.log("setProtocolHandlerWindowsLinux")
+    log.info('setProtocolHandlerWindowsLinux');
     // Force Single Instance Application
     const gotTheLock = app.requestSingleInstanceLock();
 
@@ -38,28 +34,52 @@ export const setProtocolHandlerWindowsLinux = () => {
     });
 
     if (gotTheLock) {
-        app.whenReady().then(async () => {
+        app.whenReady().then(() => {
             // Open main windows
-            await MainWindow.openMainWindow();
-            MainWindow.mainWindow.webContents.send('tc', process.argv.pop().slice(0, -1));
+            initMainWindow();
         });
     } else {
         app.quit();
     }
-}
-
+};
 
 /**
  * @description Create logic (OSX) for open url from protocol
  */
 export const setProtocolHandlerOSX = () => {
-    console.log("setProtocolHandlerOSX")
+    log.info('setProtocolHandlerOSX');
+
+    app.whenReady().then(() => {
+        initMainWindow();
+    });
 
     app.on('open-url', (event: Electron.Event, url: string) => {
         event.preventDefault();
+        log.info({ url });
+
         app.whenReady().then(async () => {
-            await MainWindow.openMainWindow();
-            MainWindow.mainWindow.webContents.send('tc', url);
+            const window = await MainWindow.openMainWindow();
+
+            window.show();
+            window.webContents.send('tc', url);
         });
     });
-}
+};
+
+const initMainWindow = async () => {
+    // Open main windows
+    log.info({ initArgs: process.argv });
+    const window = await MainWindow.openMainWindow();
+
+    if (process.argv.length == 1) return;
+    try {
+        const url = process.argv.pop().slice(0, -1);
+        log.info({ url });
+
+        if (url != null) {
+            window.webContents.send('tc', url);
+        }
+    } catch (e) {
+        log.error(e);
+    }
+};

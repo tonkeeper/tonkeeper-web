@@ -35,7 +35,6 @@ export function parseTonTransfer(options: { url: string }) {
 
         return result;
     } catch (e) {
-        console.log(e);
         return null;
     }
 }

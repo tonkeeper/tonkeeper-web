@@ -24,7 +24,7 @@ export abstract class MainWindow {
                 'public',
                 process.platform === 'darwin' ? 'icon.icns' : 'icon.png'
             ),
-            width: isDev ? 1100 : 450,
+            width: 450,
             height: 700,
             resizable: isDev,
             webPreferences: {

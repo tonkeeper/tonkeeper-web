@@ -16,6 +16,7 @@ import {
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { Buffer as BufferPolyfill } from 'buffer';
+import log from 'electron-log/main';
 import EventSourcePolyfill from 'eventsource';
 import { MainWindow } from './mainWindow';
 import { mainStorage } from './storageService';
@@ -40,7 +41,7 @@ export class TonConnectSSE {
     }
 
     public reconnect() {
-        console.log('reconnect');
+        log.info('Reconnect.');
         return this.init().then(() => this.connect());
     }
 
@@ -111,7 +112,7 @@ export class TonConnectSSE {
     public async connect() {
         this.destroy();
         if (this.connections.length === 0) {
-            console.log('Missing connection.');
+            log.info('Missing connection.');
         }
         this.closeConnection = subscribeTonConnect({
             storage: mainStorage,
@@ -124,7 +125,7 @@ export class TonConnectSSE {
 
     public destroy() {
         if (this.closeConnection) {
-            console.log('Close connection.');
+            log.info('Close connection.');
             this.closeConnection();
         }
     }
