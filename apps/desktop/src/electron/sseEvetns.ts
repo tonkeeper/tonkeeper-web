@@ -1,5 +1,5 @@
 import { TonConnectAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
-import { getAccountState } from '@tonkeeper/core/dist/service/accountService';
+import { accountSelectWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import {
     replyBadRequestResponse,
     replyDisconnectResponse
@@ -73,7 +73,7 @@ export class TonConnectSSE {
         await this.reconnect();
     };
 
-    private handleMessage = (params: TonConnectAppRequest) => {
+    private handleMessage = async (params: TonConnectAppRequest) => {
         switch (params.request.method) {
             case 'disconnect': {
                 return this.disconnect(params);
@@ -85,10 +85,12 @@ export class TonConnectSSE {
                     payload: JSON.parse(params.request.params[0])
                 };
 
-                MainWindow.mainWindow.show();
-                setTimeout(() => {
-                    MainWindow.mainWindow.webContents.send('sendTransaction', value);
-                }, 200);
+                const walletPublicKey = this.dist[params.connection.clientSessionId];
+                await accountSelectWallet(mainStorage, walletPublicKey);
+                // TODO: reset context?
+
+                const window = await MainWindow.openMainWindow();
+                window.webContents.send('sendTransaction', value);
                 return;
             }
             default: {

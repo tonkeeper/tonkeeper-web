@@ -15,6 +15,8 @@ export abstract class MainWindow {
     static mainWindow: BrowserWindow | undefined = undefined;
 
     static async openMainWindow() {
+        if (this.mainWindow != undefined) return this.mainWindow;
+
         // Create the browser window.
         this.mainWindow = new BrowserWindow({
             icon: path.join(
@@ -53,5 +55,7 @@ export abstract class MainWindow {
         });
 
         await delay(500);
+
+        return this.mainWindow;
     }
 }
