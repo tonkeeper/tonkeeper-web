@@ -153,6 +153,10 @@ export const Loader: FC = () => {
         }
     }, [activeWallet, i18n]);
 
+    useEffect(() => {
+        window.backgroundApi.onRefresh(() => queryClient.invalidateQueries());
+    }, []);
+
     if (auth === undefined || account === undefined || config === undefined || lock === undefined) {
         return <Loading />;
     }

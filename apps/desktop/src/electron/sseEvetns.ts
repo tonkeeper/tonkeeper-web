@@ -14,6 +14,7 @@ import {
     subscribeTonConnect
 } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
+import { delay } from '@tonkeeper/core/dist/utils/common';
 import { Buffer as BufferPolyfill } from 'buffer';
 import EventSourcePolyfill from 'eventsource';
 import { MainWindow } from './mainWindow';
@@ -86,10 +87,18 @@ export class TonConnectSSE {
                 };
 
                 const walletPublicKey = this.dist[params.connection.clientSessionId];
-                await accountSelectWallet(mainStorage, walletPublicKey);
-                // TODO: reset context?
+
+                const account = await getAccountState(mainStorage);
 
                 const window = await MainWindow.openMainWindow();
+                window.show();
+
+                if (account.activePublicKey !== walletPublicKey) {
+                    await accountSelectWallet(mainStorage, walletPublicKey);
+                    window.webContents.send('refresh');
+                    await delay(500);
+                }
+
                 window.webContents.send('sendTransaction', value);
                 return;
             }

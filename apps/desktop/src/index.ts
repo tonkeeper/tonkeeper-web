@@ -11,7 +11,6 @@ import { TonConnectSSE } from './electron/sseEvetns';
 
 app.setName('Tonkeeper Desktop');
 
-// Optional, initialize the logger for any renderer process
 log.initialize({ preload: true });
 log.info('Application start-up');
 
