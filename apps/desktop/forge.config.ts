@@ -22,6 +22,7 @@ const devAndRpmOptions = {
     name: 'Tonkeeper',
     productName: 'Tonkeeper',
     genericName: 'Tonkeeper',
+    bin: "Tonkeeper", // bin name
     description: 'Your desktop wallet on The Open Network',
     homepage: 'https://tonkeeper.com',
     icon: path.join(process.cwd(), 'public', 'icon.png'),
