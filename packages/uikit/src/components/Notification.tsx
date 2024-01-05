@@ -9,7 +9,7 @@ import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
 import { BackButton, ButtonMock } from './fields/BackButton';
 
-const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
+const NotificationContainer = styled(Container) <{ scrollbarWidth: number }>`
     background: transparent;
     padding-left: ${props => props.scrollbarWidth}px;
 `;
@@ -21,7 +21,7 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean }>> = ({
     const sdk = useAppSdk();
 
     const scrollbarWidth = useMemo(() => {
-        return sdk.getScrollbarWidth();
+        return window.innerWidth > 550 ? sdk.getScrollbarWidth() : 0;
     }, [sdk, entered]);
 
     return (
@@ -47,16 +47,28 @@ const Padding = styled.div`
     height: 1rem;
 `;
 
-const Overlay = styled.div`
+const Overlay = styled.div<{ entered: boolean, paddingRight: number }>`
     position: fixed;
     left: 0;
     right: 0;
     height: 100%;
     top: 100%;
-    transition: all 0.3s ease-in-out;
-    overflow: hidden;
+    transition: top 0.3s ease-in-out;
+    overflow-y: ${props => props.entered ? "scroll" : "hidden"};
+    padding-right: ${props => props.paddingRight}px;
     -webkit-overflow-scrolling: touch;
 `;
+
+const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ entered: boolean }>>(({ entered, children }, ref) => {
+    const sdk = useAppSdk();
+
+    const scrollbarWidth = useMemo(() => {
+        return sdk.getScrollbarWidth();
+    }, [sdk, entered]);
+
+    return <Overlay ref={ref} entered={entered} paddingRight={entered ? 0 : scrollbarWidth}>{children}</Overlay>
+})
+
 
 const Splash = styled.div`
     position: fixed;
@@ -81,7 +93,6 @@ const Splash = styled.div`
     &.enter-done ${Overlay} {
         top: 0;
         pointer-events: auto;
-        overflow-y: scroll;
     }
 
     &.exit {
@@ -89,6 +100,7 @@ const Splash = styled.div`
     }
     &.exit ${Overlay} {
         top: 100%;
+        overflow-y: hidden;
     }
 `;
 
@@ -156,7 +168,7 @@ export const NotificationBlock = styled.form`
     align-items: center;
 `;
 
-export const FullHeightBlock = styled(NotificationBlock)<{
+export const FullHeightBlock = styled(NotificationBlock) <{
     standalone: boolean;
     fitContent?: boolean;
     noPadding?: boolean;
@@ -187,8 +199,8 @@ export const NotificationCancelButton: FC<{ handleClose: () => void }> = ({ hand
 
 export const NotificationScrollContext = React.createContext<HTMLDivElement | null>(null);
 
-const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> = React.memo(
-    ({ children, handleClose }) => {
+const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void, entered: boolean }>> = React.memo(
+    ({ children, handleClose, entered }) => {
         const scrollRef = useRef<HTMLDivElement>(null);
 
         useEffect(() => {
@@ -247,11 +259,11 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void }>> = 
         }, [scrollRef, handleClose]);
 
         return (
-            <Overlay ref={scrollRef}>
+            <OverlayWrapper ref={scrollRef} entered={entered}>
                 <NotificationScrollContext.Provider value={scrollRef.current}>
                     {children}
                 </NotificationScrollContext.Provider>
-            </Overlay>
+            </OverlayWrapper>
         );
     }
 );
@@ -304,7 +316,8 @@ export const Notification: FC<{
             }
         };
 
-        const timer = setTimeout(handler, 0);
+        handler();
+        const timer = setTimeout(handler, 301);
 
         return () => {
             clearTimeout(timer);
@@ -320,14 +333,14 @@ export const Notification: FC<{
         <ReactPortal wrapperId="react-portal-modal-container">
             <CSSTransition
                 in={open}
-                timeout={{ enter: 0, exit: 300 }}
+                timeout={300}
                 unmountOnExit
                 nodeRef={nodeRef}
-                onEntered={() => setEntered(true)}
-                onExited={() => setEntered(false)}
+                onEntered={() => setTimeout(() => setEntered(true), 300)}
+                onExit={() => setEntered(false)}
             >
                 <Splash ref={nodeRef} className="scrollable">
-                    <NotificationOverlay handleClose={handleClose}>
+                    <NotificationOverlay handleClose={handleClose} entered={entered}>
                         <NotificationWrapper entered={entered}>
                             <Wrapper>
                                 <Padding onClick={handleClose} />

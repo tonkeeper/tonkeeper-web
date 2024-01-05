@@ -5746,6 +5746,7 @@ __metadata:
     "@types/node": "npm:^20.10.3"
     "@types/react": "npm:^18.0.26"
     "@types/react-dom": "npm:^18.0.9"
+    "@types/uuid": "npm:^9.0.7"
     "@typescript-eslint/eslint-plugin": "npm:^5.0.0"
     "@typescript-eslint/parser": "npm:^5.0.0"
     "@vercel/webpack-asset-relocator-loader": "npm:1.7.3"
@@ -5776,6 +5777,7 @@ __metadata:
     ts-node: "npm:^10.0.0"
     typescript: "npm:^4.9.4"
     update-electron-app: "npm:^3.0.0"
+    uuid: "npm:^9.0.1"
     webpack: "npm:^5.89.0"
   languageName: unknown
   linkType: soft
@@ -6857,7 +6859,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:^9.0.1":
+"@types/uuid@npm:^9.0.1, @types/uuid@npm:^9.0.7":
   version: 9.0.7
   resolution: "@types/uuid@npm:9.0.7"
   checksum: c7321194aeba9ea173efd1e721403bdf4e7ae6945f8f8cdbc87c791f4b505ccf3dbc4a8883d90b394ef13b7c2dc778045792b05dbb23b3c746f8ea347804d448
@@ -25453,7 +25455,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^9.0.0":
+"uuid@npm:^9.0.0, uuid@npm:^9.0.1":
   version: 9.0.1
   resolution: "uuid@npm:9.0.1"
   bin:
