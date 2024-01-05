@@ -55,12 +55,15 @@ const config: ForgeConfig = {
             appleApiKey: parsed!.APPLE_API_KEY,
             appleApiKeyId: parsed!.APPLE_API_KEY_ID,
             appleApiIssuer: parsed!.APPLE_API_ISSUER
-        } as NotaryToolCredentials
+        } as NotaryToolCredentials,
+        extraResource: [
+            "./public"
+        ]
     },
     rebuildConfig: {},
     makers: [
         new MakerSquirrel({}),
-        new MakerZIP({}, ['darwin']),
+        new MakerZIP({}, ['darwin', "linux"]),
         new MakerDMG(
             arch => ({
                 background: path.join(process.cwd(), 'public', 'dmg-bg.png'),
@@ -81,10 +84,10 @@ const config: ForgeConfig = {
         ),
         new MakerRpm({
             options: devAndRpmOptions
-        }),
+        }, ['linux']),
         new MakerDeb({
             options: devAndRpmOptions
-        })
+        }, ['linux'])
     ],
     plugins: [
         new AutoUnpackNativesPlugin({}),

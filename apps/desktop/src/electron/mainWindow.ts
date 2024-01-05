@@ -1,6 +1,7 @@
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { BrowserWindow, ipcMain } from 'electron';
 import isDev from 'electron-is-dev';
+import log from 'electron-log/main';
 import path from 'path';
 import { handleBackgroundMessage } from '../electron/background';
 import { Message } from '../libs/message';
@@ -17,18 +18,23 @@ export abstract class MainWindow {
     static async openMainWindow() {
         if (this.mainWindow != undefined) return this.mainWindow;
 
+        const icon = (() => {
+            switch (process.platform) {
+                case "darwin": return path.join(process.cwd(), "public", "icon.icns")
+                case "linux": return path.join(__dirname, "../../../", "public", 'icon.png')
+                default: return "";
+            }
+        })()
+
+        log.info({ platform: process.platform, dir: __dirname, icon });
         // Create the browser window.
         this.mainWindow = new BrowserWindow({
-            icon: path.join(
-                process.cwd(),
-                'public',
-                process.platform === 'darwin' ? 'icon.icns' : 'icon.png'
-            ),
+            icon: icon,
             width: 450,
             height: 700,
             resizable: isDev,
             webPreferences: {
-                zoomFactor: 0.8,
+                zoomFactor: process.platform === 'darwin' ? 0.8 : undefined,
                 preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
             }
         });
