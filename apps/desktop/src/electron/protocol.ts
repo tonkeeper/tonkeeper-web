@@ -1,3 +1,4 @@
+import { delay } from '@tonkeeper/core/dist/utils/common';
 import { app } from 'electron';
 import log from 'electron-log/main';
 import { MainWindow } from './mainWindow';
@@ -72,6 +73,7 @@ const initMainWindow = async () => {
 
     if (process.argv.length == 1) return;
     try {
+        await delay(500);
         const url = process.platform === "linux" ? process.argv.pop() : process.argv.pop().slice(0, -1);
         log.info({ initUrl: url });
 

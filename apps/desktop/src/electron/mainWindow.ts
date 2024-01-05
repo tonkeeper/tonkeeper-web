@@ -1,7 +1,6 @@
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { BrowserWindow, ipcMain } from 'electron';
 import isDev from 'electron-is-dev';
-import log from 'electron-log/main';
 import path from 'path';
 import { handleBackgroundMessage } from '../electron/background';
 import { Message } from '../libs/message';
@@ -24,13 +23,12 @@ export abstract class MainWindow {
                 case "linux": return path.join(__dirname, "../../../", "public", 'icon.png')
                 default: return "";
             }
-        })()
+        })();
 
-        log.info({ platform: process.platform, dir: __dirname, icon });
         // Create the browser window.
         this.mainWindow = new BrowserWindow({
             icon: icon,
-            width: 450,
+            width: process.platform == "linux" ? 438 : 450,
             height: 700,
             resizable: isDev,
             webPreferences: {
