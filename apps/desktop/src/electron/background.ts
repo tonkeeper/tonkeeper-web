@@ -6,10 +6,7 @@ import { mainStorage } from './storageService';
 
 const service = 'tonkeeper.com';
 
-export const handleBackgroundMessage = async (
-    message: Message,
-    tonConnect: TonConnectSSE
-): Promise<unknown> => {
+export const handleBackgroundMessage = async (message: Message): Promise<unknown> => {
     switch (message.king) {
         case 'storage-set':
             return mainStorage.set(message.key, message.value);
@@ -32,7 +29,7 @@ export const handleBackgroundMessage = async (
         case 'get-keychain':
             return await keytar.getPassword(service, `Wallet-${message.publicKey}`);
         case 'reconnect':
-            return await tonConnect.reconnect();
+            return await TonConnectSSE.getInstance().reconnect();
         default:
             throw new Error(`Unknown message: ${JSON.stringify(message)}`);
     }

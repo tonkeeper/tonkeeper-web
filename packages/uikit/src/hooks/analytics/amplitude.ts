@@ -5,7 +5,7 @@ import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { Analytics } from '.';
 
 export class Amplitude implements Analytics {
-    constructor(private key: string) {}
+    constructor(private key: string, private userId?: string) { }
 
     init(
         application: string,
@@ -15,7 +15,7 @@ export class Amplitude implements Analytics {
         version?: string,
         platform?: string
     ) {
-        amplitude.init(this.key, undefined, {
+        amplitude.init(this.key, this.userId, {
             defaultTracking: {
                 sessions: true,
                 pageViews: true,

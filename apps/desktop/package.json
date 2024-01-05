@@ -1,6 +1,7 @@
 {
     "name": "@tonkeeper/desktop",
-    "version": "3.4.10",
+    "license": "Apache-2.0",
+    "version": "3.5.0",
     "description": "Your desktop wallet on The Open Network",
     "main": ".webpack/main",
     "repository": {
@@ -8,17 +9,17 @@
         "url": "https://github.com/tonkeeper/tonkeeper-web.git"
     },
     "scripts": {
-        "locales": "ts-node ./task/locales",
         "start": "electron-forge start",
         "package": "electron-forge package",
         "make": "electron-forge make",
+        "make:arm": "electron-forge make --arch=arm64",
+        "make:intel": "electron-forge make --arch=x64",
+        "make:universal": "electron-forge make --arch=universal",
         "publish": "electron-forge publish",
-        "publish:universal": "electron-forge publish --arch=universal --platform=darwin",
-        "publish:intel": "electron-forge publish --arch=x64 --platform=darwin",
+        "publish:arm": "electron-forge publish --arch=arm64",
+        "publish:intel": "electron-forge publish --arch=x64",
+        "publish:universal": "electron-forge publish --arch=universal",
         "lint": "eslint --ext .ts,.tsx .",
-        "build:win32": "npm run make -- --platform win32",
-        "build:linux": "npm run make -- --platform linux",
-        "build:darwin": "npm run make -- --platform darwin",
         "build": "yarn make",
         "build:desktop": "yarn make",
         "debug": "export DEBUG=electron*"
@@ -43,6 +44,7 @@
         "@types/node": "^20.10.3",
         "@types/react": "^18.0.26",
         "@types/react-dom": "^18.0.9",
+        "@types/uuid": "^9.0.7",
         "@typescript-eslint/eslint-plugin": "^5.0.0",
         "@typescript-eslint/parser": "^5.0.0",
         "@vercel/webpack-asset-relocator-loader": "1.7.3",
@@ -79,7 +81,8 @@
         "react-i18next": "^13.5.0",
         "react-router-dom": "^6.20.1",
         "styled-components": "^6.1.1",
-        "update-electron-app": "^3.0.0"
+        "update-electron-app": "^3.0.0",
+        "uuid": "^9.0.1"
     },
     "packageManager": "yarn@4.0.2"
 }

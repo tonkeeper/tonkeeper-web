@@ -16,16 +16,31 @@ import { rendererConfig } from './webpack.renderer.config';
 
 const { parsed } = dotenv.config();
 
+const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc'];
+
+const devAndRpmOptions = {
+    name: 'Tonkeeper',
+    productName: 'Tonkeeper',
+    genericName: 'Tonkeeper',
+    license: "Apache-2.0",
+    maintainer: "Ton Apps Group",
+    bin: "Tonkeeper", // bin name
+    description: 'Your desktop wallet on The Open Network',
+    homepage: 'https://tonkeeper.com',
+    icon: path.join(__dirname, 'public', 'icon.png'),
+    mimeType: schemes.map(schema => `x-scheme-handler/${schema}`)
+};
+
 const config: ForgeConfig = {
     packagerConfig: {
         asar: true,
-        icon: './public/icon',
+        icon: path.join(__dirname, 'public', 'icon'),
         name: 'Tonkeeper',
         executableName: 'Tonkeeper',
         protocols: [
             {
                 name: 'Tonkeeper Protocol',
-                schemes: ['tc', 'tonkeeper', 'tonkeeper-tc']
+                schemes: schemes
             }
         ],
         appBundleId: parsed!.APPLE_BUILD_ID,
@@ -40,12 +55,15 @@ const config: ForgeConfig = {
             appleApiKey: parsed!.APPLE_API_KEY,
             appleApiKeyId: parsed!.APPLE_API_KEY_ID,
             appleApiIssuer: parsed!.APPLE_API_ISSUER
-        } as NotaryToolCredentials
+        } as NotaryToolCredentials,
+        extraResource: [
+            "./public"
+        ]
     },
     rebuildConfig: {},
     makers: [
         new MakerSquirrel({}),
-        new MakerZIP({}, ['darwin']),
+        new MakerZIP({}, ['darwin', "linux"]),
         new MakerDMG(
             arch => ({
                 background: path.join(process.cwd(), 'public', 'dmg-bg.png'),
@@ -64,8 +82,12 @@ const config: ForgeConfig = {
             }),
             ['darwin']
         ),
-        new MakerRpm({}),
-        new MakerDeb({})
+        new MakerRpm({
+            options: devAndRpmOptions
+        }, ['linux']),
+        new MakerDeb({
+            options: devAndRpmOptions
+        }, ['linux'])
     ],
     plugins: [
         new AutoUnpackNativesPlugin({}),

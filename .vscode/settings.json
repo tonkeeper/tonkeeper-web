@@ -1,8 +1,8 @@
 {
     "editor.codeActionsOnSave": {
-        "source.fixAll": true,
-        "source.fixAll.eslint": true,
-        "source.organizeImports": true
+        "source.fixAll": "explicit",
+        "source.fixAll.eslint": "explicit",
+        "source.organizeImports": "explicit"
     },
     "javascript.format.enable": true,
     "editor.formatOnSave": true,

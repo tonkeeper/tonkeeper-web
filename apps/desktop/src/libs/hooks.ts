@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { Amplitude } from '@tonkeeper/uikit/dist/hooks/analytics/amplitude';
+import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -49,10 +52,24 @@ export const useAnalytics = (
     account?: AccountState,
     wallet?: WalletState | null
 ) => {
+    const sdk = useAppSdk();
+
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
-            const tracker = new Amplitude(REACT_APP_AMPLITUDE);
+
+            const userId = await sdk.storage.get<string>(AppKey.USER_ID)
+                .then(async (userId: string | null) => {
+                    if (userId) {
+                        return userId;
+                    } else {
+                        const newUserId = uuidv4();
+                        await sdk.storage.set(AppKey.USER_ID, newUserId);
+                        return newUserId;
+                    }
+                });
+
+            const tracker = new Amplitude(REACT_APP_AMPLITUDE, userId);
             tracker.init(
                 'Desktop',
                 toWalletType(wallet),
