@@ -60,8 +60,14 @@ const config: ForgeConfig = {
     },
     rebuildConfig: {},
     makers: [
-        new MakerSquirrel({}),
-        new MakerZIP({}, ['darwin', 'linux']),
+        new MakerSquirrel(
+            {
+                authors: 'Ton Apps Group',
+                description: 'Your desktop wallet on The Open Network'
+            },
+            ['win32']
+        ),
+        new MakerZIP({}, ['darwin', 'linux', 'win32']),
         new MakerDMG(
             arch => ({
                 background: path.join(process.cwd(), 'public', 'dmg-bg.png'),
