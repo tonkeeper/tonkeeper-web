@@ -1,11 +1,10 @@
-name: Tonkeeper Desktop CD
+name: Tonkeeper Desktop Distributives
 on:
-    # Allows you to run this workflow manually from the Actions a tab
     workflow_dispatch:
 
-    push:
-        branches:
-            - feature/cd
+    pull_request:
+        types: [opened, edited]
+
 jobs:
     desktop-build:
         name: desktop-build
