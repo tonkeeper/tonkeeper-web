@@ -19,20 +19,26 @@ export abstract class MainWindow {
 
         const icon = (() => {
             switch (process.platform) {
-                case "darwin": return path.join(process.cwd(), "public", "icon.icns")
-                case "linux": return path.join(__dirname, "../../../", "public", 'icon.png')
-                default: return "";
+                case 'darwin':
+                    return path.join(process.cwd(), 'public', 'icon.icns');
+                case 'linux':
+                    return path.join(__dirname, '../../../', 'public', 'icon.png');
+                case 'win32':
+                    return path.join(process.cwd(), 'public', 'icon.ico');
+                default:
+                    return '';
             }
         })();
 
         // Create the browser window.
         this.mainWindow = new BrowserWindow({
             icon: icon,
-            width: process.platform == "linux" ? 438 : 450,
+            width: process.platform == 'linux' ? 438 : 450,
             height: 700,
             resizable: isDev,
+            autoHideMenuBar: process.platform != 'darwin',
             webPreferences: {
-                zoomFactor: process.platform === 'darwin' ? 0.8 : undefined,
+                zoomFactor: process.platform !== 'linux' ? 0.8 : undefined,
                 preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
             }
         });

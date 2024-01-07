@@ -14,6 +14,11 @@ app.setName('Tonkeeper Desktop');
 log.initialize({ preload: true });
 log.info('Application start-up');
 
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+if (require('electron-squirrel-startup')) {
+    app.quit();
+}
+
 const connection = TonConnectSSE.getInstance();
 app.on('before-quit', e => {
     connection.destroy();
@@ -31,11 +36,6 @@ switch (process.platform) {
         break;
     default:
         throw new Error('Process platform is undefined');
-}
-
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
-    app.quit();
 }
 
 // This method will be called when Electron has finished

@@ -11,7 +11,8 @@
         "build:twa": "npx turbo build:twa && yarn deploy:twa",
         "deploy:twa": "npx wrangler pages deploy apps/twa/build",
         "build:extension": "npx turbo build:extension",
-        "build:desktop": "npx turbo build:desktop"
+        "build:desktop": "npx turbo build:desktop",
+        "build:pkg": "npx turbo build:pkg"
     },
     "private": true,
     "devDependencies": {
