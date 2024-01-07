@@ -11,7 +11,7 @@ jobs:
         name: tonkeeper-desktop-build
         strategy:
             matrix:
-                os: [ubuntu-latest]
+                os: [ubuntu-latest, macos-latest, windows-latest]
                 node-version: [20.7.0]
 
         runs-on: ${{ matrix.os }}
@@ -34,7 +34,9 @@ jobs:
               with:
                   cmd: install # will run `yarn install` command
 
-            - name: Run install
+            - name: Run build
               uses: borales/actions-yarn@v4
               with:
                   cmd: build:desktop
+              env:
+                  REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE }}
