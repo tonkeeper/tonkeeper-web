@@ -65,7 +65,8 @@ const config: ForgeConfig = {
                 name: 'Tonkeeper',
                 authors: 'Ton Apps Group',
                 description: 'Your desktop wallet on The Open Network',
-                iconUrl: path.join(__dirname, 'public', 'icon.png')
+                iconUrl: path.join(process.cwd(), 'public', 'icon.ico'),
+                setupIcon: path.join(process.cwd(), 'public', 'icon.ico')
             },
             ['win32']
         ),
