@@ -62,8 +62,10 @@ const config: ForgeConfig = {
     makers: [
         new MakerSquirrel(
             {
+                name: 'Tonkeeper',
                 authors: 'Ton Apps Group',
-                description: 'Your desktop wallet on The Open Network'
+                description: 'Your desktop wallet on The Open Network',
+                iconUrl: path.join(__dirname, 'public', 'icon.png')
             },
             ['win32']
         ),
