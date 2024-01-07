@@ -104,3 +104,9 @@ jobs:
                   retention-days: 10
                   path: |
                       ${{ github.workspace }}/apps/desktop/out/Tonkeeper*
+
+            - name: Clean-up credentials
+              if: always()
+              run: |
+                  security delete-keychain build.keychain
+                  rm ${{ github.workspace }}/AuthKey.p8
