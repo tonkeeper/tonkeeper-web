@@ -29,14 +29,23 @@ jobs:
               run: |
                   corepack enable
 
+            - name: Decode service account into a file
+              env:
+                  CREDENTIALS: ${{ secrets.APPLE_API_KEY }}
+              run: |
+                  echo $CREDENTIALS > AuthKey.p8
+
             - name: Run install
               uses: borales/actions-yarn@v4
               with:
-                  cmd: install # will run `yarn install` command
+                  cmd: install
 
             - name: Run build
               uses: borales/actions-yarn@v4
+              env:
+                  APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
+                  APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+                  APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+                  REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE }}
               with:
                   cmd: build:desktop
-              env:
-                  REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE }}

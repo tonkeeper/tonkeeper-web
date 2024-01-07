@@ -14,7 +14,7 @@ import path from 'path';
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 
-const { parsed } = dotenv.config();
+dotenv.config();
 
 const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc'];
 
@@ -22,9 +22,9 @@ const devAndRpmOptions = {
     name: 'Tonkeeper',
     productName: 'Tonkeeper',
     genericName: 'Tonkeeper',
-    license: "Apache-2.0",
-    maintainer: "Ton Apps Group",
-    bin: "Tonkeeper", // bin name
+    license: 'Apache-2.0',
+    maintainer: 'Ton Apps Group',
+    bin: 'Tonkeeper', // bin name
     description: 'Your desktop wallet on The Open Network',
     homepage: 'https://tonkeeper.com',
     icon: path.join(__dirname, 'public', 'icon.png'),
@@ -43,7 +43,7 @@ const config: ForgeConfig = {
                 schemes: schemes
             }
         ],
-        appBundleId: parsed!.APPLE_BUILD_ID,
+        appBundleId: 'com.tonapps.tonkeeperpro',
         osxSign: {
             optionsForFile: (optionsForFile: string) => {
                 return {
@@ -52,18 +52,16 @@ const config: ForgeConfig = {
             }
         },
         osxNotarize: {
-            appleApiKey: parsed!.APPLE_API_KEY,
-            appleApiKeyId: parsed!.APPLE_API_KEY_ID,
-            appleApiIssuer: parsed!.APPLE_API_ISSUER
+            appleApiKey: process.env.APPLE_API_KEY,
+            appleApiKeyId: process.env.APPLE_API_KEY_ID,
+            appleApiIssuer: process.env.APPLE_API_ISSUER
         } as NotaryToolCredentials,
-        extraResource: [
-            "./public"
-        ]
+        extraResource: ['./public']
     },
     rebuildConfig: {},
     makers: [
         new MakerSquirrel({}),
-        new MakerZIP({}, ['darwin', "linux"]),
+        new MakerZIP({}, ['darwin', 'linux']),
         new MakerDMG(
             arch => ({
                 background: path.join(process.cwd(), 'public', 'dmg-bg.png'),
@@ -82,12 +80,18 @@ const config: ForgeConfig = {
             }),
             ['darwin']
         ),
-        new MakerRpm({
-            options: devAndRpmOptions
-        }, ['linux']),
-        new MakerDeb({
-            options: devAndRpmOptions
-        }, ['linux'])
+        new MakerRpm(
+            {
+                options: devAndRpmOptions
+            },
+            ['linux']
+        ),
+        new MakerDeb(
+            {
+                options: devAndRpmOptions
+            },
+            ['linux']
+        )
     ],
     plugins: [
         new AutoUnpackNativesPlugin({}),
