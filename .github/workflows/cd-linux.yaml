@@ -98,8 +98,8 @@ jobs:
                   dir: 'apps/desktop'
 
             - name: Upload distributives to artifacts
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                   name: Tonkeeper Desktop ${{ runner.os }}
                   path: |
-                      ${{ github.workspace }}/apps/desktop/out
+                      ${{ github.workspace }}/apps/desktop/out/Tonkeeper*
