@@ -101,5 +101,6 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: Tonkeeper Desktop ${{ runner.os }}
+                  retention-days: 10
                   path: |
                       ${{ github.workspace }}/apps/desktop/out/Tonkeeper*
