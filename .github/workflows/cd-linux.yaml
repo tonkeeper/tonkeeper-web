@@ -7,8 +7,8 @@ on:
         branches:
             - feature/cd
 jobs:
-    tonkeeper-desktop-build:
-        name: tonkeeper-desktop-build
+    desktop-build:
+        name: desktop-build
         strategy:
             matrix:
                 os: [ubuntu-latest, macos-latest, windows-latest]
@@ -40,7 +40,12 @@ jobs:
               with:
                   cmd: install
 
-            - name: Run build
+            - name: Run build packages
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: build:pkg
+
+            - name: Run build arm distributive
               uses: borales/actions-yarn@v4
               env:
                   APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
@@ -48,4 +53,28 @@ jobs:
                   APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
                   REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE }}
               with:
-                  cmd: build:desktop
+                  cmd: make:arm
+                  dir: 'apps/desktop'
+
+            - name: Run build intel distributive
+              uses: borales/actions-yarn@v4
+              env:
+                  APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
+                  APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+                  APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+                  REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE }}
+              with:
+                  cmd: make:intel
+                  dir: 'apps/desktop'
+
+            - name: Run build universal distributive
+              if: ${{ matrix.os }} == 'macos-latest'
+              uses: borales/actions-yarn@v4
+              env:
+                  APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
+                  APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+                  APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+                  REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE }}
+              with:
+                  cmd: make:universal
+                  dir: 'apps/desktop'
