@@ -106,7 +106,7 @@ jobs:
                       ${{ github.workspace }}/apps/desktop/out/make
 
             - name: Clean-up credentials
-              if: always()
+              if: always() && runner.os == 'macOS'
               run: |
                   security delete-keychain build.keychain
                   rm ${{ github.workspace }}/AuthKey.p8
