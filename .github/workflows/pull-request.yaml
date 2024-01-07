@@ -1,9 +1,7 @@
 name: Tonkeeper Desktop Distributives
 on:
     workflow_dispatch:
-
     pull_request:
-        types: [opened, edited]
 
 jobs:
     desktop-build:
