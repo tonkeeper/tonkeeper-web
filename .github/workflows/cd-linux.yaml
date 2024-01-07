@@ -1,0 +1,33 @@
+name: Tonkeeper Desktop CD
+on:
+    # Allows you to run this workflow manually from the Actions a tab
+    workflow_dispatch:
+
+jobs:
+    tonkeeper-desktop-build:
+        name: tonkeeper-desktop-build
+        strategy:
+            matrix:
+                os: [ubuntu-latest]
+                node-version: [20.7.0]
+
+        runs-on: ${{ matrix.os }}
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Run install
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: install # will run `yarn install` command
+
+            - name: Run install
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: build:desktop
