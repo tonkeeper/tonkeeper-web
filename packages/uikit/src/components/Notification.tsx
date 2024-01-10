@@ -320,8 +320,11 @@ export const Notification: FC<{
             }
         };
         const timer = setTimeout(handler, 301);
+        const timer2 = setTimeout(handler, 600);
+
         return () => {
             clearTimeout(timer);
+            clearTimeout(timer2);
         };
     }, [open, entered, sdk]);
 
