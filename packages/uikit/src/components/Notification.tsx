@@ -9,7 +9,7 @@ import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
 import { BackButton, ButtonMock } from './fields/BackButton';
 
-const NotificationContainer = styled(Container) <{ scrollbarWidth: number }>`
+const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
     padding-left: ${props => props.scrollbarWidth}px;
 `;
@@ -47,28 +47,33 @@ const Padding = styled.div`
     height: 1rem;
 `;
 
-const Overlay = styled.div<{ entered: boolean, paddingRight: number }>`
+const Overlay = styled.div<{ entered: boolean; paddingRight: number }>`
     position: fixed;
     left: 0;
     right: 0;
     height: 100%;
     top: 100%;
     transition: top 0.3s ease-in-out;
-    overflow-y: ${props => props.entered ? "scroll" : "hidden"};
+    overflow-y: ${props => (props.entered ? 'scroll' : 'hidden')};
     padding-right: ${props => props.paddingRight}px;
     -webkit-overflow-scrolling: touch;
 `;
 
-const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ entered: boolean }>>(({ entered, children }, ref) => {
-    const sdk = useAppSdk();
+const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ entered: boolean }>>(
+    ({ entered, children }, ref) => {
+        const sdk = useAppSdk();
 
-    const scrollbarWidth = useMemo(() => {
-        return sdk.getScrollbarWidth();
-    }, [sdk, entered]);
+        const scrollbarWidth = useMemo(() => {
+            return sdk.getScrollbarWidth();
+        }, [sdk, entered]);
 
-    return <Overlay ref={ref} entered={entered} paddingRight={entered ? 0 : scrollbarWidth}>{children}</Overlay>
-})
-
+        return (
+            <Overlay ref={ref} entered={entered} paddingRight={entered ? 0 : scrollbarWidth}>
+                {children}
+            </Overlay>
+        );
+    }
+);
 
 const Splash = styled.div`
     position: fixed;
@@ -168,7 +173,7 @@ export const NotificationBlock = styled.form`
     align-items: center;
 `;
 
-export const FullHeightBlock = styled(NotificationBlock) <{
+export const FullHeightBlock = styled(NotificationBlock)<{
     standalone: boolean;
     fitContent?: boolean;
     noPadding?: boolean;
@@ -199,8 +204,8 @@ export const NotificationCancelButton: FC<{ handleClose: () => void }> = ({ hand
 
 export const NotificationScrollContext = React.createContext<HTMLDivElement | null>(null);
 
-const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void, entered: boolean }>> = React.memo(
-    ({ children, handleClose, entered }) => {
+const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void; entered: boolean }>> =
+    React.memo(({ children, handleClose, entered }) => {
         const scrollRef = useRef<HTMLDivElement>(null);
 
         useEffect(() => {
@@ -265,8 +270,7 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void, enter
                 </NotificationScrollContext.Provider>
             </OverlayWrapper>
         );
-    }
-);
+    });
 NotificationOverlay.displayName = 'NotificationOverlay';
 
 export const Notification: FC<{
@@ -315,13 +319,12 @@ export const Notification: FC<{
                 }
             }
         };
-
-        handler();
         const timer = setTimeout(handler, 301);
+        const timer2 = setTimeout(handler, 400);
 
         return () => {
             clearTimeout(timer);
-            handler();
+            clearTimeout(timer2);
         };
     }, [open, entered, sdk]);
 

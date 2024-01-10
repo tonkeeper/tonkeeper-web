@@ -91,8 +91,7 @@ export class TonConnectSSE {
 
                 const account = await getAccountState(mainStorage);
 
-                const window = await MainWindow.openMainWindow();
-                window.show();
+                const window = await MainWindow.bringToFront();
 
                 if (account.activePublicKey !== walletPublicKey) {
                     await accountSelectWallet(mainStorage, walletPublicKey);

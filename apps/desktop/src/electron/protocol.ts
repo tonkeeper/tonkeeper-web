@@ -19,19 +19,14 @@ export const setProtocolHandlerWindowsLinux = () => {
     const gotTheLock = app.requestSingleInstanceLock();
 
     app.on('second-instance', async (e: Electron.Event, argv: string[]) => {
-        // Someone tried to run a second instance, we should focus our window.
-        if (MainWindow.mainWindow) {
-            if (MainWindow.mainWindow.isMinimized()) MainWindow.mainWindow.restore();
-            MainWindow.mainWindow.focus();
-        } else {
-            // Open main windows
-            await MainWindow.openMainWindow();
-        }
+        const window = await MainWindow.bringToFront();
 
-        const url = process.platform === "linux" ? argv.pop() : argv.pop().slice(0, -1);
+        const url = argv.pop();
+        if (url.startsWith('--')) return;
+
         log.info({ secondInsUrl: url });
         app.whenReady().then(() => {
-            MainWindow.mainWindow.webContents.send('tc', url);
+            window.webContents.send('tc', url);
         });
     });
 
@@ -74,7 +69,9 @@ const initMainWindow = async () => {
     if (process.argv.length == 1) return;
     try {
         await delay(500);
-        const url = process.platform === "linux" ? process.argv.pop() : process.argv.pop().slice(0, -1);
+        const url = process.argv.pop();
+        if (url.startsWith('--') || url.startsWith('.')) return;
+
         log.info({ initUrl: url });
 
         if (url != null) {

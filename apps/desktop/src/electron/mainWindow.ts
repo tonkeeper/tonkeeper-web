@@ -68,4 +68,24 @@ export abstract class MainWindow {
 
         return this.mainWindow;
     }
+
+    static async bringToFront() {
+        if (process.platform === 'win32') {
+            if (this.mainWindow) {
+                if (this.mainWindow.isMinimized()) this.mainWindow.restore();
+            } else {
+                // Open main windows
+                await this.openMainWindow();
+            }
+
+            this.mainWindow.setAlwaysOnTop(true);
+            this.mainWindow.focus();
+            this.mainWindow.setAlwaysOnTop(false);
+        } else {
+            await this.openMainWindow();
+            this.mainWindow.show();
+        }
+
+        return this.mainWindow;
+    }
 }
