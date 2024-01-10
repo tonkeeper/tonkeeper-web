@@ -73,16 +73,15 @@ export abstract class MainWindow {
         if (process.platform === 'win32') {
             if (this.mainWindow) {
                 if (this.mainWindow.isMinimized()) this.mainWindow.restore();
-                this.mainWindow.focus();
             } else {
                 // Open main windows
                 await this.openMainWindow();
             }
+            this.mainWindow.focus();
         } else {
             await this.openMainWindow();
+            this.mainWindow.show();
         }
-
-        this.mainWindow.show();
 
         return this.mainWindow;
     }

@@ -319,8 +319,11 @@ export const Notification: FC<{
                 }
             }
         };
-        handler();
-    }, [entered, sdk]);
+        const timer = setTimeout(handler, 301);
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [open, entered, sdk]);
 
     const standalone = useMemo(() => {
         return sdk.isIOs() && sdk.isStandalone();
