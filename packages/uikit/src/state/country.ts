@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
@@ -8,10 +9,15 @@ export interface CountryIs {
     ip: string;
 }
 
-const getMyCountryCode = async () => {
+const getMyCountryCode = async (sdk: IAppSdk) => {
+    const url = 'https://api.country.is';
     try {
-        const response = await fetch('https://api.country.is');
+        const country = await sdk.storage.get<string>(url);
+        if (country) return country;
+
+        const response = await fetch(url);
         const json: CountryIs = await response.json();
+        await sdk.storage.set<string>(url, json.country);
         return json.country;
     } catch (e) {
         return null;
@@ -26,8 +32,9 @@ export const useCountrySetting = () => {
 };
 
 export const useAutoCountry = () => {
+    const sdk = useAppSdk();
     return useQuery<string | null, Error>([QueryKey.country, 'detect'], async () => {
-        return await getMyCountryCode();
+        return await getMyCountryCode(sdk);
     });
 };
 
@@ -36,7 +43,7 @@ export const useUserCountry = () => {
     return useQuery<string | null, Error>([QueryKey.country], async () => {
         let code = await sdk.storage.get<string>(AppKey.COUNTRY);
         if (!code) {
-            code = await getMyCountryCode();
+            code = await getMyCountryCode(sdk);
         }
         return code;
     });
