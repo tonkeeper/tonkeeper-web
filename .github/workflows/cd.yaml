@@ -58,7 +58,7 @@ jobs:
                   cmd: build:pkg
 
             - name: Run build intel distributive
-              uses: borales/actions-yarn@v4
+              uses: nick-fields/retry@v2
               env:
                   APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
                   APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -67,11 +67,13 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
                   DEBUG: electron*
               with:
-                  cmd: publish:intel
-                  dir: 'apps/desktop'
+                  timeout_minutes: 10
+                  max_attempts: 3
+                  retry_on: timeout
+                  command: cd apps/desktop && yarn publish:intel
 
             - name: Run build arm distributive
-              uses: borales/actions-yarn@v4
+              uses: nick-fields/retry@v2
               env:
                   APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
                   APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -80,12 +82,14 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
                   DEBUG: electron*
               with:
-                  cmd: publish:arm
-                  dir: 'apps/desktop'
+                  timeout_minutes: 10
+                  max_attempts: 3
+                  retry_on: timeout
+                  command: cd apps/desktop && yarn publish:arm
 
             - name: Run build universal distributive
               if: runner.os == 'macOS'
-              uses: borales/actions-yarn@v4
+              uses: nick-fields/retry@v2
               env:
                   APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
                   APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -94,8 +98,10 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
                   DEBUG: electron*
               with:
-                  cmd: publish:universal
-                  dir: 'apps/desktop'
+                  timeout_minutes: 10
+                  max_attempts: 3
+                  retry_on: timeout
+                  command: cd apps/desktop && yarn publish:universal
 
             - name: Clean-up credentials
               if: always() && runner.os == 'macOS'
