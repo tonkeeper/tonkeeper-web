@@ -96,11 +96,48 @@ jobs:
 
             - name: Upload distributives to artifacts
               uses: actions/upload-artifact@v4
+              if: runner.os == 'macOS'
               with:
                   name: Tonkeeper Desktop ${{ runner.os }}
                   retention-days: 10
                   path: |
                       ${{ github.workspace }}/apps/desktop/out/make
+
+            - name: Upload distributives to artifacts
+              uses: actions/upload-artifact@v4
+              if: runner.os == 'Windows'
+              with:
+                  name: Tonkeeper Desktop ${{ runner.os }} arm64
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/arm64
+
+            - name: Upload distributives to artifacts
+              uses: actions/upload-artifact@v4
+              if: runner.os == 'Windows'
+              with:
+                  name: Tonkeeper Desktop ${{ runner.os }} x64
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/x64
+
+            - name: Upload distributives to artifacts
+              uses: actions/upload-artifact@v4
+              if: runner.os == 'Linux'
+              with:
+                  name: Tonkeeper Desktop ${{ runner.os }} x64
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make/deb/x64
+
+            - name: Upload distributives to artifacts
+              uses: actions/upload-artifact@v4
+              if: runner.os == 'Linux'
+              with:
+                  name: Tonkeeper Desktop ${{ runner.os }} arm64
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make/deb/arm64
 
             - name: Clean-up credentials
               if: always() && runner.os == 'macOS'
