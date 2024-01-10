@@ -79,9 +79,10 @@ export abstract class MainWindow {
                 await this.openMainWindow();
             }
         } else {
-            const window = await this.openMainWindow();
-            window.show();
+            await this.openMainWindow();
         }
+
+        this.mainWindow.show();
 
         return this.mainWindow;
     }
