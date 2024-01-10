@@ -70,7 +70,7 @@ const initMainWindow = async () => {
     try {
         await delay(500);
         const url = process.argv.pop();
-        if (url.startsWith('--')) return;
+        if (url.startsWith('--') || url.startsWith('.')) return;
 
         log.info({ initUrl: url });
 
