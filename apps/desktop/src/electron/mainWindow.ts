@@ -77,7 +77,10 @@ export abstract class MainWindow {
                 // Open main windows
                 await this.openMainWindow();
             }
+
+            this.mainWindow.setAlwaysOnTop(true);
             this.mainWindow.focus();
+            this.mainWindow.setAlwaysOnTop(false);
         } else {
             await this.openMainWindow();
             this.mainWindow.show();
