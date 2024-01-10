@@ -319,15 +319,8 @@ export const Notification: FC<{
                 }
             }
         };
-
         handler();
-        const timer = setTimeout(handler, 0);
-
-        return () => {
-            clearTimeout(timer);
-            handler();
-        };
-    }, [sdk, entered]);
+    }, [entered, sdk]);
 
     const standalone = useMemo(() => {
         return sdk.isIOs() && sdk.isStandalone();
@@ -341,7 +334,7 @@ export const Notification: FC<{
                 unmountOnExit
                 nodeRef={nodeRef}
                 onEntered={() => setTimeout(() => setEntered(true), 300)}
-                onExit={() => setTimeout(() => setEntered(false), 300)}
+                onExit={() => setEntered(false)}
             >
                 <Splash ref={nodeRef} className="scrollable">
                     <NotificationOverlay handleClose={handleClose} entered={entered}>
