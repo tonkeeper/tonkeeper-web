@@ -67,8 +67,8 @@ const config: ForgeConfig = {
                 description: 'Your desktop wallet on The Open Network',
                 iconUrl: 'https://tonkeeper.com/assets/icon.ico',
                 setupIcon: path.join(process.cwd(), 'public', 'icon.ico'),
-                remoteReleases:
-                    'https://github.com/tonkeeper/tonkeeper-web/releases/latest/download'
+                loadingGif: path.join(process.cwd(), 'public', 'install.gif'),
+                remoteReleases: 'https://github.com/tonkeeper/tonkeeper-web'
             },
             ['win32']
         ),
