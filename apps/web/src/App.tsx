@@ -86,7 +86,7 @@ export const App: FC<PropsWithChildren> = () => {
     const { t, i18n } = useTranslation();
 
     const translation = useMemo(() => {
-        const languages = (process.env.REACT_APP_LOCALES ?? 'en').split(',');
+        const languages = (import.meta.env.VITE_APP_LOCALES ?? 'en').split(',');
         const client: I18nContext = {
             t,
             i18n: {

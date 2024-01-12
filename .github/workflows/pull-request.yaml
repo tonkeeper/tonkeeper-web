@@ -145,3 +145,44 @@ jobs:
               run: |
                   security delete-keychain build.keychain
                   rm ${{ github.workspace }}/AuthKey.p8
+
+    web-build:
+        name: web-build
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20.7.0
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Run install
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: install
+
+            - name: Run build
+              uses: borales/actions-yarn@v4
+              env:
+                  REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
+                  REACT_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
+                  REACT_APP_LOCALES: en,zh_CN,ru,it,tr
+              with:
+                  cmd: build:web
+
+            - name: Publish to Cloudflare Pages
+              uses: cloudflare/pages-action@v1
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  projectName: tonkeeper-web
+                  directory: apps/web/dist
+                  wranglerVersion: '3'

@@ -22,20 +22,29 @@
     <link rel="canonical" href="https://wallet.tonkeeper.com/">
 
     <link rel="apple-touch-icon" sizes="288x288" href="https://tonkeeper.com/assets/tonconnect-icon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/logo-16x16.png">
-    <link rel="icon" type="image/png" sizes="64x64" href="%PUBLIC_URL%/logo-64x64.png">
-    <link rel="icon" type="image/png" sizes="128x128" href="%PUBLIC_URL%/logo-128x128.png">
-    <link rel="alternate icon" href="%PUBLIC_URL%/favicon.ico" type="image/x-icon">
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo-16x16.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="/logo-64x64.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="/logo-128x128.png">
+    <link rel="alternate icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="/manifest.json" />
 
 
     <link
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;display=swap"
       rel="stylesheet"
     />
+
+    <script type="module">
+      import { Buffer } from "buffer";
+      window.Buffer = Buffer;
+
+      import process from "process";
+      window.process = process; 
+    </script>
   </head>
   <body style="background:#10161F;margin: 0;" class="top bottom">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>
