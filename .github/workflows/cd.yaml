@@ -104,3 +104,43 @@ jobs:
               run: |
                   security delete-keychain build.keychain
                   rm ${{ github.workspace }}/AuthKey.p8
+
+    extension-build:
+        name: extension-build
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20.7.0
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Run install
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: install
+
+            - name: Run install
+              uses: borales/actions-yarn@v4
+              env:
+                  REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
+              with:
+                  cmd: build:extension
+
+            - name: Upload apps to artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: Tonkeeper Extensions
+                  retention-days: 10
+                  compression-level: 0
+                  path: |
+                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_*.zip
+                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_firefix_*.zip
