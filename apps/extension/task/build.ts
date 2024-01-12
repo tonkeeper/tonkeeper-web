@@ -6,7 +6,7 @@ import firefox from './fireFox';
 
 common.notify('Build UI');
 
-common.exec('yarn react-app-rewired build', {
+common.exec('npx react-app-rewired build', {
     stdio: 'inherit',
     env: {
         ...process.env,
@@ -17,7 +17,7 @@ common.exec('yarn react-app-rewired build', {
 
 common.notify(`Build Tonkeeper background.js, provider.js, content.js`);
 
-common.exec('yarn webpack -c ./task/webpack.config.js', {
+common.exec('npx webpack -c ./task/webpack.config.js', {
     stdio: 'inherit',
     env: process.env
 });
