@@ -19,7 +19,7 @@
         "react-dom": "^18.2.0",
         "react-i18next": "^12.1.1",
         "react-router-dom": "^6.4.5",
-        "styled-components": "^5.3.6"
+        "styled-components": "^6.1.1"
     },
     "devDependencies": {
         "@testing-library/dom": "^9.3.1",
@@ -37,7 +37,7 @@
         "react-is": "^18.2.0",
         "ts-node": "^10.9.1",
         "typescript": "5.2.2",
-        "vite": "^4.5.1"
+        "vite": "^5.0.5"
     },
     "scripts": {
         "locales": "ts-node ./task/locales",
