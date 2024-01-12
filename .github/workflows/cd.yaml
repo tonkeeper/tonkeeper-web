@@ -183,5 +183,5 @@ jobs:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   projectName: tonkeeper-web
-                  directory: 'apps/web/build'
+                  directory: apps/web/dist
                   wranglerVersion: '3'

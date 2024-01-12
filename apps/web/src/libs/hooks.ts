@@ -53,8 +53,8 @@ export const useAnalytics = (account?: AccountState, wallet?: WalletState | null
         [QueryKey.analytics],
         async () => {
             const tracker = new AnalyticsGroup(
-                new Amplitude(process.env.REACT_APP_AMPLITUDE!),
-                new Gtag(process.env.REACT_APP_MEASUREMENT_ID!)
+                new Amplitude(import.meta.env.VITE_APP_AMPLITUDE!),
+                new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID!)
             );
 
             tracker.init('Web', toWalletType(wallet), account, wallet);
