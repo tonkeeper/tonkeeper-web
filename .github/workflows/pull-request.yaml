@@ -148,7 +148,7 @@ jobs:
 
     extension-build:
         name: extension-build
-        runs-on: macos-13
+        runs-on: ubuntu-latest
         timeout-minutes: 10
 
         steps:
@@ -188,7 +188,7 @@ jobs:
 
     web-build:
         name: web-build
-        runs-on: macos-13
+        runs-on: ubuntu-latest
         timeout-minutes: 10
 
         steps:
