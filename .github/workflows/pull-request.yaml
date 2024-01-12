@@ -148,7 +148,7 @@ jobs:
 
     extension-build:
         name: extension-build
-        runs-on: ubuntu-latest
+        runs-on: macos-13
         timeout-minutes: 10
 
         steps:
@@ -185,3 +185,35 @@ jobs:
                   path: |
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_beta_*.zip
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_firefix_*.zip
+
+    web-build:
+        name: web-build
+        runs-on: macos-13
+        timeout-minutes: 10
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20.7.0
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Run install
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: install
+
+            - name: Run install
+              uses: borales/actions-yarn@v4
+              env:
+                  REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
+                  REACT_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
+                  REACT_APP_LOCALES: en,ru,it,tr-TR
+              with:
+                  cmd: build:web
