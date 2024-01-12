@@ -7,14 +7,21 @@ browsers. We recommend using the latest available browser version.
 
 ## Building locally
 
--   Install `Node.js` version v20.7.0
--   Install `Yarn` version 4.0.2
+```sh
+# Install `Node.js` version v20.7.0
+nvm use
+
+# Install `Yarn` version 4.0.2
+corepack enable
+```
 
 ### Build web script
 
 ```sh
+# Install dependencies
 yarn
 
+# Build web app
 yarn build:web
 ```
 
@@ -23,8 +30,10 @@ Compressed build could be found in `/apps/web/build` once they're built.
 ### Build extension script
 
 ```sh
+# Install dependencies
 yarn
 
+# Build extension apps
 yarn build:extension
 ```
 
@@ -34,8 +43,10 @@ once they're built.
 ### Build desktop script
 
 ```sh
+# Install dependencies
 yarn
 
+# Build desktop for current OS
 yarn build:desktop
 ```
 
