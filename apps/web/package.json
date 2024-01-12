@@ -33,6 +33,7 @@
         "@vitejs/plugin-react": "^4.2.1",
         "fs-extra": "^11.2.0",
         "react-is": "^18.2.0",
+        "rollup-plugin-polyfill-node": "^0.13.0",
         "ts-node": "^10.9.1",
         "typescript": "5.2.2",
         "vite": "^5.0.11",

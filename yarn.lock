@@ -4417,7 +4417,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-inject@npm:^5.0.5":
+"@rollup/plugin-inject@npm:^5.0.4, @rollup/plugin-inject@npm:^5.0.5":
   version: 5.0.5
   resolution: "@rollup/plugin-inject@npm:5.0.5"
   dependencies:
@@ -6317,6 +6317,7 @@ __metadata:
     react-i18next: "npm:^12.1.1"
     react-is: "npm:^18.2.0"
     react-router-dom: "npm:^6.4.5"
+    rollup-plugin-polyfill-node: "npm:^0.13.0"
     styled-components: "npm:^5.3.6"
     ts-node: "npm:^10.9.1"
     typescript: "npm:5.2.2"
@@ -22803,6 +22804,17 @@ __metadata:
   dependencies:
     rollup-plugin-inject: "npm:^3.0.0"
   checksum: 283c108108f93684975c83fd2b274d028162a9df0db2225737bfd0f8cab9215f0228d3703928ef667a8ba2f4749649ba06c58b89f48a211d7116e7f98fc988dd
+  languageName: node
+  linkType: hard
+
+"rollup-plugin-polyfill-node@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "rollup-plugin-polyfill-node@npm:0.13.0"
+  dependencies:
+    "@rollup/plugin-inject": "npm:^5.0.4"
+  peerDependencies:
+    rollup: ^1.20.0 || ^2.0.0 || ^3.0.0 || ^4.0.0
+  checksum: 915af7606b35fa5bddfa87f65e18a0329de61f08c418a3a76aa41d9a46c744809afae3e5ebbf1b9555886835405c508ee1ec52f47df5745d5f453e179e9589c4
   languageName: node
   linkType: hard
 
