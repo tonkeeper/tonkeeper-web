@@ -173,7 +173,7 @@ jobs:
               env:
                   REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
                   REACT_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
-                  REACT_APP_LOCALES: en,ru,it,tr-TR
+                  REACT_APP_LOCALES: en,zh_CN,ru,it,tr
               with:
                   cmd: build:web
 
