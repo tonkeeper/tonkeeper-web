@@ -76,7 +76,7 @@ export class Tonendpoint {
         }: Partial<BootParams>,
         { fetchApi = defaultFetch, basePath = defaultTonendpoint }: BootOptions
     ) {
-        this.params = { lang, build: '3.5.0', network, platform, countryCode };
+        this.params = { lang, build, network, platform, countryCode };
         this.fetchApi = fetchApi;
         this.basePath = basePath;
     }
@@ -99,9 +99,12 @@ export class Tonendpoint {
     };
 
     boot = async (): Promise<TonendpointConfig> => {
-        const response = await this.fetchApi(`${this.basePath}/keys?${this.toSearchParams()}`, {
-            method: 'GET'
-        });
+        const response = await this.fetchApi(
+            `https://boot.tonkeeper.com/keys?${this.toSearchParams()}`,
+            {
+                method: 'GET'
+            }
+        );
 
         return response.json();
     };
