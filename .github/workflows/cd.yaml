@@ -144,4 +144,5 @@ jobs:
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   projectName: tonkeeper-web
                   directory: apps/web/dist
+                  branch: main
                   wranglerVersion: '3'
