@@ -169,7 +169,7 @@ jobs:
               with:
                   cmd: install
 
-            - name: Run install
+            - name: Run build
               uses: borales/actions-yarn@v4
               env:
                   REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
@@ -209,7 +209,7 @@ jobs:
               with:
                   cmd: install
 
-            - name: Run install
+            - name: Run build
               uses: borales/actions-yarn@v4
               env:
                   REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
