@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "jsx": "react",
+    "jsx": "react-jsx",
     "target": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -16,7 +16,7 @@
     "isolatedModules": true,
     "noEmit": false,
     "outDir": "dist",
-    "declaration": true
+    "declaration": true,
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/stories"]
