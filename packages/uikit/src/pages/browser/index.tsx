@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useRef } from 'react';
 import { Carousel } from '../../components/shared';
 import styled from 'styled-components';
 import { useRecommendations } from '../../hooks/browser/useRecommendations';
@@ -7,6 +7,7 @@ import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { Link } from 'react-router-dom';
 import { useUserCountry } from '../../state/country';
 import { SkeletonText } from '../../components/Skeleton';
+import { useAppSdk } from '../../hooks/appSdk';
 
 const Heading = styled.div`
     position: fixed;
@@ -53,6 +54,7 @@ const CarouselCard = styled.div<{ img: string }>`
     display: inline-flex !important;
     align-items: flex-end;
     justify-content: flex-start;
+    cursor: pointer;
 `;
 
 const CardFooter = styled.div`
@@ -83,6 +85,9 @@ const Body3Styled = styled(Body3)`
 const BrowserPage: FC = () => {
     const { data, isLoading, error } = useRecommendations();
     const { data: country, isLoading: isCountryLoading } = useUserCountry();
+    const sdk = useAppSdk();
+
+    const clickedPosition = useRef<{ clientX: number; clientY: number }>({});
 
     return (
         <div>
@@ -101,7 +106,25 @@ const BrowserPage: FC = () => {
             {!!data && (
                 <Carousel gap="8px">
                     {data.apps.map(item => (
-                        <CarouselCard img={item.poster} key={item.url}>
+                        <CarouselCard
+                            key={item.url}
+                            img={item.poster}
+                            onMouseDown={e =>
+                                (clickedPosition.current = {
+                                    clientY: e.clientY,
+                                    clientX: e.clientX
+                                })
+                            }
+                            onMouseUp={e => {
+                                const xInArea =
+                                    Math.abs(e.clientX - clickedPosition.current.clientX) < 10;
+                                const yInArea =
+                                    Math.abs(e.clientY - clickedPosition.current.clientY) < 10;
+                                if (xInArea && yInArea) {
+                                    sdk.openPage(item.url);
+                                }
+                            }}
+                        >
                             <CardFooter>
                                 <CardFooterImage src={item.icon} />
                                 <CardFooterText color={item.textColor}>
