@@ -2,6 +2,7 @@
 export enum AppRoute {
     import = '/import',
     settings = '/settings',
+    browser = '/browser',
     activity = '/activity',
     coins = '/coins',
     home = '/'
