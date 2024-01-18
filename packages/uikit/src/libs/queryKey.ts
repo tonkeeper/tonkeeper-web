@@ -19,6 +19,7 @@ export enum QueryKey {
 
     connection = 'connection',
     subscribed = 'subscribed',
+    featuredRecommendations = 'recommendations',
 
     tron = 'tron',
     rate = 'rate',

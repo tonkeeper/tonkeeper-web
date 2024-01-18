@@ -69,11 +69,10 @@ const Block = styled(Base)<{ size?: string; width?: string }>`
     }}
 `;
 
-export const SkeletonText: FC<{ size?: 'large' | 'small'; width?: string }> = React.memo(
-    ({ size, width }) => {
-        return <Block size={size} width={width} />;
-    }
-);
+export const SkeletonText: FC<{ size?: 'large' | 'small'; width?: string; className?: string }> =
+    React.memo(({ size, width, className }) => {
+        return <Block size={size} width={width} className={className} />;
+    });
 
 const Image = styled(Base)<{ width?: string }>`
     border-radius: ${props => props.theme.cornerFull};

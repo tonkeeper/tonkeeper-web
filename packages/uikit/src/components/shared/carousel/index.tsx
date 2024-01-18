@@ -1,24 +1,9 @@
-import { cloneElement, FC, PropsWithChildren, useLayoutEffect, useMemo, useRef } from 'react';
+import { FC, PropsWithChildren, useRef, WheelEvent } from 'react';
 import styled from 'styled-components';
+import Slider from 'react-slick';
 import { ChevronLeftIcon, ChevronRightIcon } from '../../Icon';
-
-const Container = styled.div<{ gap: string }>`
-    position: relative;
-    display: flex;
-    gap: ${props => props.gap};
-    overflow-x: auto;
-
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-
-    &::-webkit-scrollbar {
-        display: none;
-    }
-
-    > * {
-        flex-shrink: 0;
-    }
-`;
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 const SwipeButton = styled.button<{ position: 'left' | 'right' }>`
     width: 40px;
@@ -30,137 +15,87 @@ const SwipeButton = styled.button<{ position: 'left' | 'right' }>`
     display: flex;
     justify-content: center;
     align-items: center;
-    position: sticky;
+    position: absolute;
+    z-index: 2;
     border: none;
     cursor: pointer;
     top: calc(50% - 20px);
     ${props => (props.position === 'left' ? 'left: 12px;' : 'right: 12px;')};
+    transition: opacity 0.2s ease-in-out;
+
+    &:hover {
+        opacity: 0.8;
+    }
+`;
+
+const SliderStyled = styled(Slider)<{ gap: string }>`
+    .slick-list {
+        margin: 0 -${props => parseFloat(props.gap) / 2}px;
+    }
+    .slick-slide > div {
+        margin: 0 ${props => parseFloat(props.gap) / 2}px;
+    }
+`;
+
+const CarouselWrapper = styled.div`
+    overflow: hidden;
+    position: relative;
 `;
 
 export interface CarouselProps {
     gap: string;
-    itemWidth: number | string;
 }
 
-export const Carousel: FC<PropsWithChildren & CarouselProps> = ({
-    children,
-    gap,
-    itemWidth: itemW
-}) => {
-    const gapPx = parseFloat(gap);
-    const moveButtonWidthPx = 40;
-    const itemWidth = parseFloat(itemW.toString());
-    const blockSize = itemWidth + gapPx;
-
-    const containerRef = useRef<HTMLDivElement | null>(null);
-
-    const childPrevPrevRef = useRef<HTMLElement>(null);
-    const childNextNextRef = useRef<HTMLElement>(null);
-
-    const [childPrev, childPrevPrev, childNext, childNextNext, childrenLength] = useMemo(() => {
-        if (children && Array.isArray(children) && children.length > 2) {
-            const _childPrev = cloneElement(children[children.length - 1]);
-            const _childPrevPrev = cloneElement(children[children.length - 2], {
-                ref: childPrevPrevRef
-            });
-            const _childNext = cloneElement(children[0]);
-            const _childNextNext = cloneElement(children[1], { ref: childNextNextRef });
-
-            return [_childPrev, _childPrevPrev, _childNext, _childNextNext, children.length];
-        } else {
-            return [null, null, null, null, 0];
-        }
-    }, [children]);
-
-    const getScrollLeft = (blocksNumber: number) => {
-        const container = containerRef.current;
-        if (!container) {
-            return 0;
-        }
-        const shift = (container.offsetWidth - itemWidth) / 2 - gapPx;
-        return blockSize * blocksNumber - shift + moveButtonWidthPx;
+export const Carousel: FC<PropsWithChildren & CarouselProps> = ({ children, gap }) => {
+    const sliderRef = useRef<Slider | null>(null);
+    const isSwiping = useRef(false);
+    const settings = {
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        centerMode: true
     };
 
-    useLayoutEffect(() => {
-        const container = containerRef.current;
-        const prevPrev = childPrevPrevRef.current;
-        const nextNext = childNextNextRef.current;
+    const onWheel = (e: WheelEvent) => {
+        if (!isSwiping.current) {
+            isSwiping.current = true;
 
-        if (container && prevPrev && nextNext && childrenLength > 2) {
-            container.scrollLeft = getScrollLeft(2);
+            if (e.deltaX > 0) {
+                return sliderRef.current?.slickNext();
+            }
 
-            const options = {
-                root: container,
-                rootMargin: '0px',
-                threshold: 0
-            };
-
-            const callback: IntersectionObserverCallback = entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        if (entry.target === prevPrev) {
-                            requestAnimationFrame(() =>
-                                container.scrollTo({
-                                    left: container.scrollLeft + childrenLength * itemWidth - 4
-                                })
-                            );
-                        } else {
-                            requestAnimationFrame(() =>
-                                container.scrollTo({
-                                    left: container.scrollLeft - childrenLength * itemWidth + 4
-                                })
-                            );
-                        }
-                    }
-                });
-            };
-
-            const observer = new IntersectionObserver(callback, options);
-            observer.observe(nextNext);
-            observer.observe(prevPrev);
-
-            return () => {
-                observer.unobserve(nextNext);
-                observer.unobserve(prevPrev);
-            };
+            if (e.deltaX < 0) {
+                return sliderRef.current?.slickPrev();
+            }
         }
-    }, []);
-
-    const move = (direction: 'left' | 'right') => {
-        const nextBlock = Math.ceil(
-            (containerRef.current!.scrollLeft + containerRef.current!.offsetWidth) / blockSize
-        );
-        const prevBlock = Math.floor(
-            (containerRef.current!.scrollLeft + moveButtonWidthPx) / blockSize
-        );
-        const blocksNumber = direction === 'left' ? prevBlock : nextBlock;
-        containerRef.current?.scrollTo({
-            left: getScrollLeft(blocksNumber - 1),
-            behavior: 'smooth'
-        });
     };
 
-    const moveLeft = () => {
-        move('left');
+    const blockSwipe = () => {
+        isSwiping.current = true;
     };
 
-    const moveRight = () => {
-        move('right');
+    const unblockSwipe = () => {
+        isSwiping.current = false;
     };
 
     return (
-        <Container gap={gap} ref={containerRef}>
-            <SwipeButton position="left" onClick={moveLeft}>
+        <CarouselWrapper onWheel={onWheel}>
+            <SwipeButton position="left" onClick={() => sliderRef.current?.slickPrev()}>
                 <ChevronLeftIcon />
             </SwipeButton>
-            {childPrevPrev}
-            {childPrev}
-            {children}
-            {childNext}
-            {childNextNext}
-            <SwipeButton position="right" onClick={moveRight}>
+            <SliderStyled
+                ref={sliderRef}
+                beforeChange={blockSwipe}
+                afterChange={unblockSwipe}
+                gap={gap}
+                {...settings}
+            >
+                {children}
+            </SliderStyled>
+            <SwipeButton position="right" onClick={() => sliderRef.current?.slickNext()}>
                 <ChevronRightIcon />
             </SwipeButton>
-        </Container>
+        </CarouselWrapper>
     );
 };
