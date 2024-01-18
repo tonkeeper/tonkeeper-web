@@ -28,18 +28,16 @@ const SwipeButton = styled.button<{ position: 'left' | 'right' }>`
     }
 `;
 
-const SliderStyled = styled(Slider)<{ gap: string }>`
+const CarouselWrapper = styled.div<{ gap: string }>`
+    overflow: hidden;
+    position: relative;
+
     .slick-list {
         margin: 0 -${props => parseFloat(props.gap) / 2}px;
     }
     .slick-slide > div {
         margin: 0 ${props => parseFloat(props.gap) / 2}px;
     }
-`;
-
-const CarouselWrapper = styled.div`
-    overflow: hidden;
-    position: relative;
 `;
 
 export interface CarouselProps {
@@ -80,19 +78,18 @@ export const Carousel: FC<PropsWithChildren & CarouselProps> = ({ children, gap 
     };
 
     return (
-        <CarouselWrapper onWheel={onWheel}>
+        <CarouselWrapper onWheel={onWheel} gap={gap}>
             <SwipeButton position="left" onClick={() => sliderRef.current?.slickPrev()}>
                 <ChevronLeftIcon />
             </SwipeButton>
-            <SliderStyled
+            <Slider
                 ref={sliderRef}
                 beforeChange={blockSwipe}
                 afterChange={unblockSwipe}
-                gap={gap}
                 {...settings}
             >
                 {children}
-            </SliderStyled>
+            </Slider>
             <SwipeButton position="right" onClick={() => sliderRef.current?.slickNext()}>
                 <ChevronRightIcon />
             </SwipeButton>
