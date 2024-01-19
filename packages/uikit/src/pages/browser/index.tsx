@@ -1,13 +1,18 @@
-import { FC, useRef } from 'react';
-import { Carousel } from '../../components/shared';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { useRecommendations } from '../../hooks/browser/useRecommendations';
-import { Body3, H1, Label2 } from '../../components/Text';
+import { H1, Label2 } from '../../components/Text';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { Link } from 'react-router-dom';
 import { useUserCountry } from '../../state/country';
 import { SkeletonText } from '../../components/Skeleton';
-import { useAppSdk } from '../../hooks/appSdk';
+import { PromotionsCarousel } from './promotions-carousel';
+import { CategoryBlock } from './category-block';
+import { InnerBody } from '../../components/Body';
+
+const InnerBodyStyled = styled(InnerBody)`
+    padding: 0;
+`;
 
 const Heading = styled.div`
     position: fixed;
@@ -18,6 +23,8 @@ const Heading = styled.div`
     padding: 12px 1rem;
     display: flex;
     align-items: center;
+    background-color: ${props => props.theme.backgroundPage};
+    z-index: 3;
 `;
 const SkeletonCountry = styled(SkeletonText)`
     position: absolute;
@@ -43,51 +50,13 @@ const CountryButton = styled.button`
     transition: background-color 0.1s ease;
 `;
 
-const CarouselCard = styled.div<{ img: string }>`
-    width: 448px;
-    height: 224px;
-
-    background-image: ${props => `url(${props.img})`};
-    background-size: cover;
-    border-radius: ${props => props.theme.cornerSmall};
-
-    display: inline-flex !important;
-    align-items: flex-end;
-    justify-content: flex-start;
-    cursor: pointer;
-`;
-
-const CardFooter = styled.div`
-    height: 76px;
-    display: flex;
-    align-items: center;
-    padding-left: 16px;
-`;
-
-const CardFooterImage = styled.img`
-    height: 44px;
-    width: 44px;
-    border-radius: ${props => props.theme.cornerExtraSmall};
-`;
-
-const CardFooterText = styled.div<{ color?: string }>`
-    display: flex;
-    flex-direction: column;
-    padding: 11px 12px 13px;
-    word-break: break-word;
-    color: ${props => props.color || props.theme.textPrimary};
-`;
-
-const Body3Styled = styled(Body3)`
-    opacity: 0.73;
+const PromotionsCarouselStyled = styled(PromotionsCarousel)`
+    margin-bottom: 16px;
 `;
 
 const BrowserPage: FC = () => {
     const { data, isLoading, error } = useRecommendations();
     const { data: country, isLoading: isCountryLoading } = useUserCountry();
-    const sdk = useAppSdk();
-
-    const clickedPosition = useRef<{ clientX: number; clientY: number }>({});
 
     return (
         <div>
@@ -104,37 +73,12 @@ const BrowserPage: FC = () => {
                 )}
             </Heading>
             {!!data && (
-                <Carousel gap="8px">
-                    {data.apps.map(item => (
-                        <CarouselCard
-                            key={item.url}
-                            img={item.poster}
-                            onMouseDown={e =>
-                                (clickedPosition.current = {
-                                    clientY: e.clientY,
-                                    clientX: e.clientX
-                                })
-                            }
-                            onMouseUp={e => {
-                                const xInArea =
-                                    Math.abs(e.clientX - clickedPosition.current.clientX) < 10;
-                                const yInArea =
-                                    Math.abs(e.clientY - clickedPosition.current.clientY) < 10;
-                                if (xInArea && yInArea) {
-                                    sdk.openPage(item.url);
-                                }
-                            }}
-                        >
-                            <CardFooter>
-                                <CardFooterImage src={item.icon} />
-                                <CardFooterText color={item.textColor}>
-                                    <Label2>{item.name}</Label2>
-                                    <Body3Styled>{item.description}</Body3Styled>
-                                </CardFooterText>
-                            </CardFooter>
-                        </CarouselCard>
+                <InnerBodyStyled>
+                    <PromotionsCarouselStyled apps={data.apps} />
+                    {data.categories.map(category => (
+                        <CategoryBlock key={category.id} category={category} />
                     ))}
-                </Carousel>
+                </InnerBodyStyled>
             )}
         </div>
     );

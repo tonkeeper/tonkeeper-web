@@ -17,7 +17,7 @@ export interface PromotedApp {
 export interface PromotionCategory {
     id: string;
     title: string;
-    apps: PromotedApp;
+    apps: PromotedApp[];
 }
 
 export interface Recommendations {

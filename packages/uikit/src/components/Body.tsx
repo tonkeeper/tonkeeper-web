@@ -126,70 +126,71 @@ export const useAppSelection = (elementRef: React.MutableRefObject<HTMLDivElemen
     return selection;
 };
 
-export const InnerBody = React.forwardRef<HTMLDivElement, PropsWithChildren>(
-    ({ children }, ref) => {
-        const sdk = useAppSdk();
-        const { standalone } = useAppContext();
+export const InnerBody = React.forwardRef<
+    HTMLDivElement,
+    PropsWithChildren & { className?: string }
+>(({ children, className }, ref) => {
+    const sdk = useAppSdk();
+    const { standalone } = useAppContext();
 
-        const innerRef = useRef<HTMLDivElement>(null);
+    const innerRef = useRef<HTMLDivElement>(null);
 
-        const elementRef = (
-            ref == null ? innerRef : ref
-        ) as React.MutableRefObject<HTMLDivElement | null>;
+    const elementRef = (
+        ref == null ? innerRef : ref
+    ) as React.MutableRefObject<HTMLDivElement | null>;
 
-        useLayoutEffect(() => {
-            const element = elementRef.current;
-            if (!element) return;
-            if (!standalone) return;
+    useLayoutEffect(() => {
+        const element = elementRef.current;
+        if (!element) return;
+        if (!standalone) return;
 
-            let timer: NodeJS.Timeout | undefined;
+        let timer: NodeJS.Timeout | undefined;
 
-            const handlerScroll = throttle(() => {
-                if (element.scrollTop < 10) {
-                    setTop();
-                } else {
-                    removeTop();
-                }
-                if (element.scrollTop + element.clientHeight < element.scrollHeight - 10) {
-                    removeBottom();
-                } else {
-                    setBottom();
-                }
-                clearTimeout(timer);
-                if (!document.body.classList.contains('scroll')) {
-                    document.body.classList.add('scroll');
-                }
-                timer = setTimeout(function () {
-                    document.body.classList.remove('scroll');
-                }, 300);
-            }, 50);
-
-            element.addEventListener('scroll', handlerScroll);
-            sdk.uiEvents.on('loading', handlerScroll);
-
-            handlerScroll();
-
-            return () => {
+        const handlerScroll = throttle(() => {
+            if (element.scrollTop < 10) {
                 setTop();
+            } else {
+                removeTop();
+            }
+            if (element.scrollTop + element.clientHeight < element.scrollHeight - 10) {
+                removeBottom();
+            } else {
                 setBottom();
-                clearTimeout(timer);
-                sdk.uiEvents.off('loading', handlerScroll);
+            }
+            clearTimeout(timer);
+            if (!document.body.classList.contains('scroll')) {
+                document.body.classList.add('scroll');
+            }
+            timer = setTimeout(function () {
+                document.body.classList.remove('scroll');
+            }, 300);
+        }, 50);
 
-                element.removeEventListener('scroll', handlerScroll);
-            };
-        }, [elementRef]);
+        element.addEventListener('scroll', handlerScroll);
+        sdk.uiEvents.on('loading', handlerScroll);
 
-        const selection = useAppSelection(elementRef);
-        const id = standalone ? 'body' : undefined;
+        handlerScroll();
 
-        return (
-            <BodyElement ref={elementRef} id={id}>
-                <AppSelectionContext.Provider value={selection}>
-                    {children}
-                </AppSelectionContext.Provider>
-            </BodyElement>
-        );
-    }
-);
+        return () => {
+            setTop();
+            setBottom();
+            clearTimeout(timer);
+            sdk.uiEvents.off('loading', handlerScroll);
+
+            element.removeEventListener('scroll', handlerScroll);
+        };
+    }, [elementRef]);
+
+    const selection = useAppSelection(elementRef);
+    const id = standalone ? 'body' : undefined;
+
+    return (
+        <BodyElement ref={elementRef} id={id} className={className}>
+            <AppSelectionContext.Provider value={selection}>
+                {children}
+            </AppSelectionContext.Provider>
+        </BodyElement>
+    );
+});
 
 InnerBody.displayName = 'InnerBody';

@@ -135,6 +135,7 @@ const Block = styled.div<{ standalone?: boolean; sticky?: boolean }>`
     max-width: 548px;
     box-sizing: border-box;
     overflow: visible !important;
+    z-index: 3;
 
     background-color: ${props => props.theme.backgroundPage};
 

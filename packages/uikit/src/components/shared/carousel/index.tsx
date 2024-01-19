@@ -1,6 +1,6 @@
-import { FC, PropsWithChildren, useRef, WheelEvent } from 'react';
+import { FC, PropsWithChildren, useRef, useState, WheelEvent } from 'react';
 import styled from 'styled-components';
-import Slider from 'react-slick';
+import Slider, { Settings } from 'react-slick';
 import { ChevronLeftIcon, ChevronRightIcon } from '../../Icon';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -28,12 +28,13 @@ const SwipeButton = styled.button<{ position: 'left' | 'right' }>`
     }
 `;
 
-const CarouselWrapper = styled.div<{ gap: string }>`
+const CarouselWrapper = styled.div<{ gap: string; isFirst?: boolean }>`
     overflow: hidden;
     position: relative;
 
     .slick-list {
         margin: 0 -${props => parseFloat(props.gap) / 2}px;
+        ${props => props.isFirst && 'padding-left: 16px !important;'}
     }
     .slick-slide > div {
         margin: 0 ${props => parseFloat(props.gap) / 2}px;
@@ -42,18 +43,29 @@ const CarouselWrapper = styled.div<{ gap: string }>`
 
 export interface CarouselProps {
     gap: string;
+    className?: string;
 }
 
-export const Carousel: FC<PropsWithChildren & CarouselProps> = ({ children, gap }) => {
+const defaultSettings = {
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    centerMode: true,
+    arrows: false
+};
+
+export const Carousel: FC<PropsWithChildren & CarouselProps & Settings> = ({
+    children,
+    gap,
+    className,
+    ...settings
+}) => {
+    const isInfinite = settings.infinite !== false;
     const sliderRef = useRef<Slider | null>(null);
     const isSwiping = useRef(false);
-    const settings = {
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        centerMode: true
-    };
+
+    const [hideRightButton, setHideRightButton] = useState(false);
+    const [hideLeftButton, setHideLeftButton] = useState(!isInfinite);
 
     const onWheel = (e: WheelEvent) => {
         if (!isSwiping.current) {
@@ -77,22 +89,35 @@ export const Carousel: FC<PropsWithChildren & CarouselProps> = ({ children, gap 
         isSwiping.current = false;
     };
 
+    const beforeChange = (_: number, nextIndex: number) => {
+        blockSwipe();
+
+        const childrenLength = children && Array.isArray(children) ? children.length : 0;
+        setHideRightButton(nextIndex === childrenLength - 1 && !isInfinite);
+        setHideLeftButton(nextIndex === 0 && !isInfinite);
+    };
+
     return (
-        <CarouselWrapper onWheel={onWheel} gap={gap}>
-            <SwipeButton position="left" onClick={() => sliderRef.current?.slickPrev()}>
-                <ChevronLeftIcon />
-            </SwipeButton>
+        <CarouselWrapper onWheel={onWheel} gap={gap} className={className}>
+            {!hideLeftButton && (
+                <SwipeButton position="left" onClick={() => sliderRef.current?.slickPrev()}>
+                    <ChevronLeftIcon />
+                </SwipeButton>
+            )}
             <Slider
                 ref={sliderRef}
-                beforeChange={blockSwipe}
+                beforeChange={beforeChange}
                 afterChange={unblockSwipe}
+                {...defaultSettings}
                 {...settings}
             >
                 {children}
             </Slider>
-            <SwipeButton position="right" onClick={() => sliderRef.current?.slickNext()}>
-                <ChevronRightIcon />
-            </SwipeButton>
+            {!hideRightButton && (
+                <SwipeButton position="right" onClick={() => sliderRef.current?.slickNext()}>
+                    <ChevronRightIcon />
+                </SwipeButton>
+            )}
         </CarouselWrapper>
     );
 };
