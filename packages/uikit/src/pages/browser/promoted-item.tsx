@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 export const PromotedItem = styled.div`
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
     display: flex;
     align-items: center;
     width: 100%;

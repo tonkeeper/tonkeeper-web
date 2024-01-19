@@ -51,7 +51,11 @@ const CountryButton = styled.button`
 `;
 
 const PromotionsCarouselStyled = styled(PromotionsCarousel)`
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
+`;
+
+const CategoryBlockStyled = styled(CategoryBlock)`
+    margin-bottom: 1rem;
 `;
 
 const BrowserPage: FC = () => {
@@ -76,7 +80,7 @@ const BrowserPage: FC = () => {
                 <InnerBodyStyled>
                     <PromotionsCarouselStyled apps={data.apps} />
                     {data.categories.map(category => (
-                        <CategoryBlock key={category.id} category={category} />
+                        <CategoryBlockStyled key={category.id} category={category} />
                     ))}
                 </InnerBodyStyled>
             )}

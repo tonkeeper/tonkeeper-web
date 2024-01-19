@@ -6,8 +6,8 @@ import { ListBlock, ListItem } from '../../components/List';
 import { Carousel } from '../../components/shared';
 import { PromotedItem, PromotedItemImage, PromotedItemText } from './promoted-item';
 import { useElementSize } from '../../hooks/useElementSize';
-
-const Container = styled.div``;
+import { ChevronRightIcon } from '../../components/Icon';
+import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
 
 const Heading = styled.div`
     display: flex;
@@ -38,8 +38,19 @@ const ListBlockStyled = styled(ListBlock)<{ width: string; marginLeft?: string }
     margin-bottom: 0;
 `;
 
+const IconContainerStyled = styled.div`
+    margin-left: auto;
+    margin-right: 1rem;
+    color: ${props => props.theme.iconTertiary};
+    transition: transform 0.2s ease;
+`;
+
 const ListItemStyled = styled(ListItem)`
-    padding-left: 16px;
+    padding-left: 1rem;
+
+    &:hover ${IconContainerStyled} {
+        transform: translateX(2px);
+    }
 `;
 
 export const CategoryBlock: FC<{ category: PromotionCategory; className?: string }> = ({
@@ -65,7 +76,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
     const canExpand = groups.length > 1;
 
     return (
-        <Container className={className} ref={containerRef}>
+        <div className={className} ref={containerRef}>
             <Heading>
                 <H3>{category.title}</H3>
                 {canExpand && (
@@ -87,15 +98,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
                             marginLeft={groupIndex === 0 ? '-34px' : '0'}
                         >
                             {group.map(item => (
-                                <ListItemStyled key={item.url}>
-                                    <PromotedItem>
-                                        <PromotedItemImage src={item.icon} />
-                                        <PromotedItemText>
-                                            <Label2>{item.name}</Label2>
-                                            <Body3>{item.description}</Body3>
-                                        </PromotedItemText>
-                                    </PromotedItem>
-                                </ListItemStyled>
+                                <GroupItem key={item.url} item={item} />
                             ))}
                         </ListBlockStyled>
                     ))}
@@ -105,20 +108,31 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
                     <ListContainer key={groupsKeys[groupIndex]}>
                         <ListBlockStyled key={groupsKeys[groupIndex]} width="100%">
                             {group.map(item => (
-                                <ListItemStyled key={item.url}>
-                                    <PromotedItem>
-                                        <PromotedItemImage src={item.icon} />
-                                        <PromotedItemText>
-                                            <Label2>{item.name}</Label2>
-                                            <Body3>{item.description}</Body3>
-                                        </PromotedItemText>
-                                    </PromotedItem>
-                                </ListItemStyled>
+                                <GroupItem key={item.url} item={item} />
                             ))}
                         </ListBlockStyled>
                     </ListContainer>
                 ))
             )}
-        </Container>
+        </div>
+    );
+};
+
+const GroupItem: FC<{ item: PromotedApp }> = ({ item }) => {
+    const ref = useOpenLinkOnAreaClick(item.url);
+
+    return (
+        <ListItemStyled key={item.url} ref={ref}>
+            <PromotedItem>
+                <PromotedItemImage src={item.icon} />
+                <PromotedItemText>
+                    <Label2>{item.name}</Label2>
+                    <Body3>{item.description}</Body3>
+                </PromotedItemText>
+                <IconContainerStyled>
+                    <ChevronRightIcon />
+                </IconContainerStyled>
+            </PromotedItem>
+        </ListItemStyled>
     );
 };
