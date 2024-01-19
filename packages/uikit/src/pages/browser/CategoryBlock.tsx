@@ -4,10 +4,12 @@ import { Body3, H3, Label1, Label2 } from '../../components/Text';
 import { PromotedApp, PromotionCategory } from '../../hooks/browser/useRecommendations';
 import { ListBlock, ListItem } from '../../components/List';
 import { Carousel } from '../../components/shared';
-import { PromotedItem, PromotedItemImage, PromotedItemText } from './promoted-item';
+import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
 import { useElementSize } from '../../hooks/useElementSize';
 import { ChevronRightIcon } from '../../components/Icon';
 import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
+import { Link } from 'react-router-dom';
+import { BrowserRoute } from '../../libs/routes';
 
 const Heading = styled.div`
     display: flex;
@@ -80,9 +82,11 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
             <Heading>
                 <H3>{category.title}</H3>
                 {canExpand && (
-                    <AllButton>
-                        <Label1>All</Label1>
-                    </AllButton>
+                    <Link to={'.' + BrowserRoute.category + '/' + category.id}>
+                        <AllButton>
+                            <Label1>All</Label1>
+                        </AllButton>
+                    </Link>
                 )}
             </Heading>
             {canExpand ? (
@@ -98,7 +102,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
                             marginLeft={groupIndex === 0 ? '-34px' : '0'}
                         >
                             {group.map(item => (
-                                <GroupItem key={item.url} item={item} />
+                                <CategoryGroupItem key={item.url} item={item} />
                             ))}
                         </ListBlockStyled>
                     ))}
@@ -108,7 +112,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
                     <ListContainer key={groupsKeys[groupIndex]}>
                         <ListBlockStyled key={groupsKeys[groupIndex]} width="100%">
                             {group.map(item => (
-                                <GroupItem key={item.url} item={item} />
+                                <CategoryGroupItem key={item.url} item={item} />
                             ))}
                         </ListBlockStyled>
                     </ListContainer>
@@ -118,7 +122,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
     );
 };
 
-const GroupItem: FC<{ item: PromotedApp }> = ({ item }) => {
+export const CategoryGroupItem: FC<{ item: PromotedApp }> = ({ item }) => {
     const ref = useOpenLinkOnAreaClick(item.url);
 
     return (

@@ -3,7 +3,7 @@ import { FC } from 'react';
 import { Carousel } from '../../components/shared';
 import styled from 'styled-components';
 import { CarouselApp } from '../../hooks/browser/useRecommendations';
-import { PromotedItem, PromotedItemImage, PromotedItemText } from './promoted-item';
+import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
 import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
 
 const CarouselCard = styled.div<{ img: string }>`

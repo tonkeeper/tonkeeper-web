@@ -30,6 +30,11 @@ export enum SettingsRoute {
     country = '/country'
 }
 
+export enum BrowserRoute {
+    index = '/',
+    category = '/category'
+}
+
 export const any = (route: string): string => {
     return `${route}/*`;
 };
