@@ -82,6 +82,7 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new ExtensionAppSdk();
+const TARGET_ENV = 'extension';
 connectToBackground();
 
 export const App: FC = () => {
@@ -166,6 +167,7 @@ export const Loader: FC = React.memo(() => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
     const tonendpoint = useTonendpoint(
+        TARGET_ENV,
         sdk.version,
         activeWallet?.network,
         localizationFrom(browser.i18n.getUILanguage())

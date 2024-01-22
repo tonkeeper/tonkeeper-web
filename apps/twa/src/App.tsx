@@ -78,6 +78,8 @@ const queryClient = new QueryClient({
     }
 });
 
+const TARGET_ENV = 'twa';
+
 export const App = () => {
     return (
         <StandardErrorBoundary>
@@ -212,7 +214,7 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
-    const tonendpoint = useTonendpoint(sdk.version, activeWallet?.network, activeWallet?.lang);
+    const tonendpoint = useTonendpoint(TARGET_ENV, sdk.version, activeWallet?.network, activeWallet?.lang);
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();

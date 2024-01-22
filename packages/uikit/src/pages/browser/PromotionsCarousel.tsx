@@ -2,9 +2,10 @@ import { Body3, Label2 } from '../../components/Text';
 import { FC } from 'react';
 import { Carousel } from '../../components/shared';
 import styled from 'styled-components';
-import { CarouselApp } from '../../hooks/browser/useRecommendations';
 import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
 import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
+import { CarouselApp } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
+import { useAppContext } from '../../hooks/appContext';
 
 const CarouselCard = styled.div<{ img: string }>`
     width: 448px;
@@ -18,6 +19,16 @@ const CarouselCard = styled.div<{ img: string }>`
     align-items: flex-end;
     justify-content: flex-start;
     cursor: pointer;
+
+    @media (max-width: ${480}px) {
+        width: 400px;
+        height: 200px;
+    }
+
+    @media (max-width: ${436}px) {
+        width: 340px;
+        height: 170px;
+    }
 `;
 const CarouselCardFooter = styled(PromotedItem)`
     margin-left: 1rem;
@@ -27,8 +38,11 @@ export const PromotionsCarousel: FC<{ apps: CarouselApp[]; className?: string }>
     apps,
     className
 }) => {
+    const { config } = useAppContext();
+    const speed = config.featured_play_interval || 1000 * 10;
+
     return (
-        <Carousel className={className} gap="8px" autoplay={true} autoplaySpeed={1000 * 10}>
+        <Carousel className={className} gap="8px" autoplay={false} autoplaySpeed={speed}>
             {apps.map(item => (
                 <CarouselItem item={item} key={item.url} />
             ))}

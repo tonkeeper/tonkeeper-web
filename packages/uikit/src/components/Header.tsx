@@ -29,8 +29,8 @@ const Block = styled.div<{
     width: var(--app-width);
     overflow: visible !important;
     max-width: 548px;
-    top: 0px;
-    z-index: 1;
+    top: 0;
+    z-index: 4;
 
     ${props =>
         css`

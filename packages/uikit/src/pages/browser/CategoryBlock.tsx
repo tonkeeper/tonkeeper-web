@@ -1,7 +1,6 @@
 import { FC, useMemo } from 'react';
 import styled from 'styled-components';
 import { Body3, H3, Label1, Label2 } from '../../components/Text';
-import { PromotedApp, PromotionCategory } from '../../hooks/browser/useRecommendations';
 import { ListBlock, ListItem } from '../../components/List';
 import { Carousel } from '../../components/shared';
 import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
@@ -10,6 +9,7 @@ import { ChevronRightIcon } from '../../components/Icon';
 import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
 import { Link } from 'react-router-dom';
 import { BrowserRoute } from '../../libs/routes';
+import { PromotedApp, PromotionCategory } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 
 const Heading = styled.div`
     display: flex;

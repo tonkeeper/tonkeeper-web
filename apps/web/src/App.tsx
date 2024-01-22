@@ -82,6 +82,7 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new BrowserAppSdk();
+const TARGET_ENV = 'web';
 
 export const App: FC<PropsWithChildren> = () => {
     const { t, i18n } = useTranslation();
@@ -171,7 +172,7 @@ export const Loader: FC = () => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
-    const tonendpoint = useTonendpoint(sdk.version, activeWallet?.network, activeWallet?.lang);
+    const tonendpoint = useTonendpoint(TARGET_ENV, sdk.version, activeWallet?.network, activeWallet?.lang);
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();

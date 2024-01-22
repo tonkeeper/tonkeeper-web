@@ -73,6 +73,7 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new DesktopAppSdk();
+const TARGET_ENV = 'desktop';
 
 const langs = 'en,zh_CN,ru,it,tr';
 const listOfAuth: AuthState['kind'][] = ['keychain'];
@@ -135,7 +136,12 @@ export const Loader: FC = () => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
-    const tonendpoint = useTonendpoint(sdk.version, activeWallet?.network, activeWallet?.lang);
+    const tonendpoint = useTonendpoint(
+        TARGET_ENV,
+        sdk.version,
+        activeWallet?.network,
+        activeWallet?.lang
+    );
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
