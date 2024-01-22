@@ -11,7 +11,7 @@ import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import {
-    ActivitySkeletonPage,
+    ActivitySkeletonPage, BrowserSkeletonPage,
     CoinSkeletonPage,
     HomeSkeleton,
     SettingsSkeletonPage
@@ -280,7 +280,7 @@ export const Content: FC<{
                     <Route
                         path={any(AppRoute.browser)}
                         element={
-                            <Suspense fallback={<SettingsSkeletonPage />}>
+                            <Suspense fallback={<BrowserSkeletonPage />}>
                                 <Browser />
                             </Suspense>
                         }

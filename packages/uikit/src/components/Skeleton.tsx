@@ -2,7 +2,7 @@ import React, { FC, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { InnerBody } from './Body';
-import { ActivityHeader, SettingsHeader } from './Header';
+import { ActivityHeader, BrowserHeader, SettingsHeader } from './Header';
 import { ActionsRow } from './home/Actions';
 import { BalanceSkeleton } from './home/Balance';
 import { CoinInfoSkeleton } from './jettons/Info';
@@ -10,6 +10,7 @@ import { ColumnText } from './Layout';
 import { ListBlock, ListItem, ListItemPayload } from './List';
 import { SubHeader } from './SubHeader';
 import { H3 } from './Text';
+import { RecommendationsPageBodySkeleton } from './skeletons/BrowserSkeletons';
 
 function randomIntFromInterval(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -73,6 +74,27 @@ export const SkeletonText: FC<{ size?: 'large' | 'small'; width?: string; classN
     React.memo(({ size, width, className }) => {
         return <Block size={size} width={width} className={className} />;
     });
+
+export const Skeleton = styled(Base)<{
+    width: string;
+    height: string;
+    borderRadius?: string;
+    margin?: string;
+    marginBottom?: string;
+}>`
+    display: block;
+    border-radius: ${props =>
+        props.borderRadius
+            ? props.theme[props.borderRadius] || props.theme.cornerExtraExtraSmall
+            : props.theme.cornerExtraExtraSmall};
+
+    ${props => css`
+        width: ${props.width ?? '3rem'};
+        height: ${props.height ?? '20px'};
+        ${props.margin && `margin: ${props.margin};`}
+        ${props.marginBottom && `margin-bottom: ${props.marginBottom};`}
+    `}
+`;
 
 const Image = styled(Base)<{ width?: string }>`
     border-radius: ${props => props.theme.cornerFull};
@@ -207,6 +229,17 @@ export const SettingsSkeletonPage = React.memo(() => {
                     <SkeletonSettingsList size={3} />
                     <SkeletonSettingsList size={6} />
                 </ActivityList>
+            </InnerBody>
+        </>
+    );
+});
+
+export const BrowserSkeletonPage = React.memo(() => {
+    return (
+        <>
+            <BrowserHeader />
+            <InnerBody>
+                <RecommendationsPageBodySkeleton />
             </InnerBody>
         </>
     );
