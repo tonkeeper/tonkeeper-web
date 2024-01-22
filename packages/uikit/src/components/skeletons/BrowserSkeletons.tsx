@@ -1,5 +1,5 @@
 import { PromotedItem, PromotedItemText } from '../../pages/browser/PromotedItem';
-import { Skeleton } from '../Skeleton';
+import { Skeleton } from '../shared/Skeleton';
 import React, { FC } from 'react';
 import { ListBlock, ListItem } from '../List';
 import styled from 'styled-components';
@@ -16,15 +16,15 @@ const Heading = styled.div`
     gap: 1rem;
 `;
 
+const CarouselSkeleton = styled(Skeleton)`
+    height: auto;
+    aspect-ratio: 2 / 1;
+`;
+
 export const RecommendationsPageBodySkeleton: FC = () => {
     return (
         <>
-            <Skeleton
-                width="448px"
-                height="224px"
-                borderRadius="cornerSmall"
-                margin="0 auto 1rem"
-            />
+            <CarouselSkeleton width="100%" borderRadius="cornerSmall" margin="0 auto 1rem" />
             <CategorySkeleton />
             <CategorySkeleton />
         </>

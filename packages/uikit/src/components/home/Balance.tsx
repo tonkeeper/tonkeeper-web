@@ -13,7 +13,7 @@ import { formatFiatCurrency } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { TokenRate, getRateKey } from '../../state/rates';
-import { SkeletonText } from '../Skeleton';
+import { SkeletonText } from '../shared/Skeleton';
 import { Body3, Label2, Num2 } from '../Text';
 import { AssetData } from './Jettons';
 

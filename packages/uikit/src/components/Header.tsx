@@ -15,7 +15,7 @@ import { H1, H3, Label1, Label2 } from './Text';
 import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 import { useUserCountry } from '../state/country';
-import { SkeletonText } from './Skeleton';
+import { SkeletonText } from './shared/Skeleton';
 
 const Block = styled.div<{
     center?: boolean;
