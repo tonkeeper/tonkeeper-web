@@ -8,8 +8,8 @@ import { CarouselApp } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { useAppContext } from '../../hooks/appContext';
 
 const CarouselCard = styled.div<{ img: string }>`
-    width: 448px;
-    height: 224px;
+    width: 100%;
+    aspect-ratio: 2 / 1;
 
     background-image: ${props => `url(${props.img})`};
     background-size: cover;
@@ -19,16 +19,6 @@ const CarouselCard = styled.div<{ img: string }>`
     align-items: flex-end;
     justify-content: flex-start;
     cursor: pointer;
-
-    @media (max-width: ${480}px) {
-        width: 400px;
-        height: 200px;
-    }
-
-    @media (max-width: ${436}px) {
-        width: 340px;
-        height: 170px;
-    }
 `;
 const CarouselCardFooter = styled(PromotedItem)`
     margin-left: 1rem;
@@ -42,7 +32,13 @@ export const PromotionsCarousel: FC<{ apps: CarouselApp[]; className?: string }>
     const speed = config.featured_play_interval || 1000 * 10;
 
     return (
-        <Carousel className={className} gap="8px" autoplay={false} autoplaySpeed={speed}>
+        <Carousel
+            className={className}
+            gap="8px"
+            autoplay={true}
+            centerPadding="16px"
+            autoplaySpeed={speed}
+        >
             {apps.map(item => (
                 <CarouselItem item={item} key={item.url} />
             ))}
