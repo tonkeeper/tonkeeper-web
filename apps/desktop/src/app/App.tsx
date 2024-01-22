@@ -14,6 +14,7 @@ import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import {
     ActivitySkeletonPage,
+    BrowserSkeletonPage,
     CoinSkeletonPage,
     HomeSkeleton,
     SettingsSkeletonPage
@@ -46,6 +47,7 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import Settings from '@tonkeeper/uikit/dist/pages/settings';
+import Browser from '@tonkeeper/uikit/dist/pages/browser';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
@@ -236,6 +238,14 @@ export const Content: FC<{
                         element={
                             <Suspense fallback={<ActivitySkeletonPage />}>
                                 <Activity />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path={any(AppRoute.browser)}
+                        element={
+                            <Suspense fallback={<BrowserSkeletonPage />}>
+                                <Browser />
                             </Suspense>
                         }
                     />

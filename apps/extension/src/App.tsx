@@ -11,7 +11,7 @@ import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import {
-    ActivitySkeletonPage,
+    ActivitySkeletonPage, BrowserSkeletonPage,
     CoinSkeletonPage,
     HomeSkeleton,
     SettingsSkeletonPage
@@ -56,6 +56,7 @@ import { useAnalytics, useAppWidth } from './libs/hoolks';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
+const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
@@ -279,6 +280,14 @@ export const Content: FC<{
                         element={
                             <Suspense fallback={<ActivitySkeletonPage />}>
                                 <Activity />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path={any(AppRoute.browser)}
+                        element={
+                            <Suspense fallback={<BrowserSkeletonPage />}>
+                                <Browser />
                             </Suspense>
                         }
                     />
