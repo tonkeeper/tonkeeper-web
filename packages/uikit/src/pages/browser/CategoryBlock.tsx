@@ -1,15 +1,15 @@
-import { FC, useMemo } from 'react';
-import styled from 'styled-components';
-import { Body3, H3, Label1, Label2 } from '../../components/Text';
-import { ListBlock, ListItem } from '../../components/List';
-import { Carousel } from '../../components/shared';
-import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
-import { useElementSize } from '../../hooks/useElementSize';
-import { ChevronRightIcon } from '../../components/Icon';
-import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
-import { Link } from 'react-router-dom';
-import { BrowserRoute } from '../../libs/routes';
 import { PromotedApp, PromotionCategory } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
+import { FC, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import { ChevronRightIcon } from '../../components/Icon';
+import { ListBlock, ListItem } from '../../components/List';
+import { Body3, H3, Label1, Label2 } from '../../components/Text';
+import { Carousel } from '../../components/shared';
+import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
+import { useElementSize } from '../../hooks/useElementSize';
+import { BrowserRoute } from '../../libs/routes';
+import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
 
 const Heading = styled.div`
     display: flex;
@@ -123,7 +123,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
 };
 
 export const CategoryGroupItem: FC<{ item: PromotedApp }> = ({ item }) => {
-    const ref = useOpenLinkOnAreaClick(item.url);
+    const ref = useOpenLinkOnAreaClick(item.url, 'recommendation');
 
     return (
         <ListItemStyled key={item.url} ref={ref}>

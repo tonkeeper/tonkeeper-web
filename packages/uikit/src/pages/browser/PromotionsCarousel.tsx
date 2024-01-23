@@ -1,11 +1,11 @@
-import { Body3, Label2 } from '../../components/Text';
-import { FC } from 'react';
-import { Carousel } from '../../components/shared';
-import styled from 'styled-components';
-import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
-import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
 import { CarouselApp } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
+import { FC } from 'react';
+import styled from 'styled-components';
+import { Body3, Label2 } from '../../components/Text';
+import { Carousel } from '../../components/shared';
 import { useAppContext } from '../../hooks/appContext';
+import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
+import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
 
 const CarouselCard = styled.div<{ img: string }>`
     width: 100%;
@@ -47,7 +47,7 @@ export const PromotionsCarousel: FC<{ apps: CarouselApp[]; className?: string }>
 };
 
 const CarouselItem: FC<{ item: CarouselApp }> = ({ item }) => {
-    const ref = useOpenLinkOnAreaClick(item.url);
+    const ref = useOpenLinkOnAreaClick(item.url, 'featured');
 
     return (
         <CarouselCard img={item.poster} ref={ref}>

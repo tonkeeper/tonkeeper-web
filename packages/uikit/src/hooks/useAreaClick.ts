@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react';
-import { useEventListener } from './useEventListener';
+import { useClickBrowser } from './amplitude';
 import { useAppSdk } from './appSdk';
+import { useEventListener } from './useEventListener';
 
 export function useAreaClick<T extends HTMLElement = HTMLDivElement>({
     callback,
@@ -44,12 +45,17 @@ export function useAreaClick<T extends HTMLElement = HTMLDivElement>({
     return ref;
 }
 
-export function useOpenLinkOnAreaClick<T extends HTMLElement = HTMLDivElement>(url: string) {
+export function useOpenLinkOnAreaClick<T extends HTMLElement = HTMLDivElement>(
+    url: string,
+    source: string
+) {
     const sdk = useAppSdk();
+    const track = useClickBrowser();
 
     const callback = useCallback(() => {
+        track(url, source);
         sdk.openPage(url);
-    }, [url, sdk]);
+    }, [url, sdk, track]);
 
     return useAreaClick<T>({ callback });
 }
