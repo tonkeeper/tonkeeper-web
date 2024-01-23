@@ -1,7 +1,7 @@
-import { useUserCountry } from '../../state/country';
 import { useQuery } from '@tanstack/react-query';
-import { QueryKey } from '../../libs/queryKey';
 import { Recommendations } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
+import { QueryKey } from '../../libs/queryKey';
+import { useUserCountry } from '../../state/country';
 import { useAppContext } from '../appContext';
 
 export function useRecommendations() {
@@ -10,6 +10,10 @@ export function useRecommendations() {
     const lang = country.data || 'en';
 
     return useQuery<Recommendations, Error>([QueryKey.featuredRecommendations, lang], async () => {
-        return tonendpoint.getAppsPopular(lang);
+        const data: Recommendations = await tonendpoint.getAppsPopular(lang);
+        // TODO: Remove mobile hack
+        data.categories = data.categories.filter(item => item.id != 'featured');
+
+        return data;
     });
 }
