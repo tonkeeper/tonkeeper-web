@@ -1,6 +1,14 @@
-import React, { FC, PropsWithChildren, useContext, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+    forwardRef,
+    PropsWithChildren,
+    useContext,
+    useLayoutEffect,
+    useRef,
+    useState
+} from 'react';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../hooks/appContext';
+import { mergeRefs } from '../libs/common';
 
 export const ListBlock = styled.div<{
     margin?: boolean;
@@ -129,14 +137,15 @@ export const GlobalListStyle = createGlobalStyle`
     
   }
 `;
-export const ListItem: FC<
+export const ListItem = forwardRef<
+    HTMLDivElement,
     PropsWithChildren<
         { hover?: boolean; dropDown?: boolean } & Omit<
             React.HTMLProps<HTMLDivElement>,
             'size' | 'children' | 'as' | 'ref'
         >
     >
-> = ({ children, hover, dropDown, ...props }) => {
+>(({ children, hover, dropDown, ...props }, externalRef) => {
     const selection = useContext(AppSelectionContext);
     const { ios } = useAppContext();
     const [isHover, setHover] = useState(false);
@@ -154,7 +163,7 @@ export const ListItem: FC<
         <ListItemElement
             hover={hover}
             isHover={isHover}
-            ref={ref}
+            ref={mergeRefs(ref, externalRef)}
             dropDown={dropDown}
             ios={ios}
             {...props}
@@ -162,4 +171,4 @@ export const ListItem: FC<
             {children}
         </ListItemElement>
     );
-};
+});

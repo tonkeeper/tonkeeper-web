@@ -1,6 +1,6 @@
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useTranslation } from '../hooks/translation';
@@ -11,9 +11,11 @@ import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
-import { H1, H3, Label1 } from './Text';
+import { H1, H3, Label1, Label2 } from './Text';
 import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
+import { useUserCountry } from '../state/country';
+import { SkeletonText } from './shared/Skeleton';
 
 const Block = styled.div<{
     center?: boolean;
@@ -27,8 +29,8 @@ const Block = styled.div<{
     width: var(--app-width);
     overflow: visible !important;
     max-width: 548px;
-    top: 0px;
-    z-index: 1;
+    top: 0;
+    z-index: 4;
 
     ${props =>
         css`
@@ -233,6 +235,50 @@ export const SettingsHeader = () => {
     return (
         <Block second>
             <H1>{t('settings_title')}</H1>
+        </Block>
+    );
+};
+
+const SkeletonCountry = styled(SkeletonText)`
+    position: absolute;
+    right: 16px;
+    top: 24px;
+`;
+
+const CountryButton = styled.button`
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    color: ${props => props.theme.buttonSecondaryForeground};
+    background: ${props => props.theme.buttonSecondaryBackground};
+    border-radius: ${props => props.theme.cornerSmall};
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: ${props => props.theme.backgroundContentTint};
+    }
+
+    transition: background-color 0.1s ease;
+`;
+
+export const BrowserHeader = () => {
+    const { t } = useTranslation();
+    const { data: country, isLoading: isCountryLoading } = useUserCountry();
+
+    return (
+        <Block second>
+            <H1>{t('browser_title')}</H1>
+            {isCountryLoading ? (
+                <SkeletonCountry width="50px" size="large" />
+            ) : (
+                <Link to={AppRoute.settings + SettingsRoute.country}>
+                    <CountryButton>
+                        <Label2>{country || '🌎'}</Label2>
+                    </CountryButton>
+                </Link>
+            )}
         </Block>
     );
 };

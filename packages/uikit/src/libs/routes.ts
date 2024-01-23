@@ -2,6 +2,7 @@
 export enum AppRoute {
     import = '/import',
     settings = '/settings',
+    browser = '/browser',
     activity = '/activity',
     coins = '/coins',
     home = '/'
@@ -27,6 +28,11 @@ export enum SettingsRoute {
     security = '/security',
     subscriptions = '/subscriptions',
     country = '/country'
+}
+
+export enum BrowserRoute {
+    index = '/',
+    category = '/category'
 }
 
 export const any = (route: string): string => {

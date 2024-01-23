@@ -1,8 +1,8 @@
 import React, { FC, useEffect } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { InnerBody } from './Body';
-import { ActivityHeader, SettingsHeader } from './Header';
+import {ActivityHeader, BrowserHeader, SettingsHeader} from './Header';
 import { ActionsRow } from './home/Actions';
 import { BalanceSkeleton } from './home/Balance';
 import { CoinInfoSkeleton } from './jettons/Info';
@@ -10,83 +10,9 @@ import { ColumnText } from './Layout';
 import { ListBlock, ListItem, ListItemPayload } from './List';
 import { SubHeader } from './SubHeader';
 import { H3 } from './Text';
-
-function randomIntFromInterval(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-function randomWidth() {
-    return randomIntFromInterval(30, 90) + '%';
-}
-
-const Base = styled.div`
-    display: inline-block;
-
-    @keyframes placeHolderShimmer {
-        0% {
-            background-position: -800px 0;
-        }
-        100% {
-            background-position: 800px 0;
-        }
-    }
-
-    animation-duration: 2s;
-    animation-fill-mode: forwards;
-    animation-iteration-count: infinite;
-    animation-name: placeHolderShimmer;
-    animation-timing-function: linear;
-    background-color: #f6f7f8;
-    background: linear-gradient(to right, #4f5a70 8%, #bbbbbb 18%, #4f5a70 33%);
-    background-size: 800px 104px;
-
-    opacity: 0.1;
-
-    position: relative;
-`;
-const Block = styled(Base)<{ size?: string; width?: string }>`
-    border-radius: ${props => props.theme.cornerExtraExtraSmall};
-
-    ${props => css`
-        width: ${props.width ?? randomWidth()};
-    `}
-
-    ${props => {
-        switch (props.size) {
-            case 'large':
-                return css`
-                    height: 1.5rem;
-                `;
-            case 'small':
-                return css`
-                    height: 0.5rem;
-                `;
-            default:
-                return css`
-                    height: 1rem;
-                `;
-        }
-    }}
-`;
-
-export const SkeletonText: FC<{ size?: 'large' | 'small'; width?: string }> = React.memo(
-    ({ size, width }) => {
-        return <Block size={size} width={width} />;
-    }
-);
-
-const Image = styled(Base)<{ width?: string }>`
-    border-radius: ${props => props.theme.cornerFull};
-
-    ${props => css`
-        width: ${props.width ?? '44px'};
-        height: ${props.width ?? '44px'};
-    `}
-`;
-
-export const SkeletonImage: FC<{ width?: string }> = React.memo(({ width }) => {
-    return <Image width={width} />;
-});
+import { SkeletonImage, SkeletonText } from './shared/Skeleton';
+import {randomIntFromInterval} from "../libs/common";
+import {RecommendationsPageBodySkeleton} from "./skeletons/BrowserSkeletons";
 
 export const SkeletonSubHeader = React.memo(() => {
     return <SubHeader title={<SkeletonText size="large" />} />;
@@ -208,6 +134,17 @@ export const SettingsSkeletonPage = React.memo(() => {
                     <SkeletonSettingsList size={3} />
                     <SkeletonSettingsList size={6} />
                 </ActivityList>
+            </InnerBody>
+        </>
+    );
+});
+
+export const BrowserSkeletonPage = React.memo(() => {
+    return (
+        <>
+            <BrowserHeader />
+            <InnerBody>
+                <RecommendationsPageBodySkeleton />
             </InnerBody>
         </>
     );

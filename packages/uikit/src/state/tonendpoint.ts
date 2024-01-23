@@ -6,18 +6,23 @@ import {
     TonendpoinFiatItem,
     Tonendpoint,
     TonendpointConfig,
-    getFiatMethods,
     getServerConfig
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
 import { useUserCountry } from './country';
+import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
 
-export const useTonendpoint = (build: string, network?: Network, lang?: Language) => {
+export const useTonendpoint = (
+    targetEnv: TargetEnv,
+    build: string,
+    network?: Network,
+    lang?: Language
+) => {
     return useMemo(() => {
-        return new Tonendpoint({ build, network, lang: localizationText(lang) }, {});
-    }, [build, network, lang]);
+        return new Tonendpoint({ build, network, lang: localizationText(lang), targetEnv }, {});
+    }, [targetEnv, build, network, lang]);
 };
 
 export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
@@ -37,7 +42,7 @@ export const useTonendpointBuyMethods = () => {
     return useQuery<TonendpoinFiatCategory, Error>(
         [QueryKey.tonkeeperApi, TonkeeperApiKey.fiat, tonendpoint.params.lang, countryCode],
         async () => {
-            const methods = await getFiatMethods(tonendpoint, countryCode);
+            const methods = await tonendpoint.getFiatMethods(countryCode);
             const buy = methods.categories[0];
 
             const layout = methods.layoutByCountry.find(item => item.countryCode === countryCode);
