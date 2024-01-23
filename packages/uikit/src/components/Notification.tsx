@@ -319,12 +319,14 @@ export const Notification: FC<{
                 }
             }
         };
+        handler();
         const timer = setTimeout(handler, 301);
         const timer2 = setTimeout(handler, 400);
 
         return () => {
             clearTimeout(timer);
             clearTimeout(timer2);
+            handler();
         };
     }, [open, entered, sdk]);
 
