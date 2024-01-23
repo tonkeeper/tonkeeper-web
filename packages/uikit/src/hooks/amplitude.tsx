@@ -69,6 +69,29 @@ export const useBuyAnalytics = () => {
     );
 };
 
+export const useOpenBrowser = () => {
+    const tracker = useContext(AmplitudeAnalyticsContext);
+
+    return useCallback(() => {
+        if (tracker) {
+            tracker.track('open_browser', {});
+        }
+    }, [tracker]);
+};
+
+export const useClickBrowser = () => {
+    const tracker = useContext(AmplitudeAnalyticsContext);
+
+    return useCallback(
+        (dapp: string, source: string) => {
+            if (tracker) {
+                tracker.track('click_dapp', { dapp, source });
+            }
+        },
+        [tracker]
+    );
+};
+
 const getOrigin = (url: string) => {
     try {
         let item = new URL(url);

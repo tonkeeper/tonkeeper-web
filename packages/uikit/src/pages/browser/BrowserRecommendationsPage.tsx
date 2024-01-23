@@ -1,11 +1,12 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import styled from 'styled-components';
-import { useRecommendations } from '../../hooks/browser/useRecommendations';
-import { PromotionsCarousel } from './PromotionsCarousel';
-import { CategoryBlock } from './CategoryBlock';
 import { InnerBody } from '../../components/Body';
-import { RecommendationsPageBodySkeleton } from '../../components/skeletons/BrowserSkeletons';
 import { BrowserHeader } from '../../components/Header';
+import { RecommendationsPageBodySkeleton } from '../../components/skeletons/BrowserSkeletons';
+import { useOpenBrowser } from '../../hooks/amplitude';
+import { useRecommendations } from '../../hooks/browser/useRecommendations';
+import { CategoryBlock } from './CategoryBlock';
+import { PromotionsCarousel } from './PromotionsCarousel';
 
 const InnerBodyStyled = styled(InnerBody)`
     padding: 0;
@@ -25,6 +26,11 @@ const SkeletonContainer = styled.div`
 
 export const BrowserRecommendationsPage: FC = () => {
     const { data } = useRecommendations();
+
+    const track = useOpenBrowser();
+    useEffect(() => {
+        if (data) track();
+    }, [track, data]);
 
     return (
         <div>
