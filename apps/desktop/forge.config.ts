@@ -11,6 +11,7 @@ import type { NotaryToolCredentials } from '@electron/notarize/lib/types';
 import dotenv from 'dotenv';
 import path from 'path';
 
+import { MakerDebConfigOptions } from '@electron-forge/maker-deb/dist/Config';
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 
@@ -98,7 +99,7 @@ const config: ForgeConfig = {
         ),
         new MakerDeb(
             {
-                options: devAndRpmOptions
+                options: { ...devAndRpmOptions, compression: 'xz' } as MakerDebConfigOptions
             },
             ['linux']
         )
