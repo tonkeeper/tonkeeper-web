@@ -1,7 +1,7 @@
 import { WalletVersions, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { getWalletAddress } from '@tonkeeper/core/dist/service/walletService';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
 import { SubHeader } from '../../components/SubHeader';

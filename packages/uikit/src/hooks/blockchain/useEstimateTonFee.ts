@@ -5,7 +5,7 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TransferEstimation } from '@tonkeeper/core/dist/entries/send';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { EmulationApi } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountEvent, EmulationApi } from '@tonkeeper/core/dist/tonApiV2';
 import { Omit } from 'react-beautiful-dnd';
 import { useAppContext, useWalletContext } from '../appContext';
 
@@ -34,9 +34,12 @@ export function useEstimateTonFee<Args extends ContractCallerParams>(
         async () => {
             const boc = await caller({ ...args, walletState, api } as Args);
 
-            const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+            const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+                accountId: walletState.active.rawAddress,
                 emulateMessageToEventRequest: { boc }
             });
+
+            const emulation: { event: AccountEvent } = { event };
 
             const fee = new AssetAmount({
                 asset: TON_ASSET,

@@ -3,7 +3,7 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
 import { WalletAddress } from '@tonkeeper/core/dist/entries/wallet';
 import { getWalletsAddresses } from '@tonkeeper/core/dist/service/walletService';
-import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { areEqAddresses, formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { isTMEDomain } from '@tonkeeper/core/dist/utils/nft';
@@ -139,7 +139,7 @@ const LinkNftUnlinked: FC<{
         nftAddress: nft.address,
         amount: unShiftedDecimals(dnsLinkAmount),
         linkToAddress,
-        fee: estimation.data?.payload as MessageConsequences
+        fee: estimation.data?.payload as { event: AccountEvent }
     });
 
     const isSelectedCurrentAddress = areEqAddresses(linkToAddress, walletState.active.rawAddress);
@@ -334,7 +334,7 @@ const LinkNftLinked: FC<{
         nftAddress: nft.address,
         amount: unShiftedDecimals(dnsLinkAmount),
         linkToAddress,
-        fee: estimation.data?.payload as MessageConsequences
+        fee: estimation.data?.payload as { event: AccountEvent }
     });
 
     const child = () => (

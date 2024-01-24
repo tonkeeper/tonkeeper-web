@@ -9,6 +9,7 @@ import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import {
     Account,
+    AccountEvent,
     AccountsApi,
     BlockchainApi,
     EmulationApi,
@@ -98,6 +99,7 @@ const createTonTransfer = (
     secretKey: Buffer = Buffer.alloc(64)
 ) => {
     const contract = walletContractFromState(walletState);
+
     const transfer = contract.createTransfer({
         seqno,
         secretKey,
@@ -150,7 +152,7 @@ export const estimateTonTransfer = async (
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean
-) => {
+): Promise<{ event: AccountEvent }> => {
     await checkServiceTimeOrDie(api);
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     if (!isMax) {
@@ -159,11 +161,12 @@ export const estimateTonTransfer = async (
 
     const cell = createTonTransfer(seqno, walletState, recipient, weiAmount, isMax);
 
-    const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+    const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+        accountId: wallet.address,
         emulateMessageToEventRequest: { boc: cell.toString('base64') }
     });
 
-    return emulation;
+    return { event };
 };
 
 export const estimateTonConnectTransfer = async (
@@ -171,16 +174,19 @@ export const estimateTonConnectTransfer = async (
     walletState: WalletState,
     accounts: AccountsMap,
     params: TonConnectTransactionPayload
-) => {
+): Promise<{ event: AccountEvent }> => {
     await checkServiceTimeOrDie(api);
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = createTonConnectTransfer(seqno, walletState, accounts, params);
 
-    return await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+    const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+        accountId: wallet.address,
         emulateMessageToEventRequest: { boc: cell.toString('base64') }
     });
+
+    return { event };
 };
 
 export const sendTonConnectTransfer = async (
@@ -217,7 +223,7 @@ export const sendTonTransfer = async (
     recipient: TonRecipientData,
     amount: AssetAmount,
     isMax: boolean,
-    fee: MessageConsequences,
+    fee: { event: AccountEvent },
     mnemonic: string[]
 ) => {
     await checkServiceTimeOrDie(api);

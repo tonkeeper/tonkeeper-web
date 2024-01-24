@@ -11,7 +11,7 @@ import {
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { sendTronTransfer } from '@tonkeeper/core/dist/service/tron/tronTransferService';
-import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 import { EstimatePayload } from '@tonkeeper/core/dist/tronApi';
 import { Address } from 'ton-core';
 import { notifyError } from '../../components/transfer/common';
@@ -49,7 +49,7 @@ export function useSendTransfer<T extends Asset>(
                         recipient as TonRecipientData,
                         amount,
                         isMax,
-                        estimation.payload as MessageConsequences,
+                        estimation.payload as { event: AccountEvent },
                         mnemonic
                     );
                 } else {
@@ -65,7 +65,7 @@ export function useSendTransfer<T extends Asset>(
                         recipient as TonRecipientData,
                         amount as AssetAmount<TonAsset>,
                         jettonInfo!.walletAddress.address,
-                        estimation.payload as MessageConsequences,
+                        estimation.payload as { event: AccountEvent },
                         mnemonic
                     );
                 }

@@ -15,14 +15,9 @@ import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
 import { APIConfig } from '../../entries/apis';
+import { WalletContractW5 } from '../../entries/w5/wallet-v5';
 import { WalletState } from '../../entries/wallet';
-import {
-    Account,
-    AccountsApi,
-    LiteServerApi,
-    MessageConsequences,
-    WalletApi
-} from '../../tonApiV2';
+import { Account, AccountEvent, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
 
 export enum SendMode {
@@ -35,7 +30,7 @@ export enum SendMode {
 }
 
 export const externalMessage = (
-    contract: WalletContractV3R1 | WalletContractV3R2 | WalletContractV4,
+    contract: WalletContractV3R1 | WalletContractV3R2 | WalletContractV4 | WalletContractW5,
     seqno: number,
     body: Cell
 ) => {
@@ -151,7 +146,7 @@ export const createTransferMessage = (
 export async function getKeyPairAndSeqno(options: {
     api: APIConfig;
     walletState: WalletState;
-    fee: MessageConsequences;
+    fee: { event: AccountEvent };
     mnemonic: string[];
     amount: BigNumber;
 }) {

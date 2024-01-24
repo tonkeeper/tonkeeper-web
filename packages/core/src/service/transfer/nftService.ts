@@ -4,7 +4,7 @@ import { mnemonicToPrivateKey } from 'ton-crypto';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
-import { BlockchainApi, EmulationApi, MessageConsequences, NftItem } from '../../tonApiV2';
+import { AccountEvent, BlockchainApi, EmulationApi, NftItem } from '../../tonApiV2';
 import {
     checkServiceTimeOrDie,
     checkWalletBalanceOrDie,
@@ -90,7 +90,7 @@ export const estimateNftTransfer = async (
     walletState: WalletState,
     recipient: TonRecipientData,
     nftItem: NftItem
-) => {
+): Promise<{ event: AccountEvent }> => {
     await checkServiceTimeOrDie(api);
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
@@ -104,10 +104,12 @@ export const estimateNftTransfer = async (
         recipient.comment ? comment(recipient.comment) : null
     );
 
-    const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+    const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+        accountId: wallet.address,
         emulateMessageToEventRequest: { boc: cell.toString('base64') }
     });
-    return emulation;
+
+    return { event };
 };
 
 export const sendNftTransfer = async (
@@ -115,7 +117,7 @@ export const sendNftTransfer = async (
     walletState: WalletState,
     recipient: TonRecipientData,
     nftItem: NftItem,
-    fee: MessageConsequences,
+    fee: { event: AccountEvent },
     mnemonic: string[]
 ) => {
     await checkServiceTimeOrDie(api);
@@ -154,7 +156,7 @@ export const sendNftRenew = async (options: {
     api: APIConfig;
     walletState: WalletState;
     nftAddress: string;
-    fee: MessageConsequences;
+    fee: { event: AccountEvent };
     mnemonic: string[];
     amount: BigNumber;
 }) => {
@@ -205,7 +207,7 @@ export const sendNftLink = async (options: {
     walletState: WalletState;
     nftAddress: string;
     linkToAddress: string;
-    fee: MessageConsequences;
+    fee: { event: AccountEvent };
     mnemonic: string[];
     amount: BigNumber;
 }) => {
