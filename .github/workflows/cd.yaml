@@ -18,6 +18,7 @@ jobs:
             APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
             APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
             REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE }}
+            GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
             DEBUG: electron*
 
         steps:
