@@ -33,9 +33,8 @@ export const BrowserRecommendationsPage: FC = () => {
     }, [track, data]);
 
     return (
-        <div>
+        <>
             <BrowserHeader />
-
             <InnerBodyStyled>
                 {data ? (
                     <>
@@ -50,6 +49,6 @@ export const BrowserRecommendationsPage: FC = () => {
                     </SkeletonContainer>
                 )}
             </InnerBodyStyled>
-        </div>
+        </>
     );
 };
