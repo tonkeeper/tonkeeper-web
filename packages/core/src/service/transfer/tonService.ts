@@ -7,14 +7,7 @@ import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipient, TonRecipientData } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
-import {
-    Account,
-    AccountEvent,
-    AccountsApi,
-    BlockchainApi,
-    EmulationApi,
-    MessageConsequences
-} from '../../tonApiV2';
+import { Account, AccountEvent, AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     SendMode,
@@ -31,7 +24,7 @@ export type AccountsMap = Map<string, Account>;
 
 export type EstimateData = {
     accounts: AccountsMap;
-    accountEvent: MessageConsequences;
+    accountEvent: { event: AccountEvent };
 };
 
 export const getAccountsMap = async (
