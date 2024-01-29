@@ -254,7 +254,7 @@ export const SuggestionList: FC<{
             {data.length > 0 ? (
                 <Label>{t('send_screen_steps_address_suggests_label')}</Label>
             ) : undefined}
-            <ListBlock margin={false} fullWidth nouserselect="true">
+            <ListBlock margin={false} fullWidth noUserSelect>
                 {data.map(item => {
                     if (item.isFavorite) {
                         return (

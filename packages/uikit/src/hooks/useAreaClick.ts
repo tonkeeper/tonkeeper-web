@@ -1,3 +1,4 @@
+import { DAppSource, DAppTrack, formatBrowserUrl } from '@tonkeeper/core/dist/service/urlService';
 import { useCallback, useRef } from 'react';
 import { useClickBrowser } from './amplitude';
 import { useAppSdk } from './appSdk';
@@ -47,15 +48,17 @@ export function useAreaClick<T extends HTMLElement = HTMLDivElement>({
 
 export function useOpenLinkOnAreaClick<T extends HTMLElement = HTMLDivElement>(
     url: string,
-    source: string
+    source: DAppSource,
+    track: DAppTrack
 ) {
     const sdk = useAppSdk();
-    const track = useClickBrowser();
+    const event = useClickBrowser();
 
     const callback = useCallback(() => {
-        track(url, source);
-        sdk.openPage(url);
-    }, [url, sdk, track]);
+        event(url, source);
+        console.log(formatBrowserUrl(url, source, track));
+        sdk.openPage(formatBrowserUrl(url, source, track));
+    }, [url, sdk, event]);
 
     return useAreaClick<T>({ callback });
 }

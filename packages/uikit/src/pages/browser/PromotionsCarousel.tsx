@@ -47,7 +47,8 @@ export const PromotionsCarousel: FC<{ apps: CarouselApp[]; className?: string }>
 };
 
 const CarouselItem: FC<{ item: CarouselApp }> = ({ item }) => {
-    const ref = useOpenLinkOnAreaClick(item.url, 'featured');
+    const { tonendpoint } = useAppContext();
+    const ref = useOpenLinkOnAreaClick(item.url, 'featured', tonendpoint.getTrack());
 
     return (
         <CarouselCard img={item.poster} ref={ref}>

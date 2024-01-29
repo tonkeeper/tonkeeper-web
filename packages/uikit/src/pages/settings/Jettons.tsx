@@ -139,7 +139,7 @@ export const JettonsSettings = () => {
                             <ListBlock
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
-                                nouserselect="true"
+                                noUserSelect
                             >
                                 {jettons.map((jetton, index) => (
                                     <Draggable

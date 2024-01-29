@@ -102,12 +102,12 @@ export const JettonList: FC<AssetProps> = ({
 }) => {
     return (
         <>
-            <ListBlock nouserselect="true">
+            <ListBlock noUserSelect>
                 <TonAsset info={info} />
                 {/* TODO: ENABLE TRON */}
                 {/* <TronAssets tokens={tron} /> */}
             </ListBlock>
-            <ListBlock nouserselect="true">
+            <ListBlock noUserSelect>
                 {jettons.balances.map(jetton => (
                     <JettonAsset key={jetton.jetton.address} jetton={jetton} />
                 ))}

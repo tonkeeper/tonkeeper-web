@@ -1,7 +1,8 @@
+import { TargetEnv } from '../AppSdk';
 import { intlLocale } from '../entries/language';
 import { Network } from '../entries/network';
+import { DAppTrack } from '../service/urlService';
 import { FetchAPI } from '../tonApiV2';
-import { TargetEnv } from '../AppSdk';
 
 interface BootParams {
     platform: 'ios' | 'android' | 'web';
@@ -157,11 +158,11 @@ export class Tonendpoint {
     };
 
     getAppsPopular = (countryCode?: string | null | undefined): Promise<Recommendations> => {
-        return this.GET(
-            '/apps/popular',
-            { countryCode },
-            { track: this.targetEnv === 'extension' ? 'extension' : 'desktop' }
-        );
+        return this.GET('/apps/popular', { countryCode }, { track: this.getTrack() });
+    };
+
+    getTrack = (): DAppTrack => {
+        return this.targetEnv === 'extension' ? 'extension' : 'desktop';
     };
 }
 

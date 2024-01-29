@@ -6,6 +6,7 @@ import { ChevronRightIcon } from '../../components/Icon';
 import { ListBlock, ListItem } from '../../components/List';
 import { Body3, H3, Label1, Label2 } from '../../components/Text';
 import { Carousel } from '../../components/shared';
+import { useAppContext } from '../../hooks/appContext';
 import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
 import { useElementSize } from '../../hooks/useElementSize';
 import { BrowserRoute } from '../../libs/routes';
@@ -123,7 +124,8 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
 };
 
 export const CategoryGroupItem: FC<{ item: PromotedApp }> = ({ item }) => {
-    const ref = useOpenLinkOnAreaClick(item.url, 'recommendation');
+    const { tonendpoint } = useAppContext();
+    const ref = useOpenLinkOnAreaClick(item.url, 'recommendation', tonendpoint.getTrack());
 
     return (
         <ListItemStyled key={item.url} ref={ref}>

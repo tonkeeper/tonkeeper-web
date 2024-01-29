@@ -78,7 +78,7 @@ export const EmulationList: FC<{ isError: boolean; estimate: EstimateData | unde
     if (estimate) {
         return (
             <>
-                <ListBlock nouserselect="true" fullWidth margin={false}>
+                <ListBlock noUserSelect fullWidth margin={false}>
                     <TonActivityEvents
                         hover={false}
                         event={estimate.accountEvent.event}
