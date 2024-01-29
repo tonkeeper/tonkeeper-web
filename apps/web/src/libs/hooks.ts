@@ -3,7 +3,6 @@ import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
-import { Amplitude } from '@tonkeeper/uikit/dist/hooks/analytics/amplitude';
 import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
@@ -52,10 +51,7 @@ export const useAnalytics = (account?: AccountState, wallet?: WalletState | null
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
-            const tracker = new AnalyticsGroup(
-                new Amplitude(import.meta.env.VITE_APP_AMPLITUDE!),
-                new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID!)
-            );
+            const tracker = new AnalyticsGroup(new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID!));
 
             tracker.init('Web', toWalletType(wallet), account, wallet);
 
