@@ -126,9 +126,7 @@ export const DomainRenewActionDetails: FC<ActionData> = ({ action, timestamp, ev
     return (
         <ActionDetailsBlock event={event}>
             <div>
-                <Title>
-                    {simplePreview.name} {domainRenew.domain}
-                </Title>
+                <Title>{domainRenew.domain}</Title>
                 <ActionDate kind="send" timestamp={timestamp} />
                 <FailedDetail status={action.status} />
             </div>
