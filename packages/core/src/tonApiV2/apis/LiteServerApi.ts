@@ -76,6 +76,7 @@ export interface GetAllRawShardsInfoRequest {
 
 export interface GetRawAccountStateRequest {
     accountId: string;
+    targetBlock?: string;
 }
 
 export interface GetRawBlockProofRequest {
@@ -160,6 +161,7 @@ export interface LiteServerApiInterface {
     /**
      * Get raw account state
      * @param {string} accountId account ID
+     * @param {string} [targetBlock] target block: (workchain,shard,seqno,root_hash,file_hash)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof LiteServerApiInterface
@@ -411,6 +413,10 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters.targetBlock !== undefined) {
+            queryParameters['target_block'] = requestParameters.targetBlock;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

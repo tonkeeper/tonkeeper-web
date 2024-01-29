@@ -34,6 +34,12 @@ import {
 export interface Message {
     /**
      * 
+     * @type {string}
+     * @memberof Message
+     */
+    msgType: MessageMsgTypeEnum;
+    /**
+     * 
      * @type {number}
      * @memberof Message
      */
@@ -130,11 +136,24 @@ export interface Message {
     decodedBody?: any | null;
 }
 
+
+/**
+ * @export
+ */
+export const MessageMsgTypeEnum = {
+    IntMsg: 'int_msg',
+    ExtInMsg: 'ext_in_msg',
+    ExtOutMsg: 'ext_out_msg'
+} as const;
+export type MessageMsgTypeEnum = typeof MessageMsgTypeEnum[keyof typeof MessageMsgTypeEnum];
+
+
 /**
  * Check if a given object implements the Message interface.
  */
 export function instanceOfMessage(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "msgType" in value;
     isInstance = isInstance && "createdLt" in value;
     isInstance = isInstance && "ihrDisabled" in value;
     isInstance = isInstance && "bounce" in value;
@@ -158,6 +177,7 @@ export function MessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): M
     }
     return {
         
+        'msgType': json['msg_type'],
         'createdLt': json['created_lt'],
         'ihrDisabled': json['ihr_disabled'],
         'bounce': json['bounce'],
@@ -186,6 +206,7 @@ export function MessageToJSON(value?: Message | null): any {
     }
     return {
         
+        'msg_type': value.msgType,
         'created_lt': value.createdLt,
         'ihr_disabled': value.ihrDisabled,
         'bounce': value.bounce,

@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { TokenRates } from './TokenRates';
+import {
+    TokenRatesFromJSON,
+    TokenRatesFromJSONTyped,
+    TokenRatesToJSON,
+} from './TokenRates';
+
 /**
  * 
  * @export
@@ -21,10 +28,10 @@ import { exists, mapValues } from '../runtime';
 export interface GetRates200Response {
     /**
      * 
-     * @type {{ [key: string]: any; }}
+     * @type {{ [key: string]: TokenRates; }}
      * @memberof GetRates200Response
      */
-    rates: { [key: string]: any; };
+    rates: { [key: string]: TokenRates; };
 }
 
 /**
@@ -47,7 +54,7 @@ export function GetRates200ResponseFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
-        'rates': json['rates'],
+        'rates': (mapValues(json['rates'], TokenRatesFromJSON)),
     };
 }
 
@@ -60,7 +67,7 @@ export function GetRates200ResponseToJSON(value?: GetRates200Response | null): a
     }
     return {
         
-        'rates': value.rates,
+        'rates': (mapValues(value.rates, TokenRatesToJSON)),
     };
 }
 

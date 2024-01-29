@@ -1,7 +1,7 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, seeIfAddressEqual, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { ListItemPayload } from '../../../components/List';
 import {
     ActivityIcon,
@@ -177,6 +177,38 @@ const AuctionBidAction: FC<{
     );
 };
 
+const DomainRenewAction: FC<{
+    action: Action;
+    date: string;
+}> = ({ action, date }) => {
+    const { t } = useTranslation();
+    const { domainRenew, simplePreview } = action;
+    const wallet = useWalletContext();
+    const format = useFormatCoinValue();
+
+    if (!domainRenew) {
+        return <ErrorAction />;
+    }
+
+    return (
+        <ListItemGrid>
+            <ActivityIcon status={action.status}>
+                <SentIcon />
+            </ActivityIcon>
+            <Description>
+                <FirstLine>
+                    <FirstLabel>{simplePreview.name}</FirstLabel>
+                </FirstLine>
+                <SecondLine>
+                    <SecondaryText>{domainRenew.domain}</SecondaryText>
+                    <SecondaryText>{date}</SecondaryText>
+                </SecondLine>
+            </Description>
+            <FailedNote status={action.status} />
+        </ListItemGrid>
+    );
+};
+
 export const ActivityAction: FC<{
     action: Action;
     date: string;
@@ -215,6 +247,8 @@ export const ActivityAction: FC<{
             return <WithdrawStakeAction action={action} date={date} />;
         case 'WithdrawStakeRequest':
             return <WithdrawRequestStakeAction action={action} date={date} />;
+        case 'DomainRenew':
+            return <DomainRenewAction action={action} date={date} />;
         case 'Unknown':
             return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;
         default: {

@@ -19,6 +19,7 @@ import type {
   AccountEvent,
   AccountEvents,
   Accounts,
+  AddressParse200Response,
   DnsExpiring,
   DomainNames,
   FoundAccounts,
@@ -40,6 +41,8 @@ import {
     AccountEventsToJSON,
     AccountsFromJSON,
     AccountsToJSON,
+    AddressParse200ResponseFromJSON,
+    AddressParse200ResponseToJSON,
     DnsExpiringFromJSON,
     DnsExpiringToJSON,
     DomainNamesFromJSON,
@@ -65,6 +68,10 @@ import {
 } from '../models/index';
 
 export interface AccountDnsBackResolveRequest {
+    accountId: string;
+}
+
+export interface AddressParseRequest {
     accountId: string;
 }
 
@@ -94,6 +101,7 @@ export interface GetAccountEventsRequest {
     accountId: string;
     limit: number;
     acceptLanguage?: string;
+    initiator?: boolean;
     subjectOnly?: boolean;
     beforeLt?: number;
     startDate?: number;
@@ -112,6 +120,7 @@ export interface GetAccountJettonHistoryByIDRequest {
 
 export interface GetAccountJettonsBalancesRequest {
     accountId: string;
+    currencies?: string;
 }
 
 export interface GetAccountJettonsHistoryRequest {
@@ -176,6 +185,20 @@ export interface AccountsApiInterface {
      * Get account\'s domains
      */
     accountDnsBackResolve(requestParameters: AccountDnsBackResolveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DomainNames>;
+
+    /**
+     * parse address and display in all formats
+     * @param {string} accountId account ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApiInterface
+     */
+    addressParseRaw(requestParameters: AddressParseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AddressParse200Response>>;
+
+    /**
+     * parse address and display in all formats
+     */
+    addressParse(requestParameters: AddressParseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AddressParse200Response>;
 
     /**
      * Get human-friendly information about an account without low-level details.
@@ -244,6 +267,7 @@ export interface AccountsApiInterface {
      * @param {string} accountId account ID
      * @param {number} limit 
      * @param {string} [acceptLanguage] 
+     * @param {boolean} [initiator] Show only events that are initiated by this account
      * @param {boolean} [subjectOnly] filter actions where requested account is not real subject (for example sender or receiver jettons)
      * @param {number} [beforeLt] omit this parameter to get last events
      * @param {number} [startDate] 
@@ -282,6 +306,7 @@ export interface AccountsApiInterface {
     /**
      * Get all Jettons balances by owner address
      * @param {string} accountId account ID
+     * @param {string} [currencies] accept ton and all possible fiat currencies, separated by commas
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApiInterface
@@ -453,6 +478,36 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
     }
 
     /**
+     * parse address and display in all formats
+     */
+    async addressParseRaw(requestParameters: AddressParseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AddressParse200Response>> {
+        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
+            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling addressParse.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/address/{account_id}/parse`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AddressParse200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * parse address and display in all formats
+     */
+    async addressParse(requestParameters: AddressParseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AddressParse200Response> {
+        const response = await this.addressParseRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Get human-friendly information about an account without low-level details.
      */
     async getAccountRaw(requestParameters: GetAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Account>> {
@@ -618,6 +673,10 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
 
         const queryParameters: any = {};
 
+        if (requestParameters.initiator !== undefined) {
+            queryParameters['initiator'] = requestParameters.initiator;
+        }
+
         if (requestParameters.subjectOnly !== undefined) {
             queryParameters['subject_only'] = requestParameters.subjectOnly;
         }
@@ -729,6 +788,10 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters.currencies !== undefined) {
+            queryParameters['currencies'] = requestParameters.currencies;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

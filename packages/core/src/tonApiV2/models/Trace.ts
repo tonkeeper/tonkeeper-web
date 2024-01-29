@@ -44,6 +44,12 @@ export interface Trace {
      * @memberof Trace
      */
     children?: Array<Trace>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Trace
+     */
+    emulated?: boolean;
 }
 
 /**
@@ -70,6 +76,7 @@ export function TraceFromJSONTyped(json: any, ignoreDiscriminator: boolean): Tra
         'transaction': TransactionFromJSON(json['transaction']),
         'interfaces': json['interfaces'],
         'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(TraceFromJSON)),
+        'emulated': !exists(json, 'emulated') ? undefined : json['emulated'],
     };
 }
 
@@ -85,6 +92,7 @@ export function TraceToJSON(value?: Trace | null): any {
         'transaction': TransactionToJSON(value.transaction),
         'interfaces': value.interfaces,
         'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(TraceToJSON)),
+        'emulated': value.emulated,
     };
 }
 

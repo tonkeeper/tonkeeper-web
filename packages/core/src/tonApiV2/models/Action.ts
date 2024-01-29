@@ -37,6 +37,12 @@ import {
     DepositStakeActionFromJSONTyped,
     DepositStakeActionToJSON,
 } from './DepositStakeAction';
+import type { DomainRenewAction } from './DomainRenewAction';
+import {
+    DomainRenewActionFromJSON,
+    DomainRenewActionFromJSONTyped,
+    DomainRenewActionToJSON,
+} from './DomainRenewAction';
 import type { ElectionsDepositStakeAction } from './ElectionsDepositStakeAction';
 import {
     ElectionsDepositStakeActionFromJSON,
@@ -49,6 +55,18 @@ import {
     ElectionsRecoverStakeActionFromJSONTyped,
     ElectionsRecoverStakeActionToJSON,
 } from './ElectionsRecoverStakeAction';
+import type { InscriptionMintAction } from './InscriptionMintAction';
+import {
+    InscriptionMintActionFromJSON,
+    InscriptionMintActionFromJSONTyped,
+    InscriptionMintActionToJSON,
+} from './InscriptionMintAction';
+import type { InscriptionTransferAction } from './InscriptionTransferAction';
+import {
+    InscriptionTransferActionFromJSON,
+    InscriptionTransferActionFromJSONTyped,
+    InscriptionTransferActionToJSON,
+} from './InscriptionTransferAction';
 import type { JettonBurnAction } from './JettonBurnAction';
 import {
     JettonBurnActionFromJSON,
@@ -244,6 +262,24 @@ export interface Action {
     smartContractExec?: SmartContractAction;
     /**
      * 
+     * @type {DomainRenewAction}
+     * @memberof Action
+     */
+    domainRenew?: DomainRenewAction;
+    /**
+     * 
+     * @type {InscriptionTransferAction}
+     * @memberof Action
+     */
+    inscriptionTransfer?: InscriptionTransferAction;
+    /**
+     * 
+     * @type {InscriptionMintAction}
+     * @memberof Action
+     */
+    inscriptionMint?: InscriptionMintAction;
+    /**
+     * 
      * @type {ActionSimplePreview}
      * @memberof Action
      */
@@ -272,6 +308,9 @@ export const ActionTypeEnum = {
     SmartContractExec: 'SmartContractExec',
     ElectionsRecoverStake: 'ElectionsRecoverStake',
     ElectionsDepositStake: 'ElectionsDepositStake',
+    DomainRenew: 'DomainRenew',
+    InscriptionTransfer: 'InscriptionTransfer',
+    InscriptionMint: 'InscriptionMint',
     Unknown: 'Unknown'
 } as const;
 export type ActionTypeEnum = typeof ActionTypeEnum[keyof typeof ActionTypeEnum];
@@ -327,6 +366,9 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'electionsRecoverStake': !exists(json, 'ElectionsRecoverStake') ? undefined : ElectionsRecoverStakeActionFromJSON(json['ElectionsRecoverStake']),
         'jettonSwap': !exists(json, 'JettonSwap') ? undefined : JettonSwapActionFromJSON(json['JettonSwap']),
         'smartContractExec': !exists(json, 'SmartContractExec') ? undefined : SmartContractActionFromJSON(json['SmartContractExec']),
+        'domainRenew': !exists(json, 'DomainRenew') ? undefined : DomainRenewActionFromJSON(json['DomainRenew']),
+        'inscriptionTransfer': !exists(json, 'InscriptionTransfer') ? undefined : InscriptionTransferActionFromJSON(json['InscriptionTransfer']),
+        'inscriptionMint': !exists(json, 'InscriptionMint') ? undefined : InscriptionMintActionFromJSON(json['InscriptionMint']),
         'simplePreview': ActionSimplePreviewFromJSON(json['simple_preview']),
     };
 }
@@ -359,6 +401,9 @@ export function ActionToJSON(value?: Action | null): any {
         'ElectionsRecoverStake': ElectionsRecoverStakeActionToJSON(value.electionsRecoverStake),
         'JettonSwap': JettonSwapActionToJSON(value.jettonSwap),
         'SmartContractExec': SmartContractActionToJSON(value.smartContractExec),
+        'DomainRenew': DomainRenewActionToJSON(value.domainRenew),
+        'InscriptionTransfer': InscriptionTransferActionToJSON(value.inscriptionTransfer),
+        'InscriptionMint': InscriptionMintActionToJSON(value.inscriptionMint),
         'simple_preview': ActionSimplePreviewToJSON(value.simplePreview),
     };
 }

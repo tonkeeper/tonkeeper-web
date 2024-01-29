@@ -17,10 +17,13 @@ import * as runtime from '../runtime';
 import type {
   BlockchainAccountInspect,
   BlockchainBlock,
+  BlockchainBlockShards,
+  BlockchainBlocks,
   BlockchainConfig,
   BlockchainRawAccount,
   GetBlockchainBlockDefaultResponse,
   MethodExecutionResult,
+  RawBlockchainConfig,
   SendBlockchainMessageRequest,
   Transaction,
   Transactions,
@@ -31,6 +34,10 @@ import {
     BlockchainAccountInspectToJSON,
     BlockchainBlockFromJSON,
     BlockchainBlockToJSON,
+    BlockchainBlockShardsFromJSON,
+    BlockchainBlockShardsToJSON,
+    BlockchainBlocksFromJSON,
+    BlockchainBlocksToJSON,
     BlockchainConfigFromJSON,
     BlockchainConfigToJSON,
     BlockchainRawAccountFromJSON,
@@ -39,6 +46,8 @@ import {
     GetBlockchainBlockDefaultResponseToJSON,
     MethodExecutionResultFromJSON,
     MethodExecutionResultToJSON,
+    RawBlockchainConfigFromJSON,
+    RawBlockchainConfigToJSON,
     SendBlockchainMessageRequestFromJSON,
     SendBlockchainMessageRequestToJSON,
     TransactionFromJSON,
@@ -74,6 +83,22 @@ export interface GetBlockchainBlockTransactionsRequest {
     blockId: string;
 }
 
+export interface GetBlockchainConfigFromBlockRequest {
+    masterchainSeqno: number;
+}
+
+export interface GetBlockchainMasterchainBlocksRequest {
+    masterchainSeqno: number;
+}
+
+export interface GetBlockchainMasterchainShardsRequest {
+    masterchainSeqno: number;
+}
+
+export interface GetBlockchainMasterchainTransactionsRequest {
+    masterchainSeqno: number;
+}
+
 export interface GetBlockchainRawAccountRequest {
     accountId: string;
 }
@@ -84,6 +109,10 @@ export interface GetBlockchainTransactionRequest {
 
 export interface GetBlockchainTransactionByMessageHashRequest {
     msgId: string;
+}
+
+export interface GetRawBlockchainConfigFromBlockRequest {
+    masterchainSeqno: number;
 }
 
 export interface SendBlockchainMessageOperationRequest {
@@ -186,6 +215,34 @@ export interface BlockchainApiInterface {
     getBlockchainConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainConfig>;
 
     /**
+     * Get blockchain config from a specific block, if present.
+     * @param {number} masterchainSeqno masterchain block seqno
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    getBlockchainConfigFromBlockRaw(requestParameters: GetBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainConfig>>;
+
+    /**
+     * Get blockchain config from a specific block, if present.
+     */
+    getBlockchainConfigFromBlock(requestParameters: GetBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainConfig>;
+
+    /**
+     * Get all blocks in all shards and workchains between target and previous masterchain block according to shards last blocks snapshot in masterchain.  We don\'t recommend to build your app around this method because it has problem with scalability and will work very slow in the future.
+     * @param {number} masterchainSeqno masterchain block seqno
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    getBlockchainMasterchainBlocksRaw(requestParameters: GetBlockchainMasterchainBlocksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainBlocks>>;
+
+    /**
+     * Get all blocks in all shards and workchains between target and previous masterchain block according to shards last blocks snapshot in masterchain.  We don\'t recommend to build your app around this method because it has problem with scalability and will work very slow in the future.
+     */
+    getBlockchainMasterchainBlocks(requestParameters: GetBlockchainMasterchainBlocksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainBlocks>;
+
+    /**
      * Get last known masterchain block
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -197,6 +254,34 @@ export interface BlockchainApiInterface {
      * Get last known masterchain block
      */
     getBlockchainMasterchainHead(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainBlock>;
+
+    /**
+     * Get blockchain block shards
+     * @param {number} masterchainSeqno masterchain block seqno
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    getBlockchainMasterchainShardsRaw(requestParameters: GetBlockchainMasterchainShardsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainBlockShards>>;
+
+    /**
+     * Get blockchain block shards
+     */
+    getBlockchainMasterchainShards(requestParameters: GetBlockchainMasterchainShardsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainBlockShards>;
+
+    /**
+     * Get all transactions in all shards and workchains between target and previous masterchain block according to shards last blocks snapshot in masterchain. We don\'t recommend to build your app around this method because it has problem with scalability and will work very slow in the future.
+     * @param {number} masterchainSeqno masterchain block seqno
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    getBlockchainMasterchainTransactionsRaw(requestParameters: GetBlockchainMasterchainTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Transactions>>;
+
+    /**
+     * Get all transactions in all shards and workchains between target and previous masterchain block according to shards last blocks snapshot in masterchain. We don\'t recommend to build your app around this method because it has problem with scalability and will work very slow in the future.
+     */
+    getBlockchainMasterchainTransactions(requestParameters: GetBlockchainMasterchainTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions>;
 
     /**
      * Get low-level information about an account taken directly from the blockchain.
@@ -252,6 +337,33 @@ export interface BlockchainApiInterface {
      * Get blockchain validators
      */
     getBlockchainValidators(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Validators>;
+
+    /**
+     * Get raw blockchain config
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    getRawBlockchainConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RawBlockchainConfig>>;
+
+    /**
+     * Get raw blockchain config
+     */
+    getRawBlockchainConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RawBlockchainConfig>;
+
+    /**
+     * Get raw blockchain config from a specific block, if present.
+     * @param {number} masterchainSeqno masterchain block seqno
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    getRawBlockchainConfigFromBlockRaw(requestParameters: GetRawBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RawBlockchainConfig>>;
+
+    /**
+     * Get raw blockchain config from a specific block, if present.
+     */
+    getRawBlockchainConfigFromBlock(requestParameters: GetRawBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RawBlockchainConfig>;
 
     /**
      * Send message to blockchain
@@ -471,6 +583,66 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
     }
 
     /**
+     * Get blockchain config from a specific block, if present.
+     */
+    async getBlockchainConfigFromBlockRaw(requestParameters: GetBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainConfig>> {
+        if (requestParameters.masterchainSeqno === null || requestParameters.masterchainSeqno === undefined) {
+            throw new runtime.RequiredError('masterchainSeqno','Required parameter requestParameters.masterchainSeqno was null or undefined when calling getBlockchainConfigFromBlock.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/blockchain/masterchain/{masterchain_seqno}/config`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters.masterchainSeqno))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BlockchainConfigFromJSON(jsonValue));
+    }
+
+    /**
+     * Get blockchain config from a specific block, if present.
+     */
+    async getBlockchainConfigFromBlock(requestParameters: GetBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainConfig> {
+        const response = await this.getBlockchainConfigFromBlockRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get all blocks in all shards and workchains between target and previous masterchain block according to shards last blocks snapshot in masterchain.  We don\'t recommend to build your app around this method because it has problem with scalability and will work very slow in the future.
+     */
+    async getBlockchainMasterchainBlocksRaw(requestParameters: GetBlockchainMasterchainBlocksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainBlocks>> {
+        if (requestParameters.masterchainSeqno === null || requestParameters.masterchainSeqno === undefined) {
+            throw new runtime.RequiredError('masterchainSeqno','Required parameter requestParameters.masterchainSeqno was null or undefined when calling getBlockchainMasterchainBlocks.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/blockchain/masterchain/{masterchain_seqno}/blocks`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters.masterchainSeqno))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BlockchainBlocksFromJSON(jsonValue));
+    }
+
+    /**
+     * Get all blocks in all shards and workchains between target and previous masterchain block according to shards last blocks snapshot in masterchain.  We don\'t recommend to build your app around this method because it has problem with scalability and will work very slow in the future.
+     */
+    async getBlockchainMasterchainBlocks(requestParameters: GetBlockchainMasterchainBlocksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainBlocks> {
+        const response = await this.getBlockchainMasterchainBlocksRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Get last known masterchain block
      */
     async getBlockchainMasterchainHeadRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainBlock>> {
@@ -493,6 +665,66 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      */
     async getBlockchainMasterchainHead(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainBlock> {
         const response = await this.getBlockchainMasterchainHeadRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get blockchain block shards
+     */
+    async getBlockchainMasterchainShardsRaw(requestParameters: GetBlockchainMasterchainShardsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainBlockShards>> {
+        if (requestParameters.masterchainSeqno === null || requestParameters.masterchainSeqno === undefined) {
+            throw new runtime.RequiredError('masterchainSeqno','Required parameter requestParameters.masterchainSeqno was null or undefined when calling getBlockchainMasterchainShards.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/blockchain/masterchain/{masterchain_seqno}/shards`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters.masterchainSeqno))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BlockchainBlockShardsFromJSON(jsonValue));
+    }
+
+    /**
+     * Get blockchain block shards
+     */
+    async getBlockchainMasterchainShards(requestParameters: GetBlockchainMasterchainShardsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainBlockShards> {
+        const response = await this.getBlockchainMasterchainShardsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get all transactions in all shards and workchains between target and previous masterchain block according to shards last blocks snapshot in masterchain. We don\'t recommend to build your app around this method because it has problem with scalability and will work very slow in the future.
+     */
+    async getBlockchainMasterchainTransactionsRaw(requestParameters: GetBlockchainMasterchainTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Transactions>> {
+        if (requestParameters.masterchainSeqno === null || requestParameters.masterchainSeqno === undefined) {
+            throw new runtime.RequiredError('masterchainSeqno','Required parameter requestParameters.masterchainSeqno was null or undefined when calling getBlockchainMasterchainTransactions.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/blockchain/masterchain/{masterchain_seqno}/transactions`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters.masterchainSeqno))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TransactionsFromJSON(jsonValue));
+    }
+
+    /**
+     * Get all transactions in all shards and workchains between target and previous masterchain block according to shards last blocks snapshot in masterchain. We don\'t recommend to build your app around this method because it has problem with scalability and will work very slow in the future.
+     */
+    async getBlockchainMasterchainTransactions(requestParameters: GetBlockchainMasterchainTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions> {
+        const response = await this.getBlockchainMasterchainTransactionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -609,6 +841,62 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      */
     async getBlockchainValidators(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Validators> {
         const response = await this.getBlockchainValidatorsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get raw blockchain config
+     */
+    async getRawBlockchainConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RawBlockchainConfig>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/blockchain/config/raw`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => RawBlockchainConfigFromJSON(jsonValue));
+    }
+
+    /**
+     * Get raw blockchain config
+     */
+    async getRawBlockchainConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RawBlockchainConfig> {
+        const response = await this.getRawBlockchainConfigRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get raw blockchain config from a specific block, if present.
+     */
+    async getRawBlockchainConfigFromBlockRaw(requestParameters: GetRawBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RawBlockchainConfig>> {
+        if (requestParameters.masterchainSeqno === null || requestParameters.masterchainSeqno === undefined) {
+            throw new runtime.RequiredError('masterchainSeqno','Required parameter requestParameters.masterchainSeqno was null or undefined when calling getRawBlockchainConfigFromBlock.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/blockchain/masterchain/{masterchain_seqno}/config/raw`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters.masterchainSeqno))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => RawBlockchainConfigFromJSON(jsonValue));
+    }
+
+    /**
+     * Get raw blockchain config from a specific block, if present.
+     */
+    async getRawBlockchainConfigFromBlock(requestParameters: GetRawBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RawBlockchainConfig> {
+        const response = await this.getRawBlockchainConfigFromBlockRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

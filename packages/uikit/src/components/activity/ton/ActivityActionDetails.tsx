@@ -1,7 +1,7 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AccountEvent, ActionStatusEnum, TonTransferAction } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
@@ -108,6 +108,30 @@ export const AuctionBidActionDetails: FC<ActionData> = ({ action, timestamp, eve
             </div>
             <ListBlock margin={false} fullWidth>
                 <ActionBeneficiaryDetails beneficiary={auctionBid.auction} />
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
+            </ListBlock>
+        </ActionDetailsBlock>
+    );
+};
+
+export const DomainRenewActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
+    const { t } = useTranslation();
+    const { domainRenew, simplePreview } = action;
+
+    if (!domainRenew) {
+        return <ErrorActivityNotification event={event} />;
+    }
+
+    return (
+        <ActionDetailsBlock event={event}>
+            <div>
+                <Title>{domainRenew.domain}</Title>
+                <ActionDate kind="send" timestamp={timestamp} />
+                <FailedDetail status={action.status} />
+            </div>
+            <ListBlock margin={false} fullWidth>
+                <ActionRecipientDetails recipient={domainRenew.renewer} bounced />
                 <ActionTransactionDetails eventId={event.eventId} />
                 <ActionExtraDetails extra={event.extra} />
             </ListBlock>

@@ -1,6 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { TronApi } from '@tonkeeper/core/dist/tronApi';
 import React, { FC, Suspense, useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
@@ -38,34 +37,34 @@ const Activity: FC = () => {
         getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
     });
 
-    const {
-        isFetched: isTronFetched,
-        data: tronEvents,
-        isFetchingNextPage: isTronFetchingNextPage,
-        hasNextPage: hasTronNextPage,
-        fetchNextPage: fetchTronNextPage
-    } = useInfiniteQuery({
-        queryKey: [wallet.tron?.ownerWalletAddress, wallet.network, QueryKey.tron],
-        queryFn: ({ pageParam = undefined }) =>
-            new TronApi(api.tronApi).getTransactions({
-                ownerAddress: wallet.tron!.ownerWalletAddress,
-                fingerprint: pageParam,
-                limit: 100
-            }),
-        getNextPageParam: lastPage => lastPage.fingerprint,
-        enabled: wallet.tron !== undefined
-    });
+    // const {
+    //     isFetched: isTronFetched,
+    //     data: tronEvents,
+    //     isFetchingNextPage: isTronFetchingNextPage,
+    //     hasNextPage: hasTronNextPage,
+    //     fetchNextPage: fetchTronNextPage
+    // } = useInfiniteQuery({
+    //     queryKey: [wallet.tron?.ownerWalletAddress, wallet.network, QueryKey.tron],
+    //     queryFn: ({ pageParam = undefined }) =>
+    //         new TronApi(api.tronApi).getTransactions({
+    //             ownerAddress: wallet.tron!.ownerWalletAddress,
+    //             fingerprint: pageParam,
+    //             limit: 100
+    //         }),
+    //     getNextPageParam: lastPage => lastPage.fingerprint,
+    //     enabled: wallet.tron !== undefined
+    // });
 
-    const isFetchingNextPage = isTonFetchingNextPage || isTronFetchingNextPage;
+    const isFetchingNextPage = isTonFetchingNextPage;
 
     useFetchNext(hasTonNextPage, isFetchingNextPage, fetchTonNextPage, standalone, ref);
-    useFetchNext(hasTronNextPage, isFetchingNextPage, fetchTronNextPage, standalone, ref);
+    //  useFetchNext(hasTronNextPage, isFetchingNextPage, fetchTronNextPage, standalone, ref);
 
     const activity = useMemo(() => {
-        return getMixedActivity(tonEvents, tronEvents);
-    }, [tonEvents, tronEvents]);
+        return getMixedActivity(tonEvents, undefined);
+    }, [tonEvents]);
 
-    if (!isTonFetched || (wallet.tron !== undefined && !isTronFetched)) {
+    if (!isTonFetched) {
         return <ActivitySkeletonPage />;
     }
 

@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { PoolImplementationType } from './PoolImplementationType';
+import {
+    PoolImplementationTypeFromJSON,
+    PoolImplementationTypeFromJSONTyped,
+    PoolImplementationTypeToJSON,
+} from './PoolImplementationType';
+
 /**
  * 
  * @export
@@ -39,10 +46,10 @@ export interface PoolInfo {
     totalAmount: number;
     /**
      * 
-     * @type {string}
+     * @type {PoolImplementationType}
      * @memberof PoolInfo
      */
-    implementation: PoolInfoImplementationEnum;
+    implementation: PoolImplementationType;
     /**
      * APY in percent
      * @type {number}
@@ -103,19 +110,13 @@ export interface PoolInfo {
      * @memberof PoolInfo
      */
     validatorStake: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PoolInfo
+     */
+    cycleLength?: number;
 }
-
-
-/**
- * @export
- */
-export const PoolInfoImplementationEnum = {
-    Whales: 'whales',
-    Tf: 'tf',
-    LiquidTf: 'liquidTF'
-} as const;
-export type PoolInfoImplementationEnum = typeof PoolInfoImplementationEnum[keyof typeof PoolInfoImplementationEnum];
-
 
 /**
  * Check if a given object implements the PoolInfo interface.
@@ -152,7 +153,7 @@ export function PoolInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'address': json['address'],
         'name': json['name'],
         'totalAmount': json['total_amount'],
-        'implementation': json['implementation'],
+        'implementation': PoolImplementationTypeFromJSON(json['implementation']),
         'apy': json['apy'],
         'minStake': json['min_stake'],
         'cycleStart': json['cycle_start'],
@@ -163,6 +164,7 @@ export function PoolInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'liquidJettonMaster': !exists(json, 'liquid_jetton_master') ? undefined : json['liquid_jetton_master'],
         'nominatorsStake': json['nominators_stake'],
         'validatorStake': json['validator_stake'],
+        'cycleLength': !exists(json, 'cycle_length') ? undefined : json['cycle_length'],
     };
 }
 
@@ -178,7 +180,7 @@ export function PoolInfoToJSON(value?: PoolInfo | null): any {
         'address': value.address,
         'name': value.name,
         'total_amount': value.totalAmount,
-        'implementation': value.implementation,
+        'implementation': PoolImplementationTypeToJSON(value.implementation),
         'apy': value.apy,
         'min_stake': value.minStake,
         'cycle_start': value.cycleStart,
@@ -189,6 +191,7 @@ export function PoolInfoToJSON(value?: PoolInfo | null): any {
         'liquid_jetton_master': value.liquidJettonMaster,
         'nominators_stake': value.nominatorsStake,
         'validator_stake': value.validatorStake,
+        'cycle_length': value.cycleLength,
     };
 }
 
