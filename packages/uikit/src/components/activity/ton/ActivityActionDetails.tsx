@@ -131,7 +131,7 @@ export const DomainRenewActionDetails: FC<ActionData> = ({ action, timestamp, ev
                 <FailedDetail status={action.status} />
             </div>
             <ListBlock margin={false} fullWidth>
-                <ActionRecipientDetails recipient={domainRenew.renewer} bounced />
+                <ActionSenderDetails sender={domainRenew.renewer} bounced />
                 <ActionTransactionDetails eventId={event.eventId} />
                 <ActionExtraDetails extra={event.extra} />
             </ListBlock>
