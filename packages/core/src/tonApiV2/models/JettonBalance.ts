@@ -25,6 +25,12 @@ import {
     JettonPreviewFromJSONTyped,
     JettonPreviewToJSON,
 } from './JettonPreview';
+import type { TokenRates } from './TokenRates';
+import {
+    TokenRatesFromJSON,
+    TokenRatesFromJSONTyped,
+    TokenRatesToJSON,
+} from './TokenRates';
 
 /**
  * 
@@ -38,6 +44,12 @@ export interface JettonBalance {
      * @memberof JettonBalance
      */
     balance: string;
+    /**
+     * 
+     * @type {TokenRates}
+     * @memberof JettonBalance
+     */
+    price?: TokenRates;
     /**
      * 
      * @type {AccountAddress}
@@ -75,6 +87,7 @@ export function JettonBalanceFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'balance': json['balance'],
+        'price': !exists(json, 'price') ? undefined : TokenRatesFromJSON(json['price']),
         'walletAddress': AccountAddressFromJSON(json['wallet_address']),
         'jetton': JettonPreviewFromJSON(json['jetton']),
     };
@@ -90,6 +103,7 @@ export function JettonBalanceToJSON(value?: JettonBalance | null): any {
     return {
         
         'balance': value.balance,
+        'price': TokenRatesToJSON(value.price),
         'wallet_address': AccountAddressToJSON(value.walletAddress),
         'jetton': JettonPreviewToJSON(value.jetton),
     };

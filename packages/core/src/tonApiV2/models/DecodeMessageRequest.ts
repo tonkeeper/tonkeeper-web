@@ -16,32 +16,32 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface EmulateMessageToEventRequest
+ * @interface DecodeMessageRequest
  */
-export interface EmulateMessageToEventRequest {
+export interface DecodeMessageRequest {
     /**
      * 
      * @type {string}
-     * @memberof EmulateMessageToEventRequest
+     * @memberof DecodeMessageRequest
      */
     boc: string;
 }
 
 /**
- * Check if a given object implements the EmulateMessageToEventRequest interface.
+ * Check if a given object implements the DecodeMessageRequest interface.
  */
-export function instanceOfEmulateMessageToEventRequest(value: object): boolean {
+export function instanceOfDecodeMessageRequest(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "boc" in value;
 
     return isInstance;
 }
 
-export function EmulateMessageToEventRequestFromJSON(json: any): EmulateMessageToEventRequest {
-    return EmulateMessageToEventRequestFromJSONTyped(json, false);
+export function DecodeMessageRequestFromJSON(json: any): DecodeMessageRequest {
+    return DecodeMessageRequestFromJSONTyped(json, false);
 }
 
-export function EmulateMessageToEventRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): EmulateMessageToEventRequest {
+export function DecodeMessageRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): DecodeMessageRequest {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -51,7 +51,7 @@ export function EmulateMessageToEventRequestFromJSONTyped(json: any, ignoreDiscr
     };
 }
 
-export function EmulateMessageToEventRequestToJSON(value?: EmulateMessageToEventRequest | null): any {
+export function DecodeMessageRequestToJSON(value?: DecodeMessageRequest | null): any {
     if (value === undefined) {
         return undefined;
     }

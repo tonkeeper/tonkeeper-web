@@ -68,7 +68,25 @@ export interface NftCollection {
      * @memberof NftCollection
      */
     previews?: Array<ImagePreview>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof NftCollection
+     */
+    approvedBy: Array<NftCollectionApprovedByEnum>;
 }
+
+
+/**
+ * @export
+ */
+export const NftCollectionApprovedByEnum = {
+    Getgems: 'getgems',
+    Tonkeeper: 'tonkeeper',
+    TonDiamonds: 'ton.diamonds'
+} as const;
+export type NftCollectionApprovedByEnum = typeof NftCollectionApprovedByEnum[keyof typeof NftCollectionApprovedByEnum];
+
 
 /**
  * Check if a given object implements the NftCollection interface.
@@ -78,6 +96,7 @@ export function instanceOfNftCollection(value: object): boolean {
     isInstance = isInstance && "address" in value;
     isInstance = isInstance && "nextItemIndex" in value;
     isInstance = isInstance && "rawCollectionContent" in value;
+    isInstance = isInstance && "approvedBy" in value;
 
     return isInstance;
 }
@@ -98,6 +117,7 @@ export function NftCollectionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'rawCollectionContent': json['raw_collection_content'],
         'metadata': !exists(json, 'metadata') ? undefined : json['metadata'],
         'previews': !exists(json, 'previews') ? undefined : ((json['previews'] as Array<any>).map(ImagePreviewFromJSON)),
+        'approvedBy': json['approved_by'],
     };
 }
 
@@ -116,6 +136,7 @@ export function NftCollectionToJSON(value?: NftCollection | null): any {
         'raw_collection_content': value.rawCollectionContent,
         'metadata': value.metadata,
         'previews': value.previews === undefined ? undefined : ((value.previews as Array<any>).map(ImagePreviewToJSON)),
+        'approved_by': value.approvedBy,
     };
 }
 

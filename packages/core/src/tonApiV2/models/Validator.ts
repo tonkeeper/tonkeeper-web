@@ -25,6 +25,24 @@ export interface Validator {
      * @memberof Validator
      */
     address: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Validator
+     */
+    adnlAddress: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Validator
+     */
+    stake: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Validator
+     */
+    maxFactor: number;
 }
 
 /**
@@ -33,6 +51,9 @@ export interface Validator {
 export function instanceOfValidator(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "address" in value;
+    isInstance = isInstance && "adnlAddress" in value;
+    isInstance = isInstance && "stake" in value;
+    isInstance = isInstance && "maxFactor" in value;
 
     return isInstance;
 }
@@ -48,6 +69,9 @@ export function ValidatorFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'address': json['address'],
+        'adnlAddress': json['adnl_address'],
+        'stake': json['stake'],
+        'maxFactor': json['max_factor'],
     };
 }
 
@@ -61,6 +85,9 @@ export function ValidatorToJSON(value?: Validator | null): any {
     return {
         
         'address': value.address,
+        'adnl_address': value.adnlAddress,
+        'stake': value.stake,
+        'max_factor': value.maxFactor,
     };
 }
 

@@ -52,10 +52,10 @@ export interface ValidatorsSet {
     main: number;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof ValidatorsSet
      */
-    totalWeight?: number;
+    totalWeight?: string;
     /**
      * 
      * @type {Array<ValidatorsSetListInner>}

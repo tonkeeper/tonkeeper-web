@@ -13,12 +13,31 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { BlockValueFlow } from './BlockValueFlow';
+import {
+    BlockValueFlowFromJSON,
+    BlockValueFlowFromJSONTyped,
+    BlockValueFlowToJSON,
+} from './BlockValueFlow';
+
 /**
  * 
  * @export
  * @interface BlockchainBlock
  */
 export interface BlockchainBlock {
+    /**
+     * 
+     * @type {number}
+     * @memberof BlockchainBlock
+     */
+    txQuantity: number;
+    /**
+     * 
+     * @type {BlockValueFlow}
+     * @memberof BlockchainBlock
+     */
+    valueFlow: BlockValueFlow;
     /**
      * 
      * @type {number}
@@ -194,6 +213,8 @@ export interface BlockchainBlock {
  */
 export function instanceOfBlockchainBlock(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "txQuantity" in value;
+    isInstance = isInstance && "valueFlow" in value;
     isInstance = isInstance && "workchainId" in value;
     isInstance = isInstance && "shard" in value;
     isInstance = isInstance && "seqno" in value;
@@ -233,6 +254,8 @@ export function BlockchainBlockFromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
+        'txQuantity': json['tx_quantity'],
+        'valueFlow': BlockValueFlowFromJSON(json['value_flow']),
         'workchainId': json['workchain_id'],
         'shard': json['shard'],
         'seqno': json['seqno'],
@@ -273,6 +296,8 @@ export function BlockchainBlockToJSON(value?: BlockchainBlock | null): any {
     }
     return {
         
+        'tx_quantity': value.txQuantity,
+        'value_flow': BlockValueFlowToJSON(value.valueFlow),
         'workchain_id': value.workchainId,
         'shard': value.shard,
         'seqno': value.seqno,

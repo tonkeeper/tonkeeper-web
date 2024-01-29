@@ -30,6 +30,12 @@ export interface ActionPhase {
      * @type {number}
      * @memberof ActionPhase
      */
+    resultCode: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ActionPhase
+     */
     totalActions: number;
     /**
      * 
@@ -57,6 +63,7 @@ export interface ActionPhase {
 export function instanceOfActionPhase(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "success" in value;
+    isInstance = isInstance && "resultCode" in value;
     isInstance = isInstance && "totalActions" in value;
     isInstance = isInstance && "skippedActions" in value;
     isInstance = isInstance && "fwdFees" in value;
@@ -76,6 +83,7 @@ export function ActionPhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean
     return {
         
         'success': json['success'],
+        'resultCode': json['result_code'],
         'totalActions': json['total_actions'],
         'skippedActions': json['skipped_actions'],
         'fwdFees': json['fwd_fees'],
@@ -93,6 +101,7 @@ export function ActionPhaseToJSON(value?: ActionPhase | null): any {
     return {
         
         'success': value.success,
+        'result_code': value.resultCode,
         'total_actions': value.totalActions,
         'skipped_actions': value.skippedActions,
         'fwd_fees': value.fwdFees,
