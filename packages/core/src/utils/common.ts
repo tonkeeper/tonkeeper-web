@@ -54,7 +54,11 @@ export const areEqAddresses = (address1: string, address2: string) => {
 };
 
 export const toShortValue = (value: string, length = 4): string => {
-    return value.slice(0, length) + '...' + value.slice(-length);
+    if (value.length > length * 2) {
+        return value.slice(0, length) + '...' + value.slice(-length);
+    } else {
+        return value;
+    }
 };
 
 export const formatAddress = (value: string, network?: Network, bounceable = false) => {
