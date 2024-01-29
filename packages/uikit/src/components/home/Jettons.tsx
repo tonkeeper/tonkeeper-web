@@ -2,7 +2,7 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Account, JettonBalance, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import { TronBalances } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-import React, { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Address } from 'ton-core';
 import { useFormatBalance } from '../../hooks/balance';

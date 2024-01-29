@@ -116,7 +116,7 @@ const DeltaColor = styled.span<{ positive: boolean }>`
 `;
 
 const Delta: FC<{ data: TokenRate | undefined }> = ({ data }) => {
-    if (!data || !data.diff_24h || data.diff_24h == '0') return null;
-    const positive = data.diff_24h.startsWith('+');
-    return <DeltaColor positive={positive}>{data.diff_24h}</DeltaColor>;
+    if (!data || !data.diff24h || data.diff24h == '0') return null;
+    const positive = data.diff24h.startsWith('+');
+    return <DeltaColor positive={positive}>{data.diff24h}</DeltaColor>;
 };

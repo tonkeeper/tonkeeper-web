@@ -17,10 +17,12 @@ import {
     WalletApi
 } from '@tonkeeper/core/dist/tonApiV2';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
+import { Address } from 'ton';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
+import { getRateKey, toTokenRate } from './rates';
 import { DefaultRefetchInterval } from './tonendpoint';
 
 export const useActiveWallet = () => {
@@ -127,13 +129,14 @@ export const useWalletAccountInfo = () => {
 
 export const useWalletJettonList = () => {
     const wallet = useWalletContext();
-    const { api } = useAppContext();
+    const { api, fiat } = useAppContext();
     const client = useQueryClient();
     return useQuery<JettonsBalances, Error>(
-        [wallet.active.rawAddress, QueryKey.jettons],
+        [wallet.active.rawAddress, QueryKey.jettons, fiat, wallet.network],
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.active.rawAddress
+                accountId: wallet.active.rawAddress,
+                currencies: fiat
             });
 
             result.balances.forEach(item => {
@@ -141,6 +144,19 @@ export const useWalletJettonList = () => {
                     [wallet.publicKey, QueryKey.jettons, JettonKey.balance, item.jetton.address],
                     item
                 );
+
+                if (item.price) {
+                    try {
+                        const tokenRate = toTokenRate(item.price, fiat);
+                        console.log(tokenRate);
+                        client.setQueryData(
+                            getRateKey(fiat, Address.parse(item.jetton.address).toString()),
+                            tokenRate
+                        );
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
             });
 
             return result;

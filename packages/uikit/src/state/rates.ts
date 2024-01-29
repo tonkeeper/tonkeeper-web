@@ -9,24 +9,18 @@ import { formatFiatCurrency } from '../hooks/balance';
 import { QueryKey } from '../libs/queryKey';
 
 export interface TokenRate {
-    diff_7d: string;
-    diff_24h: string;
+    diff7d: string;
+    diff24h: string;
     prices: number;
 }
 
-const toTokenRate = (rate: TokenRates, fiat: FiatCurrencies): TokenRate => {
+export const toTokenRate = (rate: TokenRates, fiat: FiatCurrencies): TokenRate => {
     return Object.entries(rate).reduce((acc, [key, value]) => {
         acc[key] = value[fiat];
         return acc;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }, {} as Record<string, any>) as TokenRate;
 };
-
-const popularJettons = [
-    'EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA', // jUSDT
-    'EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728', // jUSDC
-    'EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728' // jWBTC
-];
 
 export const usePreFetchRates = () => {
     const {
@@ -39,7 +33,7 @@ export const usePreFetchRates = () => {
         [QueryKey.rate],
         async () => {
             const value = await new RatesApi(tonApiV2).getRates({
-                tokens: [CryptoCurrency.TON, CryptoCurrency.USDT, ...popularJettons].join(','),
+                tokens: [CryptoCurrency.TON, CryptoCurrency.USDT].join(','),
                 currencies: fiat
             });
 
@@ -99,7 +93,7 @@ export const useFormatFiat = (rate: TokenRate | undefined, tokenAmount: BigNumbe
     const { fiat } = useAppContext();
 
     const [fiatPrice, fiatAmount] = useMemo(() => {
-        if (!rate || !rate.prices) return [undefined, undefined] as const;
+        if (!rate) return [undefined, undefined] as const;
         return [
             formatFiatCurrency(fiat, rate.prices),
             formatFiatCurrency(fiat, new BigNumber(rate.prices).multipliedBy(tokenAmount))
