@@ -148,7 +148,6 @@ export const useWalletJettonList = () => {
                 if (item.price) {
                     try {
                         const tokenRate = toTokenRate(item.price, fiat);
-                        console.log(tokenRate);
                         client.setQueryData(
                             getRateKey(fiat, Address.parse(item.jetton.address).toString()),
                             tokenRate

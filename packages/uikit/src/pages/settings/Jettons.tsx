@@ -1,5 +1,5 @@
 import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import {
     DragDropContext,
     Draggable,
@@ -139,7 +139,7 @@ export const JettonsSettings = () => {
                             <ListBlock
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
-                                noUserSelect
+                                nouserselect="true"
                             >
                                 {jettons.map((jetton, index) => (
                                     <Draggable

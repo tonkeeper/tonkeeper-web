@@ -12,7 +12,7 @@ import {
     hideSuggestions
 } from '@tonkeeper/core/dist/service/suggestionService';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -254,7 +254,7 @@ export const SuggestionList: FC<{
             {data.length > 0 ? (
                 <Label>{t('send_screen_steps_address_suggests_label')}</Label>
             ) : undefined}
-            <ListBlock margin={false} fullWidth noUserSelect>
+            <ListBlock margin={false} fullWidth nouserselect="true">
                 {data.map(item => {
                     if (item.isFavorite) {
                         return (
