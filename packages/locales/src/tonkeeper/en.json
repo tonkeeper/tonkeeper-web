@@ -22,11 +22,11 @@
   "activity" : {
     "buy_toncoin_btn" : "Buy Toncoin",
     "empty_transaction_caption" : "Make your first transaction!",
-    "empty_transaction_title" : "Your activity will be shown here",
+    "empty_transaction_title" : "Your history will be shown here",
     "failed_transaction" : "Failed",
     "receive_btn" : "Receive",
     "received" : "Received",
-    "screen_title" : "Activity",
+    "screen_title" : "History",
     "sent" : "Sent"
   },
   "add_edit_favorite" : {
@@ -114,6 +114,7 @@
       "one" : "%{count} token",
       "other" : "%{count} tokens"
     },
+    "unverified_token" : "Unverified Token",
     "verify_collection" : "Verify collection",
     "verify_description_collection" : "These tokens are from unknown issuer. To detect counterfeits, verify the collection ID with the issuer's official source. You can change token visibility later in settings.",
     "verify_description_token" : "This token is from unknown issuer. To detect counterfeits, verify the token ID with the issuer's official source. You can change token visibility later in settings.",
@@ -125,10 +126,10 @@
   "balances_setup_wallet" : "Set up wallet",
   "battery" : {
     "description" : {
-      "almost_empty" : "You have enough charge battery for more than 300 transactions.",
-      "empty" : "You have enough charge battery for more than 5 transactions.",
-      "full" : "You have enough charge battery for more than 700 transactions."
+      "empty" : "Send tokens and NFTs, pay for staking actions with empty main balance.",
+      "other" : "You have enough charge battery for more than %{cnt} transactions."
     },
+    "ok" : "OK",
     "packages" : {
       "buy" : "Buy",
       "disclaimer" : "This is approximate transactions number. Some your transactions may cost more.",
@@ -139,16 +140,22 @@
         "medium" : "Medium gas fees pack",
         "small" : "Small gas fees pack"
       },
-      "title" : {
-        "large" : "700 transactions for {{price}}",
-        "medium" : "400 transactions for {{price}}",
-        "small" : "100 transactions for {{price}}"
-      }
+      "title" : "{{cnt}} transactions for {{price}}"
     },
+    "promocode" : {
+      "apply" : "Apply",
+      "button" : "Recharge by Promo Code",
+      "placeholder" : "Code",
+      "success" : "Your battery is charged",
+      "title" : "Promo Code"
+    },
+    "screen_title" : "Battery",
+    "settings" : "Battery",
     "title" : {
-      "almost_empty" : "Battery for gas fees is half full",
-      "empty" : "Battery for gas fees is almost empty",
-      "full" : "Battery for gas fees is full"
+      "almost_empty" : "Battery for gas fees is almost empty",
+      "empty" : "Recharge your battery for gas fees",
+      "full" : "Battery for gas fees is full",
+      "medium" : "Battery for gas fees is half full"
     }
   },
   "browser" : {
@@ -201,6 +208,7 @@
   "check_words_success" : "Congratulations! You’ve set up your wallet",
   "check_words_title" : "So, let’s check",
   "choose_country" : {
+    "auto" : "Auto",
     "cancel" : "Cancel",
     "empty_placeholder" : "Your search returned no results",
     "search" : "Search",
@@ -256,13 +264,15 @@
   "confirm_sending_title" : "Confirm sending",
   "confirmSendModal" : {
     "network_fee" : "Network fee",
+    "refund" : "Refund",
     "title" : "Confirm action",
     "to_your_address" : "To your address",
     "transaction_type" : {
       "burn" : "Burn",
       "receive" : "Receive",
       "send" : "Send"
-    }
+    },
+    "will_be_paid_with_battery" : "Will be paid with Battery"
   },
   "continue" : "Continue",
   "copied" : "Copied",
@@ -300,7 +310,7 @@
   "dns_on_sale_text" : "Domain is on sale at the marketplace now. For transfer, you should remove it from sale first.",
   "dns_renew_all_until_btn" : "Renew all until %{untilDate}",
   "dns_renew_in_progress_btn" : "Domain renew in progress…",
-  "dns_renew_toast_success" : "Domain renewed for 1 year",
+  "dns_renew_toast_success" : "Domain renewed",
   "dns_renew_until_btn" : "Renew until %{untilDate}",
   "dns_renew_valid_caption" : {
     "one" : "Expires in %{count} day",
@@ -317,13 +327,25 @@
   "edit_coins_added_toast" : "Added",
   "edit_coins_hide" : "Hide",
   "edit_coins_title" : "Add crypto",
+  "encryptedComments" : {
+    "encryptedComment" : "Encrypted comment",
+    "encryptedCommentModal" : {
+      "button" : "Decrypt the comment",
+      "checkboxLabel" : "Do not show again",
+      "description" : "The comment is encrypted by sender and can only be decrypted by you. Please be careful with the content and beware of scams.",
+      "title" : "Encrypted comment"
+    },
+    "show" : "Show"
+  },
   "error_network" : "Network error",
   "error_occurred" : "An error occurred",
   "exchange_method_dont_show_again" : "Do not show again",
   "exchange_method_open_warning" : "You are opening an external app not operated by Tonkeeper.",
   "exchange_modal" : {
+    "buy" : "Buy",
     "hide" : "Hide",
     "other_ways_to_buy" : "Other ways to buy",
+    "sell" : "Sell",
     "show_all" : "Show all",
     "title" : "Buy or sell"
   },
@@ -363,6 +385,17 @@
   "jettons_manage_tokens" : "Manage tokens",
   "jettons_show_jettons" : "Show tokens in wallet",
   "jetton_token" : "Token",
+  "language" : {
+    "language_alert" : {
+      "cancel" : "Cancel",
+      "open" : "Settings",
+      "title" : "To change the language of the app, go to device Settings"
+    },
+    "list_item" : {
+      "title" : "Language",
+      "value" : "English"
+    }
+  },
   "later" : "Later",
   "legal_font_license" : "Montserrat font",
   "legal_header_title" : "Legal",
@@ -434,6 +467,16 @@
   "nft_token_id" : "Token ID",
   "nft_transaction_head_placeholder" : "NFT",
   "nft_transfer_comment" : "Comment",
+  "nft_transfer" : {
+    "confirm" : {
+      "fee" : {
+        "label" : "Fee",
+        "refund_label" : "Refund",
+        "value" : "≈ %{value} TON"
+      }
+    },
+    "title" : "NFT transfer"
+  },
   "nft_transfer_description" : "The NFT will be sent to this address. Be careful when sending an NFT to another user.",
   "nft_transfer_dns" : "Transfer",
   "nft_transfer_nft" : "Transfer",
@@ -581,7 +624,7 @@
       "insufficient_balance" : "Insufficient balance",
       "less_than_min" : "Minimum %{minAmount} TON",
       "liquid_jetton_note" : "Sending tsTON liquidity token",
-      "max" : "Max",
+      "max" : "MAX",
       "recipient_label" : "To:",
       "remaining" : "Available: %{amount}",
       "title" : "Amount"
@@ -593,11 +636,13 @@
       "comment_description_encrypted" : "Will be visible only to recipient and you.",
       "comment_encrypt" : "Encrypt comment",
       "comment_label" : "Comment",
+      "comment_label_encrypted" : "Encrypted comment",
       "comment_label_required" : "Required comment",
       "comment_required_text" : "You must include the note from the exchange for transfer. Without it your funds will be lost. ",
       "details_label" : "Details",
       "details_max_balance_label" : "Sending max. balance of %{currency}",
-      "title" : "Confirm action"
+      "title" : "Confirm action",
+      "will_be_paid_with_battery" : "Will be paid with Battery"
     },
     "done" : {
       "add_favorite" : "Save address to favorites",
@@ -706,13 +751,14 @@
         "desc" : "All transactions take effect once the cycle ends.",
         "desc_liquid" : "Unstake requests are complete after the cycle ends.",
         "in" : "in",
+        "message" : "Unstake request will be processed after the end of the validation cycle in %{value}",
         "reward_title" : "Next reward",
         "title" : "Next cycle"
       },
       "note" : "Staking is based on smart contracts by third parties. Tonkeeper is not responsible for staking experience.",
       "pendingDeposit" : "Pending Stake",
       "pendingWithdraw" : "Pending Unstake",
-      "pendingWithdrawDesc" : "at the end of the cycle",
+      "pendingWithdrawDesc" : "after the end of the cycle",
       "pool_address" : {
         "label" : "Pool address"
       },
@@ -724,6 +770,7 @@
       "tap_to_collect" : "Tap to collect"
     },
     "estimated_profit" : "%{amount} TON – annual profit\nif you stake TON today",
+    "estimated_profit_compare" : "More profitable by %{amount} TON per year than your current staking",
     "get_withdrawal" : "Get withdrawal",
     "highest_apy" : "MAX APY",
     "jetton_note" : "When you stake TON in a %{poolName} pool, you receive a token called %{token} that represents your share in the pool. As the pool accumulates profits, your %{token} represents larger amount of TON.",
@@ -731,6 +778,7 @@
     "message" : {
       "pendingDeposit" : "%{amount} TON staked\n",
       "pendingWithdraw" : "%{amount} TON unstaked\n",
+      "pendingWithdrawLiquid" : "%{amount} TON unstaked after the end of the cycle",
       "readyWithdraw" : "%{amount} TON ready.\nTap to collect"
     },
     "no_funds" : "No funds available for unstake",
@@ -759,14 +807,14 @@
     },
     "widget_desc" : "APY up to %{apy}%",
     "widget_staking_options" : "Staking options",
-    "widget_title" : "Earn TON",
+    "widget_title" : "Stake TON",
     "withdraw" : "Unstake",
     "withdrawal_fee_warning" : {
       "continue" : "Continue anyway",
       "message" : "Please leave at least {{amount}} TON on your balance.",
       "title" : "You will have not enough funds for withdraw"
     },
-    "withdrawal_request" : "Unstake Request"
+    "withdrawal_request" : "Unstake"
   },
   "subscription_back_to_merchant_button" : "Back",
   "subscription_back_to_merchant_caption" : "The transaction is being processed. Your subscription will be active soon.",
@@ -811,12 +859,14 @@
   "tab_swap" : "Swap",
   "tab_wallet" : "Wallet",
   "today" : "Today",
+  "tonkeeper_pro" : "Tonkeeper Pro",
+  "tonkeeper_pro_description" : "Tonkeeper Pro's subscription comes with an extended wallet feature, offering a toolset for crypto management. ",
   "ton_login_back_to_button" : "Back to %{name}",
   "ton_login_caption" : "%{name} is requesting access to your wallet address ",
   "ton_login_connect_button" : "Connect wallet",
   "ton_login_notice" : "Be sure to check the service address before connecting the wallet.",
   "ton_login_success" : "Done",
-  "ton_login_title" : "Connect to %{name}?",
+  "ton_login_title" : "Connect to %domain?",
   "transaction_bid_collection_name" : "Issuer",
   "transaction_bid_date" : "Bid %{date}",
   "transaction_bid_dns" : "Name",
@@ -905,7 +955,10 @@
   "transaction_your_bid" : "Your bid",
   "transfer_deeplink_address_error" : "Incorrect recipient address",
   "transfer_deeplink_amount_error" : "Incorrect amount request",
+  "transfer_deeplink_expired_error" : "Expired link",
   "transfer_deeplink_nft_address_error" : "Incorrect NFT address",
+  "transfer_deeplink_unknown_token" : "Unknown token",
+  "transfer_deeplink_wrong_params" : "Wrong parameters",
   "transfer_from_old_wallet_btn" : "Transfer",
   "transfer_from_old_wallet_caption" : "Tonkeeper will transfer all coins from your old address to your current address.",
   "transfer_from_old_wallet_in_progress" : "Transfer in progress",
@@ -930,10 +983,12 @@
       },
       "comment" : "Comment",
       "insufficientFunds" : {
-        "rechargeWallet" : "Recharge wallet",
+        "rechargeBattery" : "Recharge Battery",
+        "rechargeWallet" : "Buy %{currency}",
+        "stakingDeposit" : "Minimum balance for participate:\n%{amount} %{currency}\n",
         "stakingFee" : "%{count} TON needed for transaction. Estimated fee %{fee} TON will be deducted, the rest will be refunded.",
         "title" : "Insufficient funds",
-        "toBePaid" : "To be paid: %{amount} %{currency}\n",
+        "toBePaid" : "To be paid: %{amount} %{currency}\n",
         "withFees" : "+ blockchain fees.\n",
         "yourBalance" : "Your balance: %{balance} %{currency}."
       },
@@ -975,7 +1030,7 @@
   "wallet_about" : "About",
   "wallet_buy" : "Buy",
   "wallet" : {
-    "buy_btn" : "Buy TON",
+    "buy_btn" : "Buy & Sell",
     "collectibles_tab_lable" : "Collectibles",
     "edit_tokens_btn" : "Edit",
     "nft_tab_lable" : "Collectibles",
@@ -985,7 +1040,8 @@
     "screen_title" : "Wallet",
     "send_btn" : "Send",
     "swap_btn" : "Swap",
-    "tonkens_tab_lable" : "Tokens"
+    "tonkens_tab_lable" : "Tokens",
+    "updated_at" : "Updated on %{value}"
   },
   "wallet_chat" : "Chat",
   "wallet_community" : "Community",

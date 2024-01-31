@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 
 export const WalletsIcon = () => {
     return (
@@ -68,6 +68,22 @@ export const RecoveryPhraseIcon = () => {
                 d="M19 11.001C19 12.0397 18.802 13.0322 18.4418 13.9428L24.0627 19.5637C24.4086 19.9096 24.5816 20.0826 24.7053 20.2844C24.8149 20.4634 24.8957 20.6584 24.9447 20.8625C25 21.0927 25 21.3373 25 21.8265V25.001H20.5V23.501H19V22.001H17.5V20.501H16L13.9418 18.4428C13.0312 18.803 12.0387 19.001 11 19.001C6.58172 19.001 3 15.4193 3 11.001C3 6.5827 6.58172 3.00098 11 3.00098C15.4183 3.00098 19 6.5827 19 11.001ZM10 12.501C11.3807 12.501 12.5 11.3817 12.5 10.001C12.5 8.62026 11.3807 7.50098 10 7.50098C8.61929 7.50098 7.5 8.62026 7.5 10.001C7.5 11.3817 8.61929 12.501 10 12.501Z"
                 fill="currentColor"
             />
+        </svg>
+    );
+};
+
+export const SettingsProIcon: FC<{ size?: number }> = ({ size = 28 }) => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={size}
+            height={size}
+            viewBox="0 0 28 28"
+            fill="none"
+        >
+            <path opacity="0.5" d="M14 13.5L26.5 8L14 27.5V13.5Z" fill="currentColor" />
+            <path opacity="0.75" d="M13.9999 13.5L1.5 8L13.9999 27.5V13.5Z" fill="currentColor" />
+            <path d="M14 13.5L1.5 8L14 2.5L26.5 8L14 13.5Z" fill="currentColor" />
         </svg>
     );
 };

@@ -22,6 +22,7 @@ export interface IAppContext {
     standalone: boolean;
     extension: boolean;
     ios: boolean;
+    proFeatures: boolean;
     hideQrScanner?: boolean;
 }
 
@@ -38,6 +39,7 @@ export const AppContext = React.createContext<IAppContext>({
     standalone: false,
     extension: false,
     ios: false,
+    proFeatures: false,
     hideQrScanner: false
 });
 

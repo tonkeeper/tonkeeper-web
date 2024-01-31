@@ -51,12 +51,13 @@ export const BackButtonLeft = styled(BackButton)`
 `;
 
 export interface SubHeaderProps {
-    title: React.ReactNode;
+    title?: React.ReactNode;
 }
 
 const Title = styled(H3)`
     margin-top: 1px;
     margin-bottom: 2px;
+    min-height: 28px;
 `;
 
 const SubHeaderBackButton = () => {

@@ -40,6 +40,7 @@ import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
 import { AppRoute, any, AppProRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import Activity from '@tonkeeper/uikit/dist/pages/activity/Activity';
+import Browser from '@tonkeeper/uikit/dist/pages/browser';
 import Coin from '@tonkeeper/uikit/dist/pages/coin/Coin';
 import Home from '@tonkeeper/uikit/dist/pages/home/Home';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
@@ -47,7 +48,6 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import Settings from '@tonkeeper/uikit/dist/pages/settings';
-import Browser from '@tonkeeper/uikit/dist/pages/browser';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
@@ -230,6 +230,7 @@ export const Loader: FC = () => {
         tonendpoint,
         standalone: false,
         extension: false,
+        proFeatures: true,
         ios: false
     };
 

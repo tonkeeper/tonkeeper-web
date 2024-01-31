@@ -262,6 +262,11 @@
   "jettons_manage_tokens" : "管理代币",
   "jettons_show_jettons" : "在钱包中显示代币",
   "jetton_token" : "代币",
+  "language" : {
+    "list_item" : {
+      "value" : "中文"
+    }
+  },
   "later" : "稍后",
   "legal_font_license" : "Montserrat字体",
   "legal_header_title" : "法律",
@@ -658,12 +663,13 @@
   "tab_swap" : "交换",
   "tab_wallet" : "钱包",
   "today" : "今天",
+  "tonkeeper_pro" : "Tonkeeper Pro",
   "ton_login_back_to_button" : "返回到%{name}",
   "ton_login_caption" : "%{name}正在请求访问您的钱包地址",
   "ton_login_connect_button" : "连接钱包",
   "ton_login_notice" : "连接钱包之前，请务必检查服务地址。",
   "ton_login_success" : "完成",
-  "ton_login_title" : "连接到%{name}？",
+  "ton_login_title" : "连接到%domain？",
   "transaction_bid_collection_name" : "发行者",
   "transaction_bid_date" : "出价日期 %{date}",
   "transaction_bid_dns" : "名称",

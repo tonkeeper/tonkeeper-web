@@ -31,7 +31,8 @@ export enum SettingsRoute {
     jettons = '/jettons',
     security = '/security',
     subscriptions = '/subscriptions',
-    country = '/country'
+    country = '/country',
+    pro = '/pro'
 }
 
 export enum BrowserRoute {
