@@ -4,14 +4,15 @@ import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { useAccountState } from '../../state/account';
-import { useProState, useSelectWalletMutation } from '../../state/pro';
+import { useLoginTonConsole, useProState, useSelectWalletMutation } from '../../state/pro';
 import { useWalletState } from '../../state/wallet';
 import { InnerBody } from '../Body';
 import { DoneIcon, DownIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { SubHeader } from '../SubHeader';
-import { Body1, Title } from '../Text';
+import { Body1, Body2, Title } from '../Text';
+import { Button } from '../fields/Button';
 
 const Block = styled.div`
     display: flex;
@@ -29,6 +30,19 @@ const Icon = styled.img`
 const Description = styled(Body1)`
     color: ${props => props.theme.textSecondary};
     margin-bottom: 16px;
+`;
+
+const HelpText = styled(Body2)`
+    color: ${props => props.theme.textSecondary};
+    width: 100%;
+    text-align: center;
+    display: inline-block;
+    margin-top: 8px;
+`;
+
+const SignIn = styled.span`
+    color: ${props => props.theme.accentBlue};
+    cursor: pointer;
 `;
 
 const DownIconWrapper = styled.span`
@@ -104,9 +118,17 @@ const SelectWallet: FC<{ data: ProState }> = ({ data }) => {
 };
 
 const ProContent: FC<{ data: ProState }> = ({ data }) => {
+    const { t } = useTranslation();
+    const { mutate, isLoading } = useLoginTonConsole(data.wallet);
+
     return (
         <div>
             <SelectWallet data={data} />
+            {!data.hasCookie && (
+                <Button size="large" primary fullWidth loading={isLoading} onClick={() => mutate()}>
+                    {t('Authorize')}
+                </Button>
+            )}
         </div>
     );
 };

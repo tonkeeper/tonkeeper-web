@@ -1,7 +1,7 @@
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import Store from 'electron-store';
 
-const electronStore = new Store();
+export const electronStore = new Store();
 
 class NodeStorage implements IStorage {
     get = async <R>(key: string) => {

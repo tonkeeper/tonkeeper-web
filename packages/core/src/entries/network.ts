@@ -1,4 +1,5 @@
 import { Configuration as ConfigurationV2 } from '../tonApiV2';
+import { OpenAPI as TonConsoleApi } from '../tonConsoleApi';
 import { TonendpointConfig } from '../tonkeeperApi/tonendpoint';
 import { Configuration as TronConfiguration } from '../tronApi';
 import { TronApi, TronChain } from './tron';
@@ -31,6 +32,13 @@ const getTronClient = (current?: Network) => {
 };
 
 export const getApiConfig = (config: TonendpointConfig, network?: Network) => {
+    // Global config
+    if (network === Network.MAINNET) {
+        TonConsoleApi.BASE = 'http://localhost:8010/proxy'; // 'https://dev.tonconsole.com';
+    } else {
+        TonConsoleApi.BASE = 'http://localhost:8010/proxy'; // 'https://dev.tonconsole.com';
+    }
+
     return {
         tonApiV2: getTonClientV2(config, network),
         tronApi: getTronClient(network)
