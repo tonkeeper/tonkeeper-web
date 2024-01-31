@@ -1,24 +1,32 @@
-import { ProState } from '@tonkeeper/core/dist/entries/pro';
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { ProPlan, ProState } from '@tonkeeper/core/dist/entries/pro';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { FC, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useAccountState } from '../../state/account';
-import { useLoginTonConsole, useProState, useSelectWalletMutation } from '../../state/pro';
+import { useProLogout, useProPlans, useProState, useSelectWalletMutation } from '../../state/pro';
 import { useWalletState } from '../../state/wallet';
 import { InnerBody } from '../Body';
-import { DoneIcon, DownIcon } from '../Icon';
+import { DoneIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { SubHeader } from '../SubHeader';
-import { Body1, Body2, Title } from '../Text';
+import { Body1, Label1, Title } from '../Text';
 import { Button } from '../fields/Button';
+import { Radio } from '../fields/Checkbox';
+import { Input } from '../fields/Input';
 
 const Block = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+`;
+
+const Line = styled.div`
+    margin-bottom: 32px;
 `;
 
 const Icon = styled.img`
@@ -30,31 +38,6 @@ const Icon = styled.img`
 const Description = styled(Body1)`
     color: ${props => props.theme.textSecondary};
     margin-bottom: 16px;
-`;
-
-const HelpText = styled(Body2)`
-    color: ${props => props.theme.textSecondary};
-    width: 100%;
-    text-align: center;
-    display: inline-block;
-    margin-top: 8px;
-`;
-
-const SignIn = styled.span`
-    color: ${props => props.theme.accentBlue};
-    cursor: pointer;
-`;
-
-const DownIconWrapper = styled.span`
-    color: ${props => props.theme.iconSecondary};
-    display: flex;
-    align-items: center;
-`;
-
-const SelectIconWrapper = styled.span`
-    padding-left: 0.5rem;
-    color: ${props => props.theme.accentBlue};
-    display: flex;
 `;
 
 const WalletItem: FC<{ publicKey: string }> = ({ publicKey }) => {
@@ -73,61 +56,138 @@ const WalletItem: FC<{ publicKey: string }> = ({ publicKey }) => {
         />
     );
 };
-const SelectWallet: FC<{ data: ProState }> = ({ data }) => {
-    const [isEdit, setEdit] = useState(false);
+
+const SelectLabel = styled(Label1)`
+    padding-left: 16px;
+    margin-bottom: 8px;
+`;
+
+const SelectWallet: FC = () => {
     const { data: accounts } = useAccountState();
     const { mutate } = useSelectWalletMutation();
 
     if (!accounts) return <></>;
 
-    if (isEdit) {
-        return (
+    return (
+        <>
+            <SelectLabel>Select Wallet for authorization</SelectLabel>
             <ListBlock>
                 {accounts.publicKeys.map(publicKey => (
-                    <ListItem
-                        onClick={() =>
-                            data.wallet.publicKey === publicKey ? setEdit(false) : mutate(publicKey)
-                        }
-                    >
+                    <ListItem onClick={() => mutate(publicKey)}>
                         <ListItemPayload>
                             <WalletItem publicKey={publicKey} />
-                            {data.wallet.publicKey === publicKey ? (
-                                <SelectIconWrapper>
-                                    <DoneIcon />
-                                </SelectIconWrapper>
-                            ) : undefined}
                         </ListItemPayload>
                     </ListItem>
                 ))}
             </ListBlock>
-        );
-    }
+        </>
+    );
+};
 
+const SelectIconWrapper = styled.span`
+    padding-left: 0.5rem;
+    color: ${props => props.theme.accentBlue};
+    display: flex;
+`;
+
+const ProWallet: FC<{ data: ProState; onClick: () => void }> = ({ data, onClick }) => {
     return (
         <ListBlock>
-            <ListItem onClick={() => setEdit(true)}>
+            <ListItem onClick={onClick}>
                 <ListItemPayload>
                     <WalletItem publicKey={data.wallet.publicKey} />
-                    <DownIconWrapper>
-                        <DownIcon />
-                    </DownIconWrapper>
+                    <SelectIconWrapper>
+                        <DoneIcon />
+                    </SelectIconWrapper>
                 </ListItemPayload>
             </ListItem>
         </ListBlock>
     );
 };
 
+const SelectProPlans: FC<{
+    plans: ProPlan[];
+    selected: string | null;
+    setPlan: (id: string) => void;
+}> = ({ plans, selected, setPlan }) => {
+    const format = useFormatCoinValue();
+    return (
+        <>
+            <ListBlock>
+                {plans.map(plan => (
+                    <ListItem onClick={() => setPlan(plan.id)}>
+                        <ListItemPayload>
+                            <ColumnText
+                                noWrap
+                                text={plan.name}
+                                secondary={
+                                    <>
+                                        {format(plan.price)} {CryptoCurrency.TON}
+                                    </>
+                                }
+                            />
+                            <Radio
+                                checked={selected === plan.id}
+                                onChange={() => setPlan(plan.id)}
+                            />
+                        </ListItemPayload>
+                    </ListItem>
+                ))}
+            </ListBlock>
+        </>
+    );
+};
+
 const ProContent: FC<{ data: ProState }> = ({ data }) => {
     const { t } = useTranslation();
-    const { mutate, isLoading } = useLoginTonConsole(data.wallet);
+
+    const ref = useRef<HTMLDivElement>();
+
+    const { mutate: logOut } = useProLogout();
+    const [selectedPlan, setPlan] = useState<string | null>(null);
+    const [promo, setPromo] = useState('');
+
+    const { data: plans } = useProPlans();
+
+    useEffect(() => {
+        if (plans && plans[0] && selectedPlan == null) {
+            setPlan(plans[0].id);
+        }
+    }, [plans]);
+
+    useEffect(() => {
+        if (ref.current) {
+            ref.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [ref.current]);
+
+    if (!data.hasCookie) {
+        return <SelectWallet />;
+    }
 
     return (
         <div>
-            <SelectWallet data={data} />
-            {!data.hasCookie && (
-                <Button size="large" primary fullWidth loading={isLoading} onClick={() => mutate()}>
-                    {t('Authorize')}
-                </Button>
+            <ProWallet data={data} onClick={logOut} />
+            {data.subscription.valid ? (
+                'valid'
+            ) : (
+                <>
+                    <SelectProPlans plans={plans ?? []} setPlan={setPlan} selected={selectedPlan} />
+                    <Line>
+                        <Input
+                            value={promo}
+                            onChange={setPromo}
+                            label={t('battery_promocode_title')}
+                            clearButton
+                        />
+                    </Line>
+                    <Line>
+                        <Button primary size="large" fullWidth>
+                            Buy
+                        </Button>
+                    </Line>
+                    <div ref={ref}></div>
+                </>
             )}
         </div>
     );
@@ -147,17 +207,6 @@ export const ProSettings = () => {
                     <Description>{t('tonkeeper_pro_description')}</Description>
                 </Block>
                 {data ? <ProContent data={data} /> : undefined}
-
-                {/* <Block>
-            <Input
-                value={search}
-                onChange={setSearch}
-                label={t('settings_search_engine')}
-                clearButton
-            />
-        </Block>
-        <SettingsList items={autoItem} />
-        <SettingsList items={countries} /> */}
             </InnerBody>
         </>
     );

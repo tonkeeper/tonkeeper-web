@@ -22,7 +22,7 @@
         "lint": "eslint --ext .ts,.tsx .",
         "build": "yarn make",
         "build:desktop": "yarn make",
-        "debug": "export DEBUG=electron*"
+        "proxyTonConsole": "lcp --proxyUrl https://dev.tonconsole.com"
     },
     "keywords": [],
     "author": {

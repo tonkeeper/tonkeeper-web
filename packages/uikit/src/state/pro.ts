@@ -1,30 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { ProState, ProStateWallet } from '@tonkeeper/core/dist/entries/pro';
+import { ProPlan, ProState } from '@tonkeeper/core/dist/entries/pro';
 import {
     authViaTonConnect,
     getProState,
-    logoutTonConsole
+    logoutTonConsole,
+    maybeCreateProProject
 } from '@tonkeeper/core/dist/service/proService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
+import { toNano } from 'ton-core';
 import { useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { signTonConnect } from './mnemonic';
 
 export const useProState = () => {
-    const sdk = useAppSdk();
     const wallet = useWalletContext();
-    return useQuery<ProState, Error>([QueryKey.pro], () => getProState(sdk.storage, wallet));
+    return useQuery<ProState, Error>([QueryKey.pro], () => getProState(wallet));
 };
 
-const login = async (sdk: IAppSdk, publicKey: string) => {
-    const state = await getWalletState(sdk.storage, publicKey);
-    if (!state) {
-        throw new Error('Missing wallet state');
-    }
-    await authViaTonConnect(state, signTonConnect(sdk, publicKey));
-};
 export const useSelectWalletMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
@@ -34,16 +27,37 @@ export const useSelectWalletMutation = () => {
         } catch (e) {
             console.warn(e);
         }
-        await login(sdk, publicKey);
+        const state = await getWalletState(sdk.storage, publicKey);
+        if (!state) {
+            throw new Error('Missing wallet state');
+        }
+        await authViaTonConnect(state, signTonConnect(sdk, publicKey));
+        await maybeCreateProProject(state);
         await client.invalidateQueries([QueryKey.pro]);
     });
 };
 
-export const useLoginTonConsole = (wallet: ProStateWallet) => {
-    const sdk = useAppSdk();
+export const useProLogout = () => {
     const client = useQueryClient();
-    return useMutation<void, Error>(async () => {
-        await login(sdk, wallet.publicKey);
+    return useMutation(async () => {
+        await logoutTonConsole();
         await client.invalidateQueries([QueryKey.pro]);
+    });
+};
+
+export const useProPlans = () => {
+    return useQuery<ProPlan[], Error>([QueryKey.pro, 'plans'], () => {
+        return [
+            {
+                id: '1',
+                name: 'Monthly Individual Package',
+                price: toNano('13.37').toString()
+            },
+            {
+                id: '2',
+                name: 'Yearly Individual Package',
+                price: toNano('133.7').toString()
+            }
+        ];
     });
 };
