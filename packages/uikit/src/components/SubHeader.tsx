@@ -7,7 +7,9 @@ import { ChevronLeftIcon } from './Icon';
 import { H3 } from './Text';
 import { BackButton } from './fields/BackButton';
 
-const Block = styled.div`
+export const WithHeadingDivider = styled.div``;
+
+const Block = styled(WithHeadingDivider)`
     flex-shrink: 0;
 
     padding: 1rem;
@@ -27,7 +29,7 @@ const Block = styled.div`
 `;
 
 export const SybHeaderGlobalStyle = createGlobalStyle`
-  body:not(.top) ${Block} {
+  body:not(.top) ${WithHeadingDivider} {
     &:after {
       content: '';
       display: block;

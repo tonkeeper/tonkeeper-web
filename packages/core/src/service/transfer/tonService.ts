@@ -160,7 +160,7 @@ export const estimateTonTransfer = async (
     const cell = createTonTransfer(seqno, walletState, recipient, weiAmount, isMax);
 
     const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-        emulateMessageToEventRequest: { boc: cell.toString('base64') }
+        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
     });
 
     return emulation;
@@ -179,7 +179,7 @@ export const estimateTonConnectTransfer = async (
     const cell = createTonConnectTransfer(seqno, walletState, accounts, params);
 
     return await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-        emulateMessageToEventRequest: { boc: cell.toString('base64') }
+        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
     });
 };
 

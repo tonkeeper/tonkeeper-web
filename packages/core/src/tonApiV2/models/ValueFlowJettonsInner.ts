@@ -19,6 +19,12 @@ import {
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
 } from './AccountAddress';
+import type { JettonPreview } from './JettonPreview';
+import {
+    JettonPreviewFromJSON,
+    JettonPreviewFromJSONTyped,
+    JettonPreviewToJSON,
+} from './JettonPreview';
 
 /**
  * 
@@ -34,6 +40,12 @@ export interface ValueFlowJettonsInner {
     account: AccountAddress;
     /**
      * 
+     * @type {JettonPreview}
+     * @memberof ValueFlowJettonsInner
+     */
+    jetton: JettonPreview;
+    /**
+     * 
      * @type {number}
      * @memberof ValueFlowJettonsInner
      */
@@ -46,6 +58,7 @@ export interface ValueFlowJettonsInner {
 export function instanceOfValueFlowJettonsInner(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "account" in value;
+    isInstance = isInstance && "jetton" in value;
     isInstance = isInstance && "quantity" in value;
 
     return isInstance;
@@ -62,6 +75,7 @@ export function ValueFlowJettonsInnerFromJSONTyped(json: any, ignoreDiscriminato
     return {
         
         'account': AccountAddressFromJSON(json['account']),
+        'jetton': JettonPreviewFromJSON(json['jetton']),
         'quantity': json['quantity'],
     };
 }
@@ -76,6 +90,7 @@ export function ValueFlowJettonsInnerToJSON(value?: ValueFlowJettonsInner | null
     return {
         
         'account': AccountAddressToJSON(value.account),
+        'jetton': JettonPreviewToJSON(value.jetton),
         'quantity': value.quantity,
     };
 }

@@ -25,6 +25,18 @@ export interface ValidatorsSetListInner {
      * @memberof ValidatorsSetListInner
      */
     publicKey: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ValidatorsSetListInner
+     */
+    weight: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ValidatorsSetListInner
+     */
+    adnlAddr?: string;
 }
 
 /**
@@ -33,6 +45,7 @@ export interface ValidatorsSetListInner {
 export function instanceOfValidatorsSetListInner(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "publicKey" in value;
+    isInstance = isInstance && "weight" in value;
 
     return isInstance;
 }
@@ -48,6 +61,8 @@ export function ValidatorsSetListInnerFromJSONTyped(json: any, ignoreDiscriminat
     return {
         
         'publicKey': json['public_key'],
+        'weight': json['weight'],
+        'adnlAddr': !exists(json, 'adnl_addr') ? undefined : json['adnl_addr'],
     };
 }
 
@@ -61,6 +76,8 @@ export function ValidatorsSetListInnerToJSON(value?: ValidatorsSetListInner | nu
     return {
         
         'public_key': value.publicKey,
+        'weight': value.weight,
+        'adnl_addr': value.adnlAddr,
     };
 }
 

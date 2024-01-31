@@ -11,7 +11,8 @@
         "build:twa": "npx turbo build:twa && yarn deploy:twa",
         "deploy:twa": "npx wrangler pages deploy apps/twa/build",
         "build:extension": "npx turbo build:extension",
-        "build:desktop": "npx turbo build:desktop"
+        "build:desktop": "npx turbo build:desktop",
+        "build:pkg": "npx turbo build:pkg"
     },
     "private": true,
     "devDependencies": {
@@ -30,6 +31,7 @@
         "eslint-plugin-unused-imports": "^2.0.0",
         "prettier": "^2.6.2",
         "turbo": "latest",
+        "typescript": "^4.9.4",
         "webpack": "^5.80.0",
         "webpack-cli": "^5.0.1",
         "wrangler": "^3.7.0"

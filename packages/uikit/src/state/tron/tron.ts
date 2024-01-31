@@ -75,9 +75,9 @@ export const useTronBalances = () => {
                     walletAddress
                 });
             } else {
-                const { tokens } = await sdk.getSettings();
+                //  const { tokens } = await sdk.getSettings();
                 return {
-                    balances: tokens.map(token => ({ token, weiAmount: '0' }))
+                    balances: [] // tokens.map(token => ({ token, weiAmount: '0' }))
                 };
             }
         },

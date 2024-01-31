@@ -1,3 +1,0 @@
-FROM openapitools/openapi-generator-cli
-
-CMD ["generate", "-i", "https://tonapi.io/swagger.json", "-g", "typescript-fetch", "-o", "/local/src/tonApiV1", "-p", "supportsES6=true,withInterfaces=true"]

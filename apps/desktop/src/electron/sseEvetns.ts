@@ -1,5 +1,5 @@
 import { TonConnectAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
-import { getAccountState } from '@tonkeeper/core/dist/service/accountService';
+import { accountSelectWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import {
     replyBadRequestResponse,
     replyDisconnectResponse
@@ -14,9 +14,11 @@ import {
     subscribeTonConnect
 } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
+import { delay } from '@tonkeeper/core/dist/utils/common';
 import { Buffer as BufferPolyfill } from 'buffer';
-import { BrowserWindow } from 'electron';
+import log from 'electron-log/main';
 import EventSourcePolyfill from 'eventsource';
+import { MainWindow } from './mainWindow';
 import { mainStorage } from './storageService';
 
 globalThis.Buffer = BufferPolyfill;
@@ -29,17 +31,17 @@ export class TonConnectSSE {
 
     private static instance: TonConnectSSE = null;
 
-    static getInstance(mainWindow: BrowserWindow) {
+    static getInstance() {
         if (this.instance != null) return this.instance;
-        return (this.instance = new TonConnectSSE(mainWindow));
+        return (this.instance = new TonConnectSSE());
     }
 
-    constructor(private mainWindow: BrowserWindow) {
+    constructor() {
         this.reconnect();
     }
 
     public reconnect() {
-        console.log('reconnect');
+        log.info('Reconnect.');
         return this.init().then(() => this.connect());
     }
 
@@ -73,7 +75,7 @@ export class TonConnectSSE {
         await this.reconnect();
     };
 
-    private handleMessage = (params: TonConnectAppRequest) => {
+    private handleMessage = async (params: TonConnectAppRequest) => {
         switch (params.request.method) {
             case 'disconnect': {
                 return this.disconnect(params);
@@ -85,10 +87,19 @@ export class TonConnectSSE {
                     payload: JSON.parse(params.request.params[0])
                 };
 
-                this.mainWindow.show();
-                setTimeout(() => {
-                    this.mainWindow.webContents.send('sendTransaction', value);
-                }, 200);
+                const walletPublicKey = this.dist[params.connection.clientSessionId];
+
+                const account = await getAccountState(mainStorage);
+
+                const window = await MainWindow.bringToFront();
+
+                if (account.activePublicKey !== walletPublicKey) {
+                    await accountSelectWallet(mainStorage, walletPublicKey);
+                    window.webContents.send('refresh');
+                    await delay(500);
+                }
+
+                window.webContents.send('sendTransaction', value);
                 return;
             }
             default: {
@@ -99,6 +110,9 @@ export class TonConnectSSE {
 
     public async connect() {
         this.destroy();
+        if (this.connections.length === 0) {
+            log.info('Missing connection.');
+        }
         this.closeConnection = subscribeTonConnect({
             storage: mainStorage,
             handleMessage: this.handleMessage,
@@ -110,6 +124,7 @@ export class TonConnectSSE {
 
     public destroy() {
         if (this.closeConnection) {
+            log.info('Close connection.');
             this.closeConnection();
         }
     }

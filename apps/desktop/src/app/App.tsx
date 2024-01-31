@@ -14,6 +14,7 @@ import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import {
     ActivitySkeletonPage,
+    BrowserSkeletonPage,
     CoinSkeletonPage,
     HomeSkeleton,
     SettingsSkeletonPage
@@ -27,10 +28,7 @@ import {
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
 import SendActionNotification from '@tonkeeper/uikit/dist/components/transfer/SendNotifications';
 import SendNftNotification from '@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification';
-import {
-    AmplitudeAnalyticsContext,
-    useAmplitudeAnalytics
-} from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
@@ -49,6 +47,7 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import Settings from '@tonkeeper/uikit/dist/pages/settings';
+import Browser from '@tonkeeper/uikit/dist/pages/browser';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
@@ -60,7 +59,7 @@ import { useTranslation } from 'react-i18next';
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
-import { useAppHeight, useAppWidth } from '../libs/hooks';
+import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 
@@ -74,6 +73,7 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new DesktopAppSdk();
+const TARGET_ENV = 'desktop';
 
 const langs = 'en,zh_CN,ru,it,tr';
 const listOfAuth: AuthState['kind'][] = ['keychain'];
@@ -136,13 +136,18 @@ export const Loader: FC = () => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
-    const tonendpoint = useTonendpoint(sdk.version, activeWallet?.network, activeWallet?.lang);
+    const tonendpoint = useTonendpoint(
+        TARGET_ENV,
+        sdk.version,
+        activeWallet?.network,
+        activeWallet?.lang
+    );
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
     useAppHeight();
 
-    const enable = useAmplitudeAnalytics('Desktop', account, activeWallet);
+    const { data: tracker } = useAnalytics(sdk.version, account, activeWallet);
 
     useEffect(() => {
         if (
@@ -155,6 +160,10 @@ export const Loader: FC = () => {
             );
         }
     }, [activeWallet, i18n]);
+
+    useEffect(() => {
+        window.backgroundApi.onRefresh(() => queryClient.invalidateQueries());
+    }, []);
 
     if (auth === undefined || account === undefined || config === undefined || lock === undefined) {
         return <Loading />;
@@ -175,7 +184,7 @@ export const Loader: FC = () => {
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={enable}>
+        <AmplitudeAnalyticsContext.Provider value={tracker}>
             <OnImportAction.Provider value={navigate}>
                 <AfterImportAction.Provider
                     value={() => navigate(AppRoute.home, { replace: true })}
@@ -198,6 +207,7 @@ export const Content: FC<{
     const location = useLocation();
     useWindowsScroll();
     useAppWidth();
+    useTrackLocation();
 
     if (lock) {
         return (
@@ -234,6 +244,14 @@ export const Content: FC<{
                         element={
                             <Suspense fallback={<ActivitySkeletonPage />}>
                                 <Activity />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path={any(AppRoute.browser)}
+                        element={
+                            <Suspense fallback={<BrowserSkeletonPage />}>
+                                <Browser />
                             </Suspense>
                         }
                     />

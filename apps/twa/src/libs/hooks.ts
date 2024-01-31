@@ -1,4 +1,10 @@
+import { useQuery } from '@tanstack/react-query';
+import { AccountState } from '@tonkeeper/core/dist/entries/account';
+import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { Analytics, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { Viewport } from '@twa.js/sdk';
 import { useMainButton, useViewport } from '@twa.js/sdk-react';
 import React, { useEffect } from 'react';
@@ -63,4 +69,18 @@ export const useTwaAppViewport = (setAppHeight: boolean) => {
             window.removeEventListener('resize', callback);
         };
     }, [sdk, viewport]);
+};
+
+export const useAnalytics = (account?: AccountState, wallet?: WalletState | null) => {
+    return useQuery<Analytics>(
+        [QueryKey.analytics],
+        async () => {
+            const tracker = new Gtag(process.env.REACT_APP_MEASUREMENT_ID!);
+
+            tracker.init('Twa', toWalletType(wallet), account, wallet);
+
+            return tracker;
+        },
+        { enabled: account != null }
+    );
 };

@@ -12,6 +12,7 @@ import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import {
     ActivitySkeletonPage,
+    BrowserSkeletonPage,
     CoinSkeletonPage,
     HomeSkeleton,
     SettingsSkeletonPage
@@ -21,10 +22,7 @@ import {
     AddFavoriteNotification,
     EditFavoriteNotification
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
-import {
-    AmplitudeAnalyticsContext,
-    useAmplitudeAnalytics
-} from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
@@ -50,10 +48,11 @@ import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
-import { useAppHeight, useAppWidth } from './libs/hooks';
+import { useAnalytics, useAppHeight, useAppWidth } from './libs/hooks';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
+const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
@@ -84,12 +83,13 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new BrowserAppSdk();
+const TARGET_ENV = 'web';
 
 export const App: FC<PropsWithChildren> = () => {
     const { t, i18n } = useTranslation();
 
     const translation = useMemo(() => {
-        const languages = (process.env.REACT_APP_LOCALES ?? 'en').split(',');
+        const languages = (import.meta.env.VITE_APP_LOCALES ?? 'en').split(',');
         const client: I18nContext = {
             t,
             i18n: {
@@ -173,13 +173,13 @@ export const Loader: FC = () => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
-    const tonendpoint = useTonendpoint(sdk.version, activeWallet?.network, activeWallet?.lang);
+    const tonendpoint = useTonendpoint(TARGET_ENV, sdk.version, activeWallet?.network, activeWallet?.lang);
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
     useAppHeight();
 
-    const enable = useAmplitudeAnalytics('Web', account, activeWallet);
+    const { data: tracker } = useAnalytics(account, activeWallet);
 
     useEffect(() => {
         if (
@@ -212,7 +212,7 @@ export const Loader: FC = () => {
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={enable}>
+        <AmplitudeAnalyticsContext.Provider value={tracker}>
             <OnImportAction.Provider value={navigate}>
                 <AfterImportAction.Provider
                     value={() => navigate(AppRoute.home, { replace: true })}
@@ -239,6 +239,7 @@ export const Content: FC<{
     useWindowsScroll();
     useAppWidth(standalone);
     useKeyboardHeight();
+    useTrackLocation();
 
     if (lock) {
         return (
@@ -254,7 +255,10 @@ export const Content: FC<{
                 <Suspense fallback={<Loading />}>
                     <InitializeContainer fullHeight={false}>
                         <Routes>
-                            <Route path={any(AppRoute.import)} element={<ImportRouter />} />
+                            <Route
+                                path={any(AppRoute.import)}
+                                element={<ImportRouter listOfAuth={[]} />}
+                            />
                             <Route path="*" element={<Initialize />} />
                         </Routes>
                     </InitializeContainer>
@@ -272,6 +276,14 @@ export const Content: FC<{
                         element={
                             <Suspense fallback={<ActivitySkeletonPage />}>
                                 <Activity />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path={any(AppRoute.browser)}
+                        element={
+                            <Suspense fallback={<BrowserSkeletonPage />}>
+                                <Browser />
                             </Suspense>
                         }
                     />

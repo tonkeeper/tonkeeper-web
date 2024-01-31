@@ -28,6 +28,30 @@ import {
 export interface Validators {
     /**
      * 
+     * @type {number}
+     * @memberof Validators
+     */
+    electAt: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Validators
+     */
+    electClose: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Validators
+     */
+    minStake: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Validators
+     */
+    totalStake: number;
+    /**
+     * 
      * @type {Array<Validator>}
      * @memberof Validators
      */
@@ -39,6 +63,10 @@ export interface Validators {
  */
 export function instanceOfValidators(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "electAt" in value;
+    isInstance = isInstance && "electClose" in value;
+    isInstance = isInstance && "minStake" in value;
+    isInstance = isInstance && "totalStake" in value;
     isInstance = isInstance && "validators" in value;
 
     return isInstance;
@@ -54,6 +82,10 @@ export function ValidatorsFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     }
     return {
         
+        'electAt': json['elect_at'],
+        'electClose': json['elect_close'],
+        'minStake': json['min_stake'],
+        'totalStake': json['total_stake'],
         'validators': ((json['validators'] as Array<any>).map(ValidatorFromJSON)),
     };
 }
@@ -67,6 +99,10 @@ export function ValidatorsToJSON(value?: Validators | null): any {
     }
     return {
         
+        'elect_at': value.electAt,
+        'elect_close': value.electClose,
+        'min_stake': value.minStake,
+        'total_stake': value.totalStake,
         'validators': ((value.validators as Array<any>).map(ValidatorToJSON)),
     };
 }

@@ -103,6 +103,7 @@ export abstract class BaseApp implements IAppSdk {
     uiEvents = new EventEmitter();
 
     constructor(public storage: IStorage) {}
+
     nativeBackButton?: NativeBackButton | undefined;
 
     topMessage = (text?: string) => {
@@ -136,7 +137,9 @@ export abstract class BaseApp implements IAppSdk {
     isStandalone = () => false;
 
     confirm = async (text: string) => window.confirm(text);
+
     alert = async (text: string) => window.alert(text);
+
     prompt = async (message: string, defaultValue?: string) => window.prompt(message, defaultValue);
 
     requestExtensionPermission = async () => {};
@@ -153,3 +156,5 @@ export class MockAppSdk extends BaseApp {
         super(new MemoryStorage());
     }
 }
+
+export type TargetEnv = 'web' | 'extension' | 'desktop' | 'twa';

@@ -1,5 +1,7 @@
+import { TargetEnv } from '../AppSdk';
 import { intlLocale } from '../entries/language';
 import { Network } from '../entries/network';
+import { DAppTrack } from '../service/urlService';
 import { FetchAPI } from '../tonApiV2';
 
 interface BootParams {
@@ -39,6 +41,8 @@ export interface TonendpointConfig {
     transactionExplorer?: string;
     NFTOnExplorerUrl?: string;
 
+    featured_play_interval?: number;
+
     /**
      * @deprecated use ton api
      */
@@ -66,17 +70,21 @@ export class Tonendpoint {
 
     public basePath: string;
 
+    public readonly targetEnv: TargetEnv;
+
     constructor(
         {
             lang = 'en',
             build = '3.0.0',
             network = Network.MAINNET,
             platform = 'web',
-            countryCode
-        }: Partial<BootParams>,
+            countryCode,
+            targetEnv
+        }: Partial<BootParams> & { targetEnv: TargetEnv },
         { fetchApi = defaultFetch, basePath = defaultTonendpoint }: BootOptions
     ) {
-        this.params = { lang, build: '3.5.0', network, platform, countryCode };
+        this.targetEnv = targetEnv;
+        this.params = { lang, build, network, platform, countryCode };
         this.fetchApi = fetchApi;
         this.basePath = basePath;
     }
@@ -85,31 +93,57 @@ export class Tonendpoint {
         this.params.countryCode = countryCode;
     };
 
-    toSearchParams = () => {
+    toSearchParams = (
+        rewriteParams?: Partial<BootParams>,
+        additionalParams?: Record<string, string | number>
+    ) => {
         const params = new URLSearchParams({
-            lang: intlLocale(this.params.lang),
-            build: this.params.build,
-            chainName: this.params.network === Network.TESTNET ? 'testnet' : 'mainnet',
-            platform: this.params.platform
+            lang: intlLocale(rewriteParams?.lang ?? this.params.lang),
+            build: rewriteParams?.build ?? this.params.build,
+            chainName:
+                (rewriteParams?.network ?? this.params.network) === Network.TESTNET
+                    ? 'testnet'
+                    : 'mainnet',
+            platform: rewriteParams?.platform ?? this.params.platform
         });
-        if (this.params.countryCode) {
-            params.append('countryCode', this.params.countryCode);
+        const countryCode = rewriteParams?.countryCode ?? this.params.countryCode;
+
+        if (countryCode) {
+            params.append('countryCode', countryCode);
+        }
+
+        if (!additionalParams) {
+            return params.toString();
+        }
+
+        for (const key in additionalParams) {
+            params.append(key, additionalParams[key].toString());
         }
         return params.toString();
     };
 
     boot = async (): Promise<TonendpointConfig> => {
-        const response = await this.fetchApi(`${this.basePath}/keys?${this.toSearchParams()}`, {
-            method: 'GET'
-        });
+        const response = await this.fetchApi(
+            `https://boot.tonkeeper.com/keys?${this.toSearchParams()}`,
+            {
+                method: 'GET'
+            }
+        );
 
         return response.json();
     };
 
-    GET = async <Data>(path: string): Promise<Data> => {
-        const response = await this.fetchApi(`${this.basePath}${path}?${this.toSearchParams()}`, {
-            method: 'GET'
-        });
+    GET = async <Data>(
+        path: string,
+        rewriteParams?: Partial<BootParams>,
+        additionalParams?: Record<string, string | number>
+    ): Promise<Data> => {
+        const response = await this.fetchApi(
+            `${this.basePath}${path}?${this.toSearchParams(rewriteParams, additionalParams)}`,
+            {
+                method: 'GET'
+            }
+        );
 
         const result: TonendpointResponse<Data> = await response.json();
         if (!result.success) {
@@ -117,6 +151,18 @@ export class Tonendpoint {
         }
 
         return result.data;
+    };
+
+    getFiatMethods = (countryCode?: string | null | undefined): Promise<TonendpoinFiatMethods> => {
+        return this.GET('/fiat/methods', { countryCode });
+    };
+
+    getAppsPopular = (countryCode?: string | null | undefined): Promise<Recommendations> => {
+        return this.GET('/apps/popular', { countryCode }, { track: this.getTrack() });
+    };
+
+    getTrack = (): DAppTrack => {
+        return this.targetEnv === 'extension' ? 'extension' : 'desktop';
     };
 }
 
@@ -165,10 +211,25 @@ export interface TonendpoinFiatMethods {
     categories: TonendpoinFiatCategory[];
 }
 
-export const getFiatMethods = async (
-    tonendpoint: Tonendpoint,
-    countryCode: string | null | undefined
-) => {
-    tonendpoint.setCountryCode(countryCode);
-    return tonendpoint.GET<TonendpoinFiatMethods>('/fiat/methods');
-};
+export interface CarouselApp extends PromotedApp {
+    poster: string;
+}
+
+export interface PromotedApp {
+    name: string;
+    description: string;
+    icon: string;
+    url: string;
+    textColor?: string;
+}
+
+export interface PromotionCategory {
+    id: string;
+    title: string;
+    apps: PromotedApp[];
+}
+
+export interface Recommendations {
+    categories: PromotionCategory[];
+    apps: CarouselApp[];
+}

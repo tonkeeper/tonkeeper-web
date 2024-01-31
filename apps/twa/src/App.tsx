@@ -11,7 +11,7 @@ import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import {
-    ActivitySkeletonPage,
+    ActivitySkeletonPage, BrowserSkeletonPage,
     CoinSkeletonPage,
     HomeSkeleton,
     SettingsSkeletonPage
@@ -33,10 +33,7 @@ import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import {
-    AmplitudeAnalyticsContext,
-    useAmplitudeAnalytics
-} from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
@@ -59,10 +56,11 @@ import { TwaQrScanner } from './components/TwaQrScanner';
 import { TwaNftNotification } from './components/nft/NftNotification';
 import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
-import { useTwaAppViewport } from './libs/hooks';
+import { useAnalytics, useTwaAppViewport } from './libs/hooks';
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
+const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
@@ -79,6 +77,8 @@ const queryClient = new QueryClient({
         }
     }
 });
+
+const TARGET_ENV = 'twa';
 
 export const App = () => {
     return (
@@ -214,11 +214,11 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
-    const tonendpoint = useTonendpoint(sdk.version, activeWallet?.network, activeWallet?.lang);
+    const tonendpoint = useTonendpoint(TARGET_ENV, sdk.version, activeWallet?.network, activeWallet?.lang);
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
-    const enable = useAmplitudeAnalytics('Twa', account, activeWallet);
+    const { data: tracker } = useAnalytics(account, activeWallet);
 
     if (auth === undefined || account === undefined || config === undefined || lock === undefined) {
         return <Loading />;
@@ -242,7 +242,7 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={enable}>
+        <AmplitudeAnalyticsContext.Provider value={tracker}>
             <OnImportAction.Provider value={navigate}>
                 <AfterImportAction.Provider
                     value={() => navigate(AppRoute.home, { replace: true })}
@@ -293,7 +293,7 @@ const InitPages = () => {
         <InitWrapper>
             <Suspense fallback={<Loading />}>
                 <Routes>
-                    <Route path={any(AppRoute.import)} element={<ImportRouter />} />
+                    <Route path={any(AppRoute.import)} element={<ImportRouter listOfAuth={[]} />} />
                     <Route path="*" element={<Initialize />} />
                 </Routes>
             </Suspense>
@@ -308,6 +308,7 @@ const Content: FC<{
 }> = ({ activeWallet, lock, showQrScan }) => {
     const location = useLocation();
     useWindowsScroll();
+    useTrackLocation();
 
     if (lock) {
         return (
@@ -349,6 +350,14 @@ const MainPages: FC<{ showQrScan: boolean }> = ({ showQrScan }) => {
                         element={
                             <Suspense fallback={<ActivitySkeletonPage />}>
                                 <Activity />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path={any(AppRoute.browser)}
+                        element={
+                            <Suspense fallback={<BrowserSkeletonPage />}>
+                                <Browser />
                             </Suspense>
                         }
                     />

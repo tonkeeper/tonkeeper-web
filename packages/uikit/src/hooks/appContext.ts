@@ -34,7 +34,7 @@ export const AppContext = React.createContext<IAppContext>({
     auth: defaultAuthState,
     fiat: FiatCurrencies.USD,
     config: defaultTonendpointConfig,
-    tonendpoint: new Tonendpoint({}, {}),
+    tonendpoint: new Tonendpoint({ targetEnv: 'web' }, {}),
     standalone: false,
     extension: false,
     ios: false,

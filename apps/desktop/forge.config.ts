@@ -11,25 +11,40 @@ import type { NotaryToolCredentials } from '@electron/notarize/lib/types';
 import dotenv from 'dotenv';
 import path from 'path';
 
+import { MakerDebConfigOptions } from '@electron-forge/maker-deb/dist/Config';
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 
-const { parsed } = dotenv.config();
+dotenv.config();
+
+const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc'];
+
+const devAndRpmOptions = {
+    name: 'Tonkeeper',
+    productName: 'Tonkeeper',
+    genericName: 'Tonkeeper',
+    license: 'Apache-2.0',
+    maintainer: 'Ton Apps Group',
+    bin: 'Tonkeeper', // bin name
+    description: 'Your desktop wallet on The Open Network',
+    homepage: 'https://tonkeeper.com',
+    icon: path.join(__dirname, 'public', 'icon.png'),
+    mimeType: schemes.map(schema => `x-scheme-handler/${schema}`)
+};
 
 const config: ForgeConfig = {
     packagerConfig: {
         asar: true,
-        icon: './public/icon',
-        extraResource: ['./public'],
+        icon: path.join(__dirname, 'public', 'icon'),
         name: 'Tonkeeper',
         executableName: 'Tonkeeper',
         protocols: [
             {
                 name: 'Tonkeeper Protocol',
-                schemes: ['tc', 'tonkeeper', 'tonkeeper-tc']
+                schemes: schemes
             }
         ],
-        appBundleId: parsed!.APPLE_BUILD_ID,
+        appBundleId: 'com.tonapps.tonkeeperpro',
         osxSign: {
             optionsForFile: (optionsForFile: string) => {
                 return {
@@ -38,24 +53,56 @@ const config: ForgeConfig = {
             }
         },
         osxNotarize: {
-            appleApiKey: parsed!.APPLE_API_KEY,
-            appleApiKeyId: parsed!.APPLE_API_KEY_ID,
-            appleApiIssuer: parsed!.APPLE_API_ISSUER
-        } as NotaryToolCredentials
+            appleApiKey: process.env.APPLE_API_KEY,
+            appleApiKeyId: process.env.APPLE_API_KEY_ID,
+            appleApiIssuer: process.env.APPLE_API_ISSUER
+        } as NotaryToolCredentials,
+        extraResource: ['./public']
     },
     rebuildConfig: {},
     makers: [
-        new MakerSquirrel({}),
-        new MakerZIP({}, ['darwin']),
-        new MakerDMG(
+        new MakerSquirrel(
             {
-                icon: path.join(process.cwd(), 'public', 'icon.icns'),
-                format: 'ULFO'
+                name: 'Tonkeeper',
+                authors: 'Ton Apps Group',
+                description: 'Your desktop wallet on The Open Network',
+                iconUrl: 'https://tonkeeper.com/assets/icon.ico',
+                setupIcon: path.join(process.cwd(), 'public', 'icon.ico'),
+                loadingGif: path.join(process.cwd(), 'public', 'install.gif')
             },
+            ['win32']
+        ),
+        new MakerZIP({}, ['darwin', 'linux', 'win32']),
+        new MakerDMG(
+            arch => ({
+                background: path.join(process.cwd(), 'public', 'dmg-bg.png'),
+                icon: path.join(process.cwd(), 'public', 'icon.icns'),
+                format: 'ULFO',
+                additionalDMGOptions: { window: { size: { width: 600, height: 372 } } },
+                contents: [
+                    {
+                        x: 200,
+                        y: 170,
+                        type: 'file',
+                        path: `${process.cwd()}/out/Tonkeeper-darwin-${arch}/Tonkeeper.app`
+                    },
+                    { x: 400, y: 170, type: 'link', path: '/Applications' }
+                ]
+            }),
             ['darwin']
         ),
-        new MakerRpm({}),
-        new MakerDeb({})
+        new MakerRpm(
+            {
+                options: devAndRpmOptions
+            },
+            ['linux']
+        ),
+        new MakerDeb(
+            {
+                options: { ...devAndRpmOptions, compression: 'xz' } as MakerDebConfigOptions
+            },
+            ['linux']
+        )
     ],
     plugins: [
         new AutoUnpackNativesPlugin({}),

@@ -11,7 +11,7 @@ import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import {
-    ActivitySkeletonPage,
+    ActivitySkeletonPage, BrowserSkeletonPage,
     CoinSkeletonPage,
     HomeSkeleton,
     SettingsSkeletonPage
@@ -21,10 +21,7 @@ import {
     AddFavoriteNotification,
     EditFavoriteNotification
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
-import {
-    AmplitudeAnalyticsContext,
-    useAmplitudeAnalytics
-} from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import {
     AppContext,
     IAppContext,
@@ -54,11 +51,12 @@ import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
 import { Notifications } from './components/Notifications';
 import { connectToBackground } from './event';
-import { ExtensionAppSdk, extensionType } from './libs/appSdk';
-import { useAppWidth } from './libs/hoolks';
+import { ExtensionAppSdk } from './libs/appSdk';
+import { useAnalytics, useAppWidth } from './libs/hoolks';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
+const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
@@ -84,6 +82,7 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new ExtensionAppSdk();
+const TARGET_ENV = 'extension';
 connectToBackground();
 
 export const App: FC = () => {
@@ -168,13 +167,14 @@ export const Loader: FC = React.memo(() => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
     const tonendpoint = useTonendpoint(
+        TARGET_ENV,
         sdk.version,
         activeWallet?.network,
         localizationFrom(browser.i18n.getUILanguage())
     );
     const { data: config } = useTonenpointConfig(tonendpoint);
 
-    const enable = useAmplitudeAnalytics(extensionType, account, activeWallet);
+    const { data: tracker } = useAnalytics(sdk.storage, account, activeWallet);
 
     if (!account || !auth || !config || lock === undefined) {
         return (
@@ -201,7 +201,7 @@ export const Loader: FC = React.memo(() => {
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={enable}>
+        <AmplitudeAnalyticsContext.Provider value={tracker}>
             <OnImportAction.Provider value={sdk.openExtensionInBrowser}>
                 <AfterImportAction.Provider value={sdk.closeExtensionInBrowser}>
                     <AppContext.Provider value={context}>
@@ -236,6 +236,7 @@ export const Content: FC<{
 
     useWindowsScroll(!pageView);
     useAppWidth();
+    useTrackLocation();
 
     if (lock) {
         return (
@@ -254,7 +255,7 @@ export const Content: FC<{
                             path={any(AppRoute.import)}
                             element={
                                 <InitializeContainer fullHeight={false}>
-                                    <ImportRouter />
+                                    <ImportRouter listOfAuth={[]} />
                                 </InitializeContainer>
                             }
                         />
@@ -281,6 +282,14 @@ export const Content: FC<{
                         element={
                             <Suspense fallback={<ActivitySkeletonPage />}>
                                 <Activity />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path={any(AppRoute.browser)}
+                        element={
+                            <Suspense fallback={<BrowserSkeletonPage />}>
+                                <Browser />
                             </Suspense>
                         }
                     />

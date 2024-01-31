@@ -4,6 +4,7 @@
     "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
     "description": "Your telegram mini app wallet on The Open Network",
     "dependencies": {
+        "@tanstack/react-query": "4.3.4",
         "@tonkeeper/core": "0.1.0",
         "@tonkeeper/locales": "0.1.0",
         "@tonkeeper/uikit": "0.1.0",
@@ -17,7 +18,7 @@
         "react-dom": "^18.2.0",
         "react-i18next": "^12.1.1",
         "react-router-dom": "^6.4.5",
-        "styled-components": "^5.3.6",
+        "styled-components": "^6.1.1",
         "web-vitals": "^2.1.4"
     },
     "devDependencies": {

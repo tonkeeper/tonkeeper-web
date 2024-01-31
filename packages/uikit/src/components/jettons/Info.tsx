@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { SkeletonImage, SkeletonText } from '../Skeleton';
+import { SkeletonImage, SkeletonText } from '../shared/Skeleton';
 import { H2 } from '../Text';
 import { Body } from './CroppedText';
 

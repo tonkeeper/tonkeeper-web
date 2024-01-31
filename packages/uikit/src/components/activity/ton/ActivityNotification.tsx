@@ -1,9 +1,10 @@
 import { AccountEvent, Action } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, useCallback } from 'react';
+import { FC, useCallback } from 'react';
 import { Notification } from '../../Notification';
 import { ErrorActivityNotification } from '../NotificationCommon';
 import {
     AuctionBidActionDetails,
+    DomainRenewActionDetails,
     SmartContractExecActionDetails,
     TonTransferActionNotification
 } from './ActivityActionDetails';
@@ -43,6 +44,8 @@ const ActivityContent: FC<ActionData> = props => {
             return <SubscribeActionDetails {...props} />;
         case 'AuctionBid':
             return <AuctionBidActionDetails {...props} />;
+        case 'DomainRenew':
+            return <DomainRenewActionDetails {...props} />;
         case 'SmartContractExec':
             return <SmartContractExecActionDetails {...props} />;
         case 'JettonTransfer':

@@ -1,0 +1,159 @@
+name: Tonkeeper Desktop Distributives
+on:
+    workflow_dispatch:
+    pull_request:
+
+jobs:
+    desktop-build:
+        name: desktop-build
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-13, windows-latest]
+                node-version: [20.7.0]
+
+        runs-on: ${{ matrix.os }}
+        timeout-minutes: 30
+        env:
+            APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
+            APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+            APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+            REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE }}
+            DEBUG: electron*
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Decode service account into a file
+              if: runner.os == 'macOS'
+              env:
+                  CREDENTIALS: ${{ secrets.APPLE_API_KEY }}
+              run: |
+                  echo $CREDENTIALS | base64 -d > ${{ github.workspace }}/AuthKey.p8
+
+            - name: Configure keychain
+              if: runner.os == 'macOS'
+              uses: apple-actions/import-codesign-certs@v2
+              with:
+                  p12-file-base64: ${{ secrets.IDENTITY_P12_B64 }}
+                  p12-password: ${{ secrets.IDENTITY_PASSPHRASE }}
+
+            - name: Run install
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: install
+
+            - name: Run build packages
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: build:pkg
+
+            - name: Run build intel distributive
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: make:intel
+                  dir: 'apps/desktop'
+
+            - name: Run build arm distributive
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: make:arm
+                  dir: 'apps/desktop'
+
+            - name: Run build universal distributive
+              if: runner.os == 'macOS'
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: make:universal
+                  dir: 'apps/desktop'
+
+            - name: Upload distributives to artifacts
+              uses: actions/upload-artifact@v4
+              if: runner.os == 'macOS'
+              with:
+                  name: Tonkeeper Desktop ${{ runner.os }}
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make
+
+            - name: Upload distributives to artifacts
+              uses: actions/upload-artifact@v4
+              if: runner.os == 'Windows'
+              with:
+                  name: Tonkeeper Desktop ${{ runner.os }} x64
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/x64
+
+            - name: Upload distributives to artifacts
+              uses: actions/upload-artifact@v4
+              if: runner.os == 'Linux'
+              with:
+                  name: Tonkeeper Desktop ${{ runner.os }} x64
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make/deb/x64
+
+            - name: Upload distributives to artifacts
+              uses: actions/upload-artifact@v4
+              if: runner.os == 'Linux'
+              with:
+                  name: Tonkeeper Desktop ${{ runner.os }} arm64
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make/deb/arm64
+
+            - name: Clean-up credentials
+              if: always() && runner.os == 'macOS'
+              run: |
+                  rm ${{ github.workspace }}/AuthKey.p8
+
+    web-build:
+        name: web-build
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.7.0
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Run install
+              uses: borales/actions-yarn@v4
+              with:
+                  cmd: install
+
+            - name: Run build
+              uses: borales/actions-yarn@v4
+              env:
+                  VITE_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
+                  VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
+                  VITE_APP_LOCALES: en,zh_CN,ru,it,tr
+              with:
+                  cmd: build:web
+
+            - name: Publish to Cloudflare Pages
+              uses: cloudflare/pages-action@v1
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  projectName: tonkeeper-web
+                  directory: apps/web/dist
+                  wranglerVersion: '3'

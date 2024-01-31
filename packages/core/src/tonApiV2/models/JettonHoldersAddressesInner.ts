@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
+
 /**
  * 
  * @export
@@ -27,6 +34,12 @@ export interface JettonHoldersAddressesInner {
     address: string;
     /**
      * 
+     * @type {AccountAddress}
+     * @memberof JettonHoldersAddressesInner
+     */
+    owner: AccountAddress;
+    /**
+     * 
      * @type {string}
      * @memberof JettonHoldersAddressesInner
      */
@@ -39,6 +52,7 @@ export interface JettonHoldersAddressesInner {
 export function instanceOfJettonHoldersAddressesInner(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "address" in value;
+    isInstance = isInstance && "owner" in value;
     isInstance = isInstance && "balance" in value;
 
     return isInstance;
@@ -55,6 +69,7 @@ export function JettonHoldersAddressesInnerFromJSONTyped(json: any, ignoreDiscri
     return {
         
         'address': json['address'],
+        'owner': AccountAddressFromJSON(json['owner']),
         'balance': json['balance'],
     };
 }
@@ -69,6 +84,7 @@ export function JettonHoldersAddressesInnerToJSON(value?: JettonHoldersAddresses
     return {
         
         'address': value.address,
+        'owner': AccountAddressToJSON(value.owner),
         'balance': value.balance,
     };
 }

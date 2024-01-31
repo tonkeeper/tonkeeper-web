@@ -101,7 +101,7 @@ export const estimateJettonTransfer = async (
     );
 
     const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-        emulateMessageToEventRequest: { boc: cell.toString('base64') }
+        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
     });
     return emulation;
 };

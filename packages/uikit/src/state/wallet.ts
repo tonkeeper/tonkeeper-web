@@ -4,7 +4,6 @@ import { WalletState, WalletVersion, walletVersionText } from '@tonkeeper/core/d
 import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
-import { getWalletActiveAddresses } from '@tonkeeper/core/dist/tonApiExtended/walletApi';
 import {
     Account,
     AccountsApi,
@@ -18,10 +17,12 @@ import {
     WalletApi
 } from '@tonkeeper/core/dist/tonApiV2';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
+import { Address } from 'ton';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
+import { getRateKey, toTokenRate } from './rates';
 import { DefaultRefetchInterval } from './tonendpoint';
 
 export const useActiveWallet = () => {
@@ -91,9 +92,20 @@ export const useWalletAddresses = () => {
     const {
         api: { tonApiV2 }
     } = useAppContext();
-    return useQuery<string[], Error>([wallet.publicKey, QueryKey.addresses], () =>
-        getWalletActiveAddresses(tonApiV2, wallet)
-    );
+    return useQuery<string[], Error>([wallet.publicKey, QueryKey.addresses], async () => {
+        const { accounts } = await new WalletApi(tonApiV2).getWalletsByPublicKey({
+            publicKey: wallet.publicKey
+        });
+        const result = accounts
+            .filter(item => item.balance > 0 || item.status === 'active')
+            .map(w => w.address);
+
+        if (result.length > 0) {
+            return result;
+        } else {
+            return [wallet.active.rawAddress];
+        }
+    });
 };
 
 export const useWalletAccountInfo = () => {
@@ -117,13 +129,14 @@ export const useWalletAccountInfo = () => {
 
 export const useWalletJettonList = () => {
     const wallet = useWalletContext();
-    const { api } = useAppContext();
+    const { api, fiat } = useAppContext();
     const client = useQueryClient();
     return useQuery<JettonsBalances, Error>(
-        [wallet.active.rawAddress, QueryKey.jettons],
+        [wallet.active.rawAddress, QueryKey.jettons, fiat, wallet.network],
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.active.rawAddress
+                accountId: wallet.active.rawAddress,
+                currencies: fiat
             });
 
             result.balances.forEach(item => {
@@ -131,6 +144,18 @@ export const useWalletJettonList = () => {
                     [wallet.publicKey, QueryKey.jettons, JettonKey.balance, item.jetton.address],
                     item
                 );
+
+                if (item.price) {
+                    try {
+                        const tokenRate = toTokenRate(item.price, fiat);
+                        client.setQueryData(
+                            getRateKey(fiat, Address.parse(item.jetton.address).toString()),
+                            tokenRate
+                        );
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
             });
 
             return result;

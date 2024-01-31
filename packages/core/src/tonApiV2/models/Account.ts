@@ -85,6 +85,12 @@ export interface Account {
      * @memberof Account
      */
     isSuspended?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Account
+     */
+    isWallet: boolean;
 }
 
 /**
@@ -97,6 +103,7 @@ export function instanceOfAccount(value: object): boolean {
     isInstance = isInstance && "lastActivity" in value;
     isInstance = isInstance && "status" in value;
     isInstance = isInstance && "getMethods" in value;
+    isInstance = isInstance && "isWallet" in value;
 
     return isInstance;
 }
@@ -122,6 +129,7 @@ export function AccountFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
         'memoRequired': !exists(json, 'memo_required') ? undefined : json['memo_required'],
         'getMethods': json['get_methods'],
         'isSuspended': !exists(json, 'is_suspended') ? undefined : json['is_suspended'],
+        'isWallet': json['is_wallet'],
     };
 }
 
@@ -145,6 +153,7 @@ export function AccountToJSON(value?: Account | null): any {
         'memo_required': value.memoRequired,
         'get_methods': value.getMethods,
         'is_suspended': value.isSuspended,
+        'is_wallet': value.isWallet,
     };
 }
 

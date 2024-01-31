@@ -19,6 +19,12 @@ import {
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
 } from './AccountAddress';
+import type { PoolImplementationType } from './PoolImplementationType';
+import {
+    PoolImplementationTypeFromJSON,
+    PoolImplementationTypeFromJSONTyped,
+    PoolImplementationTypeToJSON,
+} from './PoolImplementationType';
 
 /**
  * validator's participation in elections
@@ -44,6 +50,12 @@ export interface WithdrawStakeRequestAction {
      * @memberof WithdrawStakeRequestAction
      */
     pool: AccountAddress;
+    /**
+     * 
+     * @type {PoolImplementationType}
+     * @memberof WithdrawStakeRequestAction
+     */
+    implementation: PoolImplementationType;
 }
 
 /**
@@ -53,6 +65,7 @@ export function instanceOfWithdrawStakeRequestAction(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "staker" in value;
     isInstance = isInstance && "pool" in value;
+    isInstance = isInstance && "implementation" in value;
 
     return isInstance;
 }
@@ -70,6 +83,7 @@ export function WithdrawStakeRequestActionFromJSONTyped(json: any, ignoreDiscrim
         'amount': !exists(json, 'amount') ? undefined : json['amount'],
         'staker': AccountAddressFromJSON(json['staker']),
         'pool': AccountAddressFromJSON(json['pool']),
+        'implementation': PoolImplementationTypeFromJSON(json['implementation']),
     };
 }
 
@@ -85,6 +99,7 @@ export function WithdrawStakeRequestActionToJSON(value?: WithdrawStakeRequestAct
         'amount': value.amount,
         'staker': AccountAddressToJSON(value.staker),
         'pool': AccountAddressToJSON(value.pool),
+        'implementation': PoolImplementationTypeToJSON(value.implementation),
     };
 }
 
