@@ -11,15 +11,19 @@ export const usePairSignerMutation = () => {
     const sdk = useAppSdk();
     const { api } = useAppContext();
     const client = useQueryClient();
-
     const navigate = useNavigate();
     return useMutation<void, Error, string>(async qrCode => {
-        const state = await walletStateFromSignerQr(api, qrCode);
+        try {
+            const state = await walletStateFromSignerQr(api, qrCode);
 
-        await addWalletWithCustomAuthState(sdk.storage, state);
+            await addWalletWithCustomAuthState(sdk.storage, state);
 
-        await client.invalidateQueries([QueryKey.account]);
+            await client.invalidateQueries([QueryKey.account]);
 
-        navigate(AppRoute.home);
+            navigate(AppRoute.home);
+        } catch (e) {
+            if (e instanceof Error) sdk.alert(e.message);
+            throw e;
+        }
     });
 };

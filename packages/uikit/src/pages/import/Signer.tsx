@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { styled } from 'styled-components';
 import { IconPage } from '../../components/Layout';
 import { SignerIcon } from '../../components/create/ImportIcons';
 import { Button } from '../../components/fields/Button';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useScanner } from '../../hooks/scanner';
 import { useTranslation } from '../../hooks/translation';
 import { usePairSignerMutation } from '../../state/signer';
 
@@ -13,35 +13,17 @@ const IconBlock = styled.div`
 
 export const PairSigner = () => {
     const { t } = useTranslation();
-    const sdk = useAppSdk();
-
-    const [scanId, setScanId] = useState(Date.now());
 
     const { mutate, reset, isLoading } = usePairSignerMutation();
-    useEffect(() => {
-        sdk.uiEvents.emit('scan', {
-            method: 'scan',
-            id: scanId,
-            params: undefined
-        });
-    }, [scanId]);
+    const onSubmit = useCallback(
+        (result: string) => {
+            reset();
+            mutate(result);
+        },
+        [reset, mutate]
+    );
 
-    useEffect(() => {
-        const handler = (options: {
-            method: 'response';
-            id?: number | undefined;
-            params: string;
-        }) => {
-            if (options.id === scanId) {
-                reset();
-                mutate(options.params);
-            }
-        };
-        sdk.uiEvents.on('response', handler);
-        return () => {
-            sdk.uiEvents.off('response', handler);
-        };
-    }, [sdk, scanId]);
+    const openScanner = useScanner(Date.now(), onSubmit);
 
     return (
         <IconPage
@@ -60,7 +42,7 @@ export const PairSigner = () => {
                     primary
                     loading={isLoading}
                     marginTop
-                    onClick={() => setScanId(Date.now())}
+                    onClick={openScanner}
                 >
                     {t('scan_qr_title')}
                 </Button>

@@ -16,6 +16,7 @@ import { WalletContractV5 } from '@ton/ton/dist/wallets/WalletContractV5';
 import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
+import { Signer } from '../../entries/signer';
 import { TransferEstimationEvent } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
 import { Account, AccountsApi, BlockchainApi, LiteServerApi } from '../../tonApiV2';
@@ -122,7 +123,7 @@ export const createTransferMessage = async (
     wallet: {
         seqno: number;
         state: WalletState;
-        signer: (buffer: Buffer) => Promise<Buffer>;
+        signer: Signer;
     },
     transaction: {
         to: string;
@@ -152,16 +153,16 @@ export const createTransferMessage = async (
     return externalMessage(contract, wallet.seqno, transfer).toBoc();
 };
 
-export const signEstimateMessage = async (payloadToSign: Buffer): Promise<Buffer> => {
-    const signature = sign(payloadToSign, Buffer.alloc(64));
-    return signature;
+export const signEstimateMessage = async (message: Cell): Promise<Cell> => {
+    const signature = sign(message.hash(), Buffer.alloc(64));
+    return beginCell().storeBuffer(signature).storeBuilder(message.asBuilder()).endCell();
 };
 
 export const signByMnemonicOver = async (mnemonic: string[]) => {
-    return async (payloadToSign: Buffer): Promise<Buffer> => {
+    return async (message: Cell): Promise<Cell> => {
         const keyPair = await mnemonicToPrivateKey(mnemonic);
-        const signature = sign(payloadToSign, keyPair.secretKey);
-        return signature;
+        const signature = sign(message.hash(), keyPair.secretKey);
+        return beginCell().storeBuffer(signature).storeBuilder(message.asBuilder()).endCell();
     };
 };
 

@@ -1,7 +1,7 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TronWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, formatTransferUrl } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useRef, useState } from 'react';
+import { FC, useRef, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled, { css } from 'styled-components';
@@ -26,7 +26,7 @@ const CopyBlock = styled.div`
     align-items: center;
 `;
 
-const Background = styled.div<{ extension?: boolean }>`
+export const Background = styled.div<{ extension?: boolean }>`
     padding: 20px;
     width: 100%;
     box-sizing: border-box;
@@ -50,13 +50,13 @@ const Background = styled.div<{ extension?: boolean }>`
     }
 `;
 
-const QrWrapper = styled.div`
+export const QrWrapper = styled.div`
     width: 100%;
     padding-bottom: 100%;
     position: relative;
 `;
 
-const AddressText = styled(Body1)<{ extension?: boolean }>`
+export const AddressText = styled(Body1)<{ extension?: boolean }>`
     display: inline-block;
     word-break: break-all;
     color: black;
@@ -101,11 +101,14 @@ const values = [
     { name: 'TRC20', id: BLOCKCHAIN_NAME.TRON }
 ];
 
-const HeaderBlock: FC<{ title: string; description: string }> = ({ title, description }) => {
+export const HeaderBlock: FC<{ title?: string; description: string }> = ({
+    title,
+    description
+}) => {
     const { extension } = useAppContext();
     return (
         <TextBlock extension={extension}>
-            <Title>{title}</Title>
+            {title && <Title>{title}</Title>}
             <Description>{description}</Description>
         </TextBlock>
     );

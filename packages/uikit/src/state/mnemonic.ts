@@ -1,3 +1,4 @@
+import { Cell } from '@ton/core';
 import { mnemonicToPrivateKey, sha256_sync } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
@@ -23,9 +24,12 @@ export const getSigner = async (sdk: IAppSdk, publicKey: string): Promise<Signer
 
     switch (auth.kind) {
         case 'signer': {
-            return async (buffer: Buffer) => {
-                // TODO: Open signer notification
-                return buffer;
+            return async (message: Cell) => {
+                const result = await pairSignerByNotification(
+                    sdk,
+                    message.toBoc({ idx: false }).toString('base64')
+                );
+                return Cell.fromBase64(result);
             };
         }
         default: {
@@ -65,6 +69,36 @@ export const getPasswordByNotification = async (sdk: IAppSdk, auth: AuthState): 
             method: 'getPassword',
             id,
             params: { auth }
+        });
+
+        const onCallback = (message: {
+            method: 'response';
+            id?: number | undefined;
+            params: string | Error;
+        }) => {
+            if (message.id === id) {
+                const { params } = message;
+                sdk.uiEvents.off('response', onCallback);
+
+                if (typeof params === 'string') {
+                    resolve(params);
+                } else {
+                    reject(params);
+                }
+            }
+        };
+
+        sdk.uiEvents.on('response', onCallback);
+    });
+};
+
+const pairSignerByNotification = async (sdk: IAppSdk, boc: string): Promise<string> => {
+    const id = Date.now();
+    return new Promise<string>((resolve, reject) => {
+        sdk.uiEvents.emit('signer', {
+            method: 'signer',
+            id,
+            params: boc
         });
 
         const onCallback = (message: {

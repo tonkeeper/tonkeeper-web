@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipient, TonRecipientData, TransferEstimationEvent } from '../../entries/send';
+import { Signer } from '../../entries/signer';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import { Account, AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
@@ -90,7 +91,7 @@ const createTonTransfer = async (
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean,
-    signer: (buffer: Buffer) => Promise<Buffer>
+    signer: Signer
 ) => {
     const contract = walletContractFromState(walletState);
     const transfer = await contract.createTransferAndSignRequestAsync({
@@ -117,7 +118,7 @@ const createTonConnectTransfer = async (
     walletState: WalletState,
     accounts: AccountsMap,
     params: TonConnectTransactionPayload,
-    signer: (buffer: Buffer) => Promise<Buffer>
+    signer: Signer
 ) => {
     const contract = walletContractFromState(walletState);
 
@@ -233,7 +234,7 @@ export const sendTonConnectTransfer = async (
     walletState: WalletState,
     accounts: AccountsMap,
     params: TonConnectTransactionPayload,
-    signer: (buffer: Buffer) => Promise<Buffer>
+    signer: Signer
 ) => {
     await checkServiceTimeOrDie(api);
     const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
@@ -256,7 +257,7 @@ export const sendTonTransfer = async (
     amount: AssetAmount,
     isMax: boolean,
     fee: TransferEstimationEvent,
-    signer: (buffer: Buffer) => Promise<Buffer>
+    signer: Signer
 ) => {
     await checkServiceTimeOrDie(api);
 

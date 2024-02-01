@@ -1,10 +1,15 @@
 import { Address, beginCell, storeStateInit } from '@ton/core';
-import { getSecureRandomBytes, keyPairFromSeed, sha256_sync } from '@ton/crypto';
+import {
+    getSecureRandomBytes,
+    keyPairFromSeed,
+    mnemonicToPrivateKey,
+    sha256_sync
+} from '@ton/crypto';
 import queryString from 'query-string';
+import nacl from 'tweetnacl';
 import { IStorage } from '../../Storage';
 import { TonConnectError } from '../../entries/exception';
 import { Network } from '../../entries/network';
-import { Signer } from '../../entries/signer';
 import {
     CONNECT_EVENT_ERROR_CODES,
     ConnectEvent,
@@ -266,12 +271,12 @@ export const tonConnectProofPayload = (
 export const toTonProofItemReply = async (options: {
     storage: IStorage;
     wallet: WalletState;
-    signer: Signer;
+    mnemonic: string[];
     proof: ConnectProofPayload;
 }): Promise<TonProofItemReplySuccess> => {
     const result: TonProofItemReplySuccess = {
         name: 'ton_proof',
-        proof: await toTonProofItem(options.signer, options.proof)
+        proof: await toTonProofItem(options.mnemonic, options.proof)
     };
     return result;
 };

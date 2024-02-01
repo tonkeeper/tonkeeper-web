@@ -36,6 +36,7 @@ export interface UIEvents {
     resize: void;
     navigate: void;
     getPassword: GetPasswordParams;
+    signer: string;
     loading: void;
     transfer: TransferInitParams;
     receive: ReceiveInitParams;
