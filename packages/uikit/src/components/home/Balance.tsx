@@ -8,6 +8,7 @@ import { formatFiatCurrency } from '../../hooks/balance';
 import { QueryKey } from '../../libs/queryKey';
 import { SkeletonText } from '../shared/Skeleton';
 import { Body3, Label2, Num2 } from '../Text';
+import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
 import { useWalletTotalBalance } from '../../state/wallet';
 

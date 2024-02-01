@@ -1,7 +1,7 @@
+import { Address } from '@ton/core';
+import { mnemonicToPrivateKey } from '@ton/crypto';
+import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import queryString from 'query-string';
-import { Address } from 'ton-core';
-import { mnemonicToPrivateKey } from 'ton-crypto';
-import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
 import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
