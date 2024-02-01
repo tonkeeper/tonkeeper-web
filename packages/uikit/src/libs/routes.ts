@@ -17,7 +17,8 @@ export enum AppProRoute {
 
 export enum ImportRoute {
     import = '/import',
-    create = '/create'
+    create = '/create',
+    signer = '/signer'
 }
 
 export enum SettingsRoute {
