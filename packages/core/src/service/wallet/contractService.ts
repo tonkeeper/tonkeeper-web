@@ -6,7 +6,7 @@ import { WalletContractV5 } from '@ton/ton/dist/wallets/WalletContractV5';
 import { Network } from '../../entries/network';
 import { WalletState, WalletVersion } from '../../entries/wallet';
 
-export const walletContractFromState = (wallet: WalletState, network?: Network) => {
+export const walletContractFromState = (wallet: WalletState) => {
     const publicKey = Buffer.from(wallet.publicKey, 'hex');
     return walletContract(publicKey, wallet.active.version, wallet.network);
 };
