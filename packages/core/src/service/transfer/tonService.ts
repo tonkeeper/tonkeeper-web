@@ -102,7 +102,7 @@ const createTonTransfer = async (
             : SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
             internal({
-                to: recipient.toAccount.address,
+                to: Address.parse(recipient.toAccount.address),
                 bounce: seeIfTransferBounceable(recipient.toAccount, recipient.address),
                 value: BigInt(weiAmount.toFixed(0)),
                 body: recipient.comment !== '' ? recipient.comment : undefined
@@ -128,7 +128,7 @@ const createTonConnectTransfer = async (
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: params.messages.map(item =>
             internal({
-                to: item.address,
+                to: Address.parse(item.address),
                 bounce: seeIfBounceable(accounts, item.address),
                 value: BigInt(item.amount),
                 init: toStateInit(item.stateInit),
