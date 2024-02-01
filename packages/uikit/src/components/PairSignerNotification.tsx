@@ -8,7 +8,7 @@ import { useScanner } from '../hooks/scanner';
 import { useTranslation } from '../hooks/translation';
 import { Notification, NotificationBlock } from './Notification';
 import { Button } from './fields/Button';
-import { AddressText, Background, HeaderBlock, QrWrapper } from './home/AccountView';
+import { Background, HeaderBlock, QrWrapper } from './home/AccountView';
 
 export const SignerContent: FC<{
     sdk: IAppSdk;
@@ -38,8 +38,8 @@ export const SignerContent: FC<{
                 openScanner();
             }}
         >
-            <HeaderBlock description={t('signer_scan_tx_description')} />
-            <Background extension={extension}>
+            <HeaderBlock title={t('import_signer')} description={t('signer_scan_tx_description')} />
+            <Background extension={extension} margin>
                 <QrWrapper>
                     <QRCode
                         size={400}
@@ -51,9 +51,8 @@ export const SignerContent: FC<{
                         }}
                     />
                 </QrWrapper>
-                <AddressText extension={extension}>{message}</AddressText>
             </Background>
-            <Button primary size="large" type="submit">
+            <Button primary size="large" fullWidth type="submit">
                 {t('signer_scan_result')}
             </Button>
         </NotificationBlock>
@@ -119,12 +118,7 @@ const PairSignerNotification = () => {
     }, [sdk, boc, requestId, onCancel, onSubmit]);
 
     return (
-        <Notification
-            isOpen={boc != null && requestId != null}
-            hideButton
-            handleClose={onCancel}
-            title={t('txActions_signRaw_title')}
-        >
+        <Notification isOpen={boc != null && requestId != null} handleClose={onCancel}>
             {Content}
         </Notification>
     );

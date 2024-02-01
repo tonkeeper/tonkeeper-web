@@ -26,13 +26,19 @@ const CopyBlock = styled.div`
     align-items: center;
 `;
 
-export const Background = styled.div<{ extension?: boolean }>`
+export const Background = styled.div<{ extension?: boolean; margin?: boolean }>`
     padding: 20px;
     width: 100%;
     box-sizing: border-box;
     border-radius: 20px;
     background: white;
     max-width: 300px;
+
+    ${props =>
+        props.margin &&
+        css`
+            margin-bottom: 16px;
+        `}
 
     ${props =>
         props.extension &&
