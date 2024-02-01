@@ -118,11 +118,11 @@ export const checkServiceTimeOrDie = async (api: APIConfig) => {
     }
 };
 
-export const createTransferMessage = (
+export const createTransferMessage = async (
     wallet: {
         seqno: number;
         state: WalletState;
-        secretKey: Buffer;
+        signer: (buffer: Buffer) => Promise<Buffer>;
     },
     transaction: {
         to: string;
@@ -133,9 +133,10 @@ export const createTransferMessage = (
     const value =
         transaction.value instanceof BigNumber ? transaction.value.toFixed(0) : transaction.value;
     const contract = walletContractFromState(wallet.state);
-    const transfer = contract.createTransfer({
+
+    const transfer = await contract.createTransferAndSignRequestAsync({
         seqno: wallet.seqno,
-        secretKey: wallet.secretKey,
+        signer: wallet.signer,
         timeout: getTTL(),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
@@ -151,21 +152,32 @@ export const createTransferMessage = (
     return externalMessage(contract, wallet.seqno, transfer).toBoc();
 };
 
+export const signEstimateMessage = async (payloadToSign: Buffer): Promise<Buffer> => {
+    const signature = sign(payloadToSign, Buffer.alloc(64));
+    return signature;
+};
+
+export const signByMnemonicOver = async (mnemonic: string[]) => {
+    return async (payloadToSign: Buffer): Promise<Buffer> => {
+        const keyPair = await mnemonicToPrivateKey(mnemonic);
+        const signature = sign(payloadToSign, keyPair.secretKey);
+        return signature;
+    };
+};
+
 export async function getKeyPairAndSeqno(options: {
     api: APIConfig;
     walletState: WalletState;
     fee: TransferEstimationEvent;
-    mnemonic: string[];
     amount: BigNumber;
 }) {
     await checkServiceTimeOrDie(options.api);
-    const keyPair = await mnemonicToPrivateKey(options.mnemonic);
 
     const total = options.amount.plus(options.fee.event.extra * -1);
 
     const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
     checkWalletBalanceOrDie(total, wallet);
-    return { seqno, keyPair };
+    return { seqno };
 }
 
 export const getTTL = () => {
