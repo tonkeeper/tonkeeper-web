@@ -8,6 +8,9 @@ export default defineConfig({
         alias: {
             react: path.resolve(__dirname, './node_modules/react'),
             'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
+            '@ton/core': path.resolve(__dirname, '../../packages/core/node_modules/@ton/core'),
+            '@ton/crypto': path.resolve(__dirname, '../../packages/core/node_modules/@ton/crypto'),
+            '@ton/ton': path.resolve(__dirname, '../../packages/core/node_modules/@ton/ton'),
             'react-router-dom': path.resolve(__dirname, './node_modules/react-router-dom'),
             'styled-components': path.resolve(__dirname, './node_modules/styled-components'),
             'react-i18next': path.resolve(__dirname, './node_modules/react-i18next'),
