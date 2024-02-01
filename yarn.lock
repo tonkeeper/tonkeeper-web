@@ -6181,7 +6181,7 @@ __metadata:
     "@testing-library/user-event": "npm:^13.5.0"
     "@ton/core": "npm:0.54.0"
     "@ton/crypto": "npm:3.2.0"
-    "@ton/ton": "npm:13.9.0"
+    "@ton/ton": "https://github.com/tonkeeper/ton-lib"
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
     "@tonkeeper/uikit": "npm:0.1.0"
