@@ -1,6 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import {
     ConnectItemReply,
     ConnectRequest,
@@ -22,7 +20,7 @@ import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { getMnemonic } from '../../state/mnemonic';
+import { getSigner } from '../../state/mnemonic';
 import { CheckmarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
@@ -48,11 +46,8 @@ const useConnectMutation = (
                 result.push(toTonAddressItemReply(wallet));
             }
             if (item.name === 'ton_proof') {
-                const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
-                if (!auth) {
-                    throw new Error('Missing Auth');
-                }
-                const mnemonic = await getMnemonic(sdk, wallet.publicKey);
+                const signer = await getSigner(sdk, wallet.publicKey);
+
                 const proof = tonConnectProofPayload(
                     webViewUrl ?? manifest.url,
                     wallet.active.rawAddress,
@@ -62,7 +57,7 @@ const useConnectMutation = (
                     await toTonProofItemReply({
                         storage: sdk.storage,
                         wallet,
-                        mnemonic,
+                        signer,
                         proof
                     })
                 );

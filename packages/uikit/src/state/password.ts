@@ -7,7 +7,7 @@ import { QueryKey } from '../libs/queryKey';
 export const useAuthState = () => {
     const sdk = useAppSdk();
     return useQuery([QueryKey.password], async () => {
-        const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
+        const auth = await sdk.storage.get<AuthState>(AppKey.GLOBAL_AUTH_STATE);
         return auth ?? defaultAuthState;
     });
 };

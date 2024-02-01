@@ -20,7 +20,23 @@ const accountAppendWallet = async (account: AccountState, publicKey: string) => 
     };
 };
 
-export const accountSetUpWalletState = async (
+export const addWalletWithCustomAuthState = async (storage: IStorage, state: WalletState) => {
+    const account = await getAccountState(storage);
+    const updatedAccount = await accountAppendWallet(account, state.publicKey);
+
+    const name = account.publicKeys.includes(state.publicKey) ? undefined : state.name;
+
+    if (!('auth' in state)) {
+        throw new Error('Missing wallet auth state.');
+    }
+
+    await storage.setBatch({
+        [AppKey.ACCOUNT]: updatedAccount,
+        [`${AppKey.WALLET}_${state.publicKey}`]: { ...state, name }
+    });
+};
+
+export const addWalletWithGlobalAuthState = async (
     storage: IStorage,
     state: WalletState,
     auth: AuthState,
@@ -31,13 +47,13 @@ export const accountSetUpWalletState = async (
     if (account.publicKeys.includes(state.publicKey)) {
         await storage.setBatch({
             [AppKey.ACCOUNT]: updatedAccount,
-            [AppKey.PASSWORD]: auth,
+            [AppKey.GLOBAL_AUTH_STATE]: auth,
             [`${AppKey.WALLET}_${state.publicKey}`]: { ...state, name: undefined }
         });
     } else {
         const data = {
             [AppKey.ACCOUNT]: updatedAccount,
-            [AppKey.PASSWORD]: auth,
+            [AppKey.GLOBAL_AUTH_STATE]: auth,
             [`${AppKey.WALLET}_${state.publicKey}`]: state
         };
 
@@ -78,7 +94,7 @@ export const accountLogOutWallet = async (
     if (updatedAccount.publicKeys.length === 0) {
         await storage.setBatch({
             [AppKey.ACCOUNT]: null,
-            [AppKey.PASSWORD]: null,
+            [AppKey.GLOBAL_AUTH_STATE]: null,
             [`${AppKey.WALLET}_${publicKey}`]: null,
             [`${AppKey.MNEMONIC}_${publicKey}`]: null
         });

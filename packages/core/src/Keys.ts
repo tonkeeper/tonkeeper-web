@@ -8,7 +8,7 @@ export enum AppKey {
     MULTI_SEND_LISTS = 'multi_send_lists',
     FIAT = 'fiat',
 
-    PASSWORD = 'password',
+    GLOBAL_AUTH_STATE = 'password',
     LOCK = 'lock',
     COUNTRY = 'country',
 

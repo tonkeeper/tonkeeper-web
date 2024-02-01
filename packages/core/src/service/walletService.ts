@@ -2,14 +2,16 @@ import { Address } from '@ton/core';
 import { mnemonicToPrivateKey } from '@ton/crypto';
 import { WalletContractV4 } from '@ton/ton/src/wallets/WalletContractV4';
 import queryString from 'query-string';
+import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
+import { AuthState } from '../entries/password';
 import { WalletAddress, WalletState, WalletVersion, WalletVersions } from '../entries/wallet';
 import { WalletApi } from '../tonApiV2';
 import { encrypt } from './cryptoService';
 import { walletContract } from './wallet/contractService';
-import { getFallbackWalletEmoji, setWalletState } from './wallet/storeService';
+import { getWalletStateOrDie, getFallbackWalletEmoji, setWalletState } from './wallet/storeService';
 
 export const createNewWalletState = async (api: APIConfig, mnemonic: string[], name?: string) => {
     const keyPair = await mnemonicToPrivateKey(mnemonic);
@@ -188,8 +190,24 @@ export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) =>
         publicKey,
         active,
         revision: 0,
-        name
+        name,
+        auth: { kind: 'signer' }
     };
 
     return state;
+};
+
+export const getWalletAuthState = async (storage: IStorage, publicKey: string) => {
+    const wallet = await getWalletStateOrDie(storage, publicKey);
+
+    if (wallet.auth) {
+        return wallet.auth;
+    }
+
+    const globalAuth = await storage.get<AuthState>(AppKey.GLOBAL_AUTH_STATE);
+    if (!globalAuth) {
+        throw new Error('Missing Auth');
+    }
+
+    return globalAuth;
 };

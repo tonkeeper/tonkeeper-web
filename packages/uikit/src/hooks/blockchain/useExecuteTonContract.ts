@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
+import { Signer } from '@tonkeeper/core/dist/entries/signer';
 import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { Omit } from 'react-beautiful-dnd';
 import { notifyError } from '../../components/transfer/common';
-import { getMnemonic } from '../../state/mnemonic';
+import { getSigner } from '../../state/mnemonic';
 import { AmplitudeTransactionType, useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
@@ -13,7 +14,7 @@ import { useTranslation } from '../translation';
 export type ContractExecutorParams = {
     api: APIConfig;
     walletState: WalletState;
-    mnemonic: string[];
+    signer: Signer;
     fee: TransferEstimationEvent;
 };
 
@@ -39,15 +40,15 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
             return false;
         }
 
-        const mnemonic = await getMnemonic(sdk, walletState.publicKey).catch(() => null);
-        if (mnemonic === null) return false;
+        const signer = await getSigner(sdk, walletState.publicKey).catch(() => null);
+        if (signer === null) return false;
 
         track2(eventName2);
         try {
             await executor({
                 api,
                 walletState,
-                mnemonic,
+                signer,
                 ...args
             } as Args);
         } catch (e) {

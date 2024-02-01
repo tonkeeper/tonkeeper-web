@@ -1,9 +1,10 @@
 import { mnemonicToPrivateKey, sha256_sync } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
+import { Signer } from '@tonkeeper/core/dist/entries/signer';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
-import nacl from 'tweetnacl';
+import { signByMnemonicOver } from '@tonkeeper/core/dist/service/transfer/common';
+import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
 
 export const signTonConnect = (sdk: IAppSdk, publicKey: string) => {
     return async (bufferToSign: Buffer) => {
@@ -17,11 +18,25 @@ export const signTonConnect = (sdk: IAppSdk, publicKey: string) => {
     };
 };
 
-export const getMnemonic = async (sdk: IAppSdk, publicKey: string): Promise<string[]> => {
-    const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
-    if (!auth) {
-        throw new Error('Missing Auth');
+export const getSigner = async (sdk: IAppSdk, publicKey: string): Promise<Signer> => {
+    const auth = await getWalletAuthState(sdk.storage, publicKey);
+
+    switch (auth.kind) {
+        case 'signer': {
+            return async (buffer: Buffer) => {
+                // TODO: Open signer notification
+                return buffer;
+            };
+        }
+        default: {
+            const mnemonic = await getMnemonic(sdk, publicKey);
+            return signByMnemonicOver(mnemonic);
+        }
     }
+};
+
+export const getMnemonic = async (sdk: IAppSdk, publicKey: string): Promise<string[]> => {
+    const auth = await getWalletAuthState(sdk.storage, publicKey);
 
     switch (auth.kind) {
         case 'none': {
