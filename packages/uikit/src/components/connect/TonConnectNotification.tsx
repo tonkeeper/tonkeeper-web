@@ -1,6 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import {
     ConnectItemReply,
     ConnectRequest,
@@ -48,10 +46,6 @@ const useConnectMutation = (
                 result.push(toTonAddressItemReply(wallet));
             }
             if (item.name === 'ton_proof') {
-                const auth = await sdk.storage.get<AuthState>(AppKey.GLOBAL_AUTH_STATE);
-                if (!auth) {
-                    throw new Error('Missing Auth');
-                }
                 const mnemonic = await getMnemonic(sdk, wallet.publicKey);
                 const proof = tonConnectProofPayload(
                     webViewUrl ?? manifest.url,
