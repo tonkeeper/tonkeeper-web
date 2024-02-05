@@ -141,7 +141,7 @@ const SelectProPlans: FC<{
 const ProContent: FC<{ data: ProState }> = ({ data }) => {
     const { t } = useTranslation();
 
-    const ref = useRef<HTMLDivElement>();
+    const ref = useRef<HTMLDivElement>(null);
 
     const { mutate: logOut } = useProLogout();
     const [selectedPlan, setPlan] = useState<string | null>(null);
