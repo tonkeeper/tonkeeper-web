@@ -3,7 +3,6 @@ import React, { FC, PropsWithChildren, useMemo } from 'react';
 import { DefaultTheme, ThemeProvider } from 'styled-components';
 import { useUserTheme } from '../state/theme';
 import { defaultTheme } from '../styles/defaultTheme';
-import { GlobalStyle } from '../styles/globalStyle';
 import { lightTheme } from '../styles/lightTheme';
 
 export const UserThemeProvider: FC<PropsWithChildren<{ isDark?: boolean }>> = ({
@@ -34,10 +33,5 @@ export const UserThemeProvider: FC<PropsWithChildren<{ isDark?: boolean }>> = ({
         return <div></div>;
     }
 
-    return (
-        <ThemeProvider theme={currentTheme as DefaultTheme}>
-            <GlobalStyle />
-            {children}
-        </ThemeProvider>
-    );
+    return <ThemeProvider theme={currentTheme as DefaultTheme}>{children}</ThemeProvider>;
 };

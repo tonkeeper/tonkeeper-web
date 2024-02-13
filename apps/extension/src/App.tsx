@@ -44,7 +44,7 @@ import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import {Container, GlobalStyle} from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -108,6 +108,7 @@ export const App: FC = () => {
                         <StorageContext.Provider value={sdk.storage}>
                             <TranslationContext.Provider value={translation}>
                                 <UserThemeProvider>
+                                    <GlobalStyle />
                                     <HeaderGlobalStyle />
                                     <FooterGlobalStyle />
                                     <SybHeaderGlobalStyle />

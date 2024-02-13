@@ -38,7 +38,7 @@ import {
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppRoute, any, AppProRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import Activity from '@tonkeeper/uikit/dist/pages/activity/Activity';
 import Coin from '@tonkeeper/uikit/dist/pages/coin/Coin';
 import Home from '@tonkeeper/uikit/dist/pages/home/Home';
@@ -53,15 +53,16 @@ import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import { FC, Suspense, useEffect, useMemo } from 'react';
+import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import React, { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { MemoryRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import styled, { createGlobalStyle } from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
+import { AsideMenu } from '@tonkeeper/uikit/dist/components/aside/AsideMenu';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -71,6 +72,25 @@ const queryClient = new QueryClient({
         }
     }
 });
+
+const GlobalStyle = createGlobalStyle`
+    ${GlobalStyleCss};
+    
+    html, body, #root {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    button, input[type="submit"], input[type="reset"] {
+      background: none;
+      color: inherit;
+      border: none;
+      padding: 0;
+      font: inherit;
+      cursor: pointer;
+      outline: inherit;
+    }
+`;
 
 const sdk = new DesktopAppSdk();
 const TARGET_ENV = 'desktop';
@@ -104,6 +124,7 @@ export const App = () => {
                         <TranslationContext.Provider value={translation}>
                             <StorageContext.Provider value={sdk.storage}>
                                 <UserThemeProvider>
+                                    <GlobalStyle />
                                     <HeaderGlobalStyle />
                                     <FooterGlobalStyle />
                                     <SybHeaderGlobalStyle />
@@ -126,6 +147,21 @@ const Wrapper = styled(FullSizeWrapper)`
     box-sizing: border-box;
     padding-top: 64px;
     padding-bottom: 80px;
+`;
+
+const WideLayout = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    & > *:first-child {
+        width: 200px;
+    }
+`;
+
+const WideContent = styled.div`
+    flex: 1;
+    overflow: auto;
 `;
 
 export const Loader: FC = () => {
@@ -236,68 +272,151 @@ export const Content: FC<{
     }
 
     return (
-        <Wrapper>
-            <WalletStateContext.Provider value={activeWallet}>
-                <Routes>
-                    <Route
-                        path={AppRoute.activity}
-                        element={
-                            <Suspense fallback={<ActivitySkeletonPage />}>
-                                <Activity />
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path={any(AppRoute.browser)}
-                        element={
-                            <Suspense fallback={<BrowserSkeletonPage />}>
-                                <Browser />
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path={any(AppRoute.settings)}
-                        element={
-                            <Suspense fallback={<SettingsSkeletonPage />}>
-                                <Settings />
-                            </Suspense>
-                        }
-                    />
-                    <Route path={AppRoute.coins}>
+        <WalletStateContext.Provider value={activeWallet}>
+            <WideLayout>
+                <AsideMenu />
+                <WideContent>
+                    <Routes>
                         <Route
-                            path=":name/*"
+                            path={AppProRoute.dashboard}
                             element={
-                                <Suspense fallback={<CoinSkeletonPage />}>
-                                    <Coin />
+                                <Suspense fallback={<div></div>}>
+                                    <div>Dashboard</div>
                                 </Suspense>
                             }
                         />
-                    </Route>
-                    <Route
-                        path="*"
-                        element={
-                            <>
-                                <Header />
-                                <InnerBody>
-                                    <Suspense fallback={<HomeSkeleton />}>
-                                        <Home />
+                        <Route element={<OldAppRouting />}>
+                            <Route
+                                path={AppRoute.activity}
+                                element={
+                                    <Suspense fallback={<ActivitySkeletonPage />}>
+                                        <Activity />
                                     </Suspense>
-                                </InnerBody>
-                            </>
-                        }
-                    />
-                </Routes>
-                <Footer standalone={false} />
-                <MemoryScroll />
-                <SendActionNotification />
-                <ReceiveNotification />
-                <TonConnectSubscription />
-                <NftNotification />
-                <SendNftNotification />
-                <AddFavoriteNotification />
-                <EditFavoriteNotification />
-                <DeepLinkSubscription />
-            </WalletStateContext.Provider>
+                                }
+                            />
+                            <Route
+                                path={any(AppRoute.browser)}
+                                element={
+                                    <Suspense fallback={<BrowserSkeletonPage />}>
+                                        <Browser />
+                                    </Suspense>
+                                }
+                            />
+                            <Route
+                                path={any(AppRoute.settings)}
+                                element={
+                                    <Suspense fallback={<SettingsSkeletonPage />}>
+                                        <Settings />
+                                    </Suspense>
+                                }
+                            />
+                            <Route path={AppRoute.coins}>
+                                <Route
+                                    path=":name/*"
+                                    element={
+                                        <Suspense fallback={<CoinSkeletonPage />}>
+                                            <Coin />
+                                        </Suspense>
+                                    }
+                                />
+                            </Route>
+                            <Route
+                                path="*"
+                                element={
+                                    <>
+                                        <InnerBody>
+                                            <Suspense fallback={<HomeSkeleton />}>
+                                                <Home />
+                                            </Suspense>
+                                        </InnerBody>
+                                    </>
+                                }
+                            />
+                        </Route>
+                    </Routes>
+
+                    {/* <Wrapper>
+                    <WalletStateContext.Provider value={activeWallet}>
+                        <Routes>
+                            <Route
+                                path={AppRoute.activity}
+                                element={
+                                    <Suspense fallback={<ActivitySkeletonPage />}>
+                                        <Activity />
+                                    </Suspense>
+                                }
+                            />
+                            <Route
+                                path={any(AppRoute.browser)}
+                                element={
+                                    <Suspense fallback={<BrowserSkeletonPage />}>
+                                        <Browser />
+                                    </Suspense>
+                                }
+                            />
+                            <Route
+                                path={any(AppRoute.settings)}
+                                element={
+                                    <Suspense fallback={<SettingsSkeletonPage />}>
+                                        <Settings />
+                                    </Suspense>
+                                }
+                            />
+                            <Route path={AppRoute.coins}>
+                                <Route
+                                    path=":name/*"
+                                    element={
+                                        <Suspense fallback={<CoinSkeletonPage />}>
+                                            <Coin />
+                                        </Suspense>
+                                    }
+                                />
+                            </Route>
+                            <Route
+                                path="*"
+                                element={
+                                    <>
+                                        <InnerBody>
+                                            <Suspense fallback={<HomeSkeleton />}>
+                                                <Home />
+                                            </Suspense>
+                                        </InnerBody>
+                                    </>
+                                }
+                            />
+                        </Routes>
+                        <Footer standalone={false} />
+                        <MemoryScroll />
+                        <SendActionNotification />
+                        <ReceiveNotification />
+                        <TonConnectSubscription />
+                        <NftNotification />
+                        <SendNftNotification />
+                        <AddFavoriteNotification />
+                        <EditFavoriteNotification />
+                        <DeepLinkSubscription />
+                    </WalletStateContext.Provider>
+                </Wrapper>*/}
+                </WideContent>
+            </WideLayout>
+        </WalletStateContext.Provider>
+    );
+};
+
+const OldAppRouting = () => {
+    return (
+        <Wrapper>
+            <Outlet />
+            <Footer standalone={false} />
+            <MemoryScroll />
+            <SendActionNotification />
+            <ReceiveNotification />
+            <TonConnectSubscription />
+            <NftNotification />
+            <SendNftNotification />
+            <AddFavoriteNotification />
+            <EditFavoriteNotification />
+            <DeepLinkSubscription />
         </Wrapper>
     );
 };

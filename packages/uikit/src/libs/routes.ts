@@ -8,6 +8,10 @@ export enum AppRoute {
     home = '/'
 }
 
+export enum AppProRoute {
+    dashboard = '/dashboard'
+}
+
 export enum ImportRoute {
     import = '/import',
     create = '/create'
