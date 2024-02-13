@@ -63,6 +63,7 @@ import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/aside/AsideMenu';
+import DashboardPage from '@tonkeeper/uikit/dist/pages/dashboard';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -277,14 +278,7 @@ export const Content: FC<{
                 <AsideMenu />
                 <WideContent>
                     <Routes>
-                        <Route
-                            path={AppProRoute.dashboard}
-                            element={
-                                <Suspense fallback={<div></div>}>
-                                    <div>Dashboard</div>
-                                </Suspense>
-                            }
-                        />
+                        <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
                         <Route element={<OldAppRouting />}>
                             <Route
                                 path={AppRoute.activity}

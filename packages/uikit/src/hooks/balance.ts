@@ -33,7 +33,7 @@ export const useFormatBalance = (amount: number | string, decimals: string | num
 };
 
 export const useFormatCoinValue = () => {
-    return useCallback((amount: number | string, decimals: string | number = 9) => {
+    return useCallback((amount: number | string | BigNumber, decimals: string | number = 9) => {
         return formatter.format(formatDecimals(amount, decimals), {
             ignoreZeroTruncate: false,
             decimals

@@ -75,5 +75,7 @@ declare module 'styled-components' {
         cornerMedium: string;
         cornerLarge: string;
         cornerFull: string;
+
+        fontMono: string;
     }
 }

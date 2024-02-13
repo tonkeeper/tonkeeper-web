@@ -79,5 +79,6 @@ export const defaultTheme: DefaultTheme = {
     cornerSmall: '16px',
     cornerMedium: '20px',
     cornerLarge: '24px',
-    cornerFull: '100%'
+    cornerFull: '100%',
+    fontMono: 'ui-monospace, SF Mono, monospace, Roboto Mono, Menlo, Consolas, Courier'
 };
