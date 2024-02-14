@@ -1,9 +1,13 @@
 import * as fs from 'fs-extra';
+import * as path from 'path';
 
 console.log('Copy Locales');
 const srcDir = `../../packages/locales/dist/locales`;
 const buildDestDir = `build/locales`;
 const devDestDir = `public/locales`;
+
+console.log(path.resolve(srcDir));
+fs.readdirSync(srcDir).forEach(file => console.log(file));
 
 if (!fs.existsSync('build')) {
     fs.mkdirSync('build');
