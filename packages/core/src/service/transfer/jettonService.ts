@@ -13,6 +13,7 @@ import {
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
     externalMessage,
+    getTonkeeperQueryId,
     getTTL,
     getWalletBalance,
     SendMode
@@ -22,7 +23,7 @@ const jettonTransferAmount = toNano('0.64');
 const jettonTransferForwardAmount = BigInt('1');
 
 const jettonTransferBody = (params: {
-    queryId?: number;
+    queryId: bigint;
     jettonAmount: bigint;
     toAddress: Address;
     responseAddress: Address;
@@ -31,7 +32,7 @@ const jettonTransferBody = (params: {
 }) => {
     return beginCell()
         .storeUint(0xf8a7ea5, 32) // request_transfer op
-        .storeUint(params.queryId || 0, 64)
+        .storeUint(params.queryId, 64)
         .storeCoins(params.jettonAmount)
         .storeAddress(params.toAddress)
         .storeAddress(params.responseAddress)
@@ -53,7 +54,7 @@ const createJettonTransfer = (
     const jettonAmount = BigInt(amount.stringWeiAmount);
 
     const body = jettonTransferBody({
-        queryId: Date.now(),
+        queryId: getTonkeeperQueryId(),
         jettonAmount,
         toAddress: Address.parse(recipientAddress),
         responseAddress: Address.parse(walletState.active.rawAddress),
