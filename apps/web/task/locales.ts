@@ -3,7 +3,7 @@ import * as path from 'path';
 
 console.log('Copy Locales');
 const srcDir = `../../packages/locales/dist/locales`;
-const buildDestDir = `build/locales`;
+const buildDestDir = `dist/locales`;
 const devDestDir = `public/locales`;
 
 console.log(path.resolve(srcDir));
