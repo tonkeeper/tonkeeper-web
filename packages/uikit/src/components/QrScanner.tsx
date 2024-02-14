@@ -1,5 +1,5 @@
 import { QrScanSignature } from '@polkadot/react-qr/ScanSignature';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
@@ -23,6 +23,18 @@ const Block = styled.div<{ ios: boolean }>`
         `}
 `;
 
+const orderAnimatedQr = (values: string[]) => {
+    for (let i = 0; i < 1000; i++) {
+        const first = values.shift()!;
+        values.push(first);
+        if (first.length < 256) {
+            return values.join('');
+        }
+    }
+
+    return values.join('');
+};
+
 const QrScanner = () => {
     const [scanId, setScanId] = useState<number | undefined>(undefined);
     const sdk = useAppSdk();
@@ -42,20 +54,32 @@ const QrScanner = () => {
     const onCancel = () => {
         setScanId(undefined);
     };
-    const onScan = useCallback(
-        ({ signature }: { signature: string }) => {
-            signature = signature.slice(2);
 
+    const onScan = useMemo(() => {
+        const result: string[] = [];
+        let timer: NodeJS.Timeout;
+
+        const done = () => {
             sdk.uiEvents.emit('response', {
                 method: 'response',
                 id: scanId,
-                params: signature
+                params: orderAnimatedQr(result)
             });
-
             setScanId(undefined);
-        },
-        [sdk, scanId, setScanId]
-    );
+        };
+        return ({ signature }: { signature: string }) => {
+            clearTimeout(timer);
+
+            signature = signature.slice(2);
+
+            console.log(signature);
+
+            if (!result.includes(signature)) {
+                result.push(signature);
+            }
+            timer = setTimeout(done, 500);
+        };
+    }, [sdk, scanId, setScanId]);
 
     const Content = useCallback(() => {
         return (

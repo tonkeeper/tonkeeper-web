@@ -1,6 +1,5 @@
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { QRCode } from 'react-qrcode-logo';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useNavigate } from '../hooks/navigate';
@@ -8,7 +7,8 @@ import { useScanner } from '../hooks/scanner';
 import { useTranslation } from '../hooks/translation';
 import { Notification, NotificationBlock } from './Notification';
 import { Button } from './fields/Button';
-import { Background, HeaderBlock, QrWrapper } from './home/AccountView';
+import { Background, HeaderBlock } from './home/AccountView';
+import { AnimatedQrCode } from './home/qrCodeView';
 
 export const SignerContent: FC<{
     sdk: IAppSdk;
@@ -40,17 +40,7 @@ export const SignerContent: FC<{
         >
             <HeaderBlock title={t('import_signer')} description={t('signer_scan_tx_description')} />
             <Background extension={extension} margin>
-                <QrWrapper>
-                    <QRCode
-                        size={400}
-                        value={message}
-                        qrStyle="dots"
-                        eyeRadius={{
-                            inner: 2,
-                            outer: 16
-                        }}
-                    />
-                </QrWrapper>
+                <AnimatedQrCode message={message} />
             </Background>
             <Button primary size="large" fullWidth type="submit">
                 {t('signer_scan_result')}
