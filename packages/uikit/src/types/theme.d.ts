@@ -77,5 +77,10 @@ declare module 'styled-components' {
         cornerFull: string;
 
         fontMono: string;
+
+        /**
+         * 'compact' is default mode and 'full-width' is for desktop 'pro' mode
+         */
+        displayType: 'compact' | 'full-width';
     }
 }

@@ -23,7 +23,9 @@ export enum QueryKey {
 
     tron = 'tron',
     rate = 'rate',
-    total = 'total'
+    total = 'total',
+
+    dashboardCategories = 'dashboardCategories'
 }
 
 export enum JettonKey {

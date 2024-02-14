@@ -19,3 +19,11 @@ export type DashboardRow = {
     [DASHBOARD_COLUMNS.STORAGE]: 'keychain' | 'pk';
     [DASHBOARD_COLUMNS.CURRENT_MONTH]: BigNumber;
 };
+
+export const DashboardColumnsTranslationKeys: Record<DASHBOARD_COLUMNS, string> = {
+    ADDRESS: 'Address',
+    BALANCE_TON: 'Balance ton',
+    CURRENT_MONTH: 'current month',
+    STORAGE: 'storage',
+    TOTAL: 'total'
+};

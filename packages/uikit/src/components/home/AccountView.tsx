@@ -10,7 +10,11 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useTronWalletState } from '../../state/tron/tron';
 import { CopyIcon } from '../Icon';
-import { FullHeightBlock, NotificationBlock, NotificationTitleRow } from '../Notification';
+import {
+    FullHeightBlockResponsive,
+    NotificationBlock,
+    NotificationTitleRow
+} from '../Notification';
 import { Body1, H3 } from '../Text';
 import { Button } from '../fields/Button';
 import { Wrapper, childFactoryCreator, duration } from '../transfer/common';
@@ -216,7 +220,7 @@ export const ReceiveContent: FC<{
     const state = isTon ? 'ton' : 'tron';
 
     return (
-        <FullHeightBlock standalone={standalone}>
+        <FullHeightBlockResponsive standalone={standalone}>
             <NotificationTitleRow handleClose={handleClose} center>
                 {/* TODO: ENABLE TRON */}
                 {/* <Tabs active={active} setActive={setActive} values={values} /> */}
@@ -237,6 +241,6 @@ export const ReceiveContent: FC<{
                     </CSSTransition>
                 </TransitionGroup>
             </Wrapper>
-        </FullHeightBlock>
+        </FullHeightBlockResponsive>
     );
 };

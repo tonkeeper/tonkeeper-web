@@ -1,6 +1,6 @@
 import React, { FC, PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react';
 import { CSSTransition } from 'react-transition-group';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { Container } from '../styles/globalStyle';
 import { CloseIcon } from './Icon';
@@ -12,6 +12,13 @@ import { BackButton, ButtonMock } from './fields/BackButton';
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
     padding-left: ${props => props.scrollbarWidth}px;
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            min-height: 100%;
+            height: 100%;
+        `}
 `;
 
 const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean }>> = ({
@@ -34,6 +41,12 @@ const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
     min-height: var(--app-height);
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            justify-content: center;
+        `}
 `;
 
 export const ButtonContainer = styled.div`
@@ -45,6 +58,14 @@ export const ButtonContainer = styled.div`
 const Padding = styled.div`
     flex-shrink: 0;
     height: 1rem;
+`;
+
+const GapAdjusted = styled(Gap)`
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            display: none;
+        `}
 `;
 
 const Overlay = styled.div<{ entered: boolean; paddingRight: number }>`
@@ -123,6 +144,13 @@ const Content = styled.div<{ standalone: boolean }>`
         css`
             padding-bottom: 2rem;
         `}
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            border-bottom-right-radius: ${p.theme.cornerMedium};
+            border-bottom-left-radius: ${p.theme.cornerMedium};
+        `}
 `;
 
 const TitleRow = styled.div`
@@ -147,6 +175,12 @@ const BackShadow = styled.div`
     z-index: -1;
     top: 80%;
     background-color: ${props => props.theme.backgroundPage};
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            max-width: 550px;
+        `}
 `;
 
 export const NotificationTitleRow: FC<
@@ -184,6 +218,18 @@ export const FullHeightBlock = styled(NotificationBlock)<{
     box-sizing: border-box;
 
     background-color: ${props => props.theme.backgroundPage};
+`;
+
+export const FullHeightBlockResponsive = styled(FullHeightBlock)<{
+    standalone: boolean;
+    fitContent?: boolean;
+    noPadding?: boolean;
+}>`
+    ${props =>
+        props.theme.displayType === 'full-width' &&
+        css`
+            min-height: unset;
+        `};
 `;
 
 export const NotificationTitleBlock = styled.div`
@@ -283,6 +329,7 @@ export const Notification: FC<{
 }> = ({ children, isOpen, hideButton, backShadow, handleClose, title }) => {
     const [entered, setEntered] = useState(false);
     const [open, setOpen] = useState(false);
+    const { displayType } = useTheme();
 
     useEffect(() => {
         setTimeout(() => setOpen(isOpen));
@@ -349,14 +396,14 @@ export const Notification: FC<{
                         <NotificationWrapper entered={entered}>
                             <Wrapper>
                                 <Padding onClick={handleClose} />
-                                <Gap onClick={handleClose} />
+                                <GapAdjusted onClick={handleClose} />
                                 <Content standalone={standalone}>
                                     {title && (
                                         <NotificationTitleRow handleClose={handleClose}>
                                             {title}
                                         </NotificationTitleRow>
                                     )}
-                                    {!hideButton && (
+                                    {!hideButton && !title && (
                                         <ButtonContainer>
                                             <NotificationCancelButton handleClose={handleClose} />
                                         </ButtonContainer>
@@ -366,7 +413,7 @@ export const Notification: FC<{
                             </Wrapper>
                         </NotificationWrapper>
                     </NotificationOverlay>
-                    {backShadow && entered && <BackShadow />}
+                    {backShadow && entered && displayType !== 'full-width' && <BackShadow />}
                 </Splash>
             </CSSTransition>
         </ReactPortal>

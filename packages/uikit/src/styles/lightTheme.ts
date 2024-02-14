@@ -78,5 +78,6 @@ export const lightTheme: DefaultTheme = {
     cornerMedium: '20px',
     cornerLarge: '24px',
     cornerFull: '100%',
-    fontMono: 'ui-monospace, SF Mono, monospace, Roboto Mono, Menlo, Consolas, Courier'
+    fontMono: 'ui-monospace, SF Mono, monospace, Roboto Mono, Menlo, Consolas, Courier',
+    displayType: 'compact'
 };

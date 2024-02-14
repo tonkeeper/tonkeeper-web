@@ -124,7 +124,7 @@ export const App = () => {
                     <AppSdkContext.Provider value={sdk}>
                         <TranslationContext.Provider value={translation}>
                             <StorageContext.Provider value={sdk.storage}>
-                                <UserThemeProvider>
+                                <UserThemeProvider displayType="full-width">
                                     <GlobalStyle />
                                     <HeaderGlobalStyle />
                                     <FooterGlobalStyle />
@@ -328,69 +328,6 @@ export const Content: FC<{
                             />
                         </Route>
                     </Routes>
-
-                    {/* <Wrapper>
-                    <WalletStateContext.Provider value={activeWallet}>
-                        <Routes>
-                            <Route
-                                path={AppRoute.activity}
-                                element={
-                                    <Suspense fallback={<ActivitySkeletonPage />}>
-                                        <Activity />
-                                    </Suspense>
-                                }
-                            />
-                            <Route
-                                path={any(AppRoute.browser)}
-                                element={
-                                    <Suspense fallback={<BrowserSkeletonPage />}>
-                                        <Browser />
-                                    </Suspense>
-                                }
-                            />
-                            <Route
-                                path={any(AppRoute.settings)}
-                                element={
-                                    <Suspense fallback={<SettingsSkeletonPage />}>
-                                        <Settings />
-                                    </Suspense>
-                                }
-                            />
-                            <Route path={AppRoute.coins}>
-                                <Route
-                                    path=":name/*"
-                                    element={
-                                        <Suspense fallback={<CoinSkeletonPage />}>
-                                            <Coin />
-                                        </Suspense>
-                                    }
-                                />
-                            </Route>
-                            <Route
-                                path="*"
-                                element={
-                                    <>
-                                        <InnerBody>
-                                            <Suspense fallback={<HomeSkeleton />}>
-                                                <Home />
-                                            </Suspense>
-                                        </InnerBody>
-                                    </>
-                                }
-                            />
-                        </Routes>
-                        <Footer standalone={false} />
-                        <MemoryScroll />
-                        <SendActionNotification />
-                        <ReceiveNotification />
-                        <TonConnectSubscription />
-                        <NftNotification />
-                        <SendNftNotification />
-                        <AddFavoriteNotification />
-                        <EditFavoriteNotification />
-                        <DeepLinkSubscription />
-                    </WalletStateContext.Provider>
-                </Wrapper>*/}
                 </WideContent>
             </WideLayout>
         </WalletStateContext.Provider>

@@ -5,14 +5,17 @@ import { useUserTheme } from '../state/theme';
 import { defaultTheme } from '../styles/defaultTheme';
 import { lightTheme } from '../styles/lightTheme';
 
-export const UserThemeProvider: FC<PropsWithChildren<{ isDark?: boolean }>> = ({
-    children,
-    isDark = true
-}) => {
+export const UserThemeProvider: FC<
+    PropsWithChildren<{ isDark?: boolean; displayType?: 'compact' | 'full-width' }>
+> = ({ children, isDark = true, displayType }) => {
     const { data, isFetched } = useUserTheme();
 
     const currentTheme = useMemo(() => {
         const theme = isDark ? defaultTheme : lightTheme;
+
+        if (displayType) {
+            theme.displayType = displayType;
+        }
 
         if (!data || data.name === 'default') {
             return theme;
@@ -27,7 +30,7 @@ export const UserThemeProvider: FC<PropsWithChildren<{ isDark?: boolean }>> = ({
                     return acc;
                 }, {} as Record<string, string>);
         }
-    }, [data, isDark]);
+    }, [data, isDark, displayType]);
 
     if (!isFetched) {
         return <div></div>;
