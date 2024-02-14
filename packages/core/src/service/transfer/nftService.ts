@@ -11,6 +11,7 @@ import {
     checkWalletPositiveBalanceOrDie,
     createTransferMessage,
     getKeyPairAndSeqno,
+    getTonkeeperQueryId,
     getWalletBalance
 } from './common';
 
@@ -18,7 +19,7 @@ const initNftTransferAmount = toNano('1');
 const nftTransferForwardAmount = BigInt('1');
 
 const nftTransferBody = (params: {
-    queryId?: number;
+    queryId: bigint;
     newOwnerAddress: Address;
     responseAddress: Address;
     forwardAmount: bigint;
@@ -26,7 +27,7 @@ const nftTransferBody = (params: {
 }) => {
     return beginCell()
         .storeUint(0x5fcc3d14, 32) // transfer op
-        .storeUint(params.queryId || 0, 64)
+        .storeUint(params.queryId, 64)
         .storeAddress(params.newOwnerAddress)
         .storeAddress(params.responseAddress)
         .storeBit(false) // null custom_payload
@@ -35,10 +36,10 @@ const nftTransferBody = (params: {
         .endCell();
 };
 
-const nftRenewBody = (params?: { queryId?: number }) => {
+const nftRenewBody = (params: { queryId: bigint }) => {
     return beginCell()
         .storeUint(0x4eb1f0f9, 32) // op::change_dns_record,
-        .storeUint(params?.queryId || 0, 64)
+        .storeUint(params.queryId, 64)
         .storeUint(0, 256)
         .endCell();
 };
@@ -46,10 +47,10 @@ const nftRenewBody = (params?: { queryId?: number }) => {
 const addressToDNSAddressFormat = (address: string) =>
     beginCell().storeUint(0x9fd3, 16).storeAddress(Address.parse(address)).storeUint(0, 8);
 
-const nftLinkBody = (params: { queryId?: number; linkToAddress: string }) => {
+const nftLinkBody = (params: { queryId: bigint; linkToAddress: string }) => {
     let cell = beginCell()
         .storeUint(0x4eb1f0f9, 32) // op::change_dns_record,
-        .storeUint(params?.queryId || 0, 64)
+        .storeUint(params?.queryId, 64)
         .storeUint(
             BigInt('0xe8d44050873dba865aa7c170ab4cce64d90839a34dcfd6cf71d14e0205443b1b'),
             256
@@ -72,7 +73,7 @@ const createNftTransfer = (
     secretKey: Buffer = Buffer.alloc(64)
 ) => {
     const body = nftTransferBody({
-        queryId: Date.now(),
+        queryId: getTonkeeperQueryId(),
         newOwnerAddress: Address.parse(recipientAddress),
         responseAddress: Address.parse(walletState.active.rawAddress),
         forwardAmount: nftTransferForwardAmount,
@@ -160,7 +161,7 @@ export const sendNftRenew = async (options: {
 }) => {
     const { seqno, keyPair } = await getKeyPairAndSeqno(options);
 
-    const body = nftRenewBody();
+    const body = nftRenewBody({ queryId: getTonkeeperQueryId() });
 
     const cell = createTransferMessage(
         {
@@ -186,7 +187,7 @@ export const estimateNftRenew = async (options: {
     const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
-    const body = nftRenewBody();
+    const body = nftRenewBody({ queryId: getTonkeeperQueryId() });
 
     const cell = createTransferMessage(
         {
@@ -211,7 +212,7 @@ export const sendNftLink = async (options: {
 }) => {
     const { seqno, keyPair } = await getKeyPairAndSeqno(options);
 
-    const body = nftLinkBody(options);
+    const body = nftLinkBody({ ...options, queryId: getTonkeeperQueryId() });
 
     const cell = createTransferMessage(
         {
@@ -238,7 +239,7 @@ export const estimateNftLink = async (options: {
     const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
-    const body = nftLinkBody(options);
+    const body = nftLinkBody({ ...options, queryId: getTonkeeperQueryId() });
 
     const cell = createTransferMessage(
         {
