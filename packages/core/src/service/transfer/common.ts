@@ -170,9 +170,9 @@ export const getTTL = () => {
 };
 
 export const getTonkeeperQueryId = () => {
-    // cell.WriteUint(0x546de4ef, 32) //crc32("tonkeeper")
-    // cell.WriteUint(rand.Read(32), 32) //случайные 32 бита
-
-    const value = Buffer.concat([Buffer.from('546de4ef', 'hex'), nacl.randomBytes(4)]);
-    return BigInt(`0x${value.toString('hex')}`);
+    return beginCell()
+        .storeUint(0x546de4ef, 32) //crc32("tonkeeper")
+        .storeBuffer(Buffer.from(nacl.randomBytes(4))) //random 32 bits
+        .asSlice()
+        .loadIntBig(64);
 };
