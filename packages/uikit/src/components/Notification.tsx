@@ -444,19 +444,21 @@ export const Notification: FC<{
     const [footerElement, setFooterElement] = useState<HTMLDivElement | null>(null);
     const [headerElement, setHeaderElement] = useState<HTMLDivElement | null>(null);
 
+    const [isEntering, setIsEntering] = useState(false);
+
     useEffect(() => {
-        if (entered && footerRef.current) {
+        if (isEntering && footerRef.current) {
             setFooterElement(footerRef.current);
         } else {
             setFooterElement(null);
         }
 
-        if (entered && headerRef.current) {
+        if (isEntering && headerRef.current) {
             setHeaderElement(headerRef.current);
         } else {
             setHeaderElement(null);
         }
-    }, [entered]);
+    }, [isEntering]);
 
     return (
         <NotificationContext.Provider value={{ footerElement, headerElement }}>
@@ -466,6 +468,8 @@ export const Notification: FC<{
                     timeout={300}
                     unmountOnExit
                     nodeRef={nodeRef}
+                    onEntering={() => setIsEntering(true)}
+                    onExited={() => setIsEntering(false)}
                     onEntered={() => setTimeout(() => setEntered(true), 300)}
                     onExit={() => setEntered(false)}
                 >
