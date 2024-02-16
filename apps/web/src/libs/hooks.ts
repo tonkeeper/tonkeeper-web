@@ -57,9 +57,9 @@ export const useAnalytics = (
         [QueryKey.analytics],
         async () => {
             const tracker = new AnalyticsGroup(
-                new AptabaseWeb(import.meta.env.VITE_APP_APTABASE, version)
+                new AptabaseWeb(import.meta.env.VITE_APP_APTABASE, version),
+                new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID)
             );
-            const tracker = new AnalyticsGroup(new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID!));
 
             tracker.init('Web', toWalletType(wallet), account, wallet);
 
