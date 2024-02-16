@@ -4,7 +4,7 @@ import {
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -12,7 +12,13 @@ import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useUserCountry } from '../../state/country';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { ListBlock } from '../List';
-import { Notification, NotificationCancelButton, NotificationTitleBlock } from '../Notification';
+import {
+    Notification,
+    NotificationCancelButton,
+    NotificationHeader,
+    NotificationHeaderPortal,
+    NotificationTitleBlock
+} from '../Notification';
 import { H3, Label2 } from '../Text';
 import { CommonCountryButton } from '../fields/BackButton';
 import { Action } from './Actions';
@@ -50,14 +56,18 @@ const ActionNotification: FC<{
     const { config } = useAppContext();
     return (
         <Block>
-            <NotificationTitleBlock>
-                <CommonCountryButton
-                    country={country}
-                    onClick={() => navigate(AppRoute.settings + SettingsRoute.country)}
-                />
-                <H3>{item.title}</H3>
-                <NotificationCancelButton handleClose={handleClose} />
-            </NotificationTitleBlock>
+            <NotificationHeaderPortal>
+                <NotificationHeader>
+                    <NotificationTitleBlock>
+                        <CommonCountryButton
+                            country={country}
+                            onClick={() => navigate(AppRoute.settings + SettingsRoute.country)}
+                        />
+                        <H3>{item.title}</H3>
+                        <NotificationCancelButton handleClose={handleClose} />
+                    </NotificationTitleBlock>
+                </NotificationHeader>
+            </NotificationHeaderPortal>
             <BuyList items={item.items} kind={kind} />
             <OtherBlock>
                 <OtherLink
@@ -74,6 +84,12 @@ const ActionNotification: FC<{
 
 const OtherBlock = styled.div`
     text-align: center;
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            padding-bottom: 1rem;
+        `}
 `;
 
 const OtherLink = styled(Label2)`

@@ -238,6 +238,7 @@ export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisable
 };
 
 const ConfirmViewButtonsContainerStyled = styled.div`
+    width: 100%;
     display: flex;
     gap: 1rem;
     & > * {

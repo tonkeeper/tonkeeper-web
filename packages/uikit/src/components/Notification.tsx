@@ -201,6 +201,10 @@ const FooterWrapper = styled.div`
             position: sticky;
             bottom: 0;
             z-index: 100;
+
+            &:empty {
+                padding-bottom: 1rem;
+            }
         `}
 `;
 
@@ -211,6 +215,10 @@ const HeaderWrapper = styled.div`
             position: sticky;
             top: 0;
             z-index: 100;
+
+            &:empty {
+                padding-bottom: 1rem;
+            }
         `}
 `;
 
@@ -497,9 +505,7 @@ export const Notification: FC<{
                                             </ButtonContainer>
                                         )}
                                         {Child}
-                                        {footer && (
-                                            <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
-                                        )}
+                                        <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
                                     </Content>
                                     <PaddingAdjusted onClick={handleClose} />
                                 </Wrapper>

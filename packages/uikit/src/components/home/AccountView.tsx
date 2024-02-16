@@ -13,6 +13,8 @@ import { CopyIcon } from '../Icon';
 import {
     FullHeightBlockResponsive,
     NotificationBlock,
+    NotificationHeader,
+    NotificationHeaderPortal,
     NotificationTitleRow
 } from '../Notification';
 import { Body1, H3 } from '../Text';
@@ -221,10 +223,14 @@ export const ReceiveContent: FC<{
 
     return (
         <FullHeightBlockResponsive standalone={standalone}>
-            <NotificationTitleRow handleClose={handleClose} center>
-                {/* TODO: ENABLE TRON */}
-                {/* <Tabs active={active} setActive={setActive} values={values} /> */}
-            </NotificationTitleRow>
+            <NotificationHeaderPortal>
+                <NotificationHeader>
+                    <NotificationTitleRow handleClose={handleClose} center>
+                        {/* TODO: ENABLE TRON */}
+                        {/* <Tabs active={active} setActive={setActive} values={values} /> */}
+                    </NotificationTitleRow>
+                </NotificationHeader>
+            </NotificationHeaderPortal>
             <Wrapper standalone={false} extension fullWidth>
                 <TransitionGroup childFactory={childFactoryCreator(!isTon)}>
                     <CSSTransition

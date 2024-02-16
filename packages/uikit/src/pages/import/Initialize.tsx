@@ -27,11 +27,14 @@ const Block = styled.div<{ fullHeight: boolean }>`
               `}
 `;
 
-export const InitializeContainer: FC<PropsWithChildren<{ fullHeight?: boolean }>> = ({
-    fullHeight = true,
-    children
-}) => {
-    return <Block fullHeight={fullHeight}>{children}</Block>;
+export const InitializeContainer: FC<
+    PropsWithChildren<{ fullHeight?: boolean; className?: string }>
+> = ({ fullHeight = true, children, className }) => {
+    return (
+        <Block fullHeight={fullHeight} className={className}>
+            {children}
+        </Block>
+    );
 };
 
 const Accent = styled.span`

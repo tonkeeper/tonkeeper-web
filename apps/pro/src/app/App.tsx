@@ -165,6 +165,15 @@ const WideContent = styled.div`
     overflow: auto;
 `;
 
+const InitializeContainerStyled = styled(InitializeContainer)`
+    min-height: fit-content;
+`;
+
+const FullSizeWrapperBounded = styled(FullSizeWrapper)`
+    max-height: 100%;
+    overflow: auto;
+`;
+
 export const Loader: FC = () => {
     const { data: activeWallet } = useActiveWallet();
 
@@ -256,9 +265,9 @@ export const Content: FC<{
 
     if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
         return (
-            <FullSizeWrapper>
+            <FullSizeWrapperBounded>
                 <Suspense fallback={<Loading />}>
-                    <InitializeContainer fullHeight={false}>
+                    <InitializeContainerStyled fullHeight={false}>
                         <Routes>
                             <Route
                                 path={any(AppRoute.import)}
@@ -266,9 +275,9 @@ export const Content: FC<{
                             />
                             <Route path="*" element={<Initialize />} />
                         </Routes>
-                    </InitializeContainer>
+                    </InitializeContainerStyled>
                 </Suspense>
-            </FullSizeWrapper>
+            </FullSizeWrapperBounded>
         );
     }
 
