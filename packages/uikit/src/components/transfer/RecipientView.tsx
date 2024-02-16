@@ -10,7 +10,7 @@ import {
     seeIfValidTronAddress
 } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
@@ -18,12 +18,20 @@ import { useTranslation } from '../../hooks/translation';
 import { scrollToTop } from '../../libs/common';
 import { QueryKey } from '../../libs/queryKey';
 import { Gap } from '../Layout';
-import { FullHeightBlock } from '../Notification';
+import {
+    FullHeightBlock,
+    NotificationFooter,
+    NotificationFooterPortal,
+    NotificationHeader,
+    NotificationHeaderPortal
+} from '../Notification';
 import { Body2 } from '../Text';
 import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
+import { MainButton } from './common';
+import {useIsFullWidthMode} from "../../hooks/useIsFullWidthMode";
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -112,6 +120,7 @@ export const RecipientView: FC<{
     MainButton: (props: { isLoading: boolean; onClick: () => void }) => JSX.Element;
     HeaderBlock: () => JSX.Element;
     fitContent?: boolean;
+    isAnimationProcess?: boolean;
 }> = ({
     data,
     setRecipient,
@@ -119,9 +128,9 @@ export const RecipientView: FC<{
     onScan,
     isExternalLoading,
     acceptBlockchains,
-    MainButton,
     HeaderBlock,
-    fitContent
+    fitContent,
+    isAnimationProcess
 }) => {
     const sdk = useAppSdk();
     const [submitted, setSubmit] = useState(false);
@@ -129,6 +138,8 @@ export const RecipientView: FC<{
     const { t } = useTranslation();
     const { standalone, ios } = useAppContext();
     const ref = useRef<HTMLTextAreaElement | null>(null);
+    const isFullWidth = useIsFullWidthMode();
+    const shouldHideHeaderAndFooter = isFullWidth && isAnimationProcess;
 
     const [comment, setComment] = useState(data && 'comment' in data ? data.comment : '');
     const [recipient, setAddress] = useState<BaseRecipient | DnsRecipient>(
@@ -304,7 +315,13 @@ export const RecipientView: FC<{
             fitContent={fitContent}
             noPadding
         >
-            <HeaderBlock />
+            {!shouldHideHeaderAndFooter && (
+                <NotificationHeaderPortal>
+                    <NotificationHeader>
+                        <HeaderBlock />
+                    </NotificationHeader>
+                </NotificationHeaderPortal>
+            )}
             <ShowAddress value={showAddress}>
                 <InputWithScanner
                     onSubmit={handleSubmit}
@@ -340,7 +357,16 @@ export const RecipientView: FC<{
 
             <Gap />
 
-            <MainButton isLoading={isFetching || isDnsFetching} onClick={handleSubmit} />
+            {!shouldHideHeaderAndFooter && (
+                <NotificationFooterPortal>
+                    <NotificationFooter>
+                        <MainButton
+                            isLoading={isFetching || isDnsFetching}
+                            onClick={handleSubmit}
+                        />
+                    </NotificationFooter>
+                </NotificationFooterPortal>
+            )}
         </FullHeightBlock>
     );
 };

@@ -1,5 +1,5 @@
-import { Notification } from '../Notification';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import { Notification, NotificationFooter } from '../Notification';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Draggable, Droppable, OnDragEndResponder } from 'react-beautiful-dnd';
 import { ListBlock, ListItemElement, ListItemPayload } from '../List';
 import { DASHBOARD_COLUMNS, DashboardColumnsTranslationKeys } from './columns/DASHBOARD_COLUMNS';
@@ -11,22 +11,13 @@ import {
     DashboardCategoriesStore,
     useDashboardCategories
 } from '../../hooks/dashboard/useDashboardCategories';
+import { Button } from '../fields/Button';
 
 export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     isOpen,
     onClose
 }) => {
-    const child = useCallback(() => <CategoriesModalContent />, []);
-
-    return (
-        <Notification title="Dashboard metrics" isOpen={isOpen} handleClose={onClose}>
-            {child}
-        </Notification>
-    );
-};
-
-const CategoriesModalContent: FC = () => {
-    const [{ data }] = useDashboardCategories();
+    const [{ data }, { mutate, isLoading }] = useDashboardCategories();
     const [categoriesForm, setCategoriesForm] = useState<DashboardCategoriesStore>([]);
 
     useEffect(() => {
@@ -35,6 +26,62 @@ const CategoriesModalContent: FC = () => {
         }
     }, [data]);
 
+    const child = useCallback(
+        () => (
+            <CategoriesModalContent
+                categoriesForm={categoriesForm}
+                setCategoriesForm={setCategoriesForm}
+            />
+        ),
+        [categoriesForm, setCategoriesForm]
+    );
+
+    const onSave = () => {
+        mutate(categoriesForm, {
+            onSuccess: () => {
+                onClose();
+            }
+        });
+    };
+
+    const formHasChanged = useMemo(() => {
+        return JSON.stringify(data) !== JSON.stringify(categoriesForm);
+    }, [categoriesForm, data]);
+
+    return (
+        <Notification
+            title="Dashboard metrics"
+            isOpen={isOpen}
+            handleClose={onClose}
+            footer={
+                <NotificationFooter>
+                    <Button
+                        size="large"
+                        primary
+                        fullWidth
+                        type="button"
+                        loading={isLoading}
+                        disabled={isLoading || !formHasChanged}
+                        onClick={onSave}
+                    >
+                        Save
+                    </Button>
+                </NotificationFooter>
+            }
+        >
+            {child}
+        </Notification>
+    );
+};
+
+const CategoriesModalContent: FC<{
+    categoriesForm: DashboardCategoriesStore;
+    setCategoriesForm: (
+        data:
+            | DashboardCategoriesStore
+            | ((data: DashboardCategoriesStore) => DashboardCategoriesStore)
+    ) => void;
+}> = ({ categoriesForm, setCategoriesForm }) => {
     const handleDrop: OnDragEndResponder = useCallback(droppedItem => {
         const destination = droppedItem.destination;
         if (!destination) return;
