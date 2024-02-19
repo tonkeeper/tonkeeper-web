@@ -25,7 +25,10 @@ export enum QueryKey {
     rate = 'rate',
     total = 'total',
 
-    dashboardCategories = 'dashboardCategories'
+    dashboardColumnsForm = 'dashboardColumnsForm',
+    dashboardColumns = 'dashboardColumns',
+    selectedDashboardColumns = 'selectedDashboardColumns',
+    dashboardData = 'dashboardData'
 }
 
 export enum JettonKey {

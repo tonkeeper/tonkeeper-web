@@ -2,23 +2,25 @@ import { Notification, NotificationFooter } from '../Notification';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Draggable, Droppable, OnDragEndResponder } from 'react-beautiful-dnd';
 import { ListBlock, ListItemElement, ListItemPayload } from '../List';
-import { DASHBOARD_COLUMNS, DashboardColumnsTranslationKeys } from './columns/DASHBOARD_COLUMNS';
 import { ReorderIcon } from '../Icon';
 import styled from 'styled-components';
 import { Body1 } from '../Text';
 import { Checkbox } from '../fields/Checkbox';
 import {
-    DashboardCategoriesStore,
-    useDashboardCategories
-} from '../../hooks/dashboard/useDashboardCategories';
+    DashboardColumnsForm,
+    useDashboardColumnsAsForm,
+    useDashboardColumnsForm
+} from '../../hooks/dashboard/useDashboardColumns';
 import { Button } from '../fields/Button';
+import { DashboardColumn } from '../../hooks/dashboard/dashboard-column';
 
 export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     isOpen,
     onClose
 }) => {
-    const [{ data }, { mutate, isLoading }] = useDashboardCategories();
-    const [categoriesForm, setCategoriesForm] = useState<DashboardCategoriesStore>([]);
+    const [_, { mutate, isLoading }] = useDashboardColumnsForm();
+    const { data } = useDashboardColumnsAsForm();
+    const [categoriesForm, setCategoriesForm] = useState<DashboardColumnsForm>([]);
 
     useEffect(() => {
         if (data) {
@@ -29,6 +31,7 @@ export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     const child = useCallback(
         () => (
             <CategoriesModalContent
+                categories={data || []}
                 categoriesForm={categoriesForm}
                 setCategoriesForm={setCategoriesForm}
             />
@@ -75,28 +78,27 @@ export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
 };
 
 const CategoriesModalContent: FC<{
-    categoriesForm: DashboardCategoriesStore;
+    categories: DashboardColumn[];
+    categoriesForm: DashboardColumnsForm;
     setCategoriesForm: (
-        data:
-            | DashboardCategoriesStore
-            | ((data: DashboardCategoriesStore) => DashboardCategoriesStore)
+        data: DashboardColumnsForm | ((data: DashboardColumnsForm) => DashboardColumnsForm)
     ) => void;
-}> = ({ categoriesForm, setCategoriesForm }) => {
+}> = ({ categories, categoriesForm, setCategoriesForm }) => {
     const handleDrop: OnDragEndResponder = useCallback(droppedItem => {
         const destination = droppedItem.destination;
         if (!destination) return;
 
-        setCategoriesForm(categories => {
-            const updatedList = [...categories];
+        setCategoriesForm(_categories => {
+            const updatedList = [..._categories];
             const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
             updatedList.splice(destination.index, 0, reorderedItem);
             return updatedList;
         });
     }, []);
 
-    const onCheckboxChange = (category: DASHBOARD_COLUMNS, checked: boolean) => {
+    const onCheckboxChange = (categoryId: string, checked: boolean) => {
         setCategoriesForm(form =>
-            form.map(c => (c.name === category ? { ...c, isEnabled: checked } : c))
+            form.map(c => (c.id === categoryId ? { ...c, isEnabled: checked } : c))
         );
     };
     return (
@@ -104,8 +106,8 @@ const CategoriesModalContent: FC<{
             <Droppable direction="vertical" droppableId="wallets">
                 {provided => (
                     <ListBlock {...provided.droppableProps} ref={provided.innerRef}>
-                        {categoriesForm.map(({ name, isEnabled }, index) => (
-                            <Draggable key={name} draggableId={name} index={index}>
+                        {categoriesForm.map(({ id, isEnabled }, index) => (
+                            <Draggable key={id} draggableId={id} index={index}>
                                 {(p, snapshotDrag) => {
                                     let transform = p.draggableProps.style?.transform;
 
@@ -132,15 +134,12 @@ const CategoriesModalContent: FC<{
                                                         <ReorderIcon />
                                                     </Icon>
                                                     <Body1>
-                                                        {DashboardColumnsTranslationKeys[name]}
+                                                        {categories.find(c => c.id === id)?.name}
                                                     </Body1>
                                                     <CheckboxStyled
                                                         checked={isEnabled}
                                                         onChange={value =>
-                                                            onCheckboxChange(
-                                                                name as DASHBOARD_COLUMNS,
-                                                                value
-                                                            )
+                                                            onCheckboxChange(id, value)
                                                         }
                                                     />
                                                 </Row>
