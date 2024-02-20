@@ -3,7 +3,7 @@ import { FC } from 'react';
 import { Body2 } from '../Text';
 import { useDashboardColumnsAsForm } from '../../hooks/dashboard/useDashboardColumns';
 import { useDashboardData } from '../../hooks/dashboard/useDashboardData';
-import { DashboardCellAddress } from '../../hooks/dashboard/dashboard-column';
+import { DashboardCellAddress, DashboardColumnType } from '../../hooks/dashboard/dashboard-column';
 import { DashboardCell } from './columns/DashboardCell';
 
 const TableStyled = styled.table`
@@ -18,7 +18,6 @@ const HeadingTrStyled = styled.tr`
         top: 0;
         background: ${props => props.theme.backgroundPage};
         z-index: 3;
-        text-align: left;
         padding: 16px 12px 8px;
         border-bottom: 1px solid ${props => props.theme.separatorCommon};
         color: ${props => props.theme.textSecondary};
@@ -52,6 +51,20 @@ const TrStyled = styled.tr`
     }
 `;
 
+const Th = styled.th<{ textAlign?: string }>`
+    text-align: ${p => p.textAlign || 'start'};
+`;
+
+const Td = styled.td<{ textAlign?: string }>`
+    text-align: ${p => p.textAlign || 'start'};
+`;
+
+const isNumericColumn = (columnType: DashboardColumnType): boolean => {
+    return (
+        columnType === 'numeric' || columnType === 'numeric_fiat' || columnType === 'numeric_crypto'
+    );
+};
+
 export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
     const { data: columns } = useDashboardColumnsAsForm();
     const { data: dashboardData } = useDashboardData();
@@ -67,9 +80,12 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
             <thead>
                 <HeadingTrStyled>
                     {selectedColumns.map(column => (
-                        <th key={column.id}>
+                        <Th
+                            key={column.id}
+                            textAlign={isNumericColumn(column.type) ? 'right' : undefined}
+                        >
                             <Body2>{column.name}</Body2>
-                        </th>
+                        </Th>
                     ))}
                 </HeadingTrStyled>
             </thead>
@@ -82,9 +98,12 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
                         }
                     >
                         {dataRow.map((cell, i) => (
-                            <td key={i}>
+                            <Td
+                                key={i}
+                                textAlign={isNumericColumn(cell.type) ? 'right' : undefined}
+                            >
                                 <DashboardCell {...cell} />
-                            </td>
+                            </Td>
                         ))}
                     </TrStyled>
                 ))}
