@@ -21,11 +21,13 @@ export function useDashboardColumnsForm() {
             const stored = await storage.get<DashboardColumnsForm>('dashboard-columns');
 
             if (stored) {
-                return stored.filter(c => {
-                    const colInfo = columns.find(item => item.id === c.id);
-
-                    return !!colInfo && isSupportedColumnType(colInfo.type);
-                });
+                return columns
+                    .filter(c => isSupportedColumnType(c.type))
+                    .map(c => ({
+                        id: c.id,
+                        isEnabled:
+                            stored.find(item => item.id === c.id)?.isEnabled || c.defaultIsChecked
+                    }));
             }
             return columns.map(c => ({ id: c.id, isEnabled: c.defaultIsChecked }));
         },
@@ -101,6 +103,34 @@ export function useDashboardColumns() {
                 type: 'string' as const,
                 defaultIsChecked: true,
                 onlyPro: false
+            },
+            {
+                id: 'send_current',
+                name: 'Send current month',
+                type: 'numeric_crypto' as const,
+                defaultIsChecked: false,
+                onlyPro: true
+            },
+            {
+                id: 'send_prev',
+                name: 'Send previous month',
+                type: 'numeric_crypto' as const,
+                defaultIsChecked: false,
+                onlyPro: true
+            },
+            {
+                id: 'received_current',
+                name: 'Received current month',
+                type: 'numeric_crypto' as const,
+                defaultIsChecked: false,
+                onlyPro: true
+            },
+            {
+                id: 'received_prev',
+                name: 'Received previous month',
+                type: 'numeric_crypto' as const,
+                defaultIsChecked: true,
+                onlyPro: true
             }
         ];
 

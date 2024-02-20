@@ -38,6 +38,7 @@ const TrStyled = styled.tr`
     > td {
         padding: 14px 12px;
         border-bottom: 1px solid ${props => props.theme.separatorCommon};
+        white-space: nowrap;
 
         &:first-child {
             text-align: left !important;

@@ -6,20 +6,21 @@ import { Button } from '../fields/Button';
 const ProBannerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
     border-radius: ${p => p.theme.cornerSmall};
-    padding: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 1rem 14px;
+    gap: 1rem;
 `;
 
 const TextContainerStyled = styled.div`
-    padding-left: 1rem;
     display: flex;
     flex-direction: column;
+    min-width: 300px;
 `;
 const ButtonsContainerStyled = styled.div`
     display: flex;
-    padding: 1rem;
     gap: 8px;
 `;
 

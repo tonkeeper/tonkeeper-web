@@ -59,5 +59,29 @@ const mocks = {
     storage: {
         type: 'string',
         value: 'keychain'
+    },
+    send_current: {
+        type: 'numeric_crypto',
+        value: new BigNumber(123456),
+        decimals: 9,
+        symbol: 'TON'
+    },
+    send_prev: {
+        type: 'numeric_crypto',
+        value: new BigNumber(1234111111),
+        decimals: 9,
+        symbol: 'TON'
+    },
+    received_current: {
+        type: 'numeric_crypto',
+        value: new BigNumber(333333323456),
+        decimals: 9,
+        symbol: 'TON'
+    },
+    received_prev: {
+        type: 'numeric_crypto',
+        value: new BigNumber(111111111123456),
+        decimals: 9,
+        symbol: 'TON'
     }
 };
