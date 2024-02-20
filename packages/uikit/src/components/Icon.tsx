@@ -88,7 +88,7 @@ export const ChevronDownIcon = () => {
     );
 };
 
-export const DoneIcon = () => {
+export const DoneIcon: FC<{ className?: string }> = ({ className }) => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -96,6 +96,7 @@ export const DoneIcon = () => {
             height="16"
             viewBox="0 0 16 16"
             fill="none"
+            className={className}
         >
             <path
                 fillRule="evenodd"

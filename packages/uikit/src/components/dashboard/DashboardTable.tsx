@@ -19,7 +19,7 @@ const HeadingTrStyled = styled.tr`
         background: ${props => props.theme.backgroundPage};
         z-index: 3;
         text-align: left;
-        padding: 8px 12px;
+        padding: 16px 12px 8px;
         border-bottom: 1px solid ${props => props.theme.separatorCommon};
         color: ${props => props.theme.textSecondary};
 

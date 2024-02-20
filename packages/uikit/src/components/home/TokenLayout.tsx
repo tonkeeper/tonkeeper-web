@@ -50,7 +50,7 @@ const CoinLabel = styled(Label4)`
     display: inline-block;
     margin-left: 8px;
     padding: 3px 4px;
-    border-radius: ${props => props.theme.cornerExtraExtraSmall};
+    border-radius: ${props => props.theme.corner3xSmall};
     background: ${props => props.theme.backgroundContentTint};
     color: ${props => props.theme.textSecondary};
 `;

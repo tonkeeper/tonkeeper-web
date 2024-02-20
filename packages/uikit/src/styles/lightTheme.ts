@@ -72,7 +72,8 @@ export const lightTheme: DefaultTheme = {
     blue: '#0077FF',
     red: '#FF3B30',
 
-    cornerExtraExtraSmall: '4px',
+    corner3xSmall: '4px',
+    corner2xSmall: '8px',
     cornerExtraSmall: '12px',
     cornerSmall: '16px',
     cornerMedium: '20px',
