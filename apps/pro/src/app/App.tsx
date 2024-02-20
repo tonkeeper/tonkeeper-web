@@ -82,6 +82,10 @@ const GlobalStyle = createGlobalStyle`
         overflow: hidden;
     }
 
+    html.is-locked {
+        height: var(--app-height);
+    }
+
     button, input[type="submit"], input[type="reset"] {
       background: none;
       color: inherit;

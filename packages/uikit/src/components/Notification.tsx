@@ -4,6 +4,7 @@ import React, {
     forwardRef,
     PropsWithChildren,
     ReactNode,
+    useCallback,
     useContext,
     useEffect,
     useMemo,
@@ -21,6 +22,7 @@ import { H2, H3 } from './Text';
 import { BackButton, ButtonMock } from './fields/BackButton';
 import { createPortal } from 'react-dom';
 import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -468,6 +470,21 @@ export const Notification: FC<{
         }
     }, [isEntering]);
 
+    const isFullWidth = useIsFullWidthMode();
+    const onClickOutside = useCallback(() => {
+        if (isFullWidth) {
+            handleClose();
+        }
+    }, [isFullWidth, handleClose]);
+
+    const handleCloseOnlyOnNotFullWidth = useCallback(() => {
+        if (!isFullWidth) {
+            handleClose();
+        }
+    }, [isFullWidth, handleClose]);
+
+    const containerRef = useClickOutside<HTMLDivElement>(onClickOutside);
+
     return (
         <NotificationContext.Provider value={{ footerElement, headerElement }}>
             <ReactPortal wrapperId="react-portal-modal-container">
@@ -485,9 +502,9 @@ export const Notification: FC<{
                         <NotificationOverlay handleClose={handleClose} entered={entered}>
                             <NotificationWrapper entered={entered}>
                                 <Wrapper>
-                                    <Padding onClick={handleClose} />
-                                    <GapAdjusted onClick={handleClose} />
-                                    <Content standalone={standalone}>
+                                    <Padding onClick={handleCloseOnlyOnNotFullWidth} />
+                                    <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
+                                    <Content standalone={standalone} ref={containerRef}>
                                         <HeaderWrapper ref={headerRef}>
                                             {title && (
                                                 <NotificationHeader>
@@ -507,7 +524,7 @@ export const Notification: FC<{
                                         {Child}
                                         <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
                                     </Content>
-                                    <PaddingAdjusted onClick={handleClose} />
+                                    <PaddingAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
                                 </Wrapper>
                             </NotificationWrapper>
                         </NotificationOverlay>
