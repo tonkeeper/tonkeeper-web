@@ -1,9 +1,9 @@
-import styled from 'styled-components';
-import { FC } from 'react';
+import styled, { css } from 'styled-components';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Body2 } from '../Text';
 import { useDashboardColumnsAsForm } from '../../hooks/dashboard/useDashboardColumns';
 import { useDashboardData } from '../../hooks/dashboard/useDashboardData';
-import { DashboardCellAddress, DashboardColumnType } from '../../hooks/dashboard/dashboard-column';
+import { DashboardColumnType } from '../../hooks/dashboard/dashboard-column';
 import { DashboardCell } from './columns/DashboardCell';
 
 const TableStyled = styled.table`
@@ -18,7 +18,7 @@ const HeadingTrStyled = styled.tr`
         top: 0;
         background: ${props => props.theme.backgroundPage};
         z-index: 3;
-        padding: 16px 12px 8px;
+        padding: 16px 24px 8px 0;
         border-bottom: 1px solid ${props => props.theme.separatorCommon};
         color: ${props => props.theme.textSecondary};
 
@@ -52,8 +52,37 @@ const TrStyled = styled.tr`
     }
 `;
 
+const ResizeHandleWrapper = styled.button<{ hidden?: boolean }>`
+    width: 24px;
+    height: 20px;
+    position: absolute;
+    top: calc(50% + 4px - 10px);
+    right: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: opacity 0.15s ease-in-out;
+
+    ${p =>
+        p.hidden &&
+        css`
+            opacity: 0;
+        `}
+`;
+
+const ResizeHandle = styled.div`
+    background: ${p => p.theme.iconTertiary};
+    width: 1px;
+    height: 12px;
+`;
+
 const Th = styled.th<{ textAlign?: string }>`
     text-align: ${p => p.textAlign || 'start'};
+    position: relative;
+    box-sizing: border-box;
 `;
 
 const Td = styled.td<{ textAlign?: string }>`
@@ -70,6 +99,59 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
     const { data: columns } = useDashboardColumnsAsForm();
     const { data: dashboardData } = useDashboardData();
 
+    const [isResizing, setIsResizing] = useState<boolean>(false);
+    const [hoverOnColumn, setHoverOnColumn] = useState<number | undefined>(undefined);
+    const pressedColumn = useRef<{
+        index: number;
+        initialPageX: number;
+        initialWidth: number;
+    } | null>();
+    const thRefs = useRef<(HTMLTableHeaderCellElement | null)[]>([]);
+
+    const changeColWidth = (i: number, change: number) => {
+        if (!pressedColumn.current) {
+            return;
+        }
+
+        const initialWidth = pressedColumn.current!.initialWidth;
+
+        const newWidth = initialWidth + change;
+
+        thRefs.current[i]!.style.width = `${newWidth}px`;
+    };
+
+    useEffect(() => {
+        const onMouseUp = () => {
+            document.body.style.cursor = 'unset';
+            setIsResizing(false);
+            pressedColumn.current = undefined;
+        };
+
+        const onMouseMove = (e: MouseEvent) => {
+            if (pressedColumn.current?.index !== undefined) {
+                changeColWidth(
+                    pressedColumn.current!.index,
+                    e.pageX - pressedColumn.current.initialPageX
+                );
+            }
+        };
+
+        document.addEventListener('mouseup', onMouseUp);
+        document.addEventListener('mousemove', onMouseMove);
+        return () => {
+            document.removeEventListener('mouseup', onMouseUp);
+            document.removeEventListener('mousemove', onMouseMove);
+        };
+    }, []);
+
+    const shouldHighlightSeparator = (i: number) => {
+        if (isResizing) {
+            return pressedColumn.current && i === pressedColumn.current!.index;
+        }
+
+        return hoverOnColumn !== undefined && hoverOnColumn >= i && hoverOnColumn <= i + 1;
+    };
+
     if (!columns || !dashboardData) {
         return null;
     }
@@ -80,24 +162,44 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
         <TableStyled className={className}>
             <thead>
                 <HeadingTrStyled>
-                    {selectedColumns.map(column => (
+                    {selectedColumns.map((column, index) => (
                         <Th
                             key={column.id}
                             textAlign={isNumericColumn(column.type) ? 'right' : undefined}
+                            ref={el => (thRefs.current[index] = el)}
+                            onMouseLeave={() => {
+                                setTimeout(
+                                    () => setHoverOnColumn(i => (index === i ? undefined : i)),
+                                    50
+                                );
+                            }}
+                            onMouseEnter={() => setHoverOnColumn(index)}
                         >
                             <Body2>{column.name}</Body2>
+                            {index !== selectedColumns.length - 1 && (
+                                <ResizeHandleWrapper
+                                    hidden={!shouldHighlightSeparator(index)}
+                                    onMouseDown={e => {
+                                        setIsResizing(true);
+                                        document.body.style.cursor = 'col-resize';
+                                        pressedColumn.current = {
+                                            index,
+                                            initialPageX: e.pageX,
+                                            initialWidth: thRefs.current[index]?.offsetWidth || 0
+                                        };
+                                    }}
+                                    onMouseEnter={() => setHoverOnColumn(index + 0.5)}
+                                >
+                                    <ResizeHandle />
+                                </ResizeHandleWrapper>
+                            )}
                         </Th>
                     ))}
                 </HeadingTrStyled>
             </thead>
             <tbody>
                 {dashboardData.map((dataRow, index) => (
-                    <TrStyled
-                        key={
-                            (dataRow.find(c => c.type === 'address') as DashboardCellAddress)
-                                ?.raw || '' + index.toString()
-                        }
-                    >
+                    <TrStyled key={index.toString()}>
                         {dataRow.map((cell, i) => (
                             <Td
                                 key={i}
