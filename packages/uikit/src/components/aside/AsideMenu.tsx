@@ -11,18 +11,17 @@ import { AppProRoute, AppRoute, SettingsRoute } from '../../libs/routes';
 import { scrollToTop } from '../../libs/common';
 import { ImportNotification } from '../create/ImportNotification';
 import { PlusIcon, SlidersIcon } from '../Icon';
+import { SubscriptionInfo } from './SubscriptionInfo';
 
 const AsideContainer = styled.div`
-    background: ${p => p.theme.backgroundContent};
-    position: relative;
+    height: 100%;
     overflow: auto;
+    box-sizing: border-box;
+
+    background: ${p => p.theme.backgroundContent};
     display: flex;
     flex-direction: column;
-`;
-
-const AsideScrollContent = styled.div`
     padding: 0.5rem 0;
-    flex: 1;
 `;
 
 const IconWrapper = styled.div`
@@ -54,10 +53,10 @@ const AsideMenuCard = styled.button<{ isSelected: boolean; padding: 's' | 'm' }>
 `;
 
 const AsideMenuBottom = styled.div`
-    position: sticky;
-    bottom: 0;
-    padding-bottom: 0.5rem;
-    background: inherit;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 `;
 
 const AsideMenuItemIcon = styled.div`
@@ -135,26 +134,24 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
 
     return (
         <AsideContainer className={className}>
-            <AsideScrollContent>
-                <AsideMenuCard
-                    isSelected={activeRoute === AppProRoute.dashboard}
-                    padding="m"
-                    onClick={() => handleNavigateClick(AppProRoute.dashboard)}
-                >
-                    <Body2>Dashboard</Body2> {/*TODO*/}
-                </AsideMenuCard>
-                {account.publicKeys.map(publicKey => (
-                    <AsideMenuAccount
-                        key={publicKey}
-                        publicKey={publicKey}
-                        isSelected={
-                            !activeRoute &&
-                            !!account.activePublicKey &&
-                            account.activePublicKey === publicKey
-                        }
-                    />
-                ))}
-            </AsideScrollContent>
+            <AsideMenuCard
+                isSelected={activeRoute === AppProRoute.dashboard}
+                padding="m"
+                onClick={() => handleNavigateClick(AppProRoute.dashboard)}
+            >
+                <Body2>Dashboard</Body2> {/*TODO*/}
+            </AsideMenuCard>
+            {account.publicKeys.map(publicKey => (
+                <AsideMenuAccount
+                    key={publicKey}
+                    publicKey={publicKey}
+                    isSelected={
+                        !activeRoute &&
+                        !!account.activePublicKey &&
+                        account.activePublicKey === publicKey
+                    }
+                />
+            ))}
             <AsideMenuBottom>
                 <AsideMenuCard padding="m" isSelected={false} onClick={() => setIsOpenImport(true)}>
                     <AsideMenuItemIcon>
@@ -176,6 +173,7 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
                         </IconWrapper>
                     </AsideMenuItemIcon>
                 </AsideMenuCard>
+                <SubscriptionInfo />
             </AsideMenuBottom>
             <ImportNotification isOpen={isOpenImport} setOpen={setIsOpenImport} />
         </AsideContainer>

@@ -13,6 +13,7 @@ import {
 } from '../../hooks/dashboard/useDashboardColumns';
 import { Button } from '../fields/Button';
 import { DashboardColumn } from '../../hooks/dashboard/dashboard-column';
+import { Badge } from '../shared';
 
 export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     isOpen,
@@ -77,6 +78,11 @@ export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     );
 };
 
+const activateSubscription = () => {
+    alert('activate subscription');
+}; /* TODO */
+const isSubscriptionActive = Math.random() > 0.5; /* TODO */
+
 const CategoriesModalContent: FC<{
     categories: DashboardColumn[];
     categoriesForm: DashboardColumnsForm;
@@ -120,6 +126,9 @@ const CategoriesModalContent: FC<{
                                         transform
                                     };
 
+                                    const category = categories.find(c => c.id === id);
+                                    const isDisabled = category?.onlyPro && !isSubscriptionActive;
+
                                     return (
                                         <ListItemElement
                                             ios={true}
@@ -129,16 +138,21 @@ const CategoriesModalContent: FC<{
                                             style={style}
                                         >
                                             <ListItemPayload>
-                                                <Row>
+                                                <Row
+                                                    onClick={() =>
+                                                        isDisabled && activateSubscription()
+                                                    }
+                                                >
                                                     <Icon {...p.dragHandleProps}>
                                                         <ReorderIcon />
                                                     </Icon>
-                                                    <Body1>
-                                                        {categories.find(c => c.id === id)?.name}
-                                                    </Body1>
+                                                    <Body1>{category?.name}</Body1>
+                                                    {category?.onlyPro && <Badge>PRO</Badge>}
                                                     <CheckboxStyled
                                                         checked={isEnabled}
+                                                        disabled={isDisabled}
                                                         onChange={value =>
+                                                            !isDisabled &&
                                                             onCheckboxChange(id, value)
                                                         }
                                                     />

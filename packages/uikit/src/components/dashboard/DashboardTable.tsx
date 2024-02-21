@@ -3,7 +3,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { Body2 } from '../Text';
 import { useDashboardColumnsAsForm } from '../../hooks/dashboard/useDashboardColumns';
 import { useDashboardData } from '../../hooks/dashboard/useDashboardData';
-import { DashboardColumnType } from '../../hooks/dashboard/dashboard-column';
+import { DashboardCellAddress, DashboardColumnType } from '../../hooks/dashboard/dashboard-column';
 import { DashboardCell } from './columns/DashboardCell';
 
 const TableStyled = styled.table`
@@ -202,7 +202,13 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
                     <TrStyled key={index.toString()}>
                         {dataRow.map((cell, i) => (
                             <Td
-                                key={i}
+                                key={
+                                    (
+                                        dataRow.find(
+                                            c => c.type === 'address'
+                                        ) as DashboardCellAddress
+                                    )?.raw || i.toString()
+                                }
                                 textAlign={isNumericColumn(cell.type) ? 'right' : undefined}
                             >
                                 <DashboardCell {...cell} />
