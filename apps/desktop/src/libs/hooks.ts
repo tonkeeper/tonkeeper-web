@@ -57,8 +57,8 @@ export const useAnalytics = (
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
-
-            const userId = await sdk.storage.get<string>(AppKey.USER_ID)
+            const userId = await sdk.storage
+                .get<string>(AppKey.USER_ID)
                 .then(async (userId: string | null) => {
                     if (userId) {
                         return userId;
