@@ -2,17 +2,15 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { InvoiceFieldOrder } from '../models/InvoiceFieldOrder';
 import type { InvoicesApp } from '../models/InvoicesApp';
 import type { InvoicesInvoice } from '../models/InvoicesInvoice';
 import type { InvoiceStatus } from '../models/InvoiceStatus';
 import type { Ok } from '../models/Ok';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class InvoicesServiceService {
-
     /**
      * Create invoices app
      * @param projectId Project ID
@@ -46,7 +44,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Get invoices app by project
      * @param projectId Project ID
@@ -71,7 +68,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Update invoices app
      * @param id App ID
@@ -104,7 +100,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Delete invoices app
      * @param id App ID
@@ -127,7 +122,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Create webhook for app
      * @param id App ID
@@ -158,7 +152,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Update webhook for app
      * @param id App ID
@@ -192,7 +185,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Delete webhook for app
      * @param id App ID
@@ -220,7 +212,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Get invoices app token
      * @param appId App ID
@@ -245,7 +236,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Regenerate invoices app token
      * @param appId App ID
@@ -270,7 +260,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Create invoice
      * @param appId App ID
@@ -307,7 +296,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Get invoices
      * @param appId App ID
@@ -318,6 +306,8 @@ export class InvoicesServiceService {
      * @param searchId Search ID
      * @param filterStatus Filter status
      * @param overpayment Overpayment
+     * @param start Start date
+     * @param end End date
      * @returns any Invoices
      * @throws ApiError
      */
@@ -325,11 +315,13 @@ export class InvoicesServiceService {
         appId: number,
         limit: number = 100,
         offset?: number,
-        fieldOrder?: 'id' | 'amount' | 'status' | 'life_time' | 'description' | 'pay_to_address' | 'paid_by_address' | 'date_create' | 'date_paid',
+        fieldOrder?: InvoiceFieldOrder,
         typeOrder?: 'asc' | 'desc',
         searchId?: string,
         filterStatus?: Array<InvoiceStatus>,
         overpayment: boolean = false,
+        start?: number,
+        end?: number,
     ): CancelablePromise<{
         items: Array<InvoicesInvoice>;
         count: number;
@@ -346,6 +338,8 @@ export class InvoicesServiceService {
                 'search_id': searchId,
                 'filter_status': filterStatus,
                 'overpayment': overpayment,
+                'start': start,
+                'end': end,
             },
             errors: {
                 400: `Something went wrong on client side`,
@@ -354,7 +348,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Get invoice
      * @param id Invoice ID
@@ -382,7 +375,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Update invoice
      * @param id Invoice ID
@@ -417,7 +409,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Cancel invoice
      * @param id Invoice ID
@@ -445,7 +436,6 @@ export class InvoicesServiceService {
             },
         });
     }
-
     /**
      * Get invoices stats
      * @param appId App ID
@@ -476,5 +466,47 @@ export class InvoicesServiceService {
             },
         });
     }
-
+    /**
+     * Export invoices to csv file
+     * @param appId App ID
+     * @param fieldOrder Field
+     * @param typeOrder Type order
+     * @param searchId Search ID
+     * @param filterStatus Filter status
+     * @param overpayment Overpayment
+     * @param start Start date
+     * @param end End date
+     * @returns binary Invoices CSV
+     * @throws ApiError
+     */
+    public static exportInvoicesCsv(
+        appId: number,
+        fieldOrder?: InvoiceFieldOrder,
+        typeOrder?: 'asc' | 'desc',
+        searchId?: string,
+        filterStatus?: Array<InvoiceStatus>,
+        overpayment: boolean = false,
+        start?: number,
+        end?: number,
+    ): CancelablePromise<Blob> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/services/invoices/export',
+            query: {
+                'app_id': appId,
+                'field_order': fieldOrder,
+                'type_order': typeOrder,
+                'search_id': searchId,
+                'filter_status': filterStatus,
+                'overpayment': overpayment,
+                'start': start,
+                'end': end,
+            },
+            errors: {
+                400: `Something went wrong on client side`,
+                404: `The specified resource was not found`,
+                500: `Something went wrong on server side`,
+            },
+        });
+    }
 }

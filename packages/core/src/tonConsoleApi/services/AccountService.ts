@@ -3,13 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Ok } from '../models/Ok';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class AccountService {
-
     /**
      * Logout from the system
      * After logout, the user's token is deleted
@@ -28,5 +25,4 @@ export class AccountService {
             },
         });
     }
-
 }

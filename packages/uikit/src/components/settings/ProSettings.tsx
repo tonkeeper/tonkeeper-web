@@ -1,6 +1,7 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { ProPlan, ProState } from '@tonkeeper/core/dist/entries/pro';
+import { ProState } from '@tonkeeper/core/dist/entries/pro';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
 import { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useFormatCoinValue } from '../../hooks/balance';
@@ -106,9 +107,9 @@ const ProWallet: FC<{ data: ProState; onClick: () => void }> = ({ data, onClick 
 };
 
 const SelectProPlans: FC<{
-    plans: ProPlan[];
-    selected: string | null;
-    setPlan: (id: string) => void;
+    plans: ProServiceTier[];
+    selected: number | null;
+    setPlan: (id: number) => void;
 }> = ({ plans, selected, setPlan }) => {
     const format = useFormatCoinValue();
     return (
@@ -122,7 +123,7 @@ const SelectProPlans: FC<{
                                 text={plan.name}
                                 secondary={
                                     <>
-                                        {format(plan.price)} {CryptoCurrency.TON}
+                                        {format(plan.amount)} {CryptoCurrency.TON}
                                     </>
                                 }
                             />
@@ -144,7 +145,7 @@ const ProContent: FC<{ data: ProState }> = ({ data }) => {
     const ref = useRef<HTMLDivElement>(null);
 
     const { mutate: logOut } = useProLogout();
-    const [selectedPlan, setPlan] = useState<string | null>(null);
+    const [selectedPlan, setPlan] = useState<number | null>(null);
     const [promo, setPromo] = useState('');
 
     const { data: plans } = useProPlans();

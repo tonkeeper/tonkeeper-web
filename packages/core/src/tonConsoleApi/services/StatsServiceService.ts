@@ -2,28 +2,31 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Charge } from '../models/Charge';
+import type { Chain } from '../models/Chain';
 import type { StatsDashboard } from '../models/StatsDashboard';
 import type { StatsEstimateQuery } from '../models/StatsEstimateQuery';
 import type { StatsQuery } from '../models/StatsQuery';
 import type { StatsQueryResult } from '../models/StatsQueryResult';
 import type { StatsQueryType } from '../models/StatsQueryType';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class StatsServiceService {
-
     /**
      * Get stats db ddl
+     * @param chain chain
      * @returns binary Stats db ddl
      * @throws ApiError
      */
-    public static getStatsDdl(): CancelablePromise<Blob> {
+    public static getStatsDdl(
+        chain?: Chain,
+    ): CancelablePromise<Blob> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/services/stats/ddl',
+            query: {
+                'chain': chain,
+            },
             errors: {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
@@ -32,14 +35,15 @@ export class StatsServiceService {
             },
         });
     }
-
     /**
      * Estimate query
+     * @param chain chain
      * @param requestBody Data that is expected
      * @returns StatsEstimateQuery Estimate query
      * @throws ApiError
      */
     public static estimateStatsQuery(
+        chain?: Chain,
         requestBody?: {
             project_id: number;
             query?: string;
@@ -53,6 +57,9 @@ export class StatsServiceService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/stats/query/estimate',
+            query: {
+                'chain': chain,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {
@@ -63,14 +70,15 @@ export class StatsServiceService {
             },
         });
     }
-
     /**
      * Send query to stats service
+     * @param chain chain
      * @param requestBody Data that is expected
      * @returns StatsQueryResult Query result
      * @throws ApiError
      */
     public static sendQueryToStats(
+        chain?: Chain,
         requestBody?: {
             project_id: number;
             query?: string;
@@ -84,6 +92,9 @@ export class StatsServiceService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/stats/query',
+            query: {
+                'chain': chain,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {
@@ -94,7 +105,6 @@ export class StatsServiceService {
             },
         });
     }
-
     /**
      * Get result by sql query id
      * @param id Query ID
@@ -118,7 +128,6 @@ export class StatsServiceService {
             },
         });
     }
-
     /**
      * Update query
      * @param id Query ID
@@ -156,7 +165,6 @@ export class StatsServiceService {
             },
         });
     }
-
     /**
      * Get sql history queries
      * @param projectId Project ID
@@ -195,11 +203,11 @@ export class StatsServiceService {
             },
         });
     }
-
     /**
      * Get an intersection between accounts
      * @param addresses Addresses
      * @param projectId Project ID
+     * @param chain chain
      * @param onlyBetween
      * @param repeatInterval cyclic execution of requests
      * @returns StatsQueryResult Query result
@@ -208,6 +216,7 @@ export class StatsServiceService {
     public static getGraphFromStats(
         addresses: string,
         projectId: number,
+        chain?: Chain,
         onlyBetween: boolean = false,
         repeatInterval?: number,
     ): CancelablePromise<StatsQueryResult> {
@@ -215,6 +224,7 @@ export class StatsServiceService {
             method: 'POST',
             url: '/api/v1/services/stats/cosmos/graph',
             query: {
+                'chain': chain,
                 'addresses': addresses,
                 'only_between': onlyBetween,
                 'project_id': projectId,
@@ -228,42 +238,17 @@ export class StatsServiceService {
             },
         });
     }
-
-    /**
-     * Get project stats payments history
-     * @param projectId Project ID
-     * @returns any Project payments history
-     * @throws ApiError
-     */
-    public static getProjectStatsPaymentsHistory(
-        projectId: number,
-    ): CancelablePromise<{
-        history: Array<Charge>;
-    }> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/v1/services/stats/payments/history',
-            query: {
-                'project_id': projectId,
-            },
-            errors: {
-                400: `Something went wrong on client side`,
-                403: `Access token is missing or invalid`,
-                404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
-        });
-    }
-
     /**
      * Send request to ChatGPT
      * @param projectId Project ID
+     * @param chain chain
      * @param requestBody Data that is expected
      * @returns any Answer from ChatGPT
      * @throws ApiError
      */
     public static statsChatGptRequest(
         projectId: number,
+        chain?: Chain,
         requestBody?: {
             message: string;
             context?: string;
@@ -277,6 +262,7 @@ export class StatsServiceService {
             url: '/api/v1/services/stats/gpt',
             query: {
                 'project_id': projectId,
+                'chain': chain,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -288,7 +274,6 @@ export class StatsServiceService {
             },
         });
     }
-
     /**
      * Price per request for ChatGPT
      * @param projectId Project ID
@@ -316,7 +301,6 @@ export class StatsServiceService {
             },
         });
     }
-
     /**
      * Create dashboard
      * @param projectId Project ID
@@ -350,7 +334,6 @@ export class StatsServiceService {
             },
         });
     }
-
     /**
      * Get dashboard
      * @param id Dashboard ID
@@ -379,7 +362,6 @@ export class StatsServiceService {
             },
         });
     }
-
     /**
      * Update dashboard
      * @param id Dashboard ID
@@ -418,7 +400,6 @@ export class StatsServiceService {
             },
         });
     }
-
     /**
      * Get dashboards
      * @param projectId Project ID
@@ -444,5 +425,4 @@ export class StatsServiceService {
             },
         });
     }
-
 }

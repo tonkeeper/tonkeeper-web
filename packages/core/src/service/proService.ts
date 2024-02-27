@@ -2,7 +2,7 @@ import { ProState, ProStateSubscription } from '../entries/pro';
 import { WalletState, walletVersionFromText, walletVersionText } from '../entries/wallet';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
-import { AccountService, AuthService, ProjectService } from '../tonConsoleApi';
+import { ProjectService, ProServiceService } from '../tonConsoleApi';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { walletContract, walletStateInitFromState } from './wallet/contractService';
 
@@ -30,8 +30,7 @@ export const getProState = async (wallet: WalletState): Promise<ProState> => {
 
 const toEmptySubscription = (): ProStateSubscription => {
     return {
-        valid: false,
-        validUntil: Date.now()
+        valid: false
     };
 };
 
@@ -70,7 +69,7 @@ export const loadProState = async (wallet: WalletState): Promise<ProState> => {
         walletVersionFromText(version)
     );
 
-    const subscription: ProStateSubscription = { valid: false, validUntil: Date.now() }; //await ProjectService.validatePro( project.id;) // TODO: Implement api
+    const subscription = await ProServiceService.proServiceVerify();
 
     return {
         subscription,
@@ -84,7 +83,7 @@ export const loadProState = async (wallet: WalletState): Promise<ProState> => {
 
 export const checkAuthCookie = async () => {
     try {
-        await ProjectService.getProjects();
+        await ProServiceService.proServiceVerify();
         return true;
     } catch (e) {
         return false;
@@ -96,7 +95,7 @@ export const authViaTonConnect = async (
     signProof: (bufferToSing: Buffer) => Promise<Uint8Array>
 ) => {
     const domain = 'https://tonkeeper.com/';
-    const { payload } = await AuthService.authGeneratePayload();
+    const { payload } = await ProServiceService.proServiceAuthGeneratePayload();
 
     const proofPayload = tonConnectProofPayload(domain, wallet.active.rawAddress, payload);
     const stateInit = walletStateInitFromState(wallet);
@@ -106,7 +105,7 @@ export const authViaTonConnect = async (
         stateInit
     );
 
-    const result = await AuthService.authViaTonConnect({
+    const result = await ProServiceService.proServiceTonConnectAuth({
         address: wallet.active.rawAddress,
         proof: {
             timestamp: proof.timestamp,
@@ -123,7 +122,7 @@ export const authViaTonConnect = async (
 };
 
 export const logoutTonConsole = async () => {
-    const result = await AccountService.accountLogout();
+    const result = await ProServiceService.proServiceLogout();
     if (!result.ok) {
         throw new Error('Unable to logout');
     }

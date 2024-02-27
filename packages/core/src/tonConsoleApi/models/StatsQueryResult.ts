@@ -2,12 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { StatsEstimateQuery } from './StatsEstimateQuery';
 import type { StatsQuery } from './StatsQuery';
 import type { StatsQueryStatus } from './StatsQueryStatus';
 import type { StatsQueryType } from './StatsQueryType';
-
 export type StatsQueryResult = {
     id: string;
     status: StatsQueryStatus;
@@ -24,6 +22,7 @@ export type StatsQueryResult = {
     error?: string;
     all_data_in_preview?: boolean;
     preview?: Array<Array<string>>;
+    testnet: boolean;
     is_gpt?: boolean;
     date_create: number;
 };

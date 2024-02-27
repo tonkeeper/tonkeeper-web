@@ -3,13 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Ok } from '../models/Ok';
-
+import type { TgAuth } from '../models/TgAuth';
+import type { TonConnectProof } from '../models/TonConnectProof';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class AuthService {
-
     /**
      * Auth via telegram
      * The token is recorded in the database and in the user's cookies.  If the user logs in under different browsers, then each authorization will have its own token.
@@ -18,15 +17,7 @@ export class AuthService {
      * @throws ApiError
      */
     public static authViaTg(
-        requestBody?: {
-            id: number;
-            first_name?: string;
-            last_name?: string;
-            photo_url?: string;
-            username?: string;
-            hash: string;
-            auth_date: number;
-        },
+        requestBody?: TgAuth,
     ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -41,7 +32,6 @@ export class AuthService {
             },
         });
     }
-
     /**
      * Generate payload for TON Connect
      * @returns any Payload for TON Connect
@@ -61,25 +51,15 @@ export class AuthService {
             },
         });
     }
-
     /**
      * Auth via TON Connect
      * The token is recorded in the database and in the user's cookies.  If the user logs in under different browsers, then each authorization will have its own token.
-     * @param requestBody Data that is expected from TON Connect
+     * @param requestBody Data that is expected
      * @returns Ok Ok
      * @throws ApiError
      */
     public static authViaTonConnect(
-        requestBody?: {
-            address: string;
-            proof: {
-                timestamp?: number;
-                domain?: string;
-                signature?: string;
-                payload?: string;
-                state_init?: string;
-            };
-        },
+        requestBody?: TonConnectProof,
     ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -94,5 +74,4 @@ export class AuthService {
             },
         });
     }
-
 }

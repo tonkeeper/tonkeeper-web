@@ -34,9 +34,9 @@ const getTronClient = (current?: Network) => {
 export const getApiConfig = (config: TonendpointConfig, network?: Network) => {
     // Global config
     if (network === Network.MAINNET) {
-        TonConsoleApi.BASE = 'http://localhost:8010/proxy'; // 'https://dev.tonconsole.com';
+        TonConsoleApi.BASE = 'https://pro.tonconsole.com'; // 'https://pro.tonconsole.com';
     } else {
-        TonConsoleApi.BASE = 'http://localhost:8010/proxy'; // 'https://dev.tonconsole.com';
+        TonConsoleApi.BASE = 'https://dev-pro.tonconsole.com';
     }
 
     return {
