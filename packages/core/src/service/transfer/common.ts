@@ -9,11 +9,11 @@ import {
     storeMessage,
     toNano
 } from 'ton-core';
-
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
+import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
 import { WalletState } from '../../entries/wallet';
 import {
@@ -167,4 +167,12 @@ export async function getKeyPairAndSeqno(options: {
 
 export const getTTL = () => {
     return Math.floor(Date.now() / 1e3) + 300; // 5min
+};
+
+export const getTonkeeperQueryId = () => {
+    return beginCell()
+        .storeUint(0x546de4ef, 32) //crc32("tonkeeper")
+        .storeBuffer(Buffer.from(nacl.randomBytes(4))) //random 32 bits
+        .asSlice()
+        .loadIntBig(64);
 };

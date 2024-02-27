@@ -48,30 +48,30 @@ jobs:
                   p12-password: ${{ secrets.IDENTITY_PASSPHRASE }}
 
             - name: Run install
-              uses: borales/actions-yarn@v4
+              uses: borales/actions-yarn@v5
               with:
                   cmd: install
 
             - name: Run build packages
-              uses: borales/actions-yarn@v4
+              uses: borales/actions-yarn@v5
               with:
                   cmd: build:pkg
 
             - name: Run build intel distributive
-              uses: borales/actions-yarn@v4
+              uses: borales/actions-yarn@v5
               with:
                   cmd: make:intel
                   dir: 'apps/desktop'
 
             - name: Run build arm distributive
-              uses: borales/actions-yarn@v4
+              uses: borales/actions-yarn@v5
               with:
                   cmd: make:arm
                   dir: 'apps/desktop'
 
             - name: Run build universal distributive
               if: runner.os == 'macOS'
-              uses: borales/actions-yarn@v4
+              uses: borales/actions-yarn@v5
               with:
                   cmd: make:universal
                   dir: 'apps/desktop'
@@ -136,15 +136,16 @@ jobs:
                   corepack enable
 
             - name: Run install
-              uses: borales/actions-yarn@v4
+              uses: borales/actions-yarn@v5
               with:
                   cmd: install
 
             - name: Run build
-              uses: borales/actions-yarn@v4
+              uses: borales/actions-yarn@v5
               env:
                   VITE_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
                   VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
+                  VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
                   VITE_APP_LOCALES: en,zh_CN,ru,it,tr
               with:
                   cmd: build:web
