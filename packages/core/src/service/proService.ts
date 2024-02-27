@@ -1,10 +1,10 @@
 import { ProState, ProStateSubscription } from '../entries/pro';
-import { WalletState, walletVersionFromText, walletVersionText } from '../entries/wallet';
+import { WalletState } from '../entries/wallet';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
-import { ProjectService, ProServiceService } from '../tonConsoleApi';
+import { ProServiceService } from '../tonConsoleApi';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
-import { walletContract, walletStateInitFromState } from './wallet/contractService';
+import { walletStateInitFromState } from './wallet/contractService';
 
 const getBackupState = async (storage: IStorage) => {
     const backup = await storage.get<ProStateSubscription>(AppKey.PRO_BACKUP);
@@ -34,49 +34,16 @@ const toEmptySubscription = (): ProStateSubscription => {
     };
 };
 
-const createProjectName = (wallet: WalletState) => {
-    return `TonkeeperPro|${wallet.publicKey}|${walletVersionText(wallet.active.version)}`;
-};
-
-export const maybeCreateProProject = async (wallet: WalletState) => {
-    const { items } = await ProjectService.getProjects();
-    const project = items.find(item => item.name.startsWith('TonkeeperPro'));
-    if (!project) {
-        return await ProjectService.createProject({ name: createProjectName(wallet) });
-    }
-};
-
 export const loadProState = async (wallet: WalletState): Promise<ProState> => {
-    const { items } = await ProjectService.getProjects();
-
-    const project = items.find(item => item.name.startsWith('TonkeeperPro'));
-
-    if (!project) {
-        const subscription = toEmptySubscription();
-        return {
-            subscription,
-            hasCookie: true,
-            wallet: {
-                publicKey: wallet.publicKey,
-                rawAddress: wallet.active.rawAddress
-            }
-        };
-    }
-
-    const [_, publicKey, version] = project.name.split('|');
-    const { address } = walletContract(
-        Buffer.from(publicKey, 'hex'),
-        walletVersionFromText(version)
-    );
-
     const subscription = await ProServiceService.proServiceVerify();
+    // TODO: get address from cookie
 
     return {
         subscription,
         hasCookie: true,
         wallet: {
-            publicKey: publicKey,
-            rawAddress: address.toRawString()
+            publicKey: wallet.publicKey,
+            rawAddress: wallet.active.rawAddress
         }
     };
 };

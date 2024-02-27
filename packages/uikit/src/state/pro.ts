@@ -4,8 +4,7 @@ import { ProState } from '@tonkeeper/core/dist/entries/pro';
 import {
     authViaTonConnect,
     getProState,
-    logoutTonConsole,
-    maybeCreateProProject
+    logoutTonConsole
 } from '@tonkeeper/core/dist/service/proService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { Lang, ProServiceService, ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
@@ -33,7 +32,6 @@ export const useSelectWalletMutation = () => {
             throw new Error('Missing wallet state');
         }
         await authViaTonConnect(state, signTonConnect(sdk, publicKey));
-        await maybeCreateProProject(state);
         await client.invalidateQueries([QueryKey.pro]);
     });
 };
