@@ -54,6 +54,9 @@ export const useProPlans = (promoCode?: string) => {
                 promoCode
             );
             return items;
+        },
+        {
+            keepPreviousData: true
         }
     );
 };
