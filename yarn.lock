@@ -129,6 +129,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aptabase/web@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "@aptabase/web@npm:0.4.2"
+  checksum: 349b605639e57ba990174d0dcc75578871b38e182b2c71de8309f9d19e96f287ff8d5c6dd9dd9e437f0041898fd93edaa5b4329da2c5e120c4834cf4d28ac3f9
+  languageName: node
+  linkType: hard
+
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.10.4, @babel/code-frame@npm:^7.12.13, @babel/code-frame@npm:^7.16.0, @babel/code-frame@npm:^7.16.7, @babel/code-frame@npm:^7.22.13, @babel/code-frame@npm:^7.23.5, @babel/code-frame@npm:^7.5.5, @babel/code-frame@npm:^7.8.3":
   version: 7.23.5
   resolution: "@babel/code-frame@npm:7.23.5"
@@ -6201,6 +6208,7 @@ __metadata:
   resolution: "@tonkeeper/uikit@workspace:packages/uikit"
   dependencies:
     "@amplitude/analytics-browser": "npm:^2.1.0"
+    "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
     "@polkadot/react-qr": "npm:^3.1.1"
     "@storybook/addon-actions": "npm:^6.5.14"
@@ -6255,6 +6263,7 @@ __metadata:
   resolution: "@tonkeeper/web@workspace:apps/web"
   dependencies:
     "@amplitude/analytics-browser": "npm:^2.1.0"
+    "@aptabase/web": "npm:^0.4.2"
     "@tanstack/react-query": "npm:4.3.4"
     "@testing-library/dom": "npm:^9.3.1"
     "@testing-library/jest-dom": "npm:^5.16.5"
