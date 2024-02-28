@@ -175,6 +175,8 @@ export class ProServiceService {
      */
     public static proServiceVerify(): CancelablePromise<{
         valid: boolean;
+        is_trial: boolean;
+        used_trial: boolean;
         next_charge?: number;
     }> {
         return __request(OpenAPI, {
