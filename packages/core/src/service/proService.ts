@@ -1,22 +1,32 @@
-import { Language, localizationText } from '../entries/language';
-import { ProState, ProStateSubscription } from '../entries/pro';
-import { WalletState } from '../entries/wallet';
+import BigNumber from 'bignumber.js';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
-import { Lang, ProServiceService } from '../tonConsoleApi';
+import { APIConfig } from '../entries/apis';
+import { BLOCKCHAIN_NAME } from '../entries/crypto';
+import { AssetAmount } from '../entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '../entries/crypto/asset/constants';
+import { Language, localizationText } from '../entries/language';
+import { ProState, ProStateSubscription } from '../entries/pro';
+import { TonRecipientData } from '../entries/send';
+import { WalletState } from '../entries/wallet';
+import { AccountsApi, MessageConsequences } from '../tonApiV2';
+import { InvoiceStatus, InvoicesInvoice, Lang, ProServiceService } from '../tonConsoleApi';
+import { delay } from '../utils/common';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
+import { estimateTonTransfer, sendTonTransfer } from './transfer/tonService';
 import { walletStateInitFromState } from './wallet/contractService';
+import { getWalletState } from './wallet/storeService';
 
 const getBackupState = async (storage: IStorage) => {
     const backup = await storage.get<ProStateSubscription>(AppKey.PRO_BACKUP);
     return backup ?? toEmptySubscription();
 };
 
-export const getProState = async (wallet: WalletState): Promise<ProState> => {
+export const getProState = async (storage: IStorage, wallet: WalletState): Promise<ProState> => {
     const hasCookie = await checkAuthCookie();
 
     if (hasCookie) {
-        return await loadProState(wallet);
+        return await loadProState(storage, wallet);
     } else {
         return {
             subscription: toEmptySubscription(),
@@ -37,10 +47,15 @@ const toEmptySubscription = (): ProStateSubscription => {
     };
 };
 
-export const loadProState = async (wallet: WalletState): Promise<ProState> => {
-    const subscription = await ProServiceService.proServiceVerify();
+export const loadProState = async (storage: IStorage, wallet: WalletState): Promise<ProState> => {
     // TODO: get address from cookie
+    // TODO: GET value from cookie
+    const publicKey = await storage.get<string>('temporary_wallet');
+    if (publicKey) {
+        wallet = (await getWalletState(storage, publicKey)) as WalletState;
+    }
 
+    const subscription = await ProServiceService.proServiceVerify();
     return {
         subscription,
         hasCookie: true,
@@ -104,4 +119,75 @@ export const getProServiceTiers = async (lang?: Language | undefined, promoCode?
         promoCode
     );
     return items;
+};
+
+export const createProServiceInvoice = async (tierId: number, promoCode?: string) => {
+    return await ProServiceService.createProServiceInvoice({
+        tier_id: tierId,
+        promo_code: promoCode
+    });
+};
+
+const createRecipient = async (api: APIConfig, invoice: InvoicesInvoice) => {
+    const toAccount = await new AccountsApi(api.tonApiV2).getAccount({
+        accountId: invoice.pay_to_address
+    });
+
+    const recipient: TonRecipientData = {
+        address: { address: invoice.pay_to_address, blockchain: BLOCKCHAIN_NAME.TON },
+        comment: invoice.id,
+        done: true,
+        toAccount: toAccount
+    };
+    return recipient;
+};
+
+export const estimateProServiceInvoice = async (
+    api: APIConfig,
+    walletState: WalletState,
+    invoice: InvoicesInvoice
+) => {
+    const recipient = await createRecipient(api, invoice);
+    const estimate = await estimateTonTransfer(
+        api,
+        walletState,
+        recipient,
+        new BigNumber(invoice.amount),
+        false
+    );
+    return estimate;
+};
+
+export const publishAndWaitProServiceInvoice = async (
+    api: APIConfig,
+    walletState: WalletState,
+    invoice: InvoicesInvoice,
+    estimate: MessageConsequences,
+    mnemonic: string[]
+) => {
+    const recipient = await createRecipient(api, invoice);
+
+    await sendTonTransfer(
+        api,
+        walletState,
+        recipient,
+        new AssetAmount({
+            asset: TON_ASSET,
+            weiAmount: new BigNumber(invoice.amount)
+        }),
+        false,
+        estimate,
+        mnemonic
+    );
+
+    let updated = invoice;
+
+    do {
+        await delay(4000);
+        try {
+            updated = await ProServiceService.getProServiceInvoice(invoice.id);
+        } catch (e) {
+            console.warn(e);
+        }
+    } while (updated.status === InvoiceStatus.PENDING);
 };

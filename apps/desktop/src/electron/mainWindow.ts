@@ -92,11 +92,9 @@ export abstract class MainWindow {
             const setCookie = details.responseHeaders['set-cookie'] ?? [];
 
             Promise.all(
-                setCookie.map(cookieRaw => {
-                    const cookie = Cookie.parse(cookieRaw);
-                    cookie.path = '/';
-                    return cookieJar.setCookie(cookie, details.url);
-                })
+                setCookie.map(cookieRaw =>
+                    cookieJar.setCookie(Cookie.parse(cookieRaw), details.url)
+                )
             ).finally(() => {
                 callback({});
             });

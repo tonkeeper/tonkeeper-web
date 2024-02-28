@@ -7,7 +7,7 @@ import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
-import { Header, HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
+import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
@@ -20,6 +20,7 @@ import {
     SettingsSkeletonPage
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
+import { AsideMenu } from '@tonkeeper/uikit/dist/components/aside/AsideMenu';
 import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
 import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
 import {
@@ -38,10 +39,11 @@ import {
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppRoute, any, AppProRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import Activity from '@tonkeeper/uikit/dist/pages/activity/Activity';
 import Browser from '@tonkeeper/uikit/dist/pages/browser';
 import Coin from '@tonkeeper/uikit/dist/pages/coin/Coin';
+import DashboardPage from '@tonkeeper/uikit/dist/pages/dashboard';
 import Home from '@tonkeeper/uikit/dist/pages/home/Home';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -54,7 +56,7 @@ import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, Suspense, useEffect, useMemo } from 'react';
+import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MemoryRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
@@ -62,8 +64,6 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
-import { AsideMenu } from '@tonkeeper/uikit/dist/components/aside/AsideMenu';
-import DashboardPage from '@tonkeeper/uikit/dist/pages/dashboard';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -102,6 +102,8 @@ const TARGET_ENV = 'desktop';
 
 const langs = 'en,zh_CN,ru,it,tr';
 const listOfAuth: AuthState['kind'][] = ['keychain'];
+
+declare const REACT_APP_TONCONSOLE_API: string;
 
 export const App = () => {
     const { t, i18n } = useTranslation();
@@ -222,7 +224,7 @@ export const Loader: FC = () => {
     const network = activeWallet?.network ?? Network.MAINNET;
     const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
     const context = {
-        api: getApiConfig(config, network),
+        api: getApiConfig(config, network, REACT_APP_TONCONSOLE_API),
         auth,
         fiat,
         account,

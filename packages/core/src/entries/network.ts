@@ -31,9 +31,9 @@ const getTronClient = (current?: Network) => {
     });
 };
 
-export const getApiConfig = (config: TonendpointConfig, network?: Network) => {
+export const getApiConfig = (config: TonendpointConfig, network?: Network, TonConsoleBase = '') => {
     // Global config
-    TonConsoleApi.BASE = 'https://dev-pro.tonconsole.com'; // 'https://pro.tonconsole.com';
+    TonConsoleApi.BASE = TonConsoleBase;
 
     return {
         tonApiV2: getTonClientV2(config, network),

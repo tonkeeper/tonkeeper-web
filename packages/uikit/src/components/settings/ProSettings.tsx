@@ -7,7 +7,13 @@ import styled from 'styled-components';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useAccountState } from '../../state/account';
-import { useProLogout, useProPlans, useProState, useSelectWalletMutation } from '../../state/pro';
+import {
+    buyProServiceMutation,
+    useProLogout,
+    useProPlans,
+    useProState,
+    useSelectWalletMutation
+} from '../../state/pro';
 import { useWalletState } from '../../state/wallet';
 import { InnerBody } from '../Body';
 import { DoneIcon } from '../Icon';
@@ -91,10 +97,14 @@ const SelectIconWrapper = styled.span`
     display: flex;
 `;
 
-const ProWallet: FC<{ data: ProState; onClick: () => void }> = ({ data, onClick }) => {
+const ProWallet: FC<{ data: ProState; onClick: () => void; disabled?: boolean }> = ({
+    data,
+    onClick,
+    disabled
+}) => {
     return (
         <ListBlock>
-            <ListItem onClick={onClick}>
+            <ListItem onClick={() => !disabled && onClick()}>
                 <ListItemPayload>
                     <WalletItem publicKey={data.wallet.publicKey} />
                     <SelectIconWrapper>
@@ -110,13 +120,14 @@ const SelectProPlans: FC<{
     plans: ProServiceTier[];
     selected: number | null;
     setPlan: (id: number) => void;
-}> = ({ plans, selected, setPlan }) => {
+    disabled?: boolean;
+}> = ({ plans, selected, setPlan, disabled }) => {
     const format = useFormatCoinValue();
     return (
         <>
             <ListBlock>
                 {plans.map(plan => (
-                    <ListItem onClick={() => setPlan(plan.id)}>
+                    <ListItem onClick={() => !disabled && setPlan(plan.id)}>
                         <ListItemPayload>
                             <ColumnText
                                 noWrap
@@ -128,6 +139,7 @@ const SelectProPlans: FC<{
                                 }
                             />
                             <Radio
+                                disabled={disabled}
                                 checked={selected === plan.id}
                                 onChange={() => setPlan(plan.id)}
                             />
@@ -139,7 +151,7 @@ const SelectProPlans: FC<{
     );
 };
 
-const ProContent: FC<{ data: ProState }> = ({ data }) => {
+const BuyProService: FC<{ data: ProState }> = ({ data }) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);
@@ -148,7 +160,9 @@ const ProContent: FC<{ data: ProState }> = ({ data }) => {
     const [selectedPlan, setPlan] = useState<number | null>(null);
     const [promo, setPromo] = useState('');
 
-    const { data: plans } = useProPlans();
+    const [plans, promoCode] = useProPlans(promo);
+
+    const { mutate, isLoading } = buyProServiceMutation();
 
     useEffect(() => {
         if (plans && plans[0] && selectedPlan == null) {
@@ -162,36 +176,59 @@ const ProContent: FC<{ data: ProState }> = ({ data }) => {
         }
     }, [ref.current]);
 
-    if (!data.hasCookie) {
-        return <SelectWallet />;
-    }
+    return (
+        <div>
+            <ProWallet data={data} onClick={logOut} disabled={isLoading} />
+            <SelectProPlans
+                plans={plans ?? []}
+                setPlan={setPlan}
+                selected={selectedPlan}
+                disabled={isLoading}
+            />
+            <Line>
+                <Input
+                    disabled={isLoading}
+                    value={promo}
+                    onChange={setPromo}
+                    label={t('battery_promocode_title')}
+                    clearButton
+                />
+            </Line>
+            <Line>
+                <Button
+                    primary
+                    size="large"
+                    fullWidth
+                    loading={isLoading}
+                    onClick={() => mutate({ state: data, tierId: selectedPlan, promoCode })}
+                >
+                    Buy
+                </Button>
+            </Line>
+            <div ref={ref}></div>
+        </div>
+    );
+};
+
+const PreServiceStatus: FC<{ data: ProState }> = ({ data }) => {
+    const { mutate: logOut } = useProLogout();
 
     return (
         <div>
             <ProWallet data={data} onClick={logOut} />
-            {data.subscription.valid ? (
-                'valid'
-            ) : (
-                <>
-                    <SelectProPlans plans={plans ?? []} setPlan={setPlan} selected={selectedPlan} />
-                    <Line>
-                        <Input
-                            value={promo}
-                            onChange={setPromo}
-                            label={t('battery_promocode_title')}
-                            clearButton
-                        />
-                    </Line>
-                    <Line>
-                        <Button primary size="large" fullWidth>
-                            Buy
-                        </Button>
-                    </Line>
-                    <div ref={ref}></div>
-                </>
-            )}
+            "valid"
         </div>
     );
+};
+
+const ProContent: FC<{ data: ProState }> = ({ data }) => {
+    if (!data.hasCookie) {
+        return <SelectWallet />;
+    }
+    if (data.subscription.valid) {
+        return <PreServiceStatus data={data} />;
+    }
+    return <BuyProService data={data} />;
 };
 
 export const ProSettings = () => {
