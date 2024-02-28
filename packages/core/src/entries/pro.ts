@@ -11,6 +11,8 @@ export interface ProStateWallet {
 
 export interface ProStateSubscription {
     valid: boolean;
+    is_trial: boolean;
+    used_trial: boolean;
     next_charge?: number | undefined;
 }
 
