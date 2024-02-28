@@ -1,8 +1,9 @@
+import { Language, localizationText } from '../entries/language';
 import { ProState, ProStateSubscription } from '../entries/pro';
 import { WalletState } from '../entries/wallet';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
-import { ProServiceService } from '../tonConsoleApi';
+import { Lang, ProServiceService } from '../tonConsoleApi';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { walletStateInitFromState } from './wallet/contractService';
 
@@ -30,7 +31,9 @@ export const getProState = async (wallet: WalletState): Promise<ProState> => {
 
 const toEmptySubscription = (): ProStateSubscription => {
     return {
-        valid: false
+        valid: false,
+        is_trial: false,
+        used_trial: false
     };
 };
 
@@ -93,4 +96,12 @@ export const logoutTonConsole = async () => {
     if (!result.ok) {
         throw new Error('Unable to logout');
     }
+};
+
+export const getProServiceTiers = async (lang?: Language | undefined, promoCode?: string) => {
+    const { items } = await ProServiceService.getProServiceTiers(
+        localizationText(lang) as Lang,
+        promoCode
+    );
+    return items;
 };

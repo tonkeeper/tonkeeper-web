@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { ProState } from '@tonkeeper/core/dist/entries/pro';
 import {
     authViaTonConnect,
+    getProServiceTiers,
     getProState,
     logoutTonConsole
 } from '@tonkeeper/core/dist/service/proService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
-import { Lang, ProServiceService, ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
+import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
 import { useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
@@ -48,13 +48,7 @@ export const useProPlans = (promoCode?: string) => {
     const wallet = useWalletContext();
     return useQuery<ProServiceTier[], Error>(
         [QueryKey.pro, 'plans', wallet.lang, promoCode],
-        async () => {
-            const { items } = await ProServiceService.getProServiceTiers(
-                localizationText(wallet.lang) as Lang,
-                promoCode
-            );
-            return items;
-        },
+        () => getProServiceTiers(wallet.lang, promoCode),
         {
             keepPreviousData: true
         }

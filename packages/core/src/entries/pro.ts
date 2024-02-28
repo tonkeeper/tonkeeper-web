@@ -15,10 +15,3 @@ export interface ProStateSubscription {
     used_trial: boolean;
     next_charge?: number | undefined;
 }
-
-export interface ProPlan {
-    id: string;
-    name: string;
-    description?: string;
-    price: string; // nano ton
-}
