@@ -79,7 +79,6 @@ export abstract class MainWindow {
                     const result = cookies
                         .map(cookie => `${cookie.key}=${cookie.value}`)
                         .join(', ');
-                    console.log(result);
                     callback({
                         requestHeaders: Object.assign(details.requestHeaders, {
                             cookie: result
@@ -91,9 +90,12 @@ export abstract class MainWindow {
 
         this.mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
             const setCookie = details.responseHeaders['set-cookie'] ?? [];
+
             Promise.all(
-                setCookie.map(async cookieRaw => {
-                    await cookieJar.setCookie(Cookie.parse(cookieRaw), details.url);
+                setCookie.map(cookieRaw => {
+                    const cookie = Cookie.parse(cookieRaw);
+                    cookie.path = '/';
+                    return cookieJar.setCookie(cookie, details.url);
                 })
             ).finally(() => {
                 callback({});
