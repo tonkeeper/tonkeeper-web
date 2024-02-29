@@ -59,8 +59,8 @@ export const useProPlans = (promoCode?: string) => {
 
     const promo = useQuery<ProServiceTier[], Error>(
         [QueryKey.pro, 'promo', wallet.lang, promoCode],
-        () => getProServiceTiers(wallet.lang, promoCode != '' ? promoCode : undefined),
-        { enabled: promoCode != '' }
+        () => getProServiceTiers(wallet.lang, promoCode !== '' ? promoCode : undefined),
+        { enabled: promoCode !== '' }
     );
 
     return useMemo<[ProServiceTier[] | undefined, string | undefined]>(() => {
@@ -72,7 +72,7 @@ export const useProPlans = (promoCode?: string) => {
     }, [all.data, promo.data]);
 };
 
-export const buyProServiceMutation = () => {
+export const useBuyProServiceMutation = () => {
     const sdk = useAppSdk();
     const { api } = useAppContext();
     const client = useQueryClient();

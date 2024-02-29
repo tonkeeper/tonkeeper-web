@@ -483,7 +483,7 @@ export const Notification: FC<{
         }
     }, [isFullWidth, handleClose]);
 
-    const containerRef = useClickOutside<HTMLDivElement>(onClickOutside);
+    const containerRef = useClickOutside<HTMLDivElement>(onClickOutside, nodeRef.current);
 
     return (
         <NotificationContext.Provider value={{ footerElement, headerElement }}>

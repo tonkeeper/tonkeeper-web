@@ -1,8 +1,8 @@
-import { useAppSdk } from '../appSdk';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '../../libs/queryKey';
 import { DashboardColumn, isSupportedColumnType } from './dashboard-column';
-import { useTranslation } from '../translation';
+import { useTranslation } from '../../hooks/translation';
 
 export type DashboardColumnsForm = { id: string; isEnabled: boolean }[];
 
@@ -26,7 +26,7 @@ export function useDashboardColumnsForm() {
                     .map(c => ({
                         id: c.id,
                         isEnabled:
-                            stored.find(item => item.id === c.id)?.isEnabled || c.defaultIsChecked
+                            stored.find(item => item.id === c.id)?.isEnabled ?? c.defaultIsChecked
                     }));
             }
             return columns.map(c => ({ id: c.id, isEnabled: c.defaultIsChecked }));

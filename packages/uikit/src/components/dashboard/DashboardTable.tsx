@@ -1,9 +1,9 @@
 import styled, { css } from 'styled-components';
 import { FC, useEffect, useRef, useState } from 'react';
 import { Body2 } from '../Text';
-import { useDashboardColumnsAsForm } from '../../hooks/dashboard/useDashboardColumns';
-import { useDashboardData } from '../../hooks/dashboard/useDashboardData';
-import { DashboardCellAddress, DashboardColumnType } from '../../hooks/dashboard/dashboard-column';
+import { useDashboardColumnsAsForm } from '../../state/dashboard/useDashboardColumns';
+import { useDashboardData } from '../../state/dashboard/useDashboardData';
+import { DashboardCellAddress, DashboardColumnType } from '../../state/dashboard/dashboard-column';
 import { DashboardCell } from './columns/DashboardCell';
 
 const TableStyled = styled.table`
