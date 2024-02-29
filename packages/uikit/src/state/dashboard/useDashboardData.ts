@@ -4,7 +4,7 @@ import { DashboardCell } from './dashboard-column';
 import { useDashboardColumnsAsForm } from './useDashboardColumns';
 import BigNumber from 'bignumber.js';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { useAppContext } from '../appContext';
+import { useAppContext } from '../../hooks/appContext';
 
 export function useDashboardData() {
     const { data: columns } = useDashboardColumnsAsForm();

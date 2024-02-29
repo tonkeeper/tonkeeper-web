@@ -1,19 +1,24 @@
 import { useEffect, useRef } from 'react';
 
-export function useClickOutside<T extends HTMLElement>(callback: () => void) {
+export function useClickOutside<T extends HTMLElement, A extends HTMLElement = HTMLElement>(
+    callback: () => void,
+    areaElement?: A | null
+) {
     const ref = useRef<T | null>(null);
 
     useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
+        function handleClickOutside(event: Event) {
             if (ref.current && !ref.current.contains(event.target as Node)) {
                 callback();
             }
         }
-        document.addEventListener('mousedown', handleClickOutside);
+        const element = areaElement || document;
+
+        element.addEventListener('mousedown', handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            element.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [callback]);
+    }, [callback, areaElement]);
 
     return ref;
 }

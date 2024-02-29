@@ -8,7 +8,7 @@ import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useAccountState } from '../../state/account';
 import {
-    buyProServiceMutation,
+    useBuyProServiceMutation,
     useProLogout,
     useProPlans,
     useProState,
@@ -162,7 +162,7 @@ const BuyProService: FC<{ data: ProState }> = ({ data }) => {
 
     const [plans, promoCode] = useProPlans(promo);
 
-    const { mutate, isLoading } = buyProServiceMutation();
+    const { mutate, isLoading } = useBuyProServiceMutation();
 
     useEffect(() => {
         if (plans && plans[0] && selectedPlan == null) {
@@ -231,20 +231,28 @@ const ProContent: FC<{ data: ProState }> = ({ data }) => {
     return <BuyProService data={data} />;
 };
 
-export const ProSettings = () => {
+export const ProSettingsContent: FC = () => {
     const { t } = useTranslation();
 
     const { data } = useProState();
     return (
         <>
+            <Block>
+                <Icon src="https://tonkeeper.com/assets/icon.ico" />
+                <Title>{t('tonkeeper_pro')}</Title>
+                <Description>{t('tonkeeper_pro_description')}</Description>
+            </Block>
+            {data ? <ProContent data={data} /> : undefined}
+        </>
+    );
+};
+
+export const ProSettings: FC = () => {
+    return (
+        <>
             <SubHeader />
             <InnerBody>
-                <Block>
-                    <Icon src="https://tonkeeper.com/assets/icon.ico" />
-                    <Title>{t('tonkeeper_pro')}</Title>
-                    <Description>{t('tonkeeper_pro_description')}</Description>
-                </Block>
-                {data ? <ProContent data={data} /> : undefined}
+                <ProSettingsContent />
             </InnerBody>
         </>
     );

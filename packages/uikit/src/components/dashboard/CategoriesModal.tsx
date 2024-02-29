@@ -10,10 +10,13 @@ import {
     DashboardColumnsForm,
     useDashboardColumnsAsForm,
     useDashboardColumnsForm
-} from '../../hooks/dashboard/useDashboardColumns';
+} from '../../state/dashboard/useDashboardColumns';
 import { Button } from '../fields/Button';
-import { DashboardColumn } from '../../hooks/dashboard/dashboard-column';
+import { DashboardColumn } from '../../state/dashboard/dashboard-column';
 import { Badge } from '../shared';
+import { useProState } from '../../state/pro';
+import { ProNotification } from '../pro/ProNotification';
+import { useDisclosure } from '../../hooks/useDisclosure';
 
 export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     isOpen,
@@ -78,11 +81,6 @@ export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     );
 };
 
-const activateSubscription = () => {
-    alert('activate subscription');
-}; /* TODO */
-const isSubscriptionActive = Math.random() > 0.5; /* TODO */
-
 const CategoriesModalContent: FC<{
     categories: DashboardColumn[];
     categoriesForm: DashboardColumnsForm;
@@ -90,6 +88,10 @@ const CategoriesModalContent: FC<{
         data: DashboardColumnsForm | ((data: DashboardColumnsForm) => DashboardColumnsForm)
     ) => void;
 }> = ({ categories, categoriesForm, setCategoriesForm }) => {
+    const { data } = useProState();
+    const isProEnabled = data?.subscription.valid;
+    const { isOpen, onClose, onOpen } = useDisclosure();
+
     const handleDrop: OnDragEndResponder = useCallback(droppedItem => {
         const destination = droppedItem.destination;
         if (!destination) return;
@@ -108,66 +110,65 @@ const CategoriesModalContent: FC<{
         );
     };
     return (
-        <DragDropContext onDragEnd={handleDrop}>
-            <Droppable direction="vertical" droppableId="wallets">
-                {provided => (
-                    <ListBlock {...provided.droppableProps} ref={provided.innerRef}>
-                        {categoriesForm.map(({ id, isEnabled }, index) => (
-                            <Draggable key={id} draggableId={id} index={index}>
-                                {(p, snapshotDrag) => {
-                                    let transform = p.draggableProps.style?.transform;
+        <>
+            <DragDropContext onDragEnd={handleDrop}>
+                <Droppable direction="vertical" droppableId="wallets">
+                    {provided => (
+                        <ListBlock {...provided.droppableProps} ref={provided.innerRef}>
+                            {categoriesForm.map(({ id, isEnabled }, index) => (
+                                <Draggable key={id} draggableId={id} index={index}>
+                                    {(p, snapshotDrag) => {
+                                        let transform = p.draggableProps.style?.transform;
 
-                                    if (snapshotDrag.isDragging && transform) {
-                                        transform = transform.replace(/\(.+\,/, '(0,');
-                                    }
+                                        if (snapshotDrag.isDragging && transform) {
+                                            transform = transform.replace(/\(.+\,/, '(0,');
+                                        }
 
-                                    const style = {
-                                        ...p.draggableProps.style,
-                                        transform
-                                    };
+                                        const style = {
+                                            ...p.draggableProps.style,
+                                            transform
+                                        };
 
-                                    const category = categories.find(c => c.id === id);
-                                    const isDisabled = category?.onlyPro && !isSubscriptionActive;
+                                        const category = categories.find(c => c.id === id);
+                                        const isDisabled = category?.onlyPro && !isProEnabled;
 
-                                    return (
-                                        <ListItemElement
-                                            ios={true}
-                                            hover={false}
-                                            ref={p.innerRef}
-                                            {...p.draggableProps}
-                                            style={style}
-                                        >
-                                            <ListItemPayload>
-                                                <Row
-                                                    onClick={() =>
-                                                        isDisabled && activateSubscription()
-                                                    }
-                                                >
-                                                    <Icon {...p.dragHandleProps}>
-                                                        <ReorderIcon />
-                                                    </Icon>
-                                                    <Body1>{category?.name}</Body1>
-                                                    {category?.onlyPro && <Badge>PRO</Badge>}
-                                                    <CheckboxStyled
-                                                        checked={isEnabled}
-                                                        disabled={isDisabled}
-                                                        onChange={value =>
-                                                            !isDisabled &&
-                                                            onCheckboxChange(id, value)
-                                                        }
-                                                    />
-                                                </Row>
-                                            </ListItemPayload>
-                                        </ListItemElement>
-                                    );
-                                }}
-                            </Draggable>
-                        ))}
-                        {provided.placeholder}
-                    </ListBlock>
-                )}
-            </Droppable>
-        </DragDropContext>
+                                        return (
+                                            <ListItemElement
+                                                ios={true}
+                                                hover={false}
+                                                ref={p.innerRef}
+                                                {...p.draggableProps}
+                                                style={style}
+                                            >
+                                                <ListItemPayload>
+                                                    <Row onClick={() => isDisabled && onOpen()}>
+                                                        <Icon {...p.dragHandleProps}>
+                                                            <ReorderIcon />
+                                                        </Icon>
+                                                        <Body1>{category?.name}</Body1>
+                                                        {category?.onlyPro && <Badge>PRO</Badge>}
+                                                        <CheckboxStyled
+                                                            checked={isEnabled}
+                                                            disabled={isDisabled}
+                                                            onChange={value =>
+                                                                !isDisabled &&
+                                                                onCheckboxChange(id, value)
+                                                            }
+                                                        />
+                                                    </Row>
+                                                </ListItemPayload>
+                                            </ListItemElement>
+                                        );
+                                    }}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
+                        </ListBlock>
+                    )}
+                </Droppable>
+            </DragDropContext>
+            <ProNotification isOpen={isOpen} onClose={onClose} />
+        </>
     );
 };
 
