@@ -23,11 +23,9 @@ const getBackupState = async (storage: IStorage) => {
 };
 
 export const getProState = async (storage: IStorage, wallet: WalletState): Promise<ProState> => {
-    const hasCookie = await checkAuthCookie();
-
-    if (hasCookie) {
-        return await loadProState(storage, wallet);
-    } else {
+    try {
+        return await loadProState(storage);
+    } catch (e) {
         return {
             subscription: toEmptySubscription(),
             hasCookie: false,
@@ -47,12 +45,12 @@ const toEmptySubscription = (): ProStateSubscription => {
     };
 };
 
-export const loadProState = async (storage: IStorage, wallet: WalletState): Promise<ProState> => {
-    // TODO: get address from cookie
-    // TODO: GET value from cookie
-    const publicKey = await storage.get<string>('temporary_wallet');
-    if (publicKey) {
-        wallet = (await getWalletState(storage, publicKey)) as WalletState;
+export const loadProState = async (storage: IStorage): Promise<ProState> => {
+    const user = await ProServiceService.proServiceGetUserInfo();
+
+    const wallet = await getWalletState(storage, user.pub_key);
+    if (!wallet) {
+        throw new Error('Unknown wallet');
     }
 
     const subscription = await ProServiceService.proServiceVerify();

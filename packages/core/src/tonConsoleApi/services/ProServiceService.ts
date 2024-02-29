@@ -72,6 +72,28 @@ export class ProServiceService {
         });
     }
     /**
+     * Get user info
+     * @returns any State
+     * @throws ApiError
+     */
+    public static proServiceGetUserInfo(): CancelablePromise<{
+        pub_key: string;
+        version: string;
+        user_id?: number;
+        tg_id?: number;
+    }> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/services/pro/user/info',
+            errors: {
+                400: `Something went wrong on client side`,
+                403: `Access token is missing or invalid`,
+                404: `The specified resource was not found`,
+                500: `Something went wrong on server side`,
+            },
+        });
+    }
+    /**
      * Get active tiers
      * @param lang Lang
      * @param promoCode Promo code

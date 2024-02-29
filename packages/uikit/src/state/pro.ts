@@ -10,7 +10,7 @@ import {
     publishAndWaitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
-import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
+import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
 import { useMemo } from 'react';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
@@ -37,9 +37,6 @@ export const useSelectWalletMutation = () => {
             throw new Error('Missing wallet state');
         }
         await authViaTonConnect(state, signTonConnect(sdk, publicKey));
-
-        // TODO: GET value from cookie
-        await sdk.storage.set('temporary_wallet', publicKey);
 
         await client.invalidateQueries([QueryKey.pro]);
     });
@@ -68,9 +65,9 @@ export const useProPlans = (promoCode?: string) => {
 
     return useMemo<[ProServiceTier[] | undefined, string | undefined]>(() => {
         if (!promo.data) {
-            return [all.data, undefined] as const;
+            return [all.data, undefined];
         } else {
-            return [promo.data, promoCode] as const;
+            return [promo.data, promoCode];
         }
     }, [all.data, promo.data]);
 };
