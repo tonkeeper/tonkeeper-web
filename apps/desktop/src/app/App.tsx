@@ -53,6 +53,7 @@ import Settings from '@tonkeeper/uikit/dist/pages/settings';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
+import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -130,21 +131,28 @@ export const App = () => {
                     <AppSdkContext.Provider value={sdk}>
                         <TranslationContext.Provider value={translation}>
                             <StorageContext.Provider value={sdk.storage}>
-                                <UserThemeProvider displayType="full-width">
-                                    <GlobalStyle />
-                                    <HeaderGlobalStyle />
-                                    <FooterGlobalStyle />
-                                    <SybHeaderGlobalStyle />
-                                    <GlobalListStyle />
-                                    <Loader />
-                                    <UnlockNotification sdk={sdk} />
-                                </UserThemeProvider>
+                                <ThemeAndContent />
                             </StorageContext.Provider>
                         </TranslationContext.Provider>
                     </AppSdkContext.Provider>
                 </Suspense>
             </QueryClientProvider>
         </MemoryRouter>
+    );
+};
+
+const ThemeAndContent = () => {
+    const { data } = useProBackupState();
+    return (
+        <UserThemeProvider displayType="full-width" isPro={data?.valid}>
+            <GlobalStyle />
+            <HeaderGlobalStyle />
+            <FooterGlobalStyle />
+            <SybHeaderGlobalStyle />
+            <GlobalListStyle />
+            <Loader />
+            <UnlockNotification sdk={sdk} />
+        </UserThemeProvider>
     );
 };
 

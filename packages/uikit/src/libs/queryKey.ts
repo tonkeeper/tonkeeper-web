@@ -25,6 +25,7 @@ export enum QueryKey {
     rate = 'rate',
     total = 'total',
     pro = 'pro',
+    proBackup = 'proBackup',
 
     dashboardColumnsForm = 'dashboardColumnsForm',
     dashboardColumns = 'dashboardColumns',

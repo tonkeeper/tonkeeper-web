@@ -17,7 +17,11 @@ import { estimateTonTransfer, sendTonTransfer } from './transfer/tonService';
 import { walletStateInitFromState } from './wallet/contractService';
 import { getWalletState } from './wallet/storeService';
 
-const getBackupState = async (storage: IStorage) => {
+export const setBackupState = async (storage: IStorage, state: ProStateSubscription) => {
+    await storage.set(AppKey.PRO_BACKUP, state);
+};
+
+export const getBackupState = async (storage: IStorage) => {
     const backup = await storage.get<ProStateSubscription>(AppKey.PRO_BACKUP);
     return backup ?? toEmptySubscription();
 };
