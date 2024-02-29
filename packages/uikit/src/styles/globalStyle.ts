@@ -68,12 +68,6 @@ export const Container = styled.div`
     background-color: ${props => props.theme.backgroundPage};
 
     white-space: pre-wrap;
-
-    ${p =>
-        p.theme.displayType === 'full-width' &&
-        css`
-            max-width: 548px;
-        `}
 `;
 
 export const Body = styled.div`

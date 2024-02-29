@@ -1,6 +1,6 @@
 import React, { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { useNativeBackButton } from './BackButton';
 import { ChevronLeftIcon } from './Icon';
@@ -20,10 +20,19 @@ const Block = styled(WithHeadingDivider)`
 
     position: fixed;
     z-index: 3;
-    width: var(--app-width);
     overflow: visible !important;
-    max-width: 548px;
+
     top: 0;
+
+    ${p =>
+        p.theme.displayType === 'full-width'
+            ? css`
+                  width: 100%;
+              `
+            : css`
+                  width: var(--app-width);
+                  max-width: 548px;
+              `}
 
     background: ${props => props.theme.backgroundPage};
 `;

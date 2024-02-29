@@ -1,6 +1,6 @@
 {
   "about_ton" : "TON is a fully decentralized layer-1 blockchain designed by Telegram to onboard billions of users. It boasts ultra-fast transactions, tiny fees, easy-to-use apps, and is environmentally friendly.",
-  "access_confirmation_logout" : "Log out",
+  "access_confirmation_logout" : "Sign Out",
   "access_confirmation_reset" : "Reset",
   "access_confirmation_title" : "Enter passcode",
   "access_confirmation_update_biometry" : "Enter passcode to use biometric auth data",
@@ -47,12 +47,39 @@
     "notification_desc_will_change" : "On October 5 your wallet address will update to the UQ format which is just better. The old address will also work. You don’t need to do anything.",
     "old_style" : "Old address",
     "post_dates" : "\nOctober 5, 2023: all addresses switch to the UQ format in Tonkeeper.\n\nJanuary 1, 2024: Tonkeeper stops checking the contract status and uses the “bounceable” flag in the address. Coins sent to non-published contracts with an EQ address will bounce back to the sender.",
+    "post_published_date" : "Published: September 27, 2023",
     "post_rest" : "There are two address styles on the TON blockchain and until now only one was used for apps and wallets.\n\nThe EQ format is best for smart contracts that process incoming funds. If a smart contract isn’t published yet — i.e., the code isn’t on the blockchain — then the TONs sent to that address will bounce back to the sender. And this is a safety feature: if there is any error, TONs bounce back.\n\nThe UQ format is best for wallets. Coins never bounce because wallets are designed to simply store funds. Each wallet starts as a plain address without a code on the blockchain. So, it would make no sense for coins to bounce back.\n\nThis year we are switching wallets to the more suitable UQ format. And if you continue sending funds to an old EQ address someone gave you, there will be two options:\n",
     "post_top" : "By the end of this year the entire TON network will display wallet addresses differently. The new address will start with UQ instead of EQ. And the last four letters will change too. The old address will also work and direct to the same wallet. It doesn't effect the safety of funds stored in your wallet anyhow.",
     "second_option" : "Less likely that the wallet has never been used for payments. And Tonkeeper won’t send coins to that address next year. You will have to ask the recipient for a new UQ address.",
     "title" : "Address Update",
     "why_change" : "Why change?",
     "your_wallet" : "Your wallet"
+  },
+  "add_wallet" : "Add wallet",
+  "add_wallet_modal" : {
+    "create" : {
+      "subtitle" : "Create new wallet",
+      "title" : "New Wallet"
+    },
+    "import" : {
+      "subtitle" : "Import wallet with a 24 secret recovery words",
+      "title" : "Existing Wallet"
+    },
+    "subtitle" : "Create a new wallet or add an existing one.",
+    "testnet" : {
+      "subtitle" : "Import wallet with a 24 secret recovery words to Testnet",
+      "title" : "Testnet Account"
+    },
+    "title" : "Add Wallet",
+    "watch_only" : {
+      "subtitle" : "For monitor wallet activity without recovery phrase",
+      "title" : "Watch Account"
+    }
+  },
+  "add_watch_only" : {
+    "subtitle" : "Monitor wallet activity without recovery phrase. You will be notified of any transactions from this wallet.",
+    "title" : "Watch Account",
+    "wallet_not_found" : "Wallet address not found"
   },
   "all_regions" : "All Regions",
   "appearance_accent_name" : {
@@ -127,6 +154,7 @@
   "battery" : {
     "description" : {
       "empty" : "Send tokens and NFTs, pay for staking actions with empty main balance.",
+      "less_10" : "You have enough charge battery for less than 10 transactions.",
       "other" : "You have enough charge battery for more than %{cnt} transactions."
     },
     "ok" : "OK",
@@ -136,9 +164,9 @@
       "ok" : "OK",
       "refilled" : "Your battery is charged",
       "subtitle" : {
-        "large" : "Large gas fees pack",
-        "medium" : "Medium gas fees pack",
-        "small" : "Small gas fees pack"
+        "large" : "Large pack",
+        "medium" : "Medium pack",
+        "small" : "Small pack"
       },
       "title" : "{{cnt}} transactions for {{price}}"
     },
@@ -245,6 +273,11 @@
     },
     "header_title" : "Primary currency"
   },
+  "choose_wallets" : {
+    "subtitle" : "Choose wallets you want to add.",
+    "title" : "Choose Wallets",
+    "tokens" : "tokens"
+  },
   "confirm" : "Confirm",
   "confirm_renew_all_domains_title" : "Confirm action",
   "confirm_sending_amount" : "Amount",
@@ -266,12 +299,14 @@
     "network_fee" : "Network fee",
     "refund" : "Refund",
     "title" : "Confirm action",
+    "title_multiwallets" : "Action for %{walletName}",
     "to_your_address" : "To your address",
     "transaction_type" : {
       "burn" : "Burn",
       "receive" : "Receive",
       "send" : "Send"
     },
+    "wallet" : "Wallet:",
     "will_be_paid_with_battery" : "Will be paid with Battery"
   },
   "continue" : "Continue",
@@ -285,6 +320,13 @@
   "create_wallet_generated" : "Your wallet has\njust been created!",
   "create_wallet_generating" : "Generating wallet...",
   "create_wallet_title" : "Grab a pen and a piece of paper",
+  "customize" : "Customize",
+  "customize_modal" : {
+    "save" : "Save",
+    "subtitle" : "Wallet name and icon are stored locally on your device.",
+    "title" : "Customize your Wallet",
+    "wallet_name" : "Wallet Name"
+  },
   "decryption_error" : "Decryption error",
   "deploy_contract_button" : "Confirm and deploy",
   "deploy_contract_title" : "Deploy contract",
@@ -357,6 +399,14 @@
   "exchange_title" : "Buy TON",
   "expiring_domains" : "Expiring domains",
   "form_optional_indicator" : "Optional",
+  "import_add_wallet" : "Add Wallet",
+  "import_add_wallet_description" : "Create a new wallet or add an existing one.",
+  "import_existing_wallet" : "Existing Wallet",
+  "import_existing_wallet_description" : "Import wallet with a 24 secret recovery words",
+  "import_new_wallet" : "New Wallet",
+  "import_new_wallet_description" : "Create new wallet",
+  "import_signer" : "Pair Signer",
+  "import_signer_description" : "A higher level of control and security",
   "import_wallet_caption" : "To restore access to your wallet, enter the 24 secret recovery words given to you when you created your wallet.",
   "import_wallet_reset_caption" : "Please restore access to your wallet\n8by entering 24 secret words you wrote down then creating the wallet.",
   "import_wallet_title" : "Enter your\nrecovery phrase",
@@ -391,10 +441,18 @@
       "open" : "Settings",
       "title" : "To change the language of the app, go to device Settings"
     },
+    "languagesList" : {
+      "en" : "English",
+      "ru" : "Russian",
+      "system" : "System",
+      "tr" : "Turkish",
+      "zh-Hans" : "Chinese"
+    },
     "list_item" : {
       "title" : "Language",
       "value" : "English"
-    }
+    },
+    "title" : "Language"
   },
   "later" : "Later",
   "legal_font_license" : "Montserrat font",
@@ -413,6 +471,12 @@
   "migration_migrate_btn" : "Upgrade wallet",
   "migration_new_wallet" : "New address",
   "migration_old_wallet" : "Old address",
+  "migration" : {
+    "subtitle" : "Unlock wallet to continue.",
+    "title" : "Migrate your wallet to the new version of Tonkeeper",
+    "with_biometry" : "Continue with %{type}",
+    "with_passcode" : "Enter Passcode"
+  },
   "migration_title" : "Upgrade your wallet",
   "nft_about_collection" : "About collection",
   "nft_about_dns" : "TON DNS is a service that allows users to assign a human-readable name to crypto wallets, smart contracts, and websites. \n\nWith TON DNS, access to decentralized services is analogous to access to websites on the internet.",
@@ -523,6 +587,7 @@
   "notify_incorrect_time_err_title" : "Time and date are incorrect",
   "notify_no_signal_caption" : "Please check your internet connection.",
   "notify_no_signal_title" : "No signal",
+  "old_wallet_error" : "Use wallet with v4R2 version",
   "passcode_changed" : "Passcode changed",
   "paste" : "Paste",
   "pin_enter_faceid_err" : " Biometrics check failed",
@@ -552,6 +617,9 @@
       "open" : "Open anyway",
       "title" : "Are you sure you want to open an external link?"
     }
+  },
+  "purchases" : {
+    "screen_title" : "Purchases"
   },
   "receive_address_title" : "Or use wallet address",
   "receive_copy" : "Copy",
@@ -585,6 +653,8 @@
   "secret_words_caption" : "Write down these 24 words in the order given below and store them in a secret, safe place.",
   "secret_words_title" : "Your recovery phrase",
   "security_change_passcode" : "Change passcode",
+  "security_lock_screen_switch" : "Lock Screen",
+  "security_lock_screen_tip" : "Require passcode to view wallet contents.",
   "security_migration_caption" : "Now your balance and any operations are secured by a passcode. You can also speed up with biometric check.",
   "security_migration_skip_button" : "Do not update now",
   "security_migration_submit_button" : "Update security settings",
@@ -642,6 +712,7 @@
       "details_label" : "Details",
       "details_max_balance_label" : "Sending max. balance of %{currency}",
       "title" : "Confirm action",
+      "wallet" : "Wallet",
       "will_be_paid_with_battery" : "Will be paid with Battery"
     },
     "done" : {
@@ -661,7 +732,8 @@
   "send_sending_wrong_time_title" : "Error occurred",
   "send_title" : "Send %{currency}",
   "settings_appearance" : "Theme",
-  "settings_backup_seed" : "Show recovery phrase",
+  "settings_backup_seed" : "Recovery Phrase",
+  "settings_bank_card" : "Bank card",
   "settings_contact_support" : "Contact us",
   "settings_delete_account" : "Delete account",
   "settings_delete_alert_button" : "Delete account and data",
@@ -675,10 +747,12 @@
   "settings_primary_currency" : "Currency",
   "settings_rate" : "Rate Tonkeeper",
   "settings_recovery_phrase" : "Recovery phrase",
-  "settings_reset" : "Log out",
-  "settings_reset_alert_button" : "Log out",
-  "settings_reset_alert_caption" : "This will erase keys to the wallet. Make sure you have backed up your secret recovery phrase.",
-  "settings_reset_alert_title" : "Log out?",
+  "settings_reset" : "Sign Out",
+  "settings_reset_alert_button" : "Sign Out",
+  "settings_reset_alert_caption" : "This will erase key to your wallet. Make sure you have backed up your recovery phrase.",
+  "settings_reset_alert_caption_all" : "This will erase keys to all wallets. Make sure you have backed up your recovery phrases.",
+  "settings_reset_alert_title" : "Sign Out?",
+  "settings_reset_alert_title_all" : "Sign Out of All Wallets?",
   "settings_search_engine" : "Search",
   "settings_security" : "Security",
   "settings_subscriptions" : "Subscriptions",
@@ -694,6 +768,8 @@
   "setup_notifications_caption" : "Get notifications when you \n receive TON, tokens and NFTs.",
   "setup_notifications_enable_button" : "Enable notifications",
   "setup_notifications_title" : "Get instant notifications",
+  "signer_scan_result" : "Scan signed transaction",
+  "signer_scan_tx_description" : "Please open Signer and scan QR code with transaction",
   "skip" : "Skip",
   "spam_action" : "Spam",
   "staking" : {
@@ -816,6 +892,12 @@
     },
     "withdrawal_request" : "Unstake"
   },
+  "start_screen" : {
+    "caption" : "Create a new wallet or add \nan existing one",
+    "create_wallet_button" : "Create New Wallet",
+    "import_wallet_button" : "Import Existing Wallet"
+  },
+  "stop_watch" : "Delete Watch Account",
   "subscription_back_to_merchant_button" : "Back",
   "subscription_back_to_merchant_caption" : "The transaction is being processed. Your subscription will be active soon.",
   "subscription_back_to_merchant_name" : "Back to %{merchantName}",
@@ -969,6 +1051,12 @@
     "refund" : "Refund",
     "signRaw" : {
       "addressMismatch" : {
+        "switchWallet" : {
+          "close" : "Cancel",
+          "description" : "Switch wallet to confirm the action.",
+          "switch" : "Switch and Continue",
+          "title" : "Action for your wallet %{value}"
+        },
         "wrongVersion" : {
           "close" : "Cancel",
           "description" : "Switch your active address to %{version} to confirm the action.",
@@ -1014,6 +1102,17 @@
       }
     }
   },
+  "unverifiedTokenDetails" : {
+    "button" : "OK",
+    "description" : "This token looks suspicious for one or several reasons.",
+    "paragraphs" : {
+      "p1" : "Low liquidity. Token may have some value, but it is extremely low.",
+      "p2" : "Token is not listed on trading platforms and has limited demand.",
+      "p3" : "Used for spam. Employed for sending unwanted and often irrelevant messages at scale.",
+      "p4" : "Used for scam. Token's name or image can lead users into deception."
+    },
+    "title" : "Unverified Token"
+  },
   "update" : {
     "description" : "A new version of Tonkeeper is available. You can download it now.",
     "download" : "Download",
@@ -1033,6 +1132,7 @@
     "buy_btn" : "Buy & Sell",
     "collectibles_tab_lable" : "Collectibles",
     "edit_tokens_btn" : "Edit",
+    "inscriptions_tab_label" : "Inscriptions",
     "nft_tab_lable" : "Collectibles",
     "old_wallets_title" : "Old wallets",
     "old_wallet_title" : "Old wallet",
@@ -1048,10 +1148,12 @@
   "wallet_hours_symbol" : "h",
   "wallet_old_balance" : "Old wallet:",
   "wallet_receive" : "Receive",
+  "wallets" : "Wallets",
   "wallet_sell" : "Sell",
   "wallet_send" : "Send",
   "wallet_source_code" : "Source code",
   "wallet_swap" : "Swap",
   "wallet_title" : "Wallet",
+  "watch_only" : "Watch only",
   "yesterday" : "Yesterday"
 }
