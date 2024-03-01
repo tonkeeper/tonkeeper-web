@@ -8,6 +8,7 @@ import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
 import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
+import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
@@ -140,13 +141,15 @@ const ThemeAndContent = () => {
     const { data } = useProBackupState();
     return (
         <UserThemeProvider displayType="full-width" isPro={data?.valid}>
-            <GlobalStyle />
-            <HeaderGlobalStyle />
-            <FooterGlobalStyle />
-            <SybHeaderGlobalStyle />
-            <GlobalListStyle />
-            <Loader />
-            <UnlockNotification sdk={sdk} />
+            <DarkThemeContext.Provider value={!data?.valid}>
+                <GlobalStyle />
+                <HeaderGlobalStyle />
+                <FooterGlobalStyle />
+                <SybHeaderGlobalStyle />
+                <GlobalListStyle />
+                <Loader />
+                <UnlockNotification sdk={sdk} />
+            </DarkThemeContext.Provider>
         </UserThemeProvider>
     );
 };

@@ -76,6 +76,13 @@ const Navigation = () => {
                 action: () => handleClick(AppRoute.home)
             },
             {
+                name: t('browser_title'),
+                icon: <BrowserIcon />,
+                iconColor:
+                    active === AppRoute.browser ? theme.tabBarActiveIcon : theme.tabBarInactiveIcon,
+                action: () => handleClick(AppRoute.browser)
+            },
+            {
                 name: t('activity_screen_title'),
                 icon: <ActivityIcon />,
                 iconColor:
@@ -83,13 +90,6 @@ const Navigation = () => {
                         ? theme.tabBarActiveIcon
                         : theme.tabBarInactiveIcon,
                 action: () => handleClick(AppRoute.activity)
-            },
-            {
-                name: t('browser_title'),
-                icon: <BrowserIcon />,
-                iconColor:
-                    active === AppRoute.browser ? theme.tabBarActiveIcon : theme.tabBarInactiveIcon,
-                action: () => handleClick(AppRoute.browser)
             }
         ];
         if (nfts && nfts.length > 0) {
