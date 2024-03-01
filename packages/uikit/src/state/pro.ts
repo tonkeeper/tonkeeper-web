@@ -1,14 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ProState } from '@tonkeeper/core/dist/entries/pro';
+import { ProState, ProStateSubscription } from '@tonkeeper/core/dist/entries/pro';
 import {
     authViaTonConnect,
     createProServiceInvoice,
     estimateProServiceInvoice,
+    getBackupState,
     getProServiceTiers,
     getProState,
     logoutTonConsole,
     publishAndWaitProServiceInvoice,
-    startProServiceTrial
+    startProServiceTrial,
+    setBackupState
 } from '@tonkeeper/core/dist/service/proService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
@@ -18,10 +20,25 @@ import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { getMnemonic, signTonConnect } from './mnemonic';
 
+export const useProBackupState = () => {
+    const sdk = useAppSdk();
+    return useQuery<ProStateSubscription, Error>(
+        [QueryKey.proBackup],
+        () => getBackupState(sdk.storage),
+        { keepPreviousData: true }
+    );
+};
+
 export const useProState = () => {
     const wallet = useWalletContext();
     const sdk = useAppSdk();
-    return useQuery<ProState, Error>([QueryKey.pro], () => getProState(sdk.storage, wallet));
+    const client = useQueryClient();
+    return useQuery<ProState, Error>([QueryKey.pro], async () => {
+        const state = await getProState(sdk.storage, wallet);
+        await setBackupState(sdk.storage, state.subscription);
+        await client.invalidateQueries([QueryKey.proBackup]);
+        return state;
+    });
 };
 
 export const useSelectWalletMutation = () => {

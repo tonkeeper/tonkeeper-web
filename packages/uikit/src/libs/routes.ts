@@ -4,6 +4,7 @@ export enum AppRoute {
     settings = '/settings',
     browser = '/browser',
     activity = '/activity',
+    purchases = '/purchases',
     coins = '/coins',
     home = '/'
 }

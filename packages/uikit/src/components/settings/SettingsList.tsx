@@ -17,10 +17,10 @@ export interface SettingsListProps {
     loading?: boolean;
 }
 
-const Icon = styled(Label1)`
+const Icon = styled(Label1)<{ color?: string }>`
     display: flex;
     margin: -3px 0;
-    color: ${props => props.theme.accentBlue};
+    color: ${props => props.color ?? props.theme.accentBlue};
 `;
 
 const Secondary = styled(Body1)`
