@@ -2,13 +2,7 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { memo, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from 'styled-components';
-import {
-    ActivityIcon,
-    BrowserIcon,
-    NftIcon,
-    SettingsIcon,
-    WalletIcon
-} from '../../components/NavigationIcons';
+import { ActivityIcon, BrowserIcon, NftIcon, WalletIcon } from '../../components/NavigationIcons';
 import { SkeletonAction } from '../../components/Skeleton';
 import { ActionsRow } from '../../components/home/Actions';
 import { Balance, BalanceSkeleton } from '../../components/home/Balance';
@@ -50,9 +44,6 @@ const Navigation = () => {
     const active = useMemo<AppRoute>(() => {
         if (location.pathname.includes(AppRoute.activity)) {
             return AppRoute.activity;
-        }
-        if (location.pathname.includes(AppRoute.settings)) {
-            return AppRoute.settings;
         }
         if (location.pathname.includes(AppRoute.browser)) {
             return AppRoute.browser;
@@ -105,15 +96,6 @@ const Navigation = () => {
                         ? theme.tabBarActiveIcon
                         : theme.tabBarInactiveIcon,
                 action: () => handleClick(AppRoute.purchases)
-            },
-            {
-                name: t('settings_title'),
-                icon: <SettingsIcon />,
-                iconColor:
-                    active === AppRoute.settings
-                        ? theme.tabBarActiveIcon
-                        : theme.tabBarInactiveIcon,
-                action: () => handleClick(AppRoute.settings)
             }
         ];
         return items;

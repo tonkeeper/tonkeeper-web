@@ -1,16 +1,16 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
-import styled from 'styled-components';
-import { useWalletState } from '../../state/wallet';
-import { Body2, Body3 } from '../Text';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { FC, useCallback, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useMutateActiveWallet } from '../../state/account';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { AppProRoute, AppRoute, SettingsRoute } from '../../libs/routes';
 import { scrollToTop } from '../../libs/common';
-import { ImportNotification } from '../create/ImportNotification';
+import { AppProRoute, AppRoute } from '../../libs/routes';
+import { useMutateActiveWallet } from '../../state/account';
+import { useWalletState } from '../../state/wallet';
 import { PlusIcon, SlidersIcon } from '../Icon';
+import { Body2, Body3 } from '../Text';
+import { ImportNotification } from '../create/ImportNotification';
 import { SubscriptionInfo } from './SubscriptionInfo';
 
 const AsideContainer = styled.div`
@@ -114,8 +114,8 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
             return AppProRoute.dashboard;
         }
 
-        if (location.pathname.startsWith(AppRoute.settings + SettingsRoute.account)) {
-            return AppRoute.settings + SettingsRoute.account;
+        if (location.pathname.startsWith(AppRoute.settings)) {
+            return AppRoute.settings;
         }
 
         return undefined;
@@ -163,8 +163,8 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
                 </AsideMenuCard>
                 <AsideMenuCard
                     padding="m"
-                    onClick={() => handleNavigateClick(AppRoute.settings + SettingsRoute.account)}
-                    isSelected={activeRoute === AppRoute.settings + SettingsRoute.account}
+                    onClick={() => handleNavigateClick(AppRoute.settings)}
+                    isSelected={activeRoute === AppRoute.settings}
                 >
                     <AsideMenuItemIcon>
                         <Body2>Settings</Body2>
