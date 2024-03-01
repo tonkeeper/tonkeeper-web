@@ -16,9 +16,7 @@ const Block = styled(WithHeadingDivider)`
     box-sizing: border-box;
     display: flex;
     justify-content: center;
-    position: relative;
 
-    position: fixed;
     z-index: 3;
     overflow: visible !important;
 
@@ -27,9 +25,11 @@ const Block = styled(WithHeadingDivider)`
     ${p =>
         p.theme.displayType === 'full-width'
             ? css`
+                  position: absolute;
                   width: 100%;
               `
             : css`
+                  position: fixed;
                   width: var(--app-width);
                   max-width: 548px;
               `}

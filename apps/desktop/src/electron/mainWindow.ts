@@ -38,9 +38,9 @@ export abstract class MainWindow {
         // Create the browser window.
         this.mainWindow = new BrowserWindow({
             icon: icon,
-            width: 1200,
+            width: 1150,
             minWidth: 1100,
-            height: 700,
+            height: 800,
             minHeight: 600,
             resizable: isDev,
             autoHideMenuBar: process.platform != 'darwin',

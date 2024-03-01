@@ -156,7 +156,6 @@ const FullSizeWrapper = styled(Container)``;
 const Wrapper = styled.div`
     box-sizing: border-box;
     padding-top: 64px;
-    padding-bottom: 80px;
 
     width: 100%;
     display: flex;
@@ -199,6 +198,7 @@ const SecondColumn = styled.div`
     display: flex;
     flex-grow: 1;
     overflow: auto;
+    position: relative;
 `;
 
 const InitializeContainerStyled = styled(InitializeContainer)`

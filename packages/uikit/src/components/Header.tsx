@@ -25,7 +25,6 @@ const Block = styled.div<{
 
     user-select: none;
 
-    position: fixed;
     overflow: visible !important;
     top: 0;
     z-index: 4;
@@ -33,9 +32,11 @@ const Block = styled.div<{
     ${p =>
         p.theme.displayType === 'full-width'
             ? css`
+                  position: absolute;
                   width: 100%;
               `
             : css`
+                  position: fixed;
                   width: var(--app-width);
                   max-width: 548px;
               `}

@@ -1,6 +1,6 @@
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import React, { PropsWithChildren, useLayoutEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 
@@ -9,6 +9,12 @@ const BodyElement = styled.div`
     padding: 0 1rem;
     -webkit-overflow-scrolling: touch;
     background-color: ${props => props.theme.backgroundPage};
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            overflow: auto;
+        `}
 `;
 
 const setTop = () => {
