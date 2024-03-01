@@ -17,22 +17,7 @@ export function useDashboardData() {
             const mockRow: DashboardCell[] = (selectedColumns?.map(
                 c => mocks[c.id as keyof typeof mocks]
             ) || []) as DashboardCell[];
-            return [
-                mockRow,
-                mockRow,
-                mockRow,
-                mockRow,
-                mockRow,
-                mockRow,
-                mockRow,
-                mockRow,
-                mockRow,
-                mockRow,
-                mockRow,
-                mockRow,
-                mockRow,
-                mockRow
-            ];
+            return [mockRow];
         },
         {
             enabled: !!selectedColumns

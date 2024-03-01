@@ -7,7 +7,8 @@ import {
     getProServiceTiers,
     getProState,
     logoutTonConsole,
-    publishAndWaitProServiceInvoice
+    publishAndWaitProServiceInvoice,
+    startProServiceTrial
 } from '@tonkeeper/core/dist/service/proService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
@@ -97,4 +98,14 @@ export const useBuyProServiceMutation = () => {
             await client.invalidateQueries([QueryKey.pro]);
         }
     );
+};
+
+export const useActivateTrialMutation = () => {
+    const client = useQueryClient();
+    const ctx = useAppContext();
+
+    return useMutation<void, Error>(async () => {
+        await startProServiceTrial((ctx.env as { tgAuthBotId: string }).tgAuthBotId);
+        await client.invalidateQueries([QueryKey.pro]);
+    });
 };

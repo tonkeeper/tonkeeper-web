@@ -1,5 +1,5 @@
 import { delay } from '@tonkeeper/core/dist/utils/common';
-import { BrowserWindow, ipcMain } from 'electron';
+import { BrowserWindow, ipcMain, shell } from 'electron';
 import isDev from 'electron-is-dev';
 import path from 'path';
 import { Cookie, CookieJar } from 'tough-cookie';
@@ -20,7 +20,7 @@ export abstract class MainWindow {
     static mainWindow: BrowserWindow | undefined = undefined;
 
     static async openMainWindow() {
-        if (this.mainWindow != undefined) return this.mainWindow;
+        if (this.mainWindow !== undefined) return this.mainWindow;
 
         const icon = (() => {
             switch (process.platform) {
@@ -41,7 +41,7 @@ export abstract class MainWindow {
             width: 1300,
             height: 700,
             resizable: isDev,
-            autoHideMenuBar: process.platform != 'darwin',
+            autoHideMenuBar: process.platform !== 'darwin',
             webPreferences: {
                 zoomFactor: process.platform !== 'linux' ? 0.8 : undefined,
                 preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
@@ -78,11 +78,20 @@ export abstract class MainWindow {
                     }
                     const result = cookies
                         .map(cookie => `${cookie.key}=${cookie.value}`)
-                        .join(', ');
+                        .join('; ');
+
+                    /* patch tg auth headers  */
+                    if (details.url === 'https://oauth.telegram.org/auth/get') {
+                        details.requestHeaders.origin = 'https://tonkeeper.com';
+                        details.requestHeaders.referer = 'https://tonkeeper.com';
+                    }
+
                     callback({
-                        requestHeaders: Object.assign(details.requestHeaders, {
+                        ...details,
+                        requestHeaders: {
+                            ...details.requestHeaders,
                             cookie: result
-                        })
+                        }
                     });
                 });
             }
@@ -91,12 +100,21 @@ export abstract class MainWindow {
         this.mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
             const setCookie = details.responseHeaders['set-cookie'] ?? [];
 
+            /* patch tg auth headers cors  */
+            if (details.url === 'https://oauth.telegram.org/auth/get') {
+                const corsHeader =
+                    Object.keys(details.responseHeaders).find(
+                        k => k.toLowerCase() === 'access-control-allow-origin'
+                    ) || 'access-control-allow-origin';
+                details.responseHeaders[corsHeader] = ['*'];
+            }
+
             Promise.all(
                 setCookie.map(cookieRaw =>
                     cookieJar.setCookie(Cookie.parse(cookieRaw), details.url)
                 )
             ).finally(() => {
-                callback({});
+                callback(details);
             });
         });
 

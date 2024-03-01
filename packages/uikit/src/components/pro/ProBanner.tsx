@@ -2,7 +2,7 @@ import { FC } from 'react';
 import styled from 'styled-components';
 import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
-import { useProState } from '../../state/pro';
+import { useActivateTrialMutation, useProState } from '../../state/pro';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { ProNotification } from './ProNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
@@ -30,6 +30,7 @@ const ButtonsContainerStyled = styled.div`
 
 export const ProBanner: FC<{ className?: string }> = ({ className }) => {
     const formatDate = useDateTimeFormat();
+    const { mutate } = useActivateTrialMutation();
     const { data } = useProState();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -64,7 +65,7 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
                     </Label2>
                 ) : (
                     !used_trial && (
-                        <Button size="small" corner="2xSmall">
+                        <Button size="small" corner="2xSmall" onClick={() => mutate()}>
                             Try Pro for Free
                         </Button>
                     )

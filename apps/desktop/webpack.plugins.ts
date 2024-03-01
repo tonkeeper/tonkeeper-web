@@ -13,6 +13,7 @@ export const plugins = [
     }),
     new webpack.DefinePlugin({
         REACT_APP_AMPLITUDE: JSON.stringify(process.env.REACT_APP_AMPLITUDE),
-        REACT_APP_TONCONSOLE_API: JSON.stringify(process.env.REACT_APP_TONCONSOLE_API)
+        REACT_APP_TONCONSOLE_API: JSON.stringify(process.env.REACT_APP_TONCONSOLE_API),
+        REACT_APP_TG_BOT_ID: JSON.stringify(process.env.REACT_APP_TG_BOT_ID)
     })
 ];

@@ -11,6 +11,8 @@ import {
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { Configuration as TronConfiguration } from '@tonkeeper/core/dist/tronApi';
 import React, { useContext } from 'react';
+import webpack from 'webpack';
+import Record = webpack.compilation.Record;
 
 export interface IAppContext {
     api: APIConfig;
@@ -24,6 +26,9 @@ export interface IAppContext {
     ios: boolean;
     proFeatures: boolean;
     hideQrScanner?: boolean;
+    env?: {
+        tgAuthBotId: string;
+    };
 }
 
 export const AppContext = React.createContext<IAppContext>({

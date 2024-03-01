@@ -104,6 +104,7 @@ const langs = 'en,zh_CN,ru,it,tr';
 const listOfAuth: AuthState['kind'][] = ['keychain'];
 
 declare const REACT_APP_TONCONSOLE_API: string;
+declare const REACT_APP_TG_BOT_ID: string;
 
 export const App = () => {
     const { t, i18n } = useTranslation();
@@ -233,7 +234,10 @@ export const Loader: FC = () => {
         standalone: false,
         extension: false,
         proFeatures: true,
-        ios: false
+        ios: false,
+        env: {
+            tgAuthBotId: REACT_APP_TG_BOT_ID
+        }
     };
 
     return (

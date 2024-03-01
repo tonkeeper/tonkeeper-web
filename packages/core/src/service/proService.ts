@@ -16,6 +16,7 @@ import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connect
 import { estimateTonTransfer, sendTonTransfer } from './transfer/tonService';
 import { walletStateInitFromState } from './wallet/contractService';
 import { getWalletState } from './wallet/storeService';
+import { loginViaTG } from './telegram-oauth';
 
 const getBackupState = async (storage: IStorage) => {
     const backup = await storage.get<ProStateSubscription>(AppKey.PRO_BACKUP);
@@ -120,7 +121,7 @@ export const getProServiceTiers = async (lang?: Language | undefined, promoCode?
 };
 
 export const createProServiceInvoice = async (tierId: number, promoCode?: string) => {
-    return await ProServiceService.createProServiceInvoice({
+    return ProServiceService.createProServiceInvoice({
         tier_id: tierId,
         promo_code: promoCode
     });
@@ -189,3 +190,10 @@ export const publishAndWaitProServiceInvoice = async (
         }
     } while (updated.status === InvoiceStatus.PENDING);
 };
+
+export async function startProServiceTrial(botId: string) {
+    const tgData = await loginViaTG(botId);
+    if (tgData) {
+        return ProServiceService.proServiceTrial(tgData);
+    }
+}
