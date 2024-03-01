@@ -201,10 +201,6 @@ const SecondColumn = styled.div`
     position: relative;
 `;
 
-const InitializeContainerStyled = styled(InitializeContainer)`
-    min-height: fit-content;
-`;
-
 const FullSizeWrapperBounded = styled(FullSizeWrapper)`
     max-height: 100%;
     overflow: auto;
@@ -304,7 +300,7 @@ export const Content: FC<{
         return (
             <FullSizeWrapperBounded>
                 <Suspense fallback={<Loading />}>
-                    <InitializeContainerStyled fullHeight={false}>
+                    <InitializeContainer fullHeight={false}>
                         <Routes>
                             <Route
                                 path={any(AppRoute.import)}
@@ -312,7 +308,7 @@ export const Content: FC<{
                             />
                             <Route path="*" element={<Initialize />} />
                         </Routes>
-                    </InitializeContainerStyled>
+                    </InitializeContainer>
                 </Suspense>
             </FullSizeWrapperBounded>
         );

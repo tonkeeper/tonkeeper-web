@@ -14,6 +14,7 @@ import { useTranslation } from '../../hooks/translation';
 import { scrollToTop } from '../../libs/common';
 import { AppRoute } from '../../libs/routes';
 import { useAssets } from '../../state/home';
+import { useWalletNftList } from '../../state/wallet';
 
 const MainColumnSkeleton = memo(() => {
     const sdk = useAppSdk();
@@ -40,6 +41,8 @@ const Navigation = () => {
     const { t } = useTranslation();
     const location = useLocation();
     const navigate = useNavigate();
+
+    const { data: nfts } = useWalletNftList();
 
     const active = useMemo<AppRoute>(() => {
         if (location.pathname.includes(AppRoute.activity)) {
@@ -87,8 +90,10 @@ const Navigation = () => {
                 iconColor:
                     active === AppRoute.browser ? theme.tabBarActiveIcon : theme.tabBarInactiveIcon,
                 action: () => handleClick(AppRoute.browser)
-            },
-            {
+            }
+        ];
+        if (nfts && nfts.length > 0) {
+            items.push({
                 name: t('purchases_screen_title'),
                 icon: <NftIcon />,
                 iconColor:
@@ -96,10 +101,10 @@ const Navigation = () => {
                         ? theme.tabBarActiveIcon
                         : theme.tabBarInactiveIcon,
                 action: () => handleClick(AppRoute.purchases)
-            }
-        ];
+            });
+        }
         return items;
-    }, [t, location, navigate, active, theme]);
+    }, [t, location, navigate, active, theme, nfts]);
 
     return <SettingsList items={items} />;
 };

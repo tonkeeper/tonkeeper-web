@@ -40,7 +40,7 @@ export abstract class MainWindow {
             icon: icon,
             width: 1150,
             minWidth: 1100,
-            height: 800,
+            height: 700,
             minHeight: 600,
             resizable: isDev,
             autoHideMenuBar: process.platform != 'darwin',
