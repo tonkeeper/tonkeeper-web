@@ -263,7 +263,6 @@ const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, s
             <Line>
                 <Input
                     isSuccess={promoCode != undefined}
-                    isValid={promo == '' || promoCode != undefined}
                     disabled={isLoading}
                     value={promo}
                     onChange={setPromo}
