@@ -21,6 +21,7 @@ import { ColumnText } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { SubHeader } from '../SubHeader';
 import { Body1, Label1, Title } from '../Text';
+import { SubscriptionStatus } from '../aside/SubscriptionInfo';
 import { Button } from '../fields/Button';
 import { Radio } from '../fields/Checkbox';
 import { Input } from '../fields/Input';
@@ -151,12 +152,11 @@ const SelectProPlans: FC<{
     );
 };
 
-const BuyProService: FC<{ data: ProState }> = ({ data }) => {
+const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, setReLogin }) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);
 
-    const { mutate: logOut } = useProLogout();
     const [selectedPlan, setPlan] = useState<number | null>(null);
     const [promo, setPromo] = useState('');
 
@@ -178,7 +178,7 @@ const BuyProService: FC<{ data: ProState }> = ({ data }) => {
 
     return (
         <div>
-            <ProWallet data={data} onClick={logOut} disabled={isLoading} />
+            <ProWallet data={data} onClick={setReLogin} disabled={isLoading} />
             <SelectProPlans
                 plans={plans ?? []}
                 setPlan={setPlan}
@@ -210,39 +210,57 @@ const BuyProService: FC<{ data: ProState }> = ({ data }) => {
     );
 };
 
-const PreServiceStatus: FC<{ data: ProState }> = ({ data }) => {
-    const { mutate: logOut } = useProLogout();
+const StatusText = styled(Label1)`
+    text-align: center;
+    margin: 16px 0 32px;
+    display: block;
+`;
+
+const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({ data, setReLogin }) => {
+    const { t } = useTranslation();
+
+    const { mutate: logOut, isLoading } = useProLogout();
 
     return (
         <div>
-            <ProWallet data={data} onClick={logOut} />
-            "valid"
+            <ProWallet data={data} onClick={setReLogin} />
+
+            <StatusText>
+                <SubscriptionStatus data={data} />
+            </StatusText>
+
+            <Button size="large" secondary fullWidth onClick={() => logOut()} loading={isLoading}>
+                {t('settings_reset')}
+            </Button>
         </div>
     );
 };
 
 const ProContent: FC<{ data: ProState }> = ({ data }) => {
-    if (!data.hasCookie) {
+    const [reLogin, setReLogin] = useState(false);
+
+    if (!data.hasCookie || reLogin) {
         return <SelectWallet />;
     }
     if (data.subscription.valid) {
-        return <PreServiceStatus data={data} />;
+        return <PreServiceStatus data={data} setReLogin={() => setReLogin(true)} />;
     }
-    return <BuyProService data={data} />;
+    return <BuyProService data={data} setReLogin={() => setReLogin(true)} />;
 };
 
-export const ProSettingsContent: FC = () => {
+export const ProSettingsContent: FC<{ showLogo?: boolean }> = ({ showLogo = true }) => {
     const { t } = useTranslation();
 
     const { data } = useProState();
+
     return (
         <>
             <Block>
-                <Icon src="https://tonkeeper.com/assets/icon.ico" />
+                {showLogo && <Icon src="https://tonkeeper.com/assets/icon.ico" />}
                 <Title>{t('tonkeeper_pro')}</Title>
                 <Description>{t('tonkeeper_pro_description')}</Description>
             </Block>
-            {data ? <ProContent data={data} /> : undefined}
+            {data ? <ProContent key={data.wallet.rawAddress} data={data} /> : undefined}
         </>
     );
 };

@@ -44,11 +44,6 @@ export const useSelectWalletMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     return useMutation<void, Error, string>(async publicKey => {
-        try {
-            await logoutTonConsole();
-        } catch (e) {
-            console.warn(e);
-        }
         const state = await getWalletState(sdk.storage, publicKey);
         if (!state) {
             throw new Error('Missing wallet state');
