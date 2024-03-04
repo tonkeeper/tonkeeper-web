@@ -71,6 +71,7 @@ const SelectLabel = styled(Label1)`
 `;
 
 const SelectWallet: FC = () => {
+    const { t } = useTranslation();
     const { data: accounts } = useAccountState();
     const { mutate } = useSelectWalletMutation();
 
@@ -78,7 +79,7 @@ const SelectWallet: FC = () => {
 
     return (
         <>
-            <SelectLabel>Select Wallet for authorization</SelectLabel>
+            <SelectLabel>{t('select_wallet_for_authorization')}</SelectLabel>
             <ListBlock>
                 {accounts.publicKeys.map(publicKey => (
                     <ListItem onClick={() => mutate(publicKey)}>
@@ -202,7 +203,7 @@ const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, s
                     loading={isLoading}
                     onClick={() => mutate({ state: data, tierId: selectedPlan, promoCode })}
                 >
-                    Buy
+                    {t('wallet_buy')}
                 </Button>
             </Line>
             <div ref={ref}></div>

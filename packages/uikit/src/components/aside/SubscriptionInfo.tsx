@@ -2,6 +2,7 @@ import { ProState } from '@tonkeeper/core/dist/entries/pro';
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { useTranslation } from '../../hooks/translation';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useProState } from '../../state/pro';
@@ -18,6 +19,7 @@ const InfoStyled = styled(Body3)`
 `;
 
 export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
+    const { t } = useTranslation();
     const formatDate = useDateTimeFormat();
 
     const {
@@ -26,8 +28,7 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
 
     const Expires = next_charge ? (
         <>
-            {' '}
-            It expires on{' '}
+            {` ${t('it_expires_on')} `}
             {formatDate(next_charge, {
                 day: 'numeric',
                 month: 'short',
@@ -38,11 +39,21 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
     ) : null;
 
     if (is_trial) {
-        return <>Pro Trial is active.{Expires}</>;
+        return (
+            <>
+                {t('pro_trial_is_active')}
+                {Expires}
+            </>
+        );
     }
 
     if (valid) {
-        return <>Pro Subscription is active.{Expires}</>;
+        return (
+            <>
+                {t('pro_subscription_is_active')}
+                {Expires}
+            </>
+        );
     }
     return null;
 };

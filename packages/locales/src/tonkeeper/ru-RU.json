@@ -43,7 +43,7 @@
     "first_option" : "Наиболее вероятно, что кошелёк получателя уже использовался и вы не заметите никакой разницы.",
     "learn_more" : "Подробнее",
     "new_style" : "Новый адрес",
-    "notification_desc_did_change" : "Пятого октября адрес вашего кошелька изменил свой формат на UQ, который ему лучше подходит. Старый адрес также продолжит работать. От вас не потребуется никаких действий.",
+    "notification_desc_did_change" : "Адрес вашего кошелька изменил свой формат на UQ. Старый адрес также продолжает работать.",
     "notification_desc_will_change" : "Пятого октября адрес вашего кошелька изменит свой формат на UQ, который ему лучше подходит. Старый адрес также продолжит работать. От вас не потребуется никаких действий.",
     "old_style" : "Старый адрес",
     "post_dates" : "\n5 октября 2023: все адреса переводятся в формат UQ в Tonkeeper.\n\n1 января 2024: Tonkeeper прекращает проверку статуса контракта и использует в адресе флаг «bounceable». Монеты, отправленные на неопубликованные контракты с EQ-адресом, вернутся обратно отправителю.",
@@ -156,6 +156,29 @@
     "whitelisted_token" : "Токен в белом списке"
   },
   "auth_failed" : "Авторизация не прошла",
+  "backup_check" : {
+    "caption" : "Давайте проверим, все ли вы записали правильно. Введите слова %{one}, %{two}, и %{three}.",
+    "done_button" : "Готово",
+    "title" : "Проверка резервной копии"
+  },
+  "backup_screen" : {
+    "last_backup_time" : "Последняя %{time}",
+    "manual_backup_on" : "Резервная копия сделана",
+    "manual_button" : "Сделать копию вручную",
+    "manual_caption" : "Создайте резервную копию своего кошелька вручную, записав секретный ключ.",
+    "manual_title" : "Вручную",
+    "show_recovery_phrase" : "Показать секретный ключ",
+    "title" : "Резервная копия"
+  },
+  "backup_warning" : {
+    "cancel_button" : "Отмена",
+    "caption" : "Пожалуйста, внимательно прочитайте перед просмотром секретного ключа.",
+    "continue_button" : "Продолжить",
+    "p1" : "Никогда и нигде не вводите свой секретный ключ для доступа к кошельку, кроме Tonkeeper.",
+    "p2" : "Поддержка Tonkeeper никогда не запрашивает секретный ключ.",
+    "p3" : "Любой, кто знает ваш секретный ключ, сможет получить доступ к вашему кошельку.",
+    "title" : "Внимание"
+  },
   "balances_setup_wallet" : "Подключить кошелёк",
   "battery" : {
     "description" : {
@@ -192,6 +215,28 @@
       "medium" : "Батарейка для оплаты комиссий заряжена наполовину"
     }
   },
+  "biometry" : {
+    "android" : {
+      "face_recognition" : "распознавание лица",
+      "face_recognition_genitive" : "распознавания лица",
+      "face_recognition_instrumental" : "распознаванием лица",
+      "fingerprint" : "отпечаток пальца",
+      "fingerprint_genitive" : "отпечатка пальца",
+      "fingerprint_instrumental" : "отпечатком пальца"
+    },
+    "default" : "биометрия",
+    "default_accusative" : "биометрию",
+    "default_genitive" : "биометрии",
+    "default_instrumental" : "биометрией",
+    "ios" : {
+      "face_recognition" : "Face ID",
+      "face_recognition_genitive" : "Face ID",
+      "face_recognition_instrumental" : "Face ID",
+      "fingerprint" : "Touch ID",
+      "fingerprint_genitive" : "Touch ID",
+      "fingerprint_instrumental" : "Touch ID"
+    }
+  },
   "browser" : {
     "about_dapps_caption" : "Исследуйте приложения и сервисы, в которых вы можете использовать Tonkeeper для входа и платежей.",
     "about_dapps_learn_more" : "Подробнее",
@@ -223,6 +268,10 @@
     "start_typing" : "Введите адрес или начните поиск",
     "title" : "Браузер",
     "web_search_title" : "Поиск в %{searchEngine}"
+  },
+  "buy_ton" : {
+    "subtitle" : "Моментально с банковской картой",
+    "title" : "Купить TON"
   },
   "cancel" : "Отмена",
   "chart" : {
@@ -410,6 +459,13 @@
   "exchange_telegram_bot" : "TELEGRAM BOT",
   "exchange_title" : "Купить TON",
   "expiring_domains" : "Истекающие домены",
+  "finish_setup" : {
+    "backup" : "Создайте резервную копию секретного ключа кошелька",
+    "done_buttom" : "Done",
+    "enable_notifications" : "Включите уведомления о транзакциях",
+    "header_title" : "Завершить установку",
+    "use_biometry" : "Включите %{name} для подтверждения транзакций"
+  },
   "form_optional_indicator" : "Необязательно",
   "import_add_wallet" : "Добавить кошелёк",
   "import_add_wallet_description" : "Создать новый кошелёк или добавить существующий.",
@@ -641,6 +697,12 @@
   "receive_share" : "Поделиться",
   "receive_title" : "Получить %{currency}",
   "receive_ton_and_jettons" : "Получить TON и другие токены",
+  "recovery_phrase" : {
+    "caption" : "Запишите эти слова с их номерами и сохраните их в надежном месте.",
+    "check_button" : "Проверить резервную копию",
+    "copy_button" : "Скопировать",
+    "title" : "Секретный ключ"
+  },
   "refresh_app" : "Перезапустить",
   "region_nokyc" : "Нейтральные воды",
   "reminder_notifications_caption" : "Получайте уведомления при получении TON, токенов и NFT.",
@@ -737,7 +799,7 @@
   "send_sending_wrong_time_title" : "Произошла ошибка",
   "send_title" : "Отправить %{currency}",
   "settings_appearance" : "Тема",
-  "settings_backup_seed" : "Секретный ключ",
+  "settings_backup_seed" : "Резервная копия",
   "settings_bank_card" : "Банковская карта",
   "settings_contact_support" : "Написать команде",
   "settings_delete_account" : "Удалить аккаунт",
@@ -973,7 +1035,7 @@
   "tab_wallet" : "Кошелёк",
   "today" : "Сегодня",
   "ton_login_back_to_button" : "Вернуться в %{name}",
-  "ton_login_caption" : "%{name} запрашивает доступ к адресу вашего кошелька\n",
+  "ton_login_caption" : "%{name} запрашивает доступ к адресу вашего кошелька",
   "ton_login_connect_button" : "Подключить кошелёк",
   "ton_login_notice" : "Обязательно проверьте адрес сервиса перед подключением кошелька.",
   "ton_login_success" : "Готово",

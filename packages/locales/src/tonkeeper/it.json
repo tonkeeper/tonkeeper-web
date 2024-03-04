@@ -47,6 +47,20 @@
   "app_name" : "Tonkeeper",
   "auth_failed" : "Autenticazione fallita",
   "balances_setup_wallet" : "Imposta wallet",
+  "biometry" : {
+    "android" : {
+      "face_recognition" : "riconoscimento facciale",
+      "face_recognition_genitive" : "riconoscimento facciale",
+      "fingerprint" : "impronta digitale",
+      "fingerprint_genitive" : "impronta digitale"
+    },
+    "ios" : {
+      "face_recognition" : "Face ID",
+      "face_recognition_genitive" : "Face ID",
+      "fingerprint" : "Touch ID",
+      "fingerprint_genitive" : "Touch ID"
+    }
+  },
   "browser" : {
     "about_dapps_caption" : "Esplora app e servizi in cui puoi utilizzare Tonkeeper per l'accesso e i pagamenti.",
     "about_dapps_learn_more" : "Scopri di più",
