@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { Address } from 'ton-core';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
@@ -7,13 +8,12 @@ import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { Language, localizationText } from '../entries/language';
 import { ProState, ProStateSubscription } from '../entries/pro';
-import { TonRecipientData } from '../entries/send';
+import { RecipientData, TonRecipientData } from '../entries/send';
 import { WalletState } from '../entries/wallet';
-import { AccountsApi, MessageConsequences } from '../tonApiV2';
+import { AccountsApi } from '../tonApiV2';
 import { InvoiceStatus, InvoicesInvoice, Lang, ProServiceService } from '../tonConsoleApi';
 import { delay } from '../utils/common';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
-import { estimateTonTransfer, sendTonTransfer } from './transfer/tonService';
 import { walletStateInitFromState } from './wallet/contractService';
 import { getWalletState } from './wallet/storeService';
 
@@ -130,58 +130,33 @@ export const createProServiceInvoice = async (tierId: number, promoCode?: string
     });
 };
 
-const createRecipient = async (api: APIConfig, invoice: InvoicesInvoice) => {
+export const createRecipient = async (
+    api: APIConfig,
+    invoice: InvoicesInvoice
+): Promise<[RecipientData, AssetAmount]> => {
     const toAccount = await new AccountsApi(api.tonApiV2).getAccount({
         accountId: invoice.pay_to_address
     });
 
     const recipient: TonRecipientData = {
-        address: { address: invoice.pay_to_address, blockchain: BLOCKCHAIN_NAME.TON },
+        address: {
+            address: Address.parse(invoice.pay_to_address).toString({ bounceable: false }),
+            blockchain: BLOCKCHAIN_NAME.TON
+        },
         comment: invoice.id,
         done: true,
         toAccount: toAccount
     };
-    return recipient;
+
+    const asset = new AssetAmount({
+        asset: TON_ASSET,
+        weiAmount: new BigNumber(invoice.amount)
+    });
+
+    return [recipient, asset];
 };
 
-export const estimateProServiceInvoice = async (
-    api: APIConfig,
-    walletState: WalletState,
-    invoice: InvoicesInvoice
-) => {
-    const recipient = await createRecipient(api, invoice);
-    const estimate = await estimateTonTransfer(
-        api,
-        walletState,
-        recipient,
-        new BigNumber(invoice.amount),
-        false
-    );
-    return estimate;
-};
-
-export const publishAndWaitProServiceInvoice = async (
-    api: APIConfig,
-    walletState: WalletState,
-    invoice: InvoicesInvoice,
-    estimate: MessageConsequences,
-    mnemonic: string[]
-) => {
-    const recipient = await createRecipient(api, invoice);
-
-    await sendTonTransfer(
-        api,
-        walletState,
-        recipient,
-        new AssetAmount({
-            asset: TON_ASSET,
-            weiAmount: new BigNumber(invoice.amount)
-        }),
-        false,
-        estimate,
-        mnemonic
-    );
-
+export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
     let updated = invoice;
 
     do {

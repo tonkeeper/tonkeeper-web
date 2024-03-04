@@ -2,29 +2,36 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { ProState } from '@tonkeeper/core/dist/entries/pro';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { WalletStateContext } from '../../hooks/appContext';
 import { useFormatCoinValue } from '../../hooks/balance';
+import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
+import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
 import { useTranslation } from '../../hooks/translation';
 import { useAccountState } from '../../state/account';
 import {
-    useBuyProServiceMutation,
+    ConfirmState,
+    useCreateInvoiceMutation,
     useProLogout,
     useProPlans,
     useProState,
-    useSelectWalletMutation
+    useSelectWalletMutation,
+    useWaitInvoiceMutation
 } from '../../state/pro';
 import { useWalletState } from '../../state/wallet';
 import { InnerBody } from '../Body';
 import { DoneIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
+import { Notification } from '../Notification';
 import { SubHeader } from '../SubHeader';
 import { Body1, Label1, Title } from '../Text';
 import { SubscriptionStatus } from '../aside/SubscriptionInfo';
 import { Button } from '../fields/Button';
 import { Radio } from '../fields/Checkbox';
 import { Input } from '../fields/Input';
+import { ConfirmView } from '../transfer/ConfirmView';
 
 const Block = styled.div`
     display: flex;
@@ -136,6 +143,12 @@ const SelectProPlans: FC<{
                                 text={plan.name}
                                 secondary={
                                     <>
+                                        {plan.description ? (
+                                            <>
+                                                {plan.description}
+                                                <br />
+                                            </>
+                                        ) : null}
                                         {format(plan.amount)} {CryptoCurrency.TON}
                                     </>
                                 }
@@ -153,6 +166,52 @@ const SelectProPlans: FC<{
     );
 };
 
+const ConfirmNotification: FC<{
+    state: ConfirmState | null;
+    onClose: () => void;
+    waitResult: (state: ConfirmState) => void;
+}> = ({ state, onClose, waitResult }) => {
+    const content = useCallback(() => {
+        if (!state) return <></>;
+        return (
+            <WalletStateContext.Provider value={state.wallet}>
+                <ConfirmBuyProService
+                    {...state}
+                    onClose={confirmed => {
+                        if (confirmed) {
+                            waitResult(state);
+                            setTimeout(onClose, 3000);
+                        } else {
+                            onClose();
+                        }
+                    }}
+                />
+            </WalletStateContext.Provider>
+        );
+    }, [state]);
+
+    return (
+        <Notification isOpen={state != null} hideButton handleClose={onClose} backShadow>
+            {content}
+        </Notification>
+    );
+};
+
+const ConfirmBuyProService: FC<
+    PropsWithChildren<
+        {
+            onBack?: () => void;
+            onClose: (confirmed?: boolean) => void;
+            fitContent?: boolean;
+        } & ConfirmState
+    >
+> = ({ ...rest }) => {
+    const estimation = useEstimateTransfer(rest.recipient, rest.assetAmount, false);
+    const mutation = useSendTransfer(rest.recipient, rest.assetAmount, false, estimation.data!);
+
+    return <ConfirmView estimation={estimation} {...mutation} {...rest} />;
+};
+
 const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, setReLogin }) => {
     const { t } = useTranslation();
 
@@ -163,7 +222,12 @@ const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, s
 
     const [plans, promoCode] = useProPlans(promo);
 
-    const { mutate, isLoading } = useBuyProServiceMutation();
+    const { mutateAsync: createInvoice, isLoading: isInvoiceLoading } = useCreateInvoiceMutation();
+    const { mutate: waitInvoice, isLoading: isInvoicePending } = useWaitInvoiceMutation();
+
+    const isLoading = isInvoiceLoading || isInvoicePending;
+
+    const [confirm, setConfirm] = useState<ConfirmState | null>(null);
 
     useEffect(() => {
         if (plans && plans[0] && selectedPlan == null) {
@@ -177,6 +241,16 @@ const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, s
         }
     }, [ref.current]);
 
+    const onSubmit = async () => {
+        setConfirm(
+            await createInvoice({
+                state: data,
+                tierId: selectedPlan,
+                promoCode
+            })
+        );
+    };
+
     return (
         <div>
             <ProWallet data={data} onClick={setReLogin} disabled={isLoading} />
@@ -188,6 +262,8 @@ const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, s
             />
             <Line>
                 <Input
+                    isSuccess={promoCode != undefined}
+                    isValid={promo == '' || promoCode != undefined}
                     disabled={isLoading}
                     value={promo}
                     onChange={setPromo}
@@ -196,16 +272,15 @@ const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, s
                 />
             </Line>
             <Line>
-                <Button
-                    primary
-                    size="large"
-                    fullWidth
-                    loading={isLoading}
-                    onClick={() => mutate({ state: data, tierId: selectedPlan, promoCode })}
-                >
+                <Button primary size="large" fullWidth loading={isLoading} onClick={onSubmit}>
                     {t('wallet_buy')}
                 </Button>
             </Line>
+            <ConfirmNotification
+                state={confirm}
+                onClose={() => setConfirm(null)}
+                waitResult={waitInvoice}
+            />
             <div ref={ref}></div>
         </div>
     );
