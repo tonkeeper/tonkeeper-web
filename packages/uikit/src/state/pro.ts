@@ -12,6 +12,7 @@ import {
     getProState,
     logoutTonConsole,
     setBackupState,
+    startProServiceTrial,
     waitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
