@@ -2,7 +2,6 @@ import { BaseApp, IAppSdk, KeychainPassword } from '@tonkeeper/core/dist/AppSdk'
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { sendBackground } from './backgroudService';
-import { disableScroll, enableScroll } from './scroll';
 import { DesktopStorage } from './storage';
 
 export class KeychainDesktop implements KeychainPassword {
@@ -30,10 +29,6 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
     openPage = async (url: string) => {
         return sendBackground<void>({ king: 'open-page', url });
     };
-
-    disableScroll = disableScroll;
-    enableScroll = enableScroll;
-    getScrollbarWidth = () => 0; // For win and linux scrollbar have a 0 width
 
     version = packageJson.version ?? 'Unknown';
 }
