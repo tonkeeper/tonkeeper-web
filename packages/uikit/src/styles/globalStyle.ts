@@ -53,9 +53,13 @@ export const GlobalStyleCss = css`
         right: 0;
     }
 
-    body.win32.not(.scroll)::-webkit-scrollbar,
-    body.linux.not(.scroll)::-webkit-scrollbar {
-        width: 0px;
+    .win32 #body::-webkit-scrollbar,
+    .linux #body::-webkit-scrollbar,
+    .win32 .scrollable::-webkit-scrollbar,
+    .linux .scrollable::-webkit-scrollbar,
+    .win32 .dialog-content::-webkit-scrollbar,
+    .linux .dialog-content::-webkit-scrollbar {
+        width: 0;
     }
 `;
 
