@@ -55,8 +55,8 @@ export const GlobalStyleCss = css`
 
     .win32 #body::-webkit-scrollbar,
     .linux #body::-webkit-scrollbar,
-    .win32 .scrollable::-webkit-scrollbar,
-    .linux .scrollable::-webkit-scrollbar,
+    .win32 .notification-container::-webkit-scrollbar,
+    .linux .notification-container::-webkit-scrollbar,
     .win32 .dialog-content::-webkit-scrollbar,
     .linux .dialog-content::-webkit-scrollbar {
         width: 0;

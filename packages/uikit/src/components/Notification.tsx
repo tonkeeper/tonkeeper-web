@@ -47,7 +47,9 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean }>> = ({
     }, [sdk, entered]);
 
     return (
-        <NotificationContainer scrollbarWidth={scrollbarWidth}>{children}</NotificationContainer>
+        <NotificationContainer className="notification-container" scrollbarWidth={scrollbarWidth}>
+            {children}
+        </NotificationContainer>
     );
 };
 
