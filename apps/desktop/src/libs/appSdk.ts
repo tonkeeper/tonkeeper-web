@@ -2,7 +2,7 @@ import { BaseApp, IAppSdk, KeychainPassword } from '@tonkeeper/core/dist/AppSdk'
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { sendBackground } from './backgroudService';
-import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
+import { disableScroll, enableScroll } from './scroll';
 import { DesktopStorage } from './storage';
 
 export class KeychainDesktop implements KeychainPassword {
@@ -33,7 +33,7 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
 
     disableScroll = disableScroll;
     enableScroll = enableScroll;
-    getScrollbarWidth = getScrollbarWidth;
+    getScrollbarWidth = () => 0; // For win and linux scrollbar have a 0 width
 
     version = packageJson.version ?? 'Unknown';
 }
