@@ -339,6 +339,12 @@ const Inputs = styled.div`
     @media (max-width: 768px) {
         grid-template-rows: repeat(24, minmax(0, 1fr));
     }
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            grid-template-rows: repeat(8, minmax(0, 1fr));
+        `}
 `;
 
 const seeIfValidWord = (word: string) => {

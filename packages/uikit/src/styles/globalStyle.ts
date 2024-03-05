@@ -55,6 +55,8 @@ export const GlobalStyleCss = css`
 
     .win32 #body::-webkit-scrollbar,
     .linux #body::-webkit-scrollbar,
+    .win32 .full-size-wrapper::-webkit-scrollbar,
+    .linux .full-size-wrapper::-webkit-scrollbar,
     .win32 .notification-overlay::-webkit-scrollbar,
     .linux .notification-overlay::-webkit-scrollbar,
     .win32 .dialog-content::-webkit-scrollbar,
