@@ -291,6 +291,7 @@ export const FullHeightBlock = styled(NotificationBlock)<{
         props.theme.displayType === 'full-width' &&
         css`
             min-height: unset;
+            padding-top: 2px;
             padding-bottom: 1rem;
         `};
 `;
