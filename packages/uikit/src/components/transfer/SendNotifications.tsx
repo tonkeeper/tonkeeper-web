@@ -19,7 +19,13 @@ import { useTranslation } from '../../hooks/translation';
 import { useUserJettonList } from '../../state/jetton';
 import { useTronBalances } from '../../state/tron/tron';
 import { useWalletJettonList } from '../../state/wallet';
-import { Notification } from '../Notification';
+import {
+    Notification,
+    NotificationFooter,
+    NotificationFooterPortal,
+    NotificationHeader,
+    NotificationHeaderPortal
+} from '../Notification';
 import { ConfirmTransferView } from './ConfirmTransferView';
 import {
     ConfirmViewButtons,
@@ -43,6 +49,7 @@ import {
     getInitData,
     getJetton
 } from './common';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const SendContent: FC<{
     onClose: () => void;
@@ -55,10 +62,7 @@ const SendContent: FC<{
     const { t } = useTranslation();
     const { data: jettons } = useWalletJettonList();
     const filter = useUserJettonList(jettons);
-
-    const recipientRef = useRef<HTMLDivElement>(null);
-    const amountRef = useRef<HTMLDivElement>(null);
-    const confirmRef = useRef<HTMLDivElement>(null);
+    const isFullWidth = useIsFullWidthMode();
 
     const [view, setView] = useState<'recipient' | 'amount' | 'confirm'>('recipient');
     const [right, setRight] = useState(true);
@@ -197,6 +201,10 @@ const SendContent: FC<{
         });
     };
 
+    const recipientRef = useRef<HTMLDivElement>(null);
+    const amountRef = useRef<HTMLDivElement>(null);
+    const confirmRef = useRef<HTMLDivElement>(null);
+
     const nodeRef = {
         recipient: recipientRef,
         amount: amountRef,
@@ -214,55 +222,73 @@ const SendContent: FC<{
                         setTimeout(done, duration);
                     }}
                 >
-                    <div ref={nodeRef}>
-                        {view === 'recipient' && (
-                            <RecipientView
-                                data={recipient}
-                                setRecipient={onRecipient}
-                                onScan={onScan}
-                                keyboard="decimal"
-                                isExternalLoading={isAccountLoading}
-                                acceptBlockchains={chain ? [chain] : undefined}
-                                MainButton={MainButton}
-                                HeaderBlock={() => (
-                                    <RecipientHeaderBlock
-                                        title={t('transaction_recipient')}
-                                        onClose={onClose}
-                                    />
-                                )}
-                            />
-                        )}
-                        {view === 'amount' && (
-                            <AmountView
-                                defaults={amountViewState}
-                                onClose={onClose}
-                                onBack={backToRecipient}
-                                recipient={recipient!}
-                                onConfirm={onConfirmAmount}
-                                MainButton={AmountMainButton}
-                                HeaderBlock={AmountHeaderBlock}
-                            />
-                        )}
-                        {view === 'confirm' && (
-                            <ConfirmTransferView
-                                onClose={onClose}
-                                onBack={backToAmount}
-                                recipient={recipient!}
-                                assetAmount={AssetAmount.fromRelativeAmount({
-                                    asset: amountViewState!.token!,
-                                    amount: amountViewState!.coinValue!
-                                })}
-                                isMax={amountViewState!.isMax!}
-                            >
-                                <ConfirmViewTitleSlot>
-                                    <ConfirmViewTitle />
-                                </ConfirmViewTitleSlot>
-                                <ConfirmViewButtonsSlot>
-                                    <ConfirmViewButtons MainButton={ConfirmMainButton} />
-                                </ConfirmViewButtonsSlot>
-                            </ConfirmTransferView>
-                        )}
-                    </div>
+                    {status => (
+                        <div ref={nodeRef}>
+                            {view === 'recipient' && (
+                                <RecipientView
+                                    data={recipient}
+                                    setRecipient={onRecipient}
+                                    onScan={onScan}
+                                    keyboard="decimal"
+                                    isExternalLoading={isAccountLoading}
+                                    acceptBlockchains={chain ? [chain] : undefined}
+                                    MainButton={MainButton}
+                                    HeaderBlock={() => (
+                                        <RecipientHeaderBlock
+                                            title={t('transaction_recipient')}
+                                            onClose={onClose}
+                                        />
+                                    )}
+                                    isAnimationProcess={status === 'exiting'}
+                                />
+                            )}
+                            {view === 'amount' && (
+                                <AmountView
+                                    defaults={amountViewState}
+                                    onClose={onClose}
+                                    onBack={backToRecipient}
+                                    recipient={recipient!}
+                                    onConfirm={onConfirmAmount}
+                                    MainButton={AmountMainButton}
+                                    HeaderBlock={AmountHeaderBlock}
+                                    isAnimationProcess={status === 'exiting'}
+                                />
+                            )}
+                            {view === 'confirm' && (
+                                <ConfirmTransferView
+                                    onClose={onClose}
+                                    onBack={backToAmount}
+                                    recipient={recipient!}
+                                    assetAmount={AssetAmount.fromRelativeAmount({
+                                        asset: amountViewState!.token!,
+                                        amount: amountViewState!.coinValue!
+                                    })}
+                                    isMax={amountViewState!.isMax!}
+                                >
+                                    <ConfirmViewTitleSlot>
+                                        {status !== 'exiting' && isFullWidth && (
+                                            <NotificationHeaderPortal>
+                                                <NotificationHeader>
+                                                    <ConfirmViewTitle />
+                                                </NotificationHeader>
+                                            </NotificationHeaderPortal>
+                                        )}
+                                    </ConfirmViewTitleSlot>
+                                    <ConfirmViewButtonsSlot>
+                                        {status !== 'exiting' && isFullWidth && (
+                                            <NotificationFooterPortal>
+                                                <NotificationFooter>
+                                                    <ConfirmViewButtons
+                                                        MainButton={ConfirmMainButton}
+                                                    />
+                                                </NotificationFooter>
+                                            </NotificationFooterPortal>
+                                        )}
+                                    </ConfirmViewButtonsSlot>
+                                </ConfirmTransferView>
+                            )}
+                        </div>
+                    )}
                 </CSSTransition>
             </TransitionGroup>
         </Wrapper>
@@ -323,7 +349,7 @@ const SendActionNotification = () => {
     }, [open, tonTransfer, chain]);
 
     return (
-        <Notification isOpen={open} handleClose={onClose} hideButton backShadow>
+        <Notification isOpen={open} handleClose={onClose} hideButton backShadow footer={<></>}>
             {Content}
         </Notification>
     );

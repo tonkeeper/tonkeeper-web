@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 export type InvoicesAppWebhooks = Array<{
     id: string;
     webhook: string;

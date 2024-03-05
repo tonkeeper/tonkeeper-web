@@ -10,7 +10,13 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useTronWalletState } from '../../state/tron/tron';
 import { CopyIcon } from '../Icon';
-import { FullHeightBlock, NotificationBlock, NotificationTitleRow } from '../Notification';
+import {
+    FullHeightBlockResponsive,
+    NotificationBlock,
+    NotificationHeader,
+    NotificationHeaderPortal,
+    NotificationTitleRow
+} from '../Notification';
 import { Body1, H3 } from '../Text';
 import { Button } from '../fields/Button';
 import { Wrapper, childFactoryCreator, duration } from '../transfer/common';
@@ -216,11 +222,15 @@ export const ReceiveContent: FC<{
     const state = isTon ? 'ton' : 'tron';
 
     return (
-        <FullHeightBlock standalone={standalone}>
-            <NotificationTitleRow handleClose={handleClose} center>
-                {/* TODO: ENABLE TRON */}
-                {/* <Tabs active={active} setActive={setActive} values={values} /> */}
-            </NotificationTitleRow>
+        <FullHeightBlockResponsive standalone={standalone}>
+            <NotificationHeaderPortal>
+                <NotificationHeader>
+                    <NotificationTitleRow handleClose={handleClose} center>
+                        {/* TODO: ENABLE TRON */}
+                        {/* <Tabs active={active} setActive={setActive} values={values} /> */}
+                    </NotificationTitleRow>
+                </NotificationHeader>
+            </NotificationHeaderPortal>
             <Wrapper standalone={false} extension fullWidth>
                 <TransitionGroup childFactory={childFactoryCreator(!isTon)}>
                     <CSSTransition
@@ -237,6 +247,6 @@ export const ReceiveContent: FC<{
                     </CSSTransition>
                 </TransitionGroup>
             </Wrapper>
-        </FullHeightBlock>
+        </FullHeightBlockResponsive>
     );
 };

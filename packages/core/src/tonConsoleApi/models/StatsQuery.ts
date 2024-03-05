@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 export type StatsQuery = {
     addresses?: Array<string>;
     only_between?: boolean;

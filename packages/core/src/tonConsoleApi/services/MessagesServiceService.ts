@@ -2,17 +2,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Charge } from '../models/Charge';
 import type { MessagesApp } from '../models/MessagesApp';
 import type { MessagesPackage } from '../models/MessagesPackage';
 import type { Ok } from '../models/Ok';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class MessagesServiceService {
-
     /**
      * Get messages packages
      * @returns any Messages packages
@@ -32,7 +28,6 @@ export class MessagesServiceService {
             },
         });
     }
-
     /**
      * Buy messages package
      * @param projectId Project ID
@@ -62,33 +57,6 @@ export class MessagesServiceService {
             },
         });
     }
-
-    /**
-     * Get project messages payments history
-     * @param projectId Project ID
-     * @returns any Project payments history
-     * @throws ApiError
-     */
-    public static getProjectMessagesPaymentsHistory(
-        projectId: number,
-    ): CancelablePromise<{
-        history: Array<Charge>;
-    }> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/v1/services/messages/payments/history',
-            query: {
-                'project_id': projectId,
-            },
-            errors: {
-                400: `Something went wrong on client side`,
-                403: `Access token is missing or invalid`,
-                404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
-        });
-    }
-
     /**
      * Create project messages app
      * @param projectId Project ID
@@ -123,7 +91,6 @@ export class MessagesServiceService {
             },
         });
     }
-
     /**
      * Delete project messages app
      * @param appId App ID
@@ -147,7 +114,6 @@ export class MessagesServiceService {
             },
         });
     }
-
     /**
      * Verify project messages app
      * @param projectId Project ID
@@ -177,7 +143,6 @@ export class MessagesServiceService {
             },
         });
     }
-
     /**
      * Get project messages apps
      * @param projectId Project ID
@@ -203,7 +168,6 @@ export class MessagesServiceService {
             },
         });
     }
-
     /**
      * Get project messages balance
      * @param projectId Project ID
@@ -229,7 +193,6 @@ export class MessagesServiceService {
             },
         });
     }
-
     /**
      * Get project messages app token
      * @param appId App ID
@@ -255,7 +218,6 @@ export class MessagesServiceService {
             },
         });
     }
-
     /**
      * Regenerate project messages app token
      * @param appId App ID
@@ -281,7 +243,6 @@ export class MessagesServiceService {
             },
         });
     }
-
     /**
      * Get project messages stats
      * @param appId App ID
@@ -312,7 +273,6 @@ export class MessagesServiceService {
             },
         });
     }
-
     /**
      * Send project messages push
      * @param requestBody Data that is expected
@@ -327,6 +287,7 @@ export class MessagesServiceService {
              * Link for user action, the link will open in Tonkeeper dApp Browser
              */
             link?: string;
+            addresses?: Array<string>;
             /**
              * If the address has not been transmitted, then push messages will be sent to all users
              */
@@ -346,5 +307,4 @@ export class MessagesServiceService {
             },
         });
     }
-
 }

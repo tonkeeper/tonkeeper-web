@@ -12,6 +12,7 @@ export interface ButtonProps {
     fullWidth?: boolean;
     bottom?: boolean;
     marginTop?: boolean;
+    corner?: '3xSmall' | '2xSmall' | 'small' | 'medium' | 'large' | 'full';
 
     type?: 'button' | 'submit' | 'reset' | undefined;
 }
@@ -61,7 +62,7 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
                   width: 100%;
               `
             : css`
-                  width: auth;
+                  width: auto;
               `}
 
   ${props => {
@@ -69,17 +70,17 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
             case 'large':
                 return css`
                     height: 56px;
-                    padding: 0px 24px;
+                    padding: 0 24px;
                 `;
             case 'small':
                 return css`
                     height: 36px;
-                    padding: 0px 16px;
+                    padding: 0 16px;
                 `;
             default:
                 return css`
                     height: 48px;
-                    padding: 0px 20px;
+                    padding: 0 20px;
                 `;
         }
     }}
@@ -169,6 +170,14 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
             }
         }
     }}
+
+    ${props =>
+        props.corner &&
+        css`
+            border-radius: ${props.theme[
+                `corner${props.corner[0].toUpperCase() + props.corner.slice(1)}`
+            ]};
+        `}
 `;
 
 export const ButtonRow = styled.div`

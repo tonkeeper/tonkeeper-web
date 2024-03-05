@@ -2,14 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Charge } from '../models/Charge';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class TestnetServiceService {
-
     /**
      * Check available coins
      * @returns any Available balance
@@ -30,7 +26,6 @@ export class TestnetServiceService {
             },
         });
     }
-
     /**
      * Buy testnet coins
      * @param projectId Project ID
@@ -66,31 +61,4 @@ export class TestnetServiceService {
             },
         });
     }
-
-    /**
-     * Get project testnet payments history
-     * @param projectId Project ID
-     * @returns any Project payments history
-     * @throws ApiError
-     */
-    public static getProjectTestnetPaymentsHistory(
-        projectId: number,
-    ): CancelablePromise<{
-        history: Array<Charge>;
-    }> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/v1/services/testnet/payments/history',
-            query: {
-                'project_id': projectId,
-            },
-            errors: {
-                400: `Something went wrong on client side`,
-                403: `Access token is missing or invalid`,
-                404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
-        });
-    }
-
 }

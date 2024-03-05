@@ -1,11 +1,12 @@
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute } from '../libs/routes';
 import { useMutateActiveWallet } from '../state/account';
+import { useUserCountry } from '../state/country';
 import { useWalletState } from '../state/wallet';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
@@ -14,7 +15,6 @@ import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1, Label2 } from './Text';
 import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
-import { useUserCountry } from '../state/country';
 import { SkeletonText } from './shared/Skeleton';
 
 const Block = styled.div<{
@@ -25,12 +25,21 @@ const Block = styled.div<{
 
     user-select: none;
 
-    position: fixed;
-    width: var(--app-width);
     overflow: visible !important;
-    max-width: 548px;
     top: 0;
     z-index: 4;
+
+    ${p =>
+        p.theme.displayType === 'full-width'
+            ? css`
+                  position: absolute;
+                  width: 100%;
+              `
+            : css`
+                  position: fixed;
+                  width: var(--app-width);
+                  max-width: 548px;
+              `}
 
     ${props =>
         css`
@@ -225,6 +234,26 @@ export const ActivityHeader = () => {
     return (
         <Block second>
             <H1>{t('activity_screen_title')}</H1>
+        </Block>
+    );
+};
+
+export const PurchasesHeader = () => {
+    const { t } = useTranslation();
+
+    return (
+        <Block second>
+            <H1>{t('purchases_screen_title')}</H1>
+        </Block>
+    );
+};
+
+export const TokensHeader = () => {
+    const { t } = useTranslation();
+
+    return (
+        <Block second>
+            <H1>{t('jettons_list_title')}</H1>
         </Block>
     );
 };

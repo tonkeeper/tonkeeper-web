@@ -7,7 +7,7 @@ import { TonTransferParams } from '@tonkeeper/core/dist/service/deeplinkingServi
 import { seeIfBalanceError, seeIfTimeError } from '@tonkeeper/core/dist/service/transfer/common';
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, PropsWithChildren } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { cleanSyncDateBanner } from '../../state/syncDate';
@@ -145,6 +145,12 @@ export const Wrapper = styled.div<{ standalone: boolean; extension: boolean; ful
 export const ButtonBlock = React.forwardRef<HTMLDivElement, PropsWithChildren>(
     ({ children }, ref) => {
         const { standalone, extension } = useAppContext();
+        const { displayType } = useTheme();
+
+        if (displayType === 'full-width') {
+            return <>{children}</>;
+        }
+
         return (
             <ButtonBlockElement ref={ref} standalone={standalone && !extension}>
                 {children}
@@ -154,12 +160,19 @@ export const ButtonBlock = React.forwardRef<HTMLDivElement, PropsWithChildren>(
 );
 ButtonBlock.displayName = 'ButtonBlock';
 
-export const MainButton = ({ isLoading }: { isLoading: boolean; onClick: () => void }) => {
+export const MainButton = ({ isLoading, onClick }: { isLoading: boolean; onClick: () => void }) => {
     const { t } = useTranslation();
 
     return (
         <ButtonBlock>
-            <Button fullWidth size="large" primary type="submit" loading={isLoading}>
+            <Button
+                fullWidth
+                size="large"
+                primary
+                type="submit"
+                loading={isLoading}
+                onClick={onClick}
+            >
                 {t('continue')}
             </Button>
         </ButtonBlock>
@@ -179,7 +192,7 @@ interface AmountMainButtonProps {
     onClick: () => void;
 }
 export const AmountMainButton = React.forwardRef<HTMLDivElement, AmountMainButtonProps>(
-    ({ isLoading, isDisabled }, refButton) => {
+    ({ isLoading, isDisabled, onClick }, refButton) => {
         const { t } = useTranslation();
 
         return (
@@ -191,6 +204,7 @@ export const AmountMainButton = React.forwardRef<HTMLDivElement, AmountMainButto
                     type="submit"
                     disabled={isDisabled}
                     loading={isLoading}
+                    onClick={onClick}
                 >
                     {t('continue')}
                 </Button>
@@ -206,7 +220,7 @@ export type ConfirmMainButtonProps = (props: {
     onClose: () => void;
 }) => JSX.Element;
 
-export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled }) => {
+export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled, onClick }) => {
     const { t } = useTranslation();
     return (
         <Button
@@ -216,6 +230,7 @@ export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisable
             type="submit"
             disabled={isDisabled}
             loading={isLoading}
+            onClick={onClick}
         >
             {t('confirm_sending_submit')}
         </Button>
@@ -223,6 +238,7 @@ export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisable
 };
 
 const ConfirmViewButtonsContainerStyled = styled.div`
+    width: 100%;
     display: flex;
     gap: 1rem;
     & > * {
@@ -302,7 +318,8 @@ export const Label = styled(Body1)`
 export const childFactoryCreator = (right: boolean) => (child: React.ReactElement) =>
     React.cloneElement(child, {
         classNames: right ? rightToLeft : leftToTight,
-        timeout: duration
+        timeout: duration,
+        isAnimating: true
     });
 
 export const notifyError = async (

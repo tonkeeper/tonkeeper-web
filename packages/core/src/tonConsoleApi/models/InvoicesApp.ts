@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { InvoicesAppWebhooks } from './InvoicesAppWebhooks';
-
 export type InvoicesApp = {
     id: number;
     project_id: number;

@@ -2,6 +2,20 @@ import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
+import { mnemonicToPrivateKey, sha256_sync } from 'ton-crypto';
+import nacl from 'tweetnacl';
+
+export const signTonConnect = (sdk: IAppSdk, publicKey: string) => {
+    return async (bufferToSign: Buffer) => {
+        const mnemonic = await getMnemonic(sdk, publicKey);
+        const keyPair = await mnemonicToPrivateKey(mnemonic);
+        const signature = nacl.sign.detached(
+            Buffer.from(sha256_sync(bufferToSign)),
+            keyPair.secretKey
+        );
+        return signature;
+    };
+};
 
 export const getMnemonic = async (sdk: IAppSdk, publicKey: string): Promise<string[]> => {
     const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);

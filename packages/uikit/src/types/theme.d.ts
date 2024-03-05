@@ -69,11 +69,18 @@ declare module 'styled-components' {
         blue: string;
         red: string;
 
-        cornerExtraExtraSmall: string;
-        cornerExtraSmall: string;
+        corner3xSmall: string;
+        corner2xSmall: string;
         cornerSmall: string;
         cornerMedium: string;
         cornerLarge: string;
         cornerFull: string;
+
+        fontMono: string;
+
+        /**
+         * 'compact' is default mode and 'full-width' is for desktop 'pro' mode
+         */
+        displayType: 'compact' | 'full-width';
     }
 }

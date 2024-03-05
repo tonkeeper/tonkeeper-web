@@ -40,7 +40,7 @@ const Line = styled.div`
     height: 3px;
     width: 0px;
     bottom: -0.5rem;
-    border-radius: ${props => props.theme.cornerExtraExtraSmall};
+    border-radius: ${props => props.theme.corner3xSmall};
     background: ${props => props.theme.accentBlue};
 `;
 

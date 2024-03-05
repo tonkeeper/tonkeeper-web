@@ -12,6 +12,7 @@ export const plugins = [
         logger: 'webpack-infrastructure'
     }),
     new webpack.DefinePlugin({
-        REACT_APP_AMPLITUDE: JSON.stringify(process.env.REACT_APP_AMPLITUDE)
+        REACT_APP_AMPLITUDE: JSON.stringify(process.env.REACT_APP_AMPLITUDE),
+        REACT_APP_TONCONSOLE_API: JSON.stringify(process.env.REACT_APP_TONCONSOLE_API)
     })
 ];

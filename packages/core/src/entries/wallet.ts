@@ -25,6 +25,19 @@ export const walletVersionText = (version: WalletVersion) => {
     }
 };
 
+export const walletVersionFromText = (value: string) => {
+    switch (value) {
+        case 'v3R1':
+            return WalletVersion.V3R1;
+        case 'v3R2':
+            return WalletVersion.V3R2;
+        case 'v4R2':
+            return WalletVersion.V4R2;
+        default:
+            throw new Error('Unsupported version');
+    }
+};
+
 export interface WalletAddress {
     friendlyAddress: string;
     rawAddress: string;

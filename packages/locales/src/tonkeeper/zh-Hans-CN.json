@@ -26,6 +26,32 @@
   },
   "add_other_coins" : "增添代币",
   "address_copied" : "地址已复制",
+  "add_wallet" : "添加钱包",
+  "add_wallet_modal" : {
+    "create" : {
+      "subtitle" : "创建新钱包",
+      "title" : "新钱包"
+    },
+    "import" : {
+      "subtitle" : "使用24个助记词导入钱包",
+      "title" : "现有钱包"
+    },
+    "subtitle" : "创建一个新钱包或添加现有钱包。",
+    "testnet" : {
+      "subtitle" : "使用24个助记词导入测试网钱包",
+      "title" : "测试网账户"
+    },
+    "title" : "添加钱包",
+    "watch_only" : {
+      "subtitle" : "在没有恢复词的情况下监控钱包活动",
+      "title" : "观察账户"
+    }
+  },
+  "add_watch_only" : {
+    "subtitle" : "在没有恢复词的情况下监控钱包活动。您将收到来自此钱包所有交易的通知。",
+    "title" : "观察账户",
+    "wallet_not_found" : "钱包地址未找到"
+  },
   "appearance_accent_name" : {
     "andromeda" : "仙女座",
     "arctic" : "北极",
@@ -88,6 +114,54 @@
   },
   "auth_failed" : "认证失败",
   "balances_setup_wallet" : "注册钱包",
+  "battery" : {
+    "description" : {
+      "empty" : "发送代币和 NFT，用空的主账户支付质押操作费用。",
+      "other" : "您已有足够的电量以进行 %{cnt} 次交易"
+    },
+    "ok" : "确定",
+    "packages" : {
+      "buy" : "购买",
+      "disclaimer" : "这是估计的转账数量。您的某些交易可能会花费更多。",
+      "ok" : "确定",
+      "refilled" : "电池已充电",
+      "subtitle" : {
+        "large" : "大杯",
+        "medium" : "中杯",
+        "small" : "小杯"
+      },
+      "title" : "{{cnt}} 笔交易，总共 {{price}}"
+    },
+    "promocode" : {
+      "apply" : "应用",
+      "button" : "使用优惠码充值",
+      "placeholder" : "优惠码",
+      "success" : "电池已充电",
+      "title" : "优惠码"
+    },
+    "screen_title" : "电池",
+    "settings" : "电池",
+    "title" : {
+      "almost_empty" : "电池即将耗尽",
+      "empty" : "为你的电池充电",
+      "full" : "电池已充满",
+      "medium" : "电池已经充满一半"
+    }
+  },
+  "biometry" : {
+    "android" : {
+      "face_recognition" : "面部识别",
+      "face_recognition_genitive" : "面部识别",
+      "fingerprint" : "指纹",
+      "fingerprint_genitive" : "指纹"
+    },
+    "ios" : {
+      "face_recognition" : "Face ID",
+      "face_recognition_genitive" : "Face ID",
+      "fingerprint" : "Touch ID",
+      "fingerprint_genitive" : "Touch ID"
+    }
+  },
   "browser" : {
     "about_dapps_caption" : "探索可以使用Tonkeeper进行登录和支付的应用和服务。",
     "about_dapps_learn_more" : "了解更多",
@@ -165,6 +239,11 @@
     },
     "header_title" : "主要货币"
   },
+  "choose_wallets" : {
+    "subtitle" : "选择您想添加的钱包。",
+    "title" : "选择钱包",
+    "tokens" : "代币"
+  },
   "confirm" : "确认",
   "confirm_sending_amount" : "金额",
   "confirm_sending_fee" : "手续费",
@@ -182,6 +261,10 @@
   "confirm_sending_sent_title" : "已发送币种",
   "confirm_sending_submit" : "确认并发送",
   "confirm_sending_title" : "确认发送",
+  "confirmSendModal" : {
+    "wallet" : "钱包：",
+    "will_be_paid_with_battery" : "将使用电池进行支付"
+  },
   "continue" : "继续",
   "copied" : "复制",
   "copy_error_log" : "复制错误指令",
@@ -193,6 +276,13 @@
   "create_wallet_generated" : "恭喜！您的钱包已成功创建！",
   "create_wallet_generating" : "正在生成钱包...",
   "create_wallet_title" : "拿一支笔和一张纸",
+  "customize" : "自定义",
+  "customize_modal" : {
+    "save" : "保存",
+    "subtitle" : "钱包名称和图标将存储在您的本机设备。",
+    "title" : "自定义您的钱包",
+    "wallet_name" : "钱包名称"
+  },
   "decryption_error" : "解密错误",
   "deploy_contract_button" : "确认并部署",
   "deploy_contract_title" : "部署合同",
@@ -234,6 +324,9 @@
   "exchange_telegram_bot" : "TELEGRAM机器人",
   "exchange_title" : "购买TON",
   "form_optional_indicator" : "可选",
+  "import_add_wallet" : "添加钱包",
+  "import_add_wallet_description" : "创建一个新钱包或添加现有钱包。",
+  "import_existing_wallet_description" : "使用24个助记词导入钱包",
   "import_wallet_caption" : "为了恢复到您的钱包，请输入创建钱包时给您的24个助记词。",
   "import_wallet_reset_caption" : "请恢复您的钱包\n通过输入创建钱包时写下的24个助记词。",
   "import_wallet_title" : "输入您的\n恢复短语",
@@ -262,6 +355,11 @@
   "jettons_manage_tokens" : "管理代币",
   "jettons_show_jettons" : "在钱包中显示代币",
   "jetton_token" : "代币",
+  "language" : {
+    "list_item" : {
+      "value" : "中文"
+    }
+  },
   "later" : "稍后",
   "legal_font_license" : "Montserrat字体",
   "legal_header_title" : "法律",
@@ -279,6 +377,12 @@
   "migration_migrate_btn" : "升级钱包",
   "migration_new_wallet" : "新地址",
   "migration_old_wallet" : "旧地址",
+  "migration" : {
+    "subtitle" : "请解锁钱包以继续。",
+    "title" : "将您的钱包迁移到 Tonkeeper 的新版本",
+    "with_biometry" : "继续 %{type}",
+    "with_passcode" : "输入密码"
+  },
   "migration_title" : "升级您的钱包",
   "nft_about_dns" : "TON DNS 是一项服务，允许用户为加密钱包、智能合约和网站分配人类可读的名称。\n\n 使用 TON DNS，像访问互联网上一样访问去中心化服务的网站。",
   "nft_browse_markets" : "浏览市场",
@@ -476,7 +580,8 @@
       "comment_required_text" : "你必须包含交换的备注进行转账。否则你的资金将会丢失。",
       "details_label" : "详情",
       "details_max_balance_label" : "发送全部余额 %{currency}",
-      "title" : "确认交易"
+      "title" : "确认交易",
+      "will_be_paid_with_battery" : "将使用电池进行支付"
     },
     "done" : {
       "add_favorite" : "将地址保存到收藏",
@@ -513,7 +618,9 @@
   "settings_reset" : "退出登录",
   "settings_reset_alert_button" : "退出登录",
   "settings_reset_alert_caption" : "这将删除钱包的密钥。确保您已备份了您的秘密恢复短语。",
+  "settings_reset_alert_caption_all" : "这将删除所有钱包的密钥。确保您已备份了您的助记词。",
   "settings_reset_alert_title" : "退出登录？",
+  "settings_reset_alert_title_all" : "注销所有钱包？",
   "settings_search_engine" : "搜索",
   "settings_security" : "安全",
   "settings_subscriptions" : "订阅",
@@ -615,6 +722,12 @@
     },
     "withdrawal_request" : "提款请求"
   },
+  "start_screen" : {
+    "caption" : "创建一个新钱包或添加现有钱包",
+    "create_wallet_button" : "创建新钱包",
+    "import_wallet_button" : "导入现有钱包"
+  },
+  "stop_watch" : "删除观察账户",
   "subscription_back_to_merchant_button" : "返回",
   "subscription_back_to_merchant_caption" : "交易正在处理中。您的订阅很快就会生效。",
   "subscription_back_to_merchant_name" : "返回到%{merchantName}",
@@ -658,12 +771,13 @@
   "tab_swap" : "交换",
   "tab_wallet" : "钱包",
   "today" : "今天",
+  "tonkeeper_pro" : "Tonkeeper Pro",
   "ton_login_back_to_button" : "返回到%{name}",
   "ton_login_caption" : "%{name}正在请求访问您的钱包地址",
   "ton_login_connect_button" : "连接钱包",
   "ton_login_notice" : "连接钱包之前，请务必检查服务地址。",
   "ton_login_success" : "完成",
-  "ton_login_title" : "连接到%{name}？",
+  "ton_login_title" : "连接到%domain？",
   "transaction_bid_collection_name" : "发行者",
   "transaction_bid_date" : "出价日期 %{date}",
   "transaction_bid_dns" : "名称",
@@ -773,6 +887,7 @@
       },
       "comment" : "评论",
       "insufficientFunds" : {
+        "rechargeBattery" : "给电池充电",
         "rechargeWallet" : "充值钱包",
         "title" : "资金不足",
         "toBePaid" : "支付金额: %{amount} %{currency}\n",
@@ -833,6 +948,7 @@
   "wallet_hours_symbol" : "h",
   "wallet_old_balance" : "老钱包：",
   "wallet_receive" : "接收",
+  "wallets" : "钱包",
   "wallet_sell" : "出售",
   "wallet_send" : "发送",
   "wallet_source_code" : "源代码",
@@ -840,5 +956,6 @@
   "wallet_title" : "钱包",
   "wallet_toncommunity_chat_link" : "https://t.me/toncoin_chat",
   "wallet_toncommunity_link" : "https://t.me/toncoin",
+  "watch_only" : "仅限观察",
   "yesterday" : "昨天"
 }

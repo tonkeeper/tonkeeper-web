@@ -1,6 +1,6 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
-import React, { FC, useMemo } from 'react';
+import { FC } from 'react';
 import { HomeSkeleton } from '../../components/Skeleton';
 import { Balance } from '../../components/home/Balance';
 import { CompactView } from '../../components/home/CompactView';
@@ -8,11 +8,9 @@ import { AssetData } from '../../components/home/Jettons';
 import { DateSyncBanner } from '../../components/home/SyncBunner';
 import { TabsView } from '../../components/home/TabsView';
 import { HomeActions } from '../../components/home/TonActions';
-import { useWalletContext } from '../../hooks/appContext';
-import { filterTonAssetList } from '../../state/jetton';
+import { useAssets } from '../../state/home';
 import { usePreFetchRates } from '../../state/rates';
-import { useTronBalances } from '../../state/tron/tron';
-import { useWalletAccountInfo, useWalletJettonList, useWalletNftList } from '../../state/wallet';
+import { useWalletNftList } from '../../state/wallet';
 
 const HomeAssets: FC<{
     assets: AssetData;
@@ -29,23 +27,13 @@ const HomeAssets: FC<{
 };
 
 const Home = () => {
-    const wallet = useWalletContext();
-
     const { isFetched } = usePreFetchRates();
-    const { data: info, error, isFetching: isAccountLoading } = useWalletAccountInfo();
-    const { data: jettons, isFetching: isJettonLoading } = useWalletJettonList();
+
+    const [assets, error, isAssetLoading] = useAssets();
+
     const { data: nfts, isFetching: isNftLoading } = useWalletNftList();
-    const { data: tronBalances, isFetching: isTronLoading } = useTronBalances();
 
-    const isLoading = isJettonLoading || isAccountLoading || isNftLoading || isTronLoading;
-
-    const assets = useMemo<AssetData | undefined>(() => {
-        if (!info || !jettons || !tronBalances) return undefined;
-        return {
-            ton: { info, jettons: filterTonAssetList(jettons, wallet) },
-            tron: tronBalances
-        };
-    }, [info, jettons, wallet, tronBalances]);
+    const isLoading = isAssetLoading || isNftLoading;
 
     if (!nfts || !assets || !isFetched) {
         return <HomeSkeleton />;

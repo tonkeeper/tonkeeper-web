@@ -3,13 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Ok } from '../models/Ok';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class AdminService {
-
     /**
      * Private method: Get project balance
      * @param id Project ID
@@ -35,7 +32,6 @@ export class AdminService {
             },
         });
     }
-
     /**
      * Private method: Charge project
      * Private method
@@ -68,7 +64,6 @@ export class AdminService {
             },
         });
     }
-
     /**
      * Private method: Messages charge project
      * Private method
@@ -81,7 +76,7 @@ export class AdminService {
             app_id: number;
             success_delivery: number;
             message: string;
-            address?: string;
+            addresses?: Array<string>;
         },
     ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
@@ -97,5 +92,4 @@ export class AdminService {
             },
         });
     }
-
 }

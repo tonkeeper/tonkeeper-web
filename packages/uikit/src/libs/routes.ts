@@ -4,8 +4,13 @@ export enum AppRoute {
     settings = '/settings',
     browser = '/browser',
     activity = '/activity',
+    purchases = '/purchases',
     coins = '/coins',
     home = '/'
+}
+
+export enum AppProRoute {
+    dashboard = '/dashboard'
 }
 
 export enum ImportRoute {
@@ -27,7 +32,8 @@ export enum SettingsRoute {
     jettons = '/jettons',
     security = '/security',
     subscriptions = '/subscriptions',
-    country = '/country'
+    country = '/country',
+    pro = '/pro'
 }
 
 export enum BrowserRoute {

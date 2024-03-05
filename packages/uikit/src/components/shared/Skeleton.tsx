@@ -32,7 +32,7 @@ const Base = styled.div`
     position: relative;
 `;
 const Block = styled(Base)<{ size?: string; width?: string }>`
-    border-radius: ${props => props.theme.cornerExtraExtraSmall};
+    border-radius: ${props => props.theme.corner3xSmall};
 
     ${props => css`
         width: ${props.width ?? randomWidth()};
@@ -71,8 +71,8 @@ export const Skeleton = styled(Base)<{
     display: block;
     border-radius: ${props =>
         props.borderRadius
-            ? props.theme[props.borderRadius] || props.theme.cornerExtraExtraSmall
-            : props.theme.cornerExtraExtraSmall};
+            ? props.theme[props.borderRadius] || props.theme.corner3xSmall
+            : props.theme.corner3xSmall};
 
     ${props => css`
         width: ${props.width ?? '3rem'};

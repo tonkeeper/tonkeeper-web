@@ -281,6 +281,23 @@ export const toTonProofItemReply = async (options: {
     return result;
 };
 
+export const createTonProofItem = (
+    signature: Uint8Array,
+    proof: ConnectProofPayload,
+    stateInit?: string
+) => {
+    return {
+        timestamp: proof.timestamp, // 64-bit unix epoch time of the signing operation (seconds)
+        domain: {
+            lengthBytes: proof.domainBuffer.byteLength, // AppDomain Length
+            value: proof.domainBuffer.toString('utf8') // app domain name (as url part, without encoding)
+        },
+        signature: Buffer.from(signature).toString('base64'), // base64-encoded signature
+        payload: proof.payload, // payload from the request,
+        stateInit: stateInit // state init for a wallet
+    };
+};
+
 export const toTonProofItem = async (
     mnemonic: string[],
     proof: ConnectProofPayload,
@@ -293,16 +310,7 @@ export const toTonProofItem = async (
         keyPair.secretKey
     );
 
-    return {
-        timestamp: proof.timestamp, // 64-bit unix epoch time of the signing operation (seconds)
-        domain: {
-            lengthBytes: proof.domainBuffer.byteLength, // AppDomain Length
-            value: proof.domainBuffer.toString('utf8') // app domain name (as url part, without encoding)
-        },
-        signature: Buffer.from(signature).toString('base64'), // base64-encoded signature
-        payload: proof.payload, // payload from the request,
-        stateInit: stateInit // state init for a wallet
-    };
+    return createTonProofItem(signature, proof, stateInit);
 };
 
 export const tonDisconnectRequest = async (options: { storage: IStorage; webViewUrl: string }) => {
