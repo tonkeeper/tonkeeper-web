@@ -1,7 +1,7 @@
 {
     "name": "@tonkeeper/desktop",
     "license": "Apache-2.0",
-    "version": "3.6.2",
+    "version": "3.7.0",
     "description": "Your desktop wallet on The Open Network",
     "main": ".webpack/main",
     "repository": {
