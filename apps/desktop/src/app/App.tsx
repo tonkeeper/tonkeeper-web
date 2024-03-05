@@ -261,7 +261,7 @@ export const Loader: FC = () => {
         tonendpoint,
         standalone: true,
         extension: false,
-        proFeatures: true,
+        proFeatures: false, // TODO: enable
         ios: false
     };
 
