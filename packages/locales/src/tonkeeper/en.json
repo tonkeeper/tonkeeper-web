@@ -3,7 +3,7 @@
   "access_confirmation_logout" : "Sign Out",
   "access_confirmation_reset" : "Reset",
   "access_confirmation_title" : "Enter passcode",
-  "access_confirmation_update_biometry" : "Enter passcode to use biometric auth data",
+  "access_confirmation_update_biometry" : "Enter passcode to use biometrics auth data",
   "access_denied" : "Access denied",
   "account_deleted" : "Account deleted",
   "activityActionModal" : {
@@ -43,7 +43,7 @@
     "first_option" : "Most likely the destination wallet is already actively used and you won’t notice any difference.",
     "learn_more" : "Learn more",
     "new_style" : "New address",
-    "notification_desc_did_change" : "On October 5 your wallet address did update to the UQ format which is just better. The old address will also work. You don’t need to do anything.",
+    "notification_desc_did_change" : "Your wallet address has been updated to the UQ format. The old address also continues to work.",
     "notification_desc_will_change" : "On October 5 your wallet address will update to the UQ format which is just better. The old address will also work. You don’t need to do anything.",
     "old_style" : "Old address",
     "post_dates" : "\nOctober 5, 2023: all addresses switch to the UQ format in Tonkeeper.\n\nJanuary 1, 2024: Tonkeeper stops checking the contract status and uses the “bounceable” flag in the address. Coins sent to non-published contracts with an EQ address will bounce back to the sender.",
@@ -150,6 +150,29 @@
     "whitelisted_token" : "Whitelisted token"
   },
   "auth_failed" : "Authentication failed",
+  "backup_check" : {
+    "caption" : "Let's see if you've got everything right. Enter words %{one}, %{two}, and %{three}.",
+    "done_button" : "Done",
+    "title" : "Backup Check"
+  },
+  "backup_screen" : {
+    "last_backup_time" : "Last backup %{time}",
+    "manual_backup_on" : "Manual Backup On",
+    "manual_button" : "Back Up Manually",
+    "manual_caption" : "Back up your wallet manually by writing down the recovery phrase.",
+    "manual_title" : "Manual",
+    "show_recovery_phrase" : "Show Recovery Phrase",
+    "title" : "Backup"
+  },
+  "backup_warning" : {
+    "cancel_button" : "Cancel",
+    "caption" : "Please read the following carefully before viewing your recovery phrase.",
+    "continue_button" : "Continue",
+    "p1" : "Never enter your recovery phrase any other place than Tonkeeper to access your wallet.",
+    "p2" : "Tonkeeper Support never asks for a recovery phrase.",
+    "p3" : "Everybody with your recovery phrase can access your wallet.",
+    "title" : "Attention"
+  },
   "balances_setup_wallet" : "Set up wallet",
   "battery" : {
     "description" : {
@@ -186,6 +209,28 @@
       "medium" : "Battery for gas fees is half full"
     }
   },
+  "biometry" : {
+    "android" : {
+      "face_recognition" : "face recognition",
+      "face_recognition_genitive" : "face recognition",
+      "face_recognition_instrumental" : "face recognition",
+      "fingerprint" : "fingerprint",
+      "fingerprint_genitive" : "fingerprint",
+      "fingerprint_instrumental" : "fingerprint"
+    },
+    "default" : "biometrics",
+    "default_accusative" : "biometrics",
+    "default_genitive" : "biometrics",
+    "default_instrumental" : "biometrics",
+    "ios" : {
+      "face_recognition" : "Face ID",
+      "face_recognition_genitive" : "Face ID",
+      "face_recognition_instrumental" : "Face ID",
+      "fingerprint" : "Touch ID",
+      "fingerprint_genitive" : "Touch ID",
+      "fingerprint_instrumental" : "Touch ID"
+    }
+  },
   "browser" : {
     "about_dapps_caption" : "Explore apps and services where you can use Tonkeeper for sign-in and payments.",
     "about_dapps_learn_more" : "Learn more",
@@ -217,6 +262,10 @@
     "start_typing" : "Enter an address or search the web",
     "title" : "Browser",
     "web_search_title" : "%{searchEngine} Search"
+  },
+  "buy_ton" : {
+    "subtitle" : "Instantly with a bank card",
+    "title" : "Buy TON"
   },
   "cancel" : "Cancel",
   "chart" : {
@@ -398,6 +447,13 @@
   "exchange_telegram_bot" : "TELEGRAM BOT",
   "exchange_title" : "Buy TON",
   "expiring_domains" : "Expiring domains",
+  "finish_setup" : {
+    "backup" : "Back up the wallet recovery phrase",
+    "done_button" : "Done",
+    "enable_notifications" : "Enable transaction notifications",
+    "header_title" : "Finish setting up",
+    "use_biometry" : "Use %{name} to approve transaction"
+  },
   "form_optional_indicator" : "Optional",
   "import_add_wallet" : "Add Wallet",
   "import_add_wallet_description" : "Create a new wallet or add an existing one.",
@@ -426,6 +482,7 @@
   "intro_item3_caption" : "-",
   "intro_item3_title" : "-",
   "intro_title" : "Welcome\nto ",
+  "it_expires_on" : "It expires on",
   "jetton_id" : "Token ID: %{jettonAddress}",
   "jetton_id_copied" : "Token ID copied",
   "jetton_name" : "%{name} Token",
@@ -618,6 +675,8 @@
       "title" : "Are you sure you want to open an external link?"
     }
   },
+  "pro_subscription_is_active" : "Pro Subscription is active.",
+  "pro_trial_is_active" : "Pro Trial is active.",
   "purchases" : {
     "screen_title" : "Purchases"
   },
@@ -635,6 +694,12 @@
   "receive_share" : "Share",
   "receive_title" : "Receive %{currency}",
   "receive_ton_and_jettons" : "Receive TON and other tokens",
+  "recovery_phrase" : {
+    "caption" : "Write down these words with their numbers and store them in a safe place.",
+    "check_button" : "Check Backup",
+    "copy_button" : "Copy",
+    "title" : "Recovery Phrase"
+  },
   "refresh_app" : "Restart",
   "region_nokyc" : "Neutral Waters",
   "reminder_notifications_caption" : "Get notifications when you receive TON, tokens and NFTs.",
@@ -663,6 +728,7 @@
   "security_title" : "Security",
   "security_use_biometry_switch" : "Use %{biometryType}",
   "security_use_biometry_tip" : "You can always unlock your wallet with a passcode.",
+  "select_wallet_for_authorization" : "Select Wallet for authorization",
   "send_address_placeholder" : "Address or name",
   "send_all_warning_title" : "Are you sure you want to send all your balance?",
   "send_build_tx_error" : "Your transaction failed",
@@ -732,7 +798,7 @@
   "send_sending_wrong_time_title" : "Error occurred",
   "send_title" : "Send %{currency}",
   "settings_appearance" : "Theme",
-  "settings_backup_seed" : "Recovery Phrase",
+  "settings_backup_seed" : "Backup",
   "settings_bank_card" : "Bank card",
   "settings_contact_support" : "Contact us",
   "settings_delete_account" : "Delete account",
@@ -765,9 +831,9 @@
   "setup_biometry_caption" : "%{biometryType} allows you to open your wallet faster without having\nto enter your password.",
   "setup_biometry_enable_button" : "Enable %{biometryType}",
   "setup_biometry_title" : "Quick sign-in with %{biometryType}",
-  "setup_notifications_caption" : "Get notifications when you \n receive TON, tokens and NFTs.",
+  "setup_notifications_caption" : "Get notified when you receive\nTON, tokens and NFTs",
   "setup_notifications_enable_button" : "Enable notifications",
-  "setup_notifications_title" : "Get instant notifications",
+  "setup_notifications_title" : "Get instant\nnotifications",
   "signer_scan_result" : "Scan signed transaction",
   "signer_scan_tx_description" : "Please open Signer and scan QR code with transaction",
   "skip" : "Skip",
@@ -944,7 +1010,7 @@
   "tonkeeper_pro" : "Tonkeeper Pro",
   "tonkeeper_pro_description" : "Tonkeeper Pro's subscription comes with an extended wallet feature, offering a toolset for crypto management. ",
   "ton_login_back_to_button" : "Back to %{name}",
-  "ton_login_caption" : "%{name} is requesting access to your wallet address ",
+  "ton_login_caption" : "%{name} is requesting access to your wallet address",
   "ton_login_connect_button" : "Connect wallet",
   "ton_login_notice" : "Be sure to check the service address before connecting the wallet.",
   "ton_login_success" : "Done",

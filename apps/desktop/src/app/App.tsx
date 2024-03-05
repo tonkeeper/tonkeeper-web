@@ -121,6 +121,9 @@ export const App = () => {
         return client;
     }, [t, i18n]);
 
+    useEffect(() => {
+        document.body.classList.add(window.backgroundApi.platform());
+    }, []);
     return (
         <MemoryRouter>
             <QueryClientProvider client={queryClient}>

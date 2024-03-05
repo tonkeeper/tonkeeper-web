@@ -105,7 +105,7 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
 
 export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
     const [isOpenImport, setIsOpenImport] = useState(false);
-    const { account } = useAppContext();
+    const { account, proFeatures } = useAppContext();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -134,13 +134,15 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
 
     return (
         <AsideContainer className={className}>
-            <AsideMenuCard
-                isSelected={activeRoute === AppProRoute.dashboard}
-                padding="m"
-                onClick={() => handleNavigateClick(AppProRoute.dashboard)}
-            >
-                <Body2>Dashboard</Body2> {/*TODO*/}
-            </AsideMenuCard>
+            {proFeatures && (
+                <AsideMenuCard
+                    isSelected={activeRoute === AppProRoute.dashboard}
+                    padding="m"
+                    onClick={() => handleNavigateClick(AppProRoute.dashboard)}
+                >
+                    <Body2>Dashboard</Body2> {/*TODO*/}
+                </AsideMenuCard>
+            )}
             {account.publicKeys.map(publicKey => (
                 <AsideMenuAccount
                     key={publicKey}

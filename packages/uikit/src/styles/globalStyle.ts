@@ -52,6 +52,15 @@ export const GlobalStyleCss = css`
         position: absolute;
         right: 0;
     }
+
+    .win32 #body::-webkit-scrollbar,
+    .linux #body::-webkit-scrollbar,
+    .win32 .notification-overlay::-webkit-scrollbar,
+    .linux .notification-overlay::-webkit-scrollbar,
+    .win32 .dialog-content::-webkit-scrollbar,
+    .linux .dialog-content::-webkit-scrollbar {
+        width: 0;
+    }
 `;
 
 export const GlobalStyle = createGlobalStyle`
