@@ -114,7 +114,12 @@ const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ ente
         }, [sdk, entered]);
 
         return (
-            <Overlay ref={ref} entered={entered} paddingRight={entered ? 0 : scrollbarWidth}>
+            <Overlay
+                ref={ref}
+                entered={entered}
+                paddingRight={entered ? 0 : scrollbarWidth}
+                className="notification-overlay"
+            >
                 {children}
             </Overlay>
         );
