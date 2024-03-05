@@ -10,7 +10,7 @@
         "sdk": "npm-run-all -p generate:*",
         "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f resource/Dockerfile.apiV2 . -t tonapisdkv2 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv2",
         "generate:tronApi": "rm -fr src/tronApi && docker build -f resource/Dockerfile.tronApi . -t tronapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tronapisdk",
-        "generate:tonConsoleApi": "rm -r ./src/tonConsoleApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/tonconsole_backend/main/swagger.yaml?token=GHSAT0AAAAAACKHFPNI62ED6ADNOWUCFWBAZNXRIJQ' --output ./src/tonConsoleApi",
+        "generate:tonConsoleApi": "rm -r ./src/tonConsoleApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/tonconsole_backend/dev/swagger.yaml?token=GHSAT0AAAAAACKHFPNI4HJL4Q4RIAYDUQ3MZPAKM2A' --output ./src/tonConsoleApi",
         "build:pkg": "yarn build"
     },
     "devDependencies": {

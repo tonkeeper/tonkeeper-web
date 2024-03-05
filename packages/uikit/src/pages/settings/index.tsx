@@ -1,7 +1,7 @@
-import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { InnerBody } from '../../components/Body';
 import { SettingsHeader } from '../../components/Header';
+import { ProSettings } from '../../components/settings/ProSettings';
 import { SettingsRoute } from '../../libs/routes';
 import { Account } from './Account';
 import { CountrySettings } from './Country';
@@ -35,6 +35,7 @@ const SettingsRouter = () => {
             <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
             <Route path={SettingsRoute.security} element={<SecuritySettings />} />
             <Route path={SettingsRoute.country} element={<CountrySettings />} />
+            <Route path={SettingsRoute.pro} element={<ProSettings />} />
             <Route
                 path="*"
                 element={

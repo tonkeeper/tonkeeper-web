@@ -19,6 +19,10 @@ export const getWalletState = async (storage: IStorage, publicKey: string) => {
     return state;
 };
 
+export const getWalletStateByAddress = async (storage: IStorage, rawAddress: string) => {
+    return null;
+};
+
 export const setWalletState = (storage: IStorage, state: WalletState) => {
     return storage.set(`${AppKey.WALLET}_${state.publicKey}`, state);
 };

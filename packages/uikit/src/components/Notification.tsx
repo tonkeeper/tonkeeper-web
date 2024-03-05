@@ -1,17 +1,39 @@
-import React, { FC, PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+    createContext,
+    FC,
+    forwardRef,
+    PropsWithChildren,
+    ReactNode,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState
+} from 'react';
+import { createPortal } from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
+import { useClickOutside } from '../hooks/useClickOutside';
+import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
 import { Container } from '../styles/globalStyle';
+import { BackButton, ButtonMock } from './fields/BackButton';
 import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
-import { BackButton, ButtonMock } from './fields/BackButton';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
     padding-left: ${props => props.scrollbarWidth}px;
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            min-height: 100%;
+            height: 100%;
+        `}
 `;
 
 const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean }>> = ({
@@ -25,7 +47,9 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean }>> = ({
     }, [sdk, entered]);
 
     return (
-        <NotificationContainer scrollbarWidth={scrollbarWidth}>{children}</NotificationContainer>
+        <NotificationContainer className="notification-container" scrollbarWidth={scrollbarWidth}>
+            {children}
+        </NotificationContainer>
     );
 };
 
@@ -34,6 +58,12 @@ const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
     min-height: var(--app-height);
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            justify-content: center;
+        `}
 `;
 
 export const ButtonContainer = styled.div`
@@ -45,6 +75,22 @@ export const ButtonContainer = styled.div`
 const Padding = styled.div`
     flex-shrink: 0;
     height: 1rem;
+`;
+
+const PaddingAdjusted = styled(Padding)`
+    ${p =>
+        p.theme.displayType !== 'full-width' &&
+        css`
+            display: none;
+        `}
+`;
+
+const GapAdjusted = styled(Gap)`
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            display: none;
+        `}
 `;
 
 const Overlay = styled.div<{ entered: boolean; paddingRight: number }>`
@@ -68,7 +114,12 @@ const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ ente
         }, [sdk, entered]);
 
         return (
-            <Overlay ref={ref} entered={entered} paddingRight={entered ? 0 : scrollbarWidth}>
+            <Overlay
+                ref={ref}
+                entered={entered}
+                paddingRight={entered ? 0 : scrollbarWidth}
+                className="notification-overlay"
+            >
                 {children}
             </Overlay>
         );
@@ -123,6 +174,17 @@ const Content = styled.div<{ standalone: boolean }>`
         css`
             padding-bottom: 2rem;
         `}
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            border-bottom-right-radius: ${p.theme.cornerMedium};
+            border-bottom-left-radius: ${p.theme.cornerMedium};
+            max-height: calc(100% - 32px);
+            overflow: auto;
+            padding-top: 0;
+            padding-bottom: 0;
+        `}
 `;
 
 const TitleRow = styled.div`
@@ -133,6 +195,40 @@ const TitleRow = styled.div`
     margin-bottom: 1rem;
     user-select: none;
     width: 100%;
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            margin-bottom: 0;
+        `}
+`;
+
+const FooterWrapper = styled.div`
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+
+            &:empty {
+                padding-bottom: 1rem;
+            }
+        `}
+`;
+
+const HeaderWrapper = styled.div`
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            position: sticky;
+            top: 0;
+            z-index: 100;
+
+            &:empty {
+                padding-bottom: 1rem;
+            }
+        `}
 `;
 
 const RowTitle = styled(H3)`
@@ -147,6 +243,12 @@ const BackShadow = styled.div`
     z-index: -1;
     top: 80%;
     background-color: ${props => props.theme.backgroundPage};
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            max-width: 550px;
+        `}
 `;
 
 export const NotificationTitleRow: FC<
@@ -184,6 +286,26 @@ export const FullHeightBlock = styled(NotificationBlock)<{
     box-sizing: border-box;
 
     background-color: ${props => props.theme.backgroundPage};
+
+    ${props =>
+        props.theme.displayType === 'full-width' &&
+        css`
+            min-height: unset;
+            padding-top: 2px;
+            padding-bottom: 1rem;
+        `};
+`;
+
+export const FullHeightBlockResponsive = styled(FullHeightBlock)<{
+    standalone: boolean;
+    fitContent?: boolean;
+    noPadding?: boolean;
+}>`
+    ${props =>
+        props.theme.displayType === 'full-width' &&
+        css`
+            min-height: unset;
+        `};
 `;
 
 export const NotificationTitleBlock = styled.div`
@@ -279,10 +401,12 @@ export const Notification: FC<{
     hideButton?: boolean;
     backShadow?: boolean;
     title?: string;
+    footer?: ReactNode;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
-}> = ({ children, isOpen, hideButton, backShadow, handleClose, title }) => {
+}> = ({ children, isOpen, hideButton, backShadow, handleClose, title, footer }) => {
     const [entered, setEntered] = useState(false);
     const [open, setOpen] = useState(false);
+    const { displayType } = useTheme();
 
     useEffect(() => {
         setTimeout(() => setOpen(isOpen));
@@ -300,7 +424,6 @@ export const Notification: FC<{
     }, [handleClose]);
 
     const Child = useMemo(() => {
-        if (!open) return undefined;
         return children((afterClose?: () => void) => {
             setTimeout(() => afterClose && afterClose(), 300);
             handleClose();
@@ -334,42 +457,183 @@ export const Notification: FC<{
         return sdk.isIOs() && sdk.isStandalone();
     }, [sdk]);
 
+    const footerRef = useRef<HTMLDivElement | null>(null);
+    const headerRef = useRef<HTMLDivElement | null>(null);
+    const [footerElement, setFooterElement] = useState<HTMLDivElement | null>(null);
+    const [headerElement, setHeaderElement] = useState<HTMLDivElement | null>(null);
+
+    const [isEntering, setIsEntering] = useState(false);
+
+    useEffect(() => {
+        if (isEntering && footerRef.current) {
+            setFooterElement(footerRef.current);
+        } else {
+            setFooterElement(null);
+        }
+
+        if (isEntering && headerRef.current) {
+            setHeaderElement(headerRef.current);
+        } else {
+            setHeaderElement(null);
+        }
+    }, [isEntering]);
+
+    const isFullWidth = useIsFullWidthMode();
+    const onClickOutside = useCallback(() => {
+        if (isFullWidth) {
+            handleClose();
+        }
+    }, [isFullWidth, handleClose]);
+
+    const handleCloseOnlyOnNotFullWidth = useCallback(() => {
+        if (!isFullWidth) {
+            handleClose();
+        }
+    }, [isFullWidth, handleClose]);
+
+    const containerRef = useClickOutside<HTMLDivElement>(onClickOutside, nodeRef.current);
+
     return (
-        <ReactPortal wrapperId="react-portal-modal-container">
-            <CSSTransition
-                in={open}
-                timeout={300}
-                unmountOnExit
-                nodeRef={nodeRef}
-                onEntered={() => setTimeout(() => setEntered(true), 300)}
-                onExit={() => setEntered(false)}
-            >
-                <Splash ref={nodeRef} className="scrollable">
-                    <NotificationOverlay handleClose={handleClose} entered={entered}>
-                        <NotificationWrapper entered={entered}>
-                            <Wrapper>
-                                <Padding onClick={handleClose} />
-                                <Gap onClick={handleClose} />
-                                <Content standalone={standalone}>
-                                    {title && (
-                                        <NotificationTitleRow handleClose={handleClose}>
-                                            {title}
-                                        </NotificationTitleRow>
-                                    )}
-                                    {!hideButton && (
-                                        <ButtonContainer>
-                                            <NotificationCancelButton handleClose={handleClose} />
-                                        </ButtonContainer>
-                                    )}
-                                    {Child}
-                                </Content>
-                            </Wrapper>
-                        </NotificationWrapper>
-                    </NotificationOverlay>
-                    {backShadow && entered && <BackShadow />}
-                </Splash>
-            </CSSTransition>
-        </ReactPortal>
+        <NotificationContext.Provider value={{ footerElement, headerElement }}>
+            <ReactPortal wrapperId="react-portal-modal-container">
+                <CSSTransition
+                    in={open}
+                    timeout={300}
+                    unmountOnExit
+                    nodeRef={nodeRef}
+                    onEntering={() => setIsEntering(true)}
+                    onExited={() => setIsEntering(false)}
+                    onEntered={() => setTimeout(() => setEntered(true), 300)}
+                    onExit={() => setEntered(false)}
+                >
+                    <Splash ref={nodeRef} className="scrollable">
+                        <NotificationOverlay handleClose={handleClose} entered={entered}>
+                            <NotificationWrapper entered={entered}>
+                                <Wrapper>
+                                    <Padding onClick={handleCloseOnlyOnNotFullWidth} />
+                                    <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
+                                    <Content
+                                        standalone={standalone}
+                                        ref={containerRef}
+                                        className="dialog-content"
+                                    >
+                                        <HeaderWrapper ref={headerRef}>
+                                            {title && (
+                                                <NotificationHeader>
+                                                    <NotificationTitleRow handleClose={handleClose}>
+                                                        {title}
+                                                    </NotificationTitleRow>
+                                                </NotificationHeader>
+                                            )}
+                                        </HeaderWrapper>
+                                        {!hideButton && !title && (
+                                            <ButtonContainer>
+                                                <NotificationCancelButton
+                                                    handleClose={handleClose}
+                                                />
+                                            </ButtonContainer>
+                                        )}
+                                        {Child}
+                                        <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
+                                    </Content>
+                                    <PaddingAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
+                                </Wrapper>
+                            </NotificationWrapper>
+                        </NotificationOverlay>
+                        {backShadow && entered && displayType !== 'full-width' && <BackShadow />}
+                    </Splash>
+                </CSSTransition>
+            </ReactPortal>
+        </NotificationContext.Provider>
     );
 };
 Notification.displayName = 'Notification';
+
+const NotificationFooterStyled = styled.div`
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            padding-bottom: 16px;
+
+            & > * {
+                position: relative;
+                z-index: 102;
+            }
+
+            &::after {
+                content: '';
+                display: block;
+                background-color: ${p.theme.backgroundPage};
+                width: 100%;
+                height: 20px;
+                position: absolute;
+                bottom: 0;
+                z-index: 101;
+            }
+        `}
+`;
+
+export const NotificationHeaderStyled = styled.div`
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            background: ${p.theme.backgroundPage};
+            padding-top: 16px;
+            padding-bottom: 16px;
+        `}
+`;
+
+export const NotificationFooter = forwardRef<HTMLDivElement, { children: ReactNode }>(
+    ({ children }, ref) => {
+        const isFullWidth = useIsFullWidthMode();
+
+        if (!isFullWidth) {
+            return <>{children}</>;
+        }
+
+        return <NotificationFooterStyled ref={ref}>{children}</NotificationFooterStyled>;
+    }
+);
+
+export const NotificationHeader: FC<{ children: ReactNode }> = forwardRef<
+    HTMLDivElement,
+    { children: ReactNode }
+>(({ children }, ref) => {
+    const isFullWidth = useIsFullWidthMode();
+
+    if (!isFullWidth) {
+        return <>{children}</>;
+    }
+
+    return <NotificationHeaderStyled ref={ref}>{children}</NotificationHeaderStyled>;
+});
+
+export const NotificationContext = createContext<{
+    footerElement: Element | null;
+    headerElement: Element | null;
+}>({
+    footerElement: null,
+    headerElement: null
+});
+
+export const NotificationFooterPortal: FC<{ children: ReactNode }> = ({ children }) => {
+    const { footerElement } = useContext(NotificationContext);
+    const isFullWidth = useIsFullWidthMode();
+
+    if (footerElement && isFullWidth) {
+        return createPortal(children, footerElement);
+    }
+
+    return <>{children}</>;
+};
+
+export const NotificationHeaderPortal: FC<{ children: ReactNode }> = ({ children }) => {
+    const { headerElement } = useContext(NotificationContext);
+    const isFullWidth = useIsFullWidthMode();
+
+    if (headerElement && isFullWidth) {
+        return createPortal(children, headerElement);
+    }
+
+    return <>{children}</>;
+};

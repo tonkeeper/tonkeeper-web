@@ -11,7 +11,8 @@ import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import {
-    ActivitySkeletonPage, BrowserSkeletonPage,
+    ActivitySkeletonPage,
+    BrowserSkeletonPage,
     CoinSkeletonPage,
     HomeSkeleton,
     SettingsSkeletonPage
@@ -214,7 +215,12 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
-    const tonendpoint = useTonendpoint(TARGET_ENV, sdk.version, activeWallet?.network, activeWallet?.lang);
+    const tonendpoint = useTonendpoint(
+        TARGET_ENV,
+        sdk.version,
+        activeWallet?.network,
+        activeWallet?.lang
+    );
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
@@ -238,6 +244,7 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
         standalone: false,
         extension: false,
         ios: true,
+        proFeatures: false,
         hideQrScanner: !showQrScan
     };
 

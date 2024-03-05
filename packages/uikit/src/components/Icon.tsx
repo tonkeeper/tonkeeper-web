@@ -88,7 +88,7 @@ export const ChevronDownIcon = () => {
     );
 };
 
-export const DoneIcon = () => {
+export const DoneIcon: FC<{ className?: string }> = ({ className }) => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -96,6 +96,7 @@ export const DoneIcon = () => {
             height="16"
             viewBox="0 0 16 16"
             fill="none"
+            className={className}
         >
             <path
                 fillRule="evenodd"
@@ -791,6 +792,31 @@ export const NotificationIcon = () => {
             <path
                 opacity="0.32"
                 d="M26 6C26 8.20914 24.2091 10 22 10C19.7909 10 18 8.20914 18 6C18 3.79086 19.7909 2 22 2C24.2091 2 26 3.79086 26 6Z"
+                fill="currentColor"
+            />
+        </svg>
+    );
+};
+
+export const SlidersIcon = () => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+        >
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M2 3.5H7.35352C7.67998 2.34575 8.74122 1.5 10 1.5C11.2588 1.5 12.32 2.34575 12.6465 3.5H14C14.4142 3.5 14.75 3.83579 14.75 4.25C14.75 4.66421 14.4142 5 14 5H12.6465C12.32 6.15425 11.2588 7 10 7C8.74122 7 7.67998 6.15425 7.35352 5H2C1.58579 5 1.25 4.66421 1.25 4.25C1.25 3.83579 1.58579 3.5 2 3.5ZM10 3C9.30964 3 8.75 3.55964 8.75 4.25C8.75 4.94036 9.30964 5.5 10 5.5C10.6904 5.5 11.25 4.94036 11.25 4.25C11.25 3.55964 10.6904 3 10 3Z"
+                fill="currentColor"
+            />
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M2 11H3.35352C3.67998 9.84575 4.74122 9 6 9C7.25878 9 8.32002 9.84575 8.64648 11H14C14.4142 11 14.75 11.3358 14.75 11.75C14.75 12.1642 14.4142 12.5 14 12.5H8.64648C8.32002 13.6543 7.25878 14.5 6 14.5C4.74122 14.5 3.67998 13.6543 3.35352 12.5H2C1.58579 12.5 1.25 12.1642 1.25 11.75C1.25 11.3358 1.58579 11 2 11ZM6 10.5C5.30964 10.5 4.75 11.0596 4.75 11.75C4.75 12.4404 5.30964 13 6 13C6.69036 13 7.25 12.4404 7.25 11.75C7.25 11.0596 6.69036 10.5 6 10.5Z"
                 fill="currentColor"
             />
         </svg>

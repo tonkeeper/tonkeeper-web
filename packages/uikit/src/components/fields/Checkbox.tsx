@@ -8,6 +8,7 @@ export interface CheckboxProps {
     onChange: (checked: boolean) => void;
     disabled?: boolean;
     light?: boolean;
+    className?: string;
 }
 
 const Wrapper = styled.div`
@@ -70,10 +71,11 @@ export const Checkbox: FC<PropsWithChildren<CheckboxProps>> = ({
     onChange,
     disabled,
     children,
-    light
+    light,
+    className
 }) => {
     return (
-        <Wrapper onClick={() => onChange(!checked)}>
+        <Wrapper onClick={() => onChange(!checked)} className={className}>
             <CheckboxItem checked={checked} disabled={disabled}>
                 {checked ? <CheckboxIcon /> : undefined}
             </CheckboxItem>

@@ -4,22 +4,17 @@ import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
+import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
-import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
-import { Header, HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
+import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
+import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
+import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
-import {
-    ActivitySkeletonPage,
-    BrowserSkeletonPage,
-    CoinSkeletonPage,
-    HomeSkeleton,
-    SettingsSkeletonPage
-} from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
+import { AsideMenu } from '@tonkeeper/uikit/dist/components/aside/AsideMenu';
 import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
 import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
 import {
@@ -38,26 +33,30 @@ import {
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import Activity from '@tonkeeper/uikit/dist/pages/activity/Activity';
+import Browser from '@tonkeeper/uikit/dist/pages/browser';
 import Coin from '@tonkeeper/uikit/dist/pages/coin/Coin';
-import Home from '@tonkeeper/uikit/dist/pages/home/Home';
+import DashboardPage from '@tonkeeper/uikit/dist/pages/dashboard';
+import { MainColumn } from '@tonkeeper/uikit/dist/pages/home/MainColumn';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
+import { Purchases } from '@tonkeeper/uikit/dist/pages/purchases/Purchases';
+import { Tokens } from '@tonkeeper/uikit/dist/pages/purchases/Tokens';
 import Settings from '@tonkeeper/uikit/dist/pages/settings';
-import Browser from '@tonkeeper/uikit/dist/pages/browser';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
+import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { MemoryRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import styled, { createGlobalStyle } from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
@@ -72,11 +71,36 @@ const queryClient = new QueryClient({
     }
 });
 
+const GlobalStyle = createGlobalStyle`
+    ${GlobalStyleCss};
+    
+    html, body, #root {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    html.is-locked {
+        height: var(--app-height);
+    }
+
+    button, input[type="submit"], input[type="reset"] {
+      background: none;
+      color: inherit;
+      border: none;
+      padding: 0;
+      font: inherit;
+      cursor: pointer;
+      outline: inherit;
+    }
+`;
+
 const sdk = new DesktopAppSdk();
 const TARGET_ENV = 'desktop';
 
 const langs = 'en,zh_CN,ru,it,tr';
 const listOfAuth: AuthState['kind'][] = ['keychain'];
+
+declare const REACT_APP_TONCONSOLE_API: string;
 
 export const App = () => {
     const { t, i18n } = useTranslation();
@@ -96,6 +120,9 @@ export const App = () => {
         return client;
     }, [t, i18n]);
 
+    useEffect(() => {
+        document.body.classList.add(window.backgroundApi.platform());
+    }, []);
     return (
         <MemoryRouter>
             <QueryClientProvider client={queryClient}>
@@ -103,14 +130,7 @@ export const App = () => {
                     <AppSdkContext.Provider value={sdk}>
                         <TranslationContext.Provider value={translation}>
                             <StorageContext.Provider value={sdk.storage}>
-                                <UserThemeProvider>
-                                    <HeaderGlobalStyle />
-                                    <FooterGlobalStyle />
-                                    <SybHeaderGlobalStyle />
-                                    <GlobalListStyle />
-                                    <Loader />
-                                    <UnlockNotification sdk={sdk} />
-                                </UserThemeProvider>
+                                <ThemeAndContent />
                             </StorageContext.Provider>
                         </TranslationContext.Provider>
                     </AppSdkContext.Provider>
@@ -120,12 +140,76 @@ export const App = () => {
     );
 };
 
+const ThemeAndContent = () => {
+    const { data } = useProBackupState();
+    return (
+        <UserThemeProvider displayType="full-width" isPro={data?.valid}>
+            <DarkThemeContext.Provider value={!data?.valid}>
+                <GlobalStyle />
+                <HeaderGlobalStyle />
+                <FooterGlobalStyle />
+                <SybHeaderGlobalStyle />
+                <GlobalListStyle />
+                <Loader />
+                <UnlockNotification sdk={sdk} />
+            </DarkThemeContext.Provider>
+        </UserThemeProvider>
+    );
+};
+
 const FullSizeWrapper = styled(Container)``;
 
-const Wrapper = styled(FullSizeWrapper)`
+const Wrapper = styled.div`
     box-sizing: border-box;
     padding-top: 64px;
-    padding-bottom: 80px;
+
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: var(--app-height);
+    background-color: ${props => props.theme.backgroundPage};
+    white-space: pre-wrap;
+`;
+
+const WideLayout = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    & > *:first-child {
+        width: 200px;
+    }
+`;
+
+const WideContent = styled.div`
+    flex: 1;
+    overflow: auto;
+`;
+
+const WalletLayout = styled.div`
+    display: flex;
+    height: 100%;
+`;
+
+const FirstColumn = styled.div`
+    display: flex;
+    flex-basis: 40%;
+    overflow: auto;
+    flex-direction: column;
+    padding: 64px 16px 0;
+    flex-shrink: 0;
+`;
+
+const SecondColumn = styled.div`
+    display: flex;
+    flex-grow: 1;
+    overflow: auto;
+    position: relative;
+`;
+
+const FullSizeWrapperBounded = styled(FullSizeWrapper)`
+    max-height: 100%;
+    overflow: auto;
 `;
 
 export const Loader: FC = () => {
@@ -172,14 +256,15 @@ export const Loader: FC = () => {
     const network = activeWallet?.network ?? Network.MAINNET;
     const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
     const context = {
-        api: getApiConfig(config, network),
+        api: getApiConfig(config, network, REACT_APP_TONCONSOLE_API),
         auth,
         fiat,
         account,
         config,
         tonendpoint,
-        standalone: false,
+        standalone: true,
         extension: false,
+        proFeatures: false, // TODO: enable
         ios: false
     };
 
@@ -219,7 +304,7 @@ export const Content: FC<{
 
     if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
         return (
-            <FullSizeWrapper>
+            <FullSizeWrapperBounded>
                 <Suspense fallback={<Loading />}>
                     <InitializeContainer fullHeight={false}>
                         <Routes>
@@ -231,73 +316,62 @@ export const Content: FC<{
                         </Routes>
                     </InitializeContainer>
                 </Suspense>
-            </FullSizeWrapper>
+            </FullSizeWrapperBounded>
         );
     }
 
     return (
-        <Wrapper>
-            <WalletStateContext.Provider value={activeWallet}>
+        <WalletStateContext.Provider value={activeWallet}>
+            <WideLayout>
+                <AsideMenu />
+                <WideContent>
+                    <Routes>
+                        <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
+                        <Route path="*" element={<WalletContent />} />
+                    </Routes>
+                </WideContent>
+            </WideLayout>
+        </WalletStateContext.Provider>
+    );
+};
+
+const WalletContent = () => {
+    return (
+        <WalletLayout>
+            <FirstColumn>
+                <MainColumn />
+            </FirstColumn>
+            <SecondColumn>
                 <Routes>
-                    <Route
-                        path={AppRoute.activity}
-                        element={
-                            <Suspense fallback={<ActivitySkeletonPage />}>
-                                <Activity />
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path={any(AppRoute.browser)}
-                        element={
-                            <Suspense fallback={<BrowserSkeletonPage />}>
-                                <Browser />
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path={any(AppRoute.settings)}
-                        element={
-                            <Suspense fallback={<SettingsSkeletonPage />}>
-                                <Settings />
-                            </Suspense>
-                        }
-                    />
-                    <Route path={AppRoute.coins}>
-                        <Route
-                            path=":name/*"
-                            element={
-                                <Suspense fallback={<CoinSkeletonPage />}>
-                                    <Coin />
-                                </Suspense>
-                            }
-                        />
+                    <Route element={<OldAppRouting />}>
+                        <Route path={AppRoute.activity} element={<Activity />} />
+                        <Route path={any(AppRoute.browser)} element={<Browser />} />
+                        <Route path={any(AppRoute.purchases)} element={<Purchases />} />
+                        <Route path={any(AppRoute.settings)} element={<Settings />} />
+                        <Route path={AppRoute.coins}>
+                            <Route path=":name/*" element={<Coin />} />
+                        </Route>
+                        <Route path="*" element={<Tokens />} />
                     </Route>
-                    <Route
-                        path="*"
-                        element={
-                            <>
-                                <Header />
-                                <InnerBody>
-                                    <Suspense fallback={<HomeSkeleton />}>
-                                        <Home />
-                                    </Suspense>
-                                </InnerBody>
-                            </>
-                        }
-                    />
                 </Routes>
-                <Footer standalone={false} />
-                <MemoryScroll />
-                <SendActionNotification />
-                <ReceiveNotification />
-                <TonConnectSubscription />
-                <NftNotification />
-                <SendNftNotification />
-                <AddFavoriteNotification />
-                <EditFavoriteNotification />
-                <DeepLinkSubscription />
-            </WalletStateContext.Provider>
+            </SecondColumn>
+        </WalletLayout>
+    );
+};
+
+const OldAppRouting = () => {
+    return (
+        <Wrapper>
+            <Outlet />
+            <MemoryScroll />
+            <SendActionNotification />
+            <ReceiveNotification />
+            <TonConnectSubscription />
+            <NftNotification />
+            <SendNftNotification />
+            <AddFavoriteNotification />
+            <EditFavoriteNotification />
+            <DeepLinkSubscription />
         </Wrapper>
     );
 };

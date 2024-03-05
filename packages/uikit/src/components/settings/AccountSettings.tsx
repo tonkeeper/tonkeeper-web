@@ -1,9 +1,9 @@
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { relative, SettingsRoute } from '../../libs/routes';
+import { SettingsRoute, relative } from '../../libs/routes';
 import { useWalletJettonList } from '../../state/wallet';
 import { LogOutWalletNotification } from './LogOutNotification';
 import {
@@ -11,6 +11,7 @@ import {
     LogOutIcon,
     RecoveryPhraseIcon,
     SecurityIcon,
+    SettingsProIcon,
     WalletsIcon
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
@@ -21,7 +22,7 @@ const SingleAccountSettings = () => {
     const navigate = useNavigate();
     const wallet = useWalletContext();
     const { data: jettons } = useWalletJettonList();
-
+    const { proFeatures } = useAppContext();
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [
             // {
@@ -40,6 +41,15 @@ const SingleAccountSettings = () => {
                 action: () => navigate(relative(SettingsRoute.version))
             }
         ];
+
+        if (proFeatures) {
+            items.unshift({
+                name: t('tonkeeper_pro'),
+                icon: <SettingsProIcon />,
+                action: () => navigate(relative(SettingsRoute.pro))
+            });
+        }
+
         if (jettons?.balances.length) {
             items.push({
                 name: t('settings_jettons_list'),
@@ -79,6 +89,8 @@ const MultipleAccountSettings = () => {
     const wallet = useWalletContext();
 
     const { data: jettons } = useWalletJettonList();
+    const { proFeatures } = useAppContext();
+
     const accountItems = useMemo(() => {
         const items: SettingsItem[] = [
             {
@@ -92,6 +104,14 @@ const MultipleAccountSettings = () => {
             //   action: () => navigate(relative(SettingsRoute.subscriptions)),
             // },
         ];
+
+        if (proFeatures) {
+            items.push({
+                name: t('tonkeeper_pro'),
+                icon: <SettingsProIcon />,
+                action: () => navigate(relative(SettingsRoute.pro))
+            });
+        }
 
         return items;
     }, [wallet, t]);
@@ -109,6 +129,7 @@ const MultipleAccountSettings = () => {
                 action: () => navigate(relative(SettingsRoute.version))
             }
         ];
+
         if (jettons?.balances.length) {
             items.push({
                 name: t('settings_jettons_list'),

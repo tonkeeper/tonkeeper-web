@@ -66,7 +66,7 @@ const initMainWindow = async () => {
     log.info({ initArgs: process.argv });
     const window = await MainWindow.openMainWindow();
 
-    if (process.argv.length == 1) return;
+    if (process.argv.length === 1) return;
     try {
         await delay(500);
         const url = process.argv.pop();

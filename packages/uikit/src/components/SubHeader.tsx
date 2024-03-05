@@ -1,6 +1,6 @@
 import React, { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { useNativeBackButton } from './BackButton';
 import { ChevronLeftIcon } from './Icon';
@@ -16,14 +16,23 @@ const Block = styled(WithHeadingDivider)`
     box-sizing: border-box;
     display: flex;
     justify-content: center;
-    position: relative;
 
-    position: fixed;
     z-index: 3;
-    width: var(--app-width);
     overflow: visible !important;
-    max-width: 548px;
+
     top: 0;
+
+    ${p =>
+        p.theme.displayType === 'full-width'
+            ? css`
+                  position: absolute;
+                  width: 100%;
+              `
+            : css`
+                  position: fixed;
+                  width: var(--app-width);
+                  max-width: 548px;
+              `}
 
     background: ${props => props.theme.backgroundPage};
 `;
@@ -51,12 +60,13 @@ export const BackButtonLeft = styled(BackButton)`
 `;
 
 export interface SubHeaderProps {
-    title: React.ReactNode;
+    title?: React.ReactNode;
 }
 
 const Title = styled(H3)`
     margin-top: 1px;
     margin-bottom: 2px;
+    min-height: 28px;
 `;
 
 const SubHeaderBackButton = () => {

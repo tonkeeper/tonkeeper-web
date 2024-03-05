@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 export enum InvoiceStatus {
     PENDING = 'pending',
     PAID = 'paid',

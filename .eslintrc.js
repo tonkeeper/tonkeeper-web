@@ -100,7 +100,8 @@ module.exports = {
                         vars: 'all',
                         args: 'all',
                         ignoreRestSiblings: false,
-                        argsIgnorePattern: '^_'
+                        argsIgnorePattern: '^_',
+                        varsIgnorePattern: '^_'
                     }
                 ],
 

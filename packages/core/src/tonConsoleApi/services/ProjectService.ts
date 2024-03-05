@@ -3,16 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Balance } from '../models/Balance';
+import type { Charge } from '../models/Charge';
 import type { Deposit } from '../models/Deposit';
 import type { Ok } from '../models/Ok';
 import type { Project } from '../models/Project';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class ProjectService {
-
     /**
      * Create project
      * @param formData Data that is expected
@@ -40,7 +38,6 @@ export class ProjectService {
             },
         });
     }
-
     /**
      * Get user's project
      * @returns any User projects
@@ -60,7 +57,6 @@ export class ProjectService {
             },
         });
     }
-
     /**
      * Update user project
      * You need to pass only those fields that need to be changed.
@@ -95,7 +91,6 @@ export class ProjectService {
             },
         });
     }
-
     /**
      * Delete user project
      * @param id Project ID
@@ -119,7 +114,6 @@ export class ProjectService {
             },
         });
     }
-
     /**
      * Get project deposit address
      * @param id Project ID
@@ -145,7 +139,6 @@ export class ProjectService {
             },
         });
     }
-
     /**
      * Get project deposits history
      * @param id Project ID
@@ -172,7 +165,6 @@ export class ProjectService {
             },
         });
     }
-
     /**
      * Crediting funds with a promo code
      * @param id Project ID
@@ -199,5 +191,38 @@ export class ProjectService {
             },
         });
     }
-
+    /**
+     * Get project payments history
+     * @param id Project ID
+     * @param offset Offset
+     * @param limit Limit
+     * @returns any Project payments history
+     * @throws ApiError
+     */
+    public static projectPaymentsHistory(
+        id: number,
+        offset?: number,
+        limit: number = 100,
+    ): CancelablePromise<{
+        count: number;
+        history: Array<Charge>;
+    }> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/project/{id}/payments/history',
+            path: {
+                'id': id,
+            },
+            query: {
+                'offset': offset,
+                'limit': limit,
+            },
+            errors: {
+                400: `Something went wrong on client side`,
+                403: `Access token is missing or invalid`,
+                404: `The specified resource was not found`,
+                500: `Something went wrong on server side`,
+            },
+        });
+    }
 }

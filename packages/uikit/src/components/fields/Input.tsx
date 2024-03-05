@@ -7,6 +7,7 @@ import { TextareaAutosize } from './TextareaAutosize';
 export const InputBlock = styled.div<{
     focus: boolean;
     valid: boolean;
+    isSuccess?: boolean;
     scanner?: boolean;
     clearButton?: boolean;
 }>`
@@ -54,6 +55,12 @@ export const InputBlock = styled.div<{
                   border: 1px solid ${props.theme.fieldBackground};
                   background: ${props.theme.fieldBackground};
               `}
+
+    ${props =>
+        props.isSuccess &&
+        css`
+            border: 1px solid ${props.theme.accentGreen};
+        `}
 `;
 
 export const InputField = styled.input`
@@ -129,6 +136,7 @@ export interface InputProps {
     onChange?: (value: string) => void;
     onSubmit?: () => void;
     isValid?: boolean;
+    isSuccess?: boolean;
     label?: string;
     disabled?: boolean;
     helpText?: string;
@@ -138,7 +146,18 @@ export interface InputProps {
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     (
-        { type, value, onChange, isValid = true, label, disabled, helpText, tabIndex, clearButton },
+        {
+            type,
+            value,
+            onChange,
+            isValid = true,
+            isSuccess = false,
+            label,
+            disabled,
+            helpText,
+            tabIndex,
+            clearButton
+        },
         ref
     ) => {
         const [focus, setFocus] = useState(false);
@@ -152,7 +171,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         return (
             <OuterBlock>
-                <InputBlock focus={focus} valid={isValid} clearButton={clearButton}>
+                <InputBlock
+                    focus={focus}
+                    valid={isValid}
+                    isSuccess={isSuccess}
+                    clearButton={clearButton}
+                >
                     <InputField
                         ref={ref}
                         disabled={disabled}

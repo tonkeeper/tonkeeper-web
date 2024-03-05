@@ -1,8 +1,8 @@
+import { spawnSync } from 'child_process';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import fetch from 'node-fetch';
 import * as path from 'path';
-import * as unzipper from 'unzipper';
 
 dotenv.config();
 
@@ -29,15 +29,7 @@ interface Message {
 }
 
 const unzip = (zipFile: string) => {
-    return new Promise((resolve, reject) => {
-        fs.createReadStream(zipFile)
-            .pipe(unzipper.Extract({ path: path.join(src) }))
-            .on('close', () => {
-                console.log('Files loaded and unzipped successfully');
-                resolve(undefined);
-            })
-            .on('error', reject);
-    });
+    spawnSync('unzip', ['-d', src, zipFile]);
 };
 
 const loadTransactions = async () => {

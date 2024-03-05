@@ -23,7 +23,14 @@ export enum QueryKey {
 
     tron = 'tron',
     rate = 'rate',
-    total = 'total'
+    total = 'total',
+    pro = 'pro',
+    proBackup = 'proBackup',
+
+    dashboardColumnsForm = 'dashboardColumnsForm',
+    dashboardColumns = 'dashboardColumns',
+    selectedDashboardColumns = 'selectedDashboardColumns',
+    dashboardData = 'dashboardData'
 }
 
 export enum JettonKey {

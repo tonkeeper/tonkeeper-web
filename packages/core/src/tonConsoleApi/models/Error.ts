@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 export type Error = {
     /**
      * Error message
@@ -13,9 +12,7 @@ export type Error = {
      */
     code: Error.code;
 };
-
 export namespace Error {
-
     /**
      * backend error code
      */
@@ -24,7 +21,5 @@ export namespace Error {
         '_2' = 2,
         '_3' = 3,
     }
-
-
 }
 

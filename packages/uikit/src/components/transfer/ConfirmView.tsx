@@ -26,7 +26,11 @@ import { useAssetAmountFiatEquivalent, useAssetImage } from '../../state/asset';
 import { CheckmarkCircleIcon, ChevronLeftIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Gap } from '../Layout';
 import { ListBlock } from '../List';
-import { FullHeightBlock, NotificationCancelButton, NotificationTitleBlock } from '../Notification';
+import {
+    FullHeightBlockResponsive,
+    NotificationCancelButton,
+    NotificationTitleBlock
+} from '../Notification';
 import { Label2 } from '../Text';
 import { TransferComment } from '../activity/ActivityDetailsLayout';
 import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
@@ -174,7 +178,11 @@ export function ConfirmView<T extends Asset = Asset>({
                 handleSubmit
             }}
         >
-            <FullHeightBlock onSubmit={onSubmit} standalone={standalone} fitContent={fitContent}>
+            <FullHeightBlockResponsive
+                onSubmit={onSubmit}
+                standalone={standalone}
+                fitContent={fitContent}
+            >
                 {titleBlock}
                 {heading}
                 <ListBlock margin={false} fullWidth>
@@ -183,7 +191,7 @@ export function ConfirmView<T extends Asset = Asset>({
                 <Gap />
 
                 <ButtonBlock>{buttons}</ButtonBlock>
-            </FullHeightBlock>
+            </FullHeightBlockResponsive>
         </ConfirmViewContext.Provider>
     );
 }

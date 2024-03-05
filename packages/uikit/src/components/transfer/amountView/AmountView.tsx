@@ -25,7 +25,13 @@ import { useUserJettonList } from '../../../state/jetton';
 import { useRate } from '../../../state/rates';
 import { useWalletAccountInfo, useWalletJettonList } from '../../../state/wallet';
 import { Gap } from '../../Layout';
-import { FullHeightBlock } from '../../Notification';
+import {
+    FullHeightBlock,
+    NotificationFooter,
+    NotificationFooterPortal,
+    NotificationHeader,
+    NotificationHeaderPortal
+} from '../../Notification';
 import { Label1 } from '../../Text';
 import { InputSize, Sentence } from '../Sentence';
 import { AmountHeaderBlockComponent, AmountMainButtonComponent } from '../common';
@@ -53,6 +59,8 @@ import {
     toInitAmountState,
     toTokenRateSymbol
 } from './amountState';
+import { useTheme } from 'styled-components';
+import {useIsFullWidthMode} from "../../../hooks/useIsFullWidthMode";
 
 export const AmountView: FC<{
     onClose: () => void;
@@ -62,11 +70,23 @@ export const AmountView: FC<{
     defaults?: Partial<AmountState>;
     MainButton: AmountMainButtonComponent;
     HeaderBlock: AmountHeaderBlockComponent;
-}> = ({ recipient, onClose, onBack, onConfirm, defaults, MainButton, HeaderBlock }) => {
+    isAnimationProcess: boolean;
+}> = ({
+    recipient,
+    onClose,
+    onBack,
+    onConfirm,
+    defaults,
+    MainButton,
+    HeaderBlock,
+    isAnimationProcess
+}) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { standalone, fiat } = useAppContext();
     const blockchain = recipient.address.blockchain;
+    const isFullWidth = useIsFullWidthMode();
+    const shouldHideHeaderAndFooter = isFullWidth && isAnimationProcess;
 
     const { data: notFilteredJettons } = useWalletJettonList();
     const jettons = useUserJettonList(notFilteredJettons);
@@ -157,13 +177,19 @@ export const AmountView: FC<{
 
     return (
         <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
-            <HeaderBlock onClose={onClose} onBack={handleBack}>
-                <SubTitle>
-                    {t('send_screen_steps_done_to').replace('%{name}', '')}
-                    <RecipientName recipient={recipient} />
-                    <RecipientAddress recipient={recipient} />
-                </SubTitle>
-            </HeaderBlock>
+            {!shouldHideHeaderAndFooter && (
+                <NotificationHeaderPortal>
+                    <NotificationHeader>
+                        <HeaderBlock onClose={onClose} onBack={handleBack}>
+                            <SubTitle>
+                                {t('send_screen_steps_done_to').replace('%{name}', '')}
+                                <RecipientName recipient={recipient} />
+                                <RecipientAddress recipient={recipient} />
+                            </SubTitle>
+                        </HeaderBlock>
+                    </NotificationHeader>
+                </NotificationHeaderPortal>
+            )}
 
             <AmountBlock ref={refBlock}>
                 <SelectCenter>
@@ -213,12 +239,18 @@ export const AmountView: FC<{
 
             <Gap />
 
-            <MainButton
-                ref={refButton}
-                isDisabled={!isValid}
-                isLoading={rateLoading || balanceLoading}
-                onClick={handleSubmit}
-            />
+            {!shouldHideHeaderAndFooter && (
+                <NotificationFooterPortal>
+                    <NotificationFooter>
+                        <MainButton
+                            ref={refButton}
+                            isDisabled={!isValid}
+                            isLoading={rateLoading || balanceLoading}
+                            onClick={handleSubmit}
+                        />
+                    </NotificationFooter>
+                </NotificationFooterPortal>
+            )}
         </FullHeightBlock>
     );
 };
