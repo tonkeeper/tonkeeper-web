@@ -20,6 +20,8 @@ export class CookieStore extends Store {
             Record<string, Record<string, Record<string, Cookie>>>
         >(this.key);
 
+        if (!result) return;
+
         Object.keys(result).forEach(domain => {
             Object.keys(result[domain]).forEach(path => {
                 Object.keys(result[domain][path]).forEach(name => {

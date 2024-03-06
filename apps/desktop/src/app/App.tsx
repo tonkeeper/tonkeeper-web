@@ -121,6 +121,9 @@ export const App = () => {
         return client;
     }, [t, i18n]);
 
+    useEffect(() => {
+        document.body.classList.add(window.backgroundApi.platform());
+    }, []);
     return (
         <MemoryRouter>
             <QueryClientProvider client={queryClient}>
@@ -155,7 +158,9 @@ const ThemeAndContent = () => {
     );
 };
 
-const FullSizeWrapper = styled(Container)``;
+const FullSizeWrapper = styled(Container)`
+    max-width: 800px;
+`;
 
 const Wrapper = styled.div`
     box-sizing: border-box;
@@ -208,6 +213,8 @@ const SecondColumn = styled.div`
 const FullSizeWrapperBounded = styled(FullSizeWrapper)`
     max-height: 100%;
     overflow: auto;
+
+    justify-content: center;
 `;
 
 export const Loader: FC = () => {
@@ -262,7 +269,7 @@ export const Loader: FC = () => {
         tonendpoint,
         standalone: true,
         extension: false,
-        proFeatures: true,
+        proFeatures: false, // TODO: enable
         ios: false,
         env: {
             tgAuthBotId: REACT_APP_TG_BOT_ID
@@ -305,18 +312,16 @@ export const Content: FC<{
 
     if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
         return (
-            <FullSizeWrapperBounded>
-                <Suspense fallback={<Loading />}>
-                    <InitializeContainer fullHeight={false}>
-                        <Routes>
-                            <Route
-                                path={any(AppRoute.import)}
-                                element={<ImportRouter listOfAuth={listOfAuth} />}
-                            />
-                            <Route path="*" element={<Initialize />} />
-                        </Routes>
-                    </InitializeContainer>
-                </Suspense>
+            <FullSizeWrapperBounded className="full-size-wrapper">
+                <InitializeContainer fullHeight={false}>
+                    <Routes>
+                        <Route
+                            path={any(AppRoute.import)}
+                            element={<ImportRouter listOfAuth={listOfAuth} />}
+                        />
+                        <Route path="*" element={<Initialize />} />
+                    </Routes>
+                </InitializeContainer>
             </FullSizeWrapperBounded>
         );
     }

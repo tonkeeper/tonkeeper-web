@@ -1,24 +1,28 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { ProState, ProStateSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
     authViaTonConnect,
     createProServiceInvoice,
-    estimateProServiceInvoice,
+    createRecipient,
     getBackupState,
     getProServiceTiers,
     getProState,
     logoutTonConsole,
-    publishAndWaitProServiceInvoice,
-    startProServiceTrial,
-    setBackupState
+    setBackupState,
+    waitProServiceInvoice,
+    startProServiceTrial
 } from '@tonkeeper/core/dist/service/proService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
+import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
 import { useMemo } from 'react';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
-import { getMnemonic, signTonConnect } from './mnemonic';
+import { signTonConnect } from './mnemonic';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -45,11 +49,6 @@ export const useSelectWalletMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     return useMutation<void, Error, string>(async publicKey => {
-        try {
-            await logoutTonConsole();
-        } catch (e) {
-            console.warn(e);
-        }
         const state = await getWalletState(sdk.storage, publicKey);
         if (!state) {
             throw new Error('Missing wallet state');
@@ -90,39 +89,54 @@ export const useProPlans = (promoCode?: string) => {
     }, [all.data, promo.data]);
 };
 
-export const useBuyProServiceMutation = () => {
+export interface ConfirmState {
+    invoice: InvoicesInvoice;
+    recipient: RecipientData;
+    assetAmount: AssetAmount;
+    wallet: WalletState;
+}
+
+export const useCreateInvoiceMutation = () => {
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const client = useQueryClient();
-    return useMutation<void, Error, { state: ProState; tierId: number | null; promoCode?: string }>(
-        async data => {
-            if (data.tierId === null) {
-                throw new Error('missing tier');
-            }
-            const wallet = await getWalletState(sdk.storage, data.state.wallet.publicKey);
-            if (!wallet) {
-                throw new Error('Missing wallet');
-            }
-
-            const invoice = await createProServiceInvoice(data.tierId, data.promoCode);
-
-            const estimate = await estimateProServiceInvoice(api, wallet, invoice);
-
-            const mnemonic = await getMnemonic(sdk, data.state.wallet.publicKey);
-
-            await publishAndWaitProServiceInvoice(api, wallet, invoice, estimate, mnemonic);
-
-            await client.invalidateQueries([QueryKey.pro]);
+    return useMutation<
+        ConfirmState,
+        Error,
+        { state: ProState; tierId: number | null; promoCode?: string }
+    >(async data => {
+        if (data.tierId === null) {
+            throw new Error('missing tier');
         }
-    );
+        const wallet = await getWalletState(sdk.storage, data.state.wallet.publicKey);
+        if (!wallet) {
+            throw new Error('Missing wallet');
+        }
+
+        const invoice = await createProServiceInvoice(data.tierId, data.promoCode);
+        const [recipient, assetAmount] = await createRecipient(api, invoice);
+        return {
+            invoice,
+            wallet,
+            recipient,
+            assetAmount
+        };
+    });
+};
+
+export const useWaitInvoiceMutation = () => {
+    const client = useQueryClient();
+    return useMutation<void, Error, ConfirmState>(async data => {
+        await waitProServiceInvoice(data.invoice);
+        await client.invalidateQueries([QueryKey.pro]);
+    });
 };
 
 export const useActivateTrialMutation = () => {
-    const client = useQueryClient();
-    const ctx = useAppContext();
+  const client = useQueryClient();
+  const ctx = useAppContext();
 
-    return useMutation<void, Error>(async () => {
-        await startProServiceTrial((ctx.env as { tgAuthBotId: string }).tgAuthBotId);
-        await client.invalidateQueries([QueryKey.pro]);
-    });
+  return useMutation<void, Error>(async () => {
+    await startProServiceTrial((ctx.env as { tgAuthBotId: string }).tgAuthBotId);
+    await client.invalidateQueries([QueryKey.pro]);
+  });
 };

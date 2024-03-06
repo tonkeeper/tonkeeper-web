@@ -11,18 +11,18 @@ import React, {
     useRef,
     useState
 } from 'react';
+import { createPortal } from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
 import styled, { css, useTheme } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
+import { useClickOutside } from '../hooks/useClickOutside';
+import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
 import { Container } from '../styles/globalStyle';
+import { BackButton, ButtonMock } from './fields/BackButton';
 import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3 } from './Text';
-import { BackButton, ButtonMock } from './fields/BackButton';
-import { createPortal } from 'react-dom';
-import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
-import { useClickOutside } from '../hooks/useClickOutside';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -47,7 +47,9 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean }>> = ({
     }, [sdk, entered]);
 
     return (
-        <NotificationContainer scrollbarWidth={scrollbarWidth}>{children}</NotificationContainer>
+        <NotificationContainer className="notification-container" scrollbarWidth={scrollbarWidth}>
+            {children}
+        </NotificationContainer>
     );
 };
 
@@ -112,7 +114,12 @@ const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ ente
         }, [sdk, entered]);
 
         return (
-            <Overlay ref={ref} entered={entered} paddingRight={entered ? 0 : scrollbarWidth}>
+            <Overlay
+                ref={ref}
+                entered={entered}
+                paddingRight={entered ? 0 : scrollbarWidth}
+                className="notification-overlay"
+            >
                 {children}
             </Overlay>
         );
@@ -284,6 +291,7 @@ export const FullHeightBlock = styled(NotificationBlock)<{
         props.theme.displayType === 'full-width' &&
         css`
             min-height: unset;
+            padding-top: 2px;
             padding-bottom: 1rem;
         `};
 `;
@@ -504,7 +512,11 @@ export const Notification: FC<{
                                 <Wrapper>
                                     <Padding onClick={handleCloseOnlyOnNotFullWidth} />
                                     <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
-                                    <Content standalone={standalone} ref={containerRef}>
+                                    <Content
+                                        standalone={standalone}
+                                        ref={containerRef}
+                                        className="dialog-content"
+                                    >
                                         <HeaderWrapper ref={headerRef}>
                                             {title && (
                                                 <NotificationHeader>

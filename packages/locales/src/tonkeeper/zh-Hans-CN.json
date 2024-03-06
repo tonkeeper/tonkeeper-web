@@ -148,6 +148,20 @@
       "medium" : "电池已经充满一半"
     }
   },
+  "biometry" : {
+    "android" : {
+      "face_recognition" : "面部识别",
+      "face_recognition_genitive" : "面部识别",
+      "fingerprint" : "指纹",
+      "fingerprint_genitive" : "指纹"
+    },
+    "ios" : {
+      "face_recognition" : "Face ID",
+      "face_recognition_genitive" : "Face ID",
+      "fingerprint" : "Touch ID",
+      "fingerprint_genitive" : "Touch ID"
+    }
+  },
   "browser" : {
     "about_dapps_caption" : "探索可以使用Tonkeeper进行登录和支付的应用和服务。",
     "about_dapps_learn_more" : "了解更多",

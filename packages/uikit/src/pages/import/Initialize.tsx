@@ -1,4 +1,4 @@
-import React, { FC, PropsWithChildren, useState } from 'react';
+import { FC, PropsWithChildren, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { CenterContainer } from '../../components/Layout';
 import { H1 } from '../../components/Text';
@@ -16,6 +16,14 @@ const Block = styled.div<{ fullHeight: boolean }>`
     padding: 1rem 1rem;
     box-sizing: border-box;
     position: relative;
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            height: auto;
+            min-height: unset;
+            position: static;
+        `}
 
     ${props =>
         props.fullHeight

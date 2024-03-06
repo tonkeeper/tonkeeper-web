@@ -8,7 +8,7 @@ export const ProNotification: FC<{ isOpen: boolean; onClose: () => void }> = ({
 }) => {
     return (
         <Notification isOpen={isOpen} handleClose={onClose}>
-            {() => <ProSettingsContent />}
+            {() => <ProSettingsContent showLogo={false} />}
         </Notification>
     );
 };

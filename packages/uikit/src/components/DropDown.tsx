@@ -28,7 +28,16 @@ const DropDownListContainer = styled.div<{ center?: boolean }>`
     z-index: 1;
     background-color: ${props => props.theme.backgroundContentTint};
     border-radius: ${props => props.theme.cornerSmall};
-    max-height: 368px;
+
+    ${p =>
+        p.theme.displayType === 'full-width'
+            ? css`
+                  max-height: 220px;
+              `
+            : css`
+                  max-height: 368px;
+              `}
+
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 
