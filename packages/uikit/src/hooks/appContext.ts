@@ -11,8 +11,6 @@ import {
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { Configuration as TronConfiguration } from '@tonkeeper/core/dist/tronApi';
 import React, { useContext } from 'react';
-import webpack from 'webpack';
-import Record = webpack.compilation.Record;
 
 export interface IAppContext {
     api: APIConfig;

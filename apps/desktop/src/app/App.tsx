@@ -269,10 +269,10 @@ export const Loader: FC = () => {
         tonendpoint,
         standalone: true,
         extension: false,
-        proFeatures: false, // TODO: enable
+        proFeatures: true,
         ios: false,
         env: {
-            tgAuthBotId: REACT_APP_TG_BOT_ID
+          tgAuthBotId: REACT_APP_TG_BOT_ID
         }
     };
 

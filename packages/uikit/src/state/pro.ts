@@ -12,8 +12,8 @@ import {
     getProState,
     logoutTonConsole,
     setBackupState,
-    waitProServiceInvoice,
-    startProServiceTrial
+    startProServiceTrial,
+    waitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
