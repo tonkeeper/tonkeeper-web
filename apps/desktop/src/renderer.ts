@@ -36,4 +36,5 @@ log.info('UI Start-up');
 Object.assign(console, log.functions);
 console.log('👋 This message is being logged by "renderer.js", included via webpack');
 
+import './telegram-widget';
 import './react';

@@ -184,8 +184,8 @@ export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
     } while (updated.status === InvoiceStatus.PENDING);
 };
 
-export async function startProServiceTrial(botId: string) {
-    const tgData = await loginViaTG(botId);
+export async function startProServiceTrial(botId: string, lang?: string) {
+    const tgData = await loginViaTG(botId, lang);
     if (tgData) {
         return ProServiceService.proServiceTrial(tgData);
     }

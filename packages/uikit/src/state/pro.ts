@@ -23,6 +23,7 @@ import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { signTonConnect } from './mnemonic';
+import { useTranslation } from '../hooks/translation';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -132,11 +133,14 @@ export const useWaitInvoiceMutation = () => {
 };
 
 export const useActivateTrialMutation = () => {
-  const client = useQueryClient();
-  const ctx = useAppContext();
+    const client = useQueryClient();
+    const ctx = useAppContext();
+    const {
+        i18n: { language }
+    } = useTranslation();
 
-  return useMutation<void, Error>(async () => {
-    await startProServiceTrial((ctx.env as { tgAuthBotId: string }).tgAuthBotId);
-    await client.invalidateQueries([QueryKey.pro]);
-  });
+    return useMutation<void, Error>(async () => {
+        await startProServiceTrial((ctx.env as { tgAuthBotId: string }).tgAuthBotId, language);
+        await client.invalidateQueries([QueryKey.pro]);
+    });
 };

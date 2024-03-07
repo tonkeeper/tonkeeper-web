@@ -52,7 +52,7 @@ function isTGAvailable(window: Window): window is Window & {
     );
 }
 
-export async function loginViaTG(botId: string): Promise<TGLoginData | null> {
+export async function loginViaTG(botId: string, lang?: string): Promise<TGLoginData | null> {
     const window = getWindow();
     if (!window) {
         return null;
@@ -62,7 +62,7 @@ export async function loginViaTG(botId: string): Promise<TGLoginData | null> {
         throw new Error('Telegram auth provider not found');
     }
     return new Promise(res => {
-        window.Telegram.Login.auth({ bot_id: botId, request_access: 'write' }, data => {
+        window.Telegram.Login.auth({ bot_id: botId, request_access: 'write', lang }, data => {
             res(data || null);
         });
     });
