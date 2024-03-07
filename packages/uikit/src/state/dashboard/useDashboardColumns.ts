@@ -1,14 +1,27 @@
 import { useAppSdk } from '../../hooks/appSdk';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '../../libs/queryKey';
-import { DashboardColumn, isSupportedColumnType } from './dashboard-column';
 import { useTranslation } from '../../hooks/translation';
+import { DashboardColumn, isSupportedColumnType } from '@tonkeeper/core/dist/entries/dashboard';
+import { getDashboardColumns } from '@tonkeeper/core/dist/service/proService';
+import { useProState } from '../pro';
 
 export type DashboardColumnsForm = { id: string; isEnabled: boolean }[];
+
+export const ClientColumns: (Omit<DashboardColumn, 'name'> & { i18Key: string })[] = [
+    {
+        type: 'string',
+        i18Key: 'dashboard_column_name',
+        id: 'name',
+        defaultIsChecked: true,
+        onlyPro: false
+    }
+];
 
 export function useDashboardColumnsForm() {
     const client = useQueryClient();
     const { storage } = useAppSdk();
+    const { data: proState } = useProState();
 
     const { data: columns } = useDashboardColumns();
 
@@ -21,18 +34,39 @@ export function useDashboardColumnsForm() {
             const stored = await storage.get<DashboardColumnsForm>('dashboard-columns');
 
             if (stored) {
-                return columns
-                    .filter(c => isSupportedColumnType(c.type))
+                const storedList = stored
+                    .map(storedColumn => {
+                        const columnInfo = columns.find(column => column.id === storedColumn.id);
+                        if (!columnInfo || !isSupportedColumnType(columnInfo.type)) {
+                            return null;
+                        }
+
+                        return {
+                            id: storedColumn.id,
+                            isEnabled:
+                                columnInfo.onlyPro && !proState?.subscription.valid
+                                    ? false
+                                    : storedColumn.isEnabled ?? columnInfo.defaultIsChecked
+                        };
+                    })
+                    .filter(Boolean) as DashboardColumnsForm;
+
+                const newColumns = columns
+                    .filter(c => stored.every(s => s.id !== c.id))
                     .map(c => ({
                         id: c.id,
                         isEnabled:
-                            stored.find(item => item.id === c.id)?.isEnabled ?? c.defaultIsChecked
+                            c.onlyPro && !proState?.subscription.valid ? false : c.defaultIsChecked
                     }));
+                return storedList.concat(newColumns);
             }
-            return columns.map(c => ({ id: c.id, isEnabled: c.defaultIsChecked }));
+            return columns.map(c => ({
+                id: c.id,
+                isEnabled: c.onlyPro && !proState?.subscription.valid ? false : c.defaultIsChecked
+            }));
         },
         {
-            enabled: !!columns
+            enabled: !!columns && !!proState
         }
     );
 
@@ -72,68 +106,17 @@ export function useDashboardColumnsAsForm() {
 
 export function useDashboardColumns() {
     const {
-        i18n: { language }
+        i18n: { language },
+        t
     } = useTranslation();
     return useQuery<DashboardColumn[]>([QueryKey.dashboardColumns, language], async () => {
-        const response = [
-            {
-                id: 'address',
-                name: 'Address',
-                type: 'address' as const,
-                defaultIsChecked: true,
-                onlyPro: false
-            },
-            {
-                id: 'total',
-                name: 'Total',
-                type: 'numeric_fiat' as const,
-                defaultIsChecked: true,
-                onlyPro: false
-            },
-            {
-                id: 'balance_ton',
-                name: 'Balance TON',
-                type: 'numeric_crypto' as const,
-                defaultIsChecked: true,
-                onlyPro: false
-            },
-            {
-                id: 'storage',
-                name: 'Storage',
-                type: 'string' as const,
-                defaultIsChecked: true,
-                onlyPro: false
-            },
-            {
-                id: 'send_current',
-                name: 'Send current month',
-                type: 'numeric_crypto' as const,
-                defaultIsChecked: false,
-                onlyPro: true
-            },
-            {
-                id: 'send_prev',
-                name: 'Send previous month',
-                type: 'numeric_crypto' as const,
-                defaultIsChecked: false,
-                onlyPro: true
-            },
-            {
-                id: 'received_current',
-                name: 'Received current month',
-                type: 'numeric_crypto' as const,
-                defaultIsChecked: false,
-                onlyPro: true
-            },
-            {
-                id: 'received_prev',
-                name: 'Received previous month',
-                type: 'numeric_crypto' as const,
-                defaultIsChecked: true,
-                onlyPro: true
-            }
-        ];
+        const response = await getDashboardColumns(language);
 
-        return response.filter(column => isSupportedColumnType(column.type));
+        const clientColumns: DashboardColumn[] = ClientColumns.map(c => ({
+            ...c,
+            name: t(c.i18Key)
+        }));
+
+        return clientColumns.concat(response.filter(column => isSupportedColumnType(column.type)));
     });
 }

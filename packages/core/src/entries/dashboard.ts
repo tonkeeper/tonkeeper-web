@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { FiatCurrencies } from './fiat';
 
 export const columnsTypes = [
     'string',
@@ -32,22 +32,26 @@ export type DashboardCell =
     | DashboardCellNumericFiat;
 
 export type DashboardCellString = {
+    columnId: string;
     type: 'string';
     value: string;
 };
 
 export type DashboardCellAddress = {
+    columnId: string;
     type: 'address';
     raw: string;
 };
 
 export type DashboardCellNumeric = {
+    columnId: string;
     type: 'numeric';
     value: string;
     decimalPlaces?: number;
 };
 
 export type DashboardCellNumericCrypto = {
+    columnId: string;
     type: 'numeric_crypto';
     value: BigNumber;
     decimals: number;
@@ -55,6 +59,7 @@ export type DashboardCellNumericCrypto = {
 };
 
 export type DashboardCellNumericFiat = {
+    columnId: string;
     type: 'numeric_fiat';
     value: BigNumber;
     fiat: FiatCurrencies;

@@ -12,11 +12,11 @@ import {
     useDashboardColumnsForm
 } from '../../state/dashboard/useDashboardColumns';
 import { Button } from '../fields/Button';
-import { DashboardColumn } from '../../state/dashboard/dashboard-column';
 import { Badge } from '../shared';
 import { useProState } from '../../state/pro';
 import { ProNotification } from '../pro/ProNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
+import { DashboardColumn } from "@tonkeeper/core/dist/entries/dashboard";
 
 export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     isOpen,

@@ -2,9 +2,16 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { FiatCurrencies } from '../models/FiatCurrencies';
 import type { InvoicesInvoice } from '../models/InvoicesInvoice';
 import type { Lang } from '../models/Lang';
 import type { Ok } from '../models/Ok';
+import type { ProServiceDashboardCellAddress } from '../models/ProServiceDashboardCellAddress';
+import type { ProServiceDashboardCellNumericCrypto } from '../models/ProServiceDashboardCellNumericCrypto';
+import type { ProServiceDashboardCellNumericFiat } from '../models/ProServiceDashboardCellNumericFiat';
+import type { ProServiceDashboardCellString } from '../models/ProServiceDashboardCellString';
+import type { ProServiceDashboardColumn } from '../models/ProServiceDashboardColumn';
+import type { ProServiceInvoiceWebhook } from '../models/ProServiceInvoiceWebhook';
 import type { ProServiceState } from '../models/ProServiceState';
 import type { ProServiceTier } from '../models/ProServiceTier';
 import type { TgAuth } from '../models/TgAuth';
@@ -175,7 +182,7 @@ export class ProServiceService {
      * @throws ApiError
      */
     public static proServiceInvoiceWebhook(
-        requestBody?: InvoicesInvoice,
+        requestBody?: ProServiceInvoiceWebhook,
     ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -224,6 +231,66 @@ export class ProServiceService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/trial',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Something went wrong on client side`,
+                403: `Access token is missing or invalid`,
+                404: `The specified resource was not found`,
+                500: `Something went wrong on server side`,
+            },
+        });
+    }
+    /**
+     * Get dashboard columns
+     * @param lang Lang
+     * @returns any Dashboard columns
+     * @throws ApiError
+     */
+    public static proServiceDashboardColumns(
+        lang?: Lang,
+    ): CancelablePromise<{
+        items: Array<ProServiceDashboardColumn>;
+    }> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/services/pro/dashboard/columns',
+            query: {
+                'lang': lang,
+            },
+            errors: {
+                400: `Something went wrong on client side`,
+                403: `Access token is missing or invalid`,
+                404: `The specified resource was not found`,
+                500: `Something went wrong on server side`,
+            },
+        });
+    }
+    /**
+     * Get dashboard data
+     * @param lang Lang
+     * @param currency Currency
+     * @param requestBody Data that is expected
+     * @returns any Dashboard data
+     * @throws ApiError
+     */
+    public static proServiceDashboardData(
+        lang?: Lang,
+        currency?: FiatCurrencies,
+        requestBody?: {
+            accounts: Array<string>;
+            columns: Array<string>;
+        },
+    ): CancelablePromise<{
+        items: Array<Array<(ProServiceDashboardCellString | ProServiceDashboardCellAddress | ProServiceDashboardCellNumericCrypto | ProServiceDashboardCellNumericFiat)>>;
+    }> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/services/pro/dashboard/data',
+            query: {
+                'lang': lang,
+                'currency': currency,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {

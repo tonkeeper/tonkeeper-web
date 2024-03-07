@@ -63,5 +63,6 @@
   "Unlock" : "Разблокировать",
   "wallet_address" : "Адрес кошелька",
   "Wallet_name" : "Имя кошелька",
-  "wallet_sell" : "Продать"
+  "wallet_sell" : "Продать",
+  "dashboard_column_name" : "Имя"
 }

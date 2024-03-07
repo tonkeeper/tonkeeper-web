@@ -3,8 +3,8 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { Body2 } from '../Text';
 import { useDashboardColumnsAsForm } from '../../state/dashboard/useDashboardColumns';
 import { useDashboardData } from '../../state/dashboard/useDashboardData';
-import { DashboardCellAddress, DashboardColumnType } from '../../state/dashboard/dashboard-column';
 import { DashboardCell } from './columns/DashboardCell';
+import { DashboardCellAddress, DashboardColumnType } from '@tonkeeper/core/dist/entries/dashboard';
 
 const TableStyled = styled.table`
     width: 100%;

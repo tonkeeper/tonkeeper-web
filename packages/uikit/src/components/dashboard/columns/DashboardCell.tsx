@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { DashboardCell as DashboardCellProps } from '../../../state/dashboard/dashboard-column';
+import { DashboardCell as DashboardCellProps } from '@tonkeeper/core/dist/entries/dashboard';
 import { StringCell } from './StringCell';
 import { AddressCell } from './AddressCell';
 import { Network } from '@tonkeeper/core/dist/entries/network';

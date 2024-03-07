@@ -63,5 +63,6 @@
   "Unlock" : "Unlock",
   "wallet_address" : "Wallet address",
   "Wallet_name" : "Wallet name",
-  "wallet_sell" : "Sell"
+  "wallet_sell" : "Sell",
+  "dashboard_column_name" : "Name"
 }

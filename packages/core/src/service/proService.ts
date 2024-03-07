@@ -11,12 +11,26 @@ import { ProState, ProStateSubscription } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { WalletState } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
-import { InvoiceStatus, InvoicesInvoice, Lang, ProServiceService } from '../tonConsoleApi';
+import {
+    InvoicesInvoice,
+    InvoiceStatus,
+    Lang,
+    ProServiceService,
+    FiatCurrencies as FiatCurrenciesGenerated,
+    ProServiceDashboardColumnType,
+    ProServiceDashboardCellString,
+    ProServiceDashboardCellAddress,
+    ProServiceDashboardCellNumericCrypto,
+    ProServiceDashboardCellNumericFiat
+} from '../tonConsoleApi';
 import { delay } from '../utils/common';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { walletStateInitFromState } from './wallet/contractService';
 import { getWalletState } from './wallet/storeService';
 import { loginViaTG } from './telegram-oauth';
+import { DashboardCell, DashboardColumn } from '../entries/dashboard';
+import { FiatCurrencies } from '../entries/fiat';
+import { Flatten } from '../utils/types';
 
 export const setBackupState = async (storage: IStorage, state: ProStateSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -174,5 +188,93 @@ export async function startProServiceTrial(botId: string) {
     const tgData = await loginViaTG(botId);
     if (tgData) {
         return ProServiceService.proServiceTrial(tgData);
+    }
+}
+
+export async function getDashboardColumns(lang?: string): Promise<DashboardColumn[]> {
+    if (!Object.values(Lang).includes(lang as Lang)) {
+        lang = Lang.EN;
+    }
+
+    const result = await ProServiceService.proServiceDashboardColumns(lang as Lang);
+    return result.items.map(item => ({
+        id: item.id,
+        name: item.name,
+        type: item.column_type,
+        defaultIsChecked: item.checked_default,
+        onlyPro: item.only_pro
+    }));
+}
+
+export async function getDashboardData(
+    query: {
+        accounts: string[];
+        columns: string[];
+    },
+    options?: { lang?: string; currency?: FiatCurrencies }
+): Promise<DashboardCell[][]> {
+    let lang = Lang.EN;
+    if (Object.values(Lang).includes(options?.lang as Lang)) {
+        lang = options?.lang as Lang;
+    }
+
+    let currency = FiatCurrenciesGenerated.USD;
+    if (
+        Object.values(FiatCurrenciesGenerated).includes(
+            options?.currency as FiatCurrenciesGenerated
+        )
+    ) {
+        currency = options?.currency as FiatCurrenciesGenerated;
+    }
+
+    const result = await ProServiceService.proServiceDashboardData(lang, currency, query);
+    return result.items.map(row => row.map(mapDtoCellToCell));
+}
+
+type DTOCell = Flatten<
+    Flatten<Awaited<ReturnType<typeof ProServiceService.proServiceDashboardData>>['items']>
+>;
+
+function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
+    switch (dtoCell.type) {
+        case ProServiceDashboardColumnType.STRING: {
+            const cell = dtoCell as ProServiceDashboardCellString;
+
+            return {
+                columnId: cell.column_id,
+                type: 'string',
+                value: cell.value
+            };
+        }
+        case ProServiceDashboardColumnType.ADDRESS: {
+            const cell = dtoCell as ProServiceDashboardCellAddress;
+            return {
+                columnId: cell.column_id,
+                type: 'address',
+                raw: cell.raw
+            };
+        }
+        case ProServiceDashboardColumnType.NUMERIC_CRYPTO: {
+            const cell = dtoCell as ProServiceDashboardCellNumericCrypto;
+            return {
+                columnId: cell.column_id,
+                type: 'numeric_crypto',
+                value: new BigNumber(cell.value),
+                decimals: cell.decimals,
+                symbol: cell.symbol
+            };
+        }
+
+        case ProServiceDashboardColumnType.NUMERIC_FIAT: {
+            const cell = dtoCell as ProServiceDashboardCellNumericFiat;
+            return {
+                columnId: cell.column_id,
+                type: 'numeric_fiat',
+                value: new BigNumber(cell.value),
+                fiat: cell.fiat
+            };
+        }
+        default:
+            throw new Error('Unsupported cell type');
     }
 }
