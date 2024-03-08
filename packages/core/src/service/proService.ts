@@ -27,7 +27,7 @@ import { delay } from '../utils/common';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { walletStateInitFromState } from './wallet/contractService';
 import { getWalletState } from './wallet/storeService';
-import { loginViaTG } from './telegram-oauth';
+import { loginViaTG } from './telegramOauth';
 import { DashboardCell, DashboardColumn } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Flatten } from '../utils/types';
