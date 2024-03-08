@@ -10,12 +10,13 @@ import {
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { useUserJettonList } from '../../state/jetton';
 import { useTronBalances } from '../../state/tron/tron';
 import { useWalletJettonList } from '../../state/wallet';
@@ -49,7 +50,6 @@ import {
     getInitData,
     getJetton
 } from './common';
-import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const SendContent: FC<{
     onClose: () => void;
@@ -265,17 +265,17 @@ const SendContent: FC<{
                                     })}
                                     isMax={amountViewState!.isMax!}
                                 >
-                                    <ConfirmViewTitleSlot>
-                                        {status !== 'exiting' && isFullWidth && (
+                                    {status !== 'exiting' && isFullWidth && (
+                                        <ConfirmViewTitleSlot>
                                             <NotificationHeaderPortal>
                                                 <NotificationHeader>
                                                     <ConfirmViewTitle />
                                                 </NotificationHeader>
                                             </NotificationHeaderPortal>
-                                        )}
-                                    </ConfirmViewTitleSlot>
-                                    <ConfirmViewButtonsSlot>
-                                        {status !== 'exiting' && isFullWidth && (
+                                        </ConfirmViewTitleSlot>
+                                    )}
+                                    {status !== 'exiting' && isFullWidth && (
+                                        <ConfirmViewButtonsSlot>
                                             <NotificationFooterPortal>
                                                 <NotificationFooter>
                                                     <ConfirmViewButtons
@@ -283,8 +283,8 @@ const SendContent: FC<{
                                                     />
                                                 </NotificationFooter>
                                             </NotificationFooterPortal>
-                                        )}
-                                    </ConfirmViewButtonsSlot>
+                                        </ConfirmViewButtonsSlot>
+                                    )}
                                 </ConfirmTransferView>
                             )}
                         </div>
