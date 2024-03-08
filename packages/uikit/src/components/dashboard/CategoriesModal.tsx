@@ -16,12 +16,21 @@ import { Badge } from '../shared';
 import { useProState } from '../../state/pro';
 import { ProNotification } from '../pro/ProNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
-import { DashboardColumn } from "@tonkeeper/core/dist/entries/dashboard";
+import { DashboardColumn } from '@tonkeeper/core/dist/entries/dashboard';
+import { useTranslation } from '../../hooks/translation';
+
+const HeaderStyled = styled.div`
+    width: 100%;
+    padding-left: 48px;
+    text-align: center;
+    box-sizing: border-box;
+`;
 
 export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     isOpen,
     onClose
 }) => {
+    const { t } = useTranslation();
     const [_, { mutate, isLoading }] = useDashboardColumnsForm();
     const { data } = useDashboardColumnsAsForm();
     const [categoriesForm, setCategoriesForm] = useState<DashboardColumnsForm>([]);
@@ -57,9 +66,9 @@ export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
 
     return (
         <Notification
-            title="Dashboard metrics"
             isOpen={isOpen}
             handleClose={onClose}
+            title={<HeaderStyled>{t('dashboard_manage_modal_title')}</HeaderStyled>}
             footer={
                 <NotificationFooter>
                     <Button
@@ -71,7 +80,7 @@ export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
                         disabled={isLoading || !formHasChanged}
                         onClick={onSave}
                     >
-                        Save
+                        {t('save')}
                     </Button>
                 </NotificationFooter>
             }

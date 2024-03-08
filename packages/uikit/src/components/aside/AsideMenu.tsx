@@ -89,7 +89,7 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
     }, [publicKey, mutate, handleNavigateHome]);
 
     if (!wallet) {
-        return null; //TODO
+        return null;
     }
 
     const address = formatAddress(wallet.active.rawAddress, wallet.network);
@@ -104,6 +104,7 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
 };
 
 export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
+    const { t } = useTranslation();
     const [isOpenImport, setIsOpenImport] = useState(false);
     const { account, proFeatures } = useAppContext();
     const navigate = useNavigate();
@@ -140,7 +141,7 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
                     padding="m"
                     onClick={() => handleNavigateClick(AppProRoute.dashboard)}
                 >
-                    <Body2>Dashboard</Body2> {/*TODO*/}
+                    <Body2>{t('aside_dashboard')}</Body2>
                 </AsideMenuCard>
             )}
             {account.publicKeys.map(publicKey => (
@@ -157,7 +158,7 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
             <AsideMenuBottom>
                 <AsideMenuCard padding="m" isSelected={false} onClick={() => setIsOpenImport(true)}>
                     <AsideMenuItemIcon>
-                        <Body2>Add Wallet</Body2>
+                        <Body2>{t('aside_add_wallet')}</Body2>
                         <IconWrapper>
                             <PlusIcon />
                         </IconWrapper>
@@ -169,7 +170,7 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
                     isSelected={activeRoute === AppRoute.settings}
                 >
                     <AsideMenuItemIcon>
-                        <Body2>Settings</Body2>
+                        <Body2>{t('aside_settings')}</Body2>
                         <IconWrapper>
                             <SlidersIcon />
                         </IconWrapper>

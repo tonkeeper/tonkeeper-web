@@ -1,7 +1,9 @@
-export interface ProState {
-    wallet: ProStateWallet;
+type TgUserId = number;
+
+export interface ProState<A extends TgUserId | ProStateWallet = TgUserId | ProStateWallet> {
+    auth: A;
     hasCookie: boolean;
-    subscription: ProStateSubscription;
+    subscription: ProSubscription;
 }
 
 export interface ProStateWallet {
@@ -9,9 +11,44 @@ export interface ProStateWallet {
     rawAddress: string;
 }
 
-export interface ProStateSubscription {
-    valid: boolean;
-    is_trial: boolean;
-    used_trial: boolean;
-    next_charge?: number | undefined;
+export type ProSubscription = ProSubscriptionValid | ProSubscriptionInvalid;
+
+export interface ProSubscriptionPaid {
+    valid: true;
+    isTrial: false;
+    usedTrial: boolean;
+    nextChargeDate: Date;
+}
+
+export interface ProSubscriptionTrial {
+    valid: true;
+    isTrial: true;
+    trialEndDate: Date;
+    usedTrial: true;
+}
+
+export type ProSubscriptionValid = ProSubscriptionPaid | ProSubscriptionTrial;
+
+export interface ProSubscriptionInvalid {
+    valid: false;
+    isTrial: false;
+    usedTrial: boolean;
+}
+
+export function isTrialSubscription(
+    subscription: ProSubscription
+): subscription is ProSubscriptionTrial {
+    return subscription.isTrial;
+}
+
+export function isValidSubscription(
+    subscription: ProSubscription
+): subscription is ProSubscriptionValid {
+    return subscription.valid;
+}
+
+export function isPaidSubscription(
+    subscription: ProSubscription
+): subscription is ProSubscriptionPaid {
+    return subscription.valid && !subscription.isTrial;
 }

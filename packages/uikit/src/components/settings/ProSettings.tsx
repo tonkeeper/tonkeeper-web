@@ -1,5 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { ProState } from '@tonkeeper/core/dist/entries/pro';
+import { ProState, ProStateWallet } from '@tonkeeper/core/dist/entries/pro';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
@@ -89,7 +89,7 @@ const SelectWallet: FC = () => {
             <SelectLabel>{t('select_wallet_for_authorization')}</SelectLabel>
             <ListBlock>
                 {accounts.publicKeys.map(publicKey => (
-                    <ListItem onClick={() => mutate(publicKey)}>
+                    <ListItem key={publicKey} onClick={() => mutate(publicKey)}>
                         <ListItemPayload>
                             <WalletItem publicKey={publicKey} />
                         </ListItemPayload>
@@ -106,16 +106,16 @@ const SelectIconWrapper = styled.span`
     display: flex;
 `;
 
-const ProWallet: FC<{ data: ProState; onClick: () => void; disabled?: boolean }> = ({
-    data,
-    onClick,
-    disabled
-}) => {
+const ProWallet: FC<{
+    data: ProState<ProStateWallet>;
+    onClick: () => void;
+    disabled?: boolean;
+}> = ({ data, onClick, disabled }) => {
     return (
         <ListBlock>
             <ListItem onClick={() => !disabled && onClick()}>
                 <ListItemPayload>
-                    <WalletItem publicKey={data.wallet.publicKey} />
+                    <WalletItem publicKey={data.auth.publicKey} />
                     <SelectIconWrapper>
                         <DoneIcon />
                     </SelectIconWrapper>
@@ -136,7 +136,7 @@ const SelectProPlans: FC<{
         <>
             <ListBlock>
                 {plans.map(plan => (
-                    <ListItem onClick={() => !disabled && setPlan(plan.id)}>
+                    <ListItem key={plan.id} onClick={() => !disabled && setPlan(plan.id)}>
                         <ListItemPayload>
                             <ColumnText
                                 noWrap
@@ -212,7 +212,10 @@ const ConfirmBuyProService: FC<
     return <ConfirmView estimation={estimation} {...mutation} {...rest} />;
 };
 
-const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, setReLogin }) => {
+const BuyProService: FC<{ data: ProState<ProStateWallet>; setReLogin: () => void }> = ({
+    data,
+    setReLogin
+}) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);
@@ -262,7 +265,7 @@ const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, s
             />
             <Line>
                 <Input
-                    isSuccess={promoCode != undefined}
+                    isSuccess={promoCode !== undefined}
                     disabled={isLoading}
                     value={promo}
                     onChange={setPromo}
@@ -291,7 +294,10 @@ const StatusText = styled(Label1)`
     display: block;
 `;
 
-const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({ data, setReLogin }) => {
+const PreServiceStatus: FC<{ data: ProState<ProStateWallet>; setReLogin: () => void }> = ({
+    data,
+    setReLogin
+}) => {
     const { t } = useTranslation();
 
     const { mutate: logOut, isLoading } = useProLogout();
@@ -311,7 +317,7 @@ const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({ data
     );
 };
 
-const ProContent: FC<{ data: ProState }> = ({ data }) => {
+const ProContent: FC<{ data: ProState<ProStateWallet> }> = ({ data }) => {
     const [reLogin, setReLogin] = useState(false);
 
     if (!data.hasCookie || reLogin) {
@@ -335,7 +341,9 @@ export const ProSettingsContent: FC<{ showLogo?: boolean }> = ({ showLogo = true
                 <Title>{t('tonkeeper_pro')}</Title>
                 <Description>{t('tonkeeper_pro_description')}</Description>
             </Block>
-            {data ? <ProContent key={data.wallet.rawAddress} data={data} /> : undefined}
+            {data && typeof data.auth === 'object' ? (
+                <ProContent key={data.auth.rawAddress} data={data as ProState<ProStateWallet>} />
+            ) : undefined}
         </>
     );
 };

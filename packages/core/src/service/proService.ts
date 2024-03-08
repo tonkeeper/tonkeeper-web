@@ -7,7 +7,7 @@ import { BLOCKCHAIN_NAME } from '../entries/crypto';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { Language, localizationText } from '../entries/language';
-import { ProState, ProStateSubscription } from '../entries/pro';
+import { ProState, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { WalletState } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
@@ -32,12 +32,12 @@ import { DashboardCell, DashboardColumn } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Flatten } from '../utils/types';
 
-export const setBackupState = async (storage: IStorage, state: ProStateSubscription) => {
+export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
 };
 
 export const getBackupState = async (storage: IStorage) => {
-    const backup = await storage.get<ProStateSubscription>(AppKey.PRO_BACKUP);
+    const backup = await storage.get<ProSubscription>(AppKey.PRO_BACKUP);
     return backup ?? toEmptySubscription();
 };
 
@@ -48,7 +48,7 @@ export const getProState = async (storage: IStorage, wallet: WalletState): Promi
         return {
             subscription: toEmptySubscription(),
             hasCookie: false,
-            wallet: {
+            auth: {
                 publicKey: wallet.publicKey,
                 rawAddress: wallet.active.rawAddress
             }
@@ -56,30 +56,62 @@ export const getProState = async (storage: IStorage, wallet: WalletState): Promi
     }
 };
 
-const toEmptySubscription = (): ProStateSubscription => {
+const toEmptySubscription = (): ProSubscriptionInvalid => {
     return {
         valid: false,
-        is_trial: false,
-        used_trial: false
+        isTrial: false,
+        usedTrial: false
     };
 };
 
 export const loadProState = async (storage: IStorage): Promise<ProState> => {
     const user = await ProServiceService.proServiceGetUserInfo();
 
-    const wallet = await getWalletState(storage, user.pub_key);
-    if (!wallet) {
-        throw new Error('Unknown wallet');
+    let auth: ProState['auth'];
+    if (user.tg_id !== undefined) {
+        auth = user.tg_id;
+    } else {
+        const wallet = await getWalletState(storage, user.pub_key);
+        if (!wallet) {
+            throw new Error('Unknown wallet');
+        }
+        auth = {
+            publicKey: wallet.publicKey,
+            rawAddress: wallet.active.rawAddress
+        };
     }
 
-    const subscription = await ProServiceService.proServiceVerify();
+    const subscriptionDTO = await ProServiceService.proServiceVerify();
+
+    let subscription: ProSubscription;
+    if (subscriptionDTO.is_trial) {
+        subscription = {
+            valid: true,
+            isTrial: true,
+            usedTrial: true,
+            trialEndDate: new Date(subscriptionDTO.next_charge! * 1000)
+        };
+    } else {
+        if (subscriptionDTO.valid) {
+            subscription = {
+                valid: true,
+                isTrial: false,
+                usedTrial: subscriptionDTO.used_trial,
+                nextChargeDate: new Date(subscriptionDTO.next_charge! * 1000)
+            };
+        } else {
+            subscription = {
+                valid: false,
+                isTrial: false,
+                usedTrial: subscriptionDTO.used_trial
+            };
+        }
+    }
+
     return {
         subscription,
         hasCookie: true,
-        wallet: {
-            publicKey: wallet.publicKey,
-            rawAddress: wallet.active.rawAddress
-        }
+        auth
     };
 };
 

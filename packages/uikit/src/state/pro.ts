@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { ProState, ProStateSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { ProState, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -27,7 +27,7 @@ import { useTranslation } from '../hooks/translation';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
-    return useQuery<ProStateSubscription, Error>(
+    return useQuery<ProSubscription, Error>(
         [QueryKey.proBackup],
         () => getBackupState(sdk.storage),
         { keepPreviousData: true }
@@ -108,7 +108,10 @@ export const useCreateInvoiceMutation = () => {
         if (data.tierId === null) {
             throw new Error('missing tier');
         }
-        const wallet = await getWalletState(sdk.storage, data.state.wallet.publicKey);
+        if (typeof data.state.auth !== 'object') {
+            throw new Error('Invoice can be created only with wallet auth');
+        }
+        const wallet = await getWalletState(sdk.storage, data.state.auth.publicKey);
         if (!wallet) {
             throw new Error('Missing wallet');
         }

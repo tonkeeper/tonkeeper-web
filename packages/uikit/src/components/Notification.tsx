@@ -234,6 +234,7 @@ const HeaderWrapper = styled.div`
 const RowTitle = styled(H3)`
     margin: 0;
     user-select: none;
+    flex: 1;
 `;
 
 const BackShadow = styled.div`
@@ -400,7 +401,7 @@ export const Notification: FC<{
     handleClose: () => void;
     hideButton?: boolean;
     backShadow?: boolean;
-    title?: string;
+    title?: ReactNode;
     footer?: ReactNode;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
 }> = ({ children, isOpen, hideButton, backShadow, handleClose, title, footer }) => {
