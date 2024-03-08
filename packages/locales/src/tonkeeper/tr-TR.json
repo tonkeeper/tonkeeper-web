@@ -149,6 +149,29 @@
     "whitelisted_token" : "Beyaz listeye alınmış token"
   },
   "auth_failed" : "Kimlik doğrulama başarısız oldu",
+  "backup_check" : {
+    "caption" : "Her şeyi doğru yapıp yapmadığınızı görelim. %{one}, %{two} ve %{three} numaralı kelimeleri girin.",
+    "done_button" : "Tamamlandı",
+    "title" : "Yedekleme Kontrolü"
+  },
+  "backup_screen" : {
+    "last_backup_time" : "Son yedekleme %{time}",
+    "manual_backup_on" : "Manuel Yedekleme Açık",
+    "manual_button" : "Manuel Olarak Yedekleyin",
+    "manual_caption" : "Kurtarma ifadesini yazarak cüzdanınızı manuel olarak yedekleyin.",
+    "manual_title" : "Manuel",
+    "show_recovery_phrase" : "Kurtarma İfadesini Göster",
+    "title" : "Yedekle"
+  },
+  "backup_warning" : {
+    "cancel_button" : "İptal",
+    "caption" : "Kurtarma ifadenizi görüntülemeden önce lütfen aşağıdakileri dikkatlice okuyun.",
+    "continue_button" : "Devam et",
+    "p1" : "Cüzdanınıza erişmek için kurtarma cümlenizi asla Tonkeeper'dan başka bir yere girmeyin.",
+    "p2" : "Tonkeeper Destek hiçbir zaman size kurtarma ifadesini sormaz.",
+    "p3" : "Kurtarma ifadenizi bilen herkes cüzdanınıza erişebilir.",
+    "title" : "Dikkat"
+  },
   "balances_setup_wallet" : "Cüzdanı ayarlayın",
   "battery" : {
     "description" : {
@@ -188,14 +211,22 @@
     "android" : {
       "face_recognition" : "yüz tanıma",
       "face_recognition_genitive" : "yüz tanıma",
+      "face_recognition_instrumental" : "yüz tanıma",
       "fingerprint" : "Parmak izi",
-      "fingerprint_genitive" : "Parmak izi"
+      "fingerprint_genitive" : "Parmak izi",
+      "fingerprint_instrumental" : "Parmak izi"
     },
+    "default" : "Biyometrik",
+    "default_accusative" : "Biyometrik",
+    "default_genitive" : "Biyometrik",
+    "default_instrumental" : "Biyometrik",
     "ios" : {
-      "face_recognition" : "Yüz kimliği",
-      "face_recognition_genitive" : "Yüz kimliği",
+      "face_recognition" : "Face ID",
+      "face_recognition_genitive" : "Face ID",
+      "face_recognition_instrumental" : "Face ID",
       "fingerprint" : "Touch ID",
-      "fingerprint_genitive" : "Touch ID"
+      "fingerprint_genitive" : "Touch ID",
+      "fingerprint_instrumental" : "Touch ID"
     }
   },
   "browser" : {
@@ -409,6 +440,13 @@
   "exchange_telegram_bot" : "TELEGRAM BOTU",
   "exchange_title" : "TON satın alın",
   "expiring_domains" : "Süresi dolan alan adları",
+  "finish_setup" : {
+    "backup" : "Cüzdan kurtarma ifadesini yedekleyin",
+    "done_button" : "Tamamlandı",
+    "enable_notifications" : "İşlem bildirimlerini etkinleştirin",
+    "header_title" : "Kurulumu tamamla",
+    "use_biometry" : "İşlemi onaylamak için %{name} kullanın"
+  },
   "form_optional_indicator" : "İsteğe bağlı",
   "import_add_wallet" : "Cüzdan Ekle",
   "import_add_wallet_description" : "Yeni bir cüzdan oluşturun veya mevcut bir cüzdan ekleyin.",
@@ -634,6 +672,12 @@
   "receive_share" : "Paylaş",
   "receive_title" : "%{currency} al",
   "receive_ton_and_jettons" : "TON ve diğer token'ları cüzdana alın",
+  "recovery_phrase" : {
+    "caption" : "Bu kelimeleri numaralarıyla birlikte not edin ve güvenli bir yerde saklayın.",
+    "check_button" : "Yedekleme Kontrolü",
+    "copy_button" : "Kopyala",
+    "title" : "Gizli kurtarma ifadesi"
+  },
   "refresh_app" : "Yeniden Başlat",
   "region_nokyc" : "Tarafsız bölge",
   "reminder_notifications_caption" : "Cüzdanınıza TON, token ve NFT geldiğinde bildirimler alın.",
@@ -728,7 +772,7 @@
   "send_sending_wrong_time_title" : "Hata oluştu",
   "send_title" : "%{currency} gönder",
   "settings_appearance" : "Tema",
-  "settings_backup_seed" : "Gizli kurtarma ifadesini göster",
+  "settings_backup_seed" : "Yedekle",
   "settings_contact_support" : "Bize Ulaşın",
   "settings_delete_account" : "Hesabı sil",
   "settings_delete_alert_button" : "Hesabı ve verileri sil",
