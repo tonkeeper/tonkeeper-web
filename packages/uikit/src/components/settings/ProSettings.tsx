@@ -1,5 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { ProState, ProStateWallet } from '@tonkeeper/core/dist/entries/pro';
+import { isPaidSubscription, ProState, ProStateWallet } from "@tonkeeper/core/dist/entries/pro";
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
@@ -107,7 +107,7 @@ const SelectIconWrapper = styled.span`
 `;
 
 const ProWallet: FC<{
-    data: ProState<ProStateWallet>;
+    data: ProState;
     onClick: () => void;
     disabled?: boolean;
 }> = ({ data, onClick, disabled }) => {
@@ -115,7 +115,7 @@ const ProWallet: FC<{
         <ListBlock>
             <ListItem onClick={() => !disabled && onClick()}>
                 <ListItemPayload>
-                    <WalletItem publicKey={data.auth.publicKey} />
+                    <WalletItem publicKey={data.wallet.publicKey} />
                     <SelectIconWrapper>
                         <DoneIcon />
                     </SelectIconWrapper>
@@ -212,7 +212,7 @@ const ConfirmBuyProService: FC<
     return <ConfirmView estimation={estimation} {...mutation} {...rest} />;
 };
 
-const BuyProService: FC<{ data: ProState<ProStateWallet>; setReLogin: () => void }> = ({
+const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({
     data,
     setReLogin
 }) => {
@@ -294,7 +294,7 @@ const StatusText = styled(Label1)`
     display: block;
 `;
 
-const PreServiceStatus: FC<{ data: ProState<ProStateWallet>; setReLogin: () => void }> = ({
+const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({
     data,
     setReLogin
 }) => {
@@ -317,13 +317,13 @@ const PreServiceStatus: FC<{ data: ProState<ProStateWallet>; setReLogin: () => v
     );
 };
 
-const ProContent: FC<{ data: ProState<ProStateWallet> }> = ({ data }) => {
+const ProContent: FC<{ data: ProState }> = ({ data }) => {
     const [reLogin, setReLogin] = useState(false);
 
     if (!data.hasCookie || reLogin) {
         return <SelectWallet />;
     }
-    if (data.subscription.valid) {
+    if (isPaidSubscription(data.subscription)) {
         return <PreServiceStatus data={data} setReLogin={() => setReLogin(true)} />;
     }
     return <BuyProService data={data} setReLogin={() => setReLogin(true)} />;
@@ -341,9 +341,7 @@ export const ProSettingsContent: FC<{ showLogo?: boolean }> = ({ showLogo = true
                 <Title>{t('tonkeeper_pro')}</Title>
                 <Description>{t('tonkeeper_pro_description')}</Description>
             </Block>
-            {data && typeof data.auth === 'object' ? (
-                <ProContent key={data.auth.rawAddress} data={data as ProState<ProStateWallet>} />
-            ) : undefined}
+            {data && <ProContent key={data.wallet.rawAddress} data={data} />}
         </>
     );
 };

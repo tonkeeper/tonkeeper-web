@@ -1,7 +1,5 @@
-type TgUserId = number;
-
-export interface ProState<A extends TgUserId | ProStateWallet = TgUserId | ProStateWallet> {
-    auth: A;
+export interface ProState {
+    wallet: ProStateWallet;
     hasCookie: boolean;
     subscription: ProSubscription;
 }
@@ -21,6 +19,7 @@ export interface ProSubscriptionPaid {
 }
 
 export interface ProSubscriptionTrial {
+    trialUserId: number;
     valid: true;
     isTrial: true;
     trialEndDate: Date;

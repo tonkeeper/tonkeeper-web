@@ -43,12 +43,12 @@ export const getBackupState = async (storage: IStorage) => {
 
 export const getProState = async (storage: IStorage, wallet: WalletState): Promise<ProState> => {
     try {
-        return await loadProState(storage);
+        return await loadProState(storage, wallet);
     } catch (e) {
         return {
             subscription: toEmptySubscription(),
             hasCookie: false,
-            auth: {
+            wallet: {
                 publicKey: wallet.publicKey,
                 rawAddress: wallet.active.rawAddress
             }
@@ -64,20 +64,24 @@ const toEmptySubscription = (): ProSubscriptionInvalid => {
     };
 };
 
-export const loadProState = async (storage: IStorage): Promise<ProState> => {
+export const loadProState = async (
+    storage: IStorage,
+    fallbackWallet: WalletState
+): Promise<ProState> => {
     const user = await ProServiceService.proServiceGetUserInfo();
 
-    let auth: ProState['auth'];
-    if (user.tg_id !== undefined) {
-        auth = user.tg_id;
-    } else {
-        const wallet = await getWalletState(storage, user.pub_key);
-        if (!wallet) {
+    let wallet = {
+        publicKey: fallbackWallet.publicKey,
+        rawAddress: fallbackWallet.active.rawAddress
+    };
+    if (user.pub_key) {
+        const actualWallet = await getWalletState(storage, user.pub_key);
+        if (!actualWallet) {
             throw new Error('Unknown wallet');
         }
-        auth = {
-            publicKey: wallet.publicKey,
-            rawAddress: wallet.active.rawAddress
+        wallet = {
+            publicKey: actualWallet.publicKey,
+            rawAddress: actualWallet.active.rawAddress
         };
     }
 
@@ -89,6 +93,7 @@ export const loadProState = async (storage: IStorage): Promise<ProState> => {
             valid: true,
             isTrial: true,
             usedTrial: true,
+            trialUserId: user.tg_id!,
             trialEndDate: new Date(subscriptionDTO.next_charge! * 1000)
         };
     } else {
@@ -111,7 +116,7 @@ export const loadProState = async (storage: IStorage): Promise<ProState> => {
     return {
         subscription,
         hasCookie: true,
-        auth
+        wallet
     };
 };
 

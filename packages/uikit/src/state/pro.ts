@@ -108,10 +108,8 @@ export const useCreateInvoiceMutation = () => {
         if (data.tierId === null) {
             throw new Error('missing tier');
         }
-        if (typeof data.state.auth !== 'object') {
-            throw new Error('Invoice can be created only with wallet auth');
-        }
-        const wallet = await getWalletState(sdk.storage, data.state.auth.publicKey);
+
+        const wallet = await getWalletState(sdk.storage, data.state.wallet.publicKey);
         if (!wallet) {
             throw new Error('Missing wallet');
         }

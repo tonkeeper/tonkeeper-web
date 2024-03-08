@@ -6,7 +6,6 @@ export enum ProServiceDashboardColumnID {
     ADDRESS = 'address',
     TOTAL_BALANCE = 'total_balance',
     TOTAL_TON = 'total_ton',
-    KEY_STORAGE = 'key_storage',
     SEND_CURRENT_MONTH = 'send_current_month',
     SEND_LAST_MONTH = 'send_last_month',
     RECEIVE_CURRENT_MONTH = 'receive_current_month',

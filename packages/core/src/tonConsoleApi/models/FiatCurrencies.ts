@@ -4,5 +4,16 @@
 /* eslint-disable */
 export enum FiatCurrencies {
     USD = 'USD',
-    TON = 'TON',
+    EUR = 'EUR',
+    RUB = 'RUB',
+    AED = 'AED',
+    KZT = 'KZT',
+    UAH = 'UAH',
+    GBP = 'GBP',
+    CHF = 'CHF',
+    CNY = 'CNY',
+    KRW = 'KRW',
+    IDR = 'IDR',
+    INR = 'INR',
+    JPY = 'JPY',
 }
