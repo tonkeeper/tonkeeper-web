@@ -45,6 +45,16 @@ const AsideMenuCard = styled.button<{ isSelected: boolean; padding: 's' | 'm' }>
         color: ${props => props.theme.textSecondary};
     }
 
+    & > ${Body2} {
+        text-align: left;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
     transition: background-color 0.2s ease-in-out;
 
     &:hover {

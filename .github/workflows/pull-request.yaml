@@ -65,6 +65,7 @@ jobs:
                   dir: 'apps/desktop'
 
             - name: Run build arm distributive
+              if: runner.os != 'Windows'
               uses: borales/actions-yarn@v5
               with:
                   cmd: make:arm
