@@ -5,6 +5,7 @@ import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { useActivateTrialMutation } from '../../state/pro';
 import { TelegramIcon } from '../Icon';
+import { useTranslation } from '../../hooks/translation';
 
 const ContentWrapper = styled.div`
     display: flex;
@@ -40,6 +41,7 @@ export const ProTrialStartNotification: FC<{ isOpen: boolean; onClose: () => voi
     isOpen,
     onClose
 }) => {
+    const { t } = useTranslation();
     const { mutateAsync, isLoading } = useActivateTrialMutation();
 
     const onConfirm = async () => {
@@ -55,7 +57,7 @@ export const ProTrialStartNotification: FC<{ isOpen: boolean; onClose: () => voi
                 <FooterStyled>
                     <ButtonStyled primary fullWidth loading={isLoading} onClick={onConfirm}>
                         <TelegramIcon />
-                        Connect Telegram
+                        {t('connect_telegram')}
                     </ButtonStyled>
                 </FooterStyled>
             }
@@ -63,11 +65,8 @@ export const ProTrialStartNotification: FC<{ isOpen: boolean; onClose: () => voi
             {() => (
                 <ContentWrapper>
                     <ImageStyled src="https://tonkeeper.com/assets/icon.ico" />
-                    <Label2>Connect Telegram to Pro for Free</Label2>
-                    <Body2>
-                        Telegram connection is required solely for the purpose of verification that
-                        you are not a bot.
-                    </Body2>
+                    <Label2>{t('start_trial_notification_heading')}</Label2>
+                    <Body2>{t('start_trial_notification_description')}</Body2>
                 </ContentWrapper>
             )}
         </Notification>
