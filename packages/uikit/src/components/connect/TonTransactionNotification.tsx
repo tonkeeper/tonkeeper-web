@@ -14,43 +14,35 @@ import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { getMnemonic } from '../../state/mnemonic';
 import { CheckmarkCircleIcon } from '../Icon';
-import { Notification, NotificationBlock } from '../Notification';
+import {
+    Notification,
+    NotificationBlock,
+    NotificationFooter,
+    NotificationFooterPortal
+} from '../Notification';
 import { SkeletonList } from '../Skeleton';
 import { Label2 } from '../Text';
-import { Button, ButtonRow } from '../fields/Button';
+import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
 
 const ButtonGap = styled.div`
     height: 56px;
-`;
-
-const ButtonRowFixed = styled(ButtonRow)<{ standalone: boolean }>`
-    position: fixed;
 
     ${props =>
-        props.standalone
-            ? css`
-                  bottom: 32px;
-              `
-            : css`
-                  bottom: 16px;
-              `}
+        props.theme.displayType === 'full-width' &&
+        css`
+            height: 1rem;
+        `}
+`;
 
-    padding: 0 16px;
-    box-sizing: border-box;
-    width: var(--app-width);
+const ButtonRowStyled = styled.div`
+    display: flex;
+    gap: 1rem;
+    width: 100%;
 
-    &:after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        top: 0;
-        left: 0;
-        bottom: -32px;
-        height: calc(100% + 2rem);
-        z-index: -1;
-        background: ${props => props.theme.gradientBackgroundBottom};
+    & > * {
+        flex: 1;
     }
 `;
 
@@ -70,21 +62,24 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
 };
 
 const NotificationSkeleton: FC<{ handleClose: (result?: string) => void }> = ({ handleClose }) => {
-    const { standalone } = useAppContext();
     const { t } = useTranslation();
 
     return (
         <NotificationBlock>
             <SkeletonList size={3} margin fullWidth />
             <ButtonGap />
-            <ButtonRowFixed standalone={standalone}>
-                <Button size="large" type="button" onClick={() => handleClose()}>
-                    {t('notifications_alert_cancel')}
-                </Button>
-                <Button size="large" type="submit" primary fullWidth loading>
-                    {t('confirm')}
-                </Button>
-            </ButtonRowFixed>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ButtonRowStyled>
+                        <Button size="large" type="button" onClick={() => handleClose()}>
+                            {t('notifications_alert_cancel')}
+                        </Button>
+                        <Button size="large" type="submit" primary loading>
+                            {t('confirm')}
+                        </Button>
+                    </ButtonRowStyled>
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </NotificationBlock>
     );
 };
@@ -94,7 +89,6 @@ const ConnectContent: FC<{
     handleClose: (result?: string) => void;
 }> = ({ params, handleClose }) => {
     const sdk = useAppSdk();
-    const { standalone } = useAppContext();
     const [done, setDone] = useState(false);
 
     const { t } = useTranslation();
@@ -109,8 +103,7 @@ const ConnectContent: FC<{
         sdk.hapticNotification('success');
     }, []);
 
-    const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
-        e.preventDefault();
+    const onSubmit = async () => {
         const result = await mutateAsync();
         setDone(true);
         sdk.hapticNotification('success');
@@ -122,40 +115,42 @@ const ConnectContent: FC<{
     }
 
     return (
-        <NotificationBlock onSubmit={onSubmit}>
+        <NotificationBlock>
             <EmulationList isError={isError} estimate={estimate} />
             <ButtonGap />
-            <ButtonRowFixed standalone={standalone}>
-                {done && (
-                    <ResultButton done>
-                        <CheckmarkCircleIcon />
-                        <Label2>{t('ton_login_success')}</Label2>
-                    </ResultButton>
-                )}
-                {!done && (
-                    <>
-                        <Button
-                            size="large"
-                            type="button"
-                            loading={isLoading}
-                            disabled={isLoading}
-                            onClick={() => handleClose()}
-                        >
-                            {t('notifications_alert_cancel')}
-                        </Button>
-                        <Button
-                            size="large"
-                            type="submit"
-                            primary
-                            fullWidth
-                            loading={isLoading}
-                            disabled={isLoading}
-                        >
-                            {t('confirm')}
-                        </Button>
-                    </>
-                )}
-            </ButtonRowFixed>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    {done && (
+                        <ResultButton done>
+                            <CheckmarkCircleIcon />
+                            <Label2>{t('ton_login_success')}</Label2>
+                        </ResultButton>
+                    )}
+                    {!done && (
+                        <ButtonRowStyled>
+                            <Button
+                                size="large"
+                                type="button"
+                                loading={isLoading}
+                                disabled={isLoading}
+                                onClick={() => handleClose()}
+                            >
+                                {t('notifications_alert_cancel')}
+                            </Button>
+                            <Button
+                                size="large"
+                                type="submit"
+                                primary
+                                loading={isLoading}
+                                disabled={isLoading}
+                                onClick={onSubmit}
+                            >
+                                {t('confirm')}
+                            </Button>
+                        </ButtonRowStyled>
+                    )}
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </NotificationBlock>
     );
 };
