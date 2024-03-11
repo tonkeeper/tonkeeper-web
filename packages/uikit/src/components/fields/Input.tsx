@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { XmarkIcon } from '../Icon';
 import { Body2 } from '../Text';
@@ -63,7 +63,7 @@ export const InputBlock = styled.div<{
         `}
 `;
 
-export const InputField = styled.input`
+export const InputField = styled.input<{ marginRight?: string }>`
     outline: none;
     border: none;
     background: transparent;
@@ -74,6 +74,11 @@ export const InputField = styled.input`
     box-sizing: border-box;
 
     color: ${props => props.theme.textPrimary};
+    ${props =>
+        props.marginRight &&
+        css`
+            margin-right: ${props.marginRight};
+        `};
 `;
 
 export const Label = styled.label<{ active?: boolean }>`
@@ -116,12 +121,15 @@ export const HelpText = styled(Body2)<{ valid: boolean }>`
               `}
 `;
 
-const ClearBlock = styled.div`
+const RightBlock = styled.div`
     position: absolute;
     right: 1rem;
     height: 100%;
     display: flex;
     align-items: center;
+`;
+
+const ClearBlock = styled(RightBlock)`
     cursor: pointer;
     color: ${props => props.theme.textSecondary};
 
@@ -142,6 +150,8 @@ export interface InputProps {
     helpText?: string;
     tabIndex?: number;
     clearButton?: boolean;
+    rightElement?: ReactNode;
+    marginRight?: string;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -156,7 +166,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             disabled,
             helpText,
             tabIndex,
-            clearButton
+            clearButton,
+            rightElement,
+            marginRight
         },
         ref
     ) => {
@@ -184,12 +196,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         value={value}
                         spellCheck={false}
                         tabIndex={tabIndex}
+                        marginRight={marginRight}
                         onChange={e => onChange && onChange(e.target.value)}
                         onFocus={() => setFocus(true)}
                         onBlur={() => setFocus(false)}
                     />
                     {label && <Label active={value !== ''}>{label}</Label>}
-                    {!!value && clearButton && (
+                    {rightElement && <RightBlock onClick={onClear}>{rightElement}</RightBlock>}
+                    {!!value && clearButton && !rightElement && (
                         <ClearBlock onClick={onClear}>
                             <XmarkIcon />
                         </ClearBlock>
