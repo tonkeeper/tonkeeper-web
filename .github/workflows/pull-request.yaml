@@ -19,6 +19,8 @@ jobs:
             APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
             REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE }}
             REACT_APP_TONCONSOLE_API: https://pro.tonconsole.com
+            REACT_APP_TG_BOT_ID: 6345183204
+            REACT_APP_TG_BOT_ORIGIN: https://tonkeeper.com
             DEBUG: electron*
 
         steps:
