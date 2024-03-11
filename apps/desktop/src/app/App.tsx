@@ -272,7 +272,7 @@ export const Loader: FC = () => {
         proFeatures: true,
         ios: false,
         env: {
-          tgAuthBotId: REACT_APP_TG_BOT_ID
+            tgAuthBotId: REACT_APP_TG_BOT_ID
         }
     };
 
@@ -336,6 +336,7 @@ export const Content: FC<{
                         <Route path="*" element={<WalletContent />} />
                     </Routes>
                 </WideContent>
+                <BackgroundElements />
             </WideLayout>
         </WalletStateContext.Provider>
     );
@@ -370,6 +371,13 @@ const OldAppRouting = () => {
         <Wrapper>
             <Outlet />
             <MemoryScroll />
+        </Wrapper>
+    );
+};
+
+const BackgroundElements = () => {
+    return (
+        <>
             <SendActionNotification />
             <ReceiveNotification />
             <TonConnectSubscription />
@@ -378,6 +386,6 @@ const OldAppRouting = () => {
             <AddFavoriteNotification />
             <EditFavoriteNotification />
             <DeepLinkSubscription />
-        </Wrapper>
+        </>
     );
 };
