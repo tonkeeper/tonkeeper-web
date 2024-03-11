@@ -1,5 +1,5 @@
 import { delay } from '@tonkeeper/core/dist/utils/common';
-import { BrowserWindow, ipcMain, shell } from 'electron';
+import { BrowserWindow, ipcMain } from 'electron';
 import isDev from 'electron-is-dev';
 import path from 'path';
 import { Cookie, CookieJar } from 'tough-cookie';
@@ -43,7 +43,6 @@ export abstract class MainWindow {
             height: 750,
             minHeight: 700,
             resizable: isDev,
-            autoHideMenuBar: process.platform !== 'darwin',
             webPreferences: {
                 zoomFactor: process.platform !== 'linux' ? 0.8 : undefined,
                 preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
