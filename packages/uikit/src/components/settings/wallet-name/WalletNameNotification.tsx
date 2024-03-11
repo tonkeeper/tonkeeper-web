@@ -8,6 +8,8 @@ import { Button } from '../../fields/Button';
 import { Input } from '../../fields/Input';
 import styled from 'styled-components';
 import { emojis } from './emojis';
+import { emojiIcons } from './emojiIcons';
+import { WalletEmoji } from '../../shared/wallet/WalletEmoji';
 
 const EmojisListScroll = styled.div`
     max-height: 240px;
@@ -52,7 +54,6 @@ const EmojiWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
 `;
 
 const EmojiButton = styled(EmojiWrapper)`
@@ -74,6 +75,11 @@ const EmojisList: FC<{ onClick: (emoji: string) => void; keepShortListForMS?: nu
         return (
             <EmojisListScroll>
                 <ShadowTop />
+                {emojiIcons.map(item => (
+                    <EmojiButton key={item.name} onClick={() => onClick(item.name)}>
+                        <item.icon />
+                    </EmojiButton>
+                ))}
                 {emojisList.map(emoji => (
                     <EmojiButton key={emoji} onClick={() => onClick(emoji)}>
                         {emoji}
@@ -111,7 +117,7 @@ const RenameWalletContent: FC<{
                 onChange={setName}
                 isValid={!isError}
                 label={t('Wallet_name')}
-                rightElement={emoji ? <EmojiWrapper>{emoji}</EmojiWrapper> : null}
+                rightElement={emoji ? <WalletEmoji emoji={emoji} /> : null}
                 marginRight="36px"
             />
             <EmojisList keepShortListForMS={animationTime} onClick={setEmoji} />
