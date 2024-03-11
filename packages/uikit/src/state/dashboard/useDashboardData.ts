@@ -5,33 +5,34 @@ import { useAppContext } from '../../hooks/appContext';
 import { DashboardCell } from '@tonkeeper/core/dist/entries/dashboard';
 import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
 import { useTranslation } from '../../hooks/translation';
-import { useAppSdk } from '../../hooks/appSdk';
-import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { Address } from 'ton-core';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useWalletsState } from '../wallet';
 
 export function useDashboardData() {
     const { data: columns } = useDashboardColumnsAsForm();
     const selectedColumns = columns?.filter(c => c.isEnabled);
-    const { fiat, account } = useAppContext();
+    const { fiat } = useAppContext();
     const {
         i18n: { language },
         t
     } = useTranslation();
     const selectedColIds = selectedColumns?.map(c => c.id);
-    const publicKeys = account?.publicKeys;
-    const { storage } = useAppSdk();
     const client = useQueryClient();
 
+    const { data: walletsState } = useWalletsState();
+    const mainnetWallets = walletsState?.filter(w => w?.network === Network.MAINNET);
+    const publicKeysMainnet = mainnetWallets?.map(w => w!.publicKey);
+
     return useQuery<DashboardCell[][]>(
-        [QueryKey.dashboardData, selectedColIds, publicKeys, fiat, language],
+        [QueryKey.dashboardData, selectedColIds, publicKeysMainnet, fiat, language],
         async ctx => {
-            if (!selectedColIds?.length || !publicKeys?.length) {
+            if (!selectedColIds?.length || !publicKeysMainnet?.length || !mainnetWallets?.length) {
                 return [];
             }
 
-            const wallets = await Promise.all(publicKeys.map(pk => getWalletState(storage, pk)));
-            const accounts = wallets.map(acc => acc!.active.friendlyAddress);
+            const accounts = mainnetWallets.map(acc => acc!.active.friendlyAddress);
 
             const loadData = async (query: { columns: string[]; accounts: string[] }) => {
                 const queryToFetch = {
@@ -51,7 +52,7 @@ export function useDashboardData() {
                 const defaultWalletName = t('wallet_title');
                 const result: DashboardCell[][] = query.accounts.map(() => []);
                 query.accounts.forEach((walletAddress, rowIndex) => {
-                    const wallet = wallets.find(w =>
+                    const wallet = mainnetWallets.find(w =>
                         Address.parse(w!.active.friendlyAddress).equals(
                             Address.parse(walletAddress)
                         )
@@ -91,8 +92,8 @@ export function useDashboardData() {
                 const walletsToQuerySet = new Set<WalletState>();
                 const columnsToQuerySet = new Set<string>();
 
-                const result: (DashboardCell | null)[][] = publicKeys.map(() => []);
-                publicKeys.forEach((pk, walletIndex) => {
+                const result: (DashboardCell | null)[][] = publicKeysMainnet.map(() => []);
+                publicKeysMainnet.forEach((pk, walletIndex) => {
                     selectedColIds.forEach((col, colIndex) => {
                         const matchingQueries = pastQueries.filter(
                             ([key, _]) =>
@@ -102,7 +103,7 @@ export function useDashboardData() {
 
                         if (!matchingQueries.length) {
                             result[walletIndex][colIndex] = null;
-                            walletsToQuerySet.add(wallets[walletIndex]!);
+                            walletsToQuerySet.add(mainnetWallets[walletIndex]!);
                             columnsToQuerySet.add(col);
                             return;
                         }
@@ -119,10 +120,7 @@ export function useDashboardData() {
                 });
 
                 const walletsToQuery = [...walletsToQuerySet.values()];
-                let accountsToQuery = walletsToQuery.map(acc => acc.active.friendlyAddress);
-                if (columnsToQuerySet.size > 0) {
-                    accountsToQuery = accounts;
-                }
+                const accountsToQuery = walletsToQuery.map(acc => acc.active.friendlyAddress);
                 const columnsToQuery = [...columnsToQuerySet.values()];
 
                 if (!accountsToQuery.length || !columnsToQuery.length) {
@@ -135,7 +133,9 @@ export function useDashboardData() {
                 });
 
                 newData.forEach((row, rowIndex) => {
-                    const walletIndex = publicKeys.indexOf(walletsToQuery[rowIndex].publicKey);
+                    const walletIndex = publicKeysMainnet.indexOf(
+                        walletsToQuery[rowIndex].publicKey
+                    );
                     row.forEach(cell => {
                         const colIndex = selectedColIds.indexOf(cell.columnId);
                         result[walletIndex][colIndex] = cell;
@@ -149,7 +149,7 @@ export function useDashboardData() {
             return loadData({ accounts, columns: selectedColIds });
         },
         {
-            enabled: !!selectedColIds && !!publicKeys
+            enabled: !!selectedColIds && !!mainnetWallets
         }
     );
 }

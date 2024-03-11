@@ -41,6 +41,15 @@ export const useWalletState = (publicKey: string) => {
     );
 };
 
+export const useWalletsState = () => {
+    const { account } = useAppContext();
+    const sdk = useAppSdk();
+    return useQuery<(WalletState | null)[], Error>(
+        [QueryKey.account, QueryKey.wallets, account.publicKeys],
+        () => Promise.all(account.publicKeys.map(key => getWalletState(sdk.storage, key)))
+    );
+};
+
 export const useMutateLogOut = (publicKey: string, remove = false) => {
     const sdk = useAppSdk();
     const client = useQueryClient();
