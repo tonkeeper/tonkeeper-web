@@ -68,7 +68,12 @@ export const useMutateRenameWallet = (wallet: WalletState) => {
             throw new Error('Missing name');
         }
 
-        await updateWalletProperty(sdk.storage, wallet, form);
+        const formToUpdate = {
+            ...(form.emoji && { emoji: form.emoji }),
+            ...(form.name && { name: form.name })
+        };
+
+        await updateWalletProperty(sdk.storage, wallet, formToUpdate);
         await client.invalidateQueries([QueryKey.account]);
     });
 };
@@ -84,7 +89,7 @@ export const useMutateWalletProperty = (clearWallet = false) => {
         Partial<
             Pick<
                 WalletState,
-                'name' | 'hiddenJettons' | 'orderJettons' | 'lang' | 'fiat' | 'network'
+                'name' | 'hiddenJettons' | 'orderJettons' | 'lang' | 'fiat' | 'network' | 'emoji'
             >
         >
     >(async props => {
