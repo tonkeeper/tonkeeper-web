@@ -82,6 +82,9 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
     const { mutate } = useMutateActiveWallet();
     const navigate = useNavigate();
 
+    const { account } = useAppContext();
+    const shouldShowIcon = account.publicKeys.length > 1;
+
     const handleNavigateHome = useCallback(() => {
         if (location.pathname !== AppRoute.home) {
             return navigate(AppRoute.home);
@@ -103,7 +106,9 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
 
     return (
         <AsideMenuCard isSelected={isSelected} onClick={onClick}>
-            <WalletEmoji emojiSize="16px" containerSize="16px" emoji={wallet.emoji} />
+            {shouldShowIcon && (
+                <WalletEmoji emojiSize="16px" containerSize="16px" emoji={wallet.emoji} />
+            )}
             <Body2>{name}</Body2>
         </AsideMenuCard>
     );
