@@ -30,6 +30,7 @@ import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useMutateAccountState } from '../../state/account';
 import { useWalletState } from '../../state/wallet';
+import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 
 const Row = styled.div`
     display: flex;
@@ -69,6 +70,7 @@ const WalletRow: FC<{
                     <Icon {...dragHandleProps}>
                         <ReorderIcon />
                     </Icon>
+                    <WalletEmoji emoji={wallet.emoji} />
                     <ColumnText
                         noWrap
                         text={wallet.name ? wallet.name : t('wallet_title')}

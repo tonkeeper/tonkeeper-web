@@ -6,6 +6,7 @@ import { TonConnectError } from '../../entries/exception';
 import { Network } from '../../entries/network';
 import { CONNECT_EVENT_ERROR_CODES } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
+import { emojis } from "../../utils/emojis";
 
 export const getWalletState = async (storage: IStorage, publicKey: string) => {
     const state = await storage.get<WalletState>(`${AppKey.WALLET}_${publicKey}`);
@@ -14,6 +15,8 @@ export const getWalletState = async (storage: IStorage, publicKey: string) => {
         state.active.friendlyAddress = Address.parse(state.active.friendlyAddress).toString({
             testOnly: state.network === Network.TESTNET
         });
+
+        state.emoji ||= getFallbackWalletEmoji(state.publicKey);
     }
 
     return state;
@@ -48,3 +51,8 @@ export const getCurrentWallet = async (storage: IStorage) => {
 
     return wallet;
 };
+
+export function getFallbackWalletEmoji(publicKey: string) {
+    const index = Number('0x' + publicKey.slice(-6)) % emojis.length;
+    return emojis[index];
+}

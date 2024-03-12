@@ -1,94 +1,13 @@
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { useTranslation } from '../../../hooks/translation';
 import { useMutateRenameWallet } from '../../../state/wallet';
 import { Notification, NotificationBlock } from '../../Notification';
 import { Button } from '../../fields/Button';
 import { Input } from '../../fields/Input';
-import styled from 'styled-components';
-import { emojis } from './emojis';
-import { emojiIcons } from './emojiIcons';
-import { WalletEmoji } from '../../shared/wallet/WalletEmoji';
-
-const EmojisListScroll = styled.div`
-    max-height: 240px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    overflow: auto;
-    position: relative;
-
-    &::-webkit-scrollbar {
-        display: none;
-        width: 0;
-        background: transparent;
-        height: 0;
-    }
-
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-`;
-
-const Shadow = styled.div`
-    position: sticky;
-    width: 100%;
-    height: 16px;
-`;
-
-const ShadowBottom = styled(Shadow)`
-    bottom: -1px;
-    background: ${props => props.theme.gradientBackgroundBottom};
-`;
-
-const ShadowTop = styled(Shadow)`
-    top: 0;
-    background: ${props => props.theme.gradientBackgroundTop};
-`;
-
-const EmojiWrapper = styled.div`
-    height: 32px;
-    width: 32px;
-    line-height: 24px;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`;
-
-const EmojiButton = styled(EmojiWrapper)`
-    cursor: pointer;
-`;
-
-const shortEmojisList = emojis.slice(0, 150);
-
-const EmojisList: FC<{ onClick: (emoji: string) => void; keepShortListForMS?: number }> =
-    React.memo(({ onClick, keepShortListForMS }) => {
-        const [emojisList, setEmojisList] = useState(keepShortListForMS ? shortEmojisList : emojis);
-
-        useEffect(() => {
-            if (keepShortListForMS) {
-                setTimeout(() => setEmojisList(emojis), keepShortListForMS);
-            }
-        }, []);
-
-        return (
-            <EmojisListScroll>
-                <ShadowTop />
-                {emojiIcons.map(item => (
-                    <EmojiButton key={item.name} onClick={() => onClick(item.name)}>
-                        <item.icon />
-                    </EmojiButton>
-                ))}
-                {emojisList.map(emoji => (
-                    <EmojiButton key={emoji} onClick={() => onClick(emoji)}>
-                        {emoji}
-                    </EmojiButton>
-                ))}
-                <ShadowBottom />
-            </EmojisListScroll>
-        );
-    });
+import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
+import { EmojisList } from '../../shared/emoji/EmojisList';
 
 const RenameWalletContent: FC<{
     wallet: WalletState;
@@ -125,7 +44,6 @@ const RenameWalletContent: FC<{
             <Button
                 size="large"
                 fullWidth
-                marginTop
                 primary
                 loading={isLoading}
                 disabled={isLoading}

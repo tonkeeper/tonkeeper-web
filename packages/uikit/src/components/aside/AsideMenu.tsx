@@ -1,4 +1,3 @@
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -8,10 +7,11 @@ import { scrollToTop } from '../../libs/common';
 import { AppProRoute, AppRoute } from '../../libs/routes';
 import { useMutateActiveWallet } from '../../state/account';
 import { useWalletState } from '../../state/wallet';
-import { PlusIcon, SlidersIcon } from '../Icon';
-import { Body2, Body3 } from '../Text';
+import { PlusIcon, SlidersIcon, StatsIcon } from '../Icon';
+import { Body2 } from '../Text';
 import { ImportNotification } from '../create/ImportNotification';
 import { SubscriptionInfo } from './SubscriptionInfo';
+import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 
 const AsideContainer = styled.div`
     height: 100%;
@@ -21,7 +21,7 @@ const AsideContainer = styled.div`
     background: ${p => p.theme.backgroundContent};
     display: flex;
     flex-direction: column;
-    padding: 0.5rem 0;
+    padding: 0.5rem;
 `;
 
 const IconWrapper = styled.div`
@@ -33,20 +33,18 @@ const IconWrapper = styled.div`
     }
 `;
 
-const AsideMenuCard = styled.button<{ isSelected: boolean; padding: 's' | 'm' }>`
+const AsideMenuCard = styled.button<{ isSelected: boolean }>`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : p.theme.backgroundContent)};
-    ${p => (p.padding === 's' ? 'padding: 6px 16px' : 'padding: 8px 16px')};
+    border-radius: ${p => p.theme.corner2xSmall};
 
+    padding: 6px 10px;
     width: 100%;
+    height: 36px;
     display: flex;
-    flex-direction: column;
-
-    & > ${Body3} {
-        color: ${props => props.theme.textSecondary};
-    }
+    align-items: center;
+    gap: 10px;
 
     & > ${Body2} {
-        text-align: left;
         text-overflow: ellipsis;
         display: -webkit-box;
         -webkit-line-clamp: 1;
@@ -67,13 +65,6 @@ const AsideMenuBottom = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-`;
-
-const AsideMenuItemIcon = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
 `;
 
 export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = ({
@@ -102,13 +93,12 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
         return null;
     }
 
-    const address = formatAddress(wallet.active.rawAddress, wallet.network);
     const name = wallet.name ? wallet.name : t('wallet_title');
 
     return (
-        <AsideMenuCard isSelected={isSelected} padding="s" onClick={onClick}>
+        <AsideMenuCard isSelected={isSelected} onClick={onClick}>
+            <WalletEmoji emojiSize="16px" containerSize="16px" emoji={wallet.emoji} />
             <Body2>{name}</Body2>
-            <Body3>{toShortValue(address)}</Body3>
         </AsideMenuCard>
     );
 };
@@ -148,9 +138,9 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
             {proFeatures && (
                 <AsideMenuCard
                     isSelected={activeRoute === AppProRoute.dashboard}
-                    padding="m"
                     onClick={() => handleNavigateClick(AppProRoute.dashboard)}
                 >
+                    <StatsIcon />
                     <Body2>{t('aside_dashboard')}</Body2>
                 </AsideMenuCard>
             )}
@@ -166,25 +156,20 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
                 />
             ))}
             <AsideMenuBottom>
-                <AsideMenuCard padding="m" isSelected={false} onClick={() => setIsOpenImport(true)}>
-                    <AsideMenuItemIcon>
-                        <Body2>{t('aside_add_wallet')}</Body2>
-                        <IconWrapper>
-                            <PlusIcon />
-                        </IconWrapper>
-                    </AsideMenuItemIcon>
+                <AsideMenuCard isSelected={false} onClick={() => setIsOpenImport(true)}>
+                    <IconWrapper>
+                        <PlusIcon />
+                    </IconWrapper>
+                    <Body2>{t('aside_add_wallet')}</Body2>
                 </AsideMenuCard>
                 <AsideMenuCard
-                    padding="m"
                     onClick={() => handleNavigateClick(AppRoute.settings)}
                     isSelected={activeRoute === AppRoute.settings}
                 >
-                    <AsideMenuItemIcon>
-                        <Body2>{t('aside_settings')}</Body2>
-                        <IconWrapper>
-                            <SlidersIcon />
-                        </IconWrapper>
-                    </AsideMenuItemIcon>
+                    <IconWrapper>
+                        <SlidersIcon />
+                    </IconWrapper>
+                    <Body2>{t('aside_settings')}</Body2>
                 </AsideMenuCard>
                 <SubscriptionInfo />
             </AsideMenuBottom>

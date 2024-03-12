@@ -56,7 +56,7 @@ export interface WalletState {
     active: WalletAddress;
 
     name?: string;
-    emoji?: string;
+    emoji: string;
 
     revision: number;
 

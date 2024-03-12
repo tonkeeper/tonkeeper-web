@@ -1,5 +1,5 @@
 import React, { FC, Suspense, useContext } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 const TonkeeperLottieIcon = React.lazy(() => import('./lottie/TonkeeperLottie'));
 
@@ -852,6 +852,27 @@ export const TelegramIcon: FC<{ className?: string }> = ({ className }) => {
                     />
                 </clipPath>
             </defs>
+        </svg>
+    );
+};
+
+export const StatsIcon: FC<{ className?: string }> = ({ className }) => {
+    const theme = useTheme();
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            color={theme.iconSecondary}
+            className={className}
+        >
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M13.25 2C12.8358 2 12.5 2.33579 12.5 2.75V13.25C12.5 13.6642 12.8358 14 13.25 14C13.6642 14 14 13.6642 14 13.25V2.75C14 2.33579 13.6642 2 13.25 2ZM2.75 4C2.33579 4 2 4.33579 2 4.75V13.25C2 13.6642 2.33579 14 2.75 14C3.16421 14 3.5 13.6642 3.5 13.25V4.75C3.5 4.33579 3.16421 4 2.75 4ZM6.25 8C5.83579 8 5.5 8.33579 5.5 8.75V13.25C5.5 13.6642 5.83579 14 6.25 14C6.66421 14 7 13.6642 7 13.25V8.75C7 8.33579 6.66421 8 6.25 8ZM9 6.75C9 6.33579 9.33579 6 9.75 6C10.1642 6 10.5 6.33579 10.5 6.75V13.25C10.5 13.6642 10.1642 14 9.75 14C9.33579 14 9 13.6642 9 13.25V6.75Z"
+                fill="currentColor"
+            />
         </svg>
     );
 };

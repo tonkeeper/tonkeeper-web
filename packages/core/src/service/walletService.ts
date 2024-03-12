@@ -8,7 +8,7 @@ import { WalletAddress, WalletState, WalletVersion, WalletVersions } from '../en
 import { WalletApi } from '../tonApiV2';
 import { encrypt } from './cryptoService';
 import { walletContract } from './wallet/contractService';
-import { setWalletState } from './wallet/storeService';
+import { getFallbackWalletEmoji, setWalletState } from './wallet/storeService';
 
 export const createNewWalletState = async (api: APIConfig, mnemonic: string[], name?: string) => {
     const keyPair = await mnemonicToPrivateKey(mnemonic);
@@ -21,7 +21,8 @@ export const createNewWalletState = async (api: APIConfig, mnemonic: string[], n
         publicKey,
         active,
         revision: 0,
-        name
+        name,
+        emoji: getFallbackWalletEmoji(publicKey)
     };
 
     // state.tron = await getTronWallet(api.tronApi, mnemonic, state).catch(() => undefined);
@@ -30,7 +31,7 @@ export const createNewWalletState = async (api: APIConfig, mnemonic: string[], n
 };
 
 export const encryptWalletMnemonic = async (mnemonic: string[], password: string) => {
-    return await encrypt(mnemonic.join(' '), password);
+    return encrypt(mnemonic.join(' '), password);
 };
 
 const versionMap: Record<string, WalletVersion> = {
