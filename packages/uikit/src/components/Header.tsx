@@ -206,6 +206,10 @@ export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const { t } = useTranslation();
     const wallet = useWalletContext();
     const [isOpen, setOpen] = useState(false);
+
+    const { account } = useAppContext();
+    const shouldShowIcon = account.publicKeys.length > 1;
+
     return (
         <Block center>
             <DropDown
@@ -215,7 +219,7 @@ export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
                 )}
             >
                 <Title>
-                    <WalletEmoji emoji={wallet.emoji} />
+                    {shouldShowIcon && <WalletEmoji emoji={wallet.emoji} />}
                     <TitleName> {wallet.name ? wallet.name : t('wallet_title')}</TitleName>
 
                     <DownIconWrapper>
