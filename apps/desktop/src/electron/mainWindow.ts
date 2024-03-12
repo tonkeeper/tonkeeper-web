@@ -44,7 +44,6 @@ export abstract class MainWindow {
             minHeight: 700,
             resizable: isDev,
             webPreferences: {
-                zoomFactor: process.platform !== 'linux' ? 0.8 : undefined,
                 preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
             }
         });
