@@ -139,7 +139,7 @@ const ConnectContent: FC<{
                             </Button>
                             <Button
                                 size="large"
-                                type="submit"
+                                type="button"
                                 primary
                                 loading={isLoading}
                                 disabled={isLoading}
