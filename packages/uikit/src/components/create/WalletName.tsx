@@ -30,23 +30,25 @@ const useUpdateNameMutation = (account: AccountState) => {
     const sdk = useAppSdk();
     const client = useQueryClient();
 
-    return useMutation<AccountState, Error, string>(async name => {
-        if (name.length < 3) {
-            throw new Error('Missing name');
-        }
+    return useMutation<AccountState, Error, { name: string; emoji: string }>(
+        async ({ name, emoji }) => {
+            if (name.length < 3) {
+                throw new Error('Missing name');
+            }
 
-        if (!account.activePublicKey) {
-            throw new Error('Missing activePublicKey');
-        }
-        const wallet = await getWalletState(sdk.storage, account.activePublicKey);
-        if (!wallet) {
-            throw new Error('Missing wallet');
-        }
+            if (!account.activePublicKey) {
+                throw new Error('Missing activePublicKey');
+            }
+            const wallet = await getWalletState(sdk.storage, account.activePublicKey);
+            if (!wallet) {
+                throw new Error('Missing wallet');
+            }
 
-        await updateWalletProperty(sdk.storage, wallet, { name });
-        await client.invalidateQueries([QueryKey.account]);
-        return account;
-    });
+            await updateWalletProperty(sdk.storage, wallet, { name, emoji });
+            await client.invalidateQueries([QueryKey.account]);
+            return account;
+        }
+    );
 };
 
 export const UpdateWalletName: FC<{
@@ -71,7 +73,7 @@ export const UpdateWalletName: FC<{
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
-        onUpdate(await mutateAsync(name));
+        onUpdate(await mutateAsync({ name, emoji }));
     };
 
     const onChange = (value: string) => {
