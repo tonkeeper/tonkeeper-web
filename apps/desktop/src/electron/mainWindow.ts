@@ -40,8 +40,8 @@ export abstract class MainWindow {
             icon: icon,
             width: 1150,
             minWidth: 1100,
-            height: 750,
-            minHeight: 700,
+            height: 850,
+            minHeight: 760,
             webPreferences: {
                 preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
             }

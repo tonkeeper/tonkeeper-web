@@ -462,6 +462,7 @@
   "finish_setup" : {
     "backup" : "Создайте резервную копию секретного ключа кошелька",
     "done_buttom" : "Done",
+    "done_button" : "Готово",
     "enable_notifications" : "Включите уведомления о транзакциях",
     "header_title" : "Завершить установку",
     "use_biometry" : "Включите %{name} для подтверждения транзакций"
