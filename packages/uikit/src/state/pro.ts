@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { ProState, ProStateSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { ProState, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -12,6 +12,7 @@ import {
     getProState,
     logoutTonConsole,
     setBackupState,
+    startProServiceTrial,
     waitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
@@ -22,10 +23,11 @@ import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { signTonConnect } from './mnemonic';
+import { useTranslation } from '../hooks/translation';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
-    return useQuery<ProStateSubscription, Error>(
+    return useQuery<ProSubscription, Error>(
         [QueryKey.proBackup],
         () => getBackupState(sdk.storage),
         { keepPreviousData: true }
@@ -106,6 +108,7 @@ export const useCreateInvoiceMutation = () => {
         if (data.tierId === null) {
             throw new Error('missing tier');
         }
+
         const wallet = await getWalletState(sdk.storage, data.state.wallet.publicKey);
         if (!wallet) {
             throw new Error('Missing wallet');
@@ -126,6 +129,19 @@ export const useWaitInvoiceMutation = () => {
     const client = useQueryClient();
     return useMutation<void, Error, ConfirmState>(async data => {
         await waitProServiceInvoice(data.invoice);
+        await client.invalidateQueries([QueryKey.pro]);
+    });
+};
+
+export const useActivateTrialMutation = () => {
+    const client = useQueryClient();
+    const ctx = useAppContext();
+    const {
+        i18n: { language }
+    } = useTranslation();
+
+    return useMutation<void, Error>(async () => {
+        await startProServiceTrial((ctx.env as { tgAuthBotId: string }).tgAuthBotId, language);
         await client.invalidateQueries([QueryKey.pro]);
     });
 };

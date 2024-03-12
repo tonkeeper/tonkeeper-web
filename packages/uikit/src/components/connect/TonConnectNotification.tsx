@@ -174,6 +174,13 @@ const ConnectContent: FC<{
 
     const address = formatAddress(wallet.active.rawAddress, wallet.network);
 
+    let shortUrl = manifest.url;
+    try {
+        shortUrl = new URL(manifest.url).hostname;
+    } catch {
+        /* eslint-stub */
+    }
+
     return (
         <NotificationBlock onSubmit={onSubmit}>
             <ImageRow>
@@ -182,9 +189,9 @@ const ConnectContent: FC<{
             </ImageRow>
 
             <div>
-                <Title>{t('ton_login_title').replace('%domain', manifest.name)}</Title>
+                <Title>{t('ton_login_title').replace('%domain', shortUrl)}</Title>
                 <SubTitle>
-                    {t('ton_login_caption').replace('%{name}', getDomain(manifest.url))}{' '}
+                    {t('ton_login_caption').replace('%{name}', getDomain(manifest.name))}{' '}
                     <Address>{toShortValue(address)}</Address>{' '}
                     {walletVersionText(wallet.active.version)}
                 </SubTitle>

@@ -6,6 +6,9 @@ import { useProState } from '../../state/pro';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { ProNotification } from './ProNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
+import { useTranslation } from '../../hooks/translation';
+import { isPaidSubscription, isTrialSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { ProTrialStartNotification } from './ProTrialStartNotification';
 
 const ProBannerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
@@ -24,57 +27,72 @@ const TextContainerStyled = styled.div`
     min-width: 300px;
 `;
 const ButtonsContainerStyled = styled.div`
+    align-items: center;
     display: flex;
     gap: 8px;
 `;
 
+const Label2Styled = styled(Label2)`
+    padding-right: 12px;
+`;
+
 export const ProBanner: FC<{ className?: string }> = ({ className }) => {
+    const {
+        isOpen: isTrialModalOpen,
+        onClose: onTrialModalClose,
+        onOpen: onTrialModalOpen
+    } = useDisclosure();
+    const { t } = useTranslation();
     const formatDate = useDateTimeFormat();
     const { data } = useProState();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isPurchaseModalOpen,
+        onOpen: onPurchaseModalOpen,
+        onClose: onPurchaseModalClose
+    } = useDisclosure();
 
     if (!data) {
         return null;
     }
 
-    const {
-        subscription: { is_trial, used_trial, valid, next_charge }
-    } = data;
+    const { subscription } = data;
 
-    if (valid) {
+    if (isPaidSubscription(subscription)) {
         return null;
     }
 
     return (
         <ProBannerStyled className={className}>
             <TextContainerStyled>
-                <Label2>Get more with Tonkeeper Pro</Label2>
-                <Body2>Access advanced features and tools to boost your work.</Body2>
+                <Label2>{t('pro_banner_title')}</Label2>
+                <Body2>{t('pro_banner_subtitle')}</Body2>
             </TextContainerStyled>
             <ButtonsContainerStyled>
-                {is_trial ? (
-                    <Label2>
-                        {next_charge &&
-                            formatDate(next_charge, {
+                {isTrialSubscription(subscription) ? (
+                    <Label2Styled>
+                        {t('pro_banner_days_left').replace(
+                            '%days%',
+                            formatDate(subscription.trialEndDate, {
                                 day: 'numeric',
                                 month: 'short',
-                                year: 'numeric',
-                                inputUnit: 'seconds'
-                            })}
-                    </Label2>
+                                year: 'numeric'
+                            })
+                        )}
+                    </Label2Styled>
                 ) : (
-                    !used_trial && (
-                        <Button size="small" corner="2xSmall">
-                            Try Pro for Free
+                    !subscription.usedTrial && (
+                        <Button size="small" corner="2xSmall" onClick={onTrialModalOpen}>
+                            {t('pro_banner_start_trial')}
                         </Button>
                     )
                 )}
 
-                <Button size="small" corner="2xSmall" primary onClick={onOpen}>
-                    Buy Pro
+                <Button size="small" corner="2xSmall" primary onClick={onPurchaseModalOpen}>
+                    {t('pro_banner_buy')}
                 </Button>
             </ButtonsContainerStyled>
-            <ProNotification isOpen={isOpen} onClose={onClose} />
+            <ProNotification isOpen={isPurchaseModalOpen} onClose={onPurchaseModalClose} />
+            <ProTrialStartNotification isOpen={isTrialModalOpen} onClose={onTrialModalClose} />
         </ProBannerStyled>
     );
 };

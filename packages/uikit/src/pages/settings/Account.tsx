@@ -24,12 +24,13 @@ import {
 } from '../../components/settings/LogOutNotification';
 import { SetUpWalletIcon } from '../../components/settings/SettingsIcons';
 import { SettingsList } from '../../components/settings/SettingsList';
-import { RenameWalletNotification } from '../../components/settings/WalletNameNotification';
+import { RenameWalletNotification } from '../../components/settings/wallet-name/WalletNameNotification';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useMutateAccountState } from '../../state/account';
 import { useWalletState } from '../../state/wallet';
+import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 
 const Row = styled.div`
     display: flex;
@@ -69,6 +70,7 @@ const WalletRow: FC<{
                     <Icon {...dragHandleProps}>
                         <ReorderIcon />
                     </Icon>
+                    <WalletEmoji emoji={wallet.emoji} />
                     <ColumnText
                         noWrap
                         text={wallet.name ? wallet.name : t('wallet_title')}

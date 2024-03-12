@@ -1,4 +1,8 @@
-import { ProState } from '@tonkeeper/core/dist/entries/pro';
+import {
+    isTrialSubscription,
+    isValidSubscription,
+    ProState
+} from '@tonkeeper/core/dist/entries/pro';
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -22,36 +26,42 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
     const { t } = useTranslation();
     const formatDate = useDateTimeFormat();
 
-    const {
-        subscription: { is_trial, valid, next_charge }
-    } = data;
+    const { subscription } = data;
 
-    const Expires = next_charge ? (
-        <>
-            {` ${t('it_expires_on')} `}
-            {formatDate(next_charge, {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-                inputUnit: 'seconds'
-            })}
-        </>
-    ) : null;
-
-    if (is_trial) {
+    if (isTrialSubscription(subscription)) {
         return (
             <>
-                {t('pro_trial_is_active')}
-                {Expires}
+                <div>{t('aside_pro_trial_is_active')}</div>
+                <div>
+                    {t('aside_expires_on').replace(
+                        '%date%',
+                        formatDate(subscription.trialEndDate, {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            inputUnit: 'seconds'
+                        })
+                    )}
+                </div>
             </>
         );
     }
 
-    if (valid) {
+    if (isValidSubscription(subscription)) {
         return (
             <>
-                {t('pro_subscription_is_active')}
-                {Expires}
+                <div>{t('aside_pro_subscription_is_active')}</div>
+                <div>
+                    {t('aside_expires_on').replace(
+                        '%date%',
+                        formatDate(subscription.nextChargeDate, {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            inputUnit: 'seconds'
+                        })
+                    )}
+                </div>
             </>
         );
     }
@@ -61,7 +71,7 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
 export const SubscriptionInfo: FC<{ className?: string }> = ({ className }) => {
     const { data } = useProState();
 
-    if (!data) {
+    if (!data || !data.subscription.valid) {
         return null;
     }
 

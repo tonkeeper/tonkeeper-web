@@ -62,7 +62,9 @@ const Import: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
     }
 
     if (account && account.publicKeys.length > 1 && wallet && wallet.name == null) {
-        return <UpdateWalletName account={account} onUpdate={setAccount} />;
+        return (
+            <UpdateWalletName account={account} onUpdate={setAccount} walletEmoji={wallet.emoji} />
+        );
     }
 
     if (sdk.notifications && !passNotifications) {

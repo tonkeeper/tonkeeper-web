@@ -101,6 +101,7 @@ const langs = 'en,zh_CN,ru,it,tr';
 const listOfAuth: AuthState['kind'][] = ['keychain'];
 
 declare const REACT_APP_TONCONSOLE_API: string;
+declare const REACT_APP_TG_BOT_ID: string;
 
 export const App = () => {
     const { t, i18n } = useTranslation();
@@ -179,7 +180,7 @@ const WideLayout = styled.div`
     display: flex;
 
     & > *:first-child {
-        width: 200px;
+        width: 250px;
     }
 `;
 
@@ -268,8 +269,11 @@ export const Loader: FC = () => {
         tonendpoint,
         standalone: true,
         extension: false,
-        proFeatures: false, // TODO: enable
-        ios: false
+        proFeatures: true,
+        ios: false,
+        env: {
+            tgAuthBotId: REACT_APP_TG_BOT_ID
+        }
     };
 
     return (
@@ -332,6 +336,7 @@ export const Content: FC<{
                         <Route path="*" element={<WalletContent />} />
                     </Routes>
                 </WideContent>
+                <BackgroundElements />
             </WideLayout>
         </WalletStateContext.Provider>
     );
@@ -366,6 +371,13 @@ const OldAppRouting = () => {
         <Wrapper>
             <Outlet />
             <MemoryScroll />
+        </Wrapper>
+    );
+};
+
+const BackgroundElements = () => {
+    return (
+        <>
             <SendActionNotification />
             <ReceiveNotification />
             <TonConnectSubscription />
@@ -374,6 +386,6 @@ const OldAppRouting = () => {
             <AddFavoriteNotification />
             <EditFavoriteNotification />
             <DeepLinkSubscription />
-        </Wrapper>
+        </>
     );
 };

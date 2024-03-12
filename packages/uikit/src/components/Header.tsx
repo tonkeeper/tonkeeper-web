@@ -16,6 +16,7 @@ import { H1, H3, Label1, Label2 } from './Text';
 import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 import { SkeletonText } from './shared/Skeleton';
+import { WalletEmoji } from './shared/emoji/WalletEmoji';
 
 const Block = styled.div<{
     center?: boolean;
@@ -134,6 +135,7 @@ const WalletRow: FC<{
             }}
         >
             <ListItemPayload>
+                {wallet && <WalletEmoji emoji={wallet.emoji} />}
                 <ColumnText
                     noWrap
                     text={wallet?.name ? wallet.name : `${t('wallet_title')} ${index + 1}`}
@@ -213,6 +215,7 @@ export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
                 )}
             >
                 <Title>
+                    <WalletEmoji emoji={wallet.emoji} />
                     <TitleName> {wallet.name ? wallet.name : t('wallet_title')}</TitleName>
 
                     <DownIconWrapper>

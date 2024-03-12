@@ -3,8 +3,11 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { Body2 } from '../Text';
 import { useDashboardColumnsAsForm } from '../../state/dashboard/useDashboardColumns';
 import { useDashboardData } from '../../state/dashboard/useDashboardData';
-import { DashboardCellAddress, DashboardColumnType } from '../../state/dashboard/dashboard-column';
+import { DashboardCellAddress, DashboardColumnType } from '@tonkeeper/core/dist/entries/dashboard';
+import { Skeleton } from '../shared/Skeleton';
 import { DashboardCell } from './columns/DashboardCell';
+import { useWalletsState } from '../../state/wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const TableStyled = styled.table`
     width: 100%;
@@ -98,6 +101,10 @@ const isNumericColumn = (columnType: DashboardColumnType): boolean => {
 export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
     const { data: columns } = useDashboardColumnsAsForm();
     const { data: dashboardData } = useDashboardData();
+    const { data: wallets, isFetched: isWalletsFetched } = useWalletsState();
+    const mainnetPubkeys = wallets
+        ?.filter(w => w && w.network !== Network.TESTNET)
+        .map(w => w!.publicKey);
 
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [hoverOnColumn, setHoverOnColumn] = useState<number | undefined>(undefined);
@@ -152,7 +159,7 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
         return hoverOnColumn !== undefined && hoverOnColumn >= i && hoverOnColumn <= i + 1;
     };
 
-    if (!columns || !dashboardData) {
+    if (!columns || !isWalletsFetched) {
         return null;
     }
 
@@ -198,24 +205,42 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
                 </HeadingTrStyled>
             </thead>
             <tbody>
-                {dashboardData.map((dataRow, index) => (
-                    <TrStyled key={index.toString()}>
-                        {dataRow.map((cell, i) => (
-                            <Td
-                                key={
-                                    (
-                                        dataRow.find(
-                                            c => c.type === 'address'
-                                        ) as DashboardCellAddress
-                                    )?.raw || i.toString()
-                                }
-                                textAlign={isNumericColumn(cell.type) ? 'right' : undefined}
-                            >
-                                <DashboardCell {...cell} />
-                            </Td>
-                        ))}
-                    </TrStyled>
-                ))}
+                {dashboardData
+                    ? dashboardData.map((dataRow, index) => (
+                          <TrStyled key={index.toString()}>
+                              {dataRow.map((cell, i) => (
+                                  <Td
+                                      key={
+                                          (
+                                              dataRow.find(
+                                                  c => c.type === 'address'
+                                              ) as DashboardCellAddress
+                                          )?.raw || i.toString()
+                                      }
+                                      textAlign={isNumericColumn(cell.type) ? 'right' : undefined}
+                                  >
+                                      <DashboardCell {...cell} />
+                                  </Td>
+                              ))}
+                          </TrStyled>
+                      ))
+                    : (mainnetPubkeys || [1, 2, 3]).map(key => (
+                          <TrStyled key={key}>
+                              {selectedColumns.map((col, colIndex) => (
+                                  <Td key={col.id}>
+                                      <Skeleton
+                                          width="100px"
+                                          margin={
+                                              isNumericColumn(col.type) ||
+                                              colIndex === selectedColumns.length - 1
+                                                  ? '0 0 0 auto'
+                                                  : '0'
+                                          }
+                                      />
+                                  </Td>
+                              ))}
+                          </TrStyled>
+                      ))}
             </tbody>
         </TableStyled>
     );

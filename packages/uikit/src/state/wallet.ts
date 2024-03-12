@@ -41,6 +41,15 @@ export const useWalletState = (publicKey: string) => {
     );
 };
 
+export const useWalletsState = () => {
+    const { account } = useAppContext();
+    const sdk = useAppSdk();
+    return useQuery<(WalletState | null)[], Error>(
+        [QueryKey.account, QueryKey.wallets, account.publicKeys],
+        () => Promise.all(account.publicKeys.map(key => getWalletState(sdk.storage, key)))
+    );
+};
+
 export const useMutateLogOut = (publicKey: string, remove = false) => {
     const sdk = useAppSdk();
     const client = useQueryClient();
@@ -54,12 +63,12 @@ export const useMutateRenameWallet = (wallet: WalletState) => {
     const sdk = useAppSdk();
     const client = useQueryClient();
 
-    return useMutation<void, Error, string>(async name => {
-        if (name.length <= 0) {
+    return useMutation<void, Error, { name?: string; emoji?: string }>(async form => {
+        if (form.name !== undefined && form.name.length <= 0) {
             throw new Error('Missing name');
         }
 
-        await updateWalletProperty(sdk.storage, wallet, { name });
+        await updateWalletProperty(sdk.storage, wallet, form);
         await client.invalidateQueries([QueryKey.account]);
     });
 };

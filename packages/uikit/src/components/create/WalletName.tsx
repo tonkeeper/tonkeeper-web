@@ -11,6 +11,8 @@ import { CenterContainer } from '../Layout';
 import { Body2, H2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
+import { EmojisList } from '../shared/emoji/EmojisList';
+import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 
 const Block = styled.form`
     display: flex;
@@ -50,7 +52,8 @@ const useUpdateNameMutation = (account: AccountState) => {
 export const UpdateWalletName: FC<{
     account: AccountState;
     onUpdate: (account: AccountState) => void;
-}> = ({ account, onUpdate }) => {
+    walletEmoji: string;
+}> = ({ account, onUpdate, walletEmoji }) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLInputElement | null>(null);
@@ -64,6 +67,7 @@ export const UpdateWalletName: FC<{
     }, [ref.current]);
 
     const [name, setName] = useState('');
+    const [emoji, setEmoji] = useState(walletEmoji);
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
@@ -90,7 +94,9 @@ export const UpdateWalletName: FC<{
                     label={t('Wallet_name')}
                     disabled={isLoading}
                     isValid={!isError}
+                    rightElement={emoji ? <WalletEmoji emoji={emoji} /> : null}
                 />
+                <EmojisList keepShortListForMS={500} onClick={setEmoji} />
 
                 <Button
                     size="large"

@@ -113,6 +113,29 @@
     "whitelisted_token" : "白名单代币"
   },
   "auth_failed" : "认证失败",
+  "backup_check" : {
+    "caption" : "让我们看看是否全部正确。输入单词%{one}，%{two}和%{three}。",
+    "done_button" : "完成",
+    "title" : "备份检查"
+  },
+  "backup_screen" : {
+    "last_backup_time" : "上次备份 %{time}",
+    "manual_backup_on" : "手动备份开启",
+    "manual_button" : "手动备份",
+    "manual_caption" : "通过写下助记词以手动备份您的钱包。",
+    "manual_title" : "手动",
+    "show_recovery_phrase" : "显示恢复短语",
+    "title" : "备份"
+  },
+  "backup_warning" : {
+    "cancel_button" : "取消",
+    "caption" : "在查看您的助记词之前，请仔细阅读以下内容。",
+    "continue_button" : "继续",
+    "p1" : "切勿在Tonkeeper以外的任何其他地方输入您的助记词来访问您的钱包。",
+    "p2" : "Tonkeeper 支持人员永远不会要求您提供助记词。",
+    "p3" : "每一个知道您助记词的人都可以控制您的钱包。",
+    "title" : "请注意"
+  },
   "balances_setup_wallet" : "注册钱包",
   "battery" : {
     "description" : {
@@ -150,16 +173,24 @@
   },
   "biometry" : {
     "android" : {
-      "face_recognition" : "面部识别",
-      "face_recognition_genitive" : "面部识别",
-      "fingerprint" : "指纹",
-      "fingerprint_genitive" : "指纹"
+      "face_recognition" : "人脸识别",
+      "face_recognition_genitive" : "人脸识别",
+      "face_recognition_instrumental" : "人脸识别",
+      "fingerprint" : "指纹识别",
+      "fingerprint_genitive" : "指纹识别",
+      "fingerprint_instrumental" : "指纹识别"
     },
+    "default" : "生物识别",
+    "default_accusative" : "生物识别",
+    "default_genitive" : "生物识别",
+    "default_instrumental" : "生物识别",
     "ios" : {
       "face_recognition" : "Face ID",
       "face_recognition_genitive" : "Face ID",
+      "face_recognition_instrumental" : "Face ID",
       "fingerprint" : "Touch ID",
-      "fingerprint_genitive" : "Touch ID"
+      "fingerprint_genitive" : "Touch ID",
+      "fingerprint_instrumental" : "Touch ID"
     }
   },
   "browser" : {
@@ -323,6 +354,13 @@
   "exchange_other_ways" : "其他购买或出售TON的方式",
   "exchange_telegram_bot" : "TELEGRAM机器人",
   "exchange_title" : "购买TON",
+  "finish_setup" : {
+    "backup" : "备份钱包助记词",
+    "done_button" : "完成",
+    "enable_notifications" : "启用交易通知",
+    "header_title" : "完成设置",
+    "use_biometry" : "使用 %{name} 批准交易"
+  },
   "form_optional_indicator" : "可选",
   "import_add_wallet" : "添加钱包",
   "import_add_wallet_description" : "创建一个新钱包或添加现有钱包。",
@@ -510,6 +548,12 @@
   "receive_share" : "分享",
   "receive_title" : "接收 %{currency}",
   "receive_ton_and_jettons" : "接收TON和其他代币",
+  "recovery_phrase" : {
+    "caption" : "写下这些单词及其编号并将其存放在安全的地方。",
+    "check_button" : "检查备份",
+    "copy_button" : "复制",
+    "title" : "助记词"
+  },
   "refresh_app" : "重新刷新",
   "reminder_notifications_caption" : "当您收到TON、代币和NFT时获得通知。",
   "reminder_notifications_enable_button" : "启用通知",
@@ -600,7 +644,7 @@
   "send_sending_wrong_time_title" : "发生错误",
   "send_title" : "发送 %{currency}",
   "settings_appearance" : "主题",
-  "settings_backup_seed" : "显示恢复短语",
+  "settings_backup_seed" : "备份",
   "settings_contact_support" : "联系我们",
   "settings_delete_account" : "删除账户",
   "settings_delete_alert_button" : "删除账户和数据",

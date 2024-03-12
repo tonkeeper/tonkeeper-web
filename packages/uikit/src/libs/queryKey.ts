@@ -1,6 +1,7 @@
 export enum QueryKey {
     account = 'account',
     wallet = 'wallet',
+    wallets = 'wallets',
     lock = 'lock',
     country = 'country',
     password = 'password',

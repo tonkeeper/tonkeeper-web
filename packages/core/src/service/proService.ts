@@ -7,32 +7,47 @@ import { BLOCKCHAIN_NAME } from '../entries/crypto';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { Language, localizationText } from '../entries/language';
-import { ProState, ProStateSubscription } from '../entries/pro';
+import { ProState, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { WalletState } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
-import { InvoiceStatus, InvoicesInvoice, Lang, ProServiceService } from '../tonConsoleApi';
+import {
+    InvoicesInvoice,
+    InvoiceStatus,
+    Lang,
+    ProServiceService,
+    FiatCurrencies as FiatCurrenciesGenerated,
+    ProServiceDashboardColumnType,
+    ProServiceDashboardCellString,
+    ProServiceDashboardCellAddress,
+    ProServiceDashboardCellNumericCrypto,
+    ProServiceDashboardCellNumericFiat
+} from '../tonConsoleApi';
 import { delay } from '../utils/common';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { walletStateInitFromState } from './wallet/contractService';
 import { getWalletState } from './wallet/storeService';
+import { loginViaTG } from './telegramOauth';
+import { DashboardCell, DashboardColumn } from '../entries/dashboard';
+import { FiatCurrencies } from '../entries/fiat';
+import { Flatten } from '../utils/types';
 
-export const setBackupState = async (storage: IStorage, state: ProStateSubscription) => {
+export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
 };
 
 export const getBackupState = async (storage: IStorage) => {
-    const backup = await storage.get<ProStateSubscription>(AppKey.PRO_BACKUP);
+    const backup = await storage.get<ProSubscription>(AppKey.PRO_BACKUP);
     return backup ?? toEmptySubscription();
 };
 
 export const getProState = async (storage: IStorage, wallet: WalletState): Promise<ProState> => {
     try {
-        return await loadProState(storage);
+        return await loadProState(storage, wallet);
     } catch (e) {
         return {
             subscription: toEmptySubscription(),
-            hasCookie: false,
+            hasWalletAuthCookie: false,
             wallet: {
                 publicKey: wallet.publicKey,
                 rawAddress: wallet.active.rawAddress
@@ -41,30 +56,67 @@ export const getProState = async (storage: IStorage, wallet: WalletState): Promi
     }
 };
 
-const toEmptySubscription = (): ProStateSubscription => {
+const toEmptySubscription = (): ProSubscriptionInvalid => {
     return {
         valid: false,
-        is_trial: false,
-        used_trial: false
+        isTrial: false,
+        usedTrial: false
     };
 };
 
-export const loadProState = async (storage: IStorage): Promise<ProState> => {
+export const loadProState = async (
+    storage: IStorage,
+    fallbackWallet: WalletState
+): Promise<ProState> => {
     const user = await ProServiceService.proServiceGetUserInfo();
 
-    const wallet = await getWalletState(storage, user.pub_key);
-    if (!wallet) {
-        throw new Error('Unknown wallet');
+    let wallet = {
+        publicKey: fallbackWallet.publicKey,
+        rawAddress: fallbackWallet.active.rawAddress
+    };
+    if (user.pub_key) {
+        const actualWallet = await getWalletState(storage, user.pub_key);
+        if (!actualWallet) {
+            throw new Error('Unknown wallet');
+        }
+        wallet = {
+            publicKey: actualWallet.publicKey,
+            rawAddress: actualWallet.active.rawAddress
+        };
     }
 
-    const subscription = await ProServiceService.proServiceVerify();
+    const subscriptionDTO = await ProServiceService.proServiceVerify();
+
+    let subscription: ProSubscription;
+    if (subscriptionDTO.is_trial) {
+        subscription = {
+            valid: true,
+            isTrial: true,
+            usedTrial: true,
+            trialUserId: user.tg_id!,
+            trialEndDate: new Date(subscriptionDTO.next_charge! * 1000)
+        };
+    } else {
+        if (subscriptionDTO.valid) {
+            subscription = {
+                valid: true,
+                isTrial: false,
+                usedTrial: subscriptionDTO.used_trial,
+                nextChargeDate: new Date(subscriptionDTO.next_charge! * 1000)
+            };
+        } else {
+            subscription = {
+                valid: false,
+                isTrial: false,
+                usedTrial: subscriptionDTO.used_trial
+            };
+        }
+    }
+
     return {
         subscription,
-        hasCookie: true,
-        wallet: {
-            publicKey: wallet.publicKey,
-            rawAddress: wallet.active.rawAddress
-        }
+        hasWalletAuthCookie: !!user.pub_key,
+        wallet
     };
 };
 
@@ -124,7 +176,7 @@ export const getProServiceTiers = async (lang?: Language | undefined, promoCode?
 };
 
 export const createProServiceInvoice = async (tierId: number, promoCode?: string) => {
-    return await ProServiceService.createProServiceInvoice({
+    return ProServiceService.createProServiceInvoice({
         tier_id: tierId,
         promo_code: promoCode
     });
@@ -168,3 +220,98 @@ export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
         }
     } while (updated.status === InvoiceStatus.PENDING);
 };
+
+export async function startProServiceTrial(botId: string, lang?: string) {
+    const tgData = await loginViaTG(botId, lang);
+    if (tgData) {
+        return ProServiceService.proServiceTrial(tgData);
+    }
+}
+
+export async function getDashboardColumns(lang?: string): Promise<DashboardColumn[]> {
+    if (!Object.values(Lang).includes(lang as Lang)) {
+        lang = Lang.EN;
+    }
+
+    const result = await ProServiceService.proServiceDashboardColumns(lang as Lang);
+    return result.items.map(item => ({
+        id: item.id,
+        name: item.name,
+        type: item.column_type,
+        defaultIsChecked: item.checked_default,
+        onlyPro: item.only_pro
+    }));
+}
+
+export async function getDashboardData(
+    query: {
+        accounts: string[];
+        columns: string[];
+    },
+    options?: { lang?: string; currency?: FiatCurrencies }
+): Promise<DashboardCell[][]> {
+    let lang = Lang.EN;
+    if (Object.values(Lang).includes(options?.lang as Lang)) {
+        lang = options?.lang as Lang;
+    }
+
+    let currency = FiatCurrenciesGenerated.USD;
+    if (
+        Object.values(FiatCurrenciesGenerated).includes(
+            options?.currency as FiatCurrenciesGenerated
+        )
+    ) {
+        currency = options?.currency as FiatCurrenciesGenerated;
+    }
+
+    const result = await ProServiceService.proServiceDashboardData(lang, currency, query);
+    return result.items.map(row => row.map(mapDtoCellToCell));
+}
+
+type DTOCell = Flatten<
+    Flatten<Awaited<ReturnType<typeof ProServiceService.proServiceDashboardData>>['items']>
+>;
+
+function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
+    switch (dtoCell.type) {
+        case ProServiceDashboardColumnType.STRING: {
+            const cell = dtoCell as ProServiceDashboardCellString;
+
+            return {
+                columnId: cell.column_id,
+                type: 'string',
+                value: cell.value
+            };
+        }
+        case ProServiceDashboardColumnType.ADDRESS: {
+            const cell = dtoCell as ProServiceDashboardCellAddress;
+            return {
+                columnId: cell.column_id,
+                type: 'address',
+                raw: cell.raw
+            };
+        }
+        case ProServiceDashboardColumnType.NUMERIC_CRYPTO: {
+            const cell = dtoCell as ProServiceDashboardCellNumericCrypto;
+            return {
+                columnId: cell.column_id,
+                type: 'numeric_crypto',
+                value: new BigNumber(cell.value),
+                decimals: cell.decimals,
+                symbol: cell.symbol
+            };
+        }
+
+        case ProServiceDashboardColumnType.NUMERIC_FIAT: {
+            const cell = dtoCell as ProServiceDashboardCellNumericFiat;
+            return {
+                columnId: cell.column_id,
+                type: 'numeric_fiat',
+                value: new BigNumber(cell.value),
+                fiat: cell.fiat
+            };
+        }
+        default:
+            throw new Error('Unsupported cell type');
+    }
+}

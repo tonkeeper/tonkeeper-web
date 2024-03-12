@@ -24,6 +24,9 @@ export interface IAppContext {
     ios: boolean;
     proFeatures: boolean;
     hideQrScanner?: boolean;
+    env?: {
+        tgAuthBotId: string;
+    };
 }
 
 export const AppContext = React.createContext<IAppContext>({

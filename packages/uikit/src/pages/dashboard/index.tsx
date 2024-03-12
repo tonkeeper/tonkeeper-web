@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { CategoriesModal } from '../../components/dashboard/CategoriesModal';
 import { Button } from '../../components/fields/Button';
 import { ProBanner } from '../../components/pro/ProBanner';
+import { useTranslation } from '../../hooks/translation';
 
 const DashboardTableStyled = styled(DashboardTable)``;
 
@@ -35,13 +36,14 @@ const PageWrapper = styled.div`
 `;
 
 const DashboardPage: FC = () => {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     return (
         <PageWrapper>
             <DashboardTableStyled />
             <ButtonContainerStyled>
                 <Button size="small" corner="2xSmall" onClick={() => setIsOpen(true)}>
-                    Manage
+                    {t('manage')}
                 </Button>
             </ButtonContainerStyled>
             <ProBannerStyled />
