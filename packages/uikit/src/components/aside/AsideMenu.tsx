@@ -21,7 +21,7 @@ const AsideContainer = styled.div`
     background: ${p => p.theme.backgroundContent};
     display: flex;
     flex-direction: column;
-    padding: 0.5rem;
+    padding: 0.5rem 0.5rem 0;
 `;
 
 const IconWrapper = styled.div`
@@ -40,6 +40,7 @@ const AsideMenuCard = styled.button<{ isSelected: boolean }>`
     padding: 6px 10px;
     width: 100%;
     height: 36px;
+    min-height: 36px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -65,6 +66,11 @@ const AsideMenuBottom = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    position: sticky;
+    bottom: 0;
+
+    background: ${p => p.theme.backgroundContent};
+    padding: 0.5rem 0;
 `;
 
 export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = ({

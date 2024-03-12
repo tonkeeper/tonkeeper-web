@@ -180,7 +180,7 @@ const WideLayout = styled.div`
     display: flex;
 
     & > *:first-child {
-        width: 200px;
+        width: 250px;
     }
 `;
 

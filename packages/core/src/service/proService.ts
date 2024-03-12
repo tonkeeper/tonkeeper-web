@@ -47,7 +47,7 @@ export const getProState = async (storage: IStorage, wallet: WalletState): Promi
     } catch (e) {
         return {
             subscription: toEmptySubscription(),
-            hasCookie: false,
+            hasWalletAuthCookie: false,
             wallet: {
                 publicKey: wallet.publicKey,
                 rawAddress: wallet.active.rawAddress
@@ -115,7 +115,7 @@ export const loadProState = async (
 
     return {
         subscription,
-        hasCookie: true,
+        hasWalletAuthCookie: !!user.pub_key,
         wallet
     };
 };

@@ -103,7 +103,7 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
     const { data: dashboardData } = useDashboardData();
     const { data: wallets, isFetched: isWalletsFetched } = useWalletsState();
     const mainnetPubkeys = wallets
-        ?.filter(w => w?.network === Network.MAINNET)
+        ?.filter(w => w && w.network !== Network.TESTNET)
         .map(w => w!.publicKey);
 
     const [isResizing, setIsResizing] = useState<boolean>(false);

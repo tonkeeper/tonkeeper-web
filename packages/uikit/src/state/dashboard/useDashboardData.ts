@@ -22,7 +22,7 @@ export function useDashboardData() {
     const client = useQueryClient();
 
     const { data: walletsState } = useWalletsState();
-    const mainnetWallets = walletsState?.filter(w => w?.network === Network.MAINNET);
+    const mainnetWallets = walletsState?.filter(w => w && w.network !== Network.TESTNET);
     const publicKeysMainnet = mainnetWallets?.map(w => w!.publicKey);
 
     return useQuery<DashboardCell[][]>(

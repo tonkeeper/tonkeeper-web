@@ -71,7 +71,7 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
 export const SubscriptionInfo: FC<{ className?: string }> = ({ className }) => {
     const { data } = useProState();
 
-    if (!data) {
+    if (!data || !data.subscription.valid) {
         return null;
     }
 

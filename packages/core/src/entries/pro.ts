@@ -1,6 +1,6 @@
 export interface ProState {
     wallet: ProStateWallet;
-    hasCookie: boolean;
+    hasWalletAuthCookie: boolean;
     subscription: ProSubscription;
 }
 

@@ -320,7 +320,7 @@ const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({
 const ProContent: FC<{ data: ProState }> = ({ data }) => {
     const [reLogin, setReLogin] = useState(false);
 
-    if (!data.hasCookie || reLogin) {
+    if (!data.hasWalletAuthCookie || reLogin) {
         return <SelectWallet />;
     }
     if (isPaidSubscription(data.subscription)) {

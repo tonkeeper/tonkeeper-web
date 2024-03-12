@@ -84,8 +84,8 @@ export class ProServiceService {
      * @throws ApiError
      */
     public static proServiceGetUserInfo(): CancelablePromise<{
-        pub_key: string;
-        version: string;
+        pub_key?: string;
+        version?: string;
         user_id?: number;
         tg_id?: number;
     }> {
