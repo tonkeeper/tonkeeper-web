@@ -42,7 +42,6 @@ export abstract class MainWindow {
             minWidth: 1100,
             height: 750,
             minHeight: 700,
-            resizable: isDev,
             webPreferences: {
                 preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
             }
