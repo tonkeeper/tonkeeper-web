@@ -142,16 +142,18 @@ export const updateWalletVersion = async (
 export const updateWalletProperty = async (
     storage: IStorage,
     wallet: WalletState,
-    props: Pick<
-        WalletState,
-        | 'name'
-        | 'hiddenJettons'
-        | 'shownJettons'
-        | 'orderJettons'
-        | 'lang'
-        | 'fiat'
-        | 'network'
-        | 'emoji'
+    props: Partial<
+        Pick<
+            WalletState,
+            | 'name'
+            | 'hiddenJettons'
+            | 'shownJettons'
+            | 'orderJettons'
+            | 'lang'
+            | 'fiat'
+            | 'network'
+            | 'emoji'
+        >
     >
 ) => {
     const updated: WalletState = {

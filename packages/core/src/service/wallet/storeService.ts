@@ -6,7 +6,7 @@ import { TonConnectError } from '../../entries/exception';
 import { Network } from '../../entries/network';
 import { CONNECT_EVENT_ERROR_CODES } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
-import { emojis } from "../../utils/emojis";
+import { emojis } from '../../utils/emojis';
 
 export const getWalletState = async (storage: IStorage, publicKey: string) => {
     const state = await storage.get<WalletState>(`${AppKey.WALLET}_${publicKey}`);
