@@ -12,16 +12,30 @@ import { Body2 } from '../Text';
 import { ImportNotification } from '../create/ImportNotification';
 import { SubscriptionInfo } from './SubscriptionInfo';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
+import { useIsScrolled } from '../../hooks/useIsScrolled';
 
 const AsideContainer = styled.div`
     height: 100%;
-    overflow: auto;
     box-sizing: border-box;
 
     background: ${p => p.theme.backgroundContent};
     display: flex;
     flex-direction: column;
     padding: 0.5rem 0.5rem 0;
+`;
+
+const ScrollContainer = styled.div`
+    overflow: auto;
+`;
+
+const DividerStyled = styled.div<{ isHidden?: boolean }>`
+    opacity: ${p => (p.isHidden ? 0 : 1)};
+    height: 1px;
+    background-color: ${p => p.theme.separatorCommon};
+    margin: 0 -0.5rem;
+    width: calc(100% + 1rem);
+
+    transition: opacity 0.15s ease-in-out;
 `;
 
 const IconWrapper = styled.div`
@@ -47,10 +61,7 @@ const AsideMenuCard = styled.button<{ isSelected: boolean }>`
 
     & > ${Body2} {
         text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        line-clamp: 1;
-        -webkit-box-orient: vertical;
+        white-space: nowrap;
         overflow: hidden;
     }
 
@@ -66,11 +77,13 @@ const AsideMenuBottom = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    position: sticky;
-    bottom: 0;
 
     background: ${p => p.theme.backgroundContent};
-    padding: 0.5rem 0;
+    padding-bottom: 0.5rem;
+
+    & > ${AsideMenuCard}:nth-child(2) {
+        margin-top: 0.5rem;
+    }
 `;
 
 export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = ({
@@ -120,6 +133,7 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
     const { account, proFeatures } = useAppContext();
     const navigate = useNavigate();
     const location = useLocation();
+    const { ref, closeBottom } = useIsScrolled();
 
     const activeRoute = useMemo<string | undefined>(() => {
         if (location.pathname.startsWith(AppProRoute.dashboard)) {
@@ -146,27 +160,30 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
 
     return (
         <AsideContainer className={className}>
-            {proFeatures && (
-                <AsideMenuCard
-                    isSelected={activeRoute === AppProRoute.dashboard}
-                    onClick={() => handleNavigateClick(AppProRoute.dashboard)}
-                >
-                    <StatsIcon />
-                    <Body2>{t('aside_dashboard')}</Body2>
-                </AsideMenuCard>
-            )}
-            {account.publicKeys.map(publicKey => (
-                <AsideMenuAccount
-                    key={publicKey}
-                    publicKey={publicKey}
-                    isSelected={
-                        !activeRoute &&
-                        !!account.activePublicKey &&
-                        account.activePublicKey === publicKey
-                    }
-                />
-            ))}
+            <ScrollContainer ref={ref}>
+                {proFeatures && (
+                    <AsideMenuCard
+                        isSelected={activeRoute === AppProRoute.dashboard}
+                        onClick={() => handleNavigateClick(AppProRoute.dashboard)}
+                    >
+                        <StatsIcon />
+                        <Body2>{t('aside_dashboard')}</Body2>
+                    </AsideMenuCard>
+                )}
+                {account.publicKeys.map(publicKey => (
+                    <AsideMenuAccount
+                        key={publicKey}
+                        publicKey={publicKey}
+                        isSelected={
+                            !activeRoute &&
+                            !!account.activePublicKey &&
+                            account.activePublicKey === publicKey
+                        }
+                    />
+                ))}
+            </ScrollContainer>
             <AsideMenuBottom>
+                <DividerStyled isHidden={!closeBottom} />
                 <AsideMenuCard isSelected={false} onClick={() => setIsOpenImport(true)}>
                     <IconWrapper>
                         <PlusIcon />
