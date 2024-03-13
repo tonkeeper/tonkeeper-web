@@ -38,6 +38,15 @@ export const GlobalStyleCss = css`
         -webkit-overflow-scrolling: touch;
     }
 
+    html.no-user-select {
+        * {
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+        }
+    }
+
     .disable-hover {
         pointer-events: none;
     }

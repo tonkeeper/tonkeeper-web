@@ -4,6 +4,7 @@ export enum AppKey {
     MNEMONIC = 'mnemonic',
 
     THEME = 'theme',
+    UI_PREFERENCES = 'ui_preferences',
 
     PASSWORD = 'password',
     LOCK = 'lock',

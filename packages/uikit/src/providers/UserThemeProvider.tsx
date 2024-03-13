@@ -1,7 +1,7 @@
 import { userDefaultTheme } from '@tonkeeper/core/dist/entries/theme';
 import { FC, PropsWithChildren, useMemo } from 'react';
 import { DefaultTheme, ThemeProvider } from 'styled-components';
-import { useUserTheme } from '../state/theme';
+import { useUserUIPreferences, useUserTheme } from '../state/theme';
 import { defaultTheme } from '../styles/defaultTheme';
 import { lightTheme } from '../styles/lightTheme';
 import { proTheme } from '../styles/proTheme';
@@ -22,6 +22,7 @@ export const UserThemeProvider: FC<
     PropsWithChildren<{ isDark?: boolean; displayType?: 'compact' | 'full-width'; isPro?: boolean }>
 > = ({ children, isDark = true, displayType, isPro }) => {
     const { data, isFetched } = useUserTheme();
+    const { isFetched: isUIPreferencesLoaded } = useUserUIPreferences();
 
     const currentTheme = useMemo(() => {
         let theme = isPro ? proTheme : isDark ? defaultTheme : lightTheme;
@@ -51,7 +52,7 @@ export const UserThemeProvider: FC<
         }
     }, [data, isDark, displayType, isPro]);
 
-    if (!isFetched) {
+    if (!isFetched || !isUIPreferencesLoaded) {
         return <div></div>;
     }
 

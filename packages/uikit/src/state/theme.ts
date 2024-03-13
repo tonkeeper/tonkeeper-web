@@ -32,3 +32,23 @@ export const useMutateTheme = () => {
         await client.invalidateQueries([AppKey.THEME]);
     });
 };
+
+export interface UIPreferences {
+    asideWidth: number;
+}
+
+export const useUserUIPreferences = () => {
+    const sdk = useAppSdk();
+    return useQuery([AppKey.UI_PREFERENCES], () => {
+        return sdk.storage.get<UIPreferences>(AppKey.UI_PREFERENCES);
+    });
+};
+
+export const useMutateUserUIPreferencesWidth = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+    return useMutation<void, Error, UIPreferences>(async preferences => {
+        await sdk.storage.set(AppKey.UI_PREFERENCES, preferences);
+        await client.invalidateQueries([AppKey.UI_PREFERENCES]);
+    });
+};
