@@ -226,7 +226,7 @@ export const Loader: FC = () => {
                 >
                     <AppContext.Provider value={context}>
                         <Content activeWallet={activeWallet} lock={lock} standalone={standalone} />
-                        <CopyNotification />
+                        <CopyNotification hideSimpleCopyNotifications />
                         <Suspense fallback={<></>}>
                             <QrScanner />
                         </Suspense>

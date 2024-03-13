@@ -44,47 +44,59 @@ const Content = styled.div`
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.16);
 `;
 
-export const CopyNotification: FC = React.memo(() => {
-    const { t } = useTranslation();
-    const [isOpen, setOpen] = useState<boolean>(false);
-    const [text, setText] = useState<string>(t('copied'));
-    const sdk = useAppSdk();
+export const CopyNotification: FC<{ hideSimpleCopyNotifications?: boolean }> = React.memo(
+    ({ hideSimpleCopyNotifications }) => {
+        const { t } = useTranslation();
+        const [isOpen, setOpen] = useState<boolean>(false);
+        const [text, setText] = useState<string>(t('copied'));
+        const sdk = useAppSdk();
 
-    useEffect(() => {
-        let timer: NodeJS.Timeout | null = null;
-        const handler = (options: { method: 'copy'; id?: number | undefined; params: string }) => {
-            if (timer) {
-                clearTimeout(timer);
-            }
-            setText(options.params ?? t('copied'));
-            setOpen(true);
-            timer = setTimeout(() => {
-                setOpen(false);
-            }, 2000);
-        };
-        sdk.uiEvents.on('copy', handler);
-        return () => {
-            sdk.uiEvents.off('copy', handler);
-        };
-    }, []);
+        useEffect(() => {
+            let timer: NodeJS.Timeout | null = null;
+            const handler = (options: {
+                method: 'copy';
+                id?: number | undefined;
+                params: string;
+            }) => {
+                if (timer) {
+                    clearTimeout(timer);
+                }
 
-    const nodeRef = useRef(null);
+                if (hideSimpleCopyNotifications && !options.params) {
+                    return;
+                    // hide 'Copy' notification
+                }
 
-    return (
-        <ReactPortal wrapperId="react-copy-modal">
-            <CSSTransition
-                in={isOpen}
-                timeout={{ enter: 0, exit: 300 }}
-                unmountOnExit
-                nodeRef={nodeRef}
-            >
-                <Message ref={nodeRef}>
-                    <Content>
-                        <Label2 onClick={() => sdk.copyToClipboard(text)}>{text}</Label2>
-                    </Content>
-                </Message>
-            </CSSTransition>
-        </ReactPortal>
-    );
-});
+                setText(options.params ?? t('copied'));
+                setOpen(true);
+                timer = setTimeout(() => {
+                    setOpen(false);
+                }, 2000);
+            };
+            sdk.uiEvents.on('copy', handler);
+            return () => {
+                sdk.uiEvents.off('copy', handler);
+            };
+        }, [hideSimpleCopyNotifications]);
+
+        const nodeRef = useRef(null);
+
+        return (
+            <ReactPortal wrapperId="react-copy-modal">
+                <CSSTransition
+                    in={isOpen}
+                    timeout={{ enter: 0, exit: 300 }}
+                    unmountOnExit
+                    nodeRef={nodeRef}
+                >
+                    <Message onClick={() => setOpen(false)} ref={nodeRef}>
+                        <Content>
+                            <Label2 onClick={() => sdk.copyToClipboard(text)}>{text}</Label2>
+                        </Content>
+                    </Message>
+                </CSSTransition>
+            </ReactPortal>
+        );
+    }
+);
 CopyNotification.displayName = 'CopyNotification';
