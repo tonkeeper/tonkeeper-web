@@ -42,7 +42,7 @@ import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import {Container, GlobalStyle} from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -226,7 +226,7 @@ export const Loader: FC = () => {
                 >
                     <AppContext.Provider value={context}>
                         <Content activeWallet={activeWallet} lock={lock} standalone={standalone} />
-                        <CopyNotification />
+                        <CopyNotification hideSimpleCopyNotifications={!standalone} />
                         <Suspense fallback={<></>}>
                             <QrScanner />
                         </Suspense>

@@ -44,7 +44,8 @@ export abstract class MainWindow {
             minHeight: 760,
             webPreferences: {
                 preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
-            }
+            },
+            resizable: true
         });
 
         // and load the index.html of the app.

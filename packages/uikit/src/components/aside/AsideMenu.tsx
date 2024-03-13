@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
@@ -12,16 +12,49 @@ import { Body2 } from '../Text';
 import { ImportNotification } from '../create/ImportNotification';
 import { SubscriptionInfo } from './SubscriptionInfo';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
+import { useIsScrolled } from '../../hooks/useIsScrolled';
+import { useUserUIPreferences, useMutateUserUIPreferencesWidth } from '../../state/theme';
 
-const AsideContainer = styled.div`
+const AsideContainer = styled.div<{ width: number }>`
     height: 100%;
-    overflow: auto;
+    display: flex;
+    position: relative;
+    width: ${p => p.width}px;
+`;
+
+const AsideResizeHandle = styled.div`
+    position: absolute;
+    height: 100%;
+    width: 10px;
+    cursor: col-resize;
+    right: -5px;
+    z-index: 50;
+`;
+
+const AsideContentContainer = styled.div`
+    flex: 1;
+    height: 100%;
+    width: 100%;
     box-sizing: border-box;
 
     background: ${p => p.theme.backgroundContent};
     display: flex;
     flex-direction: column;
     padding: 0.5rem 0.5rem 0;
+`;
+
+const ScrollContainer = styled.div`
+    overflow: auto;
+`;
+
+const DividerStyled = styled.div<{ isHidden?: boolean }>`
+    opacity: ${p => (p.isHidden ? 0 : 1)};
+    height: 1px;
+    background-color: ${p => p.theme.separatorCommon};
+    margin: 0 -0.5rem;
+    width: calc(100% + 1rem);
+
+    transition: opacity 0.15s ease-in-out;
 `;
 
 const IconWrapper = styled.div`
@@ -47,10 +80,7 @@ const AsideMenuCard = styled.button<{ isSelected: boolean }>`
 
     & > ${Body2} {
         text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        line-clamp: 1;
-        -webkit-box-orient: vertical;
+        white-space: nowrap;
         overflow: hidden;
     }
 
@@ -66,11 +96,13 @@ const AsideMenuBottom = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    position: sticky;
-    bottom: 0;
 
     background: ${p => p.theme.backgroundContent};
-    padding: 0.5rem 0;
+    padding-bottom: 0.5rem;
+
+    & > ${AsideMenuCard}:nth-child(2) {
+        margin-top: 0.5rem;
+    }
 `;
 
 export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = ({
@@ -120,6 +152,7 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
     const { account, proFeatures } = useAppContext();
     const navigate = useNavigate();
     const location = useLocation();
+    const { ref, closeBottom } = useIsScrolled();
 
     const activeRoute = useMemo<string | undefined>(() => {
         if (location.pathname.startsWith(AppProRoute.dashboard)) {
@@ -144,47 +177,99 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
         [location.pathname]
     );
 
+    const [asideWidth, setAsideWidth] = useState(250);
+    const asideWidthRef = useRef(asideWidth);
+    const isResizing = useRef(false);
+    const { data: uiPreferences } = useUserUIPreferences();
+    const { mutate: mutateWidth } = useMutateUserUIPreferencesWidth();
+
+    useLayoutEffect(() => {
+        if (uiPreferences?.asideWidth) {
+            setAsideWidth(uiPreferences?.asideWidth);
+            asideWidthRef.current = uiPreferences?.asideWidth;
+        }
+    }, [uiPreferences?.asideWidth]);
+
+    useEffect(() => {
+        const minWidth = 200;
+        const maxWidth = 500;
+        const onMouseUp = () => {
+            document.body.style.cursor = 'unset';
+            document.documentElement.classList.remove('no-user-select');
+            isResizing.current = false;
+            mutateWidth({ asideWidth: asideWidthRef.current });
+        };
+
+        const onMouseMove = (e: MouseEvent) => {
+            if (isResizing.current) {
+                const newWidth =
+                    e.pageX < minWidth ? minWidth : e.pageX > maxWidth ? maxWidth : e.pageX;
+                setAsideWidth(newWidth);
+                asideWidthRef.current = newWidth;
+            }
+        };
+
+        document.addEventListener('mouseup', onMouseUp);
+        document.addEventListener('mousemove', onMouseMove);
+        return () => {
+            document.removeEventListener('mouseup', onMouseUp);
+            document.removeEventListener('mousemove', onMouseMove);
+        };
+    }, [mutateWidth]);
+
     return (
-        <AsideContainer className={className}>
-            {proFeatures && (
-                <AsideMenuCard
-                    isSelected={activeRoute === AppProRoute.dashboard}
-                    onClick={() => handleNavigateClick(AppProRoute.dashboard)}
-                >
-                    <StatsIcon />
-                    <Body2>{t('aside_dashboard')}</Body2>
-                </AsideMenuCard>
-            )}
-            {account.publicKeys.map(publicKey => (
-                <AsideMenuAccount
-                    key={publicKey}
-                    publicKey={publicKey}
-                    isSelected={
-                        !activeRoute &&
-                        !!account.activePublicKey &&
-                        account.activePublicKey === publicKey
-                    }
-                />
-            ))}
-            <AsideMenuBottom>
-                <AsideMenuCard isSelected={false} onClick={() => setIsOpenImport(true)}>
-                    <IconWrapper>
-                        <PlusIcon />
-                    </IconWrapper>
-                    <Body2>{t('aside_add_wallet')}</Body2>
-                </AsideMenuCard>
-                <AsideMenuCard
-                    onClick={() => handleNavigateClick(AppRoute.settings)}
-                    isSelected={activeRoute === AppRoute.settings}
-                >
-                    <IconWrapper>
-                        <SlidersIcon />
-                    </IconWrapper>
-                    <Body2>{t('aside_settings')}</Body2>
-                </AsideMenuCard>
-                <SubscriptionInfo />
-            </AsideMenuBottom>
-            <ImportNotification isOpen={isOpenImport} setOpen={setIsOpenImport} />
+        <AsideContainer width={asideWidth}>
+            <AsideContentContainer className={className}>
+                <ScrollContainer ref={ref}>
+                    {proFeatures && (
+                        <AsideMenuCard
+                            isSelected={activeRoute === AppProRoute.dashboard}
+                            onClick={() => handleNavigateClick(AppProRoute.dashboard)}
+                        >
+                            <StatsIcon />
+                            <Body2>{t('aside_dashboard')}</Body2>
+                        </AsideMenuCard>
+                    )}
+                    {account.publicKeys.map(publicKey => (
+                        <AsideMenuAccount
+                            key={publicKey}
+                            publicKey={publicKey}
+                            isSelected={
+                                !activeRoute &&
+                                !!account.activePublicKey &&
+                                account.activePublicKey === publicKey
+                            }
+                        />
+                    ))}
+                </ScrollContainer>
+                <AsideMenuBottom>
+                    <DividerStyled isHidden={!closeBottom} />
+                    <AsideMenuCard isSelected={false} onClick={() => setIsOpenImport(true)}>
+                        <IconWrapper>
+                            <PlusIcon />
+                        </IconWrapper>
+                        <Body2>{t('aside_add_wallet')}</Body2>
+                    </AsideMenuCard>
+                    <AsideMenuCard
+                        onClick={() => handleNavigateClick(AppRoute.settings)}
+                        isSelected={activeRoute === AppRoute.settings}
+                    >
+                        <IconWrapper>
+                            <SlidersIcon />
+                        </IconWrapper>
+                        <Body2>{t('aside_settings')}</Body2>
+                    </AsideMenuCard>
+                    <SubscriptionInfo />
+                </AsideMenuBottom>
+                <ImportNotification isOpen={isOpenImport} setOpen={setIsOpenImport} />
+            </AsideContentContainer>
+            <AsideResizeHandle
+                onMouseDown={() => {
+                    isResizing.current = true;
+                    document.body.style.cursor = 'col-resize';
+                    document.documentElement.classList.add('no-user-select');
+                }}
+            />
         </AsideContainer>
     );
 };

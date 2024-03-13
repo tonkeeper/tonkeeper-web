@@ -19,11 +19,12 @@ const ButtonContainerStyled = styled.div`
     }
 `;
 
-const ProBannerStyled = styled(ProBanner)`
-    margin: 0 1rem;
+const ProBannerWrapper = styled.div`
+    padding: 1rem;
     position: sticky;
-    bottom: 1rem;
-    left: 1rem;
+    bottom: 0;
+    left: 0;
+    background: ${p => p.theme.gradientBackgroundBottom};
 `;
 
 const PageWrapper = styled.div`
@@ -46,7 +47,9 @@ const DashboardPage: FC = () => {
                     {t('manage')}
                 </Button>
             </ButtonContainerStyled>
-            <ProBannerStyled />
+            <ProBannerWrapper>
+                <ProBanner />
+            </ProBannerWrapper>
             <CategoriesModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
         </PageWrapper>
     );

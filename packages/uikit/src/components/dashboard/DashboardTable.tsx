@@ -39,7 +39,7 @@ const HeadingTrStyled = styled.tr`
 
 const TrStyled = styled.tr`
     > td {
-        padding: 14px 12px;
+        padding: 14px 24px 14px 0;
         border-bottom: 1px solid ${props => props.theme.separatorCommon};
         white-space: nowrap;
 

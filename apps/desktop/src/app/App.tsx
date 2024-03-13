@@ -178,10 +178,6 @@ const WideLayout = styled.div`
     width: 100%;
     height: 100%;
     display: flex;
-
-    & > *:first-child {
-        width: 250px;
-    }
 `;
 
 const WideContent = styled.div`
@@ -284,7 +280,7 @@ export const Loader: FC = () => {
                 >
                     <AppContext.Provider value={context}>
                         <Content activeWallet={activeWallet} lock={lock} />
-                        <CopyNotification />
+                        <CopyNotification hideSimpleCopyNotifications />
                         <QrScanner />
                     </AppContext.Provider>
                 </AfterImportAction.Provider>
