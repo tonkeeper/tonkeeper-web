@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { WalletState, WalletVersion, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
@@ -22,8 +22,14 @@ import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
-import { getRateKey, toTokenRate } from './rates';
+import { getRateKey, TokenRate, toTokenRate } from './rates';
 import { DefaultRefetchInterval } from './tonendpoint';
+import BigNumber from 'bignumber.js';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { AssetData } from '../components/home/Jettons';
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { useAssets } from './home';
 
 export const useActiveWallet = () => {
     const sdk = useAppSdk();
@@ -328,5 +334,68 @@ export const useNftItemData = (address?: string) => {
             return result;
         },
         { enabled: address !== undefined }
+    );
+};
+
+const rateOrDefault = (
+    client: QueryClient,
+    fiat: FiatCurrencies,
+    token: string,
+    mapRate: (rate: TokenRate) => BigNumber,
+    defaultValue: BigNumber
+) => {
+    const rate = client.getQueryCache().find(getRateKey(fiat, token))?.state.data as
+        | TokenRate
+        | undefined;
+
+    if (rate) {
+        return mapRate(rate);
+    } else {
+        return defaultValue;
+    }
+};
+
+const getTonFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
+    return rateOrDefault(
+        client,
+        fiat,
+        CryptoCurrency.TON,
+        rate => shiftedDecimals(assets.ton.info.balance).multipliedBy(rate.prices),
+        new BigNumber(0)
+    );
+};
+
+const getJettonsFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
+    return assets.ton.jettons.balances.reduce(
+        (total, { jetton, balance }) =>
+            rateOrDefault(
+                client,
+                fiat,
+                Address.parse(jetton.address).toString(),
+                rate =>
+                    total.plus(shiftedDecimals(balance, jetton.decimals).multipliedBy(rate.prices)),
+                total
+            ),
+        new BigNumber(0)
+    );
+};
+
+export const useWalletTotalBalance = (fiat: FiatCurrencies) => {
+    const [assets] = useAssets();
+
+    const client = useQueryClient();
+    return useQuery(
+        [QueryKey.total, fiat, assets],
+        () => {
+            if (!assets) {
+                return undefined;
+            }
+            return (
+                getTonFiatAmount(client, fiat, assets)
+                    // .plus(getTRC20FiatAmount(client, fiat, assets)) // TODO: ENABLE TRON
+                    .plus(getJettonsFiatAmount(client, fiat, assets))
+            );
+        },
+        { initialData: new BigNumber(0) }
     );
 };

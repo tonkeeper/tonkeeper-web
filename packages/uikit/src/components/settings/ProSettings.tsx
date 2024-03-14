@@ -27,7 +27,7 @@ import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Notification } from '../Notification';
 import { SubHeader } from '../SubHeader';
 import { Body1, Label1, Title } from '../Text';
-import { SubscriptionStatus } from '../aside/SubscriptionInfo';
+import { SubscriptionStatus } from '../desktop/aside/SubscriptionInfo';
 import { Button } from '../fields/Button';
 import { Radio } from '../fields/Checkbox';
 import { Input } from '../fields/Input';

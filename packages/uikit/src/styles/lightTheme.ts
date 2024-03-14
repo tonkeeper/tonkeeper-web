@@ -11,6 +11,7 @@ export const lightTheme: DefaultTheme = {
     backgroundTransparent: '#F2F2F6F5',
     backgroundContent: '#FFFFFF',
     backgroundContentTint: '#F2F2F6',
+    backgroundContentAttention: '#424C5C',
     backgroundOverlayStrong: '#000000B8',
     backgroundOverlayLight: ' #0000007A',
     backgroundOverlayExtraLight: '#0000003D',

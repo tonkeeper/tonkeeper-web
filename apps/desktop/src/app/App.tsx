@@ -61,6 +61,8 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
+import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/main-screen/WalletAsideMenu';
+import { DesktopHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeader';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -169,7 +171,6 @@ const Wrapper = styled.div`
     width: 100%;
     display: flex;
     flex-direction: column;
-    min-height: var(--app-height);
     background-color: ${props => props.theme.backgroundPage};
     white-space: pre-wrap;
 `;
@@ -187,21 +188,18 @@ const WideContent = styled.div`
 
 const WalletLayout = styled.div`
     display: flex;
+    flex-direction: column;
     height: 100%;
 `;
 
-const FirstColumn = styled.div`
+const WalletLayoutBody = styled.div`
+    flex: 1;
     display: flex;
-    flex-basis: 40%;
-    overflow: auto;
-    flex-direction: column;
-    padding: 64px 16px 0;
-    flex-shrink: 0;
+    max-height: calc(100% - 69px);
 `;
 
-const SecondColumn = styled.div`
-    display: flex;
-    flex-grow: 1;
+const WalletRoutingWrapper = styled.div`
+    flex: 1;
     overflow: auto;
     position: relative;
 `;
@@ -341,23 +339,25 @@ export const Content: FC<{
 const WalletContent = () => {
     return (
         <WalletLayout>
-            <FirstColumn>
-                <MainColumn />
-            </FirstColumn>
-            <SecondColumn>
-                <Routes>
-                    <Route element={<OldAppRouting />}>
-                        <Route path={AppRoute.activity} element={<Activity />} />
-                        <Route path={any(AppRoute.browser)} element={<Browser />} />
-                        <Route path={any(AppRoute.purchases)} element={<Purchases />} />
-                        <Route path={any(AppRoute.settings)} element={<Settings />} />
-                        <Route path={AppRoute.coins}>
-                            <Route path=":name/*" element={<Coin />} />
+            <DesktopHeader />
+
+            <WalletLayoutBody>
+                <WalletAsideMenu />
+                <WalletRoutingWrapper>
+                    <Routes>
+                        <Route element={<OldAppRouting />}>
+                            <Route path={AppRoute.activity} element={<Activity />} />
+                            <Route path={any(AppRoute.browser)} element={<Browser />} />
+                            <Route path={any(AppRoute.purchases)} element={<Purchases />} />
+                            <Route path={any(AppRoute.settings)} element={<Settings />} />
+                            <Route path={AppRoute.coins}>
+                                <Route path=":name/*" element={<Coin />} />
+                            </Route>
+                            <Route path="*" element={<Tokens />} />
                         </Route>
-                        <Route path="*" element={<Tokens />} />
-                    </Route>
-                </Routes>
-            </SecondColumn>
+                    </Routes>
+                </WalletRoutingWrapper>
+            </WalletLayoutBody>
         </WalletLayout>
     );
 };

@@ -4,7 +4,9 @@ import styled from 'styled-components';
 
 const EmojiWrapper = styled.div<{ emojiSize?: string; containerSize?: string }>`
     height: ${p => p.containerSize || '32px'};
+    min-height: ${p => p.containerSize || '32px'};
     width: ${p => p.containerSize || '32px'};
+    min-width: ${p => p.containerSize || '32px'};
     font-size: ${p => p.emojiSize || '24px'};
     display: flex;
     align-items: center;

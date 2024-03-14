@@ -11,6 +11,7 @@ export const proTheme: DefaultTheme = {
     backgroundTransparent: 'rgb(0 0 0 / 96%)',
     backgroundContent: '#17171A',
     backgroundContentTint: '#222224',
+    backgroundContentAttention: '#2F2F33',
     backgroundOverlayStrong: 'rgb(15 15 15 / 72%)',
     backgroundOverlayLight: 'rgb(15 15 15 / 48%)',
     backgroundOverlayExtraLight: 'rgb(15 15 15 / 24%)',
