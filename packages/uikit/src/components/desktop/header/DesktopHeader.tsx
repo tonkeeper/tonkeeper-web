@@ -13,6 +13,7 @@ import { BuyNotification } from '../../home/BuyAction';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
 import { DesktopExternalLinks } from '../../../libs/externalLinks';
+import { usePreFetchRates } from '../../../state/rates';
 
 const DesktopHeaderStyled = styled.div`
     padding-left: 1rem;
@@ -43,6 +44,7 @@ const ButtonStyled = styled(Button)`
 `;
 
 export const DesktopHeader = () => {
+    usePreFetchRates();
     const { fiat } = useAppContext();
     const { data: balance, isLoading } = useWalletTotalBalance(fiat);
     const sdk = useAppSdk();

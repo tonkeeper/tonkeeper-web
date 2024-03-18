@@ -25,6 +25,7 @@ export enum QueryKey {
     tron = 'tron',
     rate = 'rate',
     total = 'total',
+    distribution = 'distribution',
     pro = 'pro',
     proBackup = 'proBackup',
 

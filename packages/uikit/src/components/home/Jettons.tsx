@@ -26,9 +26,10 @@ export interface AssetProps {
     assets: AssetData;
 }
 
-const TonAsset: FC<{
+export const TonAsset: FC<{
     info: Account;
-}> = ({ info }) => {
+    className?: string;
+}> = ({ info, className }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -39,7 +40,7 @@ const TonAsset: FC<{
     const { fiatPrice, fiatAmount } = useFormatFiat(data, amount);
 
     return (
-        <ListItem onClick={() => navigate(AppRoute.coins + '/ton')}>
+        <ListItem onClick={() => navigate(AppRoute.coins + '/ton')} className={className}>
             <ListItemPayload>
                 <TokenLogo src="https://wallet.tonkeeper.com/img/toncoin.svg" />
                 <TokenLayout
@@ -55,9 +56,10 @@ const TonAsset: FC<{
     );
 };
 
-const JettonAsset: FC<{
+export const JettonAsset: FC<{
     jetton: JettonBalance;
-}> = ({ jetton }) => {
+    className?: string;
+}> = ({ jetton, className }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -78,6 +80,7 @@ const JettonAsset: FC<{
             onClick={() =>
                 navigate(AppRoute.coins + `/${encodeURIComponent(jetton.jetton.address)}`)
             }
+            className={className}
         >
             <ListItemPayload>
                 <TokenLogo src={jetton.jetton.image} />

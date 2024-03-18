@@ -1,4 +1,4 @@
-import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { WalletState, WalletVersion, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
@@ -10,6 +10,7 @@ import {
     BlockchainApi,
     DNSApi,
     DnsRecord,
+    JettonBalance,
     JettonsBalances,
     NFTApi,
     NftCollection,
@@ -22,14 +23,21 @@ import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
-import { getRateKey, TokenRate, toTokenRate } from './rates';
+import {
+    getJettonsFiatAmount,
+    getRateKey,
+    getTonFiatAmount,
+    tokenRate as getTokenRate,
+    toTokenRate,
+    useRate
+} from './rates';
 import { DefaultRefetchInterval } from './tonendpoint';
 import BigNumber from 'bignumber.js';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { AssetData } from '../components/home/Jettons';
+import { useAssets } from './home';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { useAssets } from './home';
+import { KNOWN_TON_ASSETS } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export const useActiveWallet = () => {
     const sdk = useAppSdk();
@@ -337,58 +345,16 @@ export const useNftItemData = (address?: string) => {
     );
 };
 
-const rateOrDefault = (
-    client: QueryClient,
-    fiat: FiatCurrencies,
-    token: string,
-    mapRate: (rate: TokenRate) => BigNumber,
-    defaultValue: BigNumber
-) => {
-    const rate = client.getQueryCache().find(getRateKey(fiat, token))?.state.data as
-        | TokenRate
-        | undefined;
-
-    if (rate) {
-        return mapRate(rate);
-    } else {
-        return defaultValue;
-    }
-};
-
-const getTonFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
-    return rateOrDefault(
-        client,
-        fiat,
-        CryptoCurrency.TON,
-        rate => shiftedDecimals(assets.ton.info.balance).multipliedBy(rate.prices),
-        new BigNumber(0)
-    );
-};
-
-const getJettonsFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
-    return assets.ton.jettons.balances.reduce(
-        (total, { jetton, balance }) =>
-            rateOrDefault(
-                client,
-                fiat,
-                Address.parse(jetton.address).toString(),
-                rate =>
-                    total.plus(shiftedDecimals(balance, jetton.decimals).multipliedBy(rate.prices)),
-                total
-            ),
-        new BigNumber(0)
-    );
-};
-
 export const useWalletTotalBalance = (fiat: FiatCurrencies) => {
     const [assets] = useAssets();
+    const { data: tonRate } = useRate(CryptoCurrency.TON);
 
     const client = useQueryClient();
-    return useQuery(
-        [QueryKey.total, fiat, assets],
+    return useQuery<BigNumber>(
+        [QueryKey.total, fiat, assets, tonRate],
         () => {
             if (!assets) {
-                return undefined;
+                return new BigNumber(0);
             }
             return (
                 getTonFiatAmount(client, fiat, assets)
@@ -396,6 +362,163 @@ export const useWalletTotalBalance = (fiat: FiatCurrencies) => {
                     .plus(getJettonsFiatAmount(client, fiat, assets))
             );
         },
-        { initialData: new BigNumber(0) }
+        { enabled: !!assets && !!tonRate }
     );
 };
+
+export interface TokenMeta {
+    address: string;
+    name: string;
+    symbol: string;
+    color: string;
+    image: string;
+    balance: BigNumber;
+    price: number;
+}
+
+export interface TokenDistribution {
+    percent: number;
+    fiatBalance: BigNumber;
+    meta:
+        | TokenMeta
+        | {
+              type: 'others';
+              color: string;
+              tokens: TokenMeta[];
+          };
+}
+
+export function useAssetsDistribution(maxGropusNumber = 10) {
+    const [assets] = useAssets();
+    const { fiat } = useAppContext();
+    const { data: tonRate } = useRate(CryptoCurrency.TON);
+
+    const client = useQueryClient();
+    return useQuery<TokenDistribution[]>(
+        [QueryKey.distribution, fiat, assets, tonRate, maxGropusNumber],
+        () => {
+            if (!assets) {
+                return [];
+            }
+
+            const ton: Omit<TokenDistribution, 'percent'> = {
+                fiatBalance: getTonFiatAmount(client, fiat, assets),
+                meta: convertJettonToTokenMeta(
+                    { isNative: true, balance: assets.ton.info.balance },
+                    getTokenRate(client, fiat, CryptoCurrency.TON)?.prices || 0
+                )
+            };
+
+            const tokensOmited: Omit<TokenDistribution, 'percent'>[] = [ton].concat(
+                assets.ton.jettons.balances.map(b => {
+                    const price =
+                        getTokenRate(client, fiat, Address.parse(b.jetton.address).toString())
+                            ?.prices || 0;
+                    const fiatBalance = shiftedDecimals(b.balance, b.jetton.decimals).multipliedBy(
+                        price
+                    );
+
+                    return {
+                        fiatBalance,
+                        meta: convertJettonToTokenMeta(b, price)
+                    };
+                })
+            );
+
+            const total = tokensOmited.reduce(
+                (acc, t) => t.fiatBalance.plus(acc),
+                new BigNumber(0)
+            );
+
+            tokensOmited.sort((a, b) => b.fiatBalance.minus(a.fiatBalance).toNumber());
+
+            const tokens: TokenDistribution[] = tokensOmited
+                .slice(0, maxGropusNumber - 1)
+                .map(t => ({
+                    ...t,
+                    percent: t.fiatBalance
+                        .dividedBy(total)
+                        .multipliedBy(100)
+                        .decimalPlaces(2)
+                        .toNumber()
+                }));
+
+            const includedPercent = tokens.reduce((acc, t) => t.percent + acc, 0);
+            const includedBalance = tokens.reduce(
+                (acc, t) => t.fiatBalance.plus(acc),
+                new BigNumber(0)
+            );
+
+            if (tokens.length < maxGropusNumber) {
+                tokens.push({
+                    percent: 100 - includedPercent,
+                    fiatBalance: total.minus(includedBalance),
+                    meta: {
+                        type: 'others',
+                        color: '#9DA2A4',
+                        tokens: tokensOmited
+                            .slice(maxGropusNumber - 1)
+                            .map(t => t.meta) as TokenMeta[]
+                    }
+                });
+            }
+
+            return tokens;
+        },
+        { enabled: !!assets && !!tonRate }
+    );
+}
+function tokenColor(tokenAddress: string) {
+    if (tokenAddress === 'TON') {
+        return '#0098EA';
+    }
+
+    const address = Address.parse(tokenAddress);
+
+    if (address.equals(KNOWN_TON_ASSETS.jUSDT)) {
+        return '#2AAF86';
+    }
+
+    const addressId = Number('0x' + address.toRawString().slice(-10));
+
+    const restColors = [
+        '#FF8585',
+        '#FFA970',
+        '#FFC95C',
+        '#85CC7A',
+        '#70A0FF',
+        '#6CCCF5',
+        '#AD89F5',
+        '#F57FF5',
+        '#F576B1'
+    ];
+
+    return restColors[addressId % restColors.length];
+}
+
+function convertJettonToTokenMeta(
+    asset: JettonBalance | { isNative: true; balance: number },
+    price: number
+): TokenMeta {
+    if ('isNative' in asset) {
+        return {
+            address: 'TON',
+            name: 'TON',
+            symbol: 'TON',
+            color: tokenColor('TON'),
+            image: 'https://wallet.tonkeeper.com/img/toncoin.svg',
+            price,
+            balance: new BigNumber(asset.balance)
+        };
+    }
+
+    return {
+        address: asset.jetton.address,
+        name: asset.jetton.name,
+        symbol: asset.jetton.symbol,
+        color: tokenColor(asset.jetton.address),
+        image: asset.jetton.image,
+        balance: new BigNumber(asset.balance),
+        price
+    };
+}
