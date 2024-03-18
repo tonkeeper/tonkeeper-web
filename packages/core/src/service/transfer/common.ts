@@ -12,6 +12,7 @@ import { mnemonicToPrivateKey } from '@ton/crypto';
 import { WalletContractV3R1 } from '@ton/ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from '@ton/ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
+import { WalletContractV5 } from '@ton/ton/dist/wallets/WalletContractV5';
 import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
@@ -35,7 +36,7 @@ export enum SendMode {
 }
 
 export const externalMessage = (
-    contract: WalletContractV3R1 | WalletContractV3R2 | WalletContractV4,
+    contract: WalletContractV3R1 | WalletContractV3R2 | WalletContractV4 | WalletContractV5,
     seqno: number,
     body: Cell
 ) => {

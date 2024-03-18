@@ -99,7 +99,7 @@ export const getWalletAddress = (
     version: WalletVersion,
     network?: Network
 ): WalletAddress => {
-    const { address } = walletContract(publicKey, version);
+    const { address } = walletContract(publicKey, version, network);
     return {
         rawAddress: address.toRawString(),
         friendlyAddress: address.toString({
