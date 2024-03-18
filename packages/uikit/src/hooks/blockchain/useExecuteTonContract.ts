@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
+import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
 import { Omit } from 'react-beautiful-dnd';
 import { notifyError } from '../../components/transfer/common';
 import { getMnemonic } from '../../state/mnemonic';
@@ -14,7 +14,7 @@ export type ContractExecutorParams = {
     api: APIConfig;
     walletState: WalletState;
     mnemonic: string[];
-    fee: MessageConsequences;
+    fee: TransferEstimationEvent;
 };
 
 export function useExecuteTonContract<Args extends ContractExecutorParams>(

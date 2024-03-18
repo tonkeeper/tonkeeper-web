@@ -9,13 +9,14 @@ import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset'
 import {
     RecipientData,
     TonRecipientData,
-    TransferEstimation
+    TransferEstimation,
+    TransferEstimationEvent
 } from '@tonkeeper/core/dist/entries/send';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { estimateTron } from '@tonkeeper/core/dist/service/tron/tronTransferService';
-import { JettonsBalances, MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
+import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import { notifyError } from '../../components/transfer/common';
 import { QueryKey } from '../../libs/queryKey';
 import { DefaultRefetchInterval } from '../../state/tonendpoint';
@@ -40,7 +41,7 @@ async function estimateTon({
     wallet: WalletState;
     jettons: JettonsBalances | undefined;
 }): Promise<TransferEstimation<TonAsset>> {
-    let payload: MessageConsequences;
+    let payload: TransferEstimationEvent;
     if (amount.asset.id === TON_ASSET.id) {
         payload = await estimateTonTransfer(
             api,

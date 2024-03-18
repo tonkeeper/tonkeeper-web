@@ -34,15 +34,16 @@ export function useEstimateTonFee<Args extends ContractCallerParams>(
         async () => {
             const boc = await caller({ ...args, walletState, api } as Args);
 
-            const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-                emulateMessageToWalletRequest: { boc }
+            const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+                accountId: walletState.active.rawAddress,
+                decodeMessageRequest: { boc }
             });
 
             const fee = new AssetAmount({
                 asset: TON_ASSET,
-                weiAmount: emulation.event.extra * -1
+                weiAmount: event.extra * -1
             });
-            return { fee, payload: emulation };
+            return { fee, payload: { event } };
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         options as any

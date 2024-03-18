@@ -16,14 +16,9 @@ import { WalletContractV5 } from '@ton/ton/dist/wallets/WalletContractV5';
 import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
+import { TransferEstimationEvent } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
-import {
-    Account,
-    AccountsApi,
-    LiteServerApi,
-    MessageConsequences,
-    WalletApi
-} from '../../tonApiV2';
+import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
 
 export enum SendMode {
@@ -152,7 +147,7 @@ export const createTransferMessage = (
 export async function getKeyPairAndSeqno(options: {
     api: APIConfig;
     walletState: WalletState;
-    fee: MessageConsequences;
+    fee: TransferEstimationEvent;
     mnemonic: string[];
     amount: BigNumber;
 }) {
