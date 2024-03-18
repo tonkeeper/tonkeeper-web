@@ -6064,9 +6064,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton/ton@https://github.com/tonkeeper/tonkeeper-ton#build4":
+"@ton/ton@https://github.com/tonkeeper/tonkeeper-ton#build5":
   version: 13.9.0
-  resolution: "@ton/ton@https://github.com/tonkeeper/tonkeeper-ton.git#commit=305a0cbf1f498c2ab03f70e3b547379195adcbbd"
+  resolution: "@ton/ton@https://github.com/tonkeeper/tonkeeper-ton.git#commit=97451d09801c5e5680958d146c8025c3793c5f26"
   dependencies:
     axios: "npm:^0.25.0"
     dataloader: "npm:^2.0.0"
@@ -6076,7 +6076,7 @@ __metadata:
   peerDependencies:
     "@ton/core": ">=0.53.0"
     "@ton/crypto": ">=3.2.0"
-  checksum: 574826c6f85ee20471dbbad5fc32c82b869983eb9eb7bf9a2b1682b8d17f6f55b2e74ea41608f7dbc1dc1d08177f158c6813ec7cb37ccfc2d48f0968f16e0a4a
+  checksum: 39ca8e1f2e756ce41af112c70a6252b4b4b84435e6dc5f4112e67c37cfcce9d0e1d2244657b4fabe5b8a8b2dbca4d37201c5f771a531682b0225a8241c27b564
   languageName: node
   linkType: hard
 
@@ -6086,7 +6086,7 @@ __metadata:
   dependencies:
     "@ton/core": "npm:0.54.0"
     "@ton/crypto": "npm:3.2.0"
-    "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build4"
+    "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build5"
     bignumber.js: "npm:^9.1.1"
     ethers: "npm:^6.6.5"
     npm-run-all: "npm:^4.1.5"

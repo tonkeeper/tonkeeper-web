@@ -30,7 +30,6 @@ export const walletContract = (
         case WalletVersion.W5:
             return WalletContractV5.create({
                 walletId: {
-                    workChain: workchain,
                     networkGlobalId: network
                 },
                 publicKey
