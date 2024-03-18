@@ -1,5 +1,5 @@
+import { hmac_sha512, mnemonicToPrivateKey } from '@ton/crypto';
 import { ethers } from 'ethers';
-import { hmac_sha512, mnemonicToPrivateKey } from 'ton-crypto';
 import { IStorage } from '../../Storage';
 import { Network } from '../../entries/network';
 import { Factories, TronChain, WalletImplementations } from '../../entries/tron';

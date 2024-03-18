@@ -1,4 +1,4 @@
-import { mnemonicValidate } from 'ton-crypto';
+import { mnemonicValidate } from '@ton/crypto';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { decrypt } from './cryptoService';

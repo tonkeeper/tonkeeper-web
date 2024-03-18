@@ -1,36 +1,36 @@
+import { Address } from '@ton/core';
 import BigNumber from 'bignumber.js';
-import { Address } from 'ton-core';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
 import { BLOCKCHAIN_NAME } from '../entries/crypto';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../entries/crypto/asset/constants';
+import { DashboardCell, DashboardColumn } from '../entries/dashboard';
+import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import { ProState, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { WalletState } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
 import {
-    InvoicesInvoice,
-    InvoiceStatus,
-    Lang,
-    ProServiceService,
     FiatCurrencies as FiatCurrenciesGenerated,
-    ProServiceDashboardColumnType,
-    ProServiceDashboardCellString,
+    InvoiceStatus,
+    InvoicesInvoice,
+    Lang,
     ProServiceDashboardCellAddress,
     ProServiceDashboardCellNumericCrypto,
-    ProServiceDashboardCellNumericFiat
+    ProServiceDashboardCellNumericFiat,
+    ProServiceDashboardCellString,
+    ProServiceDashboardColumnType,
+    ProServiceService
 } from '../tonConsoleApi';
 import { delay } from '../utils/common';
+import { Flatten } from '../utils/types';
+import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { walletStateInitFromState } from './wallet/contractService';
 import { getWalletState } from './wallet/storeService';
-import { loginViaTG } from './telegramOauth';
-import { DashboardCell, DashboardColumn } from '../entries/dashboard';
-import { FiatCurrencies } from '../entries/fiat';
-import { Flatten } from '../utils/types';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);

@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Address } from '@ton/core';
 import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
@@ -13,7 +14,6 @@ import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonServic
 import { sendTronTransfer } from '@tonkeeper/core/dist/service/tron/tronTransferService';
 import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
 import { EstimatePayload } from '@tonkeeper/core/dist/tronApi';
-import { Address } from 'ton-core';
 import { notifyError } from '../../components/transfer/common';
 import { getMnemonic } from '../../state/mnemonic';
 import { useWalletJettonList } from '../../state/wallet';

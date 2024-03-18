@@ -1,7 +1,7 @@
-import { beginCell, storeStateInit } from 'ton-core';
-import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
-import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
-import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
+import { beginCell, storeStateInit } from '@ton/core';
+import { WalletContractV3R1 } from '@ton/ton/dist/wallets/WalletContractV3R1';
+import { WalletContractV3R2 } from '@ton/ton/dist/wallets/WalletContractV3R2';
+import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import { WalletState, WalletVersion } from '../../entries/wallet';
 
 export const walletContractFromState = (wallet: WalletState) => {

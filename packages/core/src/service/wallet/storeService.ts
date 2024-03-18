@@ -1,4 +1,4 @@
-import { Address } from 'ton-core';
+import { Address } from '@ton/core';
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
 import { AccountState } from '../../entries/account';

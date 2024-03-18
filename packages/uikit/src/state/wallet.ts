@@ -1,4 +1,7 @@
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Address } from '@ton/core';
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { WalletState, WalletVersion, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
@@ -16,20 +19,17 @@ import {
     NftItem,
     WalletApi
 } from '@tonkeeper/core/dist/tonApiV2';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
-import { Address } from 'ton';
+import BigNumber from 'bignumber.js';
+import { AssetData } from '../components/home/Jettons';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
-import { getRateKey, TokenRate, toTokenRate } from './rates';
-import { DefaultRefetchInterval } from './tonendpoint';
-import BigNumber from 'bignumber.js';
-import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { AssetData } from '../components/home/Jettons';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useAssets } from './home';
+import { TokenRate, getRateKey, toTokenRate } from './rates';
+import { DefaultRefetchInterval } from './tonendpoint';
 
 export const useActiveWallet = () => {
     const sdk = useAppSdk();

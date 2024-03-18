@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Address } from '@ton/core';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
@@ -15,7 +16,6 @@ import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/je
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { estimateTron } from '@tonkeeper/core/dist/service/tron/tronTransferService';
 import { JettonsBalances, MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
-import { Address } from 'ton-core';
 import { notifyError } from '../../components/transfer/common';
 import { QueryKey } from '../../libs/queryKey';
 import { DefaultRefetchInterval } from '../../state/tonendpoint';

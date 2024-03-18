@@ -15,9 +15,9 @@ module.exports = function override(config, env) {
     config.resolve.alias = {
         ...config.resolve.alias,
         react: path.resolve(__dirname, './node_modules/react'),
-        ton: path.resolve(__dirname, './node_modules/ton'),
-        'ton-core': path.resolve(__dirname, './node_modules/ton-core'),
-        'ton-crypto': path.resolve(__dirname, './node_modules/ton-crypto'),
+        '@ton/core': path.resolve(__dirname, '../../packages/core/node_modules/@ton/core'),
+        '@ton/crypto': path.resolve(__dirname, '../../packages/core/node_modules/@ton/crypto'),
+        '@ton/ton': path.resolve(__dirname, '../../packages/core/node_modules/@ton/ton'),
         'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
         'react-router-dom': path.resolve(__dirname, './node_modules/react-router-dom'),
         'styled-components': path.resolve(__dirname, './node_modules/styled-components'),

@@ -1,3 +1,4 @@
+import { Address } from '@ton/core';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
@@ -10,7 +11,6 @@ import { isTMEDomain } from '@tonkeeper/core/dist/utils/nft';
 import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { Address } from 'ton-core';
 import { useWalletContext } from '../../hooks/appContext';
 import { useToast } from '../../hooks/appSdk';
 import { useAreNftActionsDisabled } from '../../hooks/blockchain/nft/useAreNftActionsDisabled';

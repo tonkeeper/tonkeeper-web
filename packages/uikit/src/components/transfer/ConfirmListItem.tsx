@@ -1,8 +1,8 @@
+import { Address } from '@ton/core';
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC } from 'react';
-import { Address } from 'ton-core';
+import { FC } from 'react';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';

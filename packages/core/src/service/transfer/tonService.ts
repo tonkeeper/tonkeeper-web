@@ -1,7 +1,7 @@
+import { Address, Cell, internal, loadStateInit } from '@ton/core';
+import { Maybe } from '@ton/core/dist/utils/maybe';
+import { mnemonicToPrivateKey } from '@ton/crypto';
 import BigNumber from 'bignumber.js';
-import { Address, Cell, internal, loadStateInit } from 'ton-core';
-import { Maybe } from 'ton-core/dist/utils/maybe';
-import { mnemonicToPrivateKey } from 'ton-crypto';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipient, TonRecipientData } from '../../entries/send';

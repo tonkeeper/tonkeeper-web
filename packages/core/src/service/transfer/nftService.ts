@@ -1,6 +1,6 @@
+import { Address, beginCell, Cell, comment, toNano } from '@ton/core';
+import { mnemonicToPrivateKey } from '@ton/crypto';
 import BigNumber from 'bignumber.js';
-import { Address, beginCell, Cell, comment, toNano } from 'ton-core';
-import { mnemonicToPrivateKey } from 'ton-crypto';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipientData } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';

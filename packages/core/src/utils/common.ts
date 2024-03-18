@@ -1,5 +1,5 @@
+import { Address } from '@ton/core';
 import { decodeBase58, sha256 } from 'ethers';
-import { Address } from 'ton-core';
 import { Network } from '../entries/network';
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
