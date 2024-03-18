@@ -43,8 +43,8 @@ import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { Purchases } from '@tonkeeper/uikit/dist/pages/purchases/Purchases';
-import { Tokens } from '@tonkeeper/uikit/dist/pages/purchases/Tokens';
+import { DesktopPurchases } from '@tonkeeper/uikit/dist/pages/purchases/DesktopPurchases';
+import { DesktopTokens } from '@tonkeeper/uikit/dist/pages/purchases/DesktopTokens';
 import Settings from '@tonkeeper/uikit/dist/pages/settings';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
@@ -343,17 +343,17 @@ const WalletContent = () => {
 
             <WalletLayoutBody>
                 <WalletAsideMenu />
-                <WalletRoutingWrapper>
+                <WalletRoutingWrapper className="hide-scrollbar">
                     <Routes>
                         <Route element={<OldAppRouting />}>
                             <Route path={AppRoute.activity} element={<Activity />} />
                             <Route path={any(AppRoute.browser)} element={<Browser />} />
-                            <Route path={any(AppRoute.purchases)} element={<Purchases />} />
+                            <Route path={any(AppRoute.purchases)} element={<DesktopPurchases />} />
                             <Route path={any(AppRoute.settings)} element={<Settings />} />
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<Coin />} />
                             </Route>
-                            <Route path="*" element={<Tokens />} />
+                            <Route path="*" element={<DesktopTokens />} />
                         </Route>
                     </Routes>
                 </WalletRoutingWrapper>

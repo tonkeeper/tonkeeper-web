@@ -141,10 +141,10 @@ export const NftItemView: FC<{
     );
 });
 
-export const NftsList: FC<{ nfts: NFT[] | undefined }> = ({ nfts }) => {
+export const NftsList: FC<{ nfts: NFT[] | undefined, className?: string }> = ({ nfts, className }) => {
     const sdk = useAppSdk();
     return (
-        <Grid>
+        <Grid className={className}>
             {(nfts ?? []).map(item => {
                 if (item.metadata?.render_type === 'hidden') {
                     return <></>;
