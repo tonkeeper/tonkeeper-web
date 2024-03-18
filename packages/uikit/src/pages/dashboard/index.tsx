@@ -5,6 +5,8 @@ import { CategoriesModal } from '../../components/dashboard/CategoriesModal';
 import { Button } from '../../components/fields/Button';
 import { ProBanner } from '../../components/pro/ProBanner';
 import { useTranslation } from '../../hooks/translation';
+import { useProState } from '../../state/pro';
+import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const DashboardTableStyled = styled(DashboardTable)``;
 
@@ -39,6 +41,10 @@ const PageWrapper = styled.div`
 const DashboardPage: FC = () => {
     const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
+
+    const { data } = useProState();
+    const shouldShowProBanner = data && !isPaidSubscription(data.subscription);
+
     return (
         <PageWrapper>
             <DashboardTableStyled />
@@ -47,9 +53,11 @@ const DashboardPage: FC = () => {
                     {t('manage')}
                 </Button>
             </ButtonContainerStyled>
-            <ProBannerWrapper>
-                <ProBanner />
-            </ProBannerWrapper>
+            {shouldShowProBanner && (
+                <ProBannerWrapper>
+                    <ProBanner />
+                </ProBannerWrapper>
+            )}
             <CategoriesModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
         </PageWrapper>
     );

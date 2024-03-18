@@ -1,21 +1,15 @@
-import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { useQueryClient } from '@tanstack/react-query';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import BigNumber from 'bignumber.js';
 import React, { FC, useEffect } from 'react';
 import styled from 'styled-components';
-import { Address } from 'ton-core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
-import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { TokenRate, getRateKey } from '../../state/rates';
 import { SkeletonText } from '../shared/Skeleton';
 import { Body3, Label2, Num2 } from '../Text';
 import { AssetData } from './Jettons';
+import { useWalletTotalBalance } from '../../state/wallet';
 
 const Block = styled.div`
     display: flex;
@@ -70,72 +64,11 @@ export const BalanceSkeleton = () => {
     );
 };
 
-const useRateOrDefault = (
-    client: QueryClient,
-    fiat: FiatCurrencies,
-    token: string,
-    useRate: (rate: TokenRate) => BigNumber,
-    defaultValue: BigNumber
-) => {
-    const rate = client.getQueryCache().find(getRateKey(fiat, token))?.state.data as
-        | TokenRate
-        | undefined;
-
-    if (rate) {
-        return useRate(rate);
-    } else {
-        return defaultValue;
-    }
-};
-
-const getTonFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
-    return useRateOrDefault(
-        client,
-        fiat,
-        CryptoCurrency.TON,
-        rate => shiftedDecimals(assets.ton.info.balance).multipliedBy(rate.prices),
-        new BigNumber(0)
-    );
-};
-
-const getTRC20FiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
-    return assets.tron.balances.reduce(
-        (total, { weiAmount, token }) =>
-            useRateOrDefault(
-                client,
-                fiat,
-                token.symbol,
-                rate =>
-                    total.plus(
-                        shiftedDecimals(weiAmount, token.decimals).multipliedBy(rate.prices)
-                    ),
-                total
-            ),
-        new BigNumber(0)
-    );
-};
-
-const getJettonsFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
-    return assets.ton.jettons.balances.reduce(
-        (total, { jetton, balance }) =>
-            useRateOrDefault(
-                client,
-                fiat,
-                Address.parse(jetton.address).toString(),
-                rate =>
-                    total.plus(shiftedDecimals(balance, jetton.decimals).multipliedBy(rate.prices)),
-                total
-            ),
-        new BigNumber(0)
-    );
-};
-
 export const Balance: FC<{
     error?: Error | null;
     isFetching: boolean;
     assets: AssetData;
-}> = ({ assets, error, isFetching }) => {
-    const { t } = useTranslation();
+}> = ({ error, isFetching }) => {
     const sdk = useAppSdk();
     const { fiat } = useAppContext();
     const wallet = useWalletContext();
@@ -143,21 +76,11 @@ export const Balance: FC<{
 
     const address = formatAddress(wallet.active.rawAddress, wallet.network);
 
-    const { data: total } = useQuery(
-        [QueryKey.total, fiat, assets],
-        () => {
-            return (
-                getTonFiatAmount(client, fiat, assets)
-                    // .plus(getTRC20FiatAmount(client, fiat, assets)) // TODO: ENABLE TRON
-                    .plus(getJettonsFiatAmount(client, fiat, assets))
-            );
-        },
-        { initialData: new BigNumber(0) }
-    );
+    const { data: total } = useWalletTotalBalance(fiat);
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (total.toString() === '0') {
+            if (!total || total.toString() === '0') {
                 client.invalidateQueries([QueryKey.total]);
             }
         }, 500);
@@ -170,7 +93,7 @@ export const Balance: FC<{
     return (
         <Block>
             <MessageBlock error={error} isFetching={isFetching} />
-            <Amount>{formatFiatCurrency(fiat, total)}</Amount>
+            <Amount>{formatFiatCurrency(fiat, total || 0)}</Amount>
             <Body onClick={() => sdk.copyToClipboard(address)}>{toShortValue(address)}</Body>
         </Block>
     );

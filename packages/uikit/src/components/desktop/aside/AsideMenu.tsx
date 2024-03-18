@@ -1,25 +1,29 @@
 import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
-import { useTranslation } from '../../hooks/translation';
-import { scrollToTop } from '../../libs/common';
-import { AppProRoute, AppRoute } from '../../libs/routes';
-import { useMutateActiveWallet } from '../../state/account';
-import { useWalletState } from '../../state/wallet';
-import { PlusIcon, SlidersIcon, StatsIcon } from '../Icon';
-import { Body2 } from '../Text';
-import { ImportNotification } from '../create/ImportNotification';
+import { useAppContext } from '../../../hooks/appContext';
+import { useTranslation } from '../../../hooks/translation';
+import { scrollToTop } from '../../../libs/common';
+import { AppProRoute, AppRoute } from '../../../libs/routes';
+import { useMutateActiveWallet } from '../../../state/account';
+import { useWalletState } from '../../../state/wallet';
+import { PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
+import { Label2 } from '../../Text';
+import { ImportNotification } from '../../create/ImportNotification';
 import { SubscriptionInfo } from './SubscriptionInfo';
-import { WalletEmoji } from '../shared/emoji/WalletEmoji';
-import { useIsScrolled } from '../../hooks/useIsScrolled';
-import { useUserUIPreferences, useMutateUserUIPreferencesWidth } from '../../state/theme';
+import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
+import { useIsScrolled } from '../../../hooks/useIsScrolled';
+import { useUserUIPreferences, useMutateUserUIPreferencesWidth } from '../../../state/theme';
+import { AsideMenuItem } from '../../shared/AsideItem';
+import { AsideHeader } from './AsideHeader';
 
 const AsideContainer = styled.div<{ width: number }>`
-    height: 100%;
     display: flex;
+    flex-direction: column;
+    height: 100%;
     position: relative;
     width: ${p => p.width}px;
+    border-right: 1px solid ${p => p.theme.backgroundContentAttention};
 `;
 
 const AsideResizeHandle = styled.div`
@@ -33,7 +37,6 @@ const AsideResizeHandle = styled.div`
 
 const AsideContentContainer = styled.div`
     flex: 1;
-    height: 100%;
     width: 100%;
     box-sizing: border-box;
 
@@ -66,31 +69,6 @@ const IconWrapper = styled.div`
     }
 `;
 
-const AsideMenuCard = styled.button<{ isSelected: boolean }>`
-    background: ${p => (p.isSelected ? p.theme.backgroundContentTint : p.theme.backgroundContent)};
-    border-radius: ${p => p.theme.corner2xSmall};
-
-    padding: 6px 10px;
-    width: 100%;
-    height: 36px;
-    min-height: 36px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    & > ${Body2} {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-    }
-
-    transition: background-color 0.2s ease-in-out;
-
-    &:hover {
-        background: ${p => p.theme.backgroundContentTint};
-    }
-`;
-
 const AsideMenuBottom = styled.div`
     flex: 1;
     display: flex;
@@ -100,7 +78,7 @@ const AsideMenuBottom = styled.div`
     background: ${p => p.theme.backgroundContent};
     padding-bottom: 0.5rem;
 
-    & > ${AsideMenuCard}:nth-child(2) {
+    & > ${AsideMenuItem}:nth-child(2) {
         margin-top: 0.5rem;
     }
 `;
@@ -137,12 +115,12 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
     const name = wallet.name ? wallet.name : t('wallet_title');
 
     return (
-        <AsideMenuCard isSelected={isSelected} onClick={onClick}>
+        <AsideMenuItem isSelected={isSelected} onClick={onClick}>
             {shouldShowIcon && (
                 <WalletEmoji emojiSize="16px" containerSize="16px" emoji={wallet.emoji} />
             )}
-            <Body2>{name}</Body2>
-        </AsideMenuCard>
+            <Label2>{name}</Label2>
+        </AsideMenuItem>
     );
 };
 
@@ -219,16 +197,17 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
 
     return (
         <AsideContainer width={asideWidth}>
+            <AsideHeader width={asideWidth} />
             <AsideContentContainer className={className}>
                 <ScrollContainer ref={ref}>
                     {proFeatures && (
-                        <AsideMenuCard
+                        <AsideMenuItem
                             isSelected={activeRoute === AppProRoute.dashboard}
                             onClick={() => handleNavigateClick(AppProRoute.dashboard)}
                         >
                             <StatsIcon />
-                            <Body2>{t('aside_dashboard')}</Body2>
-                        </AsideMenuCard>
+                            <Label2>{t('aside_dashboard')}</Label2>
+                        </AsideMenuItem>
                     )}
                     {account.publicKeys.map(publicKey => (
                         <AsideMenuAccount
@@ -244,21 +223,21 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
                 </ScrollContainer>
                 <AsideMenuBottom>
                     <DividerStyled isHidden={!closeBottom} />
-                    <AsideMenuCard isSelected={false} onClick={() => setIsOpenImport(true)}>
+                    <AsideMenuItem isSelected={false} onClick={() => setIsOpenImport(true)}>
                         <IconWrapper>
                             <PlusIcon />
                         </IconWrapper>
-                        <Body2>{t('aside_add_wallet')}</Body2>
-                    </AsideMenuCard>
-                    <AsideMenuCard
+                        <Label2>{t('aside_add_wallet')}</Label2>
+                    </AsideMenuItem>
+                    <AsideMenuItem
                         onClick={() => handleNavigateClick(AppRoute.settings)}
                         isSelected={activeRoute === AppRoute.settings}
                     >
                         <IconWrapper>
                             <SlidersIcon />
                         </IconWrapper>
-                        <Body2>{t('aside_settings')}</Body2>
-                    </AsideMenuCard>
+                        <Label2>{t('aside_settings')}</Label2>
+                    </AsideMenuItem>
                     <SubscriptionInfo />
                 </AsideMenuBottom>
                 <ImportNotification isOpen={isOpenImport} setOpen={setIsOpenImport} />

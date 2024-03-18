@@ -11,6 +11,7 @@ declare module 'styled-components' {
         backgroundPage: string;
         backgroundTransparent: string;
         backgroundContent: string;
+        backgroundContentAttention: string;
         backgroundContentTint: string;
         backgroundOverlayStrong: string;
         backgroundOverlayLight: string;

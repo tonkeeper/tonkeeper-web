@@ -11,6 +11,7 @@ export const defaultTheme: DefaultTheme = {
     backgroundTransparent: 'rgba(16, 22, 31, 0.92)',
     backgroundContent: '#1D2633',
     backgroundContentTint: '#2E3847',
+    backgroundContentAttention: '#424C5C',
     backgroundOverlayStrong: 'rgba(0, 0, 0, 0.72)',
     backgroundOverlayLight: 'rgba(0, 0, 0, 0.48)',
     backgroundOverlayExtraLight: 'rgba(0, 0, 0, 0.24)',

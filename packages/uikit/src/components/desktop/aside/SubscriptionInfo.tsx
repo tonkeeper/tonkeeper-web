@@ -6,11 +6,11 @@ import {
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { useTranslation } from '../../hooks/translation';
-import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
-import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useProState } from '../../state/pro';
-import { Body3 } from '../Text';
+import { useTranslation } from '../../../hooks/translation';
+import { useDateTimeFormat } from '../../../hooks/useDateTimeFormat';
+import { AppRoute, SettingsRoute } from '../../../libs/routes';
+import { useProState } from '../../../state/pro';
+import { Body3 } from '../../Text';
 
 const LinkStyled = styled(Link)`
     text-decoration: none;
