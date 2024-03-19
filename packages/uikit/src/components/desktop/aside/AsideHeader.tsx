@@ -1,11 +1,15 @@
 import styled from 'styled-components';
-import { FC } from 'react';
+import { FC, useRef, useState } from 'react';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { Body3, Label2 } from '../../Text';
 import { useAppContext } from '../../../hooks/appContext';
 import { useWalletState } from '../../../state/wallet';
 import { useTranslation } from '../../../hooks/translation';
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
+import { useAppSdk } from '../../../hooks/appSdk';
+import { CopyIcon, DoneIcon } from '../../Icon';
+import { Transition } from 'react-transition-group';
 
 const HeaderContainer = styled.div<{ width: number }>`
     box-sizing: border-box;
@@ -16,37 +20,106 @@ const HeaderContainer = styled.div<{ width: number }>`
     align-items: center;
     border-bottom: 1px solid ${p => p.theme.backgroundContentAttention};
     background: ${p => p.theme.backgroundContent};
-    min-height: 68px;
+    min-height: 69px;
     justify-content: space-between;
+    cursor: pointer;
 `;
 
 const TextContainer = styled.div`
     overflow: hidden;
 
-    > * {
+    & > ${Label2} {
         display: block;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
+`;
+
+const AddressWrapper = styled.div`
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+
     & > ${Body3} {
         color: ${p => p.theme.textSecondary};
         font-family: ${p => p.theme.fontMono};
     }
 `;
 
+const CopyIconWrapper = styled.div<{ opacity: number }>`
+    transition: opacity 0.2s ease-in-out;
+    opacity: ${p => p.opacity};
+`;
+
+const CopyIconStyled = styled(CopyIcon)`
+    color: ${p => p.theme.iconTertiary};
+    cursor: pointer;
+`;
+
+const DoneIconStyled = styled(DoneIcon)`
+    color: ${p => p.theme.accentGreen};
+`;
+
 export const AsideHeader: FC<{ width: number }> = ({ width }) => {
     const { t } = useTranslation();
     const { account } = useAppContext();
     const { data: wallet } = useWalletState(account.activePublicKey!);
+    const route = useAsideActiveRoute();
+    const [copied, setIsCopied] = useState(false);
+    const sdk = useAppSdk();
+    const [hovered, setHovered] = useState(false);
+
+    const address = wallet ? formatAddress(wallet.active.rawAddress) : '';
+
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+    const onCopy = () => {
+        clearTimeout(timeoutRef.current);
+        sdk.copyToClipboard(address);
+        setIsCopied(true);
+        timeoutRef.current = setTimeout(() => setIsCopied(false), 2000);
+    };
+
+    const transitionStyles = {
+        entering: { opacity: 1 },
+        entered: { opacity: 1 },
+        exiting: { opacity: 0 },
+        exited: { opacity: 0 },
+        unmounted: { opacity: 0 }
+    };
+
+    const ref = useRef<HTMLDivElement>(null);
 
     return (
-        <HeaderContainer width={width}>
-            {wallet && (
+        <HeaderContainer
+            width={width}
+            onClick={onCopy}
+            onMouseOver={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+        >
+            {wallet && !route && (
                 <>
                     <TextContainer>
                         <Label2>{wallet.name || t('wallet_title')}</Label2>
-                        <Body3>{toShortValue(wallet.active.friendlyAddress)}</Body3>
+                        <AddressWrapper>
+                            <Body3>{toShortValue(address)}</Body3>
+                            <Transition
+                                nodeRef={ref}
+                                in={hovered}
+                                timeout={200}
+                                onExited={() => setIsCopied(false)}
+                            >
+                                {state => (
+                                    <CopyIconWrapper
+                                        ref={ref}
+                                        opacity={transitionStyles[state].opacity}
+                                    >
+                                        {copied ? <DoneIconStyled /> : <CopyIconStyled />}
+                                    </CopyIconWrapper>
+                                )}
+                            </Transition>
+                        </AddressWrapper>
                     </TextContainer>
                     <WalletEmoji emoji={wallet.emoji} emojiSize="24px" containerSize="24px" />
                 </>

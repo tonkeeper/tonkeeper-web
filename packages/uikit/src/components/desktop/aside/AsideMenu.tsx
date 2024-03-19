@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
@@ -7,7 +7,7 @@ import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateActiveWallet } from '../../../state/account';
 import { useWalletState } from '../../../state/wallet';
-import { PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
+import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from "../../Icon";
 import { Label2 } from '../../Text';
 import { ImportNotification } from '../../create/ImportNotification';
 import { SubscriptionInfo } from './SubscriptionInfo';
@@ -16,6 +16,7 @@ import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { useUserUIPreferences, useMutateUserUIPreferences } from '../../../state/theme';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { AsideHeader } from './AsideHeader';
+import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -132,17 +133,7 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
     const location = useLocation();
     const { ref, closeBottom } = useIsScrolled();
 
-    const activeRoute = useMemo<string | undefined>(() => {
-        if (location.pathname.startsWith(AppProRoute.dashboard)) {
-            return AppProRoute.dashboard;
-        }
-
-        if (location.pathname.startsWith(AppRoute.settings)) {
-            return AppRoute.settings;
-        }
-
-        return undefined;
-    }, [location.pathname]);
+    const activeRoute = useAsideActiveRoute();
 
     const handleNavigateClick = useCallback(
         (route: string) => {
@@ -223,6 +214,15 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
                 </ScrollContainer>
                 <AsideMenuBottom>
                     <DividerStyled isHidden={!closeBottom} />
+                    <AsideMenuItem
+                        onClick={() => handleNavigateClick(AppRoute.browser)}
+                        isSelected={activeRoute === AppRoute.browser}
+                    >
+                        <IconWrapper>
+                            <GlobeIcon />
+                        </IconWrapper>
+                        <Label2>{t('aside_discover')}</Label2>
+                    </AsideMenuItem>
                     <AsideMenuItem isSelected={false} onClick={() => setIsOpenImport(true)}>
                         <IconWrapper>
                             <PlusIcon />

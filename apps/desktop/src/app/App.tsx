@@ -76,6 +76,10 @@ const queryClient = new QueryClient({
 const GlobalStyle = createGlobalStyle`
     ${GlobalStyleCss};
     
+    body {
+        font-family: '-apple-system', BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, 'sans-serif';
+    }
+    
     html, body, #root {
         height: 100%;
         overflow: hidden;

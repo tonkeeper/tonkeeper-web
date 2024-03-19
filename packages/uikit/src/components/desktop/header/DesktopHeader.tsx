@@ -5,7 +5,7 @@ import { Skeleton } from '../../shared/Skeleton';
 import { useAppContext } from '../../../hooks/appContext';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { Button } from '../../fields/Button';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../Icon';
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon, RefreshIcon, SwapIcon } from '../../Icon';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import React from 'react';
@@ -14,6 +14,7 @@ import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
 import { DesktopExternalLinks } from '../../../libs/externalLinks';
 import { usePreFetchRates } from '../../../state/rates';
+import { IconButton } from '../../fields/IconButton';
 
 const DesktopHeaderStyled = styled.div`
     padding-left: 1rem;
@@ -43,6 +44,16 @@ const ButtonStyled = styled(Button)`
     }
 `;
 
+const BalanceContainer = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    & > ${IconButton} {
+        padding: 6px;
+    }
+`;
+
 export const DesktopHeader = () => {
     usePreFetchRates();
     const { fiat } = useAppContext();
@@ -56,7 +67,12 @@ export const DesktopHeader = () => {
             {isLoading ? (
                 <Skeleton width="100px" height="36px" />
             ) : (
-                <Num2>{formatFiatCurrency(fiat, balance || 0)}</Num2>
+                <BalanceContainer>
+                    <Num2>{formatFiatCurrency(fiat, balance || 0)}</Num2>
+                    <IconButton>
+                        <RefreshIcon />
+                    </IconButton>
+                </BalanceContainer>
             )}
             <Num2></Num2>
             <DesktopRightPart>
