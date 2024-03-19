@@ -13,7 +13,7 @@ import { ImportNotification } from '../../create/ImportNotification';
 import { SubscriptionInfo } from './SubscriptionInfo';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { useIsScrolled } from '../../../hooks/useIsScrolled';
-import { useUserUIPreferences, useMutateUserUIPreferencesWidth } from '../../../state/theme';
+import { useUserUIPreferences, useMutateUserUIPreferences } from '../../../state/theme';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { AsideHeader } from './AsideHeader';
 
@@ -159,7 +159,7 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
     const asideWidthRef = useRef(asideWidth);
     const isResizing = useRef(false);
     const { data: uiPreferences } = useUserUIPreferences();
-    const { mutate: mutateWidth } = useMutateUserUIPreferencesWidth();
+    const { mutate: mutateWidth } = useMutateUserUIPreferences();
 
     useLayoutEffect(() => {
         if (uiPreferences?.asideWidth) {

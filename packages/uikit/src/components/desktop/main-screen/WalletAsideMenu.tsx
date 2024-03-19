@@ -7,7 +7,7 @@ import { AppRoute } from '../../../libs/routes';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
-    width: 288px;
+    width: 228px;
     border-right: 1px solid ${p => p.theme.backgroundContentAttention};
 
     > a {

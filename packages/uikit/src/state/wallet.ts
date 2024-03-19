@@ -449,9 +449,9 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
                 new BigNumber(0)
             );
 
-            if (tokens.length < maxGropusNumber) {
+            if (tokensOmited.length > maxGropusNumber) {
                 tokens.push({
-                    percent: 100 - includedPercent,
+                    percent: new BigNumber(100 - includedPercent).decimalPlaces(2).toNumber(),
                     fiatBalance: total.minus(includedBalance),
                     meta: {
                         type: 'others',

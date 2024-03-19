@@ -14,7 +14,6 @@ import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
-import { AsideMenu } from '@tonkeeper/uikit/dist/components/aside/AsideMenu';
 import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
 import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
 import {
@@ -56,13 +55,14 @@ import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalSt
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MemoryRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/main-screen/WalletAsideMenu';
 import { DesktopHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeader';
+import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -164,9 +164,13 @@ const FullSizeWrapper = styled(Container)`
     max-width: 800px;
 `;
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ withPadding: boolean }>`
     box-sizing: border-box;
-    padding-top: 64px;
+    ${p =>
+        p.withPadding &&
+        css`
+            padding-top: 64px;
+        `}
 
     width: 100%;
     display: flex;
@@ -345,7 +349,7 @@ const WalletContent = () => {
                 <WalletAsideMenu />
                 <WalletRoutingWrapper className="hide-scrollbar">
                     <Routes>
-                        <Route element={<OldAppRouting />}>
+                        <Route element={<OldAppRouting withPadding />}>
                             <Route path={AppRoute.activity} element={<Activity />} />
                             <Route path={any(AppRoute.browser)} element={<Browser />} />
                             <Route path={any(AppRoute.purchases)} element={<DesktopPurchases />} />
@@ -353,6 +357,8 @@ const WalletContent = () => {
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<Coin />} />
                             </Route>
+                        </Route>
+                        <Route element={<OldAppRouting />}>
                             <Route path="*" element={<DesktopTokens />} />
                         </Route>
                     </Routes>
@@ -362,9 +368,9 @@ const WalletContent = () => {
     );
 };
 
-const OldAppRouting = () => {
+const OldAppRouting: FC<{ withPadding?: boolean }> = ({ withPadding }) => {
     return (
-        <Wrapper>
+        <Wrapper withPadding={withPadding}>
             <Outlet />
             <MemoryScroll />
         </Wrapper>
