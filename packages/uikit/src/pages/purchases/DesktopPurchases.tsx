@@ -1,8 +1,11 @@
-import { InnerBody } from '../../components/Body';
-import { PurchasesHeader } from '../../components/Header';
 import { NftsList } from '../../components/nft/Nfts';
 import { useWalletNftList } from '../../state/wallet';
 import styled from 'styled-components';
+import { Body2, Label2 } from '../../components/Text';
+import { Button } from '../../components/fields/Button';
+import { Link } from 'react-router-dom';
+import { AppRoute } from '../../libs/routes';
+import { useTranslation } from '../../hooks/translation';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -17,15 +20,64 @@ const NftsListStyled = styled(NftsList)`
         minmax(max(${minColumnWidth}, var(--grid-item--max-width)), 1fr)
     );
     grid-gap: ${gap};
+
+    margin-bottom: 0;
+`;
+
+const NFTEmptyPage = styled.div`
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
+const NFTPageWrapper = styled.div`
+    padding: 1rem;
+`;
+
+const NFTEmptyContainer = styled.div`
+    padding: 2rem;
+
+    text-align: center;
+
+    & > * {
+        display: block;
+    }
+
+    & > ${Body2} {
+        margin-bottom: 1.5rem;
+        color: ${p => p.theme.textSecondary};
+    }
+`;
+
+const LinkStyled = styled(Link)`
+    text-decoration: unset;
+    color: inherit;
+    width: fit-content;
+    margin: 0 auto;
 `;
 
 export const DesktopPurchases = () => {
     const { data: nfts } = useWalletNftList();
+    const { t } = useTranslation();
 
-    return (
-        <>
-            <PurchasesHeader />
-            <InnerBody>{nfts && <NftsListStyled nfts={nfts} />}</InnerBody>
-        </>
-    );
+    if (!nfts) {
+        return null;
+    }
+
+    if (!nfts.length) {
+        return (
+            <NFTEmptyPage>
+                <NFTEmptyContainer>
+                    <Label2>{t('nft_empty_header')}</Label2>
+                    <Body2>{t('nft_empty_description')}</Body2>
+                    <LinkStyled to={AppRoute.browser}>
+                        <Button size="small">{t('nft_empty_go_discover_button')}</Button>
+                    </LinkStyled>
+                </NFTEmptyContainer>
+            </NFTEmptyPage>
+        );
+    }
+
+    return <NFTPageWrapper>{nfts && <NftsListStyled nfts={nfts} />}</NFTPageWrapper>;
 };

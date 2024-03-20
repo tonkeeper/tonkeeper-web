@@ -31,6 +31,7 @@ const JettonAssetStyled = styled(JettonAsset)`
 const TokensHeaderContainer = styled.div`
     height: 44px;
     padding-left: 1rem;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;

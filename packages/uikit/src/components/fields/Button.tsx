@@ -108,7 +108,9 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
                 `;
             default:
                 return css`
-                    border-radius: ${props.theme.cornerLarge};
+                    border-radius: ${props.theme.displayType === 'full-width'
+                        ? props.theme.cornerSmall
+                        : props.theme.cornerLarge};
                 `;
         }
     }}

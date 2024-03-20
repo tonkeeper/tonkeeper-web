@@ -14,6 +14,10 @@ export function useAsideActiveRoute() {
             return AppRoute.settings;
         }
 
+        if (location.pathname.startsWith(AppRoute.browser)) {
+            return AppRoute.browser;
+        }
+
         return undefined;
     }, [location.pathname]);
 }

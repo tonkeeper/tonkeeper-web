@@ -176,7 +176,7 @@ const Wrapper = styled.div<{ withPadding: boolean }>`
             padding-top: 64px;
         `}
 
-    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     background-color: ${props => props.theme.backgroundPage};
@@ -356,13 +356,13 @@ const WalletContent = () => {
                         <Route element={<OldAppRouting withPadding />}>
                             <Route path={AppRoute.activity} element={<Activity />} />
                             <Route path={any(AppRoute.browser)} element={<Browser />} />
-                            <Route path={any(AppRoute.purchases)} element={<DesktopPurchases />} />
                             <Route path={any(AppRoute.settings)} element={<Settings />} />
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<Coin />} />
                             </Route>
                         </Route>
                         <Route element={<OldAppRouting />}>
+                            <Route path={any(AppRoute.purchases)} element={<DesktopPurchases />} />
                             <Route path="*" element={<DesktopTokens />} />
                         </Route>
                     </Routes>
