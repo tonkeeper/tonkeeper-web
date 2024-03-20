@@ -20,7 +20,7 @@ const HeaderContainer = styled.div<{ width: number }>`
     align-items: center;
     border-bottom: 1px solid ${p => p.theme.backgroundContentAttention};
     background: ${p => p.theme.backgroundContent};
-    min-height: 69px;
+    height: 69px;
     justify-content: space-between;
     cursor: pointer;
 `;
