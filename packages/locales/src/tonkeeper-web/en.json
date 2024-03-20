@@ -74,6 +74,8 @@
   "start_trial_notification_description" : "Telegram connection is required solely for the purpose of verification that you are not a bot.",
   "start_trial_notification_heading" : "Connect Telegram to Pro for Free",
   "tme_linked_with_another_address_warn" : "The name is not linked to your current address. Be careful with transactions to this name.",
+  "tokens_hide_statistics_btn" : "Hide Statistics",
+  "tokens_show_statistics_btn" : "Show Statistics",
   "Toncoin" : "Toncoin",
   "Ton_page_description" : "TON is a fully decentralized layer-1 blockchain designed by Telegram to onboard billions of users. It boasts ultra-fast transactions, tiny fees, easy-to-use apps, and is environmentally friendly.",
   "total_balance" : "Total balance",
@@ -84,6 +86,10 @@
   "Unexpected_QR_Code" : "Unexpected QR Code",
   "Unlock" : "Unlock",
   "wallet_address" : "Wallet address",
+  "wallet_aside_history" : "History",
+  "wallet_aside_purchases" : "Purchases",
+  "wallet_aside_settings" : "Settings",
+  "wallet_aside_tokens" : "Tokens",
   "Wallet_name" : "Wallet name",
   "wallet_sell" : "Sell"
 }

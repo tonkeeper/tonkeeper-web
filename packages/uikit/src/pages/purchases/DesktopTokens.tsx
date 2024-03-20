@@ -83,7 +83,13 @@ export const DesktopTokens = () => {
                 <Label2>{t('jettons_list_title')}</Label2>
                 {canShowChart && (
                     <HideButton onClick={onToggleChart}>
-                        <Body2>{showChart ? 'Hide Statistics' : 'Show Statistics'}</Body2>
+                        <Body2>
+                            {t(
+                                showChart
+                                    ? 'tokens_hide_statistics_btn'
+                                    : 'tokens_show_statistics_btn'
+                            )}
+                        </Body2>
                     </HideButton>
                 )}
             </TokensHeaderContainer>

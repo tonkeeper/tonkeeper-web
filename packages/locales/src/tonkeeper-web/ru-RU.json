@@ -74,6 +74,8 @@
   "start_trial_notification_description" : "Подключение к Telegram необходимо только для проверки, что вы не бот.",
   "start_trial_notification_heading" : "Подключите Telegram для пробного периода Pro",
   "tme_linked_with_another_address_warn" : "Имя не связано с вашим текущим адресом. Будьте осторожными с транзакциями на это имя.",
+  "tokens_hide_statistics_btn" : "Скрыть статистику",
+  "tokens_show_statistics_btn" : "Показать статистику",
   "Toncoin" : "Toncoin",
   "Ton_page_description" : "TON — это полностью децентрализованный блокчейн первого уровня, разработанный Telegram для миллиардов пользователей. Он может похвастаться сверхбыстрыми транзакциями, небольшими комиссиями, простыми в использовании приложениями и экологичностью.",
   "total_balance" : "Баланс",
@@ -84,6 +86,10 @@
   "Unexpected_QR_Code" : "Неожиданный QR-код",
   "Unlock" : "Разблокировать",
   "wallet_address" : "Адрес кошелька",
+  "wallet_aside_history" : "История",
+  "wallet_aside_purchases" : "Покупки",
+  "wallet_aside_settings" : "Настройки",
+  "wallet_aside_tokens" : "Монеты",
   "Wallet_name" : "Имя кошелька",
   "wallet_sell" : "Продать"
 }

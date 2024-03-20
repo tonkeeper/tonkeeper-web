@@ -17,6 +17,7 @@ import { usePreFetchRates } from '../../../state/rates';
 import { IconButton } from '../../fields/IconButton';
 import { useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '../../../libs/queryKey';
+import { useTranslation } from '../../../hooks/translation';
 
 const DesktopHeaderStyled = styled.div`
     padding-left: 1rem;
@@ -92,6 +93,7 @@ export const DesktopHeader = () => {
     const { data: buy } = useTonendpointBuyMethods();
     const client = useQueryClient();
     const wallet = useWalletContext();
+    const { t } = useTranslation();
 
     const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -141,7 +143,7 @@ export const DesktopHeader = () => {
                         }
                     >
                         <ArrowUpIcon />
-                        Send
+                        {t('wallet_send')}
                     </ButtonStyled>
                     <ButtonStyled
                         size="small"
@@ -153,7 +155,7 @@ export const DesktopHeader = () => {
                         }}
                     >
                         <ArrowDownIcon />
-                        Receive
+                        {t('wallet_receive')}
                     </ButtonStyled>
                 </ButtonsContainer>
                 <ButtonsContainer>
@@ -162,11 +164,11 @@ export const DesktopHeader = () => {
                         onClick={() => sdk.openPage(DesktopExternalLinks.Swap)}
                     >
                         <SwapIcon />
-                        Swap
+                        {t('wallet_swap')}
                     </ButtonStyled>
                     <ButtonStyled size="small" onClick={onOpen}>
                         <PlusIcon />
-                        Buy
+                        {t('wallet_buy')}
                     </ButtonStyled>
                 </ButtonsContainer>
             </DesktopRightPart>
