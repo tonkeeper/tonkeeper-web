@@ -36,7 +36,6 @@ import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import Activity from '@tonkeeper/uikit/dist/pages/activity/Activity';
 import Browser from '@tonkeeper/uikit/dist/pages/browser';
 import Coin from '@tonkeeper/uikit/dist/pages/coin/Coin';
-import DashboardPage from '@tonkeeper/uikit/dist/pages/dashboard';
 import { MainColumn } from '@tonkeeper/uikit/dist/pages/home/MainColumn';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -63,6 +62,9 @@ import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/main-screen/WalletAsideMenu';
 import { DesktopHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeader';
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
+import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
+import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
+import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -295,6 +297,10 @@ export const Loader: FC = () => {
     );
 };
 
+const usePrefetch = () => {
+    useRecommendations();
+};
+
 export const Content: FC<{
     activeWallet?: WalletState | null;
     lock: boolean;
@@ -303,6 +309,7 @@ export const Content: FC<{
     useWindowsScroll();
     useAppWidth();
     useTrackLocation();
+    usePrefetch();
 
     if (lock) {
         return (
@@ -335,6 +342,7 @@ export const Content: FC<{
                 <WideContent>
                     <Routes>
                         <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
+                        <Route path={AppRoute.browser} element={<DesktopBrowser />} />
                         <Route path="*" element={<WalletContent />} />
                     </Routes>
                 </WideContent>
@@ -355,7 +363,6 @@ const WalletContent = () => {
                     <Routes>
                         <Route element={<OldAppRouting withPadding />}>
                             <Route path={AppRoute.activity} element={<Activity />} />
-                            <Route path={any(AppRoute.browser)} element={<Browser />} />
                             <Route path={any(AppRoute.settings)} element={<Settings />} />
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<Coin />} />

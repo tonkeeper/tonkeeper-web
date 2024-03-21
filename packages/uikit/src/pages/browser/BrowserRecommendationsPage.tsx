@@ -6,7 +6,7 @@ import { RecommendationsPageBodySkeleton } from '../../components/skeletons/Brow
 import { useOpenBrowser } from '../../hooks/amplitude';
 import { useRecommendations } from '../../hooks/browser/useRecommendations';
 import { CategoryBlock } from './CategoryBlock';
-import { PromotionsCarousel } from './PromotionsCarousel';
+import { PromotionsCarousel } from '../../components/browser/PromotionsCarousel';
 
 const InnerBodyStyled = styled(InnerBody)`
     padding: 0;

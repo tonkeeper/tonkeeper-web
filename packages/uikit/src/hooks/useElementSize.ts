@@ -1,33 +1,38 @@
-import { useCallback, useLayoutEffect, useState } from 'react';
-import { useEventListener } from './useEventListener';
+import { MutableRefObject, useCallback, useRef, useState } from 'react';
+import { useResizeObserver } from './useResizeObserver';
 
 interface Size {
     width: number;
     height: number;
 }
 
+interface ScrollSize {
+    scrollWidth: number;
+    scrollHeight: number;
+}
+
 export function useElementSize<T extends HTMLElement = HTMLDivElement>(): [
-    (node: T | null) => void,
-    Size
+    MutableRefObject<T | null>,
+    Size & ScrollSize
 ] {
-    const [ref, setRef] = useState<T | null>(null);
-    const [size, setSize] = useState<Size>({
+    const ref = useRef<T | null>(null);
+    const [size, setSize] = useState<Size & ScrollSize>({
         width: 0,
-        height: 0
+        height: 0,
+        scrollWidth: 0,
+        scrollHeight: 0
     });
 
-    const handleSize = useCallback(() => {
+    const onResize = useCallback(() => {
         setSize({
-            width: ref?.offsetWidth || 0,
-            height: ref?.offsetHeight || 0
+            width: ref.current?.offsetWidth || 0,
+            height: ref.current?.offsetHeight || 0,
+            scrollWidth: ref.current?.scrollWidth || 0,
+            scrollHeight: ref.current?.scrollHeight || 0
         });
-    }, [ref?.offsetHeight, ref?.offsetWidth]);
+    }, []);
 
-    useEventListener('resize', handleSize);
+    useResizeObserver({ ref, onResize });
 
-    useLayoutEffect(() => {
-        handleSize();
-    }, [ref?.offsetHeight, ref?.offsetWidth]);
-
-    return [setRef, size];
+    return [ref, size];
 }
