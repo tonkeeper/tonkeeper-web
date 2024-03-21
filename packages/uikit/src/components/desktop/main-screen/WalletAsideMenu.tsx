@@ -8,7 +8,7 @@ import { useTranslation } from '../../../hooks/translation';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
-    width: 228px;
+    width: fit-content;
     border-right: 1px solid ${p => p.theme.backgroundContentAttention};
 
     > a {
@@ -19,6 +19,7 @@ const WalletAsideContainer = styled.div`
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
+    padding-right: 50px;
 `;
 
 export const WalletAsideMenu = () => {
