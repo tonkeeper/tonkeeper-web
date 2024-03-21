@@ -2,21 +2,19 @@ import styled from 'styled-components';
 import { Num2 } from '../../Text';
 import { useWalletTotalBalance } from '../../../state/wallet';
 import { Skeleton } from '../../shared/Skeleton';
-import { useAppContext, useWalletContext } from '../../../hooks/appContext';
+import { useAppContext } from '../../../hooks/appContext';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { Button } from '../../fields/Button';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, RefreshIcon, SwapIcon } from '../../Icon';
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../Icon';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import React, { useState } from 'react';
+import React from 'react';
 import { BuyNotification } from '../../home/BuyAction';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
 import { DesktopExternalLinks } from '../../../libs/externalLinks';
 import { usePreFetchRates } from '../../../state/rates';
 import { IconButton } from '../../fields/IconButton';
-import { useQueryClient } from '@tanstack/react-query';
-import { QueryKey } from '../../../libs/queryKey';
 import { useTranslation } from '../../../hooks/translation';
 
 const DesktopHeaderStyled = styled.div`
@@ -91,31 +89,7 @@ export const DesktopHeader = () => {
     const sdk = useAppSdk();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: buy } = useTonendpointBuyMethods();
-    const client = useQueryClient();
-    const wallet = useWalletContext();
     const { t } = useTranslation();
-
-    const [isRefreshing, setIsRefreshing] = useState(false);
-
-    const onRefresh = async () => {
-        setIsRefreshing(true);
-        let isCompleted = false;
-
-        const interval = setInterval(() => {
-            if (isCompleted) {
-                setIsRefreshing(false);
-                clearInterval(interval);
-            }
-        }, 1000);
-        await Promise.all([
-            client.invalidateQueries([wallet.active.rawAddress, QueryKey.jettons]),
-            client.invalidateQueries([wallet.active.rawAddress, QueryKey.info]),
-            client.invalidateQueries([wallet.publicKey, QueryKey.tron]),
-            client.invalidateQueries([QueryKey.total]),
-            client.invalidateQueries([QueryKey.distribution])
-        ]);
-        isCompleted = true;
-    };
 
     return (
         <DesktopHeaderStyled>
@@ -124,9 +98,6 @@ export const DesktopHeader = () => {
             ) : (
                 <BalanceContainer>
                     <Num2>{formatFiatCurrency(fiat, balance || 0)}</Num2>
-                    <IconButton onClick={onRefresh} disabled={isRefreshing}>
-                        <RefreshIcon />
-                    </IconButton>
                 </BalanceContainer>
             )}
             <Num2></Num2>

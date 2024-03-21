@@ -1,9 +1,9 @@
 import { InfiniteData } from '@tanstack/react-query';
-import { AccountEvents, NftItem } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountEvents } from '@tonkeeper/core/dist/tonApiV2';
 import { TronEvents } from '@tonkeeper/core/dist/tronApi';
 import React, { FC, useMemo, useState } from 'react';
 import { GenericActivityGroup } from '../../state/activity';
-import { MixedActivity, getMixedActivity } from '../../state/mixedActivity';
+import { MixedActivity, getMixedActivityGroups } from '../../state/mixedActivity';
 import { CoinHistorySkeleton, HistoryBlock, SkeletonList } from '../Skeleton';
 import { ActivityBlock } from './ActivityLayout';
 import { ActionData, ActivityNotification } from './ton/ActivityNotification';
@@ -18,7 +18,7 @@ export const ActivityList: FC<{
     tronEvents?: InfiniteData<TronEvents>;
 }> = ({ isFetched, isFetchingNextPage, tonEvents, tronEvents }) => {
     const activity = useMemo<GenericActivityGroup<MixedActivity>[]>(() => {
-        return getMixedActivity(tonEvents, tronEvents);
+        return getMixedActivityGroups(tonEvents, tronEvents);
     }, [tonEvents, tronEvents]);
 
     if (!isFetched) {

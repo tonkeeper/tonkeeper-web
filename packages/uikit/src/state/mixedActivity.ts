@@ -74,5 +74,12 @@ export const getMixedActivity = (
         });
     }
 
-    return groupGenericActivity(activity);
+    return activity;
+};
+
+export const getMixedActivityGroups = (
+    tonEvents: InfiniteData<AccountEvents> | undefined,
+    tronEvents: InfiniteData<TronEvents> | undefined
+) => {
+    return groupGenericActivity(getMixedActivity(tonEvents, tronEvents));
 };

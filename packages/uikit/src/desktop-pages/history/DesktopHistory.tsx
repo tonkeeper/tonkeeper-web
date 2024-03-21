@@ -1,19 +1,26 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, Suspense, useMemo, useRef } from 'react';
-import { InnerBody } from '../../components/Body';
-import { ActivityHeader } from '../../components/Header';
 import { ActivitySkeletonPage, SkeletonList } from '../../components/Skeleton';
-import { MixedActivityGroup } from '../../components/activity/ActivityGroup';
 
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import { getMixedActivityGroups } from '../../state/mixedActivity';
+import { getMixedActivity } from '../../state/mixedActivity';
+import EmptyActivity from '../../components/activity/EmptyActivity';
+import styled from 'styled-components';
+import { Label2 } from '../../components/Text';
+import { HistoryEvent } from '../../components/desktop/history/HistoryEvent';
 
-const EmptyActivity = React.lazy(() => import('../../components/activity/EmptyActivity'));
+const HistoryHeader = styled.div`
+    padding: 0.5rem 1rem;
+`;
 
-const Activity: FC = () => {
+const HistoryPageWrapper = styled.div`
+    overflow: auto;
+`;
+
+export const DesktopHistory: FC = () => {
     const wallet = useWalletContext();
     const { api, standalone } = useAppContext();
 
@@ -37,35 +44,16 @@ const Activity: FC = () => {
         getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
     });
 
-    // const {
-    //     isFetched: isTronFetched,
-    //     data: tronEvents,
-    //     isFetchingNextPage: isTronFetchingNextPage,
-    //     hasNextPage: hasTronNextPage,
-    //     fetchNextPage: fetchTronNextPage
-    // } = useInfiniteQuery({
-    //     queryKey: [wallet.tron?.ownerWalletAddress, wallet.network, QueryKey.tron],
-    //     queryFn: ({ pageParam = undefined }) =>
-    //         new TronApi(api.tronApi).getTransactions({
-    //             ownerAddress: wallet.tron!.ownerWalletAddress,
-    //             fingerprint: pageParam,
-    //             limit: 100
-    //         }),
-    //     getNextPageParam: lastPage => lastPage.fingerprint,
-    //     enabled: wallet.tron !== undefined
-    // });
-
     const isFetchingNextPage = isTonFetchingNextPage;
 
     useFetchNext(hasTonNextPage, isFetchingNextPage, fetchTonNextPage, standalone, ref);
-    //  useFetchNext(hasTronNextPage, isFetchingNextPage, fetchTronNextPage, standalone, ref);
 
     const activity = useMemo(() => {
-        return getMixedActivityGroups(tonEvents, undefined);
+        return getMixedActivity(tonEvents, undefined);
     }, [tonEvents]);
 
     if (!isTonFetched) {
-        return <ActivitySkeletonPage />;
+        return null;
     }
 
     if (activity.length === 0) {
@@ -77,14 +65,14 @@ const Activity: FC = () => {
     }
 
     return (
-        <>
-            <ActivityHeader />
-            <InnerBody ref={ref}>
-                <MixedActivityGroup items={activity} />
-                {isFetchingNextPage && <SkeletonList size={3} />}
-            </InnerBody>
-        </>
+        <HistoryPageWrapper ref={ref}>
+            <HistoryHeader>
+                <Label2>History</Label2>
+            </HistoryHeader>
+            {activity.map(item => (
+                <HistoryEvent item={item} key={item.key} />
+            ))}
+            {isFetchingNextPage && <SkeletonList size={3} />}
+        </HistoryPageWrapper>
     );
 };
-
-export default Activity;

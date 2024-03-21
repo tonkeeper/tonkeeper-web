@@ -90,7 +90,7 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
 }) => {
     const { t } = useTranslation();
     const { data: wallet } = useWalletState(publicKey);
-    const { mutate } = useMutateActiveWallet();
+    const { mutateAsync } = useMutateActiveWallet();
     const navigate = useNavigate();
 
     const { account } = useAppContext();
@@ -105,9 +105,8 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
     }, [location.pathname]);
 
     const onClick = useCallback(() => {
-        mutate(publicKey);
-        handleNavigateHome();
-    }, [publicKey, mutate, handleNavigateHome]);
+        mutateAsync(publicKey).then(handleNavigateHome);
+    }, [publicKey, mutateAsync, handleNavigateHome]);
 
     if (!wallet) {
         return null;
