@@ -75,38 +75,42 @@ export const JettonTransferDesktopAction: FC<{
 
     if (eqAddresses(wallet.active.rawAddress, jettonTransfer.sender?.address)) {
         return (
-            <ActionRow>
+            <>
                 <HistoryCellActionSent isFailed={action.status === 'failed'} />
                 <HistoryCellAccount
                     account={jettonTransfer.recipient}
                     fallbackAddress={jettonTransfer.recipientsWallet}
                 />
-                <HistoryCellComment comment={jettonTransfer.comment} />
-                <HistoryCellAmount
-                    amount={jettonTransfer.amount}
-                    symbol={jettonTransfer.jetton.symbol}
-                    decimals={jettonTransfer.jetton.decimals}
-                    isFailed={action.status === 'failed'}
-                />
-            </ActionRow>
+                <ActionRow>
+                    <HistoryCellComment comment={jettonTransfer.comment} />
+                    <HistoryCellAmount
+                        amount={jettonTransfer.amount}
+                        symbol={jettonTransfer.jetton.symbol}
+                        decimals={jettonTransfer.jetton.decimals}
+                        isFailed={action.status === 'failed'}
+                    />
+                </ActionRow>
+            </>
         );
     }
     return (
-        <ActionRow>
+        <>
             <HistoryCellActionReceived isScam={isScam} isFailed={action.status === 'failed'} />
             <HistoryCellAccount
                 account={jettonTransfer.sender}
                 fallbackAddress={jettonTransfer.sendersWallet}
             />
-            <HistoryCellComment comment={jettonTransfer.comment} isScam={isScam} />
-            <HistoryCellAmount
-                amount={jettonTransfer.amount}
-                symbol={jettonTransfer.jetton.symbol}
-                decimals={jettonTransfer.jetton.decimals}
-                isFailed={action.status === 'failed'}
-                isSpam={isScam}
-            />
-        </ActionRow>
+            <ActionRow>
+                <HistoryCellComment comment={jettonTransfer.comment} isScam={isScam} />
+                <HistoryCellAmount
+                    amount={jettonTransfer.amount}
+                    symbol={jettonTransfer.jetton.symbol}
+                    decimals={jettonTransfer.jetton.decimals}
+                    isFailed={action.status === 'failed'}
+                    isSpam={isScam}
+                />
+            </ActionRow>
+        </>
     );
 };
 
@@ -127,30 +131,31 @@ export const JettonSwapDesktopAction: FC<{ action: Action }> = ({ action }) => {
     const isFailed = action.status === 'failed';
 
     return (
-        <ActionRow>
+        <>
             <HistoryCellActionGeneric icon={<SwapIcon />} isFailed={isFailed}>
                 {t('transactions_swap')}
             </HistoryCellActionGeneric>
             <HistoryCellAccount account={{ name: toDexName(jettonSwap.dex) }} />
-            <HistoryCellComment />
-
-            <SwapHistoryCell>
-                <HistoryCellAmount
-                    amount={assetIn.amount}
-                    symbol={assetIn.symbol}
-                    decimals={assetIn.decimals}
-                    isFailed={isFailed}
-                    isNegative
-                />
-                <ChevronRightIcon />
-                <HistoryCellAmount
-                    amount={assetOut.amount}
-                    symbol={assetOut.symbol}
-                    decimals={assetOut.decimals}
-                    isFailed={isFailed}
-                />
-            </SwapHistoryCell>
-        </ActionRow>
+            <ActionRow>
+                <HistoryCellComment />
+                <SwapHistoryCell>
+                    <HistoryCellAmount
+                        amount={assetIn.amount}
+                        symbol={assetIn.symbol}
+                        decimals={assetIn.decimals}
+                        isFailed={isFailed}
+                        isNegative
+                    />
+                    <ChevronRightIcon />
+                    <HistoryCellAmount
+                        amount={assetOut.amount}
+                        symbol={assetOut.symbol}
+                        decimals={assetOut.decimals}
+                        isFailed={isFailed}
+                    />
+                </SwapHistoryCell>
+            </ActionRow>
+        </>
     );
 };
 
@@ -165,21 +170,22 @@ export const JettonBurnDesktopAction: FC<{ action: Action }> = ({ action }) => {
     const isFailed = action.status === 'failed';
 
     return (
-        <ActionRow>
+        <>
             <HistoryCellActionGeneric icon={<FireIcon color="iconPrimary" />} isFailed={isFailed}>
                 {t('transactions_burned')}
             </HistoryCellActionGeneric>
             <HistoryCellAccount account={{ address: jettonBurn.jetton.address }} />
-            <HistoryCellComment />
-
-            <HistoryCellAmount
-                amount={jettonBurn.amount}
-                symbol={jettonBurn.jetton.symbol}
-                decimals={jettonBurn.jetton.decimals}
-                isFailed={isFailed}
-                isNegative
-            />
-        </ActionRow>
+            <ActionRow>
+                <HistoryCellComment />
+                <HistoryCellAmount
+                    amount={jettonBurn.amount}
+                    symbol={jettonBurn.jetton.symbol}
+                    decimals={jettonBurn.jetton.decimals}
+                    isFailed={isFailed}
+                    isNegative
+                />
+            </ActionRow>
+        </>
     );
 };
 
@@ -193,19 +199,20 @@ export const JettonMintDesktopAction: FC<{ action: Action }> = ({ action }) => {
     const isFailed = action.status === 'failed';
 
     return (
-        <ActionRow>
+        <>
             <HistoryCellActionGeneric icon={<SparkIcon color="iconPrimary" />} isFailed={isFailed}>
                 {t('transaction_type_mint')}
             </HistoryCellActionGeneric>
             <HistoryCellAccount account={{ address: jettonMint.jetton.address }} />
-            <HistoryCellComment />
-
-            <HistoryCellAmount
-                amount={jettonMint.amount}
-                symbol={jettonMint.jetton.symbol}
-                decimals={jettonMint.jetton.decimals}
-                isFailed={isFailed}
-            />
-        </ActionRow>
+            <ActionRow>
+                <HistoryCellComment />
+                <HistoryCellAmount
+                    amount={jettonMint.amount}
+                    symbol={jettonMint.jetton.symbol}
+                    decimals={jettonMint.jetton.decimals}
+                    isFailed={isFailed}
+                />
+            </ActionRow>
+        </>
     );
 };

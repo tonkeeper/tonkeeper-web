@@ -20,6 +20,27 @@ const HistoryPageWrapper = styled.div`
     overflow: auto;
 `;
 
+const HistoryEventsGrid = styled.div<{ withBorder?: boolean }>`
+    display: grid;
+    grid-template-columns: 124px fit-content(256px) fit-content(256px) minmax(40px, 1fr);
+    column-gap: 8px;
+    padding: 0 1rem;
+`;
+
+const GridSizer = styled.div`
+    height: 0;
+`;
+
+const GridSizer2 = styled.div`
+    height: 0;
+    min-width: 120px;
+`;
+
+const GridSizer3 = styled.div`
+    height: 0;
+    min-width: 120px;
+`;
+
 export const DesktopHistory: FC = () => {
     const wallet = useWalletContext();
     const { api, standalone } = useAppContext();
@@ -69,9 +90,15 @@ export const DesktopHistory: FC = () => {
             <HistoryHeader>
                 <Label2>History</Label2>
             </HistoryHeader>
-            {activity.map(item => (
-                <HistoryEvent item={item} key={item.key} />
-            ))}
+            <HistoryEventsGrid>
+                <GridSizer />
+                <GridSizer2 />
+                <GridSizer3 />
+                <GridSizer />
+                {activity.map(item => (
+                    <HistoryEvent item={item} key={item.key} />
+                ))}
+            </HistoryEventsGrid>
             {isFetchingNextPage && <SkeletonList size={3} />}
         </HistoryPageWrapper>
     );

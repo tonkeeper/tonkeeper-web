@@ -10,7 +10,9 @@ import {
     JettonSwapDesktopAction,
     JettonTransferDesktopAction
 } from './JettonDesktopActivity';
-import { ContractDeployDesktopAction } from "./ContractDeployAction";
+import { ContractDeployDesktopAction } from './ContractDeployAction';
+import { Body2 } from '../../../Text';
+import { HistoryGridCellFillRow } from './HistoryGrid';
 
 export const HistoryAction: FC<{
     action: Action;
@@ -57,7 +59,13 @@ export const HistoryAction: FC<{
             return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;*/
         default: {
             console.log(action);
-            return <div>{action.simplePreview.description}</div>;
+            return (
+                <>
+                    <HistoryGridCellFillRow>
+                        <Body2>{action.simplePreview.description}</Body2>
+                    </HistoryGridCellFillRow>
+                </>
+            );
         }
     }
 };

@@ -7,8 +7,9 @@ import { Body2 } from '../../../Text';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useFormatCoinValue } from '../../../../hooks/balance';
 import { useWalletContext } from '../../../../hooks/appContext';
+import { HistoryGridCell, HistoryGridCellFillRow } from './HistoryGrid';
 
-export const HistoryCellAction = styled.div`
+export const HistoryCellAction = styled(HistoryGridCell)`
     display: flex;
     gap: 6px;
     height: 20px;
@@ -81,7 +82,9 @@ export const HistoryBadgeScam = () => {
     return <HistoryBadge color="accentOrange">{t('transactions_spam')}</HistoryBadge>;
 };
 
-const HistoryCellAccountStyled = styled(Body2)`
+const HistoryCellAccountStyled = styled(HistoryGridCell)`
+    ${Body2};
+
     color: ${p => p.theme.textSecondary};
     font-family: ${p => p.theme.fontMono};
     text-overflow: ellipsis;
@@ -95,18 +98,16 @@ export const HistoryCellAccount: FC<{
     const wallet = useWalletContext();
     const { t } = useTranslation();
 
-    return account?.name ? (
-        <HistoryCellAccountStyled>{account.name}</HistoryCellAccountStyled>
-    ) : account?.address ? (
+    return (
         <HistoryCellAccountStyled>
-            {toShortValue(formatAddress(account.address, wallet.network))}
+            {account?.name
+                ? account.name
+                : account?.address
+                ? toShortValue(formatAddress(account.address, wallet.network))
+                : fallbackAddress
+                ? toShortValue(formatAddress(fallbackAddress, wallet.network))
+                : t('transactions_unknown')}
         </HistoryCellAccountStyled>
-    ) : fallbackAddress ? (
-        <HistoryCellAccountStyled>
-            {toShortValue(formatAddress(fallbackAddress, wallet.network))}
-        </HistoryCellAccountStyled>
-    ) : (
-        <HistoryCellAccountStyled>{t('transactions_unknown')}</HistoryCellAccountStyled>
     );
 };
 
@@ -168,12 +169,18 @@ export const HistoryCellAmount: FC<{
     );
 };
 
-export const ActionRow = styled.div`
+export const ActionRow = styled(HistoryGridCell)`
     display: grid;
     gap: 0.5rem;
-    grid-template-columns: 132px 116px 1fr max-content;
+    grid-template-columns: 1fr max-content;
 `;
 
 export const ErrorRow = () => {
-    return <Body2 color="textTertiary">Unknown error</Body2>;
+    return (
+        <>
+            <HistoryGridCellFillRow>
+                <Body2 color="textTertiary">Unknown error</Body2>
+            </HistoryGridCellFillRow>
+        </>
+    );
 };

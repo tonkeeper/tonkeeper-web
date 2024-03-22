@@ -27,31 +27,35 @@ export const TonTransferDesktopAction: FC<{
 
     if (eqAddresses(tonTransfer.recipient.address, wallet.active.rawAddress)) {
         return (
-            <ActionRow>
+            <>
                 <HistoryCellActionReceived isScam={isScam} isFailed={action.status === 'failed'} />
                 <HistoryCellAccount account={tonTransfer.sender} />
-                <HistoryCellComment comment={tonTransfer.comment} isScam={isScam} />
+                <ActionRow>
+                    <HistoryCellComment comment={tonTransfer.comment} isScam={isScam} />
+                    <HistoryCellAmount
+                        amount={tonTransfer.amount}
+                        symbol={CryptoCurrency.TON}
+                        decimals={9}
+                        isFailed={action.status === 'failed'}
+                        isSpam={isScam}
+                    />
+                </ActionRow>
+            </>
+        );
+    }
+    return (
+        <>
+            <HistoryCellActionSent isFailed={action.status === 'failed'} />
+            <HistoryCellAccount account={tonTransfer.recipient} />
+            <ActionRow>
+                <HistoryCellComment comment={tonTransfer.comment} />
                 <HistoryCellAmount
                     amount={tonTransfer.amount}
                     symbol={CryptoCurrency.TON}
                     decimals={9}
                     isFailed={action.status === 'failed'}
-                    isSpam={isScam}
                 />
             </ActionRow>
-        );
-    }
-    return (
-        <ActionRow>
-            <HistoryCellActionSent isFailed={action.status === 'failed'} />
-            <HistoryCellAccount account={tonTransfer.recipient} />
-            <HistoryCellComment comment={tonTransfer.comment} />
-            <HistoryCellAmount
-                amount={tonTransfer.amount}
-                symbol={CryptoCurrency.TON}
-                decimals={9}
-                isFailed={action.status === 'failed'}
-            />
-        </ActionRow>
+        </>
     );
 };

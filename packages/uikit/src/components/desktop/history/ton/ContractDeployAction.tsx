@@ -56,31 +56,35 @@ export const ContractDeployDesktopAction: FC<{ action: Action }> = ({ action }) 
     const walletType = interfaces.find(i => i.startsWith('wallet'));
     if (walletType) {
         return (
-            <ActionRow>
+            <>
                 <HistoryCellActionGeneric icon={<DoneIconStyled />} isFailed={isFailed}>
                     {t('transaction_type_wallet_initialized')}
                 </HistoryCellActionGeneric>
                 <HistoryCellAccount account={{ address: contractDeploy.address }} />
-                <HistoryCellCommentSecondary comment={walletType} />
-                <AmountCellStub>-</AmountCellStub>
-            </ActionRow>
+                <ActionRow>
+                    <HistoryCellCommentSecondary comment={walletType} />
+                    <AmountCellStub>-</AmountCellStub>
+                </ActionRow>
+            </>
         );
     }
 
     return (
-        <ActionRow>
+        <>
             <HistoryCellActionGeneric icon={<ContractDeployIconStyled />} isFailed={isFailed}>
                 {t('transaction_type_contract_deploy')}
             </HistoryCellActionGeneric>
             <HistoryCellAccount account={{ address: contractDeploy.address }} />
-            <HistoryCellCommentSecondary
-                comment={
-                    contractDeploy.interfaces.length
-                        ? 'Interfaces: [' + contractDeploy.interfaces.join(', ') + ']'
-                        : ''
-                }
-            />
-            <AmountCellStub>-</AmountCellStub>
-        </ActionRow>
+            <ActionRow>
+                <HistoryCellCommentSecondary
+                    comment={
+                        contractDeploy.interfaces.length
+                            ? 'Interfaces: [' + contractDeploy.interfaces.join(', ') + ']'
+                            : ''
+                    }
+                />
+                <AmountCellStub>-</AmountCellStub>
+            </ActionRow>
+        </>
     );
 };
