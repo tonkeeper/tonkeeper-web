@@ -5,9 +5,8 @@ import { Analytics } from '.';
 export class AptabaseWeb implements Analytics {
     private user_properties: Record<string, any> = {};
 
-    constructor(private key: string, appVersion?: string) {
-        console.log({ appVersion });
-        init(this.key, { appVersion });
+    constructor(private host: string, private key: string, appVersion?: string) {
+        init(this.key, { appVersion, host: this.host });
     }
 
     init = (
