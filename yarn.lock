@@ -129,6 +129,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aptabase/browser@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "@aptabase/browser@npm:0.1.1"
+  checksum: ce07902b6fa6194be0961b0762588daa36a18287670eca8454dfbe51d90b07dbe87f92f6583b08745c73ccb8a6ad3c01356be781f9e81f3d6eb6b8c301c0b775
+  languageName: node
+  linkType: hard
+
 "@aptabase/web@npm:^0.4.2":
   version: 0.4.2
   resolution: "@aptabase/web@npm:0.4.2"
@@ -6210,6 +6217,7 @@ __metadata:
   resolution: "@tonkeeper/uikit@workspace:packages/uikit"
   dependencies:
     "@amplitude/analytics-browser": "npm:^2.1.0"
+    "@aptabase/browser": "npm:^0.1.1"
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
     "@polkadot/react-qr": "npm:^3.1.1"

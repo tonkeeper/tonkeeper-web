@@ -6,6 +6,7 @@ import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { Amplitude } from '@tonkeeper/uikit/dist/hooks/analytics/amplitude';
+import { AptabaseExtension } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-extension';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -34,7 +35,8 @@ export const useAppWidth = () => {
 export const useAnalytics = (
     storage: IStorage,
     account?: AccountState,
-    wallet?: WalletState | null
+    wallet?: WalletState | null,
+    version?: string
 ) => {
     return useQuery<Analytics>(
         [QueryKey.analytics],
@@ -53,6 +55,11 @@ export const useAnalytics = (
             }
 
             const tracker = new AnalyticsGroup(
+                new AptabaseExtension(
+                    process.env.REACT_APP_APTABASE_HOST!,
+                    process.env.REACT_APP_APTABASE!,
+                    version
+                ),
                 new Amplitude(process.env.REACT_APP_AMPLITUDE!, userId)
             );
 

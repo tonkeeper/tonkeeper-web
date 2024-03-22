@@ -45,7 +45,7 @@ import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import {Container, GlobalStyle} from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -176,7 +176,7 @@ export const Loader: FC = React.memo(() => {
     );
     const { data: config } = useTonenpointConfig(tonendpoint);
 
-    const { data: tracker } = useAnalytics(sdk.storage, account, activeWallet);
+    const { data: tracker } = useAnalytics(sdk.storage, account, activeWallet, sdk.version);
 
     if (!account || !auth || !config || lock === undefined) {
         return (
