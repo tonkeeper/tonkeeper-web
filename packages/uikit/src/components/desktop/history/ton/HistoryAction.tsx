@@ -4,6 +4,13 @@ import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { TonTransferDesktopAction } from './TonTransferDesktopAction';
 import { useTranslation } from '../../../../hooks/translation';
 import { NftPurchaseDesktopAction, NftTransferDesktopAction } from './NftDesktopAction';
+import {
+    JettonBurnDesktopAction,
+    JettonMintDesktopAction,
+    JettonSwapDesktopAction,
+    JettonTransferDesktopAction
+} from './JettonDesktopActivity';
+import { ContractDeployDesktopAction } from "./ContractDeployAction";
 
 export const HistoryAction: FC<{
     action: Action;
@@ -19,8 +26,9 @@ export const HistoryAction: FC<{
             return <NftTransferDesktopAction action={action} isScam={isScam} />;
         case 'NftPurchase':
             return <NftPurchaseDesktopAction action={action} />;
-        /* case 'ContractDeploy':
-            return <ContractDeployAction action={action} date={date} />;
+        case 'ContractDeploy':
+            return <ContractDeployDesktopAction action={action} />;
+        /*
         case 'UnSubscribe':
             return <UnSubscribeAction action={action} date={date} />;
         case 'Subscribe':
@@ -28,16 +36,16 @@ export const HistoryAction: FC<{
         case 'AuctionBid':
             return <AuctionBidAction action={action} date={date} />;
         case 'SmartContractExec':
-            return <SmartContractExecAction action={action} date={date} />;
+            return <SmartContractExecAction action={action} date={date} />; */
         case 'JettonTransfer':
-            return <JettonTransferAction action={action} date={date} />;
+            return <JettonTransferDesktopAction action={action} isScam={isScam} />;
         case 'JettonSwap':
-            return <JettonSwapAction action={action} date={date} />;
+            return <JettonSwapDesktopAction action={action} />;
         case 'JettonBurn':
-            return <JettonBurnAction action={action} date={date} />;
+            return <JettonBurnDesktopAction action={action} />;
         case 'JettonMint':
-            return <JettonMintAction action={action} date={date} />;
-        case 'DepositStake':
+            return <JettonMintDesktopAction action={action} />;
+        /*   case 'DepositStake':
             return <DepositStakeAction action={action} date={date} />;
         case 'WithdrawStake':
             return <WithdrawStakeAction action={action} date={date} />;

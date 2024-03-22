@@ -309,22 +309,24 @@ export const useNftDNSExpirationDate = (nft: NFT) => {
     });
 };
 
-export const useNftCollectionData = (nft: NftItem) => {
+export const useNftCollectionData = (nftOrCollection: NftItem | string) => {
     const {
         api: { tonApiV2 }
     } = useAppContext();
 
+    const collectionAddress =
+        typeof nftOrCollection === 'string' ? nftOrCollection : nftOrCollection.collection?.address;
+
     return useQuery<NftCollection | null, Error>(
-        [nft?.address, QueryKey.nftCollection],
+        [collectionAddress, QueryKey.nftCollection],
         async () => {
-            const { collection } = nft!;
-            if (!collection) return null;
+            if (!collectionAddress) return null;
 
             return new NFTApi(tonApiV2).getNftCollection({
-                accountId: collection.address
+                accountId: collectionAddress
             });
         },
-        { enabled: nft.collection != null }
+        { enabled: !!collectionAddress }
     );
 };
 

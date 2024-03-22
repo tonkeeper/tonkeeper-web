@@ -9,16 +9,18 @@ import {
     HistoryCellComment,
     HistoryCellAccount,
     ErrorRow,
-    HistoryCellAction
+    HistoryCellAction,
+    HistoryCellActionGeneric
 } from './HistoryCell';
 import { useWalletContext } from '../../../../hooks/appContext';
-import { useNftItemData } from '../../../../state/wallet';
+import { useNftCollectionData, useNftItemData } from '../../../../state/wallet';
 import styled, { css } from 'styled-components';
 import { Body2 } from '../../../Text';
 import { Skeleton } from '../../../shared/Skeleton';
 import { useFormatCoinValue } from '../../../../hooks/balance';
 import { ChevronRightIcon, CoinsIcon } from '../../../Icon';
 import { useTranslation } from '../../../../hooks/translation';
+import { ContractDeployIcon } from '../../../activity/ActivityIcons';
 
 const NftImage = styled.img`
     width: 20px;
@@ -49,7 +51,7 @@ const NftPurchaseContainer = styled.div`
 `;
 
 const ActionRowNftStyled = styled(ActionRow)`
-    grid-template-columns: 132px 166px 1fr minmax(50px, max-content);
+    grid-template-columns: 132px 116px 1fr minmax(50px, max-content);
 `;
 
 const HistoryCellNft: FC<{
@@ -102,11 +104,11 @@ export const NftTransferDesktopAction: FC<{
         return <ErrorRow />;
     }
 
-    if (eqAddresses(nftItemTransfer.sender?.address || '', wallet.active.rawAddress)) {
+    if (eqAddresses(wallet.active.rawAddress, nftItemTransfer.sender?.address)) {
         return (
             <ActionRowNftStyled>
                 <HistoryCellActionSent isFailed={action.status === 'failed'} />
-                <HistoryCellAccount account={nftItemTransfer.sender} />
+                <HistoryCellAccount account={nftItemTransfer.recipient} />
                 <HistoryCellComment comment={nftItemTransfer.comment} />
                 <HistoryCellNft
                     nftAddress={nftItemTransfer.nft}
@@ -118,8 +120,8 @@ export const NftTransferDesktopAction: FC<{
     return (
         <ActionRowNftStyled>
             <HistoryCellActionReceived isScam={isScam} isFailed={action.status === 'failed'} />
-            <HistoryCellAccount account={nftItemTransfer.recipient} />
-            <HistoryCellComment comment={nftItemTransfer.comment} />
+            <HistoryCellAccount account={nftItemTransfer.sender} />
+            <HistoryCellComment comment={nftItemTransfer.comment} isScam={isScam} />
             <HistoryCellNft
                 nftAddress={nftItemTransfer.nft}
                 isFailed={action.status === 'failed'}
@@ -153,5 +155,59 @@ export const NftPurchaseDesktopAction: FC<{
                 symbol={nftPurchase.amount.tokenName}
             />
         </ActionRow>
+    );
+};
+
+const ContractDeployIconStyled = styled(ContractDeployIcon)`
+    color: ${p => p.theme.iconPrimary};
+    width: 16px;
+    height: 16px;
+`;
+
+export const NftDeployDesktopAction: FC<{ address: string; isFailed: boolean }> = ({
+    address,
+    isFailed
+}) => {
+    const { t } = useTranslation();
+
+    return (
+        <ActionRowNftStyled>
+            <HistoryCellActionGeneric icon={<ContractDeployIconStyled />} isFailed={isFailed}>
+                {t('NFT_creation')}
+            </HistoryCellActionGeneric>
+            <HistoryCellAccount account={{ address }} />
+            <HistoryCellComment />
+            <HistoryCellNft nftAddress={address} isFailed={isFailed} />
+        </ActionRowNftStyled>
+    );
+};
+
+export const NftCollectionDeployDesktopAction: FC<{ address: string; isFailed: boolean }> = ({
+    address,
+    isFailed
+}) => {
+    const { t } = useTranslation();
+    const { data } = useNftCollectionData(address);
+
+    if (!data) {
+        return <Skeleton width="100px" height="20px" />;
+    }
+
+    const preview = data?.previews?.find(item => item.resolution === '100x100');
+
+    return (
+        <ActionRowNftStyled>
+            <HistoryCellActionGeneric icon={<ContractDeployIconStyled />} isFailed={isFailed}>
+                {t('nft_deploy_collection_title')}
+            </HistoryCellActionGeneric>
+            <HistoryCellAccount account={{ address }} />
+            <HistoryCellComment />
+            <NftContainer>
+                <NftTitle isFailed={isFailed}>
+                    {data.metadata?.name || 'Unnamed Collection'}
+                </NftTitle>
+                {preview && <NftImage src={preview.url} alt="NFT Preview" />}
+            </NftContainer>
+        </ActionRowNftStyled>
     );
 };

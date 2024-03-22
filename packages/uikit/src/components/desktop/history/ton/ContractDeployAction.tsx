@@ -1,104 +1,86 @@
-export {};
-/*
-import { Action } from '@tonkeeper/core/dist/tonApiV2';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
-import { useWalletContext } from '../../../hooks/appContext';
-import { useTranslation } from '../../../hooks/translation';
-import { ListBlock } from '../../List';
-import { ContractDeployActivityAction, WalletDeployActivityAction } from '../ActivityActionLayout';
-import { FailedDetail } from '../ActivityDetailsLayout';
-import { ActivityIcon, ContractDeployIcon } from '../ActivityIcons';
-import { ColumnLayout, ErrorAction, ListItemGrid } from '../CommonAction';
+import { Action } from '@tonkeeper/core/dist/tonApiV2';
+import { useTranslation } from '../../../../hooks/translation';
 import {
-    ActionDate,
-    ActionDeployerDetails,
-    ActionDetailsBlock,
-    ActionExtraDetails,
-    ActionTransactionDetails,
-    ErrorActivityNotification,
-    Title
-} from '../NotificationCommon';
-import { ActionData } from './ActivityNotification';
-import { NftComment } from './NftActivity';
+    ActionRow,
+    ErrorRow,
+    HistoryCellAccount,
+    HistoryCellActionGeneric,
+    HistoryCellCommentSecondary
+} from './HistoryCell';
+import { DoneIcon } from '../../../Icon';
+import { NftCollectionDeployDesktopAction, NftDeployDesktopAction } from './NftDesktopAction';
+import { ContractDeployIcon } from '../../../activity/ActivityIcons';
+import styled from 'styled-components';
+import { Body2 } from '../../../Text';
 
-export const ContractDeployActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
+const ContractDeployIconStyled = styled(ContractDeployIcon)`
+    color: ${p => p.theme.iconPrimary};
+    width: 16px;
+    height: 16px;
+`;
+
+const DoneIconStyled = styled(DoneIcon)`
+    color: ${p => p.theme.iconPrimary};
+`;
+
+const AmountCellStub = styled(Body2)`
+    color: ${p => p.theme.textTertiary};
+`;
+
+export const ContractDeployDesktopAction: FC<{ action: Action }> = ({ action }) => {
     const { t } = useTranslation();
     const { contractDeploy } = action;
 
     if (!contractDeploy) {
-        return <ErrorActivityNotification event={event} />;
+        return <ErrorRow />;
+    }
+
+    const isFailed = action.status === 'failed';
+
+    const interfaces = contractDeploy.interfaces ?? [];
+
+    if (interfaces.includes('nft_item')) {
+        return <NftDeployDesktopAction isFailed={isFailed} address={contractDeploy.address} />;
+    }
+
+    if (interfaces.includes('nft_collection')) {
+        return (
+            <NftCollectionDeployDesktopAction
+                isFailed={isFailed}
+                address={contractDeploy.address}
+            />
+        );
+    }
+
+    const walletType = interfaces.find(i => i.startsWith('wallet'));
+    if (walletType) {
+        return (
+            <ActionRow>
+                <HistoryCellActionGeneric icon={<DoneIconStyled />} isFailed={isFailed}>
+                    {t('transaction_type_wallet_initialized')}
+                </HistoryCellActionGeneric>
+                <HistoryCellAccount account={{ address: contractDeploy.address }} />
+                <HistoryCellCommentSecondary comment={walletType} />
+                <AmountCellStub>-</AmountCellStub>
+            </ActionRow>
+        );
     }
 
     return (
-        <ActionDetailsBlock event={event}>
-            <div>
-                <Title>
-                    {contractDeploy.interfaces?.includes('wallet')
-                        ? t('transaction_type_wallet_initialized')
-                        : t('transaction_type_contract_deploy')}
-                </Title>
-                <ActionDate kind="received" timestamp={timestamp} />
-                <FailedDetail status={action.status} />
-            </div>
-            <ListBlock margin={false} fullWidth>
-                <ActionDeployerDetails deployer={contractDeploy.address} />
-                <ActionTransactionDetails eventId={event.eventId} />
-                <ActionExtraDetails extra={event.extra} />
-            </ListBlock>
-        </ActionDetailsBlock>
+        <ActionRow>
+            <HistoryCellActionGeneric icon={<ContractDeployIconStyled />} isFailed={isFailed}>
+                {t('transaction_type_contract_deploy')}
+            </HistoryCellActionGeneric>
+            <HistoryCellAccount account={{ address: contractDeploy.address }} />
+            <HistoryCellCommentSecondary
+                comment={
+                    contractDeploy.interfaces.length
+                        ? 'Interfaces: [' + contractDeploy.interfaces.join(', ') + ']'
+                        : ''
+                }
+            />
+            <AmountCellStub>-</AmountCellStub>
+        </ActionRow>
     );
 };
-
-export const ContractDeployAction: FC<{
-    action: Action;
-    date: string;
-}> = ({ action, date }) => {
-    const { t } = useTranslation();
-    const { contractDeploy } = action;
-    const wallet = useWalletContext();
-    if (!contractDeploy) {
-        return <ErrorAction />;
-    }
-    const interfaces = contractDeploy.interfaces ?? [];
-    const address = toShortValue(
-        formatAddress(
-            contractDeploy.address,
-            wallet.network,
-            !interfaces.some(value => value.includes('wallet'))
-        )
-    );
-
-    if (interfaces.includes('nft_item')) {
-        return (
-            <ListItemGrid>
-                <ActivityIcon status={action.status}>
-                    <ContractDeployIcon />
-                </ActivityIcon>
-                <ColumnLayout title={t('NFT_creation')} entry="-" address={address} date={date} />
-                <NftComment address={contractDeploy.address} />
-            </ListItemGrid>
-        );
-    }
-    if (interfaces.includes('nft_collection')) {
-        return (
-            <ListItemGrid>
-                <ActivityIcon status={action.status}>
-                    <ContractDeployIcon />
-                </ActivityIcon>
-                <ColumnLayout
-                    title={t('nft_deploy_collection_title')}
-                    entry="-"
-                    address={address}
-                    date={date}
-                />
-            </ListItemGrid>
-        );
-    }
-    if (interfaces.includes('wallet')) {
-        return <WalletDeployActivityAction address={address} date={date} />;
-    }
-
-    return <ContractDeployActivityAction address={address} date={date} />;
-};
-*/

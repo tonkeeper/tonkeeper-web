@@ -2,21 +2,32 @@ import styled from 'styled-components';
 import { hexToRGBA } from '../../../../libs/css';
 import { useTranslation } from '../../../../hooks/translation';
 import { ArrowDownIcon, ArrowUpIcon, XMarkCircleIcon } from '../../../Icon';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { Body2 } from '../../../Text';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useFormatCoinValue } from '../../../../hooks/balance';
 import { useWalletContext } from '../../../../hooks/appContext';
 
-export const MayBeFailedBody2 = styled(Body2)<{ isFailed: boolean }>`
-    color: ${props => (props.isFailed ? props.theme.textTertiary : props.theme.textPrimary)};
-`;
-
 export const HistoryCellAction = styled.div`
     display: flex;
     gap: 6px;
     height: 20px;
+    align-items: center;
 `;
+
+export const HistoryCellActionGeneric: FC<{
+    icon: ReactNode;
+    children: ReactNode;
+    isFailed: boolean;
+}> = ({ icon, children, isFailed }) => {
+    return (
+        <HistoryCellAction>
+            {isFailed ? <XMarkCircleIcon color="accentRed" /> : icon}
+            <Body2>{children}</Body2>
+            {isFailed && <HistoryBadgeFailed />}
+        </HistoryCellAction>
+    );
+};
 
 export const HistoryCellActionReceived: FC<{
     isScam: boolean;
@@ -26,7 +37,7 @@ export const HistoryCellActionReceived: FC<{
     return (
         <HistoryCellAction>
             {isFailed ? <XMarkCircleIcon color="accentRed" /> : <ArrowDownIcon />}
-            {isScam ? t('spam_action') : t('transaction_type_receive')}
+            <Body2>{isScam ? t('spam_action') : t('transaction_type_receive')}</Body2>
             {isScam && !isFailed && <HistoryBadgeScam />}
             {isFailed && <HistoryBadgeFailed />}
         </HistoryCellAction>
@@ -57,6 +68,7 @@ export const HistoryBadge = styled.div<{ color: string }>`
     font-size: 8.5px;
     font-weight: 510;
     line-height: 12px;
+    height: fit-content;
 `;
 
 export const HistoryBadgeFailed = () => {
@@ -66,12 +78,8 @@ export const HistoryBadgeFailed = () => {
 
 export const HistoryBadgeScam = () => {
     const { t } = useTranslation();
-    return <HistoryBadge color="accentYellow">{t('transactions_spam')}</HistoryBadge>;
+    return <HistoryBadge color="accentOrange">{t('transactions_spam')}</HistoryBadge>;
 };
-
-export const FailedTxIcon = styled(XMarkCircleIcon)`
-    color: ${p => p.theme.accentRed};
-`;
 
 const HistoryCellAccountStyled = styled(Body2)`
     color: ${p => p.theme.textSecondary};
@@ -80,9 +88,10 @@ const HistoryCellAccountStyled = styled(Body2)`
     overflow: hidden;
     white-space: nowrap;
 `;
-export const HistoryCellAccount: FC<{ account?: { address?: string; name?: string } }> = ({
-    account
-}) => {
+export const HistoryCellAccount: FC<{
+    account?: { address?: string; name?: string };
+    fallbackAddress?: string;
+}> = ({ account, fallbackAddress }) => {
     const wallet = useWalletContext();
     const { t } = useTranslation();
 
@@ -91,6 +100,10 @@ export const HistoryCellAccount: FC<{ account?: { address?: string; name?: strin
     ) : account?.address ? (
         <HistoryCellAccountStyled>
             {toShortValue(formatAddress(account.address, wallet.network))}
+        </HistoryCellAccountStyled>
+    ) : fallbackAddress ? (
+        <HistoryCellAccountStyled>
+            {toShortValue(formatAddress(fallbackAddress, wallet.network))}
         </HistoryCellAccountStyled>
     ) : (
         <HistoryCellAccountStyled>{t('transactions_unknown')}</HistoryCellAccountStyled>
@@ -104,12 +117,20 @@ const HistoryCellCommentStyled = styled(Body2)`
     min-width: 40px;
 `;
 
-export const HistoryCellComment: FC<{ comment?: string }> = ({ comment }) => {
-    if (!comment) {
+export const HistoryCellComment: FC<{ comment?: string; isScam?: boolean; className?: string }> = ({
+    comment,
+    isScam,
+    className
+}) => {
+    if (!comment || isScam) {
         return <div />;
     }
-    return <HistoryCellCommentStyled>{comment}</HistoryCellCommentStyled>;
+    return <HistoryCellCommentStyled className={className}>{comment}</HistoryCellCommentStyled>;
 };
+
+export const HistoryCellCommentSecondary = styled(HistoryCellComment)`
+    color: ${p => p.theme.textSecondary};
+`;
 
 const HistoryCellAmountStyled = styled(Body2)<{ color?: string }>`
     color: ${p => (p.color ? p.theme[p.color] : p.theme.textPrimary)};
@@ -121,11 +142,12 @@ const HistoryCellAmountStyled = styled(Body2)<{ color?: string }>`
 export const HistoryCellAmount: FC<{
     amount: string | number;
     symbol: string;
+    decimals: number;
     color?: string;
     isNegative?: boolean;
     isFailed?: boolean;
     isSpam?: boolean;
-}> = ({ amount, symbol, color, isNegative, isFailed, isSpam }) => {
+}> = ({ amount, symbol, decimals, color, isNegative, isFailed, isSpam }) => {
     const format = useFormatCoinValue();
 
     const finalColor = color
@@ -141,13 +163,14 @@ export const HistoryCellAmount: FC<{
     return (
         <HistoryCellAmountStyled color={finalColor}>
             {isNegative ? '−' : '+'}
-            {format(amount)}&nbsp;{symbol}
+            {format(amount, decimals)}&nbsp;{symbol}
         </HistoryCellAmountStyled>
     );
 };
 
 export const ActionRow = styled.div`
     display: grid;
+    gap: 0.5rem;
     grid-template-columns: 132px 116px 1fr max-content;
 `;
 
