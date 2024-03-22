@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface SendRawMessageRequest {
  * Check if a given object implements the SendRawMessageRequest interface.
  */
 export function instanceOfSendRawMessageRequest(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "body" in value;
-
-    return isInstance;
+    if (!('body' in value)) return false;
+    return true;
 }
 
 export function SendRawMessageRequestFromJSON(json: any): SendRawMessageRequest {
@@ -42,7 +40,7 @@ export function SendRawMessageRequestFromJSON(json: any): SendRawMessageRequest 
 }
 
 export function SendRawMessageRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): SendRawMessageRequest {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function SendRawMessageRequestFromJSONTyped(json: any, ignoreDiscriminato
 }
 
 export function SendRawMessageRequestToJSON(value?: SendRawMessageRequest | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'body': value.body,
+        'body': value['body'],
     };
 }
 

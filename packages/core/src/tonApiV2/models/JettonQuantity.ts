@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -56,12 +56,10 @@ export interface JettonQuantity {
  * Check if a given object implements the JettonQuantity interface.
  */
 export function instanceOfJettonQuantity(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "quantity" in value;
-    isInstance = isInstance && "walletAddress" in value;
-    isInstance = isInstance && "jetton" in value;
-
-    return isInstance;
+    if (!('quantity' in value)) return false;
+    if (!('walletAddress' in value)) return false;
+    if (!('jetton' in value)) return false;
+    return true;
 }
 
 export function JettonQuantityFromJSON(json: any): JettonQuantity {
@@ -69,7 +67,7 @@ export function JettonQuantityFromJSON(json: any): JettonQuantity {
 }
 
 export function JettonQuantityFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonQuantity {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -81,17 +79,14 @@ export function JettonQuantityFromJSONTyped(json: any, ignoreDiscriminator: bool
 }
 
 export function JettonQuantityToJSON(value?: JettonQuantity | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'quantity': value.quantity,
-        'wallet_address': AccountAddressToJSON(value.walletAddress),
-        'jetton': JettonPreviewToJSON(value.jetton),
+        'quantity': value['quantity'],
+        'wallet_address': AccountAddressToJSON(value['walletAddress']),
+        'jetton': JettonPreviewToJSON(value['jetton']),
     };
 }
 

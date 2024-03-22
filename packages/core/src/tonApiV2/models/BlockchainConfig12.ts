@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { WorkchainDescr } from './WorkchainDescr';
 import {
     WorkchainDescrFromJSON,
@@ -38,10 +38,8 @@ export interface BlockchainConfig12 {
  * Check if a given object implements the BlockchainConfig12 interface.
  */
 export function instanceOfBlockchainConfig12(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "workchains" in value;
-
-    return isInstance;
+    if (!('workchains' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig12FromJSON(json: any): BlockchainConfig12 {
@@ -49,7 +47,7 @@ export function BlockchainConfig12FromJSON(json: any): BlockchainConfig12 {
 }
 
 export function BlockchainConfig12FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig12 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function BlockchainConfig12FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig12ToJSON(value?: BlockchainConfig12 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'workchains': ((value.workchains as Array<any>).map(WorkchainDescrToJSON)),
+        'workchains': ((value['workchains'] as Array<any>).map(WorkchainDescrToJSON)),
     };
 }
 

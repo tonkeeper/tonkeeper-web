@@ -16,30 +16,30 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface ModelError
+ * @interface ReduceIndexingLatencyDefaultResponse
  */
-export interface ModelError {
+export interface ReduceIndexingLatencyDefaultResponse {
     /**
      * 
      * @type {string}
-     * @memberof ModelError
+     * @memberof ReduceIndexingLatencyDefaultResponse
      */
     error: string;
 }
 
 /**
- * Check if a given object implements the ModelError interface.
+ * Check if a given object implements the ReduceIndexingLatencyDefaultResponse interface.
  */
-export function instanceOfModelError(value: object): boolean {
+export function instanceOfReduceIndexingLatencyDefaultResponse(value: object): boolean {
     if (!('error' in value)) return false;
     return true;
 }
 
-export function ModelErrorFromJSON(json: any): ModelError {
-    return ModelErrorFromJSONTyped(json, false);
+export function ReduceIndexingLatencyDefaultResponseFromJSON(json: any): ReduceIndexingLatencyDefaultResponse {
+    return ReduceIndexingLatencyDefaultResponseFromJSONTyped(json, false);
 }
 
-export function ModelErrorFromJSONTyped(json: any, ignoreDiscriminator: boolean): ModelError {
+export function ReduceIndexingLatencyDefaultResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): ReduceIndexingLatencyDefaultResponse {
     if (json == null) {
         return json;
     }
@@ -49,7 +49,7 @@ export function ModelErrorFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-export function ModelErrorToJSON(value?: ModelError | null): any {
+export function ReduceIndexingLatencyDefaultResponseToJSON(value?: ReduceIndexingLatencyDefaultResponse | null): any {
     if (value == null) {
         return value;
     }

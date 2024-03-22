@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -62,13 +62,11 @@ export interface JettonBurnAction {
  * Check if a given object implements the JettonBurnAction interface.
  */
 export function instanceOfJettonBurnAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "sender" in value;
-    isInstance = isInstance && "sendersWallet" in value;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "jetton" in value;
-
-    return isInstance;
+    if (!('sender' in value)) return false;
+    if (!('sendersWallet' in value)) return false;
+    if (!('amount' in value)) return false;
+    if (!('jetton' in value)) return false;
+    return true;
 }
 
 export function JettonBurnActionFromJSON(json: any): JettonBurnAction {
@@ -76,7 +74,7 @@ export function JettonBurnActionFromJSON(json: any): JettonBurnAction {
 }
 
 export function JettonBurnActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonBurnAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -89,18 +87,15 @@ export function JettonBurnActionFromJSONTyped(json: any, ignoreDiscriminator: bo
 }
 
 export function JettonBurnActionToJSON(value?: JettonBurnAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'sender': AccountAddressToJSON(value.sender),
-        'senders_wallet': value.sendersWallet,
-        'amount': value.amount,
-        'jetton': JettonPreviewToJSON(value.jetton),
+        'sender': AccountAddressToJSON(value['sender']),
+        'senders_wallet': value['sendersWallet'],
+        'amount': value['amount'],
+        'jetton': JettonPreviewToJSON(value['jetton']),
     };
 }
 

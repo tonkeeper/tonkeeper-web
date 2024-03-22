@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { Subscription } from './Subscription';
 import {
     SubscriptionFromJSON,
@@ -38,10 +38,8 @@ export interface Subscriptions {
  * Check if a given object implements the Subscriptions interface.
  */
 export function instanceOfSubscriptions(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "subscriptions" in value;
-
-    return isInstance;
+    if (!('subscriptions' in value)) return false;
+    return true;
 }
 
 export function SubscriptionsFromJSON(json: any): Subscriptions {
@@ -49,7 +47,7 @@ export function SubscriptionsFromJSON(json: any): Subscriptions {
 }
 
 export function SubscriptionsFromJSONTyped(json: any, ignoreDiscriminator: boolean): Subscriptions {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function SubscriptionsFromJSONTyped(json: any, ignoreDiscriminator: boole
 }
 
 export function SubscriptionsToJSON(value?: Subscriptions | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'subscriptions': ((value.subscriptions as Array<any>).map(SubscriptionToJSON)),
+        'subscriptions': ((value['subscriptions'] as Array<any>).map(SubscriptionToJSON)),
     };
 }
 

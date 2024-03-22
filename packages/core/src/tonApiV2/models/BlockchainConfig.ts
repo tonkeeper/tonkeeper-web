@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockchainConfig10 } from './BlockchainConfig10';
 import {
     BlockchainConfig10FromJSON,
@@ -464,15 +464,13 @@ export interface BlockchainConfig {
  * Check if a given object implements the BlockchainConfig interface.
  */
 export function instanceOfBlockchainConfig(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "raw" in value;
-    isInstance = isInstance && "_0" in value;
-    isInstance = isInstance && "_1" in value;
-    isInstance = isInstance && "_2" in value;
-    isInstance = isInstance && "_4" in value;
-    isInstance = isInstance && "_44" in value;
-
-    return isInstance;
+    if (!('raw' in value)) return false;
+    if (!('_0' in value)) return false;
+    if (!('_1' in value)) return false;
+    if (!('_2' in value)) return false;
+    if (!('_4' in value)) return false;
+    if (!('_44' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfigFromJSON(json: any): BlockchainConfig {
@@ -480,7 +478,7 @@ export function BlockchainConfigFromJSON(json: any): BlockchainConfig {
 }
 
 export function BlockchainConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -489,102 +487,99 @@ export function BlockchainConfigFromJSONTyped(json: any, ignoreDiscriminator: bo
         '_0': json['0'],
         '_1': json['1'],
         '_2': json['2'],
-        '_3': !exists(json, '3') ? undefined : json['3'],
+        '_3': json['3'] == null ? undefined : json['3'],
         '_4': json['4'],
-        '_5': !exists(json, '5') ? undefined : BlockchainConfig5FromJSON(json['5']),
-        '_6': !exists(json, '6') ? undefined : BlockchainConfig6FromJSON(json['6']),
-        '_7': !exists(json, '7') ? undefined : BlockchainConfig7FromJSON(json['7']),
-        '_8': !exists(json, '8') ? undefined : BlockchainConfig8FromJSON(json['8']),
-        '_9': !exists(json, '9') ? undefined : BlockchainConfig9FromJSON(json['9']),
-        '_10': !exists(json, '10') ? undefined : BlockchainConfig10FromJSON(json['10']),
-        '_11': !exists(json, '11') ? undefined : BlockchainConfig11FromJSON(json['11']),
-        '_12': !exists(json, '12') ? undefined : BlockchainConfig12FromJSON(json['12']),
-        '_13': !exists(json, '13') ? undefined : BlockchainConfig13FromJSON(json['13']),
-        '_14': !exists(json, '14') ? undefined : BlockchainConfig14FromJSON(json['14']),
-        '_15': !exists(json, '15') ? undefined : BlockchainConfig15FromJSON(json['15']),
-        '_16': !exists(json, '16') ? undefined : BlockchainConfig16FromJSON(json['16']),
-        '_17': !exists(json, '17') ? undefined : BlockchainConfig17FromJSON(json['17']),
-        '_18': !exists(json, '18') ? undefined : BlockchainConfig18FromJSON(json['18']),
-        '_20': !exists(json, '20') ? undefined : BlockchainConfig20FromJSON(json['20']),
-        '_21': !exists(json, '21') ? undefined : BlockchainConfig21FromJSON(json['21']),
-        '_22': !exists(json, '22') ? undefined : BlockchainConfig22FromJSON(json['22']),
-        '_23': !exists(json, '23') ? undefined : BlockchainConfig23FromJSON(json['23']),
-        '_24': !exists(json, '24') ? undefined : BlockchainConfig24FromJSON(json['24']),
-        '_25': !exists(json, '25') ? undefined : BlockchainConfig25FromJSON(json['25']),
-        '_28': !exists(json, '28') ? undefined : BlockchainConfig28FromJSON(json['28']),
-        '_29': !exists(json, '29') ? undefined : BlockchainConfig29FromJSON(json['29']),
-        '_31': !exists(json, '31') ? undefined : BlockchainConfig31FromJSON(json['31']),
-        '_32': !exists(json, '32') ? undefined : ValidatorsSetFromJSON(json['32']),
-        '_33': !exists(json, '33') ? undefined : ValidatorsSetFromJSON(json['33']),
-        '_34': !exists(json, '34') ? undefined : ValidatorsSetFromJSON(json['34']),
-        '_35': !exists(json, '35') ? undefined : ValidatorsSetFromJSON(json['35']),
-        '_36': !exists(json, '36') ? undefined : ValidatorsSetFromJSON(json['36']),
-        '_37': !exists(json, '37') ? undefined : ValidatorsSetFromJSON(json['37']),
-        '_40': !exists(json, '40') ? undefined : BlockchainConfig40FromJSON(json['40']),
-        '_43': !exists(json, '43') ? undefined : BlockchainConfig43FromJSON(json['43']),
+        '_5': json['5'] == null ? undefined : BlockchainConfig5FromJSON(json['5']),
+        '_6': json['6'] == null ? undefined : BlockchainConfig6FromJSON(json['6']),
+        '_7': json['7'] == null ? undefined : BlockchainConfig7FromJSON(json['7']),
+        '_8': json['8'] == null ? undefined : BlockchainConfig8FromJSON(json['8']),
+        '_9': json['9'] == null ? undefined : BlockchainConfig9FromJSON(json['9']),
+        '_10': json['10'] == null ? undefined : BlockchainConfig10FromJSON(json['10']),
+        '_11': json['11'] == null ? undefined : BlockchainConfig11FromJSON(json['11']),
+        '_12': json['12'] == null ? undefined : BlockchainConfig12FromJSON(json['12']),
+        '_13': json['13'] == null ? undefined : BlockchainConfig13FromJSON(json['13']),
+        '_14': json['14'] == null ? undefined : BlockchainConfig14FromJSON(json['14']),
+        '_15': json['15'] == null ? undefined : BlockchainConfig15FromJSON(json['15']),
+        '_16': json['16'] == null ? undefined : BlockchainConfig16FromJSON(json['16']),
+        '_17': json['17'] == null ? undefined : BlockchainConfig17FromJSON(json['17']),
+        '_18': json['18'] == null ? undefined : BlockchainConfig18FromJSON(json['18']),
+        '_20': json['20'] == null ? undefined : BlockchainConfig20FromJSON(json['20']),
+        '_21': json['21'] == null ? undefined : BlockchainConfig21FromJSON(json['21']),
+        '_22': json['22'] == null ? undefined : BlockchainConfig22FromJSON(json['22']),
+        '_23': json['23'] == null ? undefined : BlockchainConfig23FromJSON(json['23']),
+        '_24': json['24'] == null ? undefined : BlockchainConfig24FromJSON(json['24']),
+        '_25': json['25'] == null ? undefined : BlockchainConfig25FromJSON(json['25']),
+        '_28': json['28'] == null ? undefined : BlockchainConfig28FromJSON(json['28']),
+        '_29': json['29'] == null ? undefined : BlockchainConfig29FromJSON(json['29']),
+        '_31': json['31'] == null ? undefined : BlockchainConfig31FromJSON(json['31']),
+        '_32': json['32'] == null ? undefined : ValidatorsSetFromJSON(json['32']),
+        '_33': json['33'] == null ? undefined : ValidatorsSetFromJSON(json['33']),
+        '_34': json['34'] == null ? undefined : ValidatorsSetFromJSON(json['34']),
+        '_35': json['35'] == null ? undefined : ValidatorsSetFromJSON(json['35']),
+        '_36': json['36'] == null ? undefined : ValidatorsSetFromJSON(json['36']),
+        '_37': json['37'] == null ? undefined : ValidatorsSetFromJSON(json['37']),
+        '_40': json['40'] == null ? undefined : BlockchainConfig40FromJSON(json['40']),
+        '_43': json['43'] == null ? undefined : BlockchainConfig43FromJSON(json['43']),
         '_44': BlockchainConfig44FromJSON(json['44']),
-        '_71': !exists(json, '71') ? undefined : BlockchainConfig71FromJSON(json['71']),
-        '_72': !exists(json, '72') ? undefined : BlockchainConfig71FromJSON(json['72']),
-        '_73': !exists(json, '73') ? undefined : BlockchainConfig71FromJSON(json['73']),
-        '_79': !exists(json, '79') ? undefined : BlockchainConfig79FromJSON(json['79']),
-        '_81': !exists(json, '81') ? undefined : BlockchainConfig79FromJSON(json['81']),
-        '_82': !exists(json, '82') ? undefined : BlockchainConfig79FromJSON(json['82']),
+        '_71': json['71'] == null ? undefined : BlockchainConfig71FromJSON(json['71']),
+        '_72': json['72'] == null ? undefined : BlockchainConfig71FromJSON(json['72']),
+        '_73': json['73'] == null ? undefined : BlockchainConfig71FromJSON(json['73']),
+        '_79': json['79'] == null ? undefined : BlockchainConfig79FromJSON(json['79']),
+        '_81': json['81'] == null ? undefined : BlockchainConfig79FromJSON(json['81']),
+        '_82': json['82'] == null ? undefined : BlockchainConfig79FromJSON(json['82']),
     };
 }
 
 export function BlockchainConfigToJSON(value?: BlockchainConfig | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'raw': value.raw,
-        '0': value._0,
-        '1': value._1,
-        '2': value._2,
-        '3': value._3,
-        '4': value._4,
-        '5': BlockchainConfig5ToJSON(value._5),
-        '6': BlockchainConfig6ToJSON(value._6),
-        '7': BlockchainConfig7ToJSON(value._7),
-        '8': BlockchainConfig8ToJSON(value._8),
-        '9': BlockchainConfig9ToJSON(value._9),
-        '10': BlockchainConfig10ToJSON(value._10),
-        '11': BlockchainConfig11ToJSON(value._11),
-        '12': BlockchainConfig12ToJSON(value._12),
-        '13': BlockchainConfig13ToJSON(value._13),
-        '14': BlockchainConfig14ToJSON(value._14),
-        '15': BlockchainConfig15ToJSON(value._15),
-        '16': BlockchainConfig16ToJSON(value._16),
-        '17': BlockchainConfig17ToJSON(value._17),
-        '18': BlockchainConfig18ToJSON(value._18),
-        '20': BlockchainConfig20ToJSON(value._20),
-        '21': BlockchainConfig21ToJSON(value._21),
-        '22': BlockchainConfig22ToJSON(value._22),
-        '23': BlockchainConfig23ToJSON(value._23),
-        '24': BlockchainConfig24ToJSON(value._24),
-        '25': BlockchainConfig25ToJSON(value._25),
-        '28': BlockchainConfig28ToJSON(value._28),
-        '29': BlockchainConfig29ToJSON(value._29),
-        '31': BlockchainConfig31ToJSON(value._31),
-        '32': ValidatorsSetToJSON(value._32),
-        '33': ValidatorsSetToJSON(value._33),
-        '34': ValidatorsSetToJSON(value._34),
-        '35': ValidatorsSetToJSON(value._35),
-        '36': ValidatorsSetToJSON(value._36),
-        '37': ValidatorsSetToJSON(value._37),
-        '40': BlockchainConfig40ToJSON(value._40),
-        '43': BlockchainConfig43ToJSON(value._43),
-        '44': BlockchainConfig44ToJSON(value._44),
-        '71': BlockchainConfig71ToJSON(value._71),
-        '72': BlockchainConfig71ToJSON(value._72),
-        '73': BlockchainConfig71ToJSON(value._73),
-        '79': BlockchainConfig79ToJSON(value._79),
-        '81': BlockchainConfig79ToJSON(value._81),
-        '82': BlockchainConfig79ToJSON(value._82),
+        'raw': value['raw'],
+        '0': value['_0'],
+        '1': value['_1'],
+        '2': value['_2'],
+        '3': value['_3'],
+        '4': value['_4'],
+        '5': BlockchainConfig5ToJSON(value['_5']),
+        '6': BlockchainConfig6ToJSON(value['_6']),
+        '7': BlockchainConfig7ToJSON(value['_7']),
+        '8': BlockchainConfig8ToJSON(value['_8']),
+        '9': BlockchainConfig9ToJSON(value['_9']),
+        '10': BlockchainConfig10ToJSON(value['_10']),
+        '11': BlockchainConfig11ToJSON(value['_11']),
+        '12': BlockchainConfig12ToJSON(value['_12']),
+        '13': BlockchainConfig13ToJSON(value['_13']),
+        '14': BlockchainConfig14ToJSON(value['_14']),
+        '15': BlockchainConfig15ToJSON(value['_15']),
+        '16': BlockchainConfig16ToJSON(value['_16']),
+        '17': BlockchainConfig17ToJSON(value['_17']),
+        '18': BlockchainConfig18ToJSON(value['_18']),
+        '20': BlockchainConfig20ToJSON(value['_20']),
+        '21': BlockchainConfig21ToJSON(value['_21']),
+        '22': BlockchainConfig22ToJSON(value['_22']),
+        '23': BlockchainConfig23ToJSON(value['_23']),
+        '24': BlockchainConfig24ToJSON(value['_24']),
+        '25': BlockchainConfig25ToJSON(value['_25']),
+        '28': BlockchainConfig28ToJSON(value['_28']),
+        '29': BlockchainConfig29ToJSON(value['_29']),
+        '31': BlockchainConfig31ToJSON(value['_31']),
+        '32': ValidatorsSetToJSON(value['_32']),
+        '33': ValidatorsSetToJSON(value['_33']),
+        '34': ValidatorsSetToJSON(value['_34']),
+        '35': ValidatorsSetToJSON(value['_35']),
+        '36': ValidatorsSetToJSON(value['_36']),
+        '37': ValidatorsSetToJSON(value['_37']),
+        '40': BlockchainConfig40ToJSON(value['_40']),
+        '43': BlockchainConfig43ToJSON(value['_43']),
+        '44': BlockchainConfig44ToJSON(value['_44']),
+        '71': BlockchainConfig71ToJSON(value['_71']),
+        '72': BlockchainConfig71ToJSON(value['_72']),
+        '73': BlockchainConfig71ToJSON(value['_73']),
+        '79': BlockchainConfig79ToJSON(value['_79']),
+        '81': BlockchainConfig79ToJSON(value['_81']),
+        '82': BlockchainConfig79ToJSON(value['_82']),
     };
 }
 

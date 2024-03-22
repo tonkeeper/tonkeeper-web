@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -62,12 +62,10 @@ export interface Sale {
  * Check if a given object implements the Sale interface.
  */
 export function instanceOfSale(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "market" in value;
-    isInstance = isInstance && "price" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('market' in value)) return false;
+    if (!('price' in value)) return false;
+    return true;
 }
 
 export function SaleFromJSON(json: any): Sale {
@@ -75,31 +73,28 @@ export function SaleFromJSON(json: any): Sale {
 }
 
 export function SaleFromJSONTyped(json: any, ignoreDiscriminator: boolean): Sale {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'address': json['address'],
         'market': AccountAddressFromJSON(json['market']),
-        'owner': !exists(json, 'owner') ? undefined : AccountAddressFromJSON(json['owner']),
+        'owner': json['owner'] == null ? undefined : AccountAddressFromJSON(json['owner']),
         'price': PriceFromJSON(json['price']),
     };
 }
 
 export function SaleToJSON(value?: Sale | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'market': AccountAddressToJSON(value.market),
-        'owner': AccountAddressToJSON(value.owner),
-        'price': PriceToJSON(value.price),
+        'address': value['address'],
+        'market': AccountAddressToJSON(value['market']),
+        'owner': AccountAddressToJSON(value['owner']),
+        'price': PriceToJSON(value['price']),
     };
 }
 

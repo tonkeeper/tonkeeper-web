@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { PoolImplementationType } from './PoolImplementationType';
 import {
     PoolImplementationTypeFromJSON,
@@ -122,22 +122,20 @@ export interface PoolInfo {
  * Check if a given object implements the PoolInfo interface.
  */
 export function instanceOfPoolInfo(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "totalAmount" in value;
-    isInstance = isInstance && "implementation" in value;
-    isInstance = isInstance && "apy" in value;
-    isInstance = isInstance && "minStake" in value;
-    isInstance = isInstance && "cycleStart" in value;
-    isInstance = isInstance && "cycleEnd" in value;
-    isInstance = isInstance && "verified" in value;
-    isInstance = isInstance && "currentNominators" in value;
-    isInstance = isInstance && "maxNominators" in value;
-    isInstance = isInstance && "nominatorsStake" in value;
-    isInstance = isInstance && "validatorStake" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('name' in value)) return false;
+    if (!('totalAmount' in value)) return false;
+    if (!('implementation' in value)) return false;
+    if (!('apy' in value)) return false;
+    if (!('minStake' in value)) return false;
+    if (!('cycleStart' in value)) return false;
+    if (!('cycleEnd' in value)) return false;
+    if (!('verified' in value)) return false;
+    if (!('currentNominators' in value)) return false;
+    if (!('maxNominators' in value)) return false;
+    if (!('nominatorsStake' in value)) return false;
+    if (!('validatorStake' in value)) return false;
+    return true;
 }
 
 export function PoolInfoFromJSON(json: any): PoolInfo {
@@ -145,7 +143,7 @@ export function PoolInfoFromJSON(json: any): PoolInfo {
 }
 
 export function PoolInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): PoolInfo {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -161,37 +159,34 @@ export function PoolInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'verified': json['verified'],
         'currentNominators': json['current_nominators'],
         'maxNominators': json['max_nominators'],
-        'liquidJettonMaster': !exists(json, 'liquid_jetton_master') ? undefined : json['liquid_jetton_master'],
+        'liquidJettonMaster': json['liquid_jetton_master'] == null ? undefined : json['liquid_jetton_master'],
         'nominatorsStake': json['nominators_stake'],
         'validatorStake': json['validator_stake'],
-        'cycleLength': !exists(json, 'cycle_length') ? undefined : json['cycle_length'],
+        'cycleLength': json['cycle_length'] == null ? undefined : json['cycle_length'],
     };
 }
 
 export function PoolInfoToJSON(value?: PoolInfo | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'name': value.name,
-        'total_amount': value.totalAmount,
-        'implementation': PoolImplementationTypeToJSON(value.implementation),
-        'apy': value.apy,
-        'min_stake': value.minStake,
-        'cycle_start': value.cycleStart,
-        'cycle_end': value.cycleEnd,
-        'verified': value.verified,
-        'current_nominators': value.currentNominators,
-        'max_nominators': value.maxNominators,
-        'liquid_jetton_master': value.liquidJettonMaster,
-        'nominators_stake': value.nominatorsStake,
-        'validator_stake': value.validatorStake,
-        'cycle_length': value.cycleLength,
+        'address': value['address'],
+        'name': value['name'],
+        'total_amount': value['totalAmount'],
+        'implementation': PoolImplementationTypeToJSON(value['implementation']),
+        'apy': value['apy'],
+        'min_stake': value['minStake'],
+        'cycle_start': value['cycleStart'],
+        'cycle_end': value['cycleEnd'],
+        'verified': value['verified'],
+        'current_nominators': value['currentNominators'],
+        'max_nominators': value['maxNominators'],
+        'liquid_jetton_master': value['liquidJettonMaster'],
+        'nominators_stake': value['nominatorsStake'],
+        'validator_stake': value['validatorStake'],
+        'cycle_length': value['cycleLength'],
     };
 }
 

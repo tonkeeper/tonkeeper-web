@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -74,13 +74,11 @@ export interface SmartContractAction {
  * Check if a given object implements the SmartContractAction interface.
  */
 export function instanceOfSmartContractAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "executor" in value;
-    isInstance = isInstance && "contract" in value;
-    isInstance = isInstance && "tonAttached" in value;
-    isInstance = isInstance && "operation" in value;
-
-    return isInstance;
+    if (!('executor' in value)) return false;
+    if (!('contract' in value)) return false;
+    if (!('tonAttached' in value)) return false;
+    if (!('operation' in value)) return false;
+    return true;
 }
 
 export function SmartContractActionFromJSON(json: any): SmartContractAction {
@@ -88,7 +86,7 @@ export function SmartContractActionFromJSON(json: any): SmartContractAction {
 }
 
 export function SmartContractActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): SmartContractAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -97,26 +95,23 @@ export function SmartContractActionFromJSONTyped(json: any, ignoreDiscriminator:
         'contract': AccountAddressFromJSON(json['contract']),
         'tonAttached': json['ton_attached'],
         'operation': json['operation'],
-        'payload': !exists(json, 'payload') ? undefined : json['payload'],
-        'refund': !exists(json, 'refund') ? undefined : RefundFromJSON(json['refund']),
+        'payload': json['payload'] == null ? undefined : json['payload'],
+        'refund': json['refund'] == null ? undefined : RefundFromJSON(json['refund']),
     };
 }
 
 export function SmartContractActionToJSON(value?: SmartContractAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'executor': AccountAddressToJSON(value.executor),
-        'contract': AccountAddressToJSON(value.contract),
-        'ton_attached': value.tonAttached,
-        'operation': value.operation,
-        'payload': value.payload,
-        'refund': RefundToJSON(value.refund),
+        'executor': AccountAddressToJSON(value['executor']),
+        'contract': AccountAddressToJSON(value['contract']),
+        'ton_attached': value['tonAttached'],
+        'operation': value['operation'],
+        'payload': value['payload'],
+        'refund': RefundToJSON(value['refund']),
     };
 }
 

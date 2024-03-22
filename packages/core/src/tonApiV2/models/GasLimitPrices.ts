@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -79,15 +79,13 @@ export interface GasLimitPrices {
  * Check if a given object implements the GasLimitPrices interface.
  */
 export function instanceOfGasLimitPrices(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "gasPrice" in value;
-    isInstance = isInstance && "gasLimit" in value;
-    isInstance = isInstance && "gasCredit" in value;
-    isInstance = isInstance && "blockGasLimit" in value;
-    isInstance = isInstance && "freezeDueLimit" in value;
-    isInstance = isInstance && "deleteDueLimit" in value;
-
-    return isInstance;
+    if (!('gasPrice' in value)) return false;
+    if (!('gasLimit' in value)) return false;
+    if (!('gasCredit' in value)) return false;
+    if (!('blockGasLimit' in value)) return false;
+    if (!('freezeDueLimit' in value)) return false;
+    if (!('deleteDueLimit' in value)) return false;
+    return true;
 }
 
 export function GasLimitPricesFromJSON(json: any): GasLimitPrices {
@@ -95,14 +93,14 @@ export function GasLimitPricesFromJSON(json: any): GasLimitPrices {
 }
 
 export function GasLimitPricesFromJSONTyped(json: any, ignoreDiscriminator: boolean): GasLimitPrices {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'specialGasLimit': !exists(json, 'special_gas_limit') ? undefined : json['special_gas_limit'],
-        'flatGasLimit': !exists(json, 'flat_gas_limit') ? undefined : json['flat_gas_limit'],
-        'flatGasPrice': !exists(json, 'flat_gas_price') ? undefined : json['flat_gas_price'],
+        'specialGasLimit': json['special_gas_limit'] == null ? undefined : json['special_gas_limit'],
+        'flatGasLimit': json['flat_gas_limit'] == null ? undefined : json['flat_gas_limit'],
+        'flatGasPrice': json['flat_gas_price'] == null ? undefined : json['flat_gas_price'],
         'gasPrice': json['gas_price'],
         'gasLimit': json['gas_limit'],
         'gasCredit': json['gas_credit'],
@@ -113,23 +111,20 @@ export function GasLimitPricesFromJSONTyped(json: any, ignoreDiscriminator: bool
 }
 
 export function GasLimitPricesToJSON(value?: GasLimitPrices | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'special_gas_limit': value.specialGasLimit,
-        'flat_gas_limit': value.flatGasLimit,
-        'flat_gas_price': value.flatGasPrice,
-        'gas_price': value.gasPrice,
-        'gas_limit': value.gasLimit,
-        'gas_credit': value.gasCredit,
-        'block_gas_limit': value.blockGasLimit,
-        'freeze_due_limit': value.freezeDueLimit,
-        'delete_due_limit': value.deleteDueLimit,
+        'special_gas_limit': value['specialGasLimit'],
+        'flat_gas_limit': value['flatGasLimit'],
+        'flat_gas_price': value['flatGasPrice'],
+        'gas_price': value['gasPrice'],
+        'gas_limit': value['gasLimit'],
+        'gas_credit': value['gasCredit'],
+        'block_gas_limit': value['blockGasLimit'],
+        'freeze_due_limit': value['freezeDueLimit'],
+        'delete_due_limit': value['deleteDueLimit'],
     };
 }
 

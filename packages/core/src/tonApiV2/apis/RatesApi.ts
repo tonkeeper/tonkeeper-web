@@ -15,17 +15,17 @@
 
 import * as runtime from '../runtime';
 import type {
-  GetBlockchainBlockDefaultResponse,
   GetChartRates200Response,
   GetRates200Response,
+  ReduceIndexingLatencyDefaultResponse,
 } from '../models/index';
 import {
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
     GetChartRates200ResponseFromJSON,
     GetChartRates200ResponseToJSON,
     GetRates200ResponseFromJSON,
     GetRates200ResponseToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetChartRatesRequest {
@@ -33,11 +33,12 @@ export interface GetChartRatesRequest {
     currency?: string;
     startDate?: number;
     endDate?: number;
+    pointsCount?: number;
 }
 
 export interface GetRatesRequest {
-    tokens: string;
-    currencies: string;
+    tokens: Array<string>;
+    currencies: Array<string>;
 }
 
 /**
@@ -53,6 +54,7 @@ export interface RatesApiInterface {
      * @param {string} [currency] 
      * @param {number} [startDate] 
      * @param {number} [endDate] 
+     * @param {number} [pointsCount] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RatesApiInterface
@@ -66,8 +68,8 @@ export interface RatesApiInterface {
 
     /**
      * Get the token price to the currency
-     * @param {string} tokens accept ton and jetton master addresses, separated by commas
-     * @param {string} currencies accept ton and all possible fiat currencies, separated by commas
+     * @param {Array<string>} tokens accept ton and jetton master addresses, separated by commas
+     * @param {Array<string>} currencies accept ton and all possible fiat currencies, separated by commas
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RatesApiInterface
@@ -90,26 +92,33 @@ export class RatesApi extends runtime.BaseAPI implements RatesApiInterface {
      * Get chart by token
      */
     async getChartRatesRaw(requestParameters: GetChartRatesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetChartRates200Response>> {
-        if (requestParameters.token === null || requestParameters.token === undefined) {
-            throw new runtime.RequiredError('token','Required parameter requestParameters.token was null or undefined when calling getChartRates.');
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling getChartRates().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.token !== undefined) {
-            queryParameters['token'] = requestParameters.token;
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
         }
 
-        if (requestParameters.currency !== undefined) {
-            queryParameters['currency'] = requestParameters.currency;
+        if (requestParameters['currency'] != null) {
+            queryParameters['currency'] = requestParameters['currency'];
         }
 
-        if (requestParameters.startDate !== undefined) {
-            queryParameters['start_date'] = requestParameters.startDate;
+        if (requestParameters['startDate'] != null) {
+            queryParameters['start_date'] = requestParameters['startDate'];
         }
 
-        if (requestParameters.endDate !== undefined) {
-            queryParameters['end_date'] = requestParameters.endDate;
+        if (requestParameters['endDate'] != null) {
+            queryParameters['end_date'] = requestParameters['endDate'];
+        }
+
+        if (requestParameters['pointsCount'] != null) {
+            queryParameters['points_count'] = requestParameters['pointsCount'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -136,22 +145,28 @@ export class RatesApi extends runtime.BaseAPI implements RatesApiInterface {
      * Get the token price to the currency
      */
     async getRatesRaw(requestParameters: GetRatesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRates200Response>> {
-        if (requestParameters.tokens === null || requestParameters.tokens === undefined) {
-            throw new runtime.RequiredError('tokens','Required parameter requestParameters.tokens was null or undefined when calling getRates.');
+        if (requestParameters['tokens'] == null) {
+            throw new runtime.RequiredError(
+                'tokens',
+                'Required parameter "tokens" was null or undefined when calling getRates().'
+            );
         }
 
-        if (requestParameters.currencies === null || requestParameters.currencies === undefined) {
-            throw new runtime.RequiredError('currencies','Required parameter requestParameters.currencies was null or undefined when calling getRates.');
+        if (requestParameters['currencies'] == null) {
+            throw new runtime.RequiredError(
+                'currencies',
+                'Required parameter "currencies" was null or undefined when calling getRates().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.tokens !== undefined) {
-            queryParameters['tokens'] = requestParameters.tokens;
+        if (requestParameters['tokens'] != null) {
+            queryParameters['tokens'] = requestParameters['tokens']!.join(runtime.COLLECTION_FORMATS["csv"]);
         }
 
-        if (requestParameters.currencies !== undefined) {
-            queryParameters['currencies'] = requestParameters.currencies;
+        if (requestParameters['currencies'] != null) {
+            queryParameters['currencies'] = requestParameters['currencies']!.join(runtime.COLLECTION_FORMATS["csv"]);
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

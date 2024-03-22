@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -62,13 +62,11 @@ export interface GetRawBlockProof200Response {
  * Check if a given object implements the GetRawBlockProof200Response interface.
  */
 export function instanceOfGetRawBlockProof200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "complete" in value;
-    isInstance = isInstance && "from" in value;
-    isInstance = isInstance && "to" in value;
-    isInstance = isInstance && "steps" in value;
-
-    return isInstance;
+    if (!('complete' in value)) return false;
+    if (!('from' in value)) return false;
+    if (!('to' in value)) return false;
+    if (!('steps' in value)) return false;
+    return true;
 }
 
 export function GetRawBlockProof200ResponseFromJSON(json: any): GetRawBlockProof200Response {
@@ -76,7 +74,7 @@ export function GetRawBlockProof200ResponseFromJSON(json: any): GetRawBlockProof
 }
 
 export function GetRawBlockProof200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawBlockProof200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -89,18 +87,15 @@ export function GetRawBlockProof200ResponseFromJSONTyped(json: any, ignoreDiscri
 }
 
 export function GetRawBlockProof200ResponseToJSON(value?: GetRawBlockProof200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'complete': value.complete,
-        'from': BlockRawToJSON(value.from),
-        'to': BlockRawToJSON(value.to),
-        'steps': ((value.steps as Array<any>).map(GetRawBlockProof200ResponseStepsInnerToJSON)),
+        'complete': value['complete'],
+        'from': BlockRawToJSON(value['from']),
+        'to': BlockRawToJSON(value['to']),
+        'steps': ((value['steps'] as Array<any>).map(GetRawBlockProof200ResponseStepsInnerToJSON)),
     };
 }
 

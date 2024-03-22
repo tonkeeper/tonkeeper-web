@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -55,12 +55,10 @@ export interface AccountAddress {
  * Check if a given object implements the AccountAddress interface.
  */
 export function instanceOfAccountAddress(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "isScam" in value;
-    isInstance = isInstance && "isWallet" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('isScam' in value)) return false;
+    if (!('isWallet' in value)) return false;
+    return true;
 }
 
 export function AccountAddressFromJSON(json: any): AccountAddress {
@@ -68,33 +66,30 @@ export function AccountAddressFromJSON(json: any): AccountAddress {
 }
 
 export function AccountAddressFromJSONTyped(json: any, ignoreDiscriminator: boolean): AccountAddress {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'address': json['address'],
-        'name': !exists(json, 'name') ? undefined : json['name'],
+        'name': json['name'] == null ? undefined : json['name'],
         'isScam': json['is_scam'],
-        'icon': !exists(json, 'icon') ? undefined : json['icon'],
+        'icon': json['icon'] == null ? undefined : json['icon'],
         'isWallet': json['is_wallet'],
     };
 }
 
 export function AccountAddressToJSON(value?: AccountAddress | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'name': value.name,
-        'is_scam': value.isScam,
-        'icon': value.icon,
-        'is_wallet': value.isWallet,
+        'address': value['address'],
+        'name': value['name'],
+        'is_scam': value['isScam'],
+        'icon': value['icon'],
+        'is_wallet': value['isWallet'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -86,10 +86,8 @@ export interface NftItemTransferAction {
  * Check if a given object implements the NftItemTransferAction interface.
  */
 export function instanceOfNftItemTransferAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "nft" in value;
-
-    return isInstance;
+    if (!('nft' in value)) return false;
+    return true;
 }
 
 export function NftItemTransferActionFromJSON(json: any): NftItemTransferAction {
@@ -97,37 +95,34 @@ export function NftItemTransferActionFromJSON(json: any): NftItemTransferAction 
 }
 
 export function NftItemTransferActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): NftItemTransferAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'sender': !exists(json, 'sender') ? undefined : AccountAddressFromJSON(json['sender']),
-        'recipient': !exists(json, 'recipient') ? undefined : AccountAddressFromJSON(json['recipient']),
+        'sender': json['sender'] == null ? undefined : AccountAddressFromJSON(json['sender']),
+        'recipient': json['recipient'] == null ? undefined : AccountAddressFromJSON(json['recipient']),
         'nft': json['nft'],
-        'comment': !exists(json, 'comment') ? undefined : json['comment'],
-        'encryptedComment': !exists(json, 'encrypted_comment') ? undefined : EncryptedCommentFromJSON(json['encrypted_comment']),
-        'payload': !exists(json, 'payload') ? undefined : json['payload'],
-        'refund': !exists(json, 'refund') ? undefined : RefundFromJSON(json['refund']),
+        'comment': json['comment'] == null ? undefined : json['comment'],
+        'encryptedComment': json['encrypted_comment'] == null ? undefined : EncryptedCommentFromJSON(json['encrypted_comment']),
+        'payload': json['payload'] == null ? undefined : json['payload'],
+        'refund': json['refund'] == null ? undefined : RefundFromJSON(json['refund']),
     };
 }
 
 export function NftItemTransferActionToJSON(value?: NftItemTransferAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'sender': AccountAddressToJSON(value.sender),
-        'recipient': AccountAddressToJSON(value.recipient),
-        'nft': value.nft,
-        'comment': value.comment,
-        'encrypted_comment': EncryptedCommentToJSON(value.encryptedComment),
-        'payload': value.payload,
-        'refund': RefundToJSON(value.refund),
+        'sender': AccountAddressToJSON(value['sender']),
+        'recipient': AccountAddressToJSON(value['recipient']),
+        'nft': value['nft'],
+        'comment': value['comment'],
+        'encrypted_comment': EncryptedCommentToJSON(value['encryptedComment']),
+        'payload': value['payload'],
+        'refund': RefundToJSON(value['refund']),
     };
 }
 

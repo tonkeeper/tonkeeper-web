@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner } from './GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner';
 import {
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerFromJSON,
@@ -50,12 +50,10 @@ export interface GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward
  * Check if a given object implements the GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures interface.
  */
 export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "validatorSetHash" in value;
-    isInstance = isInstance && "catchainSeqno" in value;
-    isInstance = isInstance && "signatures" in value;
-
-    return isInstance;
+    if (!('validatorSetHash' in value)) return false;
+    if (!('catchainSeqno' in value)) return false;
+    if (!('signatures' in value)) return false;
+    return true;
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesFromJSON(json: any): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures {
@@ -63,7 +61,7 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardS
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -75,17 +73,14 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardS
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesToJSON(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'validator_set_hash': value.validatorSetHash,
-        'catchain_seqno': value.catchainSeqno,
-        'signatures': ((value.signatures as Array<any>).map(GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerToJSON)),
+        'validator_set_hash': value['validatorSetHash'],
+        'catchain_seqno': value['catchainSeqno'],
+        'signatures': ((value['signatures'] as Array<any>).map(GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerToJSON)),
     };
 }
 

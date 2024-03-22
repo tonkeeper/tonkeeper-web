@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { NftItem } from './NftItem';
 import {
     NftItemFromJSON,
@@ -50,10 +50,8 @@ export interface DomainInfo {
  * Check if a given object implements the DomainInfo interface.
  */
 export function instanceOfDomainInfo(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    return true;
 }
 
 export function DomainInfoFromJSON(json: any): DomainInfo {
@@ -61,29 +59,26 @@ export function DomainInfoFromJSON(json: any): DomainInfo {
 }
 
 export function DomainInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): DomainInfo {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'name': json['name'],
-        'expiringAt': !exists(json, 'expiring_at') ? undefined : json['expiring_at'],
-        'item': !exists(json, 'item') ? undefined : NftItemFromJSON(json['item']),
+        'expiringAt': json['expiring_at'] == null ? undefined : json['expiring_at'],
+        'item': json['item'] == null ? undefined : NftItemFromJSON(json['item']),
     };
 }
 
 export function DomainInfoToJSON(value?: DomainInfo | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'name': value.name,
-        'expiring_at': value.expiringAt,
-        'item': NftItemToJSON(value.item),
+        'name': value['name'],
+        'expiring_at': value['expiringAt'],
+        'item': NftItemToJSON(value['item']),
     };
 }
 

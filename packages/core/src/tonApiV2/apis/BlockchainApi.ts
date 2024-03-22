@@ -21,10 +21,11 @@ import type {
   BlockchainBlocks,
   BlockchainConfig,
   BlockchainRawAccount,
-  GetBlockchainBlockDefaultResponse,
   MethodExecutionResult,
   RawBlockchainConfig,
+  ReduceIndexingLatencyDefaultResponse,
   SendBlockchainMessageRequest,
+  ServiceStatus,
   Transaction,
   Transactions,
   Validators,
@@ -42,14 +43,16 @@ import {
     BlockchainConfigToJSON,
     BlockchainRawAccountFromJSON,
     BlockchainRawAccountToJSON,
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
     MethodExecutionResultFromJSON,
     MethodExecutionResultToJSON,
     RawBlockchainConfigFromJSON,
     RawBlockchainConfigToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
     SendBlockchainMessageRequestFromJSON,
     SendBlockchainMessageRequestToJSON,
+    ServiceStatusFromJSON,
+    ServiceStatusToJSON,
     TransactionFromJSON,
     TransactionToJSON,
     TransactionsFromJSON,
@@ -366,6 +369,19 @@ export interface BlockchainApiInterface {
     getRawBlockchainConfigFromBlock(requestParameters: GetRawBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RawBlockchainConfig>;
 
     /**
+     * Reduce indexing latency
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    reduceIndexingLatencyRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ServiceStatus>>;
+
+    /**
+     * Reduce indexing latency
+     */
+    reduceIndexingLatency(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ServiceStatus>;
+
+    /**
      * Send message to blockchain
      * @param {SendBlockchainMessageRequest} sendBlockchainMessageRequest both a single boc and a batch of boc serialized in base64 are accepted
      * @param {*} [options] Override http request option.
@@ -390,8 +406,11 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Blockchain account inspect
      */
     async blockchainAccountInspectRaw(requestParameters: BlockchainAccountInspectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainAccountInspect>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling blockchainAccountInspect.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling blockchainAccountInspect().'
+            );
         }
 
         const queryParameters: any = {};
@@ -399,7 +418,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/accounts/{account_id}/inspect`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/blockchain/accounts/{account_id}/inspect`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -420,24 +439,30 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Execute get method for account
      */
     async execGetMethodForBlockchainAccountRaw(requestParameters: ExecGetMethodForBlockchainAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MethodExecutionResult>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling execGetMethodForBlockchainAccount.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling execGetMethodForBlockchainAccount().'
+            );
         }
 
-        if (requestParameters.methodName === null || requestParameters.methodName === undefined) {
-            throw new runtime.RequiredError('methodName','Required parameter requestParameters.methodName was null or undefined when calling execGetMethodForBlockchainAccount.');
+        if (requestParameters['methodName'] == null) {
+            throw new runtime.RequiredError(
+                'methodName',
+                'Required parameter "methodName" was null or undefined when calling execGetMethodForBlockchainAccount().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.args) {
-            queryParameters['args'] = requestParameters.args;
+        if (requestParameters['args'] != null) {
+            queryParameters['args'] = requestParameters['args'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/accounts/{account_id}/methods/{method_name}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))).replace(`{${"method_name"}}`, encodeURIComponent(String(requestParameters.methodName))),
+            path: `/v2/blockchain/accounts/{account_id}/methods/{method_name}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))).replace(`{${"method_name"}}`, encodeURIComponent(String(requestParameters['methodName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -458,28 +483,31 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Get account transactions
      */
     async getBlockchainAccountTransactionsRaw(requestParameters: GetBlockchainAccountTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Transactions>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getBlockchainAccountTransactions.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getBlockchainAccountTransactions().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.afterLt !== undefined) {
-            queryParameters['after_lt'] = requestParameters.afterLt;
+        if (requestParameters['afterLt'] != null) {
+            queryParameters['after_lt'] = requestParameters['afterLt'];
         }
 
-        if (requestParameters.beforeLt !== undefined) {
-            queryParameters['before_lt'] = requestParameters.beforeLt;
+        if (requestParameters['beforeLt'] != null) {
+            queryParameters['before_lt'] = requestParameters['beforeLt'];
         }
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/accounts/{account_id}/transactions`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/blockchain/accounts/{account_id}/transactions`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -500,8 +528,11 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Get blockchain block data
      */
     async getBlockchainBlockRaw(requestParameters: GetBlockchainBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainBlock>> {
-        if (requestParameters.blockId === null || requestParameters.blockId === undefined) {
-            throw new runtime.RequiredError('blockId','Required parameter requestParameters.blockId was null or undefined when calling getBlockchainBlock.');
+        if (requestParameters['blockId'] == null) {
+            throw new runtime.RequiredError(
+                'blockId',
+                'Required parameter "blockId" was null or undefined when calling getBlockchainBlock().'
+            );
         }
 
         const queryParameters: any = {};
@@ -509,7 +540,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/blocks/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters.blockId))),
+            path: `/v2/blockchain/blocks/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters['blockId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -530,8 +561,11 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Get transactions from block
      */
     async getBlockchainBlockTransactionsRaw(requestParameters: GetBlockchainBlockTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Transactions>> {
-        if (requestParameters.blockId === null || requestParameters.blockId === undefined) {
-            throw new runtime.RequiredError('blockId','Required parameter requestParameters.blockId was null or undefined when calling getBlockchainBlockTransactions.');
+        if (requestParameters['blockId'] == null) {
+            throw new runtime.RequiredError(
+                'blockId',
+                'Required parameter "blockId" was null or undefined when calling getBlockchainBlockTransactions().'
+            );
         }
 
         const queryParameters: any = {};
@@ -539,7 +573,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/blocks/{block_id}/transactions`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters.blockId))),
+            path: `/v2/blockchain/blocks/{block_id}/transactions`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters['blockId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -586,8 +620,11 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Get blockchain config from a specific block, if present.
      */
     async getBlockchainConfigFromBlockRaw(requestParameters: GetBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainConfig>> {
-        if (requestParameters.masterchainSeqno === null || requestParameters.masterchainSeqno === undefined) {
-            throw new runtime.RequiredError('masterchainSeqno','Required parameter requestParameters.masterchainSeqno was null or undefined when calling getBlockchainConfigFromBlock.');
+        if (requestParameters['masterchainSeqno'] == null) {
+            throw new runtime.RequiredError(
+                'masterchainSeqno',
+                'Required parameter "masterchainSeqno" was null or undefined when calling getBlockchainConfigFromBlock().'
+            );
         }
 
         const queryParameters: any = {};
@@ -595,7 +632,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/masterchain/{masterchain_seqno}/config`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters.masterchainSeqno))),
+            path: `/v2/blockchain/masterchain/{masterchain_seqno}/config`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters['masterchainSeqno']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -616,8 +653,11 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Get all blocks in all shards and workchains between target and previous masterchain block according to shards last blocks snapshot in masterchain.  We don\'t recommend to build your app around this method because it has problem with scalability and will work very slow in the future.
      */
     async getBlockchainMasterchainBlocksRaw(requestParameters: GetBlockchainMasterchainBlocksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainBlocks>> {
-        if (requestParameters.masterchainSeqno === null || requestParameters.masterchainSeqno === undefined) {
-            throw new runtime.RequiredError('masterchainSeqno','Required parameter requestParameters.masterchainSeqno was null or undefined when calling getBlockchainMasterchainBlocks.');
+        if (requestParameters['masterchainSeqno'] == null) {
+            throw new runtime.RequiredError(
+                'masterchainSeqno',
+                'Required parameter "masterchainSeqno" was null or undefined when calling getBlockchainMasterchainBlocks().'
+            );
         }
 
         const queryParameters: any = {};
@@ -625,7 +665,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/masterchain/{masterchain_seqno}/blocks`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters.masterchainSeqno))),
+            path: `/v2/blockchain/masterchain/{masterchain_seqno}/blocks`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters['masterchainSeqno']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -672,8 +712,11 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Get blockchain block shards
      */
     async getBlockchainMasterchainShardsRaw(requestParameters: GetBlockchainMasterchainShardsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainBlockShards>> {
-        if (requestParameters.masterchainSeqno === null || requestParameters.masterchainSeqno === undefined) {
-            throw new runtime.RequiredError('masterchainSeqno','Required parameter requestParameters.masterchainSeqno was null or undefined when calling getBlockchainMasterchainShards.');
+        if (requestParameters['masterchainSeqno'] == null) {
+            throw new runtime.RequiredError(
+                'masterchainSeqno',
+                'Required parameter "masterchainSeqno" was null or undefined when calling getBlockchainMasterchainShards().'
+            );
         }
 
         const queryParameters: any = {};
@@ -681,7 +724,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/masterchain/{masterchain_seqno}/shards`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters.masterchainSeqno))),
+            path: `/v2/blockchain/masterchain/{masterchain_seqno}/shards`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters['masterchainSeqno']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -702,8 +745,11 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Get all transactions in all shards and workchains between target and previous masterchain block according to shards last blocks snapshot in masterchain. We don\'t recommend to build your app around this method because it has problem with scalability and will work very slow in the future.
      */
     async getBlockchainMasterchainTransactionsRaw(requestParameters: GetBlockchainMasterchainTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Transactions>> {
-        if (requestParameters.masterchainSeqno === null || requestParameters.masterchainSeqno === undefined) {
-            throw new runtime.RequiredError('masterchainSeqno','Required parameter requestParameters.masterchainSeqno was null or undefined when calling getBlockchainMasterchainTransactions.');
+        if (requestParameters['masterchainSeqno'] == null) {
+            throw new runtime.RequiredError(
+                'masterchainSeqno',
+                'Required parameter "masterchainSeqno" was null or undefined when calling getBlockchainMasterchainTransactions().'
+            );
         }
 
         const queryParameters: any = {};
@@ -711,7 +757,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/masterchain/{masterchain_seqno}/transactions`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters.masterchainSeqno))),
+            path: `/v2/blockchain/masterchain/{masterchain_seqno}/transactions`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters['masterchainSeqno']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -732,8 +778,11 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Get low-level information about an account taken directly from the blockchain.
      */
     async getBlockchainRawAccountRaw(requestParameters: GetBlockchainRawAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainRawAccount>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getBlockchainRawAccount.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getBlockchainRawAccount().'
+            );
         }
 
         const queryParameters: any = {};
@@ -741,7 +790,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/accounts/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/blockchain/accounts/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -762,8 +811,11 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Get transaction data
      */
     async getBlockchainTransactionRaw(requestParameters: GetBlockchainTransactionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Transaction>> {
-        if (requestParameters.transactionId === null || requestParameters.transactionId === undefined) {
-            throw new runtime.RequiredError('transactionId','Required parameter requestParameters.transactionId was null or undefined when calling getBlockchainTransaction.');
+        if (requestParameters['transactionId'] == null) {
+            throw new runtime.RequiredError(
+                'transactionId',
+                'Required parameter "transactionId" was null or undefined when calling getBlockchainTransaction().'
+            );
         }
 
         const queryParameters: any = {};
@@ -771,7 +823,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/transactions/{transaction_id}`.replace(`{${"transaction_id"}}`, encodeURIComponent(String(requestParameters.transactionId))),
+            path: `/v2/blockchain/transactions/{transaction_id}`.replace(`{${"transaction_id"}}`, encodeURIComponent(String(requestParameters['transactionId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -792,8 +844,11 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Get transaction data by message hash
      */
     async getBlockchainTransactionByMessageHashRaw(requestParameters: GetBlockchainTransactionByMessageHashRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Transaction>> {
-        if (requestParameters.msgId === null || requestParameters.msgId === undefined) {
-            throw new runtime.RequiredError('msgId','Required parameter requestParameters.msgId was null or undefined when calling getBlockchainTransactionByMessageHash.');
+        if (requestParameters['msgId'] == null) {
+            throw new runtime.RequiredError(
+                'msgId',
+                'Required parameter "msgId" was null or undefined when calling getBlockchainTransactionByMessageHash().'
+            );
         }
 
         const queryParameters: any = {};
@@ -801,7 +856,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/messages/{msg_id}/transaction`.replace(`{${"msg_id"}}`, encodeURIComponent(String(requestParameters.msgId))),
+            path: `/v2/blockchain/messages/{msg_id}/transaction`.replace(`{${"msg_id"}}`, encodeURIComponent(String(requestParameters['msgId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -874,8 +929,11 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      * Get raw blockchain config from a specific block, if present.
      */
     async getRawBlockchainConfigFromBlockRaw(requestParameters: GetRawBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RawBlockchainConfig>> {
-        if (requestParameters.masterchainSeqno === null || requestParameters.masterchainSeqno === undefined) {
-            throw new runtime.RequiredError('masterchainSeqno','Required parameter requestParameters.masterchainSeqno was null or undefined when calling getRawBlockchainConfigFromBlock.');
+        if (requestParameters['masterchainSeqno'] == null) {
+            throw new runtime.RequiredError(
+                'masterchainSeqno',
+                'Required parameter "masterchainSeqno" was null or undefined when calling getRawBlockchainConfigFromBlock().'
+            );
         }
 
         const queryParameters: any = {};
@@ -883,7 +941,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/blockchain/masterchain/{masterchain_seqno}/config/raw`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters.masterchainSeqno))),
+            path: `/v2/blockchain/masterchain/{masterchain_seqno}/config/raw`.replace(`{${"masterchain_seqno"}}`, encodeURIComponent(String(requestParameters['masterchainSeqno']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -901,11 +959,40 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
     }
 
     /**
+     * Reduce indexing latency
+     */
+    async reduceIndexingLatencyRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ServiceStatus>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/status`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ServiceStatusFromJSON(jsonValue));
+    }
+
+    /**
+     * Reduce indexing latency
+     */
+    async reduceIndexingLatency(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ServiceStatus> {
+        const response = await this.reduceIndexingLatencyRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Send message to blockchain
      */
     async sendBlockchainMessageRaw(requestParameters: SendBlockchainMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.sendBlockchainMessageRequest === null || requestParameters.sendBlockchainMessageRequest === undefined) {
-            throw new runtime.RequiredError('sendBlockchainMessageRequest','Required parameter requestParameters.sendBlockchainMessageRequest was null or undefined when calling sendBlockchainMessage.');
+        if (requestParameters['sendBlockchainMessageRequest'] == null) {
+            throw new runtime.RequiredError(
+                'sendBlockchainMessageRequest',
+                'Required parameter "sendBlockchainMessageRequest" was null or undefined when calling sendBlockchainMessage().'
+            );
         }
 
         const queryParameters: any = {};
@@ -919,7 +1006,7 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: SendBlockchainMessageRequestToJSON(requestParameters.sendBlockchainMessageRequest),
+            body: SendBlockchainMessageRequestToJSON(requestParameters['sendBlockchainMessageRequest']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);

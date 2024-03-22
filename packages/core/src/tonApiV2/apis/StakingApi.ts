@@ -16,22 +16,22 @@
 import * as runtime from '../runtime';
 import type {
   AccountStaking,
-  GetBlockchainBlockDefaultResponse,
   GetStakingPoolHistory200Response,
   GetStakingPoolInfo200Response,
   GetStakingPools200Response,
+  ReduceIndexingLatencyDefaultResponse,
 } from '../models/index';
 import {
     AccountStakingFromJSON,
     AccountStakingToJSON,
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
     GetStakingPoolHistory200ResponseFromJSON,
     GetStakingPoolHistory200ResponseToJSON,
     GetStakingPoolInfo200ResponseFromJSON,
     GetStakingPoolInfo200ResponseToJSON,
     GetStakingPools200ResponseFromJSON,
     GetStakingPools200ResponseToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetAccountNominatorsPoolsRequest {
@@ -130,8 +130,11 @@ export class StakingApi extends runtime.BaseAPI implements StakingApiInterface {
      * All pools where account participates
      */
     async getAccountNominatorsPoolsRaw(requestParameters: GetAccountNominatorsPoolsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountStaking>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountNominatorsPools.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountNominatorsPools().'
+            );
         }
 
         const queryParameters: any = {};
@@ -139,7 +142,7 @@ export class StakingApi extends runtime.BaseAPI implements StakingApiInterface {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/staking/nominator/{account_id}/pools`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/staking/nominator/{account_id}/pools`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -160,8 +163,11 @@ export class StakingApi extends runtime.BaseAPI implements StakingApiInterface {
      * Pool history
      */
     async getStakingPoolHistoryRaw(requestParameters: GetStakingPoolHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetStakingPoolHistory200Response>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getStakingPoolHistory.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getStakingPoolHistory().'
+            );
         }
 
         const queryParameters: any = {};
@@ -169,7 +175,7 @@ export class StakingApi extends runtime.BaseAPI implements StakingApiInterface {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/staking/pool/{account_id}/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/staking/pool/{account_id}/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -190,20 +196,23 @@ export class StakingApi extends runtime.BaseAPI implements StakingApiInterface {
      * Stacking pool info
      */
     async getStakingPoolInfoRaw(requestParameters: GetStakingPoolInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetStakingPoolInfo200Response>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getStakingPoolInfo.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getStakingPoolInfo().'
+            );
         }
 
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({
-            path: `/v2/staking/pool/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/staking/pool/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -226,18 +235,18 @@ export class StakingApi extends runtime.BaseAPI implements StakingApiInterface {
     async getStakingPoolsRaw(requestParameters: GetStakingPoolsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetStakingPools200Response>> {
         const queryParameters: any = {};
 
-        if (requestParameters.availableFor !== undefined) {
-            queryParameters['available_for'] = requestParameters.availableFor;
+        if (requestParameters['availableFor'] != null) {
+            queryParameters['available_for'] = requestParameters['availableFor'];
         }
 
-        if (requestParameters.includeUnverified !== undefined) {
-            queryParameters['include_unverified'] = requestParameters.includeUnverified;
+        if (requestParameters['includeUnverified'] != null) {
+            queryParameters['include_unverified'] = requestParameters['includeUnverified'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({

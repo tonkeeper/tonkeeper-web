@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -97,21 +97,19 @@ export interface WorkchainDescr {
  * Check if a given object implements the WorkchainDescr interface.
  */
 export function instanceOfWorkchainDescr(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "workchain" in value;
-    isInstance = isInstance && "enabledSince" in value;
-    isInstance = isInstance && "actualMinSplit" in value;
-    isInstance = isInstance && "minSplit" in value;
-    isInstance = isInstance && "maxSplit" in value;
-    isInstance = isInstance && "basic" in value;
-    isInstance = isInstance && "active" in value;
-    isInstance = isInstance && "acceptMsgs" in value;
-    isInstance = isInstance && "flags" in value;
-    isInstance = isInstance && "zerostateRootHash" in value;
-    isInstance = isInstance && "zerostateFileHash" in value;
-    isInstance = isInstance && "version" in value;
-
-    return isInstance;
+    if (!('workchain' in value)) return false;
+    if (!('enabledSince' in value)) return false;
+    if (!('actualMinSplit' in value)) return false;
+    if (!('minSplit' in value)) return false;
+    if (!('maxSplit' in value)) return false;
+    if (!('basic' in value)) return false;
+    if (!('active' in value)) return false;
+    if (!('acceptMsgs' in value)) return false;
+    if (!('flags' in value)) return false;
+    if (!('zerostateRootHash' in value)) return false;
+    if (!('zerostateFileHash' in value)) return false;
+    if (!('version' in value)) return false;
+    return true;
 }
 
 export function WorkchainDescrFromJSON(json: any): WorkchainDescr {
@@ -119,7 +117,7 @@ export function WorkchainDescrFromJSON(json: any): WorkchainDescr {
 }
 
 export function WorkchainDescrFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkchainDescr {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -140,26 +138,23 @@ export function WorkchainDescrFromJSONTyped(json: any, ignoreDiscriminator: bool
 }
 
 export function WorkchainDescrToJSON(value?: WorkchainDescr | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'workchain': value.workchain,
-        'enabled_since': value.enabledSince,
-        'actual_min_split': value.actualMinSplit,
-        'min_split': value.minSplit,
-        'max_split': value.maxSplit,
-        'basic': value.basic,
-        'active': value.active,
-        'accept_msgs': value.acceptMsgs,
-        'flags': value.flags,
-        'zerostate_root_hash': value.zerostateRootHash,
-        'zerostate_file_hash': value.zerostateFileHash,
-        'version': value.version,
+        'workchain': value['workchain'],
+        'enabled_since': value['enabledSince'],
+        'actual_min_split': value['actualMinSplit'],
+        'min_split': value['minSplit'],
+        'max_split': value['maxSplit'],
+        'basic': value['basic'],
+        'active': value['active'],
+        'accept_msgs': value['acceptMsgs'],
+        'flags': value['flags'],
+        'zerostate_root_hash': value['zerostateRootHash'],
+        'zerostate_file_hash': value['zerostateFileHash'],
+        'version': value['version'],
     };
 }
 

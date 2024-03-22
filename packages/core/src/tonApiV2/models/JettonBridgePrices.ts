@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -61,15 +61,13 @@ export interface JettonBridgePrices {
  * Check if a given object implements the JettonBridgePrices interface.
  */
 export function instanceOfJettonBridgePrices(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "bridgeBurnFee" in value;
-    isInstance = isInstance && "bridgeMintFee" in value;
-    isInstance = isInstance && "walletMinTonsForStorage" in value;
-    isInstance = isInstance && "walletGasConsumption" in value;
-    isInstance = isInstance && "minterMinTonsForStorage" in value;
-    isInstance = isInstance && "discoverGasConsumption" in value;
-
-    return isInstance;
+    if (!('bridgeBurnFee' in value)) return false;
+    if (!('bridgeMintFee' in value)) return false;
+    if (!('walletMinTonsForStorage' in value)) return false;
+    if (!('walletGasConsumption' in value)) return false;
+    if (!('minterMinTonsForStorage' in value)) return false;
+    if (!('discoverGasConsumption' in value)) return false;
+    return true;
 }
 
 export function JettonBridgePricesFromJSON(json: any): JettonBridgePrices {
@@ -77,7 +75,7 @@ export function JettonBridgePricesFromJSON(json: any): JettonBridgePrices {
 }
 
 export function JettonBridgePricesFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonBridgePrices {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -92,20 +90,17 @@ export function JettonBridgePricesFromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function JettonBridgePricesToJSON(value?: JettonBridgePrices | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'bridge_burn_fee': value.bridgeBurnFee,
-        'bridge_mint_fee': value.bridgeMintFee,
-        'wallet_min_tons_for_storage': value.walletMinTonsForStorage,
-        'wallet_gas_consumption': value.walletGasConsumption,
-        'minter_min_tons_for_storage': value.minterMinTonsForStorage,
-        'discover_gas_consumption': value.discoverGasConsumption,
+        'bridge_burn_fee': value['bridgeBurnFee'],
+        'bridge_mint_fee': value['bridgeMintFee'],
+        'wallet_min_tons_for_storage': value['walletMinTonsForStorage'],
+        'wallet_gas_consumption': value['walletGasConsumption'],
+        'minter_min_tons_for_storage': value['minterMinTonsForStorage'],
+        'discover_gas_consumption': value['discoverGasConsumption'],
     };
 }
 

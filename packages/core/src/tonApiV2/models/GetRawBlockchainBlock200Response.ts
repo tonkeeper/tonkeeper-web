@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -44,11 +44,9 @@ export interface GetRawBlockchainBlock200Response {
  * Check if a given object implements the GetRawBlockchainBlock200Response interface.
  */
 export function instanceOfGetRawBlockchainBlock200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "id" in value;
-    isInstance = isInstance && "data" in value;
-
-    return isInstance;
+    if (!('id' in value)) return false;
+    if (!('data' in value)) return false;
+    return true;
 }
 
 export function GetRawBlockchainBlock200ResponseFromJSON(json: any): GetRawBlockchainBlock200Response {
@@ -56,7 +54,7 @@ export function GetRawBlockchainBlock200ResponseFromJSON(json: any): GetRawBlock
 }
 
 export function GetRawBlockchainBlock200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawBlockchainBlock200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -67,16 +65,13 @@ export function GetRawBlockchainBlock200ResponseFromJSONTyped(json: any, ignoreD
 }
 
 export function GetRawBlockchainBlock200ResponseToJSON(value?: GetRawBlockchainBlock200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'id': BlockRawToJSON(value.id),
-        'data': value.data,
+        'id': BlockRawToJSON(value['id']),
+        'data': value['data'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -62,14 +62,12 @@ export interface DomainBid {
  * Check if a given object implements the DomainBid interface.
  */
 export function instanceOfDomainBid(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "success" in value;
-    isInstance = isInstance && "value" in value;
-    isInstance = isInstance && "txTime" in value;
-    isInstance = isInstance && "txHash" in value;
-    isInstance = isInstance && "bidder" in value;
-
-    return isInstance;
+    if (!('success' in value)) return false;
+    if (!('value' in value)) return false;
+    if (!('txTime' in value)) return false;
+    if (!('txHash' in value)) return false;
+    if (!('bidder' in value)) return false;
+    return true;
 }
 
 export function DomainBidFromJSON(json: any): DomainBid {
@@ -77,7 +75,7 @@ export function DomainBidFromJSON(json: any): DomainBid {
 }
 
 export function DomainBidFromJSONTyped(json: any, ignoreDiscriminator: boolean): DomainBid {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -91,19 +89,16 @@ export function DomainBidFromJSONTyped(json: any, ignoreDiscriminator: boolean):
 }
 
 export function DomainBidToJSON(value?: DomainBid | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'success': value.success,
-        'value': value.value,
-        'txTime': value.txTime,
-        'txHash': value.txHash,
-        'bidder': AccountAddressToJSON(value.bidder),
+        'success': value['success'],
+        'value': value['value'],
+        'txTime': value['txTime'],
+        'txHash': value['txHash'],
+        'bidder': AccountAddressToJSON(value['bidder']),
     };
 }
 

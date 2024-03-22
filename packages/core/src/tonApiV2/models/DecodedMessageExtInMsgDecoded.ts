@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { DecodedMessageExtInMsgDecodedWalletHighloadV2 } from './DecodedMessageExtInMsgDecodedWalletHighloadV2';
 import {
     DecodedMessageExtInMsgDecodedWalletHighloadV2FromJSON,
@@ -62,9 +62,7 @@ export interface DecodedMessageExtInMsgDecoded {
  * Check if a given object implements the DecodedMessageExtInMsgDecoded interface.
  */
 export function instanceOfDecodedMessageExtInMsgDecoded(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function DecodedMessageExtInMsgDecodedFromJSON(json: any): DecodedMessageExtInMsgDecoded {
@@ -72,29 +70,26 @@ export function DecodedMessageExtInMsgDecodedFromJSON(json: any): DecodedMessage
 }
 
 export function DecodedMessageExtInMsgDecodedFromJSONTyped(json: any, ignoreDiscriminator: boolean): DecodedMessageExtInMsgDecoded {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'walletV3': !exists(json, 'wallet_v3') ? undefined : DecodedMessageExtInMsgDecodedWalletV3FromJSON(json['wallet_v3']),
-        'walletV4': !exists(json, 'wallet_v4') ? undefined : DecodedMessageExtInMsgDecodedWalletV4FromJSON(json['wallet_v4']),
-        'walletHighloadV2': !exists(json, 'wallet_highload_v2') ? undefined : DecodedMessageExtInMsgDecodedWalletHighloadV2FromJSON(json['wallet_highload_v2']),
+        'walletV3': json['wallet_v3'] == null ? undefined : DecodedMessageExtInMsgDecodedWalletV3FromJSON(json['wallet_v3']),
+        'walletV4': json['wallet_v4'] == null ? undefined : DecodedMessageExtInMsgDecodedWalletV4FromJSON(json['wallet_v4']),
+        'walletHighloadV2': json['wallet_highload_v2'] == null ? undefined : DecodedMessageExtInMsgDecodedWalletHighloadV2FromJSON(json['wallet_highload_v2']),
     };
 }
 
 export function DecodedMessageExtInMsgDecodedToJSON(value?: DecodedMessageExtInMsgDecoded | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'wallet_v3': DecodedMessageExtInMsgDecodedWalletV3ToJSON(value.walletV3),
-        'wallet_v4': DecodedMessageExtInMsgDecodedWalletV4ToJSON(value.walletV4),
-        'wallet_highload_v2': DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSON(value.walletHighloadV2),
+        'wallet_v3': DecodedMessageExtInMsgDecodedWalletV3ToJSON(value['walletV3']),
+        'wallet_v4': DecodedMessageExtInMsgDecodedWalletV4ToJSON(value['walletV4']),
+        'wallet_highload_v2': DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSON(value['walletHighloadV2']),
     };
 }
 

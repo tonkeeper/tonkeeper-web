@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface GetWalletBackup200Response {
  * Check if a given object implements the GetWalletBackup200Response interface.
  */
 export function instanceOfGetWalletBackup200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "dump" in value;
-
-    return isInstance;
+    if (!('dump' in value)) return false;
+    return true;
 }
 
 export function GetWalletBackup200ResponseFromJSON(json: any): GetWalletBackup200Response {
@@ -42,7 +40,7 @@ export function GetWalletBackup200ResponseFromJSON(json: any): GetWalletBackup20
 }
 
 export function GetWalletBackup200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetWalletBackup200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function GetWalletBackup200ResponseFromJSONTyped(json: any, ignoreDiscrim
 }
 
 export function GetWalletBackup200ResponseToJSON(value?: GetWalletBackup200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'dump': value.dump,
+        'dump': value['dump'],
     };
 }
 

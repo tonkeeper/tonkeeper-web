@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -75,9 +75,10 @@ export interface NftPurchaseAction {
  * @export
  */
 export const NftPurchaseActionAuctionTypeEnum = {
+    DnsTon: 'DNS.ton',
     DnsTg: 'DNS.tg',
-    Getgems: 'getgems',
-    Basic: 'basic'
+    NumberTg: 'NUMBER.tg',
+    Getgems: 'getgems'
 } as const;
 export type NftPurchaseActionAuctionTypeEnum = typeof NftPurchaseActionAuctionTypeEnum[keyof typeof NftPurchaseActionAuctionTypeEnum];
 
@@ -86,14 +87,12 @@ export type NftPurchaseActionAuctionTypeEnum = typeof NftPurchaseActionAuctionTy
  * Check if a given object implements the NftPurchaseAction interface.
  */
 export function instanceOfNftPurchaseAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "auctionType" in value;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "nft" in value;
-    isInstance = isInstance && "seller" in value;
-    isInstance = isInstance && "buyer" in value;
-
-    return isInstance;
+    if (!('auctionType' in value)) return false;
+    if (!('amount' in value)) return false;
+    if (!('nft' in value)) return false;
+    if (!('seller' in value)) return false;
+    if (!('buyer' in value)) return false;
+    return true;
 }
 
 export function NftPurchaseActionFromJSON(json: any): NftPurchaseAction {
@@ -101,7 +100,7 @@ export function NftPurchaseActionFromJSON(json: any): NftPurchaseAction {
 }
 
 export function NftPurchaseActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): NftPurchaseAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -115,19 +114,16 @@ export function NftPurchaseActionFromJSONTyped(json: any, ignoreDiscriminator: b
 }
 
 export function NftPurchaseActionToJSON(value?: NftPurchaseAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'auction_type': value.auctionType,
-        'amount': PriceToJSON(value.amount),
-        'nft': NftItemToJSON(value.nft),
-        'seller': AccountAddressToJSON(value.seller),
-        'buyer': AccountAddressToJSON(value.buyer),
+        'auction_type': value['auctionType'],
+        'amount': PriceToJSON(value['amount']),
+        'nft': NftItemToJSON(value['nft']),
+        'seller': AccountAddressToJSON(value['seller']),
+        'buyer': AccountAddressToJSON(value['buyer']),
     };
 }
 

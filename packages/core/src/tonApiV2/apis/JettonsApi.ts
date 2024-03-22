@@ -16,22 +16,22 @@
 import * as runtime from '../runtime';
 import type {
   Event,
-  GetBlockchainBlockDefaultResponse,
   JettonHolders,
   JettonInfo,
   Jettons,
+  ReduceIndexingLatencyDefaultResponse,
 } from '../models/index';
 import {
     EventFromJSON,
     EventToJSON,
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
     JettonHoldersFromJSON,
     JettonHoldersToJSON,
     JettonInfoFromJSON,
     JettonInfoToJSON,
     JettonsFromJSON,
     JettonsToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetJettonHoldersRequest {
@@ -132,24 +132,27 @@ export class JettonsApi extends runtime.BaseAPI implements JettonsApiInterface {
      * Get jetton\'s holders
      */
     async getJettonHoldersRaw(requestParameters: GetJettonHoldersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JettonHolders>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getJettonHolders.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getJettonHolders().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
-        if (requestParameters.offset !== undefined) {
-            queryParameters['offset'] = requestParameters.offset;
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/jettons/{account_id}/holders`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/jettons/{account_id}/holders`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -170,8 +173,11 @@ export class JettonsApi extends runtime.BaseAPI implements JettonsApiInterface {
      * Get jetton metadata by jetton master address
      */
     async getJettonInfoRaw(requestParameters: GetJettonInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JettonInfo>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getJettonInfo.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getJettonInfo().'
+            );
         }
 
         const queryParameters: any = {};
@@ -179,7 +185,7 @@ export class JettonsApi extends runtime.BaseAPI implements JettonsApiInterface {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/jettons/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/jettons/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -202,12 +208,12 @@ export class JettonsApi extends runtime.BaseAPI implements JettonsApiInterface {
     async getJettonsRaw(requestParameters: GetJettonsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Jettons>> {
         const queryParameters: any = {};
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
-        if (requestParameters.offset !== undefined) {
-            queryParameters['offset'] = requestParameters.offset;
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -234,20 +240,23 @@ export class JettonsApi extends runtime.BaseAPI implements JettonsApiInterface {
      * Get only jetton transfers in the event
      */
     async getJettonsEventsRaw(requestParameters: GetJettonsEventsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Event>> {
-        if (requestParameters.eventId === null || requestParameters.eventId === undefined) {
-            throw new runtime.RequiredError('eventId','Required parameter requestParameters.eventId was null or undefined when calling getJettonsEvents.');
+        if (requestParameters['eventId'] == null) {
+            throw new runtime.RequiredError(
+                'eventId',
+                'Required parameter "eventId" was null or undefined when calling getJettonsEvents().'
+            );
         }
 
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({
-            path: `/v2/events/{event_id}/jettons`.replace(`{${"event_id"}}`, encodeURIComponent(String(requestParameters.eventId))),
+            path: `/v2/events/{event_id}/jettons`.replace(`{${"event_id"}}`, encodeURIComponent(String(requestParameters['eventId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

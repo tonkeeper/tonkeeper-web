@@ -26,9 +26,9 @@ import type {
   GetAccountDiff200Response,
   GetAccountPublicKey200Response,
   GetAccountsRequest,
-  GetBlockchainBlockDefaultResponse,
   JettonsBalances,
   NftItems,
+  ReduceIndexingLatencyDefaultResponse,
   Subscriptions,
   TraceIDs,
 } from '../models/index';
@@ -55,12 +55,12 @@ import {
     GetAccountPublicKey200ResponseToJSON,
     GetAccountsRequestFromJSON,
     GetAccountsRequestToJSON,
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
     JettonsBalancesFromJSON,
     JettonsBalancesToJSON,
     NftItemsFromJSON,
     NftItemsToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
     SubscriptionsFromJSON,
     SubscriptionsToJSON,
     TraceIDsFromJSON,
@@ -120,7 +120,7 @@ export interface GetAccountJettonHistoryByIDRequest {
 
 export interface GetAccountJettonsBalancesRequest {
     accountId: string;
-    currencies?: string;
+    currencies?: Array<string>;
 }
 
 export interface GetAccountJettonsHistoryRequest {
@@ -306,7 +306,7 @@ export interface AccountsApiInterface {
     /**
      * Get all Jettons balances by owner address
      * @param {string} accountId account ID
-     * @param {string} [currencies] accept ton and all possible fiat currencies, separated by commas
+     * @param {Array<string>} [currencies] accept ton and all possible fiat currencies, separated by commas
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApiInterface
@@ -451,8 +451,11 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get account\'s domains
      */
     async accountDnsBackResolveRaw(requestParameters: AccountDnsBackResolveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DomainNames>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling accountDnsBackResolve.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling accountDnsBackResolve().'
+            );
         }
 
         const queryParameters: any = {};
@@ -460,7 +463,7 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/dns/backresolve`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/dns/backresolve`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -481,8 +484,11 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * parse address and display in all formats
      */
     async addressParseRaw(requestParameters: AddressParseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AddressParse200Response>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling addressParse.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling addressParse().'
+            );
         }
 
         const queryParameters: any = {};
@@ -490,7 +496,7 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/address/{account_id}/parse`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/address/{account_id}/parse`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -511,8 +517,11 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get human-friendly information about an account without low-level details.
      */
     async getAccountRaw(requestParameters: GetAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Account>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccount.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccount().'
+            );
         }
 
         const queryParameters: any = {};
@@ -520,7 +529,7 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -541,32 +550,41 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get account\'s balance change
      */
     async getAccountDiffRaw(requestParameters: GetAccountDiffRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetAccountDiff200Response>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountDiff.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountDiff().'
+            );
         }
 
-        if (requestParameters.startDate === null || requestParameters.startDate === undefined) {
-            throw new runtime.RequiredError('startDate','Required parameter requestParameters.startDate was null or undefined when calling getAccountDiff.');
+        if (requestParameters['startDate'] == null) {
+            throw new runtime.RequiredError(
+                'startDate',
+                'Required parameter "startDate" was null or undefined when calling getAccountDiff().'
+            );
         }
 
-        if (requestParameters.endDate === null || requestParameters.endDate === undefined) {
-            throw new runtime.RequiredError('endDate','Required parameter requestParameters.endDate was null or undefined when calling getAccountDiff.');
+        if (requestParameters['endDate'] == null) {
+            throw new runtime.RequiredError(
+                'endDate',
+                'Required parameter "endDate" was null or undefined when calling getAccountDiff().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.startDate !== undefined) {
-            queryParameters['start_date'] = requestParameters.startDate;
+        if (requestParameters['startDate'] != null) {
+            queryParameters['start_date'] = requestParameters['startDate'];
         }
 
-        if (requestParameters.endDate !== undefined) {
-            queryParameters['end_date'] = requestParameters.endDate;
+        if (requestParameters['endDate'] != null) {
+            queryParameters['end_date'] = requestParameters['endDate'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/diff`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/diff`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -587,20 +605,23 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get expiring account .ton dns
      */
     async getAccountDnsExpiringRaw(requestParameters: GetAccountDnsExpiringRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DnsExpiring>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountDnsExpiring.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountDnsExpiring().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.period !== undefined) {
-            queryParameters['period'] = requestParameters.period;
+        if (requestParameters['period'] != null) {
+            queryParameters['period'] = requestParameters['period'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/dns/expiring`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/dns/expiring`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -621,28 +642,34 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get event for an account by event_id
      */
     async getAccountEventRaw(requestParameters: GetAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvent>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountEvent.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountEvent().'
+            );
         }
 
-        if (requestParameters.eventId === null || requestParameters.eventId === undefined) {
-            throw new runtime.RequiredError('eventId','Required parameter requestParameters.eventId was null or undefined when calling getAccountEvent.');
+        if (requestParameters['eventId'] == null) {
+            throw new runtime.RequiredError(
+                'eventId',
+                'Required parameter "eventId" was null or undefined when calling getAccountEvent().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.subjectOnly !== undefined) {
-            queryParameters['subject_only'] = requestParameters.subjectOnly;
+        if (requestParameters['subjectOnly'] != null) {
+            queryParameters['subject_only'] = requestParameters['subjectOnly'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/events/{event_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))).replace(`{${"event_id"}}`, encodeURIComponent(String(requestParameters.eventId))),
+            path: `/v2/accounts/{account_id}/events/{event_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))).replace(`{${"event_id"}}`, encodeURIComponent(String(requestParameters['eventId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -663,48 +690,54 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get events for an account. Each event is built on top of a trace which is a series of transactions caused by one inbound message. TonAPI looks for known patterns inside the trace and splits the trace into actions, where a single action represents a meaningful high-level operation like a Jetton Transfer or an NFT Purchase. Actions are expected to be shown to users. It is advised not to build any logic on top of actions because actions can be changed at any time.
      */
     async getAccountEventsRaw(requestParameters: GetAccountEventsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountEvents.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountEvents().'
+            );
         }
 
-        if (requestParameters.limit === null || requestParameters.limit === undefined) {
-            throw new runtime.RequiredError('limit','Required parameter requestParameters.limit was null or undefined when calling getAccountEvents.');
+        if (requestParameters['limit'] == null) {
+            throw new runtime.RequiredError(
+                'limit',
+                'Required parameter "limit" was null or undefined when calling getAccountEvents().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.initiator !== undefined) {
-            queryParameters['initiator'] = requestParameters.initiator;
+        if (requestParameters['initiator'] != null) {
+            queryParameters['initiator'] = requestParameters['initiator'];
         }
 
-        if (requestParameters.subjectOnly !== undefined) {
-            queryParameters['subject_only'] = requestParameters.subjectOnly;
+        if (requestParameters['subjectOnly'] != null) {
+            queryParameters['subject_only'] = requestParameters['subjectOnly'];
         }
 
-        if (requestParameters.beforeLt !== undefined) {
-            queryParameters['before_lt'] = requestParameters.beforeLt;
+        if (requestParameters['beforeLt'] != null) {
+            queryParameters['before_lt'] = requestParameters['beforeLt'];
         }
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
-        if (requestParameters.startDate !== undefined) {
-            queryParameters['start_date'] = requestParameters.startDate;
+        if (requestParameters['startDate'] != null) {
+            queryParameters['start_date'] = requestParameters['startDate'];
         }
 
-        if (requestParameters.endDate !== undefined) {
-            queryParameters['end_date'] = requestParameters.endDate;
+        if (requestParameters['endDate'] != null) {
+            queryParameters['end_date'] = requestParameters['endDate'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/events`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/events`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -725,44 +758,53 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get the transfer jetton history for account and jetton
      */
     async getAccountJettonHistoryByIDRaw(requestParameters: GetAccountJettonHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountJettonHistoryByID.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountJettonHistoryByID().'
+            );
         }
 
-        if (requestParameters.jettonId === null || requestParameters.jettonId === undefined) {
-            throw new runtime.RequiredError('jettonId','Required parameter requestParameters.jettonId was null or undefined when calling getAccountJettonHistoryByID.');
+        if (requestParameters['jettonId'] == null) {
+            throw new runtime.RequiredError(
+                'jettonId',
+                'Required parameter "jettonId" was null or undefined when calling getAccountJettonHistoryByID().'
+            );
         }
 
-        if (requestParameters.limit === null || requestParameters.limit === undefined) {
-            throw new runtime.RequiredError('limit','Required parameter requestParameters.limit was null or undefined when calling getAccountJettonHistoryByID.');
+        if (requestParameters['limit'] == null) {
+            throw new runtime.RequiredError(
+                'limit',
+                'Required parameter "limit" was null or undefined when calling getAccountJettonHistoryByID().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.beforeLt !== undefined) {
-            queryParameters['before_lt'] = requestParameters.beforeLt;
+        if (requestParameters['beforeLt'] != null) {
+            queryParameters['before_lt'] = requestParameters['beforeLt'];
         }
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
-        if (requestParameters.startDate !== undefined) {
-            queryParameters['start_date'] = requestParameters.startDate;
+        if (requestParameters['startDate'] != null) {
+            queryParameters['start_date'] = requestParameters['startDate'];
         }
 
-        if (requestParameters.endDate !== undefined) {
-            queryParameters['end_date'] = requestParameters.endDate;
+        if (requestParameters['endDate'] != null) {
+            queryParameters['end_date'] = requestParameters['endDate'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/jettons/{jetton_id}/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))).replace(`{${"jetton_id"}}`, encodeURIComponent(String(requestParameters.jettonId))),
+            path: `/v2/accounts/{account_id}/jettons/{jetton_id}/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))).replace(`{${"jetton_id"}}`, encodeURIComponent(String(requestParameters['jettonId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -783,20 +825,23 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get all Jettons balances by owner address
      */
     async getAccountJettonsBalancesRaw(requestParameters: GetAccountJettonsBalancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JettonsBalances>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountJettonsBalances.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountJettonsBalances().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.currencies !== undefined) {
-            queryParameters['currencies'] = requestParameters.currencies;
+        if (requestParameters['currencies'] != null) {
+            queryParameters['currencies'] = requestParameters['currencies']!.join(runtime.COLLECTION_FORMATS["csv"]);
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/jettons`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/jettons`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -817,40 +862,46 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get the transfer jettons history for account
      */
     async getAccountJettonsHistoryRaw(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountJettonsHistory.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountJettonsHistory().'
+            );
         }
 
-        if (requestParameters.limit === null || requestParameters.limit === undefined) {
-            throw new runtime.RequiredError('limit','Required parameter requestParameters.limit was null or undefined when calling getAccountJettonsHistory.');
+        if (requestParameters['limit'] == null) {
+            throw new runtime.RequiredError(
+                'limit',
+                'Required parameter "limit" was null or undefined when calling getAccountJettonsHistory().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.beforeLt !== undefined) {
-            queryParameters['before_lt'] = requestParameters.beforeLt;
+        if (requestParameters['beforeLt'] != null) {
+            queryParameters['before_lt'] = requestParameters['beforeLt'];
         }
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
-        if (requestParameters.startDate !== undefined) {
-            queryParameters['start_date'] = requestParameters.startDate;
+        if (requestParameters['startDate'] != null) {
+            queryParameters['start_date'] = requestParameters['startDate'];
         }
 
-        if (requestParameters.endDate !== undefined) {
-            queryParameters['end_date'] = requestParameters.endDate;
+        if (requestParameters['endDate'] != null) {
+            queryParameters['end_date'] = requestParameters['endDate'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/jettons/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/jettons/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -871,32 +922,35 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get all NFT items by owner address
      */
     async getAccountNftItemsRaw(requestParameters: GetAccountNftItemsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NftItems>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountNftItems.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountNftItems().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.collection !== undefined) {
-            queryParameters['collection'] = requestParameters.collection;
+        if (requestParameters['collection'] != null) {
+            queryParameters['collection'] = requestParameters['collection'];
         }
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
-        if (requestParameters.offset !== undefined) {
-            queryParameters['offset'] = requestParameters.offset;
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
         }
 
-        if (requestParameters.indirectOwnership !== undefined) {
-            queryParameters['indirect_ownership'] = requestParameters.indirectOwnership;
+        if (requestParameters['indirectOwnership'] != null) {
+            queryParameters['indirect_ownership'] = requestParameters['indirectOwnership'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/nfts`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/nfts`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -917,8 +971,11 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get public key by account id
      */
     async getAccountPublicKeyRaw(requestParameters: GetAccountPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetAccountPublicKey200Response>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountPublicKey.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountPublicKey().'
+            );
         }
 
         const queryParameters: any = {};
@@ -926,7 +983,7 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/publickey`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/publickey`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -947,8 +1004,11 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get all subscriptions by wallet address
      */
     async getAccountSubscriptionsRaw(requestParameters: GetAccountSubscriptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Subscriptions>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountSubscriptions.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountSubscriptions().'
+            );
         }
 
         const queryParameters: any = {};
@@ -956,7 +1016,7 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/subscriptions`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/subscriptions`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -977,20 +1037,23 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Get traces for account
      */
     async getAccountTracesRaw(requestParameters: GetAccountTracesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TraceIDs>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountTraces.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountTraces().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/traces`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/traces`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -1022,7 +1085,7 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: GetAccountsRequestToJSON(requestParameters.getAccountsRequest),
+            body: GetAccountsRequestToJSON(requestParameters['getAccountsRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => AccountsFromJSON(jsonValue));
@@ -1040,8 +1103,11 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Update internal cache for a particular account
      */
     async reindexAccountRaw(requestParameters: ReindexAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling reindexAccount.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling reindexAccount().'
+            );
         }
 
         const queryParameters: any = {};
@@ -1049,7 +1115,7 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/reindex`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/reindex`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -1069,14 +1135,17 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      * Search by account domain name
      */
     async searchAccountsRaw(requestParameters: SearchAccountsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FoundAccounts>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling searchAccounts.');
+        if (requestParameters['name'] == null) {
+            throw new runtime.RequiredError(
+                'name',
+                'Required parameter "name" was null or undefined when calling searchAccounts().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.name !== undefined) {
-            queryParameters['name'] = requestParameters.name;
+        if (requestParameters['name'] != null) {
+            queryParameters['name'] = requestParameters['name'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

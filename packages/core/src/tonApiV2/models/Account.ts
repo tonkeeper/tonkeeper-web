@@ -12,7 +12,14 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
+import type { AccountStatus } from './AccountStatus';
+import {
+    AccountStatusFromJSON,
+    AccountStatusFromJSONTyped,
+    AccountStatusToJSON,
+} from './AccountStatus';
+
 /**
  * 
  * @export
@@ -39,10 +46,10 @@ export interface Account {
     lastActivity: number;
     /**
      * 
-     * @type {string}
+     * @type {AccountStatus}
      * @memberof Account
      */
-    status: string;
+    status: AccountStatus;
     /**
      * 
      * @type {Array<string>}
@@ -97,15 +104,13 @@ export interface Account {
  * Check if a given object implements the Account interface.
  */
 export function instanceOfAccount(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "balance" in value;
-    isInstance = isInstance && "lastActivity" in value;
-    isInstance = isInstance && "status" in value;
-    isInstance = isInstance && "getMethods" in value;
-    isInstance = isInstance && "isWallet" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('balance' in value)) return false;
+    if (!('lastActivity' in value)) return false;
+    if (!('status' in value)) return false;
+    if (!('getMethods' in value)) return false;
+    if (!('isWallet' in value)) return false;
+    return true;
 }
 
 export function AccountFromJSON(json: any): Account {
@@ -113,7 +118,7 @@ export function AccountFromJSON(json: any): Account {
 }
 
 export function AccountFromJSONTyped(json: any, ignoreDiscriminator: boolean): Account {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -121,39 +126,36 @@ export function AccountFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
         'address': json['address'],
         'balance': json['balance'],
         'lastActivity': json['last_activity'],
-        'status': json['status'],
-        'interfaces': !exists(json, 'interfaces') ? undefined : json['interfaces'],
-        'name': !exists(json, 'name') ? undefined : json['name'],
-        'isScam': !exists(json, 'is_scam') ? undefined : json['is_scam'],
-        'icon': !exists(json, 'icon') ? undefined : json['icon'],
-        'memoRequired': !exists(json, 'memo_required') ? undefined : json['memo_required'],
+        'status': AccountStatusFromJSON(json['status']),
+        'interfaces': json['interfaces'] == null ? undefined : json['interfaces'],
+        'name': json['name'] == null ? undefined : json['name'],
+        'isScam': json['is_scam'] == null ? undefined : json['is_scam'],
+        'icon': json['icon'] == null ? undefined : json['icon'],
+        'memoRequired': json['memo_required'] == null ? undefined : json['memo_required'],
         'getMethods': json['get_methods'],
-        'isSuspended': !exists(json, 'is_suspended') ? undefined : json['is_suspended'],
+        'isSuspended': json['is_suspended'] == null ? undefined : json['is_suspended'],
         'isWallet': json['is_wallet'],
     };
 }
 
 export function AccountToJSON(value?: Account | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'balance': value.balance,
-        'last_activity': value.lastActivity,
-        'status': value.status,
-        'interfaces': value.interfaces,
-        'name': value.name,
-        'is_scam': value.isScam,
-        'icon': value.icon,
-        'memo_required': value.memoRequired,
-        'get_methods': value.getMethods,
-        'is_suspended': value.isSuspended,
-        'is_wallet': value.isWallet,
+        'address': value['address'],
+        'balance': value['balance'],
+        'last_activity': value['lastActivity'],
+        'status': AccountStatusToJSON(value['status']),
+        'interfaces': value['interfaces'],
+        'name': value['name'],
+        'is_scam': value['isScam'],
+        'icon': value['icon'],
+        'memo_required': value['memoRequired'],
+        'get_methods': value['getMethods'],
+        'is_suspended': value['isSuspended'],
+        'is_wallet': value['isWallet'],
     };
 }
 

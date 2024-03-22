@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockParamLimits } from './BlockParamLimits';
 import {
     BlockParamLimitsFromJSON,
@@ -50,12 +50,10 @@ export interface BlockLimits {
  * Check if a given object implements the BlockLimits interface.
  */
 export function instanceOfBlockLimits(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "bytes" in value;
-    isInstance = isInstance && "gas" in value;
-    isInstance = isInstance && "ltDelta" in value;
-
-    return isInstance;
+    if (!('bytes' in value)) return false;
+    if (!('gas' in value)) return false;
+    if (!('ltDelta' in value)) return false;
+    return true;
 }
 
 export function BlockLimitsFromJSON(json: any): BlockLimits {
@@ -63,7 +61,7 @@ export function BlockLimitsFromJSON(json: any): BlockLimits {
 }
 
 export function BlockLimitsFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockLimits {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -75,17 +73,14 @@ export function BlockLimitsFromJSONTyped(json: any, ignoreDiscriminator: boolean
 }
 
 export function BlockLimitsToJSON(value?: BlockLimits | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'bytes': BlockParamLimitsToJSON(value.bytes),
-        'gas': BlockParamLimitsToJSON(value.gas),
-        'lt_delta': BlockParamLimitsToJSON(value.ltDelta),
+        'bytes': BlockParamLimitsToJSON(value['bytes']),
+        'gas': BlockParamLimitsToJSON(value['gas']),
+        'lt_delta': BlockParamLimitsToJSON(value['ltDelta']),
     };
 }
 

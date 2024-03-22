@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { PoolImplementation } from './PoolImplementation';
 import {
     PoolImplementationFromJSON,
@@ -50,11 +50,9 @@ export interface GetStakingPools200Response {
  * Check if a given object implements the GetStakingPools200Response interface.
  */
 export function instanceOfGetStakingPools200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "pools" in value;
-    isInstance = isInstance && "implementations" in value;
-
-    return isInstance;
+    if (!('pools' in value)) return false;
+    if (!('implementations' in value)) return false;
+    return true;
 }
 
 export function GetStakingPools200ResponseFromJSON(json: any): GetStakingPools200Response {
@@ -62,7 +60,7 @@ export function GetStakingPools200ResponseFromJSON(json: any): GetStakingPools20
 }
 
 export function GetStakingPools200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetStakingPools200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -73,16 +71,13 @@ export function GetStakingPools200ResponseFromJSONTyped(json: any, ignoreDiscrim
 }
 
 export function GetStakingPools200ResponseToJSON(value?: GetStakingPools200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'pools': ((value.pools as Array<any>).map(PoolInfoToJSON)),
-        'implementations': (mapValues(value.implementations, PoolImplementationToJSON)),
+        'pools': ((value['pools'] as Array<any>).map(PoolInfoToJSON)),
+        'implementations': (mapValues(value['implementations'], PoolImplementationToJSON)),
     };
 }
 

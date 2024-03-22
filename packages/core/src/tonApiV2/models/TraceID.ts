@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface TraceID {
  * Check if a given object implements the TraceID interface.
  */
 export function instanceOfTraceID(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "id" in value;
-    isInstance = isInstance && "utime" in value;
-
-    return isInstance;
+    if (!('id' in value)) return false;
+    if (!('utime' in value)) return false;
+    return true;
 }
 
 export function TraceIDFromJSON(json: any): TraceID {
@@ -49,7 +47,7 @@ export function TraceIDFromJSON(json: any): TraceID {
 }
 
 export function TraceIDFromJSONTyped(json: any, ignoreDiscriminator: boolean): TraceID {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function TraceIDFromJSONTyped(json: any, ignoreDiscriminator: boolean): T
 }
 
 export function TraceIDToJSON(value?: TraceID | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'id': value.id,
-        'utime': value.utime,
+        'id': value['id'],
+        'utime': value['utime'],
     };
 }
 

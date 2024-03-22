@@ -106,6 +106,7 @@ export const estimateNftTransfer = async (
     );
 
     const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+        ignoreSignatureCheck: true,
         accountId: wallet.address,
         decodeMessageRequest: { boc: cell.toString('base64') }
     });

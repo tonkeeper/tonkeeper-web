@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface TonConnectProof200Response {
  * Check if a given object implements the TonConnectProof200Response interface.
  */
 export function instanceOfTonConnectProof200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "token" in value;
-
-    return isInstance;
+    if (!('token' in value)) return false;
+    return true;
 }
 
 export function TonConnectProof200ResponseFromJSON(json: any): TonConnectProof200Response {
@@ -42,7 +40,7 @@ export function TonConnectProof200ResponseFromJSON(json: any): TonConnectProof20
 }
 
 export function TonConnectProof200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): TonConnectProof200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function TonConnectProof200ResponseFromJSONTyped(json: any, ignoreDiscrim
 }
 
 export function TonConnectProof200ResponseToJSON(value?: TonConnectProof200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'token': value.token,
+        'token': value['token'],
     };
 }
 

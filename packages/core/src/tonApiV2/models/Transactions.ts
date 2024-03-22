@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { Transaction } from './Transaction';
 import {
     TransactionFromJSON,
@@ -38,10 +38,8 @@ export interface Transactions {
  * Check if a given object implements the Transactions interface.
  */
 export function instanceOfTransactions(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "transactions" in value;
-
-    return isInstance;
+    if (!('transactions' in value)) return false;
+    return true;
 }
 
 export function TransactionsFromJSON(json: any): Transactions {
@@ -49,7 +47,7 @@ export function TransactionsFromJSON(json: any): Transactions {
 }
 
 export function TransactionsFromJSONTyped(json: any, ignoreDiscriminator: boolean): Transactions {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function TransactionsFromJSONTyped(json: any, ignoreDiscriminator: boolea
 }
 
 export function TransactionsToJSON(value?: Transactions | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'transactions': ((value.transactions as Array<any>).map(TransactionToJSON)),
+        'transactions': ((value['transactions'] as Array<any>).map(TransactionToJSON)),
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The limits on the number of validators in the TON blockchain.
  * @export
@@ -43,12 +43,10 @@ export interface BlockchainConfig16 {
  * Check if a given object implements the BlockchainConfig16 interface.
  */
 export function instanceOfBlockchainConfig16(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "maxValidators" in value;
-    isInstance = isInstance && "maxMainValidators" in value;
-    isInstance = isInstance && "minValidators" in value;
-
-    return isInstance;
+    if (!('maxValidators' in value)) return false;
+    if (!('maxMainValidators' in value)) return false;
+    if (!('minValidators' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig16FromJSON(json: any): BlockchainConfig16 {
@@ -56,7 +54,7 @@ export function BlockchainConfig16FromJSON(json: any): BlockchainConfig16 {
 }
 
 export function BlockchainConfig16FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig16 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -68,17 +66,14 @@ export function BlockchainConfig16FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig16ToJSON(value?: BlockchainConfig16 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'max_validators': value.maxValidators,
-        'max_main_validators': value.maxMainValidators,
-        'min_validators': value.minValidators,
+        'max_validators': value['maxValidators'],
+        'max_main_validators': value['maxMainValidators'],
+        'min_validators': value['minValidators'],
     };
 }
 

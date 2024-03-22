@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface Price {
  * Check if a given object implements the Price interface.
  */
 export function instanceOfPrice(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "value" in value;
-    isInstance = isInstance && "tokenName" in value;
-
-    return isInstance;
+    if (!('value' in value)) return false;
+    if (!('tokenName' in value)) return false;
+    return true;
 }
 
 export function PriceFromJSON(json: any): Price {
@@ -49,7 +47,7 @@ export function PriceFromJSON(json: any): Price {
 }
 
 export function PriceFromJSONTyped(json: any, ignoreDiscriminator: boolean): Price {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function PriceFromJSONTyped(json: any, ignoreDiscriminator: boolean): Pri
 }
 
 export function PriceToJSON(value?: Price | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'value': value.value,
-        'token_name': value.tokenName,
+        'value': value['value'],
+        'token_name': value['tokenName'],
     };
 }
 

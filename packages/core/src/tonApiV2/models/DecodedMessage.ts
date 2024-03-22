@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -56,11 +56,9 @@ export interface DecodedMessage {
  * Check if a given object implements the DecodedMessage interface.
  */
 export function instanceOfDecodedMessage(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "destination" in value;
-    isInstance = isInstance && "destinationWalletVersion" in value;
-
-    return isInstance;
+    if (!('destination' in value)) return false;
+    if (!('destinationWalletVersion' in value)) return false;
+    return true;
 }
 
 export function DecodedMessageFromJSON(json: any): DecodedMessage {
@@ -68,29 +66,26 @@ export function DecodedMessageFromJSON(json: any): DecodedMessage {
 }
 
 export function DecodedMessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): DecodedMessage {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'destination': AccountAddressFromJSON(json['destination']),
         'destinationWalletVersion': json['destination_wallet_version'],
-        'extInMsgDecoded': !exists(json, 'ext_in_msg_decoded') ? undefined : DecodedMessageExtInMsgDecodedFromJSON(json['ext_in_msg_decoded']),
+        'extInMsgDecoded': json['ext_in_msg_decoded'] == null ? undefined : DecodedMessageExtInMsgDecodedFromJSON(json['ext_in_msg_decoded']),
     };
 }
 
 export function DecodedMessageToJSON(value?: DecodedMessage | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'destination': AccountAddressToJSON(value.destination),
-        'destination_wallet_version': value.destinationWalletVersion,
-        'ext_in_msg_decoded': DecodedMessageExtInMsgDecodedToJSON(value.extInMsgDecoded),
+        'destination': AccountAddressToJSON(value['destination']),
+        'destination_wallet_version': value['destinationWalletVersion'],
+        'ext_in_msg_decoded': DecodedMessageExtInMsgDecodedToJSON(value['extInMsgDecoded']),
     };
 }
 

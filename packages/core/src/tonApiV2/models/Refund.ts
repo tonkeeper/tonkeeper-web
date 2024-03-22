@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -49,11 +49,9 @@ export type RefundTypeEnum = typeof RefundTypeEnum[keyof typeof RefundTypeEnum];
  * Check if a given object implements the Refund interface.
  */
 export function instanceOfRefund(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "type" in value;
-    isInstance = isInstance && "origin" in value;
-
-    return isInstance;
+    if (!('type' in value)) return false;
+    if (!('origin' in value)) return false;
+    return true;
 }
 
 export function RefundFromJSON(json: any): Refund {
@@ -61,7 +59,7 @@ export function RefundFromJSON(json: any): Refund {
 }
 
 export function RefundFromJSONTyped(json: any, ignoreDiscriminator: boolean): Refund {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -72,16 +70,13 @@ export function RefundFromJSONTyped(json: any, ignoreDiscriminator: boolean): Re
 }
 
 export function RefundToJSON(value?: Refund | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'type': value.type,
-        'origin': value.origin,
+        'type': value['type'],
+        'origin': value['origin'],
     };
 }
 

@@ -156,7 +156,7 @@ export const useWalletJettonList = () => {
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                 accountId: wallet.active.rawAddress,
-                currencies: fiat
+                currencies: [fiat]
             });
 
             result.balances.forEach(item => {

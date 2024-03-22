@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The configuration for the consensus protocol above catchain.
  * @export
@@ -31,10 +31,8 @@ export interface BlockchainConfig31 {
  * Check if a given object implements the BlockchainConfig31 interface.
  */
 export function instanceOfBlockchainConfig31(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "fundamentalSmcAddr" in value;
-
-    return isInstance;
+    if (!('fundamentalSmcAddr' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig31FromJSON(json: any): BlockchainConfig31 {
@@ -42,7 +40,7 @@ export function BlockchainConfig31FromJSON(json: any): BlockchainConfig31 {
 }
 
 export function BlockchainConfig31FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig31 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function BlockchainConfig31FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig31ToJSON(value?: BlockchainConfig31 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'fundamental_smc_addr': value.fundamentalSmcAddr,
+        'fundamental_smc_addr': value['fundamentalSmcAddr'],
     };
 }
 

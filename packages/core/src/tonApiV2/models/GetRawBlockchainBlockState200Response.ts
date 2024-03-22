@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -56,13 +56,11 @@ export interface GetRawBlockchainBlockState200Response {
  * Check if a given object implements the GetRawBlockchainBlockState200Response interface.
  */
 export function instanceOfGetRawBlockchainBlockState200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "id" in value;
-    isInstance = isInstance && "rootHash" in value;
-    isInstance = isInstance && "fileHash" in value;
-    isInstance = isInstance && "data" in value;
-
-    return isInstance;
+    if (!('id' in value)) return false;
+    if (!('rootHash' in value)) return false;
+    if (!('fileHash' in value)) return false;
+    if (!('data' in value)) return false;
+    return true;
 }
 
 export function GetRawBlockchainBlockState200ResponseFromJSON(json: any): GetRawBlockchainBlockState200Response {
@@ -70,7 +68,7 @@ export function GetRawBlockchainBlockState200ResponseFromJSON(json: any): GetRaw
 }
 
 export function GetRawBlockchainBlockState200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawBlockchainBlockState200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -83,18 +81,15 @@ export function GetRawBlockchainBlockState200ResponseFromJSONTyped(json: any, ig
 }
 
 export function GetRawBlockchainBlockState200ResponseToJSON(value?: GetRawBlockchainBlockState200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'id': BlockRawToJSON(value.id),
-        'root_hash': value.rootHash,
-        'file_hash': value.fileHash,
-        'data': value.data,
+        'id': BlockRawToJSON(value['id']),
+        'root_hash': value['rootHash'],
+        'file_hash': value['fileHash'],
+        'data': value['data'],
     };
 }
 

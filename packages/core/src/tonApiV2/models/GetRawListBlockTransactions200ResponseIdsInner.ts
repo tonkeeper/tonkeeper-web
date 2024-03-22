@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -49,10 +49,8 @@ export interface GetRawListBlockTransactions200ResponseIdsInner {
  * Check if a given object implements the GetRawListBlockTransactions200ResponseIdsInner interface.
  */
 export function instanceOfGetRawListBlockTransactions200ResponseIdsInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "mode" in value;
-
-    return isInstance;
+    if (!('mode' in value)) return false;
+    return true;
 }
 
 export function GetRawListBlockTransactions200ResponseIdsInnerFromJSON(json: any): GetRawListBlockTransactions200ResponseIdsInner {
@@ -60,31 +58,28 @@ export function GetRawListBlockTransactions200ResponseIdsInnerFromJSON(json: any
 }
 
 export function GetRawListBlockTransactions200ResponseIdsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawListBlockTransactions200ResponseIdsInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'mode': json['mode'],
-        'account': !exists(json, 'account') ? undefined : json['account'],
-        'lt': !exists(json, 'lt') ? undefined : json['lt'],
-        'hash': !exists(json, 'hash') ? undefined : json['hash'],
+        'account': json['account'] == null ? undefined : json['account'],
+        'lt': json['lt'] == null ? undefined : json['lt'],
+        'hash': json['hash'] == null ? undefined : json['hash'],
     };
 }
 
 export function GetRawListBlockTransactions200ResponseIdsInnerToJSON(value?: GetRawListBlockTransactions200ResponseIdsInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'mode': value.mode,
-        'account': value.account,
-        'lt': value.lt,
-        'hash': value.hash,
+        'mode': value['mode'],
+        'account': value['account'],
+        'lt': value['lt'],
+        'hash': value['hash'],
     };
 }
 

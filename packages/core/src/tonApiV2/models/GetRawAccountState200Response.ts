@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -62,14 +62,12 @@ export interface GetRawAccountState200Response {
  * Check if a given object implements the GetRawAccountState200Response interface.
  */
 export function instanceOfGetRawAccountState200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "id" in value;
-    isInstance = isInstance && "shardblk" in value;
-    isInstance = isInstance && "shardProof" in value;
-    isInstance = isInstance && "proof" in value;
-    isInstance = isInstance && "state" in value;
-
-    return isInstance;
+    if (!('id' in value)) return false;
+    if (!('shardblk' in value)) return false;
+    if (!('shardProof' in value)) return false;
+    if (!('proof' in value)) return false;
+    if (!('state' in value)) return false;
+    return true;
 }
 
 export function GetRawAccountState200ResponseFromJSON(json: any): GetRawAccountState200Response {
@@ -77,7 +75,7 @@ export function GetRawAccountState200ResponseFromJSON(json: any): GetRawAccountS
 }
 
 export function GetRawAccountState200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawAccountState200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -91,19 +89,16 @@ export function GetRawAccountState200ResponseFromJSONTyped(json: any, ignoreDisc
 }
 
 export function GetRawAccountState200ResponseToJSON(value?: GetRawAccountState200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'id': BlockRawToJSON(value.id),
-        'shardblk': BlockRawToJSON(value.shardblk),
-        'shard_proof': value.shardProof,
-        'proof': value.proof,
-        'state': value.state,
+        'id': BlockRawToJSON(value['id']),
+        'shardblk': BlockRawToJSON(value['shardblk']),
+        'shard_proof': value['shardProof'],
+        'proof': value['proof'],
+        'state': value['state'],
     };
 }
 

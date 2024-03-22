@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -91,20 +91,18 @@ export interface MisbehaviourPunishmentConfig {
  * Check if a given object implements the MisbehaviourPunishmentConfig interface.
  */
 export function instanceOfMisbehaviourPunishmentConfig(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "defaultFlatFine" in value;
-    isInstance = isInstance && "defaultProportionalFine" in value;
-    isInstance = isInstance && "severityFlatMult" in value;
-    isInstance = isInstance && "severityProportionalMult" in value;
-    isInstance = isInstance && "unpunishableInterval" in value;
-    isInstance = isInstance && "longInterval" in value;
-    isInstance = isInstance && "longFlatMult" in value;
-    isInstance = isInstance && "longProportionalMult" in value;
-    isInstance = isInstance && "mediumInterval" in value;
-    isInstance = isInstance && "mediumFlatMult" in value;
-    isInstance = isInstance && "mediumProportionalMult" in value;
-
-    return isInstance;
+    if (!('defaultFlatFine' in value)) return false;
+    if (!('defaultProportionalFine' in value)) return false;
+    if (!('severityFlatMult' in value)) return false;
+    if (!('severityProportionalMult' in value)) return false;
+    if (!('unpunishableInterval' in value)) return false;
+    if (!('longInterval' in value)) return false;
+    if (!('longFlatMult' in value)) return false;
+    if (!('longProportionalMult' in value)) return false;
+    if (!('mediumInterval' in value)) return false;
+    if (!('mediumFlatMult' in value)) return false;
+    if (!('mediumProportionalMult' in value)) return false;
+    return true;
 }
 
 export function MisbehaviourPunishmentConfigFromJSON(json: any): MisbehaviourPunishmentConfig {
@@ -112,7 +110,7 @@ export function MisbehaviourPunishmentConfigFromJSON(json: any): MisbehaviourPun
 }
 
 export function MisbehaviourPunishmentConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): MisbehaviourPunishmentConfig {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -132,25 +130,22 @@ export function MisbehaviourPunishmentConfigFromJSONTyped(json: any, ignoreDiscr
 }
 
 export function MisbehaviourPunishmentConfigToJSON(value?: MisbehaviourPunishmentConfig | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'default_flat_fine': value.defaultFlatFine,
-        'default_proportional_fine': value.defaultProportionalFine,
-        'severity_flat_mult': value.severityFlatMult,
-        'severity_proportional_mult': value.severityProportionalMult,
-        'unpunishable_interval': value.unpunishableInterval,
-        'long_interval': value.longInterval,
-        'long_flat_mult': value.longFlatMult,
-        'long_proportional_mult': value.longProportionalMult,
-        'medium_interval': value.mediumInterval,
-        'medium_flat_mult': value.mediumFlatMult,
-        'medium_proportional_mult': value.mediumProportionalMult,
+        'default_flat_fine': value['defaultFlatFine'],
+        'default_proportional_fine': value['defaultProportionalFine'],
+        'severity_flat_mult': value['severityFlatMult'],
+        'severity_proportional_mult': value['severityProportionalMult'],
+        'unpunishable_interval': value['unpunishableInterval'],
+        'long_interval': value['longInterval'],
+        'long_flat_mult': value['longFlatMult'],
+        'long_proportional_mult': value['longProportionalMult'],
+        'medium_interval': value['mediumInterval'],
+        'medium_flat_mult': value['mediumFlatMult'],
+        'medium_proportional_mult': value['mediumProportionalMult'],
     };
 }
 

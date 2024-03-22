@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -91,20 +91,18 @@ export interface Subscription {
  * Check if a given object implements the Subscription interface.
  */
 export function instanceOfSubscription(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "walletAddress" in value;
-    isInstance = isInstance && "beneficiaryAddress" in value;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "period" in value;
-    isInstance = isInstance && "startTime" in value;
-    isInstance = isInstance && "timeout" in value;
-    isInstance = isInstance && "lastPaymentTime" in value;
-    isInstance = isInstance && "lastRequestTime" in value;
-    isInstance = isInstance && "subscriptionId" in value;
-    isInstance = isInstance && "failedAttempts" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('walletAddress' in value)) return false;
+    if (!('beneficiaryAddress' in value)) return false;
+    if (!('amount' in value)) return false;
+    if (!('period' in value)) return false;
+    if (!('startTime' in value)) return false;
+    if (!('timeout' in value)) return false;
+    if (!('lastPaymentTime' in value)) return false;
+    if (!('lastRequestTime' in value)) return false;
+    if (!('subscriptionId' in value)) return false;
+    if (!('failedAttempts' in value)) return false;
+    return true;
 }
 
 export function SubscriptionFromJSON(json: any): Subscription {
@@ -112,7 +110,7 @@ export function SubscriptionFromJSON(json: any): Subscription {
 }
 
 export function SubscriptionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Subscription {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -132,25 +130,22 @@ export function SubscriptionFromJSONTyped(json: any, ignoreDiscriminator: boolea
 }
 
 export function SubscriptionToJSON(value?: Subscription | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'wallet_address': value.walletAddress,
-        'beneficiary_address': value.beneficiaryAddress,
-        'amount': value.amount,
-        'period': value.period,
-        'start_time': value.startTime,
-        'timeout': value.timeout,
-        'last_payment_time': value.lastPaymentTime,
-        'last_request_time': value.lastRequestTime,
-        'subscription_id': value.subscriptionId,
-        'failed_attempts': value.failedAttempts,
+        'address': value['address'],
+        'wallet_address': value['walletAddress'],
+        'beneficiary_address': value['beneficiaryAddress'],
+        'amount': value['amount'],
+        'period': value['period'],
+        'start_time': value['startTime'],
+        'timeout': value['timeout'],
+        'last_payment_time': value['lastPaymentTime'],
+        'last_request_time': value['lastRequestTime'],
+        'subscription_id': value['subscriptionId'],
+        'failed_attempts': value['failedAttempts'],
     };
 }
 

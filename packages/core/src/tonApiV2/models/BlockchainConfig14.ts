@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The reward in nanoTons for block creation in the TON blockchain.
  * @export
@@ -37,11 +37,9 @@ export interface BlockchainConfig14 {
  * Check if a given object implements the BlockchainConfig14 interface.
  */
 export function instanceOfBlockchainConfig14(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "masterchainBlockFee" in value;
-    isInstance = isInstance && "basechainBlockFee" in value;
-
-    return isInstance;
+    if (!('masterchainBlockFee' in value)) return false;
+    if (!('basechainBlockFee' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig14FromJSON(json: any): BlockchainConfig14 {
@@ -49,7 +47,7 @@ export function BlockchainConfig14FromJSON(json: any): BlockchainConfig14 {
 }
 
 export function BlockchainConfig14FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig14 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function BlockchainConfig14FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig14ToJSON(value?: BlockchainConfig14 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'masterchain_block_fee': value.masterchainBlockFee,
-        'basechain_block_fee': value.basechainBlockFee,
+        'masterchain_block_fee': value['masterchainBlockFee'],
+        'basechain_block_fee': value['basechainBlockFee'],
     };
 }
 

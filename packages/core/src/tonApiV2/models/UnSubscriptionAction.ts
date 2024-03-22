@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -50,12 +50,10 @@ export interface UnSubscriptionAction {
  * Check if a given object implements the UnSubscriptionAction interface.
  */
 export function instanceOfUnSubscriptionAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "subscriber" in value;
-    isInstance = isInstance && "subscription" in value;
-    isInstance = isInstance && "beneficiary" in value;
-
-    return isInstance;
+    if (!('subscriber' in value)) return false;
+    if (!('subscription' in value)) return false;
+    if (!('beneficiary' in value)) return false;
+    return true;
 }
 
 export function UnSubscriptionActionFromJSON(json: any): UnSubscriptionAction {
@@ -63,7 +61,7 @@ export function UnSubscriptionActionFromJSON(json: any): UnSubscriptionAction {
 }
 
 export function UnSubscriptionActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): UnSubscriptionAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -75,17 +73,14 @@ export function UnSubscriptionActionFromJSONTyped(json: any, ignoreDiscriminator
 }
 
 export function UnSubscriptionActionToJSON(value?: UnSubscriptionAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'subscriber': AccountAddressToJSON(value.subscriber),
-        'subscription': value.subscription,
-        'beneficiary': AccountAddressToJSON(value.beneficiary),
+        'subscriber': AccountAddressToJSON(value['subscriber']),
+        'subscription': value['subscription'],
+        'beneficiary': AccountAddressToJSON(value['beneficiary']),
     };
 }
 

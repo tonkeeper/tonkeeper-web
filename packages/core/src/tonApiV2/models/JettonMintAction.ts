@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -62,13 +62,11 @@ export interface JettonMintAction {
  * Check if a given object implements the JettonMintAction interface.
  */
 export function instanceOfJettonMintAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "recipient" in value;
-    isInstance = isInstance && "recipientsWallet" in value;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "jetton" in value;
-
-    return isInstance;
+    if (!('recipient' in value)) return false;
+    if (!('recipientsWallet' in value)) return false;
+    if (!('amount' in value)) return false;
+    if (!('jetton' in value)) return false;
+    return true;
 }
 
 export function JettonMintActionFromJSON(json: any): JettonMintAction {
@@ -76,7 +74,7 @@ export function JettonMintActionFromJSON(json: any): JettonMintAction {
 }
 
 export function JettonMintActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonMintAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -89,18 +87,15 @@ export function JettonMintActionFromJSONTyped(json: any, ignoreDiscriminator: bo
 }
 
 export function JettonMintActionToJSON(value?: JettonMintAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'recipient': AccountAddressToJSON(value.recipient),
-        'recipients_wallet': value.recipientsWallet,
-        'amount': value.amount,
-        'jetton': JettonPreviewToJSON(value.jetton),
+        'recipient': AccountAddressToJSON(value['recipient']),
+        'recipients_wallet': value['recipientsWallet'],
+        'amount': value['amount'],
+        'jetton': JettonPreviewToJSON(value['jetton']),
     };
 }
 

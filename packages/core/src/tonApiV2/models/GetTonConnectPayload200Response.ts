@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface GetTonConnectPayload200Response {
  * Check if a given object implements the GetTonConnectPayload200Response interface.
  */
 export function instanceOfGetTonConnectPayload200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "payload" in value;
-
-    return isInstance;
+    if (!('payload' in value)) return false;
+    return true;
 }
 
 export function GetTonConnectPayload200ResponseFromJSON(json: any): GetTonConnectPayload200Response {
@@ -42,7 +40,7 @@ export function GetTonConnectPayload200ResponseFromJSON(json: any): GetTonConnec
 }
 
 export function GetTonConnectPayload200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetTonConnectPayload200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function GetTonConnectPayload200ResponseFromJSONTyped(json: any, ignoreDi
 }
 
 export function GetTonConnectPayload200ResponseToJSON(value?: GetTonConnectPayload200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'payload': value.payload,
+        'payload': value['payload'],
     };
 }
 

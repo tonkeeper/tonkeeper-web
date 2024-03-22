@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { NftItem } from './NftItem';
 import {
     NftItemFromJSON,
@@ -38,10 +38,8 @@ export interface NftItems {
  * Check if a given object implements the NftItems interface.
  */
 export function instanceOfNftItems(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "nftItems" in value;
-
-    return isInstance;
+    if (!('nftItems' in value)) return false;
+    return true;
 }
 
 export function NftItemsFromJSON(json: any): NftItems {
@@ -49,7 +47,7 @@ export function NftItemsFromJSON(json: any): NftItems {
 }
 
 export function NftItemsFromJSONTyped(json: any, ignoreDiscriminator: boolean): NftItems {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function NftItemsFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
 }
 
 export function NftItemsToJSON(value?: NftItems | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'nft_items': ((value.nftItems as Array<any>).map(NftItemToJSON)),
+        'nft_items': ((value['nftItems'] as Array<any>).map(NftItemToJSON)),
     };
 }
 

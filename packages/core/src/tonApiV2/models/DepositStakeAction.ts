@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -62,13 +62,11 @@ export interface DepositStakeAction {
  * Check if a given object implements the DepositStakeAction interface.
  */
 export function instanceOfDepositStakeAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "staker" in value;
-    isInstance = isInstance && "pool" in value;
-    isInstance = isInstance && "implementation" in value;
-
-    return isInstance;
+    if (!('amount' in value)) return false;
+    if (!('staker' in value)) return false;
+    if (!('pool' in value)) return false;
+    if (!('implementation' in value)) return false;
+    return true;
 }
 
 export function DepositStakeActionFromJSON(json: any): DepositStakeAction {
@@ -76,7 +74,7 @@ export function DepositStakeActionFromJSON(json: any): DepositStakeAction {
 }
 
 export function DepositStakeActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): DepositStakeAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -89,18 +87,15 @@ export function DepositStakeActionFromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function DepositStakeActionToJSON(value?: DepositStakeAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'amount': value.amount,
-        'staker': AccountAddressToJSON(value.staker),
-        'pool': AccountAddressToJSON(value.pool),
-        'implementation': PoolImplementationTypeToJSON(value.implementation),
+        'amount': value['amount'],
+        'staker': AccountAddressToJSON(value['staker']),
+        'pool': AccountAddressToJSON(value['pool']),
+        'implementation': PoolImplementationTypeToJSON(value['implementation']),
     };
 }
 

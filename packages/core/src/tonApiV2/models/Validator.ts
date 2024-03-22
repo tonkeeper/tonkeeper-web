@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -49,13 +49,11 @@ export interface Validator {
  * Check if a given object implements the Validator interface.
  */
 export function instanceOfValidator(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "adnlAddress" in value;
-    isInstance = isInstance && "stake" in value;
-    isInstance = isInstance && "maxFactor" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('adnlAddress' in value)) return false;
+    if (!('stake' in value)) return false;
+    if (!('maxFactor' in value)) return false;
+    return true;
 }
 
 export function ValidatorFromJSON(json: any): Validator {
@@ -63,7 +61,7 @@ export function ValidatorFromJSON(json: any): Validator {
 }
 
 export function ValidatorFromJSONTyped(json: any, ignoreDiscriminator: boolean): Validator {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -76,18 +74,15 @@ export function ValidatorFromJSONTyped(json: any, ignoreDiscriminator: boolean):
 }
 
 export function ValidatorToJSON(value?: Validator | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'adnl_address': value.adnlAddress,
-        'stake': value.stake,
-        'max_factor': value.maxFactor,
+        'address': value['address'],
+        'adnl_address': value['adnlAddress'],
+        'stake': value['stake'],
+        'max_factor': value['maxFactor'],
     };
 }
 

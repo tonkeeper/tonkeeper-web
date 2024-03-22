@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * suspended accounts
  * @export
@@ -37,11 +37,9 @@ export interface BlockchainConfig44 {
  * Check if a given object implements the BlockchainConfig44 interface.
  */
 export function instanceOfBlockchainConfig44(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "accounts" in value;
-    isInstance = isInstance && "suspendedUntil" in value;
-
-    return isInstance;
+    if (!('accounts' in value)) return false;
+    if (!('suspendedUntil' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig44FromJSON(json: any): BlockchainConfig44 {
@@ -49,7 +47,7 @@ export function BlockchainConfig44FromJSON(json: any): BlockchainConfig44 {
 }
 
 export function BlockchainConfig44FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig44 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function BlockchainConfig44FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig44ToJSON(value?: BlockchainConfig44 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'accounts': value.accounts,
-        'suspended_until': value.suspendedUntil,
+        'accounts': value['accounts'],
+        'suspended_until': value['suspendedUntil'],
     };
 }
 

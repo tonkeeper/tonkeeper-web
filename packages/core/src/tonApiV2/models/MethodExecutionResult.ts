@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { TvmStackRecord } from './TvmStackRecord';
 import {
     TvmStackRecordFromJSON,
@@ -49,19 +49,17 @@ export interface MethodExecutionResult {
      * @type {any}
      * @memberof MethodExecutionResult
      */
-    decoded?: any | null;
+    decoded?: any;
 }
 
 /**
  * Check if a given object implements the MethodExecutionResult interface.
  */
 export function instanceOfMethodExecutionResult(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "success" in value;
-    isInstance = isInstance && "exitCode" in value;
-    isInstance = isInstance && "stack" in value;
-
-    return isInstance;
+    if (!('success' in value)) return false;
+    if (!('exitCode' in value)) return false;
+    if (!('stack' in value)) return false;
+    return true;
 }
 
 export function MethodExecutionResultFromJSON(json: any): MethodExecutionResult {
@@ -69,7 +67,7 @@ export function MethodExecutionResultFromJSON(json: any): MethodExecutionResult 
 }
 
 export function MethodExecutionResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): MethodExecutionResult {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -77,23 +75,20 @@ export function MethodExecutionResultFromJSONTyped(json: any, ignoreDiscriminato
         'success': json['success'],
         'exitCode': json['exit_code'],
         'stack': ((json['stack'] as Array<any>).map(TvmStackRecordFromJSON)),
-        'decoded': !exists(json, 'decoded') ? undefined : json['decoded'],
+        'decoded': json['decoded'] == null ? undefined : json['decoded'],
     };
 }
 
 export function MethodExecutionResultToJSON(value?: MethodExecutionResult | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'success': value.success,
-        'exit_code': value.exitCode,
-        'stack': ((value.stack as Array<any>).map(TvmStackRecordToJSON)),
-        'decoded': value.decoded,
+        'success': value['success'],
+        'exit_code': value['exitCode'],
+        'stack': ((value['stack'] as Array<any>).map(TvmStackRecordToJSON)),
+        'decoded': value['decoded'],
     };
 }
 

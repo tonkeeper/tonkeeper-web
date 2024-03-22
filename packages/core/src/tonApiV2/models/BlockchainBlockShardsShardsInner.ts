@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface BlockchainBlockShardsShardsInner {
  * Check if a given object implements the BlockchainBlockShardsShardsInner interface.
  */
 export function instanceOfBlockchainBlockShardsShardsInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "lastKnownBlockId" in value;
-
-    return isInstance;
+    if (!('lastKnownBlockId' in value)) return false;
+    return true;
 }
 
 export function BlockchainBlockShardsShardsInnerFromJSON(json: any): BlockchainBlockShardsShardsInner {
@@ -42,7 +40,7 @@ export function BlockchainBlockShardsShardsInnerFromJSON(json: any): BlockchainB
 }
 
 export function BlockchainBlockShardsShardsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainBlockShardsShardsInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function BlockchainBlockShardsShardsInnerFromJSONTyped(json: any, ignoreD
 }
 
 export function BlockchainBlockShardsShardsInnerToJSON(value?: BlockchainBlockShardsShardsInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'last_known_block_id': value.lastKnownBlockId,
+        'last_known_block_id': value['lastKnownBlockId'],
     };
 }
 

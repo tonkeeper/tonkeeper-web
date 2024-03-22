@@ -16,7 +16,6 @@
 import * as runtime from '../runtime';
 import type {
   GetAllRawShardsInfo200Response,
-  GetBlockchainBlockDefaultResponse,
   GetRawAccountState200Response,
   GetRawBlockProof200Response,
   GetRawBlockchainBlock200Response,
@@ -30,14 +29,13 @@ import type {
   GetRawShardInfo200Response,
   GetRawTime200Response,
   GetRawTransactions200Response,
+  ReduceIndexingLatencyDefaultResponse,
   SendRawMessage200Response,
   SendRawMessageRequest,
 } from '../models/index';
 import {
     GetAllRawShardsInfo200ResponseFromJSON,
     GetAllRawShardsInfo200ResponseToJSON,
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
     GetRawAccountState200ResponseFromJSON,
     GetRawAccountState200ResponseToJSON,
     GetRawBlockProof200ResponseFromJSON,
@@ -64,6 +62,8 @@ import {
     GetRawTime200ResponseToJSON,
     GetRawTransactions200ResponseFromJSON,
     GetRawTransactions200ResponseToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
     SendRawMessage200ResponseFromJSON,
     SendRawMessage200ResponseToJSON,
     SendRawMessageRequestFromJSON,
@@ -378,8 +378,11 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get all raw shards info
      */
     async getAllRawShardsInfoRaw(requestParameters: GetAllRawShardsInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetAllRawShardsInfo200Response>> {
-        if (requestParameters.blockId === null || requestParameters.blockId === undefined) {
-            throw new runtime.RequiredError('blockId','Required parameter requestParameters.blockId was null or undefined when calling getAllRawShardsInfo.');
+        if (requestParameters['blockId'] == null) {
+            throw new runtime.RequiredError(
+                'blockId',
+                'Required parameter "blockId" was null or undefined when calling getAllRawShardsInfo().'
+            );
         }
 
         const queryParameters: any = {};
@@ -387,7 +390,7 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/liteserver/get_all_shards_info/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters.blockId))),
+            path: `/v2/liteserver/get_all_shards_info/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters['blockId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -408,20 +411,23 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get raw account state
      */
     async getRawAccountStateRaw(requestParameters: GetRawAccountStateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRawAccountState200Response>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getRawAccountState.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getRawAccountState().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.targetBlock !== undefined) {
-            queryParameters['target_block'] = requestParameters.targetBlock;
+        if (requestParameters['targetBlock'] != null) {
+            queryParameters['target_block'] = requestParameters['targetBlock'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/liteserver/get_account_state/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/liteserver/get_account_state/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -442,26 +448,32 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get raw block proof
      */
     async getRawBlockProofRaw(requestParameters: GetRawBlockProofRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRawBlockProof200Response>> {
-        if (requestParameters.knownBlock === null || requestParameters.knownBlock === undefined) {
-            throw new runtime.RequiredError('knownBlock','Required parameter requestParameters.knownBlock was null or undefined when calling getRawBlockProof.');
+        if (requestParameters['knownBlock'] == null) {
+            throw new runtime.RequiredError(
+                'knownBlock',
+                'Required parameter "knownBlock" was null or undefined when calling getRawBlockProof().'
+            );
         }
 
-        if (requestParameters.mode === null || requestParameters.mode === undefined) {
-            throw new runtime.RequiredError('mode','Required parameter requestParameters.mode was null or undefined when calling getRawBlockProof.');
+        if (requestParameters['mode'] == null) {
+            throw new runtime.RequiredError(
+                'mode',
+                'Required parameter "mode" was null or undefined when calling getRawBlockProof().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.knownBlock !== undefined) {
-            queryParameters['known_block'] = requestParameters.knownBlock;
+        if (requestParameters['knownBlock'] != null) {
+            queryParameters['known_block'] = requestParameters['knownBlock'];
         }
 
-        if (requestParameters.targetBlock !== undefined) {
-            queryParameters['target_block'] = requestParameters.targetBlock;
+        if (requestParameters['targetBlock'] != null) {
+            queryParameters['target_block'] = requestParameters['targetBlock'];
         }
 
-        if (requestParameters.mode !== undefined) {
-            queryParameters['mode'] = requestParameters.mode;
+        if (requestParameters['mode'] != null) {
+            queryParameters['mode'] = requestParameters['mode'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -488,8 +500,11 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get raw blockchain block
      */
     async getRawBlockchainBlockRaw(requestParameters: GetRawBlockchainBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRawBlockchainBlock200Response>> {
-        if (requestParameters.blockId === null || requestParameters.blockId === undefined) {
-            throw new runtime.RequiredError('blockId','Required parameter requestParameters.blockId was null or undefined when calling getRawBlockchainBlock.');
+        if (requestParameters['blockId'] == null) {
+            throw new runtime.RequiredError(
+                'blockId',
+                'Required parameter "blockId" was null or undefined when calling getRawBlockchainBlock().'
+            );
         }
 
         const queryParameters: any = {};
@@ -497,7 +512,7 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/liteserver/get_block/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters.blockId))),
+            path: `/v2/liteserver/get_block/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters['blockId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -518,24 +533,30 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get raw blockchain block header
      */
     async getRawBlockchainBlockHeaderRaw(requestParameters: GetRawBlockchainBlockHeaderRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRawBlockchainBlockHeader200Response>> {
-        if (requestParameters.blockId === null || requestParameters.blockId === undefined) {
-            throw new runtime.RequiredError('blockId','Required parameter requestParameters.blockId was null or undefined when calling getRawBlockchainBlockHeader.');
+        if (requestParameters['blockId'] == null) {
+            throw new runtime.RequiredError(
+                'blockId',
+                'Required parameter "blockId" was null or undefined when calling getRawBlockchainBlockHeader().'
+            );
         }
 
-        if (requestParameters.mode === null || requestParameters.mode === undefined) {
-            throw new runtime.RequiredError('mode','Required parameter requestParameters.mode was null or undefined when calling getRawBlockchainBlockHeader.');
+        if (requestParameters['mode'] == null) {
+            throw new runtime.RequiredError(
+                'mode',
+                'Required parameter "mode" was null or undefined when calling getRawBlockchainBlockHeader().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.mode !== undefined) {
-            queryParameters['mode'] = requestParameters.mode;
+        if (requestParameters['mode'] != null) {
+            queryParameters['mode'] = requestParameters['mode'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/liteserver/get_block_header/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters.blockId))),
+            path: `/v2/liteserver/get_block_header/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters['blockId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -556,8 +577,11 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get raw blockchain block state
      */
     async getRawBlockchainBlockStateRaw(requestParameters: GetRawBlockchainBlockStateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRawBlockchainBlockState200Response>> {
-        if (requestParameters.blockId === null || requestParameters.blockId === undefined) {
-            throw new runtime.RequiredError('blockId','Required parameter requestParameters.blockId was null or undefined when calling getRawBlockchainBlockState.');
+        if (requestParameters['blockId'] == null) {
+            throw new runtime.RequiredError(
+                'blockId',
+                'Required parameter "blockId" was null or undefined when calling getRawBlockchainBlockState().'
+            );
         }
 
         const queryParameters: any = {};
@@ -565,7 +589,7 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/liteserver/get_state/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters.blockId))),
+            path: `/v2/liteserver/get_state/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters['blockId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -586,24 +610,30 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get raw config
      */
     async getRawConfigRaw(requestParameters: GetRawConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRawConfig200Response>> {
-        if (requestParameters.blockId === null || requestParameters.blockId === undefined) {
-            throw new runtime.RequiredError('blockId','Required parameter requestParameters.blockId was null or undefined when calling getRawConfig.');
+        if (requestParameters['blockId'] == null) {
+            throw new runtime.RequiredError(
+                'blockId',
+                'Required parameter "blockId" was null or undefined when calling getRawConfig().'
+            );
         }
 
-        if (requestParameters.mode === null || requestParameters.mode === undefined) {
-            throw new runtime.RequiredError('mode','Required parameter requestParameters.mode was null or undefined when calling getRawConfig.');
+        if (requestParameters['mode'] == null) {
+            throw new runtime.RequiredError(
+                'mode',
+                'Required parameter "mode" was null or undefined when calling getRawConfig().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.mode !== undefined) {
-            queryParameters['mode'] = requestParameters.mode;
+        if (requestParameters['mode'] != null) {
+            queryParameters['mode'] = requestParameters['mode'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/liteserver/get_config_all/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters.blockId))),
+            path: `/v2/liteserver/get_config_all/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters['blockId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -624,40 +654,49 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get raw list block transactions
      */
     async getRawListBlockTransactionsRaw(requestParameters: GetRawListBlockTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRawListBlockTransactions200Response>> {
-        if (requestParameters.blockId === null || requestParameters.blockId === undefined) {
-            throw new runtime.RequiredError('blockId','Required parameter requestParameters.blockId was null or undefined when calling getRawListBlockTransactions.');
+        if (requestParameters['blockId'] == null) {
+            throw new runtime.RequiredError(
+                'blockId',
+                'Required parameter "blockId" was null or undefined when calling getRawListBlockTransactions().'
+            );
         }
 
-        if (requestParameters.mode === null || requestParameters.mode === undefined) {
-            throw new runtime.RequiredError('mode','Required parameter requestParameters.mode was null or undefined when calling getRawListBlockTransactions.');
+        if (requestParameters['mode'] == null) {
+            throw new runtime.RequiredError(
+                'mode',
+                'Required parameter "mode" was null or undefined when calling getRawListBlockTransactions().'
+            );
         }
 
-        if (requestParameters.count === null || requestParameters.count === undefined) {
-            throw new runtime.RequiredError('count','Required parameter requestParameters.count was null or undefined when calling getRawListBlockTransactions.');
+        if (requestParameters['count'] == null) {
+            throw new runtime.RequiredError(
+                'count',
+                'Required parameter "count" was null or undefined when calling getRawListBlockTransactions().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.mode !== undefined) {
-            queryParameters['mode'] = requestParameters.mode;
+        if (requestParameters['mode'] != null) {
+            queryParameters['mode'] = requestParameters['mode'];
         }
 
-        if (requestParameters.count !== undefined) {
-            queryParameters['count'] = requestParameters.count;
+        if (requestParameters['count'] != null) {
+            queryParameters['count'] = requestParameters['count'];
         }
 
-        if (requestParameters.accountId !== undefined) {
-            queryParameters['account_id'] = requestParameters.accountId;
+        if (requestParameters['accountId'] != null) {
+            queryParameters['account_id'] = requestParameters['accountId'];
         }
 
-        if (requestParameters.lt !== undefined) {
-            queryParameters['lt'] = requestParameters.lt;
+        if (requestParameters['lt'] != null) {
+            queryParameters['lt'] = requestParameters['lt'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/liteserver/list_block_transactions/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters.blockId))),
+            path: `/v2/liteserver/list_block_transactions/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters['blockId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -704,14 +743,17 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get raw masterchain info ext
      */
     async getRawMasterchainInfoExtRaw(requestParameters: GetRawMasterchainInfoExtRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRawMasterchainInfoExt200Response>> {
-        if (requestParameters.mode === null || requestParameters.mode === undefined) {
-            throw new runtime.RequiredError('mode','Required parameter requestParameters.mode was null or undefined when calling getRawMasterchainInfoExt.');
+        if (requestParameters['mode'] == null) {
+            throw new runtime.RequiredError(
+                'mode',
+                'Required parameter "mode" was null or undefined when calling getRawMasterchainInfoExt().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.mode !== undefined) {
-            queryParameters['mode'] = requestParameters.mode;
+        if (requestParameters['mode'] != null) {
+            queryParameters['mode'] = requestParameters['mode'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -738,8 +780,11 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get raw shard block proof
      */
     async getRawShardBlockProofRaw(requestParameters: GetRawShardBlockProofRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRawShardBlockProof200Response>> {
-        if (requestParameters.blockId === null || requestParameters.blockId === undefined) {
-            throw new runtime.RequiredError('blockId','Required parameter requestParameters.blockId was null or undefined when calling getRawShardBlockProof.');
+        if (requestParameters['blockId'] == null) {
+            throw new runtime.RequiredError(
+                'blockId',
+                'Required parameter "blockId" was null or undefined when calling getRawShardBlockProof().'
+            );
         }
 
         const queryParameters: any = {};
@@ -747,7 +792,7 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/liteserver/get_shard_block_proof/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters.blockId))),
+            path: `/v2/liteserver/get_shard_block_proof/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters['blockId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -768,40 +813,52 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get raw shard info
      */
     async getRawShardInfoRaw(requestParameters: GetRawShardInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRawShardInfo200Response>> {
-        if (requestParameters.blockId === null || requestParameters.blockId === undefined) {
-            throw new runtime.RequiredError('blockId','Required parameter requestParameters.blockId was null or undefined when calling getRawShardInfo.');
+        if (requestParameters['blockId'] == null) {
+            throw new runtime.RequiredError(
+                'blockId',
+                'Required parameter "blockId" was null or undefined when calling getRawShardInfo().'
+            );
         }
 
-        if (requestParameters.workchain === null || requestParameters.workchain === undefined) {
-            throw new runtime.RequiredError('workchain','Required parameter requestParameters.workchain was null or undefined when calling getRawShardInfo.');
+        if (requestParameters['workchain'] == null) {
+            throw new runtime.RequiredError(
+                'workchain',
+                'Required parameter "workchain" was null or undefined when calling getRawShardInfo().'
+            );
         }
 
-        if (requestParameters.shard === null || requestParameters.shard === undefined) {
-            throw new runtime.RequiredError('shard','Required parameter requestParameters.shard was null or undefined when calling getRawShardInfo.');
+        if (requestParameters['shard'] == null) {
+            throw new runtime.RequiredError(
+                'shard',
+                'Required parameter "shard" was null or undefined when calling getRawShardInfo().'
+            );
         }
 
-        if (requestParameters.exact === null || requestParameters.exact === undefined) {
-            throw new runtime.RequiredError('exact','Required parameter requestParameters.exact was null or undefined when calling getRawShardInfo.');
+        if (requestParameters['exact'] == null) {
+            throw new runtime.RequiredError(
+                'exact',
+                'Required parameter "exact" was null or undefined when calling getRawShardInfo().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.workchain !== undefined) {
-            queryParameters['workchain'] = requestParameters.workchain;
+        if (requestParameters['workchain'] != null) {
+            queryParameters['workchain'] = requestParameters['workchain'];
         }
 
-        if (requestParameters.shard !== undefined) {
-            queryParameters['shard'] = requestParameters.shard;
+        if (requestParameters['shard'] != null) {
+            queryParameters['shard'] = requestParameters['shard'];
         }
 
-        if (requestParameters.exact !== undefined) {
-            queryParameters['exact'] = requestParameters.exact;
+        if (requestParameters['exact'] != null) {
+            queryParameters['exact'] = requestParameters['exact'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/liteserver/get_shard_info/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters.blockId))),
+            path: `/v2/liteserver/get_shard_info/{block_id}`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters['blockId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -848,40 +905,52 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Get raw transactions
      */
     async getRawTransactionsRaw(requestParameters: GetRawTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRawTransactions200Response>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getRawTransactions.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getRawTransactions().'
+            );
         }
 
-        if (requestParameters.count === null || requestParameters.count === undefined) {
-            throw new runtime.RequiredError('count','Required parameter requestParameters.count was null or undefined when calling getRawTransactions.');
+        if (requestParameters['count'] == null) {
+            throw new runtime.RequiredError(
+                'count',
+                'Required parameter "count" was null or undefined when calling getRawTransactions().'
+            );
         }
 
-        if (requestParameters.lt === null || requestParameters.lt === undefined) {
-            throw new runtime.RequiredError('lt','Required parameter requestParameters.lt was null or undefined when calling getRawTransactions.');
+        if (requestParameters['lt'] == null) {
+            throw new runtime.RequiredError(
+                'lt',
+                'Required parameter "lt" was null or undefined when calling getRawTransactions().'
+            );
         }
 
-        if (requestParameters.hash === null || requestParameters.hash === undefined) {
-            throw new runtime.RequiredError('hash','Required parameter requestParameters.hash was null or undefined when calling getRawTransactions.');
+        if (requestParameters['hash'] == null) {
+            throw new runtime.RequiredError(
+                'hash',
+                'Required parameter "hash" was null or undefined when calling getRawTransactions().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.count !== undefined) {
-            queryParameters['count'] = requestParameters.count;
+        if (requestParameters['count'] != null) {
+            queryParameters['count'] = requestParameters['count'];
         }
 
-        if (requestParameters.lt !== undefined) {
-            queryParameters['lt'] = requestParameters.lt;
+        if (requestParameters['lt'] != null) {
+            queryParameters['lt'] = requestParameters['lt'];
         }
 
-        if (requestParameters.hash !== undefined) {
-            queryParameters['hash'] = requestParameters.hash;
+        if (requestParameters['hash'] != null) {
+            queryParameters['hash'] = requestParameters['hash'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/liteserver/get_transactions/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/liteserver/get_transactions/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -902,8 +971,11 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      * Send raw message to blockchain
      */
     async sendRawMessageRaw(requestParameters: SendRawMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SendRawMessage200Response>> {
-        if (requestParameters.sendRawMessageRequest === null || requestParameters.sendRawMessageRequest === undefined) {
-            throw new runtime.RequiredError('sendRawMessageRequest','Required parameter requestParameters.sendRawMessageRequest was null or undefined when calling sendRawMessage.');
+        if (requestParameters['sendRawMessageRequest'] == null) {
+            throw new runtime.RequiredError(
+                'sendRawMessageRequest',
+                'Required parameter "sendRawMessageRequest" was null or undefined when calling sendRawMessage().'
+            );
         }
 
         const queryParameters: any = {};
@@ -917,7 +989,7 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: SendRawMessageRequestToJSON(requestParameters.sendRawMessageRequest),
+            body: SendRawMessageRequestToJSON(requestParameters['sendRawMessageRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => SendRawMessage200ResponseFromJSON(jsonValue));

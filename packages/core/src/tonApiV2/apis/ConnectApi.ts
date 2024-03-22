@@ -17,18 +17,18 @@ import * as runtime from '../runtime';
 import type {
   AccountInfoByStateInit,
   GetAccountInfoByStateInitRequest,
-  GetBlockchainBlockDefaultResponse,
   GetTonConnectPayload200Response,
+  ReduceIndexingLatencyDefaultResponse,
 } from '../models/index';
 import {
     AccountInfoByStateInitFromJSON,
     AccountInfoByStateInitToJSON,
     GetAccountInfoByStateInitRequestFromJSON,
     GetAccountInfoByStateInitRequestToJSON,
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
     GetTonConnectPayload200ResponseFromJSON,
     GetTonConnectPayload200ResponseToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetAccountInfoByStateInitOperationRequest {
@@ -80,8 +80,11 @@ export class ConnectApi extends runtime.BaseAPI implements ConnectApiInterface {
      * Get account info by state init
      */
     async getAccountInfoByStateInitRaw(requestParameters: GetAccountInfoByStateInitOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountInfoByStateInit>> {
-        if (requestParameters.getAccountInfoByStateInitRequest === null || requestParameters.getAccountInfoByStateInitRequest === undefined) {
-            throw new runtime.RequiredError('getAccountInfoByStateInitRequest','Required parameter requestParameters.getAccountInfoByStateInitRequest was null or undefined when calling getAccountInfoByStateInit.');
+        if (requestParameters['getAccountInfoByStateInitRequest'] == null) {
+            throw new runtime.RequiredError(
+                'getAccountInfoByStateInitRequest',
+                'Required parameter "getAccountInfoByStateInitRequest" was null or undefined when calling getAccountInfoByStateInit().'
+            );
         }
 
         const queryParameters: any = {};
@@ -95,7 +98,7 @@ export class ConnectApi extends runtime.BaseAPI implements ConnectApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: GetAccountInfoByStateInitRequestToJSON(requestParameters.getAccountInfoByStateInitRequest),
+            body: GetAccountInfoByStateInitRequestToJSON(requestParameters['getAccountInfoByStateInitRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => AccountInfoByStateInitFromJSON(jsonValue));

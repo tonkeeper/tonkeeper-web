@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { JettonBalance } from './JettonBalance';
 import {
     JettonBalanceFromJSON,
@@ -38,10 +38,8 @@ export interface JettonsBalances {
  * Check if a given object implements the JettonsBalances interface.
  */
 export function instanceOfJettonsBalances(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "balances" in value;
-
-    return isInstance;
+    if (!('balances' in value)) return false;
+    return true;
 }
 
 export function JettonsBalancesFromJSON(json: any): JettonsBalances {
@@ -49,7 +47,7 @@ export function JettonsBalancesFromJSON(json: any): JettonsBalances {
 }
 
 export function JettonsBalancesFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonsBalances {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function JettonsBalancesFromJSONTyped(json: any, ignoreDiscriminator: boo
 }
 
 export function JettonsBalancesToJSON(value?: JettonsBalances | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'balances': ((value.balances as Array<any>).map(JettonBalanceToJSON)),
+        'balances': ((value['balances'] as Array<any>).map(JettonBalanceToJSON)),
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface EncryptedComment {
  * Check if a given object implements the EncryptedComment interface.
  */
 export function instanceOfEncryptedComment(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "encryptionType" in value;
-    isInstance = isInstance && "cipherText" in value;
-
-    return isInstance;
+    if (!('encryptionType' in value)) return false;
+    if (!('cipherText' in value)) return false;
+    return true;
 }
 
 export function EncryptedCommentFromJSON(json: any): EncryptedComment {
@@ -49,7 +47,7 @@ export function EncryptedCommentFromJSON(json: any): EncryptedComment {
 }
 
 export function EncryptedCommentFromJSONTyped(json: any, ignoreDiscriminator: boolean): EncryptedComment {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function EncryptedCommentFromJSONTyped(json: any, ignoreDiscriminator: bo
 }
 
 export function EncryptedCommentToJSON(value?: EncryptedComment | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'encryption_type': value.encryptionType,
-        'cipher_text': value.cipherText,
+        'encryption_type': value['encryptionType'],
+        'cipher_text': value['cipherText'],
     };
 }
 

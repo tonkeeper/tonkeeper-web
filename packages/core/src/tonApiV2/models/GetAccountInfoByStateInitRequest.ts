@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface GetAccountInfoByStateInitRequest {
  * Check if a given object implements the GetAccountInfoByStateInitRequest interface.
  */
 export function instanceOfGetAccountInfoByStateInitRequest(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "stateInit" in value;
-
-    return isInstance;
+    if (!('stateInit' in value)) return false;
+    return true;
 }
 
 export function GetAccountInfoByStateInitRequestFromJSON(json: any): GetAccountInfoByStateInitRequest {
@@ -42,7 +40,7 @@ export function GetAccountInfoByStateInitRequestFromJSON(json: any): GetAccountI
 }
 
 export function GetAccountInfoByStateInitRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetAccountInfoByStateInitRequest {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function GetAccountInfoByStateInitRequestFromJSONTyped(json: any, ignoreD
 }
 
 export function GetAccountInfoByStateInitRequestToJSON(value?: GetAccountInfoByStateInitRequest | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'state_init': value.stateInit,
+        'state_init': value['stateInit'],
     };
 }
 

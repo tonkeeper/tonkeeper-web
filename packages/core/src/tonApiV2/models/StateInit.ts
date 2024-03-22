@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface StateInit {
  * Check if a given object implements the StateInit interface.
  */
 export function instanceOfStateInit(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "boc" in value;
-
-    return isInstance;
+    if (!('boc' in value)) return false;
+    return true;
 }
 
 export function StateInitFromJSON(json: any): StateInit {
@@ -42,7 +40,7 @@ export function StateInitFromJSON(json: any): StateInit {
 }
 
 export function StateInitFromJSONTyped(json: any, ignoreDiscriminator: boolean): StateInit {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function StateInitFromJSONTyped(json: any, ignoreDiscriminator: boolean):
 }
 
 export function StateInitToJSON(value?: StateInit | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'boc': value.boc,
+        'boc': value['boc'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { JettonVerificationType } from './JettonVerificationType';
 import {
     JettonVerificationTypeFromJSON,
@@ -68,15 +68,13 @@ export interface JettonPreview {
  * Check if a given object implements the JettonPreview interface.
  */
 export function instanceOfJettonPreview(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "symbol" in value;
-    isInstance = isInstance && "decimals" in value;
-    isInstance = isInstance && "image" in value;
-    isInstance = isInstance && "verification" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('name' in value)) return false;
+    if (!('symbol' in value)) return false;
+    if (!('decimals' in value)) return false;
+    if (!('image' in value)) return false;
+    if (!('verification' in value)) return false;
+    return true;
 }
 
 export function JettonPreviewFromJSON(json: any): JettonPreview {
@@ -84,7 +82,7 @@ export function JettonPreviewFromJSON(json: any): JettonPreview {
 }
 
 export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonPreview {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -99,20 +97,17 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
 }
 
 export function JettonPreviewToJSON(value?: JettonPreview | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'name': value.name,
-        'symbol': value.symbol,
-        'decimals': value.decimals,
-        'image': value.image,
-        'verification': JettonVerificationTypeToJSON(value.verification),
+        'address': value['address'],
+        'name': value['name'],
+        'symbol': value['symbol'],
+        'decimals': value['decimals'],
+        'image': value['image'],
+        'verification': JettonVerificationTypeToJSON(value['verification']),
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { JettonBridgePrices } from './JettonBridgePrices';
 import {
     JettonBridgePricesFromJSON,
@@ -80,13 +80,11 @@ export interface JettonBridgeParams {
  * Check if a given object implements the JettonBridgeParams interface.
  */
 export function instanceOfJettonBridgeParams(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "bridgeAddress" in value;
-    isInstance = isInstance && "oraclesAddress" in value;
-    isInstance = isInstance && "stateFlags" in value;
-    isInstance = isInstance && "oracles" in value;
-
-    return isInstance;
+    if (!('bridgeAddress' in value)) return false;
+    if (!('oraclesAddress' in value)) return false;
+    if (!('stateFlags' in value)) return false;
+    if (!('oracles' in value)) return false;
+    return true;
 }
 
 export function JettonBridgeParamsFromJSON(json: any): JettonBridgeParams {
@@ -94,7 +92,7 @@ export function JettonBridgeParamsFromJSON(json: any): JettonBridgeParams {
 }
 
 export function JettonBridgeParamsFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonBridgeParams {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -102,29 +100,26 @@ export function JettonBridgeParamsFromJSONTyped(json: any, ignoreDiscriminator: 
         'bridgeAddress': json['bridge_address'],
         'oraclesAddress': json['oracles_address'],
         'stateFlags': json['state_flags'],
-        'burnBridgeFee': !exists(json, 'burn_bridge_fee') ? undefined : json['burn_bridge_fee'],
+        'burnBridgeFee': json['burn_bridge_fee'] == null ? undefined : json['burn_bridge_fee'],
         'oracles': ((json['oracles'] as Array<any>).map(OracleFromJSON)),
-        'externalChainAddress': !exists(json, 'external_chain_address') ? undefined : json['external_chain_address'],
-        'prices': !exists(json, 'prices') ? undefined : JettonBridgePricesFromJSON(json['prices']),
+        'externalChainAddress': json['external_chain_address'] == null ? undefined : json['external_chain_address'],
+        'prices': json['prices'] == null ? undefined : JettonBridgePricesFromJSON(json['prices']),
     };
 }
 
 export function JettonBridgeParamsToJSON(value?: JettonBridgeParams | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'bridge_address': value.bridgeAddress,
-        'oracles_address': value.oraclesAddress,
-        'state_flags': value.stateFlags,
-        'burn_bridge_fee': value.burnBridgeFee,
-        'oracles': ((value.oracles as Array<any>).map(OracleToJSON)),
-        'external_chain_address': value.externalChainAddress,
-        'prices': JettonBridgePricesToJSON(value.prices),
+        'bridge_address': value['bridgeAddress'],
+        'oracles_address': value['oraclesAddress'],
+        'state_flags': value['stateFlags'],
+        'burn_bridge_fee': value['burnBridgeFee'],
+        'oracles': ((value['oracles'] as Array<any>).map(OracleToJSON)),
+        'external_chain_address': value['externalChainAddress'],
+        'prices': JettonBridgePricesToJSON(value['prices']),
     };
 }
 

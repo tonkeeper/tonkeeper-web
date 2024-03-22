@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { Oracle } from './Oracle';
 import {
     OracleFromJSON,
@@ -56,13 +56,11 @@ export interface OracleBridgeParams {
  * Check if a given object implements the OracleBridgeParams interface.
  */
 export function instanceOfOracleBridgeParams(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "bridgeAddr" in value;
-    isInstance = isInstance && "oracleMultisigAddress" in value;
-    isInstance = isInstance && "externalChainAddress" in value;
-    isInstance = isInstance && "oracles" in value;
-
-    return isInstance;
+    if (!('bridgeAddr' in value)) return false;
+    if (!('oracleMultisigAddress' in value)) return false;
+    if (!('externalChainAddress' in value)) return false;
+    if (!('oracles' in value)) return false;
+    return true;
 }
 
 export function OracleBridgeParamsFromJSON(json: any): OracleBridgeParams {
@@ -70,7 +68,7 @@ export function OracleBridgeParamsFromJSON(json: any): OracleBridgeParams {
 }
 
 export function OracleBridgeParamsFromJSONTyped(json: any, ignoreDiscriminator: boolean): OracleBridgeParams {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -83,18 +81,15 @@ export function OracleBridgeParamsFromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function OracleBridgeParamsToJSON(value?: OracleBridgeParams | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'bridge_addr': value.bridgeAddr,
-        'oracle_multisig_address': value.oracleMultisigAddress,
-        'external_chain_address': value.externalChainAddress,
-        'oracles': ((value.oracles as Array<any>).map(OracleToJSON)),
+        'bridge_addr': value['bridgeAddr'],
+        'oracle_multisig_address': value['oracleMultisigAddress'],
+        'external_chain_address': value['externalChainAddress'],
+        'oracles': ((value['oracles'] as Array<any>).map(OracleToJSON)),
     };
 }
 

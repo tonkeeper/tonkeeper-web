@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ValidatorsSetListInner } from './ValidatorsSetListInner';
 import {
     ValidatorsSetListInnerFromJSON,
@@ -68,14 +68,12 @@ export interface ValidatorsSet {
  * Check if a given object implements the ValidatorsSet interface.
  */
 export function instanceOfValidatorsSet(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "utimeSince" in value;
-    isInstance = isInstance && "utimeUntil" in value;
-    isInstance = isInstance && "total" in value;
-    isInstance = isInstance && "main" in value;
-    isInstance = isInstance && "list" in value;
-
-    return isInstance;
+    if (!('utimeSince' in value)) return false;
+    if (!('utimeUntil' in value)) return false;
+    if (!('total' in value)) return false;
+    if (!('main' in value)) return false;
+    if (!('list' in value)) return false;
+    return true;
 }
 
 export function ValidatorsSetFromJSON(json: any): ValidatorsSet {
@@ -83,7 +81,7 @@ export function ValidatorsSetFromJSON(json: any): ValidatorsSet {
 }
 
 export function ValidatorsSetFromJSONTyped(json: any, ignoreDiscriminator: boolean): ValidatorsSet {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -92,26 +90,23 @@ export function ValidatorsSetFromJSONTyped(json: any, ignoreDiscriminator: boole
         'utimeUntil': json['utime_until'],
         'total': json['total'],
         'main': json['main'],
-        'totalWeight': !exists(json, 'total_weight') ? undefined : json['total_weight'],
+        'totalWeight': json['total_weight'] == null ? undefined : json['total_weight'],
         'list': ((json['list'] as Array<any>).map(ValidatorsSetListInnerFromJSON)),
     };
 }
 
 export function ValidatorsSetToJSON(value?: ValidatorsSet | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'utime_since': value.utimeSince,
-        'utime_until': value.utimeUntil,
-        'total': value.total,
-        'main': value.main,
-        'total_weight': value.totalWeight,
-        'list': ((value.list as Array<any>).map(ValidatorsSetListInnerToJSON)),
+        'utime_since': value['utimeSince'],
+        'utime_until': value['utimeUntil'],
+        'total': value['total'],
+        'main': value['main'],
+        'total_weight': value['totalWeight'],
+        'list': ((value['list'] as Array<any>).map(ValidatorsSetListInnerToJSON)),
     };
 }
 

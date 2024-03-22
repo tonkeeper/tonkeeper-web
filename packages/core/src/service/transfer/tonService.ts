@@ -150,10 +150,12 @@ export const estimateTonTransfer = async (
     if (!isMax) {
         checkWalletPositiveBalanceOrDie(wallet);
     }
+    console.log({ seqno });
 
     const cell = createTonTransfer(seqno, walletState, recipient, weiAmount, isMax);
 
     const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+        ignoreSignatureCheck: true,
         accountId: wallet.address,
         decodeMessageRequest: { boc: cell.toString('base64') }
     });
@@ -173,6 +175,7 @@ export const estimateTonConnectTransfer = async (
     const cell = createTonConnectTransfer(seqno, walletState, accounts, params);
 
     const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+        ignoreSignatureCheck: true,
         accountId: wallet.address,
         decodeMessageRequest: { boc: cell.toString('base64') }
     });

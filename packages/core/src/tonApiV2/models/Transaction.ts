@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -218,24 +218,22 @@ export interface Transaction {
  * Check if a given object implements the Transaction interface.
  */
 export function instanceOfTransaction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "hash" in value;
-    isInstance = isInstance && "lt" in value;
-    isInstance = isInstance && "account" in value;
-    isInstance = isInstance && "success" in value;
-    isInstance = isInstance && "utime" in value;
-    isInstance = isInstance && "origStatus" in value;
-    isInstance = isInstance && "endStatus" in value;
-    isInstance = isInstance && "totalFees" in value;
-    isInstance = isInstance && "transactionType" in value;
-    isInstance = isInstance && "stateUpdateOld" in value;
-    isInstance = isInstance && "stateUpdateNew" in value;
-    isInstance = isInstance && "outMsgs" in value;
-    isInstance = isInstance && "block" in value;
-    isInstance = isInstance && "aborted" in value;
-    isInstance = isInstance && "destroyed" in value;
-
-    return isInstance;
+    if (!('hash' in value)) return false;
+    if (!('lt' in value)) return false;
+    if (!('account' in value)) return false;
+    if (!('success' in value)) return false;
+    if (!('utime' in value)) return false;
+    if (!('origStatus' in value)) return false;
+    if (!('endStatus' in value)) return false;
+    if (!('totalFees' in value)) return false;
+    if (!('transactionType' in value)) return false;
+    if (!('stateUpdateOld' in value)) return false;
+    if (!('stateUpdateNew' in value)) return false;
+    if (!('outMsgs' in value)) return false;
+    if (!('block' in value)) return false;
+    if (!('aborted' in value)) return false;
+    if (!('destroyed' in value)) return false;
+    return true;
 }
 
 export function TransactionFromJSON(json: any): Transaction {
@@ -243,7 +241,7 @@ export function TransactionFromJSON(json: any): Transaction {
 }
 
 export function TransactionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Transaction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -259,53 +257,50 @@ export function TransactionFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'transactionType': TransactionTypeFromJSON(json['transaction_type']),
         'stateUpdateOld': json['state_update_old'],
         'stateUpdateNew': json['state_update_new'],
-        'inMsg': !exists(json, 'in_msg') ? undefined : MessageFromJSON(json['in_msg']),
+        'inMsg': json['in_msg'] == null ? undefined : MessageFromJSON(json['in_msg']),
         'outMsgs': ((json['out_msgs'] as Array<any>).map(MessageFromJSON)),
         'block': json['block'],
-        'prevTransHash': !exists(json, 'prev_trans_hash') ? undefined : json['prev_trans_hash'],
-        'prevTransLt': !exists(json, 'prev_trans_lt') ? undefined : json['prev_trans_lt'],
-        'computePhase': !exists(json, 'compute_phase') ? undefined : ComputePhaseFromJSON(json['compute_phase']),
-        'storagePhase': !exists(json, 'storage_phase') ? undefined : StoragePhaseFromJSON(json['storage_phase']),
-        'creditPhase': !exists(json, 'credit_phase') ? undefined : CreditPhaseFromJSON(json['credit_phase']),
-        'actionPhase': !exists(json, 'action_phase') ? undefined : ActionPhaseFromJSON(json['action_phase']),
-        'bouncePhase': !exists(json, 'bounce_phase') ? undefined : BouncePhaseTypeFromJSON(json['bounce_phase']),
+        'prevTransHash': json['prev_trans_hash'] == null ? undefined : json['prev_trans_hash'],
+        'prevTransLt': json['prev_trans_lt'] == null ? undefined : json['prev_trans_lt'],
+        'computePhase': json['compute_phase'] == null ? undefined : ComputePhaseFromJSON(json['compute_phase']),
+        'storagePhase': json['storage_phase'] == null ? undefined : StoragePhaseFromJSON(json['storage_phase']),
+        'creditPhase': json['credit_phase'] == null ? undefined : CreditPhaseFromJSON(json['credit_phase']),
+        'actionPhase': json['action_phase'] == null ? undefined : ActionPhaseFromJSON(json['action_phase']),
+        'bouncePhase': json['bounce_phase'] == null ? undefined : BouncePhaseTypeFromJSON(json['bounce_phase']),
         'aborted': json['aborted'],
         'destroyed': json['destroyed'],
     };
 }
 
 export function TransactionToJSON(value?: Transaction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'hash': value.hash,
-        'lt': value.lt,
-        'account': AccountAddressToJSON(value.account),
-        'success': value.success,
-        'utime': value.utime,
-        'orig_status': AccountStatusToJSON(value.origStatus),
-        'end_status': AccountStatusToJSON(value.endStatus),
-        'total_fees': value.totalFees,
-        'transaction_type': TransactionTypeToJSON(value.transactionType),
-        'state_update_old': value.stateUpdateOld,
-        'state_update_new': value.stateUpdateNew,
-        'in_msg': MessageToJSON(value.inMsg),
-        'out_msgs': ((value.outMsgs as Array<any>).map(MessageToJSON)),
-        'block': value.block,
-        'prev_trans_hash': value.prevTransHash,
-        'prev_trans_lt': value.prevTransLt,
-        'compute_phase': ComputePhaseToJSON(value.computePhase),
-        'storage_phase': StoragePhaseToJSON(value.storagePhase),
-        'credit_phase': CreditPhaseToJSON(value.creditPhase),
-        'action_phase': ActionPhaseToJSON(value.actionPhase),
-        'bounce_phase': BouncePhaseTypeToJSON(value.bouncePhase),
-        'aborted': value.aborted,
-        'destroyed': value.destroyed,
+        'hash': value['hash'],
+        'lt': value['lt'],
+        'account': AccountAddressToJSON(value['account']),
+        'success': value['success'],
+        'utime': value['utime'],
+        'orig_status': AccountStatusToJSON(value['origStatus']),
+        'end_status': AccountStatusToJSON(value['endStatus']),
+        'total_fees': value['totalFees'],
+        'transaction_type': TransactionTypeToJSON(value['transactionType']),
+        'state_update_old': value['stateUpdateOld'],
+        'state_update_new': value['stateUpdateNew'],
+        'in_msg': MessageToJSON(value['inMsg']),
+        'out_msgs': ((value['outMsgs'] as Array<any>).map(MessageToJSON)),
+        'block': value['block'],
+        'prev_trans_hash': value['prevTransHash'],
+        'prev_trans_lt': value['prevTransLt'],
+        'compute_phase': ComputePhaseToJSON(value['computePhase']),
+        'storage_phase': StoragePhaseToJSON(value['storagePhase']),
+        'credit_phase': CreditPhaseToJSON(value['creditPhase']),
+        'action_phase': ActionPhaseToJSON(value['actionPhase']),
+        'bounce_phase': BouncePhaseTypeToJSON(value['bouncePhase']),
+        'aborted': value['aborted'],
+        'destroyed': value['destroyed'],
     };
 }
 

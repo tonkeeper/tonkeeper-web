@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -43,12 +43,10 @@ export interface BlockParamLimits {
  * Check if a given object implements the BlockParamLimits interface.
  */
 export function instanceOfBlockParamLimits(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "underload" in value;
-    isInstance = isInstance && "softLimit" in value;
-    isInstance = isInstance && "hardLimit" in value;
-
-    return isInstance;
+    if (!('underload' in value)) return false;
+    if (!('softLimit' in value)) return false;
+    if (!('hardLimit' in value)) return false;
+    return true;
 }
 
 export function BlockParamLimitsFromJSON(json: any): BlockParamLimits {
@@ -56,7 +54,7 @@ export function BlockParamLimitsFromJSON(json: any): BlockParamLimits {
 }
 
 export function BlockParamLimitsFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockParamLimits {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -68,17 +66,14 @@ export function BlockParamLimitsFromJSONTyped(json: any, ignoreDiscriminator: bo
 }
 
 export function BlockParamLimitsToJSON(value?: BlockParamLimits | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'underload': value.underload,
-        'soft_limit': value.softLimit,
-        'hard_limit': value.hardLimit,
+        'underload': value['underload'],
+        'soft_limit': value['softLimit'],
+        'hard_limit': value['hardLimit'],
     };
 }
 

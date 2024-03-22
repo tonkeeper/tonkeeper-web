@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { Validator } from './Validator';
 import {
     ValidatorFromJSON,
@@ -62,14 +62,12 @@ export interface Validators {
  * Check if a given object implements the Validators interface.
  */
 export function instanceOfValidators(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "electAt" in value;
-    isInstance = isInstance && "electClose" in value;
-    isInstance = isInstance && "minStake" in value;
-    isInstance = isInstance && "totalStake" in value;
-    isInstance = isInstance && "validators" in value;
-
-    return isInstance;
+    if (!('electAt' in value)) return false;
+    if (!('electClose' in value)) return false;
+    if (!('minStake' in value)) return false;
+    if (!('totalStake' in value)) return false;
+    if (!('validators' in value)) return false;
+    return true;
 }
 
 export function ValidatorsFromJSON(json: any): Validators {
@@ -77,7 +75,7 @@ export function ValidatorsFromJSON(json: any): Validators {
 }
 
 export function ValidatorsFromJSONTyped(json: any, ignoreDiscriminator: boolean): Validators {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -91,19 +89,16 @@ export function ValidatorsFromJSONTyped(json: any, ignoreDiscriminator: boolean)
 }
 
 export function ValidatorsToJSON(value?: Validators | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'elect_at': value.electAt,
-        'elect_close': value.electClose,
-        'min_stake': value.minStake,
-        'total_stake': value.totalStake,
-        'validators': ((value.validators as Array<any>).map(ValidatorToJSON)),
+        'elect_at': value['electAt'],
+        'elect_close': value['electClose'],
+        'min_stake': value['minStake'],
+        'total_stake': value['totalStake'],
+        'validators': ((value['validators'] as Array<any>).map(ValidatorToJSON)),
     };
 }
 

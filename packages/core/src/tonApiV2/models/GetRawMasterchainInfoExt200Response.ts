@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -86,17 +86,15 @@ export interface GetRawMasterchainInfoExt200Response {
  * Check if a given object implements the GetRawMasterchainInfoExt200Response interface.
  */
 export function instanceOfGetRawMasterchainInfoExt200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "mode" in value;
-    isInstance = isInstance && "version" in value;
-    isInstance = isInstance && "capabilities" in value;
-    isInstance = isInstance && "last" in value;
-    isInstance = isInstance && "lastUtime" in value;
-    isInstance = isInstance && "now" in value;
-    isInstance = isInstance && "stateRootHash" in value;
-    isInstance = isInstance && "init" in value;
-
-    return isInstance;
+    if (!('mode' in value)) return false;
+    if (!('version' in value)) return false;
+    if (!('capabilities' in value)) return false;
+    if (!('last' in value)) return false;
+    if (!('lastUtime' in value)) return false;
+    if (!('now' in value)) return false;
+    if (!('stateRootHash' in value)) return false;
+    if (!('init' in value)) return false;
+    return true;
 }
 
 export function GetRawMasterchainInfoExt200ResponseFromJSON(json: any): GetRawMasterchainInfoExt200Response {
@@ -104,7 +102,7 @@ export function GetRawMasterchainInfoExt200ResponseFromJSON(json: any): GetRawMa
 }
 
 export function GetRawMasterchainInfoExt200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawMasterchainInfoExt200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -121,22 +119,19 @@ export function GetRawMasterchainInfoExt200ResponseFromJSONTyped(json: any, igno
 }
 
 export function GetRawMasterchainInfoExt200ResponseToJSON(value?: GetRawMasterchainInfoExt200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'mode': value.mode,
-        'version': value.version,
-        'capabilities': value.capabilities,
-        'last': BlockRawToJSON(value.last),
-        'last_utime': value.lastUtime,
-        'now': value.now,
-        'state_root_hash': value.stateRootHash,
-        'init': InitStateRawToJSON(value.init),
+        'mode': value['mode'],
+        'version': value['version'],
+        'capabilities': value['capabilities'],
+        'last': BlockRawToJSON(value['last']),
+        'last_utime': value['lastUtime'],
+        'now': value['now'],
+        'state_root_hash': value['stateRootHash'],
+        'init': InitStateRawToJSON(value['init']),
     };
 }
 

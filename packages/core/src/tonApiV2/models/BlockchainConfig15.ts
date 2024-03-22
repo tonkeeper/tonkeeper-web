@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The reward in nanoTons for block creation in the TON blockchain.
  * @export
@@ -49,13 +49,11 @@ export interface BlockchainConfig15 {
  * Check if a given object implements the BlockchainConfig15 interface.
  */
 export function instanceOfBlockchainConfig15(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "validatorsElectedFor" in value;
-    isInstance = isInstance && "electionsStartBefore" in value;
-    isInstance = isInstance && "electionsEndBefore" in value;
-    isInstance = isInstance && "stakeHeldFor" in value;
-
-    return isInstance;
+    if (!('validatorsElectedFor' in value)) return false;
+    if (!('electionsStartBefore' in value)) return false;
+    if (!('electionsEndBefore' in value)) return false;
+    if (!('stakeHeldFor' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig15FromJSON(json: any): BlockchainConfig15 {
@@ -63,7 +61,7 @@ export function BlockchainConfig15FromJSON(json: any): BlockchainConfig15 {
 }
 
 export function BlockchainConfig15FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig15 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -76,18 +74,15 @@ export function BlockchainConfig15FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig15ToJSON(value?: BlockchainConfig15 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'validators_elected_for': value.validatorsElectedFor,
-        'elections_start_before': value.electionsStartBefore,
-        'elections_end_before': value.electionsEndBefore,
-        'stake_held_for': value.stakeHeldFor,
+        'validators_elected_for': value['validatorsElectedFor'],
+        'elections_start_before': value['electionsStartBefore'],
+        'elections_end_before': value['electionsEndBefore'],
+        'stake_held_for': value['stakeHeldFor'],
     };
 }
 

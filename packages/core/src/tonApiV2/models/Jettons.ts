@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { JettonInfo } from './JettonInfo';
 import {
     JettonInfoFromJSON,
@@ -38,10 +38,8 @@ export interface Jettons {
  * Check if a given object implements the Jettons interface.
  */
 export function instanceOfJettons(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "jettons" in value;
-
-    return isInstance;
+    if (!('jettons' in value)) return false;
+    return true;
 }
 
 export function JettonsFromJSON(json: any): Jettons {
@@ -49,7 +47,7 @@ export function JettonsFromJSON(json: any): Jettons {
 }
 
 export function JettonsFromJSONTyped(json: any, ignoreDiscriminator: boolean): Jettons {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function JettonsFromJSONTyped(json: any, ignoreDiscriminator: boolean): J
 }
 
 export function JettonsToJSON(value?: Jettons | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'jettons': ((value.jettons as Array<any>).map(JettonInfoToJSON)),
+        'jettons': ((value['jettons'] as Array<any>).map(JettonInfoToJSON)),
     };
 }
 

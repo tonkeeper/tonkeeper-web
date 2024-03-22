@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,9 +37,7 @@ export interface SendBlockchainMessageRequest {
  * Check if a given object implements the SendBlockchainMessageRequest interface.
  */
 export function instanceOfSendBlockchainMessageRequest(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function SendBlockchainMessageRequestFromJSON(json: any): SendBlockchainMessageRequest {
@@ -47,27 +45,24 @@ export function SendBlockchainMessageRequestFromJSON(json: any): SendBlockchainM
 }
 
 export function SendBlockchainMessageRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): SendBlockchainMessageRequest {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'boc': !exists(json, 'boc') ? undefined : json['boc'],
-        'batch': !exists(json, 'batch') ? undefined : json['batch'],
+        'boc': json['boc'] == null ? undefined : json['boc'],
+        'batch': json['batch'] == null ? undefined : json['batch'],
     };
 }
 
 export function SendBlockchainMessageRequestToJSON(value?: SendBlockchainMessageRequest | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'boc': value.boc,
-        'batch': value.batch,
+        'boc': value['boc'],
+        'batch': value['batch'],
     };
 }
 

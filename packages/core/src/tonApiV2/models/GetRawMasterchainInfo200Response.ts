@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -56,12 +56,10 @@ export interface GetRawMasterchainInfo200Response {
  * Check if a given object implements the GetRawMasterchainInfo200Response interface.
  */
 export function instanceOfGetRawMasterchainInfo200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "last" in value;
-    isInstance = isInstance && "stateRootHash" in value;
-    isInstance = isInstance && "init" in value;
-
-    return isInstance;
+    if (!('last' in value)) return false;
+    if (!('stateRootHash' in value)) return false;
+    if (!('init' in value)) return false;
+    return true;
 }
 
 export function GetRawMasterchainInfo200ResponseFromJSON(json: any): GetRawMasterchainInfo200Response {
@@ -69,7 +67,7 @@ export function GetRawMasterchainInfo200ResponseFromJSON(json: any): GetRawMaste
 }
 
 export function GetRawMasterchainInfo200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawMasterchainInfo200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -81,17 +79,14 @@ export function GetRawMasterchainInfo200ResponseFromJSONTyped(json: any, ignoreD
 }
 
 export function GetRawMasterchainInfo200ResponseToJSON(value?: GetRawMasterchainInfo200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'last': BlockRawToJSON(value.last),
-        'state_root_hash': value.stateRootHash,
-        'init': InitStateRawToJSON(value.init),
+        'last': BlockRawToJSON(value['last']),
+        'state_root_hash': value['stateRootHash'],
+        'init': InitStateRawToJSON(value['init']),
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { DomainBid } from './DomainBid';
 import {
     DomainBidFromJSON,
@@ -38,10 +38,8 @@ export interface DomainBids {
  * Check if a given object implements the DomainBids interface.
  */
 export function instanceOfDomainBids(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "data" in value;
-
-    return isInstance;
+    if (!('data' in value)) return false;
+    return true;
 }
 
 export function DomainBidsFromJSON(json: any): DomainBids {
@@ -49,7 +47,7 @@ export function DomainBidsFromJSON(json: any): DomainBids {
 }
 
 export function DomainBidsFromJSONTyped(json: any, ignoreDiscriminator: boolean): DomainBids {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function DomainBidsFromJSONTyped(json: any, ignoreDiscriminator: boolean)
 }
 
 export function DomainBidsToJSON(value?: DomainBids | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'data': ((value.data as Array<any>).map(DomainBidToJSON)),
+        'data': ((value['data'] as Array<any>).map(DomainBidToJSON)),
     };
 }
 

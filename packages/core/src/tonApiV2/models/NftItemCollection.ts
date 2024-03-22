@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -43,12 +43,10 @@ export interface NftItemCollection {
  * Check if a given object implements the NftItemCollection interface.
  */
 export function instanceOfNftItemCollection(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "description" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('name' in value)) return false;
+    if (!('description' in value)) return false;
+    return true;
 }
 
 export function NftItemCollectionFromJSON(json: any): NftItemCollection {
@@ -56,7 +54,7 @@ export function NftItemCollectionFromJSON(json: any): NftItemCollection {
 }
 
 export function NftItemCollectionFromJSONTyped(json: any, ignoreDiscriminator: boolean): NftItemCollection {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -68,17 +66,14 @@ export function NftItemCollectionFromJSONTyped(json: any, ignoreDiscriminator: b
 }
 
 export function NftItemCollectionToJSON(value?: NftItemCollection | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'name': value.name,
-        'description': value.description,
+        'address': value['address'],
+        'name': value['name'],
+        'description': value['description'],
     };
 }
 

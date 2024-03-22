@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward
  * Check if a given object implements the GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner interface.
  */
 export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "nodeIdShort" in value;
-    isInstance = isInstance && "signature" in value;
-
-    return isInstance;
+    if (!('nodeIdShort' in value)) return false;
+    if (!('signature' in value)) return false;
+    return true;
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerFromJSON(json: any): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner {
@@ -49,7 +47,7 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardS
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardS
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerToJSON(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'node_id_short': value.nodeIdShort,
-        'signature': value.signature,
+        'node_id_short': value['nodeIdShort'],
+        'signature': value['signature'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { Transaction } from './Transaction';
 import {
     TransactionFromJSON,
@@ -56,11 +56,9 @@ export interface Trace {
  * Check if a given object implements the Trace interface.
  */
 export function instanceOfTrace(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "transaction" in value;
-    isInstance = isInstance && "interfaces" in value;
-
-    return isInstance;
+    if (!('transaction' in value)) return false;
+    if (!('interfaces' in value)) return false;
+    return true;
 }
 
 export function TraceFromJSON(json: any): Trace {
@@ -68,31 +66,28 @@ export function TraceFromJSON(json: any): Trace {
 }
 
 export function TraceFromJSONTyped(json: any, ignoreDiscriminator: boolean): Trace {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'transaction': TransactionFromJSON(json['transaction']),
         'interfaces': json['interfaces'],
-        'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(TraceFromJSON)),
-        'emulated': !exists(json, 'emulated') ? undefined : json['emulated'],
+        'children': json['children'] == null ? undefined : ((json['children'] as Array<any>).map(TraceFromJSON)),
+        'emulated': json['emulated'] == null ? undefined : json['emulated'],
     };
 }
 
 export function TraceToJSON(value?: Trace | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'transaction': TransactionToJSON(value.transaction),
-        'interfaces': value.interfaces,
-        'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(TraceToJSON)),
-        'emulated': value.emulated,
+        'transaction': TransactionToJSON(value['transaction']),
+        'interfaces': value['interfaces'],
+        'children': value['children'] == null ? undefined : ((value['children'] as Array<any>).map(TraceToJSON)),
+        'emulated': value['emulated'],
     };
 }
 

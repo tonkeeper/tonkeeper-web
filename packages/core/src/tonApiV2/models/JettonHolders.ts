@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { JettonHoldersAddressesInner } from './JettonHoldersAddressesInner';
 import {
     JettonHoldersAddressesInnerFromJSON,
@@ -38,10 +38,8 @@ export interface JettonHolders {
  * Check if a given object implements the JettonHolders interface.
  */
 export function instanceOfJettonHolders(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "addresses" in value;
-
-    return isInstance;
+    if (!('addresses' in value)) return false;
+    return true;
 }
 
 export function JettonHoldersFromJSON(json: any): JettonHolders {
@@ -49,7 +47,7 @@ export function JettonHoldersFromJSON(json: any): JettonHolders {
 }
 
 export function JettonHoldersFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonHolders {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function JettonHoldersFromJSONTyped(json: any, ignoreDiscriminator: boole
 }
 
 export function JettonHoldersToJSON(value?: JettonHolders | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'addresses': ((value.addresses as Array<any>).map(JettonHoldersAddressesInnerToJSON)),
+        'addresses': ((value['addresses'] as Array<any>).map(JettonHoldersAddressesInnerToJSON)),
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -50,12 +50,10 @@ export interface GetAllRawShardsInfo200Response {
  * Check if a given object implements the GetAllRawShardsInfo200Response interface.
  */
 export function instanceOfGetAllRawShardsInfo200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "id" in value;
-    isInstance = isInstance && "proof" in value;
-    isInstance = isInstance && "data" in value;
-
-    return isInstance;
+    if (!('id' in value)) return false;
+    if (!('proof' in value)) return false;
+    if (!('data' in value)) return false;
+    return true;
 }
 
 export function GetAllRawShardsInfo200ResponseFromJSON(json: any): GetAllRawShardsInfo200Response {
@@ -63,7 +61,7 @@ export function GetAllRawShardsInfo200ResponseFromJSON(json: any): GetAllRawShar
 }
 
 export function GetAllRawShardsInfo200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetAllRawShardsInfo200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -75,17 +73,14 @@ export function GetAllRawShardsInfo200ResponseFromJSONTyped(json: any, ignoreDis
 }
 
 export function GetAllRawShardsInfo200ResponseToJSON(value?: GetAllRawShardsInfo200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'id': BlockRawToJSON(value.id),
-        'proof': value.proof,
-        'data': value.data,
+        'id': BlockRawToJSON(value['id']),
+        'proof': value['proof'],
+        'data': value['data'],
     };
 }
 

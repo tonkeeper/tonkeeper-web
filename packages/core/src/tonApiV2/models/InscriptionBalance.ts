@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -60,13 +60,11 @@ export type InscriptionBalanceTypeEnum = typeof InscriptionBalanceTypeEnum[keyof
  * Check if a given object implements the InscriptionBalance interface.
  */
 export function instanceOfInscriptionBalance(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "type" in value;
-    isInstance = isInstance && "ticker" in value;
-    isInstance = isInstance && "balance" in value;
-    isInstance = isInstance && "decimals" in value;
-
-    return isInstance;
+    if (!('type' in value)) return false;
+    if (!('ticker' in value)) return false;
+    if (!('balance' in value)) return false;
+    if (!('decimals' in value)) return false;
+    return true;
 }
 
 export function InscriptionBalanceFromJSON(json: any): InscriptionBalance {
@@ -74,7 +72,7 @@ export function InscriptionBalanceFromJSON(json: any): InscriptionBalance {
 }
 
 export function InscriptionBalanceFromJSONTyped(json: any, ignoreDiscriminator: boolean): InscriptionBalance {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -87,18 +85,15 @@ export function InscriptionBalanceFromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function InscriptionBalanceToJSON(value?: InscriptionBalance | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'type': value.type,
-        'ticker': value.ticker,
-        'balance': value.balance,
-        'decimals': value.decimals,
+        'type': value['type'],
+        'ticker': value['ticker'],
+        'balance': value['balance'],
+        'decimals': value['decimals'],
     };
 }
 

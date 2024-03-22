@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockchainConfig18StoragePricesInner } from './BlockchainConfig18StoragePricesInner';
 import {
     BlockchainConfig18StoragePricesInnerFromJSON,
@@ -38,10 +38,8 @@ export interface BlockchainConfig18 {
  * Check if a given object implements the BlockchainConfig18 interface.
  */
 export function instanceOfBlockchainConfig18(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "storagePrices" in value;
-
-    return isInstance;
+    if (!('storagePrices' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig18FromJSON(json: any): BlockchainConfig18 {
@@ -49,7 +47,7 @@ export function BlockchainConfig18FromJSON(json: any): BlockchainConfig18 {
 }
 
 export function BlockchainConfig18FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig18 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function BlockchainConfig18FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig18ToJSON(value?: BlockchainConfig18 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'storage_prices': ((value.storagePrices as Array<any>).map(BlockchainConfig18StoragePricesInnerToJSON)),
+        'storage_prices': ((value['storagePrices'] as Array<any>).map(BlockchainConfig18StoragePricesInnerToJSON)),
     };
 }
 
