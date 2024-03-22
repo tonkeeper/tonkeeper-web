@@ -27,10 +27,10 @@ export class AptabaseWeb implements Analytics {
     };
 
     pageView = (location: string) => {
-        trackEvent('Page_view', { ...this.user_properties, location });
+        trackEvent('page_view', { ...this.user_properties, location });
     };
 
     track = async (name: string, params: Record<string, any>) => {
-        trackEvent(name, { ...this.user_properties, ...params });
+        trackEvent(name.toLowerCase(), { ...this.user_properties, ...params });
     };
 }
