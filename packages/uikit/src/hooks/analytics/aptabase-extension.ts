@@ -1,8 +1,8 @@
-import { init, trackEvent } from '@aptabase/web';
+import { init, trackEvent } from '@aptabase/browser';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Analytics } from '.';
 
-export class AptabaseWeb implements Analytics {
+export class AptabaseExtension implements Analytics {
     private user_properties: Record<string, any> = {};
 
     constructor(private host: string, private key: string, appVersion?: string) {

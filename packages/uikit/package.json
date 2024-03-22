@@ -15,6 +15,7 @@
     "license": "ISC",
     "dependencies": {
         "@amplitude/analytics-browser": "^2.1.0",
+        "@aptabase/browser": "^0.1.1",
         "@aptabase/web": "^0.4.2",
         "@polkadot/react-qr": "^3.1.1",
         "@tanstack/react-query": "4.3.4",
