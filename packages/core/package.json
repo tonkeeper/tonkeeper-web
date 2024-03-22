@@ -21,7 +21,7 @@
     "dependencies": {
         "@ton/core": "0.54.0",
         "@ton/crypto": "3.2.0",
-        "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build6",
+        "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build8",
         "bignumber.js": "^9.1.1",
         "ethers": "^6.6.5",
         "query-string": "^8.1.0",

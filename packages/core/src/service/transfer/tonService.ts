@@ -150,7 +150,6 @@ export const estimateTonTransfer = async (
     if (!isMax) {
         checkWalletPositiveBalanceOrDie(wallet);
     }
-    console.log({ seqno });
 
     const cell = createTonTransfer(seqno, walletState, recipient, weiAmount, isMax);
 
@@ -159,6 +158,7 @@ export const estimateTonTransfer = async (
         accountId: wallet.address,
         decodeMessageRequest: { boc: cell.toString('base64') }
     });
+
     return { event };
 };
 
