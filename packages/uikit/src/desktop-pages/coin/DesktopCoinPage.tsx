@@ -50,7 +50,7 @@ const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
     margin-bottom: 0.5rem;
 `;
 
-const CoinPageBody = styled.div`
+const CoinHeaderStyled = styled.div`
     padding: 0 1rem;
 `;
 
@@ -77,7 +77,7 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
 
     const sdk = useAppSdk();
     return (
-        <>
+        <CoinHeaderStyled>
             <CoinInfo token={token} />
             <HeaderButtonsContainer>
                 <ButtonStyled
@@ -117,7 +117,7 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                 )}
             </HeaderButtonsContainer>
             <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />
-        </>
+        </CoinHeaderStyled>
     );
 };
 
@@ -243,10 +243,8 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
                 <Label2>{assetSymbol || 'Unknown asset'}</Label2>
             </DesktopViewHeaderStyled>
             <DesktopViewDivider />
-            <CoinPageBody>
-                <CoinHeader token={token} />
-                <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
-            </CoinPageBody>
+            <CoinHeader token={token} />
+            <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
         </DesktopViewPageLayout>
     );
 };
