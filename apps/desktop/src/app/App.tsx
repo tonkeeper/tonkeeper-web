@@ -33,7 +33,6 @@ import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
 import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
-import Coin from '@tonkeeper/uikit/dist/pages/coin/Coin';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
@@ -60,9 +59,10 @@ import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideM
 import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
 import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
 import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
-import { DesktopHistory } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistory';
-import { DesktopPurchases } from "@tonkeeper/uikit/dist/desktop-pages/purchases/DesktopPurchases";
-import { DesktopTokens } from "@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens";
+import { DesktopPurchases } from '@tonkeeper/uikit/dist/desktop-pages/purchases/DesktopPurchases';
+import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
+import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/DesktopCoinPage';
+import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -361,13 +361,13 @@ const WalletContent = () => {
                     <Routes>
                         <Route element={<OldAppRouting withPadding />}>
                             <Route path={any(AppRoute.settings)} element={<Settings />} />
-                            <Route path={AppRoute.coins}>
-                                <Route path=":name/*" element={<Coin />} />
-                            </Route>
                         </Route>
                         <Route element={<OldAppRouting />}>
-                            <Route path={AppRoute.activity} element={<DesktopHistory />} />
+                            <Route path={AppRoute.activity} element={<DesktopHistoryPage />} />
                             <Route path={any(AppRoute.purchases)} element={<DesktopPurchases />} />
+                            <Route path={AppRoute.coins}>
+                                <Route path=":name/*" element={<DesktopCoinPage />} />
+                            </Route>
                             <Route path="*" element={<DesktopTokens />} />
                         </Route>
                     </Routes>

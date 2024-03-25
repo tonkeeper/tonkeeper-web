@@ -1312,3 +1312,22 @@ export const SpinnerRing: FC<{ className?: string; color?: string }> = ({ color,
         </SpinnerRingContainer>
     );
 };
+
+export const ArrowLeftIcon: FC<{ className?: string; color?: string }> = ({ color, className }) => {
+    const theme = useTheme();
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            color={theme[color || 'iconSecondary']}
+            className={className}
+        >
+            <path
+                d="M13.25 8.75C13.6642 8.75 14 8.41421 14 8C14 7.58579 13.6642 7.25 13.25 7.25L4.56066 7.25L7.28033 4.53033C7.57322 4.23744 7.57322 3.76256 7.28033 3.46967C6.98744 3.17678 6.51256 3.17678 6.21967 3.46967L2.21967 7.46967C1.92678 7.76256 1.92678 8.23744 2.21967 8.53033L6.21967 12.5303C6.51256 12.8232 6.98744 12.8232 7.28033 12.5303C7.57322 12.2374 7.57322 11.7626 7.28033 11.4697L4.56066 8.75H13.25Z"
+                fill="currentColor"
+            />
+        </svg>
+    );
+};

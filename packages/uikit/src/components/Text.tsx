@@ -89,3 +89,10 @@ export const Num2 = styled.span`
     font-size: 28px;
     line-height: 36px;
 `;
+
+export const Num3 = styled.span`
+    font-style: normal;
+    font-weight: 510;
+    font-size: 24px;
+    line-height: 32px;
+`;

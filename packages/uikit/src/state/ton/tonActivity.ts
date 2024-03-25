@@ -1,7 +1,7 @@
 import { InfiniteData } from '@tanstack/react-query';
 import { AccountEvent, AccountEvents, Action } from '@tonkeeper/core/dist/tonApiV2';
 
-const seeIfTonTransfer = (action: Action) => {
+export const seeIfTonTransfer = (action: Action) => {
     if (action.type === 'TonTransfer') {
         return true;
     } else if (action.type === 'ContractDeploy') {
