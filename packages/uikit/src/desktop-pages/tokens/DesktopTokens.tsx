@@ -1,4 +1,3 @@
-import { InnerBody } from '../../components/Body';
 import { JettonAsset, TonAsset } from '../../components/home/Jettons';
 import { useAssets } from '../../state/home';
 import { TokensPieChart } from '../../components/desktop/tokens/TokensPieChart';
@@ -8,6 +7,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useAssetsDistribution } from '../../state/wallet';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 import { useLayoutEffect, useState } from 'react';
+import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
 
 const DesktopAssetStylesOverride = css`
     background-color: transparent;
@@ -29,13 +29,19 @@ const JettonAssetStyled = styled(JettonAsset)`
 `;
 
 const TokensHeaderContainer = styled.div`
-    height: 44px;
+    height: 37px;
     padding-left: 1rem;
+    padding-bottom: 0.5rem;
+    box-sizing: content-box;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid ${p => p.theme.separatorCommon};
+`;
+
+const TokensPageBody = styled.div`
+    padding: 0 1rem 1rem;
 `;
 
 const HideButton = styled.button`
@@ -78,7 +84,7 @@ export const DesktopTokens = () => {
     };
 
     return (
-        <>
+        <DesktopViewPageLayout>
             <TokensHeaderContainer>
                 <Label2>{t('jettons_list_title')}</Label2>
                 {canShowChart && (
@@ -93,7 +99,7 @@ export const DesktopTokens = () => {
                     </HideButton>
                 )}
             </TokensHeaderContainer>
-            <InnerBody>
+            <TokensPageBody>
                 {assets && distribution && uiPreferences && (
                     <>
                         {canShowChart && showChart && (
@@ -112,7 +118,7 @@ export const DesktopTokens = () => {
                         ))}
                     </>
                 )}
-            </InnerBody>
-        </>
+            </TokensPageBody>
+        </DesktopViewPageLayout>
     );
 };

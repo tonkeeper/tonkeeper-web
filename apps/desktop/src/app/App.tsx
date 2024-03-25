@@ -38,8 +38,6 @@ import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { DesktopPurchases } from '@tonkeeper/uikit/dist/pages/purchases/DesktopPurchases';
-import { DesktopTokens } from '@tonkeeper/uikit/dist/pages/purchases/DesktopTokens';
 import Settings from '@tonkeeper/uikit/dist/pages/settings';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
@@ -63,6 +61,8 @@ import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
 import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
 import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
 import { DesktopHistory } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistory';
+import { DesktopPurchases } from "@tonkeeper/uikit/dist/desktop-pages/purchases/DesktopPurchases";
+import { DesktopTokens } from "@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens";
 
 const queryClient = new QueryClient({
     defaultOptions: {

@@ -12,12 +12,13 @@ import styled from 'styled-components';
 import { Label2 } from '../../components/Text';
 import { HistoryEvent } from '../../components/desktop/history/HistoryEvent';
 import { SpinnerRing } from '../../components/Icon';
+import {
+    DesktopViewHeader,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { useTranslation } from '../../hooks/translation';
 
-const HistoryHeader = styled.div`
-    padding: 0.5rem 1rem;
-`;
-
-const HistoryPageWrapper = styled.div`
+const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
 `;
 
@@ -56,6 +57,7 @@ const FetchingRows = styled.div`
 export const DesktopHistory: FC = () => {
     const wallet = useWalletContext();
     const { api, standalone } = useAppContext();
+    const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);
 
@@ -99,9 +101,9 @@ export const DesktopHistory: FC = () => {
 
     return (
         <HistoryPageWrapper ref={ref}>
-            <HistoryHeader>
-                <Label2>History</Label2>
-            </HistoryHeader>
+            <DesktopViewHeader>
+                <Label2>{t('page_header_history')}</Label2>
+            </DesktopViewHeader>
             <HistoryEventsGrid>
                 <GridSizer />
                 <GridSizer2 />

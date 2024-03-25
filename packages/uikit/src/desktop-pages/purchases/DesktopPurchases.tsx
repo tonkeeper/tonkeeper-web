@@ -6,6 +6,10 @@ import { Button } from '../../components/fields/Button';
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { useTranslation } from '../../hooks/translation';
+import {
+    DesktopViewHeader,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -31,8 +35,8 @@ const NFTEmptyPage = styled.div`
     justify-content: center;
 `;
 
-const NFTPageWrapper = styled.div`
-    padding: 1rem;
+const NFTPageBody = styled.div`
+    padding: 0.5rem 1rem 1rem;
 `;
 
 const NFTEmptyContainer = styled.div`
@@ -79,5 +83,10 @@ export const DesktopPurchases = () => {
         );
     }
 
-    return <NFTPageWrapper>{nfts && <NftsListStyled nfts={nfts} />}</NFTPageWrapper>;
+    return (
+        <DesktopViewPageLayout>
+            <DesktopViewHeader>{t('page_header_purchases')}</DesktopViewHeader>
+            <NFTPageBody>{nfts && <NftsListStyled nfts={nfts} />}</NFTPageBody>
+        </DesktopViewPageLayout>
+    );
 };
