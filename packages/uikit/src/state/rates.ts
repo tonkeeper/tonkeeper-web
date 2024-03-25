@@ -1,15 +1,15 @@
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Address } from '@ton/core';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { RatesApi, TokenRates } from '@tonkeeper/core/dist/tonApiV2';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
+import { AssetData } from '../components/home/Jettons';
 import { useAppContext } from '../hooks/appContext';
 import { formatFiatCurrency } from '../hooks/balance';
 import { QueryKey } from '../libs/queryKey';
-import { AssetData } from '../components/home/Jettons';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { Address } from '@ton/ton';
 
 export interface TokenRate {
     diff7d: string;
