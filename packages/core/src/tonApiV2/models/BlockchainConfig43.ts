@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { SizeLimitsConfig } from './SizeLimitsConfig';
 import {
     SizeLimitsConfigFromJSON,
@@ -38,10 +38,8 @@ export interface BlockchainConfig43 {
  * Check if a given object implements the BlockchainConfig43 interface.
  */
 export function instanceOfBlockchainConfig43(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "sizeLimitsConfig" in value;
-
-    return isInstance;
+    if (!('sizeLimitsConfig' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig43FromJSON(json: any): BlockchainConfig43 {
@@ -49,7 +47,7 @@ export function BlockchainConfig43FromJSON(json: any): BlockchainConfig43 {
 }
 
 export function BlockchainConfig43FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig43 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function BlockchainConfig43FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig43ToJSON(value?: BlockchainConfig43 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'size_limits_config': SizeLimitsConfigToJSON(value.sizeLimitsConfig),
+        'size_limits_config': SizeLimitsConfigToJSON(value['sizeLimitsConfig']),
     };
 }
 

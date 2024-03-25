@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { TraceID } from './TraceID';
 import {
     TraceIDFromJSON,
@@ -38,10 +38,8 @@ export interface TraceIDs {
  * Check if a given object implements the TraceIDs interface.
  */
 export function instanceOfTraceIDs(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "traces" in value;
-
-    return isInstance;
+    if (!('traces' in value)) return false;
+    return true;
 }
 
 export function TraceIDsFromJSON(json: any): TraceIDs {
@@ -49,7 +47,7 @@ export function TraceIDsFromJSON(json: any): TraceIDs {
 }
 
 export function TraceIDsFromJSONTyped(json: any, ignoreDiscriminator: boolean): TraceIDs {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function TraceIDsFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
 }
 
 export function TraceIDsToJSON(value?: TraceIDs | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'traces': ((value.traces as Array<any>).map(TraceIDToJSON)),
+        'traces': ((value['traces'] as Array<any>).map(TraceIDToJSON)),
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface GetAccountsRequest {
  * Check if a given object implements the GetAccountsRequest interface.
  */
 export function instanceOfGetAccountsRequest(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "accountIds" in value;
-
-    return isInstance;
+    if (!('accountIds' in value)) return false;
+    return true;
 }
 
 export function GetAccountsRequestFromJSON(json: any): GetAccountsRequest {
@@ -42,7 +40,7 @@ export function GetAccountsRequestFromJSON(json: any): GetAccountsRequest {
 }
 
 export function GetAccountsRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetAccountsRequest {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function GetAccountsRequestFromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function GetAccountsRequestToJSON(value?: GetAccountsRequest | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'account_ids': value.accountIds,
+        'account_ids': value['accountIds'],
     };
 }
 

@@ -16,8 +16,8 @@
 import * as runtime from '../runtime';
 import type {
   Accounts,
-  GetBlockchainBlockDefaultResponse,
   GetWalletBackup200Response,
+  ReduceIndexingLatencyDefaultResponse,
   Seqno,
   TonConnectProof200Response,
   TonConnectProofRequest,
@@ -25,10 +25,10 @@ import type {
 import {
     AccountsFromJSON,
     AccountsToJSON,
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
     GetWalletBackup200ResponseFromJSON,
     GetWalletBackup200ResponseToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
     SeqnoFromJSON,
     SeqnoToJSON,
     TonConnectProof200ResponseFromJSON,
@@ -147,8 +147,11 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
      * Get account seqno
      */
     async getAccountSeqnoRaw(requestParameters: GetAccountSeqnoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Seqno>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountSeqno.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountSeqno().'
+            );
         }
 
         const queryParameters: any = {};
@@ -156,7 +159,7 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/wallet/{account_id}/seqno`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/wallet/{account_id}/seqno`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -177,16 +180,19 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
      * Get backup info
      */
     async getWalletBackupRaw(requestParameters: GetWalletBackupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetWalletBackup200Response>> {
-        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
-            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling getWalletBackup.');
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling getWalletBackup().'
+            );
         }
 
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
@@ -211,8 +217,11 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
      * Get wallets by public key
      */
     async getWalletsByPublicKeyRaw(requestParameters: GetWalletsByPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Accounts>> {
-        if (requestParameters.publicKey === null || requestParameters.publicKey === undefined) {
-            throw new runtime.RequiredError('publicKey','Required parameter requestParameters.publicKey was null or undefined when calling getWalletsByPublicKey.');
+        if (requestParameters['publicKey'] == null) {
+            throw new runtime.RequiredError(
+                'publicKey',
+                'Required parameter "publicKey" was null or undefined when calling getWalletsByPublicKey().'
+            );
         }
 
         const queryParameters: any = {};
@@ -220,7 +229,7 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/pubkeys/{public_key}/wallets`.replace(`{${"public_key"}}`, encodeURIComponent(String(requestParameters.publicKey))),
+            path: `/v2/pubkeys/{public_key}/wallets`.replace(`{${"public_key"}}`, encodeURIComponent(String(requestParameters['publicKey']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -241,12 +250,18 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
      * Set backup info
      */
     async setWalletBackupRaw(requestParameters: SetWalletBackupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
-            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling setWalletBackup.');
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling setWalletBackup().'
+            );
         }
 
-        if (requestParameters.body === null || requestParameters.body === undefined) {
-            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling setWalletBackup.');
+        if (requestParameters['body'] == null) {
+            throw new runtime.RequiredError(
+                'body',
+                'Required parameter "body" was null or undefined when calling setWalletBackup().'
+            );
         }
 
         const queryParameters: any = {};
@@ -255,8 +270,8 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
 
         headerParameters['Content-Type'] = 'application/octet-stream';
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
@@ -264,7 +279,7 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters.body as any,
+            body: requestParameters['body'] as any,
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -281,8 +296,11 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
      * Account verification and token issuance
      */
     async tonConnectProofRaw(requestParameters: TonConnectProofOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TonConnectProof200Response>> {
-        if (requestParameters.tonConnectProofRequest === null || requestParameters.tonConnectProofRequest === undefined) {
-            throw new runtime.RequiredError('tonConnectProofRequest','Required parameter requestParameters.tonConnectProofRequest was null or undefined when calling tonConnectProof.');
+        if (requestParameters['tonConnectProofRequest'] == null) {
+            throw new runtime.RequiredError(
+                'tonConnectProofRequest',
+                'Required parameter "tonConnectProofRequest" was null or undefined when calling tonConnectProof().'
+            );
         }
 
         const queryParameters: any = {};
@@ -296,7 +314,7 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: TonConnectProofRequestToJSON(requestParameters.tonConnectProofRequest),
+            body: TonConnectProofRequestToJSON(requestParameters['tonConnectProofRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => TonConnectProof200ResponseFromJSON(jsonValue));

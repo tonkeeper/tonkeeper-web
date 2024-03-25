@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface ContractDeployAction {
  * Check if a given object implements the ContractDeployAction interface.
  */
 export function instanceOfContractDeployAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "interfaces" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('interfaces' in value)) return false;
+    return true;
 }
 
 export function ContractDeployActionFromJSON(json: any): ContractDeployAction {
@@ -49,7 +47,7 @@ export function ContractDeployActionFromJSON(json: any): ContractDeployAction {
 }
 
 export function ContractDeployActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): ContractDeployAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function ContractDeployActionFromJSONTyped(json: any, ignoreDiscriminator
 }
 
 export function ContractDeployActionToJSON(value?: ContractDeployAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'interfaces': value.interfaces,
+        'address': value['address'],
+        'interfaces': value['interfaces'],
     };
 }
 

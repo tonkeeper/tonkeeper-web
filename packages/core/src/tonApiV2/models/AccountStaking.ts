@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountStakingInfo } from './AccountStakingInfo';
 import {
     AccountStakingInfoFromJSON,
@@ -38,10 +38,8 @@ export interface AccountStaking {
  * Check if a given object implements the AccountStaking interface.
  */
 export function instanceOfAccountStaking(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "pools" in value;
-
-    return isInstance;
+    if (!('pools' in value)) return false;
+    return true;
 }
 
 export function AccountStakingFromJSON(json: any): AccountStaking {
@@ -49,7 +47,7 @@ export function AccountStakingFromJSON(json: any): AccountStaking {
 }
 
 export function AccountStakingFromJSONTyped(json: any, ignoreDiscriminator: boolean): AccountStaking {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function AccountStakingFromJSONTyped(json: any, ignoreDiscriminator: bool
 }
 
 export function AccountStakingToJSON(value?: AccountStaking | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'pools': ((value.pools as Array<any>).map(AccountStakingInfoToJSON)),
+        'pools': ((value['pools'] as Array<any>).map(AccountStakingInfoToJSON)),
     };
 }
 

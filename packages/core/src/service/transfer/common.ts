@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js';
 import {
     Address,
     beginCell,
@@ -8,21 +7,18 @@ import {
     internal,
     storeMessage,
     toNano
-} from 'ton-core';
-import { mnemonicToPrivateKey } from 'ton-crypto';
-import { WalletContractV3R1 } from 'ton/dist/wallets/WalletContractV3R1';
-import { WalletContractV3R2 } from 'ton/dist/wallets/WalletContractV3R2';
-import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
+} from '@ton/core';
+import { mnemonicToPrivateKey } from '@ton/crypto';
+import { WalletContractV3R1 } from '@ton/ton/dist/wallets/WalletContractV3R1';
+import { WalletContractV3R2 } from '@ton/ton/dist/wallets/WalletContractV3R2';
+import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
+import { WalletContractV5 } from '@ton/ton/dist/wallets/WalletContractV5';
+import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
+import { TransferEstimationEvent } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
-import {
-    Account,
-    AccountsApi,
-    LiteServerApi,
-    MessageConsequences,
-    WalletApi
-} from '../../tonApiV2';
+import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
 
 export enum SendMode {
@@ -35,7 +31,7 @@ export enum SendMode {
 }
 
 export const externalMessage = (
-    contract: WalletContractV3R1 | WalletContractV3R2 | WalletContractV4,
+    contract: WalletContractV3R1 | WalletContractV3R2 | WalletContractV4 | WalletContractV5,
     seqno: number,
     body: Cell
 ) => {
@@ -151,7 +147,7 @@ export const createTransferMessage = (
 export async function getKeyPairAndSeqno(options: {
     api: APIConfig;
     walletState: WalletState;
-    fee: MessageConsequences;
+    fee: TransferEstimationEvent;
     mnemonic: string[];
     amount: BigNumber;
 }) {

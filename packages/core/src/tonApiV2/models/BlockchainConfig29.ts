@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The configuration for the consensus protocol above catchain.
  * @export
@@ -97,17 +97,15 @@ export interface BlockchainConfig29 {
  * Check if a given object implements the BlockchainConfig29 interface.
  */
 export function instanceOfBlockchainConfig29(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "roundCandidates" in value;
-    isInstance = isInstance && "nextCandidateDelayMs" in value;
-    isInstance = isInstance && "consensusTimeoutMs" in value;
-    isInstance = isInstance && "fastAttempts" in value;
-    isInstance = isInstance && "attemptDuration" in value;
-    isInstance = isInstance && "catchainMaxDeps" in value;
-    isInstance = isInstance && "maxBlockBytes" in value;
-    isInstance = isInstance && "maxCollatedBytes" in value;
-
-    return isInstance;
+    if (!('roundCandidates' in value)) return false;
+    if (!('nextCandidateDelayMs' in value)) return false;
+    if (!('consensusTimeoutMs' in value)) return false;
+    if (!('fastAttempts' in value)) return false;
+    if (!('attemptDuration' in value)) return false;
+    if (!('catchainMaxDeps' in value)) return false;
+    if (!('maxBlockBytes' in value)) return false;
+    if (!('maxCollatedBytes' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig29FromJSON(json: any): BlockchainConfig29 {
@@ -115,13 +113,13 @@ export function BlockchainConfig29FromJSON(json: any): BlockchainConfig29 {
 }
 
 export function BlockchainConfig29FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig29 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'flags': !exists(json, 'flags') ? undefined : json['flags'],
-        'newCatchainIds': !exists(json, 'new_catchain_ids') ? undefined : json['new_catchain_ids'],
+        'flags': json['flags'] == null ? undefined : json['flags'],
+        'newCatchainIds': json['new_catchain_ids'] == null ? undefined : json['new_catchain_ids'],
         'roundCandidates': json['round_candidates'],
         'nextCandidateDelayMs': json['next_candidate_delay_ms'],
         'consensusTimeoutMs': json['consensus_timeout_ms'],
@@ -130,32 +128,29 @@ export function BlockchainConfig29FromJSONTyped(json: any, ignoreDiscriminator: 
         'catchainMaxDeps': json['catchain_max_deps'],
         'maxBlockBytes': json['max_block_bytes'],
         'maxCollatedBytes': json['max_collated_bytes'],
-        'protoVersion': !exists(json, 'proto_version') ? undefined : json['proto_version'],
-        'catchainMaxBlocksCoeff': !exists(json, 'catchain_max_blocks_coeff') ? undefined : json['catchain_max_blocks_coeff'],
+        'protoVersion': json['proto_version'] == null ? undefined : json['proto_version'],
+        'catchainMaxBlocksCoeff': json['catchain_max_blocks_coeff'] == null ? undefined : json['catchain_max_blocks_coeff'],
     };
 }
 
 export function BlockchainConfig29ToJSON(value?: BlockchainConfig29 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'flags': value.flags,
-        'new_catchain_ids': value.newCatchainIds,
-        'round_candidates': value.roundCandidates,
-        'next_candidate_delay_ms': value.nextCandidateDelayMs,
-        'consensus_timeout_ms': value.consensusTimeoutMs,
-        'fast_attempts': value.fastAttempts,
-        'attempt_duration': value.attemptDuration,
-        'catchain_max_deps': value.catchainMaxDeps,
-        'max_block_bytes': value.maxBlockBytes,
-        'max_collated_bytes': value.maxCollatedBytes,
-        'proto_version': value.protoVersion,
-        'catchain_max_blocks_coeff': value.catchainMaxBlocksCoeff,
+        'flags': value['flags'],
+        'new_catchain_ids': value['newCatchainIds'],
+        'round_candidates': value['roundCandidates'],
+        'next_candidate_delay_ms': value['nextCandidateDelayMs'],
+        'consensus_timeout_ms': value['consensusTimeoutMs'],
+        'fast_attempts': value['fastAttempts'],
+        'attempt_duration': value['attemptDuration'],
+        'catchain_max_deps': value['catchainMaxDeps'],
+        'max_block_bytes': value['maxBlockBytes'],
+        'max_collated_bytes': value['maxCollatedBytes'],
+        'proto_version': value['protoVersion'],
+        'catchain_max_blocks_coeff': value['catchainMaxBlocksCoeff'],
     };
 }
 

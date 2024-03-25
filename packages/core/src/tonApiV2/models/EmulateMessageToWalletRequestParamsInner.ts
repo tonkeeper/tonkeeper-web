@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,10 +37,8 @@ export interface EmulateMessageToWalletRequestParamsInner {
  * Check if a given object implements the EmulateMessageToWalletRequestParamsInner interface.
  */
 export function instanceOfEmulateMessageToWalletRequestParamsInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    return true;
 }
 
 export function EmulateMessageToWalletRequestParamsInnerFromJSON(json: any): EmulateMessageToWalletRequestParamsInner {
@@ -48,27 +46,24 @@ export function EmulateMessageToWalletRequestParamsInnerFromJSON(json: any): Emu
 }
 
 export function EmulateMessageToWalletRequestParamsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): EmulateMessageToWalletRequestParamsInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'address': json['address'],
-        'balance': !exists(json, 'balance') ? undefined : json['balance'],
+        'balance': json['balance'] == null ? undefined : json['balance'],
     };
 }
 
 export function EmulateMessageToWalletRequestParamsInnerToJSON(value?: EmulateMessageToWalletRequestParamsInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'balance': value.balance,
+        'address': value['address'],
+        'balance': value['balance'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -61,15 +61,13 @@ export interface StorageProvider {
  * Check if a given object implements the StorageProvider interface.
  */
 export function instanceOfStorageProvider(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "acceptNewContracts" in value;
-    isInstance = isInstance && "ratePerMbDay" in value;
-    isInstance = isInstance && "maxSpan" in value;
-    isInstance = isInstance && "minimalFileSize" in value;
-    isInstance = isInstance && "maximalFileSize" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('acceptNewContracts' in value)) return false;
+    if (!('ratePerMbDay' in value)) return false;
+    if (!('maxSpan' in value)) return false;
+    if (!('minimalFileSize' in value)) return false;
+    if (!('maximalFileSize' in value)) return false;
+    return true;
 }
 
 export function StorageProviderFromJSON(json: any): StorageProvider {
@@ -77,7 +75,7 @@ export function StorageProviderFromJSON(json: any): StorageProvider {
 }
 
 export function StorageProviderFromJSONTyped(json: any, ignoreDiscriminator: boolean): StorageProvider {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -92,20 +90,17 @@ export function StorageProviderFromJSONTyped(json: any, ignoreDiscriminator: boo
 }
 
 export function StorageProviderToJSON(value?: StorageProvider | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'accept_new_contracts': value.acceptNewContracts,
-        'rate_per_mb_day': value.ratePerMbDay,
-        'max_span': value.maxSpan,
-        'minimal_file_size': value.minimalFileSize,
-        'maximal_file_size': value.maximalFileSize,
+        'address': value['address'],
+        'accept_new_contracts': value['acceptNewContracts'],
+        'rate_per_mb_day': value['ratePerMbDay'],
+        'max_span': value['maxSpan'],
+        'minimal_file_size': value['minimalFileSize'],
+        'maximal_file_size': value['maximalFileSize'],
     };
 }
 

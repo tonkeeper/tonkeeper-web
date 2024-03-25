@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -44,11 +44,9 @@ export interface GetRawShardBlockProof200ResponseLinksInner {
  * Check if a given object implements the GetRawShardBlockProof200ResponseLinksInner interface.
  */
 export function instanceOfGetRawShardBlockProof200ResponseLinksInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "id" in value;
-    isInstance = isInstance && "proof" in value;
-
-    return isInstance;
+    if (!('id' in value)) return false;
+    if (!('proof' in value)) return false;
+    return true;
 }
 
 export function GetRawShardBlockProof200ResponseLinksInnerFromJSON(json: any): GetRawShardBlockProof200ResponseLinksInner {
@@ -56,7 +54,7 @@ export function GetRawShardBlockProof200ResponseLinksInnerFromJSON(json: any): G
 }
 
 export function GetRawShardBlockProof200ResponseLinksInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawShardBlockProof200ResponseLinksInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -67,16 +65,13 @@ export function GetRawShardBlockProof200ResponseLinksInnerFromJSONTyped(json: an
 }
 
 export function GetRawShardBlockProof200ResponseLinksInnerToJSON(value?: GetRawShardBlockProof200ResponseLinksInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'id': BlockRawToJSON(value.id),
-        'proof': value.proof,
+        'id': BlockRawToJSON(value['id']),
+        'proof': value['proof'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -44,11 +44,9 @@ export interface GetRawTransactions200Response {
  * Check if a given object implements the GetRawTransactions200Response interface.
  */
 export function instanceOfGetRawTransactions200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "ids" in value;
-    isInstance = isInstance && "transactions" in value;
-
-    return isInstance;
+    if (!('ids' in value)) return false;
+    if (!('transactions' in value)) return false;
+    return true;
 }
 
 export function GetRawTransactions200ResponseFromJSON(json: any): GetRawTransactions200Response {
@@ -56,7 +54,7 @@ export function GetRawTransactions200ResponseFromJSON(json: any): GetRawTransact
 }
 
 export function GetRawTransactions200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawTransactions200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -67,16 +65,13 @@ export function GetRawTransactions200ResponseFromJSONTyped(json: any, ignoreDisc
 }
 
 export function GetRawTransactions200ResponseToJSON(value?: GetRawTransactions200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'ids': ((value.ids as Array<any>).map(BlockRawToJSON)),
-        'transactions': value.transactions,
+        'ids': ((value['ids'] as Array<any>).map(BlockRawToJSON)),
+        'transactions': value['transactions'],
     };
 }
 

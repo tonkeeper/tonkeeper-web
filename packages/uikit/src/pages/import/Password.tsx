@@ -1,4 +1,5 @@
 import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
+import { mnemonicValidate } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
@@ -12,9 +13,8 @@ import {
     createNewWalletState,
     encryptWalletMnemonic
 } from '@tonkeeper/core/dist/service/walletService';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { mnemonicValidate } from 'ton-crypto';
 import { IconPage } from '../../components/Layout';
 import { CheckLottieIcon, ConfettiLottieIcon } from '../../components/lottie/LottieIcons';
 import { useAppContext } from '../../hooks/appContext';

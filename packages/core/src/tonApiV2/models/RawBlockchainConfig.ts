@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface RawBlockchainConfig {
  * Check if a given object implements the RawBlockchainConfig interface.
  */
 export function instanceOfRawBlockchainConfig(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "config" in value;
-
-    return isInstance;
+    if (!('config' in value)) return false;
+    return true;
 }
 
 export function RawBlockchainConfigFromJSON(json: any): RawBlockchainConfig {
@@ -42,7 +40,7 @@ export function RawBlockchainConfigFromJSON(json: any): RawBlockchainConfig {
 }
 
 export function RawBlockchainConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): RawBlockchainConfig {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function RawBlockchainConfigFromJSONTyped(json: any, ignoreDiscriminator:
 }
 
 export function RawBlockchainConfigToJSON(value?: RawBlockchainConfig | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'config': value.config,
+        'config': value['config'],
     };
 }
 

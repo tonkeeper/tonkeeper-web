@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { Action } from './Action';
 import {
     ActionFromJSON,
@@ -80,16 +80,14 @@ export interface Event {
  * Check if a given object implements the Event interface.
  */
 export function instanceOfEvent(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "eventId" in value;
-    isInstance = isInstance && "timestamp" in value;
-    isInstance = isInstance && "actions" in value;
-    isInstance = isInstance && "valueFlow" in value;
-    isInstance = isInstance && "isScam" in value;
-    isInstance = isInstance && "lt" in value;
-    isInstance = isInstance && "inProgress" in value;
-
-    return isInstance;
+    if (!('eventId' in value)) return false;
+    if (!('timestamp' in value)) return false;
+    if (!('actions' in value)) return false;
+    if (!('valueFlow' in value)) return false;
+    if (!('isScam' in value)) return false;
+    if (!('lt' in value)) return false;
+    if (!('inProgress' in value)) return false;
+    return true;
 }
 
 export function EventFromJSON(json: any): Event {
@@ -97,7 +95,7 @@ export function EventFromJSON(json: any): Event {
 }
 
 export function EventFromJSONTyped(json: any, ignoreDiscriminator: boolean): Event {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -113,21 +111,18 @@ export function EventFromJSONTyped(json: any, ignoreDiscriminator: boolean): Eve
 }
 
 export function EventToJSON(value?: Event | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'event_id': value.eventId,
-        'timestamp': value.timestamp,
-        'actions': ((value.actions as Array<any>).map(ActionToJSON)),
-        'value_flow': ((value.valueFlow as Array<any>).map(ValueFlowToJSON)),
-        'is_scam': value.isScam,
-        'lt': value.lt,
-        'in_progress': value.inProgress,
+        'event_id': value['eventId'],
+        'timestamp': value['timestamp'],
+        'actions': ((value['actions'] as Array<any>).map(ActionToJSON)),
+        'value_flow': ((value['valueFlow'] as Array<any>).map(ValueFlowToJSON)),
+        'is_scam': value['isScam'],
+        'lt': value['lt'],
+        'in_progress': value['inProgress'],
     };
 }
 

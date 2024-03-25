@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { DecodedRawMessageMessage } from './DecodedRawMessageMessage';
 import {
     DecodedRawMessageMessageFromJSON,
@@ -44,11 +44,9 @@ export interface DecodedRawMessage {
  * Check if a given object implements the DecodedRawMessage interface.
  */
 export function instanceOfDecodedRawMessage(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "message" in value;
-    isInstance = isInstance && "mode" in value;
-
-    return isInstance;
+    if (!('message' in value)) return false;
+    if (!('mode' in value)) return false;
+    return true;
 }
 
 export function DecodedRawMessageFromJSON(json: any): DecodedRawMessage {
@@ -56,7 +54,7 @@ export function DecodedRawMessageFromJSON(json: any): DecodedRawMessage {
 }
 
 export function DecodedRawMessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): DecodedRawMessage {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -67,16 +65,13 @@ export function DecodedRawMessageFromJSONTyped(json: any, ignoreDiscriminator: b
 }
 
 export function DecodedRawMessageToJSON(value?: DecodedRawMessage | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'message': DecodedRawMessageMessageToJSON(value.message),
-        'mode': value.mode,
+        'message': DecodedRawMessageMessageToJSON(value['message']),
+        'mode': value['mode'],
     };
 }
 

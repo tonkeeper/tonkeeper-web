@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The cost of filing complaints about incorrect operation of validators.
  * @export
@@ -43,12 +43,10 @@ export interface BlockchainConfig13 {
  * Check if a given object implements the BlockchainConfig13 interface.
  */
 export function instanceOfBlockchainConfig13(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "deposit" in value;
-    isInstance = isInstance && "bitPrice" in value;
-    isInstance = isInstance && "cellPrice" in value;
-
-    return isInstance;
+    if (!('deposit' in value)) return false;
+    if (!('bitPrice' in value)) return false;
+    if (!('cellPrice' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig13FromJSON(json: any): BlockchainConfig13 {
@@ -56,7 +54,7 @@ export function BlockchainConfig13FromJSON(json: any): BlockchainConfig13 {
 }
 
 export function BlockchainConfig13FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig13 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -68,17 +66,14 @@ export function BlockchainConfig13FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig13ToJSON(value?: BlockchainConfig13 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'deposit': value.deposit,
-        'bit_price': value.bitPrice,
-        'cell_price': value.cellPrice,
+        'deposit': value['deposit'],
+        'bit_price': value['bitPrice'],
+        'cell_price': value['cellPrice'],
     };
 }
 

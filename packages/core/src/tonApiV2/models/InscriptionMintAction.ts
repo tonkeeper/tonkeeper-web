@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -73,14 +73,12 @@ export type InscriptionMintActionTypeEnum = typeof InscriptionMintActionTypeEnum
  * Check if a given object implements the InscriptionMintAction interface.
  */
 export function instanceOfInscriptionMintAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "recipient" in value;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "type" in value;
-    isInstance = isInstance && "ticker" in value;
-    isInstance = isInstance && "decimals" in value;
-
-    return isInstance;
+    if (!('recipient' in value)) return false;
+    if (!('amount' in value)) return false;
+    if (!('type' in value)) return false;
+    if (!('ticker' in value)) return false;
+    if (!('decimals' in value)) return false;
+    return true;
 }
 
 export function InscriptionMintActionFromJSON(json: any): InscriptionMintAction {
@@ -88,7 +86,7 @@ export function InscriptionMintActionFromJSON(json: any): InscriptionMintAction 
 }
 
 export function InscriptionMintActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): InscriptionMintAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -102,19 +100,16 @@ export function InscriptionMintActionFromJSONTyped(json: any, ignoreDiscriminato
 }
 
 export function InscriptionMintActionToJSON(value?: InscriptionMintAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'recipient': AccountAddressToJSON(value.recipient),
-        'amount': value.amount,
-        'type': value.type,
-        'ticker': value.ticker,
-        'decimals': value.decimals,
+        'recipient': AccountAddressToJSON(value['recipient']),
+        'amount': value['amount'],
+        'type': value['type'],
+        'ticker': value['ticker'],
+        'decimals': value['decimals'],
     };
 }
 

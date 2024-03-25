@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -27,10 +27,10 @@ export interface BlockRaw {
     workchain: number;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof BlockRaw
      */
-    shard: number;
+    shard: string;
     /**
      * 
      * @type {number}
@@ -55,14 +55,12 @@ export interface BlockRaw {
  * Check if a given object implements the BlockRaw interface.
  */
 export function instanceOfBlockRaw(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "workchain" in value;
-    isInstance = isInstance && "shard" in value;
-    isInstance = isInstance && "seqno" in value;
-    isInstance = isInstance && "rootHash" in value;
-    isInstance = isInstance && "fileHash" in value;
-
-    return isInstance;
+    if (!('workchain' in value)) return false;
+    if (!('shard' in value)) return false;
+    if (!('seqno' in value)) return false;
+    if (!('rootHash' in value)) return false;
+    if (!('fileHash' in value)) return false;
+    return true;
 }
 
 export function BlockRawFromJSON(json: any): BlockRaw {
@@ -70,7 +68,7 @@ export function BlockRawFromJSON(json: any): BlockRaw {
 }
 
 export function BlockRawFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockRaw {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -84,19 +82,16 @@ export function BlockRawFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
 }
 
 export function BlockRawToJSON(value?: BlockRaw | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'workchain': value.workchain,
-        'shard': value.shard,
-        'seqno': value.seqno,
-        'root_hash': value.rootHash,
-        'file_hash': value.fileHash,
+        'workchain': value['workchain'],
+        'shard': value['shard'],
+        'seqno': value['seqno'],
+        'root_hash': value['rootHash'],
+        'file_hash': value['fileHash'],
     };
 }
 

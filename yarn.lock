@@ -6033,17 +6033,64 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ton/core@npm:0.54.0":
+  version: 0.54.0
+  resolution: "@ton/core@npm:0.54.0"
+  dependencies:
+    symbol.inspect: "npm:1.0.1"
+  peerDependencies:
+    "@ton/crypto": ">=3.2.0"
+  checksum: 2af2f369ed9ce83e985550cdca078c332fa4ac2842d213ed4b9e0615ddba3ce2c9571f5ea99a4f3a9d8d3e3a3df347815b5454cb09c99bca282a5ca7dcf0ab92
+  languageName: node
+  linkType: hard
+
+"@ton/crypto-primitives@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@ton/crypto-primitives@npm:2.0.0"
+  dependencies:
+    jssha: "npm:3.2.0"
+  checksum: 1a686b04dc1430792341339f0ddc1e2f5effd94d31ae118baf2c510e074201495801787b2ca881a6ceb587f89212eb081ec9e3979d374d9c9004c6c4b61fc591
+  languageName: node
+  linkType: hard
+
+"@ton/crypto@npm:3.2.0":
+  version: 3.2.0
+  resolution: "@ton/crypto@npm:3.2.0"
+  dependencies:
+    "@ton/crypto-primitives": "npm:2.0.0"
+    jssha: "npm:3.2.0"
+    tweetnacl: "npm:1.0.3"
+  checksum: 7179020da4daa61114af3e507856308cff08d8fdecb1ed973c26434d6cac42f9e7551fdfbbc16940c95578b0842f0524c9d55762c42a55b10e6421b49582bd75
+  languageName: node
+  linkType: hard
+
+"@ton/ton@https://github.com/tonkeeper/tonkeeper-ton#build8":
+  version: 13.9.0
+  resolution: "@ton/ton@https://github.com/tonkeeper/tonkeeper-ton.git#commit=e8a7f3415e241daf4ac723f273fbc12776663c49"
+  dependencies:
+    axios: "npm:^0.25.0"
+    dataloader: "npm:^2.0.0"
+    symbol.inspect: "npm:1.0.1"
+    teslabot: "npm:^1.3.0"
+    zod: "npm:^3.21.4"
+  peerDependencies:
+    "@ton/core": ">=0.53.0"
+    "@ton/crypto": ">=3.2.0"
+  checksum: b678a719ecee40d0c4a16f88dd0e3a051974ec6431d874c1f8951679727d65fd70688949449c45a84e2b3be4793a6f0b1ee862f4ad8f71b7d77722695d1102c0
+  languageName: node
+  linkType: hard
+
 "@tonkeeper/core@npm:0.1.0, @tonkeeper/core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@tonkeeper/core@workspace:packages/core"
   dependencies:
+    "@ton/core": "npm:0.54.0"
+    "@ton/crypto": "npm:3.2.0"
+    "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build8"
     bignumber.js: "npm:^9.1.1"
     ethers: "npm:^6.6.5"
     npm-run-all: "npm:^4.1.5"
     query-string: "npm:^8.1.0"
-    ton: "npm:^13.4.1"
-    ton-core: "npm:^0.49.0"
-    ton-crypto: "npm:^3.2.0"
     tweetnacl: "npm:^1.0.3"
     typescript: "npm:^4.9.4"
     yarn-run-all: "npm:^3.1.1"
@@ -6147,9 +6194,6 @@ __metadata:
     react-scripts: "npm:5.0.1"
     stream-browserify: "npm:^3.0.0"
     styled-components: "npm:^6.1.1"
-    ton: "npm:^13.4.1"
-    ton-core: "npm:^0.49.0"
-    ton-crypto: "npm:^3.2.0"
     ts-loader: "npm:^9.4.2"
     ts-node: "npm:^10.9.1"
     typescript: "npm:^4.9.4"
@@ -6230,6 +6274,8 @@ __metadata:
     "@storybook/react": "npm:^6.5.14"
     "@storybook/testing-library": "npm:^0.0.13"
     "@tanstack/react-query": "npm:4.3.4"
+    "@ton/core": "npm:0.54.0"
+    "@ton/crypto": "npm:3.2.0"
     "@tonkeeper/core": "npm:0.1.0"
     "@types/country-list-js": "npm:^3.1.3"
     "@types/react": "npm:^18.0.26"
@@ -6259,9 +6305,7 @@ __metadata:
     slick-carousel: "npm:^1.8.1"
     storybook-addon-turbo-build: "npm:^1.1.0"
     styled-components: "npm:^6.1.1"
-    ton: "npm:^13.4.1"
-    ton-core: "npm:^0.49.0"
-    ton-crypto: "npm:^3.2.0"
+    tweetnacl: "npm:^1.0.3"
     typescript: "npm:^4.9.4"
     uuid: "npm:^9.0.0"
     webpack: "npm:^5.88.2"
@@ -24878,53 +24922,6 @@ __metadata:
   version: 1.0.1
   resolution: "toidentifier@npm:1.0.1"
   checksum: 952c29e2a85d7123239b5cfdd889a0dde47ab0497f0913d70588f19c53f7e0b5327c95f4651e413c74b785147f9637b17410ac8c846d5d4a20a5a33eb6dc3a45
-  languageName: node
-  linkType: hard
-
-"ton-core@npm:^0.49.0":
-  version: 0.49.1
-  resolution: "ton-core@npm:0.49.1"
-  dependencies:
-    symbol.inspect: "npm:1.0.1"
-  peerDependencies:
-    ton-crypto: ">=3.2.0"
-  checksum: aec84dcd1756cc33943e53ca097107da468dc84cc904ab8222a9914fa5a44bfae0a73ec2f702ab0ba10c5abf2f9d63a4b6456d70b44860c5def33d4f9a776db1
-  languageName: node
-  linkType: hard
-
-"ton-crypto-primitives@npm:2.0.0":
-  version: 2.0.0
-  resolution: "ton-crypto-primitives@npm:2.0.0"
-  dependencies:
-    jssha: "npm:3.2.0"
-  checksum: a81e5e7f1e44a2f32c519d6a9c3512c047b837be2f90a4e5aa226378b330ec6f9d36c1937a21b947eb792ae819c6906cfbd5b5eeab891f9df486d570141fc749
-  languageName: node
-  linkType: hard
-
-"ton-crypto@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "ton-crypto@npm:3.2.0"
-  dependencies:
-    jssha: "npm:3.2.0"
-    ton-crypto-primitives: "npm:2.0.0"
-    tweetnacl: "npm:1.0.3"
-  checksum: 2679026f38ef8c2652b0caaaf4a9765d347655dec0fc7c8875efd0b6c42b1052bbf83b8b2e8a91fe6a2ffa5b84030d447707cf6cdd98634cd39ab8620e9ee24a
-  languageName: node
-  linkType: hard
-
-"ton@npm:^13.4.1":
-  version: 13.9.0
-  resolution: "ton@npm:13.9.0"
-  dependencies:
-    axios: "npm:^0.25.0"
-    dataloader: "npm:^2.0.0"
-    symbol.inspect: "npm:1.0.1"
-    teslabot: "npm:^1.3.0"
-    zod: "npm:^3.21.4"
-  peerDependencies:
-    ton-core: ">=0.53.0"
-    ton-crypto: ">=3.2.0"
-  checksum: ea77010ee037ab45136674f7ee64bfea923ea4d29127035c27e3facdb79fea640909795dc4884c68acf0349bdb0df592e5c5b9c8f9c23323ea3f203a940fd0e3
   languageName: node
   linkType: hard
 

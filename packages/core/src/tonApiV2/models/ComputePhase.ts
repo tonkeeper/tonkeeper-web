@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ComputeSkipReason } from './ComputeSkipReason';
 import {
     ComputeSkipReasonFromJSON,
@@ -74,10 +74,8 @@ export interface ComputePhase {
  * Check if a given object implements the ComputePhase interface.
  */
 export function instanceOfComputePhase(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "skipped" in value;
-
-    return isInstance;
+    if (!('skipped' in value)) return false;
+    return true;
 }
 
 export function ComputePhaseFromJSON(json: any): ComputePhase {
@@ -85,37 +83,34 @@ export function ComputePhaseFromJSON(json: any): ComputePhase {
 }
 
 export function ComputePhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean): ComputePhase {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'skipped': json['skipped'],
-        'skipReason': !exists(json, 'skip_reason') ? undefined : ComputeSkipReasonFromJSON(json['skip_reason']),
-        'success': !exists(json, 'success') ? undefined : json['success'],
-        'gasFees': !exists(json, 'gas_fees') ? undefined : json['gas_fees'],
-        'gasUsed': !exists(json, 'gas_used') ? undefined : json['gas_used'],
-        'vmSteps': !exists(json, 'vm_steps') ? undefined : json['vm_steps'],
-        'exitCode': !exists(json, 'exit_code') ? undefined : json['exit_code'],
+        'skipReason': json['skip_reason'] == null ? undefined : ComputeSkipReasonFromJSON(json['skip_reason']),
+        'success': json['success'] == null ? undefined : json['success'],
+        'gasFees': json['gas_fees'] == null ? undefined : json['gas_fees'],
+        'gasUsed': json['gas_used'] == null ? undefined : json['gas_used'],
+        'vmSteps': json['vm_steps'] == null ? undefined : json['vm_steps'],
+        'exitCode': json['exit_code'] == null ? undefined : json['exit_code'],
     };
 }
 
 export function ComputePhaseToJSON(value?: ComputePhase | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'skipped': value.skipped,
-        'skip_reason': ComputeSkipReasonToJSON(value.skipReason),
-        'success': value.success,
-        'gas_fees': value.gasFees,
-        'gas_used': value.gasUsed,
-        'vm_steps': value.vmSteps,
-        'exit_code': value.exitCode,
+        'skipped': value['skipped'],
+        'skip_reason': ComputeSkipReasonToJSON(value['skipReason']),
+        'success': value['success'],
+        'gas_fees': value['gasFees'],
+        'gas_used': value['gasUsed'],
+        'vm_steps': value['vmSteps'],
+        'exit_code': value['exitCode'],
     };
 }
 

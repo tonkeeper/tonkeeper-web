@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { InscriptionBalance } from './InscriptionBalance';
 import {
     InscriptionBalanceFromJSON,
@@ -38,10 +38,8 @@ export interface InscriptionBalances {
  * Check if a given object implements the InscriptionBalances interface.
  */
 export function instanceOfInscriptionBalances(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "inscriptions" in value;
-
-    return isInstance;
+    if (!('inscriptions' in value)) return false;
+    return true;
 }
 
 export function InscriptionBalancesFromJSON(json: any): InscriptionBalances {
@@ -49,7 +47,7 @@ export function InscriptionBalancesFromJSON(json: any): InscriptionBalances {
 }
 
 export function InscriptionBalancesFromJSONTyped(json: any, ignoreDiscriminator: boolean): InscriptionBalances {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function InscriptionBalancesFromJSONTyped(json: any, ignoreDiscriminator:
 }
 
 export function InscriptionBalancesToJSON(value?: InscriptionBalances | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'inscriptions': ((value.inscriptions as Array<any>).map(InscriptionBalanceToJSON)),
+        'inscriptions': ((value['inscriptions'] as Array<any>).map(InscriptionBalanceToJSON)),
     };
 }
 

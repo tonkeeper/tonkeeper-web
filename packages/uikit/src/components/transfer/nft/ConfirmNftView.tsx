@@ -16,8 +16,11 @@ import { notifyError } from '../common';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TonRecipientData, TransferEstimation } from '@tonkeeper/core/dist/entries/send';
-import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
+import {
+    TonRecipientData,
+    TransferEstimation,
+    TransferEstimationEvent
+} from '@tonkeeper/core/dist/entries/send';
 import { useTransactionAnalytics } from '../../../hooks/amplitude';
 import { QueryKey } from '../../../libs/queryKey';
 import { getMnemonic } from '../../../state/mnemonic';
@@ -61,7 +64,11 @@ const useNftTransferEstimation = (nftItem: NftItem, data?: TonRecipientData) => 
     );
 };
 
-const useSendNft = (recipient: TonRecipientData, nftItem: NftItem, fee?: MessageConsequences) => {
+const useSendNft = (
+    recipient: TonRecipientData,
+    nftItem: NftItem,
+    fee?: TransferEstimationEvent
+) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();

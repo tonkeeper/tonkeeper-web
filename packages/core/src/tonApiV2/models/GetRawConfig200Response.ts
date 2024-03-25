@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -56,13 +56,11 @@ export interface GetRawConfig200Response {
  * Check if a given object implements the GetRawConfig200Response interface.
  */
 export function instanceOfGetRawConfig200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "mode" in value;
-    isInstance = isInstance && "id" in value;
-    isInstance = isInstance && "stateProof" in value;
-    isInstance = isInstance && "configProof" in value;
-
-    return isInstance;
+    if (!('mode' in value)) return false;
+    if (!('id' in value)) return false;
+    if (!('stateProof' in value)) return false;
+    if (!('configProof' in value)) return false;
+    return true;
 }
 
 export function GetRawConfig200ResponseFromJSON(json: any): GetRawConfig200Response {
@@ -70,7 +68,7 @@ export function GetRawConfig200ResponseFromJSON(json: any): GetRawConfig200Respo
 }
 
 export function GetRawConfig200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawConfig200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -83,18 +81,15 @@ export function GetRawConfig200ResponseFromJSONTyped(json: any, ignoreDiscrimina
 }
 
 export function GetRawConfig200ResponseToJSON(value?: GetRawConfig200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'mode': value.mode,
-        'id': BlockRawToJSON(value.id),
-        'state_proof': value.stateProof,
-        'config_proof': value.configProof,
+        'mode': value['mode'],
+        'id': BlockRawToJSON(value['id']),
+        'state_proof': value['stateProof'],
+        'config_proof': value['configProof'],
     };
 }
 

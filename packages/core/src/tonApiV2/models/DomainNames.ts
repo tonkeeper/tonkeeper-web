@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface DomainNames {
  * Check if a given object implements the DomainNames interface.
  */
 export function instanceOfDomainNames(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "domains" in value;
-
-    return isInstance;
+    if (!('domains' in value)) return false;
+    return true;
 }
 
 export function DomainNamesFromJSON(json: any): DomainNames {
@@ -42,7 +40,7 @@ export function DomainNamesFromJSON(json: any): DomainNames {
 }
 
 export function DomainNamesFromJSONTyped(json: any, ignoreDiscriminator: boolean): DomainNames {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function DomainNamesFromJSONTyped(json: any, ignoreDiscriminator: boolean
 }
 
 export function DomainNamesToJSON(value?: DomainNames | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'domains': value.domains,
+        'domains': value['domains'],
     };
 }
 

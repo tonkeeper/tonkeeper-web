@@ -1,9 +1,9 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { Address } from '@ton/core';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { AccountsApi, JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useMemo, useRef } from 'react';
-import { Address } from 'ton-core';
 import { InnerBody } from '../../components/Body';
 import { CoinSkeletonPage } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';

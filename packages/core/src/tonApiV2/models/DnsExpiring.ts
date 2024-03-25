@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { DnsExpiringItemsInner } from './DnsExpiringItemsInner';
 import {
     DnsExpiringItemsInnerFromJSON,
@@ -38,10 +38,8 @@ export interface DnsExpiring {
  * Check if a given object implements the DnsExpiring interface.
  */
 export function instanceOfDnsExpiring(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "items" in value;
-
-    return isInstance;
+    if (!('items' in value)) return false;
+    return true;
 }
 
 export function DnsExpiringFromJSON(json: any): DnsExpiring {
@@ -49,7 +47,7 @@ export function DnsExpiringFromJSON(json: any): DnsExpiring {
 }
 
 export function DnsExpiringFromJSONTyped(json: any, ignoreDiscriminator: boolean): DnsExpiring {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function DnsExpiringFromJSONTyped(json: any, ignoreDiscriminator: boolean
 }
 
 export function DnsExpiringToJSON(value?: DnsExpiring | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'items': ((value.items as Array<any>).map(DnsExpiringItemsInnerToJSON)),
+        'items': ((value['items'] as Array<any>).map(DnsExpiringItemsInnerToJSON)),
     };
 }
 

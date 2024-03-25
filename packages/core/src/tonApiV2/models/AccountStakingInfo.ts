@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -55,14 +55,12 @@ export interface AccountStakingInfo {
  * Check if a given object implements the AccountStakingInfo interface.
  */
 export function instanceOfAccountStakingInfo(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "pool" in value;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "pendingDeposit" in value;
-    isInstance = isInstance && "pendingWithdraw" in value;
-    isInstance = isInstance && "readyWithdraw" in value;
-
-    return isInstance;
+    if (!('pool' in value)) return false;
+    if (!('amount' in value)) return false;
+    if (!('pendingDeposit' in value)) return false;
+    if (!('pendingWithdraw' in value)) return false;
+    if (!('readyWithdraw' in value)) return false;
+    return true;
 }
 
 export function AccountStakingInfoFromJSON(json: any): AccountStakingInfo {
@@ -70,7 +68,7 @@ export function AccountStakingInfoFromJSON(json: any): AccountStakingInfo {
 }
 
 export function AccountStakingInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): AccountStakingInfo {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -84,19 +82,16 @@ export function AccountStakingInfoFromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function AccountStakingInfoToJSON(value?: AccountStakingInfo | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'pool': value.pool,
-        'amount': value.amount,
-        'pending_deposit': value.pendingDeposit,
-        'pending_withdraw': value.pendingWithdraw,
-        'ready_withdraw': value.readyWithdraw,
+        'pool': value['pool'],
+        'amount': value['amount'],
+        'pending_deposit': value['pendingDeposit'],
+        'pending_withdraw': value['pendingWithdraw'],
+        'ready_withdraw': value['readyWithdraw'],
     };
 }
 

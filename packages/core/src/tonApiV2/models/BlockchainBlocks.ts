@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockchainBlock } from './BlockchainBlock';
 import {
     BlockchainBlockFromJSON,
@@ -38,10 +38,8 @@ export interface BlockchainBlocks {
  * Check if a given object implements the BlockchainBlocks interface.
  */
 export function instanceOfBlockchainBlocks(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "blocks" in value;
-
-    return isInstance;
+    if (!('blocks' in value)) return false;
+    return true;
 }
 
 export function BlockchainBlocksFromJSON(json: any): BlockchainBlocks {
@@ -49,7 +47,7 @@ export function BlockchainBlocksFromJSON(json: any): BlockchainBlocks {
 }
 
 export function BlockchainBlocksFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainBlocks {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function BlockchainBlocksFromJSONTyped(json: any, ignoreDiscriminator: bo
 }
 
 export function BlockchainBlocksToJSON(value?: BlockchainBlocks | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'blocks': ((value.blocks as Array<any>).map(BlockchainBlockToJSON)),
+        'blocks': ((value['blocks'] as Array<any>).map(BlockchainBlockToJSON)),
     };
 }
 

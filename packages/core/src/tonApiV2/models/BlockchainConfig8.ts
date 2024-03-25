@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The network version and additional capabilities supported by the validators.
  * @export
@@ -37,11 +37,9 @@ export interface BlockchainConfig8 {
  * Check if a given object implements the BlockchainConfig8 interface.
  */
 export function instanceOfBlockchainConfig8(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "version" in value;
-    isInstance = isInstance && "capabilities" in value;
-
-    return isInstance;
+    if (!('version' in value)) return false;
+    if (!('capabilities' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig8FromJSON(json: any): BlockchainConfig8 {
@@ -49,7 +47,7 @@ export function BlockchainConfig8FromJSON(json: any): BlockchainConfig8 {
 }
 
 export function BlockchainConfig8FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig8 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function BlockchainConfig8FromJSONTyped(json: any, ignoreDiscriminator: b
 }
 
 export function BlockchainConfig8ToJSON(value?: BlockchainConfig8 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'version': value.version,
-        'capabilities': value.capabilities,
+        'version': value['version'],
+        'capabilities': value['capabilities'],
     };
 }
 

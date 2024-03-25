@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -55,14 +55,12 @@ export interface Auction {
  * Check if a given object implements the Auction interface.
  */
 export function instanceOfAuction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "domain" in value;
-    isInstance = isInstance && "owner" in value;
-    isInstance = isInstance && "price" in value;
-    isInstance = isInstance && "bids" in value;
-    isInstance = isInstance && "date" in value;
-
-    return isInstance;
+    if (!('domain' in value)) return false;
+    if (!('owner' in value)) return false;
+    if (!('price' in value)) return false;
+    if (!('bids' in value)) return false;
+    if (!('date' in value)) return false;
+    return true;
 }
 
 export function AuctionFromJSON(json: any): Auction {
@@ -70,7 +68,7 @@ export function AuctionFromJSON(json: any): Auction {
 }
 
 export function AuctionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Auction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -84,19 +82,16 @@ export function AuctionFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
 }
 
 export function AuctionToJSON(value?: Auction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'domain': value.domain,
-        'owner': value.owner,
-        'price': value.price,
-        'bids': value.bids,
-        'date': value.date,
+        'domain': value['domain'],
+        'owner': value['owner'],
+        'price': value['price'],
+        'bids': value['bids'],
+        'date': value['date'],
     };
 }
 

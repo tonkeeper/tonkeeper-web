@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface AccountInfoByStateInit {
  * Check if a given object implements the AccountInfoByStateInit interface.
  */
 export function instanceOfAccountInfoByStateInit(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "publicKey" in value;
-    isInstance = isInstance && "address" in value;
-
-    return isInstance;
+    if (!('publicKey' in value)) return false;
+    if (!('address' in value)) return false;
+    return true;
 }
 
 export function AccountInfoByStateInitFromJSON(json: any): AccountInfoByStateInit {
@@ -49,7 +47,7 @@ export function AccountInfoByStateInitFromJSON(json: any): AccountInfoByStateIni
 }
 
 export function AccountInfoByStateInitFromJSONTyped(json: any, ignoreDiscriminator: boolean): AccountInfoByStateInit {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function AccountInfoByStateInitFromJSONTyped(json: any, ignoreDiscriminat
 }
 
 export function AccountInfoByStateInitToJSON(value?: AccountInfoByStateInit | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'public_key': value.publicKey,
-        'address': value.address,
+        'public_key': value['publicKey'],
+        'address': value['address'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -42,17 +42,15 @@ export interface DecodedRawMessageMessage {
      * @type {any}
      * @memberof DecodedRawMessageMessage
      */
-    decodedBody?: any | null;
+    decodedBody?: any;
 }
 
 /**
  * Check if a given object implements the DecodedRawMessageMessage interface.
  */
 export function instanceOfDecodedRawMessageMessage(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "boc" in value;
-
-    return isInstance;
+    if (!('boc' in value)) return false;
+    return true;
 }
 
 export function DecodedRawMessageMessageFromJSON(json: any): DecodedRawMessageMessage {
@@ -60,31 +58,28 @@ export function DecodedRawMessageMessageFromJSON(json: any): DecodedRawMessageMe
 }
 
 export function DecodedRawMessageMessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): DecodedRawMessageMessage {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'boc': json['boc'],
-        'decodedOpName': !exists(json, 'decoded_op_name') ? undefined : json['decoded_op_name'],
-        'opCode': !exists(json, 'op_code') ? undefined : json['op_code'],
-        'decodedBody': !exists(json, 'decoded_body') ? undefined : json['decoded_body'],
+        'decodedOpName': json['decoded_op_name'] == null ? undefined : json['decoded_op_name'],
+        'opCode': json['op_code'] == null ? undefined : json['op_code'],
+        'decodedBody': json['decoded_body'] == null ? undefined : json['decoded_body'],
     };
 }
 
 export function DecodedRawMessageMessageToJSON(value?: DecodedRawMessageMessage | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'boc': value.boc,
-        'decoded_op_name': value.decodedOpName,
-        'op_code': value.opCode,
-        'decoded_body': value.decodedBody,
+        'boc': value['boc'],
+        'decoded_op_name': value['decodedOpName'],
+        'op_code': value['opCode'],
+        'decoded_body': value['decodedBody'],
     };
 }
 

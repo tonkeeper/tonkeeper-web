@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -43,11 +43,9 @@ export interface ValidatorsSetListInner {
  * Check if a given object implements the ValidatorsSetListInner interface.
  */
 export function instanceOfValidatorsSetListInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "publicKey" in value;
-    isInstance = isInstance && "weight" in value;
-
-    return isInstance;
+    if (!('publicKey' in value)) return false;
+    if (!('weight' in value)) return false;
+    return true;
 }
 
 export function ValidatorsSetListInnerFromJSON(json: any): ValidatorsSetListInner {
@@ -55,29 +53,26 @@ export function ValidatorsSetListInnerFromJSON(json: any): ValidatorsSetListInne
 }
 
 export function ValidatorsSetListInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): ValidatorsSetListInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'publicKey': json['public_key'],
         'weight': json['weight'],
-        'adnlAddr': !exists(json, 'adnl_addr') ? undefined : json['adnl_addr'],
+        'adnlAddr': json['adnl_addr'] == null ? undefined : json['adnl_addr'],
     };
 }
 
 export function ValidatorsSetListInnerToJSON(value?: ValidatorsSetListInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'public_key': value.publicKey,
-        'weight': value.weight,
-        'adnl_addr': value.adnlAddr,
+        'public_key': value['publicKey'],
+        'weight': value['weight'],
+        'adnl_addr': value['adnlAddr'],
     };
 }
 

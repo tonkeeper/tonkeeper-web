@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { NftCollection } from './NftCollection';
 import {
     NftCollectionFromJSON,
@@ -38,10 +38,8 @@ export interface NftCollections {
  * Check if a given object implements the NftCollections interface.
  */
 export function instanceOfNftCollections(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "nftCollections" in value;
-
-    return isInstance;
+    if (!('nftCollections' in value)) return false;
+    return true;
 }
 
 export function NftCollectionsFromJSON(json: any): NftCollections {
@@ -49,7 +47,7 @@ export function NftCollectionsFromJSON(json: any): NftCollections {
 }
 
 export function NftCollectionsFromJSONTyped(json: any, ignoreDiscriminator: boolean): NftCollections {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function NftCollectionsFromJSONTyped(json: any, ignoreDiscriminator: bool
 }
 
 export function NftCollectionsToJSON(value?: NftCollections | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'nft_collections': ((value.nftCollections as Array<any>).map(NftCollectionToJSON)),
+        'nft_collections': ((value['nftCollections'] as Array<any>).map(NftCollectionToJSON)),
     };
 }
 

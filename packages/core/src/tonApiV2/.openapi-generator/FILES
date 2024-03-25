@@ -80,6 +80,7 @@ models/BlockchainConfig7CurrenciesInner.ts
 models/BlockchainConfig8.ts
 models/BlockchainConfig9.ts
 models/BlockchainRawAccount.ts
+models/BlockchainRawAccountLibrariesInner.ts
 models/BouncePhaseType.ts
 models/ComputePhase.ts
 models/ComputeSkipReason.ts
@@ -117,7 +118,6 @@ models/GetAccountInfoByStateInitRequest.ts
 models/GetAccountPublicKey200Response.ts
 models/GetAccountsRequest.ts
 models/GetAllRawShardsInfo200Response.ts
-models/GetBlockchainBlockDefaultResponse.ts
 models/GetChartRates200Response.ts
 models/GetInscriptionOpTemplate200Response.ts
 models/GetRates200Response.ts
@@ -189,6 +189,7 @@ models/PoolImplementationType.ts
 models/PoolInfo.ts
 models/Price.ts
 models/RawBlockchainConfig.ts
+models/ReduceIndexingLatencyDefaultResponse.ts
 models/Refund.ts
 models/Risk.ts
 models/Sale.ts
@@ -196,6 +197,7 @@ models/SendBlockchainMessageRequest.ts
 models/SendRawMessage200Response.ts
 models/SendRawMessageRequest.ts
 models/Seqno.ts
+models/ServiceStatus.ts
 models/SizeLimitsConfig.ts
 models/SmartContractAction.ts
 models/StateInit.ts

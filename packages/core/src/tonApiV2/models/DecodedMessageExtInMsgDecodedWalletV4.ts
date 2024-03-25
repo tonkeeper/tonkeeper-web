@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { DecodedRawMessage } from './DecodedRawMessage';
 import {
     DecodedRawMessageFromJSON,
@@ -62,14 +62,12 @@ export interface DecodedMessageExtInMsgDecodedWalletV4 {
  * Check if a given object implements the DecodedMessageExtInMsgDecodedWalletV4 interface.
  */
 export function instanceOfDecodedMessageExtInMsgDecodedWalletV4(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "subwalletId" in value;
-    isInstance = isInstance && "validUntil" in value;
-    isInstance = isInstance && "seqno" in value;
-    isInstance = isInstance && "op" in value;
-    isInstance = isInstance && "rawMessages" in value;
-
-    return isInstance;
+    if (!('subwalletId' in value)) return false;
+    if (!('validUntil' in value)) return false;
+    if (!('seqno' in value)) return false;
+    if (!('op' in value)) return false;
+    if (!('rawMessages' in value)) return false;
+    return true;
 }
 
 export function DecodedMessageExtInMsgDecodedWalletV4FromJSON(json: any): DecodedMessageExtInMsgDecodedWalletV4 {
@@ -77,7 +75,7 @@ export function DecodedMessageExtInMsgDecodedWalletV4FromJSON(json: any): Decode
 }
 
 export function DecodedMessageExtInMsgDecodedWalletV4FromJSONTyped(json: any, ignoreDiscriminator: boolean): DecodedMessageExtInMsgDecodedWalletV4 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -91,19 +89,16 @@ export function DecodedMessageExtInMsgDecodedWalletV4FromJSONTyped(json: any, ig
 }
 
 export function DecodedMessageExtInMsgDecodedWalletV4ToJSON(value?: DecodedMessageExtInMsgDecodedWalletV4 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'subwallet_id': value.subwalletId,
-        'valid_until': value.validUntil,
-        'seqno': value.seqno,
-        'op': value.op,
-        'raw_messages': ((value.rawMessages as Array<any>).map(DecodedRawMessageToJSON)),
+        'subwallet_id': value['subwalletId'],
+        'valid_until': value['validUntil'],
+        'seqno': value['seqno'],
+        'op': value['op'],
+        'raw_messages': ((value['rawMessages'] as Array<any>).map(DecodedRawMessageToJSON)),
     };
 }
 

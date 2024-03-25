@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -133,7 +133,7 @@ export interface Message {
      * @type {any}
      * @memberof Message
      */
-    decodedBody?: any | null;
+    decodedBody?: any;
 }
 
 
@@ -152,19 +152,17 @@ export type MessageMsgTypeEnum = typeof MessageMsgTypeEnum[keyof typeof MessageM
  * Check if a given object implements the Message interface.
  */
 export function instanceOfMessage(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "msgType" in value;
-    isInstance = isInstance && "createdLt" in value;
-    isInstance = isInstance && "ihrDisabled" in value;
-    isInstance = isInstance && "bounce" in value;
-    isInstance = isInstance && "bounced" in value;
-    isInstance = isInstance && "value" in value;
-    isInstance = isInstance && "fwdFee" in value;
-    isInstance = isInstance && "ihrFee" in value;
-    isInstance = isInstance && "importFee" in value;
-    isInstance = isInstance && "createdAt" in value;
-
-    return isInstance;
+    if (!('msgType' in value)) return false;
+    if (!('createdLt' in value)) return false;
+    if (!('ihrDisabled' in value)) return false;
+    if (!('bounce' in value)) return false;
+    if (!('bounced' in value)) return false;
+    if (!('value' in value)) return false;
+    if (!('fwdFee' in value)) return false;
+    if (!('ihrFee' in value)) return false;
+    if (!('importFee' in value)) return false;
+    if (!('createdAt' in value)) return false;
+    return true;
 }
 
 export function MessageFromJSON(json: any): Message {
@@ -172,7 +170,7 @@ export function MessageFromJSON(json: any): Message {
 }
 
 export function MessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): Message {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -185,44 +183,41 @@ export function MessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): M
         'value': json['value'],
         'fwdFee': json['fwd_fee'],
         'ihrFee': json['ihr_fee'],
-        'destination': !exists(json, 'destination') ? undefined : AccountAddressFromJSON(json['destination']),
-        'source': !exists(json, 'source') ? undefined : AccountAddressFromJSON(json['source']),
+        'destination': json['destination'] == null ? undefined : AccountAddressFromJSON(json['destination']),
+        'source': json['source'] == null ? undefined : AccountAddressFromJSON(json['source']),
         'importFee': json['import_fee'],
         'createdAt': json['created_at'],
-        'opCode': !exists(json, 'op_code') ? undefined : json['op_code'],
-        'init': !exists(json, 'init') ? undefined : StateInitFromJSON(json['init']),
-        'rawBody': !exists(json, 'raw_body') ? undefined : json['raw_body'],
-        'decodedOpName': !exists(json, 'decoded_op_name') ? undefined : json['decoded_op_name'],
-        'decodedBody': !exists(json, 'decoded_body') ? undefined : json['decoded_body'],
+        'opCode': json['op_code'] == null ? undefined : json['op_code'],
+        'init': json['init'] == null ? undefined : StateInitFromJSON(json['init']),
+        'rawBody': json['raw_body'] == null ? undefined : json['raw_body'],
+        'decodedOpName': json['decoded_op_name'] == null ? undefined : json['decoded_op_name'],
+        'decodedBody': json['decoded_body'] == null ? undefined : json['decoded_body'],
     };
 }
 
 export function MessageToJSON(value?: Message | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'msg_type': value.msgType,
-        'created_lt': value.createdLt,
-        'ihr_disabled': value.ihrDisabled,
-        'bounce': value.bounce,
-        'bounced': value.bounced,
-        'value': value.value,
-        'fwd_fee': value.fwdFee,
-        'ihr_fee': value.ihrFee,
-        'destination': AccountAddressToJSON(value.destination),
-        'source': AccountAddressToJSON(value.source),
-        'import_fee': value.importFee,
-        'created_at': value.createdAt,
-        'op_code': value.opCode,
-        'init': StateInitToJSON(value.init),
-        'raw_body': value.rawBody,
-        'decoded_op_name': value.decodedOpName,
-        'decoded_body': value.decodedBody,
+        'msg_type': value['msgType'],
+        'created_lt': value['createdLt'],
+        'ihr_disabled': value['ihrDisabled'],
+        'bounce': value['bounce'],
+        'bounced': value['bounced'],
+        'value': value['value'],
+        'fwd_fee': value['fwdFee'],
+        'ihr_fee': value['ihrFee'],
+        'destination': AccountAddressToJSON(value['destination']),
+        'source': AccountAddressToJSON(value['source']),
+        'import_fee': value['importFee'],
+        'created_at': value['createdAt'],
+        'op_code': value['opCode'],
+        'init': StateInitToJSON(value['init']),
+        'raw_body': value['rawBody'],
+        'decoded_op_name': value['decodedOpName'],
+        'decoded_body': value['decodedBody'],
     };
 }
 

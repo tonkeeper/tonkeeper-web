@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ActionSimplePreview } from './ActionSimplePreview';
 import {
     ActionSimplePreviewFromJSON,
@@ -329,12 +329,10 @@ export type ActionStatusEnum = typeof ActionStatusEnum[keyof typeof ActionStatus
  * Check if a given object implements the Action interface.
  */
 export function instanceOfAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "type" in value;
-    isInstance = isInstance && "status" in value;
-    isInstance = isInstance && "simplePreview" in value;
-
-    return isInstance;
+    if (!('type' in value)) return false;
+    if (!('status' in value)) return false;
+    if (!('simplePreview' in value)) return false;
+    return true;
 }
 
 export function ActionFromJSON(json: any): Action {
@@ -342,69 +340,66 @@ export function ActionFromJSON(json: any): Action {
 }
 
 export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Action {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'type': json['type'],
         'status': json['status'],
-        'tonTransfer': !exists(json, 'TonTransfer') ? undefined : TonTransferActionFromJSON(json['TonTransfer']),
-        'contractDeploy': !exists(json, 'ContractDeploy') ? undefined : ContractDeployActionFromJSON(json['ContractDeploy']),
-        'jettonTransfer': !exists(json, 'JettonTransfer') ? undefined : JettonTransferActionFromJSON(json['JettonTransfer']),
-        'jettonBurn': !exists(json, 'JettonBurn') ? undefined : JettonBurnActionFromJSON(json['JettonBurn']),
-        'jettonMint': !exists(json, 'JettonMint') ? undefined : JettonMintActionFromJSON(json['JettonMint']),
-        'nftItemTransfer': !exists(json, 'NftItemTransfer') ? undefined : NftItemTransferActionFromJSON(json['NftItemTransfer']),
-        'subscribe': !exists(json, 'Subscribe') ? undefined : SubscriptionActionFromJSON(json['Subscribe']),
-        'unSubscribe': !exists(json, 'UnSubscribe') ? undefined : UnSubscriptionActionFromJSON(json['UnSubscribe']),
-        'auctionBid': !exists(json, 'AuctionBid') ? undefined : AuctionBidActionFromJSON(json['AuctionBid']),
-        'nftPurchase': !exists(json, 'NftPurchase') ? undefined : NftPurchaseActionFromJSON(json['NftPurchase']),
-        'depositStake': !exists(json, 'DepositStake') ? undefined : DepositStakeActionFromJSON(json['DepositStake']),
-        'withdrawStake': !exists(json, 'WithdrawStake') ? undefined : WithdrawStakeActionFromJSON(json['WithdrawStake']),
-        'withdrawStakeRequest': !exists(json, 'WithdrawStakeRequest') ? undefined : WithdrawStakeRequestActionFromJSON(json['WithdrawStakeRequest']),
-        'electionsDepositStake': !exists(json, 'ElectionsDepositStake') ? undefined : ElectionsDepositStakeActionFromJSON(json['ElectionsDepositStake']),
-        'electionsRecoverStake': !exists(json, 'ElectionsRecoverStake') ? undefined : ElectionsRecoverStakeActionFromJSON(json['ElectionsRecoverStake']),
-        'jettonSwap': !exists(json, 'JettonSwap') ? undefined : JettonSwapActionFromJSON(json['JettonSwap']),
-        'smartContractExec': !exists(json, 'SmartContractExec') ? undefined : SmartContractActionFromJSON(json['SmartContractExec']),
-        'domainRenew': !exists(json, 'DomainRenew') ? undefined : DomainRenewActionFromJSON(json['DomainRenew']),
-        'inscriptionTransfer': !exists(json, 'InscriptionTransfer') ? undefined : InscriptionTransferActionFromJSON(json['InscriptionTransfer']),
-        'inscriptionMint': !exists(json, 'InscriptionMint') ? undefined : InscriptionMintActionFromJSON(json['InscriptionMint']),
+        'tonTransfer': json['TonTransfer'] == null ? undefined : TonTransferActionFromJSON(json['TonTransfer']),
+        'contractDeploy': json['ContractDeploy'] == null ? undefined : ContractDeployActionFromJSON(json['ContractDeploy']),
+        'jettonTransfer': json['JettonTransfer'] == null ? undefined : JettonTransferActionFromJSON(json['JettonTransfer']),
+        'jettonBurn': json['JettonBurn'] == null ? undefined : JettonBurnActionFromJSON(json['JettonBurn']),
+        'jettonMint': json['JettonMint'] == null ? undefined : JettonMintActionFromJSON(json['JettonMint']),
+        'nftItemTransfer': json['NftItemTransfer'] == null ? undefined : NftItemTransferActionFromJSON(json['NftItemTransfer']),
+        'subscribe': json['Subscribe'] == null ? undefined : SubscriptionActionFromJSON(json['Subscribe']),
+        'unSubscribe': json['UnSubscribe'] == null ? undefined : UnSubscriptionActionFromJSON(json['UnSubscribe']),
+        'auctionBid': json['AuctionBid'] == null ? undefined : AuctionBidActionFromJSON(json['AuctionBid']),
+        'nftPurchase': json['NftPurchase'] == null ? undefined : NftPurchaseActionFromJSON(json['NftPurchase']),
+        'depositStake': json['DepositStake'] == null ? undefined : DepositStakeActionFromJSON(json['DepositStake']),
+        'withdrawStake': json['WithdrawStake'] == null ? undefined : WithdrawStakeActionFromJSON(json['WithdrawStake']),
+        'withdrawStakeRequest': json['WithdrawStakeRequest'] == null ? undefined : WithdrawStakeRequestActionFromJSON(json['WithdrawStakeRequest']),
+        'electionsDepositStake': json['ElectionsDepositStake'] == null ? undefined : ElectionsDepositStakeActionFromJSON(json['ElectionsDepositStake']),
+        'electionsRecoverStake': json['ElectionsRecoverStake'] == null ? undefined : ElectionsRecoverStakeActionFromJSON(json['ElectionsRecoverStake']),
+        'jettonSwap': json['JettonSwap'] == null ? undefined : JettonSwapActionFromJSON(json['JettonSwap']),
+        'smartContractExec': json['SmartContractExec'] == null ? undefined : SmartContractActionFromJSON(json['SmartContractExec']),
+        'domainRenew': json['DomainRenew'] == null ? undefined : DomainRenewActionFromJSON(json['DomainRenew']),
+        'inscriptionTransfer': json['InscriptionTransfer'] == null ? undefined : InscriptionTransferActionFromJSON(json['InscriptionTransfer']),
+        'inscriptionMint': json['InscriptionMint'] == null ? undefined : InscriptionMintActionFromJSON(json['InscriptionMint']),
         'simplePreview': ActionSimplePreviewFromJSON(json['simple_preview']),
     };
 }
 
 export function ActionToJSON(value?: Action | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'type': value.type,
-        'status': value.status,
-        'TonTransfer': TonTransferActionToJSON(value.tonTransfer),
-        'ContractDeploy': ContractDeployActionToJSON(value.contractDeploy),
-        'JettonTransfer': JettonTransferActionToJSON(value.jettonTransfer),
-        'JettonBurn': JettonBurnActionToJSON(value.jettonBurn),
-        'JettonMint': JettonMintActionToJSON(value.jettonMint),
-        'NftItemTransfer': NftItemTransferActionToJSON(value.nftItemTransfer),
-        'Subscribe': SubscriptionActionToJSON(value.subscribe),
-        'UnSubscribe': UnSubscriptionActionToJSON(value.unSubscribe),
-        'AuctionBid': AuctionBidActionToJSON(value.auctionBid),
-        'NftPurchase': NftPurchaseActionToJSON(value.nftPurchase),
-        'DepositStake': DepositStakeActionToJSON(value.depositStake),
-        'WithdrawStake': WithdrawStakeActionToJSON(value.withdrawStake),
-        'WithdrawStakeRequest': WithdrawStakeRequestActionToJSON(value.withdrawStakeRequest),
-        'ElectionsDepositStake': ElectionsDepositStakeActionToJSON(value.electionsDepositStake),
-        'ElectionsRecoverStake': ElectionsRecoverStakeActionToJSON(value.electionsRecoverStake),
-        'JettonSwap': JettonSwapActionToJSON(value.jettonSwap),
-        'SmartContractExec': SmartContractActionToJSON(value.smartContractExec),
-        'DomainRenew': DomainRenewActionToJSON(value.domainRenew),
-        'InscriptionTransfer': InscriptionTransferActionToJSON(value.inscriptionTransfer),
-        'InscriptionMint': InscriptionMintActionToJSON(value.inscriptionMint),
-        'simple_preview': ActionSimplePreviewToJSON(value.simplePreview),
+        'type': value['type'],
+        'status': value['status'],
+        'TonTransfer': TonTransferActionToJSON(value['tonTransfer']),
+        'ContractDeploy': ContractDeployActionToJSON(value['contractDeploy']),
+        'JettonTransfer': JettonTransferActionToJSON(value['jettonTransfer']),
+        'JettonBurn': JettonBurnActionToJSON(value['jettonBurn']),
+        'JettonMint': JettonMintActionToJSON(value['jettonMint']),
+        'NftItemTransfer': NftItemTransferActionToJSON(value['nftItemTransfer']),
+        'Subscribe': SubscriptionActionToJSON(value['subscribe']),
+        'UnSubscribe': UnSubscriptionActionToJSON(value['unSubscribe']),
+        'AuctionBid': AuctionBidActionToJSON(value['auctionBid']),
+        'NftPurchase': NftPurchaseActionToJSON(value['nftPurchase']),
+        'DepositStake': DepositStakeActionToJSON(value['depositStake']),
+        'WithdrawStake': WithdrawStakeActionToJSON(value['withdrawStake']),
+        'WithdrawStakeRequest': WithdrawStakeRequestActionToJSON(value['withdrawStakeRequest']),
+        'ElectionsDepositStake': ElectionsDepositStakeActionToJSON(value['electionsDepositStake']),
+        'ElectionsRecoverStake': ElectionsRecoverStakeActionToJSON(value['electionsRecoverStake']),
+        'JettonSwap': JettonSwapActionToJSON(value['jettonSwap']),
+        'SmartContractExec': SmartContractActionToJSON(value['smartContractExec']),
+        'DomainRenew': DomainRenewActionToJSON(value['domainRenew']),
+        'InscriptionTransfer': InscriptionTransferActionToJSON(value['inscriptionTransfer']),
+        'InscriptionMint': InscriptionMintActionToJSON(value['inscriptionMint']),
+        'simple_preview': ActionSimplePreviewToJSON(value['simplePreview']),
     };
 }
 

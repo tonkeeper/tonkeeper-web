@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockchainAccountInspectMethodsInner } from './BlockchainAccountInspectMethodsInner';
 import {
     BlockchainAccountInspectMethodsInnerFromJSON,
@@ -66,12 +66,10 @@ export type BlockchainAccountInspectCompilerEnum = typeof BlockchainAccountInspe
  * Check if a given object implements the BlockchainAccountInspect interface.
  */
 export function instanceOfBlockchainAccountInspect(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "code" in value;
-    isInstance = isInstance && "codeHash" in value;
-    isInstance = isInstance && "methods" in value;
-
-    return isInstance;
+    if (!('code' in value)) return false;
+    if (!('codeHash' in value)) return false;
+    if (!('methods' in value)) return false;
+    return true;
 }
 
 export function BlockchainAccountInspectFromJSON(json: any): BlockchainAccountInspect {
@@ -79,7 +77,7 @@ export function BlockchainAccountInspectFromJSON(json: any): BlockchainAccountIn
 }
 
 export function BlockchainAccountInspectFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainAccountInspect {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -87,23 +85,20 @@ export function BlockchainAccountInspectFromJSONTyped(json: any, ignoreDiscrimin
         'code': json['code'],
         'codeHash': json['code_hash'],
         'methods': ((json['methods'] as Array<any>).map(BlockchainAccountInspectMethodsInnerFromJSON)),
-        'compiler': !exists(json, 'compiler') ? undefined : json['compiler'],
+        'compiler': json['compiler'] == null ? undefined : json['compiler'],
     };
 }
 
 export function BlockchainAccountInspectToJSON(value?: BlockchainAccountInspect | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'code': value.code,
-        'code_hash': value.codeHash,
-        'methods': ((value.methods as Array<any>).map(BlockchainAccountInspectMethodsInnerToJSON)),
-        'compiler': value.compiler,
+        'code': value['code'],
+        'code_hash': value['codeHash'],
+        'methods': ((value['methods'] as Array<any>).map(BlockchainAccountInspectMethodsInnerToJSON)),
+        'compiler': value['compiler'],
     };
 }
 

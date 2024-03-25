@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockValueFlow } from './BlockValueFlow';
 import {
     BlockValueFlowFromJSON,
@@ -212,36 +212,34 @@ export interface BlockchainBlock {
  * Check if a given object implements the BlockchainBlock interface.
  */
 export function instanceOfBlockchainBlock(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "txQuantity" in value;
-    isInstance = isInstance && "valueFlow" in value;
-    isInstance = isInstance && "workchainId" in value;
-    isInstance = isInstance && "shard" in value;
-    isInstance = isInstance && "seqno" in value;
-    isInstance = isInstance && "rootHash" in value;
-    isInstance = isInstance && "fileHash" in value;
-    isInstance = isInstance && "globalId" in value;
-    isInstance = isInstance && "version" in value;
-    isInstance = isInstance && "afterMerge" in value;
-    isInstance = isInstance && "beforeSplit" in value;
-    isInstance = isInstance && "afterSplit" in value;
-    isInstance = isInstance && "wantSplit" in value;
-    isInstance = isInstance && "wantMerge" in value;
-    isInstance = isInstance && "keyBlock" in value;
-    isInstance = isInstance && "genUtime" in value;
-    isInstance = isInstance && "startLt" in value;
-    isInstance = isInstance && "endLt" in value;
-    isInstance = isInstance && "vertSeqno" in value;
-    isInstance = isInstance && "genCatchainSeqno" in value;
-    isInstance = isInstance && "minRefMcSeqno" in value;
-    isInstance = isInstance && "prevKeyBlockSeqno" in value;
-    isInstance = isInstance && "prevRefs" in value;
-    isInstance = isInstance && "inMsgDescrLength" in value;
-    isInstance = isInstance && "outMsgDescrLength" in value;
-    isInstance = isInstance && "randSeed" in value;
-    isInstance = isInstance && "createdBy" in value;
-
-    return isInstance;
+    if (!('txQuantity' in value)) return false;
+    if (!('valueFlow' in value)) return false;
+    if (!('workchainId' in value)) return false;
+    if (!('shard' in value)) return false;
+    if (!('seqno' in value)) return false;
+    if (!('rootHash' in value)) return false;
+    if (!('fileHash' in value)) return false;
+    if (!('globalId' in value)) return false;
+    if (!('version' in value)) return false;
+    if (!('afterMerge' in value)) return false;
+    if (!('beforeSplit' in value)) return false;
+    if (!('afterSplit' in value)) return false;
+    if (!('wantSplit' in value)) return false;
+    if (!('wantMerge' in value)) return false;
+    if (!('keyBlock' in value)) return false;
+    if (!('genUtime' in value)) return false;
+    if (!('startLt' in value)) return false;
+    if (!('endLt' in value)) return false;
+    if (!('vertSeqno' in value)) return false;
+    if (!('genCatchainSeqno' in value)) return false;
+    if (!('minRefMcSeqno' in value)) return false;
+    if (!('prevKeyBlockSeqno' in value)) return false;
+    if (!('prevRefs' in value)) return false;
+    if (!('inMsgDescrLength' in value)) return false;
+    if (!('outMsgDescrLength' in value)) return false;
+    if (!('randSeed' in value)) return false;
+    if (!('createdBy' in value)) return false;
+    return true;
 }
 
 export function BlockchainBlockFromJSON(json: any): BlockchainBlock {
@@ -249,7 +247,7 @@ export function BlockchainBlockFromJSON(json: any): BlockchainBlock {
 }
 
 export function BlockchainBlockFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainBlock {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -276,9 +274,9 @@ export function BlockchainBlockFromJSONTyped(json: any, ignoreDiscriminator: boo
         'genCatchainSeqno': json['gen_catchain_seqno'],
         'minRefMcSeqno': json['min_ref_mc_seqno'],
         'prevKeyBlockSeqno': json['prev_key_block_seqno'],
-        'genSoftwareVersion': !exists(json, 'gen_software_version') ? undefined : json['gen_software_version'],
-        'genSoftwareCapabilities': !exists(json, 'gen_software_capabilities') ? undefined : json['gen_software_capabilities'],
-        'masterRef': !exists(json, 'master_ref') ? undefined : json['master_ref'],
+        'genSoftwareVersion': json['gen_software_version'] == null ? undefined : json['gen_software_version'],
+        'genSoftwareCapabilities': json['gen_software_capabilities'] == null ? undefined : json['gen_software_capabilities'],
+        'masterRef': json['master_ref'] == null ? undefined : json['master_ref'],
         'prevRefs': json['prev_refs'],
         'inMsgDescrLength': json['in_msg_descr_length'],
         'outMsgDescrLength': json['out_msg_descr_length'],
@@ -288,44 +286,41 @@ export function BlockchainBlockFromJSONTyped(json: any, ignoreDiscriminator: boo
 }
 
 export function BlockchainBlockToJSON(value?: BlockchainBlock | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'tx_quantity': value.txQuantity,
-        'value_flow': BlockValueFlowToJSON(value.valueFlow),
-        'workchain_id': value.workchainId,
-        'shard': value.shard,
-        'seqno': value.seqno,
-        'root_hash': value.rootHash,
-        'file_hash': value.fileHash,
-        'global_id': value.globalId,
-        'version': value.version,
-        'after_merge': value.afterMerge,
-        'before_split': value.beforeSplit,
-        'after_split': value.afterSplit,
-        'want_split': value.wantSplit,
-        'want_merge': value.wantMerge,
-        'key_block': value.keyBlock,
-        'gen_utime': value.genUtime,
-        'start_lt': value.startLt,
-        'end_lt': value.endLt,
-        'vert_seqno': value.vertSeqno,
-        'gen_catchain_seqno': value.genCatchainSeqno,
-        'min_ref_mc_seqno': value.minRefMcSeqno,
-        'prev_key_block_seqno': value.prevKeyBlockSeqno,
-        'gen_software_version': value.genSoftwareVersion,
-        'gen_software_capabilities': value.genSoftwareCapabilities,
-        'master_ref': value.masterRef,
-        'prev_refs': value.prevRefs,
-        'in_msg_descr_length': value.inMsgDescrLength,
-        'out_msg_descr_length': value.outMsgDescrLength,
-        'rand_seed': value.randSeed,
-        'created_by': value.createdBy,
+        'tx_quantity': value['txQuantity'],
+        'value_flow': BlockValueFlowToJSON(value['valueFlow']),
+        'workchain_id': value['workchainId'],
+        'shard': value['shard'],
+        'seqno': value['seqno'],
+        'root_hash': value['rootHash'],
+        'file_hash': value['fileHash'],
+        'global_id': value['globalId'],
+        'version': value['version'],
+        'after_merge': value['afterMerge'],
+        'before_split': value['beforeSplit'],
+        'after_split': value['afterSplit'],
+        'want_split': value['wantSplit'],
+        'want_merge': value['wantMerge'],
+        'key_block': value['keyBlock'],
+        'gen_utime': value['genUtime'],
+        'start_lt': value['startLt'],
+        'end_lt': value['endLt'],
+        'vert_seqno': value['vertSeqno'],
+        'gen_catchain_seqno': value['genCatchainSeqno'],
+        'min_ref_mc_seqno': value['minRefMcSeqno'],
+        'prev_key_block_seqno': value['prevKeyBlockSeqno'],
+        'gen_software_version': value['genSoftwareVersion'],
+        'gen_software_capabilities': value['genSoftwareCapabilities'],
+        'master_ref': value['masterRef'],
+        'prev_refs': value['prevRefs'],
+        'in_msg_descr_length': value['inMsgDescrLength'],
+        'out_msg_descr_length': value['outMsgDescrLength'],
+        'rand_seed': value['randSeed'],
+        'created_by': value['createdBy'],
     };
 }
 

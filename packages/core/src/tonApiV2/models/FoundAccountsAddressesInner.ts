@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -43,12 +43,10 @@ export interface FoundAccountsAddressesInner {
  * Check if a given object implements the FoundAccountsAddressesInner interface.
  */
 export function instanceOfFoundAccountsAddressesInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "preview" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('name' in value)) return false;
+    if (!('preview' in value)) return false;
+    return true;
 }
 
 export function FoundAccountsAddressesInnerFromJSON(json: any): FoundAccountsAddressesInner {
@@ -56,7 +54,7 @@ export function FoundAccountsAddressesInnerFromJSON(json: any): FoundAccountsAdd
 }
 
 export function FoundAccountsAddressesInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): FoundAccountsAddressesInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -68,17 +66,14 @@ export function FoundAccountsAddressesInnerFromJSONTyped(json: any, ignoreDiscri
 }
 
 export function FoundAccountsAddressesInnerToJSON(value?: FoundAccountsAddressesInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'name': value.name,
-        'preview': value.preview,
+        'address': value['address'],
+        'name': value['name'],
+        'preview': value['preview'],
     };
 }
 

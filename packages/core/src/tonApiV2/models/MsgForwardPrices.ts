@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -61,15 +61,13 @@ export interface MsgForwardPrices {
  * Check if a given object implements the MsgForwardPrices interface.
  */
 export function instanceOfMsgForwardPrices(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "lumpPrice" in value;
-    isInstance = isInstance && "bitPrice" in value;
-    isInstance = isInstance && "cellPrice" in value;
-    isInstance = isInstance && "ihrPriceFactor" in value;
-    isInstance = isInstance && "firstFrac" in value;
-    isInstance = isInstance && "nextFrac" in value;
-
-    return isInstance;
+    if (!('lumpPrice' in value)) return false;
+    if (!('bitPrice' in value)) return false;
+    if (!('cellPrice' in value)) return false;
+    if (!('ihrPriceFactor' in value)) return false;
+    if (!('firstFrac' in value)) return false;
+    if (!('nextFrac' in value)) return false;
+    return true;
 }
 
 export function MsgForwardPricesFromJSON(json: any): MsgForwardPrices {
@@ -77,7 +75,7 @@ export function MsgForwardPricesFromJSON(json: any): MsgForwardPrices {
 }
 
 export function MsgForwardPricesFromJSONTyped(json: any, ignoreDiscriminator: boolean): MsgForwardPrices {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -92,20 +90,17 @@ export function MsgForwardPricesFromJSONTyped(json: any, ignoreDiscriminator: bo
 }
 
 export function MsgForwardPricesToJSON(value?: MsgForwardPrices | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'lump_price': value.lumpPrice,
-        'bit_price': value.bitPrice,
-        'cell_price': value.cellPrice,
-        'ihr_price_factor': value.ihrPriceFactor,
-        'first_frac': value.firstFrac,
-        'next_frac': value.nextFrac,
+        'lump_price': value['lumpPrice'],
+        'bit_price': value['bitPrice'],
+        'cell_price': value['cellPrice'],
+        'ihr_price_factor': value['ihrPriceFactor'],
+        'first_frac': value['firstFrac'],
+        'next_frac': value['nextFrac'],
     };
 }
 

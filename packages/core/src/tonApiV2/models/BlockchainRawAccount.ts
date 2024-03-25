@@ -12,13 +12,25 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
+import type { AccountStatus } from './AccountStatus';
+import {
+    AccountStatusFromJSON,
+    AccountStatusFromJSONTyped,
+    AccountStatusToJSON,
+} from './AccountStatus';
 import type { AccountStorageInfo } from './AccountStorageInfo';
 import {
     AccountStorageInfoFromJSON,
     AccountStorageInfoFromJSONTyped,
     AccountStorageInfoToJSON,
 } from './AccountStorageInfo';
+import type { BlockchainRawAccountLibrariesInner } from './BlockchainRawAccountLibrariesInner';
+import {
+    BlockchainRawAccountLibrariesInnerFromJSON,
+    BlockchainRawAccountLibrariesInnerFromJSONTyped,
+    BlockchainRawAccountLibrariesInnerToJSON,
+} from './BlockchainRawAccountLibrariesInner';
 
 /**
  * 
@@ -67,27 +79,43 @@ export interface BlockchainRawAccount {
      * @type {string}
      * @memberof BlockchainRawAccount
      */
-    status: string;
+    lastTransactionHash?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BlockchainRawAccount
+     */
+    frozenHash?: string;
+    /**
+     * 
+     * @type {AccountStatus}
+     * @memberof BlockchainRawAccount
+     */
+    status: AccountStatus;
     /**
      * 
      * @type {AccountStorageInfo}
      * @memberof BlockchainRawAccount
      */
     storage: AccountStorageInfo;
+    /**
+     * 
+     * @type {Array<BlockchainRawAccountLibrariesInner>}
+     * @memberof BlockchainRawAccount
+     */
+    libraries?: Array<BlockchainRawAccountLibrariesInner>;
 }
 
 /**
  * Check if a given object implements the BlockchainRawAccount interface.
  */
 export function instanceOfBlockchainRawAccount(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "balance" in value;
-    isInstance = isInstance && "lastTransactionLt" in value;
-    isInstance = isInstance && "status" in value;
-    isInstance = isInstance && "storage" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('balance' in value)) return false;
+    if (!('lastTransactionLt' in value)) return false;
+    if (!('status' in value)) return false;
+    if (!('storage' in value)) return false;
+    return true;
 }
 
 export function BlockchainRawAccountFromJSON(json: any): BlockchainRawAccount {
@@ -95,39 +123,42 @@ export function BlockchainRawAccountFromJSON(json: any): BlockchainRawAccount {
 }
 
 export function BlockchainRawAccountFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainRawAccount {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'address': json['address'],
         'balance': json['balance'],
-        'extraBalance': !exists(json, 'extra_balance') ? undefined : json['extra_balance'],
-        'code': !exists(json, 'code') ? undefined : json['code'],
-        'data': !exists(json, 'data') ? undefined : json['data'],
+        'extraBalance': json['extra_balance'] == null ? undefined : json['extra_balance'],
+        'code': json['code'] == null ? undefined : json['code'],
+        'data': json['data'] == null ? undefined : json['data'],
         'lastTransactionLt': json['last_transaction_lt'],
-        'status': json['status'],
+        'lastTransactionHash': json['last_transaction_hash'] == null ? undefined : json['last_transaction_hash'],
+        'frozenHash': json['frozen_hash'] == null ? undefined : json['frozen_hash'],
+        'status': AccountStatusFromJSON(json['status']),
         'storage': AccountStorageInfoFromJSON(json['storage']),
+        'libraries': json['libraries'] == null ? undefined : ((json['libraries'] as Array<any>).map(BlockchainRawAccountLibrariesInnerFromJSON)),
     };
 }
 
 export function BlockchainRawAccountToJSON(value?: BlockchainRawAccount | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'balance': value.balance,
-        'extra_balance': value.extraBalance,
-        'code': value.code,
-        'data': value.data,
-        'last_transaction_lt': value.lastTransactionLt,
-        'status': value.status,
-        'storage': AccountStorageInfoToJSON(value.storage),
+        'address': value['address'],
+        'balance': value['balance'],
+        'extra_balance': value['extraBalance'],
+        'code': value['code'],
+        'data': value['data'],
+        'last_transaction_lt': value['lastTransactionLt'],
+        'last_transaction_hash': value['lastTransactionHash'],
+        'frozen_hash': value['frozenHash'],
+        'status': AccountStatusToJSON(value['status']),
+        'storage': AccountStorageInfoToJSON(value['storage']),
+        'libraries': value['libraries'] == null ? undefined : ((value['libraries'] as Array<any>).map(BlockchainRawAccountLibrariesInnerToJSON)),
     };
 }
 

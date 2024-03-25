@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { StorageProvider } from './StorageProvider';
 import {
     StorageProviderFromJSON,
@@ -38,10 +38,8 @@ export interface GetStorageProviders200Response {
  * Check if a given object implements the GetStorageProviders200Response interface.
  */
 export function instanceOfGetStorageProviders200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "providers" in value;
-
-    return isInstance;
+    if (!('providers' in value)) return false;
+    return true;
 }
 
 export function GetStorageProviders200ResponseFromJSON(json: any): GetStorageProviders200Response {
@@ -49,7 +47,7 @@ export function GetStorageProviders200ResponseFromJSON(json: any): GetStoragePro
 }
 
 export function GetStorageProviders200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetStorageProviders200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function GetStorageProviders200ResponseFromJSONTyped(json: any, ignoreDis
 }
 
 export function GetStorageProviders200ResponseToJSON(value?: GetStorageProviders200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'providers': ((value.providers as Array<any>).map(StorageProviderToJSON)),
+        'providers': ((value['providers'] as Array<any>).map(StorageProviderToJSON)),
     };
 }
 

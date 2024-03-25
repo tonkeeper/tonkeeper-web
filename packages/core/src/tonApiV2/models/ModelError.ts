@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface ModelError {
  * Check if a given object implements the ModelError interface.
  */
 export function instanceOfModelError(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "error" in value;
-
-    return isInstance;
+    if (!('error' in value)) return false;
+    return true;
 }
 
 export function ModelErrorFromJSON(json: any): ModelError {
@@ -42,7 +40,7 @@ export function ModelErrorFromJSON(json: any): ModelError {
 }
 
 export function ModelErrorFromJSONTyped(json: any, ignoreDiscriminator: boolean): ModelError {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function ModelErrorFromJSONTyped(json: any, ignoreDiscriminator: boolean)
 }
 
 export function ModelErrorToJSON(value?: ModelError | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'error': value.error,
+        'error': value['error'],
     };
 }
 

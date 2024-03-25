@@ -1,3 +1,4 @@
+import { Address } from '@ton/core';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
@@ -7,7 +8,6 @@ import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/
 import { TonAsset, legacyTonAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import BigNumber from 'bignumber.js';
-import { Address } from 'ton-core';
 import { useRate } from './rates';
 import { useTronBalances } from './tron/tron';
 import { useWalletAccountInfo, useWalletJettonList } from './wallet';

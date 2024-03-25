@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -87,13 +87,11 @@ export type AuctionBidActionAuctionTypeEnum = typeof AuctionBidActionAuctionType
  * Check if a given object implements the AuctionBidAction interface.
  */
 export function instanceOfAuctionBidAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "auctionType" in value;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "bidder" in value;
-    isInstance = isInstance && "auction" in value;
-
-    return isInstance;
+    if (!('auctionType' in value)) return false;
+    if (!('amount' in value)) return false;
+    if (!('bidder' in value)) return false;
+    if (!('auction' in value)) return false;
+    return true;
 }
 
 export function AuctionBidActionFromJSON(json: any): AuctionBidAction {
@@ -101,33 +99,30 @@ export function AuctionBidActionFromJSON(json: any): AuctionBidAction {
 }
 
 export function AuctionBidActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): AuctionBidAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'auctionType': json['auction_type'],
         'amount': PriceFromJSON(json['amount']),
-        'nft': !exists(json, 'nft') ? undefined : NftItemFromJSON(json['nft']),
+        'nft': json['nft'] == null ? undefined : NftItemFromJSON(json['nft']),
         'bidder': AccountAddressFromJSON(json['bidder']),
         'auction': AccountAddressFromJSON(json['auction']),
     };
 }
 
 export function AuctionBidActionToJSON(value?: AuctionBidAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'auction_type': value.auctionType,
-        'amount': PriceToJSON(value.amount),
-        'nft': NftItemToJSON(value.nft),
-        'bidder': AccountAddressToJSON(value.bidder),
-        'auction': AccountAddressToJSON(value.auction),
+        'auction_type': value['auctionType'],
+        'amount': PriceToJSON(value['amount']),
+        'nft': NftItemToJSON(value['nft']),
+        'bidder': AccountAddressToJSON(value['bidder']),
+        'auction': AccountAddressToJSON(value['auction']),
     };
 }
 

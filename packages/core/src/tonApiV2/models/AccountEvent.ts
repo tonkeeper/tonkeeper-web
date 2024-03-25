@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -86,17 +86,15 @@ export interface AccountEvent {
  * Check if a given object implements the AccountEvent interface.
  */
 export function instanceOfAccountEvent(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "eventId" in value;
-    isInstance = isInstance && "account" in value;
-    isInstance = isInstance && "timestamp" in value;
-    isInstance = isInstance && "actions" in value;
-    isInstance = isInstance && "isScam" in value;
-    isInstance = isInstance && "lt" in value;
-    isInstance = isInstance && "inProgress" in value;
-    isInstance = isInstance && "extra" in value;
-
-    return isInstance;
+    if (!('eventId' in value)) return false;
+    if (!('account' in value)) return false;
+    if (!('timestamp' in value)) return false;
+    if (!('actions' in value)) return false;
+    if (!('isScam' in value)) return false;
+    if (!('lt' in value)) return false;
+    if (!('inProgress' in value)) return false;
+    if (!('extra' in value)) return false;
+    return true;
 }
 
 export function AccountEventFromJSON(json: any): AccountEvent {
@@ -104,7 +102,7 @@ export function AccountEventFromJSON(json: any): AccountEvent {
 }
 
 export function AccountEventFromJSONTyped(json: any, ignoreDiscriminator: boolean): AccountEvent {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -121,22 +119,19 @@ export function AccountEventFromJSONTyped(json: any, ignoreDiscriminator: boolea
 }
 
 export function AccountEventToJSON(value?: AccountEvent | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'event_id': value.eventId,
-        'account': AccountAddressToJSON(value.account),
-        'timestamp': value.timestamp,
-        'actions': ((value.actions as Array<any>).map(ActionToJSON)),
-        'is_scam': value.isScam,
-        'lt': value.lt,
-        'in_progress': value.inProgress,
-        'extra': value.extra,
+        'event_id': value['eventId'],
+        'account': AccountAddressToJSON(value['account']),
+        'timestamp': value['timestamp'],
+        'actions': ((value['actions'] as Array<any>).map(ActionToJSON)),
+        'is_scam': value['isScam'],
+        'lt': value['lt'],
+        'in_progress': value['inProgress'],
+        'extra': value['extra'],
     };
 }
 

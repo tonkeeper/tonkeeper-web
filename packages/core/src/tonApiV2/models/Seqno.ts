@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface Seqno {
  * Check if a given object implements the Seqno interface.
  */
 export function instanceOfSeqno(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "seqno" in value;
-
-    return isInstance;
+    if (!('seqno' in value)) return false;
+    return true;
 }
 
 export function SeqnoFromJSON(json: any): Seqno {
@@ -42,7 +40,7 @@ export function SeqnoFromJSON(json: any): Seqno {
 }
 
 export function SeqnoFromJSONTyped(json: any, ignoreDiscriminator: boolean): Seqno {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function SeqnoFromJSONTyped(json: any, ignoreDiscriminator: boolean): Seq
 }
 
 export function SeqnoToJSON(value?: Seqno | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'seqno': value.seqno,
+        'seqno': value['seqno'],
     };
 }
 

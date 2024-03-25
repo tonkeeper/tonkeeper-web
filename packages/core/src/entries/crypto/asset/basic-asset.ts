@@ -1,4 +1,4 @@
-import { Address } from 'ton-core';
+import { Address } from '@ton/core';
 import { BLOCKCHAIN_NAME } from '../../crypto';
 
 export interface BasicAsset {

@@ -16,19 +16,19 @@
 import * as runtime from '../runtime';
 import type {
   AccountEvents,
-  GetBlockchainBlockDefaultResponse,
   GetInscriptionOpTemplate200Response,
   InscriptionBalances,
+  ReduceIndexingLatencyDefaultResponse,
 } from '../models/index';
 import {
     AccountEventsFromJSON,
     AccountEventsToJSON,
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
     GetInscriptionOpTemplate200ResponseFromJSON,
     GetInscriptionOpTemplate200ResponseToJSON,
     InscriptionBalancesFromJSON,
     InscriptionBalancesToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetAccountInscriptionsRequest {
@@ -151,24 +151,27 @@ export class InscriptionsApi extends runtime.BaseAPI implements InscriptionsApiI
      * Get all inscriptions by owner address. It\'s experimental API and can be dropped in the future.
      */
     async getAccountInscriptionsRaw(requestParameters: GetAccountInscriptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<InscriptionBalances>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountInscriptions.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountInscriptions().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
-        if (requestParameters.offset !== undefined) {
-            queryParameters['offset'] = requestParameters.offset;
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/experimental/accounts/{account_id}/inscriptions`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/experimental/accounts/{account_id}/inscriptions`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -189,28 +192,31 @@ export class InscriptionsApi extends runtime.BaseAPI implements InscriptionsApiI
      * Get the transfer inscriptions history for account. It\'s experimental API and can be dropped in the future.
      */
     async getAccountInscriptionsHistoryRaw(requestParameters: GetAccountInscriptionsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountInscriptionsHistory.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountInscriptionsHistory().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.beforeLt !== undefined) {
-            queryParameters['before_lt'] = requestParameters.beforeLt;
+        if (requestParameters['beforeLt'] != null) {
+            queryParameters['before_lt'] = requestParameters['beforeLt'];
         }
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({
-            path: `/v2/experimental/accounts/{account_id}/inscriptions/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/experimental/accounts/{account_id}/inscriptions/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -231,32 +237,38 @@ export class InscriptionsApi extends runtime.BaseAPI implements InscriptionsApiI
      * Get the transfer inscriptions history for account. It\'s experimental API and can be dropped in the future.
      */
     async getAccountInscriptionsHistoryByTickerRaw(requestParameters: GetAccountInscriptionsHistoryByTickerRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling getAccountInscriptionsHistoryByTicker.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountInscriptionsHistoryByTicker().'
+            );
         }
 
-        if (requestParameters.ticker === null || requestParameters.ticker === undefined) {
-            throw new runtime.RequiredError('ticker','Required parameter requestParameters.ticker was null or undefined when calling getAccountInscriptionsHistoryByTicker.');
+        if (requestParameters['ticker'] == null) {
+            throw new runtime.RequiredError(
+                'ticker',
+                'Required parameter "ticker" was null or undefined when calling getAccountInscriptionsHistoryByTicker().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.beforeLt !== undefined) {
-            queryParameters['before_lt'] = requestParameters.beforeLt;
+        if (requestParameters['beforeLt'] != null) {
+            queryParameters['before_lt'] = requestParameters['beforeLt'];
         }
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({
-            path: `/v2/experimental/accounts/{account_id}/inscriptions/{ticker}/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))).replace(`{${"ticker"}}`, encodeURIComponent(String(requestParameters.ticker))),
+            path: `/v2/experimental/accounts/{account_id}/inscriptions/{ticker}/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))).replace(`{${"ticker"}}`, encodeURIComponent(String(requestParameters['ticker']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -277,54 +289,69 @@ export class InscriptionsApi extends runtime.BaseAPI implements InscriptionsApiI
      * return comment for making operation with inscription. please don\'t use it if you don\'t know what you are doing
      */
     async getInscriptionOpTemplateRaw(requestParameters: GetInscriptionOpTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetInscriptionOpTemplate200Response>> {
-        if (requestParameters.type === null || requestParameters.type === undefined) {
-            throw new runtime.RequiredError('type','Required parameter requestParameters.type was null or undefined when calling getInscriptionOpTemplate.');
+        if (requestParameters['type'] == null) {
+            throw new runtime.RequiredError(
+                'type',
+                'Required parameter "type" was null or undefined when calling getInscriptionOpTemplate().'
+            );
         }
 
-        if (requestParameters.operation === null || requestParameters.operation === undefined) {
-            throw new runtime.RequiredError('operation','Required parameter requestParameters.operation was null or undefined when calling getInscriptionOpTemplate.');
+        if (requestParameters['operation'] == null) {
+            throw new runtime.RequiredError(
+                'operation',
+                'Required parameter "operation" was null or undefined when calling getInscriptionOpTemplate().'
+            );
         }
 
-        if (requestParameters.amount === null || requestParameters.amount === undefined) {
-            throw new runtime.RequiredError('amount','Required parameter requestParameters.amount was null or undefined when calling getInscriptionOpTemplate.');
+        if (requestParameters['amount'] == null) {
+            throw new runtime.RequiredError(
+                'amount',
+                'Required parameter "amount" was null or undefined when calling getInscriptionOpTemplate().'
+            );
         }
 
-        if (requestParameters.ticker === null || requestParameters.ticker === undefined) {
-            throw new runtime.RequiredError('ticker','Required parameter requestParameters.ticker was null or undefined when calling getInscriptionOpTemplate.');
+        if (requestParameters['ticker'] == null) {
+            throw new runtime.RequiredError(
+                'ticker',
+                'Required parameter "ticker" was null or undefined when calling getInscriptionOpTemplate().'
+            );
         }
 
-        if (requestParameters.who === null || requestParameters.who === undefined) {
-            throw new runtime.RequiredError('who','Required parameter requestParameters.who was null or undefined when calling getInscriptionOpTemplate.');
+        if (requestParameters['who'] == null) {
+            throw new runtime.RequiredError(
+                'who',
+                'Required parameter "who" was null or undefined when calling getInscriptionOpTemplate().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.type !== undefined) {
-            queryParameters['type'] = requestParameters.type;
+        if (requestParameters['type'] != null) {
+            queryParameters['type'] = requestParameters['type'];
         }
 
-        if (requestParameters.destination !== undefined) {
-            queryParameters['destination'] = requestParameters.destination;
+        if (requestParameters['destination'] != null) {
+            queryParameters['destination'] = requestParameters['destination'];
         }
 
-        if (requestParameters.comment !== undefined) {
-            queryParameters['comment'] = requestParameters.comment;
+        if (requestParameters['comment'] != null) {
+            queryParameters['comment'] = requestParameters['comment'];
         }
 
-        if (requestParameters.operation !== undefined) {
-            queryParameters['operation'] = requestParameters.operation;
+        if (requestParameters['operation'] != null) {
+            queryParameters['operation'] = requestParameters['operation'];
         }
 
-        if (requestParameters.amount !== undefined) {
-            queryParameters['amount'] = requestParameters.amount;
+        if (requestParameters['amount'] != null) {
+            queryParameters['amount'] = requestParameters['amount'];
         }
 
-        if (requestParameters.ticker !== undefined) {
-            queryParameters['ticker'] = requestParameters.ticker;
+        if (requestParameters['ticker'] != null) {
+            queryParameters['ticker'] = requestParameters['ticker'];
         }
 
-        if (requestParameters.who !== undefined) {
-            queryParameters['who'] = requestParameters.who;
+        if (requestParameters['who'] != null) {
+            queryParameters['who'] = requestParameters['who'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

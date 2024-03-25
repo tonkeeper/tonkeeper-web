@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -85,15 +85,13 @@ export type InscriptionTransferActionTypeEnum = typeof InscriptionTransferAction
  * Check if a given object implements the InscriptionTransferAction interface.
  */
 export function instanceOfInscriptionTransferAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "sender" in value;
-    isInstance = isInstance && "recipient" in value;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "type" in value;
-    isInstance = isInstance && "ticker" in value;
-    isInstance = isInstance && "decimals" in value;
-
-    return isInstance;
+    if (!('sender' in value)) return false;
+    if (!('recipient' in value)) return false;
+    if (!('amount' in value)) return false;
+    if (!('type' in value)) return false;
+    if (!('ticker' in value)) return false;
+    if (!('decimals' in value)) return false;
+    return true;
 }
 
 export function InscriptionTransferActionFromJSON(json: any): InscriptionTransferAction {
@@ -101,7 +99,7 @@ export function InscriptionTransferActionFromJSON(json: any): InscriptionTransfe
 }
 
 export function InscriptionTransferActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): InscriptionTransferAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -109,7 +107,7 @@ export function InscriptionTransferActionFromJSONTyped(json: any, ignoreDiscrimi
         'sender': AccountAddressFromJSON(json['sender']),
         'recipient': AccountAddressFromJSON(json['recipient']),
         'amount': json['amount'],
-        'comment': !exists(json, 'comment') ? undefined : json['comment'],
+        'comment': json['comment'] == null ? undefined : json['comment'],
         'type': json['type'],
         'ticker': json['ticker'],
         'decimals': json['decimals'],
@@ -117,21 +115,18 @@ export function InscriptionTransferActionFromJSONTyped(json: any, ignoreDiscrimi
 }
 
 export function InscriptionTransferActionToJSON(value?: InscriptionTransferAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'sender': AccountAddressToJSON(value.sender),
-        'recipient': AccountAddressToJSON(value.recipient),
-        'amount': value.amount,
-        'comment': value.comment,
-        'type': value.type,
-        'ticker': value.ticker,
-        'decimals': value.decimals,
+        'sender': AccountAddressToJSON(value['sender']),
+        'recipient': AccountAddressToJSON(value['recipient']),
+        'amount': value['amount'],
+        'comment': value['comment'],
+        'type': value['type'],
+        'ticker': value['ticker'],
+        'decimals': value['decimals'],
     };
 }
 

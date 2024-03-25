@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -50,12 +50,10 @@ export interface DomainRenewAction {
  * Check if a given object implements the DomainRenewAction interface.
  */
 export function instanceOfDomainRenewAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "domain" in value;
-    isInstance = isInstance && "contractAddress" in value;
-    isInstance = isInstance && "renewer" in value;
-
-    return isInstance;
+    if (!('domain' in value)) return false;
+    if (!('contractAddress' in value)) return false;
+    if (!('renewer' in value)) return false;
+    return true;
 }
 
 export function DomainRenewActionFromJSON(json: any): DomainRenewAction {
@@ -63,7 +61,7 @@ export function DomainRenewActionFromJSON(json: any): DomainRenewAction {
 }
 
 export function DomainRenewActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): DomainRenewAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -75,17 +73,14 @@ export function DomainRenewActionFromJSONTyped(json: any, ignoreDiscriminator: b
 }
 
 export function DomainRenewActionToJSON(value?: DomainRenewAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'domain': value.domain,
-        'contract_address': value.contractAddress,
-        'renewer': AccountAddressToJSON(value.renewer),
+        'domain': value['domain'],
+        'contract_address': value['contractAddress'],
+        'renewer': AccountAddressToJSON(value['renewer']),
     };
 }
 

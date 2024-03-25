@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface CreditPhase {
  * Check if a given object implements the CreditPhase interface.
  */
 export function instanceOfCreditPhase(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "feesCollected" in value;
-    isInstance = isInstance && "credit" in value;
-
-    return isInstance;
+    if (!('feesCollected' in value)) return false;
+    if (!('credit' in value)) return false;
+    return true;
 }
 
 export function CreditPhaseFromJSON(json: any): CreditPhase {
@@ -49,7 +47,7 @@ export function CreditPhaseFromJSON(json: any): CreditPhase {
 }
 
 export function CreditPhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreditPhase {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function CreditPhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean
 }
 
 export function CreditPhaseToJSON(value?: CreditPhase | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'fees_collected': value.feesCollected,
-        'credit': value.credit,
+        'fees_collected': value['feesCollected'],
+        'credit': value['credit'],
     };
 }
 

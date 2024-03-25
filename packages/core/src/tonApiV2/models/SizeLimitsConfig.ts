@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -73,15 +73,13 @@ export interface SizeLimitsConfig {
  * Check if a given object implements the SizeLimitsConfig interface.
  */
 export function instanceOfSizeLimitsConfig(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "maxMsgBits" in value;
-    isInstance = isInstance && "maxMsgCells" in value;
-    isInstance = isInstance && "maxLibraryCells" in value;
-    isInstance = isInstance && "maxVmDataDepth" in value;
-    isInstance = isInstance && "maxExtMsgSize" in value;
-    isInstance = isInstance && "maxExtMsgDepth" in value;
-
-    return isInstance;
+    if (!('maxMsgBits' in value)) return false;
+    if (!('maxMsgCells' in value)) return false;
+    if (!('maxLibraryCells' in value)) return false;
+    if (!('maxVmDataDepth' in value)) return false;
+    if (!('maxExtMsgSize' in value)) return false;
+    if (!('maxExtMsgDepth' in value)) return false;
+    return true;
 }
 
 export function SizeLimitsConfigFromJSON(json: any): SizeLimitsConfig {
@@ -89,7 +87,7 @@ export function SizeLimitsConfigFromJSON(json: any): SizeLimitsConfig {
 }
 
 export function SizeLimitsConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): SizeLimitsConfig {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -100,28 +98,25 @@ export function SizeLimitsConfigFromJSONTyped(json: any, ignoreDiscriminator: bo
         'maxVmDataDepth': json['max_vm_data_depth'],
         'maxExtMsgSize': json['max_ext_msg_size'],
         'maxExtMsgDepth': json['max_ext_msg_depth'],
-        'maxAccStateCells': !exists(json, 'max_acc_state_cells') ? undefined : json['max_acc_state_cells'],
-        'maxAccStateBits': !exists(json, 'max_acc_state_bits') ? undefined : json['max_acc_state_bits'],
+        'maxAccStateCells': json['max_acc_state_cells'] == null ? undefined : json['max_acc_state_cells'],
+        'maxAccStateBits': json['max_acc_state_bits'] == null ? undefined : json['max_acc_state_bits'],
     };
 }
 
 export function SizeLimitsConfigToJSON(value?: SizeLimitsConfig | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'max_msg_bits': value.maxMsgBits,
-        'max_msg_cells': value.maxMsgCells,
-        'max_library_cells': value.maxLibraryCells,
-        'max_vm_data_depth': value.maxVmDataDepth,
-        'max_ext_msg_size': value.maxExtMsgSize,
-        'max_ext_msg_depth': value.maxExtMsgDepth,
-        'max_acc_state_cells': value.maxAccStateCells,
-        'max_acc_state_bits': value.maxAccStateBits,
+        'max_msg_bits': value['maxMsgBits'],
+        'max_msg_cells': value['maxMsgCells'],
+        'max_library_cells': value['maxLibraryCells'],
+        'max_vm_data_depth': value['maxVmDataDepth'],
+        'max_ext_msg_size': value['maxExtMsgSize'],
+        'max_ext_msg_depth': value['maxExtMsgDepth'],
+        'max_acc_state_cells': value['maxAccStateCells'],
+        'max_acc_state_bits': value['maxAccStateBits'],
     };
 }
 

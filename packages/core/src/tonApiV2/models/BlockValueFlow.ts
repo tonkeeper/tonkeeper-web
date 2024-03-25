@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockCurrencyCollection } from './BlockCurrencyCollection';
 import {
     BlockCurrencyCollectionFromJSON,
@@ -92,18 +92,16 @@ export interface BlockValueFlow {
  * Check if a given object implements the BlockValueFlow interface.
  */
 export function instanceOfBlockValueFlow(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "fromPrevBlk" in value;
-    isInstance = isInstance && "toNextBlk" in value;
-    isInstance = isInstance && "imported" in value;
-    isInstance = isInstance && "exported" in value;
-    isInstance = isInstance && "feesCollected" in value;
-    isInstance = isInstance && "feesImported" in value;
-    isInstance = isInstance && "recovered" in value;
-    isInstance = isInstance && "created" in value;
-    isInstance = isInstance && "minted" in value;
-
-    return isInstance;
+    if (!('fromPrevBlk' in value)) return false;
+    if (!('toNextBlk' in value)) return false;
+    if (!('imported' in value)) return false;
+    if (!('exported' in value)) return false;
+    if (!('feesCollected' in value)) return false;
+    if (!('feesImported' in value)) return false;
+    if (!('recovered' in value)) return false;
+    if (!('created' in value)) return false;
+    if (!('minted' in value)) return false;
+    return true;
 }
 
 export function BlockValueFlowFromJSON(json: any): BlockValueFlow {
@@ -111,7 +109,7 @@ export function BlockValueFlowFromJSON(json: any): BlockValueFlow {
 }
 
 export function BlockValueFlowFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockValueFlow {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -121,7 +119,7 @@ export function BlockValueFlowFromJSONTyped(json: any, ignoreDiscriminator: bool
         'imported': BlockCurrencyCollectionFromJSON(json['imported']),
         'exported': BlockCurrencyCollectionFromJSON(json['exported']),
         'feesCollected': BlockCurrencyCollectionFromJSON(json['fees_collected']),
-        'burned': !exists(json, 'burned') ? undefined : BlockCurrencyCollectionFromJSON(json['burned']),
+        'burned': json['burned'] == null ? undefined : BlockCurrencyCollectionFromJSON(json['burned']),
         'feesImported': BlockCurrencyCollectionFromJSON(json['fees_imported']),
         'recovered': BlockCurrencyCollectionFromJSON(json['recovered']),
         'created': BlockCurrencyCollectionFromJSON(json['created']),
@@ -130,24 +128,21 @@ export function BlockValueFlowFromJSONTyped(json: any, ignoreDiscriminator: bool
 }
 
 export function BlockValueFlowToJSON(value?: BlockValueFlow | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'from_prev_blk': BlockCurrencyCollectionToJSON(value.fromPrevBlk),
-        'to_next_blk': BlockCurrencyCollectionToJSON(value.toNextBlk),
-        'imported': BlockCurrencyCollectionToJSON(value.imported),
-        'exported': BlockCurrencyCollectionToJSON(value.exported),
-        'fees_collected': BlockCurrencyCollectionToJSON(value.feesCollected),
-        'burned': BlockCurrencyCollectionToJSON(value.burned),
-        'fees_imported': BlockCurrencyCollectionToJSON(value.feesImported),
-        'recovered': BlockCurrencyCollectionToJSON(value.recovered),
-        'created': BlockCurrencyCollectionToJSON(value.created),
-        'minted': BlockCurrencyCollectionToJSON(value.minted),
+        'from_prev_blk': BlockCurrencyCollectionToJSON(value['fromPrevBlk']),
+        'to_next_blk': BlockCurrencyCollectionToJSON(value['toNextBlk']),
+        'imported': BlockCurrencyCollectionToJSON(value['imported']),
+        'exported': BlockCurrencyCollectionToJSON(value['exported']),
+        'fees_collected': BlockCurrencyCollectionToJSON(value['feesCollected']),
+        'burned': BlockCurrencyCollectionToJSON(value['burned']),
+        'fees_imported': BlockCurrencyCollectionToJSON(value['feesImported']),
+        'recovered': BlockCurrencyCollectionToJSON(value['recovered']),
+        'created': BlockCurrencyCollectionToJSON(value['created']),
+        'minted': BlockCurrencyCollectionToJSON(value['minted']),
     };
 }
 

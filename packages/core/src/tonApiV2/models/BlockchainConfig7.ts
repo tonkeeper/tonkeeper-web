@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockchainConfig7CurrenciesInner } from './BlockchainConfig7CurrenciesInner';
 import {
     BlockchainConfig7CurrenciesInnerFromJSON,
@@ -38,10 +38,8 @@ export interface BlockchainConfig7 {
  * Check if a given object implements the BlockchainConfig7 interface.
  */
 export function instanceOfBlockchainConfig7(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "currencies" in value;
-
-    return isInstance;
+    if (!('currencies' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig7FromJSON(json: any): BlockchainConfig7 {
@@ -49,7 +47,7 @@ export function BlockchainConfig7FromJSON(json: any): BlockchainConfig7 {
 }
 
 export function BlockchainConfig7FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig7 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function BlockchainConfig7FromJSONTyped(json: any, ignoreDiscriminator: b
 }
 
 export function BlockchainConfig7ToJSON(value?: BlockchainConfig7 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'currencies': ((value.currencies as Array<any>).map(BlockchainConfig7CurrenciesInnerToJSON)),
+        'currencies': ((value['currencies'] as Array<any>).map(BlockchainConfig7CurrenciesInnerToJSON)),
     };
 }
 

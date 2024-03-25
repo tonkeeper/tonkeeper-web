@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { NftItem } from './NftItem';
 import {
     NftItemFromJSON,
@@ -50,11 +50,9 @@ export interface DnsExpiringItemsInner {
  * Check if a given object implements the DnsExpiringItemsInner interface.
  */
 export function instanceOfDnsExpiringItemsInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "expiringAt" in value;
-    isInstance = isInstance && "name" in value;
-
-    return isInstance;
+    if (!('expiringAt' in value)) return false;
+    if (!('name' in value)) return false;
+    return true;
 }
 
 export function DnsExpiringItemsInnerFromJSON(json: any): DnsExpiringItemsInner {
@@ -62,29 +60,26 @@ export function DnsExpiringItemsInnerFromJSON(json: any): DnsExpiringItemsInner 
 }
 
 export function DnsExpiringItemsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): DnsExpiringItemsInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'expiringAt': json['expiring_at'],
         'name': json['name'],
-        'dnsItem': !exists(json, 'dns_item') ? undefined : NftItemFromJSON(json['dns_item']),
+        'dnsItem': json['dns_item'] == null ? undefined : NftItemFromJSON(json['dns_item']),
     };
 }
 
 export function DnsExpiringItemsInnerToJSON(value?: DnsExpiringItemsInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'expiring_at': value.expiringAt,
-        'name': value.name,
-        'dns_item': NftItemToJSON(value.dnsItem),
+        'expiring_at': value['expiringAt'],
+        'name': value['name'],
+        'dns_item': NftItemToJSON(value['dnsItem']),
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -69,10 +69,8 @@ export type TvmStackRecordTypeEnum = typeof TvmStackRecordTypeEnum[keyof typeof 
  * Check if a given object implements the TvmStackRecord interface.
  */
 export function instanceOfTvmStackRecord(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "type" in value;
-
-    return isInstance;
+    if (!('type' in value)) return false;
+    return true;
 }
 
 export function TvmStackRecordFromJSON(json: any): TvmStackRecord {
@@ -80,33 +78,30 @@ export function TvmStackRecordFromJSON(json: any): TvmStackRecord {
 }
 
 export function TvmStackRecordFromJSONTyped(json: any, ignoreDiscriminator: boolean): TvmStackRecord {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'type': json['type'],
-        'cell': !exists(json, 'cell') ? undefined : json['cell'],
-        'slice': !exists(json, 'slice') ? undefined : json['slice'],
-        'num': !exists(json, 'num') ? undefined : json['num'],
-        'tuple': !exists(json, 'tuple') ? undefined : ((json['tuple'] as Array<any>).map(TvmStackRecordFromJSON)),
+        'cell': json['cell'] == null ? undefined : json['cell'],
+        'slice': json['slice'] == null ? undefined : json['slice'],
+        'num': json['num'] == null ? undefined : json['num'],
+        'tuple': json['tuple'] == null ? undefined : ((json['tuple'] as Array<any>).map(TvmStackRecordFromJSON)),
     };
 }
 
 export function TvmStackRecordToJSON(value?: TvmStackRecord | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'type': value.type,
-        'cell': value.cell,
-        'slice': value.slice,
-        'num': value.num,
-        'tuple': value.tuple === undefined ? undefined : ((value.tuple as Array<any>).map(TvmStackRecordToJSON)),
+        'type': value['type'],
+        'cell': value['cell'],
+        'slice': value['slice'],
+        'num': value['num'],
+        'tuple': value['tuple'] == null ? undefined : ((value['tuple'] as Array<any>).map(TvmStackRecordToJSON)),
     };
 }
 

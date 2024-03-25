@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * List of critical TON parameters, the change of which significantly affects the network, so more voting rounds are held.
  * @export
@@ -31,10 +31,8 @@ export interface BlockchainConfig10 {
  * Check if a given object implements the BlockchainConfig10 interface.
  */
 export function instanceOfBlockchainConfig10(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "criticalParams" in value;
-
-    return isInstance;
+    if (!('criticalParams' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig10FromJSON(json: any): BlockchainConfig10 {
@@ -42,7 +40,7 @@ export function BlockchainConfig10FromJSON(json: any): BlockchainConfig10 {
 }
 
 export function BlockchainConfig10FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig10 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function BlockchainConfig10FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig10ToJSON(value?: BlockchainConfig10 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'critical_params': value.criticalParams,
+        'critical_params': value['criticalParams'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { JettonBridgeParams } from './JettonBridgeParams';
 import {
     JettonBridgeParamsFromJSON,
@@ -38,10 +38,8 @@ export interface BlockchainConfig79 {
  * Check if a given object implements the BlockchainConfig79 interface.
  */
 export function instanceOfBlockchainConfig79(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "jettonBridgeParams" in value;
-
-    return isInstance;
+    if (!('jettonBridgeParams' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig79FromJSON(json: any): BlockchainConfig79 {
@@ -49,7 +47,7 @@ export function BlockchainConfig79FromJSON(json: any): BlockchainConfig79 {
 }
 
 export function BlockchainConfig79FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig79 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function BlockchainConfig79FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig79ToJSON(value?: BlockchainConfig79 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'jetton_bridge_params': JettonBridgeParamsToJSON(value.jettonBridgeParams),
+        'jetton_bridge_params': JettonBridgeParamsToJSON(value['jettonBridgeParams']),
     };
 }
 

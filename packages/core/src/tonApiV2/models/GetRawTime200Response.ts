@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface GetRawTime200Response {
  * Check if a given object implements the GetRawTime200Response interface.
  */
 export function instanceOfGetRawTime200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "time" in value;
-
-    return isInstance;
+    if (!('time' in value)) return false;
+    return true;
 }
 
 export function GetRawTime200ResponseFromJSON(json: any): GetRawTime200Response {
@@ -42,7 +40,7 @@ export function GetRawTime200ResponseFromJSON(json: any): GetRawTime200Response 
 }
 
 export function GetRawTime200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawTime200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function GetRawTime200ResponseFromJSONTyped(json: any, ignoreDiscriminato
 }
 
 export function GetRawTime200ResponseToJSON(value?: GetRawTime200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'time': value.time,
+        'time': value['time'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The configuration for the Catchain protocol.
  * @export
@@ -61,13 +61,11 @@ export interface BlockchainConfig28 {
  * Check if a given object implements the BlockchainConfig28 interface.
  */
 export function instanceOfBlockchainConfig28(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "mcCatchainLifetime" in value;
-    isInstance = isInstance && "shardCatchainLifetime" in value;
-    isInstance = isInstance && "shardValidatorsLifetime" in value;
-    isInstance = isInstance && "shardValidatorsNum" in value;
-
-    return isInstance;
+    if (!('mcCatchainLifetime' in value)) return false;
+    if (!('shardCatchainLifetime' in value)) return false;
+    if (!('shardValidatorsLifetime' in value)) return false;
+    if (!('shardValidatorsNum' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig28FromJSON(json: any): BlockchainConfig28 {
@@ -75,7 +73,7 @@ export function BlockchainConfig28FromJSON(json: any): BlockchainConfig28 {
 }
 
 export function BlockchainConfig28FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig28 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -84,26 +82,23 @@ export function BlockchainConfig28FromJSONTyped(json: any, ignoreDiscriminator: 
         'shardCatchainLifetime': json['shard_catchain_lifetime'],
         'shardValidatorsLifetime': json['shard_validators_lifetime'],
         'shardValidatorsNum': json['shard_validators_num'],
-        'flags': !exists(json, 'flags') ? undefined : json['flags'],
-        'shuffleMcValidators': !exists(json, 'shuffle_mc_validators') ? undefined : json['shuffle_mc_validators'],
+        'flags': json['flags'] == null ? undefined : json['flags'],
+        'shuffleMcValidators': json['shuffle_mc_validators'] == null ? undefined : json['shuffle_mc_validators'],
     };
 }
 
 export function BlockchainConfig28ToJSON(value?: BlockchainConfig28 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'mc_catchain_lifetime': value.mcCatchainLifetime,
-        'shard_catchain_lifetime': value.shardCatchainLifetime,
-        'shard_validators_lifetime': value.shardValidatorsLifetime,
-        'shard_validators_num': value.shardValidatorsNum,
-        'flags': value.flags,
-        'shuffle_mc_validators': value.shuffleMcValidators,
+        'mc_catchain_lifetime': value['mcCatchainLifetime'],
+        'shard_catchain_lifetime': value['shardCatchainLifetime'],
+        'shard_validators_lifetime': value['shardValidatorsLifetime'],
+        'shard_validators_num': value['shardValidatorsNum'],
+        'flags': value['flags'],
+        'shuffle_mc_validators': value['shuffleMcValidators'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface Oracle {
  * Check if a given object implements the Oracle interface.
  */
 export function instanceOfOracle(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "secpPubkey" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('secpPubkey' in value)) return false;
+    return true;
 }
 
 export function OracleFromJSON(json: any): Oracle {
@@ -49,7 +47,7 @@ export function OracleFromJSON(json: any): Oracle {
 }
 
 export function OracleFromJSONTyped(json: any, ignoreDiscriminator: boolean): Oracle {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function OracleFromJSONTyped(json: any, ignoreDiscriminator: boolean): Or
 }
 
 export function OracleToJSON(value?: Oracle | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'secp_pubkey': value.secpPubkey,
+        'address': value['address'],
+        'secp_pubkey': value['secpPubkey'],
     };
 }
 

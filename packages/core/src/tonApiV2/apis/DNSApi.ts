@@ -19,7 +19,7 @@ import type {
   DnsRecord,
   DomainBids,
   DomainInfo,
-  GetBlockchainBlockDefaultResponse,
+  ReduceIndexingLatencyDefaultResponse,
 } from '../models/index';
 import {
     AuctionsFromJSON,
@@ -30,8 +30,8 @@ import {
     DomainBidsToJSON,
     DomainInfoFromJSON,
     DomainInfoToJSON,
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
 } from '../models/index';
 
 export interface DnsResolveRequest {
@@ -124,8 +124,11 @@ export class DNSApi extends runtime.BaseAPI implements DNSApiInterface {
      * DNS resolve for domain name
      */
     async dnsResolveRaw(requestParameters: DnsResolveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DnsRecord>> {
-        if (requestParameters.domainName === null || requestParameters.domainName === undefined) {
-            throw new runtime.RequiredError('domainName','Required parameter requestParameters.domainName was null or undefined when calling dnsResolve.');
+        if (requestParameters['domainName'] == null) {
+            throw new runtime.RequiredError(
+                'domainName',
+                'Required parameter "domainName" was null or undefined when calling dnsResolve().'
+            );
         }
 
         const queryParameters: any = {};
@@ -133,7 +136,7 @@ export class DNSApi extends runtime.BaseAPI implements DNSApiInterface {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/dns/{domain_name}/resolve`.replace(`{${"domain_name"}}`, encodeURIComponent(String(requestParameters.domainName))),
+            path: `/v2/dns/{domain_name}/resolve`.replace(`{${"domain_name"}}`, encodeURIComponent(String(requestParameters['domainName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -156,8 +159,8 @@ export class DNSApi extends runtime.BaseAPI implements DNSApiInterface {
     async getAllAuctionsRaw(requestParameters: GetAllAuctionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Auctions>> {
         const queryParameters: any = {};
 
-        if (requestParameters.tld !== undefined) {
-            queryParameters['tld'] = requestParameters.tld;
+        if (requestParameters['tld'] != null) {
+            queryParameters['tld'] = requestParameters['tld'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -184,8 +187,11 @@ export class DNSApi extends runtime.BaseAPI implements DNSApiInterface {
      * Get full information about domain name
      */
     async getDnsInfoRaw(requestParameters: GetDnsInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DomainInfo>> {
-        if (requestParameters.domainName === null || requestParameters.domainName === undefined) {
-            throw new runtime.RequiredError('domainName','Required parameter requestParameters.domainName was null or undefined when calling getDnsInfo.');
+        if (requestParameters['domainName'] == null) {
+            throw new runtime.RequiredError(
+                'domainName',
+                'Required parameter "domainName" was null or undefined when calling getDnsInfo().'
+            );
         }
 
         const queryParameters: any = {};
@@ -193,7 +199,7 @@ export class DNSApi extends runtime.BaseAPI implements DNSApiInterface {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/dns/{domain_name}`.replace(`{${"domain_name"}}`, encodeURIComponent(String(requestParameters.domainName))),
+            path: `/v2/dns/{domain_name}`.replace(`{${"domain_name"}}`, encodeURIComponent(String(requestParameters['domainName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -214,8 +220,11 @@ export class DNSApi extends runtime.BaseAPI implements DNSApiInterface {
      * Get domain bids
      */
     async getDomainBidsRaw(requestParameters: GetDomainBidsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DomainBids>> {
-        if (requestParameters.domainName === null || requestParameters.domainName === undefined) {
-            throw new runtime.RequiredError('domainName','Required parameter requestParameters.domainName was null or undefined when calling getDomainBids.');
+        if (requestParameters['domainName'] == null) {
+            throw new runtime.RequiredError(
+                'domainName',
+                'Required parameter "domainName" was null or undefined when calling getDomainBids().'
+            );
         }
 
         const queryParameters: any = {};
@@ -223,7 +232,7 @@ export class DNSApi extends runtime.BaseAPI implements DNSApiInterface {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/dns/{domain_name}/bids`.replace(`{${"domain_name"}}`, encodeURIComponent(String(requestParameters.domainName))),
+            path: `/v2/dns/{domain_name}/bids`.replace(`{${"domain_name"}}`, encodeURIComponent(String(requestParameters['domainName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

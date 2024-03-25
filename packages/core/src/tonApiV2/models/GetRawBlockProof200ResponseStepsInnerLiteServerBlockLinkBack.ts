@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -68,15 +68,13 @@ export interface GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack {
  * Check if a given object implements the GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack interface.
  */
 export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "toKeyBlock" in value;
-    isInstance = isInstance && "from" in value;
-    isInstance = isInstance && "to" in value;
-    isInstance = isInstance && "destProof" in value;
-    isInstance = isInstance && "proof" in value;
-    isInstance = isInstance && "stateProof" in value;
-
-    return isInstance;
+    if (!('toKeyBlock' in value)) return false;
+    if (!('from' in value)) return false;
+    if (!('to' in value)) return false;
+    if (!('destProof' in value)) return false;
+    if (!('proof' in value)) return false;
+    if (!('stateProof' in value)) return false;
+    return true;
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackFromJSON(json: any): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack {
@@ -84,7 +82,7 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackFrom
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -99,20 +97,17 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackFrom
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackToJSON(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'to_key_block': value.toKeyBlock,
-        'from': BlockRawToJSON(value.from),
-        'to': BlockRawToJSON(value.to),
-        'dest_proof': value.destProof,
-        'proof': value.proof,
-        'state_proof': value.stateProof,
+        'to_key_block': value['toKeyBlock'],
+        'from': BlockRawToJSON(value['from']),
+        'to': BlockRawToJSON(value['to']),
+        'dest_proof': value['destProof'],
+        'proof': value['proof'],
+        'state_proof': value['stateProof'],
     };
 }
 

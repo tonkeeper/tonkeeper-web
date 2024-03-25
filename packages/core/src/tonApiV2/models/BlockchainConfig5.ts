@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -43,11 +43,9 @@ export interface BlockchainConfig5 {
  * Check if a given object implements the BlockchainConfig5 interface.
  */
 export function instanceOfBlockchainConfig5(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "feeBurnNom" in value;
-    isInstance = isInstance && "feeBurnDenom" in value;
-
-    return isInstance;
+    if (!('feeBurnNom' in value)) return false;
+    if (!('feeBurnDenom' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig5FromJSON(json: any): BlockchainConfig5 {
@@ -55,29 +53,26 @@ export function BlockchainConfig5FromJSON(json: any): BlockchainConfig5 {
 }
 
 export function BlockchainConfig5FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig5 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'blackholeAddr': !exists(json, 'blackhole_addr') ? undefined : json['blackhole_addr'],
+        'blackholeAddr': json['blackhole_addr'] == null ? undefined : json['blackhole_addr'],
         'feeBurnNom': json['fee_burn_nom'],
         'feeBurnDenom': json['fee_burn_denom'],
     };
 }
 
 export function BlockchainConfig5ToJSON(value?: BlockchainConfig5 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'blackhole_addr': value.blackholeAddr,
-        'fee_burn_nom': value.feeBurnNom,
-        'fee_burn_denom': value.feeBurnDenom,
+        'blackhole_addr': value['blackholeAddr'],
+        'fee_burn_nom': value['feeBurnNom'],
+        'fee_burn_denom': value['feeBurnDenom'],
     };
 }
 

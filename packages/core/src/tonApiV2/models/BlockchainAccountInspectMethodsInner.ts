@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface BlockchainAccountInspectMethodsInner {
  * Check if a given object implements the BlockchainAccountInspectMethodsInner interface.
  */
 export function instanceOfBlockchainAccountInspectMethodsInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "id" in value;
-    isInstance = isInstance && "method" in value;
-
-    return isInstance;
+    if (!('id' in value)) return false;
+    if (!('method' in value)) return false;
+    return true;
 }
 
 export function BlockchainAccountInspectMethodsInnerFromJSON(json: any): BlockchainAccountInspectMethodsInner {
@@ -49,7 +47,7 @@ export function BlockchainAccountInspectMethodsInnerFromJSON(json: any): Blockch
 }
 
 export function BlockchainAccountInspectMethodsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainAccountInspectMethodsInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function BlockchainAccountInspectMethodsInnerFromJSONTyped(json: any, ign
 }
 
 export function BlockchainAccountInspectMethodsInnerToJSON(value?: BlockchainAccountInspectMethodsInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'id': value.id,
-        'method': value.method,
+        'id': value['id'],
+        'method': value['method'],
     };
 }
 

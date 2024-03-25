@@ -1,5 +1,5 @@
+import { fromNano } from '@ton/core';
 import BigNumber from 'bignumber.js';
-import { fromNano } from 'ton-core';
 import { FiatCurrency, FiatCurrencySymbolsConfig } from '../entries/fiat';
 
 type LocaleFormat = {

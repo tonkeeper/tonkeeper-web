@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface GetAccountPublicKey200Response {
  * Check if a given object implements the GetAccountPublicKey200Response interface.
  */
 export function instanceOfGetAccountPublicKey200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "publicKey" in value;
-
-    return isInstance;
+    if (!('publicKey' in value)) return false;
+    return true;
 }
 
 export function GetAccountPublicKey200ResponseFromJSON(json: any): GetAccountPublicKey200Response {
@@ -42,7 +40,7 @@ export function GetAccountPublicKey200ResponseFromJSON(json: any): GetAccountPub
 }
 
 export function GetAccountPublicKey200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetAccountPublicKey200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function GetAccountPublicKey200ResponseFromJSONTyped(json: any, ignoreDis
 }
 
 export function GetAccountPublicKey200ResponseToJSON(value?: GetAccountPublicKey200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'public_key': value.publicKey,
+        'public_key': value['publicKey'],
     };
 }
 

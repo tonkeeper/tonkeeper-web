@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -62,12 +62,10 @@ export interface ValueFlow {
  * Check if a given object implements the ValueFlow interface.
  */
 export function instanceOfValueFlow(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "account" in value;
-    isInstance = isInstance && "ton" in value;
-    isInstance = isInstance && "fees" in value;
-
-    return isInstance;
+    if (!('account' in value)) return false;
+    if (!('ton' in value)) return false;
+    if (!('fees' in value)) return false;
+    return true;
 }
 
 export function ValueFlowFromJSON(json: any): ValueFlow {
@@ -75,7 +73,7 @@ export function ValueFlowFromJSON(json: any): ValueFlow {
 }
 
 export function ValueFlowFromJSONTyped(json: any, ignoreDiscriminator: boolean): ValueFlow {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -83,23 +81,20 @@ export function ValueFlowFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         'account': AccountAddressFromJSON(json['account']),
         'ton': json['ton'],
         'fees': json['fees'],
-        'jettons': !exists(json, 'jettons') ? undefined : ((json['jettons'] as Array<any>).map(ValueFlowJettonsInnerFromJSON)),
+        'jettons': json['jettons'] == null ? undefined : ((json['jettons'] as Array<any>).map(ValueFlowJettonsInnerFromJSON)),
     };
 }
 
 export function ValueFlowToJSON(value?: ValueFlow | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'account': AccountAddressToJSON(value.account),
-        'ton': value.ton,
-        'fees': value.fees,
-        'jettons': value.jettons === undefined ? undefined : ((value.jettons as Array<any>).map(ValueFlowJettonsInnerToJSON)),
+        'account': AccountAddressToJSON(value['account']),
+        'ton': value['ton'],
+        'fees': value['fees'],
+        'jettons': value['jettons'] == null ? undefined : ((value['jettons'] as Array<any>).map(ValueFlowJettonsInnerToJSON)),
     };
 }
 

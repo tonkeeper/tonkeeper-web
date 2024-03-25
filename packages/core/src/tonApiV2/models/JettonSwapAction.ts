@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -104,14 +104,12 @@ export type JettonSwapActionDexEnum = typeof JettonSwapActionDexEnum[keyof typeo
  * Check if a given object implements the JettonSwapAction interface.
  */
 export function instanceOfJettonSwapAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "dex" in value;
-    isInstance = isInstance && "amountIn" in value;
-    isInstance = isInstance && "amountOut" in value;
-    isInstance = isInstance && "userWallet" in value;
-    isInstance = isInstance && "router" in value;
-
-    return isInstance;
+    if (!('dex' in value)) return false;
+    if (!('amountIn' in value)) return false;
+    if (!('amountOut' in value)) return false;
+    if (!('userWallet' in value)) return false;
+    if (!('router' in value)) return false;
+    return true;
 }
 
 export function JettonSwapActionFromJSON(json: any): JettonSwapAction {
@@ -119,7 +117,7 @@ export function JettonSwapActionFromJSON(json: any): JettonSwapAction {
 }
 
 export function JettonSwapActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonSwapAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -127,33 +125,30 @@ export function JettonSwapActionFromJSONTyped(json: any, ignoreDiscriminator: bo
         'dex': json['dex'],
         'amountIn': json['amount_in'],
         'amountOut': json['amount_out'],
-        'tonIn': !exists(json, 'ton_in') ? undefined : json['ton_in'],
-        'tonOut': !exists(json, 'ton_out') ? undefined : json['ton_out'],
+        'tonIn': json['ton_in'] == null ? undefined : json['ton_in'],
+        'tonOut': json['ton_out'] == null ? undefined : json['ton_out'],
         'userWallet': AccountAddressFromJSON(json['user_wallet']),
         'router': AccountAddressFromJSON(json['router']),
-        'jettonMasterIn': !exists(json, 'jetton_master_in') ? undefined : JettonPreviewFromJSON(json['jetton_master_in']),
-        'jettonMasterOut': !exists(json, 'jetton_master_out') ? undefined : JettonPreviewFromJSON(json['jetton_master_out']),
+        'jettonMasterIn': json['jetton_master_in'] == null ? undefined : JettonPreviewFromJSON(json['jetton_master_in']),
+        'jettonMasterOut': json['jetton_master_out'] == null ? undefined : JettonPreviewFromJSON(json['jetton_master_out']),
     };
 }
 
 export function JettonSwapActionToJSON(value?: JettonSwapAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'dex': value.dex,
-        'amount_in': value.amountIn,
-        'amount_out': value.amountOut,
-        'ton_in': value.tonIn,
-        'ton_out': value.tonOut,
-        'user_wallet': AccountAddressToJSON(value.userWallet),
-        'router': AccountAddressToJSON(value.router),
-        'jetton_master_in': JettonPreviewToJSON(value.jettonMasterIn),
-        'jetton_master_out': JettonPreviewToJSON(value.jettonMasterOut),
+        'dex': value['dex'],
+        'amount_in': value['amountIn'],
+        'amount_out': value['amountOut'],
+        'ton_in': value['tonIn'],
+        'ton_out': value['tonOut'],
+        'user_wallet': AccountAddressToJSON(value['userWallet']),
+        'router': AccountAddressToJSON(value['router']),
+        'jetton_master_in': JettonPreviewToJSON(value['jettonMasterIn']),
+        'jetton_master_out': JettonPreviewToJSON(value['jettonMasterOut']),
     };
 }
 

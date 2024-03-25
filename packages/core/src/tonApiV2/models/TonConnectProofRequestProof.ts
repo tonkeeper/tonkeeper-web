@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { TonConnectProofRequestProofDomain } from './TonConnectProofRequestProofDomain';
 import {
     TonConnectProofRequestProofDomainFromJSON,
@@ -62,13 +62,11 @@ export interface TonConnectProofRequestProof {
  * Check if a given object implements the TonConnectProofRequestProof interface.
  */
 export function instanceOfTonConnectProofRequestProof(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "timestamp" in value;
-    isInstance = isInstance && "domain" in value;
-    isInstance = isInstance && "signature" in value;
-    isInstance = isInstance && "payload" in value;
-
-    return isInstance;
+    if (!('timestamp' in value)) return false;
+    if (!('domain' in value)) return false;
+    if (!('signature' in value)) return false;
+    if (!('payload' in value)) return false;
+    return true;
 }
 
 export function TonConnectProofRequestProofFromJSON(json: any): TonConnectProofRequestProof {
@@ -76,7 +74,7 @@ export function TonConnectProofRequestProofFromJSON(json: any): TonConnectProofR
 }
 
 export function TonConnectProofRequestProofFromJSONTyped(json: any, ignoreDiscriminator: boolean): TonConnectProofRequestProof {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -85,24 +83,21 @@ export function TonConnectProofRequestProofFromJSONTyped(json: any, ignoreDiscri
         'domain': TonConnectProofRequestProofDomainFromJSON(json['domain']),
         'signature': json['signature'],
         'payload': json['payload'],
-        'stateInit': !exists(json, 'state_init') ? undefined : json['state_init'],
+        'stateInit': json['state_init'] == null ? undefined : json['state_init'],
     };
 }
 
 export function TonConnectProofRequestProofToJSON(value?: TonConnectProofRequestProof | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'timestamp': value.timestamp,
-        'domain': TonConnectProofRequestProofDomainToJSON(value.domain),
-        'signature': value.signature,
-        'payload': value.payload,
-        'state_init': value.stateInit,
+        'timestamp': value['timestamp'],
+        'domain': TonConnectProofRequestProofDomainToJSON(value['domain']),
+        'signature': value['signature'],
+        'payload': value['payload'],
+        'state_init': value['stateInit'],
     };
 }
 

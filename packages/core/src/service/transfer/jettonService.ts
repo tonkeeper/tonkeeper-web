@@ -1,12 +1,12 @@
+import { Address, beginCell, Cell, comment, internal, toNano } from '@ton/core';
+import { mnemonicToPrivateKey } from '@ton/crypto';
 import BigNumber from 'bignumber.js';
-import { Address, beginCell, Cell, comment, internal, toNano } from 'ton-core';
-import { mnemonicToPrivateKey } from 'ton-crypto';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
-import { TonRecipientData } from '../../entries/send';
+import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { WalletState } from '../../entries/wallet';
-import { BlockchainApi, EmulationApi, MessageConsequences } from '../../tonApiV2';
+import { BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     checkServiceTimeOrDie,
@@ -87,7 +87,7 @@ export const estimateJettonTransfer = async (
     recipient: TonRecipientData,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string
-) => {
+): Promise<TransferEstimationEvent> => {
     await checkServiceTimeOrDie(api);
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
@@ -101,10 +101,13 @@ export const estimateJettonTransfer = async (
         recipient.comment ? comment(recipient.comment) : null
     );
 
-    const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
+    const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+        ignoreSignatureCheck: true,
+        accountId: wallet.address,
+        decodeMessageRequest: { boc: cell.toString('base64') }
     });
-    return emulation;
+
+    return { event };
 };
 
 export const sendJettonTransfer = async (
@@ -113,7 +116,7 @@ export const sendJettonTransfer = async (
     recipient: TonRecipientData,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string,
-    fee: MessageConsequences,
+    fee: TransferEstimationEvent,
     mnemonic: string[]
 ) => {
     await checkServiceTimeOrDie(api);

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -73,17 +73,15 @@ export interface ConfigProposalSetup {
  * Check if a given object implements the ConfigProposalSetup interface.
  */
 export function instanceOfConfigProposalSetup(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "minTotRounds" in value;
-    isInstance = isInstance && "maxTotRounds" in value;
-    isInstance = isInstance && "minWins" in value;
-    isInstance = isInstance && "maxLosses" in value;
-    isInstance = isInstance && "minStoreSec" in value;
-    isInstance = isInstance && "maxStoreSec" in value;
-    isInstance = isInstance && "bitPrice" in value;
-    isInstance = isInstance && "cellPrice" in value;
-
-    return isInstance;
+    if (!('minTotRounds' in value)) return false;
+    if (!('maxTotRounds' in value)) return false;
+    if (!('minWins' in value)) return false;
+    if (!('maxLosses' in value)) return false;
+    if (!('minStoreSec' in value)) return false;
+    if (!('maxStoreSec' in value)) return false;
+    if (!('bitPrice' in value)) return false;
+    if (!('cellPrice' in value)) return false;
+    return true;
 }
 
 export function ConfigProposalSetupFromJSON(json: any): ConfigProposalSetup {
@@ -91,7 +89,7 @@ export function ConfigProposalSetupFromJSON(json: any): ConfigProposalSetup {
 }
 
 export function ConfigProposalSetupFromJSONTyped(json: any, ignoreDiscriminator: boolean): ConfigProposalSetup {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -108,22 +106,19 @@ export function ConfigProposalSetupFromJSONTyped(json: any, ignoreDiscriminator:
 }
 
 export function ConfigProposalSetupToJSON(value?: ConfigProposalSetup | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'min_tot_rounds': value.minTotRounds,
-        'max_tot_rounds': value.maxTotRounds,
-        'min_wins': value.minWins,
-        'max_losses': value.maxLosses,
-        'min_store_sec': value.minStoreSec,
-        'max_store_sec': value.maxStoreSec,
-        'bit_price': value.bitPrice,
-        'cell_price': value.cellPrice,
+        'min_tot_rounds': value['minTotRounds'],
+        'max_tot_rounds': value['maxTotRounds'],
+        'min_wins': value['minWins'],
+        'max_losses': value['maxLosses'],
+        'min_store_sec': value['minStoreSec'],
+        'max_store_sec': value['maxStoreSec'],
+        'bit_price': value['bitPrice'],
+        'cell_price': value['cellPrice'],
     };
 }
 

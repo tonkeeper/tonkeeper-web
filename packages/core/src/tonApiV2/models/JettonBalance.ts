@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -68,12 +68,10 @@ export interface JettonBalance {
  * Check if a given object implements the JettonBalance interface.
  */
 export function instanceOfJettonBalance(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "balance" in value;
-    isInstance = isInstance && "walletAddress" in value;
-    isInstance = isInstance && "jetton" in value;
-
-    return isInstance;
+    if (!('balance' in value)) return false;
+    if (!('walletAddress' in value)) return false;
+    if (!('jetton' in value)) return false;
+    return true;
 }
 
 export function JettonBalanceFromJSON(json: any): JettonBalance {
@@ -81,31 +79,28 @@ export function JettonBalanceFromJSON(json: any): JettonBalance {
 }
 
 export function JettonBalanceFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonBalance {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'balance': json['balance'],
-        'price': !exists(json, 'price') ? undefined : TokenRatesFromJSON(json['price']),
+        'price': json['price'] == null ? undefined : TokenRatesFromJSON(json['price']),
         'walletAddress': AccountAddressFromJSON(json['wallet_address']),
         'jetton': JettonPreviewFromJSON(json['jetton']),
     };
 }
 
 export function JettonBalanceToJSON(value?: JettonBalance | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'balance': value.balance,
-        'price': TokenRatesToJSON(value.price),
-        'wallet_address': AccountAddressToJSON(value.walletAddress),
-        'jetton': JettonPreviewToJSON(value.jetton),
+        'balance': value['balance'],
+        'price': TokenRatesToJSON(value['price']),
+        'wallet_address': AccountAddressToJSON(value['walletAddress']),
+        'jetton': JettonPreviewToJSON(value['jetton']),
     };
 }
 
