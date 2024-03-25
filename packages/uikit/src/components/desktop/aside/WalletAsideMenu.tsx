@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { Label2 } from '../../Text';
-import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon, SettingsSmoothIcon } from '../../Icon';
+import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon } from '../../Icon';
 import { NavLink } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
 import { useTranslation } from '../../../hooks/translation';
@@ -50,14 +50,14 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            <NavLink to={AppRoute.settings}>
+            {/* <NavLink to={AppRoute.settings}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
                     </AsideMenuItemStyled>
                 )}
-            </NavLink>
+            </NavLink>*/}
         </WalletAsideContainer>
     );
 };
