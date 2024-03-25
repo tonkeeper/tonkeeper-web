@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, Suspense, useMemo, useRef } from 'react';
+import React, { FC, Suspense, useMemo, useRef, useState } from 'react';
 import { ActivitySkeletonPage } from '../../components/Skeleton';
 
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -17,6 +17,10 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useTranslation } from '../../hooks/translation';
+import {
+    ActionData,
+    ActivityNotification
+} from '../../components/activity/ton/ActivityNotification';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
@@ -58,6 +62,7 @@ export const DesktopHistory: FC = () => {
     const wallet = useWalletContext();
     const { api, standalone } = useAppContext();
     const { t } = useTranslation();
+    const [selectedActivity, setSelectedActivity] = useState<ActionData | undefined>();
 
     const ref = useRef<HTMLDivElement>(null);
 
@@ -101,6 +106,10 @@ export const DesktopHistory: FC = () => {
 
     return (
         <HistoryPageWrapper ref={ref}>
+            <ActivityNotification
+                value={selectedActivity}
+                handleClose={() => setSelectedActivity(undefined)}
+            />
             <DesktopViewHeader>
                 <Label2>{t('page_header_history')}</Label2>
             </DesktopViewHeader>
@@ -110,7 +119,7 @@ export const DesktopHistory: FC = () => {
                 <GridSizer3 />
                 <GridSizer />
                 {activity.map(item => (
-                    <HistoryEvent item={item} key={item.key} />
+                    <HistoryEvent item={item} key={item.key} onActionClick={setSelectedActivity} />
                 ))}
             </HistoryEventsGrid>
             {isFetchingNextPage && (

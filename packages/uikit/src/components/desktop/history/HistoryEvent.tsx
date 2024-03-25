@@ -8,6 +8,7 @@ import { HistoryAction } from './ton/HistoryAction';
 import { HistoryGridCell } from './ton/HistoryGrid';
 import { SpinnerRing } from '../../Icon';
 import { useTranslation } from '../../../hooks/translation';
+import { ActionData } from '../../activity/ton/ActivityNotification';
 
 const EventDivider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
@@ -30,7 +31,15 @@ const PendingEventCell = styled(HistoryGridCell)`
     }
 `;
 
-export const HistoryEvent: FC<{ item: GenericActivity<MixedActivity> }> = ({ item }) => {
+const HistoryEventWrapper = styled.div`
+    display: contents;
+    cursor: pointer;
+`;
+
+export const HistoryEvent: FC<{
+    item: GenericActivity<MixedActivity>;
+    onActionClick: (actionData: ActionData) => void;
+}> = ({ item, onActionClick }) => {
     const formattedDate = useDateTimeFormatFromNow(item.timestamp);
     const { t } = useTranslation();
 
@@ -44,7 +53,16 @@ export const HistoryEvent: FC<{ item: GenericActivity<MixedActivity> }> = ({ ite
         <>
             {event.actions.map((action, index) => (
                 // eslint-disable-next-line react/jsx-key
-                <>
+                <HistoryEventWrapper
+                    onClick={() =>
+                        onActionClick({
+                            timestamp: item.timestamp,
+                            action,
+                            isScam: event.isScam,
+                            event
+                        })
+                    }
+                >
                     {index === 0 ? (
                         event.inProgress ? (
                             <PendingEventCell>
@@ -65,7 +83,7 @@ export const HistoryEvent: FC<{ item: GenericActivity<MixedActivity> }> = ({ ite
                         date={event.timestamp.toString()}
                     />
                     {index === event.actions.length - 1 && <EventDivider />}
-                </>
+                </HistoryEventWrapper>
             ))}
         </>
     );
