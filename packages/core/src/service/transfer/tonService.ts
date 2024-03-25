@@ -97,7 +97,7 @@ const createTonTransfer = (
         secretKey,
         timeout: getTTL(),
         sendMode: isMax
-            ? SendMode.CARRY_ALL_REMAINING_BALANCE
+            ? SendMode.CARRY_ALL_REMAINING_BALANCE + SendMode.IGNORE_ERRORS
             : SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
             internal({
