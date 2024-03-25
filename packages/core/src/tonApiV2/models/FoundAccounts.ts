@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { FoundAccountsAddressesInner } from './FoundAccountsAddressesInner';
 import {
     FoundAccountsAddressesInnerFromJSON,
@@ -38,10 +38,8 @@ export interface FoundAccounts {
  * Check if a given object implements the FoundAccounts interface.
  */
 export function instanceOfFoundAccounts(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "addresses" in value;
-
-    return isInstance;
+    if (!('addresses' in value)) return false;
+    return true;
 }
 
 export function FoundAccountsFromJSON(json: any): FoundAccounts {
@@ -49,7 +47,7 @@ export function FoundAccountsFromJSON(json: any): FoundAccounts {
 }
 
 export function FoundAccountsFromJSONTyped(json: any, ignoreDiscriminator: boolean): FoundAccounts {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function FoundAccountsFromJSONTyped(json: any, ignoreDiscriminator: boole
 }
 
 export function FoundAccountsToJSON(value?: FoundAccounts | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'addresses': ((value.addresses as Array<any>).map(FoundAccountsAddressesInnerToJSON)),
+        'addresses': ((value['addresses'] as Array<any>).map(FoundAccountsAddressesInnerToJSON)),
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockchainBlockShardsShardsInner } from './BlockchainBlockShardsShardsInner';
 import {
     BlockchainBlockShardsShardsInnerFromJSON,
@@ -38,10 +38,8 @@ export interface BlockchainBlockShards {
  * Check if a given object implements the BlockchainBlockShards interface.
  */
 export function instanceOfBlockchainBlockShards(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "shards" in value;
-
-    return isInstance;
+    if (!('shards' in value)) return false;
+    return true;
 }
 
 export function BlockchainBlockShardsFromJSON(json: any): BlockchainBlockShards {
@@ -49,7 +47,7 @@ export function BlockchainBlockShardsFromJSON(json: any): BlockchainBlockShards 
 }
 
 export function BlockchainBlockShardsFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainBlockShards {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function BlockchainBlockShardsFromJSONTyped(json: any, ignoreDiscriminato
 }
 
 export function BlockchainBlockShardsToJSON(value?: BlockchainBlockShards | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'shards': ((value.shards as Array<any>).map(BlockchainBlockShardsShardsInnerToJSON)),
+        'shards': ((value['shards'] as Array<any>).map(BlockchainBlockShardsShardsInnerToJSON)),
     };
 }
 

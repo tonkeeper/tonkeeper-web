@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -56,12 +56,10 @@ export interface ValueFlowJettonsInner {
  * Check if a given object implements the ValueFlowJettonsInner interface.
  */
 export function instanceOfValueFlowJettonsInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "account" in value;
-    isInstance = isInstance && "jetton" in value;
-    isInstance = isInstance && "quantity" in value;
-
-    return isInstance;
+    if (!('account' in value)) return false;
+    if (!('jetton' in value)) return false;
+    if (!('quantity' in value)) return false;
+    return true;
 }
 
 export function ValueFlowJettonsInnerFromJSON(json: any): ValueFlowJettonsInner {
@@ -69,7 +67,7 @@ export function ValueFlowJettonsInnerFromJSON(json: any): ValueFlowJettonsInner 
 }
 
 export function ValueFlowJettonsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): ValueFlowJettonsInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -81,17 +79,14 @@ export function ValueFlowJettonsInnerFromJSONTyped(json: any, ignoreDiscriminato
 }
 
 export function ValueFlowJettonsInnerToJSON(value?: ValueFlowJettonsInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'account': AccountAddressToJSON(value.account),
-        'jetton': JettonPreviewToJSON(value.jetton),
-        'quantity': value.quantity,
+        'account': AccountAddressToJSON(value['account']),
+        'jetton': JettonPreviewToJSON(value['jetton']),
+        'quantity': value['quantity'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { MsgForwardPrices } from './MsgForwardPrices';
 import {
     MsgForwardPricesFromJSON,
@@ -38,10 +38,8 @@ export interface BlockchainConfig24 {
  * Check if a given object implements the BlockchainConfig24 interface.
  */
 export function instanceOfBlockchainConfig24(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "msgForwardPrices" in value;
-
-    return isInstance;
+    if (!('msgForwardPrices' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig24FromJSON(json: any): BlockchainConfig24 {
@@ -49,7 +47,7 @@ export function BlockchainConfig24FromJSON(json: any): BlockchainConfig24 {
 }
 
 export function BlockchainConfig24FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig24 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function BlockchainConfig24FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig24ToJSON(value?: BlockchainConfig24 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'msg_forward_prices': MsgForwardPricesToJSON(value.msgForwardPrices),
+        'msg_forward_prices': MsgForwardPricesToJSON(value['msgForwardPrices']),
     };
 }
 

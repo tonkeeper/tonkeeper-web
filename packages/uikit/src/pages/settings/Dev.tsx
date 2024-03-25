@@ -3,17 +3,36 @@ import React, { useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
-import { useWalletContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useCleanUpTronStore } from '../../state/tron/tron';
+import { useEnableW5, useEnableW5Mutation } from '../../state/experemental';
 import { useMutateWalletProperty } from '../../state/wallet';
+
+const SettingsW5 = () => {
+    const { experimental } = useAppContext();
+    const { data } = useEnableW5();
+    const { mutate } = useEnableW5Mutation();
+
+    const items = useMemo<SettingsItem[]>(() => {
+        return [
+            {
+                name: 'Experimental W5',
+                icon: data ? 'Active' : 'Inactive',
+                action: () => mutate()
+            }
+        ];
+    }, [data, mutate]);
+
+    if (data === undefined || experimental !== true) return null;
+
+    return <SettingsList items={items} />;
+};
 
 export const DevSettings = React.memo(() => {
     const { t } = useTranslation();
 
     const wallet = useWalletContext();
     const { mutate } = useMutateWalletProperty(true);
-    const { mutate: mutateTron } = useCleanUpTronStore();
 
     const items = useMemo<SettingsItem[]>(() => {
         const network = wallet.network ?? Network.MAINNET;
@@ -26,16 +45,6 @@ export const DevSettings = React.memo(() => {
         ];
     }, [t, wallet]);
 
-    const _items2 = useMemo<SettingsItem[]>(() => {
-        return [
-            {
-                name: t('reset_tron_cache'),
-                icon: wallet.tron ? 'Active' : 'Inactive',
-                action: () => mutateTron()
-            }
-        ];
-    }, [t, wallet, mutateTron]);
-
     return (
         <>
             <SubHeader title="Dev Menu" />
@@ -43,6 +52,7 @@ export const DevSettings = React.memo(() => {
                 <SettingsList items={items} />
                 {/* TODO: ENABLE TRON */}
                 {/* <SettingsList items={items2} /> */}
+                <SettingsW5 />
             </InnerBody>
         </>
     );

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { WalletDNS } from './WalletDNS';
 import {
     WalletDNSFromJSON,
@@ -56,10 +56,8 @@ export interface DnsRecord {
  * Check if a given object implements the DnsRecord interface.
  */
 export function instanceOfDnsRecord(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "sites" in value;
-
-    return isInstance;
+    if (!('sites' in value)) return false;
+    return true;
 }
 
 export function DnsRecordFromJSON(json: any): DnsRecord {
@@ -67,31 +65,28 @@ export function DnsRecordFromJSON(json: any): DnsRecord {
 }
 
 export function DnsRecordFromJSONTyped(json: any, ignoreDiscriminator: boolean): DnsRecord {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'wallet': !exists(json, 'wallet') ? undefined : WalletDNSFromJSON(json['wallet']),
-        'nextResolver': !exists(json, 'next_resolver') ? undefined : json['next_resolver'],
+        'wallet': json['wallet'] == null ? undefined : WalletDNSFromJSON(json['wallet']),
+        'nextResolver': json['next_resolver'] == null ? undefined : json['next_resolver'],
         'sites': json['sites'],
-        'storage': !exists(json, 'storage') ? undefined : json['storage'],
+        'storage': json['storage'] == null ? undefined : json['storage'],
     };
 }
 
 export function DnsRecordToJSON(value?: DnsRecord | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'wallet': WalletDNSToJSON(value.wallet),
-        'next_resolver': value.nextResolver,
-        'sites': value.sites,
-        'storage': value.storage,
+        'wallet': WalletDNSToJSON(value['wallet']),
+        'next_resolver': value['nextResolver'],
+        'sites': value['sites'],
+        'storage': value['storage'],
     };
 }
 

@@ -36,8 +36,8 @@ export const usePreFetchRates = () => {
         [QueryKey.rate],
         async () => {
             const value = await new RatesApi(tonApiV2).getRates({
-                tokens: [CryptoCurrency.TON, CryptoCurrency.USDT].join(','),
-                currencies: fiat
+                tokens: [CryptoCurrency.TON, CryptoCurrency.USDT],
+                currencies: [fiat]
             });
 
             if (!value || !value.rates) {
@@ -73,8 +73,8 @@ export const useRate = (token: string) => {
         getRateKey(fiat, token),
         async () => {
             const value = await new RatesApi(tonApiV2).getRates({
-                tokens: token,
-                currencies: fiat
+                tokens: [token],
+                currencies: [fiat]
             });
 
             try {

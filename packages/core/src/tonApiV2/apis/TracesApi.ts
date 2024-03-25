@@ -15,12 +15,12 @@
 
 import * as runtime from '../runtime';
 import type {
-  GetBlockchainBlockDefaultResponse,
+  ReduceIndexingLatencyDefaultResponse,
   Trace,
 } from '../models/index';
 import {
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
     TraceFromJSON,
     TraceToJSON,
 } from '../models/index';
@@ -61,8 +61,11 @@ export class TracesApi extends runtime.BaseAPI implements TracesApiInterface {
      * Get the trace by trace ID or hash of any transaction in trace
      */
     async getTraceRaw(requestParameters: GetTraceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Trace>> {
-        if (requestParameters.traceId === null || requestParameters.traceId === undefined) {
-            throw new runtime.RequiredError('traceId','Required parameter requestParameters.traceId was null or undefined when calling getTrace.');
+        if (requestParameters['traceId'] == null) {
+            throw new runtime.RequiredError(
+                'traceId',
+                'Required parameter "traceId" was null or undefined when calling getTrace().'
+            );
         }
 
         const queryParameters: any = {};
@@ -70,7 +73,7 @@ export class TracesApi extends runtime.BaseAPI implements TracesApiInterface {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v2/traces/{trace_id}`.replace(`{${"trace_id"}}`, encodeURIComponent(String(requestParameters.traceId))),
+            path: `/v2/traces/{trace_id}`.replace(`{${"trace_id"}}`, encodeURIComponent(String(requestParameters['traceId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

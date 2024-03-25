@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccStatusChange } from './AccStatusChange';
 import {
     AccStatusChangeFromJSON,
@@ -50,11 +50,9 @@ export interface StoragePhase {
  * Check if a given object implements the StoragePhase interface.
  */
 export function instanceOfStoragePhase(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "feesCollected" in value;
-    isInstance = isInstance && "statusChange" in value;
-
-    return isInstance;
+    if (!('feesCollected' in value)) return false;
+    if (!('statusChange' in value)) return false;
+    return true;
 }
 
 export function StoragePhaseFromJSON(json: any): StoragePhase {
@@ -62,29 +60,26 @@ export function StoragePhaseFromJSON(json: any): StoragePhase {
 }
 
 export function StoragePhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean): StoragePhase {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'feesCollected': json['fees_collected'],
-        'feesDue': !exists(json, 'fees_due') ? undefined : json['fees_due'],
+        'feesDue': json['fees_due'] == null ? undefined : json['fees_due'],
         'statusChange': AccStatusChangeFromJSON(json['status_change']),
     };
 }
 
 export function StoragePhaseToJSON(value?: StoragePhase | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'fees_collected': value.feesCollected,
-        'fees_due': value.feesDue,
-        'status_change': AccStatusChangeToJSON(value.statusChange),
+        'fees_collected': value['feesCollected'],
+        'fees_due': value['feesDue'],
+        'status_change': AccStatusChangeToJSON(value['statusChange']),
     };
 }
 

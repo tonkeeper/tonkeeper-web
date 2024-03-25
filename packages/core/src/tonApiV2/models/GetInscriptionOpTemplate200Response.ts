@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface GetInscriptionOpTemplate200Response {
  * Check if a given object implements the GetInscriptionOpTemplate200Response interface.
  */
 export function instanceOfGetInscriptionOpTemplate200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "comment" in value;
-    isInstance = isInstance && "destination" in value;
-
-    return isInstance;
+    if (!('comment' in value)) return false;
+    if (!('destination' in value)) return false;
+    return true;
 }
 
 export function GetInscriptionOpTemplate200ResponseFromJSON(json: any): GetInscriptionOpTemplate200Response {
@@ -49,7 +47,7 @@ export function GetInscriptionOpTemplate200ResponseFromJSON(json: any): GetInscr
 }
 
 export function GetInscriptionOpTemplate200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetInscriptionOpTemplate200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function GetInscriptionOpTemplate200ResponseFromJSONTyped(json: any, igno
 }
 
 export function GetInscriptionOpTemplate200ResponseToJSON(value?: GetInscriptionOpTemplate200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'comment': value.comment,
-        'destination': value.destination,
+        'comment': value['comment'],
+        'destination': value['destination'],
     };
 }
 

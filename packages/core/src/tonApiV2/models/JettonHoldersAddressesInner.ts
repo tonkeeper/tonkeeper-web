@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -50,12 +50,10 @@ export interface JettonHoldersAddressesInner {
  * Check if a given object implements the JettonHoldersAddressesInner interface.
  */
 export function instanceOfJettonHoldersAddressesInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "owner" in value;
-    isInstance = isInstance && "balance" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('owner' in value)) return false;
+    if (!('balance' in value)) return false;
+    return true;
 }
 
 export function JettonHoldersAddressesInnerFromJSON(json: any): JettonHoldersAddressesInner {
@@ -63,7 +61,7 @@ export function JettonHoldersAddressesInnerFromJSON(json: any): JettonHoldersAdd
 }
 
 export function JettonHoldersAddressesInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonHoldersAddressesInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -75,17 +73,14 @@ export function JettonHoldersAddressesInnerFromJSONTyped(json: any, ignoreDiscri
 }
 
 export function JettonHoldersAddressesInnerToJSON(value?: JettonHoldersAddressesInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'owner': AccountAddressToJSON(value.owner),
-        'balance': value.balance,
+        'address': value['address'],
+        'owner': AccountAddressToJSON(value['owner']),
+        'balance': value['balance'],
     };
 }
 

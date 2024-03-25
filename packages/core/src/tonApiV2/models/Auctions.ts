@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { Auction } from './Auction';
 import {
     AuctionFromJSON,
@@ -44,11 +44,9 @@ export interface Auctions {
  * Check if a given object implements the Auctions interface.
  */
 export function instanceOfAuctions(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "data" in value;
-    isInstance = isInstance && "total" in value;
-
-    return isInstance;
+    if (!('data' in value)) return false;
+    if (!('total' in value)) return false;
+    return true;
 }
 
 export function AuctionsFromJSON(json: any): Auctions {
@@ -56,7 +54,7 @@ export function AuctionsFromJSON(json: any): Auctions {
 }
 
 export function AuctionsFromJSONTyped(json: any, ignoreDiscriminator: boolean): Auctions {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -67,16 +65,13 @@ export function AuctionsFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
 }
 
 export function AuctionsToJSON(value?: Auctions | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'data': ((value.data as Array<any>).map(AuctionToJSON)),
-        'total': value.total,
+        'data': ((value['data'] as Array<any>).map(AuctionToJSON)),
+        'total': value['total'],
     };
 }
 

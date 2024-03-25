@@ -1,6 +1,6 @@
-import { Address } from 'ton-core';
-import { KeyPair, mnemonicToPrivateKey } from 'ton-crypto';
-import { WalletContractV4 } from 'ton/dist/wallets/WalletContractV4';
+import { Address } from '@ton/core';
+import { KeyPair, mnemonicToPrivateKey } from '@ton/crypto';
+import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
@@ -99,7 +99,7 @@ export const getWalletAddress = (
     version: WalletVersion,
     network?: Network
 ): WalletAddress => {
-    const { address } = walletContract(publicKey, version);
+    const { address } = walletContract(publicKey, version, network);
     return {
         rawAddress: address.toRawString(),
         friendlyAddress: address.toString({

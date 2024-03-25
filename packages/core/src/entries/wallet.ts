@@ -7,7 +7,8 @@ export enum WalletVersion {
     V3R1 = 0,
     V3R2 = 1,
     V4R1 = 2,
-    V4R2 = 3
+    V4R2 = 3,
+    W5 = 4
 }
 
 export const WalletVersions = [WalletVersion.V3R1, WalletVersion.V3R2, WalletVersion.V4R2];
@@ -20,6 +21,8 @@ export const walletVersionText = (version: WalletVersion) => {
             return 'v3R2';
         case WalletVersion.V4R2:
             return 'v4R2';
+        case WalletVersion.W5:
+            return 'W5';
         default:
             return String(version);
     }
@@ -33,6 +36,8 @@ export const walletVersionFromText = (value: string) => {
             return WalletVersion.V3R2;
         case 'v4R2':
             return WalletVersion.V4R2;
+        case 'W5':
+            return WalletVersion.W5;
         default:
             throw new Error('Unsupported version');
     }

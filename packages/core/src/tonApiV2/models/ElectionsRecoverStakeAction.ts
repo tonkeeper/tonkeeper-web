@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -44,11 +44,9 @@ export interface ElectionsRecoverStakeAction {
  * Check if a given object implements the ElectionsRecoverStakeAction interface.
  */
 export function instanceOfElectionsRecoverStakeAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "staker" in value;
-
-    return isInstance;
+    if (!('amount' in value)) return false;
+    if (!('staker' in value)) return false;
+    return true;
 }
 
 export function ElectionsRecoverStakeActionFromJSON(json: any): ElectionsRecoverStakeAction {
@@ -56,7 +54,7 @@ export function ElectionsRecoverStakeActionFromJSON(json: any): ElectionsRecover
 }
 
 export function ElectionsRecoverStakeActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): ElectionsRecoverStakeAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -67,16 +65,13 @@ export function ElectionsRecoverStakeActionFromJSONTyped(json: any, ignoreDiscri
 }
 
 export function ElectionsRecoverStakeActionToJSON(value?: ElectionsRecoverStakeAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'amount': value.amount,
-        'staker': AccountAddressToJSON(value.staker),
+        'amount': value['amount'],
+        'staker': AccountAddressToJSON(value['staker']),
     };
 }
 

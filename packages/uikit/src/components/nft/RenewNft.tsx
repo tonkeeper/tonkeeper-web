@@ -2,10 +2,10 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
-import { MessageConsequences } from '@tonkeeper/core/dist/tonApiV2';
+import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useToast } from '../../hooks/appSdk';
 import { useAreNftActionsDisabled } from '../../hooks/blockchain/nft/useAreNftActionsDisabled';
@@ -96,7 +96,7 @@ export const RenewNft: FC<{
     const mutation = useRenewNft({
         nftAddress: nft.address,
         amount: unShiftedDecimals(dnsRenewAmount),
-        fee: estimation.data?.payload as MessageConsequences
+        fee: estimation.data?.payload as TransferEstimationEvent
     });
 
     const onOpen = () => {

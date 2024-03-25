@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface GetAccountDiff200Response {
  * Check if a given object implements the GetAccountDiff200Response interface.
  */
 export function instanceOfGetAccountDiff200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "balanceChange" in value;
-
-    return isInstance;
+    if (!('balanceChange' in value)) return false;
+    return true;
 }
 
 export function GetAccountDiff200ResponseFromJSON(json: any): GetAccountDiff200Response {
@@ -42,7 +40,7 @@ export function GetAccountDiff200ResponseFromJSON(json: any): GetAccountDiff200R
 }
 
 export function GetAccountDiff200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetAccountDiff200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function GetAccountDiff200ResponseFromJSONTyped(json: any, ignoreDiscrimi
 }
 
 export function GetAccountDiff200ResponseToJSON(value?: GetAccountDiff200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'balance_change': value.balanceChange,
+        'balance_change': value['balanceChange'],
     };
 }
 

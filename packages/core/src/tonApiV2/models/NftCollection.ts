@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -92,13 +92,11 @@ export type NftCollectionApprovedByEnum = typeof NftCollectionApprovedByEnum[key
  * Check if a given object implements the NftCollection interface.
  */
 export function instanceOfNftCollection(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "nextItemIndex" in value;
-    isInstance = isInstance && "rawCollectionContent" in value;
-    isInstance = isInstance && "approvedBy" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('nextItemIndex' in value)) return false;
+    if (!('rawCollectionContent' in value)) return false;
+    if (!('approvedBy' in value)) return false;
+    return true;
 }
 
 export function NftCollectionFromJSON(json: any): NftCollection {
@@ -106,37 +104,34 @@ export function NftCollectionFromJSON(json: any): NftCollection {
 }
 
 export function NftCollectionFromJSONTyped(json: any, ignoreDiscriminator: boolean): NftCollection {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'address': json['address'],
         'nextItemIndex': json['next_item_index'],
-        'owner': !exists(json, 'owner') ? undefined : AccountAddressFromJSON(json['owner']),
+        'owner': json['owner'] == null ? undefined : AccountAddressFromJSON(json['owner']),
         'rawCollectionContent': json['raw_collection_content'],
-        'metadata': !exists(json, 'metadata') ? undefined : json['metadata'],
-        'previews': !exists(json, 'previews') ? undefined : ((json['previews'] as Array<any>).map(ImagePreviewFromJSON)),
+        'metadata': json['metadata'] == null ? undefined : json['metadata'],
+        'previews': json['previews'] == null ? undefined : ((json['previews'] as Array<any>).map(ImagePreviewFromJSON)),
         'approvedBy': json['approved_by'],
     };
 }
 
 export function NftCollectionToJSON(value?: NftCollection | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'next_item_index': value.nextItemIndex,
-        'owner': AccountAddressToJSON(value.owner),
-        'raw_collection_content': value.rawCollectionContent,
-        'metadata': value.metadata,
-        'previews': value.previews === undefined ? undefined : ((value.previews as Array<any>).map(ImagePreviewToJSON)),
-        'approved_by': value.approvedBy,
+        'address': value['address'],
+        'next_item_index': value['nextItemIndex'],
+        'owner': AccountAddressToJSON(value['owner']),
+        'raw_collection_content': value['rawCollectionContent'],
+        'metadata': value['metadata'],
+        'previews': value['previews'] == null ? undefined : ((value['previews'] as Array<any>).map(ImagePreviewToJSON)),
+        'approved_by': value['approvedBy'],
     };
 }
 

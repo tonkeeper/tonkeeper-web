@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -68,12 +68,10 @@ export interface ActionSimplePreview {
  * Check if a given object implements the ActionSimplePreview interface.
  */
 export function instanceOfActionSimplePreview(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "description" in value;
-    isInstance = isInstance && "accounts" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    if (!('description' in value)) return false;
+    if (!('accounts' in value)) return false;
+    return true;
 }
 
 export function ActionSimplePreviewFromJSON(json: any): ActionSimplePreview {
@@ -81,35 +79,32 @@ export function ActionSimplePreviewFromJSON(json: any): ActionSimplePreview {
 }
 
 export function ActionSimplePreviewFromJSONTyped(json: any, ignoreDiscriminator: boolean): ActionSimplePreview {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'name': json['name'],
         'description': json['description'],
-        'actionImage': !exists(json, 'action_image') ? undefined : json['action_image'],
-        'value': !exists(json, 'value') ? undefined : json['value'],
-        'valueImage': !exists(json, 'value_image') ? undefined : json['value_image'],
+        'actionImage': json['action_image'] == null ? undefined : json['action_image'],
+        'value': json['value'] == null ? undefined : json['value'],
+        'valueImage': json['value_image'] == null ? undefined : json['value_image'],
         'accounts': ((json['accounts'] as Array<any>).map(AccountAddressFromJSON)),
     };
 }
 
 export function ActionSimplePreviewToJSON(value?: ActionSimplePreview | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'name': value.name,
-        'description': value.description,
-        'action_image': value.actionImage,
-        'value': value.value,
-        'value_image': value.valueImage,
-        'accounts': ((value.accounts as Array<any>).map(AccountAddressToJSON)),
+        'name': value['name'],
+        'description': value['description'],
+        'action_image': value['actionImage'],
+        'value': value['value'],
+        'value_image': value['valueImage'],
+        'accounts': ((value['accounts'] as Array<any>).map(AccountAddressToJSON)),
     };
 }
 

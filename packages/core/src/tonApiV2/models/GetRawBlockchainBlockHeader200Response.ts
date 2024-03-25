@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -50,12 +50,10 @@ export interface GetRawBlockchainBlockHeader200Response {
  * Check if a given object implements the GetRawBlockchainBlockHeader200Response interface.
  */
 export function instanceOfGetRawBlockchainBlockHeader200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "id" in value;
-    isInstance = isInstance && "mode" in value;
-    isInstance = isInstance && "headerProof" in value;
-
-    return isInstance;
+    if (!('id' in value)) return false;
+    if (!('mode' in value)) return false;
+    if (!('headerProof' in value)) return false;
+    return true;
 }
 
 export function GetRawBlockchainBlockHeader200ResponseFromJSON(json: any): GetRawBlockchainBlockHeader200Response {
@@ -63,7 +61,7 @@ export function GetRawBlockchainBlockHeader200ResponseFromJSON(json: any): GetRa
 }
 
 export function GetRawBlockchainBlockHeader200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawBlockchainBlockHeader200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -75,17 +73,14 @@ export function GetRawBlockchainBlockHeader200ResponseFromJSONTyped(json: any, i
 }
 
 export function GetRawBlockchainBlockHeader200ResponseToJSON(value?: GetRawBlockchainBlockHeader200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'id': BlockRawToJSON(value.id),
-        'mode': value.mode,
-        'header_proof': value.headerProof,
+        'id': BlockRawToJSON(value['id']),
+        'mode': value['mode'],
+        'header_proof': value['headerProof'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { GasLimitPrices } from './GasLimitPrices';
 import {
     GasLimitPricesFromJSON,
@@ -38,10 +38,8 @@ export interface BlockchainConfig20 {
  * Check if a given object implements the BlockchainConfig20 interface.
  */
 export function instanceOfBlockchainConfig20(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "gasLimitsPrices" in value;
-
-    return isInstance;
+    if (!('gasLimitsPrices' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig20FromJSON(json: any): BlockchainConfig20 {
@@ -49,7 +47,7 @@ export function BlockchainConfig20FromJSON(json: any): BlockchainConfig20 {
 }
 
 export function BlockchainConfig20FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig20 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function BlockchainConfig20FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig20ToJSON(value?: BlockchainConfig20 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'gas_limits_prices': GasLimitPricesToJSON(value.gasLimitsPrices),
+        'gas_limits_prices': GasLimitPricesToJSON(value['gasLimitsPrices']),
     };
 }
 

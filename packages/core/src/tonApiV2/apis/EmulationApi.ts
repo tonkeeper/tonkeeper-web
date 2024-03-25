@@ -20,8 +20,8 @@ import type {
   DecodedMessage,
   EmulateMessageToWalletRequest,
   Event,
-  GetBlockchainBlockDefaultResponse,
   MessageConsequences,
+  ReduceIndexingLatencyDefaultResponse,
   Trace,
 } from '../models/index';
 import {
@@ -35,10 +35,10 @@ import {
     EmulateMessageToWalletRequestToJSON,
     EventFromJSON,
     EventToJSON,
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
     MessageConsequencesFromJSON,
     MessageConsequencesToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
     TraceFromJSON,
     TraceToJSON,
 } from '../models/index';
@@ -51,6 +51,7 @@ export interface EmulateMessageToAccountEventRequest {
     accountId: string;
     decodeMessageRequest: DecodeMessageRequest;
     acceptLanguage?: string;
+    ignoreSignatureCheck?: boolean;
 }
 
 export interface EmulateMessageToEventRequest {
@@ -95,6 +96,7 @@ export interface EmulationApiInterface {
      * @param {string} accountId account ID
      * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to base64
      * @param {string} [acceptLanguage] 
+     * @param {boolean} [ignoreSignatureCheck] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof EmulationApiInterface
@@ -163,8 +165,11 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
      * Decode a given message. Only external incoming messages can be decoded currently.
      */
     async decodeMessageRaw(requestParameters: DecodeMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DecodedMessage>> {
-        if (requestParameters.decodeMessageRequest === null || requestParameters.decodeMessageRequest === undefined) {
-            throw new runtime.RequiredError('decodeMessageRequest','Required parameter requestParameters.decodeMessageRequest was null or undefined when calling decodeMessage.');
+        if (requestParameters['decodeMessageRequest'] == null) {
+            throw new runtime.RequiredError(
+                'decodeMessageRequest',
+                'Required parameter "decodeMessageRequest" was null or undefined when calling decodeMessage().'
+            );
         }
 
         const queryParameters: any = {};
@@ -178,7 +183,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: DecodeMessageRequestToJSON(requestParameters.decodeMessageRequest),
+            body: DecodeMessageRequestToJSON(requestParameters['decodeMessageRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => DecodedMessageFromJSON(jsonValue));
@@ -196,30 +201,40 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
      * Emulate sending message to blockchain
      */
     async emulateMessageToAccountEventRaw(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvent>> {
-        if (requestParameters.accountId === null || requestParameters.accountId === undefined) {
-            throw new runtime.RequiredError('accountId','Required parameter requestParameters.accountId was null or undefined when calling emulateMessageToAccountEvent.');
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling emulateMessageToAccountEvent().'
+            );
         }
 
-        if (requestParameters.decodeMessageRequest === null || requestParameters.decodeMessageRequest === undefined) {
-            throw new runtime.RequiredError('decodeMessageRequest','Required parameter requestParameters.decodeMessageRequest was null or undefined when calling emulateMessageToAccountEvent.');
+        if (requestParameters['decodeMessageRequest'] == null) {
+            throw new runtime.RequiredError(
+                'decodeMessageRequest',
+                'Required parameter "decodeMessageRequest" was null or undefined when calling emulateMessageToAccountEvent().'
+            );
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['ignoreSignatureCheck'] != null) {
+            queryParameters['ignore_signature_check'] = requestParameters['ignoreSignatureCheck'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({
-            path: `/v2/accounts/{account_id}/events/emulate`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters.accountId))),
+            path: `/v2/accounts/{account_id}/events/emulate`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: DecodeMessageRequestToJSON(requestParameters.decodeMessageRequest),
+            body: DecodeMessageRequestToJSON(requestParameters['decodeMessageRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => AccountEventFromJSON(jsonValue));
@@ -237,22 +252,25 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
      * Emulate sending message to blockchain
      */
     async emulateMessageToEventRaw(requestParameters: EmulateMessageToEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Event>> {
-        if (requestParameters.decodeMessageRequest === null || requestParameters.decodeMessageRequest === undefined) {
-            throw new runtime.RequiredError('decodeMessageRequest','Required parameter requestParameters.decodeMessageRequest was null or undefined when calling emulateMessageToEvent.');
+        if (requestParameters['decodeMessageRequest'] == null) {
+            throw new runtime.RequiredError(
+                'decodeMessageRequest',
+                'Required parameter "decodeMessageRequest" was null or undefined when calling emulateMessageToEvent().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.ignoreSignatureCheck !== undefined) {
-            queryParameters['ignore_signature_check'] = requestParameters.ignoreSignatureCheck;
+        if (requestParameters['ignoreSignatureCheck'] != null) {
+            queryParameters['ignore_signature_check'] = requestParameters['ignoreSignatureCheck'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({
@@ -260,7 +278,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: DecodeMessageRequestToJSON(requestParameters.decodeMessageRequest),
+            body: DecodeMessageRequestToJSON(requestParameters['decodeMessageRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => EventFromJSON(jsonValue));
@@ -278,14 +296,17 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
      * Emulate sending message to blockchain
      */
     async emulateMessageToTraceRaw(requestParameters: EmulateMessageToTraceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Trace>> {
-        if (requestParameters.decodeMessageRequest === null || requestParameters.decodeMessageRequest === undefined) {
-            throw new runtime.RequiredError('decodeMessageRequest','Required parameter requestParameters.decodeMessageRequest was null or undefined when calling emulateMessageToTrace.');
+        if (requestParameters['decodeMessageRequest'] == null) {
+            throw new runtime.RequiredError(
+                'decodeMessageRequest',
+                'Required parameter "decodeMessageRequest" was null or undefined when calling emulateMessageToTrace().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.ignoreSignatureCheck !== undefined) {
-            queryParameters['ignore_signature_check'] = requestParameters.ignoreSignatureCheck;
+        if (requestParameters['ignoreSignatureCheck'] != null) {
+            queryParameters['ignore_signature_check'] = requestParameters['ignoreSignatureCheck'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -297,7 +318,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: DecodeMessageRequestToJSON(requestParameters.decodeMessageRequest),
+            body: DecodeMessageRequestToJSON(requestParameters['decodeMessageRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => TraceFromJSON(jsonValue));
@@ -315,8 +336,11 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
      * Emulate sending message to blockchain
      */
     async emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageConsequences>> {
-        if (requestParameters.emulateMessageToWalletRequest === null || requestParameters.emulateMessageToWalletRequest === undefined) {
-            throw new runtime.RequiredError('emulateMessageToWalletRequest','Required parameter requestParameters.emulateMessageToWalletRequest was null or undefined when calling emulateMessageToWallet.');
+        if (requestParameters['emulateMessageToWalletRequest'] == null) {
+            throw new runtime.RequiredError(
+                'emulateMessageToWalletRequest',
+                'Required parameter "emulateMessageToWalletRequest" was null or undefined when calling emulateMessageToWallet().'
+            );
         }
 
         const queryParameters: any = {};
@@ -325,8 +349,8 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({
@@ -334,7 +358,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: EmulateMessageToWalletRequestToJSON(requestParameters.emulateMessageToWalletRequest),
+            body: EmulateMessageToWalletRequestToJSON(requestParameters['emulateMessageToWalletRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MessageConsequencesFromJSON(jsonValue));

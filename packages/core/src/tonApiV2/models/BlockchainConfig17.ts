@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The stake parameters configuration in the TON blockchain.
  * @export
@@ -49,13 +49,11 @@ export interface BlockchainConfig17 {
  * Check if a given object implements the BlockchainConfig17 interface.
  */
 export function instanceOfBlockchainConfig17(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "minStake" in value;
-    isInstance = isInstance && "maxStake" in value;
-    isInstance = isInstance && "minTotalStake" in value;
-    isInstance = isInstance && "maxStakeFactor" in value;
-
-    return isInstance;
+    if (!('minStake' in value)) return false;
+    if (!('maxStake' in value)) return false;
+    if (!('minTotalStake' in value)) return false;
+    if (!('maxStakeFactor' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig17FromJSON(json: any): BlockchainConfig17 {
@@ -63,7 +61,7 @@ export function BlockchainConfig17FromJSON(json: any): BlockchainConfig17 {
 }
 
 export function BlockchainConfig17FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig17 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -76,18 +74,15 @@ export function BlockchainConfig17FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig17ToJSON(value?: BlockchainConfig17 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'min_stake': value.minStake,
-        'max_stake': value.maxStake,
-        'min_total_stake': value.minTotalStake,
-        'max_stake_factor': value.maxStakeFactor,
+        'min_stake': value['minStake'],
+        'max_stake': value['maxStake'],
+        'min_total_stake': value['minTotalStake'],
+        'max_stake_factor': value['maxStakeFactor'],
     };
 }
 

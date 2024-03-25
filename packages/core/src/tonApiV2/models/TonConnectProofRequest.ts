@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { TonConnectProofRequestProof } from './TonConnectProofRequestProof';
 import {
     TonConnectProofRequestProofFromJSON,
@@ -44,11 +44,9 @@ export interface TonConnectProofRequest {
  * Check if a given object implements the TonConnectProofRequest interface.
  */
 export function instanceOfTonConnectProofRequest(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "proof" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('proof' in value)) return false;
+    return true;
 }
 
 export function TonConnectProofRequestFromJSON(json: any): TonConnectProofRequest {
@@ -56,7 +54,7 @@ export function TonConnectProofRequestFromJSON(json: any): TonConnectProofReques
 }
 
 export function TonConnectProofRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): TonConnectProofRequest {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -67,16 +65,13 @@ export function TonConnectProofRequestFromJSONTyped(json: any, ignoreDiscriminat
 }
 
 export function TonConnectProofRequestToJSON(value?: TonConnectProofRequest | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'proof': TonConnectProofRequestProofToJSON(value.proof),
+        'address': value['address'],
+        'proof': TonConnectProofRequestProofToJSON(value['proof']),
     };
 }
 

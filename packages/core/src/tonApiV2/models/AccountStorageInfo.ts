@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -55,14 +55,12 @@ export interface AccountStorageInfo {
  * Check if a given object implements the AccountStorageInfo interface.
  */
 export function instanceOfAccountStorageInfo(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "usedCells" in value;
-    isInstance = isInstance && "usedBits" in value;
-    isInstance = isInstance && "usedPublicCells" in value;
-    isInstance = isInstance && "lastPaid" in value;
-    isInstance = isInstance && "duePayment" in value;
-
-    return isInstance;
+    if (!('usedCells' in value)) return false;
+    if (!('usedBits' in value)) return false;
+    if (!('usedPublicCells' in value)) return false;
+    if (!('lastPaid' in value)) return false;
+    if (!('duePayment' in value)) return false;
+    return true;
 }
 
 export function AccountStorageInfoFromJSON(json: any): AccountStorageInfo {
@@ -70,7 +68,7 @@ export function AccountStorageInfoFromJSON(json: any): AccountStorageInfo {
 }
 
 export function AccountStorageInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): AccountStorageInfo {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -84,19 +82,16 @@ export function AccountStorageInfoFromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function AccountStorageInfoToJSON(value?: AccountStorageInfo | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'used_cells': value.usedCells,
-        'used_bits': value.usedBits,
-        'used_public_cells': value.usedPublicCells,
-        'last_paid': value.lastPaid,
-        'due_payment': value.duePayment,
+        'used_cells': value['usedCells'],
+        'used_bits': value['usedBits'],
+        'used_public_cells': value['usedPublicCells'],
+        'last_paid': value['lastPaid'],
+        'due_payment': value['duePayment'],
     };
 }
 

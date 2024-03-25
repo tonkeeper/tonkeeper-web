@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { JettonMetadata } from './JettonMetadata';
 import {
     JettonMetadataFromJSON,
@@ -68,14 +68,12 @@ export interface JettonInfo {
  * Check if a given object implements the JettonInfo interface.
  */
 export function instanceOfJettonInfo(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "mintable" in value;
-    isInstance = isInstance && "totalSupply" in value;
-    isInstance = isInstance && "metadata" in value;
-    isInstance = isInstance && "verification" in value;
-    isInstance = isInstance && "holdersCount" in value;
-
-    return isInstance;
+    if (!('mintable' in value)) return false;
+    if (!('totalSupply' in value)) return false;
+    if (!('metadata' in value)) return false;
+    if (!('verification' in value)) return false;
+    if (!('holdersCount' in value)) return false;
+    return true;
 }
 
 export function JettonInfoFromJSON(json: any): JettonInfo {
@@ -83,7 +81,7 @@ export function JettonInfoFromJSON(json: any): JettonInfo {
 }
 
 export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonInfo {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -97,19 +95,16 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
 }
 
 export function JettonInfoToJSON(value?: JettonInfo | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'mintable': value.mintable,
-        'total_supply': value.totalSupply,
-        'metadata': JettonMetadataToJSON(value.metadata),
-        'verification': JettonVerificationTypeToJSON(value.verification),
-        'holders_count': value.holdersCount,
+        'mintable': value['mintable'],
+        'total_supply': value['totalSupply'],
+        'metadata': JettonMetadataToJSON(value['metadata']),
+        'verification': JettonVerificationTypeToJSON(value['verification']),
+        'holders_count': value['holdersCount'],
     };
 }
 

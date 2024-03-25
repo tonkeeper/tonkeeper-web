@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { JettonQuantity } from './JettonQuantity';
 import {
     JettonQuantityFromJSON,
@@ -62,13 +62,11 @@ export interface Risk {
  * Check if a given object implements the Risk interface.
  */
 export function instanceOfRisk(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "transferAllRemainingBalance" in value;
-    isInstance = isInstance && "ton" in value;
-    isInstance = isInstance && "jettons" in value;
-    isInstance = isInstance && "nfts" in value;
-
-    return isInstance;
+    if (!('transferAllRemainingBalance' in value)) return false;
+    if (!('ton' in value)) return false;
+    if (!('jettons' in value)) return false;
+    if (!('nfts' in value)) return false;
+    return true;
 }
 
 export function RiskFromJSON(json: any): Risk {
@@ -76,7 +74,7 @@ export function RiskFromJSON(json: any): Risk {
 }
 
 export function RiskFromJSONTyped(json: any, ignoreDiscriminator: boolean): Risk {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -89,18 +87,15 @@ export function RiskFromJSONTyped(json: any, ignoreDiscriminator: boolean): Risk
 }
 
 export function RiskToJSON(value?: Risk | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'transfer_all_remaining_balance': value.transferAllRemainingBalance,
-        'ton': value.ton,
-        'jettons': ((value.jettons as Array<any>).map(JettonQuantityToJSON)),
-        'nfts': ((value.nfts as Array<any>).map(NftItemToJSON)),
+        'transfer_all_remaining_balance': value['transferAllRemainingBalance'],
+        'ton': value['ton'],
+        'jettons': ((value['jettons'] as Array<any>).map(JettonQuantityToJSON)),
+        'nfts': ((value['nfts'] as Array<any>).map(NftItemToJSON)),
     };
 }
 

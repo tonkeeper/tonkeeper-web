@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -122,14 +122,12 @@ export type NftItemApprovedByEnum = typeof NftItemApprovedByEnum[keyof typeof Nf
  * Check if a given object implements the NftItem interface.
  */
 export function instanceOfNftItem(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "index" in value;
-    isInstance = isInstance && "verified" in value;
-    isInstance = isInstance && "metadata" in value;
-    isInstance = isInstance && "approvedBy" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('index' in value)) return false;
+    if (!('verified' in value)) return false;
+    if (!('metadata' in value)) return false;
+    if (!('approvedBy' in value)) return false;
+    return true;
 }
 
 export function NftItemFromJSON(json: any): NftItem {
@@ -137,43 +135,40 @@ export function NftItemFromJSON(json: any): NftItem {
 }
 
 export function NftItemFromJSONTyped(json: any, ignoreDiscriminator: boolean): NftItem {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'address': json['address'],
         'index': json['index'],
-        'owner': !exists(json, 'owner') ? undefined : AccountAddressFromJSON(json['owner']),
-        'collection': !exists(json, 'collection') ? undefined : NftItemCollectionFromJSON(json['collection']),
+        'owner': json['owner'] == null ? undefined : AccountAddressFromJSON(json['owner']),
+        'collection': json['collection'] == null ? undefined : NftItemCollectionFromJSON(json['collection']),
         'verified': json['verified'],
         'metadata': json['metadata'],
-        'sale': !exists(json, 'sale') ? undefined : SaleFromJSON(json['sale']),
-        'previews': !exists(json, 'previews') ? undefined : ((json['previews'] as Array<any>).map(ImagePreviewFromJSON)),
-        'dns': !exists(json, 'dns') ? undefined : json['dns'],
+        'sale': json['sale'] == null ? undefined : SaleFromJSON(json['sale']),
+        'previews': json['previews'] == null ? undefined : ((json['previews'] as Array<any>).map(ImagePreviewFromJSON)),
+        'dns': json['dns'] == null ? undefined : json['dns'],
         'approvedBy': json['approved_by'],
     };
 }
 
 export function NftItemToJSON(value?: NftItem | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'index': value.index,
-        'owner': AccountAddressToJSON(value.owner),
-        'collection': NftItemCollectionToJSON(value.collection),
-        'verified': value.verified,
-        'metadata': value.metadata,
-        'sale': SaleToJSON(value.sale),
-        'previews': value.previews === undefined ? undefined : ((value.previews as Array<any>).map(ImagePreviewToJSON)),
-        'dns': value.dns,
-        'approved_by': value.approvedBy,
+        'address': value['address'],
+        'index': value['index'],
+        'owner': AccountAddressToJSON(value['owner']),
+        'collection': NftItemCollectionToJSON(value['collection']),
+        'verified': value['verified'],
+        'metadata': value['metadata'],
+        'sale': SaleToJSON(value['sale']),
+        'previews': value['previews'] == null ? undefined : ((value['previews'] as Array<any>).map(ImagePreviewToJSON)),
+        'dns': value['dns'],
+        'approved_by': value['approvedBy'],
     };
 }
 

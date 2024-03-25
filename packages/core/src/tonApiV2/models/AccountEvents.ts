@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountEvent } from './AccountEvent';
 import {
     AccountEventFromJSON,
@@ -44,11 +44,9 @@ export interface AccountEvents {
  * Check if a given object implements the AccountEvents interface.
  */
 export function instanceOfAccountEvents(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "events" in value;
-    isInstance = isInstance && "nextFrom" in value;
-
-    return isInstance;
+    if (!('events' in value)) return false;
+    if (!('nextFrom' in value)) return false;
+    return true;
 }
 
 export function AccountEventsFromJSON(json: any): AccountEvents {
@@ -56,7 +54,7 @@ export function AccountEventsFromJSON(json: any): AccountEvents {
 }
 
 export function AccountEventsFromJSONTyped(json: any, ignoreDiscriminator: boolean): AccountEvents {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -67,16 +65,13 @@ export function AccountEventsFromJSONTyped(json: any, ignoreDiscriminator: boole
 }
 
 export function AccountEventsToJSON(value?: AccountEvents | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'events': ((value.events as Array<any>).map(AccountEventToJSON)),
-        'next_from': value.nextFrom,
+        'events': ((value['events'] as Array<any>).map(AccountEventToJSON)),
+        'next_from': value['nextFrom'],
     };
 }
 

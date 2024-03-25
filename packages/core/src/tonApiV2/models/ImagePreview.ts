@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface ImagePreview {
  * Check if a given object implements the ImagePreview interface.
  */
 export function instanceOfImagePreview(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "resolution" in value;
-    isInstance = isInstance && "url" in value;
-
-    return isInstance;
+    if (!('resolution' in value)) return false;
+    if (!('url' in value)) return false;
+    return true;
 }
 
 export function ImagePreviewFromJSON(json: any): ImagePreview {
@@ -49,7 +47,7 @@ export function ImagePreviewFromJSON(json: any): ImagePreview {
 }
 
 export function ImagePreviewFromJSONTyped(json: any, ignoreDiscriminator: boolean): ImagePreview {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function ImagePreviewFromJSONTyped(json: any, ignoreDiscriminator: boolea
 }
 
 export function ImagePreviewToJSON(value?: ImagePreview | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'resolution': value.resolution,
-        'url': value.url,
+        'resolution': value['resolution'],
+        'url': value['url'],
     };
 }
 

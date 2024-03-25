@@ -2,16 +2,16 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
 import {
     AccountAddress,
     AccountEvent,
-    JettonSwapActionDexEnum,
-    MessageConsequences
+    JettonSwapActionDexEnum
 } from '@tonkeeper/core/dist/tonApiV2';
 import { TronEvent, TronFee } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, PropsWithChildren, useMemo } from 'react';
+import { FC, PropsWithChildren, useMemo } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -283,7 +283,7 @@ export const ActionDeployerDetails: FC<{ deployer: string }> = ({ deployer }) =>
 };
 
 export const ActionFeeDetails: FC<{
-    fee: MessageConsequences;
+    fee: TransferEstimationEvent;
 }> = ({ fee }) => {
     const { t } = useTranslation();
 

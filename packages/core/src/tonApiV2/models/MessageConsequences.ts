@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountEvent } from './AccountEvent';
 import {
     AccountEventFromJSON,
@@ -62,12 +62,10 @@ export interface MessageConsequences {
  * Check if a given object implements the MessageConsequences interface.
  */
 export function instanceOfMessageConsequences(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "trace" in value;
-    isInstance = isInstance && "risk" in value;
-    isInstance = isInstance && "event" in value;
-
-    return isInstance;
+    if (!('trace' in value)) return false;
+    if (!('risk' in value)) return false;
+    if (!('event' in value)) return false;
+    return true;
 }
 
 export function MessageConsequencesFromJSON(json: any): MessageConsequences {
@@ -75,7 +73,7 @@ export function MessageConsequencesFromJSON(json: any): MessageConsequences {
 }
 
 export function MessageConsequencesFromJSONTyped(json: any, ignoreDiscriminator: boolean): MessageConsequences {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -87,17 +85,14 @@ export function MessageConsequencesFromJSONTyped(json: any, ignoreDiscriminator:
 }
 
 export function MessageConsequencesToJSON(value?: MessageConsequences | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'trace': TraceToJSON(value.trace),
-        'risk': RiskToJSON(value.risk),
-        'event': AccountEventToJSON(value.event),
+        'trace': TraceToJSON(value['trace']),
+        'risk': RiskToJSON(value['risk']),
+        'event': AccountEventToJSON(value['event']),
     };
 }
 

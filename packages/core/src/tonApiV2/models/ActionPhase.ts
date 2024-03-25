@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -61,15 +61,13 @@ export interface ActionPhase {
  * Check if a given object implements the ActionPhase interface.
  */
 export function instanceOfActionPhase(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "success" in value;
-    isInstance = isInstance && "resultCode" in value;
-    isInstance = isInstance && "totalActions" in value;
-    isInstance = isInstance && "skippedActions" in value;
-    isInstance = isInstance && "fwdFees" in value;
-    isInstance = isInstance && "totalFees" in value;
-
-    return isInstance;
+    if (!('success' in value)) return false;
+    if (!('resultCode' in value)) return false;
+    if (!('totalActions' in value)) return false;
+    if (!('skippedActions' in value)) return false;
+    if (!('fwdFees' in value)) return false;
+    if (!('totalFees' in value)) return false;
+    return true;
 }
 
 export function ActionPhaseFromJSON(json: any): ActionPhase {
@@ -77,7 +75,7 @@ export function ActionPhaseFromJSON(json: any): ActionPhase {
 }
 
 export function ActionPhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean): ActionPhase {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -92,20 +90,17 @@ export function ActionPhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean
 }
 
 export function ActionPhaseToJSON(value?: ActionPhase | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'success': value.success,
-        'result_code': value.resultCode,
-        'total_actions': value.totalActions,
-        'skipped_actions': value.skippedActions,
-        'fwd_fees': value.fwdFees,
-        'total_fees': value.totalFees,
+        'success': value['success'],
+        'result_code': value['resultCode'],
+        'total_actions': value['totalActions'],
+        'skipped_actions': value['skippedActions'],
+        'fwd_fees': value['fwdFees'],
+        'total_fees': value['totalFees'],
     };
 }
 

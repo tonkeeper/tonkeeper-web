@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -43,12 +43,10 @@ export interface InitStateRaw {
  * Check if a given object implements the InitStateRaw interface.
  */
 export function instanceOfInitStateRaw(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "workchain" in value;
-    isInstance = isInstance && "rootHash" in value;
-    isInstance = isInstance && "fileHash" in value;
-
-    return isInstance;
+    if (!('workchain' in value)) return false;
+    if (!('rootHash' in value)) return false;
+    if (!('fileHash' in value)) return false;
+    return true;
 }
 
 export function InitStateRawFromJSON(json: any): InitStateRaw {
@@ -56,7 +54,7 @@ export function InitStateRawFromJSON(json: any): InitStateRaw {
 }
 
 export function InitStateRawFromJSONTyped(json: any, ignoreDiscriminator: boolean): InitStateRaw {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -68,17 +66,14 @@ export function InitStateRawFromJSONTyped(json: any, ignoreDiscriminator: boolea
 }
 
 export function InitStateRawToJSON(value?: InitStateRaw | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'workchain': value.workchain,
-        'root_hash': value.rootHash,
-        'file_hash': value.fileHash,
+        'workchain': value['workchain'],
+        'root_hash': value['rootHash'],
+        'file_hash': value['fileHash'],
     };
 }
 

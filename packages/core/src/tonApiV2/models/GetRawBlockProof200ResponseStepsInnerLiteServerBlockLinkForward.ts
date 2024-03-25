@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -74,15 +74,13 @@ export interface GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward
  * Check if a given object implements the GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward interface.
  */
 export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "toKeyBlock" in value;
-    isInstance = isInstance && "from" in value;
-    isInstance = isInstance && "to" in value;
-    isInstance = isInstance && "destProof" in value;
-    isInstance = isInstance && "configProof" in value;
-    isInstance = isInstance && "signatures" in value;
-
-    return isInstance;
+    if (!('toKeyBlock' in value)) return false;
+    if (!('from' in value)) return false;
+    if (!('to' in value)) return false;
+    if (!('destProof' in value)) return false;
+    if (!('configProof' in value)) return false;
+    if (!('signatures' in value)) return false;
+    return true;
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardFromJSON(json: any): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward {
@@ -90,7 +88,7 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardF
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -105,20 +103,17 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardF
 }
 
 export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSON(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'to_key_block': value.toKeyBlock,
-        'from': BlockRawToJSON(value.from),
-        'to': BlockRawToJSON(value.to),
-        'dest_proof': value.destProof,
-        'config_proof': value.configProof,
-        'signatures': GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesToJSON(value.signatures),
+        'to_key_block': value['toKeyBlock'],
+        'from': BlockRawToJSON(value['from']),
+        'to': BlockRawToJSON(value['to']),
+        'dest_proof': value['destProof'],
+        'config_proof': value['configProof'],
+        'signatures': GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesToJSON(value['signatures']),
     };
 }
 

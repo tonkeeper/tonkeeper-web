@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockLimits } from './BlockLimits';
 import {
     BlockLimitsFromJSON,
@@ -38,10 +38,8 @@ export interface BlockchainConfig22 {
  * Check if a given object implements the BlockchainConfig22 interface.
  */
 export function instanceOfBlockchainConfig22(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "blockLimits" in value;
-
-    return isInstance;
+    if (!('blockLimits' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig22FromJSON(json: any): BlockchainConfig22 {
@@ -49,7 +47,7 @@ export function BlockchainConfig22FromJSON(json: any): BlockchainConfig22 {
 }
 
 export function BlockchainConfig22FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig22 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function BlockchainConfig22FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig22ToJSON(value?: BlockchainConfig22 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'block_limits': BlockLimitsToJSON(value.blockLimits),
+        'block_limits': BlockLimitsToJSON(value['blockLimits']),
     };
 }
 

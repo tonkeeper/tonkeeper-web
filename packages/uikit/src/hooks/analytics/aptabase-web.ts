@@ -5,9 +5,8 @@ import { Analytics } from '.';
 export class AptabaseWeb implements Analytics {
     private user_properties: Record<string, any> = {};
 
-    constructor(private key: string, appVersion?: string) {
-        console.log({ appVersion });
-        init(this.key, { appVersion });
+    constructor(private host: string, private key: string, appVersion?: string) {
+        init(this.key, { appVersion, host: this.host });
     }
 
     init = (
@@ -28,10 +27,10 @@ export class AptabaseWeb implements Analytics {
     };
 
     pageView = (location: string) => {
-        trackEvent('Page_view', { ...this.user_properties, location });
+        trackEvent('page_view', { ...this.user_properties, location });
     };
 
     track = async (name: string, params: Record<string, any>) => {
-        trackEvent(name, { ...this.user_properties, ...params });
+        trackEvent(name.toLowerCase(), { ...this.user_properties, ...params });
     };
 }

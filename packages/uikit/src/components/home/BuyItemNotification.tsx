@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { sha512_sync } from '@ton/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -9,7 +10,6 @@ import {
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { sha512_sync } from 'ton-crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { useBuyAnalytics } from '../../hooks/amplitude';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { TokenRates } from './TokenRates';
 import {
     TokenRatesFromJSON,
@@ -38,10 +38,8 @@ export interface GetRates200Response {
  * Check if a given object implements the GetRates200Response interface.
  */
 export function instanceOfGetRates200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "rates" in value;
-
-    return isInstance;
+    if (!('rates' in value)) return false;
+    return true;
 }
 
 export function GetRates200ResponseFromJSON(json: any): GetRates200Response {
@@ -49,7 +47,7 @@ export function GetRates200ResponseFromJSON(json: any): GetRates200Response {
 }
 
 export function GetRates200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRates200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function GetRates200ResponseFromJSONTyped(json: any, ignoreDiscriminator:
 }
 
 export function GetRates200ResponseToJSON(value?: GetRates200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'rates': (mapValues(value.rates, TokenRatesToJSON)),
+        'rates': (mapValues(value['rates'], TokenRatesToJSON)),
     };
 }
 

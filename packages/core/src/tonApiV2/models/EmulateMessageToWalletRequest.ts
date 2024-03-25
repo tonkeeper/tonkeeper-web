@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { EmulateMessageToWalletRequestParamsInner } from './EmulateMessageToWalletRequestParamsInner';
 import {
     EmulateMessageToWalletRequestParamsInnerFromJSON,
@@ -44,10 +44,8 @@ export interface EmulateMessageToWalletRequest {
  * Check if a given object implements the EmulateMessageToWalletRequest interface.
  */
 export function instanceOfEmulateMessageToWalletRequest(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "boc" in value;
-
-    return isInstance;
+    if (!('boc' in value)) return false;
+    return true;
 }
 
 export function EmulateMessageToWalletRequestFromJSON(json: any): EmulateMessageToWalletRequest {
@@ -55,27 +53,24 @@ export function EmulateMessageToWalletRequestFromJSON(json: any): EmulateMessage
 }
 
 export function EmulateMessageToWalletRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): EmulateMessageToWalletRequest {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'boc': json['boc'],
-        'params': !exists(json, 'params') ? undefined : ((json['params'] as Array<any>).map(EmulateMessageToWalletRequestParamsInnerFromJSON)),
+        'params': json['params'] == null ? undefined : ((json['params'] as Array<any>).map(EmulateMessageToWalletRequestParamsInnerFromJSON)),
     };
 }
 
 export function EmulateMessageToWalletRequestToJSON(value?: EmulateMessageToWalletRequest | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'boc': value.boc,
-        'params': value.params === undefined ? undefined : ((value.params as Array<any>).map(EmulateMessageToWalletRequestParamsInnerToJSON)),
+        'boc': value['boc'],
+        'params': value['params'] == null ? undefined : ((value['params'] as Array<any>).map(EmulateMessageToWalletRequestParamsInnerToJSON)),
     };
 }
 

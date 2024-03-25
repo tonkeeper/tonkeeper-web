@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -79,13 +79,11 @@ export interface JettonMetadata {
  * Check if a given object implements the JettonMetadata interface.
  */
 export function instanceOfJettonMetadata(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "address" in value;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "symbol" in value;
-    isInstance = isInstance && "decimals" in value;
-
-    return isInstance;
+    if (!('address' in value)) return false;
+    if (!('name' in value)) return false;
+    if (!('symbol' in value)) return false;
+    if (!('decimals' in value)) return false;
+    return true;
 }
 
 export function JettonMetadataFromJSON(json: any): JettonMetadata {
@@ -93,7 +91,7 @@ export function JettonMetadataFromJSON(json: any): JettonMetadata {
 }
 
 export function JettonMetadataFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonMetadata {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -102,32 +100,29 @@ export function JettonMetadataFromJSONTyped(json: any, ignoreDiscriminator: bool
         'name': json['name'],
         'symbol': json['symbol'],
         'decimals': json['decimals'],
-        'image': !exists(json, 'image') ? undefined : json['image'],
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'social': !exists(json, 'social') ? undefined : json['social'],
-        'websites': !exists(json, 'websites') ? undefined : json['websites'],
-        'catalogs': !exists(json, 'catalogs') ? undefined : json['catalogs'],
+        'image': json['image'] == null ? undefined : json['image'],
+        'description': json['description'] == null ? undefined : json['description'],
+        'social': json['social'] == null ? undefined : json['social'],
+        'websites': json['websites'] == null ? undefined : json['websites'],
+        'catalogs': json['catalogs'] == null ? undefined : json['catalogs'],
     };
 }
 
 export function JettonMetadataToJSON(value?: JettonMetadata | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'address': value.address,
-        'name': value.name,
-        'symbol': value.symbol,
-        'decimals': value.decimals,
-        'image': value.image,
-        'description': value.description,
-        'social': value.social,
-        'websites': value.websites,
-        'catalogs': value.catalogs,
+        'address': value['address'],
+        'name': value['name'],
+        'symbol': value['symbol'],
+        'decimals': value['decimals'],
+        'image': value['image'],
+        'description': value['description'],
+        'social': value['social'],
+        'websites': value['websites'],
+        'catalogs': value['catalogs'],
     };
 }
 

@@ -23,6 +23,7 @@ export interface IAppContext {
     extension: boolean;
     ios: boolean;
     proFeatures: boolean;
+    experimental?: boolean;
     hideQrScanner?: boolean;
     env?: {
         tgAuthBotId: string;

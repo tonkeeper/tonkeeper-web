@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface AddressParse200ResponseBounceable {
  * Check if a given object implements the AddressParse200ResponseBounceable interface.
  */
 export function instanceOfAddressParse200ResponseBounceable(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "b64" in value;
-    isInstance = isInstance && "b64url" in value;
-
-    return isInstance;
+    if (!('b64' in value)) return false;
+    if (!('b64url' in value)) return false;
+    return true;
 }
 
 export function AddressParse200ResponseBounceableFromJSON(json: any): AddressParse200ResponseBounceable {
@@ -49,7 +47,7 @@ export function AddressParse200ResponseBounceableFromJSON(json: any): AddressPar
 }
 
 export function AddressParse200ResponseBounceableFromJSONTyped(json: any, ignoreDiscriminator: boolean): AddressParse200ResponseBounceable {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function AddressParse200ResponseBounceableFromJSONTyped(json: any, ignore
 }
 
 export function AddressParse200ResponseBounceableToJSON(value?: AddressParse200ResponseBounceable | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'b64': value.b64,
-        'b64url': value.b64url,
+        'b64': value['b64'],
+        'b64url': value['b64url'],
     };
 }
 

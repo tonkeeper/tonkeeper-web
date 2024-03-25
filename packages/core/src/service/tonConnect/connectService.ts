@@ -1,11 +1,11 @@
-import queryString from 'query-string';
-import { Address, beginCell, storeStateInit } from 'ton-core';
+import { Address, beginCell, storeStateInit } from '@ton/core';
 import {
     getSecureRandomBytes,
     keyPairFromSeed,
     mnemonicToPrivateKey,
     sha256_sync
-} from 'ton-crypto';
+} from '@ton/crypto';
+import queryString from 'query-string';
 import nacl from 'tweetnacl';
 import { IStorage } from '../../Storage';
 import { TonConnectError } from '../../entries/exception';

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ApyHistory } from './ApyHistory';
 import {
     ApyHistoryFromJSON,
@@ -38,10 +38,8 @@ export interface GetStakingPoolHistory200Response {
  * Check if a given object implements the GetStakingPoolHistory200Response interface.
  */
 export function instanceOfGetStakingPoolHistory200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "apy" in value;
-
-    return isInstance;
+    if (!('apy' in value)) return false;
+    return true;
 }
 
 export function GetStakingPoolHistory200ResponseFromJSON(json: any): GetStakingPoolHistory200Response {
@@ -49,7 +47,7 @@ export function GetStakingPoolHistory200ResponseFromJSON(json: any): GetStakingP
 }
 
 export function GetStakingPoolHistory200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetStakingPoolHistory200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function GetStakingPoolHistory200ResponseFromJSONTyped(json: any, ignoreD
 }
 
 export function GetStakingPoolHistory200ResponseToJSON(value?: GetStakingPoolHistory200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'apy': ((value.apy as Array<any>).map(ApyHistoryToJSON)),
+        'apy': ((value['apy'] as Array<any>).map(ApyHistoryToJSON)),
     };
 }
 

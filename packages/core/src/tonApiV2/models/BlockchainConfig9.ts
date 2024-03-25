@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * List of mandatory parameters of the blockchain config.
  * @export
@@ -31,10 +31,8 @@ export interface BlockchainConfig9 {
  * Check if a given object implements the BlockchainConfig9 interface.
  */
 export function instanceOfBlockchainConfig9(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "mandatoryParams" in value;
-
-    return isInstance;
+    if (!('mandatoryParams' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig9FromJSON(json: any): BlockchainConfig9 {
@@ -42,7 +40,7 @@ export function BlockchainConfig9FromJSON(json: any): BlockchainConfig9 {
 }
 
 export function BlockchainConfig9FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig9 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function BlockchainConfig9FromJSONTyped(json: any, ignoreDiscriminator: b
 }
 
 export function BlockchainConfig9ToJSON(value?: BlockchainConfig9 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'mandatory_params': value.mandatoryParams,
+        'mandatory_params': value['mandatoryParams'],
     };
 }
 

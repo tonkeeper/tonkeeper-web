@@ -1,7 +1,7 @@
+import { mnemonicNew } from '@ton/crypto';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import React, { FC, useEffect, useState } from 'react';
-import { mnemonicNew } from 'ton-crypto';
+import { FC, useEffect, useState } from 'react';
 import { IconPage } from '../../components/Layout';
 import { CreateAuthState } from '../../components/create/CreateAuth';
 import { UpdateWalletName } from '../../components/create/WalletName';

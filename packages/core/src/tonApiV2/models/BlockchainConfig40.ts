@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { MisbehaviourPunishmentConfig } from './MisbehaviourPunishmentConfig';
 import {
     MisbehaviourPunishmentConfigFromJSON,
@@ -38,10 +38,8 @@ export interface BlockchainConfig40 {
  * Check if a given object implements the BlockchainConfig40 interface.
  */
 export function instanceOfBlockchainConfig40(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "misbehaviourPunishmentConfig" in value;
-
-    return isInstance;
+    if (!('misbehaviourPunishmentConfig' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig40FromJSON(json: any): BlockchainConfig40 {
@@ -49,7 +47,7 @@ export function BlockchainConfig40FromJSON(json: any): BlockchainConfig40 {
 }
 
 export function BlockchainConfig40FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig40 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -59,15 +57,12 @@ export function BlockchainConfig40FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig40ToJSON(value?: BlockchainConfig40 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'misbehaviour_punishment_config': MisbehaviourPunishmentConfigToJSON(value.misbehaviourPunishmentConfig),
+        'misbehaviour_punishment_config': MisbehaviourPunishmentConfigToJSON(value['misbehaviourPunishmentConfig']),
     };
 }
 

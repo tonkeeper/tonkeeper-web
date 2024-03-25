@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -49,9 +49,7 @@ export interface TokenRates {
  * Check if a given object implements the TokenRates interface.
  */
 export function instanceOfTokenRates(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function TokenRatesFromJSON(json: any): TokenRates {
@@ -59,31 +57,28 @@ export function TokenRatesFromJSON(json: any): TokenRates {
 }
 
 export function TokenRatesFromJSONTyped(json: any, ignoreDiscriminator: boolean): TokenRates {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'prices': !exists(json, 'prices') ? undefined : json['prices'],
-        'diff24h': !exists(json, 'diff_24h') ? undefined : json['diff_24h'],
-        'diff7d': !exists(json, 'diff_7d') ? undefined : json['diff_7d'],
-        'diff30d': !exists(json, 'diff_30d') ? undefined : json['diff_30d'],
+        'prices': json['prices'] == null ? undefined : json['prices'],
+        'diff24h': json['diff_24h'] == null ? undefined : json['diff_24h'],
+        'diff7d': json['diff_7d'] == null ? undefined : json['diff_7d'],
+        'diff30d': json['diff_30d'] == null ? undefined : json['diff_30d'],
     };
 }
 
 export function TokenRatesToJSON(value?: TokenRates | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'prices': value.prices,
-        'diff_24h': value.diff24h,
-        'diff_7d': value.diff7d,
-        'diff_30d': value.diff30d,
+        'prices': value['prices'],
+        'diff_24h': value['diff24h'],
+        'diff_7d': value['diff7d'],
+        'diff_30d': value['diff30d'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ConfigProposalSetup } from './ConfigProposalSetup';
 import {
     ConfigProposalSetupFromJSON,
@@ -44,11 +44,9 @@ export interface BlockchainConfig11 {
  * Check if a given object implements the BlockchainConfig11 interface.
  */
 export function instanceOfBlockchainConfig11(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "normalParams" in value;
-    isInstance = isInstance && "criticalParams" in value;
-
-    return isInstance;
+    if (!('normalParams' in value)) return false;
+    if (!('criticalParams' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig11FromJSON(json: any): BlockchainConfig11 {
@@ -56,7 +54,7 @@ export function BlockchainConfig11FromJSON(json: any): BlockchainConfig11 {
 }
 
 export function BlockchainConfig11FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig11 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -67,16 +65,13 @@ export function BlockchainConfig11FromJSONTyped(json: any, ignoreDiscriminator: 
 }
 
 export function BlockchainConfig11ToJSON(value?: BlockchainConfig11 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'normal_params': ConfigProposalSetupToJSON(value.normalParams),
-        'critical_params': ConfigProposalSetupToJSON(value.criticalParams),
+        'normal_params': ConfigProposalSetupToJSON(value['normalParams']),
+        'critical_params': ConfigProposalSetupToJSON(value['criticalParams']),
     };
 }
 

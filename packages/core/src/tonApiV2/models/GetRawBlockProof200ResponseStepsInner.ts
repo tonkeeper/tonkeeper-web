@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack } from './GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack';
 import {
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackFromJSON,
@@ -50,11 +50,9 @@ export interface GetRawBlockProof200ResponseStepsInner {
  * Check if a given object implements the GetRawBlockProof200ResponseStepsInner interface.
  */
 export function instanceOfGetRawBlockProof200ResponseStepsInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "liteServerBlockLinkBack" in value;
-    isInstance = isInstance && "liteServerBlockLinkForward" in value;
-
-    return isInstance;
+    if (!('liteServerBlockLinkBack' in value)) return false;
+    if (!('liteServerBlockLinkForward' in value)) return false;
+    return true;
 }
 
 export function GetRawBlockProof200ResponseStepsInnerFromJSON(json: any): GetRawBlockProof200ResponseStepsInner {
@@ -62,7 +60,7 @@ export function GetRawBlockProof200ResponseStepsInnerFromJSON(json: any): GetRaw
 }
 
 export function GetRawBlockProof200ResponseStepsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawBlockProof200ResponseStepsInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -73,16 +71,13 @@ export function GetRawBlockProof200ResponseStepsInnerFromJSONTyped(json: any, ig
 }
 
 export function GetRawBlockProof200ResponseStepsInnerToJSON(value?: GetRawBlockProof200ResponseStepsInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'lite_server_block_link_back': GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackToJSON(value.liteServerBlockLinkBack),
-        'lite_server_block_link_forward': GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSON(value.liteServerBlockLinkForward),
+        'lite_server_block_link_back': GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackToJSON(value['liteServerBlockLinkBack']),
+        'lite_server_block_link_forward': GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSON(value['liteServerBlockLinkForward']),
     };
 }
 

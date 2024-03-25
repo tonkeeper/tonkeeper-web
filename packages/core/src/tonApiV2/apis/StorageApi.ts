@@ -15,14 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
-  GetBlockchainBlockDefaultResponse,
   GetStorageProviders200Response,
+  ReduceIndexingLatencyDefaultResponse,
 } from '../models/index';
 import {
-    GetBlockchainBlockDefaultResponseFromJSON,
-    GetBlockchainBlockDefaultResponseToJSON,
     GetStorageProviders200ResponseFromJSON,
     GetStorageProviders200ResponseToJSON,
+    ReduceIndexingLatencyDefaultResponseFromJSON,
+    ReduceIndexingLatencyDefaultResponseToJSON,
 } from '../models/index';
 
 /**

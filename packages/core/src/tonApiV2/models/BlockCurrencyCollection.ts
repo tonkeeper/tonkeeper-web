@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockCurrencyCollectionOtherInner } from './BlockCurrencyCollectionOtherInner';
 import {
     BlockCurrencyCollectionOtherInnerFromJSON,
@@ -44,11 +44,9 @@ export interface BlockCurrencyCollection {
  * Check if a given object implements the BlockCurrencyCollection interface.
  */
 export function instanceOfBlockCurrencyCollection(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "grams" in value;
-    isInstance = isInstance && "other" in value;
-
-    return isInstance;
+    if (!('grams' in value)) return false;
+    if (!('other' in value)) return false;
+    return true;
 }
 
 export function BlockCurrencyCollectionFromJSON(json: any): BlockCurrencyCollection {
@@ -56,7 +54,7 @@ export function BlockCurrencyCollectionFromJSON(json: any): BlockCurrencyCollect
 }
 
 export function BlockCurrencyCollectionFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockCurrencyCollection {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -67,16 +65,13 @@ export function BlockCurrencyCollectionFromJSONTyped(json: any, ignoreDiscrimina
 }
 
 export function BlockCurrencyCollectionToJSON(value?: BlockCurrencyCollection | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'grams': value.grams,
-        'other': ((value.other as Array<any>).map(BlockCurrencyCollectionOtherInnerToJSON)),
+        'grams': value['grams'],
+        'other': ((value['other'] as Array<any>).map(BlockCurrencyCollectionOtherInnerToJSON)),
     };
 }
 

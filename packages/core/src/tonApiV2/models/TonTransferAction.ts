@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -80,12 +80,10 @@ export interface TonTransferAction {
  * Check if a given object implements the TonTransferAction interface.
  */
 export function instanceOfTonTransferAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "sender" in value;
-    isInstance = isInstance && "recipient" in value;
-    isInstance = isInstance && "amount" in value;
-
-    return isInstance;
+    if (!('sender' in value)) return false;
+    if (!('recipient' in value)) return false;
+    if (!('amount' in value)) return false;
+    return true;
 }
 
 export function TonTransferActionFromJSON(json: any): TonTransferAction {
@@ -93,7 +91,7 @@ export function TonTransferActionFromJSON(json: any): TonTransferAction {
 }
 
 export function TonTransferActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): TonTransferAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -101,27 +99,24 @@ export function TonTransferActionFromJSONTyped(json: any, ignoreDiscriminator: b
         'sender': AccountAddressFromJSON(json['sender']),
         'recipient': AccountAddressFromJSON(json['recipient']),
         'amount': json['amount'],
-        'comment': !exists(json, 'comment') ? undefined : json['comment'],
-        'encryptedComment': !exists(json, 'encrypted_comment') ? undefined : EncryptedCommentFromJSON(json['encrypted_comment']),
-        'refund': !exists(json, 'refund') ? undefined : RefundFromJSON(json['refund']),
+        'comment': json['comment'] == null ? undefined : json['comment'],
+        'encryptedComment': json['encrypted_comment'] == null ? undefined : EncryptedCommentFromJSON(json['encrypted_comment']),
+        'refund': json['refund'] == null ? undefined : RefundFromJSON(json['refund']),
     };
 }
 
 export function TonTransferActionToJSON(value?: TonTransferAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'sender': AccountAddressToJSON(value.sender),
-        'recipient': AccountAddressToJSON(value.recipient),
-        'amount': value.amount,
-        'comment': value.comment,
-        'encrypted_comment': EncryptedCommentToJSON(value.encryptedComment),
-        'refund': RefundToJSON(value.refund),
+        'sender': AccountAddressToJSON(value['sender']),
+        'recipient': AccountAddressToJSON(value['recipient']),
+        'amount': value['amount'],
+        'comment': value['comment'],
+        'encrypted_comment': EncryptedCommentToJSON(value['encryptedComment']),
+        'refund': RefundToJSON(value['refund']),
     };
 }
 

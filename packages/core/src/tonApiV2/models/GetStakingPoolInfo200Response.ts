@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { PoolImplementation } from './PoolImplementation';
 import {
     PoolImplementationFromJSON,
@@ -50,11 +50,9 @@ export interface GetStakingPoolInfo200Response {
  * Check if a given object implements the GetStakingPoolInfo200Response interface.
  */
 export function instanceOfGetStakingPoolInfo200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "implementation" in value;
-    isInstance = isInstance && "pool" in value;
-
-    return isInstance;
+    if (!('implementation' in value)) return false;
+    if (!('pool' in value)) return false;
+    return true;
 }
 
 export function GetStakingPoolInfo200ResponseFromJSON(json: any): GetStakingPoolInfo200Response {
@@ -62,7 +60,7 @@ export function GetStakingPoolInfo200ResponseFromJSON(json: any): GetStakingPool
 }
 
 export function GetStakingPoolInfo200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetStakingPoolInfo200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -73,16 +71,13 @@ export function GetStakingPoolInfo200ResponseFromJSONTyped(json: any, ignoreDisc
 }
 
 export function GetStakingPoolInfo200ResponseToJSON(value?: GetStakingPoolInfo200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'implementation': PoolImplementationToJSON(value.implementation),
-        'pool': PoolInfoToJSON(value.pool),
+        'implementation': PoolImplementationToJSON(value['implementation']),
+        'pool': PoolInfoToJSON(value['pool']),
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface ApyHistory {
  * Check if a given object implements the ApyHistory interface.
  */
 export function instanceOfApyHistory(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "apy" in value;
-    isInstance = isInstance && "time" in value;
-
-    return isInstance;
+    if (!('apy' in value)) return false;
+    if (!('time' in value)) return false;
+    return true;
 }
 
 export function ApyHistoryFromJSON(json: any): ApyHistory {
@@ -49,7 +47,7 @@ export function ApyHistoryFromJSON(json: any): ApyHistory {
 }
 
 export function ApyHistoryFromJSONTyped(json: any, ignoreDiscriminator: boolean): ApyHistory {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function ApyHistoryFromJSONTyped(json: any, ignoreDiscriminator: boolean)
 }
 
 export function ApyHistoryToJSON(value?: ApyHistory | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'apy': value.apy,
-        'time': value.time,
+        'apy': value['apy'],
+        'time': value['time'],
     };
 }
 

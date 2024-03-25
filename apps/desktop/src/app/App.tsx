@@ -272,6 +272,7 @@ export const Loader: FC = () => {
         standalone: true,
         extension: false,
         proFeatures: true,
+        experimental: true,
         ios: false,
         env: {
             tgAuthBotId: REACT_APP_TG_BOT_ID

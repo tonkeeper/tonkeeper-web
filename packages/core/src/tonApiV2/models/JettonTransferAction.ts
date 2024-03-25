@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -104,13 +104,11 @@ export interface JettonTransferAction {
  * Check if a given object implements the JettonTransferAction interface.
  */
 export function instanceOfJettonTransferAction(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "sendersWallet" in value;
-    isInstance = isInstance && "recipientsWallet" in value;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "jetton" in value;
-
-    return isInstance;
+    if (!('sendersWallet' in value)) return false;
+    if (!('recipientsWallet' in value)) return false;
+    if (!('amount' in value)) return false;
+    if (!('jetton' in value)) return false;
+    return true;
 }
 
 export function JettonTransferActionFromJSON(json: any): JettonTransferAction {
@@ -118,41 +116,38 @@ export function JettonTransferActionFromJSON(json: any): JettonTransferAction {
 }
 
 export function JettonTransferActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): JettonTransferAction {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'sender': !exists(json, 'sender') ? undefined : AccountAddressFromJSON(json['sender']),
-        'recipient': !exists(json, 'recipient') ? undefined : AccountAddressFromJSON(json['recipient']),
+        'sender': json['sender'] == null ? undefined : AccountAddressFromJSON(json['sender']),
+        'recipient': json['recipient'] == null ? undefined : AccountAddressFromJSON(json['recipient']),
         'sendersWallet': json['senders_wallet'],
         'recipientsWallet': json['recipients_wallet'],
         'amount': json['amount'],
-        'comment': !exists(json, 'comment') ? undefined : json['comment'],
-        'encryptedComment': !exists(json, 'encrypted_comment') ? undefined : EncryptedCommentFromJSON(json['encrypted_comment']),
-        'refund': !exists(json, 'refund') ? undefined : RefundFromJSON(json['refund']),
+        'comment': json['comment'] == null ? undefined : json['comment'],
+        'encryptedComment': json['encrypted_comment'] == null ? undefined : EncryptedCommentFromJSON(json['encrypted_comment']),
+        'refund': json['refund'] == null ? undefined : RefundFromJSON(json['refund']),
         'jetton': JettonPreviewFromJSON(json['jetton']),
     };
 }
 
 export function JettonTransferActionToJSON(value?: JettonTransferAction | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'sender': AccountAddressToJSON(value.sender),
-        'recipient': AccountAddressToJSON(value.recipient),
-        'senders_wallet': value.sendersWallet,
-        'recipients_wallet': value.recipientsWallet,
-        'amount': value.amount,
-        'comment': value.comment,
-        'encrypted_comment': EncryptedCommentToJSON(value.encryptedComment),
-        'refund': RefundToJSON(value.refund),
-        'jetton': JettonPreviewToJSON(value.jetton),
+        'sender': AccountAddressToJSON(value['sender']),
+        'recipient': AccountAddressToJSON(value['recipient']),
+        'senders_wallet': value['sendersWallet'],
+        'recipients_wallet': value['recipientsWallet'],
+        'amount': value['amount'],
+        'comment': value['comment'],
+        'encrypted_comment': EncryptedCommentToJSON(value['encryptedComment']),
+        'refund': RefundToJSON(value['refund']),
+        'jetton': JettonPreviewToJSON(value['jetton']),
     };
 }
 

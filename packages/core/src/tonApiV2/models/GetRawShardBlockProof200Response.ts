@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
@@ -50,11 +50,9 @@ export interface GetRawShardBlockProof200Response {
  * Check if a given object implements the GetRawShardBlockProof200Response interface.
  */
 export function instanceOfGetRawShardBlockProof200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "masterchainId" in value;
-    isInstance = isInstance && "links" in value;
-
-    return isInstance;
+    if (!('masterchainId' in value)) return false;
+    if (!('links' in value)) return false;
+    return true;
 }
 
 export function GetRawShardBlockProof200ResponseFromJSON(json: any): GetRawShardBlockProof200Response {
@@ -62,7 +60,7 @@ export function GetRawShardBlockProof200ResponseFromJSON(json: any): GetRawShard
 }
 
 export function GetRawShardBlockProof200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetRawShardBlockProof200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -73,16 +71,13 @@ export function GetRawShardBlockProof200ResponseFromJSONTyped(json: any, ignoreD
 }
 
 export function GetRawShardBlockProof200ResponseToJSON(value?: GetRawShardBlockProof200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'masterchain_id': BlockRawToJSON(value.masterchainId),
-        'links': ((value.links as Array<any>).map(GetRawShardBlockProof200ResponseLinksInnerToJSON)),
+        'masterchain_id': BlockRawToJSON(value['masterchainId']),
+        'links': ((value['links'] as Array<any>).map(GetRawShardBlockProof200ResponseLinksInnerToJSON)),
     };
 }
 

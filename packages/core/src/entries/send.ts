@@ -1,4 +1,4 @@
-import { Account, MessageConsequences, WalletDNS } from '../tonApiV2';
+import { Account, AccountEvent, WalletDNS } from '../tonApiV2';
 import { EstimatePayload } from '../tronApi';
 import { BLOCKCHAIN_NAME } from './crypto';
 import { Asset } from './crypto/asset/asset';
@@ -54,8 +54,10 @@ export function isTronRecipientData(
 export type TransferEstimation<T extends Asset = Asset> = {
     fee: AssetAmount<T>;
     payload: T extends TonAsset
-        ? MessageConsequences
+        ? TransferEstimationEvent
         : T extends TronAsset
         ? EstimatePayload
         : never;
 };
+
+export type TransferEstimationEvent = { event: AccountEvent };

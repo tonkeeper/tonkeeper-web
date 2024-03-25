@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,10 +37,8 @@ export interface TonConnectProofRequestProofDomain {
  * Check if a given object implements the TonConnectProofRequestProofDomain interface.
  */
 export function instanceOfTonConnectProofRequestProofDomain(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "value" in value;
-
-    return isInstance;
+    if (!('value' in value)) return false;
+    return true;
 }
 
 export function TonConnectProofRequestProofDomainFromJSON(json: any): TonConnectProofRequestProofDomain {
@@ -48,27 +46,24 @@ export function TonConnectProofRequestProofDomainFromJSON(json: any): TonConnect
 }
 
 export function TonConnectProofRequestProofDomainFromJSONTyped(json: any, ignoreDiscriminator: boolean): TonConnectProofRequestProofDomain {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'lengthBytes': !exists(json, 'length_bytes') ? undefined : json['length_bytes'],
+        'lengthBytes': json['length_bytes'] == null ? undefined : json['length_bytes'],
         'value': json['value'],
     };
 }
 
 export function TonConnectProofRequestProofDomainToJSON(value?: TonConnectProofRequestProofDomain | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'length_bytes': value.lengthBytes,
-        'value': value.value,
+        'length_bytes': value['lengthBytes'],
+        'value': value['value'],
     };
 }
 

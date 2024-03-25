@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -55,14 +55,12 @@ export interface BlockchainConfig18StoragePricesInner {
  * Check if a given object implements the BlockchainConfig18StoragePricesInner interface.
  */
 export function instanceOfBlockchainConfig18StoragePricesInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "utimeSince" in value;
-    isInstance = isInstance && "bitPricePs" in value;
-    isInstance = isInstance && "cellPricePs" in value;
-    isInstance = isInstance && "mcBitPricePs" in value;
-    isInstance = isInstance && "mcCellPricePs" in value;
-
-    return isInstance;
+    if (!('utimeSince' in value)) return false;
+    if (!('bitPricePs' in value)) return false;
+    if (!('cellPricePs' in value)) return false;
+    if (!('mcBitPricePs' in value)) return false;
+    if (!('mcCellPricePs' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig18StoragePricesInnerFromJSON(json: any): BlockchainConfig18StoragePricesInner {
@@ -70,7 +68,7 @@ export function BlockchainConfig18StoragePricesInnerFromJSON(json: any): Blockch
 }
 
 export function BlockchainConfig18StoragePricesInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig18StoragePricesInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -84,19 +82,16 @@ export function BlockchainConfig18StoragePricesInnerFromJSONTyped(json: any, ign
 }
 
 export function BlockchainConfig18StoragePricesInnerToJSON(value?: BlockchainConfig18StoragePricesInner | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'utime_since': value.utimeSince,
-        'bit_price_ps': value.bitPricePs,
-        'cell_price_ps': value.cellPricePs,
-        'mc_bit_price_ps': value.mcBitPricePs,
-        'mc_cell_price_ps': value.mcCellPricePs,
+        'utime_since': value['utimeSince'],
+        'bit_price_ps': value['bitPricePs'],
+        'cell_price_ps': value['cellPricePs'],
+        'mc_bit_price_ps': value['mcBitPricePs'],
+        'mc_cell_price_ps': value['mcCellPricePs'],
     };
 }
 

@@ -1,8 +1,8 @@
+import { mnemonicToPrivateKey, sha256_sync } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
-import { mnemonicToPrivateKey, sha256_sync } from 'ton-crypto';
 import nacl from 'tweetnacl';
 
 export const signTonConnect = (sdk: IAppSdk, publicKey: string) => {

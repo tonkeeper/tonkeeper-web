@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * Minting fees of new currencies.
  * @export
@@ -37,11 +37,9 @@ export interface BlockchainConfig6 {
  * Check if a given object implements the BlockchainConfig6 interface.
  */
 export function instanceOfBlockchainConfig6(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "mintNewPrice" in value;
-    isInstance = isInstance && "mintAddPrice" in value;
-
-    return isInstance;
+    if (!('mintNewPrice' in value)) return false;
+    if (!('mintAddPrice' in value)) return false;
+    return true;
 }
 
 export function BlockchainConfig6FromJSON(json: any): BlockchainConfig6 {
@@ -49,7 +47,7 @@ export function BlockchainConfig6FromJSON(json: any): BlockchainConfig6 {
 }
 
 export function BlockchainConfig6FromJSONTyped(json: any, ignoreDiscriminator: boolean): BlockchainConfig6 {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function BlockchainConfig6FromJSONTyped(json: any, ignoreDiscriminator: b
 }
 
 export function BlockchainConfig6ToJSON(value?: BlockchainConfig6 | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'mint_new_price': value.mintNewPrice,
-        'mint_add_price': value.mintAddPrice,
+        'mint_new_price': value['mintNewPrice'],
+        'mint_add_price': value['mintAddPrice'],
     };
 }
 

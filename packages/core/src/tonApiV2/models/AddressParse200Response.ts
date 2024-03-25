@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AddressParse200ResponseBounceable } from './AddressParse200ResponseBounceable';
 import {
     AddressParse200ResponseBounceableFromJSON,
@@ -62,14 +62,12 @@ export interface AddressParse200Response {
  * Check if a given object implements the AddressParse200Response interface.
  */
 export function instanceOfAddressParse200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "rawForm" in value;
-    isInstance = isInstance && "bounceable" in value;
-    isInstance = isInstance && "nonBounceable" in value;
-    isInstance = isInstance && "givenType" in value;
-    isInstance = isInstance && "testOnly" in value;
-
-    return isInstance;
+    if (!('rawForm' in value)) return false;
+    if (!('bounceable' in value)) return false;
+    if (!('nonBounceable' in value)) return false;
+    if (!('givenType' in value)) return false;
+    if (!('testOnly' in value)) return false;
+    return true;
 }
 
 export function AddressParse200ResponseFromJSON(json: any): AddressParse200Response {
@@ -77,7 +75,7 @@ export function AddressParse200ResponseFromJSON(json: any): AddressParse200Respo
 }
 
 export function AddressParse200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): AddressParse200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -91,19 +89,16 @@ export function AddressParse200ResponseFromJSONTyped(json: any, ignoreDiscrimina
 }
 
 export function AddressParse200ResponseToJSON(value?: AddressParse200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'raw_form': value.rawForm,
-        'bounceable': AddressParse200ResponseBounceableToJSON(value.bounceable),
-        'non_bounceable': AddressParse200ResponseBounceableToJSON(value.nonBounceable),
-        'given_type': value.givenType,
-        'test_only': value.testOnly,
+        'raw_form': value['rawForm'],
+        'bounceable': AddressParse200ResponseBounceableToJSON(value['bounceable']),
+        'non_bounceable': AddressParse200ResponseBounceableToJSON(value['nonBounceable']),
+        'given_type': value['givenType'],
+        'test_only': value['testOnly'],
     };
 }
 

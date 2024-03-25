@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface GetChartRates200Response {
  * Check if a given object implements the GetChartRates200Response interface.
  */
 export function instanceOfGetChartRates200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "points" in value;
-
-    return isInstance;
+    if (!('points' in value)) return false;
+    return true;
 }
 
 export function GetChartRates200ResponseFromJSON(json: any): GetChartRates200Response {
@@ -42,7 +40,7 @@ export function GetChartRates200ResponseFromJSON(json: any): GetChartRates200Res
 }
 
 export function GetChartRates200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetChartRates200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function GetChartRates200ResponseFromJSONTyped(json: any, ignoreDiscrimin
 }
 
 export function GetChartRates200ResponseToJSON(value?: GetChartRates200Response | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'points': value.points,
+        'points': value['points'],
     };
 }
 

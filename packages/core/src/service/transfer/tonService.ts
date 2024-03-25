@@ -1,19 +1,13 @@
+import { Address, Cell, internal, loadStateInit } from '@ton/core';
+import { Maybe } from '@ton/core/dist/utils/maybe';
+import { mnemonicToPrivateKey } from '@ton/crypto';
 import BigNumber from 'bignumber.js';
-import { Address, Cell, internal, loadStateInit } from 'ton-core';
-import { Maybe } from 'ton-core/dist/utils/maybe';
-import { mnemonicToPrivateKey } from 'ton-crypto';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
-import { TonRecipient, TonRecipientData } from '../../entries/send';
+import { TonRecipient, TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
-import {
-    Account,
-    AccountsApi,
-    BlockchainApi,
-    EmulationApi,
-    MessageConsequences
-} from '../../tonApiV2';
+import { Account, AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     SendMode,
@@ -30,7 +24,7 @@ export type AccountsMap = Map<string, Account>;
 
 export type EstimateData = {
     accounts: AccountsMap;
-    accountEvent: MessageConsequences;
+    accountEvent: TransferEstimationEvent;
 };
 
 export const getAccountsMap = async (
@@ -103,7 +97,7 @@ const createTonTransfer = (
         secretKey,
         timeout: getTTL(),
         sendMode: isMax
-            ? SendMode.CARRY_ALL_REMAINING_BALANCE
+            ? SendMode.CARRY_ALL_REMAINING_BALANCE + SendMode.IGNORE_ERRORS
             : SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
             internal({
@@ -159,11 +153,13 @@ export const estimateTonTransfer = async (
 
     const cell = createTonTransfer(seqno, walletState, recipient, weiAmount, isMax);
 
-    const emulation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
+    const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+        ignoreSignatureCheck: true,
+        accountId: wallet.address,
+        decodeMessageRequest: { boc: cell.toString('base64') }
     });
 
-    return emulation;
+    return { event };
 };
 
 export const estimateTonConnectTransfer = async (
@@ -171,16 +167,20 @@ export const estimateTonConnectTransfer = async (
     walletState: WalletState,
     accounts: AccountsMap,
     params: TonConnectTransactionPayload
-) => {
+): Promise<TransferEstimationEvent> => {
     await checkServiceTimeOrDie(api);
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = createTonConnectTransfer(seqno, walletState, accounts, params);
 
-    return await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
+    const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+        ignoreSignatureCheck: true,
+        accountId: wallet.address,
+        decodeMessageRequest: { boc: cell.toString('base64') }
     });
+
+    return { event };
 };
 
 export const sendTonConnectTransfer = async (
@@ -217,7 +217,7 @@ export const sendTonTransfer = async (
     recipient: TonRecipientData,
     amount: AssetAmount,
     isMax: boolean,
-    fee: MessageConsequences,
+    fee: TransferEstimationEvent,
     mnemonic: string[]
 ) => {
     await checkServiceTimeOrDie(api);

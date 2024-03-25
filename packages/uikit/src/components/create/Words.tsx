@@ -1,8 +1,8 @@
+import { mnemonicValidate } from '@ton/crypto';
+import { wordlist } from '@ton/crypto/dist/mnemonic/wordlist';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { mnemonicValidate } from 'ton-crypto';
-import { wordlist } from 'ton-crypto/dist/mnemonic/wordlist';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
