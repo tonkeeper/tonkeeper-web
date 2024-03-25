@@ -117,6 +117,10 @@ export const JettonTransferDesktopAction: FC<{
 const SwapHistoryCell = styled.div`
     display: flex;
     align-items: center;
+
+    svg {
+        color: ${p => p.theme.textSecondary};
+    }
 `;
 
 export const JettonSwapDesktopAction: FC<{ action: Action }> = ({ action }) => {
@@ -132,7 +136,7 @@ export const JettonSwapDesktopAction: FC<{ action: Action }> = ({ action }) => {
 
     return (
         <>
-            <HistoryCellActionGeneric icon={<SwapIcon />} isFailed={isFailed}>
+            <HistoryCellActionGeneric icon={<SwapIcon color="iconPrimary" />} isFailed={isFailed}>
                 {t('transactions_swap')}
             </HistoryCellActionGeneric>
             <HistoryCellAccount account={{ name: toDexName(jettonSwap.dex) }} />

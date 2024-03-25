@@ -6,6 +6,8 @@ import { Body2 } from '../../Text';
 import { useDateTimeFormatFromNow } from '../../../hooks/useDateTimeFormat';
 import { HistoryAction } from './ton/HistoryAction';
 import { HistoryGridCell } from './ton/HistoryGrid';
+import { SpinnerRing } from '../../Icon';
+import { useTranslation } from '../../../hooks/translation';
 
 const EventDivider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
@@ -18,8 +20,19 @@ const HistoryDateCell = styled(HistoryGridCell)`
     color: ${p => p.theme.textSecondary};
 `;
 
+const PendingEventCell = styled(HistoryGridCell)`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    > ${Body2} {
+        color: ${p => p.theme.textSecondary};
+    }
+`;
+
 export const HistoryEvent: FC<{ item: GenericActivity<MixedActivity> }> = ({ item }) => {
     const formattedDate = useDateTimeFormatFromNow(item.timestamp);
+    const { t } = useTranslation();
 
     if (item.event.kind === 'tron') {
         return null;
@@ -33,9 +46,16 @@ export const HistoryEvent: FC<{ item: GenericActivity<MixedActivity> }> = ({ ite
                 // eslint-disable-next-line react/jsx-key
                 <>
                     {index === 0 ? (
-                        <HistoryDateCell>
-                            <Body2>{formattedDate}</Body2>
-                        </HistoryDateCell>
+                        event.inProgress ? (
+                            <PendingEventCell>
+                                <SpinnerRing />
+                                <Body2>{t('transaction_type_pending') + '…'}</Body2>
+                            </PendingEventCell>
+                        ) : (
+                            <HistoryDateCell>
+                                <Body2>{formattedDate}</Body2>
+                            </HistoryDateCell>
+                        )
                     ) : (
                         <HistoryDateCell />
                     )}

@@ -6,13 +6,13 @@ import {
     ErrorRow,
     HistoryCellAccount,
     HistoryCellActionGeneric,
+    HistoryCellAmountText,
     HistoryCellCommentSecondary
 } from './HistoryCell';
 import { DoneIcon } from '../../../Icon';
-import { NftCollectionDeployDesktopAction, NftDeployDesktopAction } from './NftDesktopAction';
+import { NftCollectionDeployDesktopAction, NftDeployDesktopAction } from './NftDesktopActions';
 import { ContractDeployIcon } from '../../../activity/ActivityIcons';
 import styled from 'styled-components';
-import { Body2 } from '../../../Text';
 
 const ContractDeployIconStyled = styled(ContractDeployIcon)`
     color: ${p => p.theme.iconPrimary};
@@ -22,10 +22,6 @@ const ContractDeployIconStyled = styled(ContractDeployIcon)`
 
 const DoneIconStyled = styled(DoneIcon)`
     color: ${p => p.theme.iconPrimary};
-`;
-
-const AmountCellStub = styled(Body2)`
-    color: ${p => p.theme.textTertiary};
 `;
 
 export const ContractDeployDesktopAction: FC<{ action: Action }> = ({ action }) => {
@@ -63,7 +59,7 @@ export const ContractDeployDesktopAction: FC<{ action: Action }> = ({ action }) 
                 <HistoryCellAccount account={{ address: contractDeploy.address }} />
                 <ActionRow>
                     <HistoryCellCommentSecondary comment={walletType} />
-                    <AmountCellStub>-</AmountCellStub>
+                    <HistoryCellAmountText>-</HistoryCellAmountText>
                 </ActionRow>
             </>
         );
@@ -83,7 +79,7 @@ export const ContractDeployDesktopAction: FC<{ action: Action }> = ({ action }) 
                             : ''
                     }
                 />
-                <AmountCellStub>-</AmountCellStub>
+                <HistoryCellAmountText>-</HistoryCellAmountText>
             </ActionRow>
         </>
     );

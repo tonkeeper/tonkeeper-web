@@ -2,25 +2,31 @@ import { FC } from 'react';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 
 import { TonTransferDesktopAction } from './TonTransferDesktopAction';
-import { useTranslation } from '../../../../hooks/translation';
-import { NftPurchaseDesktopAction, NftTransferDesktopAction } from './NftDesktopAction';
+import { NftPurchaseDesktopAction, NftTransferDesktopAction } from './NftDesktopActions';
 import {
     JettonBurnDesktopAction,
     JettonMintDesktopAction,
     JettonSwapDesktopAction,
     JettonTransferDesktopAction
-} from './JettonDesktopActivity';
+} from './JettonDesktopActions';
 import { ContractDeployDesktopAction } from './ContractDeployAction';
 import { Body2 } from '../../../Text';
 import { HistoryGridCellFillRow } from './HistoryGrid';
+import { SmartContractExecDesktopAction } from './SmartContractExecDesktopAction';
+import { AuctionBidDesktopAction } from './AuctionDesktopActions';
+import {
+    DepositStakeDesktopAction,
+    WithdrawRequestStakeDesktopAction,
+    WithdrawStakeDesktopAction
+} from './StakeActions';
+import { DomainRenewDesktopAction } from './DnsActions';
+import { UnknownDesktopAction } from './UnknownAction';
 
 export const HistoryAction: FC<{
     action: Action;
     date: string;
     isScam: boolean;
-}> = ({ action, isScam, date }) => {
-    const { t } = useTranslation();
-
+}> = ({ action, isScam }) => {
     switch (action.type) {
         case 'TonTransfer':
             return <TonTransferDesktopAction action={action} isScam={isScam} />;
@@ -30,15 +36,10 @@ export const HistoryAction: FC<{
             return <NftPurchaseDesktopAction action={action} />;
         case 'ContractDeploy':
             return <ContractDeployDesktopAction action={action} />;
-        /*
-        case 'UnSubscribe':
-            return <UnSubscribeAction action={action} date={date} />;
-        case 'Subscribe':
-            return <SubscribeAction action={action} date={date} />;
         case 'AuctionBid':
-            return <AuctionBidAction action={action} date={date} />;
+            return <AuctionBidDesktopAction action={action} />;
         case 'SmartContractExec':
-            return <SmartContractExecAction action={action} date={date} />; */
+            return <SmartContractExecDesktopAction action={action} isScam={isScam} />;
         case 'JettonTransfer':
             return <JettonTransferDesktopAction action={action} isScam={isScam} />;
         case 'JettonSwap':
@@ -47,18 +48,18 @@ export const HistoryAction: FC<{
             return <JettonBurnDesktopAction action={action} />;
         case 'JettonMint':
             return <JettonMintDesktopAction action={action} />;
-        /*   case 'DepositStake':
-            return <DepositStakeAction action={action} date={date} />;
+        case 'DepositStake':
+            return <DepositStakeDesktopAction action={action} />;
         case 'WithdrawStake':
-            return <WithdrawStakeAction action={action} date={date} />;
+            return <WithdrawStakeDesktopAction action={action} />;
         case 'WithdrawStakeRequest':
-            return <WithdrawRequestStakeAction action={action} date={date} />;
+            return <WithdrawRequestStakeDesktopAction action={action} />;
         case 'DomainRenew':
-            return <DomainRenewAction action={action} date={date} />;
+            return <DomainRenewDesktopAction action={action} />;
         case 'Unknown':
-            return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;*/
+            return <UnknownDesktopAction action={action} />;
         default: {
-            console.log(action);
+            console.error(action);
             return (
                 <>
                     <HistoryGridCellFillRow>

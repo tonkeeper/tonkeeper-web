@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, Suspense, useMemo, useRef } from 'react';
-import { ActivitySkeletonPage, SkeletonList } from '../../components/Skeleton';
+import { ActivitySkeletonPage } from '../../components/Skeleton';
 
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
@@ -11,6 +11,7 @@ import EmptyActivity from '../../components/activity/EmptyActivity';
 import styled from 'styled-components';
 import { Label2 } from '../../components/Text';
 import { HistoryEvent } from '../../components/desktop/history/HistoryEvent';
+import { SpinnerRing } from '../../components/Icon';
 
 const HistoryHeader = styled.div`
     padding: 0.5rem 1rem;
@@ -39,6 +40,17 @@ const GridSizer2 = styled.div`
 const GridSizer3 = styled.div`
     height: 0;
     min-width: 120px;
+`;
+
+const FetchingRows = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 36px;
+
+    > div {
+        transform: scale(1.25);
+    }
 `;
 
 export const DesktopHistory: FC = () => {
@@ -99,7 +111,11 @@ export const DesktopHistory: FC = () => {
                     <HistoryEvent item={item} key={item.key} />
                 ))}
             </HistoryEventsGrid>
-            {isFetchingNextPage && <SkeletonList size={3} />}
+            {isFetchingNextPage && (
+                <FetchingRows>
+                    <SpinnerRing />
+                </FetchingRows>
+            )}
         </HistoryPageWrapper>
     );
 };

@@ -3,7 +3,7 @@ import { hexToRGBA } from '../../../../libs/css';
 import { useTranslation } from '../../../../hooks/translation';
 import { ArrowDownIcon, ArrowUpIcon, XMarkCircleIcon } from '../../../Icon';
 import { FC, ReactNode } from 'react';
-import { Body2 } from '../../../Text';
+import { Body2, Body2Class } from '../../../Text';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useFormatCoinValue } from '../../../../hooks/balance';
 import { useWalletContext } from '../../../../hooks/appContext';
@@ -14,6 +14,14 @@ export const HistoryCellAction = styled(HistoryGridCell)`
     gap: 6px;
     height: 20px;
     align-items: center;
+`;
+
+const ArrowDownIconStyled = styled(ArrowDownIcon)`
+    color: ${p => p.theme.iconPrimary};
+`;
+
+const ArrowUpIconStyled = styled(ArrowUpIcon)`
+    color: ${p => p.theme.iconPrimary};
 `;
 
 export const HistoryCellActionGeneric: FC<{
@@ -37,7 +45,7 @@ export const HistoryCellActionReceived: FC<{
     const { t } = useTranslation();
     return (
         <HistoryCellAction>
-            {isFailed ? <XMarkCircleIcon color="accentRed" /> : <ArrowDownIcon />}
+            {isFailed ? <XMarkCircleIcon color="accentRed" /> : <ArrowDownIconStyled />}
             <Body2>{isScam ? t('spam_action') : t('transaction_type_receive')}</Body2>
             {isScam && !isFailed && <HistoryBadgeScam />}
             {isFailed && <HistoryBadgeFailed />}
@@ -51,8 +59,8 @@ export const HistoryCellActionSent: FC<{
     const { t } = useTranslation();
     return (
         <HistoryCellAction>
-            {isFailed ? <XMarkCircleIcon color="accentRed" /> : <ArrowUpIcon />}
-            {t('transaction_type_sent')}
+            {isFailed ? <XMarkCircleIcon color="accentRed" /> : <ArrowUpIconStyled />}
+            <Body2>{t('transaction_type_sent')}</Body2>
             {isFailed && <HistoryBadgeFailed />}
         </HistoryCellAction>
     );
@@ -83,7 +91,7 @@ export const HistoryBadgeScam = () => {
 };
 
 const HistoryCellAccountStyled = styled(HistoryGridCell)`
-    ${Body2};
+    ${Body2Class};
 
     color: ${p => p.theme.textSecondary};
     font-family: ${p => p.theme.fontMono};
@@ -169,17 +177,22 @@ export const HistoryCellAmount: FC<{
     );
 };
 
+export const HistoryCellAmountText = styled(HistoryGridCell)`
+    ${Body2Class};
+    color: ${p => p.theme.textTertiary};
+`;
+
 export const ActionRow = styled(HistoryGridCell)`
     display: grid;
     gap: 0.5rem;
     grid-template-columns: 1fr max-content;
 `;
 
-export const ErrorRow = () => {
+export const ErrorRow: FC<{ children?: ReactNode }> = ({ children }) => {
     return (
         <>
             <HistoryGridCellFillRow>
-                <Body2 color="textTertiary">Unknown error</Body2>
+                <Body2 color="textTertiary">{children || 'Unknown error'}</Body2>
             </HistoryGridCellFillRow>
         </>
     );
