@@ -26,6 +26,10 @@ export const AccountStatus = {
 export type AccountStatus = typeof AccountStatus[keyof typeof AccountStatus];
 
 
+export function instanceOfAccountStatus(value: any): boolean {
+    return Object.values(AccountStatus).includes(value);
+}
+
 export function AccountStatusFromJSON(json: any): AccountStatus {
     return AccountStatusFromJSONTyped(json, false);
 }

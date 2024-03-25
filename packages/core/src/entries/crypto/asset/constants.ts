@@ -3,7 +3,7 @@ import { BLOCKCHAIN_NAME } from '../../crypto';
 import { packAssetId } from './basic-asset';
 import { TonAsset } from './ton-asset';
 import { TronAsset } from './tron-asset';
-import { Address } from 'ton-core';
+import { Address } from '@ton/core';
 
 export const TRON_USDT_ASSET: TronAsset = {
     id: packAssetId(BLOCKCHAIN_NAME.TRON, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'),

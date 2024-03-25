@@ -9,7 +9,7 @@ import { formatFiatCurrency } from '../hooks/balance';
 import { QueryKey } from '../libs/queryKey';
 import { AssetData } from '../components/home/Jettons';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { Address } from 'ton';
+import { Address } from '@ton/ton';
 
 export interface TokenRate {
     diff7d: string;

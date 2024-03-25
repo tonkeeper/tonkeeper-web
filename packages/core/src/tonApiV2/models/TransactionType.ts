@@ -29,6 +29,10 @@ export const TransactionType = {
 export type TransactionType = typeof TransactionType[keyof typeof TransactionType];
 
 
+export function instanceOfTransactionType(value: any): boolean {
+    return Object.values(TransactionType).includes(value);
+}
+
 export function TransactionTypeFromJSON(json: any): TransactionType {
     return TransactionTypeFromJSONTyped(json, false);
 }

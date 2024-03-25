@@ -25,6 +25,10 @@ export const ComputeSkipReason = {
 export type ComputeSkipReason = typeof ComputeSkipReason[keyof typeof ComputeSkipReason];
 
 
+export function instanceOfComputeSkipReason(value: any): boolean {
+    return Object.values(ComputeSkipReason).includes(value);
+}
+
 export function ComputeSkipReasonFromJSON(json: any): ComputeSkipReason {
     return ComputeSkipReasonFromJSONTyped(json, false);
 }
