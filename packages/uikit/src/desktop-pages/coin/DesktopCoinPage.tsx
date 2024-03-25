@@ -224,10 +224,23 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
         return getMixedActivity(data, undefined);
     }, [data]);
 
+    const [assets] = useAssets();
+    const assetSymbol = useMemo(() => {
+        if (!assets) {
+            return undefined;
+        }
+        if (token === CryptoCurrency.TON) {
+            return t('Toncoin');
+        }
+
+        return assets.ton.jettons.balances.find(b => eqAddresses(b.jetton.address, token))?.jetton
+            .symbol;
+    }, [assets, t, token]);
+
     return (
         <DesktopViewPageLayout ref={ref}>
             <DesktopViewHeaderStyled backButton>
-                <Label2>{t('Toncoin')}</Label2>
+                <Label2>{assetSymbol || 'Unknown asset'}</Label2>
             </DesktopViewHeaderStyled>
             <DesktopViewDivider />
             <CoinPageBody>
