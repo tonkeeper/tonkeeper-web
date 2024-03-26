@@ -19,7 +19,6 @@ import BigNumber from 'bignumber.js';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { Button } from '../../components/fields/Button';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
-import { DesktopExternalLinks } from '../../libs/externalLinks';
 import { useAppSdk } from '../../hooks/appSdk';
 import { BuyNotification } from '../../components/home/BuyAction';
 import { useDisclosure } from '../../hooks/useDisclosure';
@@ -27,6 +26,7 @@ import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useFetchFilteredActivity } from '../../state/activity';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
 import { getMixedActivity } from '../../state/mixedActivity';
+import { useIsStonfiAsset, useStonfiSwapLink } from '../../state/stonfi';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -68,8 +68,11 @@ const ButtonStyled = styled(Button)`
 const CoinHeader: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
+
     const { data: buy } = useTonendpointBuyMethods();
     const canBuy = token === CryptoCurrency.TON;
+    const { data: canSwap } = useIsStonfiAsset(token);
+    const swapLink = useStonfiSwapLink(canSwap ? token : undefined);
 
     const sdk = useAppSdk();
     return (
@@ -101,10 +104,12 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     <ArrowDownIcon />
                     {t('wallet_receive')}
                 </ButtonStyled>
-                <ButtonStyled size="small" onClick={() => sdk.openPage(DesktopExternalLinks.Swap)}>
-                    <SwapIcon />
-                    {t('wallet_swap')}
-                </ButtonStyled>
+                {canSwap && (
+                    <ButtonStyled size="small" onClick={() => swapLink && sdk.openPage(swapLink)}>
+                        <SwapIcon />
+                        {t('wallet_swap')}
+                    </ButtonStyled>
+                )}
                 {canBuy && (
                     <ButtonStyled size="small" onClick={onOpen}>
                         <PlusIcon />

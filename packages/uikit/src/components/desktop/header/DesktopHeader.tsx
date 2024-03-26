@@ -12,10 +12,10 @@ import React from 'react';
 import { BuyNotification } from '../../home/BuyAction';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
-import { DesktopExternalLinks } from '../../../libs/externalLinks';
 import { usePreFetchRates } from '../../../state/rates';
 import { IconButton } from '../../fields/IconButton';
 import { useTranslation } from '../../../hooks/translation';
+import { useStonfiSwapLink } from '../../../state/stonfi';
 
 const DesktopHeaderStyled = styled.div`
     padding-left: 1rem;
@@ -90,6 +90,7 @@ export const DesktopHeader = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: buy } = useTonendpointBuyMethods();
     const { t } = useTranslation();
+    const swapLink = useStonfiSwapLink('ton');
 
     return (
         <DesktopHeaderStyled>
@@ -130,10 +131,7 @@ export const DesktopHeader = () => {
                     </ButtonStyled>
                 </ButtonsContainer>
                 <ButtonsContainer>
-                    <ButtonStyled
-                        size="small"
-                        onClick={() => sdk.openPage(DesktopExternalLinks.Swap)}
-                    >
+                    <ButtonStyled size="small" onClick={() => sdk.openPage(swapLink)}>
                         <SwapIcon />
                         {t('wallet_swap')}
                     </ButtonStyled>

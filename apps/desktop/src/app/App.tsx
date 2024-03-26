@@ -63,6 +63,7 @@ import { DesktopPurchases } from '@tonkeeper/uikit/dist/desktop-pages/purchases/
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/DesktopCoinPage';
 import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
+import { useStonfiAssets } from '@tonkeeper/uikit/dist/state/stonfi';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -108,6 +109,7 @@ const listOfAuth: AuthState['kind'][] = ['keychain'];
 
 declare const REACT_APP_TONCONSOLE_API: string;
 declare const REACT_APP_TG_BOT_ID: string;
+declare const REACT_APP_STONFI_REFERRAL_ADDRESS: string;
 
 export const App = () => {
     const { t, i18n } = useTranslation();
@@ -275,7 +277,8 @@ export const Loader: FC = () => {
         experimental: true,
         ios: false,
         env: {
-            tgAuthBotId: REACT_APP_TG_BOT_ID
+            tgAuthBotId: REACT_APP_TG_BOT_ID,
+            stonfiReferralAddress: REACT_APP_STONFI_REFERRAL_ADDRESS
         }
     };
 
@@ -298,6 +301,7 @@ export const Loader: FC = () => {
 
 const usePrefetch = () => {
     useRecommendations();
+    useStonfiAssets();
 };
 
 export const Content: FC<{
