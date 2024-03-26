@@ -53,7 +53,7 @@ import browser from 'webextension-polyfill';
 import { Notifications } from './components/Notifications';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
-import { useAnalytics, useAppWidth } from './libs/hoolks';
+import { useAnalytics, useAppWidth } from './libs/hooks';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));

@@ -6,7 +6,7 @@ import {
     getAccountsMap,
     sendTonConnectTransfer
 } from '@tonkeeper/core/dist/service/transfer/tonService';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -27,13 +27,14 @@ import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
 
 const ButtonGap = styled.div`
-    height: 56px;
-
     ${props =>
-        props.theme.displayType === 'full-width' &&
-        css`
-            height: 1rem;
-        `}
+        props.theme.displayType === 'full-width'
+            ? css`
+                  height: 1rem;
+              `
+            : css`
+                  display: none;
+              `}
 `;
 
 const ButtonRowStyled = styled.div`
