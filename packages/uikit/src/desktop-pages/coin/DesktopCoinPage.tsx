@@ -5,7 +5,6 @@ import { useTranslation } from '../../hooks/translation';
 import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import {
-    DesktopViewDivider,
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
@@ -45,10 +44,6 @@ export const DesktopCoinPage = () => {
 
     return <CoinPage token={token} />;
 };
-
-const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
-    margin-bottom: 0.5rem;
-`;
 
 const CoinHeaderStyled = styled.div`
     padding: 0 1rem;
@@ -239,10 +234,9 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
 
     return (
         <DesktopViewPageLayout ref={ref}>
-            <DesktopViewHeaderStyled backButton>
+            <DesktopViewHeader backButton borderBottom={true}>
                 <Label2>{assetSymbol || 'Unknown asset'}</Label2>
-            </DesktopViewHeaderStyled>
-            <DesktopViewDivider />
+            </DesktopViewHeader>
             <CoinHeader token={token} />
             <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
         </DesktopViewPageLayout>

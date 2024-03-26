@@ -7,7 +7,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useAssetsDistribution } from '../../state/wallet';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 import { useLayoutEffect, useState } from 'react';
-import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import { DesktopViewHeader, DesktopViewPageLayout } from "../../components/desktop/DesktopViewLayout";
 
 const DesktopAssetStylesOverride = css`
     background-color: transparent;
@@ -28,14 +28,8 @@ const JettonAssetStyled = styled(JettonAsset)`
     ${DesktopAssetStylesOverride}
 `;
 
-const TokensHeaderContainer = styled.div`
-    height: 37px;
-    padding-left: 1rem;
-    padding-bottom: 0.5rem;
-    box-sizing: content-box;
+const TokensHeaderContainer = styled(DesktopViewHeader)`
     flex-shrink: 0;
-    display: flex;
-    align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid ${p => p.theme.separatorCommon};
 `;

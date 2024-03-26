@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { RefCallback, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 
 export function useIsScrolled<T extends HTMLElement = HTMLDivElement>(options?: {
@@ -10,6 +10,20 @@ export function useIsScrolled<T extends HTMLElement = HTMLDivElement>(options?: 
     const ref = useRef<T | null>(null);
     const [closeTop, setCloseTop] = useState(true);
     const [closeBottom, setCloseBottom] = useState(false);
+
+    const [refChanged, setRefChanged] = useState(0);
+
+    const refCallback: RefCallback<T> = useCallback(
+        node => {
+            if (ref.current) {
+                return;
+            }
+
+            ref.current = node;
+            setRefChanged(c => c + 1);
+        },
+        [setRefChanged]
+    );
 
     useLayoutEffect(() => {
         const element = ref.current;
@@ -40,7 +54,7 @@ export function useIsScrolled<T extends HTMLElement = HTMLDivElement>(options?: 
 
             element.removeEventListener('scroll', handlerScroll);
         };
-    }, []);
+    }, [refChanged]);
 
-    return { ref, closeTop, closeBottom };
+    return { ref: refCallback, closeTop, closeBottom };
 }
