@@ -6163,6 +6163,7 @@ __metadata:
   resolution: "@tonkeeper/extension@workspace:apps/extension"
   dependencies:
     "@amplitude/analytics-browser": "npm:^2.1.0"
+    "@aptabase/browser": "npm:^0.1.1"
     "@tanstack/react-query": "npm:4.3.4"
     "@testing-library/dom": "npm:^9.3.3"
     "@testing-library/jest-dom": "npm:^5.16.5"
@@ -6261,7 +6262,6 @@ __metadata:
   resolution: "@tonkeeper/uikit@workspace:packages/uikit"
   dependencies:
     "@amplitude/analytics-browser": "npm:^2.1.0"
-    "@aptabase/browser": "npm:^0.1.1"
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
     "@polkadot/react-qr": "npm:^3.1.1"
