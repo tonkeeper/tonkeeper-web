@@ -47,6 +47,7 @@ export const DesktopCoinPage = () => {
 
 const CoinHeaderStyled = styled.div`
     padding: 0 1rem;
+    border-bottom: 1px solid ${p => p.theme.separatorCommon};
 `;
 
 const HeaderButtonsContainer = styled.div`
@@ -204,6 +205,12 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
     );
 };
 
+const HistorySubheader = styled(Label2)`
+    display: block;
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
+`;
+
 export const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
@@ -238,6 +245,7 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
                 <Label2>{assetSymbol || 'Unknown asset'}</Label2>
             </DesktopViewHeader>
             <CoinHeader token={token} />
+            <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
         </DesktopViewPageLayout>
     );
