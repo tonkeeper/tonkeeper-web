@@ -3,24 +3,24 @@ import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
-import { Body1, H3, Label1 } from '../Text';
+import { Body2, Label2 } from '../Text';
 import { BuyNotification } from '../home/BuyAction';
-
-const Header = styled(H3)`
-    text-align: center;
-`;
+import { Button } from '../fields/Button';
+import { ArrowDownIcon, PlusIcon } from '../Icon';
 
 const EmptyBody = styled.div`
+    margin-top: -64px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
 `;
 
-const BodyText = styled(Body1)`
+const BodyText = styled(Body2)`
     color: ${props => props.theme.textSecondary};
-    margin-bottom: 1.438rem;
+    margin-bottom: 1.5rem;
 `;
 
 const ButtonRow = styled.div`
@@ -29,15 +29,12 @@ const ButtonRow = styled.div`
     gap: 0.75rem;
 `;
 
-const Button = styled(Label1)`
-    padding: 12px 20px;
-    background-color: ${props => props.theme.backgroundContent};
-    transition: background-color 0.1s ease;
-    border-radius: ${props => props.theme.cornerLarge};
-    cursor: pointer;
+const ButtonStyled = styled(Button)`
+    display: flex;
+    gap: 6px;
 
-    &:hover {
-        background-color: ${props => props.theme.backgroundContentTint};
+    > svg {
+        color: ${p => p.theme.buttonTertiaryForeground};
     }
 `;
 
@@ -51,15 +48,20 @@ const EmptyActivity = () => {
 
     return (
         <EmptyBody>
-            <Header>{t('activity_empty_transaction_title')}</Header>
+            <Label2>{t('activity_empty_transaction_title')}</Label2>
             <BodyText>{t('activity_empty_transaction_caption')}</BodyText>
             <ButtonRow>
-                <Button onClick={() => setOpenBuy(true)}>{t('exchange_title')}</Button>
-                <Button
+                <ButtonStyled size="small" onClick={() => setOpenBuy(true)}>
+                    <PlusIcon />
+                    {t('exchange_title')}
+                </ButtonStyled>
+                <ButtonStyled
+                    size="small"
                     onClick={() => sdk.uiEvents.emit('receive', { method: 'receive', params: {} })}
                 >
+                    <ArrowDownIcon />
                     {t('wallet_receive')}
-                </Button>
+                </ButtonStyled>
             </ButtonRow>
             <BuyNotification buy={buy} open={openBuy} handleClose={() => setOpenBuy(false)} />
         </EmptyBody>

@@ -3,6 +3,7 @@ import { BLOCKCHAIN_NAME } from '../../crypto';
 import { packAssetId } from './basic-asset';
 import { TonAsset } from './ton-asset';
 import { TronAsset } from './tron-asset';
+import { Address } from '@ton/core';
 
 export const TRON_USDT_ASSET: TronAsset = {
     id: packAssetId(BLOCKCHAIN_NAME.TRON, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'),
@@ -31,4 +32,8 @@ export const TON_ASSET: TonAsset = {
     decimals: 9,
     address: 'TON',
     blockchain: BLOCKCHAIN_NAME.TON
+};
+
+export const KNOWN_TON_ASSETS = {
+    jUSDT: Address.parse('EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA')
 };

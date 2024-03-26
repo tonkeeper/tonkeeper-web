@@ -9,7 +9,7 @@ import { MixedActivityGroup } from '../../components/activity/ActivityGroup';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import { getMixedActivity } from '../../state/mixedActivity';
+import { getMixedActivityGroups } from '../../state/mixedActivity';
 
 const EmptyActivity = React.lazy(() => import('../../components/activity/EmptyActivity'));
 
@@ -61,7 +61,7 @@ const Activity: FC = () => {
     //  useFetchNext(hasTronNextPage, isFetchingNextPage, fetchTronNextPage, standalone, ref);
 
     const activity = useMemo(() => {
-        return getMixedActivity(tonEvents, undefined);
+        return getMixedActivityGroups(tonEvents, undefined);
     }, [tonEvents]);
 
     if (!isTonFetched) {

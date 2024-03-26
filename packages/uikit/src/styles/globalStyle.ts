@@ -69,7 +69,9 @@ export const GlobalStyleCss = css`
     .win32 .notification-overlay::-webkit-scrollbar,
     .linux .notification-overlay::-webkit-scrollbar,
     .win32 .dialog-content::-webkit-scrollbar,
-    .linux .dialog-content::-webkit-scrollbar {
+    .linux .dialog-content::-webkit-scrollbar,
+    .win32 .hide-scrollbar::-webkit-scrollbar,
+    .linux .hide-scrollbar::-webkit-scrollbar {
         width: 0;
     }
 `;

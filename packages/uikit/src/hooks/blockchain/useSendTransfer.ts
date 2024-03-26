@@ -86,7 +86,9 @@ export function useSendTransfer<T extends Asset>(
             await notifyError(client, sdk, t, e);
         }
 
-        await client.invalidateQueries([wallet.active.rawAddress]);
+        await client.invalidateQueries({
+            predicate: query => query.queryKey.includes(wallet.active.rawAddress)
+        });
         return true;
     });
 }

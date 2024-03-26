@@ -25,6 +25,10 @@ export const JettonVerificationType = {
 export type JettonVerificationType = typeof JettonVerificationType[keyof typeof JettonVerificationType];
 
 
+export function instanceOfJettonVerificationType(value: any): boolean {
+    return Object.values(JettonVerificationType).includes(value);
+}
+
 export function JettonVerificationTypeFromJSON(json: any): JettonVerificationType {
     return JettonVerificationTypeFromJSONTyped(json, false);
 }

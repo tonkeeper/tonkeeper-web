@@ -25,6 +25,10 @@ export const AccStatusChange = {
 export type AccStatusChange = typeof AccStatusChange[keyof typeof AccStatusChange];
 
 
+export function instanceOfAccStatusChange(value: any): boolean {
+    return Object.values(AccStatusChange).includes(value);
+}
+
 export function AccStatusChangeFromJSON(json: any): AccStatusChange {
     return AccStatusChangeFromJSONTyped(json, false);
 }

@@ -12,7 +12,7 @@ export function useRecommendations() {
     return useQuery<Recommendations, Error>([QueryKey.featuredRecommendations, lang], async () => {
         const data: Recommendations = await tonendpoint.getAppsPopular(lang);
         // TODO: Remove mobile hack
-        data.categories = data.categories.filter(item => item.id != 'featured');
+        data.categories = data.categories.filter(item => item.id !== 'featured');
 
         return data;
     });

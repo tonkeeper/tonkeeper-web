@@ -1,9 +1,12 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Address } from '@ton/core';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { RatesApi, TokenRates } from '@tonkeeper/core/dist/tonApiV2';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
+import { AssetData } from '../components/home/Jettons';
 import { useAppContext } from '../hooks/appContext';
 import { formatFiatCurrency } from '../hooks/balance';
 import { QueryKey } from '../libs/queryKey';
@@ -79,6 +82,8 @@ export const useRate = (token: string) => {
                 if (!tokenRate || !tokenRate.prices) {
                     throw new Error(`Missing price for token: ${token}`);
                 }
+
+                // TODO need refactoring -- two reactive sources of the tokens rates
                 setTimeout(() => client.invalidateQueries([QueryKey.total]));
                 return tokenRate;
             } catch (e) {
@@ -103,4 +108,36 @@ export const useFormatFiat = (rate: TokenRate | undefined, tokenAmount: BigNumbe
         fiatPrice,
         fiatAmount
     };
+};
+
+export const tokenRate = (client: QueryClient, fiat: FiatCurrencies, token: string) => {
+    return client.getQueryCache().find(getRateKey(fiat, token))?.state.data as
+        | TokenRate
+        | undefined;
+};
+
+export const getTonFiatAmount = (client: QueryClient, fiat: FiatCurrencies, assets: AssetData) => {
+    const rate = tokenRate(client, fiat, CryptoCurrency.TON);
+
+    if (!rate) {
+        return new BigNumber(0);
+    }
+
+    return shiftedDecimals(assets.ton.info.balance).multipliedBy(rate.prices);
+};
+
+export const getJettonsFiatAmount = (
+    client: QueryClient,
+    fiat: FiatCurrencies,
+    assets: AssetData
+) => {
+    return assets.ton.jettons.balances.reduce((total, { jetton, balance }) => {
+        const rate = tokenRate(client, fiat, Address.parse(jetton.address).toString());
+
+        if (!rate) {
+            return total;
+        }
+
+        return total.plus(shiftedDecimals(balance, jetton.decimals).multipliedBy(rate.prices));
+    }, new BigNumber(0));
 };

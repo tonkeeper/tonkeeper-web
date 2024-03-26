@@ -25,6 +25,10 @@ export const BouncePhaseType = {
 export type BouncePhaseType = typeof BouncePhaseType[keyof typeof BouncePhaseType];
 
 
+export function instanceOfBouncePhaseType(value: any): boolean {
+    return Object.values(BouncePhaseType).includes(value);
+}
+
 export function BouncePhaseTypeFromJSON(json: any): BouncePhaseType {
     return BouncePhaseTypeFromJSONTyped(json, false);
 }

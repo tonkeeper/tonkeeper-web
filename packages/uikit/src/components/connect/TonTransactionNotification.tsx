@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     EstimateData,
@@ -51,6 +51,7 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
     const wallet = useWalletContext();
     const sdk = useAppSdk();
     const { api } = useAppContext();
+    const client = useQueryClient();
 
     return useMutation<string, Error>(async () => {
         const accounts = estimate?.accounts;
@@ -58,7 +59,11 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
             throw new Error('Missing accounts data');
         }
         const mnemonic = await getMnemonic(sdk, wallet.publicKey);
-        return sendTonConnectTransfer(api, wallet, accounts, params, mnemonic);
+        const value = await sendTonConnectTransfer(api, wallet, accounts, params, mnemonic);
+        client.invalidateQueries({
+            predicate: query => query.queryKey.includes(wallet.active.rawAddress)
+        });
+        return value;
     });
 };
 

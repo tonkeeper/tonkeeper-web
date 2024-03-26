@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const H1 = styled.h1`
     font-style: normal;
@@ -65,11 +65,15 @@ export const Body1 = styled.span`
     line-height: 24px;
 `;
 
-export const Body2 = styled.span`
+export const Body2Class = css`
     font-style: normal;
     font-weight: 500;
     font-size: 14px;
     line-height: 20px;
+`;
+
+export const Body2 = styled.span`
+    ${Body2Class}
 `;
 
 export const Body3 = styled.span`
@@ -84,4 +88,11 @@ export const Num2 = styled.span`
     font-weight: 600;
     font-size: 28px;
     line-height: 36px;
+`;
+
+export const Num3 = styled.span`
+    font-style: normal;
+    font-weight: 510;
+    font-size: 24px;
+    line-height: 32px;
 `;

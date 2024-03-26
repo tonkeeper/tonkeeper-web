@@ -25,6 +25,10 @@ export const PoolImplementationType = {
 export type PoolImplementationType = typeof PoolImplementationType[keyof typeof PoolImplementationType];
 
 
+export function instanceOfPoolImplementationType(value: any): boolean {
+    return Object.values(PoolImplementationType).includes(value);
+}
+
 export function PoolImplementationTypeFromJSON(json: any): PoolImplementationType {
     return PoolImplementationTypeFromJSONTyped(json, false);
 }

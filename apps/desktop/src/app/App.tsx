@@ -14,9 +14,6 @@ import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
-import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
-import { DesktopHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeader';
-import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/main-screen/WalletAsideMenu';
 import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
 import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
 import {
@@ -36,16 +33,10 @@ import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
 import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
-import Activity from '@tonkeeper/uikit/dist/pages/activity/Activity';
-import Browser from '@tonkeeper/uikit/dist/pages/browser';
-import Coin from '@tonkeeper/uikit/dist/pages/coin/Coin';
-import DashboardPage from '@tonkeeper/uikit/dist/pages/dashboard';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { Purchases } from '@tonkeeper/uikit/dist/pages/purchases/Purchases';
-import { Tokens } from '@tonkeeper/uikit/dist/pages/purchases/Tokens';
 import Settings from '@tonkeeper/uikit/dist/pages/settings';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
@@ -57,11 +48,21 @@ import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalSt
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MemoryRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
+import { DesktopHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeader';
+import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/WalletAsideMenu';
+import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
+import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
+import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
+import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
+import { DesktopPurchases } from '@tonkeeper/uikit/dist/desktop-pages/purchases/DesktopPurchases';
+import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
+import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/DesktopCoinPage';
+import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -74,6 +75,10 @@ const queryClient = new QueryClient({
 
 const GlobalStyle = createGlobalStyle`
     ${GlobalStyleCss};
+    
+    body {
+        font-family: '-apple-system', BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, 'sans-serif';
+    }
     
     html, body, #root {
         height: 100%;
@@ -163,11 +168,15 @@ const FullSizeWrapper = styled(Container)`
     max-width: 800px;
 `;
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ withPadding: boolean }>`
     box-sizing: border-box;
-    padding-top: 64px;
+    ${p =>
+        p.withPadding &&
+        css`
+            padding-top: 64px;
+        `}
 
-    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     background-color: ${props => props.theme.backgroundPage};
@@ -287,6 +296,10 @@ export const Loader: FC = () => {
     );
 };
 
+const usePrefetch = () => {
+    useRecommendations();
+};
+
 export const Content: FC<{
     activeWallet?: WalletState | null;
     lock: boolean;
@@ -295,6 +308,7 @@ export const Content: FC<{
     useWindowsScroll();
     useAppWidth();
     useTrackLocation();
+    usePrefetch();
 
     if (lock) {
         return (
@@ -327,6 +341,7 @@ export const Content: FC<{
                 <WideContent>
                     <Routes>
                         <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
+                        <Route path={AppRoute.browser} element={<DesktopBrowser />} />
                         <Route path="*" element={<WalletContent />} />
                     </Routes>
                 </WideContent>
@@ -343,17 +358,18 @@ const WalletContent = () => {
 
             <WalletLayoutBody>
                 <WalletAsideMenu />
-                <WalletRoutingWrapper>
+                <WalletRoutingWrapper className="hide-scrollbar">
                     <Routes>
-                        <Route element={<OldAppRouting />}>
-                            <Route path={AppRoute.activity} element={<Activity />} />
-                            <Route path={any(AppRoute.browser)} element={<Browser />} />
-                            <Route path={any(AppRoute.purchases)} element={<Purchases />} />
+                        <Route element={<OldAppRouting withPadding />}>
                             <Route path={any(AppRoute.settings)} element={<Settings />} />
+                        </Route>
+                        <Route element={<OldAppRouting />}>
+                            <Route path={AppRoute.activity} element={<DesktopHistoryPage />} />
+                            <Route path={any(AppRoute.purchases)} element={<DesktopPurchases />} />
                             <Route path={AppRoute.coins}>
-                                <Route path=":name/*" element={<Coin />} />
+                                <Route path=":name/*" element={<DesktopCoinPage />} />
                             </Route>
-                            <Route path="*" element={<Tokens />} />
+                            <Route path="*" element={<DesktopTokens />} />
                         </Route>
                     </Routes>
                 </WalletRoutingWrapper>
@@ -362,9 +378,9 @@ const WalletContent = () => {
     );
 };
 
-const OldAppRouting = () => {
+const OldAppRouting: FC<{ withPadding?: boolean }> = ({ withPadding }) => {
     return (
-        <Wrapper>
+        <Wrapper withPadding={withPadding}>
             <Outlet />
             <MemoryScroll />
         </Wrapper>

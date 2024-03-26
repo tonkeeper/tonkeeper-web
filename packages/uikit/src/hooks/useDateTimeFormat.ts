@@ -1,5 +1,7 @@
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { useTranslation } from './translation';
+import { useMemo } from 'react';
+import { timeFromNow } from '../libs/dateTime';
 
 export function useDateTimeFormat() {
     const { i18n } = useTranslation();
@@ -13,4 +15,20 @@ export function useDateTimeFormat() {
 
         return Intl.DateTimeFormat(intlLocale(i18n.language), options).format(new Date(date));
     };
+}
+
+const i18LangToKnownDayjsLocale = (lang: string): 'ru' | 'en' => {
+    if (lang.includes('ru')) {
+        return 'ru';
+    }
+
+    return 'en';
+};
+
+export function useDateTimeFormatFromNow(timestamp: number) {
+    const { i18n } = useTranslation();
+
+    const lang = i18LangToKnownDayjsLocale(i18n.language);
+
+    return useMemo(() => timeFromNow(timestamp, lang), [timestamp, lang]);
 }

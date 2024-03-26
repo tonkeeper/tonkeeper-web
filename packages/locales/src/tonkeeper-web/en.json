@@ -52,6 +52,8 @@
   "NFT_item_id" : "NFT item ID",
   "nft_on_sale_text" : "NFT is on sale at the marketplace now.\nFor transfer, you should remove it from sale first.",
   "Old_password" : "Current password",
+  "page_header_history" : "History",
+  "page_header_purchases" : "Purchases",
   "Password" : "Password",
   "PasswordChanged" : "Password Changed",
   "PasswordDoNotMatch" : "Passwords do not match.",

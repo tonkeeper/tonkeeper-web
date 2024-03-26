@@ -1,13 +1,14 @@
 import styled from 'styled-components';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { Label2 } from '../../Text';
-import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon, SettingsSmoothIcon } from '../../Icon';
+import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon } from '../../Icon';
 import { NavLink } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
+import { useTranslation } from '../../../hooks/translation';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
-    width: 288px;
+    width: fit-content;
     border-right: 1px solid ${p => p.theme.backgroundContentAttention};
 
     > a {
@@ -18,16 +19,18 @@ const WalletAsideContainer = styled.div`
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
+    padding-right: 50px;
 `;
 
 export const WalletAsideMenu = () => {
+    const { t } = useTranslation();
     return (
         <WalletAsideContainer>
             <NavLink to={AppRoute.home}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <CoinsIcon />
-                        <Label2>Tokens</Label2>
+                        <Label2>{t('wallet_aside_tokens')}</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
@@ -35,7 +38,7 @@ export const WalletAsideMenu = () => {
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <ClockSmoothIcon />
-                        <Label2>History</Label2>
+                        <Label2>{t('wallet_aside_history')}</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
@@ -43,18 +46,18 @@ export const WalletAsideMenu = () => {
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SaleBadgeIcon />
-                        <Label2>Purchases</Label2>
+                        <Label2>{t('wallet_aside_purchases')}</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            <NavLink to={AppRoute.settings}>
+            {/* <NavLink to={AppRoute.settings}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
-                        <Label2>Settings</Label2>
+                        <Label2>{t('wallet_aside_settings')}</Label2>
                     </AsideMenuItemStyled>
                 )}
-            </NavLink>
+            </NavLink>*/}
         </WalletAsideContainer>
     );
 };

@@ -1,11 +1,11 @@
 import { CarouselApp } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
-import { FC } from 'react';
+import { ComponentProps, FC } from 'react';
 import styled from 'styled-components';
-import { Body3, Label2 } from '../../components/Text';
-import { Carousel } from '../../components/shared';
+import { Body3, Label2 } from '../Text';
+import { Carousel } from '../shared';
 import { useAppContext } from '../../hooks/appContext';
 import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
-import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
+import { PromotedItem, PromotedItemImage, PromotedItemText } from '../../pages/browser/PromotedItem';
 
 const CarouselCard = styled.div<{ img: string }>`
     width: 100%;
@@ -24,10 +24,9 @@ const CarouselCardFooter = styled(PromotedItem)`
     margin-left: 1rem;
 `;
 
-export const PromotionsCarousel: FC<{ apps: CarouselApp[]; className?: string }> = ({
-    apps,
-    className
-}) => {
+export const PromotionsCarousel: FC<
+    { apps: CarouselApp[]; className?: string } & Partial<ComponentProps<typeof Carousel>>
+> = ({ apps, className, ...rest }) => {
     const { config } = useAppContext();
     const speed = config.featured_play_interval || 1000 * 10;
 
@@ -38,6 +37,7 @@ export const PromotionsCarousel: FC<{ apps: CarouselApp[]; className?: string }>
             autoplay={true}
             centerPadding="16px"
             autoplaySpeed={speed}
+            {...rest}
         >
             {apps.map(item => (
                 <CarouselItem item={item} key={item.url} />

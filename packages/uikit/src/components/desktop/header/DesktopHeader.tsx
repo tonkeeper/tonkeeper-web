@@ -13,6 +13,9 @@ import { BuyNotification } from '../../home/BuyAction';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
 import { DesktopExternalLinks } from '../../../libs/externalLinks';
+import { usePreFetchRates } from '../../../state/rates';
+import { IconButton } from '../../fields/IconButton';
+import { useTranslation } from '../../../hooks/translation';
 
 const DesktopHeaderStyled = styled.div`
     padding-left: 1rem;
@@ -42,19 +45,60 @@ const ButtonStyled = styled(Button)`
     }
 `;
 
+const BalanceContainer = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    & > ${IconButton} {
+        padding: 4px;
+        background-color: ${p => p.theme.buttonTertiaryBackground};
+
+        transition: background-color 0.2s ease-in-out;
+
+        &:hover {
+            background-color: ${p => p.theme.buttonTertiaryBackgroundHighlighted};
+        }
+
+        &:disabled {
+            background-color: ${p => p.theme.buttonTertiaryBackgroundDisabled};
+            animation-name: spin;
+            cursor: default;
+        }
+
+        animation-name: unset;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+`;
+
 export const DesktopHeader = () => {
+    usePreFetchRates();
     const { fiat } = useAppContext();
     const { data: balance, isLoading } = useWalletTotalBalance(fiat);
     const sdk = useAppSdk();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: buy } = useTonendpointBuyMethods();
+    const { t } = useTranslation();
 
     return (
         <DesktopHeaderStyled>
             {isLoading ? (
                 <Skeleton width="100px" height="36px" />
             ) : (
-                <Num2>{formatFiatCurrency(fiat, balance || 0)}</Num2>
+                <BalanceContainer>
+                    <Num2>{formatFiatCurrency(fiat, balance || 0)}</Num2>
+                </BalanceContainer>
             )}
             <Num2></Num2>
             <DesktopRightPart>
@@ -70,7 +114,7 @@ export const DesktopHeader = () => {
                         }
                     >
                         <ArrowUpIcon />
-                        Send
+                        {t('wallet_send')}
                     </ButtonStyled>
                     <ButtonStyled
                         size="small"
@@ -82,7 +126,7 @@ export const DesktopHeader = () => {
                         }}
                     >
                         <ArrowDownIcon />
-                        Receive
+                        {t('wallet_receive')}
                     </ButtonStyled>
                 </ButtonsContainer>
                 <ButtonsContainer>
@@ -91,11 +135,11 @@ export const DesktopHeader = () => {
                         onClick={() => sdk.openPage(DesktopExternalLinks.Swap)}
                     >
                         <SwapIcon />
-                        Swap
+                        {t('wallet_swap')}
                     </ButtonStyled>
                     <ButtonStyled size="small" onClick={onOpen}>
                         <PlusIcon />
-                        Buy
+                        {t('wallet_buy')}
                     </ButtonStyled>
                 </ButtonsContainer>
             </DesktopRightPart>
