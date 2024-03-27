@@ -1,5 +1,5 @@
 const path = require('path');
-const { ProvidePlugin } = require('webpack');
+const { ProvidePlugin, EnvironmentPlugin } = require('webpack');
 
 module.exports = [
     {
@@ -29,7 +29,8 @@ module.exports = [
             new ProvidePlugin({
                 Buffer: ['buffer', 'Buffer'],
                 process: 'process/browser'
-            })
+            }),
+            new EnvironmentPlugin(['REACT_APP_APTABASE', 'REACT_APP_APTABASE_HOST'])
         ]
     },
     {
