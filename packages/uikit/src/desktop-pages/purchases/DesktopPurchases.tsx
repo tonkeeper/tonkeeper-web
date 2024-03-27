@@ -10,6 +10,7 @@ import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
+import { useIsScrolled } from '../../hooks/useIsScrolled';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -65,6 +66,8 @@ export const DesktopPurchases = () => {
     const { data: nfts } = useWalletNftList();
     const { t } = useTranslation();
 
+    const { ref: scrollRef, closeTop } = useIsScrolled();
+
     if (!nfts) {
         return null;
     }
@@ -84,8 +87,10 @@ export const DesktopPurchases = () => {
     }
 
     return (
-        <DesktopViewPageLayout>
-            <DesktopViewHeader>{t('page_header_purchases')}</DesktopViewHeader>
+        <DesktopViewPageLayout ref={scrollRef}>
+            <DesktopViewHeader borderBottom={!closeTop}>
+                {t('page_header_purchases')}
+            </DesktopViewHeader>
             <NFTPageBody>{nfts && <NftsListStyled nfts={nfts} />}</NFTPageBody>
         </DesktopViewPageLayout>
     );

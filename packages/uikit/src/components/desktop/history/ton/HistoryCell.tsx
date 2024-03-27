@@ -171,7 +171,7 @@ export const HistoryCellAmount: FC<{
 
     return (
         <HistoryCellAmountStyled color={finalColor}>
-            {isNegative ? '−' : '+'}
+            {isNegative ? '−' : '+'}&nbsp;
             {format(amount, decimals)}&nbsp;{symbol}
         </HistoryCellAmountStyled>
     );

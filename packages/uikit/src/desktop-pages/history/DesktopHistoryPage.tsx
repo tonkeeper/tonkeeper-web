@@ -16,6 +16,8 @@ import {
 } from '../../components/desktop/DesktopViewLayout';
 import { useTranslation } from '../../hooks/translation';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
+import { useIsScrolled } from '../../hooks/useIsScrolled';
+import { mergeRefs } from '../../libs/common';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
@@ -50,6 +52,8 @@ export const DesktopHistoryPage: FC = () => {
 
     useFetchNext(hasTonNextPage, isFetchingNextPage, fetchTonNextPage, standalone, ref);
 
+    const { ref: scrollRef, closeTop } = useIsScrolled();
+
     const activity = useMemo(() => {
         return getMixedActivity(tonEvents, undefined);
     }, [tonEvents]);
@@ -67,8 +71,8 @@ export const DesktopHistoryPage: FC = () => {
     }
 
     return (
-        <HistoryPageWrapper ref={ref}>
-            <DesktopViewHeader>
+        <HistoryPageWrapper ref={mergeRefs(ref, scrollRef)}>
+            <DesktopViewHeader borderBottom={!closeTop}>
                 <Label2>{t('page_header_history')}</Label2>
             </DesktopViewHeader>
             <DesktopHistory activity={activity} isFetchingNextPage={isFetchingNextPage} />

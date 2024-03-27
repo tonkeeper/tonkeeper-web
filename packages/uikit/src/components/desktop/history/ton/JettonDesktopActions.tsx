@@ -88,6 +88,7 @@ export const JettonTransferDesktopAction: FC<{
                         symbol={jettonTransfer.jetton.symbol}
                         decimals={jettonTransfer.jetton.decimals}
                         isFailed={action.status === 'failed'}
+                        isNegative
                     />
                 </ActionRow>
             </>

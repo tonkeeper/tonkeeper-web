@@ -33,7 +33,9 @@ export enum QueryKey {
     dashboardColumnsForm = 'dashboardColumnsForm',
     dashboardColumns = 'dashboardColumns',
     selectedDashboardColumns = 'selectedDashboardColumns',
-    dashboardData = 'dashboardData'
+    dashboardData = 'dashboardData',
+
+    stonfiAssets = 'stonfiAssets'
 }
 
 export enum JettonKey {

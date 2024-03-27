@@ -27,6 +27,7 @@ export interface IAppContext {
     hideQrScanner?: boolean;
     env?: {
         tgAuthBotId: string;
+        stonfiReferralAddress: string;
     };
 }
 

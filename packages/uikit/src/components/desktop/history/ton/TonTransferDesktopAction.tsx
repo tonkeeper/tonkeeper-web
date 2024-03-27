@@ -54,6 +54,7 @@ export const TonTransferDesktopAction: FC<{
                     symbol={CryptoCurrency.TON}
                     decimals={9}
                     isFailed={action.status === 'failed'}
+                    isNegative
                 />
             </ActionRow>
         </>

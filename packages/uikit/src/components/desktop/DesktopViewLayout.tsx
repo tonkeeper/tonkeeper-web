@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import React, { FC, ReactNode, useCallback } from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useNavigate } from 'react-router-dom';
@@ -6,17 +6,32 @@ import { useNativeBackButton } from '../BackButton';
 import { ArrowLeftIcon } from '../Icon';
 import { IconButton } from '../fields/IconButton';
 
-export const DesktopViewPageLayout = styled.div`
-    padding-top: 0.5rem;
+export const DesktopViewPageLayout = styled.div<{ borderBottom?: boolean }>`
     overflow: auto;
 `;
 
-export const DesktopViewHeaderStyled = styled.div<{ withBackButton?: boolean }>`
-    padding: 0 1rem 0 ${props => (props.withBackButton ? '0' : '1rem')};
-    height: 36px;
+export const DesktopViewHeaderStyled = styled.div<{
+    withBackButton?: boolean;
+    borderBottom?: boolean;
+}>`
+    padding: 1rem 1rem 1rem ${props => (props.withBackButton ? '0' : '1rem')};
+    height: 20px;
     display: flex;
     align-items: center;
-    box-sizing: border-box;
+    box-sizing: content-box;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: ${p => p.theme.backgroundPage};
+
+    border-bottom: 1px solid transparent;
+    transition: border-bottom-color 0.2s ease-in-out;
+
+    ${props =>
+        props.borderBottom &&
+        css`
+            border-bottom-color: ${props.theme.separatorCommon};
+        `};
 `;
 
 const IconButtonStyled = styled(IconButton)`
@@ -58,9 +73,14 @@ export const DesktopViewHeader: FC<{
     children: ReactNode;
     backButton?: boolean;
     className?: string;
-}> = ({ children, backButton, className }) => {
+    borderBottom?: boolean;
+}> = ({ children, backButton, borderBottom, className }) => {
     return (
-        <DesktopViewHeaderStyled withBackButton={backButton} className={className}>
+        <DesktopViewHeaderStyled
+            withBackButton={backButton}
+            className={className}
+            borderBottom={borderBottom}
+        >
             {backButton && <BackButtonStyled />}
             {children}
         </DesktopViewHeaderStyled>

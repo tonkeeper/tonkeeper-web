@@ -8,7 +8,7 @@ import { ActionData, ActivityNotification } from '../../activity/ton/ActivityNot
 
 const HistoryEventsGrid = styled.div<{ withBorder?: boolean }>`
     display: grid;
-    grid-template-columns: 124px fit-content(256px) fit-content(256px) minmax(40px, 1fr);
+    grid-template-columns: 132px fit-content(256px) fit-content(256px) minmax(40px, 1fr);
     column-gap: 8px;
     padding: 0 1rem;
 `;

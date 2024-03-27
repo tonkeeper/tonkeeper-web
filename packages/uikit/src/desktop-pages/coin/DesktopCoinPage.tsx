@@ -5,7 +5,6 @@ import { useTranslation } from '../../hooks/translation';
 import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import {
-    DesktopViewDivider,
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
@@ -20,7 +19,6 @@ import BigNumber from 'bignumber.js';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { Button } from '../../components/fields/Button';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
-import { DesktopExternalLinks } from '../../libs/externalLinks';
 import { useAppSdk } from '../../hooks/appSdk';
 import { BuyNotification } from '../../components/home/BuyAction';
 import { useDisclosure } from '../../hooks/useDisclosure';
@@ -28,6 +26,7 @@ import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useFetchFilteredActivity } from '../../state/activity';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
 import { getMixedActivity } from '../../state/mixedActivity';
+import { useIsStonfiAsset, useStonfiSwapLink } from '../../state/stonfi';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -46,12 +45,9 @@ export const DesktopCoinPage = () => {
     return <CoinPage token={token} />;
 };
 
-const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
-    margin-bottom: 0.5rem;
-`;
-
-const CoinPageBody = styled.div`
+const CoinHeaderStyled = styled.div`
     padding: 0 1rem;
+    border-bottom: 1px solid ${p => p.theme.separatorCommon};
 `;
 
 const HeaderButtonsContainer = styled.div`
@@ -72,12 +68,15 @@ const ButtonStyled = styled(Button)`
 const CoinHeader: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
+
     const { data: buy } = useTonendpointBuyMethods();
     const canBuy = token === CryptoCurrency.TON;
+    const { data: canSwap } = useIsStonfiAsset(token);
+    const swapLink = useStonfiSwapLink(canSwap ? token : undefined);
 
     const sdk = useAppSdk();
     return (
-        <>
+        <CoinHeaderStyled>
             <CoinInfo token={token} />
             <HeaderButtonsContainer>
                 <ButtonStyled
@@ -105,10 +104,12 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     <ArrowDownIcon />
                     {t('wallet_receive')}
                 </ButtonStyled>
-                <ButtonStyled size="small" onClick={() => sdk.openPage(DesktopExternalLinks.Swap)}>
-                    <SwapIcon />
-                    {t('wallet_swap')}
-                </ButtonStyled>
+                {canSwap && (
+                    <ButtonStyled size="small" onClick={() => swapLink && sdk.openPage(swapLink)}>
+                        <SwapIcon />
+                        {t('wallet_swap')}
+                    </ButtonStyled>
+                )}
                 {canBuy && (
                     <ButtonStyled size="small" onClick={onOpen}>
                         <PlusIcon />
@@ -117,7 +118,7 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                 )}
             </HeaderButtonsContainer>
             <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />
-        </>
+        </CoinHeaderStyled>
     );
 };
 
@@ -209,6 +210,12 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
     );
 };
 
+const HistorySubheader = styled(Label2)`
+    display: block;
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
+`;
+
 export const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
@@ -239,14 +246,12 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
 
     return (
         <DesktopViewPageLayout ref={ref}>
-            <DesktopViewHeaderStyled backButton>
+            <DesktopViewHeader backButton borderBottom={true}>
                 <Label2>{assetSymbol || 'Unknown asset'}</Label2>
-            </DesktopViewHeaderStyled>
-            <DesktopViewDivider />
-            <CoinPageBody>
-                <CoinHeader token={token} />
-                <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
-            </CoinPageBody>
+            </DesktopViewHeader>
+            <CoinHeader token={token} />
+            <HistorySubheader>{t('page_header_history')}</HistorySubheader>
+            <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
         </DesktopViewPageLayout>
     );
 };
