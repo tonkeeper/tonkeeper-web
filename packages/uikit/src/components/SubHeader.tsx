@@ -1,6 +1,6 @@
 import React, { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled, { createGlobalStyle, css, useTheme } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { useNativeBackButton } from './BackButton';
 import { ChevronLeftIcon } from './Icon';
@@ -87,11 +87,9 @@ const SubHeaderBackButton = () => {
 };
 
 export const SubHeader: FC<SubHeaderProps> = ({ title }) => {
-    const theme = useTheme();
-
     return (
         <Block>
-            {theme.displayType !== 'full-width' && <SubHeaderBackButton />}
+            <SubHeaderBackButton />
             <Title>{title}</Title>
         </Block>
     );

@@ -14,6 +14,7 @@ import { Notifications } from './Notification';
 import { ActiveRecovery, Recovery } from './Recovery';
 import { SecuritySettings } from './Security';
 import { Settings } from './Settings';
+import { UserTheme } from './Theme';
 import { WalletVersion } from './Version';
 
 const SettingsRouter = () => {
@@ -21,6 +22,7 @@ const SettingsRouter = () => {
         <Routes>
             <Route path={SettingsRoute.localization} element={<Localization />} />
             <Route path={SettingsRoute.legal} element={<Legal />} />
+            <Route path={SettingsRoute.theme} element={<UserTheme />} />
             <Route path={SettingsRoute.dev} element={<DevSettings />} />
             <Route path={SettingsRoute.fiat} element={<FiatCurrency />} />
             <Route path={SettingsRoute.account} element={<Account />} />

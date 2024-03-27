@@ -4,6 +4,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { relative, SettingsRoute } from '../../libs/routes';
+import { useUserThemes } from '../../state/theme';
 import { MessageIcon, NotificationIcon } from '../Icon';
 import { LocalizationIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
@@ -14,6 +15,7 @@ export const ThemeSettings = () => {
     const navigate = useNavigate();
 
     const { fiat } = useAppContext();
+    const { data: themes } = useUserThemes();
 
     const secondaryItems = useMemo(() => {
         const items: SettingsItem[] = [];
@@ -47,17 +49,26 @@ export const ThemeSettings = () => {
 
         // TODO: REMOVE:
         items.push({
-            name: i18n.language === 'ru' ? 'Обновление адреса' : 'Address Update',
+            name: i18n.language == 'ru' ? 'Обновление адреса' : 'Address Update',
             icon: 'EQ » UQ',
             action: () =>
                 sdk.openPage(
-                    i18n.language === 'ru'
+                    i18n.language == 'ru'
                         ? 'https://t.me/tonkeeper_ru/65'
                         : 'https://t.me/tonkeeper_news/49'
                 )
         });
+
+        // if (themes && themes.length > 1) {
+        //   items.push({
+        //     name: t('Theme'),
+        //     icon: <ThemeIcon />,
+        //     action: () => navigate(relative(SettingsRoute.theme)),
+        //   });
+        // }
+
         return items;
-    }, [t, i18n.enable, navigate, fiat]);
+    }, [t, i18n.enable, navigate, fiat, themes]);
 
     return <SettingsList items={secondaryItems} />;
 };
