@@ -64,6 +64,8 @@ import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/Deskto
 import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/DesktopCoinPage';
 import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
 import { useStonfiAssets } from '@tonkeeper/uikit/dist/state/stonfi';
+import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
+import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -152,7 +154,7 @@ export const App = () => {
 const ThemeAndContent = () => {
     const { data } = useProBackupState();
     return (
-        <UserThemeProvider displayType="full-width" isPro={data?.valid}>
+        <UserThemeProvider displayType="full-width" isPro={data?.valid} isProSupported>
             <DarkThemeContext.Provider value={!data?.valid}>
                 <GlobalStyle />
                 <HeaderGlobalStyle />
@@ -170,13 +172,8 @@ const FullSizeWrapper = styled(Container)`
     max-width: 800px;
 `;
 
-const Wrapper = styled.div<{ withPadding: boolean }>`
+const Wrapper = styled.div`
     box-sizing: border-box;
-    ${p =>
-        p.withPadding &&
-        css`
-            padding-top: 64px;
-        `}
 
     height: 100%;
     display: flex;
@@ -209,6 +206,17 @@ const WalletLayoutBody = styled.div`
 `;
 
 const WalletRoutingWrapper = styled.div`
+    flex: 1;
+    overflow: auto;
+    position: relative;
+`;
+
+const PreferencesLayout = styled.div`
+    height: 100%;
+    display: flex;
+`;
+
+const PreferencesRoutingWrapper = styled.div`
     flex: 1;
     overflow: auto;
     position: relative;
@@ -346,6 +354,7 @@ export const Content: FC<{
                     <Routes>
                         <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
                         <Route path={AppRoute.browser} element={<DesktopBrowser />} />
+                        <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
                         <Route path="*" element={<WalletContent />} />
                     </Routes>
                 </WideContent>
@@ -364,9 +373,6 @@ const WalletContent = () => {
                 <WalletAsideMenu />
                 <WalletRoutingWrapper className="hide-scrollbar">
                     <Routes>
-                        <Route element={<OldAppRouting withPadding />}>
-                            <Route path={any(AppRoute.settings)} element={<Settings />} />
-                        </Route>
                         <Route element={<OldAppRouting />}>
                             <Route path={AppRoute.activity} element={<DesktopHistoryPage />} />
                             <Route path={any(AppRoute.purchases)} element={<DesktopPurchases />} />
@@ -382,9 +388,20 @@ const WalletContent = () => {
     );
 };
 
-const OldAppRouting: FC<{ withPadding?: boolean }> = ({ withPadding }) => {
+const PreferencesContent = () => {
     return (
-        <Wrapper withPadding={withPadding}>
+        <PreferencesLayout>
+            <PreferencesAsideMenu />
+            <PreferencesRoutingWrapper className="hide-scrollbar">
+                <DesktopPreferencesRouting />
+            </PreferencesRoutingWrapper>
+        </PreferencesLayout>
+    );
+};
+
+const OldAppRouting = () => {
+    return (
+        <Wrapper>
             <Outlet />
             <MemoryScroll />
         </Wrapper>
