@@ -1,8 +1,11 @@
 import * as child_process from 'child_process';
+import dotenv from 'dotenv';
 import * as fs from 'fs-extra';
 import chrome from './chrome';
 import common from './common';
 import firefox from './fireFox';
+
+dotenv.config();
 
 common.notify('Build UI');
 
@@ -16,6 +19,8 @@ common.exec('npx react-app-rewired build', {
 });
 
 common.notify(`Build Tonkeeper background.js, provider.js, content.js`);
+
+console.log({ key: process.env.REACT_APP_APTABASE, host: process.env.REACT_APP_APTABASE_HOST });
 
 common.exec('npx webpack -c ./task/webpack.config.js', {
     stdio: 'inherit',

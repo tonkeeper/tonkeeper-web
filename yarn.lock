@@ -6080,22 +6080,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton/ton@npm:^13.11.1":
-  version: 13.11.1
-  resolution: "@ton/ton@npm:13.11.1"
-  dependencies:
-    axios: "npm:^1.6.7"
-    dataloader: "npm:^2.0.0"
-    symbol.inspect: "npm:1.0.1"
-    teslabot: "npm:^1.3.0"
-    zod: "npm:^3.21.4"
-  peerDependencies:
-    "@ton/core": ">=0.56.0"
-    "@ton/crypto": ">=3.2.0"
-  checksum: 0f161823117ddd5324d7231bd4b0b5e5653a8a555ed0bf36b850640f19cfeb5b60bac01c02a39fae6011b07177ba4e714b7295f2cddb840b67d882b4b84f699f
-  languageName: node
-  linkType: hard
-
 "@tonkeeper/core@npm:0.1.0, @tonkeeper/core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@tonkeeper/core@workspace:packages/core"
@@ -6179,6 +6163,7 @@ __metadata:
   resolution: "@tonkeeper/extension@workspace:apps/extension"
   dependencies:
     "@amplitude/analytics-browser": "npm:^2.1.0"
+    "@aptabase/browser": "npm:^0.1.1"
     "@tanstack/react-query": "npm:4.3.4"
     "@testing-library/dom": "npm:^9.3.3"
     "@testing-library/jest-dom": "npm:^5.16.5"
@@ -6277,7 +6262,6 @@ __metadata:
   resolution: "@tonkeeper/uikit@workspace:packages/uikit"
   dependencies:
     "@amplitude/analytics-browser": "npm:^2.1.0"
-    "@aptabase/browser": "npm:^0.1.1"
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
     "@polkadot/react-qr": "npm:^3.1.1"
@@ -6292,7 +6276,6 @@ __metadata:
     "@tanstack/react-query": "npm:4.3.4"
     "@ton/core": "npm:0.54.0"
     "@ton/crypto": "npm:3.2.0"
-    "@ton/ton": "npm:^13.11.1"
     "@tonkeeper/core": "npm:0.1.0"
     "@types/country-list-js": "npm:^3.1.3"
     "@types/react": "npm:^18.0.26"
@@ -8935,17 +8918,6 @@ __metadata:
   dependencies:
     follow-redirects: "npm:^1.14.7"
   checksum: 7961f4386e5492c2a32756a8c9a2ca247130d4aa8d24f855d11d02f8d99288c6e9a4aabe0675587ace61779b6bd3d54a654f64431c87dc0270cfba52a4dca9c9
-  languageName: node
-  linkType: hard
-
-"axios@npm:^1.6.7":
-  version: 1.6.8
-  resolution: "axios@npm:1.6.8"
-  dependencies:
-    follow-redirects: "npm:^1.15.6"
-    form-data: "npm:^4.0.0"
-    proxy-from-env: "npm:^1.1.0"
-  checksum: 3f9a79eaf1d159544fca9576261ff867cbbff64ed30017848e4210e49f3b01e97cf416390150e6fdf6633f336cd43dc1151f890bbd09c3c01ad60bb0891eee63
   languageName: node
   linkType: hard
 
@@ -14084,16 +14056,6 @@ __metadata:
     debug:
       optional: true
   checksum: 60d98693f4976892f8c654b16ef6d1803887a951898857ab0cdc009570b1c06314ad499505b7a040ac5b98144939f8597766e5e6a6859c0945d157b473aa6f5f
-  languageName: node
-  linkType: hard
-
-"follow-redirects@npm:^1.15.6":
-  version: 1.15.6
-  resolution: "follow-redirects@npm:1.15.6"
-  peerDependenciesMeta:
-    debug:
-      optional: true
-  checksum: 70c7612c4cab18e546e36b991bbf8009a1a41cf85354afe04b113d1117569abf760269409cb3eb842d9f7b03d62826687086b081c566ea7b1e6613cf29030bf7
   languageName: node
   linkType: hard
 
@@ -21505,13 +21467,6 @@ __metadata:
     forwarded: "npm:0.2.0"
     ipaddr.js: "npm:1.9.1"
   checksum: f24a0c80af0e75d31e3451398670d73406ec642914da11a2965b80b1898ca6f66a0e3e091a11a4327079b2b268795f6fa06691923fef91887215c3d0e8ea3f68
-  languageName: node
-  linkType: hard
-
-"proxy-from-env@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "proxy-from-env@npm:1.1.0"
-  checksum: f0bb4a87cfd18f77bc2fba23ae49c3b378fb35143af16cc478171c623eebe181678f09439707ad80081d340d1593cd54a33a0113f3ccb3f4bc9451488780ee23
   languageName: node
   linkType: hard
 
