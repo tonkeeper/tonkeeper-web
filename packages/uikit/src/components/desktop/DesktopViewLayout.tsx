@@ -27,6 +27,10 @@ export const DesktopViewHeaderStyled = styled.div<{
     border-bottom: 1px solid transparent;
     transition: border-bottom-color 0.2s ease-in-out;
 
+    * {
+        user-select: none;
+    }
+
     ${props =>
         props.borderBottom &&
         css`

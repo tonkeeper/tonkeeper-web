@@ -15,6 +15,10 @@ const WalletAsideContainer = styled.div`
         text-decoration: unset;
         color: unset;
     }
+
+    * {
+        user-select: none;
+    }
 `;
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`

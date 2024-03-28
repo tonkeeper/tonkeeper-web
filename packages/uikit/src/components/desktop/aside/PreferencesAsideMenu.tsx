@@ -28,7 +28,7 @@ import { Skeleton } from '../../shared/Skeleton';
 import { useProState } from '../../../state/pro';
 import { availableThemes, useUserUIPreferences } from '../../../state/theme';
 
-const WalletAsideContainer = styled.div`
+const PreferencesAsideContainer = styled.div`
     width: fit-content;
     display: flex;
     flex-direction: column;
@@ -38,6 +38,10 @@ const WalletAsideContainer = styled.div`
     a {
         text-decoration: unset;
         color: unset;
+    }
+
+    * {
+        user-select: none;
     }
 `;
 
@@ -85,7 +89,7 @@ export const PreferencesAsideMenu = () => {
     const { fiat } = useAppContext();
 
     return (
-        <WalletAsideContainer>
+        <PreferencesAsideContainer>
             <AsideMenuItemsBlock>
                 <NavLink to={AppRoute.settings + SettingsRoute.account}>
                     {({ isActive }) => (
@@ -225,6 +229,6 @@ export const PreferencesAsideMenu = () => {
                 </AsideMenuItemStyled>
                 <DeleteAllNotification open={isOpen} handleClose={onClose} />
             </AsideMenuItemsBlock>
-        </WalletAsideContainer>
+        </PreferencesAsideContainer>
     );
 };
