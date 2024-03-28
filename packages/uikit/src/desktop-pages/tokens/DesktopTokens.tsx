@@ -7,7 +7,10 @@ import { useTranslation } from '../../hooks/translation';
 import { useAssetsDistribution } from '../../state/wallet';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 import { useLayoutEffect, useState } from 'react';
-import { DesktopViewHeader, DesktopViewPageLayout } from "../../components/desktop/DesktopViewLayout";
+import {
+    DesktopViewHeader,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
 
 const DesktopAssetStylesOverride = css`
     background-color: transparent;

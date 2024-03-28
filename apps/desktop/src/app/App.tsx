@@ -66,6 +66,7 @@ import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/
 import { useStonfiAssets } from '@tonkeeper/uikit/dist/state/stonfi';
 import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
+import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -379,6 +380,10 @@ const WalletContent = () => {
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<DesktopCoinPage />} />
                             </Route>
+                            <Route
+                                path={any(AppRoute.walletSettings)}
+                                element={<DesktopWalletSettingsRouting />}
+                            />
                             <Route path="*" element={<DesktopTokens />} />
                         </Route>
                     </Routes>

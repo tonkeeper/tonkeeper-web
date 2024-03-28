@@ -1,6 +1,6 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { ProSettings } from '../../components/settings/ProSettings';
-import { SettingsRoute } from '../../libs/routes';
+import { AppRoute, SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
 import { Localization } from '../../pages/settings/Localization';
 import { Legal } from '../../pages/settings/Legal';
 import { UserTheme } from '../../pages/settings/Theme';
@@ -8,16 +8,16 @@ import { DevSettings } from '../../pages/settings/Dev';
 import { FiatCurrency } from '../../pages/settings/FiatCurrency';
 import { Account } from '../../pages/settings/Account';
 import { Notifications } from '../../pages/settings/Notification';
-import { ActiveRecovery, Recovery } from '../../pages/settings/Recovery';
-import { WalletVersion } from '../../pages/settings/Version';
-import { JettonsSettings } from '../../pages/settings/Jettons';
-import { SecuritySettings } from '../../pages/settings/Security';
 import { CountrySettings } from '../../pages/settings/Country';
 import styled from 'styled-components';
 
 const OldSettingsLayoutWrapper = styled.div`
     padding-top: 64px;
     position: relative;
+
+    & .settings-header-back-button {
+        display: none;
+    }
 `;
 
 const OldSettingsLayout = () => {
@@ -39,13 +39,30 @@ export const DesktopPreferencesRouting = () => {
                 <Route path={SettingsRoute.fiat} element={<FiatCurrency />} />
                 <Route path={SettingsRoute.account} element={<Account />} />
                 <Route path={SettingsRoute.notification} element={<Notifications />} />
-                <Route path={SettingsRoute.recovery}>
-                    <Route path=":publicKey" element={<Recovery />} />
-                    <Route index element={<ActiveRecovery />} />
-                </Route>
-                <Route path={SettingsRoute.version} element={<WalletVersion />} />
-                <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
-                <Route path={SettingsRoute.security} element={<SecuritySettings />} />
+                <Route
+                    path={SettingsRoute.recovery}
+                    element={
+                        <Navigate to={AppRoute.walletSettings + WalletSettingsRoute.jettons} />
+                    }
+                />
+                <Route
+                    path={SettingsRoute.version}
+                    element={
+                        <Navigate to={AppRoute.walletSettings + WalletSettingsRoute.version} />
+                    }
+                />
+                <Route
+                    path={SettingsRoute.jettons}
+                    element={
+                        <Navigate to={AppRoute.walletSettings + WalletSettingsRoute.jettons} />
+                    }
+                />
+                <Route
+                    path={SettingsRoute.security}
+                    element={
+                        <Navigate to={AppRoute.walletSettings + WalletSettingsRoute.jettons} />
+                    }
+                />
                 <Route path={SettingsRoute.country} element={<CountrySettings />} />
                 <Route path={SettingsRoute.pro} element={<ProSettings />} />
                 <Route path="*" element={<Navigate to={'.' + SettingsRoute.account} replace />} />

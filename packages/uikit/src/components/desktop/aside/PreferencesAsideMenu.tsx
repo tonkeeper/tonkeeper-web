@@ -81,6 +81,7 @@ export const PreferencesAsideMenu = () => {
     const country = countryData === null ? t('auto') : countryData;
     const { data: proState } = useProState();
     const { data: uiPreferences } = useUserUIPreferences();
+    const { fiat } = useAppContext();
 
     return (
         <WalletAsideContainer>
@@ -147,6 +148,17 @@ export const PreferencesAsideMenu = () => {
                                         getCountryName(i18n.language, country)
                                     )}
                                 </Body2>
+                            </AsideMenuItemLargeBody>
+                        </AsideMenuItemLarge>
+                    )}
+                </NavLink>
+                <NavLink to={AppRoute.settings + SettingsRoute.fiat}>
+                    {({ isActive }) => (
+                        <AsideMenuItemLarge isSelected={isActive}>
+                            <PlaceIcon />
+                            <AsideMenuItemLargeBody>
+                                <Label2>{t('settings_primary_currency')}</Label2>
+                                <Body2>{fiat}</Body2>
                             </AsideMenuItemLargeBody>
                         </AsideMenuItemLarge>
                     )}
