@@ -1,7 +1,7 @@
 import { DefaultTheme } from 'styled-components';
 
 export const proTheme: DefaultTheme = {
-    textPrimary: '#FFFFFF',
+    textPrimary: '#EBEBEB',
     textSecondary: '#8D8D93',
     textTertiary: '#4E4E52',
     textAccent: '#FFDB29',
@@ -17,7 +17,7 @@ export const proTheme: DefaultTheme = {
     backgroundOverlayExtraLight: 'rgb(15 15 15 / 24%)',
     backgroundHighlighted: 'rgb(255 255 255 / 4%)',
 
-    iconPrimary: '#FFFFFF',
+    iconPrimary: '#EBEBEB',
     iconSecondary: '#8D8D93',
     iconTertiary: '#4E4E52',
     iconPrimaryAlternate: '#000000',
@@ -25,9 +25,9 @@ export const proTheme: DefaultTheme = {
     buttonPrimaryBackground: '#FFDB29',
     buttonPrimaryForeground: '#000000',
     buttonSecondaryBackground: '#17171A',
-    buttonSecondaryForeground: '#FFFFFF',
+    buttonSecondaryForeground: '#EBEBEB',
     buttonTertiaryBackground: '#222224',
-    buttonTertiaryForeground: '#FFFFFF',
+    buttonTertiaryForeground: '#EBEBEB',
     buttonPrimaryBackgroundDisabled: '#CCAF21',
     buttonSecondaryBackgroundDisabled: '#0E0E0F',
     buttonTertiaryBackgroundDisabled: '#18181A',
