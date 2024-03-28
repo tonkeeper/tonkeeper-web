@@ -3,6 +3,7 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import { Body2, Label2 } from '../../Text';
 import {
     AppearanceIcon,
+    BankIcon,
     CodeIcon,
     DocIcon,
     EnvelopeIcon,
@@ -135,6 +136,17 @@ export const PreferencesAsideMenu = () => {
                         </AsideMenuItemLarge>
                     )}
                 </NavLink>
+                <NavLink to={AppRoute.settings + SettingsRoute.fiat}>
+                    {({ isActive }) => (
+                        <AsideMenuItemLarge isSelected={isActive}>
+                            <BankIcon />
+                            <AsideMenuItemLargeBody>
+                                <Label2>{t('settings_primary_currency')}</Label2>
+                                <Body2>{fiat}</Body2>
+                            </AsideMenuItemLargeBody>
+                        </AsideMenuItemLarge>
+                    )}
+                </NavLink>
                 <NavLink to={AppRoute.settings + SettingsRoute.country}>
                     {({ isActive }) => (
                         <AsideMenuItemLarge isSelected={isActive}>
@@ -148,17 +160,6 @@ export const PreferencesAsideMenu = () => {
                                         getCountryName(i18n.language, country)
                                     )}
                                 </Body2>
-                            </AsideMenuItemLargeBody>
-                        </AsideMenuItemLarge>
-                    )}
-                </NavLink>
-                <NavLink to={AppRoute.settings + SettingsRoute.fiat}>
-                    {({ isActive }) => (
-                        <AsideMenuItemLarge isSelected={isActive}>
-                            <PlaceIcon />
-                            <AsideMenuItemLargeBody>
-                                <Label2>{t('settings_primary_currency')}</Label2>
-                                <Body2>{fiat}</Body2>
                             </AsideMenuItemLargeBody>
                         </AsideMenuItemLarge>
                     )}
