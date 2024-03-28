@@ -72,7 +72,6 @@ export interface WalletState {
     orderJettons?: string[];
 
     lang?: Language;
-    fiat?: FiatCurrencies;
     theme?: string;
 
     proxy?: WalletProxy;

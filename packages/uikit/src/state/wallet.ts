@@ -103,7 +103,7 @@ export const useMutateWalletProperty = (clearWallet = false) => {
         Partial<
             Pick<
                 WalletState,
-                'name' | 'hiddenJettons' | 'orderJettons' | 'lang' | 'fiat' | 'network' | 'emoji'
+                'name' | 'hiddenJettons' | 'orderJettons' | 'lang' | 'network' | 'emoji'
             >
         >
     >(async props => {

@@ -67,6 +67,7 @@ import { useStonfiAssets } from '@tonkeeper/uikit/dist/state/stonfi';
 import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
+import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -237,6 +238,7 @@ export const Loader: FC = () => {
     const { i18n } = useTranslation();
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
+    const { data: fiat } = useUserFiat();
 
     const tonendpoint = useTonendpoint(
         TARGET_ENV,
@@ -267,12 +269,17 @@ export const Loader: FC = () => {
         window.backgroundApi.onRefresh(() => queryClient.invalidateQueries());
     }, []);
 
-    if (auth === undefined || account === undefined || config === undefined || lock === undefined) {
+    if (
+        auth === undefined ||
+        account === undefined ||
+        config === undefined ||
+        lock === undefined ||
+        fiat === undefined
+    ) {
         return <Loading />;
     }
 
     const network = activeWallet?.network ?? Network.MAINNET;
-    const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
     const context = {
         api: getApiConfig(config, network, REACT_APP_TONCONSOLE_API),
         auth,

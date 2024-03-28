@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
@@ -49,6 +48,7 @@ import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-ro
 import styled, { css } from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from './libs/hooks';
+import { useUserFiat } from "@tonkeeper/uikit/dist/state/fiat";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -164,6 +164,7 @@ const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
 
 export const Loader: FC = () => {
     const { data: activeWallet } = useActiveWallet();
+    const { data: fiat } = useUserFiat();
 
     const [ios, standalone] = useMemo(() => {
         return [sdk.isIOs(), sdk.isStandalone()] as const;
@@ -199,12 +200,11 @@ export const Loader: FC = () => {
         }
     }, [activeWallet, i18n]);
 
-    if (auth === undefined || account === undefined || config === undefined || lock === undefined) {
+    if (auth === undefined || account === undefined || config === undefined || lock === undefined || fiat === undefined) {
         return <Loading />;
     }
 
     const network = activeWallet?.network ?? Network.MAINNET;
-    const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
     const context = {
         api: getApiConfig(config, network),
         auth,
