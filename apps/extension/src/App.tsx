@@ -54,6 +54,7 @@ import { Notifications } from './components/Notifications';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
+import { useUserFiat } from "@tonkeeper/uikit/dist/state/fiat";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -164,6 +165,7 @@ const Wrapper = styled(FullSizeWrapper)<{
 
 export const Loader: FC = React.memo(() => {
     const { data: activeWallet } = useActiveWallet();
+    const { data: fiat } = useUserFiat();
 
     const lock = useLock(sdk);
     const { data: account } = useAccountState();
@@ -178,7 +180,7 @@ export const Loader: FC = React.memo(() => {
 
     const { data: tracker } = useAnalytics(sdk.storage, account, activeWallet, sdk.version);
 
-    if (!account || !auth || !config || lock === undefined) {
+    if (!account || !auth || !config || lock === undefined || fiat === undefined) {
         return (
             <FullSizeWrapper standalone={false}>
                 <Loading />
@@ -187,7 +189,6 @@ export const Loader: FC = React.memo(() => {
     }
 
     const network = activeWallet?.network ?? Network.MAINNET;
-    const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
 
     const context: IAppContext = {
         api: getApiConfig(config, network),

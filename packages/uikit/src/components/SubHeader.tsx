@@ -1,11 +1,12 @@
 import React, { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import styled, { createGlobalStyle, css, useTheme } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { useNativeBackButton } from './BackButton';
 import { ChevronLeftIcon } from './Icon';
 import { H3 } from './Text';
 import { BackButton } from './fields/BackButton';
+import { DesktopBackButton } from './desktop/DesktopViewLayout';
 
 export const WithHeadingDivider = styled.div``;
 
@@ -59,6 +60,15 @@ export const BackButtonLeft = styled(BackButton)`
     left: 1rem;
 `;
 
+export const DesktopBackButtonLeft = styled(DesktopBackButton)`
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding-left: 1rem;
+    padding-right: 2rem;
+`;
+
 export interface SubHeaderProps {
     title?: React.ReactNode;
 }
@@ -79,14 +89,25 @@ const SubHeaderBackButton = () => {
         return <></>;
     } else {
         return (
-            <BackButtonLeft onClick={() => navigate(-1)}>
+            <BackButtonLeft className="settings-header-back-button" onClick={() => navigate(-1)}>
                 <ChevronLeftIcon />
             </BackButtonLeft>
         );
     }
 };
 
-export const SubHeader: FC<SubHeaderProps> = ({ title }) => {
+export const SubHeader: FC<SubHeaderProps & { hideBackButton?: boolean }> = ({ title }) => {
+    const theme = useTheme();
+
+    if (theme.displayType === 'full-width') {
+        return (
+            <Block>
+                <DesktopBackButtonLeft className="settings-header-back-button" />
+                <Title>{title}</Title>
+            </Block>
+        );
+    }
+
     return (
         <Block>
             <SubHeaderBackButton />

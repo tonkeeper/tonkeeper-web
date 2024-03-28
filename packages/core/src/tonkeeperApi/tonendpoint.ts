@@ -36,6 +36,7 @@ export interface TonendpointConfig {
     neocryptoWebView?: string;
 
     directSupportUrl?: string;
+    faq_url?: string;
 
     accountExplorer?: string;
     transactionExplorer?: string;

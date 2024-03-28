@@ -24,6 +24,10 @@ const DesktopHeaderStyled = styled.div`
     justify-content: space-between;
     border-bottom: 1px solid ${p => p.theme.backgroundContentAttention};
     background: ${p => p.theme.backgroundContent};
+
+    * {
+        user-select: none;
+    }
 `;
 
 const ButtonsContainer = styled.div`

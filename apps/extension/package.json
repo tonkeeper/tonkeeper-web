@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/extension",
-    "version": "3.9.0",
+    "version": "3.9.1",
     "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
     "description": "Your extension wallet on The Open Network",
     "dependencies": {

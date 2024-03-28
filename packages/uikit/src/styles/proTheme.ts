@@ -1,7 +1,7 @@
 import { DefaultTheme } from 'styled-components';
 
 export const proTheme: DefaultTheme = {
-    textPrimary: '#FFFFFF',
+    textPrimary: '#EBEBEB',
     textSecondary: '#8D8D93',
     textTertiary: '#4E4E52',
     textAccent: '#FFDB29',
@@ -17,7 +17,7 @@ export const proTheme: DefaultTheme = {
     backgroundOverlayExtraLight: 'rgb(15 15 15 / 24%)',
     backgroundHighlighted: 'rgb(255 255 255 / 4%)',
 
-    iconPrimary: '#FFFFFF',
+    iconPrimary: '#EBEBEB',
     iconSecondary: '#8D8D93',
     iconTertiary: '#4E4E52',
     iconPrimaryAlternate: '#000000',
@@ -25,9 +25,9 @@ export const proTheme: DefaultTheme = {
     buttonPrimaryBackground: '#FFDB29',
     buttonPrimaryForeground: '#000000',
     buttonSecondaryBackground: '#17171A',
-    buttonSecondaryForeground: '#FFFFFF',
+    buttonSecondaryForeground: '#EBEBEB',
     buttonTertiaryBackground: '#222224',
-    buttonTertiaryForeground: '#FFFFFF',
+    buttonTertiaryForeground: '#EBEBEB',
     buttonPrimaryBackgroundDisabled: '#CCAF21',
     buttonSecondaryBackgroundDisabled: '#0E0E0F',
     buttonTertiaryBackgroundDisabled: '#18181A',
@@ -58,7 +58,7 @@ export const proTheme: DefaultTheme = {
     separatorAlternate: 'rgb(255 255 255 / 8%)',
 
     gradientBackgroundTop:
-        'linear-gradient(180deg, #000000 0%, rgba(16, 22, 31, 0.991353) 6.67%, rgba(16, 22, 31, 0.96449) 13.33%, rgba(16, 22, 31, 0.91834) 20%, rgba(16, 22, 31, 0.852589) 26.67%, rgba(16, 22, 31, 0.768225) 33.33%, rgba(16, 22, 31, 0.668116) 40%, rgba(16, 22, 31, 0.557309) 46.67%, rgba(16, 22, 31, 0.442691) 53.33%, rgba(16, 22, 31, 0.331884) 60%, rgba(16, 22, 31, 0.231775) 66.67%, rgba(16, 22, 31, 0.147411) 73.33%, rgba(16, 22, 31, 0.0816599) 80%, rgba(16, 22, 31, 0.03551) 86.67%, rgba(16, 22, 31, 0.0086472) 93.33%, rgba(16, 22, 31, 0) 100%)',
+        'linear-gradient(180deg, #000000 0%, rgba(0, 0, 0, 0.991353) 6.67%, rgba(0, 0, 0, 0.96449) 13.33%, rgba(0, 0, 0, 0.91834) 20%, rgba(0, 0, 0, 0.852589) 26.67%, rgba(0, 0, 0, 0.768225) 33.33%, rgba(0, 0, 0, 0.668116) 40%, rgba(0, 0, 0, 0.557309) 46.67%, rgba(0, 0, 0, 0.442691) 53.33%, rgba(0, 0, 0, 0.331884) 60%, rgba(0, 0, 0, 0.231775) 66.67%, rgba(0, 0, 0, 0.147411) 73.33%, rgba(0, 0, 0, 0.0816599) 80%, rgba(0, 0, 0, 0.03551) 86.67%, rgba(0, 0, 0, 0.0086472) 93.33%, rgba(0, 0, 0, 0) 100%)',
     gradientBackgroundBottom:
         'linear-gradient(360deg, #000 0%, rgba(0, 0, 0, 0.99) 6.67%, rgba(0, 0, 0, 0.96) 13.33%, rgba(0, 0, 0, 0.92) 20%, rgba(0, 0, 0, 0.85) 26.67%, rgba(0, 0, 0, 0.77) 33.33%, rgba(0, 0, 0, 0.67) 40%, rgba(0, 0, 0, 0.56) 46.67%, rgba(0, 0, 0, 0.44) 53.33%, rgba(0, 0, 0, 0.33) 60%, rgba(0, 0, 0, 0.23) 66.67%, rgba(0, 0, 0, 0.15) 73.33%, rgba(0, 0, 0, 0.08) 80%, rgba(0, 0, 0, 0.04) 86.67%, rgba(0, 0, 0, 0.01) 93.33%, rgba(0, 0, 0, 0.00) 100%)',
     gradientBlueTop:

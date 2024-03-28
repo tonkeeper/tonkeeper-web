@@ -150,7 +150,6 @@ export const updateWalletProperty = async (
             | 'shownJettons'
             | 'orderJettons'
             | 'lang'
-            | 'fiat'
             | 'network'
             | 'emoji'
         >

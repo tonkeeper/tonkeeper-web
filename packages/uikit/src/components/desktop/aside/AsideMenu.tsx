@@ -7,7 +7,7 @@ import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateActiveWallet } from '../../../state/account';
 import { useWalletState } from '../../../state/wallet';
-import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from "../../Icon";
+import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { Label2 } from '../../Text';
 import { ImportNotification } from '../../create/ImportNotification';
 import { SubscriptionInfo } from './SubscriptionInfo';
@@ -25,6 +25,10 @@ const AsideContainer = styled.div<{ width: number }>`
     position: relative;
     width: ${p => p.width}px;
     border-right: 1px solid ${p => p.theme.backgroundContentAttention};
+
+    * {
+        user-select: none;
+    }
 `;
 
 const AsideResizeHandle = styled.div`
