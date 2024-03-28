@@ -6,16 +6,19 @@ import { Body2, Label2 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
 import { useAssetsDistribution } from '../../state/wallet';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
+import { useAppContext } from '../../hooks/appContext';
+import BigNumber from 'bignumber.js';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 const DesktopAssetStylesOverride = css`
     background-color: transparent;
     transition: background-color 0.2s ease-in-out;
-    margin: 1px -15px;
+    margin: 0 -16px;
     border-radius: 0;
 
     & > * {
@@ -66,6 +69,7 @@ export const DesktopTokens = () => {
     const { data: uiPreferences } = useUserUIPreferences();
     const { mutate } = useMutateUserUIPreferences();
     const [showChart, setShowChart] = useState(true);
+    const { fiat } = useAppContext();
 
     useLayoutEffect(() => {
         if (uiPreferences?.showTokensChart !== undefined) {
@@ -79,6 +83,26 @@ export const DesktopTokens = () => {
         mutate({ showTokensChart: !showChart });
         setShowChart(!showChart);
     };
+
+    const sortedAssets = useMemo(() => {
+        if (!assets?.ton) {
+            return [];
+        }
+
+        return assets.ton.jettons.balances.slice().sort((a, b) => {
+            const priceA = a.price?.prices?.[fiat] || 0;
+            const priceB = b.price?.prices?.[fiat] || 0;
+
+            const aFiat = shiftedDecimals(new BigNumber(a.balance), a.jetton.decimals).multipliedBy(
+                priceA
+            );
+            const bFiat = shiftedDecimals(new BigNumber(b.balance), b.jetton.decimals).multipliedBy(
+                priceB
+            );
+
+            return bFiat.comparedTo(aFiat);
+        });
+    }, [assets, fiat]);
 
     return (
         <DesktopViewPageLayout>
@@ -97,7 +121,7 @@ export const DesktopTokens = () => {
                 )}
             </TokensHeaderContainer>
             <TokensPageBody>
-                {assets && distribution && uiPreferences && (
+                {sortedAssets && assets && distribution && uiPreferences && (
                     <>
                         {canShowChart && showChart && (
                             <>
@@ -107,7 +131,7 @@ export const DesktopTokens = () => {
                         )}
                         <TonAssetStyled info={assets.ton.info} />
                         <Divider />
-                        {assets.ton.jettons.balances.map(jetton => (
+                        {sortedAssets.map(jetton => (
                             <>
                                 <JettonAssetStyled key={jetton.jetton.address} jetton={jetton} />
                                 <Divider />
