@@ -148,12 +148,12 @@ const CoinInfoAmounts = styled.div`
 const CoinInfo: FC<{ token: string }> = ({ token }) => {
     const [assets] = useAssets();
     const format = useFormatCoinValue();
-    const { data: tonRate } = useRate(CryptoCurrency.TON);
+    const { data: rate } = useRate(token);
     const { fiat } = useAppContext();
 
     const asset: { symbol: string; image: string; amount: string; fiatAmount: string } | undefined =
         useMemo(() => {
-            if (!assets || !tonRate) {
+            if (!assets || !rate) {
                 return undefined;
             }
 
@@ -165,7 +165,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
                     amount: format(amount),
                     fiatAmount: formatFiatCurrency(
                         fiat,
-                        new BigNumber(tonRate.prices).multipliedBy(shiftedDecimals(amount))
+                        new BigNumber(rate.prices).multipliedBy(shiftedDecimals(amount))
                     )
                 };
             }
@@ -186,12 +186,12 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
                 amount: format(amount, jettonBalance.jetton.decimals),
                 fiatAmount: formatFiatCurrency(
                     fiat,
-                    new BigNumber(tonRate.prices).multipliedBy(
+                    new BigNumber(rate.prices || 0).multipliedBy(
                         shiftedDecimals(jettonBalance.balance, jettonBalance.jetton.decimals)
                     )
                 )
             };
-        }, [assets, format, tonRate, fiat]);
+        }, [assets, format, rate, fiat]);
 
     if (!asset) {
         return <></>;
