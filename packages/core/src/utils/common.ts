@@ -60,7 +60,7 @@ export const isTonAddress = (address: string) => {
 
 export const toShortValue = (value: string, length = 4): string => {
     if (value.length > length * 2) {
-        return value.slice(0, length) + '...' + value.slice(-length);
+        return value.slice(0, length) + '…' + value.slice(-length);
     } else {
         return value;
     }
