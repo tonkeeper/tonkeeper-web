@@ -3,7 +3,7 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Account, JettonBalance, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import { TronBalances } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { FC, useMemo } from 'react';
+import { FC, forwardRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormatBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
@@ -26,10 +26,13 @@ export interface AssetProps {
     assets: AssetData;
 }
 
-export const TonAsset: FC<{
-    info: Account;
-    className?: string;
-}> = ({ info, className }) => {
+export const TonAsset = forwardRef<
+    HTMLDivElement,
+    {
+        info: Account;
+        className?: string;
+    }
+>(({ info, className }, ref) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -40,7 +43,7 @@ export const TonAsset: FC<{
     const { fiatPrice, fiatAmount } = useFormatFiat(data, amount);
 
     return (
-        <ListItem onClick={() => navigate(AppRoute.coins + '/ton')} className={className}>
+        <ListItem onClick={() => navigate(AppRoute.coins + '/ton')} className={className} ref={ref}>
             <ListItemPayload>
                 <TokenLogo src="https://wallet.tonkeeper.com/img/toncoin.svg" />
                 <TokenLayout
@@ -54,12 +57,15 @@ export const TonAsset: FC<{
             </ListItemPayload>
         </ListItem>
     );
-};
+});
 
-export const JettonAsset: FC<{
-    jetton: JettonBalance;
-    className?: string;
-}> = ({ jetton, className }) => {
+export const JettonAsset = forwardRef<
+    HTMLDivElement,
+    {
+        jetton: JettonBalance;
+        className?: string;
+    }
+>(({ jetton, className }, ref) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -81,6 +87,7 @@ export const JettonAsset: FC<{
                 navigate(AppRoute.coins + `/${encodeURIComponent(jetton.jetton.address)}`)
             }
             className={className}
+            ref={ref}
         >
             <ListItemPayload>
                 <TokenLogo src={jetton.jetton.image} />
@@ -95,7 +102,7 @@ export const JettonAsset: FC<{
             </ListItemPayload>
         </ListItem>
     );
-};
+});
 
 export const JettonList: FC<AssetProps> = ({
     assets: {

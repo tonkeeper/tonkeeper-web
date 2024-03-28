@@ -66,7 +66,7 @@ export const DesktopBackButton: FC<{ className?: string }> = ({ className }) => 
 
 const BackButtonStyled = styled(DesktopBackButton)`
     padding: 0 1rem;
-    height: 100%;
+    height: calc(100%, 2rem);
 `;
 
 export const DesktopViewHeader: FC<{

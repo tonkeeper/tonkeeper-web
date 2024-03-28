@@ -1,6 +1,7 @@
 import { Address } from '@ton/core';
 import { decodeBase58, sha256 } from 'ethers';
 import { Network } from '../entries/network';
+import { CryptoCurrency } from '../entries/crypto';
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -51,6 +52,10 @@ export const areEqAddresses = (address1: string, address2: string) => {
     } catch {
         return false;
     }
+};
+
+export const isTonAddress = (address: string) => {
+    return address.toLowerCase() === CryptoCurrency.TON.toLowerCase();
 };
 
 export const toShortValue = (value: string, length = 4): string => {

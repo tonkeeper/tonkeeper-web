@@ -37,7 +37,7 @@ const LegendContainer = styled.div`
     display: grid;
     grid-template-rows: repeat(auto-fit, minmax(28px, 1fr));
     grid-auto-flow: column;
-    grid-auto-columns: minmax(auto, 200px);
+    grid-auto-columns: minmax(auto, 400px);
 
     padding: 10px 0;
 
@@ -55,6 +55,7 @@ const TokenRow = styled.div<{ opacity?: number }>`
     opacity: ${p => p.opacity || 1};
     padding: 6px 16px;
     height: fit-content;
+    cursor: pointer;
 
     transition: opacity 0.2s ease-in-out;
 `;
@@ -77,7 +78,10 @@ const TokenPercentSymbol = styled(Body3)`
     color: ${p => p.theme.textSecondary};
 `;
 
-export const TokensPieChart: FC<{ distribution: TokenDistribution[] }> = ({ distribution }) => {
+export const TokensPieChart: FC<{
+    distribution: TokenDistribution[];
+    onTokenClick: (address: string) => void;
+}> = ({ distribution, onTokenClick }) => {
     const [activeAddress, setActiveAddress] = useState<string | undefined>();
     const tokenName = (token: TokenDistribution) => {
         return 'type' in token.meta ? 'Others' : token.meta.symbol;
@@ -94,7 +98,8 @@ export const TokensPieChart: FC<{ distribution: TokenDistribution[] }> = ({ dist
             return {
                 id: tokenAddress(d),
                 color: d.meta.color,
-                value: d.fiatBalance.toNumber()
+                value: d.fiatBalance.toNumber(),
+                tokenAddress: 'type' in d.meta ? 'others' : d.meta.address
             };
         });
     }, [distribution]);
@@ -105,7 +110,11 @@ export const TokensPieChart: FC<{ distribution: TokenDistribution[] }> = ({ dist
 
     return (
         <Container activeAddress={activeAddress}>
-            <Chart chartData={chartData} setActiveAddress={setActiveAddress} />
+            <Chart
+                chartData={chartData}
+                setActiveAddress={setActiveAddress}
+                onTokenClick={onTokenClick}
+            />
             <LegendContainer>
                 {distribution.map(d => (
                     <TokenRow
@@ -113,6 +122,7 @@ export const TokensPieChart: FC<{ distribution: TokenDistribution[] }> = ({ dist
                         opacity={activeAddress && activeAddress !== tokenAddress(d) ? 0.4 : 1}
                         onMouseOver={() => setActiveAddress(tokenAddress(d))}
                         onMouseOut={() => setActiveAddress(undefined)}
+                        onClick={() => onTokenClick('type' in d.meta ? 'others' : d.meta.address)}
                     >
                         <TokenCircle bg={d.meta.color} />
                         <Label3>{tokenName(d)}</Label3>
@@ -127,8 +137,9 @@ export const TokensPieChart: FC<{ distribution: TokenDistribution[] }> = ({ dist
 
 const Chart: FC<{
     setActiveAddress: (address: string | undefined) => void;
-    chartData: { id: string; color: string; value: number }[];
-}> = memo(({ setActiveAddress, chartData }) => {
+    chartData: { id: string; color: string; value: number; tokenAddress: string }[];
+    onTokenClick: (address: string) => void;
+}> = memo(({ setActiveAddress, chartData, onTokenClick }) => {
     return (
         <PieChart width={160} height={160}>
             <Pie
@@ -137,6 +148,7 @@ const Chart: FC<{
                 outerRadius={80}
                 paddingAngle={1}
                 dataKey="value"
+                isAnimationActive={false}
             >
                 {chartData.map(elem => (
                     <Cell
@@ -146,6 +158,8 @@ const Chart: FC<{
                         stroke="transparent"
                         onMouseOver={() => setActiveAddress(elem.id)}
                         onMouseOut={() => setActiveAddress(undefined)}
+                        onClick={() => onTokenClick(elem.tokenAddress)}
+                        cursor="pointer"
                     />
                 ))}
             </Pie>
