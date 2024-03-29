@@ -50,10 +50,15 @@ export const MaxRow = styled.div`
 export const MaxButton = styled(Label2)<{ maxValue: boolean }>`
     cursor: pointer;
     padding: 8px 16px;
-    border-radius: ${props => props.theme.cornerMedium};
+    border-radius: ${props =>
+        props.theme.displayType === 'full-width'
+            ? props.theme.corner2xSmall
+            : props.theme.cornerMedium};
     background-color: ${props =>
         props.maxValue ? props.theme.buttonPrimaryBackground : props.theme.backgroundContent};
-    transition: background-color 0.1s ease;
+    transition: background-color 0.15s ease;
+    color: ${props =>
+        props.maxValue ? props.theme.buttonPrimaryForeground : props.theme.textPrimary};
 
     &:hover {
         background-color: ${props =>
