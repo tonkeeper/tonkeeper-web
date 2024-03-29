@@ -27,7 +27,7 @@ const SettingsListItem = styled.div`
     gap: 12px;
     align-items: center;
 
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.15s ease-in-out;
     cursor: pointer;
     &:hover {
         background-color: ${p => p.theme.backgroundContentTint};

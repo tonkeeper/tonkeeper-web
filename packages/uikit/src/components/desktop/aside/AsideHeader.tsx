@@ -48,7 +48,7 @@ const AddressWrapper = styled.div`
 `;
 
 const CopyIconWrapper = styled.div<{ opacity: number }>`
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.15s ease-in-out;
     opacity: ${p => p.opacity};
 `;
 

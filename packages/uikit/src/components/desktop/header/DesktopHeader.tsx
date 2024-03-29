@@ -58,7 +58,7 @@ const BalanceContainer = styled.div`
         padding: 4px;
         background-color: ${p => p.theme.buttonTertiaryBackground};
 
-        transition: background-color 0.2s ease-in-out;
+        transition: background-color 0.15s ease-in-out;
 
         &:hover {
             background-color: ${p => p.theme.buttonTertiaryBackgroundHighlighted};

@@ -18,7 +18,7 @@ export const AsideMenuItem = styled.button<{ isSelected: boolean }>`
         overflow: hidden;
     }
 
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.15s ease-in-out;
 
     &:hover {
         background: ${p => p.theme.backgroundContentTint};

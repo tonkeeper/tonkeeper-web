@@ -25,7 +25,7 @@ export const DesktopViewHeaderStyled = styled.div<{
     background-color: ${p => p.theme.backgroundPage};
 
     border-bottom: 1px solid transparent;
-    transition: border-bottom-color 0.2s ease-in-out;
+    transition: border-bottom-color 0.15s ease-in-out;
 
     * {
         user-select: none;
@@ -39,7 +39,7 @@ export const DesktopViewHeaderStyled = styled.div<{
 `;
 
 const IconButtonStyled = styled(IconButton)`
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.15s ease-in-out;
 
     &:hover {
         opacity: 0.64;

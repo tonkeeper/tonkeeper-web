@@ -18,7 +18,7 @@ import { isTonAddress } from '@tonkeeper/core/dist/utils/common';
 
 const DesktopAssetStylesOverride = css`
     background-color: transparent;
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.15s ease-in-out;
     margin: 0 -16px;
     border-radius: 0;
 

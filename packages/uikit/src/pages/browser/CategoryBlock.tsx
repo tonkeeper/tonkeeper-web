@@ -45,7 +45,7 @@ const IconContainerStyled = styled.div`
     margin-left: auto;
     margin-right: 1rem;
     color: ${props => props.theme.iconTertiary};
-    transition: transform 0.2s ease;
+    transition: transform 0.15s ease;
 `;
 
 const ListItemStyled = styled(ListItem)`

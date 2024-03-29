@@ -14,7 +14,7 @@ export const DesktopPromotedItem = styled.div`
     width: 100%;
     cursor: pointer;
     border-radius: ${p => p.theme.corner2xSmall};
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.15s ease-in-out;
 
     &:hover {
         background-color: ${props => props.theme.backgroundContent};

@@ -11,7 +11,7 @@ const Container = styled.div<{ activeAddress: string | undefined }>`
     gap: 1rem;
     path {
         stroke: transparent !important;
-        transition: opacity 0.2s ease-in-out;
+        transition: opacity 0.15s ease-in-out;
         ${p => p.activeAddress && 'opacity: 0.4;'}
     }
 
@@ -57,7 +57,7 @@ const TokenRow = styled.div<{ opacity?: number }>`
     height: fit-content;
     cursor: pointer;
 
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.15s ease-in-out;
 `;
 
 const TokenCircle = styled.div<{ bg: string }>`
