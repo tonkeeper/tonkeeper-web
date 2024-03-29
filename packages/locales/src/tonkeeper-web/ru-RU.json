@@ -11,7 +11,7 @@
   "aside_expires_on" : "Подписка истекает %date%",
   "aside_pro_subscription_is_active" : "Подписка Pro активна.",
   "aside_pro_trial_is_active" : "Пробная версия Pro активна.",
-  "aside_settings" : "Предпочтения",
+  "aside_settings" : "Настройки",
   "auto" : "Авто",
   "Back_up_now" : "Сделать резервную копию сейчас",
   "Change" : "Изменить",
@@ -95,8 +95,8 @@
   "wallet_address" : "Адрес кошелька",
   "wallet_aside_history" : "История",
   "wallet_aside_purchases" : "Покупки",
-  "wallet_aside_settings" : "Настройки",
-  "wallet_aside_tokens" : "Монеты",
+  "wallet_aside_settings" : "Настройки кошелька",
+  "wallet_aside_tokens" : "Токены",
   "Wallet_name" : "Имя кошелька",
   "wallet_sell" : "Продать"
 }
