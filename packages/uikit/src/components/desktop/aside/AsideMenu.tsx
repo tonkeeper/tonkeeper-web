@@ -44,6 +44,7 @@ const AsideContentContainer = styled.div`
     flex: 1;
     width: 100%;
     box-sizing: border-box;
+    height: calc(100% - 69px);
 
     background: ${p => p.theme.backgroundContent};
     display: flex;
