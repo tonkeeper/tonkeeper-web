@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const PromotedItem = styled.div`
     padding-top: 0 !important;
@@ -13,6 +13,12 @@ export const PromotedItemImage = styled.img`
     height: 44px;
     width: 44px;
     border-radius: ${props => props.theme.cornerExtraSmall};
+
+    ${props =>
+        props.theme.displayType === 'full-width' &&
+        css`
+            border-radius: 10px;
+        `};
 `;
 
 export const PromotedItemText = styled.div<{ color?: string }>`

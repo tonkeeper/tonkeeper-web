@@ -5,7 +5,11 @@ import { Body3, Label2 } from '../Text';
 import { Carousel } from '../shared';
 import { useAppContext } from '../../hooks/appContext';
 import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
-import { PromotedItem, PromotedItemImage, PromotedItemText } from '../../pages/browser/PromotedItem';
+import {
+    PromotedItem,
+    PromotedItemImage,
+    PromotedItemText
+} from '../../pages/browser/PromotedItem';
 
 const CarouselCard = styled.div<{ img: string }>`
     width: 100%;

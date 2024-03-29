@@ -29,7 +29,7 @@ export const DesktopPromotedItemImage = styled.img`
 `;
 
 export const DesktopPromotedItemText = styled.div<{ color?: string }>`
-    max-width: calc(100% - 40px);
+    max-width: calc(100% - 48px);
     display: flex;
     flex-direction: column;
     padding: 10px 12px;
