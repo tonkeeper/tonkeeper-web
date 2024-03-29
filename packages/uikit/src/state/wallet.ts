@@ -492,7 +492,8 @@ function tokenColor(tokenAddress: string) {
         '#6CCCF5',
         '#AD89F5',
         '#F57FF5',
-        '#F576B1'
+        '#F576B1',
+        '#293342'
     ];
 
     return restColors[addressId % restColors.length];
