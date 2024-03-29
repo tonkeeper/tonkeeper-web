@@ -5,11 +5,13 @@ import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon, SettingsSmoothIcon } from '.
 import { NavLink, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
 import { useTranslation } from '../../../hooks/translation';
+import { hexToRGBA } from '../../../libs/css';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
     width: fit-content;
     border-right: 1px solid ${p => p.theme.backgroundContentAttention};
+    background: ${p => hexToRGBA(p.theme.backgroundContent, 0.56)};
 
     > a {
         text-decoration: unset;

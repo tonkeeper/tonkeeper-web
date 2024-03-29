@@ -27,6 +27,7 @@ import { useCountrySetting } from '../../../state/country';
 import { Skeleton } from '../../shared/Skeleton';
 import { useProState } from '../../../state/pro';
 import { availableThemes, useUserUIPreferences } from '../../../state/theme';
+import { hexToRGBA } from '../../../libs/css';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -34,6 +35,7 @@ const PreferencesAsideContainer = styled.div`
     flex-direction: column;
     gap: 0.5rem;
     border-right: 1px solid ${p => p.theme.backgroundContentAttention};
+    background: ${p => hexToRGBA(p.theme.backgroundContent, 0.56)};
 
     a {
         text-decoration: unset;
