@@ -83,10 +83,11 @@ const AsideMenuBottom = styled.div`
 
     background: ${p => p.theme.backgroundContent};
     padding-bottom: 0.5rem;
+`;
 
-    & > ${AsideMenuItem}:nth-child(2) {
-        margin-top: 0.5rem;
-    }
+const SubscriptionInfoStyled = styled(SubscriptionInfo)`
+    margin-top: 0.5rem;
+    padding: 6px 16px 6px 8px;
 `;
 
 export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = ({
@@ -242,7 +243,7 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
                         </IconWrapper>
                         <Label2>{t('aside_settings')}</Label2>
                     </AsideMenuItem>
-                    <SubscriptionInfo />
+                    <SubscriptionInfoStyled />
                 </AsideMenuBottom>
                 <ImportNotification isOpen={isOpenImport} setOpen={setIsOpenImport} />
             </AsideContentContainer>

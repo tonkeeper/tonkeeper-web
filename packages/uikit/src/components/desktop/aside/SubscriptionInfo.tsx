@@ -18,7 +18,6 @@ const LinkStyled = styled(Link)`
 
 const InfoStyled = styled(Body3)`
     display: block;
-    padding: 6px 16px;
     color: ${p => p.theme.textSecondary};
 `;
 
