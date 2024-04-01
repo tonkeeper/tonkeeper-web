@@ -99,7 +99,7 @@ jobs:
                   name: Tonkeeper Desktop ${{ runner.os }} x64
                   retention-days: 10
                   path: |
-                      ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/x64
+                      ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/x64/*Setup.exe
 
             - name: Upload distributives to artifacts
               uses: actions/upload-artifact@v4
