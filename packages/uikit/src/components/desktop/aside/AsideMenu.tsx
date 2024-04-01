@@ -7,7 +7,7 @@ import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateActiveWallet } from '../../../state/account';
 import { useWalletState } from '../../../state/wallet';
-import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from "../../Icon";
+import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { Label2 } from '../../Text';
 import { ImportNotification } from '../../create/ImportNotification';
 import { SubscriptionInfo } from './SubscriptionInfo';
@@ -25,6 +25,10 @@ const AsideContainer = styled.div<{ width: number }>`
     position: relative;
     width: ${p => p.width}px;
     border-right: 1px solid ${p => p.theme.backgroundContentAttention};
+
+    * {
+        user-select: none;
+    }
 `;
 
 const AsideResizeHandle = styled.div`
@@ -40,6 +44,7 @@ const AsideContentContainer = styled.div`
     flex: 1;
     width: 100%;
     box-sizing: border-box;
+    height: calc(100% - 69px);
 
     background: ${p => p.theme.backgroundContent};
     display: flex;
@@ -78,10 +83,11 @@ const AsideMenuBottom = styled.div`
 
     background: ${p => p.theme.backgroundContent};
     padding-bottom: 0.5rem;
+`;
 
-    & > ${AsideMenuItem}:nth-child(2) {
-        margin-top: 0.5rem;
-    }
+const SubscriptionInfoStyled = styled(SubscriptionInfo)`
+    margin-top: 0.5rem;
+    padding: 6px 16px 6px 8px;
 `;
 
 export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = ({
@@ -237,7 +243,7 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
                         </IconWrapper>
                         <Label2>{t('aside_settings')}</Label2>
                     </AsideMenuItem>
-                    <SubscriptionInfo />
+                    <SubscriptionInfoStyled />
                 </AsideMenuBottom>
                 <ImportNotification isOpen={isOpenImport} setOpen={setIsOpenImport} />
             </AsideContentContainer>

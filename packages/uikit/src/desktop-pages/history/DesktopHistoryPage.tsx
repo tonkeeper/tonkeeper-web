@@ -23,6 +23,10 @@ const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
 `;
 
+const HistoryContainer = styled.div`
+    overflow-x: auto;
+`;
+
 export const DesktopHistoryPage: FC = () => {
     const wallet = useWalletContext();
     const { api, standalone } = useAppContext();
@@ -75,7 +79,9 @@ export const DesktopHistoryPage: FC = () => {
             <DesktopViewHeader borderBottom={!closeTop}>
                 <Label2>{t('page_header_history')}</Label2>
             </DesktopViewHeader>
-            <DesktopHistory activity={activity} isFetchingNextPage={isFetchingNextPage} />
+            <HistoryContainer>
+                <DesktopHistory activity={activity} isFetchingNextPage={isFetchingNextPage} />
+            </HistoryContainer>
         </HistoryPageWrapper>
     );
 };

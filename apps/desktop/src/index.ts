@@ -9,7 +9,7 @@ import {
 } from './electron/protocol';
 import { TonConnectSSE } from './electron/sseEvetns';
 
-app.setName('Tonkeeper Desktop Pro');
+app.setName('Tonkeeper Pro');
 
 log.initialize({ preload: true });
 log.info('Application start-up');

@@ -25,7 +25,11 @@ export const DesktopViewHeaderStyled = styled.div<{
     background-color: ${p => p.theme.backgroundPage};
 
     border-bottom: 1px solid transparent;
-    transition: border-bottom-color 0.2s ease-in-out;
+    transition: border-bottom-color 0.15s ease-in-out;
+
+    * {
+        user-select: none;
+    }
 
     ${props =>
         props.borderBottom &&
@@ -35,7 +39,7 @@ export const DesktopViewHeaderStyled = styled.div<{
 `;
 
 const IconButtonStyled = styled(IconButton)`
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.15s ease-in-out;
 
     &:hover {
         opacity: 0.64;
@@ -47,7 +51,7 @@ export const DesktopViewDivider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
 `;
 
-const BackButton: FC<{ className?: string }> = ({ className }) => {
+export const DesktopBackButton: FC<{ className?: string }> = ({ className }) => {
     const sdk = useAppSdk();
     const navigate = useNavigate();
     const back = useCallback(() => navigate(-1), [navigate]);
@@ -64,9 +68,9 @@ const BackButton: FC<{ className?: string }> = ({ className }) => {
     }
 };
 
-const BackButtonStyled = styled(BackButton)`
+const BackButtonStyled = styled(DesktopBackButton)`
     padding: 0 1rem;
-    height: 100%;
+    height: calc(100%, 2rem);
 `;
 
 export const DesktopViewHeader: FC<{

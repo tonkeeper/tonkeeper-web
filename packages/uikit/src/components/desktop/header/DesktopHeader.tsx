@@ -24,6 +24,10 @@ const DesktopHeaderStyled = styled.div`
     justify-content: space-between;
     border-bottom: 1px solid ${p => p.theme.backgroundContentAttention};
     background: ${p => p.theme.backgroundContent};
+
+    * {
+        user-select: none;
+    }
 `;
 
 const ButtonsContainer = styled.div`
@@ -54,7 +58,7 @@ const BalanceContainer = styled.div`
         padding: 4px;
         background-color: ${p => p.theme.buttonTertiaryBackground};
 
-        transition: background-color 0.2s ease-in-out;
+        transition: background-color 0.15s ease-in-out;
 
         &:hover {
             background-color: ${p => p.theme.buttonTertiaryBackgroundHighlighted};

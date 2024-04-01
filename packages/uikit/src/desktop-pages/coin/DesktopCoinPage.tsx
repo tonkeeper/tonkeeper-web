@@ -216,6 +216,10 @@ const HistorySubheader = styled(Label2)`
     margin-top: 0.5rem;
 `;
 
+const HistoryContainer = styled.div`
+    overflow-x: auto;
+`;
+
 export const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
@@ -251,7 +255,9 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
             </DesktopViewHeader>
             <CoinHeader token={token} />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
-            <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
+            <HistoryContainer>
+                <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
+            </HistoryContainer>
         </DesktopViewPageLayout>
     );
 };

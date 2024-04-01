@@ -1,19 +1,25 @@
 import styled from 'styled-components';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { Label2 } from '../../Text';
-import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon } from '../../Icon';
+import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon, SettingsSmoothIcon } from '../../Icon';
 import { NavLink, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
 import { useTranslation } from '../../../hooks/translation';
+import { hexToRGBA } from '../../../libs/css';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
     width: fit-content;
     border-right: 1px solid ${p => p.theme.backgroundContentAttention};
+    background: ${p => hexToRGBA(p.theme.backgroundContent, 0.56)};
 
     > a {
         text-decoration: unset;
         color: unset;
+    }
+
+    * {
+        user-select: none;
     }
 `;
 
@@ -54,14 +60,14 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            {/* <NavLink to={AppRoute.settings}>
+            <NavLink to={AppRoute.walletSettings}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
                     </AsideMenuItemStyled>
                 )}
-            </NavLink>*/}
+            </NavLink>
         </WalletAsideContainer>
     );
 };

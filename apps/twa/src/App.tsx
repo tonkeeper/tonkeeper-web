@@ -58,6 +58,7 @@ import { TwaNftNotification } from './components/nft/NftNotification';
 import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
+import { useUserFiat } from "@tonkeeper/uikit/dist/state/fiat";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -210,6 +211,7 @@ const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
 export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { data: activeWallet } = useActiveWallet();
     const webApp = useWebApp();
+    const { data: fiat } = useUserFiat();
 
     const lock = useLock(sdk);
     const { data: account } = useAccountState();
@@ -226,14 +228,13 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const navigate = useNavigate();
     const { data: tracker } = useAnalytics(account, activeWallet);
 
-    if (auth === undefined || account === undefined || config === undefined || lock === undefined) {
+    if (auth === undefined || account === undefined || config === undefined || lock === undefined || fiat === undefined) {
         return <Loading />;
     }
 
     const showQrScan = seeIfShowQrScanner(webApp.platform);
 
     const network = activeWallet?.network ?? Network.MAINNET;
-    const fiat = activeWallet?.fiat ?? FiatCurrencies.USD;
     const context: IAppContext = {
         api: getApiConfig(config, network),
         auth,

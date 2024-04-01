@@ -2,6 +2,7 @@
 export enum AppRoute {
     import = '/import',
     settings = '/settings',
+    walletSettings = '/wallet-settings',
     browser = '/browser',
     activity = '/activity',
     purchases = '/purchases',
@@ -34,6 +35,14 @@ export enum SettingsRoute {
     subscriptions = '/subscriptions',
     country = '/country',
     pro = '/pro'
+}
+
+export enum WalletSettingsRoute {
+    index = '/',
+    recovery = '/recovery',
+    version = '/version',
+    jettons = '/jettons',
+    security = '/security'
 }
 
 export enum BrowserRoute {

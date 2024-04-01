@@ -103,7 +103,7 @@ export const useMutateWalletProperty = (clearWallet = false) => {
         Partial<
             Pick<
                 WalletState,
-                'name' | 'hiddenJettons' | 'orderJettons' | 'lang' | 'fiat' | 'network' | 'emoji'
+                'name' | 'hiddenJettons' | 'orderJettons' | 'lang' | 'network' | 'emoji'
             >
         >
     >(async props => {
@@ -492,7 +492,8 @@ function tokenColor(tokenAddress: string) {
         '#6CCCF5',
         '#AD89F5',
         '#F57FF5',
-        '#F576B1'
+        '#F576B1',
+        '#293342'
     ];
 
     return restColors[addressId % restColors.length];

@@ -41,7 +41,8 @@ const FetchingRows = styled.div`
 export const DesktopHistory: FC<{
     activity: GenericActivity<MixedActivity>[] | undefined;
     isFetchingNextPage: boolean;
-}> = ({ activity, isFetchingNextPage }) => {
+    className?: string;
+}> = ({ activity, isFetchingNextPage, className }) => {
     const [selectedActivity, setSelectedActivity] = useState<ActionData | undefined>();
 
     return (
@@ -51,7 +52,7 @@ export const DesktopHistory: FC<{
                 handleClose={() => setSelectedActivity(undefined)}
             />
             {activity && (
-                <HistoryEventsGrid>
+                <HistoryEventsGrid className={className}>
                     <GridSizer />
                     <GridSizer2 />
                     <GridSizer3 />

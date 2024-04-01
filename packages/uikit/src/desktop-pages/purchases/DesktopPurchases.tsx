@@ -37,7 +37,7 @@ const NFTEmptyPage = styled.div`
 `;
 
 const NFTPageBody = styled.div`
-    padding: 0.5rem 1rem 1rem;
+    padding: 0 1rem 1rem;
 `;
 
 const NFTEmptyContainer = styled.div`

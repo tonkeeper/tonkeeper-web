@@ -21,7 +21,7 @@ const SwipeButton = styled.button<{ position: 'left' | 'right' }>`
     cursor: pointer;
     top: calc(50% - 20px);
     ${props => (props.position === 'left' ? 'left: 12px;' : 'right: 12px;')};
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.15s ease-in-out;
 
     &:hover {
         opacity: 0.8;
