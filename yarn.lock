@@ -136,6 +136,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aptabase/electron@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "@aptabase/electron@npm:0.3.1"
+  peerDependencies:
+    electron: ">= 3.x"
+  checksum: 5537b6acf3c01ea7456d6455a5a7224ddabfcd1199975945d7fd3281089b3bc1e0bc93de2151a9391e4f6c222d42f07b16df18fc32f1a75658e66e91e3be9bd2
+  languageName: node
+  linkType: hard
+
 "@aptabase/web@npm:^0.4.2":
   version: 0.4.2
   resolution: "@aptabase/web@npm:0.4.2"
@@ -6101,6 +6110,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/desktop@workspace:apps/desktop"
   dependencies:
+    "@aptabase/electron": "npm:^0.3.1"
     "@electron-forge/cli": "npm:^7.2.0"
     "@electron-forge/maker-deb": "npm:^7.2.0"
     "@electron-forge/maker-dmg": "npm:^7.2.0"
