@@ -89,7 +89,7 @@ export const DesktopPurchases = () => {
     return (
         <DesktopViewPageLayout ref={scrollRef}>
             <DesktopViewHeader borderBottom={!closeTop}>
-                {t('page_header_purchases')}
+                <Label2>{t('page_header_purchases')}</Label2>
             </DesktopViewHeader>
             <NFTPageBody>{nfts && <NftsListStyled nfts={nfts} />}</NFTPageBody>
         </DesktopViewPageLayout>

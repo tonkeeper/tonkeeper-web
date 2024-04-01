@@ -12,9 +12,9 @@ export const proTheme: DefaultTheme = {
     backgroundContent: '#17171A',
     backgroundContentTint: '#222224',
     backgroundContentAttention: '#2F2F33',
-    backgroundOverlayStrong: 'rgb(15 15 15 / 72%)',
-    backgroundOverlayLight: 'rgb(15 15 15 / 48%)',
-    backgroundOverlayExtraLight: 'rgb(15 15 15 / 24%)',
+    backgroundOverlayStrong: 'rgba(20, 20, 20, 0.72)',
+    backgroundOverlayLight: 'rgba(20, 20, 20, 0.48)',
+    backgroundOverlayExtraLight: 'rgba(20, 20, 20, 0.24)',
     backgroundHighlighted: 'rgb(255 255 255 / 4%)',
 
     iconPrimary: '#EBEBEB',

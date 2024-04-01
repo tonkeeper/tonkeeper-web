@@ -55,7 +55,9 @@ export const DesktopWalletSettingsPage = () => {
 
     return (
         <DesktopViewPageLayout>
-            <DesktopViewHeader borderBottom>{t('settings_title')}</DesktopViewHeader>
+            <DesktopViewHeader borderBottom>
+                <Label2>{t('settings_title')}</Label2>
+            </DesktopViewHeader>
             <SettingsListBlock>
                 <SettingsListItem onClick={onRenameOpen}>
                     <WalletEmoji containerSize="16px" emojiSize="16px" emoji={wallet.emoji} />
