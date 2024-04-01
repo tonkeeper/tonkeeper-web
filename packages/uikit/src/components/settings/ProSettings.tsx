@@ -1,10 +1,11 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { isPaidSubscription, ProState, ProStateWallet } from "@tonkeeper/core/dist/entries/pro";
+import { isPaidSubscription, ProState } from '@tonkeeper/core/dist/entries/pro';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { WalletStateContext } from '../../hooks/appContext';
+import { useNotifyError } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
 import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
@@ -21,16 +22,16 @@ import {
 } from '../../state/pro';
 import { useWalletState } from '../../state/wallet';
 import { InnerBody } from '../Body';
+import { SubscriptionStatus } from '../desktop/aside/SubscriptionInfo';
+import { Button } from '../fields/Button';
+import { Radio } from '../fields/Checkbox';
+import { Input } from '../fields/Input';
 import { DoneIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Notification } from '../Notification';
 import { SubHeader } from '../SubHeader';
 import { Body1, Label1, Title } from '../Text';
-import { SubscriptionStatus } from '../desktop/aside/SubscriptionInfo';
-import { Button } from '../fields/Button';
-import { Radio } from '../fields/Checkbox';
-import { Input } from '../fields/Input';
 import { ConfirmView } from '../transfer/ConfirmView';
 
 const Block = styled.div`
@@ -77,10 +78,11 @@ const SelectLabel = styled(Label1)`
     margin-bottom: 8px;
 `;
 
-const SelectWallet: FC = () => {
+const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { t } = useTranslation();
     const { data: accounts } = useAccountState();
-    const { mutate } = useSelectWalletMutation();
+    const { mutateAsync, error } = useSelectWalletMutation();
+    useNotifyError(error);
 
     if (!accounts) return <></>;
 
@@ -89,7 +91,10 @@ const SelectWallet: FC = () => {
             <SelectLabel>{t('select_wallet_for_authorization')}</SelectLabel>
             <ListBlock>
                 {accounts.publicKeys.map(publicKey => (
-                    <ListItem key={publicKey} onClick={() => mutate(publicKey)}>
+                    <ListItem
+                        key={publicKey}
+                        onClick={() => mutateAsync(publicKey).then(() => onClose())}
+                    >
                         <ListItemPayload>
                             <WalletItem publicKey={publicKey} />
                         </ListItemPayload>
@@ -212,10 +217,7 @@ const ConfirmBuyProService: FC<
     return <ConfirmView estimation={estimation} {...mutation} {...rest} />;
 };
 
-const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({
-    data,
-    setReLogin
-}) => {
+const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, setReLogin }) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);
@@ -294,13 +296,11 @@ const StatusText = styled(Label1)`
     display: block;
 `;
 
-const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({
-    data,
-    setReLogin
-}) => {
+const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({ data, setReLogin }) => {
     const { t } = useTranslation();
 
-    const { mutate: logOut, isLoading } = useProLogout();
+    const { mutate: logOut, isLoading, error } = useProLogout();
+    useNotifyError(error);
 
     return (
         <div>
@@ -321,7 +321,7 @@ const ProContent: FC<{ data: ProState }> = ({ data }) => {
     const [reLogin, setReLogin] = useState(false);
 
     if (!data.hasWalletAuthCookie || reLogin) {
-        return <SelectWallet />;
+        return <SelectWallet onClose={() => setReLogin(false)} />;
     }
     if (isPaidSubscription(data.subscription)) {
         return <PreServiceStatus data={data} setReLogin={() => setReLogin(true)} />;
