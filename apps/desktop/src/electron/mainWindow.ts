@@ -20,7 +20,7 @@ export abstract class MainWindow {
     static mainWindow: BrowserWindow | undefined = undefined;
 
     static async openMainWindow() {
-        if (this.mainWindow !== undefined) return this.mainWindow;
+        if (this.mainWindow !== undefined && this.mainWindow !== null) return this.mainWindow;
 
         const icon = (() => {
             switch (process.platform) {
@@ -58,7 +58,7 @@ export abstract class MainWindow {
 
         this.mainWindow.on('closed', () => {
             ipcMain.removeHandler('message');
-            this.mainWindow = null;
+            this.mainWindow = undefined;
         });
 
         ipcMain.handle('message', async (event, message: Message) => {
