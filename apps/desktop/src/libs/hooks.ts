@@ -3,12 +3,13 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
-import { Analytics, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { Amplitude } from '@tonkeeper/uikit/dist/hooks/analytics/amplitude';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { AptabaseElectron } from './aptabaseElectron';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -69,7 +70,11 @@ export const useAnalytics = (
                     }
                 });
 
-            const tracker = new Amplitude(REACT_APP_AMPLITUDE, userId);
+            const tracker = new AnalyticsGroup(
+                new AptabaseElectron(),
+                new Amplitude(REACT_APP_AMPLITUDE, userId)
+            );
+
             tracker.init(
                 'Desktop',
                 toWalletType(wallet),

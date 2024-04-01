@@ -18,6 +18,8 @@ export const plugins = [
         REACT_APP_TG_BOT_ORIGIN: JSON.stringify(process.env.REACT_APP_TG_BOT_ORIGIN),
         REACT_APP_STONFI_REFERRAL_ADDRESS: JSON.stringify(
             process.env.REACT_APP_STONFI_REFERRAL_ADDRESS
-        )
+        ),
+        REACT_APP_APTABASE: JSON.stringify(process.env.REACT_APP_APTABASE),
+        REACT_APP_APTABASE_HOST: JSON.stringify(process.env.REACT_APP_APTABASE_HOST)
     })
 ];
