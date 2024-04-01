@@ -178,8 +178,10 @@ const Content = styled.div<{ standalone: boolean }>`
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
-            border-bottom-right-radius: ${p.theme.cornerMedium};
-            border-bottom-left-radius: ${p.theme.cornerMedium};
+            border-top-right-radius: ${props => props.theme.cornerSmall};
+            border-top-left-radius: ${props => props.theme.cornerSmall};
+            border-bottom-right-radius: ${p.theme.cornerSmall};
+            border-bottom-left-radius: ${p.theme.cornerSmall};
             max-height: calc(100% - 32px);
             overflow: auto;
             padding-top: 0;
