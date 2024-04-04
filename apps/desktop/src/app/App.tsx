@@ -68,6 +68,7 @@ import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/a
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
+import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -363,7 +364,11 @@ export const Content: FC<{
                         <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
                         <Route path={AppRoute.browser} element={<DesktopBrowser />} />
                         <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
-                        <Route path="*" element={<WalletContent />} />
+                        <Route
+                            path={any(AppProRoute.multiSend)}
+                            element={<DesktopMultiSendPage />}
+                        />
+                        <Route path="*" element={<DesktopMultiSendPage />} />
                     </Routes>
                 </WideContent>
                 <BackgroundElements />

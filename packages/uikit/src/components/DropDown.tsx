@@ -1,5 +1,14 @@
-import React, { FC, PropsWithChildren, useEffect, useRef, useState } from 'react';
+import React, {
+    forwardRef,
+    PropsWithChildren,
+    useCallback,
+    useEffect,
+    useRef,
+    useState
+} from 'react';
 import styled, { css } from 'styled-components';
+import { Transition, TransitionStatus } from 'react-transition-group';
+import { mergeRefs } from '../libs/common';
 
 const DropDownContainer = styled.div`
     position: relative;
@@ -33,6 +42,7 @@ const DropDownListContainer = styled.div<{ center?: boolean }>`
         p.theme.displayType === 'full-width'
             ? css`
                   max-height: 220px;
+                  border-radius: ${props => props.theme.corner2xSmall};
               `
             : css`
                   max-height: 368px;
@@ -57,11 +67,11 @@ const ListItem = styled.div`
     }
 `;
 
-function useOutsideAlerter(ref: React.RefObject<Node>, onClick: () => void) {
+function useOutsideAlerter(ref: React.RefObject<Node>, onClick: (e: MouseEvent) => void) {
     useEffect(() => {
-        function handleClickOutside(event: Event) {
+        function handleClickOutside(event: MouseEvent) {
             if (ref.current && !ref.current.contains(event.target as Node)) {
-                onClick();
+                onClick(event);
             }
         }
         document.addEventListener('mousedown', handleClickOutside);
@@ -71,27 +81,60 @@ function useOutsideAlerter(ref: React.RefObject<Node>, onClick: () => void) {
     }, [ref, onClick]);
 }
 
-const Container: FC<{
-    onClose: () => void;
-    children: React.ReactNode;
-    center?: boolean;
-}> = ({ onClose, children, center }) => {
+const Container = forwardRef<
+    HTMLDivElement,
+    {
+        onClose: () => void;
+        children: React.ReactNode;
+        center?: boolean;
+        className?: string;
+        hostRef?: React.RefObject<HTMLDivElement>;
+    }
+>(({ onClose, children, center, className, hostRef }, ref) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
-    useOutsideAlerter(wrapperRef, onClose);
+
+    const onClick = useCallback(
+        (e: MouseEvent) => {
+            if (!hostRef?.current || !hostRef.current.contains(e.target as Node)) {
+                onClose();
+            }
+        },
+        [onClose]
+    );
+
+    useOutsideAlerter(wrapperRef, onClick);
     return (
-        <DropDownListContainer ref={wrapperRef} center={center}>
+        <DropDownListContainer
+            ref={mergeRefs(wrapperRef, ref)}
+            center={center}
+            className={className}
+        >
             {children}
         </DropDownListContainer>
     );
-};
+});
 
 export interface DropDownProps extends PropsWithChildren {
     payload: (onClose: () => void) => React.ReactNode;
     center?: boolean;
     disabled?: boolean;
+    className?: string;
+    containerClassName?: string;
 }
 
-export const DropDown = ({ children, payload, center, disabled }: DropDownProps) => {
+const ContainerStyled = styled(Container)<{ status: TransitionStatus }>`
+    transition: opacity 0.15s ease-in-out;
+    opacity: ${p => (p.status === 'entering' || p.status === 'entered' ? 1 : 0)};
+`;
+
+export const DropDown = ({
+    children,
+    payload,
+    center,
+    disabled,
+    className,
+    containerClassName
+}: DropDownProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const toggling = () => {
@@ -107,6 +150,8 @@ export const DropDown = ({ children, payload, center, disabled }: DropDownProps)
     };
 
     const ref = useRef<HTMLDivElement>(null);
+    const hostRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const element = ref.current;
@@ -128,13 +173,24 @@ export const DropDown = ({ children, payload, center, disabled }: DropDownProps)
     }, [ref]);
 
     return (
-        <DropDownContainer ref={ref}>
-            <DropDownHeader onClick={onOpen}>{children}</DropDownHeader>
-            {isOpen && (
-                <Container onClose={toggling} center={center}>
-                    {payload(toggling)}
-                </Container>
-            )}
+        <DropDownContainer ref={ref} className={className}>
+            <DropDownHeader ref={hostRef} onClick={onOpen}>
+                {children}
+            </DropDownHeader>
+            <Transition in={isOpen} timeout={150} nodeRef={containerRef} unmountOnExit mountOnEnter>
+                {status => (
+                    <ContainerStyled
+                        onClose={toggling}
+                        center={center}
+                        className={containerClassName}
+                        hostRef={hostRef}
+                        status={status}
+                        ref={containerRef}
+                    >
+                        {payload(toggling)}
+                    </ContainerStyled>
+                )}
+            </Transition>
         </DropDownContainer>
     );
 };

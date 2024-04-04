@@ -27,6 +27,7 @@
         "react-beautiful-dnd": "^13.1.1",
         "react-dom": "^18.2.0",
         "react-ga4": "^2.1.0",
+        "react-hook-form": "^7.51.2",
         "react-lottie": "^1.2.4",
         "react-qrcode-logo": "^2.9.0",
         "react-router-dom": "^6.4.5",

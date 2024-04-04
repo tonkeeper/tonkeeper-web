@@ -6306,6 +6306,7 @@ __metadata:
     react-beautiful-dnd: "npm:^13.1.1"
     react-dom: "npm:^18.2.0"
     react-ga4: "npm:^2.1.0"
+    react-hook-form: "npm:^7.51.2"
     react-is: "npm:^18.2.0"
     react-lottie: "npm:^1.2.4"
     react-qrcode-logo: "npm:^2.9.0"
@@ -21903,6 +21904,15 @@ __metadata:
   version: 2.1.0
   resolution: "react-ga4@npm:2.1.0"
   checksum: e47edd040b7a272d35df732e08c4a8b6b14add659db04fb81a3a2cbde59bf34dc6eae9e0b8b4abd8937d11c837954773a6ba86feb2c605e5eb916f4c99e420c7
+  languageName: node
+  linkType: hard
+
+"react-hook-form@npm:^7.51.2":
+  version: 7.51.2
+  resolution: "react-hook-form@npm:7.51.2"
+  peerDependencies:
+    react: ^16.8.0 || ^17 || ^18
+  checksum: 30a6d7dec2d8bcdfd9ad92508d0a19e0fb6b344034a5dfb74ff419b54ef29f70e381bbf11bf57ddb808d37748f86581f1679fecac33860944b1baf3217a10f7a
   languageName: node
   linkType: hard
 
