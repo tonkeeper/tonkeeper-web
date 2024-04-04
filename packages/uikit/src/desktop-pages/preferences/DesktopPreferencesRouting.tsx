@@ -1,6 +1,6 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { ProSettings } from '../../components/settings/ProSettings';
-import { AppRoute, SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
+import { any, AppRoute, SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
 import { Localization } from '../../pages/settings/Localization';
 import { Legal } from '../../pages/settings/Legal';
 import { UserTheme } from '../../pages/settings/Theme';
@@ -39,12 +39,7 @@ export const DesktopPreferencesRouting = () => {
                 <Route path={SettingsRoute.fiat} element={<FiatCurrency />} />
                 <Route path={SettingsRoute.account} element={<Account />} />
                 <Route path={SettingsRoute.notification} element={<Notifications />} />
-                <Route
-                    path={SettingsRoute.recovery}
-                    element={
-                        <Navigate to={AppRoute.walletSettings + WalletSettingsRoute.jettons} />
-                    }
-                />
+                <Route path={any(SettingsRoute.recovery)} element={<NavigateToRecovery />} />
                 <Route
                     path={SettingsRoute.version}
                     element={
@@ -60,7 +55,7 @@ export const DesktopPreferencesRouting = () => {
                 <Route
                     path={SettingsRoute.security}
                     element={
-                        <Navigate to={AppRoute.walletSettings + WalletSettingsRoute.jettons} />
+                        <Navigate to={AppRoute.walletSettings + WalletSettingsRoute.security} />
                     }
                 />
                 <Route path={SettingsRoute.country} element={<CountrySettings />} />
@@ -69,4 +64,12 @@ export const DesktopPreferencesRouting = () => {
             </Route>
         </Routes>
     );
+};
+
+const NavigateToRecovery = () => {
+    const location = useLocation();
+
+    const newPath = location.pathname.replace(AppRoute.settings, AppRoute.walletSettings);
+
+    return <Navigate to={{ pathname: newPath, search: location.search }} replace={true} />;
 };
