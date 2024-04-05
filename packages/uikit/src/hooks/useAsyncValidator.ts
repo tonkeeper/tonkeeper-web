@@ -11,8 +11,9 @@ export function useAsyncValidator<
     methods: Pick<
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         ReturnType<typeof useForm<any>>,
-        'clearErrors' | 'setError' | 'formState' | 'getFieldState' | 'watch'
+        'clearErrors' | 'setError'
     >,
+    fieldValue: T,
     fieldName: Path<{ [key in N]: T }>,
     validator: (val: T) => Promise<ErrorOption | undefined | null | { success: true; result: R }>,
     debounceTime?: number
@@ -23,16 +24,14 @@ export function useAsyncValidator<
     );
     const [validationProduct, setValidationProduct] = useState<R | undefined>(undefined);
 
-    const { clearErrors, setError, formState, getFieldState, watch } = methods;
-    const { error } = getFieldState(fieldName, formState);
-    const value = watch(fieldName) as T;
+    const { clearErrors, setError } = methods;
 
     useEffect(() => {
         let shouldCancel = false;
         setValidationState('idle');
         setValidationProduct(undefined);
         const validate = async (): Promise<void> => {
-            if (!error && value) {
+            if (fieldValue) {
                 clearErrors(fieldName);
 
                 await new Promise(r => setTimeout(r, finalDebounceTime));
@@ -40,7 +39,7 @@ export function useAsyncValidator<
                     return;
                 }
                 setValidationState('validating');
-                const validationResult = await validator(value);
+                const validationResult = await validator(fieldValue);
                 if (!shouldCancel) {
                     if (!validationResult) {
                         setValidationState('succeed');
@@ -67,7 +66,7 @@ export function useAsyncValidator<
         return () => {
             shouldCancel = true;
         };
-    }, [error, value, clearErrors, setError, validator]);
+    }, [fieldValue, clearErrors, setError, validator]);
 
     return [validationState, validationProduct];
 }
