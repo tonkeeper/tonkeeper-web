@@ -1,21 +1,22 @@
-import styled from 'styled-components';
-import { Num2 } from '../../Text';
-import { useWalletTotalBalance } from '../../../state/wallet';
-import { Skeleton } from '../../shared/Skeleton';
-import { useAppContext } from '../../../hooks/appContext';
-import { formatFiatCurrency } from '../../../hooks/balance';
-import { Button } from '../../fields/Button';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../Icon';
-import { useAppSdk } from '../../../hooks/appSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import React from 'react';
-import { BuyNotification } from '../../home/BuyAction';
-import { useDisclosure } from '../../../hooks/useDisclosure';
-import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
-import { usePreFetchRates } from '../../../state/rates';
-import { IconButton } from '../../fields/IconButton';
+import { ErrorBoundary } from 'react-error-boundary';
+import styled from 'styled-components';
+import { useAppContext } from '../../../hooks/appContext';
+import { useAppSdk } from '../../../hooks/appSdk';
+import { formatFiatCurrency } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
+import { useDisclosure } from '../../../hooks/useDisclosure';
+import { usePreFetchRates } from '../../../state/rates';
 import { useStonfiSwapLink } from '../../../state/stonfi';
+import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
+import { useWalletTotalBalance } from '../../../state/wallet';
+import { fallbackRenderOver } from '../../Error';
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../Icon';
+import { Num2 } from '../../Text';
+import { Button } from '../../fields/Button';
+import { IconButton } from '../../fields/IconButton';
+import { BuyNotification } from '../../home/BuyAction';
+import { Skeleton } from '../../shared/Skeleton';
 
 const DesktopHeaderStyled = styled.div`
     padding-left: 1rem;
@@ -86,7 +87,7 @@ const BalanceContainer = styled.div`
     }
 `;
 
-export const DesktopHeader = () => {
+const DesktopHeaderPayload = () => {
     usePreFetchRates();
     const { fiat } = useAppContext();
     const { data: balance, isLoading } = useWalletTotalBalance(fiat);
@@ -147,5 +148,13 @@ export const DesktopHeader = () => {
             </DesktopRightPart>
             <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />
         </DesktopHeaderStyled>
+    );
+};
+
+export const DesktopHeader = () => {
+    return (
+        <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display desktop header')}>
+            <DesktopHeaderPayload />
+        </ErrorBoundary>
     );
 };
