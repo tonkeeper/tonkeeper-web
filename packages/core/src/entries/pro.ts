@@ -37,7 +37,7 @@ export interface ProSubscriptionInvalid {
 export function isTrialSubscription(
     subscription: ProSubscription
 ): subscription is ProSubscriptionTrial {
-    return subscription.isTrial;
+    return subscription.isTrial && subscription.valid;
 }
 
 export function isValidSubscription(

@@ -88,31 +88,30 @@ export const loadProState = async (
     const subscriptionDTO = await ProServiceService.proServiceVerify();
 
     let subscription: ProSubscription;
-    if (subscriptionDTO.is_trial) {
-        subscription = {
-            valid: true,
-            isTrial: true,
-            usedTrial: true,
-            trialUserId: user.tg_id!,
-            trialEndDate: new Date(subscriptionDTO.next_charge! * 1000)
-        };
-    } else {
-        if (subscriptionDTO.valid) {
+    if (subscriptionDTO.valid) {
+        if (subscriptionDTO.is_trial) {
+            subscription = {
+                valid: true,
+                isTrial: true,
+                usedTrial: true,
+                trialUserId: user.tg_id!,
+                trialEndDate: new Date(subscriptionDTO.next_charge! * 1000)
+            };
+        } else {
             subscription = {
                 valid: true,
                 isTrial: false,
                 usedTrial: subscriptionDTO.used_trial,
                 nextChargeDate: new Date(subscriptionDTO.next_charge! * 1000)
             };
-        } else {
-            subscription = {
-                valid: false,
-                isTrial: false,
-                usedTrial: subscriptionDTO.used_trial
-            };
         }
+    } else {
+        subscription = {
+            valid: false,
+            isTrial: false,
+            usedTrial: subscriptionDTO.used_trial
+        };
     }
-
     return {
         subscription,
         hasWalletAuthCookie: !!user.pub_key,
