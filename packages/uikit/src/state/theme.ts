@@ -2,17 +2,19 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAppSdk } from '../hooks/appSdk';
 import { defaultTheme } from '../styles/defaultTheme';
+import { lightTheme } from '../styles/lightTheme';
 import { proTheme } from '../styles/proTheme';
 
 export const availableThemes = {
     dark: defaultTheme,
-    pro: proTheme
+    pro: proTheme,
+    light: lightTheme
 };
 
 export interface UIPreferences {
     asideWidth: number;
     showTokensChart: boolean;
-    theme: 'dark' | 'pro';
+    theme: 'dark' | 'pro' | 'light';
 }
 
 export const useUserUIPreferences = () => {

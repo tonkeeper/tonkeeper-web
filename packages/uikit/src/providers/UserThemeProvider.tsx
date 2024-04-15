@@ -1,7 +1,7 @@
 import { FC, PropsWithChildren, useEffect, useMemo } from 'react';
 import { DefaultTheme, ThemeProvider } from 'styled-components';
-import { availableThemes, useMutateUserUIPreferences, useUserUIPreferences } from '../state/theme';
 import { usePrevious } from '../hooks/usePrevious';
+import { availableThemes, useMutateUserUIPreferences, useUserUIPreferences } from '../state/theme';
 export const UserThemeProvider: FC<
     PropsWithChildren<{
         displayType?: 'compact' | 'full-width';
@@ -43,7 +43,7 @@ export const UserThemeProvider: FC<
 
     useEffect(() => {
         if (currentTheme && uiPreferences && currentThemeName !== uiPreferences.theme) {
-            mutateAsync({ theme: currentThemeName as 'dark' | 'pro' });
+            mutateAsync({ theme: currentThemeName });
         }
     }, [mutateAsync, currentThemeName, uiPreferences]);
 
