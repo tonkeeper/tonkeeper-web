@@ -17,7 +17,8 @@ import {
     externalMessage,
     getTTL,
     getWalletBalance,
-    getWalletSeqNo
+    getWalletSeqNo,
+    seeIfServiceTimeSync
 } from './common';
 
 export type AccountsMap = Map<string, Account>;
@@ -160,6 +161,37 @@ export const estimateTonTransfer = async (
     });
 
     return { event };
+};
+
+export type ConnectTransferError =
+    | { kind: 'date-and-time' }
+    | { kind: 'not-enough-balance' }
+    | { kind: undefined };
+
+export const tonConnectTransferError = async (
+    api: APIConfig,
+    walletState: WalletState,
+    params: TonConnectTransactionPayload
+): Promise<ConnectTransferError> => {
+    const isSynced = await seeIfServiceTimeSync(api);
+    if (!isSynced) {
+        return { kind: 'date-and-time' };
+    }
+
+    const wallet = await new AccountsApi(api.tonApiV2).getAccount({
+        accountId: walletState.active.rawAddress
+    });
+
+    const total = params.messages.reduce(
+        (acc, message) => acc.plus(message.amount),
+        new BigNumber(0)
+    );
+
+    if (total.isGreaterThanOrEqualTo(wallet.balance)) {
+        return { kind: 'not-enough-balance' };
+    }
+
+    return { kind: undefined };
 };
 
 export const estimateTonConnectTransfer = async (
