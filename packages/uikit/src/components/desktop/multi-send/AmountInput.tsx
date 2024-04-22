@@ -1,6 +1,5 @@
-import React, { FC, useId, useRef, useState } from 'react';
+import React, { FC, useEffect, useId, useRef, useState } from 'react';
 import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form/dist/types/controller';
-import { FieldValues } from 'react-hook-form';
 import { useAppContext } from '../../../hooks/appContext';
 import { useRate } from '../../../state/rates';
 import {
@@ -17,6 +16,8 @@ import { Body2 } from '../../Text';
 
 const AmountInputFieldStyled = styled(InputFieldStyled)<{ color?: string }>`
     text-align: right;
+    min-width: 1px;
+    flex: 1;
 
     transition: color 0.1s ease-in-out;
 
@@ -41,7 +42,14 @@ const AmountInputFieldRight = styled(Body2)<{ color?: string }>`
 `;
 
 export const AmountInput: FC<{
-    field: ControllerRenderProps<FieldValues, `row.${string}.value`>;
+    field: ControllerRenderProps<
+        {
+            row: {
+                amount: { inFiat: boolean; value: string } | undefined;
+            }[];
+        },
+        `row.${number}.amount`
+    >;
     token: {
         symbol: string;
         address: string;
@@ -57,7 +65,7 @@ export const AmountInput: FC<{
         fiatValue: '',
         inputValue: ''
     });
-    const { data } = useRate(token.address);
+    const { data, isFetched } = useRate(token.address);
     const price = data?.prices || 1;
 
     const onInput = (inFiat: boolean, newValue: string) => {
@@ -72,10 +80,18 @@ export const AmountInput: FC<{
                 tokenValue: '',
                 fiatValue: ''
             }));
+            field.onChange({
+                inFiat,
+                value: ''
+            });
             return;
         }
 
         if (!seeIfValueValid(inputValue, decimals)) {
+            field.onChange({
+                inFiat,
+                value: ''
+            });
             return;
         }
 
@@ -100,6 +116,11 @@ export const AmountInput: FC<{
             inputValue = formatSendValue(inputValue);
         }
 
+        field.onChange({
+            inFiat,
+            value: inFiat ? fiatValue : tokenValue
+        });
+
         setCurrencyAmount({
             inFiat,
             inputValue,
@@ -107,6 +128,14 @@ export const AmountInput: FC<{
             fiatValue
         });
     };
+
+    useEffect(() => {
+        if (!field.value || !isFetched) {
+            return;
+        }
+
+        onInput(field.value.inFiat, field.value.value);
+    }, [isFetched]);
 
     const tokenId = useId();
     const fiatId = useId();

@@ -10,6 +10,7 @@ export interface ButtonProps {
     secondary?: boolean;
     disabled?: boolean;
     fullWidth?: boolean;
+    fitContent?: boolean;
     bottom?: boolean;
     marginTop?: boolean;
     corner?: '3xSmall' | '2xSmall' | 'small' | 'medium' | 'large' | 'full';
@@ -60,6 +61,10 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
         props.fullWidth
             ? css`
                   width: 100%;
+              `
+            : props.fitContent
+            ? css`
+                  width: fit-content;
               `
             : css`
                   width: auto;

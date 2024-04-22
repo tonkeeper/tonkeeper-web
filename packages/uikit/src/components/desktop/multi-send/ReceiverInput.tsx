@@ -1,6 +1,6 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form/dist/types/controller';
-import { ErrorOption, FieldValues, useFormContext } from 'react-hook-form';
+import { ErrorOption, useFormContext } from 'react-hook-form';
 import { useAppContext } from '../../../hooks/appContext';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import {
@@ -19,6 +19,7 @@ import { IconButton } from '../../fields/IconButton';
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard';
 import { useTranslation } from '../../../hooks/translation';
 import { seeIfInvalidDns } from '../../transfer/RecipientView';
+import { Address } from '@ton/core';
 
 const SpinnerRingStyled = styled(SpinnerRing)`
     transform: scale(1.2);
@@ -33,13 +34,21 @@ const AddressText = styled(Body2Secondary)`
 `;
 
 export const ReceiverInput: FC<{
-    field: ControllerRenderProps<FieldValues, `row.${string}.receiver`>;
+    field: ControllerRenderProps<
+        {
+            row: {
+                receiver: TonRecipient | undefined;
+            }[];
+        },
+        `row.${number}.receiver`
+    >;
     fieldState: ControllerFieldState;
 }> = ({ field, fieldState }) => {
     const methods = useFormContext();
     const [focus, setFocus] = useState(false);
     const { api } = useAppContext();
     const [inputValue, setInputValue] = useState('');
+    const inputTouched = useRef(false);
 
     const validator = useCallback<
         (
@@ -59,24 +68,31 @@ export const ReceiverInput: FC<{
                 };
             }
 
-            if (!seeIfInvalidDns(value)) {
+            if (seeIfInvalidDns(value)) {
                 return {
                     message: 'Wrong address format'
                 };
             }
             value = value.toLowerCase();
 
-            const result = await new DNSApi(api.tonApiV2).dnsResolve({ domainName: value });
-            if (result.wallet) {
-                return {
-                    success: true,
-                    result: {
-                        address: result.wallet.address,
-                        dns: result.wallet,
-                        blockchain: BLOCKCHAIN_NAME.TON
-                    }
-                };
-            } else {
+            try {
+                const result = await new DNSApi(api.tonApiV2).dnsResolve({ domainName: value });
+                if (result.wallet) {
+                    return {
+                        success: true,
+                        result: {
+                            address: result.wallet.address,
+                            dns: result.wallet,
+                            blockchain: BLOCKCHAIN_NAME.TON
+                        }
+                    };
+                } else {
+                    return {
+                        message: 'Wrong DNS wallet'
+                    };
+                }
+            } catch (e) {
+                console.error(e);
                 return {
                     message: 'Wrong DNS wallet'
                 };
@@ -94,8 +110,23 @@ export const ReceiverInput: FC<{
     const isValidating = validationState === 'validating';
 
     useEffect(() => {
+        if (!inputTouched.current) {
+            return;
+        }
         field.onChange(validationProduct);
     }, [field.onChange, validationProduct]);
+
+    useEffect(() => {
+        if (!field.value) {
+            return;
+        }
+
+        setInputValue(
+            'dns' in field.value
+                ? field.value.dns.address
+                : Address.parse(field.value.address).toString({ bounceable: false })
+        );
+    }, []);
 
     const { t } = useTranslation();
     const { onCopy, copied } = useCopyToClipboard(validationProduct?.address || '');
@@ -106,7 +137,10 @@ export const ReceiverInput: FC<{
                 {...field}
                 onFocus={() => setFocus(true)}
                 onBlur={() => setFocus(false)}
-                onChange={e => setInputValue(e.target.value)}
+                onChange={e => {
+                    setInputValue(e.target.value);
+                    inputTouched.current = true;
+                }}
                 value={inputValue}
                 placeholder="Recipient"
             />

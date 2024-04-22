@@ -21,6 +21,13 @@ const PageWrapper = styled.div`
 
 const PageBodyWrapper = styled.div`
     padding: 0 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+`;
+
+const MultiSendTableStyled = styled(MultiSendTable)`
+    flex: 1;
 `;
 
 export const DesktopMultiSendPage: FC = () => {
@@ -34,7 +41,7 @@ export const DesktopMultiSendPage: FC = () => {
                     <ListSelect />
                     <AssetSelect />
                 </MultiSendHeader>
-                <MultiSendTable />
+                <MultiSendTableStyled />
             </PageBodyWrapper>
         </PageWrapper>
     );

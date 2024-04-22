@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { InputBlockStyled, InputFieldStyled } from './InputStyled';
 
-export const CommentInput: FC<{ rowID: string }> = ({ rowID }) => {
+export const CommentInput: FC<{ index: number }> = ({ index }) => {
     const { control } = useFormContext();
     const [focus, setFocus] = useState(false);
 
@@ -18,7 +18,7 @@ export const CommentInput: FC<{ rowID: string }> = ({ rowID }) => {
                     />
                 </InputBlockStyled>
             )}
-            name={`row.${rowID}.comment`}
+            name={`row.${index}.comment`}
             control={control}
         />
     );
