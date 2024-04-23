@@ -5,6 +5,7 @@ export enum AppKey {
 
     THEME = 'theme',
     UI_PREFERENCES = 'ui_preferences',
+    MULTI_SEND_LISTS = 'multi_send_lists',
     FIAT = 'fiat',
 
     PASSWORD = 'password',

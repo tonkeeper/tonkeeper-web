@@ -9,23 +9,25 @@ import { Button } from '../../fields/Button';
 import { Body3 } from '../../Text';
 import { IconButton } from '../../fields/IconButton';
 import { CloseIcon } from '../../Icon';
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { ControllerRenderProps } from 'react-hook-form/dist/types/controller';
 import BigNumber from 'bignumber.js';
 import { formatter } from '../../../hooks/balance';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useRate } from '../../../state/rates';
 import { useAppContext } from '../../../hooks/appContext';
 import { useWalletTotalBalance } from '../../../state/wallet';
 import { SkeletonText } from '../../shared/Skeleton';
-
-export type MultiSendForm = {
-    row: {
-        receiver: TonRecipient | undefined;
-        amount: { inFiat?: boolean; value?: string } | undefined;
-        comment?: string;
-    }[];
-};
+import {
+    MultiSendForm,
+    MultiSendListTemplate,
+    useDeleteUserMultiSendList,
+    useMutateUserMultiSendList,
+    useUserMultiSendLists
+} from '../../../state/multiSend';
+import { SaveListNotification } from './SaveListNotification';
+import { useDisclosure } from '../../../hooks/useDisclosure';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { EditListNotification } from './EditListNotification';
+import { DeleteListNotification } from './DeleteListNotification';
 
 const MultiSendTableGrid = styled.div`
     display: grid;
@@ -53,7 +55,7 @@ const TableFormWrapper = styled.form`
     height: 100%;
 `;
 
-const MultiSendFooter = styled.div`
+const MultiSendFooterWrapper = styled.div`
     padding: 1rem;
     position: sticky;
     bottom: 0;
@@ -108,50 +110,11 @@ const ListActionsButtons = styled.div`
     margin-right: auto;
 `;
 
-export const MultiSendTable: FC<{ className?: string; asset: TonAsset }> = ({
-    className,
-    asset
-}) => {
-    const methods = useForm<MultiSendForm>({
-        defaultValues: {
-            row: [
-                {
-                    receiver: {
-                        blockchain: BLOCKCHAIN_NAME.TON,
-                        dns: {
-                            address: 'subbotin.ton'
-                        }
-                    },
-                    amount: { inFiat: true, value: '10' },
-                    comment: ''
-                },
-                {
-                    receiver: undefined,
-                    amount: { inFiat: false, value: '2' },
-                    comment: ''
-                },
-                {
-                    receiver: undefined,
-                    amount: undefined,
-                    comment: ''
-                }
-            ]
-        }
-    });
-
-    const { fields, append, remove } = useFieldArray({
-        control: methods.control,
-        name: 'row'
-    });
-
-    const onSubmit = (d: unknown) => {
-        console.log(d);
-    };
-
-    const rowsValue = methods.watch('row');
-    const { data: rate } = useRate(
-        typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
-    );
+export function getWillBeMultiSendValue(
+    rowsValue: MultiSendForm['rows'],
+    asset: { decimals: number; symbol: string },
+    rate: { prices: number } | undefined
+) {
     const willBeSentBN = rowsValue.reduce((acc, item) => {
         if (!item.amount?.value) {
             return acc;
@@ -173,6 +136,87 @@ export const MultiSendTable: FC<{ className?: string; asset: TonAsset }> = ({
         }) +
         ' ' +
         asset.symbol;
+
+    return { willBeSent, willBeSentBN };
+}
+
+export const MultiSendTable: FC<{
+    className?: string;
+    list: MultiSendListTemplate;
+}> = ({ className, list }) => {
+    const methods = useForm<MultiSendForm>({
+        defaultValues: list.form
+    });
+
+    const { fields, append, remove } = useFieldArray({
+        control: methods.control,
+        name: 'rows'
+    });
+
+    const onSubmit = (d: unknown) => {
+        console.log(d);
+    };
+
+    const rowsValue = methods.watch('rows');
+
+    return (
+        <>
+            <FormProvider {...methods}>
+                <TableFormWrapper onSubmit={methods.handleSubmit(onSubmit)} className={className}>
+                    <MultiSendTableGrid>
+                        {fields.map((item, index) => (
+                            <>
+                                <FormRow key={item.id} index={index} />
+                                <IconButtonStyled
+                                    type="button"
+                                    transparent
+                                    onClick={() => remove(index)}
+                                    hide={fields.length === 1}
+                                >
+                                    <CloseIcon />
+                                </IconButtonStyled>
+                            </>
+                        ))}
+                    </MultiSendTableGrid>
+                    <Button
+                        fitContent
+                        secondary
+                        type="button"
+                        onClick={() =>
+                            append({
+                                receiver: undefined,
+                                amount: undefined,
+                                comment: ''
+                            })
+                        }
+                    >
+                        Add More
+                    </Button>
+                    <Spacer />
+                    <MultiSendFooter list={list} asset={list.token} rowsValue={rowsValue} />
+                </TableFormWrapper>
+            </FormProvider>
+        </>
+    );
+};
+
+const MultiSendFooter: FC<{
+    asset: TonAsset;
+    rowsValue: MultiSendForm['rows'];
+    list: MultiSendListTemplate;
+}> = ({ asset, rowsValue, list }) => {
+    const { isOpen: saveIsOpen, onClose: saveOnClose, onOpen: saveOnOpen } = useDisclosure();
+    const { isOpen: editIsOpen, onClose: editOnClose, onOpen: editOnOpen } = useDisclosure();
+    const { isOpen: deleteIsOpen, onClose: deleteOnClose, onOpen: deleteOnOpen } = useDisclosure();
+    const { data: storedLists } = useUserMultiSendLists();
+    const { mutate: updateList } = useMutateUserMultiSendList();
+    const { mutate: deleteList } = useDeleteUserMultiSendList();
+
+    const { data: rate } = useRate(
+        typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
+    );
+    const { willBeSent, willBeSentBN } = getWillBeMultiSendValue(rowsValue, asset, rate);
+
     const { fiat } = useAppContext();
     const { data: balance } = useWalletTotalBalance(fiat);
     const remainingBalanceBN = balance?.minus(willBeSentBN);
@@ -184,69 +228,94 @@ export const MultiSendTable: FC<{ className?: string; asset: TonAsset }> = ({
         asset.symbol;
     const balancesLoading = !balance || !rate;
 
+    const listAlreadyExist = storedLists?.some(l => l.id === list.id);
+    const onSaveList = (name: string, asNew: boolean) => {
+        updateList({
+            form: {
+                rows: rowsValue
+            },
+            token: asset,
+            name,
+            id: asNew ? undefined : list.id
+        });
+        saveOnClose();
+    };
+
+    const onEditName = (name: string) => {
+        updateList({
+            ...list,
+            name
+        });
+        editOnClose();
+    };
+
+    const onDelete = () => {
+        deleteList(list.id!);
+        deleteOnClose();
+        // TODO navigate back
+    };
+
     return (
-        <FormProvider {...methods}>
-            <TableFormWrapper onSubmit={methods.handleSubmit(onSubmit)} className={className}>
-                <MultiSendTableGrid>
-                    {fields.map((item, index) => (
-                        <>
-                            <FormRow key={item.id} index={index} />
-                            <IconButtonStyled
-                                type="button"
-                                transparent
-                                onClick={() => remove(index)}
-                                hide={fields.length === 1}
-                            >
-                                <CloseIcon />
-                            </IconButtonStyled>
-                        </>
-                    ))}
-                </MultiSendTableGrid>
-                <Button
-                    fitContent
-                    secondary
-                    type="button"
-                    onClick={() =>
-                        append({
-                            receiver: undefined,
-                            amount: undefined,
-                            comment: ''
-                        })
-                    }
-                >
-                    Add More
-                </Button>
-                <Spacer />
-                <MultiSendFooter>
-                    <Shadow />
-                    <ListActionsButtons>
-                        <Button secondary type="button">
-                            Edit Name
+        <>
+            <MultiSendFooterWrapper>
+                <Shadow />
+                <ListActionsButtons>
+                    {listAlreadyExist && (
+                        <Button secondary type="button" onClick={editOnOpen}>
+                            Edit List
                         </Button>
-                        <Button secondary type="button">
+                    )}
+                    <Button secondary type="button" onClick={saveOnOpen}>
+                        Save List
+                    </Button>
+                    {listAlreadyExist && (
+                        <Button secondary type="button" onClick={deleteOnOpen}>
                             Delete List
                         </Button>
-                    </ListActionsButtons>
-                    <MultiSendFooterTextWrapper>
+                    )}
+                </ListActionsButtons>
+                <MultiSendFooterTextWrapper>
+                    <Body3>
+                        Will be sent:&nbsp;
+                        {balancesLoading ? <SkeletonText width="75px" /> : willBeSent}
+                    </Body3>
+                    {balancesLoading || remainingBalanceBN?.gt(0) ? (
                         <Body3>
-                            Will be sent:&nbsp;
-                            {balancesLoading ? <SkeletonText width="75px" /> : willBeSent}
+                            Remaining:&nbsp;
+                            {balancesLoading ? <SkeletonText width="75px" /> : remainingBalance}
                         </Body3>
-                        {balancesLoading || remainingBalanceBN?.gt(0) ? (
-                            <Body3>
-                                Remaining:&nbsp;
-                                {balancesLoading ? <SkeletonText width="75px" /> : remainingBalance}
-                            </Body3>
-                        ) : (
-                            <Body3Error>Insufficient balance</Body3Error>
-                        )}
-                    </MultiSendFooterTextWrapper>
-                    <Button type="submit" primary disabled={remainingBalanceBN?.lt(0)}>
-                        Continue
-                    </Button>
-                </MultiSendFooter>
-            </TableFormWrapper>
-        </FormProvider>
+                    ) : (
+                        <Body3Error>Insufficient balance</Body3Error>
+                    )}
+                </MultiSendFooterTextWrapper>
+                <Button type="submit" primary disabled={remainingBalanceBN?.lt(0)}>
+                    Continue
+                </Button>
+            </MultiSendFooterWrapper>
+            <SaveListNotification
+                isOpen={saveIsOpen}
+                onCancel={saveOnClose}
+                onSave={name => onSaveList(name, false)}
+                listName={list.name}
+                rowsNumber={rowsValue.length}
+                totalValue={willBeSent}
+                willDiscard={false}
+            />
+            <EditListNotification
+                isOpen={editIsOpen}
+                onCancel={editOnClose}
+                onSave={onEditName}
+                listName={list.name}
+                rowsNumber={rowsValue.length}
+                totalValue={willBeSent}
+            />
+            <DeleteListNotification
+                isOpen={deleteIsOpen}
+                onCancel={deleteOnClose}
+                onDelete={onDelete}
+                listName={list.name}
+            />
+        </>
     );
 };
 
@@ -263,17 +332,17 @@ const FormRow: FC<{ index: number }> = ({ index }) => {
                         field={
                             field as unknown as ControllerRenderProps<
                                 {
-                                    row: {
+                                    rows: {
                                         receiver: TonRecipient | undefined;
                                     }[];
                                 },
-                                `row.${number}.receiver`
+                                `rows.${number}.receiver`
                             >
                         }
                         fieldState={fieldState}
                     />
                 )}
-                name={`row.${index}.receiver`}
+                name={`rows.${index}.receiver`}
                 control={control}
             />
             <Controller
@@ -286,17 +355,17 @@ const FormRow: FC<{ index: number }> = ({ index }) => {
                         field={
                             field as unknown as ControllerRenderProps<
                                 {
-                                    row: {
+                                    rows: {
                                         amount: { inFiat: boolean; value: string } | undefined;
                                     }[];
                                 },
-                                `row.${number}.amount`
+                                `rows.${number}.amount`
                             >
                         }
                         token={{ symbol: 'TON', address: 'TON', decimals: 9 }}
                     />
                 )}
-                name={`row.${index}.amount`}
+                name={`rows.${index}.amount`}
                 control={control}
             />
             <CommentInput index={index} />

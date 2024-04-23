@@ -1,15 +1,16 @@
-import { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
 import { Body2, Body3, Label2 } from '../../components/Text';
-import { DropDown } from '../../components/DropDown';
-import { Button } from '../../components/fields/Button';
-import { SwitchIcon } from '../../components/Icon';
-import { useAssets } from '../../state/home';
-import { formatter } from '../../hooks/balance';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { MultiSendTable } from '../../components/desktop/multi-send/MultiSendTable';
-import { TON_ASSET } from "@tonkeeper/core/dist/entries/crypto/asset/constants";
+import { ListBlock, ListItem } from '../../components/List';
+import { ChevronRightIcon, SpinnerIcon } from '../../components/Icon';
+import { MultiSendList, useUserMultiSendLists } from '../../state/multiSend';
+import { getWillBeMultiSendValue } from '../../components/desktop/multi-send/MultiSendTable';
+import { useRate } from '../../state/rates';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { SkeletonText } from '../../components/shared/Skeleton';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { DesktopMultiSendFormPage } from './MultiSendFormPage';
 
 const PageWrapper = styled.div`
     overflow: auto;
@@ -20,198 +21,147 @@ const PageWrapper = styled.div`
     flex-direction: column;
 `;
 
+const LoadingWrapper = styled.div`
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
 const PageBodyWrapper = styled.div`
     padding: 0 1rem;
     flex: 1;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
 `;
 
-const MultiSendTableStyled = styled(MultiSendTable)`
-    flex: 1;
+const Body3Secondary = styled(Body3)`
+    color: ${p => p.theme.textSecondary};
+    display: flex;
+`;
+
+const ListBlockStyled = styled(ListBlock)`
+    width: 368px;
+`;
+
+const IconContainerStyled = styled.div`
+    margin-left: auto;
+    color: ${props => props.theme.iconTertiary};
+    transition: transform 0.15s ease;
+`;
+
+const ListItemStyled = styled(ListItem)`
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:not(:first-child) {
+        border-top: 1px solid ${props => props.theme.separatorCommon};
+    }
+
+    & + & > div {
+        border-top: none;
+        padding-top: 0;
+    }
+
+    &:hover ${IconContainerStyled} {
+        transform: translateX(2px);
+    }
+`;
+
+const ListItemTextContainer = styled.div`
+    display: flex;
+    flex-direction: column;
 `;
 
 export const DesktopMultiSendPage: FC = () => {
+    const { data: lists } = useUserMultiSendLists();
+    const [selectedList, setSelectedList] = useState<MultiSendList | undefined>();
+
+    useEffect(() => {
+        if (lists && !lists.length) {
+            setSelectedList({
+                id: 1,
+                name: 'List 1',
+                token: TON_ASSET,
+                form: {
+                    rows: [
+                        {
+                            receiver: undefined,
+                            amount: undefined,
+                            comment: ''
+                        },
+                        {
+                            receiver: undefined,
+                            amount: undefined,
+                            comment: ''
+                        }
+                    ]
+                }
+            });
+        }
+    }, [lists]);
+
+    if (!lists) {
+        return (
+            <LoadingWrapper>
+                <SpinnerIcon />
+            </LoadingWrapper>
+        );
+    }
+
+    if (selectedList) {
+        return <DesktopMultiSendFormPage list={selectedList} />;
+    }
+
     return (
         <PageWrapper>
-            <DesktopViewHeader>
-                <Label2>Multi Send</Label2>
+            <DesktopViewHeader backButton>
+                <Label2>New Multi Send</Label2>
             </DesktopViewHeader>
             <PageBodyWrapper>
-                <MultiSendHeader>
-                    <ListSelect />
-                    <AssetSelect />
-                </MultiSendHeader>
-                <MultiSendTableStyled asset={TON_ASSET} />
+                <ListBlockStyled>
+                    {lists.map(list => (
+                        <MultiSendListElement
+                            list={list}
+                            key={list.id}
+                            asset={list.token}
+                            onClick={() => setSelectedList(list)}
+                        />
+                    ))}
+                </ListBlockStyled>
             </PageBodyWrapper>
         </PageWrapper>
     );
 };
 
-const DropDownPayload = styled.div`
-    background-color: ${props => props.theme.backgroundContentTint};
-`;
-
-const DropDownWrapper = styled.div`
-    .drop-down-container {
-        z-index: 100;
-        top: calc(100% + 8px);
-        left: 0;
-    }
-`;
-
-const MenuItem = styled.button`
-    width: 100%;
-    text-align: start;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    display: flex;
-    gap: 0.75rem;
-    cursor: pointer;
-
-    transition: background-color 0.15s ease-in-out;
-
-    &:hover {
-        background-color: ${p => p.theme.backgroundHighlighted};
-    }
-`;
-
-const MenuItemText = styled.div`
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    > ${Body3} {
-        color: ${p => p.theme.textSecondary};
-    }
-`;
-
-const Dot = styled.span`
-    color: ${p => p.theme.textTertiary};
-`;
-
-const Divider = styled.div`
-    background-color: ${p => p.theme.separatorCommon};
-    height: 1px;
-    margin: 0 -0.5rem;
-    width: calc(100% + 1rem);
-`;
-
-const MultiSendHeader = styled.div`
-    display: flex;
-    gap: 0.5rem;
-    padding-bottom: 1rem;
-`;
-
-const ListSelect = () => {
-    return (
-        <DropDownWrapper>
-            <DropDown
-                containerClassName="drop-down-container"
-                payload={onClose => (
-                    <DropDownPayload>
-                        <MenuItem onClick={onClose}>
-                            <MenuItemText>
-                                <Label2>New List</Label2>
-                            </MenuItemText>
-                        </MenuItem>
-                        <Divider />
-                        <MenuItem onClick={onClose}>
-                            <MenuItemText>
-                                <Label2>Salary</Label2>
-                                <Body3>
-                                    24 wallets&nbsp;<Dot>·</Dot>73,1K TON
-                                </Body3>
-                            </MenuItemText>
-                        </MenuItem>
-                        <Divider />
-                        <MenuItem onClick={onClose}>
-                            <MenuItemText>
-                                <Label2>Salary</Label2>
-                                <Body3>
-                                    24 wallets&nbsp;<Dot>·</Dot>73,1K TON
-                                </Body3>
-                            </MenuItemText>
-                        </MenuItem>
-                    </DropDownPayload>
-                )}
-            >
-                <Button secondary size="small">
-                    New List
-                    <SwitchIcon />
-                </Button>
-            </DropDown>
-        </DropDownWrapper>
+const MultiSendListElement: FC<{
+    list: MultiSendList;
+    asset: TonAsset;
+    onClick: () => void;
+}> = ({ list, asset, onClick }) => {
+    const { data: rate } = useRate(
+        typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
     );
-};
 
-const AssetIcon = styled.img`
-    width: 24px;
-    height: 24px;
-    border-radius: ${props => props.theme.cornerFull};
-
-    pointer-events: none;
-`;
-
-const AssetSelect = () => {
-    const [assets] = useAssets();
+    const { willBeSent } = getWillBeMultiSendValue(list.form.rows, asset, rate);
     return (
-        <DropDownWrapper>
-            <DropDown
-                containerClassName="drop-down-container"
-                payload={onClose => (
-                    <DropDownPayload>
-                        {assets && (
-                            <>
-                                <MenuItem onClick={onClose}>
-                                    <AssetIcon src="https://wallet.tonkeeper.com/img/toncoin.svg" />
-                                    <MenuItemText>
-                                        <Label2>TON</Label2>
-                                        <Body2>
-                                            {formatter.format(
-                                                shiftedDecimals(assets.ton.info.balance, 9),
-                                                {
-                                                    ignoreZeroTruncate: false,
-                                                    decimals: 9
-                                                }
-                                            )}
-                                        </Body2>
-                                    </MenuItemText>
-                                </MenuItem>
-                                {assets.ton.jettons.balances.map(jetton => (
-                                    <>
-                                        <Divider />
-                                        <MenuItem onClick={onClose}>
-                                            <AssetIcon src={jetton.jetton.image} />
-                                            <MenuItemText>
-                                                <Label2>{jetton.jetton.symbol}</Label2>
-                                                <Body3>
-                                                    {formatter.format(
-                                                        shiftedDecimals(
-                                                            jetton.balance,
-                                                            jetton.jetton.decimals
-                                                        ),
-                                                        {
-                                                            ignoreZeroTruncate: false,
-                                                            decimals: jetton.jetton.decimals
-                                                        }
-                                                    )}
-                                                </Body3>
-                                            </MenuItemText>
-                                        </MenuItem>
-                                    </>
-                                ))}
-                            </>
-                        )}
-                    </DropDownPayload>
-                )}
-            >
-                <Button secondary size="small">
-                    TON
-                    <SwitchIcon />
-                </Button>
-            </DropDown>
-        </DropDownWrapper>
+        <ListItemStyled key={list.id} onClick={onClick}>
+            <ListItemTextContainer>
+                <Body2>
+                    {list.name} · {list.token.symbol}
+                </Body2>
+                <Body3Secondary>
+                    {list.form.rows.length} wallets · 
+                    {rate ? willBeSent : <SkeletonText size="small" />}
+                </Body3Secondary>
+            </ListItemTextContainer>
+            <IconContainerStyled>
+                <ChevronRightIcon />
+            </IconContainerStyled>
+        </ListItemStyled>
     );
 };

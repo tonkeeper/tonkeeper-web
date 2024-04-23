@@ -36,11 +36,11 @@ const AddressText = styled(Body2Secondary)`
 export const ReceiverInput: FC<{
     field: ControllerRenderProps<
         {
-            row: {
+            rows: {
                 receiver: TonRecipient | undefined;
             }[];
         },
-        `row.${number}.receiver`
+        `rows.${number}.receiver`
     >;
     fieldState: ControllerFieldState;
 }> = ({ field, fieldState }) => {

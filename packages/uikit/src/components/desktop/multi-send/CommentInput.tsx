@@ -18,7 +18,7 @@ export const CommentInput: FC<{ index: number }> = ({ index }) => {
                     />
                 </InputBlockStyled>
             )}
-            name={`row.${index}.comment`}
+            name={`rows.${index}.comment`}
             control={control}
         />
     );

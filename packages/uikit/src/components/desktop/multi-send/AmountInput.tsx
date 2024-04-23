@@ -44,11 +44,11 @@ const AmountInputFieldRight = styled(Body2)<{ color?: string }>`
 export const AmountInput: FC<{
     field: ControllerRenderProps<
         {
-            row: {
+            rows: {
                 amount: { inFiat: boolean; value: string } | undefined;
             }[];
         },
-        `row.${number}.amount`
+        `rows.${number}.amount`
     >;
     token: {
         symbol: string;
