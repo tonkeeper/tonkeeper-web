@@ -9,6 +9,7 @@ import { useAssets } from '../../state/home';
 import { formatter } from '../../hooks/balance';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { MultiSendTable } from '../../components/desktop/multi-send/MultiSendTable';
+import { TON_ASSET } from "@tonkeeper/core/dist/entries/crypto/asset/constants";
 
 const PageWrapper = styled.div`
     overflow: auto;
@@ -41,7 +42,7 @@ export const DesktopMultiSendPage: FC = () => {
                     <ListSelect />
                     <AssetSelect />
                 </MultiSendHeader>
-                <MultiSendTableStyled />
+                <MultiSendTableStyled asset={TON_ASSET} />
             </PageBodyWrapper>
         </PageWrapper>
     );

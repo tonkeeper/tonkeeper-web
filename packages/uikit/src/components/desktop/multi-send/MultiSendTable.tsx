@@ -11,6 +11,13 @@ import { IconButton } from '../../fields/IconButton';
 import { CloseIcon } from '../../Icon';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { ControllerRenderProps } from 'react-hook-form/dist/types/controller';
+import BigNumber from 'bignumber.js';
+import { formatter } from '../../../hooks/balance';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useRate } from '../../../state/rates';
+import { useAppContext } from '../../../hooks/appContext';
+import { useWalletTotalBalance } from '../../../state/wallet';
+import { SkeletonText } from '../../shared/Skeleton';
 
 export type MultiSendForm = {
     row: {
@@ -58,12 +65,19 @@ const MultiSendFooter = styled.div`
 `;
 
 const MultiSendFooterTextWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     > ${Body3} {
         text-align: right;
-        display: block;
+        display: flex;
         font-family: ${p => p.theme.fontMono};
         color: ${p => p.theme.textSecondary};
     }
+`;
+
+const Body3Error = styled(Body3)`
+    color: ${p => p.theme.accentRed} !important;
 `;
 
 const Shadow = styled.div`
@@ -88,7 +102,16 @@ const IconButtonStyled = styled(IconButton)<{ hide?: boolean }>`
         `}
 `;
 
-export const MultiSendTable: FC<{ className?: string }> = ({ className }) => {
+const ListActionsButtons = styled.div`
+    display: flex;
+    gap: 0.5rem;
+    margin-right: auto;
+`;
+
+export const MultiSendTable: FC<{ className?: string; asset: TonAsset }> = ({
+    className,
+    asset
+}) => {
     const methods = useForm<MultiSendForm>({
         defaultValues: {
             row: [
@@ -125,6 +148,42 @@ export const MultiSendTable: FC<{ className?: string }> = ({ className }) => {
         console.log(d);
     };
 
+    const rowsValue = methods.watch('row');
+    const { data: rate } = useRate(
+        typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
+    );
+    const willBeSentBN = rowsValue.reduce((acc, item) => {
+        if (!item.amount?.value) {
+            return acc;
+        }
+
+        let inToken = new BigNumber(item.amount.value);
+        if (item.amount.inFiat) {
+            inToken = rate?.prices
+                ? new BigNumber(item.amount.value).div(rate.prices)
+                : new BigNumber(0);
+        }
+
+        return acc?.plus(new BigNumber(inToken));
+    }, new BigNumber(0));
+
+    const willBeSent =
+        formatter.format(willBeSentBN, {
+            decimals: asset.decimals
+        }) +
+        ' ' +
+        asset.symbol;
+    const { fiat } = useAppContext();
+    const { data: balance } = useWalletTotalBalance(fiat);
+    const remainingBalanceBN = balance?.minus(willBeSentBN);
+    const remainingBalance =
+        formatter.format(remainingBalanceBN || new BigNumber(0), {
+            decimals: asset.decimals
+        }) +
+        ' ' +
+        asset.symbol;
+    const balancesLoading = !balance || !rate;
+
     return (
         <FormProvider {...methods}>
             <TableFormWrapper onSubmit={methods.handleSubmit(onSubmit)} className={className}>
@@ -160,11 +219,29 @@ export const MultiSendTable: FC<{ className?: string }> = ({ className }) => {
                 <Spacer />
                 <MultiSendFooter>
                     <Shadow />
+                    <ListActionsButtons>
+                        <Button secondary type="button">
+                            Edit Name
+                        </Button>
+                        <Button secondary type="button">
+                            Delete List
+                        </Button>
+                    </ListActionsButtons>
                     <MultiSendFooterTextWrapper>
-                        <Body3>Will be sent: 24,063.93 TON</Body3>
-                        <Body3>Remaining: 117,310.01 TON</Body3>
+                        <Body3>
+                            Will be sent:&nbsp;
+                            {balancesLoading ? <SkeletonText width="75px" /> : willBeSent}
+                        </Body3>
+                        {balancesLoading || remainingBalanceBN?.gt(0) ? (
+                            <Body3>
+                                Remaining:&nbsp;
+                                {balancesLoading ? <SkeletonText width="75px" /> : remainingBalance}
+                            </Body3>
+                        ) : (
+                            <Body3Error>Insufficient balance</Body3Error>
+                        )}
                     </MultiSendFooterTextWrapper>
-                    <Button type="submit" primary>
+                    <Button type="submit" primary disabled={remainingBalanceBN?.lt(0)}>
                         Continue
                     </Button>
                 </MultiSendFooter>
