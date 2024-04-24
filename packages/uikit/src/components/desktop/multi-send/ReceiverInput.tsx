@@ -122,14 +122,18 @@ export const ReceiverInput: FC<{
         }
 
         setInputValue(
-            'dns' in field.value
-                ? field.value.dns.address
+            'dns' in field.value && field.value.dns.account.name
+                ? field.value.dns.account.name
                 : Address.parse(field.value.address).toString({ bounceable: false })
         );
     }, []);
 
     const { t } = useTranslation();
-    const { onCopy, copied } = useCopyToClipboard(validationProduct?.address || '');
+    const { onCopy, copied } = useCopyToClipboard(
+        validationProduct?.address
+            ? Address.parse(validationProduct?.address).toString({ bounceable: false })
+            : ''
+    );
 
     return (
         <InputBlockStyled valid={!fieldState.invalid} focus={focus}>

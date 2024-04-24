@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
+import { DnsRecipient, TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import styled, { css } from 'styled-components';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { AmountInput } from './AmountInput';
@@ -18,7 +18,7 @@ import { useWalletTotalBalance } from '../../../state/wallet';
 import { SkeletonText } from '../../shared/Skeleton';
 import {
     MultiSendForm,
-    MultiSendListTemplate,
+    MultiSendList,
     useDeleteUserMultiSendList,
     useMutateUserMultiSendList,
     useUserMultiSendLists
@@ -28,6 +28,7 @@ import { useDisclosure } from '../../../hooks/useDisclosure';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { EditListNotification } from './EditListNotification';
 import { DeleteListNotification } from './DeleteListNotification';
+import { UpdateListNotification } from './UpdateListNotification';
 
 const MultiSendTableGrid = styled.div`
     display: grid;
@@ -142,8 +143,9 @@ export function getWillBeMultiSendValue(
 
 export const MultiSendTable: FC<{
     className?: string;
-    list: MultiSendListTemplate;
-}> = ({ className, list }) => {
+    list: MultiSendList;
+    onBack: () => void;
+}> = ({ className, list, onBack }) => {
     const methods = useForm<MultiSendForm>({
         defaultValues: list.form
     });
@@ -193,7 +195,12 @@ export const MultiSendTable: FC<{
                         Add More
                     </Button>
                     <Spacer />
-                    <MultiSendFooter list={list} asset={list.token} rowsValue={rowsValue} />
+                    <MultiSendFooter
+                        list={list}
+                        asset={list.token}
+                        rowsValue={rowsValue}
+                        onBack={onBack}
+                    />
                 </TableFormWrapper>
             </FormProvider>
         </>
@@ -203,11 +210,14 @@ export const MultiSendTable: FC<{
 const MultiSendFooter: FC<{
     asset: TonAsset;
     rowsValue: MultiSendForm['rows'];
-    list: MultiSendListTemplate;
-}> = ({ asset, rowsValue, list }) => {
+    list: MultiSendList;
+    onBack: () => void;
+}> = ({ asset, rowsValue, list, onBack }) => {
     const { isOpen: saveIsOpen, onClose: saveOnClose, onOpen: saveOnOpen } = useDisclosure();
     const { isOpen: editIsOpen, onClose: editOnClose, onOpen: editOnOpen } = useDisclosure();
     const { isOpen: deleteIsOpen, onClose: deleteOnClose, onOpen: deleteOnOpen } = useDisclosure();
+    const { isOpen: updateIsOpen, onClose: updateOnClose, onOpen: updateOnOpen } = useDisclosure();
+
     const { data: storedLists } = useUserMultiSendLists();
     const { mutate: updateList } = useMutateUserMultiSendList();
     const { mutate: deleteList } = useDeleteUserMultiSendList();
@@ -239,6 +249,7 @@ const MultiSendFooter: FC<{
             id: asNew ? undefined : list.id
         });
         saveOnClose();
+        updateOnClose();
     };
 
     const onEditName = (name: string) => {
@@ -252,8 +263,10 @@ const MultiSendFooter: FC<{
     const onDelete = () => {
         deleteList(list.id!);
         deleteOnClose();
-        // TODO navigate back
+        onBack();
     };
+
+    const canSave = asset.id !== list.token.id || !eqForms(rowsValue, list.form.rows);
 
     return (
         <>
@@ -262,10 +275,15 @@ const MultiSendFooter: FC<{
                 <ListActionsButtons>
                     {listAlreadyExist && (
                         <Button secondary type="button" onClick={editOnOpen}>
-                            Edit List
+                            Edit List Name
                         </Button>
                     )}
-                    <Button secondary type="button" onClick={saveOnOpen}>
+                    <Button
+                        secondary
+                        type="button"
+                        disabled={!canSave}
+                        onClick={listAlreadyExist ? updateOnOpen : saveOnOpen}
+                    >
                         Save List
                     </Button>
                     {listAlreadyExist && (
@@ -314,6 +332,16 @@ const MultiSendFooter: FC<{
                 onCancel={deleteOnClose}
                 onDelete={onDelete}
                 listName={list.name}
+            />
+            <UpdateListNotification
+                isOpen={updateIsOpen}
+                onCancel={updateOnClose}
+                onSave={name => onSaveList(name, true)}
+                onUpdate={() => onSaveList(list.name, false)}
+                listName={list.name}
+                rowsNumber={rowsValue.length}
+                totalValue={willBeSent}
+                willDiscard={false}
             />
         </>
     );
@@ -371,4 +399,44 @@ const FormRow: FC<{ index: number }> = ({ index }) => {
             <CommentInput index={index} />
         </>
     );
+};
+
+const eqForms = (rows1: MultiSendForm['rows'], rows2: MultiSendForm['rows']) => {
+    if (rows1.length !== rows2.length) {
+        return false;
+    }
+
+    for (let i = 0; i < rows1.length; i++) {
+        if (
+            rows1[i].amount?.inFiat !== rows2[i].amount?.inFiat ||
+            rows1[i].amount?.value !== rows2[i].amount?.value
+        ) {
+            return false;
+        }
+
+        if (!!rows1[i].receiver !== !!rows2[i].receiver) {
+            return false;
+        }
+
+        if (rows1[i].receiver?.blockchain !== rows2[i].receiver?.blockchain) {
+            return false;
+        }
+
+        if (
+            (rows1[i].receiver as DnsRecipient | undefined)?.dns?.address !==
+            (rows2[i].receiver as DnsRecipient | undefined)?.dns?.address
+        ) {
+            return false;
+        }
+
+        if (rows1[i].receiver?.address !== rows2[i].receiver?.address) {
+            return false;
+        }
+
+        if (rows1[i].comment !== rows2[i].comment) {
+            return false;
+        }
+    }
+
+    return true;
 };

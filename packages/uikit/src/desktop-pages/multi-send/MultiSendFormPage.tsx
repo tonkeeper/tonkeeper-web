@@ -9,7 +9,7 @@ import { useAssets } from '../../state/home';
 import { formatter } from '../../hooks/balance';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { MultiSendTable } from '../../components/desktop/multi-send/MultiSendTable';
-import { MultiSendList, MultiSendListTemplate } from "../../state/multiSend";
+import { MultiSendList } from '../../state/multiSend';
 
 const PageWrapper = styled.div`
     overflow: auto;
@@ -31,7 +31,10 @@ const MultiSendTableStyled = styled(MultiSendTable)`
     flex: 1;
 `;
 
-export const DesktopMultiSendFormPage: FC<{ list: MultiSendListTemplate }> = ({ list }) => {
+export const DesktopMultiSendFormPage: FC<{ list: MultiSendList; onBack: () => void }> = ({
+    list,
+    onBack
+}) => {
     return (
         <PageWrapper>
             <DesktopViewHeader>
@@ -41,7 +44,7 @@ export const DesktopMultiSendFormPage: FC<{ list: MultiSendListTemplate }> = ({ 
                 <MultiSendHeader>
                     <AssetSelect />
                 </MultiSendHeader>
-                <MultiSendTableStyled list={list} />
+                <MultiSendTableStyled list={list} onBack={onBack} />
             </PageBodyWrapper>
         </PageWrapper>
     );

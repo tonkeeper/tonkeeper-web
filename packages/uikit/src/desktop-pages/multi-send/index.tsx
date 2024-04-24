@@ -105,6 +105,15 @@ export const DesktopMultiSendPage: FC = () => {
         }
     }, [lists]);
 
+    useEffect(() => {
+        if (selectedList && lists) {
+            const updatedList = lists.find(l => l.id === selectedList.id);
+            if (updatedList) {
+                setSelectedList(updatedList);
+            }
+        }
+    }, [lists]);
+
     if (!lists) {
         return (
             <LoadingWrapper>
@@ -114,7 +123,12 @@ export const DesktopMultiSendPage: FC = () => {
     }
 
     if (selectedList) {
-        return <DesktopMultiSendFormPage list={selectedList} />;
+        return (
+            <DesktopMultiSendFormPage
+                list={selectedList}
+                onBack={() => setSelectedList(undefined)}
+            />
+        );
     }
 
     return (

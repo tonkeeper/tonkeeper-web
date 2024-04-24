@@ -37,8 +37,8 @@ export const useMutateUserMultiSendList = () => {
         const listIndex = lists.findIndex(l => l.id === list.id);
 
         if (listIndex === -1) {
-            const maxId = Math.max(1, ...lists.map(l => l.id));
-            lists.push({ ...list, id: maxId + 1 });
+            const id = list.id ?? Math.max(1, ...lists.map(l => l.id)) + 1;
+            lists.push({ ...list, id });
         } else {
             lists[listIndex] = list as MultiSendList;
         }
