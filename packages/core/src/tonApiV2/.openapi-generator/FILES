@@ -120,6 +120,7 @@ models/GetAccountsRequest.ts
 models/GetAllRawShardsInfo200Response.ts
 models/GetChartRates200Response.ts
 models/GetInscriptionOpTemplate200Response.ts
+models/GetMarketsRates200Response.ts
 models/GetRates200Response.ts
 models/GetRawAccountState200Response.ts
 models/GetRawBlockProof200Response.ts
@@ -154,6 +155,7 @@ models/InscriptionBalances.ts
 models/InscriptionMintAction.ts
 models/InscriptionTransferAction.ts
 models/JettonBalance.ts
+models/JettonBalanceLock.ts
 models/JettonBridgeParams.ts
 models/JettonBridgePrices.ts
 models/JettonBurnAction.ts
@@ -169,6 +171,7 @@ models/JettonTransferAction.ts
 models/JettonVerificationType.ts
 models/Jettons.ts
 models/JettonsBalances.ts
+models/MarketTonRates.ts
 models/Message.ts
 models/MessageConsequences.ts
 models/MethodExecutionResult.ts
