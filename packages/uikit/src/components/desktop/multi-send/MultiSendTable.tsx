@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { DnsRecipient, TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import styled, { css } from 'styled-components';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
@@ -29,6 +29,7 @@ import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { EditListNotification } from './EditListNotification';
 import { DeleteListNotification } from './DeleteListNotification';
 import { UpdateListNotification } from './UpdateListNotification';
+import { useBlocker } from 'react-router-dom';
 
 const MultiSendTableGrid = styled.div`
     display: grid;
@@ -250,6 +251,10 @@ const MultiSendFooter: FC<{
         });
         saveOnClose();
         updateOnClose();
+
+        if (blocker.state === 'blocked') {
+            blocker.proceed();
+        }
     };
 
     const onEditName = (name: string) => {
@@ -267,6 +272,25 @@ const MultiSendFooter: FC<{
     };
 
     const canSave = asset.id !== list.token.id || !eqForms(rowsValue, list.form.rows);
+    const blocker = useBlocker(() => canSave);
+
+    useEffect(() => {
+        if (blocker.state === 'blocked') {
+            if (listAlreadyExist) {
+                updateOnOpen();
+            } else {
+                saveOnOpen();
+            }
+        }
+    }, [blocker.state]);
+
+    const onClose = () => {
+        if (blocker.state === 'blocked') {
+            blocker.proceed();
+        }
+        updateOnClose();
+        saveOnClose();
+    };
 
     return (
         <>
@@ -312,12 +336,12 @@ const MultiSendFooter: FC<{
             </MultiSendFooterWrapper>
             <SaveListNotification
                 isOpen={saveIsOpen}
-                onCancel={saveOnClose}
+                onCancel={onClose}
                 onSave={name => onSaveList(name, false)}
                 listName={list.name}
                 rowsNumber={rowsValue.length}
                 totalValue={willBeSent}
-                willDiscard={false}
+                willDiscard={blocker.state === 'blocked'}
             />
             <EditListNotification
                 isOpen={editIsOpen}
@@ -335,13 +359,13 @@ const MultiSendFooter: FC<{
             />
             <UpdateListNotification
                 isOpen={updateIsOpen}
-                onCancel={updateOnClose}
+                onCancel={onClose}
                 onSave={name => onSaveList(name, true)}
                 onUpdate={() => onSaveList(list.name, false)}
                 listName={list.name}
                 rowsNumber={rowsValue.length}
                 totalValue={willBeSent}
-                willDiscard={false}
+                willDiscard={blocker.state === 'blocked'}
             />
         </>
     );

@@ -47,7 +47,17 @@ import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MemoryRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import {
+    createMemoryRouter,
+    createRoutesFromElements,
+    MemoryRouter,
+    Outlet,
+    Route,
+    RouterProvider,
+    Routes,
+    useLocation,
+    useNavigate
+} from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
@@ -137,20 +147,26 @@ export const App = () => {
     useEffect(() => {
         document.body.classList.add(window.backgroundApi.platform());
     }, []);
+
+    const router = createMemoryRouter([
+        {
+            path: '/*',
+            element: <ThemeAndContent />
+        }
+    ]);
+
     return (
-        <MemoryRouter>
-            <QueryClientProvider client={queryClient}>
-                <Suspense fallback={<div></div>}>
-                    <AppSdkContext.Provider value={sdk}>
-                        <TranslationContext.Provider value={translation}>
-                            <StorageContext.Provider value={sdk.storage}>
-                                <ThemeAndContent />
-                            </StorageContext.Provider>
-                        </TranslationContext.Provider>
-                    </AppSdkContext.Provider>
-                </Suspense>
-            </QueryClientProvider>
-        </MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+            <Suspense fallback={<div></div>}>
+                <AppSdkContext.Provider value={sdk}>
+                    <TranslationContext.Provider value={translation}>
+                        <StorageContext.Provider value={sdk.storage}>
+                            <RouterProvider router={router} />
+                        </StorageContext.Provider>
+                    </TranslationContext.Provider>
+                </AppSdkContext.Provider>
+            </Suspense>
+        </QueryClientProvider>
     );
 };
 

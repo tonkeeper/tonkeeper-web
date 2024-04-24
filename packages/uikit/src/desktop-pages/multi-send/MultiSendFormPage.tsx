@@ -1,4 +1,3 @@
-import { FC } from 'react';
 import styled from 'styled-components';
 import { DesktopBackButton, DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
 import { Body2, Body3, Label2 } from '../../components/Text';
@@ -9,7 +8,9 @@ import { useAssets } from '../../state/home';
 import { formatter } from '../../hooks/balance';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { MultiSendTable } from '../../components/desktop/multi-send/MultiSendTable';
-import { MultiSendList } from '../../state/multiSend';
+import { MultiSendList, useUserMultiSendLists } from '../../state/multiSend';
+import { useNavigate, useParams } from 'react-router-dom';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 const PageWrapper = styled.div`
     overflow: auto;
@@ -31,25 +32,49 @@ const MultiSendTableStyled = styled(MultiSendTable)`
     flex: 1;
 `;
 
-const DesktopBackButtonStyled = styled(DesktopBackButton)`
-    padding: 0 1rem;
-    height: 2rem;
-`;
 
-export const DesktopMultiSendFormPage: FC<{ list: MultiSendList; onBack: () => void }> = ({
-    list,
-    onBack
-}) => {
+export const DesktopMultiSendFormPage = () => {
+    const { id } = useParams();
+    const { data: lists } = useUserMultiSendLists();
+    const navigate = useNavigate();
+
+    let list: MultiSendList | undefined = undefined;
+    if (id !== undefined && lists) {
+        list = lists.find(l => l.id === Number(id));
+
+        if (!list) {
+            list = {
+                id: Number(id),
+                name: `List ${id}`,
+                token: TON_ASSET,
+                form: {
+                    rows: [
+                        {
+                            receiver: undefined,
+                            amount: undefined,
+                            comment: ''
+                        },
+                        {
+                            receiver: undefined,
+                            amount: undefined,
+                            comment: ''
+                        }
+                    ]
+                }
+            };
+        }
+    }
+
     return (
         <PageWrapper>
-            <DesktopViewHeader backButton={<DesktopBackButtonStyled onBack={onBack} />}>
-                <Label2>{list.name}</Label2>
+            <DesktopViewHeader backButton>
+                <Label2>{list?.name || ''}</Label2>
             </DesktopViewHeader>
             <PageBodyWrapper>
                 <MultiSendHeader>
                     <AssetSelect />
                 </MultiSendHeader>
-                <MultiSendTableStyled list={list} onBack={onBack} />
+                {list && <MultiSendTableStyled list={list} onBack={() => navigate(-1)} />}
             </PageBodyWrapper>
         </PageWrapper>
     );
