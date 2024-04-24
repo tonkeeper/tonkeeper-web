@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { DnsRecipient, TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import styled, { css } from 'styled-components';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
@@ -13,8 +13,6 @@ import { ControllerRenderProps } from 'react-hook-form/dist/types/controller';
 import BigNumber from 'bignumber.js';
 import { formatter } from '../../../hooks/balance';
 import { useRate } from '../../../state/rates';
-import { useAppContext } from '../../../hooks/appContext';
-import { useWalletTotalBalance } from '../../../state/wallet';
 import { SkeletonText } from '../../shared/Skeleton';
 import {
     MultiSendForm,
@@ -30,6 +28,15 @@ import { EditListNotification } from './EditListNotification';
 import { DeleteListNotification } from './DeleteListNotification';
 import { UpdateListNotification } from './UpdateListNotification';
 import { useBlocker } from 'react-router-dom';
+import { AssetSelect } from './AssetSelect';
+import { useAssets } from '../../../state/home';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { Address } from '@ton/core';
+
+const AssetSelectWrapper = styled.div`
+    padding-bottom: 1rem;
+`;
 
 const MultiSendTableGrid = styled.div`
     display: grid;
@@ -147,6 +154,7 @@ export const MultiSendTable: FC<{
     list: MultiSendList;
     onBack: () => void;
 }> = ({ className, list, onBack }) => {
+    const [asset, setAsset] = useState<TonAsset>(list.token);
     const methods = useForm<MultiSendForm>({
         defaultValues: list.form
     });
@@ -164,12 +172,15 @@ export const MultiSendTable: FC<{
 
     return (
         <>
+            <AssetSelectWrapper>
+                <AssetSelect asset={asset} onAssetChange={setAsset} />
+            </AssetSelectWrapper>
             <FormProvider {...methods}>
                 <TableFormWrapper onSubmit={methods.handleSubmit(onSubmit)} className={className}>
                     <MultiSendTableGrid>
                         {fields.map((item, index) => (
                             <>
-                                <FormRow key={item.id} index={index} />
+                                <FormRow key={item.id} index={index} asset={asset} />
                                 <IconButtonStyled
                                     type="button"
                                     transparent
@@ -198,7 +209,7 @@ export const MultiSendTable: FC<{
                     <Spacer />
                     <MultiSendFooter
                         list={list}
-                        asset={list.token}
+                        asset={asset}
                         rowsValue={rowsValue}
                         onBack={onBack}
                     />
@@ -228,16 +239,28 @@ const MultiSendFooter: FC<{
     );
     const { willBeSent, willBeSentBN } = getWillBeMultiSendValue(rowsValue, asset, rate);
 
-    const { fiat } = useAppContext();
-    const { data: balance } = useWalletTotalBalance(fiat);
-    const remainingBalanceBN = balance?.minus(willBeSentBN);
+    const [balances] = useAssets();
+
+    let selectedAssetBalance = new BigNumber(0);
+
+    if (asset.id === TON_ASSET.id) {
+        selectedAssetBalance = shiftedDecimals(balances?.ton.info.balance || 0, TON_ASSET.decimals);
+    } else {
+        const jb = balances?.ton.jettons.balances.find(j =>
+            Address.parse(j.jetton.address).equals(asset.address as Address)
+        );
+
+        selectedAssetBalance = shiftedDecimals(jb?.balance || 0, asset.decimals);
+    }
+
+    const remainingBalanceBN = selectedAssetBalance?.minus(willBeSentBN);
     const remainingBalance =
         formatter.format(remainingBalanceBN || new BigNumber(0), {
             decimals: asset.decimals
         }) +
         ' ' +
         asset.symbol;
-    const balancesLoading = !balance || !rate;
+    const balancesLoading = !balances || !rate;
 
     const listAlreadyExist = storedLists?.some(l => l.id === list.id);
     const onSaveList = (name: string, asNew: boolean) => {
@@ -371,7 +394,7 @@ const MultiSendFooter: FC<{
     );
 };
 
-const FormRow: FC<{ index: number }> = ({ index }) => {
+const FormRow: FC<{ index: number; asset: TonAsset }> = ({ index, asset }) => {
     const { control } = useFormContext();
     return (
         <>
@@ -414,7 +437,7 @@ const FormRow: FC<{ index: number }> = ({ index }) => {
                                 `rows.${number}.amount`
                             >
                         }
-                        token={{ symbol: 'TON', address: 'TON', decimals: 9 }}
+                        asset={asset}
                     />
                 )}
                 name={`rows.${index}.amount`}

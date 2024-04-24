@@ -1,7 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAppSdk } from '../hooks/appSdk';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import {
+    TonAsset,
+    tonAssetAddressFromString,
+    tonAssetAddressToString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 
 export type MultiSendForm = {
@@ -25,7 +29,16 @@ export const useUserMultiSendLists = () => {
     const sdk = useAppSdk();
     return useQuery([AppKey.MULTI_SEND_LISTS], async () => {
         const lists = await sdk.storage.get<MultiSendList[]>(AppKey.MULTI_SEND_LISTS);
-        return lists || [];
+
+        const deserialized = lists?.map(l => ({
+            ...l,
+            token: {
+                ...l.token,
+                address: tonAssetAddressFromString(l.token.address)
+            }
+        }));
+
+        return deserialized || [];
     });
 };
 
@@ -43,7 +56,15 @@ export const useMutateUserMultiSendList = () => {
             lists[listIndex] = list as MultiSendList;
         }
 
-        await sdk.storage.set(AppKey.MULTI_SEND_LISTS, lists);
+        const serialized = lists.map(l => ({
+            ...l,
+            token: {
+                ...l.token,
+                address: tonAssetAddressToString(l.token.address)
+            }
+        }));
+
+        await sdk.storage.set(AppKey.MULTI_SEND_LISTS, serialized);
         await client.invalidateQueries([AppKey.MULTI_SEND_LISTS]);
     });
 };

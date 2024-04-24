@@ -13,6 +13,7 @@ import { formatter } from '../../../hooks/balance';
 import { InputBlockStyled, InputFieldStyled } from './InputStyled';
 import styled, { css } from 'styled-components';
 import { Body2 } from '../../Text';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 const AmountInputFieldStyled = styled(InputFieldStyled)<{ color?: string }>`
     text-align: right;
@@ -50,13 +51,9 @@ export const AmountInput: FC<{
         },
         `rows.${number}.amount`
     >;
-    token: {
-        symbol: string;
-        address: string;
-        decimals: number;
-    };
+    asset: TonAsset;
     fieldState: ControllerFieldState;
-}> = ({ token, fieldState, field }) => {
+}> = ({ asset, fieldState, field }) => {
     const { fiat } = useAppContext();
     const [focus, setFocus] = useState(false);
     const [currencyAmount, setCurrencyAmount] = useState({
@@ -65,11 +62,15 @@ export const AmountInput: FC<{
         fiatValue: '',
         inputValue: ''
     });
-    const { data, isFetched } = useRate(token.address);
+
+    const { data, isFetched } = useRate(
+        typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
+    );
+
     const price = data?.prices || 1;
 
     const onInput = (inFiat: boolean, newValue: string) => {
-        const decimals = currencyAmount.inFiat ? 2 : token.decimals;
+        const decimals = currencyAmount.inFiat ? 2 : asset.decimals;
 
         let inputValue = replaceTypedDecimalSeparator(newValue);
 
@@ -104,7 +105,7 @@ export const AmountInput: FC<{
                 removeGroupSeparator(inputValue).replace(getDecimalSeparator(), '.')
             );
             if (inFiat) {
-                tokenValue = formatter.format(bnInput.div(price), { decimals: token.decimals });
+                tokenValue = formatter.format(bnInput.div(price), { decimals: asset.decimals });
 
                 fiatValue = formattedInput;
             } else {
@@ -187,7 +188,7 @@ export const AmountInput: FC<{
                     onFocus(false);
                 }}
             >
-                {token.symbol}
+                {asset.symbol}
             </AmountInputFieldRight>
             <AmountInputFieldStyled
                 id={fiatId}

@@ -11,6 +11,14 @@ export interface TonAssetIdentification {
 
 export interface TonAsset extends BasicAsset, TonAssetIdentification {}
 
+export function tonAssetAddressToString(address: TonAsset['address']): string {
+    return typeof address === 'string' ? address : address.toRawString();
+}
+
+export function tonAssetAddressFromString(address: string): TonAsset['address'] {
+    return address === 'TON' ? address : Address.parse(address);
+}
+
 export function jettonToTonAsset(address: string, jettons: JettonsBalances): TonAsset {
     if (address === 'TON') {
         return TON_ASSET;
