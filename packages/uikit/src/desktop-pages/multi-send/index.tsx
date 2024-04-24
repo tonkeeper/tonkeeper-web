@@ -1,9 +1,9 @@
 import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
+import { DesktopBackButton, DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
 import { Body2, Body3, Label2 } from '../../components/Text';
 import { ListBlock, ListItem } from '../../components/List';
-import { ChevronRightIcon, SpinnerIcon } from '../../components/Icon';
+import { ChevronRightIcon, CloseIcon, SpinnerIcon } from '../../components/Icon';
 import { MultiSendList, useUserMultiSendLists } from '../../state/multiSend';
 import { getWillBeMultiSendValue } from '../../components/desktop/multi-send/MultiSendTable';
 import { useRate } from '../../state/rates';
@@ -40,6 +40,11 @@ const PageBodyWrapper = styled.div`
 const Body3Secondary = styled(Body3)`
     color: ${p => p.theme.textSecondary};
     display: flex;
+    align-items: center;
+`;
+
+const SkeletonTextStyled = styled(SkeletonText)`
+    margin-left: 4px;
 `;
 
 const ListBlockStyled = styled(ListBlock)`
@@ -75,6 +80,11 @@ const ListItemStyled = styled(ListItem)`
 const ListItemTextContainer = styled.div`
     display: flex;
     flex-direction: column;
+`;
+
+const DesktopBackButtonStyled = styled(DesktopBackButton)`
+    padding: 0 1rem;
+    height: 2rem;
 `;
 
 export const DesktopMultiSendPage: FC = () => {
@@ -114,6 +124,29 @@ export const DesktopMultiSendPage: FC = () => {
         }
     }, [lists]);
 
+    const onCreateList = () => {
+        const id = Math.max(1, ...lists!.map(l => l.id)) + 1;
+        setSelectedList({
+            id,
+            name: `List ${id}`,
+            token: TON_ASSET,
+            form: {
+                rows: [
+                    {
+                        receiver: undefined,
+                        amount: undefined,
+                        comment: ''
+                    },
+                    {
+                        receiver: undefined,
+                        amount: undefined,
+                        comment: ''
+                    }
+                ]
+            }
+        });
+    };
+
     if (!lists) {
         return (
             <LoadingWrapper>
@@ -133,11 +166,17 @@ export const DesktopMultiSendPage: FC = () => {
 
     return (
         <PageWrapper>
-            <DesktopViewHeader backButton>
+            <DesktopViewHeader backButton={<DesktopBackButtonStyled icon={<CloseIcon />} />}>
                 <Label2>New Multi Send</Label2>
             </DesktopViewHeader>
             <PageBodyWrapper>
                 <ListBlockStyled>
+                    <ListItemStyled onClick={onCreateList}>
+                        <Body2>New List</Body2>
+                        <IconContainerStyled>
+                            <ChevronRightIcon />
+                        </IconContainerStyled>
+                    </ListItemStyled>
                     {lists.map(list => (
                         <MultiSendListElement
                             list={list}
@@ -169,8 +208,8 @@ const MultiSendListElement: FC<{
                     {list.name} · {list.token.symbol}
                 </Body2>
                 <Body3Secondary>
-                    {list.form.rows.length} wallets · 
-                    {rate ? willBeSent : <SkeletonText size="small" />}
+                    {list.form.rows.length}&nbsp;wallets · 
+                    {rate ? willBeSent : <SkeletonTextStyled width="50px" size="small" />}
                 </Body3Secondary>
             </ListItemTextContainer>
             <IconContainerStyled>

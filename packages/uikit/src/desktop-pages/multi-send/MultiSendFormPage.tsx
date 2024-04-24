@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import styled from 'styled-components';
-import { DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
+import { DesktopBackButton, DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
 import { Body2, Body3, Label2 } from '../../components/Text';
 import { DropDown } from '../../components/DropDown';
 import { Button } from '../../components/fields/Button';
@@ -31,14 +31,19 @@ const MultiSendTableStyled = styled(MultiSendTable)`
     flex: 1;
 `;
 
+const DesktopBackButtonStyled = styled(DesktopBackButton)`
+    padding: 0 1rem;
+    height: 2rem;
+`;
+
 export const DesktopMultiSendFormPage: FC<{ list: MultiSendList; onBack: () => void }> = ({
     list,
     onBack
 }) => {
     return (
         <PageWrapper>
-            <DesktopViewHeader>
-                <Label2>Multi Send</Label2>
+            <DesktopViewHeader backButton={<DesktopBackButtonStyled onBack={onBack} />}>
+                <Label2>{list.name}</Label2>
             </DesktopViewHeader>
             <PageBodyWrapper>
                 <MultiSendHeader>
