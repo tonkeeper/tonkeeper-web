@@ -384,7 +384,7 @@ export const Content: FC<{
                             path={any(AppProRoute.multiSend)}
                             element={<DesktopMultiSendPage />}
                         />
-                        <Route path="*" element={<DesktopMultiSendPage />} />
+                        <Route path="*" element={<WalletContent />} />
                     </Routes>
                 </WideContent>
                 <BackgroundElements />

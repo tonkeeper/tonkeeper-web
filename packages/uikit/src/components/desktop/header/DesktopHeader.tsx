@@ -16,6 +16,8 @@ import { usePreFetchRates } from '../../../state/rates';
 import { IconButton } from '../../fields/IconButton';
 import { useTranslation } from '../../../hooks/translation';
 import { useStonfiSwapLink } from '../../../state/stonfi';
+import { Link } from 'react-router-dom';
+import { AppProRoute } from '../../../libs/routes';
 
 const DesktopHeaderStyled = styled.div`
     padding-left: 1rem;
@@ -86,6 +88,10 @@ const BalanceContainer = styled.div`
     }
 `;
 
+const LinkStyled = styled(Link)`
+    text-decoration: unset;
+`;
+
 export const DesktopHeader = () => {
     usePreFetchRates();
     const { fiat } = useAppContext();
@@ -121,6 +127,12 @@ export const DesktopHeader = () => {
                         <ArrowUpIcon />
                         {t('wallet_send')}
                     </ButtonStyled>
+                    <LinkStyled to={AppProRoute.multiSend}>
+                        <ButtonStyled size="small">
+                            <ArrowUpIcon />
+                            Multi Send
+                        </ButtonStyled>
+                    </LinkStyled>
                     <ButtonStyled
                         size="small"
                         onClick={() => {
