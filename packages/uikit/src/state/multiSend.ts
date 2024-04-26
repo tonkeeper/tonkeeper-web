@@ -11,7 +11,7 @@ import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 export type MultiSendForm = {
     rows: {
         receiver: TonRecipient | undefined;
-        amount: { inFiat?: boolean; value?: string } | undefined;
+        amount: { inFiat: boolean; value: string } | undefined;
         comment?: string;
     }[];
 };
@@ -34,7 +34,7 @@ export const useUserMultiSendLists = () => {
             ...l,
             token: {
                 ...l.token,
-                address: tonAssetAddressFromString(l.token.address)
+                address: tonAssetAddressFromString(l.token.address as string)
             }
         }));
 

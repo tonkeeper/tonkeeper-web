@@ -59,10 +59,16 @@ export const ReceiverInput: FC<{
             value = value.trim();
 
             if (seeIfValidTonAddress(value)) {
+                let bounce = false;
+                if (Address.isFriendly(value)) {
+                    bounce = Address.parseFriendly(value).isBounceable;
+                }
+
                 return {
                     success: true,
                     result: {
                         address: value,
+                        bounce,
                         blockchain: BLOCKCHAIN_NAME.TON
                     }
                 };

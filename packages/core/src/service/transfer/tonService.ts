@@ -6,18 +6,19 @@ import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipient, TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
-import { WalletState } from '../../entries/wallet';
+import { WalletState, WalletVersion } from '../../entries/wallet';
 import { Account, AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
 import {
-    SendMode,
+    checkMaxAllowedMessagesInMultiTransferOrDie,
     checkServiceTimeOrDie,
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
     externalMessage,
     getTTL,
     getWalletBalance,
-    getWalletSeqNo
+    getWalletSeqNo,
+    SendMode
 } from './common';
 
 export type AccountsMap = Map<string, Account>;
@@ -242,4 +243,131 @@ export const sendTonTransfer = async (
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
         sendBlockchainMessageRequest: { boc: cell.toString('base64') }
     });
+};
+
+export type TransferMessage = {
+    to: string;
+    bounce: boolean;
+    weiAmount: BigNumber;
+    comment?: string;
+};
+
+export const transferMessagesToGroups = (
+    transferMessages: TransferMessage[],
+    walletVersion: WalletVersion
+) => {
+    const maxMessagesInTx = walletVersion === WalletVersion.W5 ? 255 : 4;
+
+    return transferMessages.reduce((acc, transferMsg) => {
+        const lastGroup = acc.length === 0 ? [] : acc[acc.length - 1];
+
+        if (lastGroup.length === maxMessagesInTx) {
+            acc.push([transferMsg]);
+        } else {
+            lastGroup.push(transferMsg);
+            acc[acc.length - 1] = lastGroup;
+        }
+        return acc;
+    }, [] as TransferMessage[][]);
+};
+
+const createTonMultiTransfer = (
+    seqno: number,
+    walletState: WalletState,
+    transferMessages: TransferMessage[],
+    secretKey: Buffer = Buffer.alloc(64)
+) => {
+    const contract = walletContractFromState(walletState);
+    const groups = transferMessagesToGroups(transferMessages, walletState.active.version);
+
+    return groups.map((group, index) => {
+        const raw = {
+            seqno: seqno + index,
+            secretKey,
+            timeout: getTTL() + 60 * index,
+            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+            messages: group.map(msg =>
+                internal({
+                    to: msg.to,
+                    bounce: msg.bounce,
+                    value: BigInt(msg.weiAmount.toFixed(0)),
+                    body: msg.comment !== '' ? msg.comment : undefined
+                })
+            )
+        };
+        const transfer = contract.createTransfer(raw);
+        return { packed: externalMessage(contract, seqno, transfer).toBoc(), raw };
+    });
+};
+
+export const MAX_ALLOWED_MULTI_TRANSFERS = {
+    [WalletVersion.W5]: 510,
+    [WalletVersion.V4R2]: 16,
+    [WalletVersion.V4R1]: 16,
+    [WalletVersion.V3R2]: 16,
+    [WalletVersion.V3R1]: 16
+};
+
+export const estimateTonMultiTransfer = async (
+    api: APIConfig,
+    walletState: WalletState,
+    transferMessages: TransferMessage[]
+) => {
+    await checkServiceTimeOrDie(api);
+
+    const total = transferMessages.reduce((acc, msg) => acc.plus(msg.weiAmount), new BigNumber(0));
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
+    checkWalletBalanceOrDie(total, wallet);
+
+    checkMaxAllowedMessagesInMultiTransferOrDie(
+        transferMessages.length,
+        walletState.active.version
+    );
+
+    const cells = createTonMultiTransfer(seqno, walletState, transferMessages, Buffer.alloc(64));
+
+    const emulationApi = new EmulationApi(api.tonApiV2);
+
+    const estimations = cells.map(cell =>
+        emulationApi.emulateMessageToAccountEvent({
+            ignoreSignatureCheck: true,
+            accountId: wallet.address,
+            decodeMessageRequest: { boc: cell.packed.toString('base64') }
+        })
+    );
+
+    return Promise.all(estimations);
+};
+
+export const sendTonMultiTransfer = async (
+    api: APIConfig,
+    walletState: WalletState,
+    transferMessages: TransferMessage[],
+    feeEstimate: BigNumber,
+    mnemonic: string[]
+) => {
+    await checkServiceTimeOrDie(api);
+    const keyPair = await mnemonicToPrivateKey(mnemonic);
+
+    const total = transferMessages.reduce((acc, msg) => acc.plus(msg.weiAmount), new BigNumber(0));
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
+    checkWalletBalanceOrDie(total.plus(feeEstimate), wallet);
+
+    checkMaxAllowedMessagesInMultiTransferOrDie(
+        transferMessages.length,
+        walletState.active.version
+    );
+
+    const cells = createTonMultiTransfer(seqno, walletState, transferMessages, keyPair.secretKey);
+
+    if (cells.length === 1) {
+        await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
+            sendBlockchainMessageRequest: { boc: cells[0].packed.toString('base64') }
+        });
+    } else {
+        await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
+            sendBlockchainMessageRequest: { batch: cells.map(c => c.packed.toString('base64')) }
+        });
+    }
+    return cells;
 };

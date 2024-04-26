@@ -17,9 +17,10 @@ import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
 import { TransferEstimationEvent } from '../../entries/send';
-import { WalletState } from '../../entries/wallet';
+import { WalletState, WalletVersion } from '../../entries/wallet';
 import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
+import { MAX_ALLOWED_MULTI_TRANSFERS } from './tonService';
 
 export enum SendMode {
     CARRY_ALL_REMAINING_BALANCE = 128,
@@ -63,6 +64,17 @@ export const checkWalletBalanceOrDie = (total: BigNumber, wallet: Account) => {
             `Not enough account "${wallet.address}" amount: "${
                 wallet.balance
             }", transaction total: ${total.toString()}`
+        );
+    }
+};
+
+export const checkMaxAllowedMessagesInMultiTransferOrDie = (
+    messagesNumber: number,
+    walletVersion: WalletVersion
+) => {
+    if (messagesNumber > MAX_ALLOWED_MULTI_TRANSFERS[walletVersion]) {
+        throw new Error(
+            `Max number of transfers in one multi transfer exceeded. Max allowed is ${MAX_ALLOWED_MULTI_TRANSFERS[walletVersion]}, but got ${messagesNumber}.`
         );
     }
 };
