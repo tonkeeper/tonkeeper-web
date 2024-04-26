@@ -11,6 +11,8 @@ import { SkeletonText } from '../../components/shared/Skeleton';
 import { DesktopMultiSendFormPage } from './MultiSendFormPage';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { getWillBeMultiSendValue } from '../../components/desktop/multi-send/utils';
+import { ErrorBoundary } from 'react-error-boundary';
+import { fallbackRenderOver } from '../../components/Error';
 
 const PageWrapper = styled.div`
     overflow: auto;
@@ -112,35 +114,48 @@ export const DesktopMultiSendPage: FC = () => {
 
     return (
         <Routes>
-            <Route path="/list/:id" element={<DesktopMultiSendFormPage />} />
+            <Route
+                path="/list/:id"
+                element={
+                    <ErrorBoundary
+                        fallbackRender={fallbackRenderOver('Failed to display multi-send page')}
+                    >
+                        <DesktopMultiSendFormPage />
+                    </ErrorBoundary>
+                }
+            />
             <Route
                 path="*"
                 element={
-                    <PageWrapper>
-                        <DesktopViewHeader
-                            backButton={<DesktopBackButtonStyled icon={<CloseIcon />} />}
-                        >
-                            <Label2>New Multi Send</Label2>
-                        </DesktopViewHeader>
-                        <PageBodyWrapper>
-                            <ListBlockStyled>
-                                <ListItemStyled onClick={onCreateList}>
-                                    <Body2>New List</Body2>
-                                    <IconContainerStyled>
-                                        <ChevronRightIcon />
-                                    </IconContainerStyled>
-                                </ListItemStyled>
-                                {lists.map(list => (
-                                    <MultiSendListElement
-                                        list={list}
-                                        key={list.id}
-                                        asset={list.token}
-                                        onClick={() => navigate('./list/' + list.id)}
-                                    />
-                                ))}
-                            </ListBlockStyled>
-                        </PageBodyWrapper>
-                    </PageWrapper>
+                    <ErrorBoundary
+                        fallbackRender={fallbackRenderOver('Failed to display multi-send page')}
+                    >
+                        <PageWrapper>
+                            <DesktopViewHeader
+                                backButton={<DesktopBackButtonStyled icon={<CloseIcon />} />}
+                            >
+                                <Label2>New Multi Send</Label2>
+                            </DesktopViewHeader>
+                            <PageBodyWrapper>
+                                <ListBlockStyled>
+                                    <ListItemStyled onClick={onCreateList}>
+                                        <Body2>New List</Body2>
+                                        <IconContainerStyled>
+                                            <ChevronRightIcon />
+                                        </IconContainerStyled>
+                                    </ListItemStyled>
+                                    {lists.map(list => (
+                                        <MultiSendListElement
+                                            list={list}
+                                            key={list.id}
+                                            asset={list.token}
+                                            onClick={() => navigate('./list/' + list.id)}
+                                        />
+                                    ))}
+                                </ListBlockStyled>
+                            </PageBodyWrapper>
+                        </PageWrapper>
+                    </ErrorBoundary>
                 }
             ></Route>
         </Routes>

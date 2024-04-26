@@ -15,8 +15,6 @@ import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../Icon';
 import { Num2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { IconButton } from '../../fields/IconButton';
-import { useTranslation } from '../../../hooks/translation';
-import { useStonfiSwapLink } from '../../../state/stonfi';
 import { Link } from 'react-router-dom';
 import { AppProRoute } from '../../../libs/routes';
 import { BuyNotification } from '../../home/BuyAction';
