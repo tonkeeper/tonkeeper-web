@@ -1,10 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
+    ConnectTransferError,
     EstimateData,
     estimateTonConnectTransfer,
     getAccountsMap,
-    sendTonConnectTransfer
+    sendTonConnectTransfer,
+    tonConnectTransferError
 } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { FC, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -13,7 +15,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { getMnemonic } from '../../state/mnemonic';
-import { CheckmarkCircleIcon } from '../Icon';
+import { CheckmarkCircleIcon, ErrorIcon } from '../Icon';
 import {
     Notification,
     NotificationBlock,
@@ -21,7 +23,7 @@ import {
     NotificationFooterPortal
 } from '../Notification';
 import { SkeletonList } from '../Skeleton';
-import { Label2 } from '../Text';
+import { Body2, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
@@ -90,6 +92,58 @@ const NotificationSkeleton: FC<{ handleClose: (result?: string) => void }> = ({ 
     );
 };
 
+const ErrorStyled = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin: 1rem 0px 2rem;
+`;
+
+const Header = styled(H2)`
+    text-align: center;
+`;
+const Secondary = styled(Body2)`
+    color: ${props => props.theme.textSecondary};
+`;
+
+const NotificationIssue: FC<{
+    kind: 'date-and-time' | 'not-enough-balance';
+    handleClose: (result?: string) => void;
+}> = ({ kind, handleClose }) => {
+    const { t } = useTranslation();
+
+    return (
+        <NotificationBlock>
+            <ErrorStyled>
+                <ErrorIcon />
+                {kind === 'date-and-time' ? (
+                    <>
+                        <div>
+                            <Header>{t('notify_incorrect_time_err_title')}</Header>
+                            <Secondary>{t('send_sending_wrong_time_description')}</Secondary>
+                        </div>
+                    </>
+                ) : (
+                    <Header>{t('send_screen_steps_amount_insufficient_balance')}</Header>
+                )}
+            </ErrorStyled>
+
+            <ButtonGap />
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ButtonRowStyled>
+                        <Button size="large" type="button" onClick={() => handleClose()}>
+                            {t('notifications_alert_cancel')}
+                        </Button>
+                    </ButtonRowStyled>
+                </NotificationFooter>
+            </NotificationFooterPortal>
+        </NotificationBlock>
+    );
+};
+
 const ConnectContent: FC<{
     params: TonConnectTransactionPayload;
     handleClose: (result?: string) => void;
@@ -99,7 +153,8 @@ const ConnectContent: FC<{
 
     const { t } = useTranslation();
 
-    const { data: estimate, isLoading: isEstimating, isError } = useEstimation(params);
+    const { data: issues, isFetched } = useTransactionError(params);
+    const { data: estimate, isLoading: isEstimating, isError } = useEstimation(params, isFetched);
     const { mutateAsync, isLoading } = useSendMutation(params, estimate);
 
     useEffect(() => {
@@ -115,6 +170,10 @@ const ConnectContent: FC<{
         sdk.hapticNotification('success');
         setTimeout(() => handleClose(result), 300);
     };
+
+    if (issues?.kind !== undefined) {
+        return <NotificationIssue kind={issues?.kind} handleClose={handleClose} />;
+    }
 
     if (isEstimating) {
         return <NotificationSkeleton handleClose={handleClose} />;
@@ -161,14 +220,27 @@ const ConnectContent: FC<{
     );
 };
 
-const useEstimation = (params: TonConnectTransactionPayload) => {
+const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boolean) => {
     const { api } = useAppContext();
     const wallet = useWalletContext();
 
-    return useQuery<EstimateData, Error>([QueryKey.estimate, params], async () => {
-        const accounts = await getAccountsMap(api, params);
-        const accountEvent = await estimateTonConnectTransfer(api, wallet, accounts, params);
-        return { accounts, accountEvent };
+    return useQuery<EstimateData, Error>(
+        [QueryKey.estimate, params],
+        async () => {
+            const accounts = await getAccountsMap(api, params);
+            const accountEvent = await estimateTonConnectTransfer(api, wallet, accounts, params);
+            return { accounts, accountEvent };
+        },
+        { enabled: errorFetched }
+    );
+};
+
+const useTransactionError = (params: TonConnectTransactionPayload) => {
+    const { api } = useAppContext();
+    const wallet = useWalletContext();
+
+    return useQuery<ConnectTransferError, Error>([QueryKey.estimate, 'error', params], async () => {
+        return tonConnectTransferError(api, wallet, params);
     });
 };
 

@@ -1,20 +1,22 @@
-import { JettonAsset, TonAsset } from '../../components/home/Jettons';
-import { useAssets } from '../../state/home';
-import { TokensPieChart } from '../../components/desktop/tokens/TokensPieChart';
-import styled, { css } from 'styled-components';
-import { Body2, Label2 } from '../../components/Text';
-import { useTranslation } from '../../hooks/translation';
-import { useAssetsDistribution } from '../../state/wallet';
-import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { isTonAddress } from '@tonkeeper/core/dist/utils/common';
+import BigNumber from 'bignumber.js';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import styled, { css } from 'styled-components';
+import { fallbackRenderOver } from '../../components/Error';
+import { Body2, Label2 } from '../../components/Text';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
+import { TokensPieChart } from '../../components/desktop/tokens/TokensPieChart';
+import { JettonAsset, TonAsset } from '../../components/home/Jettons';
 import { useAppContext } from '../../hooks/appContext';
-import BigNumber from 'bignumber.js';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { isTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { useTranslation } from '../../hooks/translation';
+import { useAssets } from '../../state/home';
+import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
+import { useAssetsDistribution } from '../../state/wallet';
 
 const DesktopAssetStylesOverride = css`
     background-color: transparent;
@@ -67,7 +69,7 @@ const Divider = styled.div`
     width: calc(100% + 32px);
 `;
 
-export const DesktopTokens = () => {
+const DesktopTokensPayload = () => {
     const [assets] = useAssets();
     const { t } = useTranslation();
     const { data: distribution } = useAssetsDistribution();
@@ -167,18 +169,22 @@ export const DesktopTokens = () => {
                 {sortedAssets && assets && distribution && uiPreferences && (
                     <>
                         {canShowChart && showChart && (
-                            <>
+                            <ErrorBoundary
+                                fallbackRender={fallbackRenderOver('Failed to display pie chart')}
+                            >
                                 <TokensPieChart
                                     distribution={distribution}
                                     onTokenClick={onTokenClick}
                                 />
                                 <Divider />
-                            </>
+                            </ErrorBoundary>
                         )}
                         <TonAssetStyled ref={tonRef} info={assets.ton.info} />
                         <Divider />
                         {sortedAssets.map(jetton => (
-                            <>
+                            <ErrorBoundary
+                                fallbackRender={fallbackRenderOver('Failed to display tokens list')}
+                            >
                                 <JettonAssetStyled
                                     ref={e => {
                                         if (e) {
@@ -191,11 +197,19 @@ export const DesktopTokens = () => {
                                     jetton={jetton}
                                 />
                                 <Divider />
-                            </>
+                            </ErrorBoundary>
                         ))}
                     </>
                 )}
             </TokensPageBody>
         </DesktopViewPageLayout>
+    );
+};
+
+export const DesktopTokens = () => {
+    return (
+        <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display desktop tokens')}>
+            <DesktopTokensPayload />
+        </ErrorBoundary>
     );
 };

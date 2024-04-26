@@ -1,22 +1,24 @@
 import { FC, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
+import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
 import { useTranslation } from '../../../hooks/translation';
+import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateActiveWallet } from '../../../state/account';
+import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
 import { useWalletState } from '../../../state/wallet';
+import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { Label2 } from '../../Text';
 import { ImportNotification } from '../../create/ImportNotification';
-import { SubscriptionInfo } from './SubscriptionInfo';
-import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
-import { useIsScrolled } from '../../../hooks/useIsScrolled';
-import { useUserUIPreferences, useMutateUserUIPreferences } from '../../../state/theme';
 import { AsideMenuItem } from '../../shared/AsideItem';
+import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { AsideHeader } from './AsideHeader';
-import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
+import { SubscriptionInfo } from './SubscriptionInfo';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -132,7 +134,7 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
     );
 };
 
-export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
+const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const [isOpenImport, setIsOpenImport] = useState(false);
     const { account, proFeatures } = useAppContext();
@@ -245,7 +247,9 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
                         </IconWrapper>
                         <Label2>{t('aside_settings')}</Label2>
                     </AsideMenuItem>
-                    <SubscriptionInfoStyled />
+                    <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load Pro State')}>
+                        <SubscriptionInfoStyled />
+                    </ErrorBoundary>
                 </AsideMenuBottom>
                 <ImportNotification isOpen={isOpenImport} setOpen={setIsOpenImport} />
             </AsideContentContainer>
@@ -257,5 +261,13 @@ export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
                 }}
             />
         </AsideContainer>
+    );
+};
+
+export const AsideMenu: FC<{ className?: string }> = ({ className }) => {
+    return (
+        <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load aside menu')}>
+            <AsideMenuPayload className={className} />
+        </ErrorBoundary>
     );
 };
