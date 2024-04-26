@@ -256,34 +256,43 @@ export const transferMessagesToGroups = (
     transferMessages: TransferMessage[],
     walletVersion: WalletVersion
 ) => {
+    if (!transferMessages.length) {
+        return [];
+    }
     const maxMessagesInTx = walletVersion === WalletVersion.W5 ? 255 : 4;
 
-    return transferMessages.reduce((acc, transferMsg) => {
-        const lastGroup = acc.length === 0 ? [] : acc[acc.length - 1];
+    return transferMessages.reduce(
+        (acc, transferMsg) => {
+            const lastGroup = acc[acc.length - 1];
 
-        if (lastGroup.length === maxMessagesInTx) {
-            acc.push([transferMsg]);
-        } else {
-            lastGroup.push(transferMsg);
-            acc[acc.length - 1] = lastGroup;
-        }
-        return acc;
-    }, [] as TransferMessage[][]);
+            if (lastGroup.length === maxMessagesInTx) {
+                acc.push([transferMsg]);
+            } else {
+                lastGroup.push(transferMsg);
+                acc[acc.length - 1] = lastGroup;
+            }
+            return acc;
+        },
+        [[]] as TransferMessage[][]
+    );
 };
 
 const createTonMultiTransfer = (
     seqno: number,
     walletState: WalletState,
     transferMessages: TransferMessage[],
-    secretKey: Buffer = Buffer.alloc(64)
+    options: {
+        keepSeqno?: boolean;
+        secretKey?: Buffer;
+    } = {}
 ) => {
     const contract = walletContractFromState(walletState);
     const groups = transferMessagesToGroups(transferMessages, walletState.active.version);
 
     return groups.map((group, index) => {
         const raw = {
-            seqno: seqno + index,
-            secretKey,
+            seqno: options.keepSeqno ? seqno : seqno + index,
+            secretKey: options.secretKey || Buffer.alloc(64),
             timeout: getTTL() + 60 * index,
             sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
             messages: group.map(msg =>
@@ -324,7 +333,7 @@ export const estimateTonMultiTransfer = async (
         walletState.active.version
     );
 
-    const cells = createTonMultiTransfer(seqno, walletState, transferMessages, Buffer.alloc(64));
+    const cells = createTonMultiTransfer(seqno, walletState, transferMessages, { keepSeqno: true });
 
     const emulationApi = new EmulationApi(api.tonApiV2);
 
@@ -358,7 +367,9 @@ export const sendTonMultiTransfer = async (
         walletState.active.version
     );
 
-    const cells = createTonMultiTransfer(seqno, walletState, transferMessages, keyPair.secretKey);
+    const cells = createTonMultiTransfer(seqno, walletState, transferMessages, {
+        secretKey: keyPair.secretKey
+    });
 
     if (cells.length === 1) {
         await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({

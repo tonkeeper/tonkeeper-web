@@ -36,11 +36,7 @@ export function multiSendFormToTransferMessages(form: MultiSendFormTokenized): T
     });
 }
 
-export function useSendMultiTransfer(
-    form: MultiSendFormTokenized,
-    asset: TonAsset,
-    feeEstimation: BigNumber
-) {
+export function useSendMultiTransfer() {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
@@ -49,7 +45,11 @@ export function useSendMultiTransfer(
     const track2 = useTransactionAnalytics();
     const { data: jettons } = useWalletJettonList();
 
-    return useMutation<boolean, Error>(async () => {
+    return useMutation<
+        boolean,
+        Error,
+        { form: MultiSendFormTokenized; asset: TonAsset; feeEstimation: BigNumber }
+    >(async ({ form, asset, feeEstimation }) => {
         const mnemonic = await getMnemonic(sdk, wallet.publicKey).catch(() => null);
         if (mnemonic === null) return false;
         try {

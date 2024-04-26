@@ -21,8 +21,8 @@ import {
 } from './common';
 import { TransferMessage, transferMessagesToGroups } from './tonService';
 
-const jettonTransferAmount = toNano('0.64');
-const jettonTransferForwardAmount = BigInt('1');
+const jettonTransferAmount = toNano(0.1);
+const jettonTransferForwardAmount = toNano(0.01);
 
 const jettonTransferBody = (params: {
     queryId: bigint;
@@ -49,15 +49,18 @@ const createJettonMultiTransfer = (
     walletState: WalletState,
     jettonWalletAddress: string,
     transferMessages: TransferMessage[],
-    secretKey: Buffer = Buffer.alloc(64)
+    options: {
+        keepSeqno?: boolean;
+        secretKey?: Buffer;
+    } = {}
 ) => {
     const contract = walletContractFromState(walletState);
     const groups = transferMessagesToGroups(transferMessages, walletState.active.version);
 
     return groups.map((group, index) => {
         const raw = {
-            seqno: seqno + index,
-            secretKey,
+            seqno: options.keepSeqno ? seqno : seqno + index,
+            secretKey: options.secretKey || Buffer.alloc(64),
             timeout: getTTL() + 60 * index,
             sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
             messages: group.map(msg =>
@@ -208,7 +211,7 @@ export const estimateJettonMultiTransfer = async (
         walletState,
         jettonWalletAddress,
         transferMessages,
-        Buffer.alloc(64)
+        { keepSeqno: true }
     );
 
     const emulationApi = new EmulationApi(api.tonApiV2);
@@ -248,7 +251,7 @@ export const sendJettonMultiTransfer = async (
         walletState,
         jettonWalletAddress,
         transferMessages,
-        keyPair.secretKey
+        { secretKey: keyPair.secretKey }
     );
 
     if (cells.length === 1) {

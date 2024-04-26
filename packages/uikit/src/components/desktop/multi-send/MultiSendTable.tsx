@@ -33,6 +33,12 @@ import { useAssets } from '../../../state/home';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { Address } from '@ton/core';
+import { MultiSendConfirmNotification } from './MultiSendConfirmNotification';
+import { getWillBeMultiSendValue } from './utils';
+import {
+    AsyncValidatorsStateProvider,
+    useAsyncValidationState
+} from '../../../hooks/useAsyncValidator';
 
 const AssetSelectWrapper = styled.div`
     padding-bottom: 1rem;
@@ -119,36 +125,6 @@ const ListActionsButtons = styled.div`
     margin-right: auto;
 `;
 
-export function getWillBeMultiSendValue(
-    rowsValue: MultiSendForm['rows'],
-    asset: { decimals: number; symbol: string },
-    rate: { prices: number } | undefined
-) {
-    const willBeSentBN = rowsValue.reduce((acc, item) => {
-        if (!item.amount?.value) {
-            return acc;
-        }
-
-        let inToken = new BigNumber(item.amount.value);
-        if (item.amount.inFiat) {
-            inToken = rate?.prices
-                ? new BigNumber(item.amount.value).div(rate.prices)
-                : new BigNumber(0);
-        }
-
-        return acc?.plus(new BigNumber(inToken));
-    }, new BigNumber(0));
-
-    const willBeSent =
-        formatter.format(willBeSentBN, {
-            decimals: asset.decimals
-        }) +
-        ' ' +
-        asset.symbol;
-
-    return { willBeSent, willBeSentBN };
-}
-
 export const MultiSendTable: FC<{
     className?: string;
     list: MultiSendList;
@@ -158,14 +134,27 @@ export const MultiSendTable: FC<{
     const methods = useForm<MultiSendForm>({
         defaultValues: list.form
     });
+    const [confirmModalForm, setConfirmModalForm] = useState<MultiSendForm | undefined>();
+    const { isOpen, onClose, onOpen } = useDisclosure();
 
     const { fields, append, remove } = useFieldArray({
         control: methods.control,
         name: 'rows'
     });
 
-    const onSubmit = (d: unknown) => {
-        console.log(d);
+    const { mutate: updateList } = useMutateUserMultiSendList();
+
+    const onSubmit = (submitForm: MultiSendForm) => {
+        setConfirmModalForm(submitForm);
+        updateList({
+            form: {
+                rows: rowsValue
+            },
+            token: asset,
+            name: list.name,
+            id: list.id
+        });
+        onOpen();
     };
 
     const rowsValue = methods.watch('rows');
@@ -176,45 +165,57 @@ export const MultiSendTable: FC<{
                 <AssetSelect asset={asset} onAssetChange={setAsset} />
             </AssetSelectWrapper>
             <FormProvider {...methods}>
-                <TableFormWrapper onSubmit={methods.handleSubmit(onSubmit)} className={className}>
-                    <MultiSendTableGrid>
-                        {fields.map((item, index) => (
-                            <>
-                                <FormRow key={item.id} index={index} asset={asset} />
-                                <IconButtonStyled
-                                    type="button"
-                                    transparent
-                                    onClick={() => remove(index)}
-                                    hide={fields.length === 1}
-                                >
-                                    <CloseIcon />
-                                </IconButtonStyled>
-                            </>
-                        ))}
-                    </MultiSendTableGrid>
-                    <Button
-                        fitContent
-                        secondary
-                        type="button"
-                        onClick={() =>
-                            append({
-                                receiver: undefined,
-                                amount: undefined,
-                                comment: ''
-                            })
-                        }
+                <AsyncValidatorsStateProvider>
+                    <TableFormWrapper
+                        onSubmit={methods.handleSubmit(onSubmit)}
+                        className={className}
                     >
-                        Add More
-                    </Button>
-                    <Spacer />
-                    <MultiSendFooter
-                        list={list}
-                        asset={asset}
-                        rowsValue={rowsValue}
-                        onBack={onBack}
-                    />
-                </TableFormWrapper>
+                        <MultiSendTableGrid>
+                            {fields.map((item, index) => (
+                                <>
+                                    <FormRow key={item.id} index={index} asset={asset} />
+                                    <IconButtonStyled
+                                        type="button"
+                                        transparent
+                                        onClick={() => remove(index)}
+                                        hide={fields.length === 1}
+                                    >
+                                        <CloseIcon />
+                                    </IconButtonStyled>
+                                </>
+                            ))}
+                        </MultiSendTableGrid>
+                        <Button
+                            fitContent
+                            secondary
+                            type="button"
+                            onClick={() =>
+                                append({
+                                    receiver: undefined,
+                                    amount: undefined,
+                                    comment: ''
+                                })
+                            }
+                        >
+                            Add More
+                        </Button>
+                        <Spacer />
+                        <MultiSendFooter
+                            list={list}
+                            asset={asset}
+                            rowsValue={rowsValue}
+                            onBack={onBack}
+                        />
+                    </TableFormWrapper>
+                </AsyncValidatorsStateProvider>
             </FormProvider>
+            <MultiSendConfirmNotification
+                isOpen={isOpen}
+                form={confirmModalForm}
+                asset={asset}
+                onClose={onClose}
+                listName={list.name}
+            />
         </>
     );
 };
@@ -225,6 +226,7 @@ const MultiSendFooter: FC<{
     list: MultiSendList;
     onBack: () => void;
 }> = ({ asset, rowsValue, list, onBack }) => {
+    const { formState } = useFormContext();
     const { isOpen: saveIsOpen, onClose: saveOnClose, onOpen: saveOnOpen } = useDisclosure();
     const { isOpen: editIsOpen, onClose: editOnClose, onOpen: editOnOpen } = useDisclosure();
     const { isOpen: deleteIsOpen, onClose: deleteOnClose, onOpen: deleteOnOpen } = useDisclosure();
@@ -315,6 +317,8 @@ const MultiSendFooter: FC<{
         saveOnClose();
     };
 
+    const { formState: formValidationState } = useAsyncValidationState();
+
     return (
         <>
             <MultiSendFooterWrapper>
@@ -353,7 +357,12 @@ const MultiSendFooter: FC<{
                         <Body3Error>Insufficient balance</Body3Error>
                     )}
                 </MultiSendFooterTextWrapper>
-                <Button type="submit" primary disabled={remainingBalanceBN?.lt(0)}>
+                <Button
+                    type="submit"
+                    primary
+                    disabled={remainingBalanceBN?.lt(0)}
+                    loading={formValidationState === 'validating'}
+                >
                     Continue
                 </Button>
             </MultiSendFooterWrapper>

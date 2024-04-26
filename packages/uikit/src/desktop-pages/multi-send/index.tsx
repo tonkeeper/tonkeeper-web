@@ -5,12 +5,12 @@ import { Body2, Body3, Label2 } from '../../components/Text';
 import { ListBlock, ListItem } from '../../components/List';
 import { ChevronRightIcon, CloseIcon, SpinnerIcon } from '../../components/Icon';
 import { MultiSendList, useUserMultiSendLists } from '../../state/multiSend';
-import { getWillBeMultiSendValue } from '../../components/desktop/multi-send/MultiSendTable';
 import { useRate } from '../../state/rates';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { SkeletonText } from '../../components/shared/Skeleton';
 import { DesktopMultiSendFormPage } from './MultiSendFormPage';
 import { Route, Routes, useNavigate } from 'react-router-dom';
+import { getWillBeMultiSendValue } from '../../components/desktop/multi-send/utils';
 
 const PageWrapper = styled.div`
     overflow: auto;

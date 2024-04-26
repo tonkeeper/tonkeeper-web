@@ -11,49 +11,51 @@ import { estimateJettonMultiTransfer } from '@tonkeeper/core/dist/service/transf
 import { Address } from '@ton/core';
 import { AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 
-export function useEstimateMultiTransfer(form: MultiSendFormTokenized, asset: TonAsset) {
+export function useEstimateMultiTransfer() {
     const { api } = useAppContext();
     const wallet = useWalletContext();
     const { data: jettons } = useWalletJettonList();
 
-    return useMutation<{ fee: AssetAmount<TonAsset>; estimations: AccountEvent[] }, Error>(
-        async () => {
-            if (asset.id === TON_ASSET.id) {
-                const estimations = await estimateTonMultiTransfer(
-                    api,
-                    wallet,
-                    multiSendFormToTransferMessages(form)
-                );
-                const total = estimations.reduce((acc, e) => {
-                    return acc.plus(e.extra);
-                }, new BigNumber(0));
+    return useMutation<
+        { fee: AssetAmount<TonAsset>; estimations: AccountEvent[] },
+        Error,
+        { form: MultiSendFormTokenized; asset: TonAsset }
+    >(async ({ form, asset }) => {
+        if (asset.id === TON_ASSET.id) {
+            const estimations = await estimateTonMultiTransfer(
+                api,
+                wallet,
+                multiSendFormToTransferMessages(form)
+            );
+            const total = estimations.reduce((acc, e) => {
+                return acc.plus(e.extra);
+            }, new BigNumber(0));
 
-                const fee = new AssetAmount({
-                    asset: TON_ASSET,
-                    weiAmount: total
-                });
-                return { fee, estimations };
-            } else {
-                const jettonInfo = jettons!.balances.find(
-                    jetton => (asset.address as Address).toRawString() === jetton.jetton.address
-                )!;
+            const fee = new AssetAmount({
+                asset: TON_ASSET,
+                weiAmount: total.multipliedBy(-1)
+            });
+            return { fee, estimations };
+        } else {
+            const jettonInfo = jettons!.balances.find(
+                jetton => (asset.address as Address).toRawString() === jetton.jetton.address
+            )!;
 
-                const estimations = await estimateJettonMultiTransfer(
-                    api,
-                    wallet,
-                    jettonInfo.walletAddress.address,
-                    multiSendFormToTransferMessages(form)
-                );
-                const total = estimations.reduce((acc, e) => {
-                    return acc.plus(e.extra);
-                }, new BigNumber(0));
+            const estimations = await estimateJettonMultiTransfer(
+                api,
+                wallet,
+                jettonInfo.walletAddress.address,
+                multiSendFormToTransferMessages(form)
+            );
+            const total = estimations.reduce((acc, e) => {
+                return acc.plus(e.extra);
+            }, new BigNumber(0));
 
-                const fee = new AssetAmount({
-                    asset: TON_ASSET,
-                    weiAmount: total
-                });
-                return { fee, estimations };
-            }
+            const fee = new AssetAmount({
+                asset: TON_ASSET,
+                weiAmount: total.multipliedBy(-1)
+            });
+            return { fee, estimations };
         }
-    );
+    });
 }

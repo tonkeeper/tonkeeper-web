@@ -19,6 +19,7 @@ export interface ButtonProps {
 }
 
 export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
+    position: relative;
     border: 0;
     outline: 0;
 
@@ -199,6 +200,16 @@ export const ButtonRow = styled.div`
     }
 `;
 
+const ChildrenHidden = styled.div`
+    visibility: hidden;
+`;
+
+const SpinnerIconStyled = styled(SpinnerIcon)`
+    position: absolute;
+    top: calc(50% - 0.5rem);
+    left: calc(50% - 0.5rem);
+`;
+
 export const Button: FC<
     PropsWithChildren<
         ButtonProps & Omit<React.HTMLProps<HTMLButtonElement>, 'size' | 'children' | 'ref' | 'as'>
@@ -207,7 +218,8 @@ export const Button: FC<
     if (loading) {
         return (
             <ButtonElement {...props} disabled>
-                <SpinnerIcon />
+                <ChildrenHidden>{children}</ChildrenHidden>
+                <SpinnerIconStyled />
             </ButtonElement>
         );
     } else {

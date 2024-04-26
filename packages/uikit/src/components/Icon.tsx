@@ -265,8 +265,8 @@ export const WriteIcon = () => {
     );
 };
 
-export const SpinnerIcon = () => (
-    <StyledSpinner viewBox="0 0 50 50" width="1em" height="1em">
+export const SpinnerIcon: FC<{ className?: string }> = ({ className }) => (
+    <StyledSpinner viewBox="0 0 50 50" width="1em" height="1em" className={className}>
         <circle className="path" cx="25" cy="25" r="20" fill="none" strokeWidth="4" />
     </StyledSpinner>
 );
