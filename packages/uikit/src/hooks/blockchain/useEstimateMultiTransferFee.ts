@@ -17,45 +17,41 @@ export function useEstimateMultiTransfer() {
     const { data: jettons } = useWalletJettonList();
 
     return useMutation<
-        { fee: AssetAmount<TonAsset>; estimations: AccountEvent[] },
+        { fee: AssetAmount<TonAsset>; estimation: AccountEvent },
         Error,
         { form: MultiSendFormTokenized; asset: TonAsset }
     >(async ({ form, asset }) => {
         if (asset.id === TON_ASSET.id) {
-            const estimations = await estimateTonMultiTransfer(
+            const estimation = await estimateTonMultiTransfer(
                 api,
                 wallet,
                 multiSendFormToTransferMessages(form)
             );
-            const total = estimations.reduce((acc, e) => {
-                return acc.plus(e.extra);
-            }, new BigNumber(0));
+            const total = new BigNumber(estimation.extra);
 
             const fee = new AssetAmount({
                 asset: TON_ASSET,
                 weiAmount: total.multipliedBy(-1)
             });
-            return { fee, estimations };
+            return { fee, estimation };
         } else {
             const jettonInfo = jettons!.balances.find(
                 jetton => (asset.address as Address).toRawString() === jetton.jetton.address
             )!;
 
-            const estimations = await estimateJettonMultiTransfer(
+            const estimation = await estimateJettonMultiTransfer(
                 api,
                 wallet,
                 jettonInfo.walletAddress.address,
                 multiSendFormToTransferMessages(form)
             );
-            const total = estimations.reduce((acc, e) => {
-                return acc.plus(e.extra);
-            }, new BigNumber(0));
+            const total = new BigNumber(estimation.extra);
 
             const fee = new AssetAmount({
                 asset: TON_ASSET,
                 weiAmount: total.multipliedBy(-1)
             });
-            return { fee, estimations };
+            return { fee, estimation };
         }
     });
 }

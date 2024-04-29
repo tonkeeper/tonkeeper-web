@@ -20,9 +20,10 @@ import {
     SendMode
 } from './common';
 import { TransferMessage } from './tonService';
+import { unShiftedDecimals } from '../../utils/balance';
 
 const jettonTransferAmount = toNano(0.1);
-const jettonTransferForwardAmount = toNano(0.01);
+const jettonTransferForwardAmount = BigInt(100000);
 
 const jettonTransferBody = (params: {
     queryId: bigint;
@@ -51,6 +52,7 @@ const createJettonMultiTransfer = (
     transferMessages: TransferMessage[],
     options: {
         secretKey?: Buffer;
+        attachValue?: BigNumber;
     } = {}
 ) => {
     const contract = walletContractFromState(walletState);
@@ -64,7 +66,9 @@ const createJettonMultiTransfer = (
             internal({
                 to: Address.parse(jettonWalletAddress),
                 bounce: true,
-                value: jettonTransferAmount,
+                value: options.attachValue
+                    ? BigInt(options.attachValue.toFixed(0))
+                    : jettonTransferAmount,
                 body: jettonTransferBody({
                     queryId: getTonkeeperQueryId(),
                     jettonAmount: BigInt(msg.weiAmount.toFixed(0)),
@@ -236,12 +240,36 @@ export const sendJettonMultiTransfer = async (
         walletState.active.version
     );
 
+    const attachValue = feeEstimate.div(transferMessages.length).plus(unShiftedDecimals(0.05));
+
+    const estimationCell = createJettonMultiTransfer(
+        seqno,
+        walletState,
+        jettonWalletAddress,
+        transferMessages,
+        { attachValue }
+    );
+
+    const res = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+        ignoreSignatureCheck: true,
+        accountId: wallet.address,
+        decodeMessageRequest: { boc: estimationCell.toString('base64') }
+    });
+
+    if (
+        res.actions
+            .filter(action => action.type === 'JettonTransfer')
+            .some(action => action.status !== 'ok')
+    ) {
+        throw new Error('Jetton transfer estimation failed');
+    }
+
     const cell = createJettonMultiTransfer(
         seqno,
         walletState,
         jettonWalletAddress,
         transferMessages,
-        { secretKey: keyPair.secretKey }
+        { attachValue, secretKey: keyPair.secretKey }
     );
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({

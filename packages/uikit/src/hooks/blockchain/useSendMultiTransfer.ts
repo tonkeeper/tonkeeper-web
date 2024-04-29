@@ -62,7 +62,6 @@ export function useSendMultiTransfer() {
                     feeEstimation,
                     mnemonic
                 );
-                // TODO save queue
             } else {
                 track2('multi-send-jetton');
                 const jettonInfo = jettons!.balances.find(
@@ -76,7 +75,6 @@ export function useSendMultiTransfer() {
                     feeEstimation,
                     mnemonic
                 );
-                // TODO save queue
             }
         } catch (e) {
             await notifyError(client, sdk, t, e);
