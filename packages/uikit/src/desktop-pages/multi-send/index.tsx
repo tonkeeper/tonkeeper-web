@@ -13,6 +13,8 @@ import { Route, Routes, useNavigate } from 'react-router-dom';
 import { getWillBeMultiSendValue } from '../../components/desktop/multi-send/utils';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
+import { useAssetWeiBalance } from '../../state/home';
+import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 const PageWrapper = styled.div`
     overflow: auto;
@@ -39,10 +41,17 @@ const PageBodyWrapper = styled.div`
     justify-content: center;
 `;
 
-const Body3Secondary = styled(Body3)`
-    color: ${p => p.theme.textSecondary};
+const SubText = styled(Body3)`
     display: flex;
     align-items: center;
+`;
+
+const Body3Secondary = styled(Body3)`
+    color: ${p => p.theme.textSecondary};
+`;
+
+const Body3Orange = styled(Body3)`
+    color: ${p => p.theme.accentOrange};
 `;
 
 const SkeletonTextStyled = styled(SkeletonText)`
@@ -171,17 +180,31 @@ const MultiSendListElement: FC<{
         typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
     );
 
-    const { willBeSent } = getWillBeMultiSendValue(list.form.rows, asset, rate);
+    const weiBalance = useAssetWeiBalance(asset);
+
+    const { willBeSent, willBeSentBN } = getWillBeMultiSendValue(list.form.rows, asset, rate);
+
+    const isInsifficientBalance = weiBalance
+        ? unShiftedDecimals(willBeSentBN, asset.decimals).gt(weiBalance)
+        : false;
+
     return (
         <ListItemStyled key={list.id} onClick={onClick}>
             <ListItemTextContainer>
-                <Body2>
-                    {list.name} · {list.token.symbol}
-                </Body2>
-                <Body3Secondary>
-                    {list.form.rows.length}&nbsp;wallets · 
-                    {rate ? willBeSent : <SkeletonTextStyled width="50px" size="small" />}
-                </Body3Secondary>
+                <Body3>
+                    {list.name}&nbsp;·&nbsp;{list.token.symbol}
+                </Body3>
+                <SubText>
+                    <Body3Secondary>
+                        {list.form.rows.length}&nbsp;wallets&nbsp;·&nbsp;
+                        {rate ? willBeSent : <SkeletonTextStyled width="50px" size="small" />}
+                    </Body3Secondary>
+                    {isInsifficientBalance && (
+                        <Body3Secondary>
+                            &nbsp;·&nbsp;<Body3Orange>Insufficient balance</Body3Orange>
+                        </Body3Secondary>
+                    )}
+                </SubText>
             </ListItemTextContainer>
             <IconContainerStyled>
                 <ChevronRightIcon />
