@@ -6,7 +6,7 @@ import { AmountInput } from './AmountInput';
 import { CommentInput } from './CommentInput';
 import { ReceiverInput } from './ReceiverInput';
 import { Button } from '../../fields/Button';
-import { Body3 } from '../../Text';
+import { Body2, Body3 } from '../../Text';
 import { IconButton } from '../../fields/IconButton';
 import { CloseIcon } from '../../Icon';
 import { ControllerRenderProps } from 'react-hook-form/dist/types/controller';
@@ -27,7 +27,7 @@ import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { EditListNotification } from './EditListNotification';
 import { DeleteListNotification } from './DeleteListNotification';
 import { UpdateListNotification } from './UpdateListNotification';
-import { useBlocker } from 'react-router-dom';
+import { Link, useBlocker } from 'react-router-dom';
 import { AssetSelect } from './AssetSelect';
 import { useAssets } from '../../../state/home';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
@@ -39,6 +39,11 @@ import {
     AsyncValidatorsStateProvider,
     useAsyncValidationState
 } from '../../../hooks/useAsyncValidator';
+import { useWalletContext } from '../../../hooks/appContext';
+import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/transfer/tonService';
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
+import { useEnableW5, useEnableW5Mutation } from '../../../state/experemental';
 
 const AssetSelectWrapper = styled.div`
     padding-bottom: 1rem;
@@ -185,20 +190,7 @@ export const MultiSendTable: FC<{
                                 </>
                             ))}
                         </MultiSendTableGrid>
-                        <Button
-                            fitContent
-                            secondary
-                            type="button"
-                            onClick={() =>
-                                append({
-                                    receiver: undefined,
-                                    amount: undefined,
-                                    comment: ''
-                                })
-                            }
-                        >
-                            Add More
-                        </Button>
+                        <MultiSendAddMore onAdd={append} fieldsNumber={fields.length} />
                         <Spacer />
                         <MultiSendFooter
                             list={list}
@@ -220,13 +212,101 @@ export const MultiSendTable: FC<{
     );
 };
 
+const MaximumReachedContainer = styled.div`
+    display: flex;
+    align-items: center;
+    padding-top: 0.25rem;
+    padding-bottom: 0.5rem;
+
+    > ${Body2} {
+        color: ${p => p.theme.textSecondary};
+    }
+`;
+
+const LinkStyled = styled(Link)`
+    color: ${p => p.theme.textAccent};
+
+    text-decoration: unset;
+
+    &:hover {
+        text-decoration: underline;
+    }
+`;
+
+const Dot = styled(Body2)`
+    color: ${props => props.theme.textTertiary};
+`;
+
+const MultiSendAddMore: FC<{
+    onAdd: (item: MultiSendForm['rows'][number]) => void;
+    fieldsNumber: number;
+}> = ({ onAdd, fieldsNumber }) => {
+    const { data } = useEnableW5();
+    const { mutate } = useEnableW5Mutation();
+
+    const wallet = useWalletContext();
+
+    if (fieldsNumber <= MAX_ALLOWED_WALLET_MSGS[wallet.active.version]) {
+        return (
+            <Button
+                fitContent
+                secondary
+                type="button"
+                onClick={() =>
+                    onAdd({
+                        receiver: undefined,
+                        amount: undefined,
+                        comment: ''
+                    })
+                }
+            >
+                Add More
+            </Button>
+        );
+    }
+
+    const onActivateW5 = () => {
+        if (!data) {
+            mutate();
+        }
+    };
+
+    if (wallet.active.version !== WalletVersion.W5) {
+        return (
+            <MaximumReachedContainer>
+                <Body2>Maximum reached. Up to 255 fields with W5 wallet version</Body2>
+                &nbsp;
+                <Dot>·</Dot>
+                &nbsp;
+                <LinkStyled
+                    onClick={onActivateW5}
+                    to={AppRoute.walletSettings + WalletSettingsRoute.version}
+                >
+                    Switch to W5
+                </LinkStyled>
+                &nbsp;
+                <Dot>·</Dot>
+                &nbsp;
+                <LinkStyled to="https://github.com/tonkeeper/w5" target="_blank">
+                    About W5
+                </LinkStyled>
+            </MaximumReachedContainer>
+        );
+    }
+
+    return (
+        <MaximumReachedContainer>
+            <Body2>Maximum 255 fields reached</Body2>
+        </MaximumReachedContainer>
+    );
+};
+
 const MultiSendFooter: FC<{
     asset: TonAsset;
     rowsValue: MultiSendForm['rows'];
     list: MultiSendList;
     onBack: () => void;
 }> = ({ asset, rowsValue, list, onBack }) => {
-    const { formState } = useFormContext();
     const { isOpen: saveIsOpen, onClose: saveOnClose, onOpen: saveOnOpen } = useDisclosure();
     const { isOpen: editIsOpen, onClose: editOnClose, onOpen: editOnOpen } = useDisclosure();
     const { isOpen: deleteIsOpen, onClose: deleteOnClose, onOpen: deleteOnOpen } = useDisclosure();
