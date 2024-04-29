@@ -19,7 +19,7 @@ import {
     getWalletBalance,
     SendMode
 } from './common';
-import { TransferMessage, transferMessagesToGroups } from './tonService';
+import { TransferMessage } from './tonService';
 
 const jettonTransferAmount = toNano(0.1);
 const jettonTransferForwardAmount = toNano(0.01);
@@ -50,39 +50,34 @@ const createJettonMultiTransfer = (
     jettonWalletAddress: string,
     transferMessages: TransferMessage[],
     options: {
-        keepSeqno?: boolean;
         secretKey?: Buffer;
     } = {}
 ) => {
     const contract = walletContractFromState(walletState);
-    const groups = transferMessagesToGroups(transferMessages, walletState.active.version);
 
-    return groups.map((group, index) => {
-        const raw = {
-            seqno: options.keepSeqno ? seqno : seqno + index,
-            secretKey: options.secretKey || Buffer.alloc(64),
-            timeout: getTTL() + 60 * index,
-            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-            messages: group.map(msg =>
-                internal({
-                    to: Address.parse(jettonWalletAddress),
-                    bounce: true,
-                    value: jettonTransferAmount,
-                    body: jettonTransferBody({
-                        queryId: getTonkeeperQueryId(),
-                        jettonAmount: BigInt(msg.weiAmount.toFixed(0)),
-                        toAddress: Address.parse(msg.to),
-                        responseAddress: Address.parse(walletState.active.rawAddress),
-                        forwardAmount: jettonTransferForwardAmount,
-                        forwardPayload: msg.comment ? comment(msg.comment) : null
-                    })
+    const transfer = contract.createTransfer({
+        seqno,
+        secretKey: options.secretKey || Buffer.alloc(64),
+        timeout: getTTL(),
+        sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+        messages: transferMessages.map(msg =>
+            internal({
+                to: Address.parse(jettonWalletAddress),
+                bounce: true,
+                value: jettonTransferAmount,
+                body: jettonTransferBody({
+                    queryId: getTonkeeperQueryId(),
+                    jettonAmount: BigInt(msg.weiAmount.toFixed(0)),
+                    toAddress: Address.parse(msg.to),
+                    responseAddress: Address.parse(walletState.active.rawAddress),
+                    forwardAmount: jettonTransferForwardAmount,
+                    forwardPayload: msg.comment ? comment(msg.comment) : null
                 })
-            )
-        };
-
-        const transfer = contract.createTransfer(raw);
-        return { packed: externalMessage(contract, seqno, transfer).toBoc(), raw };
+            })
+        )
     });
+
+    return externalMessage(contract, seqno, transfer).toBoc();
 };
 
 const createJettonTransfer = (
@@ -206,25 +201,20 @@ export const estimateJettonMultiTransfer = async (
         walletState.active.version
     );
 
-    const cells = createJettonMultiTransfer(
+    const cell = createJettonMultiTransfer(
         seqno,
         walletState,
         jettonWalletAddress,
-        transferMessages,
-        { keepSeqno: true }
+        transferMessages
     );
 
     const emulationApi = new EmulationApi(api.tonApiV2);
 
-    const estimations = cells.map(cell =>
-        emulationApi.emulateMessageToAccountEvent({
-            ignoreSignatureCheck: true,
-            accountId: wallet.address,
-            decodeMessageRequest: { boc: cell.packed.toString('base64') }
-        })
-    );
-
-    return Promise.all(estimations);
+    return emulationApi.emulateMessageToAccountEvent({
+        ignoreSignatureCheck: true,
+        accountId: wallet.address,
+        decodeMessageRequest: { boc: cell.toString('base64') }
+    });
 };
 
 export const sendJettonMultiTransfer = async (
@@ -246,7 +236,7 @@ export const sendJettonMultiTransfer = async (
         walletState.active.version
     );
 
-    const cells = createJettonMultiTransfer(
+    const cell = createJettonMultiTransfer(
         seqno,
         walletState,
         jettonWalletAddress,
@@ -254,14 +244,8 @@ export const sendJettonMultiTransfer = async (
         { secretKey: keyPair.secretKey }
     );
 
-    if (cells.length === 1) {
-        await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-            sendBlockchainMessageRequest: { boc: cells[0].packed.toString('base64') }
-        });
-    } else {
-        await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-            sendBlockchainMessageRequest: { batch: cells.map(c => c.packed.toString('base64')) }
-        });
-    }
-    return cells;
+    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
+        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
+    });
+    return true;
 };
