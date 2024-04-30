@@ -246,6 +246,10 @@ const Dot = styled(Body2)`
     color: ${props => props.theme.textTertiary};
 `;
 
+const FooterErrorMessage = styled(Body2)`
+    color: ${p => p.theme.accentOrange};
+`;
+
 const MultiSendAddMore: FC<{
     onAdd: (item: MultiSendForm['rows'][number]) => void;
     fieldsNumber: number;
@@ -451,25 +455,29 @@ const MultiSendFooter: FC<{
                         </Button>
                     )}
                 </ListActionsButtons>
-                <MultiSendFooterTextWrapper>
-                    <Body3>
-                        {t('multi-send_will-be-sent')}:&nbsp;
-                        {balancesLoading ? <SkeletonText width="75px" /> : willBeSent}
-                    </Body3>
-                    {balancesLoading || remainingBalanceBN?.gt(0) ? (
+                {maxMsgsNumberExceeded ? (
+                    <FooterErrorMessage>{t('multi-send_maximum-reached')}</FooterErrorMessage>
+                ) : (
+                    <MultiSendFooterTextWrapper>
                         <Body3>
-                            {t('multi-send_remaining')}:&nbsp;
-                            {balancesLoading ? <SkeletonText width="75px" /> : remainingBalance}
+                            {t('multi-send_will-be-sent')}:&nbsp;
+                            {balancesLoading ? <SkeletonText width="75px" /> : willBeSent}
                         </Body3>
-                    ) : (
-                        <Body3Error>{t('multi-send_insufficient_balance')}</Body3Error>
-                    )}
-                </MultiSendFooterTextWrapper>
+                        {balancesLoading || remainingBalanceBN?.gt(0) ? (
+                            <Body3>
+                                {t('multi-send_remaining')}:&nbsp;
+                                {balancesLoading ? <SkeletonText width="75px" /> : remainingBalance}
+                            </Body3>
+                        ) : (
+                            <Body3Error>{t('multi-send_insufficient_balance')}</Body3Error>
+                        )}
+                    </MultiSendFooterTextWrapper>
+                )}
                 {!proState || proState.subscription.valid ? (
                     <Button
                         type="submit"
                         primary
-                        disabled={remainingBalanceBN?.lt(0)}
+                        disabled={remainingBalanceBN?.lt(0) || maxMsgsNumberExceeded}
                         loading={formValidationState === 'validating' || !proState}
                     >
                         {t('continue')}
