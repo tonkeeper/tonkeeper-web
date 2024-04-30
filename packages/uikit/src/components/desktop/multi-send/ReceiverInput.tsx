@@ -50,6 +50,7 @@ export const ReceiverInput: FC<{
     >;
     fieldState: ControllerFieldState;
 }> = ({ field, fieldState }) => {
+    const { t } = useTranslation();
     const methods = useFormContext();
     const [focus, setFocus] = useState(false);
     const { api } = useAppContext();
@@ -140,7 +141,6 @@ export const ReceiverInput: FC<{
         );
     }, []);
 
-    const { t } = useTranslation();
     const { onCopy, copied } = useCopyToClipboard(
         validationProduct?.address
             ? Address.parse(validationProduct?.address).toString({ bounceable: false })
@@ -158,7 +158,7 @@ export const ReceiverInput: FC<{
                     inputTouched.current = true;
                 }}
                 value={inputValue}
-                placeholder="Recipient"
+                placeholder={t('transactionDetails_recipient')}
             />
             {isValidating && <SpinnerRingStyled />}
             {!isValidating &&

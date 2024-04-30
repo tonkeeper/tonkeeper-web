@@ -9,6 +9,7 @@ import { useAppContext } from '../../../hooks/appContext';
 import { useRate } from '../../../state/rates';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { useTranslation } from '../../../hooks/translation';
 
 export const MultiSendReceiversNotification: FC<{
     onClose: () => void;
@@ -16,6 +17,7 @@ export const MultiSendReceiversNotification: FC<{
     form: MultiSendFormTokenized;
     asset: TonAsset;
 }> = ({ onClose, isOpen, form, asset }) => {
+    const { t } = useTranslation();
     const WrapperStyles = createGlobalStyle`
       .multi-send-receivers-notification {
         max-width: 1000px;
@@ -26,7 +28,7 @@ export const MultiSendReceiversNotification: FC<{
         <>
             <WrapperStyles />
             <Notification
-                title="Wallets"
+                title={t('wallets')}
                 isOpen={isOpen}
                 handleClose={onClose}
                 wrapperClassName="multi-send-receivers-notification"

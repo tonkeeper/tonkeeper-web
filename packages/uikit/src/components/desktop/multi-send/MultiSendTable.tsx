@@ -44,6 +44,9 @@ import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/transfer/m
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
 import { useEnableW5, useEnableW5Mutation } from '../../../state/experemental';
+import { useProState } from '../../../state/pro';
+import { ProNotification } from '../../pro/ProNotification';
+import { useTranslation } from '../../../hooks/translation';
 
 const AssetSelectWrapper = styled.div`
     padding-bottom: 1rem;
@@ -247,6 +250,7 @@ const MultiSendAddMore: FC<{
     onAdd: (item: MultiSendForm['rows'][number]) => void;
     fieldsNumber: number;
 }> = ({ onAdd, fieldsNumber }) => {
+    const { t } = useTranslation();
     const { data } = useEnableW5();
     const { mutate } = useEnableW5Mutation();
 
@@ -266,7 +270,7 @@ const MultiSendAddMore: FC<{
                     })
                 }
             >
-                Add More
+                {t('multi-send_add-more')}
             </Button>
         );
     }
@@ -280,7 +284,7 @@ const MultiSendAddMore: FC<{
     if (wallet.active.version !== WalletVersion.W5) {
         return (
             <MaximumReachedContainer>
-                <Body2>Maximum reached. Up to 255 fields with W5 wallet version</Body2>
+                <Body2>{t('multi-send_maximum-reached')}</Body2>
                 &nbsp;
                 <Dot>·</Dot>
                 &nbsp;
@@ -288,13 +292,13 @@ const MultiSendAddMore: FC<{
                     onClick={onActivateW5}
                     to={AppRoute.walletSettings + WalletSettingsRoute.version}
                 >
-                    Switch to W5
+                    {t('multi-send_switch-to-w5')}
                 </LinkStyled>
                 &nbsp;
                 <Dot>·</Dot>
                 &nbsp;
                 <LinkStyled to="https://github.com/tonkeeper/w5" target="_blank">
-                    About W5
+                    {t('multi-send_about-w5')}
                 </LinkStyled>
             </MaximumReachedContainer>
         );
@@ -302,7 +306,7 @@ const MultiSendAddMore: FC<{
 
     return (
         <MaximumReachedContainer>
-            <Body2>Maximum 255 fields reached</Body2>
+            <Body2>{t('multi-send_maximum-255-reached')}</Body2>
         </MaximumReachedContainer>
     );
 };
@@ -313,6 +317,13 @@ const MultiSendFooter: FC<{
     list: MultiSendList;
     onBack: () => void;
 }> = ({ asset, rowsValue, list, onBack }) => {
+    const { t } = useTranslation();
+    const { data: proState } = useProState();
+    const {
+        isOpen: isProModalOpened,
+        onClose: onProModalClose,
+        onOpen: onProModalOpen
+    } = useDisclosure();
     const { watch } = useFormContext();
     const { isOpen: saveIsOpen, onClose: saveOnClose, onOpen: saveOnOpen } = useDisclosure();
     const { isOpen: editIsOpen, onClose: editOnClose, onOpen: editOnOpen } = useDisclosure();
@@ -404,6 +415,11 @@ const MultiSendFooter: FC<{
         saveOnClose();
     };
 
+    const onBuyPro = () => {
+        onSaveList(list.name, false);
+        onProModalOpen();
+    };
+
     const { formState: formValidationState } = useAsyncValidationState();
 
     const wallet = useWalletContext();
@@ -418,7 +434,7 @@ const MultiSendFooter: FC<{
                 <ListActionsButtons>
                     {listAlreadyExist && (
                         <Button secondary type="button" onClick={editOnOpen}>
-                            Edit List Name
+                            {t('multi-send_edit-list-name')}
                         </Button>
                     )}
                     <Button
@@ -427,36 +443,42 @@ const MultiSendFooter: FC<{
                         disabled={!canSave}
                         onClick={listAlreadyExist ? updateOnOpen : saveOnOpen}
                     >
-                        Save List
+                        {t('multi-send_save-list')}
                     </Button>
                     {listAlreadyExist && (
                         <Button secondary type="button" onClick={deleteOnOpen}>
-                            Delete List
+                            {t('multi-send_delete-list')}
                         </Button>
                     )}
                 </ListActionsButtons>
                 <MultiSendFooterTextWrapper>
                     <Body3>
-                        Will be sent:&nbsp;
+                        {t('multi-send_will-be-sent')}:&nbsp;
                         {balancesLoading ? <SkeletonText width="75px" /> : willBeSent}
                     </Body3>
                     {balancesLoading || remainingBalanceBN?.gt(0) ? (
                         <Body3>
-                            Remaining:&nbsp;
+                            {t('multi-send_remaining')}:&nbsp;
                             {balancesLoading ? <SkeletonText width="75px" /> : remainingBalance}
                         </Body3>
                     ) : (
-                        <Body3Error>Insufficient balance</Body3Error>
+                        <Body3Error>{t('multi-send_insufficient_balance')}</Body3Error>
                     )}
                 </MultiSendFooterTextWrapper>
-                <Button
-                    type="submit"
-                    primary
-                    disabled={remainingBalanceBN?.lt(0)}
-                    loading={formValidationState === 'validating'}
-                >
-                    Continue
-                </Button>
+                {!proState || proState.subscription.valid ? (
+                    <Button
+                        type="submit"
+                        primary
+                        disabled={remainingBalanceBN?.lt(0)}
+                        loading={formValidationState === 'validating' || !proState}
+                    >
+                        {t('continue')}
+                    </Button>
+                ) : (
+                    <Button type="button" primary onClick={onBuyPro}>
+                        {t('multi-send_continue-with-pro')}
+                    </Button>
+                )}
             </MultiSendFooterWrapper>
             <SaveListNotification
                 isOpen={saveIsOpen}
@@ -491,6 +513,7 @@ const MultiSendFooter: FC<{
                 totalValue={willBeSent}
                 willDiscard={blocker.state === 'blocked'}
             />
+            <ProNotification isOpen={isProModalOpened} onClose={onProModalClose} />
         </>
     );
 };

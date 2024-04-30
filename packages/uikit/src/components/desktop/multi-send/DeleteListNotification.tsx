@@ -3,6 +3,7 @@ import { Body2, Label1 } from '../../Text';
 import { Notification } from '../../Notification';
 import React, { FC } from 'react';
 import { Button } from '../../fields/Button';
+import { useTranslation } from '../../../hooks/translation';
 
 const NotificationBodyStyled = styled.div`
     display: flex;
@@ -36,20 +37,21 @@ export const DeleteListNotification: FC<{
     onDelete: () => void;
     listName: string;
 }> = ({ isOpen, onCancel, onDelete, listName }) => {
+    const { t } = useTranslation();
     return (
         <Notification isOpen={isOpen} handleClose={onCancel}>
             {() => (
                 <NotificationBodyStyled>
-                    <Label1>Delete &apos;{listName}&apos;?</Label1>
-                    <Body2Secondary>
-                        This action is irreversible, and all data will be lost.
-                    </Body2Secondary>
+                    <Label1>
+                        {t('delete')}&apos;{listName}&apos;?
+                    </Label1>
+                    <Body2Secondary>{t('multi-send_delete-description')}</Body2Secondary>
                     <ButtonsContainer>
                         <Button secondary onClick={onCancel}>
-                            Cancel
+                            {t('cancel')}
                         </Button>
                         <Button primary onClick={onDelete}>
-                            Delete
+                            {t('delete')}
                         </Button>
                     </ButtonsContainer>
                 </NotificationBodyStyled>

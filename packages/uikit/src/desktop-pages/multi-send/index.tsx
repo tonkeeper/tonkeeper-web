@@ -15,6 +15,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { useAssetWeiBalance } from '../../state/home';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { useTranslation } from '../../hooks/translation';
 
 const PageWrapper = styled.div`
     overflow: auto;
@@ -99,6 +100,7 @@ const DesktopBackButtonStyled = styled(DesktopBackButton)`
 `;
 
 export const DesktopMultiSendPage: FC = () => {
+    const { t } = useTranslation();
     const { data: lists } = useUserMultiSendLists();
     const navigate = useNavigate();
 
@@ -143,12 +145,12 @@ export const DesktopMultiSendPage: FC = () => {
                             <DesktopViewHeader
                                 backButton={<DesktopBackButtonStyled icon={<CloseIcon />} />}
                             >
-                                <Label2>New Multi Send</Label2>
+                                <Label2>{t('multi-send_header')}</Label2>
                             </DesktopViewHeader>
                             <PageBodyWrapper>
                                 <ListBlockStyled>
                                     <ListItemStyled onClick={onCreateList}>
-                                        <Body2>New List</Body2>
+                                        <Body2>{t('multi-send_new-list')}</Body2>
                                         <IconContainerStyled>
                                             <ChevronRightIcon />
                                         </IconContainerStyled>
@@ -176,6 +178,7 @@ const MultiSendListElement: FC<{
     asset: TonAsset;
     onClick: () => void;
 }> = ({ list, asset, onClick }) => {
+    const { t } = useTranslation();
     const { data: rate } = useRate(
         typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
     );
@@ -196,12 +199,13 @@ const MultiSendListElement: FC<{
                 </Body3>
                 <SubText>
                     <Body3Secondary>
-                        {list.form.rows.length}&nbsp;wallets&nbsp;·&nbsp;
+                        {list.form.rows.length}&nbsp;{t('multi-send_wallets')}&nbsp;·&nbsp;
                         {rate ? willBeSent : <SkeletonTextStyled width="50px" size="small" />}
                     </Body3Secondary>
                     {isInsifficientBalance && (
                         <Body3Secondary>
-                            &nbsp;·&nbsp;<Body3Orange>Insufficient balance</Body3Orange>
+                            &nbsp;·&nbsp;
+                            <Body3Orange>{t('multi-send_insufficient_balance')}</Body3Orange>
                         </Body3Secondary>
                     )}
                 </SubText>

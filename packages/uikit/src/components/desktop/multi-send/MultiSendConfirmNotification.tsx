@@ -189,12 +189,12 @@ const MultiSendConfirmContent: FC<{
         <>
             <ConfirmWrapper>
                 {image ? <Image full src={image} /> : <ImageMock full />}
-                <TransferLabel>Transfer</TransferLabel>
+                <TransferLabel>{t('confirm-modal_transfer')}</TransferLabel>
                 <Num2>{willBeSent}</Num2>
                 <FiatValue>{willBeSentInFiat}</FiatValue>
                 <ListBlockStyled noUserSelect>
                     <ListItemStyled hover={false}>
-                        <Body2>Wallet</Body2>
+                        <Body2>{t('send_screen_steps_comfirm_wallet')}</Body2>
                         {wallet && (
                             <WalletNameStyled>
                                 <WalletEmoji
@@ -207,18 +207,22 @@ const MultiSendConfirmContent: FC<{
                         )}
                     </ListItemStyled>
                     <ListItemStyled hover={false}>
-                        <Body2>Recipients</Body2>
+                        <Body2>{t('recipients')}</Body2>
                         <RecipientsContainer>
-                            <Label2>{form.rows.length}&nbsp;wallets</Label2>
-                            <ShowAllButton onClick={allRowsOnOpen}>Show all</ShowAllButton>
+                            <Label2>
+                                {form.rows.length}&nbsp;{t('multi-send_wallets')}
+                            </Label2>
+                            <ShowAllButton onClick={allRowsOnOpen}>
+                                {t('multi-send_show-all')}
+                            </ShowAllButton>
                         </RecipientsContainer>
                     </ListItemStyled>
                     <ListItemStyled hover={false}>
-                        <Body2>List</Body2>
+                        <Body2>{t('multi-send_list')}</Body2>
                         <Label2>{listName}</Label2>
                     </ListItemStyled>
                     <ListItemStyled hover={false}>
-                        <Body2>Fee</Body2>
+                        <Body2>{t('confirm_sending_fee')}</Body2>
                         <FeeContainer>
                             {estimateError ? null : estimateLoading || !tonRate ? (
                                 <>

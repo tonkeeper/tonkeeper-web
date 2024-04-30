@@ -4,6 +4,7 @@ import { Notification } from '../../Notification';
 import React, { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { InputBlockStyled, InputFieldStyled } from './InputStyled';
 import { Button } from '../../fields/Button';
+import { useTranslation } from '../../../hooks/translation';
 
 const NotificationBodyStyled = styled.div`
     display: flex;
@@ -39,6 +40,7 @@ export const EditListNotification: FC<{
     rowsNumber: number;
     totalValue: string;
 }> = ({ isOpen, onCancel, onSave, listName, rowsNumber, totalValue }) => {
+    const { t } = useTranslation();
     const [inputValue, setInputValue] = useState(listName);
 
     useLayoutEffect(() => {
@@ -51,8 +53,10 @@ export const EditListNotification: FC<{
         <Notification isOpen={isOpen} handleClose={onCancel}>
             {() => (
                 <NotificationBodyStyled>
-                    <Label1>Edit {listName}</Label1>
-                    <Body2Secondary>Enter a new name for your list:</Body2Secondary>
+                    <Label1>
+                        {t('multi-send_edit')}&nbsp;{listName}
+                    </Label1>
+                    <Body2Secondary>{t('multi-send_enter-a-name')}</Body2Secondary>
                     <NameInput
                         inputValue={inputValue}
                         rowsNumber={rowsNumber}
@@ -61,14 +65,14 @@ export const EditListNotification: FC<{
                     />
                     <ButtonsContainer>
                         <Button secondary onClick={onCancel}>
-                            Cancel
+                            {t('cancel')}
                         </Button>
                         <Button
                             primary
                             disabled={!inputValue || inputValue === listName}
                             onClick={() => onSave(inputValue)}
                         >
-                            Save
+                            {t('save')}
                         </Button>
                     </ButtonsContainer>
                 </NotificationBodyStyled>
@@ -83,6 +87,7 @@ const Dot = styled(Body2)`
 
 const InputRight = styled.div`
     color: ${props => props.theme.textSecondary};
+    white-space: nowrap;
 `;
 
 const InputFieldRegular = styled(InputFieldStyled)`

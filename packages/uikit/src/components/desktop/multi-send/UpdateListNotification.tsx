@@ -5,6 +5,7 @@ import React, { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { InputBlockStyled, InputFieldStyled } from './InputStyled';
 import { Button } from '../../fields/Button';
 import { useUserMultiSendLists } from '../../../state/multiSend';
+import { useTranslation } from '../../../hooks/translation';
 
 const NotificationBodyStyled = styled.div`
     display: flex;
@@ -88,19 +89,22 @@ const UpdateContent: FC<{
     onCancel: () => void;
     willDiscard: boolean;
 }> = ({ listName, onSave, onUpdate, onCancel, willDiscard }) => {
+    const { t } = useTranslation();
     return (
         <NotificationBodyStyled>
-            <Label1>Update &apos;{listName}&apos;?</Label1>
-            <Body2Secondary>Update the information in the current list.</Body2Secondary>
+            <Label1>
+                {t('update')}&apos;{listName}&apos;?
+            </Label1>
+            <Body2Secondary>{t('multi-send_update-description')}</Body2Secondary>
             <ThreeButtonsContainer>
                 <Button primary onClick={onUpdate}>
-                    Update
+                    {t('update')}
                 </Button>
                 <Button secondary onClick={onSave}>
-                    Save as New
+                    {t('multi-send_save-as-new')}
                 </Button>
                 <Button secondary onClick={onCancel}>
-                    {willDiscard ? 'Discard and Close' : 'Close'}
+                    {willDiscard ? t('multi-send_discard-and-close') : t('close')}
                 </Button>
             </ThreeButtonsContainer>
         </NotificationBodyStyled>
@@ -113,6 +117,7 @@ const SaveContent: FC<{
     rowsNumber: number;
     totalValue: string;
 }> = ({ onSave, onCancel, totalValue, rowsNumber }) => {
+    const { t } = useTranslation();
     const { data: lists } = useUserMultiSendLists();
     const maxId = lists ? Math.max(1, ...lists.map(l => l.id)) : undefined;
     const [inputValue, setInputValue] = useState('');
@@ -127,10 +132,8 @@ const SaveContent: FC<{
 
     return (
         <NotificationBodyStyled>
-            <Label1>Save this List?</Label1>
-            <Body2Secondary>
-                Save the list with addresses, amounts, and comments for future use.
-            </Body2Secondary>
+            <Label1>{t('multi-send_save-title')}</Label1>
+            <Body2Secondary>{t('multi-send_save-description')}</Body2Secondary>
             <NameInput
                 inputValue={inputValue}
                 rowsNumber={rowsNumber}
@@ -139,10 +142,10 @@ const SaveContent: FC<{
             />
             <ButtonsContainer>
                 <Button secondary onClick={onCancel}>
-                    Cancel
+                    {t('cancel')}
                 </Button>
                 <Button primary onClick={() => onSave(inputValue)} disabled={!inputValue}>
-                    Save
+                    {t('save')}
                 </Button>
             </ButtonsContainer>
         </NotificationBodyStyled>
@@ -155,6 +158,7 @@ const Dot = styled(Body2)`
 
 const InputRight = styled.div`
     color: ${props => props.theme.textSecondary};
+    white-space: nowrap;
 `;
 
 const InputFieldRegular = styled(InputFieldStyled)`

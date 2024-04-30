@@ -1,10 +1,12 @@
 import React, { FC, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { InputBlockStyled, InputFieldStyled } from './InputStyled';
+import { useTranslation } from '../../../hooks/translation';
 
 export const CommentInput: FC<{ index: number }> = ({ index }) => {
     const { control } = useFormContext();
     const [focus, setFocus] = useState(false);
+    const { t } = useTranslation();
 
     return (
         <Controller
@@ -14,7 +16,7 @@ export const CommentInput: FC<{ index: number }> = ({ index }) => {
                         {...field}
                         onFocus={() => setFocus(true)}
                         onBlur={() => setFocus(false)}
-                        placeholder="Comment"
+                        placeholder={t('transactionDetails_comment')}
                     />
                 </InputBlockStyled>
             )}
