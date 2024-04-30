@@ -131,7 +131,7 @@ const DesktopHeaderPayload = () => {
                     <LinkStyled to={AppProRoute.multiSend}>
                         <ButtonStyled size="small">
                             <ArrowUpIcon />
-                            {t('wallet_multi-send')}
+                            {t('wallet_multi_send')}
                         </ButtonStyled>
                     </LinkStyled>
                     <ButtonStyled

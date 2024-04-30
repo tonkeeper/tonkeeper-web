@@ -54,9 +54,9 @@ export const EditListNotification: FC<{
             {() => (
                 <NotificationBodyStyled>
                     <Label1>
-                        {t('multi-send_edit')}&nbsp;{listName}
+                        {t('multi_send_edit')}&nbsp;{listName}
                     </Label1>
-                    <Body2Secondary>{t('multi-send_enter-a-name')}</Body2Secondary>
+                    <Body2Secondary>{t('multi_send_enter_a_name')}</Body2Secondary>
                     <NameInput
                         inputValue={inputValue}
                         rowsNumber={rowsNumber}
@@ -100,6 +100,7 @@ const NameInput: FC<{
     totalValue: string;
     setInputValue: (s: string) => void;
 }> = ({ inputValue, setInputValue, rowsNumber, totalValue }) => {
+    const { t } = useTranslation();
     const [focus, setFocus] = useState(true);
     const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -122,7 +123,9 @@ const NameInput: FC<{
                 placeholder="List name"
             />
             <InputRight>
-                <Body2>{rowsNumber}&nbsp;wallets</Body2>
+                <Body2>
+                    {rowsNumber}&nbsp;{t('multi_send_wallets')}
+                </Body2>
                 &nbsp;
                 <Dot>·</Dot>
                 &nbsp;

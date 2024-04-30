@@ -95,16 +95,16 @@ const UpdateContent: FC<{
             <Label1>
                 {t('update')}&apos;{listName}&apos;?
             </Label1>
-            <Body2Secondary>{t('multi-send_update-description')}</Body2Secondary>
+            <Body2Secondary>{t('multi_send_update_description')}</Body2Secondary>
             <ThreeButtonsContainer>
                 <Button primary onClick={onUpdate}>
                     {t('update')}
                 </Button>
                 <Button secondary onClick={onSave}>
-                    {t('multi-send_save-as-new')}
+                    {t('multi_send_save_as_new')}
                 </Button>
                 <Button secondary onClick={onCancel}>
-                    {willDiscard ? t('multi-send_discard-and-close') : t('close')}
+                    {willDiscard ? t('multi_send_discard_and_close') : t('close')}
                 </Button>
             </ThreeButtonsContainer>
         </NotificationBodyStyled>
@@ -132,8 +132,8 @@ const SaveContent: FC<{
 
     return (
         <NotificationBodyStyled>
-            <Label1>{t('multi-send_save-title')}</Label1>
-            <Body2Secondary>{t('multi-send_save-description')}</Body2Secondary>
+            <Label1>{t('multi_send_save_title')}</Label1>
+            <Body2Secondary>{t('multi_send_save_description')}</Body2Secondary>
             <NameInput
                 inputValue={inputValue}
                 rowsNumber={rowsNumber}
@@ -171,6 +171,7 @@ const NameInput: FC<{
     totalValue: string;
     setInputValue: (s: string) => void;
 }> = ({ inputValue, setInputValue, rowsNumber, totalValue }) => {
+    const { t } = useTranslation();
     const [focus, setFocus] = useState(true);
     const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -193,7 +194,7 @@ const NameInput: FC<{
                 placeholder="List name"
             />
             <InputRight>
-                <Body2>{rowsNumber}&nbsp;wallets</Body2>
+                <Body2>{rowsNumber}&nbsp;{t('multi_send_wallets')}</Body2>
                 &nbsp;
                 <Dot>·</Dot>
                 &nbsp;

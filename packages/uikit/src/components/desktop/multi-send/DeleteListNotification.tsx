@@ -45,7 +45,7 @@ export const DeleteListNotification: FC<{
                     <Label1>
                         {t('delete')}&apos;{listName}&apos;?
                     </Label1>
-                    <Body2Secondary>{t('multi-send_delete-description')}</Body2Secondary>
+                    <Body2Secondary>{t('multi_send_delete_description')}</Body2Secondary>
                     <ButtonsContainer>
                         <Button secondary onClick={onCancel}>
                             {t('cancel')}

@@ -189,7 +189,7 @@ const MultiSendConfirmContent: FC<{
         <>
             <ConfirmWrapper>
                 {image ? <Image full src={image} /> : <ImageMock full />}
-                <TransferLabel>{t('confirm-modal_transfer')}</TransferLabel>
+                <TransferLabel>{t('confirm_modal_transfer')}</TransferLabel>
                 <Num2>{willBeSent}</Num2>
                 <FiatValue>{willBeSentInFiat}</FiatValue>
                 <ListBlockStyled noUserSelect>
@@ -210,15 +210,15 @@ const MultiSendConfirmContent: FC<{
                         <Body2>{t('recipients')}</Body2>
                         <RecipientsContainer>
                             <Label2>
-                                {form.rows.length}&nbsp;{t('multi-send_wallets')}
+                                {form.rows.length}&nbsp;{t('multi_send_wallets')}
                             </Label2>
                             <ShowAllButton onClick={allRowsOnOpen}>
-                                {t('multi-send_show-all')}
+                                {t('multi_send_show_all')}
                             </ShowAllButton>
                         </RecipientsContainer>
                     </ListItemStyled>
                     <ListItemStyled hover={false}>
-                        <Body2>{t('multi-send_list')}</Body2>
+                        <Body2>{t('multi_send_list')}</Body2>
                         <Label2>{listName}</Label2>
                     </ListItemStyled>
                     <ListItemStyled hover={false}>

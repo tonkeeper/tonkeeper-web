@@ -145,12 +145,12 @@ export const DesktopMultiSendPage: FC = () => {
                             <DesktopViewHeader
                                 backButton={<DesktopBackButtonStyled icon={<CloseIcon />} />}
                             >
-                                <Label2>{t('multi-send_header')}</Label2>
+                                <Label2>{t('multi_send_header')}</Label2>
                             </DesktopViewHeader>
                             <PageBodyWrapper>
                                 <ListBlockStyled>
                                     <ListItemStyled onClick={onCreateList}>
-                                        <Body2>{t('multi-send_new-list')}</Body2>
+                                        <Body2>{t('multi_send_new_list')}</Body2>
                                         <IconContainerStyled>
                                             <ChevronRightIcon />
                                         </IconContainerStyled>
@@ -199,13 +199,13 @@ const MultiSendListElement: FC<{
                 </Body3>
                 <SubText>
                     <Body3Secondary>
-                        {list.form.rows.length}&nbsp;{t('multi-send_wallets')}&nbsp;·&nbsp;
+                        {list.form.rows.length}&nbsp;{t('multi_send_wallets')}&nbsp;·&nbsp;
                         {rate ? willBeSent : <SkeletonTextStyled width="50px" size="small" />}
                     </Body3Secondary>
                     {isInsifficientBalance && (
                         <Body3Secondary>
                             &nbsp;·&nbsp;
-                            <Body3Orange>{t('multi-send_insufficient_balance')}</Body3Orange>
+                            <Body3Orange>{t('multi_send_insufficient_balance')}</Body3Orange>
                         </Body3Secondary>
                     )}
                 </SubText>

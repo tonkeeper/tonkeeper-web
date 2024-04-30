@@ -274,7 +274,7 @@ const MultiSendAddMore: FC<{
                     })
                 }
             >
-                {t('multi-send_add-more')}
+                {t('multi_send_add_more')}
             </Button>
         );
     }
@@ -288,7 +288,7 @@ const MultiSendAddMore: FC<{
     if (wallet.active.version !== WalletVersion.W5) {
         return (
             <MaximumReachedContainer>
-                <Body2>{t('multi-send_maximum-reached')}</Body2>
+                <Body2>{t('multi_send_maximum_reached')}</Body2>
                 &nbsp;
                 <Dot>·</Dot>
                 &nbsp;
@@ -296,13 +296,13 @@ const MultiSendAddMore: FC<{
                     onClick={onActivateW5}
                     to={AppRoute.walletSettings + WalletSettingsRoute.version}
                 >
-                    {t('multi-send_switch-to-w5')}
+                    {t('multi_send_switch_to_w5')}
                 </LinkStyled>
                 &nbsp;
                 <Dot>·</Dot>
                 &nbsp;
                 <LinkStyled to="https://github.com/tonkeeper/w5" target="_blank">
-                    {t('multi-send_about-w5')}
+                    {t('multi_send_about_w5')}
                 </LinkStyled>
             </MaximumReachedContainer>
         );
@@ -310,7 +310,7 @@ const MultiSendAddMore: FC<{
 
     return (
         <MaximumReachedContainer>
-            <Body2>{t('multi-send_maximum-255-reached')}</Body2>
+            <Body2>{t('multi_send_maximum_255_reached')}</Body2>
         </MaximumReachedContainer>
     );
 };
@@ -345,7 +345,7 @@ const MultiSendFooter: FC<{
 
     const [balances] = useAssets();
 
-    let selectedAssetBalance = new BigNumber(0);
+    let selectedAssetBalance;
 
     if (asset.id === TON_ASSET.id) {
         selectedAssetBalance = shiftedDecimals(balances?.ton.info.balance || 0, TON_ASSET.decimals);
@@ -438,7 +438,7 @@ const MultiSendFooter: FC<{
                 <ListActionsButtons>
                     {listAlreadyExist && (
                         <Button secondary type="button" onClick={editOnOpen}>
-                            {t('multi-send_edit-list-name')}
+                            {t('multi_send_edit_list_name')}
                         </Button>
                     )}
                     <Button
@@ -447,29 +447,29 @@ const MultiSendFooter: FC<{
                         disabled={!canSave}
                         onClick={listAlreadyExist ? updateOnOpen : saveOnOpen}
                     >
-                        {t('multi-send_save-list')}
+                        {t('multi_send_save_list')}
                     </Button>
                     {listAlreadyExist && (
                         <Button secondary type="button" onClick={deleteOnOpen}>
-                            {t('multi-send_delete-list')}
+                            {t('multi_send_delete_list')}
                         </Button>
                     )}
                 </ListActionsButtons>
                 {maxMsgsNumberExceeded ? (
-                    <FooterErrorMessage>{t('multi-send_maximum-reached')}</FooterErrorMessage>
+                    <FooterErrorMessage>{t('multi_send_maximum_reached')}</FooterErrorMessage>
                 ) : (
                     <MultiSendFooterTextWrapper>
                         <Body3>
-                            {t('multi-send_will-be-sent')}:&nbsp;
+                            {t('multi_send_will_be_sent')}:&nbsp;
                             {balancesLoading ? <SkeletonText width="75px" /> : willBeSent}
                         </Body3>
                         {balancesLoading || remainingBalanceBN?.gt(0) ? (
                             <Body3>
-                                {t('multi-send_remaining')}:&nbsp;
+                                {t('multi_send_remaining')}:&nbsp;
                                 {balancesLoading ? <SkeletonText width="75px" /> : remainingBalance}
                             </Body3>
                         ) : (
-                            <Body3Error>{t('multi-send_insufficient_balance')}</Body3Error>
+                            <Body3Error>{t('multi_send_insufficient_balance')}</Body3Error>
                         )}
                     </MultiSendFooterTextWrapper>
                 )}
@@ -484,7 +484,7 @@ const MultiSendFooter: FC<{
                     </Button>
                 ) : (
                     <Button type="button" primary onClick={onBuyPro}>
-                        {t('multi-send_continue-with-pro')}
+                        {t('multi_send_continue_with_pro')}
                     </Button>
                 )}
             </MultiSendFooterWrapper>
