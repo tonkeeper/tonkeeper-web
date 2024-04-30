@@ -17,10 +17,9 @@ import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
 import { TransferEstimationEvent } from '../../entries/send';
-import { WalletState, WalletVersion } from '../../entries/wallet';
-import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
+import { WalletState } from '../../entries/wallet';
+import { Account, AccountsApi, BlockchainApi, LiteServerApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
-import { MAX_ALLOWED_WALLET_MSGS } from "./multiSendService";
 
 export enum SendMode {
     CARRY_ALL_REMAINING_BALANCE = 128,
@@ -75,15 +74,22 @@ export const checkWalletPositiveBalanceOrDie = (wallet: Account) => {
 };
 
 export const getWalletSeqNo = async (api: APIConfig, accountId: string) => {
-    const { seqno } = await new WalletApi(api.tonApiV2)
-        .getAccountSeqno({
-            accountId
+    return new BlockchainApi(api.tonApiV2)
+        .execGetMethodForBlockchainAccount({
+            accountId: accountId,
+            methodName: 'seqno'
         })
-        .catch(() => ({
-            seqno: 0
-        }));
-
-    return seqno;
+        .then(result => {
+            if (!result.success) {
+                throw new Error('Request seqno failed');
+            }
+            const seqno = result.stack[0].num;
+            if (!seqno) {
+                throw new Error('Missing seqno value');
+            }
+            return parseInt(seqno);
+        })
+        .catch(() => 0);
 };
 
 export const getWalletBalance = async (api: APIConfig, walletState: WalletState) => {
