@@ -27,6 +27,8 @@ import {
 } from '../../../hooks/blockchain/useSendMultiTransfer';
 import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
+import { useDisclosure } from '../../../hooks/useDisclosure';
+import { MultiSendReceiversNotification } from './MultiSendReceiversNotification';
 
 const ConfirmWrapper = styled.div`
     display: flex;
@@ -98,6 +100,17 @@ const WalletNameStyled = styled.div`
     gap: 6px;
 `;
 
+const RecipientsContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+`;
+
+const ShowAllButton = styled(Body3)`
+    color: ${p => p.theme.textAccent};
+    cursor: pointer;
+`;
+
 const FeeContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -116,6 +129,11 @@ const MultiSendConfirmContent: FC<{
     onClose: () => void;
 }> = ({ form, asset, listName, onClose }) => {
     const { t } = useTranslation();
+    const {
+        isOpen: allRowsIsOpen,
+        onClose: allRowsOnClose,
+        onOpen: allRowsOnOpen
+    } = useDisclosure();
     const image = useAssetImage(asset);
     const { data: rate } = useRate(
         typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
@@ -168,64 +186,75 @@ const MultiSendConfirmContent: FC<{
     const navigate = useNavigate();
 
     return (
-        <ConfirmWrapper>
-            {image ? <Image full src={image} /> : <ImageMock full />}
-            <TransferLabel>Transfer</TransferLabel>
-            <Num2>{willBeSent}</Num2>
-            <FiatValue>{willBeSentInFiat}</FiatValue>
-            <ListBlockStyled noUserSelect>
-                <ListItemStyled hover={false}>
-                    <Body2>Wallet</Body2>
-                    {wallet && (
-                        <WalletNameStyled>
-                            <WalletEmoji
-                                emojiSize="16px"
-                                containerSize="16px"
-                                emoji={wallet.emoji}
-                            />
-                            <Label2>{wallet.name || t('wallet_title')}</Label2>
-                        </WalletNameStyled>
-                    )}
-                </ListItemStyled>
-                <ListItemStyled hover={false}>
-                    <Body2>Recipients</Body2>
-                    <Label2>{form.rows.length}</Label2>
-                </ListItemStyled>
-                <ListItemStyled hover={false}>
-                    <Body2>List</Body2>
-                    <Label2>{listName}</Label2>
-                </ListItemStyled>
-                <ListItemStyled hover={false}>
-                    <Body2>Fee</Body2>
-                    <FeeContainer>
-                        {estimateError ? null : estimateLoading || !tonRate ? (
-                            <>
-                                <Skeleton margin="3px 0" width="100px" height="14px" />
-                                <Skeleton margin="2px 0" width="80px" height="12px" />
-                            </>
-                        ) : (
-                            <>
-                                <Label2>≈ {tonFee}</Label2>
-                                <Body3>{fiatFee}</Body3>
-                            </>
+        <>
+            <ConfirmWrapper>
+                {image ? <Image full src={image} /> : <ImageMock full />}
+                <TransferLabel>Transfer</TransferLabel>
+                <Num2>{willBeSent}</Num2>
+                <FiatValue>{willBeSentInFiat}</FiatValue>
+                <ListBlockStyled noUserSelect>
+                    <ListItemStyled hover={false}>
+                        <Body2>Wallet</Body2>
+                        {wallet && (
+                            <WalletNameStyled>
+                                <WalletEmoji
+                                    emojiSize="16px"
+                                    containerSize="16px"
+                                    emoji={wallet.emoji}
+                                />
+                                <Label2>{wallet.name || t('wallet_title')}</Label2>
+                            </WalletNameStyled>
                         )}
-                    </FeeContainer>
-                </ListItemStyled>
-            </ListBlockStyled>
-            <ButtonBlock
+                    </ListItemStyled>
+                    <ListItemStyled hover={false}>
+                        <Body2>Recipients</Body2>
+                        <RecipientsContainer>
+                            <Label2>{form.rows.length}&nbsp;wallets</Label2>
+                            <ShowAllButton onClick={allRowsOnOpen}>Show all</ShowAllButton>
+                        </RecipientsContainer>
+                    </ListItemStyled>
+                    <ListItemStyled hover={false}>
+                        <Body2>List</Body2>
+                        <Label2>{listName}</Label2>
+                    </ListItemStyled>
+                    <ListItemStyled hover={false}>
+                        <Body2>Fee</Body2>
+                        <FeeContainer>
+                            {estimateError ? null : estimateLoading || !tonRate ? (
+                                <>
+                                    <Skeleton margin="3px 0" width="100px" height="14px" />
+                                    <Skeleton margin="2px 0" width="80px" height="12px" />
+                                </>
+                            ) : (
+                                <>
+                                    <Label2>≈ {tonFee}</Label2>
+                                    <Body3>{fiatFee}</Body3>
+                                </>
+                            )}
+                        </FeeContainer>
+                    </ListItemStyled>
+                </ListBlockStyled>
+                <ButtonBlock
+                    form={formTokenized}
+                    asset={asset}
+                    feeEstimation={estimateData?.fee.weiAmount}
+                    onSuccess={() => {
+                        setTimeout(() => {
+                            onClose();
+                            navigate(AppRoute.activity);
+                        }, 2000);
+                    }}
+                    isLoading={estimateLoading || !rate}
+                    estimationError={!!estimateError}
+                />
+            </ConfirmWrapper>
+            <MultiSendReceiversNotification
+                onClose={allRowsOnClose}
+                isOpen={allRowsIsOpen}
                 form={formTokenized}
                 asset={asset}
-                feeEstimation={estimateData?.fee.weiAmount}
-                onSuccess={() => {
-                    setTimeout(() => {
-                        onClose();
-                        navigate(AppRoute.activity);
-                    }, 2000);
-                }}
-                isLoading={estimateLoading || !rate}
-                estimationError={!!estimateError}
             />
-        </ConfirmWrapper>
+        </>
     );
 };
 
