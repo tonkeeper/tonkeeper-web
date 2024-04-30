@@ -25,6 +25,8 @@ import {
     MultiSendFormTokenized,
     useSendMultiTransfer
 } from '../../../hooks/blockchain/useSendMultiTransfer';
+import { useNavigate } from 'react-router-dom';
+import { AppRoute } from '../../../libs/routes';
 
 const ConfirmWrapper = styled.div`
     display: flex;
@@ -163,6 +165,8 @@ const MultiSendConfirmContent: FC<{
         estimateData?.fee.relativeAmount.multipliedBy(tonRate?.prices || 0) || new BigNumber(0)
     );
 
+    const navigate = useNavigate();
+
     return (
         <ConfirmWrapper>
             {image ? <Image full src={image} /> : <ImageMock full />}
@@ -213,7 +217,10 @@ const MultiSendConfirmContent: FC<{
                 asset={asset}
                 feeEstimation={estimateData?.fee.weiAmount}
                 onSuccess={() => {
-                    setTimeout(onClose, 2000);
+                    setTimeout(() => {
+                        onClose();
+                        navigate(AppRoute.activity);
+                    }, 2000);
                 }}
                 isLoading={estimateLoading || !rate}
                 estimationError={!!estimateError}

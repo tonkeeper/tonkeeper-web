@@ -6,11 +6,10 @@ import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipient, TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
-import { WalletState, WalletVersion } from '../../entries/wallet';
+import { WalletState } from '../../entries/wallet';
 import { Account, AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
 import {
-    checkMaxAllowedMessagesInMultiTransferOrDie,
     checkServiceTimeOrDie,
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
@@ -275,104 +274,4 @@ export const sendTonTransfer = async (
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
         sendBlockchainMessageRequest: { boc: cell.toString('base64') }
     });
-};
-
-export type TransferMessage = {
-    to: string;
-    bounce: boolean;
-    weiAmount: BigNumber;
-    comment?: string;
-};
-
-const createTonMultiTransfer = (
-    seqno: number,
-    walletState: WalletState,
-    transferMessages: TransferMessage[],
-    options: {
-        secretKey?: Buffer;
-    } = {}
-) => {
-    const contract = walletContractFromState(walletState);
-
-    const transfer = contract.createTransfer({
-        seqno,
-        secretKey: options.secretKey || Buffer.alloc(64),
-        timeout: getTTL(),
-        sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-        messages: transferMessages.map(msg =>
-            internal({
-                to: msg.to,
-                bounce: msg.bounce,
-                value: BigInt(msg.weiAmount.toFixed(0)),
-                body: msg.comment !== '' ? msg.comment : undefined
-            })
-        )
-    });
-
-    return externalMessage(contract, seqno, transfer).toBoc();
-};
-
-export const MAX_ALLOWED_WALLET_MSGS = {
-    [WalletVersion.W5]: 255,
-    [WalletVersion.V4R2]: 4,
-    [WalletVersion.V4R1]: 4,
-    [WalletVersion.V3R2]: 4,
-    [WalletVersion.V3R1]: 4
-};
-
-export const estimateTonMultiTransfer = async (
-    api: APIConfig,
-    walletState: WalletState,
-    transferMessages: TransferMessage[]
-) => {
-    await checkServiceTimeOrDie(api);
-
-    const total = transferMessages.reduce((acc, msg) => acc.plus(msg.weiAmount), new BigNumber(0));
-    const [wallet, seqno] = await getWalletBalance(api, walletState);
-    checkWalletBalanceOrDie(total, wallet);
-
-    checkMaxAllowedMessagesInMultiTransferOrDie(
-        transferMessages.length,
-        walletState.active.version
-    );
-
-    const cell = createTonMultiTransfer(seqno, walletState, transferMessages);
-
-    const emulationApi = new EmulationApi(api.tonApiV2);
-
-    return emulationApi.emulateMessageToAccountEvent({
-        ignoreSignatureCheck: true,
-        accountId: wallet.address,
-        decodeMessageRequest: { boc: cell.toString('base64') }
-    });
-};
-
-export const sendTonMultiTransfer = async (
-    api: APIConfig,
-    walletState: WalletState,
-    transferMessages: TransferMessage[],
-    feeEstimate: BigNumber,
-    mnemonic: string[]
-) => {
-    await checkServiceTimeOrDie(api);
-    const keyPair = await mnemonicToPrivateKey(mnemonic);
-
-    const total = transferMessages.reduce((acc, msg) => acc.plus(msg.weiAmount), new BigNumber(0));
-    const [wallet, seqno] = await getWalletBalance(api, walletState);
-    checkWalletBalanceOrDie(total.plus(feeEstimate), wallet);
-
-    checkMaxAllowedMessagesInMultiTransferOrDie(
-        transferMessages.length,
-        walletState.active.version
-    );
-
-    const cell = createTonMultiTransfer(seqno, walletState, transferMessages, {
-        secretKey: keyPair.secretKey
-    });
-
-    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
-    });
-
-    return true;
 };

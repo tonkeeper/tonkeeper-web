@@ -3,11 +3,13 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useWalletJettonList } from '../../state/wallet';
-import { estimateTonMultiTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
+import {
+    estimateTonMultiTransfer,
+    estimateJettonMultiTransfer
+} from '@tonkeeper/core/dist/service/transfer/multiSendService';
 import { MultiSendFormTokenized, multiSendFormToTransferMessages } from './useSendMultiTransfer';
 import BigNumber from 'bignumber.js';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { estimateJettonMultiTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { Address } from '@ton/core';
 import { AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 

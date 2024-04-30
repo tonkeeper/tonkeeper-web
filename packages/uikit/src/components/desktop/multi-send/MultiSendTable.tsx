@@ -40,7 +40,7 @@ import {
     useAsyncValidationState
 } from '../../../hooks/useAsyncValidator';
 import { useWalletContext } from '../../../hooks/appContext';
-import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/transfer/tonService';
+import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/transfer/multiSendService';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
 import { useEnableW5, useEnableW5Mutation } from '../../../state/experemental';
@@ -76,7 +76,7 @@ const TableFormWrapper = styled.form`
 `;
 
 const MultiSendFooterWrapper = styled.div`
-    padding: 1rem;
+    padding: 1rem 0;
     position: sticky;
     bottom: 0;
     display: flex;
@@ -246,7 +246,7 @@ const MultiSendAddMore: FC<{
 
     const wallet = useWalletContext();
 
-    if (fieldsNumber <= MAX_ALLOWED_WALLET_MSGS[wallet.active.version]) {
+    if (fieldsNumber < MAX_ALLOWED_WALLET_MSGS[wallet.active.version]) {
         return (
             <Button
                 fitContent
@@ -307,6 +307,7 @@ const MultiSendFooter: FC<{
     list: MultiSendList;
     onBack: () => void;
 }> = ({ asset, rowsValue, list, onBack }) => {
+    const { watch } = useFormContext();
     const { isOpen: saveIsOpen, onClose: saveOnClose, onOpen: saveOnOpen } = useDisclosure();
     const { isOpen: editIsOpen, onClose: editOnClose, onOpen: editOnOpen } = useDisclosure();
     const { isOpen: deleteIsOpen, onClose: deleteOnClose, onOpen: deleteOnOpen } = useDisclosure();
@@ -398,6 +399,11 @@ const MultiSendFooter: FC<{
     };
 
     const { formState: formValidationState } = useAsyncValidationState();
+
+    const wallet = useWalletContext();
+
+    const maxMsgsNumberExceeded =
+        watch('rows').length > MAX_ALLOWED_WALLET_MSGS[wallet.active.version];
 
     return (
         <>

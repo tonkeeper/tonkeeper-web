@@ -20,7 +20,7 @@ import { TransferEstimationEvent } from '../../entries/send';
 import { WalletState, WalletVersion } from '../../entries/wallet';
 import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
-import { MAX_ALLOWED_WALLET_MSGS } from './tonService';
+import { MAX_ALLOWED_WALLET_MSGS } from "./multiSendService";
 
 export enum SendMode {
     CARRY_ALL_REMAINING_BALANCE = 128,
@@ -64,17 +64,6 @@ export const checkWalletBalanceOrDie = (total: BigNumber, wallet: Account) => {
             `Not enough account "${wallet.address}" amount: "${
                 wallet.balance
             }", transaction total: ${total.toString()}`
-        );
-    }
-};
-
-export const checkMaxAllowedMessagesInMultiTransferOrDie = (
-    messagesNumber: number,
-    walletVersion: WalletVersion
-) => {
-    if (messagesNumber > MAX_ALLOWED_WALLET_MSGS[walletVersion]) {
-        throw new Error(
-            `Max number of transfers in one multi transfer exceeded. Max allowed is ${MAX_ALLOWED_WALLET_MSGS[walletVersion]}, but got ${messagesNumber}.`
         );
     }
 };
