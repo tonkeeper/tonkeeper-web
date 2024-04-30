@@ -4,6 +4,7 @@ import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { Signer } from '@tonkeeper/core/dist/entries/signer';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
+import { parseSignerSignature } from '@tonkeeper/core/dist/service/signerService';
 import { signByMnemonicOver } from '@tonkeeper/core/dist/service/transfer/common';
 import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
 import nacl from 'tweetnacl';
@@ -38,7 +39,7 @@ export const getSigner = async (sdk: IAppSdk, publicKey: string): Promise<Signer
                     sdk,
                     message.toBoc({ idx: false }).toString('base64')
                 );
-                return Buffer.from(result);
+                return parseSignerSignature(result);
             };
         }
         default: {

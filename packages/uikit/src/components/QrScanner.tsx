@@ -23,18 +23,6 @@ const Block = styled.div<{ ios: boolean }>`
         `}
 `;
 
-const orderAnimatedQr = (values: string[]) => {
-    for (let i = 0; i < 1000; i++) {
-        const first = values.shift()!;
-        values.push(first);
-        if (first.length < 256) {
-            return values.join('');
-        }
-    }
-
-    return values.join('');
-};
-
 const QrScanner = () => {
     const [scanId, setScanId] = useState<number | undefined>(undefined);
     const sdk = useAppSdk();
@@ -56,28 +44,15 @@ const QrScanner = () => {
     };
 
     const onScan = useMemo(() => {
-        const result: string[] = [];
-        let timer: NodeJS.Timeout;
+        return ({ signature }: { signature: string }) => {
+            signature = signature.slice(2);
 
-        const done = () => {
             sdk.uiEvents.emit('response', {
                 method: 'response',
                 id: scanId,
-                params: orderAnimatedQr(result)
+                params: signature
             });
             setScanId(undefined);
-        };
-        return ({ signature }: { signature: string }) => {
-            clearTimeout(timer);
-
-            signature = signature.slice(2);
-
-            console.log(signature);
-
-            if (!result.includes(signature)) {
-                result.push(signature);
-            }
-            timer = setTimeout(done, 500);
         };
     }, [sdk, scanId, setScanId]);
 

@@ -52,8 +52,6 @@ export const SignerContent: FC<{
 const PairSignerNotification = () => {
     const sdk = useAppSdk();
 
-    const { t } = useTranslation();
-
     const [boc, setBoc] = useState<string | undefined>(undefined);
     const [requestId, setId] = useState<number | undefined>(undefined);
 
