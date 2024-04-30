@@ -6,16 +6,25 @@ import { Signer } from '@tonkeeper/core/dist/entries/signer';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import { signByMnemonicOver } from '@tonkeeper/core/dist/service/transfer/common';
 import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
+import nacl from 'tweetnacl';
 
-export const signTonConnect = (sdk: IAppSdk, publicKey: string) => {
+export const signTonConnectOver = (sdk: IAppSdk, publicKey: string) => {
     return async (bufferToSign: Buffer) => {
-        const mnemonic = await getMnemonic(sdk, publicKey);
-        const keyPair = await mnemonicToPrivateKey(mnemonic);
-        const signature = nacl.sign.detached(
-            Buffer.from(sha256_sync(bufferToSign)),
-            keyPair.secretKey
-        );
-        return signature;
+        const auth = await getWalletAuthState(sdk.storage, publicKey);
+        switch (auth.kind) {
+            case 'signer': {
+                throw new Error('Signer is not support sign buffer.');
+            }
+            default: {
+                const mnemonic = await getMnemonic(sdk, publicKey);
+                const keyPair = await mnemonicToPrivateKey(mnemonic);
+                const signature = nacl.sign.detached(
+                    Buffer.from(sha256_sync(bufferToSign)),
+                    keyPair.secretKey
+                );
+                return signature;
+            }
+        }
     };
 };
 
@@ -29,7 +38,7 @@ export const getSigner = async (sdk: IAppSdk, publicKey: string): Promise<Signer
                     sdk,
                     message.toBoc({ idx: false }).toString('base64')
                 );
-                return Cell.fromBase64(result);
+                return Buffer.from(result);
             };
         }
         default: {

@@ -11,7 +11,7 @@ import { WalletAddress, WalletState, WalletVersion, WalletVersions } from '../en
 import { WalletApi } from '../tonApiV2';
 import { encrypt } from './cryptoService';
 import { walletContract } from './wallet/contractService';
-import { getWalletStateOrDie, getFallbackWalletEmoji, setWalletState } from './wallet/storeService';
+import { getFallbackWalletEmoji, getWalletStateOrDie, setWalletState } from './wallet/storeService';
 
 export const createNewWalletState = async (api: APIConfig, mnemonic: string[], name?: string) => {
     const keyPair = await mnemonicToPrivateKey(mnemonic);
@@ -191,7 +191,8 @@ export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) =>
         active,
         revision: 0,
         name,
-        auth: { kind: 'signer' }
+        auth: { kind: 'signer' },
+        emoji: getFallbackWalletEmoji(publicKey)
     };
 
     return state;

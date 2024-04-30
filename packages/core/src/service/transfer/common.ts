@@ -8,7 +8,7 @@ import {
     storeMessage,
     toNano
 } from '@ton/core';
-import { mnemonicToPrivateKey } from '@ton/crypto';
+import { mnemonicToPrivateKey, sign } from '@ton/crypto';
 import { WalletContractV3R1 } from '@ton/ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from '@ton/ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
@@ -16,8 +16,8 @@ import { WalletContractV5 } from '@ton/ton/dist/wallets/WalletContractV5';
 import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
-import { Signer } from '../../entries/signer';
 import { TransferEstimationEvent } from '../../entries/send';
+import { Signer } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { Account, AccountsApi, BlockchainApi, LiteServerApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
@@ -153,16 +153,14 @@ export const createTransferMessage = async (
     return externalMessage(contract, wallet.seqno, transfer).toBoc();
 };
 
-export const signEstimateMessage = async (message: Cell): Promise<Cell> => {
-    const signature = sign(message.hash(), Buffer.alloc(64));
-    return beginCell().storeBuffer(signature).storeBuilder(message.asBuilder()).endCell();
+export const signEstimateMessage = async (message: Cell): Promise<Buffer> => {
+    return sign(message.hash(), Buffer.alloc(64));
 };
 
 export const signByMnemonicOver = async (mnemonic: string[]) => {
-    return async (message: Cell): Promise<Cell> => {
+    return async (message: Cell): Promise<Buffer> => {
         const keyPair = await mnemonicToPrivateKey(mnemonic);
-        const signature = sign(message.hash(), keyPair.secretKey);
-        return beginCell().storeBuffer(signature).storeBuilder(message.asBuilder()).endCell();
+        return sign(message.hash(), keyPair.secretKey);
     };
 };
 

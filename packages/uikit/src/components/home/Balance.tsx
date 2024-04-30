@@ -1,16 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { QueryKey } from '../../libs/queryKey';
-import { SkeletonText } from '../shared/Skeleton';
+import { useWalletTotalBalance } from '../../state/wallet';
 import { Body3, Label2, Num2 } from '../Text';
 import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
-import { useWalletTotalBalance } from '../../state/wallet';
 
 const Block = styled.div`
     display: flex;

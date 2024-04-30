@@ -14,13 +14,7 @@ export default defineConfig({
             'react-router-dom': path.resolve(__dirname, './node_modules/react-router-dom'),
             'styled-components': path.resolve(__dirname, './node_modules/styled-components'),
             'react-i18next': path.resolve(__dirname, './node_modules/react-i18next'),
-            '@tanstack/react-query': path.resolve(
-                __dirname,
-                './node_modules/@tanstack/react-query'
-            ),
-            '@ton/core': path.resolve(__dirname, '../../packages/core/node_modules/@ton/core'),
-            '@ton/crypto': path.resolve(__dirname, '../../packages/core/node_modules/@ton/crypto'),
-            '@ton/ton': path.resolve(__dirname, '../../packages/core/node_modules/@ton/ton')
+            '@tanstack/react-query': path.resolve(__dirname, './node_modules/@tanstack/react-query')
         }
     }
 });

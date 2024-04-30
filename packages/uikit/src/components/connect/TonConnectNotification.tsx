@@ -20,7 +20,7 @@ import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { getMnemonic } from '../../state/mnemonic';
+import { signTonConnectOver } from '../../state/mnemonic';
 import { CheckmarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
@@ -46,7 +46,7 @@ const useConnectMutation = (
                 result.push(toTonAddressItemReply(wallet));
             }
             if (item.name === 'ton_proof') {
-                const mnemonic = await getMnemonic(sdk, wallet.publicKey);
+                const signTonConnect = signTonConnectOver(sdk, wallet.publicKey);
                 const proof = tonConnectProofPayload(
                     webViewUrl ?? manifest.url,
                     wallet.active.rawAddress,
@@ -56,7 +56,7 @@ const useConnectMutation = (
                     await toTonProofItemReply({
                         storage: sdk.storage,
                         wallet,
-                        mnemonic,
+                        signTonConnect,
                         proof
                     })
                 );
