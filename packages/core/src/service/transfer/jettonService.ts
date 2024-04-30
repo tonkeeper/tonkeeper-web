@@ -20,7 +20,7 @@ import {
 } from './common';
 
 export const jettonTransferAmount = toNano(0.1);
-export const jettonTransferForwardAmount = BigInt(100000);
+export const jettonTransferForwardAmount = BigInt(1);
 
 export const jettonTransferBody = (params: {
     queryId: bigint;

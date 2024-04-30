@@ -178,7 +178,6 @@ export const sendJettonMultiTransfer = async (
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const [wallet, seqno] = await getWalletBalance(api, walletState);
-    checkWalletBalanceOrDie(feeEstimate, wallet);
 
     checkMaxAllowedMessagesInMultiTransferOrDie(
         transferMessages.length,
@@ -186,6 +185,7 @@ export const sendJettonMultiTransfer = async (
     );
 
     const attachValue = feeEstimate.div(transferMessages.length).plus(unShiftedDecimals(0.05));
+    checkWalletBalanceOrDie(attachValue, wallet);
 
     const estimationCell = createJettonMultiTransfer(
         seqno,
