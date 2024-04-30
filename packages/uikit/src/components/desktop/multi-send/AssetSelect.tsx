@@ -53,8 +53,7 @@ const MenuItemText = styled.div`
 const Divider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
     height: 1px;
-    margin: 0 -0.5rem;
-    width: calc(100% + 1rem);
+    width: 100%;
 `;
 
 const AssetIcon = styled.img`
