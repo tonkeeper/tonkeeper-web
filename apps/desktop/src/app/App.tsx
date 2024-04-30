@@ -47,7 +47,17 @@ import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MemoryRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import {
+    createMemoryRouter,
+    createRoutesFromElements,
+    MemoryRouter,
+    Outlet,
+    Route,
+    RouterProvider,
+    Routes,
+    useLocation,
+    useNavigate
+} from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
@@ -68,6 +78,7 @@ import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/a
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
+import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -136,20 +147,26 @@ export const App = () => {
     useEffect(() => {
         document.body.classList.add(window.backgroundApi.platform());
     }, []);
+
+    const router = createMemoryRouter([
+        {
+            path: '/*',
+            element: <ThemeAndContent />
+        }
+    ]);
+
     return (
-        <MemoryRouter>
-            <QueryClientProvider client={queryClient}>
-                <Suspense fallback={<div></div>}>
-                    <AppSdkContext.Provider value={sdk}>
-                        <TranslationContext.Provider value={translation}>
-                            <StorageContext.Provider value={sdk.storage}>
-                                <ThemeAndContent />
-                            </StorageContext.Provider>
-                        </TranslationContext.Provider>
-                    </AppSdkContext.Provider>
-                </Suspense>
-            </QueryClientProvider>
-        </MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+            <Suspense fallback={<div></div>}>
+                <AppSdkContext.Provider value={sdk}>
+                    <TranslationContext.Provider value={translation}>
+                        <StorageContext.Provider value={sdk.storage}>
+                            <RouterProvider router={router} />
+                        </StorageContext.Provider>
+                    </TranslationContext.Provider>
+                </AppSdkContext.Provider>
+            </Suspense>
+        </QueryClientProvider>
     );
 };
 
@@ -363,6 +380,10 @@ export const Content: FC<{
                         <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
                         <Route path={AppRoute.browser} element={<DesktopBrowser />} />
                         <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
+                        <Route
+                            path={any(AppProRoute.multiSend)}
+                            element={<DesktopMultiSendPage />}
+                        />
                         <Route path="*" element={<WalletContent />} />
                     </Routes>
                 </WideContent>

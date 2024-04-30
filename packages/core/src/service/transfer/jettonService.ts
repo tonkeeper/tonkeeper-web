@@ -19,10 +19,10 @@ import {
     SendMode
 } from './common';
 
-const jettonTransferAmount = toNano('0.64');
-const jettonTransferForwardAmount = BigInt('1');
+export const jettonTransferAmount = toNano(0.1);
+export const jettonTransferForwardAmount = BigInt(1);
 
-const jettonTransferBody = (params: {
+export const jettonTransferBody = (params: {
     queryId: bigint;
     jettonAmount: bigint;
     toAddress: Address;

@@ -74,21 +74,21 @@
   "approval" : {
     "accept" : "接受",
     "accepted" : "已接受",
-    "accepted_at_collection" : "在 %{date} 接受",
-    "accepted_at_token" : "在 %{date} 接受",
+    "accepted_at_collection" : "在 {date} 接受",
+    "accepted_at_token" : "在 {date} 接受",
     "approve_all" : "接受所有",
-    "approve_collection_many" : "批准来自 \"%{collection}\" 集合的传入代币",
-    "approve_collection_one" : "批准来自 \"%{collection}\" 集合的传入代币",
-    "approve_many" : "批准 %{count} 传入的代币",
-    "approve_token" : "批准传入的代币\"%{name}\"",
-    "approve_two_collections" : "批准来自 \"%{collection1}\" 和 \"%{collection2}\" 集合的传入代币",
-    "approve_two_tokens" : "批准传入的代币\"%{name1}\" 和 \"%{name2}\"",
+    "approve_collection_many" : "批准来自 \"{collection}\" 集合的传入代币",
+    "approve_collection_one" : "批准来自 \"{collection}\" 集合的传入代币",
+    "approve_many" : "批准 {count} 传入的代币",
+    "approve_token" : "批准传入的代币\"{name}\"",
+    "approve_two_collections" : "批准来自 \"{collection1}\" 和 \"{collection2}\" 集合的传入代币",
+    "approve_two_tokens" : "批准传入的代币\"{name1}\" 和 \"{name2}\"",
     "blacklisted_collection" : "黑名单集合",
     "blacklisted_token" : "黑名单代币",
     "decline" : "拒绝",
     "declined" : "已拒绝",
-    "declined_at_collection" : "在 %{date} 拒绝",
-    "declined_at_token" : "在 %{date} 拒绝",
+    "declined_at_collection" : "在 {date} 拒绝",
+    "declined_at_token" : "在 {date} 拒绝",
     "details_collection" : "集合详情",
     "details_token" : "代币详细信息",
     "id_collection" : "集合ID",
@@ -102,8 +102,8 @@
     "single_token" : "单一代币",
     "token_copied" : "代币ID已复制",
     "token_count" : {
-      "one" : "%{count} 代币",
-      "other" : "%{count} 代币"
+      "one" : "{count} 代币",
+      "other" : "{count} 代币"
     },
     "verify_collection" : "验证集合",
     "verify_description_collection" : "这些代币来自未知发行者。要检测伪造品，请使用发行者的官方来源验证集合ID。您稍后可以在设置中更改代币的可见性。",
@@ -147,13 +147,7 @@
       "buy" : "购买",
       "disclaimer" : "这是估计的转账数量。您的某些交易可能会花费更多。",
       "ok" : "确定",
-      "refilled" : "电池已充电",
-      "subtitle" : {
-        "large" : "大杯",
-        "medium" : "中杯",
-        "small" : "小杯"
-      },
-      "title" : "{{cnt}} 笔交易，总共 {{price}}"
+      "refilled" : "电池已充电"
     },
     "promocode" : {
       "apply" : "应用",
@@ -163,21 +157,15 @@
       "title" : "优惠码"
     },
     "screen_title" : "电池",
-    "settings" : "电池",
-    "title" : {
-      "almost_empty" : "电池即将耗尽",
-      "empty" : "为你的电池充电",
-      "full" : "电池已充满",
-      "medium" : "电池已经充满一半"
-    }
+    "settings" : "电池"
   },
   "biometry" : {
     "android" : {
-      "face_recognition" : "人脸识别",
-      "face_recognition_genitive" : "人脸识别",
+      "face_recognition" : "面部识别",
+      "face_recognition_genitive" : "面部识别",
       "face_recognition_instrumental" : "人脸识别",
-      "fingerprint" : "指纹识别",
-      "fingerprint_genitive" : "指纹识别",
+      "fingerprint" : "指纹",
+      "fingerprint_genitive" : "指纹",
       "fingerprint_instrumental" : "指纹识别"
     },
     "default" : "生物识别",
@@ -213,12 +201,12 @@
     "popular_title" : "热门",
     "remove_alert" : {
       "approve_button" : "移除",
-      "title" : "移除“%{name}”？"
+      "title" : "移除“{name}”？"
     },
     "search_label" : "搜索或输入地址",
     "start_typing" : "输入地址或在网络上搜索",
     "title" : "浏览器",
-    "web_search_title" : "%{searchEngine} 搜索"
+    "web_search_title" : "{searchEngine} 搜索"
   },
   "cancel" : "取消",
   "chart" : {
@@ -234,7 +222,7 @@
     },
     "price" : "价格"
   },
-  "check_words_caption" : "为了检查您是否正确地写下了您的恢复短语，请输入第%{wordNum1}、%{wordNum2}和%{wordNum3}个词。",
+  "check_words_caption" : "为了检查您是否正确地写下了您的恢复短语，请输入第{wordNum1}、{wordNum2}和{wordNum3}个词。",
   "check_words_success" : "恭喜！您已经设置了您的钱包",
   "check_words_title" : "让我们检查一下",
   "choose_country" : {
@@ -282,7 +270,7 @@
   "confirm_sending_inactive_warn_description" : "如果您期望区块链发生奇迹，请不要继续。不会的。真的不会的。",
   "confirm_sending_inactive_warn_title" : "非活跃合约",
   "confirm_sending_message" : "Comment",
-  "confirm_sending_method_title" : "将你的资金发送到%{name}?",
+  "confirm_sending_method_title" : "将你的资金发送到{name}?",
   "confirm_sending_recipient" : "接收者",
   "confirm_sending_recipient_address" : "接收者地址",
   "confirm_sending_sent_caption_btc" : "你的交易已经发送到网络，将在一小时内处理。",
@@ -326,13 +314,13 @@
   "dns_on_sale_text" : "域名现在在市场上出售。为了转移，你首先应该从销售中移除它。",
   "dns_renew_in_progress_btn" : "正在进行域名续期...",
   "dns_renew_toast_success" : "域名已续期1年",
-  "dns_renew_until_btn" : "续期至 %{untilDate}",
+  "dns_renew_until_btn" : "续期至 {untilDate}",
   "dns_renew_valid_caption" : {
-    "one" : "在 %{count} 天内到期",
-    "other" : "在 %{count} 天内到期"
+    "one" : "在 {count} 天内到期",
+    "other" : "在 {count} 天内到期"
   },
   "dns_replace_button" : "替换",
-  "dns_replace_description" : "添加将与{{domain}}链接的钱包地址。",
+  "dns_replace_description" : "添加将与'{{'domain'}}'链接的钱包地址。",
   "dns_replace_save" : "保存",
   "dns_unlink_title" : "确认取消链接",
   "dns_wallet_address" : "钱包地址",
@@ -384,9 +372,9 @@
   "intro_item3_caption" : "-",
   "intro_item3_title" : "-",
   "intro_title" : "欢迎",
-  "jetton_id" : "代币ID: %{jettonAddress}",
+  "jetton_id" : "代币ID: {jettonAddress}",
   "jetton_id_copied" : "代币ID已复制",
-  "jetton_name" : "%{name} 代币",
+  "jetton_name" : "{name} 代币",
   "jetton_open_explorer" : "查看详情",
   "jetton_price" : "价格:",
   "jettons_list_title" : "代币",
@@ -410,7 +398,7 @@
   "migration_cancel_btn" : "稍后升级",
   "migration_caption" : "Tonkeeper引入了支持订阅付款的新钱包格式。您的余额将转移到新地址。您的恢复短语将保持不变。",
   "migration_failed" : "迁移失败。无法转移您的余额。",
-  "migration_fee_info" : "网络费用 ≈%{tonFee} TON (%{fiatFee})",
+  "migration_fee_info" : "网络费用 ≈{tonFee} TON ({fiatFee})",
   "migration_in_progress" : "正在进行到钱包v4的迁移",
   "migration_migrate_btn" : "升级钱包",
   "migration_new_wallet" : "新地址",
@@ -479,7 +467,7 @@
   "nft_transfer_nft" : "转移",
   "nft_transfer_recipient" : "接收者",
   "nft_transfer_title" : "转移NFT",
-  "nft_unlink_domain_button" : "已与{{address}}链接",
+  "nft_unlink_domain_button" : "已与'{{'address'}}'链接",
   "nft_unnamed_collection" : "未命名的收藏",
   "nft_view_in_explorer" : "在浏览器中查看",
   "notifications" : {
@@ -492,7 +480,7 @@
     "allow_notifications" : "允许通知",
     "apps" : "应用",
     "apps_description" : "在您的活动中来自已连接的应用的通知",
-    "disconnect_app" : "断开%{app_name}连接",
+    "disconnect_app" : "断开{app_name}连接",
     "disconnected_app" : "已断开应用",
     "earlier" : "早些时候",
     "from_connected" : "来自已连接的服务",
@@ -512,8 +500,8 @@
   "notifications_switch_title" : "推送通知",
   "notifications_title" : "通知",
   "notification_switch_description" : "当您收到TON、代币和NFT时获得通知。来自已连接应用的通知。",
-  "notify_connection_err_caption" : "%{host} 没有响应，请稍后重试",
-  "notify_connection_err_caption_few" : "%{hosts} 和 %{lastHost} 没有响应，请稍后重试",
+  "notify_connection_err_caption" : "{host} 没有响应，请稍后重试",
+  "notify_connection_err_caption_few" : "{hosts} 和 {lastHost} 没有响应，请稍后重试",
   "notify_connection_err_title" : "连接服务器失败",
   "notify_incorrect_time_err_caption" : "请在设备设置中启用自动时间和日期。如果不自动设置时间，可能会影响资金转账。",
   "notify_incorrect_time_err_title" : "时间和日期不正确",
@@ -544,9 +532,9 @@
   "receive_address_title" : "或使用钱包地址",
   "receive_copy" : "复制",
   "receive_qr_title" : "显示收款二维码",
-  "receive_received_title" : "你已接收\n%{amount} %{currency}",
+  "receive_received_title" : "你已接收\n{amount} {currency}",
   "receive_share" : "分享",
-  "receive_title" : "接收 %{currency}",
+  "receive_title" : "接收 {currency}",
   "receive_ton_and_jettons" : "接收TON和其他代币",
   "recovery_phrase" : {
     "caption" : "写下这些单词及其编号并将其存放在安全的地方。",
@@ -575,7 +563,7 @@
   "security_migration_title" : "更新钱包安全",
   "security_reset_passcode" : "重置密码",
   "security_title" : "安全",
-  "security_use_biometry_switch" : "使用%{biometryType}",
+  "security_use_biometry_switch" : "使用{biometryType}",
   "security_use_biometry_tip" : "您始终可以使用密码解锁您的钱包。",
   "send_address_placeholder" : "地址或名称",
   "send_all_warning_title" : "你确定要发送你所有的余额吗？",
@@ -593,7 +581,7 @@
   "send_publish_tx_error" : "发送交易失败",
   "send_screen_steps" : {
     "address" : {
-      "delete_alert_text" : "你确定要从收藏中删除「%{name}」吗？",
+      "delete_alert_text" : "你确定要从收藏中删除「{name}」吗？",
       "placeholder" : "钱包地址或域名",
       "recent_label" : "最近的",
       "suggest_actions" : {
@@ -607,14 +595,14 @@
     },
     "amount" : {
       "insufficient_balance" : "余额不足",
-      "less_than_min" : "最少 %{minAmount} TON",
+      "less_than_min" : "最少 {minAmount} TON",
       "max" : "最大",
       "recipient_label" : "至:",
-      "remaining" : "剩余: %{amount}",
+      "remaining" : "剩余: {amount}",
       "title" : "金额"
     },
     "comfirm" : {
-      "action" : "%{coin} 转账",
+      "action" : "{coin} 转账",
       "comment_decrypt" : "解密",
       "comment_description" : "所有人都可以看到。",
       "comment_description_encrypted" : "只有接收者和你可以看到。",
@@ -623,28 +611,28 @@
       "comment_label_required" : "需要的 Comment",
       "comment_required_text" : "你必须包含交换的备注进行转账。否则你的资金将会丢失。",
       "details_label" : "详情",
-      "details_max_balance_label" : "发送全部余额 %{currency}",
+      "details_max_balance_label" : "发送全部余额 {currency}",
       "title" : "确认交易",
       "will_be_paid_with_battery" : "将使用电池进行支付"
     },
     "done" : {
       "add_favorite" : "将地址保存到收藏",
-      "address" : "地址: %{address}",
-      "comment" : "评论: %{comment}",
+      "address" : "地址: {address}",
+      "comment" : "评论: {comment}",
       "description" : "你的交易已经发送到网络，将在几秒钟内处理。",
       "done_label" : "完成",
       "favorite_saved" : "保存到收藏",
-      "fee" : "手续费: %{fee}",
-      "title" : "%{currency} 已发送！",
-      "to" : "至: %{name}"
+      "fee" : "手续费: {fee}",
+      "title" : "{currency} 已发送！",
+      "to" : "至: {name}"
     }
   },
   "send_sending_failed" : "发送失败",
   "send_sending_wrong_time_description" : "时间不同步。在设备设置中打开自动同步日期和时间后重试转账。",
   "send_sending_wrong_time_title" : "发生错误",
-  "send_title" : "发送 %{currency}",
+  "send_title" : "发送 {currency}",
   "settings_appearance" : "主题",
-  "settings_backup_seed" : "备份",
+  "settings_backup_seed" : "显示恢复短语",
   "settings_contact_support" : "联系我们",
   "settings_delete_account" : "删除账户",
   "settings_delete_alert_button" : "删除账户和数据",
@@ -674,9 +662,9 @@
   "settings_to_testnet" : "切换到测试网",
   "settings_version" : "版本",
   "settings_wallet_version" : "活动地址",
-  "setup_biometry_caption" : "%{biometryType}允许您更快地打开您的钱包，而无需输入密码。",
-  "setup_biometry_enable_button" : "启用%{biometryType}",
-  "setup_biometry_title" : "使用%{biometryType}快速登录",
+  "setup_biometry_caption" : "{biometryType}允许您更快地打开您的钱包，而无需输入密码。",
+  "setup_biometry_enable_button" : "启用{biometryType}",
+  "setup_biometry_title" : "使用{biometryType}快速登录",
   "setup_notifications_caption" : "当您收到TON、代币和NFT时获得通知。",
   "setup_notifications_enable_button" : "启用通知",
   "setup_notifications_title" : "获得即时通知",
@@ -693,7 +681,7 @@
       },
       "fee" : {
         "label" : "费用",
-        "value" : "≈ %{value} TON"
+        "value" : "≈ {value} TON"
       },
       "recipient" : {
         "label" : "接收者"
@@ -707,7 +695,7 @@
       "about_pool" : "关于质押池",
       "apy" : {
         "label" : "预估年化收益率",
-        "value" : "≈ %{value}%"
+        "value" : "≈ {value}%"
       },
       "balance" : "质押余额",
       "cooldown" : {
@@ -717,16 +705,16 @@
       },
       "frequency" : {
         "label" : "奖励频率",
-        "value" : "每%{count}小时"
+        "value" : "每{count}小时"
       },
       "min_deposit" : {
         "label" : "最小存款",
-        "value" : "%{value} TON"
+        "value" : "{value} TON"
       },
       "next_cycle" : {
         "desc" : "所有交易在周期结束后生效",
         "desc_liquid" : "所有提款请求在周期结束后生效",
-        "time" : "在%{time}内",
+        "time" : "在{time}内",
         "title" : "下一个周期"
       },
       "pendingDeposit" : "待处理的存款",
@@ -745,23 +733,23 @@
       "after_top_up" : "充值后",
       "current" : "当前的",
       "title" : "您的年度奖励",
-      "value" : "≈ %{value} TON"
+      "value" : "≈ {value} TON"
     },
-    "staking_desc" : "最低存款从%{minStake} TON开始。\n赚取高达%{maxApy}%的收益。",
-    "staking_pool_desc" : "年化收益率 ≈ %{apy}%",
+    "staking_desc" : "最低存款从{minStake} TON开始。\n赚取高达{maxApy}%的收益。",
+    "staking_pool_desc" : "年化收益率 ≈ {apy}%",
     "title" : "质押",
     "top_up" : "充值",
     "transaction" : "交易",
     "warning" : {
-      "about" : "关于%{name}",
+      "about" : "关于{name}",
       "desc" : "质押基于第三方智能合约。我们不对其工作负责。",
       "title" : "警告"
     },
-    "widget_desc" : "在您的TONs上赚取高达 %{apy}%的收益",
+    "widget_desc" : "在您的TONs上赚取高达 {apy}%的收益",
     "withdraw" : "提款",
     "withdrawal_fee_warning" : {
       "continue" : "继续操作",
-      "message" : "请至少在您的余额上保留{{amount}} TON。",
+      "message" : "请至少在您的余额上保留'{{'amount'}}' TON。",
       "title" : "您的资金不足以提款"
     },
     "withdrawal_request" : "提款请求"
@@ -774,11 +762,11 @@
   "stop_watch" : "删除观察账户",
   "subscription_back_to_merchant_button" : "返回",
   "subscription_back_to_merchant_caption" : "交易正在处理中。您的订阅很快就会生效。",
-  "subscription_back_to_merchant_name" : "返回到%{merchantName}",
+  "subscription_back_to_merchant_name" : "返回到{merchantName}",
   "subscription_back_to_merchant_title" : "返回到频道？",
   "subscription_cancel" : "取消订阅",
   "subscription_cancel_alert_cancel_btn" : "现在不",
-  "subscription_cancel_alert_caption" : "如果您现在取消，您仍然可以在%{nextBill}之前访问您的订阅。",
+  "subscription_cancel_alert_caption" : "如果您现在取消，您仍然可以在{nextBill}之前访问您的订阅。",
   "subscription_cancel_alert_submit_btn" : "是的，取消",
   "subscription_cancel_alert_title" : "取消订阅？",
   "subscription_expiring" : "到期",
@@ -786,20 +774,20 @@
   "subscription_next_bill" : "下一次账单",
   "subscription_open_merchant" : "在Telegram中打开",
   "subscription_period" : "间隔",
-  "subscription_period_custom" : "每%{period}",
+  "subscription_period_custom" : "每{period}",
   "subscription_period_day" : "每日",
   "subscription_period_half_year" : "每半年",
   "subscription_period_hour" : "每小时",
   "subscription_period_month" : "每月",
   "subscription_period_quarter" : "每季度",
   "subscription_period_week" : "每周",
-  "subscription_period_weeks" : "每%{count}周",
+  "subscription_period_weeks" : "每{count}周",
   "subscription_period_year" : "每年",
   "subscription_price" : "价格",
   "subscription_sent" : "交易已发送",
-  "subscriptions_item_caption" : "%{price} TON, 下一次账单在%{nextBill}",
-  "subscriptions_item_caption_expired" : "在%{date}到期",
-  "subscriptions_item_caption_expiring" : "%{price} TON, 在%{date}到期",
+  "subscriptions_item_caption" : "{price} TON, 下一次账单在{nextBill}",
+  "subscriptions_item_caption_expired" : "在{date}到期",
+  "subscriptions_item_caption_expiring" : "{price} TON, 在{date}到期",
   "subscriptions_section_active" : "活跃",
   "subscriptions_section_expired" : "已过期",
   "subscription_started" : "已开始订阅",
@@ -816,40 +804,40 @@
   "tab_wallet" : "钱包",
   "today" : "今天",
   "tonkeeper_pro" : "Tonkeeper Pro",
-  "ton_login_back_to_button" : "返回到%{name}",
-  "ton_login_caption" : "%{name}正在请求访问您的钱包地址",
+  "ton_login_back_to_button" : "返回到{name}",
+  "ton_login_caption" : "{name}正在请求访问您的钱包地址",
   "ton_login_connect_button" : "连接钱包",
   "ton_login_notice" : "连接钱包之前，请务必检查服务地址。",
   "ton_login_success" : "完成",
-  "ton_login_title" : "连接到%domain？",
+  "ton_login_title" : "连接到{0, number}omain？",
   "transaction_bid_collection_name" : "发行者",
-  "transaction_bid_date" : "出价日期 %{date}",
+  "transaction_bid_date" : "出价日期 {date}",
   "transaction_bid_dns" : "名称",
-  "transaction_buy_date" : "购买日期 %{date}",
+  "transaction_buy_date" : "购买日期 {date}",
   "transaction_buy_status_failed" : "失败",
   "transaction_buy_status_pending" : "待处理",
   "transaction_buy_status_success" : "成功",
   "transaction_confirmations" : "确认",
   "transaction_confirm_bid" : "确认出价",
-  "transaction_contract_deploy_date" : "合约部署日期 %{date}",
+  "transaction_contract_deploy_date" : "合约部署日期 {date}",
   "transaction_copy_caution" : "小心外部链接！！！永远不要将你的密钥/助记词提供给第三者 — 否则你可能会失去所有的资金。\n\n- - -\n\n",
   "transactionDetails" : {
     "address" : "地址",
     "bid_collection_name" : "发行者",
-    "bid_date" : "在 %{time} 出价",
+    "bid_date" : "在 {time} 出价",
     "bid_name" : "名称",
     "comment" : "评论",
     "operation" : "操作",
     "payload" : "有效载荷",
-    "purchase_date" : "在 %{time} 购买",
-    "received_date" : "在 %{time} 收到",
+    "purchase_date" : "在 {time} 购买",
+    "received_date" : "在 {time} 收到",
     "recipient" : "接收者",
     "recipient_address" : "接收者地址",
     "sender" : "发送者",
     "sender_address" : "发送者地址",
-    "sent_date" : "在 %{time} 发送",
+    "sent_date" : "在 {time} 发送",
     "spam" : "垃圾邮件",
-    "swapped_date" : "在 %{time} 交换",
+    "swapped_date" : "在 {time} 交换",
     "transaction" : "交易"
   },
   "transaction_exchange_from_currency" : "从",
@@ -858,7 +846,7 @@
   "transaction_merchant" : "商家",
   "transaction_message" : "消息",
   "transaction_purchase_id" : "购买ID",
-  "transaction_receive_date" : "接收日期 %{date}",
+  "transaction_receive_date" : "接收日期 {date}",
   "transaction_recipient" : "收款方",
   "transaction_recipient_address" : "收款方地址",
   "transaction_refund" : "退款",
@@ -879,11 +867,11 @@
   "transaction_sender" : "付款方",
   "transaction_sender_address" : "付款方地址",
   "transaction_send_more_button" : "向此接收方发送更多",
-  "transaction_sent_date" : "发送日期 %{date}",
+  "transaction_sent_date" : "发送日期 {date}",
   "transaction_show_subscription_button" : "查看订阅",
   "transaction_status" : "状态",
   "transaction_subscription" : "订阅",
-  "transaction_subscription_date" : "扣费日期 %{date}",
+  "transaction_subscription_date" : "扣费日期 {date}",
   "transaction_transfer_name" : "转账名称",
   "transaction_type_bid" : "出价",
   "transaction_type_bounced" : "已退回",
@@ -900,9 +888,9 @@
   "transaction_type_unsubscription" : "已取消订阅",
   "transaction_type_wallet_initialized" : "已初始化钱包",
   "transaction_unsubscription" : "取消订阅",
-  "transaction_unsubscription_date" : "取消订阅日期 %{date}",
+  "transaction_unsubscription_date" : "取消订阅日期 {date}",
   "transaction_view_in_explorer" : "在浏览器中查看",
-  "transaction_wallet_initialized_date" : "钱包初始化日期 %{date}",
+  "transaction_wallet_initialized_date" : "钱包初始化日期 {date}",
   "transaction_your_bid" : "你的出价",
   "transfer_deeplink_address_error" : "收件人地址不正确",
   "transfer_deeplink_amount_error" : "金额请求不正确",
@@ -919,13 +907,13 @@
       "addressMismatch" : {
         "wrongVersion" : {
           "close" : "取消",
-          "description" : "切换您的活动地址至%{version}以确认此操作。",
+          "description" : "切换您的活动地址至{version}以确认此操作。",
           "switch" : "切换并继续",
           "title" : "您钱包的另一个地址的操作"
         },
         "wrongWallet" : {
           "close" : "好的",
-          "description" : "登录到另一个钱包%{address}然后再试。",
+          "description" : "登录到另一个钱包{address}然后再试。",
           "title" : "另一个钱包的操作"
         }
       },
@@ -934,9 +922,9 @@
         "rechargeBattery" : "给电池充电",
         "rechargeWallet" : "充值钱包",
         "title" : "资金不足",
-        "toBePaid" : "支付金额: %{amount} %{currency}\n",
+        "toBePaid" : "支付金额: {amount} {currency}\n",
         "withFees" : "+ 区块链费用。\n",
-        "yourBalance" : "您的余额: %{balance} %{currency}。"
+        "yourBalance" : "您的余额: {balance} {currency}。"
       },
       "recipient" : "收款方",
       "title" : "确认交易",
@@ -963,13 +951,13 @@
   "update" : {
     "description" : "Tonkeeper的新版本现已可用。您现在可以下载它。",
     "download" : "下载",
-    "downloading" : "下载中... {{progress}}%",
-    "mb" : "{{size}} MB",
+    "downloading" : "下载中... '{{'progress'}}'%",
+    "mb" : "'{{'size'}}' MB",
     "remindLater" : "稍后提醒我",
     "retry" : "下载错误。点击重试。",
     "tap" : "点击更新",
     "title" : "更新Tonkeeper",
-    "version" : "版本 {{version}}"
+    "version" : "版本 '{{'version'}}'"
   },
   "username_issued_by_telegram" : "由Telegram发布。",
   "username_manage_name_button" : "管理名称",

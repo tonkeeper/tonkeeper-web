@@ -51,15 +51,30 @@ export const ListBlock = styled.div<{
               `
             : undefined}
 
-  border-radius: ${props => props.theme.cornerSmall};
+  border-radius: ${props =>
+        props.theme.displayType === 'full-width'
+            ? props.theme.corner2xSmall
+            : props.theme.cornerSmall};
 
     > div:first-child {
-        border-top-right-radius: ${props => props.theme.cornerSmall};
-        border-top-left-radius: ${props => props.theme.cornerSmall};
+        border-top-right-radius: ${props =>
+            props.theme.displayType === 'full-width'
+                ? props.theme.corner2xSmall
+                : props.theme.cornerSmall};
+        border-top-left-radius: ${props =>
+            props.theme.displayType === 'full-width'
+                ? props.theme.corner2xSmall
+                : props.theme.cornerSmall};
     }
     > div:last-child {
-        border-bottom-right-radius: ${props => props.theme.cornerSmall};
-        border-bottom-left-radius: ${props => props.theme.cornerSmall};
+        border-bottom-right-radius: ${props =>
+            props.theme.displayType === 'full-width'
+                ? props.theme.corner2xSmall
+                : props.theme.cornerSmall};
+        border-bottom-left-radius: ${props =>
+            props.theme.displayType === 'full-width'
+                ? props.theme.corner2xSmall
+                : props.theme.cornerSmall};
     }
 `;
 

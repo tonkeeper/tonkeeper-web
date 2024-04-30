@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
+
 /**
  * 
  * @export
@@ -25,6 +32,12 @@ export interface WalletDNS {
      * @memberof WalletDNS
      */
     address: string;
+    /**
+     * 
+     * @type {AccountAddress}
+     * @memberof WalletDNS
+     */
+    account: AccountAddress;
     /**
      * 
      * @type {boolean}
@@ -56,6 +69,7 @@ export interface WalletDNS {
  */
 export function instanceOfWalletDNS(value: object): boolean {
     if (!('address' in value)) return false;
+    if (!('account' in value)) return false;
     if (!('isWallet' in value)) return false;
     if (!('hasMethodPubkey' in value)) return false;
     if (!('hasMethodSeqno' in value)) return false;
@@ -74,6 +88,7 @@ export function WalletDNSFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'address': json['address'],
+        'account': AccountAddressFromJSON(json['account']),
         'isWallet': json['is_wallet'],
         'hasMethodPubkey': json['has_method_pubkey'],
         'hasMethodSeqno': json['has_method_seqno'],
@@ -88,6 +103,7 @@ export function WalletDNSToJSON(value?: WalletDNS | null): any {
     return {
         
         'address': value['address'],
+        'account': AccountAddressToJSON(value['account']),
         'is_wallet': value['isWallet'],
         'has_method_pubkey': value['hasMethodPubkey'],
         'has_method_seqno': value['hasMethodSeqno'],

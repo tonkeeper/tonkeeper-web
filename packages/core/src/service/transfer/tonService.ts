@@ -10,7 +10,6 @@ import { WalletState } from '../../entries/wallet';
 import { Account, AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
 import {
-    SendMode,
     checkServiceTimeOrDie,
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
@@ -18,7 +17,8 @@ import {
     getTTL,
     getWalletBalance,
     getWalletSeqNo,
-    seeIfServiceTimeSync
+    seeIfServiceTimeSync,
+    SendMode
 } from './common';
 
 export type AccountsMap = Map<string, Account>;

@@ -16,12 +16,15 @@
 import * as runtime from '../runtime';
 import type {
   GetChartRates200Response,
+  GetMarketsRates200Response,
   GetRates200Response,
   ReduceIndexingLatencyDefaultResponse,
 } from '../models/index';
 import {
     GetChartRates200ResponseFromJSON,
     GetChartRates200ResponseToJSON,
+    GetMarketsRates200ResponseFromJSON,
+    GetMarketsRates200ResponseToJSON,
     GetRates200ResponseFromJSON,
     GetRates200ResponseToJSON,
     ReduceIndexingLatencyDefaultResponseFromJSON,
@@ -65,6 +68,19 @@ export interface RatesApiInterface {
      * Get chart by token
      */
     getChartRates(requestParameters: GetChartRatesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetChartRates200Response>;
+
+    /**
+     * Get the TON price from markets
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RatesApiInterface
+     */
+    getMarketsRatesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetMarketsRates200Response>>;
+
+    /**
+     * Get the TON price from markets
+     */
+    getMarketsRates(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetMarketsRates200Response>;
 
     /**
      * Get the token price to the currency
@@ -138,6 +154,32 @@ export class RatesApi extends runtime.BaseAPI implements RatesApiInterface {
      */
     async getChartRates(requestParameters: GetChartRatesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetChartRates200Response> {
         const response = await this.getChartRatesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get the TON price from markets
+     */
+    async getMarketsRatesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetMarketsRates200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/rates/markets`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetMarketsRates200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Get the TON price from markets
+     */
+    async getMarketsRates(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetMarketsRates200Response> {
+        const response = await this.getMarketsRatesRaw(initOverrides);
         return await response.value();
     }
 

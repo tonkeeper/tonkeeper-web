@@ -19,6 +19,12 @@ import {
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
 } from './AccountAddress';
+import type { JettonBalanceLock } from './JettonBalanceLock';
+import {
+    JettonBalanceLockFromJSON,
+    JettonBalanceLockFromJSONTyped,
+    JettonBalanceLockToJSON,
+} from './JettonBalanceLock';
 import type { JettonPreview } from './JettonPreview';
 import {
     JettonPreviewFromJSON,
@@ -62,6 +68,12 @@ export interface JettonBalance {
      * @memberof JettonBalance
      */
     jetton: JettonPreview;
+    /**
+     * 
+     * @type {JettonBalanceLock}
+     * @memberof JettonBalance
+     */
+    lock?: JettonBalanceLock;
 }
 
 /**
@@ -88,6 +100,7 @@ export function JettonBalanceFromJSONTyped(json: any, ignoreDiscriminator: boole
         'price': json['price'] == null ? undefined : TokenRatesFromJSON(json['price']),
         'walletAddress': AccountAddressFromJSON(json['wallet_address']),
         'jetton': JettonPreviewFromJSON(json['jetton']),
+        'lock': json['lock'] == null ? undefined : JettonBalanceLockFromJSON(json['lock']),
     };
 }
 
@@ -101,6 +114,7 @@ export function JettonBalanceToJSON(value?: JettonBalance | null): any {
         'price': TokenRatesToJSON(value['price']),
         'wallet_address': AccountAddressToJSON(value['walletAddress']),
         'jetton': JettonPreviewToJSON(value['jetton']),
+        'lock': JettonBalanceLockToJSON(value['lock']),
     };
 }
 

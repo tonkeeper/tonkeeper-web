@@ -15,6 +15,8 @@ import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../Icon';
 import { Num2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { IconButton } from '../../fields/IconButton';
+import { Link } from 'react-router-dom';
+import { AppProRoute } from '../../../libs/routes';
 import { BuyNotification } from '../../home/BuyAction';
 import { Skeleton } from '../../shared/Skeleton';
 
@@ -87,6 +89,10 @@ const BalanceContainer = styled.div`
     }
 `;
 
+const LinkStyled = styled(Link)`
+    text-decoration: unset;
+`;
+
 const DesktopHeaderPayload = () => {
     usePreFetchRates();
     const { fiat } = useAppContext();
@@ -122,6 +128,12 @@ const DesktopHeaderPayload = () => {
                         <ArrowUpIcon />
                         {t('wallet_send')}
                     </ButtonStyled>
+                    <LinkStyled to={AppProRoute.multiSend}>
+                        <ButtonStyled size="small">
+                            <ArrowUpIcon />
+                            {t('wallet_multi_send')}
+                        </ButtonStyled>
+                    </LinkStyled>
                     <ButtonStyled
                         size="small"
                         onClick={() => {

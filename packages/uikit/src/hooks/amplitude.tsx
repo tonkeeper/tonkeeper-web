@@ -22,7 +22,9 @@ export type AmplitudeTransactionType =
     | 'send-nft'
     | 'renew-dns'
     | 'link-dns'
-    | 'send-trc20';
+    | 'send-trc20'
+    | 'multi-send-ton'
+    | 'multi-send-jetton';
 
 export const useTransactionAnalytics = () => {
     const tracker = useContext(AmplitudeAnalyticsContext);
@@ -94,7 +96,7 @@ export const useClickBrowser = () => {
 
 const getOrigin = (url: string) => {
     try {
-        let item = new URL(url);
+        const item = new URL(url);
         return item.origin;
     } catch (e) {
         return url;

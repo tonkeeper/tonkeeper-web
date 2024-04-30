@@ -51,18 +51,22 @@ export const DesktopViewDivider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
 `;
 
-export const DesktopBackButton: FC<{ className?: string }> = ({ className }) => {
+export const DesktopBackButton: FC<{
+    className?: string;
+    icon?: ReactNode;
+    onBack?: () => void;
+}> = ({ className, icon, onBack }) => {
     const sdk = useAppSdk();
     const navigate = useNavigate();
-    const back = useCallback(() => navigate(-1), [navigate]);
+    const back = useCallback(() => (onBack ? onBack() : navigate(-1)), [navigate, onBack]);
     useNativeBackButton(sdk, back);
 
     if (sdk.nativeBackButton) {
         return <></>;
     } else {
         return (
-            <IconButtonStyled onClick={() => navigate(-1)} className={className} transparent>
-                <ArrowLeftIcon />
+            <IconButtonStyled onClick={back} className={className} transparent>
+                {icon || <ArrowLeftIcon />}
             </IconButtonStyled>
         );
     }
@@ -70,22 +74,22 @@ export const DesktopBackButton: FC<{ className?: string }> = ({ className }) => 
 
 const BackButtonStyled = styled(DesktopBackButton)`
     padding: 0 1rem;
-    height: calc(100%, 2rem);
+    height: 2rem;
 `;
 
 export const DesktopViewHeader: FC<{
     children: ReactNode;
-    backButton?: boolean;
+    backButton?: boolean | ReactNode;
     className?: string;
     borderBottom?: boolean;
 }> = ({ children, backButton, borderBottom, className }) => {
     return (
         <DesktopViewHeaderStyled
-            withBackButton={backButton}
+            withBackButton={!!backButton}
             className={className}
             borderBottom={borderBottom}
         >
-            {backButton && <BackButtonStyled />}
+            {backButton && typeof backButton === 'boolean' ? <BackButtonStyled /> : backButton}
             {children}
         </DesktopViewHeaderStyled>
     );

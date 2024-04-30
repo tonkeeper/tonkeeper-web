@@ -36,9 +36,10 @@ const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
         `}
 `;
 
-const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean }>> = ({
+const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean; className?: string }>> = ({
     children,
-    entered
+    entered,
+    className
 }) => {
     const sdk = useAppSdk();
 
@@ -47,7 +48,11 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean }>> = ({
     }, [sdk, entered]);
 
     return (
-        <NotificationContainer className="notification-container" scrollbarWidth={scrollbarWidth}>
+        <NotificationContainer
+            className={'notification-container' + className ? ' ' + className : ''}
+            id=""
+            scrollbarWidth={scrollbarWidth}
+        >
             {children}
         </NotificationContainer>
     );
@@ -406,7 +411,17 @@ export const Notification: FC<{
     title?: ReactNode;
     footer?: ReactNode;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
-}> = ({ children, isOpen, hideButton, backShadow, handleClose, title, footer }) => {
+    wrapperClassName?: string;
+}> = ({
+    children,
+    isOpen,
+    hideButton,
+    backShadow,
+    handleClose,
+    title,
+    footer,
+    wrapperClassName
+}) => {
     const [entered, setEntered] = useState(false);
     const [open, setOpen] = useState(false);
     const { displayType } = useTheme();
@@ -511,7 +526,7 @@ export const Notification: FC<{
                 >
                     <Splash ref={nodeRef} className="scrollable">
                         <NotificationOverlay handleClose={handleClose} entered={entered}>
-                            <NotificationWrapper entered={entered}>
+                            <NotificationWrapper entered={entered} className={wrapperClassName}>
                                 <Wrapper>
                                     <Padding onClick={handleCloseOnlyOnNotFullWidth} />
                                     <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />

@@ -7,7 +7,7 @@ import { TonAsset } from './crypto/asset/ton-asset';
 import { TronAsset } from './crypto/asset/tron-asset';
 import { Suggestion } from './suggestion';
 
-export type BaseRecipient = Suggestion | { address: string };
+export type BaseRecipient = Suggestion | { address: string; bounce?: boolean };
 
 export type DnsRecipient = BaseRecipient & {
     dns: WalletDNS;

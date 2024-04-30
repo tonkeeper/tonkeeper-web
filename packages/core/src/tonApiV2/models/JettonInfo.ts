@@ -13,6 +13,12 @@
  */
 
 import { mapValues } from '../runtime';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 import type { JettonMetadata } from './JettonMetadata';
 import {
     JettonMetadataFromJSON,
@@ -44,6 +50,12 @@ export interface JettonInfo {
      * @memberof JettonInfo
      */
     totalSupply: string;
+    /**
+     * 
+     * @type {AccountAddress}
+     * @memberof JettonInfo
+     */
+    admin?: AccountAddress;
     /**
      * 
      * @type {JettonMetadata}
@@ -88,6 +100,7 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         
         'mintable': json['mintable'],
         'totalSupply': json['total_supply'],
+        'admin': json['admin'] == null ? undefined : AccountAddressFromJSON(json['admin']),
         'metadata': JettonMetadataFromJSON(json['metadata']),
         'verification': JettonVerificationTypeFromJSON(json['verification']),
         'holdersCount': json['holders_count'],
@@ -102,6 +115,7 @@ export function JettonInfoToJSON(value?: JettonInfo | null): any {
         
         'mintable': value['mintable'],
         'total_supply': value['totalSupply'],
+        'admin': AccountAddressToJSON(value['admin']),
         'metadata': JettonMetadataToJSON(value['metadata']),
         'verification': JettonVerificationTypeToJSON(value['verification']),
         'holders_count': value['holdersCount'],

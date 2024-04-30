@@ -32,6 +32,12 @@ export interface JettonHolders {
      * @memberof JettonHolders
      */
     addresses: Array<JettonHoldersAddressesInner>;
+    /**
+     * 
+     * @type {number}
+     * @memberof JettonHolders
+     */
+    total: number;
 }
 
 /**
@@ -39,6 +45,7 @@ export interface JettonHolders {
  */
 export function instanceOfJettonHolders(value: object): boolean {
     if (!('addresses' in value)) return false;
+    if (!('total' in value)) return false;
     return true;
 }
 
@@ -53,6 +60,7 @@ export function JettonHoldersFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'addresses': ((json['addresses'] as Array<any>).map(JettonHoldersAddressesInnerFromJSON)),
+        'total': json['total'],
     };
 }
 
@@ -63,6 +71,7 @@ export function JettonHoldersToJSON(value?: JettonHolders | null): any {
     return {
         
         'addresses': ((value['addresses'] as Array<any>).map(JettonHoldersAddressesInnerToJSON)),
+        'total': value['total'],
     };
 }
 

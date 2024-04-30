@@ -100,12 +100,14 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
     const { data: wallet } = useWalletState(publicKey);
     const { mutateAsync } = useMutateActiveWallet();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const { account } = useAppContext();
     const shouldShowIcon = account.publicKeys.length > 1;
 
     const handleNavigateHome = useCallback(() => {
-        if (location.pathname !== AppRoute.home) {
+        const navigateHomeFromRoutes = [AppProRoute.dashboard, AppRoute.settings, AppRoute.browser];
+        if (navigateHomeFromRoutes.some(path => location.pathname.startsWith(path))) {
             return navigate(AppRoute.home);
         } else {
             scrollToTop();

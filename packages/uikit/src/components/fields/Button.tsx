@@ -10,6 +10,7 @@ export interface ButtonProps {
     secondary?: boolean;
     disabled?: boolean;
     fullWidth?: boolean;
+    fitContent?: boolean;
     bottom?: boolean;
     marginTop?: boolean;
     corner?: '3xSmall' | '2xSmall' | 'small' | 'medium' | 'large' | 'full';
@@ -18,6 +19,7 @@ export interface ButtonProps {
 }
 
 export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
+    position: relative;
     border: 0;
     outline: 0;
 
@@ -60,6 +62,10 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
         props.fullWidth
             ? css`
                   width: 100%;
+              `
+            : props.fitContent
+            ? css`
+                  width: fit-content;
               `
             : css`
                   width: auto;
@@ -194,6 +200,16 @@ export const ButtonRow = styled.div`
     }
 `;
 
+const ChildrenHidden = styled.div`
+    visibility: hidden;
+`;
+
+const SpinnerIconStyled = styled(SpinnerIcon)`
+    position: absolute;
+    top: calc(50% - 0.5rem);
+    left: calc(50% - 0.5rem);
+`;
+
 export const Button: FC<
     PropsWithChildren<
         ButtonProps & Omit<React.HTMLProps<HTMLButtonElement>, 'size' | 'children' | 'ref' | 'as'>
@@ -202,7 +218,8 @@ export const Button: FC<
     if (loading) {
         return (
             <ButtonElement {...props} disabled>
-                <SpinnerIcon />
+                <ChildrenHidden>{children}</ChildrenHidden>
+                <SpinnerIconStyled />
             </ButtonElement>
         );
     } else {

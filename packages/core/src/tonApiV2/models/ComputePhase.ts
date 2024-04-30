@@ -68,6 +68,12 @@ export interface ComputePhase {
      * @memberof ComputePhase
      */
     exitCode?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ComputePhase
+     */
+    exitCodeDescription?: string;
 }
 
 /**
@@ -95,6 +101,7 @@ export function ComputePhaseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'gasUsed': json['gas_used'] == null ? undefined : json['gas_used'],
         'vmSteps': json['vm_steps'] == null ? undefined : json['vm_steps'],
         'exitCode': json['exit_code'] == null ? undefined : json['exit_code'],
+        'exitCodeDescription': json['exit_code_description'] == null ? undefined : json['exit_code_description'],
     };
 }
 
@@ -111,6 +118,7 @@ export function ComputePhaseToJSON(value?: ComputePhase | null): any {
         'gas_used': value['gasUsed'],
         'vm_steps': value['vmSteps'],
         'exit_code': value['exitCode'],
+        'exit_code_description': value['exitCodeDescription'],
     };
 }
 

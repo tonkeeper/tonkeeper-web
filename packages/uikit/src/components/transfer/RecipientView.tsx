@@ -59,7 +59,7 @@ const useToAccount = (isValid: boolean, recipient: BaseRecipient | DnsRecipient)
     );
 };
 
-const seeIfInvalidDns = (value: string) => {
+export const seeIfInvalidDns = (value: string) => {
     return (
         value.length < 8 ||
         value.length === 48 ||

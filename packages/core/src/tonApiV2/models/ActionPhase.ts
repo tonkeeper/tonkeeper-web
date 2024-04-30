@@ -55,6 +55,12 @@ export interface ActionPhase {
      * @memberof ActionPhase
      */
     totalFees: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ActionPhase
+     */
+    resultCodeDescription?: string;
 }
 
 /**
@@ -86,6 +92,7 @@ export function ActionPhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'skippedActions': json['skipped_actions'],
         'fwdFees': json['fwd_fees'],
         'totalFees': json['total_fees'],
+        'resultCodeDescription': json['result_code_description'] == null ? undefined : json['result_code_description'],
     };
 }
 
@@ -101,6 +108,7 @@ export function ActionPhaseToJSON(value?: ActionPhase | null): any {
         'skipped_actions': value['skippedActions'],
         'fwd_fees': value['fwdFees'],
         'total_fees': value['totalFees'],
+        'result_code_description': value['resultCodeDescription'],
     };
 }
 

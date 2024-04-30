@@ -11,7 +11,8 @@ export enum AppRoute {
 }
 
 export enum AppProRoute {
-    dashboard = '/dashboard'
+    dashboard = '/dashboard',
+    multiSend = '/multi-send'
 }
 
 export enum ImportRoute {

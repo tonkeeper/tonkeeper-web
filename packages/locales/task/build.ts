@@ -108,12 +108,22 @@ const writeFiles = (
     fs.writeFileSync(path.join(dist, i18n, 'resources.json'), JSON.stringify(resources, null, 2));
 };
 
+// By some reason toglee update variables with placeholders
+const fixMessage = (message: string) => {
+    // Replace '{{'value'}}' with {{value}}
+    message = message.replace(/'\{\{\s*'([^}]+)'\s*\}\}'/g, '{{$1}}');
+
+    // Replace {value} with %{value}, excluding already existing %{value} or {{value}}
+    message = message.replace(/(?<!\{)(?<!%)({([^{}]+)})(?!\})/g, '%{$2}');
+    return message;
+};
+
 const toDict = (parentKey: string | undefined, value: object): Record<string, string> => {
     return Object.entries(value).reduce((acc, [key, message]) => {
         key = key.replace(/\./g, '_').replace(/-/g, '_');
         const item_key = parentKey ? `${parentKey}_${key}` : key;
         if (typeof message === 'string') {
-            acc[item_key] = message;
+            acc[item_key] = fixMessage(message);
             return acc;
         } else {
             const dict = toDict(item_key, message);

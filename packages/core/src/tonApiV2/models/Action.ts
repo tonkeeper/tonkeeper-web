@@ -284,6 +284,12 @@ export interface Action {
      * @memberof Action
      */
     simplePreview: ActionSimplePreview;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Action
+     */
+    baseTransactions: Array<string>;
 }
 
 
@@ -332,6 +338,7 @@ export function instanceOfAction(value: object): boolean {
     if (!('type' in value)) return false;
     if (!('status' in value)) return false;
     if (!('simplePreview' in value)) return false;
+    if (!('baseTransactions' in value)) return false;
     return true;
 }
 
@@ -368,6 +375,7 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'inscriptionTransfer': json['InscriptionTransfer'] == null ? undefined : InscriptionTransferActionFromJSON(json['InscriptionTransfer']),
         'inscriptionMint': json['InscriptionMint'] == null ? undefined : InscriptionMintActionFromJSON(json['InscriptionMint']),
         'simplePreview': ActionSimplePreviewFromJSON(json['simple_preview']),
+        'baseTransactions': json['base_transactions'],
     };
 }
 
@@ -400,6 +408,7 @@ export function ActionToJSON(value?: Action | null): any {
         'InscriptionTransfer': InscriptionTransferActionToJSON(value['inscriptionTransfer']),
         'InscriptionMint': InscriptionMintActionToJSON(value['inscriptionMint']),
         'simple_preview': ActionSimplePreviewToJSON(value['simplePreview']),
+        'base_transactions': value['baseTransactions'],
     };
 }
 

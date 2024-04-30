@@ -124,6 +124,12 @@ export interface Transaction {
     totalFees: number;
     /**
      * 
+     * @type {number}
+     * @memberof Transaction
+     */
+    endBalance: number;
+    /**
+     * 
      * @type {TransactionType}
      * @memberof Transaction
      */
@@ -226,6 +232,7 @@ export function instanceOfTransaction(value: object): boolean {
     if (!('origStatus' in value)) return false;
     if (!('endStatus' in value)) return false;
     if (!('totalFees' in value)) return false;
+    if (!('endBalance' in value)) return false;
     if (!('transactionType' in value)) return false;
     if (!('stateUpdateOld' in value)) return false;
     if (!('stateUpdateNew' in value)) return false;
@@ -254,6 +261,7 @@ export function TransactionFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'origStatus': AccountStatusFromJSON(json['orig_status']),
         'endStatus': AccountStatusFromJSON(json['end_status']),
         'totalFees': json['total_fees'],
+        'endBalance': json['end_balance'],
         'transactionType': TransactionTypeFromJSON(json['transaction_type']),
         'stateUpdateOld': json['state_update_old'],
         'stateUpdateNew': json['state_update_new'],
@@ -286,6 +294,7 @@ export function TransactionToJSON(value?: Transaction | null): any {
         'orig_status': AccountStatusToJSON(value['origStatus']),
         'end_status': AccountStatusToJSON(value['endStatus']),
         'total_fees': value['totalFees'],
+        'end_balance': value['endBalance'],
         'transaction_type': TransactionTypeToJSON(value['transactionType']),
         'state_update_old': value['stateUpdateOld'],
         'state_update_new': value['stateUpdateNew'],
