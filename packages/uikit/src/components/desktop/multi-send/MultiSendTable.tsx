@@ -51,7 +51,7 @@ const AssetSelectWrapper = styled.div`
 
 const MultiSendTableGrid = styled.div`
     display: grid;
-    grid-template-columns: 284px 1fr 296px 1fr 160px 1fr 28px;
+    grid-template-columns: 284px 1fr 296px 1fr 160px 1fr 40px;
     gap: 0.25rem;
     align-items: center;
     margin-bottom: 0.25rem;
@@ -73,11 +73,15 @@ const TableFormWrapper = styled.form`
     display: flex;
     flex-direction: column;
     height: 100%;
+    overflow-x: auto;
+    margin-right: -1rem;
 `;
 
 const MultiSendFooterWrapper = styled.div`
-    padding: 1rem 0;
+    padding: 1rem 1rem 1rem 0;
+    width: calc(100% - 1rem);
     position: sticky;
+    left: 0;
     bottom: 0;
     display: flex;
     justify-content: flex-end;
@@ -90,6 +94,7 @@ const MultiSendFooterTextWrapper = styled.div`
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 200px;
     > ${Body3} {
         text-align: right;
         display: flex;
@@ -128,6 +133,7 @@ const ListActionsButtons = styled.div`
     display: flex;
     gap: 0.5rem;
     margin-right: auto;
+    flex-wrap: wrap;
 `;
 
 export const MultiSendTable: FC<{

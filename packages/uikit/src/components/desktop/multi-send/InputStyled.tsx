@@ -11,6 +11,7 @@ export const InputBlockStyled = styled(InputBlock)`
 `;
 
 export const InputFieldStyled = styled(InputField)`
+    width: 100%;
     padding: 8px 0;
     height: 36px;
     box-sizing: content-box;

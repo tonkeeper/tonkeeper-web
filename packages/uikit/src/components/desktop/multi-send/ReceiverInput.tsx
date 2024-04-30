@@ -26,11 +26,17 @@ const SpinnerRingStyled = styled(SpinnerRing)`
 `;
 
 const Body2Secondary = styled(Body2)`
+    white-space: nowrap;
     color: ${p => p.theme.textSecondary};
 `;
 
 const AddressText = styled(Body2Secondary)`
+    white-space: nowrap;
     cursor: pointer;
+`;
+
+const ReceiverInputFieldStyled = styled(InputFieldStyled)`
+    min-width: 100px;
 `;
 
 export const ReceiverInput: FC<{
@@ -143,7 +149,7 @@ export const ReceiverInput: FC<{
 
     return (
         <InputBlockStyled valid={!fieldState.invalid} focus={focus}>
-            <InputFieldStyled
+            <ReceiverInputFieldStyled
                 {...field}
                 onFocus={() => setFocus(true)}
                 onBlur={() => setFocus(false)}
