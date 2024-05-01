@@ -273,16 +273,18 @@ export const Content: FC<{
     if (location.pathname.startsWith(AppRoute.signer)) {
         return (
             <Wrapper standalone={standalone}>
-                <Route path={AppRoute.signer}>
-                    <Route
-                        path={SignerRoute.link}
-                        element={
-                            <Suspense>
-                                <SignerLinkPage />
-                            </Suspense>
-                        }
-                    />
-                </Route>
+                <Routes>
+                    <Route path={AppRoute.signer}>
+                        <Route
+                            path={SignerRoute.link}
+                            element={
+                                <Suspense>
+                                    <SignerLinkPage />
+                                </Suspense>
+                            }
+                        />
+                    </Route>
+                </Routes>
             </Wrapper>
         );
     }
