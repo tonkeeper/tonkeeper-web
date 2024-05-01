@@ -1,27 +1,75 @@
+import { Cell } from '@ton/core';
 import { mnemonicToPrivateKey, sha256_sync } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
+import { Signer } from '@tonkeeper/core/dist/entries/signer';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
+import {
+    parseSignerSignature,
+    storeTransactionAndCreateDeepLink
+} from '@tonkeeper/core/dist/service/signerService';
+import { signByMnemonicOver } from '@tonkeeper/core/dist/service/transfer/common';
+import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
 import nacl from 'tweetnacl';
 
-export const signTonConnect = (sdk: IAppSdk, publicKey: string) => {
+export const signTonConnectOver = (sdk: IAppSdk, publicKey: string) => {
     return async (bufferToSign: Buffer) => {
-        const mnemonic = await getMnemonic(sdk, publicKey);
-        const keyPair = await mnemonicToPrivateKey(mnemonic);
-        const signature = nacl.sign.detached(
-            Buffer.from(sha256_sync(bufferToSign)),
-            keyPair.secretKey
-        );
-        return signature;
+        const auth = await getWalletAuthState(sdk.storage, publicKey);
+        switch (auth.kind) {
+            case 'signer': {
+                throw new Error('Signer linked by QR is not support sign buffer.');
+            }
+            case 'signer-deeplink': {
+                throw new Error('Signer linked by deep link is not support sign buffer.');
+            }
+            default: {
+                const mnemonic = await getMnemonic(sdk, publicKey);
+                const keyPair = await mnemonicToPrivateKey(mnemonic);
+                const signature = nacl.sign.detached(
+                    Buffer.from(sha256_sync(bufferToSign)),
+                    keyPair.secretKey
+                );
+                return signature;
+            }
+        }
     };
 };
 
-export const getMnemonic = async (sdk: IAppSdk, publicKey: string): Promise<string[]> => {
-    const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
-    if (!auth) {
-        throw new Error('Missing Auth');
+export const getSigner = async (sdk: IAppSdk, publicKey: string): Promise<Signer> => {
+    const auth = await getWalletAuthState(sdk.storage, publicKey);
+
+    switch (auth.kind) {
+        case 'signer': {
+            return async (message: Cell) => {
+                const result = await pairSignerByNotification(
+                    sdk,
+                    message.toBoc({ idx: false }).toString('base64')
+                );
+                return parseSignerSignature(result);
+            };
+        }
+        case 'signer-deeplink': {
+            return async (message: Cell) => {
+                const deeplink = await storeTransactionAndCreateDeepLink(
+                    sdk,
+                    publicKey,
+                    message.toBoc({ idx: false }).toString('base64')
+                );
+
+                window.location = deeplink as any;
+
+                throw new Error('Navigate to deeplink');
+            };
+        }
+        default: {
+            const mnemonic = await getMnemonic(sdk, publicKey);
+            return signByMnemonicOver(mnemonic);
+        }
     }
+};
+
+export const getMnemonic = async (sdk: IAppSdk, publicKey: string): Promise<string[]> => {
+    const auth = await getWalletAuthState(sdk.storage, publicKey);
 
     switch (auth.kind) {
         case 'none': {
@@ -50,6 +98,36 @@ export const getPasswordByNotification = async (sdk: IAppSdk, auth: AuthState): 
             method: 'getPassword',
             id,
             params: { auth }
+        });
+
+        const onCallback = (message: {
+            method: 'response';
+            id?: number | undefined;
+            params: string | Error;
+        }) => {
+            if (message.id === id) {
+                const { params } = message;
+                sdk.uiEvents.off('response', onCallback);
+
+                if (typeof params === 'string') {
+                    resolve(params);
+                } else {
+                    reject(params);
+                }
+            }
+        };
+
+        sdk.uiEvents.on('response', onCallback);
+    });
+};
+
+const pairSignerByNotification = async (sdk: IAppSdk, boc: string): Promise<string> => {
+    const id = Date.now();
+    return new Promise<string>((resolve, reject) => {
+        sdk.uiEvents.emit('signer', {
+            method: 'signer',
+            id,
+            params: boc
         });
 
         const onCallback = (message: {

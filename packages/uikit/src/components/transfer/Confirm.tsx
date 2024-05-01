@@ -29,4 +29,5 @@ export const SendingTitle = styled(Body1)`
 
 export const Title = styled(H3)`
     user-select: none;
+    text-align: center;
 `;

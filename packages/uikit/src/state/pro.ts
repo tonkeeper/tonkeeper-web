@@ -21,9 +21,9 @@ import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServ
 import { useMemo } from 'react';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
-import { QueryKey } from '../libs/queryKey';
-import { signTonConnect } from './mnemonic';
 import { useTranslation } from '../hooks/translation';
+import { QueryKey } from '../libs/queryKey';
+import { signTonConnectOver } from './mnemonic';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -54,7 +54,7 @@ export const useSelectWalletMutation = () => {
         if (!state) {
             throw new Error('Missing wallet state');
         }
-        await authViaTonConnect(state, signTonConnect(sdk, publicKey));
+        await authViaTonConnect(state, signTonConnectOver(sdk, publicKey));
 
         await client.invalidateQueries([QueryKey.pro]);
     });

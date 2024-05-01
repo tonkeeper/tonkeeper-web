@@ -14,7 +14,7 @@ import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { getMnemonic } from '../../state/mnemonic';
+import { getSigner } from '../../state/mnemonic';
 import { CheckmarkCircleIcon, ErrorIcon } from '../Icon';
 import {
     Notification,
@@ -60,8 +60,8 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
         if (!accounts) {
             throw new Error('Missing accounts data');
         }
-        const mnemonic = await getMnemonic(sdk, wallet.publicKey);
-        const value = await sendTonConnectTransfer(api, wallet, accounts, params, mnemonic);
+        const signer = await getSigner(sdk, wallet.publicKey);
+        const value = await sendTonConnectTransfer(api, wallet, accounts, params, signer);
         client.invalidateQueries({
             predicate: query => query.queryKey.includes(wallet.active.rawAddress)
         });

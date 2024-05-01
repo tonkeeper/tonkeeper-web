@@ -6,7 +6,8 @@ import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import {
-    accountSetUpWalletState,
+    addWalletWithCustomAuthState,
+    addWalletWithGlobalAuthState,
     getAccountState
 } from '@tonkeeper/core/dist/service/accountService';
 import {
@@ -34,10 +35,11 @@ const createWalletWithKeychain = async (
     }
 
     const state = await createNewWalletState(api, mnemonic);
+    state.auth = { kind: 'keychain' };
 
     await sdk.keychain.setPassword(state.publicKey, mnemonic.join(' '));
 
-    await accountSetUpWalletState(sdk.storage, state, { kind: 'keychain' });
+    await addWalletWithCustomAuthState(sdk.storage, state);
 
     await client.invalidateQueries([QueryKey.account]);
     return getAccountState(sdk.storage);
@@ -58,7 +60,7 @@ const createWallet = async (
 
     const state = await createNewWalletState(api, mnemonic);
     const encryptedMnemonic = await encryptWalletMnemonic(mnemonic, key);
-    await accountSetUpWalletState(sdk.storage, state, auth, encryptedMnemonic);
+    await addWalletWithGlobalAuthState(sdk.storage, state, auth, encryptedMnemonic);
 
     await client.invalidateQueries([QueryKey.account]);
     return getAccountState(sdk.storage);
@@ -83,7 +85,7 @@ export const useAddWalletMutation = () => {
             return createWalletWithKeychain(client, api, sdk, mnemonic);
         }
 
-        const auth = await sdk.storage.get<AuthState>(AppKey.PASSWORD);
+        const auth = await sdk.storage.get<AuthState>(AppKey.GLOBAL_AUTH_STATE);
         if (auth === null) {
             return false;
         }

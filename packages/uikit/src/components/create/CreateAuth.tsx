@@ -24,7 +24,7 @@ const useSetNoneAuthMutation = () => {
         const state: AuthNone = {
             kind: 'none'
         };
-        await sdk.storage.set(AppKey.PASSWORD, state);
+        await sdk.storage.set(AppKey.GLOBAL_AUTH_STATE, state);
     });
 };
 
@@ -69,7 +69,7 @@ const useCreatePassword = () => {
             const state: AuthPassword = {
                 kind: 'password'
             };
-            await sdk.storage.set(AppKey.PASSWORD, state);
+            await sdk.storage.set(AppKey.GLOBAL_AUTH_STATE, state);
         }
     );
 };

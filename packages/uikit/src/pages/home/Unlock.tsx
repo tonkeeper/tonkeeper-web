@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import React, { FC, useEffect, useRef, useState } from 'react';
@@ -10,7 +10,6 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useMutateDeleteAll } from '../../state/account';
-import { getMnemonic } from '../../state/mnemonic';
 
 const Block = styled.form<{ minHeight?: string }>`
     display: flex;
@@ -144,33 +143,11 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
     );
 };
 
-const useKeychainUnlock = () => {
-    const { account } = useAppContext();
-    const sdk = useAppSdk();
-
-    return useQuery<Boolean, Error, void>(['unlock-keychain'], async () => {
-        if (account.publicKeys.length === 0) {
-            throw new Error('Missing wallets');
-        }
-        const [publicKey] = account.publicKeys;
-
-        await getMnemonic(sdk, publicKey);
-        sdk.uiEvents.emit('unlock');
-        return true;
-    });
-};
-
-const KeychainUnlock = () => {
-    const {} = useKeychainUnlock();
-    return <></>;
-};
 export const Unlock = () => {
     const { auth } = useAppContext();
 
     if (auth.kind === 'password') {
         return <PasswordUnlock />;
-    } else if (auth.kind === 'keychain') {
-        return <KeychainUnlock />;
     } else {
         return <div>Other auth</div>;
     }

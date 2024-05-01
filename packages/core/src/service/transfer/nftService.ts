@@ -1,8 +1,8 @@
 import { Address, beginCell, Cell, comment, toNano } from '@ton/core';
-import { mnemonicToPrivateKey } from '@ton/crypto';
 import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
+import { Signer } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi, NftItem } from '../../tonApiV2';
 import {
@@ -12,7 +12,8 @@ import {
     createTransferMessage,
     getKeyPairAndSeqno,
     getTonkeeperQueryId,
-    getWalletBalance
+    getWalletBalance,
+    signEstimateMessage
 } from './common';
 
 const initNftTransferAmount = toNano('1');
@@ -70,7 +71,7 @@ const createNftTransfer = (
     nftAddress: string,
     nftTransferAmount: bigint,
     forwardPayload: Cell | null = null,
-    secretKey: Buffer = Buffer.alloc(64)
+    signer: Signer
 ) => {
     const body = nftTransferBody({
         queryId: getTonkeeperQueryId(),
@@ -81,7 +82,7 @@ const createNftTransfer = (
     });
 
     return createTransferMessage(
-        { seqno, state: walletState, secretKey },
+        { seqno, state: walletState, signer },
         { to: nftAddress, value: nftTransferAmount, body }
     );
 };
@@ -96,13 +97,14 @@ export const estimateNftTransfer = async (
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
-    const cell = createNftTransfer(
+    const cell = await createNftTransfer(
         seqno,
         walletState,
         recipient.toAccount.address,
         nftItem.address,
         initNftTransferAmount,
-        recipient.comment ? comment(recipient.comment) : null
+        recipient.comment ? comment(recipient.comment) : null,
+        signEstimateMessage
     );
 
     const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
@@ -119,10 +121,9 @@ export const sendNftTransfer = async (
     recipient: TonRecipientData,
     nftItem: NftItem,
     fee: TransferEstimationEvent,
-    mnemonic: string[]
+    signer: Signer
 ) => {
     await checkServiceTimeOrDie(api);
-    const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const min = toNano('0.05').toString();
     let nftTransferAmount = new BigNumber(fee.event.extra).multipliedBy(-1).plus(min);
@@ -138,14 +139,14 @@ export const sendNftTransfer = async (
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
-    const cell = createNftTransfer(
+    const cell = await createNftTransfer(
         seqno,
         walletState,
         recipient.toAccount.address,
         nftItem.address,
         BigInt(nftTransferAmount.toString()),
         recipient.comment ? comment(recipient.comment) : null,
-        keyPair.secretKey
+        signer
     );
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
@@ -158,18 +159,18 @@ export const sendNftRenew = async (options: {
     walletState: WalletState;
     nftAddress: string;
     fee: TransferEstimationEvent;
-    mnemonic: string[];
+    signer: Signer;
     amount: BigNumber;
 }) => {
-    const { seqno, keyPair } = await getKeyPairAndSeqno(options);
+    const { seqno } = await getKeyPairAndSeqno(options);
 
     const body = nftRenewBody({ queryId: getTonkeeperQueryId() });
 
-    const cell = createTransferMessage(
+    const cell = await createTransferMessage(
         {
             seqno,
             state: options.walletState,
-            secretKey: keyPair.secretKey
+            signer: options.signer
         },
         { to: options.nftAddress, value: options.amount, body }
     );
@@ -191,11 +192,11 @@ export const estimateNftRenew = async (options: {
 
     const body = nftRenewBody({ queryId: getTonkeeperQueryId() });
 
-    const cell = createTransferMessage(
+    const cell = await createTransferMessage(
         {
             seqno,
             state: options.walletState,
-            secretKey: Buffer.alloc(64)
+            signer: signEstimateMessage
         },
         { to: options.nftAddress, value: options.amount, body }
     );
@@ -209,18 +210,18 @@ export const sendNftLink = async (options: {
     nftAddress: string;
     linkToAddress: string;
     fee: TransferEstimationEvent;
-    mnemonic: string[];
+    signer: Signer;
     amount: BigNumber;
 }) => {
-    const { seqno, keyPair } = await getKeyPairAndSeqno(options);
+    const { seqno } = await getKeyPairAndSeqno(options);
 
     const body = nftLinkBody({ ...options, queryId: getTonkeeperQueryId() });
 
-    const cell = createTransferMessage(
+    const cell = await createTransferMessage(
         {
             seqno,
             state: options.walletState,
-            secretKey: keyPair.secretKey
+            signer: options.signer
         },
         { to: options.nftAddress, value: options.amount, body }
     );
@@ -243,11 +244,11 @@ export const estimateNftLink = async (options: {
 
     const body = nftLinkBody({ ...options, queryId: getTonkeeperQueryId() });
 
-    const cell = createTransferMessage(
+    const cell = await createTransferMessage(
         {
             seqno,
             state: options.walletState,
-            secretKey: Buffer.alloc(64)
+            signer: signEstimateMessage
         },
         { to: options.nftAddress, value: options.amount, body }
     );

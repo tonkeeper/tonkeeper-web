@@ -1,21 +1,24 @@
 import { Address } from '@ton/core';
-import { KeyPair, mnemonicToPrivateKey } from '@ton/crypto';
+import { mnemonicToPrivateKey } from '@ton/crypto';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
+import queryString from 'query-string';
+import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
+import { AuthState } from '../entries/password';
 import { WalletAddress, WalletState, WalletVersion, WalletVersions } from '../entries/wallet';
 import { WalletApi } from '../tonApiV2';
 import { encrypt } from './cryptoService';
 import { walletContract } from './wallet/contractService';
-import { getFallbackWalletEmoji, setWalletState } from './wallet/storeService';
+import { getFallbackWalletEmoji, getWalletStateOrDie, setWalletState } from './wallet/storeService';
 
 export const createNewWalletState = async (api: APIConfig, mnemonic: string[], name?: string) => {
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
-    const active = await findWalletAddress(api, keyPair);
-
     const publicKey = keyPair.publicKey.toString('hex');
+
+    const active = await findWalletAddress(api, publicKey);
 
     const state: WalletState = {
         publicKey,
@@ -52,10 +55,10 @@ const findWalletVersion = (interfaces?: string[]): WalletVersion => {
     throw new Error('Unexpected wallet version');
 };
 
-const findWalletAddress = async (api: APIConfig, keyPair: KeyPair) => {
+const findWalletAddress = async (api: APIConfig, publicKey: string) => {
     try {
         const result = await new WalletApi(api.tonApiV2).getWalletsByPublicKey({
-            publicKey: keyPair.publicKey.toString('hex')
+            publicKey: publicKey
         });
 
         const [activeWallet] = result.accounts
@@ -83,7 +86,7 @@ const findWalletAddress = async (api: APIConfig, keyPair: KeyPair) => {
 
     const contact = WalletContractV4.create({
         workchain: 0,
-        publicKey: keyPair.publicKey
+        publicKey: Buffer.from(publicKey, 'hex')
     });
     const wallet: WalletAddress = {
         rawAddress: contact.address.toRawString(),
@@ -161,4 +164,72 @@ export const updateWalletProperty = async (
         revision: wallet.revision + 1
     };
     await setWalletState(storage, updated);
+};
+
+export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) => {
+    if (!qrCode.startsWith('tonkeeper://signer')) {
+        throw new Error('Unexpected QR code');
+    }
+
+    const {
+        query: { pk, name }
+    } = queryString.parseUrl(qrCode);
+
+    if (typeof pk != 'string') {
+        throw new Error('Unexpected QR code');
+    }
+    if (typeof name != 'string') {
+        throw new Error('Unexpected QR code');
+    }
+
+    const publicKey = Buffer.from(pk, 'base64').toString('hex');
+
+    const active = await findWalletAddress(api, publicKey);
+
+    const state: WalletState = {
+        publicKey,
+        active,
+        revision: 0,
+        name,
+        auth: { kind: 'signer' },
+        emoji: getFallbackWalletEmoji(publicKey)
+    };
+
+    return state;
+};
+
+export const walletStateFromSignerDeepLink = async (
+    api: APIConfig,
+    pk: string,
+    name: string | null
+) => {
+    const publicKey = Buffer.from(pk, 'base64').toString('hex');
+
+    const active = await findWalletAddress(api, publicKey);
+
+    const state: WalletState = {
+        publicKey,
+        active,
+        revision: 0,
+        name: name ?? undefined,
+        auth: { kind: 'signer-deeplink' },
+        emoji: getFallbackWalletEmoji(publicKey)
+    };
+
+    return state;
+};
+
+export const getWalletAuthState = async (storage: IStorage, publicKey: string) => {
+    const wallet = await getWalletStateOrDie(storage, publicKey);
+
+    if (wallet.auth) {
+        return wallet.auth;
+    }
+
+    const globalAuth = await storage.get<AuthState>(AppKey.GLOBAL_AUTH_STATE);
+    if (!globalAuth) {
+        throw new Error('Missing Auth');
+    }
+
+    return globalAuth;
 };

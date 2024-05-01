@@ -8,7 +8,7 @@ import {
     storeMessage,
     toNano
 } from '@ton/core';
-import { mnemonicToPrivateKey } from '@ton/crypto';
+import { mnemonicToPrivateKey, sign } from '@ton/crypto';
 import { WalletContractV3R1 } from '@ton/ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from '@ton/ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
@@ -17,6 +17,7 @@ import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
 import { TransferEstimationEvent } from '../../entries/send';
+import { Signer } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { Account, AccountsApi, BlockchainApi, LiteServerApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
@@ -118,11 +119,11 @@ export const checkServiceTimeOrDie = async (api: APIConfig) => {
     }
 };
 
-export const createTransferMessage = (
+export const createTransferMessage = async (
     wallet: {
         seqno: number;
         state: WalletState;
-        secretKey: Buffer;
+        signer: Signer;
     },
     transaction: {
         to: string;
@@ -133,9 +134,10 @@ export const createTransferMessage = (
     const value =
         transaction.value instanceof BigNumber ? transaction.value.toFixed(0) : transaction.value;
     const contract = walletContractFromState(wallet.state);
-    const transfer = contract.createTransfer({
+
+    const transfer = await contract.createTransferAndSignRequestAsync({
         seqno: wallet.seqno,
-        secretKey: wallet.secretKey,
+        signer: wallet.signer,
         timeout: getTTL(),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
@@ -151,21 +153,30 @@ export const createTransferMessage = (
     return externalMessage(contract, wallet.seqno, transfer).toBoc();
 };
 
+export const signEstimateMessage = async (message: Cell): Promise<Buffer> => {
+    return sign(message.hash(), Buffer.alloc(64));
+};
+
+export const signByMnemonicOver = async (mnemonic: string[]) => {
+    return async (message: Cell): Promise<Buffer> => {
+        const keyPair = await mnemonicToPrivateKey(mnemonic);
+        return sign(message.hash(), keyPair.secretKey);
+    };
+};
+
 export async function getKeyPairAndSeqno(options: {
     api: APIConfig;
     walletState: WalletState;
     fee: TransferEstimationEvent;
-    mnemonic: string[];
     amount: BigNumber;
 }) {
     await checkServiceTimeOrDie(options.api);
-    const keyPair = await mnemonicToPrivateKey(options.mnemonic);
 
     const total = options.amount.plus(options.fee.event.extra * -1);
 
     const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
     checkWalletBalanceOrDie(total, wallet);
-    return { seqno, keyPair };
+    return { seqno };
 }
 
 export const getTTL = () => {

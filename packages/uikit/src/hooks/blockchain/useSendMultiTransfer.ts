@@ -10,7 +10,7 @@ import {
 } from '@tonkeeper/core/dist/service/transfer/multiSendService';
 import BigNumber from 'bignumber.js';
 import { notifyError } from '../../components/transfer/common';
-import { getMnemonic } from '../../state/mnemonic';
+import { getSigner } from '../../state/mnemonic';
 import { useWalletJettonList } from '../../state/wallet';
 import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
@@ -50,8 +50,8 @@ export function useSendMultiTransfer() {
         Error,
         { form: MultiSendFormTokenized; asset: TonAsset; feeEstimation: BigNumber }
     >(async ({ form, asset, feeEstimation }) => {
-        const mnemonic = await getMnemonic(sdk, wallet.publicKey).catch(() => null);
-        if (mnemonic === null) return false;
+        const signer = await getSigner(sdk, wallet.publicKey).catch(() => null);
+        if (signer === null) return false;
         try {
             if (asset.id === TON_ASSET.id) {
                 track2('multi-send-ton');
@@ -60,7 +60,7 @@ export function useSendMultiTransfer() {
                     wallet,
                     multiSendFormToTransferMessages(form),
                     feeEstimation,
-                    mnemonic
+                    signer
                 );
             } else {
                 track2('multi-send-jetton');
@@ -73,7 +73,7 @@ export function useSendMultiTransfer() {
                     jettonInfo.walletAddress.address,
                     multiSendFormToTransferMessages(form),
                     feeEstimation,
-                    mnemonic
+                    signer
                 );
             }
         } catch (e) {

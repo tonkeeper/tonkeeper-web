@@ -1,5 +1,5 @@
 import { QrScanSignature } from '@polkadot/react-qr/ScanSignature';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
@@ -42,8 +42,9 @@ const QrScanner = () => {
     const onCancel = () => {
         setScanId(undefined);
     };
-    const onScan = useCallback(
-        ({ signature }: { signature: string }) => {
+
+    const onScan = useMemo(() => {
+        return ({ signature }: { signature: string }) => {
             signature = signature.slice(2);
 
             sdk.uiEvents.emit('response', {
@@ -51,11 +52,9 @@ const QrScanner = () => {
                 id: scanId,
                 params: signature
             });
-
             setScanId(undefined);
-        },
-        [sdk, scanId, setScanId]
-    );
+        };
+    }, [sdk, scanId, setScanId]);
 
     const Content = useCallback(() => {
         return (
