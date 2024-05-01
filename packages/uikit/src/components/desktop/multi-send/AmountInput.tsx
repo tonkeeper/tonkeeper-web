@@ -46,7 +46,7 @@ export const AmountInput: FC<{
     field: ControllerRenderProps<
         {
             rows: {
-                amount: { inFiat: boolean; value: string } | undefined;
+                amount: { inFiat: boolean; value: string } | null;
             }[];
         },
         `rows.${number}.amount`
