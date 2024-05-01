@@ -31,13 +31,14 @@ import {
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppRoute, SignerRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
+import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
@@ -48,7 +49,6 @@ import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-ro
 import styled, { css } from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from './libs/hooks';
-import { useUserFiat } from "@tonkeeper/uikit/dist/state/fiat";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -75,6 +75,10 @@ const SendNftNotification = React.lazy(
 
 const PairSignerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
+);
+const SignerLinkPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/signer/LinkPage'));
+const SignerPublishPage = React.lazy(
+    () => import('@tonkeeper/uikit/dist/pages/signer/PublishPage')
 );
 
 const queryClient = new QueryClient({
@@ -204,7 +208,13 @@ export const Loader: FC = () => {
         }
     }, [activeWallet, i18n]);
 
-    if (auth === undefined || account === undefined || config === undefined || lock === undefined || fiat === undefined) {
+    if (
+        auth === undefined ||
+        account === undefined ||
+        config === undefined ||
+        lock === undefined ||
+        fiat === undefined
+    ) {
         return <Loading />;
     }
 
@@ -316,6 +326,24 @@ export const Content: FC<{
                             }
                         />
                     </Route>
+                    <Route path={AppRoute.signer}>
+                        <Route
+                            path={SignerRoute.link}
+                            element={
+                                <Suspense>
+                                    <SignerLinkPage />
+                                </Suspense>
+                            }
+                        />
+                    </Route>
+                    <Route
+                        path={AppRoute.publish}
+                        element={
+                            <Suspense>
+                                <SignerPublishPage />
+                            </Suspense>
+                        }
+                    />
                     <Route
                         path="*"
                         element={

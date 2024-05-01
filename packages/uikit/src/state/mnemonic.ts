@@ -4,7 +4,10 @@ import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { Signer } from '@tonkeeper/core/dist/entries/signer';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
-import { parseSignerSignature } from '@tonkeeper/core/dist/service/signerService';
+import {
+    parseSignerSignature,
+    storeTransactionAndCreateDeepLink
+} from '@tonkeeper/core/dist/service/signerService';
 import { signByMnemonicOver } from '@tonkeeper/core/dist/service/transfer/common';
 import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
 import nacl from 'tweetnacl';
@@ -14,7 +17,10 @@ export const signTonConnectOver = (sdk: IAppSdk, publicKey: string) => {
         const auth = await getWalletAuthState(sdk.storage, publicKey);
         switch (auth.kind) {
             case 'signer': {
-                throw new Error('Signer is not support sign buffer.');
+                throw new Error('Signer linked by QR is not support sign buffer.');
+            }
+            case 'signer-deeplink': {
+                throw new Error('Signer linked by deep link is not support sign buffer.');
             }
             default: {
                 const mnemonic = await getMnemonic(sdk, publicKey);
@@ -40,6 +46,19 @@ export const getSigner = async (sdk: IAppSdk, publicKey: string): Promise<Signer
                     message.toBoc({ idx: false }).toString('base64')
                 );
                 return parseSignerSignature(result);
+            };
+        }
+        case 'signer-deeplink': {
+            return async (message: Cell) => {
+                const deeplink = await storeTransactionAndCreateDeepLink(
+                    sdk,
+                    publicKey,
+                    message.toBoc({ idx: false }).toString('base64')
+                );
+
+                window.location = deeplink as any;
+
+                throw new Error('Navigate to deeplink');
             };
         }
         default: {

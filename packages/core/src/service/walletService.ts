@@ -198,6 +198,27 @@ export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) =>
     return state;
 };
 
+export const walletStateFromSignerDeepLink = async (
+    api: APIConfig,
+    pk: string,
+    name: string | null
+) => {
+    const publicKey = Buffer.from(pk, 'base64').toString('hex');
+
+    const active = await findWalletAddress(api, publicKey);
+
+    const state: WalletState = {
+        publicKey,
+        active,
+        revision: 0,
+        name: name ?? undefined,
+        auth: { kind: 'signer-deeplink' },
+        emoji: getFallbackWalletEmoji(publicKey)
+    };
+
+    return state;
+};
+
 export const getWalletAuthState = async (storage: IStorage, publicKey: string) => {
     const wallet = await getWalletStateOrDie(storage, publicKey);
 
