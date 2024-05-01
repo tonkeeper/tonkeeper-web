@@ -1,5 +1,11 @@
+import { Cell, beginCell } from '@ton/core';
 import { IAppSdk } from '../AppSdk';
 import { AppKey } from '../Keys';
+import { APIConfig } from '../entries/apis';
+import { WalletState, WalletVersion } from '../entries/wallet';
+import { BlockchainApi } from '../tonApiV2';
+import { externalMessage, getWalletSeqNo } from './transfer/common';
+import { walletContractFromState } from './wallet/contractService';
 
 export const parseSignerSignature = (payload: string): Buffer => {
     console.log('signer', payload);
@@ -23,4 +29,37 @@ export const storeTransactionAndCreateDeepLink = async (
     return `tonsign://?network=ton&pk=${encodeURIComponent(publicKey)}&body=${encodeURIComponent(
         messageBase64
     )}&return=https://wallet.tonkeeper.com/`;
+};
+
+export const publishSignerMessage = async (
+    sdk: IAppSdk,
+    api: APIConfig,
+    walletState: WalletState,
+    signatureBase64: string
+) => {
+    const messageBase64 = await sdk.storage.get<string>(AppKey.SIGNER_MESSAGE);
+    if (!messageBase64) {
+        throw new Error('missing message');
+    }
+    const contract = walletContractFromState(walletState);
+    const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
+    const signature = Buffer.from(decodeURIComponent(signatureBase64), 'base64');
+    const message = Cell.fromBase64(messageBase64).asBuilder();
+
+    const payload = beginCell();
+
+    if (walletState.active.version === WalletVersion.W5) {
+        payload.storeBuilder(message).storeBuffer(signature);
+    } else {
+        payload.storeBuffer(signature).storeBuilder(message);
+    }
+    const external = externalMessage(contract, seqno, payload.endCell());
+
+    const boc = external.toString('base64');
+
+    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
+        sendBlockchainMessageRequest: { boc }
+    });
+
+    return boc;
 };

@@ -77,8 +77,8 @@ const PairSignerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
 );
 const SignerLinkPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/signer/LinkPage'));
-const SignerPublishPage = React.lazy(
-    () => import('@tonkeeper/uikit/dist/pages/signer/PublishPage')
+const SignerPublishNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/pages/signer/PublishNotification')
 );
 
 const queryClient = new QueryClient({
@@ -346,14 +346,6 @@ export const Content: FC<{
                         />
                     </Route>
                     <Route
-                        path={AppRoute.publish}
-                        element={
-                            <Suspense>
-                                <SignerPublishPage />
-                            </Suspense>
-                        }
-                    />
-                    <Route
                         path="*"
                         element={
                             <>
@@ -378,6 +370,7 @@ export const Content: FC<{
                     <AddFavoriteNotification />
                     <EditFavoriteNotification />
                     <PairSignerNotification />
+                    <SignerPublishNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>

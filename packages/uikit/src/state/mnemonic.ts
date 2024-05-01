@@ -10,6 +10,7 @@ import {
 } from '@tonkeeper/core/dist/service/signerService';
 import { signByMnemonicOver } from '@tonkeeper/core/dist/service/transfer/common';
 import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
+import { delay } from '@tonkeeper/core/dist/utils/common';
 import nacl from 'tweetnacl';
 
 export const signTonConnectOver = (sdk: IAppSdk, publicKey: string) => {
@@ -57,6 +58,8 @@ export const getSigner = async (sdk: IAppSdk, publicKey: string): Promise<Signer
                 );
 
                 window.location = deeplink as any;
+
+                await delay(2000);
 
                 throw new Error('Navigate to deeplink');
             };
