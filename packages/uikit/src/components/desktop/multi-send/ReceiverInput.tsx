@@ -154,8 +154,8 @@ export const ReceiverInput: FC<{
                 onFocus={() => setFocus(true)}
                 onBlur={() => setFocus(false)}
                 onChange={e => {
-                    setInputValue(e.target.value);
                     inputTouched.current = true;
+                    setInputValue(e.target.value);
                 }}
                 value={inputValue}
                 placeholder={t('transactionDetails_recipient')}
@@ -172,7 +172,12 @@ export const ReceiverInput: FC<{
                     </AddressText>
                 ))}
             {!isValidating && inputValue && (
-                <IconButton onClick={() => setInputValue('')}>
+                <IconButton
+                    onClick={() => {
+                        inputTouched.current = true;
+                        setInputValue('');
+                    }}
+                >
                     <XMarkCircleIcon />
                 </IconButton>
             )}
