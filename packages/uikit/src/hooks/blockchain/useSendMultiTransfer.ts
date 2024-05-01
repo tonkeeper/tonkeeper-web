@@ -1,11 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Address } from '@ton/core';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import {
-    sendTonMultiTransfer,
+    TransferMessage,
     sendJettonMultiTransfer,
-    TransferMessage
+    sendTonMultiTransfer
 } from '@tonkeeper/core/dist/service/transfer/multiSendService';
+import BigNumber from 'bignumber.js';
 import { notifyError } from '../../components/transfer/common';
 import { getMnemonic } from '../../state/mnemonic';
 import { useWalletJettonList } from '../../state/wallet';
@@ -13,13 +16,10 @@ import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import BigNumber from 'bignumber.js';
-import { Address } from '@ton/core';
-import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 
 export type MultiSendFormTokenized = {
     rows: {
-        receiver: TonRecipient | undefined;
+        receiver: TonRecipient | null;
         weiAmount: BigNumber;
         comment?: string;
     }[];
