@@ -1,20 +1,21 @@
-import { WalletState, WalletVersion } from '../../entries/wallet';
+import { Address, comment, internal } from '@ton/core';
+import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../entries/apis';
+import { Signer } from '../../entries/signer';
+import { WalletState, WalletVersion } from '../../entries/wallet';
+import { BlockchainApi, EmulationApi } from '../../tonApiV2';
+import { unShiftedDecimals } from '../../utils/balance';
+import { walletContractFromState } from '../wallet/contractService';
 import {
+    SendMode,
     checkServiceTimeOrDie,
     checkWalletBalanceOrDie,
     externalMessage,
-    getTonkeeperQueryId,
     getTTL,
+    getTonkeeperQueryId,
     getWalletBalance,
-    SendMode
+    signEstimateMessage
 } from './common';
-import BigNumber from 'bignumber.js';
-import { BlockchainApi, EmulationApi } from '../../tonApiV2';
-import { mnemonicToPrivateKey } from '@ton/crypto';
-import { walletContractFromState } from '../wallet/contractService';
-import { Address, comment, internal } from '@ton/core';
-import { unShiftedDecimals } from '../../utils/balance';
 import {
     jettonTransferAmount,
     jettonTransferBody,
@@ -62,7 +63,12 @@ export const estimateTonMultiTransfer = async (
         walletState.active.version
     );
 
-    const cell = createTonMultiTransfer(seqno, walletState, transferMessages);
+    const cell = await createTonMultiTransfer(
+        seqno,
+        walletState,
+        transferMessages,
+        signEstimateMessage
+    );
 
     const emulationApi = new EmulationApi(api.tonApiV2);
 
@@ -78,10 +84,9 @@ export const sendTonMultiTransfer = async (
     walletState: WalletState,
     transferMessages: TransferMessage[],
     feeEstimate: BigNumber,
-    mnemonic: string[]
+    signer: Signer
 ) => {
     await checkServiceTimeOrDie(api);
-    const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const total = transferMessages.reduce((acc, msg) => acc.plus(msg.weiAmount), new BigNumber(0));
     const [wallet, seqno] = await getWalletBalance(api, walletState);
@@ -92,9 +97,7 @@ export const sendTonMultiTransfer = async (
         walletState.active.version
     );
 
-    const cell = createTonMultiTransfer(seqno, walletState, transferMessages, {
-        secretKey: keyPair.secretKey
-    });
+    const cell = await createTonMultiTransfer(seqno, walletState, transferMessages, signer);
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
         sendBlockchainMessageRequest: { boc: cell.toString('base64') }
@@ -103,19 +106,17 @@ export const sendTonMultiTransfer = async (
     return true;
 };
 
-const createTonMultiTransfer = (
+const createTonMultiTransfer = async (
     seqno: number,
     walletState: WalletState,
     transferMessages: TransferMessage[],
-    options: {
-        secretKey?: Buffer;
-    } = {}
+    signer: Signer
 ) => {
     const contract = walletContractFromState(walletState);
 
-    const transfer = contract.createTransfer({
+    const transfer = await contract.createTransferAndSignRequestAsync({
         seqno,
-        secretKey: options.secretKey || Buffer.alloc(64),
+        signer,
         timeout: getTTL(),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: transferMessages.map(msg =>
@@ -150,11 +151,13 @@ export const estimateJettonMultiTransfer = async (
         walletState.active.version
     );
 
-    const cell = createJettonMultiTransfer(
+    const cell = await createJettonMultiTransfer(
         seqno,
         walletState,
         jettonWalletAddress,
-        transferMessages
+        transferMessages,
+        BigNumber(jettonTransferAmount.toString()),
+        signEstimateMessage
     );
 
     const emulationApi = new EmulationApi(api.tonApiV2);
@@ -172,10 +175,9 @@ export const sendJettonMultiTransfer = async (
     jettonWalletAddress: string,
     transferMessages: TransferMessage[],
     feeEstimate: BigNumber,
-    mnemonic: string[]
+    signer: Signer
 ) => {
     await checkServiceTimeOrDie(api);
-    const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const [wallet, seqno] = await getWalletBalance(api, walletState);
 
@@ -187,12 +189,13 @@ export const sendJettonMultiTransfer = async (
     const attachValue = feeEstimate.div(transferMessages.length).plus(unShiftedDecimals(0.05));
     checkWalletBalanceOrDie(attachValue, wallet);
 
-    const estimationCell = createJettonMultiTransfer(
+    const estimationCell = await createJettonMultiTransfer(
         seqno,
         walletState,
         jettonWalletAddress,
         transferMessages,
-        { attachValue }
+        attachValue,
+        signEstimateMessage
     );
 
     const res = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
@@ -209,12 +212,13 @@ export const sendJettonMultiTransfer = async (
         throw new Error('Jetton transfer estimation failed');
     }
 
-    const cell = createJettonMultiTransfer(
+    const cell = await createJettonMultiTransfer(
         seqno,
         walletState,
         jettonWalletAddress,
         transferMessages,
-        { attachValue, secretKey: keyPair.secretKey }
+        attachValue,
+        signer
     );
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
@@ -223,30 +227,26 @@ export const sendJettonMultiTransfer = async (
     return true;
 };
 
-const createJettonMultiTransfer = (
+const createJettonMultiTransfer = async (
     seqno: number,
     walletState: WalletState,
     jettonWalletAddress: string,
     transferMessages: TransferMessage[],
-    options: {
-        secretKey?: Buffer;
-        attachValue?: BigNumber;
-    } = {}
+    attachValue: BigNumber,
+    signer: Signer
 ) => {
     const contract = walletContractFromState(walletState);
 
-    const transfer = contract.createTransfer({
+    const transfer = await contract.createTransferAndSignRequestAsync({
         seqno,
-        secretKey: options.secretKey || Buffer.alloc(64),
+        signer,
         timeout: getTTL(),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: transferMessages.map(msg =>
             internal({
                 to: Address.parse(jettonWalletAddress),
                 bounce: true,
-                value: options.attachValue
-                    ? BigInt(options.attachValue.toFixed(0))
-                    : jettonTransferAmount,
+                value: BigInt(attachValue.toFixed(0)),
                 body: jettonTransferBody({
                     queryId: getTonkeeperQueryId(),
                     jettonAmount: BigInt(msg.weiAmount.toFixed(0)),
