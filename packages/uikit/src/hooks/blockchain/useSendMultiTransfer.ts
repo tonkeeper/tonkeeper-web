@@ -19,7 +19,7 @@ import { useTranslation } from '../translation';
 
 export type MultiSendFormTokenized = {
     rows: {
-        receiver: TonRecipient | undefined;
+        receiver: TonRecipient | null;
         weiAmount: BigNumber;
         comment?: string;
     }[];
