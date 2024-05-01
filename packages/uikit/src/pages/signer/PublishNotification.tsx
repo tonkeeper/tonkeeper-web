@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { publishSignerMessage } from '@tonkeeper/core/dist/service/signerService';
 import { FC, useCallback, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../../components/Icon';
 import { FullHeightBlockResponsive, Notification } from '../../components/Notification';
 import { Label2 } from '../../components/Text';
@@ -9,6 +9,7 @@ import { ButtonBlock, ConfirmMainButton, ResultButton } from '../../components/t
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { AppRoute } from '../../libs/routes';
 
 const usePublishMessage = (signatureBase64: string) => {
     const sdk = useAppSdk();
@@ -25,10 +26,14 @@ const Confirm: FC<{ signatureBase64: string; onClose: () => void }> = ({
 }) => {
     const { t } = useTranslation();
     const { isFetched, isError } = usePublishMessage(signatureBase64);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (isError || isFetched) {
-            setTimeout(onClose, 2000);
+            setTimeout(() => {
+                onClose();
+                navigate(AppRoute.activity);
+            }, 2000);
         }
     }, [isError, isFetched]);
 
