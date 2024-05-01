@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
@@ -14,6 +13,10 @@ import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
+import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
+import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
+import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/WalletAsideMenu';
+import { DesktopHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeader';
 import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
 import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
 import {
@@ -22,6 +25,15 @@ import {
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
 import SendActionNotification from '@tonkeeper/uikit/dist/components/transfer/SendNotifications';
 import SendNftNotification from '@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification';
+import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
+import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/DesktopCoinPage';
+import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
+import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
+import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
+import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
+import { DesktopPurchases } from '@tonkeeper/uikit/dist/desktop-pages/purchases/DesktopPurchases';
+import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
+import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
@@ -29,6 +41,7 @@ import {
     AppSdkContext,
     OnImportAction
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
@@ -37,48 +50,31 @@ import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import Settings from '@tonkeeper/uikit/dist/pages/settings';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
+import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
+import { useStonfiAssets } from '@tonkeeper/uikit/dist/state/stonfi';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    createMemoryRouter,
-    createRoutesFromElements,
-    MemoryRouter,
     Outlet,
     Route,
     RouterProvider,
     Routes,
+    createMemoryRouter,
     useLocation,
     useNavigate
 } from 'react-router-dom';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
-import { DesktopHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeader';
-import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/WalletAsideMenu';
-import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
-import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
-import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
-import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
-import { DesktopPurchases } from '@tonkeeper/uikit/dist/desktop-pages/purchases/DesktopPurchases';
-import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
-import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/DesktopCoinPage';
-import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
-import { useStonfiAssets } from '@tonkeeper/uikit/dist/state/stonfi';
-import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
-import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
-import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
-import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
-import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -126,7 +122,7 @@ declare const REACT_APP_TONCONSOLE_API: string;
 declare const REACT_APP_TG_BOT_ID: string;
 declare const REACT_APP_STONFI_REFERRAL_ADDRESS: string;
 
-export const App = () => {
+export const Providers = () => {
     const { t, i18n } = useTranslation();
 
     const translation = useMemo(() => {
@@ -148,26 +144,30 @@ export const App = () => {
         document.body.classList.add(window.backgroundApi.platform());
     }, []);
 
-    const router = createMemoryRouter([
-        {
-            path: '/*',
-            element: <ThemeAndContent />
-        }
-    ]);
-
     return (
         <QueryClientProvider client={queryClient}>
             <Suspense fallback={<div></div>}>
                 <AppSdkContext.Provider value={sdk}>
                     <TranslationContext.Provider value={translation}>
                         <StorageContext.Provider value={sdk.storage}>
-                            <RouterProvider router={router} />
+                            <ThemeAndContent />
                         </StorageContext.Provider>
                     </TranslationContext.Provider>
                 </AppSdkContext.Provider>
             </Suspense>
         </QueryClientProvider>
     );
+};
+
+const router = createMemoryRouter([
+    {
+        path: '/*',
+        element: <Providers />
+    }
+]);
+
+export const App = () => {
+    return <RouterProvider router={router} />;
 };
 
 const ThemeAndContent = () => {
