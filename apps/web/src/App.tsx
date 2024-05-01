@@ -270,6 +270,23 @@ export const Content: FC<{
         );
     }
 
+    if (location.pathname.startsWith(AppRoute.signer)) {
+        return (
+            <Wrapper standalone={standalone}>
+                <Route path={AppRoute.signer}>
+                    <Route
+                        path={SignerRoute.link}
+                        element={
+                            <Suspense>
+                                <SignerLinkPage />
+                            </Suspense>
+                        }
+                    />
+                </Route>
+            </Wrapper>
+        );
+    }
+
     if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
         return (
             <FullSizeWrapper standalone={false}>
@@ -322,16 +339,6 @@ export const Content: FC<{
                             element={
                                 <Suspense fallback={<CoinSkeletonPage />}>
                                     <Coin />
-                                </Suspense>
-                            }
-                        />
-                    </Route>
-                    <Route path={AppRoute.signer}>
-                        <Route
-                            path={SignerRoute.link}
-                            element={
-                                <Suspense>
-                                    <SignerLinkPage />
                                 </Suspense>
                             }
                         />
