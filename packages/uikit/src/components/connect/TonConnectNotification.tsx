@@ -189,7 +189,7 @@ const ConnectContent: FC<{
             </ImageRow>
 
             <div>
-                <Title>{t('ton_login_title').replace('%domain', shortUrl)}</Title>
+                <Title>{t('ton_login_title_web').replace('%{name}', shortUrl)}</Title>
                 <SubTitle>
                     {t('ton_login_caption').replace('%{name}', getDomain(manifest.name))}{' '}
                     <Address>{toShortValue(address)}</Address>{' '}

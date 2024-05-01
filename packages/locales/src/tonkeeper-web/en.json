@@ -113,6 +113,7 @@
   "tokens_hide_statistics_btn" : "Hide Statistics",
   "tokens_show_statistics_btn" : "Show Statistics",
   "Toncoin" : "Toncoin",
+  "ton_login_title_web" : "Connect to {name}?",
   "Ton_page_description" : "TON is a fully decentralized layer-1 blockchain designed by Telegram to onboard billions of users. It boasts ultra-fast transactions, tiny fees, easy-to-use apps, and is environmentally friendly.",
   "total_balance" : "Total balance",
   "transaction_call_date" : "Contract Call %{date}",
