@@ -43,13 +43,13 @@ export const DesktopMultiSendFormPage = () => {
                 form: {
                     rows: [
                         {
-                            receiver: undefined,
-                            amount: undefined,
+                            receiver: null,
+                            amount: null,
                             comment: ''
                         },
                         {
-                            receiver: undefined,
-                            amount: undefined,
+                            receiver: null,
+                            amount: null,
                             comment: ''
                         }
                     ]

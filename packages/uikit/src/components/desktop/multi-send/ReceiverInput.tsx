@@ -43,7 +43,7 @@ export const ReceiverInput: FC<{
     field: ControllerRenderProps<
         {
             rows: {
-                receiver: TonRecipient | undefined;
+                receiver: TonRecipient | null;
             }[];
         },
         `rows.${number}.receiver`
