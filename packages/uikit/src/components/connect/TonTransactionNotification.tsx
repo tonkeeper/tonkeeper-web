@@ -109,25 +109,16 @@ const Secondary = styled(Body2)`
 `;
 
 const NotificationIssue: FC<{
-    kind: 'date-and-time' | 'not-enough-balance';
+    kind: 'not-enough-balance';
     handleClose: (result?: string) => void;
-}> = ({ kind, handleClose }) => {
+}> = ({ handleClose }) => {
     const { t } = useTranslation();
 
     return (
         <NotificationBlock>
             <ErrorStyled>
                 <ErrorIcon />
-                {kind === 'date-and-time' ? (
-                    <>
-                        <div>
-                            <Header>{t('notify_incorrect_time_err_title')}</Header>
-                            <Secondary>{t('send_sending_wrong_time_description')}</Secondary>
-                        </div>
-                    </>
-                ) : (
-                    <Header>{t('send_screen_steps_amount_insufficient_balance')}</Header>
-                )}
+                <Header>{t('send_screen_steps_amount_insufficient_balance')}</Header>
             </ErrorStyled>
 
             <ButtonGap />

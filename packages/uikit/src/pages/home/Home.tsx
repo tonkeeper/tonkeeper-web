@@ -5,7 +5,6 @@ import { HomeSkeleton } from '../../components/Skeleton';
 import { Balance } from '../../components/home/Balance';
 import { CompactView } from '../../components/home/CompactView';
 import { AssetData } from '../../components/home/Jettons';
-import { DateSyncBanner } from '../../components/home/SyncBunner';
 import { TabsView } from '../../components/home/TabsView';
 import { HomeActions } from '../../components/home/TonActions';
 import { useAssets } from '../../state/home';
@@ -41,7 +40,6 @@ const Home = () => {
 
     return (
         <>
-            <DateSyncBanner />
             <Balance assets={assets} error={error} isFetching={isLoading} />
             {/* TODO: ENABLE TRON */}
             <HomeActions chain={BLOCKCHAIN_NAME.TON} />

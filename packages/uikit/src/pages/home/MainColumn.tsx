@@ -6,7 +6,6 @@ import { ActivityIcon, BrowserIcon, NftIcon, WalletIcon } from '../../components
 import { SkeletonAction } from '../../components/Skeleton';
 import { ActionsRow } from '../../components/home/Actions';
 import { Balance, BalanceSkeleton } from '../../components/home/Balance';
-import { DateSyncBanner } from '../../components/home/SyncBunner';
 import { HomeActions } from '../../components/home/TonActions';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -118,7 +117,6 @@ export const MainColumn = () => {
 
     return (
         <>
-            <DateSyncBanner />
             <Balance assets={assets} error={error} isFetching={isAssetLoading} />
             <HomeActions chain={BLOCKCHAIN_NAME.TON} />
             <Navigation />
