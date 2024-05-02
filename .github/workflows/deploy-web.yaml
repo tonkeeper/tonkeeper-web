@@ -1,0 +1,46 @@
+name: Tonkeeper Web Deploy
+on:
+    workflow_dispatch:
+jobs:
+    web-deploy:
+        name: web-deploy
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.7.0
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Run install
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: install
+
+            - name: Run build
+              uses: borales/actions-yarn@v5
+              env:
+                  VITE_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
+                  VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
+                  VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
+                  VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
+                  VITE_APP_LOCALES: en,zh_CN,ru,it,tr
+              with:
+                  cmd: build:web
+
+            - name: Publish to Cloudflare Pages
+              uses: cloudflare/pages-action@v1
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  projectName: tonkeeper-web
+                  directory: apps/web/dist
+                  wranglerVersion: '3'

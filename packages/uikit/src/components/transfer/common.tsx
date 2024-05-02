@@ -10,7 +10,6 @@ import React, { FC, PropsWithChildren } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { cleanSyncDateBanner } from '../../state/syncDate';
 import { ChevronLeftIcon } from '../Icon';
 import { NotificationCancelButton, NotificationTitleBlock } from '../Notification';
 import { Body1, H3 } from '../Text';
@@ -336,7 +335,6 @@ export const notifyError = async (
     }
 
     if (seeIfTimeError(error)) {
-        await cleanSyncDateBanner(client, sdk);
         sdk.alert(t('send_sending_wrong_time_description'));
     }
 

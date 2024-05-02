@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/web",
-    "version": "3.10.0",
+    "version": "3.11.0",
     "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
     "description": "Your web wallet on The Open Network",
     "dependencies": {

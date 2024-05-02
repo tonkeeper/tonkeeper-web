@@ -146,7 +146,9 @@ export const MultiSendTable: FC<{
 }> = ({ className, list, onBack }) => {
     const [asset, setAsset] = useState<TonAsset>(list.token);
     const methods = useForm<MultiSendForm>({
-        defaultValues: list.form
+        defaultValues: {
+            rows: [...list.form.rows]
+        }
     });
     const [confirmModalForm, setConfirmModalForm] = useState<MultiSendForm | undefined>();
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -268,8 +270,8 @@ const MultiSendAddMore: FC<{
                 type="button"
                 onClick={() =>
                     onAdd({
-                        receiver: undefined,
-                        amount: undefined,
+                        receiver: null,
+                        amount: null,
                         comment: ''
                     })
                 }
@@ -540,7 +542,7 @@ const FormRow: FC<{ index: number; asset: TonAsset }> = ({ index, asset }) => {
                             field as unknown as ControllerRenderProps<
                                 {
                                     rows: {
-                                        receiver: TonRecipient | undefined;
+                                        receiver: TonRecipient | null;
                                     }[];
                                 },
                                 `rows.${number}.receiver`
@@ -563,7 +565,7 @@ const FormRow: FC<{ index: number; asset: TonAsset }> = ({ index, asset }) => {
                             field as unknown as ControllerRenderProps<
                                 {
                                     rows: {
-                                        amount: { inFiat: boolean; value: string } | undefined;
+                                        amount: { inFiat: boolean; value: string } | null;
                                     }[];
                                 },
                                 `rows.${number}.amount`

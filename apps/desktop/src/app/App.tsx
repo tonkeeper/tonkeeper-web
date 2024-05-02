@@ -123,7 +123,7 @@ declare const REACT_APP_TONCONSOLE_API: string;
 declare const REACT_APP_TG_BOT_ID: string;
 declare const REACT_APP_STONFI_REFERRAL_ADDRESS: string;
 
-export const App = () => {
+export const Providers = () => {
     const { t, i18n } = useTranslation();
 
     const translation = useMemo(() => {
@@ -145,26 +145,30 @@ export const App = () => {
         document.body.classList.add(window.backgroundApi.platform());
     }, []);
 
-    const router = createMemoryRouter([
-        {
-            path: '/*',
-            element: <ThemeAndContent />
-        }
-    ]);
-
     return (
         <QueryClientProvider client={queryClient}>
             <Suspense fallback={<div></div>}>
                 <AppSdkContext.Provider value={sdk}>
                     <TranslationContext.Provider value={translation}>
                         <StorageContext.Provider value={sdk.storage}>
-                            <RouterProvider router={router} />
+                            <ThemeAndContent />
                         </StorageContext.Provider>
                     </TranslationContext.Provider>
                 </AppSdkContext.Provider>
             </Suspense>
         </QueryClientProvider>
     );
+};
+
+const router = createMemoryRouter([
+    {
+        path: '/*',
+        element: <Providers />
+    }
+]);
+
+export const App = () => {
+    return <RouterProvider router={router} />;
 };
 
 const ThemeAndContent = () => {

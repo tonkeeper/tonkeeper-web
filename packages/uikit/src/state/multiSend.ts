@@ -10,8 +10,8 @@ import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 
 export type MultiSendForm = {
     rows: {
-        receiver: TonRecipient | undefined;
-        amount: { inFiat: boolean; value: string } | undefined;
+        receiver: TonRecipient | null;
+        amount: { inFiat: boolean; value: string } | null;
         comment?: string;
     }[];
 };

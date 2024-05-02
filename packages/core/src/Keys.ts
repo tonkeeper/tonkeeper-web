@@ -21,5 +21,7 @@ export enum AppKey {
     LAST_HTTP_EVENT_ID = 'last_event_id',
     USER_ID = 'user_id',
     PRO = 'pro_state',
-    PRO_BACKUP = 'pro_backup'
+    PRO_BACKUP = 'pro_backup',
+
+    SIGNER_MESSAGE = 'signer_message'
 }

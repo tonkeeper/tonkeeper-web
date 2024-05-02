@@ -7,12 +7,18 @@ export enum AppRoute {
     activity = '/activity',
     purchases = '/purchases',
     coins = '/coins',
+    signer = '/signer',
+    publish = '/publish',
     home = '/'
 }
 
 export enum AppProRoute {
     dashboard = '/dashboard',
     multiSend = '/multi-send'
+}
+
+export enum SignerRoute {
+    link = 'link'
 }
 
 export enum ImportRoute {
