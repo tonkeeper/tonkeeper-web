@@ -9,10 +9,10 @@ import { WalletState } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
 import {
-    checkServiceTimeOrDie,
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
     externalMessage,
+    getServerTime,
     getTonkeeperQueryId,
     getTTL,
     getWalletBalance,
@@ -44,6 +44,7 @@ export const jettonTransferBody = (params: {
 };
 
 const createJettonTransfer = async (
+    timestamp: number,
     seqno: number,
     walletState: WalletState,
     recipientAddress: string,
@@ -67,7 +68,7 @@ const createJettonTransfer = async (
     const transfer = await contract.createTransferAndSignRequestAsync({
         seqno,
         signer,
-        timeout: getTTL(),
+        timeout: getTTL(timestamp),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
             internal({
@@ -89,11 +90,12 @@ export const estimateJettonTransfer = async (
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string
 ): Promise<TransferEstimationEvent> => {
-    await checkServiceTimeOrDie(api);
+    const timestamp = await getServerTime(api);
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = await createJettonTransfer(
+        timestamp,
         seqno,
         walletState,
         recipient.toAccount.address,
@@ -121,7 +123,7 @@ export const sendJettonTransfer = async (
     fee: TransferEstimationEvent,
     signer: Signer
 ) => {
-    await checkServiceTimeOrDie(api);
+    const timestamp = await getServerTime(api);
 
     const total = new BigNumber(fee.event.extra)
         .multipliedBy(-1)
@@ -131,6 +133,7 @@ export const sendJettonTransfer = async (
     checkWalletBalanceOrDie(total, wallet);
 
     const cell = await createJettonTransfer(
+        timestamp,
         seqno,
         walletState,
         recipient.toAccount.address,

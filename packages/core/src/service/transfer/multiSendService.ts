@@ -8,9 +8,9 @@ import { unShiftedDecimals } from '../../utils/balance';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     SendMode,
-    checkServiceTimeOrDie,
     checkWalletBalanceOrDie,
     externalMessage,
+    getServerTime,
     getTTL,
     getTonkeeperQueryId,
     getWalletBalance,
@@ -52,7 +52,7 @@ export const estimateTonMultiTransfer = async (
     walletState: WalletState,
     transferMessages: TransferMessage[]
 ) => {
-    await checkServiceTimeOrDie(api);
+    const timestamp = await getServerTime(api);
 
     const total = transferMessages.reduce((acc, msg) => acc.plus(msg.weiAmount), new BigNumber(0));
     const [wallet, seqno] = await getWalletBalance(api, walletState);
@@ -64,6 +64,7 @@ export const estimateTonMultiTransfer = async (
     );
 
     const cell = await createTonMultiTransfer(
+        timestamp,
         seqno,
         walletState,
         transferMessages,
@@ -86,7 +87,7 @@ export const sendTonMultiTransfer = async (
     feeEstimate: BigNumber,
     signer: Signer
 ) => {
-    await checkServiceTimeOrDie(api);
+    const timestamp = await getServerTime(api);
 
     const total = transferMessages.reduce((acc, msg) => acc.plus(msg.weiAmount), new BigNumber(0));
     const [wallet, seqno] = await getWalletBalance(api, walletState);
@@ -97,7 +98,13 @@ export const sendTonMultiTransfer = async (
         walletState.active.version
     );
 
-    const cell = await createTonMultiTransfer(seqno, walletState, transferMessages, signer);
+    const cell = await createTonMultiTransfer(
+        timestamp,
+        seqno,
+        walletState,
+        transferMessages,
+        signer
+    );
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
         sendBlockchainMessageRequest: { boc: cell.toString('base64') }
@@ -107,6 +114,7 @@ export const sendTonMultiTransfer = async (
 };
 
 const createTonMultiTransfer = async (
+    timestamp: number,
     seqno: number,
     walletState: WalletState,
     transferMessages: TransferMessage[],
@@ -117,7 +125,7 @@ const createTonMultiTransfer = async (
     const transfer = await contract.createTransferAndSignRequestAsync({
         seqno,
         signer,
-        timeout: getTTL(),
+        timeout: getTTL(timestamp),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: transferMessages.map(msg =>
             internal({
@@ -138,7 +146,7 @@ export const estimateJettonMultiTransfer = async (
     jettonWalletAddress: string,
     transferMessages: TransferMessage[]
 ) => {
-    await checkServiceTimeOrDie(api);
+    const timestamp = await getServerTime(api);
 
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(
@@ -152,6 +160,7 @@ export const estimateJettonMultiTransfer = async (
     );
 
     const cell = await createJettonMultiTransfer(
+        timestamp,
         seqno,
         walletState,
         jettonWalletAddress,
@@ -177,7 +186,7 @@ export const sendJettonMultiTransfer = async (
     feeEstimate: BigNumber,
     signer: Signer
 ) => {
-    await checkServiceTimeOrDie(api);
+    const timestamp = await getServerTime(api);
 
     const [wallet, seqno] = await getWalletBalance(api, walletState);
 
@@ -190,6 +199,7 @@ export const sendJettonMultiTransfer = async (
     checkWalletBalanceOrDie(attachValue, wallet);
 
     const estimationCell = await createJettonMultiTransfer(
+        timestamp,
         seqno,
         walletState,
         jettonWalletAddress,
@@ -213,6 +223,7 @@ export const sendJettonMultiTransfer = async (
     }
 
     const cell = await createJettonMultiTransfer(
+        timestamp,
         seqno,
         walletState,
         jettonWalletAddress,
@@ -228,6 +239,7 @@ export const sendJettonMultiTransfer = async (
 };
 
 const createJettonMultiTransfer = async (
+    timestamp: number,
     seqno: number,
     walletState: WalletState,
     jettonWalletAddress: string,
@@ -240,7 +252,7 @@ const createJettonMultiTransfer = async (
     const transfer = await contract.createTransferAndSignRequestAsync({
         seqno,
         signer,
-        timeout: getTTL(),
+        timeout: getTTL(timestamp),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: transferMessages.map(msg =>
             internal({

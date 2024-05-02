@@ -102,21 +102,9 @@ export const getWalletBalance = async (api: APIConfig, walletState: WalletState)
     return [wallet, seqno] as const;
 };
 
-export const seeIfServiceTimeSync = async (api: APIConfig) => {
+export const getServerTime = async (api: APIConfig) => {
     const { time } = await new LiteServerApi(api.tonApiV2).getRawTime();
-    const isSynced = Math.abs(Date.now() - time * 1000) <= 7000;
-    return isSynced;
-};
-
-export const seeIfTimeError = (e: unknown): e is Error => {
-    return e instanceof Error && e.message.startsWith('Time and date are incorrect');
-};
-
-export const checkServiceTimeOrDie = async (api: APIConfig) => {
-    const isSynced = await seeIfServiceTimeSync(api);
-    if (!isSynced) {
-        throw new Error('Time and date are incorrect');
-    }
+    return time * 1000;
 };
 
 export const createTransferMessage = async (
@@ -124,6 +112,7 @@ export const createTransferMessage = async (
         seqno: number;
         state: WalletState;
         signer: Signer;
+        timestamp: number;
     },
     transaction: {
         to: string;
@@ -138,7 +127,7 @@ export const createTransferMessage = async (
     const transfer = await contract.createTransferAndSignRequestAsync({
         seqno: wallet.seqno,
         signer: wallet.signer,
-        timeout: getTTL(),
+        timeout: getTTL(wallet.timestamp),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         messages: [
             internal({
@@ -170,8 +159,6 @@ export async function getKeyPairAndSeqno(options: {
     fee: TransferEstimationEvent;
     amount: BigNumber;
 }) {
-    await checkServiceTimeOrDie(options.api);
-
     const total = options.amount.plus(options.fee.event.extra * -1);
 
     const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
@@ -179,8 +166,8 @@ export async function getKeyPairAndSeqno(options: {
     return { seqno };
 }
 
-export const getTTL = () => {
-    return Math.floor(Date.now() / 1e3) + 300; // 5min
+export const getTTL = (timestamp: number) => {
+    return Math.floor(timestamp / 1e3) + 300; // 5min
 };
 
 export const getTonkeeperQueryId = () => {

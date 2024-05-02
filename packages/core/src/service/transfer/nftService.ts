@@ -6,11 +6,11 @@ import { Signer } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi, NftItem } from '../../tonApiV2';
 import {
-    checkServiceTimeOrDie,
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
     createTransferMessage,
     getKeyPairAndSeqno,
+    getServerTime,
     getTonkeeperQueryId,
     getWalletBalance,
     signEstimateMessage
@@ -65,6 +65,7 @@ const nftLinkBody = (params: { queryId: bigint; linkToAddress: string }) => {
 };
 
 const createNftTransfer = (
+    timestamp: number,
     seqno: number,
     walletState: WalletState,
     recipientAddress: string,
@@ -82,7 +83,7 @@ const createNftTransfer = (
     });
 
     return createTransferMessage(
-        { seqno, state: walletState, signer },
+        { timestamp, seqno, state: walletState, signer },
         { to: nftAddress, value: nftTransferAmount, body }
     );
 };
@@ -93,11 +94,12 @@ export const estimateNftTransfer = async (
     recipient: TonRecipientData,
     nftItem: NftItem
 ): Promise<TransferEstimationEvent> => {
-    await checkServiceTimeOrDie(api);
+    const timestamp = await getServerTime(api);
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = await createNftTransfer(
+        timestamp,
         seqno,
         walletState,
         recipient.toAccount.address,
@@ -123,7 +125,7 @@ export const sendNftTransfer = async (
     fee: TransferEstimationEvent,
     signer: Signer
 ) => {
-    await checkServiceTimeOrDie(api);
+    const timestamp = await getServerTime(api);
 
     const min = toNano('0.05').toString();
     let nftTransferAmount = new BigNumber(fee.event.extra).multipliedBy(-1).plus(min);
@@ -140,6 +142,7 @@ export const sendNftTransfer = async (
     checkWalletBalanceOrDie(total, wallet);
 
     const cell = await createNftTransfer(
+        timestamp,
         seqno,
         walletState,
         recipient.toAccount.address,
@@ -162,12 +165,14 @@ export const sendNftRenew = async (options: {
     signer: Signer;
     amount: BigNumber;
 }) => {
+    const timestamp = await getServerTime(options.api);
     const { seqno } = await getKeyPairAndSeqno(options);
 
     const body = nftRenewBody({ queryId: getTonkeeperQueryId() });
 
     const cell = await createTransferMessage(
         {
+            timestamp,
             seqno,
             state: options.walletState,
             signer: options.signer
@@ -186,7 +191,7 @@ export const estimateNftRenew = async (options: {
     nftAddress: string;
     amount: BigNumber;
 }) => {
-    await checkServiceTimeOrDie(options.api);
+    const timestamp = await getServerTime(options.api);
     const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
@@ -194,6 +199,7 @@ export const estimateNftRenew = async (options: {
 
     const cell = await createTransferMessage(
         {
+            timestamp,
             seqno,
             state: options.walletState,
             signer: signEstimateMessage
@@ -213,12 +219,14 @@ export const sendNftLink = async (options: {
     signer: Signer;
     amount: BigNumber;
 }) => {
+    const timestamp = await getServerTime(options.api);
     const { seqno } = await getKeyPairAndSeqno(options);
 
     const body = nftLinkBody({ ...options, queryId: getTonkeeperQueryId() });
 
     const cell = await createTransferMessage(
         {
+            timestamp,
             seqno,
             state: options.walletState,
             signer: options.signer
@@ -238,7 +246,7 @@ export const estimateNftLink = async (options: {
     linkToAddress: string;
     amount: BigNumber;
 }) => {
-    await checkServiceTimeOrDie(options.api);
+    const timestamp = await getServerTime(options.api);
     const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
@@ -246,6 +254,7 @@ export const estimateNftLink = async (options: {
 
     const cell = await createTransferMessage(
         {
+            timestamp,
             seqno,
             state: options.walletState,
             signer: signEstimateMessage
