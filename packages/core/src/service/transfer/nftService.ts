@@ -143,6 +143,7 @@ export const sendNftTransfer = async (
     checkWalletBalanceOrDie(total, wallet);
 
     const params = [
+        timestamp,
         seqno,
         walletState,
         recipient.toAccount.address,

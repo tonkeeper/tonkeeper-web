@@ -19,6 +19,7 @@ import { nftTransferForwardAmount } from '../transfer/nftService';
 import { LedgerSigner } from '../../entries/signer';
 
 export const createLedgerTonTransfer = async (
+    timestamp: number,
     seqno: number,
     walletState: WalletState,
     recipient: TonRecipientData,
@@ -34,7 +35,7 @@ export const createLedgerTonTransfer = async (
         bounce: seeIfTransferBounceable(recipient.toAccount, recipient.address),
         amount: BigInt(weiAmount.toFixed(0)),
         seqno,
-        timeout: getTTL(),
+        timeout: getTTL(timestamp),
         sendMode: isMax
             ? SendMode.CARRY_ALL_REMAINING_BALANCE + SendMode.IGNORE_ERRORS
             : SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
@@ -45,6 +46,7 @@ export const createLedgerTonTransfer = async (
 };
 
 export const createLedgerJettonTransfer = async (
+    timestamp: number,
     seqno: number,
     walletState: WalletState,
     recipientAddress: string,
@@ -62,7 +64,7 @@ export const createLedgerJettonTransfer = async (
         bounce: true,
         amount: jettonTransferAmount,
         seqno,
-        timeout: getTTL(),
+        timeout: getTTL(timestamp),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         payload: {
             type: 'jetton-transfer',
@@ -80,6 +82,7 @@ export const createLedgerJettonTransfer = async (
 };
 
 export const createLedgerNftTransfer = async (
+    timestamp: number,
     seqno: number,
     walletState: WalletState,
     recipientAddress: string,
@@ -96,7 +99,7 @@ export const createLedgerNftTransfer = async (
         bounce: true,
         amount: nftTransferAmount,
         seqno,
-        timeout: getTTL(),
+        timeout: getTTL(timestamp),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         payload: {
             type: 'nft-transfer',

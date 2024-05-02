@@ -3,17 +3,15 @@ import { mnemonicToPrivateKey, sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
-import { parseSignerSignature } from '@tonkeeper/core/dist/service/signerService';
 import {
     parseSignerSignature,
     storeTransactionAndCreateDeepLink
 } from '@tonkeeper/core/dist/service/signerService';
-import { signByMnemonicOver } from '@tonkeeper/core/dist/service/transfer/common';
 import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import nacl from 'tweetnacl';
 import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
-import { Signer } from '@tonkeeper/core/dist/entries/signer';
+import { CellSigner, Signer } from "@tonkeeper/core/dist/entries/signer";
 
 export const signTonConnectOver = (sdk: IAppSdk, publicKey: string) => {
     return async (bufferToSign: Buffer) => {
@@ -60,19 +58,22 @@ export const getSigner = async (sdk: IAppSdk, publicKey: string): Promise<Signer
             return callback;
         }
         case 'signer-deeplink': {
-            return async (message: Cell) => {
+            const callback = async (message: Cell) => {
                 const deeplink = await storeTransactionAndCreateDeepLink(
                     sdk,
                     publicKey,
                     message.toBoc({ idx: false }).toString('base64')
                 );
 
+                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                 window.location = deeplink as any;
 
                 await delay(2000);
 
                 throw new Error('Navigate to deeplink');
             };
+            callback.type = 'cell' as const;
+            return callback as CellSigner;
         }
         default: {
             const mnemonic = await getMnemonic(sdk, publicKey);

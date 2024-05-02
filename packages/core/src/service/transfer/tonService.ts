@@ -18,13 +18,10 @@ import {
     getTTL,
     getWalletBalance,
     getWalletSeqNo,
-    seeIfServiceTimeSync,
     signEstimateMessage,
-    SendMode,
     AccountsMap,
     seeIfTransferBounceable,
-    seeIfBounceable,
-  signEstimateMessage
+    seeIfBounceable
 } from './common';
 import { createLedgerTonTransfer } from '../ledger/transfer';
 
