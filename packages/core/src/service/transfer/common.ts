@@ -104,7 +104,7 @@ export const getWalletBalance = async (api: APIConfig, walletState: WalletState)
 
 export const getServerTime = async (api: APIConfig) => {
     const { time } = await new LiteServerApi(api.tonApiV2).getRawTime();
-    return time * 1000;
+    return time;
 };
 
 export const seeIfTimeError = (e: unknown): e is Error => {
@@ -170,8 +170,9 @@ export async function getKeyPairAndSeqno(options: {
     return { seqno };
 }
 
-export const getTTL = (timestamp: number) => {
-    return Math.floor(timestamp / 1e3) + 300; // 5min
+export const getTTL = (unixTimestamp: number) => {
+    // int Seconds
+    return unixTimestamp + 300; // 5min
 };
 
 export const getTonkeeperQueryId = () => {
