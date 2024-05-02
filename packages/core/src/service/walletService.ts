@@ -198,6 +198,30 @@ export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) =>
     return state;
 };
 
+export const walletStateFromLedger = (walletInfo: {
+    address: string;
+    publicKey: Buffer;
+    accountIndex: number;
+}) => {
+    const address = Address.parse(walletInfo.address);
+    const publicKey = walletInfo.publicKey.toString('hex');
+
+    const state: WalletState = {
+        publicKey,
+        active: {
+            friendlyAddress: address.toString({ bounceable: false }),
+            rawAddress: address.toRawString(),
+            version: WalletVersion.V4R2
+        },
+        revision: 0,
+        name: `Ledger ${address.toString({ bounceable: false }).slice(-4)}`,
+        auth: { kind: 'ledger', accountIndex: walletInfo.accountIndex },
+        emoji: getFallbackWalletEmoji(publicKey)
+    };
+
+    return state;
+};
+
 export const getWalletAuthState = async (storage: IStorage, publicKey: string) => {
     const wallet = await getWalletStateOrDie(storage, publicKey);
 

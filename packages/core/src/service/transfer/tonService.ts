@@ -3,8 +3,8 @@ import { Maybe } from '@ton/core/dist/utils/maybe';
 import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
-import { TonRecipient, TonRecipientData, TransferEstimationEvent } from '../../entries/send';
-import { Signer } from '../../entries/signer';
+import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
+import { CellSigner, Signer } from '../../entries/signer';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import { Account, AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
@@ -18,11 +18,13 @@ import {
     getWalletBalance,
     getWalletSeqNo,
     seeIfServiceTimeSync,
-	signEstimateMessage,
-    SendMode
+    signEstimateMessage,
+    SendMode,
+    AccountsMap,
+    seeIfTransferBounceable,
+    seeIfBounceable
 } from './common';
-
-export type AccountsMap = Map<string, Account>;
+import { createLedgerTonTransfer } from '../ledger/transfer';
 
 export type EstimateData = {
     accounts: AccountsMap;
@@ -44,25 +46,6 @@ export const getAccountsMap = async (
     return new Map<string, Account>(accounts);
 };
 
-/*
- * Raw address is bounceable by default,
- * Please make a note that in the TonWeb Raw address is non bounceable by default
- */
-const seeIfAddressBounceable = (address: string) => {
-    return Address.isFriendly(address) ? Address.parseFriendly(address).isBounceable : true;
-};
-
-/*
- * Allow to send non bounceable only if address is non bounceable and target contract is non active
- */
-const seeIfBounceable = (accounts: AccountsMap, address: string) => {
-    const bounceableAddress = seeIfAddressBounceable(address);
-    const toAccount = accounts.get(address);
-    const activeContract = toAccount && toAccount.status === 'active';
-
-    return bounceableAddress || activeContract;
-};
-
 const toStateInit = (stateInit?: string): { code: Maybe<Cell>; data: Maybe<Cell> } | undefined => {
     if (!stateInit) {
         return undefined;
@@ -74,24 +57,13 @@ const toStateInit = (stateInit?: string): { code: Maybe<Cell>; data: Maybe<Cell>
     };
 };
 
-const seeIfTransferBounceable = (account: Account, recipient: TonRecipient) => {
-    if ('dns' in recipient) {
-        return false;
-    }
-    if (!seeIfAddressBounceable(recipient.address)) {
-        return false;
-    }
-
-    return account.status === 'active';
-};
-
 const createTonTransfer = async (
     seqno: number,
     walletState: WalletState,
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean,
-    signer: Signer
+    signer: CellSigner
 ) => {
     const contract = walletContractFromState(walletState);
     const transfer = await contract.createTransferAndSignRequestAsync({
@@ -118,7 +90,7 @@ const createTonConnectTransfer = async (
     walletState: WalletState,
     accounts: AccountsMap,
     params: TonConnectTransactionPayload,
-    signer: Signer
+    signer: CellSigner
 ) => {
     const contract = walletContractFromState(walletState);
 
@@ -234,7 +206,7 @@ export const sendTonConnectTransfer = async (
     walletState: WalletState,
     accounts: AccountsMap,
     params: TonConnectTransactionPayload,
-    signer: Signer
+    signer: CellSigner
 ) => {
     await checkServiceTimeOrDie(api);
     const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
@@ -268,16 +240,15 @@ export const sendTonTransfer = async (
         checkWalletBalanceOrDie(total, wallet);
     }
 
-    const cell = await createTonTransfer(
-        seqno,
-        walletState,
-        recipient,
-        amount.weiAmount,
-        isMax,
-        signer
-    );
+    let buffer: Buffer;
+    const params = [seqno, walletState, recipient, amount.weiAmount, isMax] as const;
+    if (signer.type === 'ledger') {
+        buffer = await createLedgerTonTransfer(...params, signer);
+    } else {
+        buffer = await createTonTransfer(...params, signer);
+    }
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
+        sendBlockchainMessageRequest: { boc: buffer.toString('base64') }
     });
 };

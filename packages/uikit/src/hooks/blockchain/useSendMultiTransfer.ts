@@ -53,6 +53,10 @@ export function useSendMultiTransfer() {
         const signer = await getSigner(sdk, wallet.publicKey).catch(() => null);
         if (signer === null) return false;
         try {
+            if (signer.type !== 'cell') {
+                throw new Error('Current wallet does not support multisend');
+            }
+
             if (asset.id === TON_ASSET.id) {
                 track2('multi-send-ton');
                 await sendTonMultiTransfer(

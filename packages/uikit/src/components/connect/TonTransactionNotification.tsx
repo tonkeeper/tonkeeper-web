@@ -61,6 +61,9 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
             throw new Error('Missing accounts data');
         }
         const signer = await getSigner(sdk, wallet.publicKey);
+        if (signer.type !== 'cell') {
+            throw new Error('Current wallet does not support TonConnect transactions');
+        }
         const value = await sendTonConnectTransfer(api, wallet, accounts, params, signer);
         client.invalidateQueries({
             predicate: query => query.queryKey.includes(wallet.active.rawAddress)

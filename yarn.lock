@@ -3801,6 +3801,97 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ledgerhq/devices@npm:^8.3.0":
+  version: 8.3.0
+  resolution: "@ledgerhq/devices@npm:8.3.0"
+  dependencies:
+    "@ledgerhq/errors": "npm:^6.16.4"
+    "@ledgerhq/logs": "npm:^6.12.0"
+    rxjs: "npm:^7.8.1"
+    semver: "npm:^7.3.5"
+  checksum: 10/cd586838d661c9627f4566e9e015dd5f07a129c30ce2680eb358f7e8ae4f42e9a3bba3e049cfeb15116000d01f813631c6c8371a964d210a4968df69401c986d
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/errors@npm:^6.16.4":
+  version: 6.16.4
+  resolution: "@ledgerhq/errors@npm:6.16.4"
+  checksum: 10/1642ff7f2e07faceb45499b3ccdb23cf6ed6f172f7a07ac73413efb4aa7136605425b643812d1c54995d8ac989ff98b1c9db040f9b730530bfc64430a74dd67d
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport-node-hid-noevents@npm:^6.29.6":
+  version: 6.29.6
+  resolution: "@ledgerhq/hw-transport-node-hid-noevents@npm:6.29.6"
+  dependencies:
+    "@ledgerhq/devices": "npm:^8.3.0"
+    "@ledgerhq/errors": "npm:^6.16.4"
+    "@ledgerhq/hw-transport": "npm:^6.30.6"
+    "@ledgerhq/logs": "npm:^6.12.0"
+    node-hid: "npm:^2.1.2"
+  checksum: 10/4c20d717b43241ffc59d2fc5747f5effdc6c214c304f536b2ce2f0182eee9564bce84723c10b9566e0cdb05836fffbfc5247decb248439d615c78e8858c3ef0e
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport-node-hid@npm:^6.28.6":
+  version: 6.28.6
+  resolution: "@ledgerhq/hw-transport-node-hid@npm:6.28.6"
+  dependencies:
+    "@ledgerhq/devices": "npm:^8.3.0"
+    "@ledgerhq/errors": "npm:^6.16.4"
+    "@ledgerhq/hw-transport": "npm:^6.30.6"
+    "@ledgerhq/hw-transport-node-hid-noevents": "npm:^6.29.6"
+    "@ledgerhq/logs": "npm:^6.12.0"
+    lodash: "npm:^4.17.21"
+    node-hid: "npm:^2.1.2"
+    usb: "npm:2.9.0"
+  checksum: 10/013778bae4f4f2ed58275f773a9311e89abdebe6492a66bd830655fa890aed1800b72d0cd85d1121f8f0c1e93d31a12d537359e4fffb4e937a478a8bcd23540d
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport-webhid@npm:^6.28.6":
+  version: 6.28.6
+  resolution: "@ledgerhq/hw-transport-webhid@npm:6.28.6"
+  dependencies:
+    "@ledgerhq/devices": "npm:^8.3.0"
+    "@ledgerhq/errors": "npm:^6.16.4"
+    "@ledgerhq/hw-transport": "npm:^6.30.6"
+    "@ledgerhq/logs": "npm:^6.12.0"
+  checksum: 10/e354074f118f0596337fcc03f817fc9d54db7f2bc66aa233a9b024a904b2dfcd4980fd47b06aa5e4659540d07ec9d83c84d7dcbaa6ba61494185e9c4b5444c85
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport-webusb@npm:^6.28.6":
+  version: 6.28.6
+  resolution: "@ledgerhq/hw-transport-webusb@npm:6.28.6"
+  dependencies:
+    "@ledgerhq/devices": "npm:^8.3.0"
+    "@ledgerhq/errors": "npm:^6.16.4"
+    "@ledgerhq/hw-transport": "npm:^6.30.6"
+    "@ledgerhq/logs": "npm:^6.12.0"
+  checksum: 10/b25244d37b644e9dca99963627d9c91342898f2c537fcc3c048f7057747a4d90eef48747dde1c3b8ad0fcbf65698410b51d2d6e6d13b255db356003ae72691ef
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport@npm:^6.28.4, @ledgerhq/hw-transport@npm:^6.30.6":
+  version: 6.30.6
+  resolution: "@ledgerhq/hw-transport@npm:6.30.6"
+  dependencies:
+    "@ledgerhq/devices": "npm:^8.3.0"
+    "@ledgerhq/errors": "npm:^6.16.4"
+    "@ledgerhq/logs": "npm:^6.12.0"
+    events: "npm:^3.3.0"
+  checksum: 10/4fc71409e1ff906e479f2e45c386a9db2d062271908a86d09a59587652d485b80200a5335e7e9dbaf5264c0af4b8e6c36d24e7db921b10f4cc420b51e9ca3c00
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/logs@npm:^6.12.0":
+  version: 6.12.0
+  resolution: "@ledgerhq/logs@npm:6.12.0"
+  checksum: 10/a0a01f5d6edb0c14e7a42d24ab67ce362219517f6a50d0572c917f4f7988a1e2e9363e3d0fb170fe267f054e1e30a111564de44276e01c538b258d902c546421
+  languageName: node
+  linkType: hard
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -6042,6 +6133,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ton-community/ton-ledger@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "@ton-community/ton-ledger@npm:7.0.1"
+  dependencies:
+    "@ledgerhq/hw-transport": "npm:^6.28.4"
+    "@ton/crypto": "npm:^3.2.0"
+    teslabot: "npm:^1.5.0"
+  peerDependencies:
+    "@ton/core": ">=0.52.2"
+  checksum: 10/9ab8d2f4c8102bed988a56101ea17d873fc48ba071ce51b1a2c04c7f08fba1800381e71d14db548b6badb0ff9789a74a904508758902371a2ed91fc0210c07b0
+  languageName: node
+  linkType: hard
+
 "@ton/core@npm:0.54.0":
   version: 0.54.0
   resolution: "@ton/core@npm:0.54.0"
@@ -6062,7 +6166,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton/crypto@npm:3.2.0":
+"@ton/crypto@npm:3.2.0, @ton/crypto@npm:^3.2.0":
   version: 3.2.0
   resolution: "@ton/crypto@npm:3.2.0"
   dependencies:
@@ -6093,6 +6197,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/core@workspace:packages/core"
   dependencies:
+    "@ledgerhq/hw-transport-node-hid": "npm:^6.28.6"
+    "@ledgerhq/hw-transport-webhid": "npm:^6.28.6"
+    "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
+    "@ton-community/ton-ledger": "npm:^7.0.1"
     "@ton/core": "npm:0.54.0"
     "@ton/crypto": "npm:3.2.0"
     "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build9"
@@ -7384,6 +7492,13 @@ __metadata:
   version: 9.0.7
   resolution: "@types/uuid@npm:9.0.7"
   checksum: 10/c7321194aeba9ea173efd1e721403bdf4e7ae6945f8f8cdbc87c791f4b505ccf3dbc4a8883d90b394ef13b7c2dc778045792b05dbb23b3c746f8ea347804d448
+  languageName: node
+  linkType: hard
+
+"@types/w3c-web-usb@npm:^1.0.6":
+  version: 1.0.10
+  resolution: "@types/w3c-web-usb@npm:1.0.10"
+  checksum: 10/6ac6786a0788f0846a48b103ab06ca5fde5eb95674217b522420a2f6157bee3e181a961c1b7011940f497c55f4f5cc46129657d881fdd8112b48764089679ad6
   languageName: node
   linkType: hard
 
@@ -13437,7 +13552,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"events@npm:^3.0.0, events@npm:^3.2.0":
+"events@npm:^3.0.0, events@npm:^3.2.0, events@npm:^3.3.0":
   version: 3.3.0
   resolution: "events@npm:3.3.0"
   checksum: 10/a3d47e285e28d324d7180f1e493961a2bbb4cad6412090e4dec114f4db1f5b560c7696ee8e758f55e23913ede856e3689cd3aa9ae13c56b5d8314cd3b3ddd1be
@@ -19095,12 +19210,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-addon-api@npm:^3.0.2":
+  version: 3.2.1
+  resolution: "node-addon-api@npm:3.2.1"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: 10/681b52dfa3e15b0a8e5cf283cc0d8cd5fd2a57c559ae670fcfd20544cbb32f75de7648674110defcd17ab2c76ebef630aa7d2d2f930bc7a8cc439b20fe233518
+  languageName: node
+  linkType: hard
+
 "node-addon-api@npm:^4.3.0":
   version: 4.3.0
   resolution: "node-addon-api@npm:4.3.0"
   dependencies:
     node-gyp: "npm:latest"
   checksum: 10/d3b38d16cb9ad0714d965331d0e38cef1c27750c2c3343cd3464a9ed8158501a2910ccbf2fd9fdc476e806a19dbc9e0524ff9d66a7c779d42a9752a63ba30b80
+  languageName: node
+  linkType: hard
+
+"node-addon-api@npm:^6.0.0":
+  version: 6.1.0
+  resolution: "node-addon-api@npm:6.1.0"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: 10/8eea1d4d965930a177a0508695beb0d89b4c1d80bf330646a035357a1e8fc31e0d09686e2374996e96e757b947a7ece319f98ede3146683f162597c0bcb4df90
   languageName: node
   linkType: hard
 
@@ -19152,6 +19285,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-gyp-build@npm:^4.5.0":
+  version: 4.8.0
+  resolution: "node-gyp-build@npm:4.8.0"
+  bin:
+    node-gyp-build: bin.js
+    node-gyp-build-optional: optional.js
+    node-gyp-build-test: build-test.js
+  checksum: 10/80f410ab412df38e84171d3634a5716b6c6f14ecfa4eb971424d289381fb76f8bcbe1b666419ceb2c81060e558fd7c6d70cc0f60832bcca6a1559098925d9657
+  languageName: node
+  linkType: hard
+
 "node-gyp@npm:^9.0.0":
   version: 9.4.1
   resolution: "node-gyp@npm:9.4.1"
@@ -19190,6 +19334,20 @@ __metadata:
   bin:
     node-gyp: bin/node-gyp.js
   checksum: 10/578cf0c821f258ce4b6ebce4461eca4c991a4df2dee163c0624f2fe09c7d6d37240be4942285a0048d307230248ee0b18382d6623b9a0136ce9533486deddfa8
+  languageName: node
+  linkType: hard
+
+"node-hid@npm:^2.1.2":
+  version: 2.2.0
+  resolution: "node-hid@npm:2.2.0"
+  dependencies:
+    bindings: "npm:^1.5.0"
+    node-addon-api: "npm:^3.0.2"
+    node-gyp: "npm:latest"
+    prebuild-install: "npm:^7.1.1"
+  bin:
+    hid-showdevices: src/show-devices.js
+  checksum: 10/445dbb88d50b56d9f8363583dd113341c12d333ebfdc6297656cdfeac455064aa910bd09cf4cd57f8c788573f748f800e0df691699ee86bec8ca3f53487c6ace
   languageName: node
   linkType: hard
 
@@ -21257,6 +21415,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prebuild-install@npm:^7.1.1":
+  version: 7.1.2
+  resolution: "prebuild-install@npm:7.1.2"
+  dependencies:
+    detect-libc: "npm:^2.0.0"
+    expand-template: "npm:^2.0.3"
+    github-from-package: "npm:0.0.0"
+    minimist: "npm:^1.2.3"
+    mkdirp-classic: "npm:^0.5.3"
+    napi-build-utils: "npm:^1.0.1"
+    node-abi: "npm:^3.3.0"
+    pump: "npm:^3.0.0"
+    rc: "npm:^1.2.7"
+    simple-get: "npm:^4.0.0"
+    tar-fs: "npm:^2.0.0"
+    tunnel-agent: "npm:^0.6.0"
+  bin:
+    prebuild-install: bin.js
+  checksum: 10/32d5c026cc978dd02762b9ad3c765178aee8383aeac4303fed3cd226eff53100db038d4791b03ae1ebc7d213a7af392d26e32095579cedb8dba1d00ad08ecd46
+  languageName: node
+  linkType: hard
+
 "prelude-ls@npm:^1.2.1":
   version: 1.2.1
   resolution: "prelude-ls@npm:1.2.1"
@@ -23150,7 +23330,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxjs@npm:^7.8.0":
+"rxjs@npm:^7.8.0, rxjs@npm:^7.8.1":
   version: 7.8.1
   resolution: "rxjs@npm:7.8.1"
   dependencies:
@@ -25004,7 +25184,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"teslabot@npm:^1.3.0":
+"teslabot@npm:^1.3.0, teslabot@npm:^1.5.0":
   version: 1.5.0
   resolution: "teslabot@npm:1.5.0"
   checksum: 10/714ab9a3eadf17efdbcc78c140246c6cf02b0fceff2fd3b9e37de7c86ad05af816037145a258b4b115327bc88219d782f64047812483169037d6956f46bb1450
@@ -26141,6 +26321,18 @@ __metadata:
     punycode: "npm:^1.4.1"
     qs: "npm:^6.11.2"
   checksum: 10/a3a5ba64d8afb4dda111355d94073a9754b88b1de4035554c398b75f3e4d4244d5e7ae9e4554f0d91be72efd416aedbb646fbb1f3dd4cacecca45ed6c9b75145
+  languageName: node
+  linkType: hard
+
+"usb@npm:2.9.0":
+  version: 2.9.0
+  resolution: "usb@npm:2.9.0"
+  dependencies:
+    "@types/w3c-web-usb": "npm:^1.0.6"
+    node-addon-api: "npm:^6.0.0"
+    node-gyp: "npm:latest"
+    node-gyp-build: "npm:^4.5.0"
+  checksum: 10/ab68d4247a24a463328e293256aec5682c12163278ab474b7243a9dba6283a44bb74f9e0ca96f1d00197bb271f294549c3a4debdbd3452a02750a4a65ff29ee6
   languageName: node
   linkType: hard
 

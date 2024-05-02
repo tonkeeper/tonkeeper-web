@@ -1,13 +1,13 @@
 import { Cell } from '@ton/core';
-import { mnemonicToPrivateKey, sha256_sync } from '@ton/crypto';
+import { mnemonicToPrivateKey, sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { Signer } from '@tonkeeper/core/dist/entries/signer';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import { parseSignerSignature } from '@tonkeeper/core/dist/service/signerService';
-import { signByMnemonicOver } from '@tonkeeper/core/dist/service/transfer/common';
 import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
 import nacl from 'tweetnacl';
+import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
+import { Signer } from '@tonkeeper/core/dist/entries/signer';
 
 export const signTonConnectOver = (sdk: IAppSdk, publicKey: string) => {
     return async (bufferToSign: Buffer) => {
@@ -34,17 +34,30 @@ export const getSigner = async (sdk: IAppSdk, publicKey: string): Promise<Signer
 
     switch (auth.kind) {
         case 'signer': {
-            return async (message: Cell) => {
+            const callback = async (message: Cell) => {
                 const result = await pairSignerByNotification(
                     sdk,
                     message.toBoc({ idx: false }).toString('base64')
                 );
                 return parseSignerSignature(result);
             };
+            callback.type = 'cell' as const;
+            return callback;
+        }
+        case 'ledger': {
+            const callback = async (path: number[], transaction: LedgerTransaction) =>
+                pairLedgerByNotification(sdk, path, transaction);
+            callback.type = 'ledger' as const;
+            return callback;
         }
         default: {
             const mnemonic = await getMnemonic(sdk, publicKey);
-            return signByMnemonicOver(mnemonic);
+            const callback = async (message: Cell) => {
+                const keyPair = await mnemonicToPrivateKey(mnemonic);
+                return sign(message.hash(), keyPair.secretKey);
+            };
+            callback.type = 'cell' as const;
+            return callback;
         }
     }
 };
@@ -54,11 +67,11 @@ export const getMnemonic = async (sdk: IAppSdk, publicKey: string): Promise<stri
 
     switch (auth.kind) {
         case 'none': {
-            return await getWalletMnemonic(sdk.storage, publicKey, auth.kind);
+            return getWalletMnemonic(sdk.storage, publicKey, auth.kind);
         }
         case 'password': {
             const password = await getPasswordByNotification(sdk, auth);
-            return await getWalletMnemonic(sdk.storage, publicKey, password);
+            return getWalletMnemonic(sdk.storage, publicKey, password);
         }
         case 'keychain': {
             if (!sdk.keychain) {
@@ -122,6 +135,40 @@ const pairSignerByNotification = async (sdk: IAppSdk, boc: string): Promise<stri
 
                 if (typeof params === 'string') {
                     resolve(params);
+                } else {
+                    reject(params);
+                }
+            }
+        };
+
+        sdk.uiEvents.on('response', onCallback);
+    });
+};
+
+const pairLedgerByNotification = async (
+    sdk: IAppSdk,
+    path: number[],
+    transaction: LedgerTransaction
+): Promise<Cell> => {
+    const id = Date.now();
+    return new Promise<Cell>((resolve, reject) => {
+        sdk.uiEvents.emit('ledger', {
+            method: 'ledger',
+            id,
+            params: { path, transaction }
+        });
+
+        const onCallback = (message: {
+            method: 'response';
+            id?: number | undefined;
+            params: unknown;
+        }) => {
+            if (message.id === id) {
+                const { params } = message;
+                sdk.uiEvents.off('response', onCallback);
+
+                if (params && typeof params === 'object') {
+                    resolve(params as Cell);
                 } else {
                     reject(params);
                 }

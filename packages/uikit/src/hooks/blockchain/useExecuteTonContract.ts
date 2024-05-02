@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
-import { Signer } from '@tonkeeper/core/dist/entries/signer';
+import { CellSigner } from '@tonkeeper/core/dist/entries/signer';
 import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { Omit } from 'react-beautiful-dnd';
@@ -14,7 +14,7 @@ import { useTranslation } from '../translation';
 export type ContractExecutorParams = {
     api: APIConfig;
     walletState: WalletState;
-    signer: Signer;
+    signer: CellSigner;
     fee: TransferEstimationEvent;
 };
 
