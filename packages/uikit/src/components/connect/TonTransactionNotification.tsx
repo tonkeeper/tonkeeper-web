@@ -111,7 +111,7 @@ const Secondary = styled(Body2)`
 const NotificationIssue: FC<{
     kind: 'not-enough-balance';
     handleClose: (result?: string) => void;
-}> = ({ kind, handleClose }) => {
+}> = ({ handleClose }) => {
     const { t } = useTranslation();
 
     return (

@@ -107,6 +107,10 @@ export const getServerTime = async (api: APIConfig) => {
     return time * 1000;
 };
 
+export const seeIfTimeError = (e: unknown): e is Error => {
+    return e instanceof Error && e.message.startsWith('Time and date are incorrect');
+};
+
 export const createTransferMessage = async (
     wallet: {
         seqno: number;
