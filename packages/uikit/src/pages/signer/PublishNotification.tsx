@@ -66,6 +66,7 @@ const Confirm: FC<{ signatureBase64: string; onClose: () => void }> = ({
 };
 
 const SignerPublishNotification = () => {
+    const { t } = useTranslation();
     let [searchParams, setParams] = useSearchParams();
 
     const signatureBase64 = searchParams.get('boc');
@@ -84,7 +85,7 @@ const SignerPublishNotification = () => {
         <Notification
             isOpen={signatureBase64 != null}
             handleClose={onClose}
-            title="Publish Message to Internet"
+            title={t('publish_message')}
         >
             {Content}
         </Notification>
