@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { KNOWN_TON_ASSETS } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { WalletState, WalletVersion, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
@@ -29,15 +30,14 @@ import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
 import { useAssets } from './home';
 import {
-    getRateKey,
-    toTokenRate,
-    useRate,
-    getTonFiatAmount,
     getJettonsFiatAmount,
-    tokenRate as getTokenRate
+    getRateKey,
+    tokenRate as getTokenRate,
+    getTonFiatAmount,
+    toTokenRate,
+    useRate
 } from './rates';
 import { DefaultRefetchInterval } from './tonendpoint';
-import { KNOWN_TON_ASSETS } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export const useActiveWallet = () => {
     const sdk = useAppSdk();
@@ -217,39 +217,15 @@ export const useWalletNftList = () => {
     } = useAppContext();
 
     return useQuery<NFT[], Error>(
-        [wallet.publicKey, QueryKey.nft],
+        [wallet.active.rawAddress, QueryKey.nft],
         async () => {
-            const { accounts } = await new WalletApi(tonApiV2).getWalletsByPublicKey({
-                publicKey: wallet.publicKey
+            const { nftItems } = await new AccountsApi(tonApiV2).getAccountNftItems({
+                accountId: wallet.active.rawAddress,
+                offset: 0,
+                limit: 1000,
+                indirectOwnership: true
             });
-
-            const result = [WalletVersion.V4R2, WalletVersion.V3R2, WalletVersion.V3R1].reduce(
-                (acc, version) => {
-                    const account = getActiveWallet(accounts, version);
-                    if (account) {
-                        acc.push(account.address);
-                    }
-                    return acc;
-                },
-                [] as string[]
-            );
-
-            if (result.length === 0) {
-                result.push(wallet.active.rawAddress);
-            }
-
-            const items = await Promise.all(
-                result.map(owner =>
-                    new AccountsApi(tonApiV2).getAccountNftItems({
-                        accountId: owner,
-                        offset: 0,
-                        limit: 1000,
-                        indirectOwnership: true
-                    })
-                )
-            );
-
-            return items.reduce((acc, account) => acc.concat(account.nftItems), [] as NftItem[]);
+            return nftItems;
         },
         {
             refetchInterval: DefaultRefetchInterval,
@@ -259,6 +235,7 @@ export const useWalletNftList = () => {
         }
     );
 };
+
 export const useNftDNSLinkData = (nft: NFT) => {
     const {
         api: { tonApiV2 }
