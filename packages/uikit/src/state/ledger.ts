@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     connectLedger,
+    isTransportReady,
     LedgerTonTransport,
     waitLedgerTonAppReady
 } from '@tonkeeper/core/dist/service/ledger/connector';
@@ -14,38 +15,60 @@ import { walletStateFromLedger } from '@tonkeeper/core/dist/service/walletServic
 import { addWalletsWithCustomAuthState } from '@tonkeeper/core/dist/service/accountService';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
+import { useCallback, useState } from 'react';
 
 export type LedgerAccount = {
     accountIndex: number;
     publicKey: Buffer;
 } & Account;
 
-export const useConnectLedgerMutation = (): ReturnType<
-    typeof useMutation<LedgerTonTransport, Error, (() => void) | undefined>
-> => {
-    return useMutation<LedgerTonTransport, Error, (() => void) | undefined>(
-        async onDeviceConnected => {
-            const transport = await connectLedger('desktop');
-            onDeviceConnected?.();
+type T = ReturnType<typeof useMutation<LedgerTonTransport, Error>>;
 
-            const isConnected = await waitLedgerTonAppReady(transport);
-            if (!isConnected) {
-                throw new Error('TON App is not opened');
-            }
+const _tonTransport: LedgerTonTransport | null = null;
 
-            return transport;
+export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T => {
+    // device might be connected, but mutation still pending if user didn't open Ton App on Ledger device
+    const [_isDeviceConnected, setIsDeviceConnected] = useState<boolean>(false);
+    const mutation = useMutation<LedgerTonTransport, Error>(async () => {
+        setIsDeviceConnected(false);
+
+        let transport: LedgerTonTransport;
+        if (_tonTransport && isTransportReady(_tonTransport)) {
+            transport = _tonTransport;
+        } else {
+            transport = await connectLedger();
         }
-    );
+
+        setIsDeviceConnected(true);
+
+        const isConnected = await waitLedgerTonAppReady(transport);
+        if (!isConnected) {
+            throw new Error('TON App is not opened');
+        }
+
+        return transport;
+    });
+
+    const reset = useCallback(() => {
+        setIsDeviceConnected(false);
+        mutation.reset();
+    }, [mutation.reset]);
+
+    return {
+        ...mutation,
+        reset,
+        isDeviceConnected: _isDeviceConnected
+    };
 };
 
-export const useLedgerAccounts = (): ReturnType<
-    typeof useMutation<LedgerAccount[], Error, LedgerTonTransport>
-> => {
+export const useLedgerAccounts = (
+    accountsNumber: number
+): ReturnType<typeof useMutation<LedgerAccount[], Error, LedgerTonTransport>> => {
     const { api } = useAppContext();
 
     return useMutation<LedgerAccount[], Error, LedgerTonTransport>(async tonTransport => {
         const accountIds = await Promise.all(
-            [...new Array(10)].map((_, i) =>
+            [...new Array(accountsNumber)].map((_, i) =>
                 tonTransport.getAddress(getLedgerAccountPathByIndex(i))
             )
         );
@@ -72,7 +95,7 @@ export const useAddLedgerAccountsMutation = () => {
         try {
             const states = ledgerAccounts.map(walletStateFromLedger);
 
-            await addWalletsWithCustomAuthState(sdk.storage, states);
+            await addWalletsWithCustomAuthState(sdk.storage, states, { keepName: true });
 
             await client.invalidateQueries([QueryKey.account]);
 

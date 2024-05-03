@@ -81,6 +81,8 @@ const SignerPublishNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/pages/signer/PublishNotification')
 );
 
+const ConnectLedgerNotification = React.lazy(() => import("@tonkeeper/uikit/dist/components/ConnectLedgerNotification"));
+
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
@@ -371,6 +373,7 @@ export const Content: FC<{
                     <EditFavoriteNotification />
                     <PairSignerNotification />
                     <SignerPublishNotification />
+                    <ConnectLedgerNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>

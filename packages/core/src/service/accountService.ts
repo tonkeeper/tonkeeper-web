@@ -27,7 +27,10 @@ export const addWalletWithCustomAuthState = async (storage: IStorage, state: Wal
 export const addWalletsWithCustomAuthState = async (
     storage: IStorage,
     states: WalletState[],
-    activePublicKey?: string
+    options?: {
+        activePublicKey?: string;
+        keepName?: boolean;
+    }
 ) => {
     const account = await getAccountState(storage);
 
@@ -36,11 +39,14 @@ export const addWalletsWithCustomAuthState = async (
         .map(s => s.publicKey);
     const updatedAccount = {
         publicKeys: account.publicKeys.concat(pksToConcat),
-        activePublicKey: activePublicKey ?? states[0].publicKey
+        activePublicKey: options?.activePublicKey ?? states[0].publicKey
     };
 
     const walletsUpdates = states.reduce((acc, s) => {
-        const name = account.publicKeys.includes(s.publicKey) ? undefined : s.name;
+        let name = s.name;
+        if (!options?.keepName) {
+            name = account.publicKeys.includes(s.publicKey) ? undefined : s.name;
+        }
 
         if (!('auth' in s)) {
             throw new Error('Missing wallet auth state.');

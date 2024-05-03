@@ -24,7 +24,8 @@ export enum SignerRoute {
 export enum ImportRoute {
     import = '/import',
     create = '/create',
-    signer = '/signer'
+    signer = '/signer',
+    ledger = '/ledger'
 }
 
 export enum SettingsRoute {

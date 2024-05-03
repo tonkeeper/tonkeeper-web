@@ -105,6 +105,23 @@ export const ImportNotification: FC<{
                             <RightIcon />
                         </ButtonIcon>
                     </ButtonBlock>
+                    <ButtonBlock
+                        onClick={() => {
+                            onClose(() => onImport(AppRoute.import + ImportRoute.ledger));
+                        }}
+                    >
+                        <ButtonIcon>
+                            <SignerIcon />
+                        </ButtonIcon>
+                        <ColumnText
+                            noWrap
+                            text={'Pair Ledger'}
+                            secondary={t('import_signer_description')}
+                        />
+                        <ButtonIcon>
+                            <RightIcon />
+                        </ButtonIcon>
+                    </ButtonBlock>
                 </div>
             )}
         </Notification>

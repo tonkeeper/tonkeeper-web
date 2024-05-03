@@ -135,7 +135,7 @@ export const sendJettonTransfer = async (
 
     let buffer: Buffer;
     const params = [
-      timestamp,
+        timestamp,
         seqno,
         walletState,
         recipient.toAccount.address,
