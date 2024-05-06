@@ -1,4 +1,5 @@
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { createTransferQr } from '@tonkeeper/core/dist/service/signerService';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
@@ -25,9 +26,7 @@ export const SignerContent: FC<{
     const openScanner = useScanner(null, onSubmit);
 
     const message = useMemo(() => {
-        return `tonsign://?pk=${Buffer.from(wallet.publicKey, 'hex').toString(
-            'base64'
-        )}&body=${boc}`;
+        return createTransferQr(wallet.publicKey, boc);
     }, [wallet, boc]);
 
     return (

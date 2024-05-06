@@ -19,6 +19,11 @@ export const parseSignerSignature = (payload: string): Buffer => {
     }
 };
 
+export const createTransferQr = (publicKey: string, boc: string) => {
+    const pk = encodeURIComponent(Buffer.from(publicKey, 'hex').toString('base64'));
+    return `tonsign://?network=ton&pk=${pk}&body=${boc}`;
+};
+
 export const storeTransactionAndCreateDeepLink = async (
     sdk: IAppSdk,
     publicKey: string,
