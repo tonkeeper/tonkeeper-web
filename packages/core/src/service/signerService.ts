@@ -1,4 +1,5 @@
 import { Cell, beginCell } from '@ton/core';
+import queryString from 'query-string';
 import { IAppSdk } from '../AppSdk';
 import { AppKey } from '../Keys';
 import { APIConfig } from '../entries/apis';
@@ -9,14 +10,20 @@ import { walletContractFromState } from './wallet/contractService';
 
 export const parseSignerSignature = (payload: string): Buffer => {
     console.log('signer', payload);
-    if (payload.startsWith('tonkeeper://publish?boc=')) {
-        const base64Signature = decodeURIComponent(
-            payload.substring('tonkeeper://publish?boc='.length)
-        );
-        return Buffer.from(base64Signature, 'base64');
-    } else {
+
+    if (!payload.startsWith('tonkeeper://publish')) {
         throw new Error(`Unexpected Result: ${payload}`);
     }
+
+    const {
+        query: { boc }
+    } = queryString.parseUrl(payload);
+
+    if (typeof boc != 'string') {
+        throw new Error('Unexpected QR code, missing boc parameter');
+    }
+
+    return Buffer.from(boc, 'base64');
 };
 
 export const createTransferQr = (publicKey: string, boc: string) => {
