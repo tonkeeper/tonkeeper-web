@@ -38,6 +38,7 @@ import { BackButton } from '../fields/BackButton';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
+import { UserCancelledError } from '../../libs/errors/UserCancelledError';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -149,15 +150,20 @@ export function ConfirmView<T extends Asset = Asset>({
     const handleSubmit = async () => {
         if (isLoading) return false;
         reset();
-        const isDone = await mutateAsync();
-        if (isDone) {
-            setDone(true);
-            setTimeout(() => {
-                setTimeout(() => client.invalidateQueries(), 100);
-                onClose(true);
-            }, 2000);
+        try {
+            const isDone = await mutateAsync();
+            if (isDone) {
+                setDone(true);
+                setTimeout(() => {
+                    setTimeout(() => client.invalidateQueries(), 100);
+                    onClose(true);
+                }, 2000);
+            }
+            return isDone;
+        } catch (e) {
+            console.error(e);
+            return false;
         }
-        return isDone;
     };
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
@@ -324,7 +330,7 @@ export const ConfirmViewButtons: FC<{
         );
     }
 
-    if (error) {
+    if (error && !(error instanceof UserCancelledError)) {
         return (
             <ResultButton>
                 <ExclamationMarkCircleIcon />

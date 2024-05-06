@@ -8,6 +8,7 @@ import { useConnectLedgerMutation } from '../state/ledger';
 import styled from 'styled-components';
 import { Cell } from '@ton/core';
 import { Body1, Body3, H2 } from './Text';
+import { UserCancelledError } from '../libs/errors/UserCancelledError';
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;
@@ -144,7 +145,7 @@ const ConnectLedgerNotification = () => {
             sdk.uiEvents.emit('response', {
                 method: 'response',
                 id: requestId,
-                params: new Error('Cancel auth request')
+                params: new UserCancelledError('Cancel auth request')
             });
         }
         close();

@@ -79,10 +79,12 @@ export const useLedgerAccounts = (
             getAccountsRequest: { accountIds: addresses }
         });
 
-        return response.accounts.map((acc, i) => ({
+        return accountIds.map((acc, i) => ({
             accountIndex: i,
-            publicKey: accountIds[i].publicKey,
-            ...acc
+            publicKey: acc.publicKey,
+            ...response.accounts.find(a =>
+                Address.parse(a.address).equals(Address.parse(acc.address))
+            )! // tonapi bug, should filter here
         }));
     });
 };

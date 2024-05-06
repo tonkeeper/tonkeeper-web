@@ -78,7 +78,7 @@ export const PairLedger = () => {
 
     const {
         isDeviceConnected,
-        mutateAsync: connectLedger,
+        mutate: connectLedger,
         isLoading: isLedgerConnecting,
         reset: resetConnection,
         data: tonTransport

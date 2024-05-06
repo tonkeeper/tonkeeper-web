@@ -11,7 +11,7 @@ import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import nacl from 'tweetnacl';
 import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
-import { CellSigner, Signer } from "@tonkeeper/core/dist/entries/signer";
+import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
 
 export const signTonConnectOver = (sdk: IAppSdk, publicKey: string) => {
     return async (bufferToSign: Buffer) => {
@@ -192,10 +192,14 @@ const pairLedgerByNotification = async (
                 const { params } = message;
                 sdk.uiEvents.off('response', onCallback);
 
-                if (params && typeof params === 'object') {
+                if (params && typeof params === 'object' && params instanceof Cell) {
                     resolve(params as Cell);
                 } else {
-                    reject(params);
+                    if (params instanceof Error) {
+                        reject(params);
+                    } else {
+                        reject(new Error(params?.toString()));
+                    }
                 }
             }
         };
