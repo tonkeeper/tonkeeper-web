@@ -26,9 +26,7 @@ export const storeTransactionAndCreateDeepLink = async (
 ) => {
     await sdk.storage.set(AppKey.SIGNER_MESSAGE, messageBase64);
 
-    const pk = encodeURIComponent(Buffer.from(publicKey, 'hex').toString('base64'));
-
-    return `tonsign://?network=ton&pk=${pk}&body=${encodeURIComponent(
+    return `tonsign://?network=ton&pk=${encodeURIComponent(publicKey)}&body=${encodeURIComponent(
         messageBase64
     )}&return=https://wallet.tonkeeper.com/`;
 };
