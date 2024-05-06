@@ -6,7 +6,7 @@ import { AppRoute, ImportRoute } from '../../libs/routes';
 import { ColumnText } from '../Layout';
 import { Notification } from '../Notification';
 import { Body1, H2 } from '../Text';
-import { AddIcon, ImportIcon, RightIcon, SignerIcon } from './ImportIcons';
+import { AddIcon, ImportIcon, LedgerIcon, RightIcon, SignerIcon } from './ImportIcons';
 
 const Title = styled(H2)`
     user-select: none;
@@ -39,6 +39,9 @@ const ButtonIcon = styled.div`
     flex-shrink: 0;
 `;
 
+const ColumnTextStyled = styled(ColumnText)`
+    flex-grow: 1;
+`;
 export const ImportNotification: FC<{
     isOpen: boolean;
     setOpen: (value: boolean) => void;
@@ -111,12 +114,11 @@ export const ImportNotification: FC<{
                         }}
                     >
                         <ButtonIcon>
-                            <SignerIcon />
+                            <LedgerIcon />
                         </ButtonIcon>
-                        <ColumnText
-                            noWrap
-                            text={'Pair Ledger'}
-                            secondary={t('import_signer_description')}
+                        <ColumnTextStyled
+                            text={t('ledger_pair_title')}
+                            secondary={t('ledger_pair_subtitle')}
                         />
                         <ButtonIcon>
                             <RightIcon />

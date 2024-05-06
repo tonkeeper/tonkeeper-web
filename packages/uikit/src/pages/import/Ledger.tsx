@@ -8,7 +8,7 @@ import {
 } from '../../state/ledger';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { LedgerTonTransport } from '@tonkeeper/core/dist/service/ledger/connector';
-import { Body1, Body2, Body3, H2 } from '../../components/Text';
+import { Body2, H2 } from '../../components/Text';
 import { useNavigate } from 'react-router-dom';
 import { useAppSdk } from '../../hooks/appSdk';
 import { AppRoute } from '../../libs/routes';
@@ -19,6 +19,7 @@ import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { formatter } from '../../hooks/balance';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { Checkbox } from '../../components/fields/Checkbox';
+import { LedgerConnectionSteps } from '../../components/ledger/LedgerConnectionSteps';
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;
@@ -27,41 +28,18 @@ const ConnectLedgerWrapper = styled.div`
 `;
 
 const H2Styled = styled(H2)`
-    margin-bottom: 0.25rem;
+    margin-bottom: 1rem;
 `;
 
-const Body1Styled = styled(Body1)`
-    margin-bottom: 0.5rem;
-    color: ${p => p.theme.textSecondary};
-`;
-
-const CardStyled = styled.div`
-    box-sizing: border-box;
-    padding: 1rem;
-    width: 100%;
+const LedgerConnectionStepsStyled = styled(LedgerConnectionSteps)`
     margin: 1rem 0;
-    background: ${p => p.theme.backgroundContent};
-    border-radius: ${p => p.theme.corner2xSmall};
-    min-height: 264px;
-`;
-
-const ImageStyled = styled.div`
-    width: 100px;
-    height: 100px;
-    background: #10161f;
-    margin: 1rem auto;
-`;
-
-const Steps = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
 `;
 
 const ButtonsBlock = styled.div`
     margin-top: 1rem;
     display: flex;
     gap: 8px;
+    max-width: 368px;
     width: 100%;
 
     > * {
@@ -75,6 +53,7 @@ export const PairLedger = () => {
     const sdk = useAppSdk();
     const back = useCallback(() => navigate(AppRoute.home), [navigate]);
     useNativeBackButton(sdk, back);
+    const [moveNext, setMoveNext] = useState(false);
 
     const {
         isDeviceConnected,
@@ -95,27 +74,38 @@ export const PairLedger = () => {
         return resetConnection;
     }, []);
 
+    useEffect(() => {
+        if (tonTransport) {
+            setTimeout(() => setMoveNext(true), 500);
+        }
+    }, [tonTransport]);
+
+    if (moveNext) {
+        return <ChooseLedgerAccounts onCancel={back} tonTransport={tonTransport!} />;
+    }
+
+    let currentStep: 'connect' | 'open-ton' | 'all-completed' = 'connect';
+    if (isDeviceConnected) {
+        currentStep = 'open-ton';
+    }
     if (tonTransport) {
-        return <ChooseLedgerAccounts onCancel={back} tonTransport={tonTransport} />;
+        currentStep = 'all-completed';
     }
 
     return (
         <ConnectLedgerWrapper>
-            <H2Styled>Connect Ledger</H2Styled>
-            <Body1Styled>Connect your Ledger to your device</Body1Styled>
-            <CardStyled>
-                <ImageStyled />
-                <Steps>
-                    <Body3>Connect ledger device</Body3>
-                    {isDeviceConnected && <Body3>Open TON App in your Ledger</Body3>}
-                </Steps>
-            </CardStyled>
+            <H2Styled>{t('ledger_connect_header')}</H2Styled>
+            <LedgerConnectionStepsStyled currentStep={currentStep} />
             <ButtonsBlock>
                 <Button secondary onClick={back}>
-                    Cancel
+                    {t('cancel')}
                 </Button>
-                <Button primary loading={isLedgerConnecting} onClick={onStartConnection}>
-                    Continue
+                <Button
+                    primary
+                    loading={isLedgerConnecting || !!tonTransport}
+                    onClick={onStartConnection}
+                >
+                    {t('try_again')}
                 </Button>
             </ButtonsBlock>
         </ConnectLedgerWrapper>
@@ -124,6 +114,7 @@ export const PairLedger = () => {
 
 const AccountsListWrapper = styled.div`
     width: 100%;
+    max-width: 368px;
 `;
 
 const AccountsLoadingWrapper = styled.div`
@@ -160,6 +151,7 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
     tonTransport,
     onCancel
 }) => {
+    const { t } = useTranslation();
     const totalAccounts = 10;
     const { mutate: getLedgerAccounts, data: ledgerAccounts } = useLedgerAccounts(totalAccounts);
     const [selectedIndexes, setSelectedIndexes] = useState<Record<number, boolean>>({});
@@ -192,15 +184,14 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
 
     return (
         <ConnectLedgerWrapper>
-            <H2Styled>Choose Wallets</H2Styled>
-            <Body1Styled>Choose wallets you want to add.</Body1Styled>
+            <H2Styled>{t('ledger_choose_wallets')}</H2Styled>
             <AccountsListWrapper>
                 {!ledgerAccounts ? (
                     <AccountsLoadingWrapper>
                         <SpinnerIcon />
                     </AccountsLoadingWrapper>
                 ) : (
-                    <ListBlock>
+                    <ListBlock margin={false}>
                         {ledgerAccounts.map(account => (
                             <ListItemStyled key={account.accountIndex} hover={false}>
                                 <Body2>{toFormattedAddress(account.address)}</Body2>
@@ -226,7 +217,7 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
             </AccountsListWrapper>
             <ButtonsBlock>
                 <Button secondary onClick={onCancel}>
-                    Cancel
+                    {t('cancel')}
                 </Button>
                 <Button
                     primary
@@ -234,7 +225,7 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
                     disabled={!chosenSomeAccounts}
                     onClick={onAdd}
                 >
-                    Add
+                    {t('continue')}
                 </Button>
             </ButtonsBlock>
         </ConnectLedgerWrapper>

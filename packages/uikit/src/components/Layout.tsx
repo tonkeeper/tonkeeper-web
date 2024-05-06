@@ -106,9 +106,10 @@ export const ColumnText: FC<{
     noWrap?: boolean;
     text: React.ReactNode;
     secondary: React.ReactNode;
-}> = ({ green, text, secondary, right, noWrap }) => {
+    className?: string;
+}> = ({ green, text, secondary, right, noWrap, className }) => {
     return (
-        <Text right={right} noWrap={noWrap}>
+        <Text right={right} noWrap={noWrap} className={className}>
             <Label green={green} noWrap={noWrap}>
                 {text}
             </Label>

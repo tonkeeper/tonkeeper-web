@@ -10,7 +10,7 @@ import {
     seeIfValidTronAddress
 } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
@@ -31,7 +31,7 @@ import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
 import { MainButton } from './common';
-import {useIsFullWidthMode} from "../../hooks/useIsFullWidthMode";
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const Warning = styled(Body2)`
     user-select: none;

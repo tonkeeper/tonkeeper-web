@@ -7,8 +7,8 @@ import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector
 import { useConnectLedgerMutation } from '../state/ledger';
 import styled from 'styled-components';
 import { Cell } from '@ton/core';
-import { Body1, Body3, H2 } from './Text';
 import { UserCancelledError } from '../libs/errors/UserCancelledError';
+import { LedgerConnectionSteps } from './ledger/LedgerConnectionSteps';
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;
@@ -16,36 +16,8 @@ const ConnectLedgerWrapper = styled.div`
     flex-direction: column;
 `;
 
-const H2Styled = styled(H2)`
-    margin-bottom: 0.25rem;
-`;
-
-const Body1Styled = styled(Body1)`
-    margin-bottom: 0.5rem;
-    color: ${p => p.theme.textSecondary};
-`;
-
-const CardStyled = styled.div`
-    box-sizing: border-box;
-    padding: 1rem;
-    width: 100%;
+const LedgerConnectionStepsStyled = styled(LedgerConnectionSteps)`
     margin: 1rem 0;
-    background: ${p => p.theme.backgroundContent};
-    border-radius: ${p => p.theme.corner2xSmall};
-    min-height: 264px;
-`;
-
-const ImageStyled = styled.div`
-    width: 100px;
-    height: 100px;
-    background: #10161f;
-    margin: 1rem auto;
-`;
-
-const Steps = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
 `;
 
 const ButtonsBlock = styled.div`
@@ -65,21 +37,28 @@ export const LedgerContent: FC<{
     onSubmit: (result: Cell) => void;
 }> = ({ ledgerParams, onClose, onSubmit }) => {
     const { t } = useTranslation();
+    const [isCompleted, setIsCompleted] = useState(false);
 
     const {
         mutateAsync: connectLedger,
         data: tonTransport,
+        isLoading: isLedgerConnecting,
         isDeviceConnected,
         reset: resetConnection
     } = useConnectLedgerMutation();
 
     const connect = () => {
-        connectLedger().then(transport =>
-            transport
-                .signTransaction(ledgerParams.path, ledgerParams.transaction)
-                .then(onSubmit)
-                .catch(onClose)
-        );
+        connectLedger()
+            .then(transport =>
+                transport
+                    .signTransaction(ledgerParams.path, ledgerParams.transaction)
+                    .then(val => {
+                        setIsCompleted(true);
+                        setTimeout(() => onSubmit(val), 500);
+                    })
+                    .catch(onClose)
+            )
+            .catch(console.debug);
     };
 
     useEffect(() => {
@@ -91,24 +70,30 @@ export const LedgerContent: FC<{
         connect();
     };
 
+    let currentStep: 'connect' | 'open-ton' | 'confirm-tx' | 'all-completed' = 'connect';
+    if (isDeviceConnected) {
+        currentStep = 'open-ton';
+    }
+    if (tonTransport) {
+        currentStep = 'confirm-tx';
+    }
+    if (isCompleted) {
+        currentStep = 'all-completed';
+    }
+
     return (
         <ConnectLedgerWrapper>
-            <H2Styled>Connect Ledger</H2Styled>
-            <Body1Styled>Connect your Ledger to your device</Body1Styled>
-            <CardStyled>
-                <ImageStyled />
-                <Steps>
-                    <Body3>Connect ledger device</Body3>
-                    {isDeviceConnected && <Body3>Open TON App in your Ledger</Body3>}
-                    {!!tonTransport && <Body3>Confirm the transaction in your Ledger</Body3>}
-                </Steps>
-            </CardStyled>
+            <LedgerConnectionStepsStyled showConfirmTxStep currentStep={currentStep} />
             <ButtonsBlock>
                 <Button secondary onClick={onClose}>
-                    Cancel
+                    {t('cancel')}
                 </Button>
-                <Button primary loading={!!tonTransport} onClick={onRetry}>
-                    Continue
+                <Button
+                    primary
+                    loading={isLedgerConnecting || !!tonTransport || isCompleted}
+                    onClick={onRetry}
+                >
+                    {t('try_again')}
                 </Button>
             </ButtonsBlock>
         </ConnectLedgerWrapper>
@@ -117,6 +102,7 @@ export const LedgerContent: FC<{
 
 const ConnectLedgerNotification = () => {
     const sdk = useAppSdk();
+    const { t } = useTranslation();
 
     const [ledgerParams, setLedgerParams] = useState<
         { path: number[]; transaction: LedgerTransaction } | undefined
@@ -172,7 +158,11 @@ const ConnectLedgerNotification = () => {
     }, [sdk, ledgerParams, requestId, onCancel, onSubmit]);
 
     return (
-        <Notification isOpen={ledgerParams != null && requestId != null} handleClose={onCancel}>
+        <Notification
+            isOpen={ledgerParams != null && requestId != null}
+            handleClose={onCancel}
+            title={t('ledger_connect_header')}
+        >
             {Content}
         </Notification>
     );
