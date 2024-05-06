@@ -81,14 +81,7 @@ const Label = () => {
                 </>
             );
         default:
-            return (
-                <>
-                    {' '}
-                    <Badge display="inline-block" color="accentPurple">
-                        Signer
-                    </Badge>
-                </>
-            );
+            return <></>;
     }
 };
 
