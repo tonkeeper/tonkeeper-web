@@ -74,7 +74,9 @@ const Label = () => {
             return (
                 <>
                     {' '}
-                    <Badge color="accentPurple">Signer</Badge>
+                    <Badge inline={true} color="accentPurple">
+                        Signer
+                    </Badge>
                 </>
             );
         default:
