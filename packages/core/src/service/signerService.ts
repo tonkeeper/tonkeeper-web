@@ -21,7 +21,8 @@ export const parseSignerSignature = (payload: string): Buffer => {
 
 export const createTransferQr = (publicKey: string, boc: string) => {
     const pk = encodeURIComponent(Buffer.from(publicKey, 'hex').toString('base64'));
-    return `tonsign://?network=ton&pk=${pk}&body=${boc}`;
+    const body = encodeURIComponent(boc);
+    return `tonsign://?network=ton&pk=${pk}&body=${body}`;
 };
 
 export const storeTransactionAndCreateDeepLink = async (
@@ -31,9 +32,10 @@ export const storeTransactionAndCreateDeepLink = async (
 ) => {
     await sdk.storage.set(AppKey.SIGNER_MESSAGE, messageBase64);
 
-    return `tonsign://?network=ton&pk=${encodeURIComponent(publicKey)}&body=${encodeURIComponent(
-        messageBase64
-    )}&return=https://wallet.tonkeeper.com/`;
+    const pk = encodeURIComponent(Buffer.from(publicKey, 'hex').toString('base64'));
+    const body = encodeURIComponent(messageBase64);
+    const back = encodeURIComponent('https://wallet.tonkeeper.com/');
+    return `tonsign://?network=ton&pk=${pk}&body=${body}&return=${back}`;
 };
 
 export const publishSignerMessage = async (
