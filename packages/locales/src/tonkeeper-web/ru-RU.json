@@ -40,6 +40,7 @@
   "ledger_choose_wallets" : "Выберите кошельки",
   "ledger_connect_header" : "Подключить Ledger",
   "ledger_continue_with_ledger" : "Продолжить с Ledger",
+  "ledger_operation_not_supported" : "Операция недоступна для кошельков Ledger. Выберите другой кошелек и повторите попытку.",
   "ledger_pair_subtitle" : "Более высокий уровень безопасности благодаря аппаратному кошельку",
   "ledger_pair_title" : "Подключить Ledger",
   "ledger_steps_confirm_tx" : "Подтвердите транзакцию в Ledger",

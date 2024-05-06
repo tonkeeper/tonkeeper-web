@@ -6,7 +6,7 @@ import {
     waitLedgerTonAppReady
 } from '@tonkeeper/core/dist/service/ledger/connector';
 import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
-import { useAppContext } from '../hooks/appContext';
+import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { AccountsApi, Account } from '@tonkeeper/core/dist/tonApiV2';
 import { Address } from '@ton/core';
 import { useAppSdk } from '../hooks/appSdk';
@@ -118,4 +118,9 @@ export const useAddLedgerAccountsMutation = () => {
             }
         }
     );
+};
+
+export const useIsActiveWalletLedger = () => {
+    const { auth } = useWalletContext();
+    return auth?.kind === 'ledger';
 };

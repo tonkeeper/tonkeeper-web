@@ -26,6 +26,7 @@ import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
+import { useIsActiveWalletLedger } from '../../state/ledger';
 
 const useConnectMutation = (
     request: ConnectRequest,
@@ -129,6 +130,11 @@ const Image = styled.img`
     border-radius: ${props => props.theme.cornerMedium};
 `;
 
+const LedgerError = styled(Body2)`
+    margin: 0.5rem 0;
+    color: ${p => p.theme.accentRed};
+`;
+
 const getDomain = (url: string) => {
     try {
         const data = new URL(url);
@@ -144,6 +150,7 @@ const ConnectContent: FC<{
     manifest: DAppManifest;
     handleClose: (result?: ConnectItemReply[], manifest?: DAppManifest) => void;
 }> = ({ params, manifest, origin, handleClose }) => {
+    const activeIsLedger = useIsActiveWalletLedger();
     const sdk = useAppSdk();
     const [done, setDone] = useState(false);
 
@@ -204,12 +211,13 @@ const ConnectContent: FC<{
                         fullWidth
                         primary
                         loading={isLoading}
-                        disabled={isLoading}
+                        disabled={isLoading || activeIsLedger}
                         type="submit"
                     >
                         {t('ton_login_connect_button')}
                     </Button>
                 )}
+                {activeIsLedger && <LedgerError>{t('ledger_operation_not_supported')}</LedgerError>}
             </>
             <Notes>{t('ton_login_notice')}</Notes>
         </NotificationBlock>
