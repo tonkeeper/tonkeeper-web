@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { hexToRGBA } from '../../libs/css';
 
 const BadgeStyled = styled.div<{ color: string; display: string }>`
-    display: ${p => p.display}
+    display: ${p => p.display};
     padding: 3px 5px;
     color: ${p => p.theme[p.color]};
     border-radius: ${p => p.theme.corner3xSmall};

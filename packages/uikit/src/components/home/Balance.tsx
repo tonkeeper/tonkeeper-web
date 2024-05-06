@@ -22,6 +22,7 @@ const Block = styled.div`
 const Body = styled(Label2)`
     color: ${props => props.theme.textSecondary};
     user-select: none;
+    display: flex;
 `;
 
 const Amount = styled(Num2)`
@@ -80,7 +81,14 @@ const Label = () => {
                 </>
             );
         default:
-            return <></>;
+            return (
+                <>
+                    {' '}
+                    <Badge display="inline-block" color="accentPurple">
+                        Signer
+                    </Badge>
+                </>
+            );
     }
 };
 
