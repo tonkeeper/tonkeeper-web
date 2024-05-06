@@ -4,10 +4,14 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { KNOWN_TON_ASSETS } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
+import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { WalletState, WalletVersion, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
-import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
+import {
+    getWalletAuthState,
+    updateWalletProperty
+} from '@tonkeeper/core/dist/service/walletService';
 import {
     Account,
     AccountsApi,
@@ -52,6 +56,13 @@ export const useWalletState = (publicKey: string) => {
     const sdk = useAppSdk();
     return useQuery<WalletState | null, Error>([QueryKey.account, QueryKey.wallet, publicKey], () =>
         getWalletState(sdk.storage, publicKey)
+    );
+};
+
+export const useWalletAuthState = (publicKey: string) => {
+    const sdk = useAppSdk();
+    return useQuery<AuthState, Error>([QueryKey.account, QueryKey.password, publicKey], () =>
+        getWalletAuthState(sdk.storage, publicKey)
     );
 };
 

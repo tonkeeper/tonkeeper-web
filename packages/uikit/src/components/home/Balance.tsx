@@ -6,8 +6,9 @@ import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { QueryKey } from '../../libs/queryKey';
-import { useWalletTotalBalance } from '../../state/wallet';
+import { useWalletAuthState, useWalletTotalBalance } from '../../state/wallet';
 import { Body3, Label2, Num2 } from '../Text';
+import { Badge } from '../shared';
 import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
 
@@ -64,6 +65,23 @@ export const BalanceSkeleton = () => {
     );
 };
 
+const Label = () => {
+    const wallet = useWalletContext();
+    const { data: state } = useWalletAuthState(wallet.publicKey);
+    switch (state?.kind) {
+        case 'signer':
+        case 'signer-deeplink':
+            return (
+                <>
+                    {' '}
+                    <Badge color="accentPurple">Signer</Badge>
+                </>
+            );
+        default:
+            return <></>;
+    }
+};
+
 export const Balance: FC<{
     error?: Error | null;
     isFetching: boolean;
@@ -94,7 +112,10 @@ export const Balance: FC<{
         <Block>
             <MessageBlock error={error} isFetching={isFetching} />
             <Amount>{formatFiatCurrency(fiat, total || 0)}</Amount>
-            <Body onClick={() => sdk.copyToClipboard(address)}>{toShortValue(address)}</Body>
+            <Body onClick={() => sdk.copyToClipboard(address)}>
+                {toShortValue(address)}
+                <Label />
+            </Body>
         </Block>
     );
 };
