@@ -118,6 +118,24 @@ export abstract class MainWindow {
             });
         });
 
+        this.mainWindow.webContents.session.on('select-hid-device', (event, details, callback) => {
+            event.preventDefault();
+            if (details.deviceList && details.deviceList.length > 0) {
+                callback(details.deviceList[0].deviceId);
+            }
+        });
+
+        this.mainWindow.webContents.session.setDevicePermissionHandler(details => {
+            const allowedConnections = ['usb', 'hid'];
+            const allowedOrigins = ['file://', 'http://localhost:3000'];
+            if (
+                allowedConnections.includes(details.deviceType) &&
+                allowedOrigins.includes(details.origin)
+            ) {
+                return true;
+            }
+        });
+
         await delay(500);
 
         return this.mainWindow;
