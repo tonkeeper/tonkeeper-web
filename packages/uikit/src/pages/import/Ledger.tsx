@@ -2,6 +2,7 @@ import { styled } from 'styled-components';
 import { Button } from '../../components/fields/Button';
 import { useTranslation } from '../../hooks/translation';
 import {
+    LedgerAccount,
     useAddLedgerAccountsMutation,
     useConnectLedgerMutation,
     useLedgerAccounts
@@ -20,6 +21,8 @@ import { formatter } from '../../hooks/balance';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { Checkbox } from '../../components/fields/Checkbox';
 import { LedgerConnectionSteps } from '../../components/ledger/LedgerConnectionSteps';
+import { UpdateWalletName } from '../../components/create/WalletName';
+import { getFallbackWalletEmoji } from '@tonkeeper/core/dist/service/wallet/storeService';
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;
@@ -156,7 +159,9 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
     const { mutate: getLedgerAccounts, data: ledgerAccounts } = useLedgerAccounts(totalAccounts);
     const [selectedIndexes, setSelectedIndexes] = useState<Record<number, boolean>>({});
 
-    const { mutate: addAccounts, isLoading: isAdding } = useAddLedgerAccountsMutation();
+    const { mutate: addAccountsMutation, isLoading: isAdding } = useAddLedgerAccountsMutation();
+
+    const [accountsToAdd, setAccountsToAdd] = useState<LedgerAccount[]>();
 
     useEffect(() => {
         getLedgerAccounts(tonTransport);
@@ -177,10 +182,22 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
         const chosenIndexes = Object.entries(selectedIndexes)
             .filter(([, v]) => v)
             .map(([k]) => Number(k));
-        addAccounts(
+        setAccountsToAdd(
             ledgerAccounts!.filter(account => chosenIndexes.includes(account.accountIndex))
         );
     };
+
+    if (accountsToAdd) {
+        const fallbackEmoji = getFallbackWalletEmoji(accountsToAdd[0].publicKey.toString('hex'));
+        return (
+            <UpdateWalletName
+                walletEmoji={fallbackEmoji}
+                submitHandler={({ name, emoji }) =>
+                    addAccountsMutation({ name, emoji, accounts: accountsToAdd })
+                }
+            />
+        );
+    }
 
     return (
         <ConnectLedgerWrapper>

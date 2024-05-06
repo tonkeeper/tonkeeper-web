@@ -56,7 +56,10 @@ export const LedgerContent: FC<{
                         setIsCompleted(true);
                         setTimeout(() => onSubmit(val), 500);
                     })
-                    .catch(onClose)
+                    .catch(e => {
+                        console.error(e);
+                        onClose();
+                    })
             )
             .catch(console.debug);
     };

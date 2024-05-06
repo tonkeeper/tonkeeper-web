@@ -16,6 +16,7 @@ import { addWalletsWithCustomAuthState } from '@tonkeeper/core/dist/service/acco
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
 import { useCallback, useState } from 'react';
+import { AuthLedger } from '@tonkeeper/core/dist/entries/password';
 
 export type LedgerAccount = {
     accountIndex: number;
@@ -93,18 +94,28 @@ export const useAddLedgerAccountsMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const navigate = useNavigate();
-    return useMutation<void, Error, LedgerAccount[]>(async ledgerAccounts => {
-        try {
-            const states = ledgerAccounts.map(walletStateFromLedger);
+    return useMutation<void, Error, { accounts: LedgerAccount[]; name: string; emoji: string }>(
+        async form => {
+            try {
+                let states = form.accounts.map(walletStateFromLedger);
+                if (form.name) {
+                    const suffix = (index: number) => (states.length > 1 ? ' ' + (index + 1) : '');
+                    states = states.map((s, i) => ({
+                        ...s,
+                        name: form.name + suffix((s.auth as AuthLedger).accountIndex),
+                        ...(i === 0 && !!form.emoji && { emoji: form.emoji })
+                    }));
+                }
 
-            await addWalletsWithCustomAuthState(sdk.storage, states, { keepName: true });
+                await addWalletsWithCustomAuthState(sdk.storage, states, { keepName: true });
 
-            await client.invalidateQueries([QueryKey.account]);
+                await client.invalidateQueries([QueryKey.account]);
 
-            navigate(AppRoute.home);
-        } catch (e) {
-            if (e instanceof Error) sdk.alert(e.message);
-            throw e;
+                navigate(AppRoute.home);
+            } catch (e) {
+                if (e instanceof Error) sdk.alert(e.message);
+                throw e;
+            }
         }
-    });
+    );
 };
