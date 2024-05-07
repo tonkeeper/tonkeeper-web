@@ -19,14 +19,15 @@ import styled from 'styled-components';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 import { QueryKey } from '../../libs/queryKey';
+import { useIsActiveWalletLedger } from '../../state/ledger';
 import { signTonConnectOver } from '../../state/mnemonic';
-import { CheckmarkCircleIcon } from '../Icon';
+import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
-import { useIsActiveWalletLedger } from '../../state/ledger';
 
 const useConnectMutation = (
     request: ConnectRequest,
@@ -164,13 +165,19 @@ const ConnectContent: FC<{
         }
     }, []);
 
+    const [error, setError] = useState<Error | null>(null);
     const { mutateAsync, isLoading } = useConnectMutation(params, manifest, origin);
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
-        const result = await mutateAsync();
-        setDone(true);
-        setTimeout(() => handleClose(result, manifest), 300);
+        try {
+            const result = await mutateAsync();
+            setDone(true);
+            setTimeout(() => handleClose(result, manifest), 300);
+        } catch (e) {
+            setDone(true);
+            setError(e as Error);
+        }
     };
 
     const address = formatAddress(wallet.active.rawAddress, wallet.network);
@@ -199,10 +206,20 @@ const ConnectContent: FC<{
             </div>
 
             <>
-                {done && (
+                {done && !error && (
                     <ResultButton done>
                         <CheckmarkCircleIcon />
                         <Label2>{t('ton_login_success')}</Label2>
+                    </ResultButton>
+                )}
+                {done && error && (
+                    <ResultButton>
+                        <ExclamationMarkCircleIcon />
+                        <Label2>
+                            {error instanceof TxConfirmationCustomError
+                                ? error.message
+                                : t('error_occurred')}
+                        </Label2>
                     </ResultButton>
                 )}
                 {!done && (

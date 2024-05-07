@@ -2,6 +2,8 @@ import { Cell } from '@ton/core';
 import { mnemonicToPrivateKey, sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
+import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
+import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import {
     parseSignerSignature,
@@ -10,18 +12,21 @@ import {
 import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import nacl from 'tweetnacl';
-import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
-import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
+import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
 
 export const signTonConnectOver = (sdk: IAppSdk, publicKey: string) => {
     return async (bufferToSign: Buffer) => {
         const auth = await getWalletAuthState(sdk.storage, publicKey);
         switch (auth.kind) {
             case 'signer': {
-                throw new Error('Signer linked by QR is not support sign buffer.');
+                throw new TxConfirmationCustomError(
+                    'Signer linked by QR is not support sign buffer.'
+                );
             }
             case 'signer-deeplink': {
-                throw new Error('Signer linked by deep link is not support sign buffer.');
+                throw new TxConfirmationCustomError(
+                    'Signer linked by deep link is not support sign buffer.'
+                );
             }
             default: {
                 const mnemonic = await getMnemonic(sdk, publicKey);
