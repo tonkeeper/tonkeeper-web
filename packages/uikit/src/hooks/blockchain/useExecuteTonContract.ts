@@ -10,6 +10,7 @@ import { AmplitudeTransactionType, useTransactionAnalytics } from '../amplitude'
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
+import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 
 export type ContractExecutorParams = {
     api: APIConfig;
@@ -41,6 +42,10 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
         }
 
         const signer = await getSigner(sdk, walletState.publicKey).catch(() => null);
+        if (signer?.type !== 'cell') {
+            throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+        }
+
         if (signer === null) return false;
 
         track2(eventName2);

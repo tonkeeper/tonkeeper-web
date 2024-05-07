@@ -504,7 +504,7 @@ export const CheckmarkCircleIcon = () => {
     );
 };
 
-export const ExclamationMarkCircleIcon = () => {
+export const ExclamationMarkCircleIcon: FC<{ className?: string }> = ({ className }) => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -512,6 +512,7 @@ export const ExclamationMarkCircleIcon = () => {
             height="32"
             viewBox="0 0 32 32"
             fill="none"
+            className={className}
         >
             <path
                 fillRule="evenodd"

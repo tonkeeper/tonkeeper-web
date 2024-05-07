@@ -16,6 +16,7 @@ import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
+import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 
 export type MultiSendFormTokenized = {
     rows: {
@@ -54,7 +55,7 @@ export function useSendMultiTransfer() {
         if (signer === null) return false;
         try {
             if (signer.type !== 'cell') {
-                throw new Error('Current wallet does not support multisend');
+                throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
             }
 
             if (asset.id === TON_ASSET.id) {

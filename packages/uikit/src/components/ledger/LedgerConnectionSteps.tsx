@@ -73,6 +73,17 @@ export const LedgerConnectionSteps: FC<{
 
     const sdk = useAppSdk();
 
+    const onOpenFaq = () => {
+        const enPath = 'article/86-how-to-connect-ledger-to-tonkeeper';
+
+        let faqBaseUrl = config.faq_url || 'https://tonkeeper.helpscoutdocs.com';
+        if (!faqBaseUrl.endsWith('/')) {
+            faqBaseUrl = faqBaseUrl + '/';
+        }
+
+        sdk.openPage(faqBaseUrl + enPath);
+    };
+
     return (
         <CardStyled className={className}>
             <ImageStyled>
@@ -109,10 +120,14 @@ export const LedgerConnectionSteps: FC<{
                         }
                     >
                         {t('ledger_steps_open_ton')}
-                        <Dot />
-                        <AStyled onClick={() => sdk.openPage(config.faq_url!)}>
-                            {t('ledger_steps_install_ton')}
-                        </AStyled>
+                        {!showConfirmTxStep && (
+                            <>
+                                <Dot />
+                                <AStyled onClick={onOpenFaq}>
+                                    {t('ledger_steps_install_ton')}
+                                </AStyled>
+                            </>
+                        )}
                     </Body2Colored>
                 </TextBlockStyled>
                 {showConfirmTxStep && (

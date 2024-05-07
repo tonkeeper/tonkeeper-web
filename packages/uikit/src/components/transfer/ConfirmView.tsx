@@ -39,6 +39,7 @@ import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
 import { UserCancelledError } from '../../libs/errors/UserCancelledError';
+import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -292,6 +293,20 @@ export const ConfirmViewDetailsComment: FC = () => {
     return <TransferComment comment={recipient.comment} />;
 };
 
+const ExclamationMarkCircleIconStyled = styled(ExclamationMarkCircleIcon)`
+    min-width: 32px;
+    min-height: 32px;
+`;
+
+const ErrorLabelStyled = styled(Label2)`
+    text-align: center;
+`;
+
+const ResultErrorButtonStyled = styled(ResultButton)`
+    height: unset;
+    min-height: 56px;
+`;
+
 export const ConfirmViewButtonsSlot: FC<PropsWithChildren> = ({ children }) => <>{children}</>;
 
 export const ConfirmViewButtons: FC<{
@@ -332,10 +347,14 @@ export const ConfirmViewButtons: FC<{
 
     if (error && !(error instanceof UserCancelledError)) {
         return (
-            <ResultButton>
-                <ExclamationMarkCircleIcon />
-                <Label2>{t('send_publish_tx_error')}</Label2>
-            </ResultButton>
+            <ResultErrorButtonStyled>
+                <ExclamationMarkCircleIconStyled />
+                <ErrorLabelStyled>
+                    {error instanceof TxConfirmationCustomError
+                        ? error.message
+                        : t('send_publish_tx_error')}
+                </ErrorLabelStyled>
+            </ResultErrorButtonStyled>
         );
     }
 
