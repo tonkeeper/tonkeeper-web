@@ -11,6 +11,7 @@ import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
+import { useCheckTouchId } from '../../state/password';
 
 export type ContractExecutorParams = {
     api: APIConfig;
@@ -35,13 +36,14 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
     const walletState = useWalletContext();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<boolean, Error>(async () => {
         if (!args.fee) {
             return false;
         }
 
-        const signer = await getSigner(sdk, walletState.publicKey, t).catch(() => null);
+        const signer = await getSigner(sdk, walletState.publicKey, checkTouchId).catch(() => null);
         if (signer?.type !== 'cell') {
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }

@@ -10,6 +10,7 @@ import { Account } from '../../pages/settings/Account';
 import { Notifications } from '../../pages/settings/Notification';
 import { CountrySettings } from '../../pages/settings/Country';
 import styled from 'styled-components';
+import { SecuritySettings } from '../../pages/settings/Security';
 
 const OldSettingsLayoutWrapper = styled.div`
     padding-top: 64px;
@@ -52,12 +53,7 @@ export const DesktopPreferencesRouting = () => {
                         <Navigate to={AppRoute.walletSettings + WalletSettingsRoute.jettons} />
                     }
                 />
-                <Route
-                    path={SettingsRoute.security}
-                    element={
-                        <Navigate to={AppRoute.walletSettings + WalletSettingsRoute.security} />
-                    }
-                />
+                <Route path={SettingsRoute.security} element={<SecuritySettings />} />
                 <Route path={SettingsRoute.country} element={<CountrySettings />} />
                 <Route path={SettingsRoute.pro} element={<ProSettings />} />
                 <Route path="*" element={<Navigate to={'.' + SettingsRoute.account} replace />} />

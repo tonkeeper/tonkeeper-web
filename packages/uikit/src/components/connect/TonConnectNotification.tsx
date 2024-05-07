@@ -28,6 +28,7 @@ import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
+import { useCheckTouchId } from '../../state/password';
 
 const useConnectMutation = (
     request: ConnectRequest,
@@ -38,6 +39,7 @@ const useConnectMutation = (
     const sdk = useAppSdk();
     const client = useQueryClient();
     const { t } = useTranslation();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<ConnectItemReply[], Error>(async () => {
         const params = await getTonConnectParams(request);
@@ -49,7 +51,7 @@ const useConnectMutation = (
                 result.push(toTonAddressItemReply(wallet));
             }
             if (item.name === 'ton_proof') {
-                const signTonConnect = signTonConnectOver(sdk, wallet.publicKey, t);
+                const signTonConnect = signTonConnectOver(sdk, wallet.publicKey, t, checkTouchId);
                 const proof = tonConnectProofPayload(
                     webViewUrl ?? manifest.url,
                     wallet.active.rawAddress,

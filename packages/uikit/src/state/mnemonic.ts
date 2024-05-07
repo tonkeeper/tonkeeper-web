@@ -17,7 +17,8 @@ import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomEr
 export const signTonConnectOver = (
     sdk: IAppSdk,
     publicKey: string,
-    t: (text: string) => string
+    t: (text: string) => string,
+    checkTouchId: () => Promise<void>
 ) => {
     return async (bufferToSign: Buffer) => {
         const auth = await getWalletAuthState(sdk.storage, publicKey);
@@ -36,7 +37,7 @@ export const signTonConnectOver = (
                 throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
             }
             default: {
-                const mnemonic = await getMnemonic(sdk, publicKey, t);
+                const mnemonic = await getMnemonic(sdk, publicKey, checkTouchId);
                 const keyPair = await mnemonicToPrivateKey(mnemonic);
                 const signature = nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
@@ -51,7 +52,7 @@ export const signTonConnectOver = (
 export const getSigner = async (
     sdk: IAppSdk,
     publicKey: string,
-    t: (text: string) => string
+    checkTouchId: () => Promise<void>
 ): Promise<Signer> => {
     try {
         const auth = await getWalletAuthState(sdk.storage, publicKey);
@@ -93,7 +94,7 @@ export const getSigner = async (
                 return callback as CellSigner;
             }
             default: {
-                const mnemonic = await getMnemonic(sdk, publicKey, t);
+                const mnemonic = await getMnemonic(sdk, publicKey, checkTouchId);
                 const callback = async (message: Cell) => {
                     const keyPair = await mnemonicToPrivateKey(mnemonic);
                     return sign(message.hash(), keyPair.secretKey);
@@ -111,7 +112,7 @@ export const getSigner = async (
 export const getMnemonic = async (
     sdk: IAppSdk,
     publicKey: string,
-    t: (key: string, options?: { lng?: string }) => string
+    checkTouchId: () => Promise<void>
 ): Promise<string[]> => {
     const auth = await getWalletAuthState(sdk.storage, publicKey);
 
@@ -127,9 +128,8 @@ export const getMnemonic = async (
             if (!sdk.keychain) {
                 throw Error('Keychain is undefined');
             }
-            const mnemonic = await sdk.keychain.getPassword(publicKey, lng =>
-                t('touch_id_unlock_wallet', { lng })
-            );
+            await checkTouchId();
+            const mnemonic = await sdk.keychain.getPassword(publicKey);
             return mnemonic.split(' ');
         }
         default:

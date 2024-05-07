@@ -9,6 +9,7 @@ import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { getMnemonic } from '../../state/mnemonic';
+import { useCheckTouchId } from "../../state/password";
 
 export const ActiveRecovery = () => {
     const wallet = useWalletContext();
@@ -28,12 +29,12 @@ const useMnemonic = (publicKey: string, auth: AuthState) => {
     const [mnemonic, setMnemonic] = useState<string[] | undefined>(undefined);
     const sdk = useAppSdk();
     const navigate = useNavigate();
-    const { t } = useTranslation();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     useEffect(() => {
         (async () => {
             try {
-                setMnemonic(await getMnemonic(sdk, publicKey, t));
+                setMnemonic(await getMnemonic(sdk, publicKey, checkTouchId));
             } catch (e) {
                 navigate(-1);
             }

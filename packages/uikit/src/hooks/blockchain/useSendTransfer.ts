@@ -19,6 +19,7 @@ import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
+import { useCheckTouchId } from '../../state/password';
 
 export function useSendTransfer<T extends Asset>(
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,
@@ -33,9 +34,10 @@ export function useSendTransfer<T extends Asset>(
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
     const { data: jettons } = useWalletJettonList();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<boolean, Error>(async () => {
-        const signer = await getSigner(sdk, wallet.publicKey, t).catch(() => null);
+        const signer = await getSigner(sdk, wallet.publicKey, checkTouchId).catch(() => null);
         if (signer === null) return false;
         try {
             if (isTonAsset(amount.asset)) {

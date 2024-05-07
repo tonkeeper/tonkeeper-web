@@ -11,6 +11,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { getMnemonic } from '../../state/mnemonic';
+import { useCheckTouchId } from '../../state/password';
 
 const useSubscribed = () => {
     const sdk = useAppSdk();
@@ -32,7 +33,7 @@ const useToggleSubscribe = () => {
     const sdk = useAppSdk();
     const wallet = useWalletContext();
     const client = useQueryClient();
-    const { t } = useTranslation();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<void, Error, boolean>(async checked => {
         const { notifications } = sdk;
@@ -40,7 +41,7 @@ const useToggleSubscribe = () => {
             throw new Error('Missing notifications');
         }
         if (checked) {
-            const mnemonic = await getMnemonic(sdk, wallet.publicKey, t);
+            const mnemonic = await getMnemonic(sdk, wallet.publicKey, checkTouchId);
             try {
                 await notifications.subscribe(wallet, mnemonic);
             } catch (e) {

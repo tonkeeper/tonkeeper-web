@@ -24,6 +24,7 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { QueryKey } from '../libs/queryKey';
 import { signTonConnectOver } from './mnemonic';
+import { useCheckTouchId } from './password';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -50,12 +51,14 @@ export const useSelectWalletMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const { t } = useTranslation();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
+
     return useMutation<void, Error, string>(async publicKey => {
         const state = await getWalletState(sdk.storage, publicKey);
         if (!state) {
             throw new Error('Missing wallet state');
         }
-        await authViaTonConnect(state, signTonConnectOver(sdk, publicKey, t));
+        await authViaTonConnect(state, signTonConnectOver(sdk, publicKey, t, checkTouchId));
 
         await client.invalidateQueries([QueryKey.pro]);
     });
