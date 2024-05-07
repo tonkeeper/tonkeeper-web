@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
+import { getWalletWithGlobalAuth } from '@tonkeeper/core/dist/service/accountService';
 import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
-import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { TonkeeperIcon } from '../../components/Icon';
@@ -41,18 +41,10 @@ const Logo = styled.div`
 `;
 
 const useMutateUnlock = () => {
-    const { account } = useAppContext();
     const sdk = useAppSdk();
 
     return useMutation<void, Error, string>(async password => {
-        if (account.publicKeys.length === 0) {
-            throw new Error('Missing wallets');
-        }
-        const [publicKey] = account.publicKeys;
-        const wallet = await getWalletState(sdk.storage, publicKey);
-        if (!wallet) {
-            throw new Error('Missing wallet');
-        }
+        const publicKey = await getWalletWithGlobalAuth(sdk.storage);
 
         const isValid = await validateWalletMnemonic(sdk.storage, publicKey, password);
         if (!isValid) {
