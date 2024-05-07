@@ -40,13 +40,13 @@ const Confirm: FC<{ signatureBase64: string; onClose: () => void }> = ({
     return (
         <FullHeightBlockResponsive standalone={false} fitContent={true}>
             <ButtonBlock>
-                {isFetched && (
+                {isFetched && !isError && (
                     <ResultButton done>
                         <CheckmarkCircleIcon />
                         <Label2>{t('send_screen_steps_done_done_label')}</Label2>
                     </ResultButton>
                 )}
-                {isError && (
+                {isFetched && isError && (
                     <ResultButton>
                         <ExclamationMarkCircleIcon />
                         <Label2>{t('send_publish_tx_error')}</Label2>

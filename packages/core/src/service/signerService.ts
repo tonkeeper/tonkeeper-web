@@ -1,4 +1,5 @@
 import { Cell, beginCell } from '@ton/core';
+import queryString from 'query-string';
 import { IAppSdk } from '../AppSdk';
 import { AppKey } from '../Keys';
 import { APIConfig } from '../entries/apis';
@@ -9,14 +10,26 @@ import { walletContractFromState } from './wallet/contractService';
 
 export const parseSignerSignature = (payload: string): Buffer => {
     console.log('signer', payload);
-    if (payload.startsWith('tonkeeper://publish?boc=')) {
-        const base64Signature = decodeURIComponent(
-            payload.substring('tonkeeper://publish?boc='.length)
-        );
-        return Buffer.from(base64Signature, 'base64');
-    } else {
+
+    if (!payload.startsWith('tonkeeper://publish')) {
         throw new Error(`Unexpected Result: ${payload}`);
     }
+
+    const {
+        query: { boc }
+    } = queryString.parseUrl(payload);
+
+    if (typeof boc != 'string') {
+        throw new Error('Unexpected QR code, missing boc parameter');
+    }
+
+    return Buffer.from(boc, 'base64');
+};
+
+export const createTransferQr = (publicKey: string, boc: string) => {
+    const pk = encodeURIComponent(Buffer.from(publicKey, 'hex').toString('base64'));
+    const body = encodeURIComponent(boc);
+    return `tonsign://?network=ton&pk=${pk}&body=${body}`;
 };
 
 export const storeTransactionAndCreateDeepLink = async (
@@ -26,9 +39,10 @@ export const storeTransactionAndCreateDeepLink = async (
 ) => {
     await sdk.storage.set(AppKey.SIGNER_MESSAGE, messageBase64);
 
-    return `tonsign://?network=ton&pk=${encodeURIComponent(publicKey)}&body=${encodeURIComponent(
-        messageBase64
-    )}&return=https://wallet.tonkeeper.com/`;
+    const pk = encodeURIComponent(Buffer.from(publicKey, 'hex').toString('base64'));
+    const body = encodeURIComponent(messageBase64);
+    const back = encodeURIComponent('https://wallet.tonkeeper.com/');
+    return `tonsign://?network=ton&pk=${pk}&body=${body}&return=${back}`;
 };
 
 export const publishSignerMessage = async (

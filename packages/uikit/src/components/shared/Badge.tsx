@@ -2,7 +2,8 @@ import { FC, PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import { hexToRGBA } from '../../libs/css';
 
-const BadgeStyled = styled.div<{ color: string }>`
+const BadgeStyled = styled.div<{ color: string; display: string }>`
+    display: ${p => p.display};
     padding: 3px 5px;
     color: ${p => p.theme[p.color]};
     border-radius: ${p => p.theme.corner3xSmall};
@@ -15,13 +16,11 @@ const BadgeStyled = styled.div<{ color: string }>`
     line-height: 14px;
 `;
 
-export const Badge: FC<PropsWithChildren<{ className?: string; color?: string }>> = ({
-    color,
-    className,
-    children
-}) => {
+export const Badge: FC<
+    PropsWithChildren<{ className?: string; color?: string; display?: string }>
+> = ({ color, className, children, display = 'block' }) => {
     return (
-        <BadgeStyled className={className} color={color || 'accentBlue'}>
+        <BadgeStyled className={className} color={color || 'accentBlue'} display={display}>
             {children}
         </BadgeStyled>
     );
