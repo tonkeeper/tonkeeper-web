@@ -14,7 +14,11 @@ import { delay } from '@tonkeeper/core/dist/utils/common';
 import nacl from 'tweetnacl';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
 
-export const signTonConnectOver = (sdk: IAppSdk, publicKey: string) => {
+export const signTonConnectOver = (
+    sdk: IAppSdk,
+    publicKey: string,
+    t: (text: string) => string
+) => {
     return async (bufferToSign: Buffer) => {
         const auth = await getWalletAuthState(sdk.storage, publicKey);
         switch (auth.kind) {
@@ -27,6 +31,9 @@ export const signTonConnectOver = (sdk: IAppSdk, publicKey: string) => {
                 throw new TxConfirmationCustomError(
                     'Signer linked by deep link is not support sign buffer.'
                 );
+            }
+            case 'ledger': {
+                throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
             }
             default: {
                 const mnemonic = await getMnemonic(sdk, publicKey);

@@ -37,6 +37,7 @@ const useConnectMutation = (
     const wallet = useWalletContext();
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const { t } = useTranslation();
 
     return useMutation<ConnectItemReply[], Error>(async () => {
         const params = await getTonConnectParams(request);
@@ -48,7 +49,7 @@ const useConnectMutation = (
                 result.push(toTonAddressItemReply(wallet));
             }
             if (item.name === 'ton_proof') {
-                const signTonConnect = signTonConnectOver(sdk, wallet.publicKey);
+                const signTonConnect = signTonConnectOver(sdk, wallet.publicKey, t);
                 const proof = tonConnectProofPayload(
                     webViewUrl ?? manifest.url,
                     wallet.active.rawAddress,
