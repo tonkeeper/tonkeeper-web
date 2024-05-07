@@ -2,7 +2,7 @@ import { Address, beginCell, Cell, comment, toNano } from '@ton/core';
 import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
-import { Signer } from '../../entries/signer';
+import { CellSigner, Signer } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi, NftItem } from '../../tonApiV2';
 import {
@@ -15,9 +15,10 @@ import {
     getWalletBalance,
     signEstimateMessage
 } from './common';
+import { createLedgerNftTransfer } from '../ledger/transfer';
 
 const initNftTransferAmount = toNano('1');
-const nftTransferForwardAmount = BigInt('1');
+export const nftTransferForwardAmount = BigInt('1');
 
 const nftTransferBody = (params: {
     queryId: bigint;
@@ -71,8 +72,8 @@ const createNftTransfer = (
     recipientAddress: string,
     nftAddress: string,
     nftTransferAmount: bigint,
-    forwardPayload: Cell | null = null,
-    signer: Signer
+    forwardPayload: Cell | null,
+    signer: CellSigner
 ) => {
     const body = nftTransferBody({
         queryId: getTonkeeperQueryId(),
@@ -141,19 +142,25 @@ export const sendNftTransfer = async (
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
-    const cell = await createNftTransfer(
+    const params = [
         timestamp,
         seqno,
         walletState,
         recipient.toAccount.address,
         nftItem.address,
         BigInt(nftTransferAmount.toString()),
-        recipient.comment ? comment(recipient.comment) : null,
-        signer
-    );
+        recipient.comment ? comment(recipient.comment) : null
+    ] as const;
+
+    let buffer;
+    if (signer.type === 'ledger') {
+        buffer = await createLedgerNftTransfer(...params, signer);
+    } else {
+        buffer = await createNftTransfer(...params, signer);
+    }
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
+        sendBlockchainMessageRequest: { boc: buffer.toString('base64') }
     });
 };
 
@@ -162,7 +169,7 @@ export const sendNftRenew = async (options: {
     walletState: WalletState;
     nftAddress: string;
     fee: TransferEstimationEvent;
-    signer: Signer;
+    signer: CellSigner;
     amount: BigNumber;
 }) => {
     const timestamp = await getServerTime(options.api);
@@ -216,7 +223,7 @@ export const sendNftLink = async (options: {
     nftAddress: string;
     linkToAddress: string;
     fee: TransferEstimationEvent;
-    signer: Signer;
+    signer: CellSigner;
     amount: BigNumber;
 }) => {
     const timestamp = await getServerTime(options.api);

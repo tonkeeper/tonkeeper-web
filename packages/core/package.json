@@ -19,6 +19,9 @@
         "yarn-run-all": "^3.1.1"
     },
     "dependencies": {
+        "@ledgerhq/hw-transport-webhid": "^6.28.6",
+        "@ledgerhq/hw-transport-webusb": "^6.28.6",
+        "@ton-community/ton-ledger": "^7.0.1",
         "@ton/core": "0.54.0",
         "@ton/crypto": "3.2.0",
         "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build9",

@@ -16,6 +16,7 @@ import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
+import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 
 export type MultiSendFormTokenized = {
     rows: {
@@ -53,6 +54,10 @@ export function useSendMultiTransfer() {
         const signer = await getSigner(sdk, wallet.publicKey).catch(() => null);
         if (signer === null) return false;
         try {
+            if (signer.type !== 'cell') {
+                throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+            }
+
             if (asset.id === TON_ASSET.id) {
                 track2('multi-send-ton');
                 await sendTonMultiTransfer(

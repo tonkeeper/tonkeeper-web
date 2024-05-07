@@ -47,6 +47,7 @@ import { useEnableW5, useEnableW5Mutation } from '../../../state/experemental';
 import { useProState } from '../../../state/pro';
 import { ProNotification } from '../../pro/ProNotification';
 import { useTranslation } from '../../../hooks/translation';
+import { useIsActiveWalletLedger } from '../../../state/ledger';
 
 const AssetSelectWrapper = styled.div`
     padding-bottom: 1rem;
@@ -250,6 +251,8 @@ const Dot = styled(Body2)`
 
 const FooterErrorMessage = styled(Body2)`
     color: ${p => p.theme.accentOrange};
+    display: block;
+    max-width: 350px;
 `;
 
 const MultiSendAddMore: FC<{
@@ -322,6 +325,7 @@ const MultiSendFooter: FC<{
     rowsValue: MultiSendForm['rows'];
     list: MultiSendList;
     onBack: () => void;
+    // eslint-disable-next-line complexity
 }> = ({ asset, rowsValue, list, onBack }) => {
     const { t } = useTranslation();
     const { data: proState } = useProState();
@@ -433,6 +437,8 @@ const MultiSendFooter: FC<{
     const maxMsgsNumberExceeded =
         watch('rows').length > MAX_ALLOWED_WALLET_MSGS[wallet.active.version];
 
+    const isLedger = useIsActiveWalletLedger();
+
     return (
         <>
             <MultiSendFooterWrapper>
@@ -457,7 +463,9 @@ const MultiSendFooter: FC<{
                         </Button>
                     )}
                 </ListActionsButtons>
-                {maxMsgsNumberExceeded ? (
+                {isLedger ? (
+                    <FooterErrorMessage>{t('ledger_operation_not_supported')}</FooterErrorMessage>
+                ) : maxMsgsNumberExceeded ? (
                     <FooterErrorMessage>{t('multi_send_maximum_reached')}</FooterErrorMessage>
                 ) : (
                     <MultiSendFooterTextWrapper>
@@ -479,7 +487,7 @@ const MultiSendFooter: FC<{
                     <Button
                         type="submit"
                         primary
-                        disabled={remainingBalanceBN?.lt(0) || maxMsgsNumberExceeded}
+                        disabled={remainingBalanceBN?.lt(0) || maxMsgsNumberExceeded || isLedger}
                         loading={formValidationState === 'validating' || !proState}
                     >
                         {t('continue')}

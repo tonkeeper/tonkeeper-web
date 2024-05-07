@@ -80,6 +80,15 @@ const Label = () => {
                     </Badge>
                 </>
             );
+        case 'ledger':
+            return (
+                <>
+                    {' '}
+                    <Badge display="inline-block" color="accentGreen">
+                        Ledger
+                    </Badge>
+                </>
+            );
         default:
             return <></>;
     }

@@ -21,18 +21,43 @@ const accountAppendWallet = async (account: AccountState, publicKey: string) => 
 };
 
 export const addWalletWithCustomAuthState = async (storage: IStorage, state: WalletState) => {
-    const account = await getAccountState(storage);
-    const updatedAccount = await accountAppendWallet(account, state.publicKey);
+    return addWalletsWithCustomAuthState(storage, [state]);
+};
 
-    const name = account.publicKeys.includes(state.publicKey) ? undefined : state.name;
-
-    if (!('auth' in state)) {
-        throw new Error('Missing wallet auth state.');
+export const addWalletsWithCustomAuthState = async (
+    storage: IStorage,
+    states: WalletState[],
+    options?: {
+        activePublicKey?: string;
+        keepName?: boolean;
     }
+) => {
+    const account = await getAccountState(storage);
+
+    const pksToConcat = states
+        .filter(s => !account.publicKeys.includes(s.publicKey))
+        .map(s => s.publicKey);
+    const updatedAccount = {
+        publicKeys: account.publicKeys.concat(pksToConcat),
+        activePublicKey: options?.activePublicKey ?? states[0].publicKey
+    };
+
+    const walletsUpdates = states.reduce((acc, s) => {
+        let name = s.name;
+        if (!options?.keepName) {
+            name = account.publicKeys.includes(s.publicKey) ? undefined : s.name;
+        }
+
+        if (!('auth' in s)) {
+            throw new Error('Missing wallet auth state.');
+        }
+
+        return { ...acc, [`${AppKey.WALLET}_${s.publicKey}`]: { ...s, name } };
+    }, {});
 
     await storage.setBatch({
         [AppKey.ACCOUNT]: updatedAccount,
-        [`${AppKey.WALLET}_${state.publicKey}`]: { ...state, name }
+        ...walletsUpdates
     });
 };
 

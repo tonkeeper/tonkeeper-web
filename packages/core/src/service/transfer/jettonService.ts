@@ -4,7 +4,7 @@ import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
-import { Signer } from '../../entries/signer';
+import { CellSigner, Signer } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
@@ -19,6 +19,7 @@ import {
     SendMode,
     signEstimateMessage
 } from './common';
+import { createLedgerJettonTransfer } from '../ledger/transfer';
 
 export const jettonTransferAmount = toNano(0.1);
 export const jettonTransferForwardAmount = BigInt(1);
@@ -51,7 +52,7 @@ const createJettonTransfer = async (
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string,
     forwardPayload: Cell | null,
-    signer: Signer
+    signer: CellSigner
 ) => {
     const jettonAmount = BigInt(amount.stringWeiAmount);
 
@@ -132,18 +133,23 @@ export const sendJettonTransfer = async (
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
-    const cell = await createJettonTransfer(
+    let buffer: Buffer;
+    const params = [
         timestamp,
         seqno,
         walletState,
         recipient.toAccount.address,
         amount,
         jettonWalletAddress,
-        recipient.comment ? comment(recipient.comment) : null,
-        signer
-    );
+        recipient.comment ? comment(recipient.comment) : null
+    ] as const;
+    if (signer.type === 'ledger') {
+        buffer = await createLedgerJettonTransfer(...params, signer);
+    } else {
+        buffer = await createJettonTransfer(...params, signer);
+    }
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
+        sendBlockchainMessageRequest: { boc: buffer.toString('base64') }
     });
 };

@@ -1,7 +1,7 @@
 import { Address, comment, internal } from '@ton/core';
 import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../entries/apis';
-import { Signer } from '../../entries/signer';
+import { CellSigner } from '../../entries/signer';
 import { WalletState, WalletVersion } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { unShiftedDecimals } from '../../utils/balance';
@@ -85,7 +85,7 @@ export const sendTonMultiTransfer = async (
     walletState: WalletState,
     transferMessages: TransferMessage[],
     feeEstimate: BigNumber,
-    signer: Signer
+    signer: CellSigner
 ) => {
     const timestamp = await getServerTime(api);
 
@@ -118,7 +118,7 @@ const createTonMultiTransfer = async (
     seqno: number,
     walletState: WalletState,
     transferMessages: TransferMessage[],
-    signer: Signer
+    signer: CellSigner
 ) => {
     const contract = walletContractFromState(walletState);
 
@@ -184,7 +184,7 @@ export const sendJettonMultiTransfer = async (
     jettonWalletAddress: string,
     transferMessages: TransferMessage[],
     feeEstimate: BigNumber,
-    signer: Signer
+    signer: CellSigner
 ) => {
     const timestamp = await getServerTime(api);
 
@@ -245,7 +245,7 @@ const createJettonMultiTransfer = async (
     jettonWalletAddress: string,
     transferMessages: TransferMessage[],
     attachValue: BigNumber,
-    signer: Signer
+    signer: CellSigner
 ) => {
     const contract = walletContractFromState(walletState);
 

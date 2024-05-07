@@ -32,6 +32,7 @@ import {
     ConfirmViewDetailsRecipient
 } from '../ConfirmView';
 import { NftDetailsBlock } from './Common';
+import { TxConfirmationCustomError } from '../../../libs/errors/TxConfirmationCustomError';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -80,6 +81,9 @@ const useSendNft = (
         if (!fee) return false;
 
         const signer = await getSigner(sdk, wallet.publicKey).catch(() => null);
+        if (signer?.type !== 'cell') {
+            throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+        }
         if (signer === null) return false;
 
         track2('send-nft');

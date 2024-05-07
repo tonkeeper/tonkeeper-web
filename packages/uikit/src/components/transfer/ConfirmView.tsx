@@ -38,6 +38,8 @@ import { BackButton } from '../fields/BackButton';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
+import { UserCancelledError } from '../../libs/errors/UserCancelledError';
+import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -149,15 +151,20 @@ export function ConfirmView<T extends Asset = Asset>({
     const handleSubmit = async () => {
         if (isLoading) return false;
         reset();
-        const isDone = await mutateAsync();
-        if (isDone) {
-            setDone(true);
-            setTimeout(() => {
-                setTimeout(() => client.invalidateQueries(), 100);
-                onClose(true);
-            }, 2000);
+        try {
+            const isDone = await mutateAsync();
+            if (isDone) {
+                setDone(true);
+                setTimeout(() => {
+                    setTimeout(() => client.invalidateQueries(), 100);
+                    onClose(true);
+                }, 2000);
+            }
+            return isDone;
+        } catch (e) {
+            console.error(e);
+            return false;
         }
-        return isDone;
     };
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
@@ -286,6 +293,20 @@ export const ConfirmViewDetailsComment: FC = () => {
     return <TransferComment comment={recipient.comment} />;
 };
 
+const ExclamationMarkCircleIconStyled = styled(ExclamationMarkCircleIcon)`
+    min-width: 32px;
+    min-height: 32px;
+`;
+
+const ErrorLabelStyled = styled(Label2)`
+    text-align: center;
+`;
+
+const ResultErrorButtonStyled = styled(ResultButton)`
+    height: unset;
+    min-height: 56px;
+`;
+
 export const ConfirmViewButtonsSlot: FC<PropsWithChildren> = ({ children }) => <>{children}</>;
 
 export const ConfirmViewButtons: FC<{
@@ -324,12 +345,16 @@ export const ConfirmViewButtons: FC<{
         );
     }
 
-    if (error) {
+    if (error && !(error instanceof UserCancelledError)) {
         return (
-            <ResultButton>
-                <ExclamationMarkCircleIcon />
-                <Label2>{t('send_publish_tx_error')}</Label2>
-            </ResultButton>
+            <ResultErrorButtonStyled>
+                <ExclamationMarkCircleIconStyled />
+                <ErrorLabelStyled>
+                    {error instanceof TxConfirmationCustomError
+                        ? error.message
+                        : t('send_publish_tx_error')}
+                </ErrorLabelStyled>
+            </ResultErrorButtonStyled>
         );
     }
 

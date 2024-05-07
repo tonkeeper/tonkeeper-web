@@ -8,7 +8,7 @@ import { seeIfBalanceError, seeIfTimeError } from '@tonkeeper/core/dist/service/
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, PropsWithChildren } from 'react';
 import styled, { css, useTheme } from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { ChevronLeftIcon } from '../Icon';
 import { NotificationCancelButton, NotificationTitleBlock } from '../Notification';
@@ -221,6 +221,8 @@ export type ConfirmMainButtonProps = (props: {
 
 export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled, onClick }) => {
     const { t } = useTranslation();
+    const { auth } = useWalletContext();
+    const isLedger = auth?.kind === 'ledger';
     return (
         <Button
             fullWidth
@@ -231,7 +233,7 @@ export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisable
             loading={isLoading}
             onClick={onClick}
         >
-            {t('confirm_sending_submit')}
+            {t(isLedger ? 'ledger_continue_with_ledger' : 'confirm_sending_submit')}
         </Button>
     );
 };
@@ -251,13 +253,15 @@ export const ConfirmAndCancelMainButton: ConfirmMainButtonProps = ({
     onClose
 }) => {
     const { t } = useTranslation();
+    const { auth } = useWalletContext();
+    const isLedger = auth?.kind === 'ledger';
     return (
         <ConfirmViewButtonsContainerStyled>
             <Button size="large" secondary onClick={onClose}>
                 {t('cancel')}
             </Button>
             <Button size="large" primary type="submit" disabled={isDisabled} loading={isLoading}>
-                {t('confirm')}
+                {t(isLedger ? 'ledger_continue_with_ledger' : 'confirm')}
             </Button>
         </ConfirmViewButtonsContainerStyled>
     );

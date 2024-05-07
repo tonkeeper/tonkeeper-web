@@ -12,8 +12,6 @@ import {
 } from '@tonkeeper/core/dist/entries/send';
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
-import { sendTronTransfer } from '@tonkeeper/core/dist/service/tron/tronTransferService';
-import { EstimatePayload } from '@tonkeeper/core/dist/tronApi';
 import { notifyError } from '../../components/transfer/common';
 import { getSigner } from '../../state/mnemonic';
 import { useWalletJettonList } from '../../state/wallet';

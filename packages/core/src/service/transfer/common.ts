@@ -8,7 +8,7 @@ import {
     storeMessage,
     toNano
 } from '@ton/core';
-import { mnemonicToPrivateKey, sign } from '@ton/crypto';
+import { sign } from '@ton/crypto';
 import { WalletContractV3R1 } from '@ton/ton/dist/wallets/WalletContractV3R1';
 import { WalletContractV3R2 } from '@ton/ton/dist/wallets/WalletContractV3R2';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
@@ -16,8 +16,8 @@ import { WalletContractV5 } from '@ton/ton/dist/wallets/WalletContractV5';
 import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
-import { TransferEstimationEvent } from '../../entries/send';
-import { Signer } from '../../entries/signer';
+import { TonRecipient, TransferEstimationEvent } from '../../entries/send';
+import { CellSigner } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
@@ -103,8 +103,8 @@ export const createTransferMessage = async (
     wallet: {
         seqno: number;
         state: WalletState;
-        signer: Signer;
-        timestamp: number;
+        signer: CellSigner;
+      timestamp: number;
     },
     transaction: {
         to: string;
@@ -137,13 +137,7 @@ export const createTransferMessage = async (
 export const signEstimateMessage = async (message: Cell): Promise<Buffer> => {
     return sign(message.hash(), Buffer.alloc(64));
 };
-
-export const signByMnemonicOver = async (mnemonic: string[]) => {
-    return async (message: Cell): Promise<Buffer> => {
-        const keyPair = await mnemonicToPrivateKey(mnemonic);
-        return sign(message.hash(), keyPair.secretKey);
-    };
-};
+signEstimateMessage.type = 'cell' as const;
 
 export async function getKeyPairAndSeqno(options: {
     api: APIConfig;
@@ -169,4 +163,36 @@ export const getTonkeeperQueryId = () => {
         .storeBuffer(Buffer.from(nacl.randomBytes(4))) //random 32 bits
         .asSlice()
         .loadIntBig(64);
+};
+
+export type AccountsMap = Map<string, Account>;
+
+/*
+ * Raw address is bounceable by default,
+ * Please make a note that in the TonWeb Raw address is non bounceable by default
+ */
+export const seeIfAddressBounceable = (address: string) => {
+    return Address.isFriendly(address) ? Address.parseFriendly(address).isBounceable : true;
+};
+
+/*
+ * Allow to send non bounceable only if address is non bounceable and target contract is non active
+ */
+export const seeIfBounceable = (accounts: AccountsMap, address: string) => {
+    const bounceableAddress = seeIfAddressBounceable(address);
+    const toAccount = accounts.get(address);
+    const activeContract = toAccount && toAccount.status === 'active';
+
+    return bounceableAddress || activeContract;
+};
+
+export const seeIfTransferBounceable = (account: Account, recipient: TonRecipient) => {
+    if ('dns' in recipient) {
+        return false;
+    }
+    if (!seeIfAddressBounceable(recipient.address)) {
+        return false;
+    }
+
+    return account.status === 'active';
 };

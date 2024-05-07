@@ -6,6 +6,7 @@ import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
 import { WalletState } from './entries/wallet';
 import { TonTransferParams } from './service/deeplinkingService';
 import { IStorage, MemoryStorage } from './Storage';
+import { LedgerTransaction } from './service/ledger/connector';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -37,6 +38,7 @@ export interface UIEvents {
     navigate: void;
     getPassword: GetPasswordParams;
     signer: string;
+    ledger: { path: number[]; transaction: LedgerTransaction };
     loading: void;
     transfer: TransferInitParams;
     receive: ReceiveInitParams;

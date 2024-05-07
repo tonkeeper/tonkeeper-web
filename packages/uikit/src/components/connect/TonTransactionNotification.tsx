@@ -27,6 +27,7 @@ import { Body2, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
+import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -54,6 +55,7 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
     const sdk = useAppSdk();
     const { api } = useAppContext();
     const client = useQueryClient();
+    const { t } = useTranslation();
 
     return useMutation<string, Error>(async () => {
         const accounts = estimate?.accounts;
@@ -61,6 +63,9 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
             throw new Error('Missing accounts data');
         }
         const signer = await getSigner(sdk, wallet.publicKey);
+        if (signer.type !== 'cell') {
+            throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+        }
         const value = await sendTonConnectTransfer(api, wallet, accounts, params, signer);
         client.invalidateQueries({
             predicate: query => query.queryKey.includes(wallet.active.rawAddress)

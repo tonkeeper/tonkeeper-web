@@ -76,6 +76,7 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
+import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -454,6 +455,7 @@ const BackgroundElements = () => {
             <EditFavoriteNotification />
             <DeepLinkSubscription />
             <PairSignerNotification />
+            <ConnectLedgerNotification />
         </>
     );
 };

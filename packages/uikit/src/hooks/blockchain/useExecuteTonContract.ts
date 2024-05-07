@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
-import { Signer } from '@tonkeeper/core/dist/entries/signer';
+import { CellSigner } from '@tonkeeper/core/dist/entries/signer';
 import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { Omit } from 'react-beautiful-dnd';
@@ -10,11 +10,12 @@ import { AmplitudeTransactionType, useTransactionAnalytics } from '../amplitude'
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
+import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 
 export type ContractExecutorParams = {
     api: APIConfig;
     walletState: WalletState;
-    signer: Signer;
+    signer: CellSigner;
     fee: TransferEstimationEvent;
 };
 
@@ -41,6 +42,10 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
         }
 
         const signer = await getSigner(sdk, walletState.publicKey).catch(() => null);
+        if (signer?.type !== 'cell') {
+            throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+        }
+
         if (signer === null) return false;
 
         track2(eventName2);

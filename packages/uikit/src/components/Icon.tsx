@@ -504,7 +504,7 @@ export const CheckmarkCircleIcon = () => {
     );
 };
 
-export const ExclamationMarkCircleIcon = () => {
+export const ExclamationMarkCircleIcon: FC<{ className?: string }> = ({ className }) => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -512,6 +512,7 @@ export const ExclamationMarkCircleIcon = () => {
             height="32"
             viewBox="0 0 32 32"
             fill="none"
+            className={className}
         >
             <path
                 fillRule="evenodd"
@@ -1529,4 +1530,30 @@ export const ErrorIcon = () => {
             />
         </svg>
     );
+};
+
+export const DotIcon: FC<{ className?: string; color?: string }> = ({ color, className }) => {
+    const theme = useTheme();
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            color={theme[color || 'iconSecondary']}
+            className={className}
+        >
+            <circle cx="8" cy="8" r="3" fill="currentColor" />
+        </svg>
+    );
+};
+
+export const ResponsiveSpinner: FC<{ className?: string }> = ({ className }) => {
+    const { displayType } = useTheme();
+
+    if (displayType === 'full-width') {
+        return <SpinnerRing className={className} />;
+    }
+
+    return <SpinnerIcon className={className} />;
 };

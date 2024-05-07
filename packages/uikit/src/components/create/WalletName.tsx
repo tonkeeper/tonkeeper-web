@@ -26,12 +26,12 @@ const Body = styled(Body2)`
     color: ${props => props.theme.textSecondary};
 `;
 
-const useUpdateNameMutation = (account: AccountState) => {
+const useUpdateNameMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
 
-    return useMutation<AccountState, Error, { name: string; emoji: string }>(
-        async ({ name, emoji }) => {
+    return useMutation<AccountState, Error, { name: string; emoji: string; account: AccountState }>(
+        async ({ name, emoji, account }) => {
             if (name.length < 3) {
                 throw new Error('Missing name');
             }
@@ -51,16 +51,22 @@ const useUpdateNameMutation = (account: AccountState) => {
     );
 };
 
-export const UpdateWalletName: FC<{
-    account: AccountState;
-    onUpdate: (account: AccountState) => void;
-    walletEmoji: string;
-}> = ({ account, onUpdate, walletEmoji }) => {
+export const UpdateWalletName: FC<
+    | {
+          account: AccountState;
+          onUpdate: (account: AccountState) => void;
+          walletEmoji: string;
+      }
+    | {
+          walletEmoji: string;
+          submitHandler: ({ name, emoji }: { name: string; emoji: string }) => void;
+      }
+> = props => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLInputElement | null>(null);
 
-    const { mutateAsync, isError, isLoading, reset } = useUpdateNameMutation(account);
+    const { mutateAsync, isError, isLoading, reset } = useUpdateNameMutation();
 
     useEffect(() => {
         if (ref.current) {
@@ -69,11 +75,15 @@ export const UpdateWalletName: FC<{
     }, [ref.current]);
 
     const [name, setName] = useState('');
-    const [emoji, setEmoji] = useState(walletEmoji);
+    const [emoji, setEmoji] = useState(props.walletEmoji);
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
-        onUpdate(await mutateAsync({ name, emoji }));
+        if ('submitHandler' in props) {
+            props.submitHandler({ name, emoji });
+        } else {
+            props.onUpdate(await mutateAsync({ name, emoji, account: props.account }));
+        }
     };
 
     const onChange = (value: string) => {
