@@ -43,6 +43,19 @@ export interface TonConnectMessage {
     king: 'reconnect';
 }
 
+export interface GetPreferredSystemLanguagesMessage {
+    king: 'get-preferred-system-languages';
+}
+
+export interface CanPromptTouchIdMessage {
+    king: 'can-prompt-touch-id';
+}
+
+export interface PromptTouchIdMessage {
+    king: 'prompt-touch-id';
+    reason: string;
+}
+
 export type Message =
     | GetStorageMessage
     | SetStorageMessage
@@ -52,4 +65,7 @@ export type Message =
     | OpenPageMessage
     | SetKeychainMessage
     | GetKeychainMessage
-    | TonConnectMessage;
+    | TonConnectMessage
+    | CanPromptTouchIdMessage
+    | PromptTouchIdMessage
+    | GetPreferredSystemLanguagesMessage;

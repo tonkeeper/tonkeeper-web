@@ -62,7 +62,7 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
         if (!accounts) {
             throw new Error('Missing accounts data');
         }
-        const signer = await getSigner(sdk, wallet.publicKey);
+        const signer = await getSigner(sdk, wallet.publicKey, t);
         if (signer.type !== 'cell') {
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }

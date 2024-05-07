@@ -32,6 +32,7 @@ const useToggleSubscribe = () => {
     const sdk = useAppSdk();
     const wallet = useWalletContext();
     const client = useQueryClient();
+    const { t } = useTranslation();
 
     return useMutation<void, Error, boolean>(async checked => {
         const { notifications } = sdk;
@@ -39,7 +40,7 @@ const useToggleSubscribe = () => {
             throw new Error('Missing notifications');
         }
         if (checked) {
-            const mnemonic = await getMnemonic(sdk, wallet.publicKey);
+            const mnemonic = await getMnemonic(sdk, wallet.publicKey, t);
             try {
                 await notifications.subscribe(wallet, mnemonic);
             } catch (e) {

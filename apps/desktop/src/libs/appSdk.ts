@@ -8,7 +8,19 @@ export class KeychainDesktop implements KeychainPassword {
     setPassword = async (publicKey: string, mnemonic: string) => {
         return sendBackground<void>({ king: 'set-keychain', publicKey, mnemonic });
     };
-    getPassword = async (publicKey: string) => {
+    getPassword = async (publicKey: string, touchIdReason: (lang: string) => string) => {
+        const touchIdSupported = await sendBackground<boolean>({ king: 'can-prompt-touch-id' });
+        if (touchIdSupported) {
+            const lagns = await sendBackground<string[]>({
+                king: 'get-preferred-system-languages'
+            });
+
+            const lang = (lagns[0] || 'en').split('-')[0];
+            await sendBackground<void>({
+                king: 'prompt-touch-id',
+                reason: touchIdReason(lang)
+            });
+        }
         return sendBackground<string>({ king: 'get-keychain', publicKey });
     };
 }

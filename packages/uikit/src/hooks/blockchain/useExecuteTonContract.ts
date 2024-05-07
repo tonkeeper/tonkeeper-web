@@ -41,7 +41,7 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
             return false;
         }
 
-        const signer = await getSigner(sdk, walletState.publicKey).catch(() => null);
+        const signer = await getSigner(sdk, walletState.publicKey, t).catch(() => null);
         if (signer?.type !== 'cell') {
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }

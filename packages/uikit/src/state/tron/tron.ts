@@ -11,6 +11,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { QueryKey } from '../../libs/queryKey';
 import { getMnemonic } from '../mnemonic';
 import { DefaultRefetchInterval } from '../tonendpoint';
+import { useTranslation } from '../../hooks/translation';
 
 enum TronKeys {
     state,
@@ -24,6 +25,7 @@ export const useTronWalletState = (enabled = true) => {
     } = useAppContext();
     const wallet = useWalletContext();
     const client = useQueryClient();
+    const { t } = useTranslation();
     return useQuery<TronWalletState, Error>(
         [wallet.publicKey, QueryKey.tron, wallet.network, TronKeys.state],
         async () => {
@@ -31,7 +33,7 @@ export const useTronWalletState = (enabled = true) => {
                 return getTronWalletState(wallet.tron, wallet.network);
             }
 
-            const mnemonic = await getMnemonic(sdk, wallet.publicKey);
+            const mnemonic = await getMnemonic(sdk, wallet.publicKey, t);
             const tron = await importTronWallet(sdk.storage, tronApi, wallet, mnemonic);
 
             const result = getTronWalletState(tron, wallet.network);

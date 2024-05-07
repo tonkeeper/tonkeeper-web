@@ -28,11 +28,12 @@ const useMnemonic = (publicKey: string, auth: AuthState) => {
     const [mnemonic, setMnemonic] = useState<string[] | undefined>(undefined);
     const sdk = useAppSdk();
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     useEffect(() => {
         (async () => {
             try {
-                setMnemonic(await getMnemonic(sdk, publicKey));
+                setMnemonic(await getMnemonic(sdk, publicKey, t));
             } catch (e) {
                 navigate(-1);
             }

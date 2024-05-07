@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InnerBody } from '../../components/Body';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
@@ -12,6 +12,8 @@ import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useLookScreen, useMutateLookScreen } from '../../state/password';
+import { useAppSdk } from '../../hooks/appSdk';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 
 const LockSwitch = () => {
     const { t } = useTranslation();

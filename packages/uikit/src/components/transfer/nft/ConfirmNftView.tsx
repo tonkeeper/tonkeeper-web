@@ -80,7 +80,7 @@ const useSendNft = (
     return useMutation<boolean, Error>(async () => {
         if (!fee) return false;
 
-        const signer = await getSigner(sdk, wallet.publicKey).catch(() => null);
+        const signer = await getSigner(sdk, wallet.publicKey, t).catch(() => null);
         if (signer?.type !== 'cell') {
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }

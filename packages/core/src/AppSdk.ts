@@ -59,7 +59,7 @@ export interface NativeBackButton {
 
 export interface KeychainPassword {
     setPassword: (publicKey: string, mnemonic: string) => Promise<void>;
-    getPassword: (publicKey: string) => Promise<string>;
+    getPassword: (publicKey: string, touchIdReason: (lang: string) => string) => Promise<string>;
 }
 
 export interface NotificationService {

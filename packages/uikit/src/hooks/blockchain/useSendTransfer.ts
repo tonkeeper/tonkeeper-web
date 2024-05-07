@@ -35,7 +35,7 @@ export function useSendTransfer<T extends Asset>(
     const { data: jettons } = useWalletJettonList();
 
     return useMutation<boolean, Error>(async () => {
-        const signer = await getSigner(sdk, wallet.publicKey).catch(() => null);
+        const signer = await getSigner(sdk, wallet.publicKey, t).catch(() => null);
         if (signer === null) return false;
         try {
             if (isTonAsset(amount.asset)) {

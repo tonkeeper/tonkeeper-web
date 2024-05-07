@@ -51,7 +51,7 @@ export function useSendMultiTransfer() {
         Error,
         { form: MultiSendFormTokenized; asset: TonAsset; feeEstimation: BigNumber }
     >(async ({ form, asset, feeEstimation }) => {
-        const signer = await getSigner(sdk, wallet.publicKey).catch(() => null);
+        const signer = await getSigner(sdk, wallet.publicKey, t).catch(() => null);
         if (signer === null) return false;
         try {
             if (signer.type !== 'cell') {
