@@ -1,9 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { GetPasswordParams, IAppSdk, KeyboardParams } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { MinPasswordLength, getAccountState } from '@tonkeeper/core/dist/service/accountService';
+import {
+    MinPasswordLength,
+    getWalletWithGlobalAuth
+} from '@tonkeeper/core/dist/service/accountService';
 import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
-import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -30,15 +32,7 @@ const Block = styled.form<{ padding: number }>`
 
 export const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
     return useMutation<void, Error, string>(async password => {
-        const account = await getAccountState(sdk.storage);
-        if (account.publicKeys.length === 0) {
-            throw new Error('Missing wallets');
-        }
-        const [publicKey] = account.publicKeys;
-        const wallet = await getWalletState(sdk.storage, publicKey);
-        if (!wallet) {
-            throw new Error('Missing wallet');
-        }
+        const publicKey = await getWalletWithGlobalAuth(sdk.storage);
 
         const isValid = await validateWalletMnemonic(sdk.storage, publicKey, password);
         if (!isValid) {

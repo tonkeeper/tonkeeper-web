@@ -28,10 +28,6 @@ export const getWalletStateOrDie = async (storage: IStorage, publicKey: string) 
         throw new Error(`Missing wallet state: ${publicKey}`);
     }
     return state;
-}
-
-export const getWalletStateByAddress = async (storage: IStorage, rawAddress: string) => {
-    return null;
 };
 
 export const setWalletState = (storage: IStorage, state: WalletState) => {

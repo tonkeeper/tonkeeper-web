@@ -5,6 +5,7 @@ import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { encrypt } from './cryptoService';
 import { getWalletMnemonic, validateWalletMnemonic } from './mnemonicService';
+import { getWalletStateOrDie } from './wallet/storeService';
 
 export const getAccountState = async (storage: IStorage) => {
     const state = await storage.get<AccountState>(AppKey.ACCOUNT);
@@ -168,4 +169,20 @@ export const accountValidatePassword = (password: string, confirm: string) => {
         return 'invalid-confirm';
     }
     return undefined;
+};
+
+export const getWalletWithGlobalAuth = async (storage: IStorage) => {
+    const account = await getAccountState(storage);
+    if (account.publicKeys.length === 0) {
+        throw new Error('Missing wallets');
+    }
+
+    for (const key of account.publicKeys) {
+        const wallet = await getWalletStateOrDie(storage, key);
+        if (wallet.auth === undefined) {
+            return key;
+        }
+    }
+
+    throw new Error('Missing wallet with global auth.');
 };

@@ -49,12 +49,13 @@ export const useProState = () => {
 export const useSelectWalletMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const { t } = useTranslation();
     return useMutation<void, Error, string>(async publicKey => {
         const state = await getWalletState(sdk.storage, publicKey);
         if (!state) {
             throw new Error('Missing wallet state');
         }
-        await authViaTonConnect(state, signTonConnectOver(sdk, publicKey));
+        await authViaTonConnect(state, signTonConnectOver(sdk, publicKey, t));
 
         await client.invalidateQueries([QueryKey.pro]);
     });
