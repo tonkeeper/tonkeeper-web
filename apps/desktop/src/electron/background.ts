@@ -31,7 +31,12 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
         case 'reconnect':
             return await TonConnectSSE.getInstance().reconnect();
         case 'can-prompt-touch-id':
-            return !!systemPreferences?.canPromptTouchID?.();
+            try {
+                return !!systemPreferences?.canPromptTouchID?.();
+            } catch (e) {
+                console.error(e);
+                return false;
+            }
         case 'prompt-touch-id':
             return systemPreferences.promptTouchID(message.reason);
         case 'get-preferred-system-languages':
