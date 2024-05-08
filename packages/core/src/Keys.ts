@@ -10,6 +10,7 @@ export enum AppKey {
 
     GLOBAL_AUTH_STATE = 'password',
     LOCK = 'lock',
+    TOUCH_ID = 'touch_id',
     COUNTRY = 'country',
 
     FAVOURITES = 'favourites',

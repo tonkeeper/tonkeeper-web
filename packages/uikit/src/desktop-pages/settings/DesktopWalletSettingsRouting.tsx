@@ -30,7 +30,6 @@ export const DesktopWalletSettingsRouting = () => {
                 </Route>
                 <Route path={SettingsRoute.version} element={<WalletVersion />} />
                 <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
-                <Route path={SettingsRoute.security} element={<SecuritySettings />} />
             </Route>
             <Route path="*" element={<DesktopWalletSettingsPage />} />
         </Routes>

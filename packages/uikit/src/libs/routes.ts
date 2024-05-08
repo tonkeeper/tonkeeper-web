@@ -50,8 +50,7 @@ export enum WalletSettingsRoute {
     index = '/',
     recovery = '/recovery',
     version = '/version',
-    jettons = '/jettons',
-    security = '/security'
+    jettons = '/jettons'
 }
 
 export enum BrowserRoute {

@@ -17,6 +17,7 @@ import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
+import { useCheckTouchId } from '../../state/password';
 
 export type MultiSendFormTokenized = {
     rows: {
@@ -45,13 +46,14 @@ export function useSendMultiTransfer() {
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
     const { data: jettons } = useWalletJettonList();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<
         boolean,
         Error,
         { form: MultiSendFormTokenized; asset: TonAsset; feeEstimation: BigNumber }
     >(async ({ form, asset, feeEstimation }) => {
-        const signer = await getSigner(sdk, wallet.publicKey).catch(() => null);
+        const signer = await getSigner(sdk, wallet.publicKey, checkTouchId).catch(() => null);
         if (signer === null) return false;
         try {
             if (signer.type !== 'cell') {

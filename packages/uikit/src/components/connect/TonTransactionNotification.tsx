@@ -28,6 +28,7 @@ import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
+import { useCheckTouchId } from '../../state/password';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -56,13 +57,14 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
     const { api } = useAppContext();
     const client = useQueryClient();
     const { t } = useTranslation();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<string, Error>(async () => {
         const accounts = estimate?.accounts;
         if (!accounts) {
             throw new Error('Missing accounts data');
         }
-        const signer = await getSigner(sdk, wallet.publicKey);
+        const signer = await getSigner(sdk, wallet.publicKey, checkTouchId);
         if (signer.type !== 'cell') {
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }
@@ -161,10 +163,14 @@ const ConnectContent: FC<{
     }, []);
 
     const onSubmit = async () => {
-        const result = await mutateAsync();
-        setDone(true);
-        sdk.hapticNotification('success');
-        setTimeout(() => handleClose(result), 300);
+        try {
+            const result = await mutateAsync();
+            setDone(true);
+            sdk.hapticNotification('success');
+            setTimeout(() => handleClose(result), 300);
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     if (issues?.kind !== undefined) {

@@ -62,6 +62,11 @@ export interface KeychainPassword {
     getPassword: (publicKey: string) => Promise<string>;
 }
 
+export interface TouchId {
+    canPrompt: () => Promise<boolean>;
+    prompt: (reason: (lang: string) => string) => Promise<void>;
+}
+
 export interface NotificationService {
     subscribe: (wallet: WalletState, mnemonic: string[]) => Promise<void>;
     unsubscribe: (address?: string) => Promise<void>;
@@ -76,6 +81,7 @@ export interface IAppSdk {
     storage: IStorage;
     nativeBackButton?: NativeBackButton;
     keychain?: KeychainPassword;
+    touchId?: TouchId;
 
     topMessage: (text: string) => void;
     copyToClipboard: (value: string, notification?: string) => void;

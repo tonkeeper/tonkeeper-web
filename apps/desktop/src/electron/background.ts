@@ -1,4 +1,4 @@
-import { shell } from 'electron';
+import { shell, systemPreferences, app } from 'electron';
 import keytar from 'keytar';
 import { Message } from '../libs/message';
 import { TonConnectSSE } from './sseEvetns';
@@ -30,6 +30,17 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
             return await keytar.getPassword(service, `Wallet-${message.publicKey}`);
         case 'reconnect':
             return await TonConnectSSE.getInstance().reconnect();
+        case 'can-prompt-touch-id':
+            try {
+                return !!systemPreferences?.canPromptTouchID?.();
+            } catch (e) {
+                console.error(e);
+                return false;
+            }
+        case 'prompt-touch-id':
+            return systemPreferences.promptTouchID(message.reason);
+        case 'get-preferred-system-languages':
+            return app.getPreferredSystemLanguages();
         default:
             throw new Error(`Unknown message: ${JSON.stringify(message)}`);
     }

@@ -54,7 +54,7 @@ import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/imp
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
-import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
+import { useAuthState, useCanPromptTouchId } from "@tonkeeper/uikit/dist/state/password";
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useStonfiAssets } from '@tonkeeper/uikit/dist/state/stonfi';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
@@ -337,6 +337,7 @@ export const Loader: FC = () => {
 const usePrefetch = () => {
     useRecommendations();
     useStonfiAssets();
+    useCanPromptTouchId();
 };
 
 export const Content: FC<{

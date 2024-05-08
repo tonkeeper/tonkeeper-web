@@ -17,7 +17,8 @@ import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomEr
 export const signTonConnectOver = (
     sdk: IAppSdk,
     publicKey: string,
-    t: (text: string) => string
+    t: (text: string) => string,
+    checkTouchId: () => Promise<void>
 ) => {
     return async (bufferToSign: Buffer) => {
         const auth = await getWalletAuthState(sdk.storage, publicKey);
@@ -36,7 +37,7 @@ export const signTonConnectOver = (
                 throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
             }
             default: {
-                const mnemonic = await getMnemonic(sdk, publicKey);
+                const mnemonic = await getMnemonic(sdk, publicKey, checkTouchId);
                 const keyPair = await mnemonicToPrivateKey(mnemonic);
                 const signature = nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
@@ -48,58 +49,71 @@ export const signTonConnectOver = (
     };
 };
 
-export const getSigner = async (sdk: IAppSdk, publicKey: string): Promise<Signer> => {
-    const auth = await getWalletAuthState(sdk.storage, publicKey);
+export const getSigner = async (
+    sdk: IAppSdk,
+    publicKey: string,
+    checkTouchId: () => Promise<void>
+): Promise<Signer> => {
+    try {
+        const auth = await getWalletAuthState(sdk.storage, publicKey);
 
-    switch (auth.kind) {
-        case 'signer': {
-            const callback = async (message: Cell) => {
-                const result = await pairSignerByNotification(
-                    sdk,
-                    message.toBoc({ idx: false }).toString('base64')
-                );
-                return parseSignerSignature(result);
-            };
-            callback.type = 'cell' as const;
-            return callback;
-        }
-        case 'ledger': {
-            const callback = async (path: number[], transaction: LedgerTransaction) =>
-                pairLedgerByNotification(sdk, path, transaction);
-            callback.type = 'ledger' as const;
-            return callback;
-        }
-        case 'signer-deeplink': {
-            const callback = async (message: Cell) => {
-                const deeplink = await storeTransactionAndCreateDeepLink(
-                    sdk,
-                    publicKey,
-                    message.toBoc({ idx: false }).toString('base64')
-                );
+        switch (auth.kind) {
+            case 'signer': {
+                const callback = async (message: Cell) => {
+                    const result = await pairSignerByNotification(
+                        sdk,
+                        message.toBoc({ idx: false }).toString('base64')
+                    );
+                    return parseSignerSignature(result);
+                };
+                callback.type = 'cell' as const;
+                return callback;
+            }
+            case 'ledger': {
+                const callback = async (path: number[], transaction: LedgerTransaction) =>
+                    pairLedgerByNotification(sdk, path, transaction);
+                callback.type = 'ledger' as const;
+                return callback;
+            }
+            case 'signer-deeplink': {
+                const callback = async (message: Cell) => {
+                    const deeplink = await storeTransactionAndCreateDeepLink(
+                        sdk,
+                        publicKey,
+                        message.toBoc({ idx: false }).toString('base64')
+                    );
 
-                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                window.location = deeplink as any;
+                    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                    window.location = deeplink as any;
 
-                await delay(2000);
+                    await delay(2000);
 
-                throw new Error('Navigate to deeplink');
-            };
-            callback.type = 'cell' as const;
-            return callback as CellSigner;
+                    throw new Error('Navigate to deeplink');
+                };
+                callback.type = 'cell' as const;
+                return callback as CellSigner;
+            }
+            default: {
+                const mnemonic = await getMnemonic(sdk, publicKey, checkTouchId);
+                const callback = async (message: Cell) => {
+                    const keyPair = await mnemonicToPrivateKey(mnemonic);
+                    return sign(message.hash(), keyPair.secretKey);
+                };
+                callback.type = 'cell' as const;
+                return callback;
+            }
         }
-        default: {
-            const mnemonic = await getMnemonic(sdk, publicKey);
-            const callback = async (message: Cell) => {
-                const keyPair = await mnemonicToPrivateKey(mnemonic);
-                return sign(message.hash(), keyPair.secretKey);
-            };
-            callback.type = 'cell' as const;
-            return callback;
-        }
+    } catch (e) {
+        console.error(e);
+        throw e;
     }
 };
 
-export const getMnemonic = async (sdk: IAppSdk, publicKey: string): Promise<string[]> => {
+export const getMnemonic = async (
+    sdk: IAppSdk,
+    publicKey: string,
+    checkTouchId: () => Promise<void>
+): Promise<string[]> => {
     const auth = await getWalletAuthState(sdk.storage, publicKey);
 
     switch (auth.kind) {
@@ -114,6 +128,7 @@ export const getMnemonic = async (sdk: IAppSdk, publicKey: string): Promise<stri
             if (!sdk.keychain) {
                 throw Error('Keychain is undefined');
             }
+            await checkTouchId();
             const mnemonic = await sdk.keychain.getPassword(publicKey);
             return mnemonic.split(' ');
         }

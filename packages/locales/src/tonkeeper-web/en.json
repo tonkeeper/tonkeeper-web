@@ -127,6 +127,7 @@
   "ton_login_title_web" : "Connect to {name}?",
   "Ton_page_description" : "TON is a fully decentralized layer-1 blockchain designed by Telegram to onboard billions of users. It boasts ultra-fast transactions, tiny fees, easy-to-use apps, and is environmentally friendly.",
   "total_balance" : "Total balance",
+  "touch_id_unlock_wallet" : "unlock your wallet",
   "transaction_call_date" : "Contract Call %{date}",
   "transaction_type_mint" : "Mint",
   "transaction_type_purchase" : "Purchase",

@@ -9,6 +9,7 @@ import {
     EnvelopeIcon,
     ExitIcon,
     GlobeIcon,
+    LockIcon,
     PlaceIcon,
     SlidersIcon,
     TelegramIcon,
@@ -98,6 +99,14 @@ export const PreferencesAsideMenu = () => {
                         <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
                             <SlidersIcon />
                             <Label2>{t('Manage_wallets')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+                <NavLink to={AppRoute.settings + SettingsRoute.security}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
+                            <LockIcon />
+                            <Label2>{t('settings_security')}</Label2>
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>

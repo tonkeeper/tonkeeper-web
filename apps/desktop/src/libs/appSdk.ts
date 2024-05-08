@@ -1,4 +1,4 @@
-import { BaseApp, IAppSdk, KeychainPassword } from '@tonkeeper/core/dist/AppSdk';
+import { BaseApp, IAppSdk, KeychainPassword, TouchId } from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { sendBackground } from './backgroudService';
@@ -10,6 +10,24 @@ export class KeychainDesktop implements KeychainPassword {
     };
     getPassword = async (publicKey: string) => {
         return sendBackground<string>({ king: 'get-keychain', publicKey });
+    };
+}
+
+export class TouchIdDesktop implements TouchId {
+    canPrompt = async () => {
+        return sendBackground<boolean>({ king: 'can-prompt-touch-id' });
+    };
+
+    prompt = async (reason: (lang: string) => string) => {
+        const lagns = await sendBackground<string[]>({
+            king: 'get-preferred-system-languages'
+        });
+
+        const lang = (lagns[0] || 'en').split('-')[0];
+        await sendBackground<void>({
+            king: 'prompt-touch-id',
+            reason: reason(lang)
+        });
     };
 }
 
@@ -29,6 +47,8 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
     openPage = async (url: string) => {
         return sendBackground<void>({ king: 'open-page', url });
     };
+
+    touchId = new TouchIdDesktop();
 
     version = packageJson.version ?? 'Unknown';
 }

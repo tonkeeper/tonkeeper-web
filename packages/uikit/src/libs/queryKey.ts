@@ -3,6 +3,8 @@ export enum QueryKey {
     wallet = 'wallet',
     wallets = 'wallets',
     lock = 'lock',
+    touchId = 'touchId',
+    canPromptTouchId = 'canPromptTouchId',
     country = 'country',
     password = 'password',
     addresses = 'addresses',

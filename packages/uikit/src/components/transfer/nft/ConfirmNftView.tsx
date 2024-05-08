@@ -33,6 +33,7 @@ import {
 } from '../ConfirmView';
 import { NftDetailsBlock } from './Common';
 import { TxConfirmationCustomError } from '../../../libs/errors/TxConfirmationCustomError';
+import { useCheckTouchId } from '../../../state/password';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -76,11 +77,12 @@ const useSendNft = (
     const wallet = useWalletContext();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<boolean, Error>(async () => {
         if (!fee) return false;
 
-        const signer = await getSigner(sdk, wallet.publicKey).catch(() => null);
+        const signer = await getSigner(sdk, wallet.publicKey, checkTouchId).catch(() => null);
         if (signer?.type !== 'cell') {
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }

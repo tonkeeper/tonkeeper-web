@@ -11,7 +11,13 @@ import { SettingsItem, SettingsList } from '../../components/settings/SettingsLi
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useLookScreen, useMutateLookScreen } from '../../state/password';
+import {
+    useCanPromptTouchId,
+    useLookScreen,
+    useMutateLookScreen,
+    useMutateTouchId,
+    useTouchIdEnabled
+} from '../../state/password';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
@@ -35,6 +41,31 @@ const LockSwitch = () => {
     } else {
         return <></>;
     }
+};
+
+const TouchIdSwitch = () => {
+    const { t } = useTranslation();
+    const { data: canPrompt } = useCanPromptTouchId();
+
+    const { data: touchIdEnabled } = useTouchIdEnabled();
+    const { mutate } = useMutateTouchId();
+
+    console.log(touchIdEnabled);
+
+    if (!canPrompt) {
+        return null;
+    }
+
+    return (
+        <ListBlock>
+            <ListItem hover={false}>
+                <ListItemPayload>
+                    <Label1>{t('biometry_ios_fingerprint')}</Label1>
+                    <Switch checked={!!touchIdEnabled} onChange={mutate} />
+                </ListItemPayload>
+            </ListItem>
+        </ListBlock>
+    );
 };
 
 const ChangePassword = () => {
@@ -90,6 +121,7 @@ export const SecuritySettings = () => {
             <SubHeader title={t('settings_security')} />
             <InnerBody>
                 <LockSwitch />
+                <TouchIdSwitch />
                 <ChangePassword />
                 <ShowPhrases />
             </InnerBody>
