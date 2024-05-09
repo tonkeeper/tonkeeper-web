@@ -50,6 +50,7 @@ export const useProState = () => {
 export const useSelectWalletMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const { api } = useAppContext();
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
@@ -58,7 +59,8 @@ export const useSelectWalletMutation = () => {
         if (!state) {
             throw new Error('Missing wallet state');
         }
-        await authViaTonConnect(state, signTonConnectOver(sdk, publicKey, t, checkTouchId));
+
+        await authViaTonConnect(api, state, signTonConnectOver(sdk, publicKey, t, checkTouchId));
 
         await client.invalidateQueries([QueryKey.pro]);
     });

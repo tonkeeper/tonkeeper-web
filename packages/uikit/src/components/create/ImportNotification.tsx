@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import styled from 'styled-components';
+import { useAppContext } from '../../hooks/appContext';
 import { useOnImportAction } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, ImportRoute } from '../../libs/routes';
@@ -48,6 +49,7 @@ export const ImportNotification: FC<{
 }> = ({ isOpen, setOpen }) => {
     const { t } = useTranslation();
     const onImport = useOnImportAction();
+    const { hideSigner } = useAppContext();
 
     return (
         <Notification isOpen={isOpen} handleClose={() => setOpen(false)}>
@@ -91,23 +93,25 @@ export const ImportNotification: FC<{
                             <RightIcon />
                         </ButtonIcon>
                     </ButtonBlock>
-                    <ButtonBlock
-                        onClick={() => {
-                            onClose(() => onImport(AppRoute.import + ImportRoute.signer));
-                        }}
-                    >
-                        <ButtonIcon>
-                            <SignerIcon />
-                        </ButtonIcon>
-                        <ColumnText
-                            noWrap
-                            text={t('import_signer')}
-                            secondary={t('import_signer_description')}
-                        />
-                        <ButtonIcon>
-                            <RightIcon />
-                        </ButtonIcon>
-                    </ButtonBlock>
+                    {hideSigner === true ? null : (
+                        <ButtonBlock
+                            onClick={() => {
+                                onClose(() => onImport(AppRoute.import + ImportRoute.signer));
+                            }}
+                        >
+                            <ButtonIcon>
+                                <SignerIcon />
+                            </ButtonIcon>
+                            <ColumnText
+                                noWrap
+                                text={t('import_signer')}
+                                secondary={t('import_signer_description')}
+                            />
+                            <ButtonIcon>
+                                <RightIcon />
+                            </ButtonIcon>
+                        </ButtonBlock>
+                    )}
                     <ButtonBlock
                         onClick={() => {
                             onClose(() => onImport(AppRoute.import + ImportRoute.ledger));

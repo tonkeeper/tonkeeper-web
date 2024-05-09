@@ -13,22 +13,23 @@ import {
     tonConnectProofPayload
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useWalletContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 import { QueryKey } from '../../libs/queryKey';
 import { useIsActiveWalletLedger } from '../../state/ledger';
 import { signTonConnectOver } from '../../state/mnemonic';
+import { useCheckTouchId } from '../../state/password';
 import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
-import { useCheckTouchId } from '../../state/password';
 
 const useConnectMutation = (
     request: ConnectRequest,
@@ -38,6 +39,7 @@ const useConnectMutation = (
     const wallet = useWalletContext();
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const { api } = useAppContext();
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
@@ -52,7 +54,9 @@ const useConnectMutation = (
             }
             if (item.name === 'ton_proof') {
                 const signTonConnect = signTonConnectOver(sdk, wallet.publicKey, t, checkTouchId);
+                const timestamp = await getServerTime(api);
                 const proof = tonConnectProofPayload(
+                    timestamp,
                     webViewUrl ?? manifest.url,
                     wallet.active.rawAddress,
                     item.payload

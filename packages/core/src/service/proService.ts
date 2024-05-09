@@ -29,6 +29,7 @@ import { delay } from '../utils/common';
 import { Flatten } from '../utils/types';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
+import { getServerTime } from './transfer/common';
 import { walletStateInitFromState } from './wallet/contractService';
 import { getWalletState } from './wallet/storeService';
 
@@ -129,13 +130,20 @@ export const checkAuthCookie = async () => {
 };
 
 export const authViaTonConnect = async (
+    api: APIConfig,
     wallet: WalletState,
     signProof: (bufferToSing: Buffer) => Promise<Uint8Array>
 ) => {
     const domain = 'https://tonkeeper.com/';
     const { payload } = await ProServiceService.proServiceAuthGeneratePayload();
 
-    const proofPayload = tonConnectProofPayload(domain, wallet.active.rawAddress, payload);
+    const timestamp = await getServerTime(api);
+    const proofPayload = tonConnectProofPayload(
+        timestamp,
+        domain,
+        wallet.active.rawAddress,
+        payload
+    );
     const stateInit = walletStateInitFromState(wallet);
     const proof = createTonProofItem(
         await signProof(proofPayload.bufferToSign),
