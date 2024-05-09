@@ -32,6 +32,7 @@ import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
 import { MainButton } from './common';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { useIsActiveWalletLedger } from '../../state/ledger';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -212,13 +213,20 @@ export const RecipientView: FC<{
 
     const isFetching = isAccountFetching || isExternalLoading;
 
+    const isLedger = useIsActiveWalletLedger();
+
     const isMemoValid = useMemo(() => {
+        if (isLedger) {
+            // only ascii symbols are supported by ledger
+            return /^[ -~]*$/gm.test(comment);
+        }
+
         if (!toAccount) return true;
         if (toAccount.memoRequired) {
             return comment.length > 0;
         }
         return true;
-    }, [toAccount, comment]);
+    }, [toAccount, comment, isLedger]);
 
     useEffect(() => {
         if (sdk.isIOs()) {
