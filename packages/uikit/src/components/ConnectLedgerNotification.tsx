@@ -7,8 +7,8 @@ import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector
 import { useConnectLedgerMutation } from '../state/ledger';
 import styled from 'styled-components';
 import { Cell } from '@ton/core';
-import { UserCancelledError } from '../libs/errors/UserCancelledError';
 import { LedgerConnectionSteps } from './ledger/LedgerConnectionSteps';
+import { UserCancelledError } from '../libs/errors/UserCancelledError';
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;
@@ -33,7 +33,7 @@ const ButtonsBlock = styled.div`
 
 export const LedgerContent: FC<{
     ledgerParams: { path: number[]; transaction: LedgerTransaction };
-    onClose: () => void;
+    onClose: (reason?: unknown) => void;
     onSubmit: (result: Cell) => void;
 }> = ({ ledgerParams, onClose, onSubmit }) => {
     const { t } = useTranslation();
@@ -58,7 +58,15 @@ export const LedgerContent: FC<{
                     })
                     .catch(e => {
                         console.error(e);
-                        onClose();
+                        if (
+                            typeof e === 'object' &&
+                            'message' in e &&
+                            e.message.includes('0x6985')
+                        ) {
+                            onClose(new UserCancelledError('Cancel auth request'));
+                        } else {
+                            onClose(e);
+                        }
                     })
             )
             .catch(console.debug);
@@ -88,7 +96,10 @@ export const LedgerContent: FC<{
         <ConnectLedgerWrapper>
             <LedgerConnectionStepsStyled showConfirmTxStep currentStep={currentStep} />
             <ButtonsBlock>
-                <Button secondary onClick={onClose}>
+                <Button
+                    secondary
+                    onClick={() => onClose(new UserCancelledError('Cancel auth request'))}
+                >
                     {t('cancel')}
                 </Button>
                 <Button
@@ -129,16 +140,19 @@ const ConnectLedgerNotification = () => {
         [sdk, requestId, close]
     );
 
-    const onCancel = useCallback(() => {
-        if (requestId) {
-            sdk.uiEvents.emit('response', {
-                method: 'response',
-                id: requestId,
-                params: new UserCancelledError('Cancel auth request')
-            });
-        }
-        close();
-    }, [requestId, sdk, close]);
+    const onCancel = useCallback(
+        (reason?: unknown) => {
+            if (requestId) {
+                sdk.uiEvents.emit('response', {
+                    method: 'response',
+                    id: requestId,
+                    params: reason ?? new Error('Unknown Ledger error')
+                });
+            }
+            close();
+        },
+        [requestId, sdk, close]
+    );
 
     useEffect(() => {
         const handler = (options: {
@@ -163,7 +177,7 @@ const ConnectLedgerNotification = () => {
     return (
         <Notification
             isOpen={ledgerParams != null && requestId != null}
-            handleClose={onCancel}
+            handleClose={() => onCancel(new UserCancelledError('Cancel auth request'))}
             title={t('ledger_connect_header')}
         >
             {Content}
