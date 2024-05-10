@@ -1,21 +1,20 @@
+import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import { CoinsIcon, ExitIcon, KeyIcon, SwitchIcon } from '../../components/Icon';
+import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { useTranslation } from '../../hooks/translation';
-import styled from 'styled-components';
+import { LogOutWalletNotification } from '../../components/settings/LogOutNotification';
+import { RenameWalletNotification } from '../../components/settings/wallet-name/WalletNameNotification';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useWalletContext } from '../../hooks/appContext';
-import { Body3, Label2 } from '../../components/Text';
-import { CoinsIcon, ExitIcon, KeyIcon, SwitchIcon } from '../../components/Icon';
-import React from 'react';
-import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
-import { RenameWalletNotification } from '../../components/settings/wallet-name/WalletNameNotification';
+import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
-import { Link } from 'react-router-dom';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
-import { LogOutWalletNotification } from '../../components/settings/LogOutNotification';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
