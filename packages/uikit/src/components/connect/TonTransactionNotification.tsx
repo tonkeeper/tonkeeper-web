@@ -4,7 +4,6 @@ import {
     ConnectTransferError,
     EstimateData,
     estimateTonConnectTransfer,
-    getAccountsMap,
     sendTonConnectTransfer,
     tonConnectTransferError
 } from '@tonkeeper/core/dist/service/transfer/tonService';
@@ -13,8 +12,10 @@ import styled, { css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 import { QueryKey } from '../../libs/queryKey';
 import { getSigner } from '../../state/mnemonic';
+import { useCheckTouchId } from '../../state/password';
 import { CheckmarkCircleIcon, ErrorIcon } from '../Icon';
 import {
     Notification,
@@ -27,8 +28,6 @@ import { Body2, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
-import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
-import { useCheckTouchId } from '../../state/password';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -60,15 +59,11 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<string, Error>(async () => {
-        const accounts = estimate?.accounts;
-        if (!accounts) {
-            throw new Error('Missing accounts data');
-        }
         const signer = await getSigner(sdk, wallet.publicKey, checkTouchId);
         if (signer.type !== 'cell') {
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }
-        const value = await sendTonConnectTransfer(api, wallet, accounts, params, signer);
+        const value = await sendTonConnectTransfer(api, wallet, params, signer);
         client.invalidateQueries({
             predicate: query => query.queryKey.includes(wallet.active.rawAddress)
         });
@@ -229,9 +224,8 @@ const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boole
     return useQuery<EstimateData, Error>(
         [QueryKey.estimate, params],
         async () => {
-            const accounts = await getAccountsMap(api, params);
-            const accountEvent = await estimateTonConnectTransfer(api, wallet, accounts, params);
-            return { accounts, accountEvent };
+            const accountEvent = await estimateTonConnectTransfer(api, wallet, params);
+            return { accountEvent };
         },
         { enabled: errorFetched }
     );
