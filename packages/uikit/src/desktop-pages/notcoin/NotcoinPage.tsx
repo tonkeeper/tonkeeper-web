@@ -178,7 +178,7 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
             () => null
         );
 
-        const chunkSize = 1;
+        const chunkSize = 4;
         for (let i = 0; i < data.length; i += chunkSize) {
             const chunk = data.slice(i, i + chunkSize);
             try {
