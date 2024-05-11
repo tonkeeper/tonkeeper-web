@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
 import { getWalletSeqNo } from '@tonkeeper/core/dist/service/transfer/common';
@@ -39,7 +39,7 @@ const useVouchers = () => {
         return items.nftItems;
     };
 
-    return useQuery(['notcoin', 'length'], async () => {
+    return useQuery(['notcoin', 'length', wallet.active.rawAddress], async () => {
         const result: NftItem[] = [];
         let page: NftItem[] = [];
         let offset = 0;
@@ -163,10 +163,12 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
 
     const process = useRef(true);
     const sdk = useAppSdk();
+    const client = useQueryClient();
 
     useEffect(() => {
         return () => {
             process.current = false;
+            client.invalidateQueries(['notcoin']);
         };
     }, []);
     const onBurn = async () => {
@@ -184,8 +186,8 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
             try {
                 if (process.current) {
                     await mutation.mutateAsync({ signer, chunk });
+                    setLeft(l => l - chunkSize);
                 }
-                setLeft(l => l - chunkSize);
             } catch (e) {
                 toast(e instanceof Error ? e.message : 'Unexpected error.');
             }
