@@ -5,6 +5,7 @@ import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi, NftItem } from '../../tonApiV2';
+import { createLedgerNftTransfer } from '../ledger/transfer';
 import {
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
@@ -15,12 +16,11 @@ import {
     getWalletBalance,
     signEstimateMessage
 } from './common';
-import { createLedgerNftTransfer } from '../ledger/transfer';
 
 const initNftTransferAmount = toNano('1');
 export const nftTransferForwardAmount = BigInt('1');
 
-const nftTransferBody = (params: {
+export const nftTransferBody = (params: {
     queryId: bigint;
     newOwnerAddress: Address;
     responseAddress: Address;
