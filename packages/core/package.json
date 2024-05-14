@@ -1,7 +1,7 @@
 {
     "name": "@tonkeeper/core",
     "version": "0.1.0",
-    "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
+    "author": "NikitaTon APPS UK Limited <support@tonkeeper.com>",
     "description": "Core features and state for tonkeeper web wallet",
     "main": "index.js",
     "scripts": {

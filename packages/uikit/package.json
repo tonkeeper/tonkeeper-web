@@ -1,7 +1,7 @@
 {
     "name": "@tonkeeper/uikit",
     "version": "0.1.0",
-    "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
+    "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "UI Kit for tonkeeper wallet",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
