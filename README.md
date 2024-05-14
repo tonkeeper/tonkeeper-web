@@ -68,4 +68,5 @@ Keychain - Certificate Type - `Developer ID Application`
 
 ## License
 
-(c) Copyright 2023 TonApps Inc. Released under the [Apache License, Version 2.0](LICENSE.txt).
+(c) Copyright 2023-2024 Ton APPS UK Limited Released under the
+[Apache License, Version 2.0](LICENSE.txt).
