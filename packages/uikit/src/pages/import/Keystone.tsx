@@ -1,12 +1,12 @@
+import { UR } from '@keystonehq/keystone-sdk';
 import { useCallback } from 'react';
+import { styled } from 'styled-components';
 import { IconPage } from '../../components/Layout';
-import { SignerIcon } from '../../components/create/ImportIcons';
+import { KeystoneIcon } from '../../components/create/ImportIcons';
 import { Button } from '../../components/fields/Button';
 import { useKeystoneScanner } from '../../hooks/keystoneScanner';
 import { useTranslation } from '../../hooks/translation';
 import { usePairKeystoneMutation } from '../../state/keystone';
-import { styled } from 'styled-components';
-import { UR } from '@keystonehq/keystone-sdk';
 
 const IconBlock = styled.div`
     color: ${props => props.theme.accentBlue};
@@ -31,11 +31,11 @@ export const PairKeystone = () => {
             logOut
             icon={
                 <IconBlock>
-                    <SignerIcon size={144} />
+                    <KeystoneIcon size={144} />
                 </IconBlock>
             }
-            title={t('import_signer')}
-            description={t('import_signer_description')}
+            title={t('keystone_pair_title')}
+            description={t('keystone_pair_subtitle')}
             button={
                 <Button
                     size="large"

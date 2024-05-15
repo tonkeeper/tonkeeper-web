@@ -47,7 +47,7 @@
   "ledger_steps_connect" : "Connect Ledger to your device",
   "ledger_steps_install_ton" : "Install TON App  ",
   "ledger_steps_open_ton" : "Unlock it and open TON App",
-  "keystone_pair_subtitle" : "A higher level of security with hardware wallet",
+  "keystone_pair_subtitle" : "A higher level of security with AIR-GAP hardware wallet",
   "keystone_pair_title" : "Pair with Keystone",
   "Localization" : "Language",
   "Lock_screen" : "Lock screen",
