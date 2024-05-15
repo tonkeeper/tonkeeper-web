@@ -333,7 +333,7 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
                 <NotCoinIcon size="128" />
                 <Center>Finish</Center>
                 <BodyCenter>
-                    You burned all NOT Vouchers. Notcoin will deposit to your wallet address
+                    You burned all NOT Vouchers. Notcoin will deposit to your wallet address{' '}
                     <TgLink
                         onClick={e => {
                             e.stopPropagation();
