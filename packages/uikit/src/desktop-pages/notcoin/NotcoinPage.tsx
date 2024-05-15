@@ -176,11 +176,7 @@ const sendNftMultiTransfer = async (
         decodeMessageRequest: { boc: estimationCell.toString('base64') }
     });
 
-    if (
-        res.actions
-            .filter(action => action.type === 'NftItemTransfer')
-            .some(action => action.status !== 'ok')
-    ) {
+    if (res.actions.some(action => action.status !== 'ok')) {
         throw new Error('NFT transfer estimation failed');
     }
 
