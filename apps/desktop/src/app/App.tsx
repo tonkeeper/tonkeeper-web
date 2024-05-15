@@ -32,6 +32,7 @@ import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/Deskto
 import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
 import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
+import { NotcoinPage } from '@tonkeeper/uikit/dist/desktop-pages/notcoin/NotcoinPage';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 import { DesktopPurchases } from '@tonkeeper/uikit/dist/desktop-pages/purchases/DesktopPurchases';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
@@ -415,6 +416,7 @@ const WalletContent = () => {
                                 path={any(AppRoute.walletSettings)}
                                 element={<DesktopWalletSettingsRouting />}
                             />
+                            <Route path={AppRoute.notcoin} element={<NotcoinPage />} />
                             <Route path="*" element={<DesktopTokens />} />
                         </Route>
                     </Routes>

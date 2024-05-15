@@ -3,7 +3,13 @@ import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
 import { AppRoute } from '../../../libs/routes';
-import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon, SettingsSmoothIcon } from '../../Icon';
+import {
+    ClockSmoothIcon,
+    CoinsIcon,
+    NotCoinIcon,
+    SaleBadgeIcon,
+    SettingsSmoothIcon
+} from '../../Icon';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
 
@@ -65,6 +71,14 @@ export const WalletAsideMenu = () => {
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
+                    </AsideMenuItemStyled>
+                )}
+            </NavLink>
+            <NavLink to={AppRoute.notcoin}>
+                {({ isActive }) => (
+                    <AsideMenuItemStyled isSelected={isActive}>
+                        <NotCoinIcon />
+                        <Label2>NOT Vouchers</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
