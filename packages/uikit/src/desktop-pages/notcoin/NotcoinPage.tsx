@@ -44,7 +44,7 @@ const useVouchers = () => {
     const getItems = async (offset: number) => {
         const items = await new AccountsApi(api.tonApiV2).getAccountNftItems({
             accountId: wallet.active.rawAddress,
-            //   collection: 'EQDmkj65Ab_m0aZaW8IpKw4kYqIgITw_HRstYEkVQ6NIYCyW',
+            collection: 'EQDmkj65Ab_m0aZaW8IpKw4kYqIgITw_HRstYEkVQ6NIYCyW',
             limit: limit,
             offset: offset
         });
