@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Address, BitString, SendMode, beginCell, internal, toNano } from '@ton/core';
+import { Address, SendMode, beginCell, internal, toNano } from '@ton/core';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
@@ -34,6 +34,7 @@ import { useAppSdk, useToast } from '../../hooks/appSdk';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { getSigner } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
+import { chooseAddress } from './address';
 
 const useVouchers = () => {
     const wallet = useWalletContext();
@@ -85,16 +86,19 @@ export const confirmWalletSeqNo = async (
 };
 
 const getNotcoinBurnAddress = (nftAddress: string, config: TonendpointConfig) => {
-    const nftAddressBits = new BitString(Address.parse(nftAddress).hash, 0, 4);
-
     const burnAddresses = config.notcoin_burn_addresses ?? [];
-    const burnAddressesBits = burnAddresses.map(
-        (address: string) => new BitString(Address.parse(address).hash, 0, 4)
+
+    const { match } = chooseAddress(
+        Address.parse(nftAddress),
+        burnAddresses.map(item => Address.parse(item))
     );
 
-    const index = burnAddressesBits.findIndex(item => nftAddressBits.equals(item));
+    if (match) {
+        return match;
+    }
 
-    return Address.parse(burnAddresses[index]);
+    var item = burnAddresses[Math.floor(Math.random() * burnAddresses.length)];
+    return Address.parse(item);
 };
 
 const checkBurnDate = async (api: APIConfig, config: TonendpointConfig) => {
