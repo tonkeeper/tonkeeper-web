@@ -44,6 +44,9 @@ export interface TonendpointConfig {
 
     featured_play_interval?: number;
 
+    notcoin_burn_date?: number;
+    notcoin_burn_addresses?: string[];
+
     /**
      * @deprecated use ton api
      */
