@@ -188,27 +188,29 @@ const sendNftMultiTransfer = async (
     return true;
 };
 
-const useBurnMutation = (config: TonendpointConfig) => {
+const useBurnMutation = () => {
     const wallet = useWalletContext();
     const { api } = useAppContext();
 
-    return useMutation<boolean, Error, { signer: Signer | null; chunk: NftItem[] }>(
-        async ({ signer, chunk }) => {
-            if (signer === null) {
-                throw new Error('Unable to sign transaction.');
-            }
-
-            const seqno = await getWalletSeqNo(api, wallet.active.rawAddress);
-
-            console.log('send', chunk);
-
-            await sendNftMultiTransfer(api, wallet, chunk, config, signer as CellSigner);
-
-            await confirmWalletSeqNo(wallet.active.rawAddress, api, seqno);
-
-            return true;
+    return useMutation<
+        boolean,
+        Error,
+        { signer: Signer | null; chunk: NftItem[]; config: TonendpointConfig }
+    >(async ({ signer, chunk, config }) => {
+        if (signer === null) {
+            throw new Error('Unable to sign transaction.');
         }
-    );
+
+        const seqno = await getWalletSeqNo(api, wallet.active.rawAddress);
+
+        console.log('send', chunk);
+
+        await sendNftMultiTransfer(api, wallet, chunk, config, signer as CellSigner);
+
+        await confirmWalletSeqNo(wallet.active.rawAddress, api, seqno);
+
+        return true;
+    });
 };
 
 const NotFound = styled.div`
@@ -258,13 +260,13 @@ const BodyCenter = styled(Body2)`
 `;
 
 const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
-    const { api, config } = useAppContext();
+    const { api, tonendpoint } = useAppContext();
 
     const [burning, setBurning] = useState(false);
     const [ok, setIsOk] = useState(false);
     const [left, setLeft] = useState(0);
 
-    const mutation = useBurnMutation(config);
+    const mutation = useBurnMutation();
     const toast = useToast();
 
     const { mutateAsync: checkTouchId } = useCheckTouchId();
@@ -283,6 +285,7 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
     }, []);
 
     const onBurn = async () => {
+        const config = await tonendpoint.boot();
         const [allow, time] = await checkBurnDate(api, config);
         if (!allow) {
             toast(
@@ -309,7 +312,7 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
             const chunk = data.slice(i, i + chunkSize);
             try {
                 if (process.current) {
-                    await mutation.mutateAsync({ signer, chunk });
+                    await mutation.mutateAsync({ signer, chunk, config });
                     setLeft(l => l - chunkSize);
                 }
             } catch (e) {
