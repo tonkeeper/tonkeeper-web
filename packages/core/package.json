@@ -19,6 +19,7 @@
         "yarn-run-all": "^3.1.1"
     },
     "dependencies": {
+        "@keystonehq/keystone-sdk": "0.4.1",
         "@ledgerhq/hw-transport-webhid": "^6.28.6",
         "@ledgerhq/hw-transport-webusb": "^6.28.6",
         "@ton-community/ton-ledger": "^7.0.1",

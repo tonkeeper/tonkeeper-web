@@ -5,7 +5,8 @@ export type AuthState =
     | KeychainPassword
     | AuthSigner
     | AuthSignerDeepLink
-    | AuthLedger;
+    | AuthLedger
+    | AuthKeystone;
 
 export interface AuthNone {
     kind: 'none';
@@ -30,6 +31,16 @@ export interface AuthSignerDeepLink {
 export interface AuthLedger {
     kind: 'ledger';
     accountIndex: number;
+}
+
+export interface AuthKeystone {
+    kind: 'keystone';
+    info?: KeystonePathInfo;
+}
+
+export interface KeystonePathInfo {
+    path: string;
+    xfp: string;
 }
 
 export interface WebAuthn {
