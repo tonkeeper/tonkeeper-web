@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InnerBody } from '../../components/Body';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
@@ -8,9 +8,10 @@ import { ChangePasswordNotification } from '../../components/create/ChangePasswo
 import { Switch } from '../../components/fields/Switch';
 import { KeyIcon, LockIcon } from '../../components/settings/SettingsIcons';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
-import { useAppContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { useIsActiveWalletLedger } from '../../state/ledger';
 import {
     useCanPromptTouchId,
     useLookScreen,
@@ -72,7 +73,8 @@ const ChangePassword = () => {
     const { t } = useTranslation();
     const [isOpen, setOpen] = useState(false);
 
-    const { auth } = useAppContext();
+    const { auth: walletAuth } = useWalletContext();
+    const { auth: globalAuth } = useAppContext();
     const items = useMemo(() => {
         const i: SettingsItem[] = [
             {
@@ -84,7 +86,7 @@ const ChangePassword = () => {
         return i;
     }, []);
 
-    if (auth.kind === 'password') {
+    if (walletAuth == null && globalAuth.kind === 'password') {
         return (
             <>
                 <SettingsList items={items} />
@@ -100,6 +102,8 @@ const ShowPhrases = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
+    const isLedger = useIsActiveWalletLedger();
+
     const items = useMemo(() => {
         const i: SettingsItem[] = [
             {
@@ -110,6 +114,10 @@ const ShowPhrases = () => {
         ];
         return i;
     }, []);
+
+    if (isLedger) {
+        return <></>;
+    }
 
     return <SettingsList items={items} />;
 };

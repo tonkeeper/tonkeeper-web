@@ -1,5 +1,5 @@
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import {
     DragDropContext,
     Draggable,
@@ -25,12 +25,12 @@ import {
 import { SetUpWalletIcon } from '../../components/settings/SettingsIcons';
 import { SettingsList } from '../../components/settings/SettingsList';
 import { RenameWalletNotification } from '../../components/settings/wallet-name/WalletNameNotification';
+import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useMutateAccountState } from '../../state/account';
 import { useWalletState } from '../../state/wallet';
-import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 
 const Row = styled.div`
     display: flex;
@@ -90,20 +90,22 @@ const WalletRow: FC<{
                                         <Label1>{t('Rename')}</Label1>
                                     </ListItemPayload>
                                 </ListItem>
-                                <ListItem
-                                    dropDown
-                                    onClick={() => {
-                                        navigate(
-                                            AppRoute.settings +
-                                                SettingsRoute.recovery +
-                                                `/${wallet.publicKey}`
-                                        );
-                                    }}
-                                >
-                                    <ListItemPayload>
-                                        <Label1>{t('settings_backup_seed')}</Label1>
-                                    </ListItemPayload>
-                                </ListItem>
+                                {wallet.auth == null && (
+                                    <ListItem
+                                        dropDown
+                                        onClick={() => {
+                                            navigate(
+                                                AppRoute.settings +
+                                                    SettingsRoute.recovery +
+                                                    `/${wallet.publicKey}`
+                                            );
+                                        }}
+                                    >
+                                        <ListItemPayload>
+                                            <Label1>{t('settings_backup_seed')}</Label1>
+                                        </ListItemPayload>
+                                    </ListItem>
+                                )}
                                 <Divider />
                                 <ListItem
                                     dropDown

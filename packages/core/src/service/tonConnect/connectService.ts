@@ -218,11 +218,11 @@ export interface ConnectProofPayload {
 }
 
 export const tonConnectProofPayload = (
+    timestamp: number,
     origin: string,
     wallet: string,
     payload: string
 ): ConnectProofPayload => {
-    const timestamp = Math.round(Date.now() / 1000);
     const timestampBuffer = Buffer.allocUnsafe(8);
     timestampBuffer.writeBigInt64LE(BigInt(timestamp));
 

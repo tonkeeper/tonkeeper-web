@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
@@ -42,6 +41,7 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
+import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
@@ -54,7 +54,6 @@ import { Notifications } from './components/Notifications';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
-import { useUserFiat } from "@tonkeeper/uikit/dist/state/fiat";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -74,7 +73,9 @@ const NftNotification = React.lazy(
 const SendNftNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification')
 );
-const ConnectLedgerNotification = React.lazy(() => import("@tonkeeper/uikit/dist/components/ConnectLedgerNotification"));
+const ConnectLedgerNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/ConnectLedgerNotification')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -202,7 +203,8 @@ export const Loader: FC = React.memo(() => {
         standalone: true,
         extension: true,
         proFeatures: false,
-        hideQrScanner: true
+        hideQrScanner: true,
+        hideSigner: true
     };
 
     return (

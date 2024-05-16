@@ -104,7 +104,7 @@ export const createTransferMessage = async (
         seqno: number;
         state: WalletState;
         signer: CellSigner;
-      timestamp: number;
+        timestamp: number;
     },
     transaction: {
         to: string;
@@ -165,25 +165,12 @@ export const getTonkeeperQueryId = () => {
         .loadIntBig(64);
 };
 
-export type AccountsMap = Map<string, Account>;
-
 /*
  * Raw address is bounceable by default,
  * Please make a note that in the TonWeb Raw address is non bounceable by default
  */
 export const seeIfAddressBounceable = (address: string) => {
     return Address.isFriendly(address) ? Address.parseFriendly(address).isBounceable : true;
-};
-
-/*
- * Allow to send non bounceable only if address is non bounceable and target contract is non active
- */
-export const seeIfBounceable = (accounts: AccountsMap, address: string) => {
-    const bounceableAddress = seeIfAddressBounceable(address);
-    const toAccount = accounts.get(address);
-    const activeContract = toAccount && toAccount.status === 'active';
-
-    return bounceableAddress || activeContract;
 };
 
 export const seeIfTransferBounceable = (account: Account, recipient: TonRecipient) => {

@@ -21,6 +21,7 @@ import {
     jettonTransferBody,
     jettonTransferForwardAmount
 } from './jettonService';
+import { nftTransferBody, nftTransferForwardAmount } from './nftService';
 
 export type TransferMessage = {
     to: string;
@@ -272,4 +273,101 @@ const createJettonMultiTransfer = async (
     });
 
     return externalMessage(contract, seqno, transfer).toBoc();
+};
+
+export type NftTransferMessage = {
+    to: string;
+    nft: string;
+    comment?: string;
+};
+
+export const createNftMultiTransfer = async (
+    timestamp: number,
+    seqno: number,
+    walletState: WalletState,
+    transferMessages: NftTransferMessage[],
+    attachValue: BigNumber,
+    signer: CellSigner
+) => {
+    const contract = walletContractFromState(walletState);
+
+    const transfer = await contract.createTransferAndSignRequestAsync({
+        seqno,
+        signer,
+        timeout: getTTL(timestamp),
+        sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+        messages: transferMessages.map(msg =>
+            internal({
+                to: Address.parse(msg.nft),
+                bounce: true,
+                value: BigInt(attachValue.toFixed(0)),
+                body: nftTransferBody({
+                    queryId: getTonkeeperQueryId(),
+                    newOwnerAddress: Address.parse(msg.to),
+                    responseAddress: Address.parse(walletState.active.rawAddress),
+                    forwardAmount: nftTransferForwardAmount,
+                    forwardPayload: msg.comment ? comment(msg.comment) : null
+                })
+            })
+        )
+    });
+
+    return externalMessage(contract, seqno, transfer).toBoc();
+};
+
+export const sendNftMultiTransfer = async (
+    api: APIConfig,
+    walletState: WalletState,
+    transferMessages: NftTransferMessage[],
+    feeEstimate: BigNumber,
+    signer: CellSigner
+) => {
+    const timestamp = await getServerTime(api);
+
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
+
+    checkMaxAllowedMessagesInMultiTransferOrDie(
+        transferMessages.length,
+        walletState.active.version
+    );
+
+    const attachValue = feeEstimate.div(transferMessages.length).plus(unShiftedDecimals(0.03));
+    checkWalletBalanceOrDie(attachValue, wallet);
+
+    const estimationCell = await createNftMultiTransfer(
+        timestamp,
+        seqno,
+        walletState,
+        transferMessages,
+        attachValue,
+        signEstimateMessage
+    );
+
+    const res = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
+        ignoreSignatureCheck: true,
+        accountId: wallet.address,
+        decodeMessageRequest: { boc: estimationCell.toString('base64') }
+    });
+
+    if (
+        res.actions
+            .filter(action => action.type === 'JettonTransfer')
+            .some(action => action.status !== 'ok')
+    ) {
+        throw new Error('Jetton transfer estimation failed');
+    }
+
+    const cell = await createNftMultiTransfer(
+        timestamp,
+        seqno,
+        walletState,
+        transferMessages,
+        attachValue,
+        signer
+    );
+
+    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
+        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
+    });
+    return true;
 };

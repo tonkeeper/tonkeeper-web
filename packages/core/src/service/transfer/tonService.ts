@@ -7,7 +7,8 @@ import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
-import { Account, AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
+import { AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
+import { createLedgerTonTransfer } from '../ledger/transfer';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     SendMode,
@@ -18,31 +19,13 @@ import {
     getTTL,
     getWalletBalance,
     getWalletSeqNo,
-    signEstimateMessage,
-    AccountsMap,
+    seeIfAddressBounceable,
     seeIfTransferBounceable,
-    seeIfBounceable
+    signEstimateMessage
 } from './common';
-import { createLedgerTonTransfer } from '../ledger/transfer';
 
 export type EstimateData = {
-    accounts: AccountsMap;
     accountEvent: TransferEstimationEvent;
-};
-
-export const getAccountsMap = async (
-    api: APIConfig,
-    params: TonConnectTransactionPayload
-): Promise<AccountsMap> => {
-    const accounts = await Promise.all(
-        params.messages.map(async message => {
-            return [
-                message.address,
-                await new AccountsApi(api.tonApiV2).getAccount({ accountId: message.address })
-            ] as const;
-        })
-    );
-    return new Map<string, Account>(accounts);
 };
 
 const toStateInit = (stateInit?: string): { code: Maybe<Cell>; data: Maybe<Cell> } | undefined => {
@@ -89,7 +72,6 @@ const createTonConnectTransfer = async (
     timestamp: number,
     seqno: number,
     walletState: WalletState,
-    accounts: AccountsMap,
     params: TonConnectTransactionPayload,
     signer: CellSigner
 ) => {
@@ -103,7 +85,7 @@ const createTonConnectTransfer = async (
         messages: params.messages.map(item =>
             internal({
                 to: Address.parse(item.address),
-                bounce: seeIfBounceable(accounts, item.address),
+                bounce: seeIfAddressBounceable(item.address),
                 value: BigInt(item.amount),
                 init: toStateInit(item.stateInit),
                 body: item.payload ? Cell.fromBase64(item.payload) : undefined
@@ -171,7 +153,6 @@ export const tonConnectTransferError = async (
 export const estimateTonConnectTransfer = async (
     api: APIConfig,
     walletState: WalletState,
-    accounts: AccountsMap,
     params: TonConnectTransactionPayload
 ): Promise<TransferEstimationEvent> => {
     const timestamp = await getServerTime(api);
@@ -182,7 +163,6 @@ export const estimateTonConnectTransfer = async (
         timestamp,
         seqno,
         walletState,
-        accounts,
         params,
         signEstimateMessage
     );
@@ -199,21 +179,13 @@ export const estimateTonConnectTransfer = async (
 export const sendTonConnectTransfer = async (
     api: APIConfig,
     walletState: WalletState,
-    accounts: AccountsMap,
     params: TonConnectTransactionPayload,
     signer: CellSigner
 ) => {
     const timestamp = await getServerTime(api);
     const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
 
-    const external = await createTonConnectTransfer(
-        timestamp,
-        seqno,
-        walletState,
-        accounts,
-        params,
-        signer
-    );
+    const external = await createTonConnectTransfer(timestamp, seqno, walletState, params, signer);
 
     const boc = external.toString('base64');
 

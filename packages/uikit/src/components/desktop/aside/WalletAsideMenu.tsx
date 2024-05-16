@@ -1,11 +1,17 @@
-import styled from 'styled-components';
-import { AsideMenuItem } from '../../shared/AsideItem';
-import { Label2 } from '../../Text';
-import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon, SettingsSmoothIcon } from '../../Icon';
 import { NavLink, useLocation } from 'react-router-dom';
-import { AppRoute } from '../../../libs/routes';
+import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
+import { AppRoute } from '../../../libs/routes';
+import {
+    ClockSmoothIcon,
+    CoinsIcon,
+    NotCoinIcon,
+    SaleBadgeIcon,
+    SettingsSmoothIcon
+} from '../../Icon';
+import { Label2 } from '../../Text';
+import { AsideMenuItem } from '../../shared/AsideItem';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -65,6 +71,14 @@ export const WalletAsideMenu = () => {
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
+                    </AsideMenuItemStyled>
+                )}
+            </NavLink>
+            <NavLink to={AppRoute.notcoin}>
+                {({ isActive }) => (
+                    <AsideMenuItemStyled isSelected={isActive}>
+                        <NotCoinIcon />
+                        <Label2>NOT Vouchers</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>

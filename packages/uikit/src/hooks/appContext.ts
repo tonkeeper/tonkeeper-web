@@ -25,6 +25,7 @@ export interface IAppContext {
     proFeatures: boolean;
     experimental?: boolean;
     hideQrScanner?: boolean;
+    hideSigner?: boolean;
     env?: {
         tgAuthBotId: string;
         stonfiReferralAddress: string;

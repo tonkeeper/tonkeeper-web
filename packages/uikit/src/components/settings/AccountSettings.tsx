@@ -30,17 +30,21 @@ const SingleAccountSettings = () => {
             //   icon: <SubscriptionIcon />,
             //   action: () => navigate(relative(SettingsRoute.subscriptions)),
             // },
-            {
+        ];
+
+        if (wallet.auth == null) {
+            items.push({
                 name: t('settings_recovery_phrase'),
                 icon: <RecoveryPhraseIcon />,
                 action: () => navigate(relative(SettingsRoute.recovery))
-            },
-            {
-                name: t('settings_wallet_version'),
-                icon: walletVersionText(wallet.active.version),
-                action: () => navigate(relative(SettingsRoute.version))
-            }
-        ];
+            });
+        }
+
+        items.push({
+            name: t('settings_wallet_version'),
+            icon: walletVersionText(wallet.active.version),
+            action: () => navigate(relative(SettingsRoute.version))
+        });
 
         if (proFeatures) {
             items.unshift({
@@ -117,18 +121,21 @@ const MultipleAccountSettings = () => {
     }, [wallet, t]);
 
     const mainItems = useMemo<SettingsItem[]>(() => {
-        const items: SettingsItem[] = [
-            {
+        const items: SettingsItem[] = [];
+
+        if (wallet.auth == null) {
+            items.push({
                 name: t('settings_recovery_phrase'),
                 icon: <RecoveryPhraseIcon />,
                 action: () => navigate(relative(SettingsRoute.recovery))
-            },
-            {
-                name: t('settings_wallet_version'),
-                icon: walletVersionText(wallet.active.version),
-                action: () => navigate(relative(SettingsRoute.version))
-            }
-        ];
+            });
+        }
+
+        items.push({
+            name: t('settings_wallet_version'),
+            icon: walletVersionText(wallet.active.version),
+            action: () => navigate(relative(SettingsRoute.version))
+        });
 
         if (jettons?.balances.length) {
             items.push({

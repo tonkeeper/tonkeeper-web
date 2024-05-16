@@ -1,7 +1,7 @@
 {
     "name": "@tonkeeper/web",
-    "version": "3.12.1",
-    "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
+    "version": "3.12.7",
+    "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "Your web wallet on The Open Network",
     "dependencies": {
         "@amplitude/analytics-browser": "^2.1.0",

@@ -10,6 +10,7 @@ export enum AppRoute {
     signer = '/signer',
     publish = '/publish',
     swap = '/swap',
+    notcoin = '/notcoin',
     home = '/'
 }
 
