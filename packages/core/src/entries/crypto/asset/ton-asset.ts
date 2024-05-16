@@ -4,6 +4,11 @@ import { BLOCKCHAIN_NAME } from '../../crypto';
 import { BasicAsset, packAssetId } from './basic-asset';
 import { TON_ASSET } from './constants';
 
+export type TonAssetAddress = Address | 'TON';
+export function isTon(address: TonAssetAddress): address is 'TON' {
+    return address === 'TON';
+}
+
 export interface TonAssetIdentification {
     address: Address | 'TON';
     blockchain: BLOCKCHAIN_NAME.TON;
