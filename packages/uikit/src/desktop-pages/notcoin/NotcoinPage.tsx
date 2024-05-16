@@ -133,7 +133,7 @@ const createNftMultiTransfer = async (
             return internal({
                 to: Address.parse(nft.address),
                 bounce: true,
-                value: toNano('0.07'),
+                value: toNano('0.09'),
                 body: beginCell()
                     .storeUint(0x5fcc3d14, 32) // transfer op
                     .storeUint(getTonkeeperQueryId(), 64)
