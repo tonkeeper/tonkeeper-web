@@ -37,7 +37,8 @@ export enum QueryKey {
     selectedDashboardColumns = 'selectedDashboardColumns',
     dashboardData = 'dashboardData',
 
-    stonfiAssets = 'stonfiAssets'
+    stonfiAssets = 'stonfiAssets',
+    swapCalculate = 'swapCalculate'
 }
 
 export enum JettonKey {

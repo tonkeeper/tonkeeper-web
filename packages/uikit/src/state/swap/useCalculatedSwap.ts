@@ -1,0 +1,321 @@
+import { useQuery } from '@tanstack/react-query';
+import {
+    isTon,
+    TonAsset,
+    TonAssetAddress
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { OpenAPI, SwapService } from '@tonkeeper/core/dist/swapsApi';
+import { JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { Address } from '@ton/core';
+import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
+import { useMemo } from 'react';
+import { useAppContext } from '../../hooks/appContext';
+import { useSwapFromAmount, useSwapFromAsset, useSwapToAsset } from './useSwapForm';
+import { atom, useAtom } from 'jotai';
+import { QueryKey } from '../../libs/queryKey';
+import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
+
+// TODO
+OpenAPI.BASE = 'http://localhost:8080';
+
+export type BasicCalculatedTrade = {
+    from: AssetAmount<TonAsset>;
+    to: AssetAmount<TonAsset>;
+    blockchainFee: AssetAmount<typeof TON_ASSET>;
+};
+
+export type DedustCalculatedTrade = BasicCalculatedTrade & {
+    path: TonAsset[];
+    rawTrade: {
+        fromAsset: string;
+        toAsset: string;
+        fromAmount: string;
+        toAmount: string;
+        poolAddress: string;
+    }[];
+};
+
+export type DedustCalculatedSwap = {
+    provider: 'dedust';
+    trade: DedustCalculatedTrade | null;
+};
+
+export type StonfiCalculatedTrade = BasicCalculatedTrade & {
+    rawTrade: {
+        fromAsset: string;
+        toAsset: string;
+        fromAmount: string;
+        toAmount: string;
+    };
+};
+
+export type StonfiCalculatedSwap = {
+    provider: 'stonfi';
+    trade: StonfiCalculatedTrade | null;
+};
+
+export type CalculatedSwap = DedustCalculatedSwap | StonfiCalculatedSwap;
+
+export type CalculateTradeForm = {
+    fromAddress: TonAssetAddress;
+    toAddress: TonAssetAddress;
+    amountWei: string;
+};
+
+const swapAssetsCache = new Map<TonAssetAddress, Promise<TonAsset>>();
+
+export const swapProviders = ['stonfi', 'dedust'] as const;
+
+const fetchedSwaps$ = atom<CalculatedSwap[]>([]);
+
+let calculationId = 0;
+
+export function useCalculatedSwap() {
+    const { api } = useAppContext();
+
+    const [fetchedSwaps, setFetchedSwaps] = useAtom(fetchedSwaps$);
+    const [fromAsset] = useSwapFromAsset();
+    const [toAsset] = useSwapToAsset();
+    const [fromAmountRelative] = useSwapFromAmount();
+
+    const query = useQuery<CalculatedSwap[], Error>({
+        queryKey: [
+            QueryKey.swapCalculate,
+            fromAsset.id,
+            toAsset.id,
+            fromAmountRelative?.shiftedBy(fromAsset.decimals).toFixed(0)
+        ],
+        queryFn: async () => {
+            setFetchedSwaps([]);
+            calculationId = calculationId + 1;
+            const currentCalulationId = calculationId;
+
+            if (!fromAmountRelative) {
+                return [];
+            }
+
+            addAssetToCache(fromAsset);
+            addAssetToCache(toAsset);
+
+            const fromAmountWei = unShiftedDecimals(fromAmountRelative, fromAsset.decimals);
+
+            let totalFetchedSwaps: CalculatedSwap[] = [];
+            return new Promise((res, rej) => {
+                let fetchedProvidersNumber = 0;
+                swapProviders.forEach(async provider => {
+                    try {
+                        const providerSwap = await SwapService.calculateSwap(
+                            toTradeAssetId(fromAsset.address),
+                            toTradeAssetId(toAsset.address),
+                            fromAmountWei.toFixed(0),
+                            provider
+                        );
+
+                        const swap = await providerSwapToSwap(
+                            providerSwap,
+                            api,
+                            fromAsset,
+                            toAsset
+                        );
+
+                        if (currentCalulationId !== calculationId) {
+                            rej(new Error('Calculation cancelled'));
+                            return;
+                        }
+
+                        totalFetchedSwaps = totalFetchedSwaps.concat(swap);
+                        setFetchedSwaps(s => [...s, ...swap]);
+
+                        fetchedProvidersNumber = fetchedProvidersNumber + 1;
+                        if (fetchedProvidersNumber === swapProviders.length) {
+                            res(sortSwaps(totalFetchedSwaps));
+                        }
+                    } catch (e) {
+                        if (currentCalulationId !== calculationId) {
+                            rej(new Error('Calculation cancelled'));
+                            return;
+                        }
+
+                        console.error(e);
+                        const swap: CalculatedSwap = {
+                            provider: provider as 'dedust' | 'stonfi',
+                            trade: null
+                        };
+                        totalFetchedSwaps = totalFetchedSwaps.concat(swap);
+                        setFetchedSwaps(s => [...s, swap]);
+
+                        fetchedProvidersNumber = fetchedProvidersNumber + 1;
+                        if (fetchedProvidersNumber === swapProviders.length) {
+                            res(sortSwaps(totalFetchedSwaps));
+                        }
+                    }
+                });
+            });
+        },
+        cacheTime: 0
+    });
+
+    return useMemo(
+        () => ({
+            ...query,
+            fetchedSwaps
+        }),
+        [query, fetchedSwaps]
+    );
+}
+
+const toTradeAssetId = (address: TonAssetAddress) => {
+    return isTon(address) ? 'ton' : address.toRawString();
+};
+
+const fromTradeAssetId = (address: string): TonAssetAddress => {
+    return address === 'ton' ? 'TON' : Address.parse(address);
+};
+
+const sortSwaps = (swaps: CalculatedSwap[]) => {
+    return swaps.slice().sort((a, b) => {
+        if (!a.trade) {
+            return 1;
+        }
+
+        if (!b.trade) {
+            return -1;
+        }
+
+        return b.trade.to.weiAmount.comparedTo(a.trade.to.weiAmount);
+    });
+};
+
+const providerSwapToSwap = async (
+    providerSwap: Awaited<ReturnType<typeof SwapService.calculateSwap>>,
+    api: APIConfig,
+    fromAsset: TonAsset,
+    toAsset: TonAsset
+): Promise<CalculatedSwap[]> => {
+    if (providerSwap.provider === 'dedust') {
+        if (providerSwap.trades.length === 0) {
+            return [
+                {
+                    provider: 'dedust',
+                    trade: null
+                }
+            ];
+        }
+
+        const assetsInfo = await getDedustAssets(providerSwap.trades, api);
+        return providerSwap.trades.map(t => ({
+            provider: 'dedust',
+            trade: {
+                from: new AssetAmount({
+                    asset: fromAsset,
+                    weiAmount: t.steps[0].fromAmount
+                }),
+                to: new AssetAmount({
+                    asset: toAsset,
+                    weiAmount: t.steps[t.steps.length - 1].toAmount
+                }),
+                path: t.steps.reduce((acc, s, index) => {
+                    acc.push(
+                        assetsInfo.find(a => eqAddresses(a.address, fromTradeAssetId(s.fromAsset)))!
+                    );
+                    if (index === t.steps.length - 1) {
+                        acc.push(
+                            assetsInfo.find(a =>
+                                eqAddresses(a.address, fromTradeAssetId(s.toAsset))
+                            )!
+                        );
+                    }
+
+                    return acc;
+                }, [] as TonAsset[]),
+                blockchainFee: new AssetAmount({
+                    asset: TON_ASSET,
+                    weiAmount: t.blockchainFee
+                }),
+                rawTrade: t.steps
+            }
+        }));
+    }
+
+    if (providerSwap.provider === 'stonfi') {
+        const trade = providerSwap.trades[0];
+        if (!trade) {
+            return [{ provider: 'stonfi', trade: null }];
+        }
+        return [
+            {
+                provider: 'stonfi',
+                trade: {
+                    from: new AssetAmount({
+                        asset: fromAsset,
+                        weiAmount: trade.fromAmount
+                    }),
+                    to: new AssetAmount({
+                        asset: toAsset,
+                        weiAmount: trade.toAmount
+                    }),
+                    blockchainFee: new AssetAmount({
+                        asset: TON_ASSET,
+                        weiAmount: trade.blockchainFee
+                    }),
+                    rawTrade: trade
+                }
+            }
+        ];
+    }
+
+    return [];
+};
+
+const getDedustAssets = async (
+    trades: Array<{
+        steps: Array<{
+            fromAsset: string;
+            toAsset: string;
+        }>;
+    }>,
+    api: APIConfig
+) => {
+    const addresses = trades
+        .flatMap(trade => trade.steps)
+        .flatMap(step => [fromTradeAssetId(step.toAsset), fromTradeAssetId(step.fromAsset)]);
+
+    return Promise.all(addresses.map(address => getAsset(api, address)));
+};
+
+const addAssetToCache = (asset: TonAsset) => {
+    if (!swapAssetsCache.has(asset.address)) {
+        swapAssetsCache.set(asset.address, Promise.resolve(asset));
+    }
+};
+
+const getAsset = async (api: APIConfig, address: TonAssetAddress): Promise<TonAsset> => {
+    if (isTon(address)) {
+        return TON_ASSET;
+    }
+
+    if (swapAssetsCache.has(address)) {
+        return swapAssetsCache.get(address)!;
+    }
+
+    const tonapi = new JettonsApi(api.tonApiV2);
+    const p = tonapi.getJettonInfo({ accountId: address.toRawString() }).then(
+        response =>
+            ({
+                symbol: response.metadata.symbol,
+                decimals: Number(response.metadata.decimals),
+                name: response.metadata.name,
+                blockchain: BLOCKCHAIN_NAME.TON,
+                address,
+                id: packAssetId(BLOCKCHAIN_NAME.TON, address),
+                image: response.metadata.image
+            } as const)
+    );
+    swapAssetsCache.set(address, p);
+    return p;
+};

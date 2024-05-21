@@ -78,6 +78,7 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
+import SwapPage from "@tonkeeper/uikit/dist/pages/swap";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -417,7 +418,7 @@ const WalletContent = () => {
                                 element={<DesktopWalletSettingsRouting />}
                             />
                             <Route path={AppRoute.notcoin} element={<NotcoinPage />} />
-                            <Route path="*" element={<DesktopTokens />} />
+                            <Route path="*" element={<SwapPage />} />
                         </Route>
                     </Routes>
                 </WalletRoutingWrapper>

@@ -186,8 +186,8 @@ export const seeIfValueValid = (value: string, decimals: number) => {
     if (value.length > 21) return false;
     if (value !== '') {
         if (value.endsWith('e')) return false;
-        const separators = value.match(getDecimalSeparator());
-        if (separators && separators.length > 1) return false;
+        const separators = value.matchAll(new RegExp(getDecimalSeparator(), 'g'));
+        if (separators && [...separators].length > 1) return false;
         if (/^[a-zA-Z]+$/.test(value)) return false;
         if (!isNumeric(removeGroupSeparator(value))) return false;
         if (seeIfLargeTail(value, decimals)) return false;

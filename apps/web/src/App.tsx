@@ -56,6 +56,7 @@ const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
+const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap/index'));
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
@@ -354,7 +355,7 @@ export const Content: FC<{
                                 <Header />
                                 <InnerBody>
                                     <Suspense fallback={<HomeSkeleton />}>
-                                        <Home />
+                                        <SwapPage />
                                     </Suspense>
                                 </InnerBody>
                             </>

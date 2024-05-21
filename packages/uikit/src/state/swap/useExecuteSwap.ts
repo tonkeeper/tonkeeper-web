@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { CalculatedSwap } from './useCalculateSwap';
+import { CalculatedSwap } from './useCalculatedSwap';
 import { SwapService } from '@tonkeeper/core/dist/swapsApi';
 import { assertUnreachable, NonNullableFields } from '@tonkeeper/core/dist/utils/types';
 import { Address } from '@ton/core';
