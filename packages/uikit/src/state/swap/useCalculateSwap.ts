@@ -7,8 +7,7 @@ import {
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { OpenAPI, TradeService } from '@tonkeeper/core/dist/swapsApi';
-import { useAppContext } from '../../appContext';
+import { OpenAPI, SwapService } from '@tonkeeper/core/dist/swapsApi';
 import { JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
@@ -16,11 +15,10 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { Address } from '@ton/core';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { useCallback, useMemo, useState } from 'react';
+import { useAppContext } from '../../hooks/appContext';
 
 // TODO
 OpenAPI.BASE = 'http://localhost:8080';
-
-export const stonfiNativeAddress = 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c';
 
 export type BasicCalculatedTrade = {
     from: AssetAmount<TonAsset>;
@@ -30,32 +28,30 @@ export type BasicCalculatedTrade = {
 export type DedustCalculatedTrade = BasicCalculatedTrade & {
     path: TonAsset[];
     rawTrade: {
-        pool: {
-            address: string;
-        };
-        assetIn: string;
-        assetOut: string;
-        amountIn: string;
-        amountOut: string;
+        fromAsset: string;
+        toAsset: string;
+        fromAmount: string;
+        toAmount: string;
+        poolAddress: string;
     }[];
 };
 
 export type DedustCalculatedSwap = {
-    type: 'dedust';
+    provider: 'dedust';
     trade: DedustCalculatedTrade | null;
 };
 
 export type StonfiCalculatedTrade = BasicCalculatedTrade & {
     rawTrade: {
-        ask_address: string;
-        ask_units: string;
-        offer_address: string;
-        offer_units: string;
+        fromAsset: string;
+        toAsset: string;
+        fromAmount: string;
+        toAmount: string;
     };
 };
 
 export type StonfiCalculatedSwap = {
-    type: 'stonfi';
+    provider: 'stonfi';
     trade: StonfiCalculatedTrade | null;
 };
 
@@ -111,7 +107,7 @@ export function useCalculateSwap() {
             let fetchedProvidersNumber = 0;
             swapProviders.forEach(async provider => {
                 try {
-                    const providerSwap = await TradeService.calculateTrade(
+                    const providerSwap = await SwapService.calculateSwap(
                         toTradeAssetId(form.fromAddress),
                         toTradeAssetId(form.toAddress),
                         form.amountWei,
@@ -119,30 +115,25 @@ export function useCalculateSwap() {
                     );
 
                     const assetsToQuery = new Set<string>();
-                    if (providerSwap.type === 'dedust') {
-                        providerSwap.trades.forEach(steps =>
-                            steps.forEach(step => {
+                    if (providerSwap.provider === 'dedust') {
+                        providerSwap.trades.forEach(t =>
+                            t.steps.forEach(step => {
                                 assetsToQuery.add(
-                                    tonAssetAddressToString(fromDedustAddress(step.assetIn))
+                                    tonAssetAddressToString(fromTradeAssetId(step.fromAsset))
                                 );
                                 assetsToQuery.add(
-                                    tonAssetAddressToString(fromDedustAddress(step.assetOut))
+                                    tonAssetAddressToString(fromTradeAssetId(step.toAsset))
                                 );
                             })
                         );
                     }
-                    if (providerSwap.type === 'stonfi') {
-                        if (providerSwap.trade) {
+                    if (providerSwap.provider === 'stonfi') {
+                        const t = providerSwap.trades[0];
+                        if (t) {
                             assetsToQuery.add(
-                                tonAssetAddressToString(
-                                    fromStonfiAddress(providerSwap.trade.ask_address)
-                                )
+                                tonAssetAddressToString(fromTradeAssetId(t.fromAsset))
                             );
-                            assetsToQuery.add(
-                                tonAssetAddressToString(
-                                    fromStonfiAddress(providerSwap.trade.offer_address)
-                                )
-                            );
+                            assetsToQuery.add(tonAssetAddressToString(fromTradeAssetId(t.toAsset)));
                         }
                     }
                     const assetsInfo = await Promise.all(
@@ -161,7 +152,7 @@ export function useCalculateSwap() {
                 } catch (e) {
                     console.error(e);
                     const swap: CalculatedSwap = {
-                        type: provider,
+                        provider: provider as 'dedust' | 'stonfi',
                         trade: null
                     };
                     totalFetchedSwaps = totalFetchedSwaps.concat(swap);
@@ -192,84 +183,83 @@ export function useCalculateSwap() {
 }
 
 const toTradeAssetId = (address: TonAssetAddress) => {
-    return isTon(address) ? 'native' : address.toRawString();
+    return isTon(address) ? 'ton' : address.toRawString();
 };
 
-const fromDedustAddress = (address: string) => {
-    if (address === 'native') {
-        return 'TON';
-    }
-
-    return Address.parse(address.split('jetton:')[1]);
-};
-
-const fromStonfiAddress = (address: string) => {
-    if (eqAddresses(address, stonfiNativeAddress)) {
-        return 'TON';
-    }
-
-    return Address.parse(address);
+const fromTradeAssetId = (address: string): TonAssetAddress => {
+    return address === 'ton' ? 'TON' : Address.parse(address);
 };
 
 const providerSwapToSwap = (
-    providerSwap: Awaited<ReturnType<typeof TradeService.calculateTrade>>,
+    providerSwap: Awaited<ReturnType<typeof SwapService.calculateSwap>>,
     assetsInfo: TonAsset[]
 ): CalculatedSwap[] => {
-    if (providerSwap.type === 'dedust') {
-        return providerSwap.trades.map(steps => ({
-            type: 'dedust',
+    if (providerSwap.provider === 'dedust') {
+        if (providerSwap.trades.length === 0) {
+            return [
+                {
+                    provider: 'dedust',
+                    trade: null
+                }
+            ];
+        }
+        return providerSwap.trades.map(t => ({
+            provider: 'dedust',
             trade: {
                 from: new AssetAmount({
                     asset: assetsInfo.find(a =>
-                        eqAddresses(a.address, fromDedustAddress(steps[0].assetIn))
+                        eqAddresses(a.address, fromTradeAssetId(t.steps[0].fromAsset))
                     )!,
-                    weiAmount: steps[0].amountIn
+                    weiAmount: t.steps[0].fromAmount
                 }),
                 to: new AssetAmount({
                     asset: assetsInfo.find(a =>
-                        eqAddresses(a.address, fromDedustAddress(steps[steps.length - 1].assetOut))
+                        eqAddresses(
+                            a.address,
+                            fromTradeAssetId(t.steps[t.steps.length - 1].toAsset)
+                        )
                     )!,
-                    weiAmount: steps[steps.length - 1].amountOut
+                    weiAmount: t.steps[t.steps.length - 1].toAmount
                 }),
-                path: steps.reduce((acc, s, index) => {
+                path: t.steps.reduce((acc, s, index) => {
                     acc.push(
-                        assetsInfo.find(a => eqAddresses(a.address, fromDedustAddress(s.assetIn)))!
+                        assetsInfo.find(a => eqAddresses(a.address, fromTradeAssetId(s.fromAsset)))!
                     );
-                    if (index === steps.length - 1) {
+                    if (index === t.steps.length - 1) {
                         acc.push(
                             assetsInfo.find(a =>
-                                eqAddresses(a.address, fromDedustAddress(s.assetOut))
+                                eqAddresses(a.address, fromTradeAssetId(s.toAsset))
                             )!
                         );
                     }
 
                     return acc;
                 }, [] as TonAsset[]),
-                rawTrade: steps
+                rawTrade: t.steps
             }
         }));
     }
 
-    if (providerSwap.type === 'stonfi') {
-        const trade = providerSwap.trade;
+    if (providerSwap.provider === 'stonfi') {
+        const trade = providerSwap.trades[0];
         if (!trade) {
-            return [{ type: 'stonfi', trade: null }];
+            return [{ provider: 'stonfi', trade: null }];
         }
         return [
             {
-                type: 'stonfi',
+                provider: 'stonfi',
                 trade: {
                     from: new AssetAmount({
                         asset: assetsInfo.find(a =>
-                            eqAddresses(a.address, fromStonfiAddress(trade.offer_address))
+                            eqAddresses(a.address, fromTradeAssetId(trade.fromAsset))
                         )!,
-                        weiAmount: trade.offer_units
+                        weiAmount: trade.fromAmount
                     }),
                     to: new AssetAmount({
                         asset: assetsInfo.find(a =>
-                            eqAddresses(a.address, fromStonfiAddress(trade.ask_address))
+                            eqAddresses(a.address, fromTradeAssetId(trade.toAsset))
                         )!,
-                        weiAmount: trade.ask_units
+                        weiAmount: trade.toAmount
                     }),
                     rawTrade: trade
                 }
