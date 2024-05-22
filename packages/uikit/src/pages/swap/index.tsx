@@ -4,6 +4,7 @@ import { RefreshIcon, SlidersIcon } from '../../components/Icon';
 import { IconButton } from '../../components/fields/IconButton';
 import { Label2 } from '../../components/Text';
 import { DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
+import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
 
 /*const SwapPage = () => {
     // const from = 'TON';
@@ -105,12 +106,13 @@ const ContentWrapper = styled.div`
 `;
 
 const SwapPage = () => {
+    const { refetch } = useCalculatedSwap();
     return (
         <SwapPageWrapper>
             <DesktopViewHeader backButton={false}>
                 <Label2>Swap</Label2>
                 <HeaderButtons>
-                    <IconButton transparent>
+                    <IconButton transparent onClick={() => refetch()}>
                         <RefreshIcon />
                     </IconButton>
                     <IconButton transparent>

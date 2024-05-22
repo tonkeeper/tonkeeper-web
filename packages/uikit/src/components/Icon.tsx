@@ -1622,3 +1622,35 @@ export const RefreshIcon: FC<{ className?: string; color?: string }> = ({ color,
         </svg>
     );
 };
+
+export const InfoCircleIcon: FC<{ className?: string; color?: string }> = ({
+    color,
+    className
+}) => {
+    const theme = useTheme();
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            color={theme[color || 'iconTertiary']}
+            className={className}
+        >
+            <g clipPath="url(#clip0_33740_221833)">
+                <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M0 6C0 2.68629 2.68629 0 6 0C9.31371 0 12 2.68629 12 6C12 9.31371 9.31371 12 6 12C2.68629 12 0 9.31371 0 6ZM5.1001 3.4C5.1001 3.89706 5.50304 4.3 6.0001 4.3C6.49715 4.3 6.9001 3.89706 6.9001 3.4C6.9001 2.90295 6.49715 2.5 6.0001 2.5C5.50304 2.5 5.1001 2.90295 5.1001 3.4ZM6 5.3C5.58579 5.3 5.25 5.63579 5.25 6.05V8.75C5.25 9.16421 5.58579 9.5 6 9.5C6.41421 9.5 6.75 9.16421 6.75 8.75V6.05C6.75 5.63579 6.41421 5.3 6 5.3Z"
+                    fill="currentColor"
+                />
+            </g>
+            <defs>
+                <clipPath id="clip0_33740_221833">
+                    <rect width="12" height="12" fill="white" transform="matrix(1 0 0 -1 0 12)" />
+                </clipPath>
+            </defs>
+        </svg>
+    );
+};

@@ -1,11 +1,16 @@
 import { FC } from 'react';
 import BigNumber from 'bignumber.js';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Skeleton } from '../shared/Skeleton';
 import { Body3, Label3 } from '../Text';
 import { styled } from 'styled-components';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import {
+    useMaxSwapValue,
+    useSwapFromAmount,
+    useSwapFromAsset,
+    useSwapToAsset
+} from '../../state/swap/useSwapForm';
 import { useAssetWeiBalance } from '../../state/home';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 
@@ -37,26 +42,44 @@ const MaxButton = styled.button`
     }
 `;
 
-export const SwapAmountBalance: FC<{
-    onMax?: (value: BigNumber) => void;
-    asset: Pick<TonAsset, 'address' | 'decimals'>;
-}> = ({ onMax, asset }) => {
+export const SwapFromAmountBalance: FC = () => {
+    const [_, setSwapAmount] = useSwapFromAmount();
+    const [asset] = useSwapFromAsset();
+    const { data: balance } = useMaxSwapValue();
+
+    return (
+        <SwapAmountContent
+            balance={balance}
+            decimals={asset.decimals}
+            onMax={() => setSwapAmount(shiftedDecimals(balance!, asset.decimals))}
+        />
+    );
+};
+
+export const SwapToAmountBalance: FC = () => {
+    const [asset] = useSwapToAsset();
     const balance = useAssetWeiBalance({ address: asset.address, blockchain: BLOCKCHAIN_NAME.TON });
+
+    return <SwapAmountContent balance={balance} decimals={asset.decimals} />;
+};
+
+const SwapAmountContent: FC<{
+    balance: BigNumber | undefined;
+    decimals: number;
+    onMax?: () => void;
+}> = ({ balance, decimals = 0, onMax }) => {
     const format = useFormatCoinValue();
 
     return (
         <BalanceContainer>
             <Body3Styled>Balance:&nbsp;</Body3Styled>
             {balance ? (
-                <Body3Styled>{format(balance, asset.decimals)}</Body3Styled>
+                <Body3Styled>{format(balance, decimals)}</Body3Styled>
             ) : (
                 <Skeleton width="80px" height="12px" margin="2px 0" />
             )}
             {onMax && (
-                <MaxButton
-                    disabled={!balance || balance.isZero()}
-                    onClick={() => onMax(shiftedDecimals(balance!, asset.decimals))}
-                >
+                <MaxButton disabled={!balance || balance.isZero()} onClick={onMax}>
                     <Label3>Max</Label3>
                 </MaxButton>
             )}

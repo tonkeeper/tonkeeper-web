@@ -11,13 +11,13 @@ import {
     removeGroupSeparator
 } from '@tonkeeper/core/dist/utils/send';
 
-const AmountInputWrapper = styled.input`
+const AmountInputWrapper = styled.input<{ isErrored: boolean }>`
     border: none;
     background: none;
     text-align: right;
     outline: none;
     width: 30px;
-    color: ${p => p.theme.textPrimary};
+    color: ${p => (p.isErrored ? p.theme.accentRed : p.theme.textPrimary)};
     font-family: inherit;
 
     ${Num2Class}
@@ -31,8 +31,9 @@ export const SwapAmountInput: FC<{
     value: BigNumber | undefined;
     onChange: (value: BigNumber | undefined) => void;
     decimals: number;
+    isErrored: boolean;
     className?: string;
-}> = ({ value, onChange, decimals, className }) => {
+}> = ({ value, onChange, decimals, className, isErrored }) => {
     const [input, setInput] = useState('');
 
     const onInput = (newValue: string) => {
@@ -70,7 +71,19 @@ export const SwapAmountInput: FC<{
         if (!value) {
             setInput('');
         } else {
-            setInput(formatNumberValue(value));
+            if (!input.endsWith(getDecimalSeparator())) {
+                try {
+                    const bnInput = new BigNumber(
+                        removeGroupSeparator(input).replace(getDecimalSeparator(), '.')
+                    );
+
+                    if (!bnInput.eq(value)) {
+                        setInput(formatNumberValue(value));
+                    }
+                } catch (_) {
+                    // ignore
+                }
+            }
         }
     }, [value]);
 
@@ -81,6 +94,7 @@ export const SwapAmountInput: FC<{
             onChange={e => onInput(e.target.value)}
             placeholder={`0${decimalSeparator}00`}
             className={className}
+            isErrored={isErrored}
         />
     );
 };

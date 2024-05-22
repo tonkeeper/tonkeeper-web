@@ -109,4 +109,28 @@ export class SwapService {
             },
         });
     }
+    /**
+     * @returns any Default Response
+     * @throws ApiError
+     */
+    public static swapGas(): CancelablePromise<{
+        dedust: {
+            tonToJetton: string;
+            jettonToTon: string;
+            jettonToJetton: string;
+        };
+        stonfi: {
+            tonToJetton: string;
+            jettonToTon: string;
+            jettonToJetton: string;
+        };
+    }> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/v2/swap/gas',
+            errors: {
+                500: `Default Response`,
+            },
+        });
+    }
 }

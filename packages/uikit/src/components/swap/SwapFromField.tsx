@@ -2,10 +2,11 @@ import { styled } from 'styled-components';
 import { Body3 } from '../Text';
 import { SwapTokenSelect } from './SwapTokenSelect';
 import { SwapAmountInput } from './SwapAmountInput';
-import { useSwapFromAmount, useSwapFromAsset } from '../../state/swap/useSwapForm';
+import { useMaxSwapValue, useSwapFromAmount, useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { SwapAmountFiat } from './SwapAmountFiat';
-import { SwapAmountBalance } from './SwapAmountBalance';
+import { SwapFromAmountBalance } from './SwapAmountBalance';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 const FiledContainerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
@@ -54,12 +55,13 @@ const SwapAmountInputStyled = styled(SwapAmountInput)`
 export const SwapFromField = () => {
     const [swapAmount, setSwapAmount] = useSwapFromAmount();
     const [fromAsset, setFromAsset] = useSwapFromAsset();
+    const { data: max } = useMaxSwapValue();
 
     return (
         <FiledContainerStyled>
             <FiledHeader>
                 <Body3>Send</Body3>
-                <SwapAmountBalance asset={fromAsset} onMax={setSwapAmount} />
+                <SwapFromAmountBalance />
             </FiledHeader>
             <FieldBody>
                 <SwapTokenSelectStyled token={fromAsset} onTokenChange={setFromAsset} />
@@ -67,6 +69,11 @@ export const SwapFromField = () => {
                     value={swapAmount}
                     onChange={debounce(setSwapAmount)}
                     decimals={fromAsset.decimals}
+                    isErrored={
+                        !!max &&
+                        !!swapAmount &&
+                        swapAmount.gt(shiftedDecimals(max, fromAsset.decimals))
+                    }
                 />
             </FieldBody>
             <FieldFooter>

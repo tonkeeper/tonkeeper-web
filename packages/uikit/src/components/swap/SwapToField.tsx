@@ -3,9 +3,10 @@ import { Body3, Num2 } from '../Text';
 import { SwapTokenSelect } from './SwapTokenSelect';
 import { useSwapToAsset } from '../../state/swap/useSwapForm';
 import { SwapAmountFiat } from './SwapAmountFiat';
-import { SwapAmountBalance } from './SwapAmountBalance';
+import { SwapToAmountBalance } from './SwapAmountBalance';
 import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
 import { Skeleton } from '../shared/Skeleton';
+import { SwapTransactionInfo } from './SwapTransactionInfo';
 
 const FiledContainerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
@@ -73,7 +74,7 @@ export const SwapToField = () => {
         <FiledContainerStyled>
             <FiledHeader>
                 <Body3>Receive</Body3>
-                <SwapAmountBalance asset={toAsset} />
+                <SwapToAmountBalance />
             </FiledHeader>
             <FieldBody>
                 <SwapTokenSelectStyled token={toAsset} onTokenChange={setToAsset} />
@@ -88,8 +89,12 @@ export const SwapToField = () => {
                 </ToAmountField>
             </FieldBody>
             <FieldFooter>
-                <SwapAmountFiat amount={bestSwap?.trade?.to.relativeAmount} asset={toAsset} />
+                <SwapAmountFiat
+                    amount={isFetching ? undefined : bestSwap?.trade?.to.relativeAmount}
+                    asset={toAsset}
+                />
             </FieldFooter>
+            <SwapTransactionInfo />
         </FiledContainerStyled>
     );
 };

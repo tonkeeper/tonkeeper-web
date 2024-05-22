@@ -14,11 +14,16 @@ import { Address } from '@ton/core';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { useMemo } from 'react';
 import { useAppContext } from '../../hooks/appContext';
-import { useSwapFromAmount, useSwapFromAsset, useSwapToAsset } from './useSwapForm';
-import { atom, useAtom } from 'jotai';
+import {
+    useSwapFromAmount,
+    useSwapFromAsset,
+    useSelectedSwap,
+    useSwapToAsset
+} from './useSwapForm';
 import { QueryKey } from '../../libs/queryKey';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
+import { atom, useAtom } from '../../libs/atom';
 
 // TODO
 OpenAPI.BASE = 'http://localhost:8080';
@@ -46,6 +51,7 @@ export type DedustCalculatedSwap = {
 };
 
 export type StonfiCalculatedTrade = BasicCalculatedTrade & {
+    path: TonAsset[];
     rawTrade: {
         fromAsset: string;
         toAsset: string;
@@ -82,6 +88,7 @@ export function useCalculatedSwap() {
     const [fromAsset] = useSwapFromAsset();
     const [toAsset] = useSwapToAsset();
     const [fromAmountRelative] = useSwapFromAmount();
+    const [_, setSelectedSwap] = useSelectedSwap();
 
     const query = useQuery<CalculatedSwap[], Error>({
         queryKey: [
@@ -92,10 +99,11 @@ export function useCalculatedSwap() {
         ],
         queryFn: async () => {
             setFetchedSwaps([]);
+            setSelectedSwap(undefined);
             calculationId = calculationId + 1;
             const currentCalulationId = calculationId;
 
-            if (!fromAmountRelative) {
+            if (!fromAmountRelative || fromAmountRelative.isZero()) {
                 return [];
             }
 
@@ -128,12 +136,13 @@ export function useCalculatedSwap() {
                             return;
                         }
 
-                        totalFetchedSwaps = totalFetchedSwaps.concat(swap);
-                        setFetchedSwaps(s => [...s, ...swap]);
+                        totalFetchedSwaps = sortSwaps(totalFetchedSwaps.concat(swap));
+                        setSelectedSwap(totalFetchedSwaps[0]);
+                        setFetchedSwaps(s => sortSwaps([...s, ...swap]));
 
                         fetchedProvidersNumber = fetchedProvidersNumber + 1;
                         if (fetchedProvidersNumber === swapProviders.length) {
-                            res(sortSwaps(totalFetchedSwaps));
+                            res(totalFetchedSwaps);
                         }
                     } catch (e) {
                         if (currentCalulationId !== calculationId) {
@@ -146,12 +155,13 @@ export function useCalculatedSwap() {
                             provider: provider as 'dedust' | 'stonfi',
                             trade: null
                         };
-                        totalFetchedSwaps = totalFetchedSwaps.concat(swap);
-                        setFetchedSwaps(s => [...s, swap]);
+                        totalFetchedSwaps = sortSwaps(totalFetchedSwaps.concat(swap));
+                        setSelectedSwap(totalFetchedSwaps[0]);
+                        setFetchedSwaps(s => sortSwaps([...s, swap]));
 
                         fetchedProvidersNumber = fetchedProvidersNumber + 1;
                         if (fetchedProvidersNumber === swapProviders.length) {
-                            res(sortSwaps(totalFetchedSwaps));
+                            res(totalFetchedSwaps);
                         }
                     }
                 });
@@ -263,7 +273,8 @@ const providerSwapToSwap = async (
                         asset: TON_ASSET,
                         weiAmount: trade.blockchainFee
                     }),
-                    rawTrade: trade
+                    rawTrade: trade,
+                    path: [fromAsset, toAsset]
                 }
             }
         ];

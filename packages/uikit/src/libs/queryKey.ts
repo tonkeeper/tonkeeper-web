@@ -38,7 +38,9 @@ export enum QueryKey {
     dashboardData = 'dashboardData',
 
     stonfiAssets = 'stonfiAssets',
-    swapCalculate = 'swapCalculate'
+    swapCalculate = 'swapCalculate',
+    swapGasConfig = 'swapCalculate',
+    swapMaxValue = 'swapMaxValue'
 }
 
 export enum JettonKey {
