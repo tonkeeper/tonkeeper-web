@@ -6,6 +6,7 @@ import { ChevronDownIcon, InfoCircleIcon } from '../Icon';
 import { Tooltip } from '../shared/Tooltip';
 import { Skeleton } from '../shared/Skeleton';
 import {
+    priceImpactStatus,
     useSelectedSwap,
     useSwapFromAmount,
     useSwapOptions,
@@ -80,6 +81,17 @@ const InfoSkeleton = () => {
     return <Skeleton width="60px" height="12px" margin="2px 0" />;
 };
 
+const PriceImpact = styled(Body3)<{ status: ReturnType<typeof priceImpactStatus> }>`
+    color: ${p =>
+        p.status === 'low'
+            ? p.theme.accentGreen
+            : p.status === 'medium'
+            ? p.theme.accentOrange
+            : p.status === 'high'
+            ? p.theme.accentRed
+            : p.theme.textSecondary};
+`;
+
 export const SwapTransactionInfo = () => {
     const [isOpened, setIsOpened] = useState(true);
     const { isFetching } = useCalculatedSwap();
@@ -121,7 +133,7 @@ export const SwapTransactionInfo = () => {
                                 {!priceImpact || isFetching ? (
                                     <InfoSkeleton />
                                 ) : (
-                                    <Body3>
+                                    <PriceImpact status={priceImpactStatus(priceImpact)}>
                                         ≈&nbsp;
                                         {priceImpact
                                             ? `${priceImpact
@@ -130,7 +142,7 @@ export const SwapTransactionInfo = () => {
                                                   .toString()
                                                   .replace('.', getDecimalSeparator())}%`
                                             : 'Unknown price impact'}
-                                    </Body3>
+                                    </PriceImpact>
                                 )}
                             </InfoRowRight>
                         </InfoRow>

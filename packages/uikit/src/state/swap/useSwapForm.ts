@@ -17,7 +17,8 @@ export const swapToAsset$ = atom<TonAsset>(TON_USDT_ASSET);
 export const swapAmount$ = atom<BigNumber | undefined>(new BigNumber(1));
 
 const swapOptions$ = atom({
-    slippagePercent: 1
+    slippagePercent: 1,
+    maxPriceImpact: 0.3
 });
 
 export const useSwapFromAsset = () => {
@@ -106,4 +107,16 @@ export const useSwapPriceImpact = () => {
     }
 
     return fromFiat.minus(toFiat).dividedBy(fromFiat);
+};
+
+export const priceImpactStatus = (priceImpact: BigNumber | undefined) => {
+    if (!priceImpact) return 'unknown';
+    if (priceImpact.isGreaterThan(0.05)) return 'high';
+    if (priceImpact.isGreaterThan(0.01)) return 'medium';
+    return 'low';
+};
+
+export const useIsSwapFormNotCompleted = () => {
+    const [fromAmount] = useSwapFromAmount();
+    return !fromAmount || fromAmount.isZero();
 };

@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
 import { Body3, Num2 } from '../Text';
 import { SwapTokenSelect } from './SwapTokenSelect';
-import { useSwapToAsset } from '../../state/swap/useSwapForm';
+import { useSelectedSwap, useSwapToAsset } from '../../state/swap/useSwapForm';
 import { SwapAmountFiat } from './SwapAmountFiat';
 import { SwapToAmountBalance } from './SwapAmountBalance';
 import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
@@ -10,7 +10,8 @@ import { SwapTransactionInfo } from './SwapTransactionInfo';
 
 const FiledContainerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
-    border-radius: ${p => p.theme.corner2xSmall};
+    border-radius: ${p =>
+        p.theme.displayType === 'full-width' ? p.theme.corner2xSmall : p.theme.cornerSmall};
     padding: 6px 12px;
 `;
 
@@ -66,9 +67,9 @@ const Num2Tertiary = styled(Num2)`
 
 export const SwapToField = () => {
     const [toAsset, setToAsset] = useSwapToAsset();
-    const { fetchedSwaps, isFetching } = useCalculatedSwap();
+    const { isFetching } = useCalculatedSwap();
 
-    const bestSwap = fetchedSwaps?.[0];
+    const [selectedSwap] = useSelectedSwap();
 
     return (
         <FiledContainerStyled>
@@ -81,8 +82,8 @@ export const SwapToField = () => {
                 <ToAmountField>
                     {isFetching ? (
                         <Skeleton width="100px" height="28px" margin="4px 0" />
-                    ) : bestSwap?.trade ? (
-                        <Num2>{bestSwap.trade.to.stringRelativeAmount}</Num2>
+                    ) : selectedSwap?.trade ? (
+                        <Num2>{selectedSwap.trade.to.stringRelativeAmount}</Num2>
                     ) : (
                         <Num2Tertiary>0</Num2Tertiary>
                     )}
@@ -90,7 +91,7 @@ export const SwapToField = () => {
             </FieldBody>
             <FieldFooter>
                 <SwapAmountFiat
-                    amount={isFetching ? undefined : bestSwap?.trade?.to.relativeAmount}
+                    amount={isFetching ? undefined : selectedSwap?.trade?.to.relativeAmount}
                     asset={toAsset}
                 />
             </FieldFooter>

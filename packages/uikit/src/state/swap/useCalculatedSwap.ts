@@ -18,8 +18,8 @@ import {
     useSwapFromAmount,
     useSwapFromAsset,
     useSelectedSwap,
-    useSwapToAsset
-} from './useSwapForm';
+    useSwapToAsset, useIsSwapFormNotCompleted
+} from "./useSwapForm";
 import { QueryKey } from '../../libs/queryKey';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
@@ -89,6 +89,7 @@ export function useCalculatedSwap() {
     const [toAsset] = useSwapToAsset();
     const [fromAmountRelative] = useSwapFromAmount();
     const [_, setSelectedSwap] = useSelectedSwap();
+    const isNotCompleted = useIsSwapFormNotCompleted();
 
     const query = useQuery<CalculatedSwap[], Error>({
         queryKey: [
@@ -103,14 +104,14 @@ export function useCalculatedSwap() {
             calculationId = calculationId + 1;
             const currentCalulationId = calculationId;
 
-            if (!fromAmountRelative || fromAmountRelative.isZero()) {
+            if (isNotCompleted) {
                 return [];
             }
 
             addAssetToCache(fromAsset);
             addAssetToCache(toAsset);
 
-            const fromAmountWei = unShiftedDecimals(fromAmountRelative, fromAsset.decimals);
+            const fromAmountWei = unShiftedDecimals(fromAmountRelative!, fromAsset.decimals);
 
             let totalFetchedSwaps: CalculatedSwap[] = [];
             return new Promise((res, rej) => {

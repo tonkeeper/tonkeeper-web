@@ -5,6 +5,7 @@ import { IconButton } from '../../components/fields/IconButton';
 import { Label2 } from '../../components/Text';
 import { DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
 import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
+import { SwapProviders } from '../../components/swap/SwapProviders';
 
 /*const SwapPage = () => {
     // const from = 'TON';
@@ -103,6 +104,8 @@ const HeaderButtons = styled.div`
 
 const ContentWrapper = styled.div`
     padding: 0 1rem;
+    display: flex;
+    gap: 0.5rem;
 `;
 
 const SwapPage = () => {
@@ -122,6 +125,7 @@ const SwapPage = () => {
             </DesktopViewHeader>
             <ContentWrapper>
                 <SwapMainForm />
+                <SwapProviders />
             </ContentWrapper>
         </SwapPageWrapper>
     );

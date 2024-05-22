@@ -10,7 +10,8 @@ import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 const FiledContainerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
-    border-radius: ${p => p.theme.corner2xSmall};
+    border-radius: ${p =>
+        p.theme.displayType === 'full-width' ? p.theme.corner2xSmall : p.theme.cornerSmall};
     padding: 6px 12px;
 `;
 

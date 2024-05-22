@@ -40,7 +40,9 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
             ? css`
                   cursor: pointer;
               `
-            : undefined}
+            : css`
+                  cursor: not-allowed;
+              `}
 
     flex-shrink: 0;
 
