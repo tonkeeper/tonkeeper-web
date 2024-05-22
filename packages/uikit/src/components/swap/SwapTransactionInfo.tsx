@@ -7,8 +7,8 @@ import { Tooltip } from '../shared/Tooltip';
 import { Skeleton } from '../shared/Skeleton';
 import {
     priceImpactStatus,
+    useIsSwapFormNotCompleted,
     useSelectedSwap,
-    useSwapFromAmount,
     useSwapOptions,
     useSwapPriceImpact
 } from '../../state/swap/useSwapForm';
@@ -98,7 +98,7 @@ export const SwapTransactionInfo = () => {
     const [swap] = useSelectedSwap();
     const priceImpact = useSwapPriceImpact();
     const [{ slippagePercent }] = useSwapOptions();
-    const [fromAmount] = useSwapFromAmount();
+    const isNotCompleted = useIsSwapFormNotCompleted();
 
     const priceImpactId = useId();
     const minimumReceivedId = useId();
@@ -108,7 +108,7 @@ export const SwapTransactionInfo = () => {
 
     const trade = swap?.trade;
 
-    if ((!isFetching && !trade) || !fromAmount || fromAmount?.isZero()) {
+    if ((!isFetching && !trade) || isNotCompleted) {
         return null;
     }
 
@@ -130,7 +130,7 @@ export const SwapTransactionInfo = () => {
                             </div>
                             <Tooltip id={priceImpactId}>TODO</Tooltip>
                             <InfoRowRight>
-                                {!priceImpact || isFetching ? (
+                                {!priceImpact || !trade ? (
                                     <InfoSkeleton />
                                 ) : (
                                     <PriceImpact status={priceImpactStatus(priceImpact)}>
@@ -153,7 +153,7 @@ export const SwapTransactionInfo = () => {
                             </div>
                             <Tooltip id={minimumReceivedId}>TODO</Tooltip>
                             <InfoRowRight>
-                                {isFetching ? (
+                                {!trade ? (
                                     <InfoSkeleton />
                                 ) : (
                                     <Body3>
@@ -177,7 +177,7 @@ export const SwapTransactionInfo = () => {
                             </div>
                             <Tooltip id={slippageId}>TODO</Tooltip>
                             <InfoRowRight>
-                                {isFetching ? <InfoSkeleton /> : <Body3>{slippagePercent}%</Body3>}
+                                {!trade ? <InfoSkeleton /> : <Body3>{slippagePercent}%</Body3>}
                             </InfoRowRight>
                         </InfoRow>
                         <InfoRow>
@@ -187,7 +187,7 @@ export const SwapTransactionInfo = () => {
                             </div>
                             <Tooltip id={blockchainFeeId}>TODO</Tooltip>
                             <InfoRowRight>
-                                {isFetching ? (
+                                {!trade ? (
                                     <InfoSkeleton />
                                 ) : (
                                     <Body3>
@@ -203,7 +203,7 @@ export const SwapTransactionInfo = () => {
                             </div>
                             <Tooltip id={routeId}>TODO</Tooltip>
                             <InfoRowRight>
-                                {isFetching ? (
+                                {!trade ? (
                                     <InfoSkeleton />
                                 ) : (
                                     <Body3>{trade!.path.map(t => t.symbol).join(' → ')}</Body3>

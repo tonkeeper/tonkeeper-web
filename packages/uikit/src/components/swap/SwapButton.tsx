@@ -31,7 +31,7 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
         return <Button disabled>Enter an amount</Button>;
     }
 
-    if (isFetching || !max || priceImpact === undefined) {
+    if ((isFetching && !selectedSwap?.trade) || !max || priceImpact === undefined) {
         return <Button loading={true}>Continue</Button>;
     }
 

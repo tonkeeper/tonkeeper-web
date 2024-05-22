@@ -113,9 +113,9 @@ const ProviderCard: FC<{ provider: keyof typeof providersConfig }> = ({ provider
 
     return (
         <ProviderCardStyled
-            isDisabled={!swap || !swap.trade}
+            isDisabled={!swap || !trade}
             isActive={isActive}
-            onClick={() => swap && setSelectedSwap(swap)}
+            onClick={() => swap && trade && setSelectedSwap(swap)}
         >
             <ProviderImage />
             <ProviderLabelContainer>

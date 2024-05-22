@@ -80,7 +80,7 @@ export const SwapToField = () => {
             <FieldBody>
                 <SwapTokenSelectStyled token={toAsset} onTokenChange={setToAsset} />
                 <ToAmountField>
-                    {isFetching ? (
+                    {!selectedSwap?.trade && isFetching ? (
                         <Skeleton width="100px" height="28px" margin="4px 0" />
                     ) : selectedSwap?.trade ? (
                         <Num2>{selectedSwap.trade.to.stringRelativeAmount}</Num2>
