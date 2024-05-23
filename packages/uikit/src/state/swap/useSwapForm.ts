@@ -38,13 +38,16 @@ export const useSwapOptions = () => {
 };
 
 export const useMaxSwapValue = () => {
-    const { data: swapGas } = useSwapGasConfig();
+    const { data: swapGas, isError } = useSwapGasConfig();
     const [fromAsset] = useSwapFromAsset();
     const balance = useAssetWeiBalance(fromAsset);
 
     return useQuery({
         queryKey: [QueryKey.swapMaxValue, swapGas, fromAsset.id, balance?.toFixed(0)],
         queryFn: async () => {
+            if (isError) {
+                return balance;
+            }
             if (!balance || !swapGas) {
                 return undefined;
             }
@@ -63,7 +66,7 @@ export const useMaxSwapValue = () => {
                 return balance;
             }
         },
-        enabled: !!swapGas && balance !== undefined
+        enabled: (!!swapGas || isError) && balance !== undefined
     });
 };
 

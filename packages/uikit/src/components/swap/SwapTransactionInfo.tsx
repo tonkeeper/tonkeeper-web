@@ -93,7 +93,7 @@ const PriceImpact = styled(Body3)<{ status: ReturnType<typeof priceImpactStatus>
 `;
 
 export const SwapTransactionInfo = () => {
-    const [isOpened, setIsOpened] = useState(true);
+    const [isOpened, setIsOpened] = useState(false);
     const { isFetching } = useCalculatedSwap();
     const [swap] = useSelectedSwap();
     const priceImpact = useSwapPriceImpact();

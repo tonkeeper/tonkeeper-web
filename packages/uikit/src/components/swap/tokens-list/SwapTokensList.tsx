@@ -1,8 +1,10 @@
 import { styled } from 'styled-components';
-import { FC } from 'react';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { FC, Fragment } from 'react';
 import { Body3, Label2 } from '../../Text';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { WalletSwapAsset } from '../../../state/swap/useSwapAssets';
+import { formatFiatCurrency } from '../../../hooks/balance';
+import { useAppContext } from '../../../hooks/appContext';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 const SwapTokensListWrapper = styled.div`
     height: calc(100% - 53px);
@@ -18,14 +20,20 @@ const SwapTokensListWrapper = styled.div`
     scrollbar-width: none;
 `;
 
-export const SwapTokensList: FC<{ assets: AssetAmount<TonAsset>[] }> = ({ assets }) => {
+export const SwapTokensList: FC<{
+    walletSwapAssets: WalletSwapAsset[];
+    onSelect: (asset: TonAsset) => void;
+}> = ({ walletSwapAssets, onSelect }) => {
     return (
         <SwapTokensListWrapper>
-            {assets.map(token => (
-                <>
-                    <TokenListItem token={token} key={token.asset.id} />
+            {walletSwapAssets.map(swapAsset => (
+                <Fragment key={swapAsset.assetAmount.asset.id}>
+                    <TokenListItem
+                        onClick={() => onSelect(swapAsset.assetAmount.asset)}
+                        swapAsset={swapAsset}
+                    />
                     <Divider />
-                </>
+                </Fragment>
             ))}
         </SwapTokensListWrapper>
     );
@@ -41,6 +49,13 @@ const TokenListItemWrapper = styled.div`
     padding: 8px 1rem;
     display: flex;
     gap: 12px;
+
+    transition: background-color 0.15s ease-in-out;
+    cursor: pointer;
+
+    &:hover {
+        background-color: ${p => p.theme.backgroundContent};
+    }
 `;
 
 const TokenImage = styled.img`
@@ -79,19 +94,27 @@ const BalanceLabel = styled(Label2)<{ isZero: boolean }>`
     color: ${p => (p.isZero ? p.theme.textTertiary : p.theme.textPrimary)};
 `;
 
-const TokenListItem: FC<{ token: AssetAmount<TonAsset> }> = ({ token }) => {
-    const isZeroBalance = token.relativeAmount.isZero();
+const TokenListItem: FC<{ swapAsset: WalletSwapAsset; onClick?: () => void }> = ({
+    swapAsset,
+    onClick
+}) => {
+    const isZeroBalance = swapAsset.assetAmount.relativeAmount.isZero();
+    const { fiat } = useAppContext();
     return (
-        <TokenListItemWrapper>
-            <TokenImage src={token.asset.image} />
+        <TokenListItemWrapper onClick={onClick}>
+            <TokenImage src={swapAsset.assetAmount.asset.image} />
             <TokenInfo>
                 <TokenInfoLine>
-                    <Label2>{token.asset.symbol}</Label2>
-                    <BalanceLabel isZero={isZeroBalance}>{token.stringRelativeAmount}</BalanceLabel>
+                    <Label2>{swapAsset.assetAmount.asset.symbol}</Label2>
+                    <BalanceLabel isZero={isZeroBalance}>
+                        {swapAsset.assetAmount.stringRelativeAmount}
+                    </BalanceLabel>
                 </TokenInfoLine>
                 <TokenInfoSecondLine>
-                    <Body3>{token.asset.name}</Body3>
-                    {!isZeroBalance && <Body3>$1,344.17</Body3>}
+                    <Body3>{swapAsset.assetAmount.asset.name}</Body3>
+                    {!isZeroBalance && (
+                        <Body3>{formatFiatCurrency(fiat, swapAsset.fiatAmount)}</Body3>
+                    )}
                 </TokenInfoSecondLine>
             </TokenInfo>
         </TokenListItemWrapper>

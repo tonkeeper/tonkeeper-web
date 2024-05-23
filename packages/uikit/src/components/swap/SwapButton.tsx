@@ -19,7 +19,7 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
     const [swapAmount] = useSwapFromAmount();
     const [fromAsset] = useSwapFromAsset();
     const { data: max } = useMaxSwapValue();
-    const { isFetching } = useCalculatedSwap();
+    const { isFetching, data: calculatedSwaps } = useCalculatedSwap();
     const [selectedSwap] = useSelectedSwap();
 
     const priceImpact = useSwapPriceImpact();
@@ -31,6 +31,10 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
         return <Button disabled>Enter an amount</Button>;
     }
 
+    if (!isFetching && calculatedSwaps?.every(s => !s.trade)) {
+        return <Button disabled>Trading is not available</Button>;
+    }
+
     if ((isFetching && !selectedSwap?.trade) || !max || priceImpact === undefined) {
         return <Button loading={true}>Continue</Button>;
     }
@@ -39,7 +43,7 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
         return <Button disabled>Trading is not available</Button>;
     }
 
-    const isNotEnoughFunds = swapAmount?.gt(shiftedDecimals(max, fromAsset.decimals));
+    const isNotEnoughFunds = swapAmount?.gt(shiftedDecimals(max!, fromAsset.decimals));
 
     if (isNotEnoughFunds) {
         return <Button disabled>Not enough funds</Button>;

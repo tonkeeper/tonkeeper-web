@@ -18,8 +18,9 @@ import {
     useSwapFromAmount,
     useSwapFromAsset,
     useSelectedSwap,
-    useSwapToAsset, useIsSwapFormNotCompleted
-} from "./useSwapForm";
+    useSwapToAsset,
+    useIsSwapFormNotCompleted
+} from './useSwapForm';
 import { QueryKey } from '../../libs/queryKey';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
@@ -138,7 +139,9 @@ export function useCalculatedSwap() {
                         }
 
                         totalFetchedSwaps = sortSwaps(totalFetchedSwaps.concat(swap));
-                        setSelectedSwap(totalFetchedSwaps[0]);
+                        if (totalFetchedSwaps[0].trade) {
+                            setSelectedSwap(totalFetchedSwaps[0]);
+                        }
                         setFetchedSwaps(s => sortSwaps([...s, ...swap]));
 
                         fetchedProvidersNumber = fetchedProvidersNumber + 1;
@@ -157,7 +160,9 @@ export function useCalculatedSwap() {
                             trade: null
                         };
                         totalFetchedSwaps = sortSwaps(totalFetchedSwaps.concat(swap));
-                        setSelectedSwap(totalFetchedSwaps[0]);
+                        if (totalFetchedSwaps[0].trade) {
+                            setSelectedSwap(totalFetchedSwaps[0]);
+                        }
                         setFetchedSwaps(s => sortSwaps([...s, swap]));
 
                         fetchedProvidersNumber = fetchedProvidersNumber + 1;

@@ -45,6 +45,7 @@ export const SwapProviders = () => {
 };
 
 const ProviderCardStyled = styled.div<{ isActive: boolean; isDisabled: boolean }>`
+    height: 56px;
     border-radius: ${p =>
         p.theme.displayType === 'full-width' ? p.theme.corner2xSmall : p.theme.cornerSmall};
     border: 1px solid ${p => (p.isActive ? p.theme.accentBlue : p.theme.separatorCommon)};
@@ -105,7 +106,7 @@ const ProviderCard: FC<{ provider: keyof typeof providersConfig }> = ({ provider
     const trade = swap?.trade;
     const [toAsset] = useSwapToAsset();
     const { data: rate } = useRate(tonAssetAddressToString(toAsset.address));
-    const isBest = fetchedSwaps.findIndex(t => t.provider === provider) === 0;
+    const isBest = fetchedSwaps.findIndex(t => t.provider === provider) === 0 && !!swap?.trade;
 
     const providerConfig = providersConfig[provider];
 
@@ -117,7 +118,7 @@ const ProviderCard: FC<{ provider: keyof typeof providersConfig }> = ({ provider
             isActive={isActive}
             onClick={() => swap && trade && setSelectedSwap(swap)}
         >
-            <ProviderImage />
+            <ProviderImage src={providerConfig.imageUrl} />
             <ProviderLabelContainer>
                 <Label2>{providerConfig.label}</Label2>
                 {isBest && <Body3Styled>Best price</Body3Styled>}

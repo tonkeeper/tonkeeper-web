@@ -133,4 +133,23 @@ export class SwapService {
             },
         });
     }
+    /**
+     * @returns any Default Response
+     * @throws ApiError
+     */
+    public static swapAssets(): CancelablePromise<Array<{
+        symbol: string;
+        name: string;
+        decimals: number;
+        address: string;
+        image: string;
+    }>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/v2/swap/assets',
+            errors: {
+                500: `Default Response`,
+            },
+        });
+    }
 }

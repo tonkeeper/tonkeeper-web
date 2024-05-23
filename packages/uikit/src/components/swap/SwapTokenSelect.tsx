@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback } from 'react';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { styled } from 'styled-components';
 import { Label2 } from '../Text';
@@ -28,6 +28,7 @@ const TokenSymbol = styled(Label2)`
 const TokenImage = styled.img`
     height: 24px;
     width: 24px;
+    border-radius: 100%;
     flex-shrink: 0;
 `;
 
@@ -42,10 +43,6 @@ export const SwapTokenSelect: FC<{
     );
 
     const openList = useOpenSwapTokensList(onClose);
-
-    useEffect(() => {
-        openList();
-    }, []);
 
     return (
         <SelectContainer className={className} onClick={openList}>

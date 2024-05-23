@@ -23,9 +23,17 @@ const SearchTokenInputElement = styled.input`
     &:focus {
         border: 1px solid ${p => p.theme.accentBlue};
     }
+    &:disabled {
+        opacity: 0.5;
+    }
     color: ${p => p.theme.textPrimary};
 `;
 
-export const SwapSearchInput: FC<{ className?: string }> = ({ className }) => {
-    return <SearchTokenInputElement className={className} placeholder="Search" />;
+export const SwapSearchInput: FC<{ className?: string; isDisabled: boolean }> = ({
+    className,
+    isDisabled
+}) => {
+    return (
+        <SearchTokenInputElement disabled={isDisabled} className={className} placeholder="Search" />
+    );
 };

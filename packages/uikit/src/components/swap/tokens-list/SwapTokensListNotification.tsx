@@ -5,9 +5,8 @@ import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { styled } from 'styled-components';
 import { SwapSearchInput } from './SwapSearchInput';
 import { SwapTokensList } from './SwapTokensList';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import BigNumber from 'bignumber.js';
+import { useWalletSwapAssets } from '../../../state/swap/useSwapAssets';
+import { SpinnerIcon } from '../../Icon';
 
 const swapTokensListOpened$ = atom<{ onClose: (token: TonAsset | undefined) => void } | undefined>(
     undefined
@@ -27,16 +26,14 @@ export const useOpenSwapTokensList = (onClose: (token: TonAsset | undefined) => 
 export const SwapTokensListNotification: FC = () => {
     const [onSelect, setIsOpen] = useAtom(swapTokensListOpened$);
 
+    const onClose = (asset: TonAsset | undefined) => {
+        onSelect?.onClose(asset);
+        setIsOpen(undefined);
+    };
+
     return (
-        <Notification
-            isOpen={!!onSelect}
-            handleClose={() => {
-                onSelect?.onClose(undefined);
-                setIsOpen(undefined);
-            }}
-            title="Tokens"
-        >
-            {() => <SwapTokensListContent onSelect={onSelect?.onClose || (() => {})} />}
+        <Notification isOpen={!!onSelect} handleClose={() => onClose(undefined)} title="Tokens">
+            {() => <SwapTokensListContent onSelect={onClose} />}
         </Notification>
     );
 };
@@ -56,43 +53,28 @@ const Divider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
 `;
 
-const mockAsset = new AssetAmount({ asset: TON_ASSET, weiAmount: new BigNumber(10000000000) });
+const SpinnerContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+`;
 
 const SwapTokensListContent: FC<{ onSelect: (token: TonAsset | undefined) => void }> = ({
     onSelect
 }) => {
+    const { data: walletSwapAssets } = useWalletSwapAssets();
     return (
         <SwapTokensListContentWrapper>
-            <SwapSearchInputStyled />
+            <SwapSearchInputStyled isDisabled={!walletSwapAssets} />
             <Divider />
-            <SwapTokensList
-                assets={[
-                    mockAsset,
-                    mockAsset,
-                    mockAsset,
-                    mockAsset,
-                    mockAsset,
-                    mockAsset,
-                    mockAsset,
-                    mockAsset,
-                    mockAsset,
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) }),
-                    new AssetAmount<TonAsset>({ asset: TON_ASSET, weiAmount: new BigNumber(0) })
-                ]}
-            />
+            {walletSwapAssets ? (
+                <SwapTokensList onSelect={onSelect} walletSwapAssets={walletSwapAssets} />
+            ) : (
+                <SpinnerContainer>
+                    <SpinnerIcon />
+                </SpinnerContainer>
+            )}
         </SwapTokensListContentWrapper>
     );
 };
