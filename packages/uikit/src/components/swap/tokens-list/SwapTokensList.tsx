@@ -45,7 +45,9 @@ const Divider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
 `;
 
-const TokenListItemWrapper = styled.div`
+const TokenListItemWrapper = styled.button`
+    border: none;
+    width: 100%;
     padding: 8px 1rem;
     display: flex;
     gap: 12px;
@@ -53,7 +55,8 @@ const TokenListItemWrapper = styled.div`
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
 
-    &:hover {
+    &:hover,
+    &:focus {
         background-color: ${p => p.theme.backgroundContent};
     }
 `;

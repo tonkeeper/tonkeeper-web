@@ -11,6 +11,9 @@ import BigNumber from 'bignumber.js';
 import { useRate } from '../rates';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useAppContext } from '../../hooks/appContext';
+import { atom, useAtom } from '../../libs/atom';
+import { useMemo } from 'react';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 
 export function useAllSwapAssets() {
     return useQuery<TonAsset[]>({
@@ -34,6 +37,12 @@ export function useAllSwapAssets() {
     });
 }
 
+const swapTokensFilter = atom('');
+
+export function useSwapTokensFilter() {
+    return useAtom(swapTokensFilter);
+}
+
 export type WalletSwapAsset = {
     assetAmount: AssetAmount<TonAsset>;
     fiatAmount: BigNumber;
@@ -46,7 +55,7 @@ export function useWalletSwapAssets() {
     const { fiat } = useAppContext();
 
     return useQuery<WalletSwapAsset[]>({
-        queryKey: [QueryKey.swapWalletAssets],
+        queryKey: [QueryKey.swapWalletAssets, allAssets, walletAssetsData, tonRate, fiat],
         queryFn: async () => {
             if (!walletAssetsData || !allAssets || !tonRate) {
                 return [];
@@ -88,3 +97,33 @@ export function useWalletSwapAssets() {
         enabled: !!walletAssetsData && !!allAssets && !!tonRate
     });
 }
+
+export const useWalletFilteredSwapAssets = () => {
+    const [filter] = useSwapTokensFilter();
+    const { data: walletSwapAssets } = useWalletSwapAssets();
+
+    return useMemo(() => {
+        if (!walletSwapAssets) {
+            return undefined;
+        }
+
+        return walletSwapAssets.filter(swapAsset => {
+            if (!filter) {
+                return true;
+            }
+
+            if (seeIfValidTonAddress(filter)) {
+                return Address.parse(filter).equals(swapAsset.assetAmount.asset.address as Address);
+            }
+
+            const upperCaseFilter = filter.toUpperCase();
+
+            if (
+                swapAsset.assetAmount.asset.symbol.toUpperCase().includes(upperCaseFilter) ||
+                swapAsset.assetAmount.asset.name?.toUpperCase().includes(upperCaseFilter)
+            ) {
+                return true;
+            }
+        });
+    }, [filter, walletSwapAssets]);
+};
