@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { QueryKey } from '../../libs/queryKey';
-import { SwapService } from '@tonkeeper/core/dist/swapsApi';
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Address } from '@ton/core';
 import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
@@ -14,12 +13,15 @@ import { useAppContext } from '../../hooks/appContext';
 import { atom, useAtom } from '../../libs/atom';
 import { useMemo } from 'react';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { useSwapsConfig } from './useSwapsConfig';
 
 export function useAllSwapAssets() {
+    const { swapService } = useSwapsConfig();
+
     return useQuery<TonAsset[]>({
         queryKey: [QueryKey.swapAllAssets],
         queryFn: async () => {
-            const assets = await SwapService.swapAssets();
+            const assets = await swapService.swapAssets();
             return assets.map(asset => {
                 const address = asset.address === 'ton' ? 'TON' : Address.parse(asset.address);
 

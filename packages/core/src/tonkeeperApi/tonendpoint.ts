@@ -47,6 +47,9 @@ export interface TonendpointConfig {
     notcoin_burn_date?: number;
     notcoin_burn_addresses?: string[];
 
+    web_swaps_url?: string;
+    web_swaps_referral_address?: string;
+
     /**
      * @deprecated use ton api
      */

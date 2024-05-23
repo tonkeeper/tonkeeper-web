@@ -5,7 +5,7 @@ import {
     TonAssetAddress
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { OpenAPI, SwapService } from '@tonkeeper/core/dist/swapsApi';
+import type { SwapService } from '@tonkeeper/core/dist/swapsApi';
 import { JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
@@ -25,9 +25,7 @@ import { QueryKey } from '../../libs/queryKey';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { atom, useAtom } from '../../libs/atom';
-
-// TODO
-OpenAPI.BASE = 'http://localhost:8080';
+import { useSwapsConfig } from './useSwapsConfig';
 
 export type BasicCalculatedTrade = {
     from: AssetAmount<TonAsset>;
@@ -91,6 +89,7 @@ export function useCalculatedSwap() {
     const [fromAmountRelative] = useSwapFromAmount();
     const [_, setSelectedSwap] = useSelectedSwap();
     const isNotCompleted = useIsSwapFormNotCompleted();
+    const { swapService } = useSwapsConfig();
 
     const query = useQuery<CalculatedSwap[], Error>({
         queryKey: [
@@ -119,7 +118,7 @@ export function useCalculatedSwap() {
                 let fetchedProvidersNumber = 0;
                 swapProviders.forEach(async provider => {
                     try {
-                        const providerSwap = await SwapService.calculateSwap(
+                        const providerSwap = await swapService.calculateSwap(
                             toTradeAssetId(fromAsset.address),
                             toTradeAssetId(toAsset.address),
                             fromAmountWei.toFixed(0),

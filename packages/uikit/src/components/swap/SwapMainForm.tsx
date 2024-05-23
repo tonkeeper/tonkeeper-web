@@ -32,11 +32,12 @@ const ChangeIconStyled = styled(IconButton)`
     position: absolute;
     right: calc(50% - 16px);
     bottom: -20px;
+    border: none;
 
     background-color: ${props => props.theme.buttonTertiaryBackground};
 
     &:hover {
-        background-color: ${props => props.theme.backgroundContentAttention};
+        background-color: ${props => props.theme.buttonTertiaryBackgroundHighlighted};
     }
 `;
 

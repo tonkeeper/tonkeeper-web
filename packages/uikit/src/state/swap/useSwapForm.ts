@@ -7,10 +7,10 @@ import BigNumber from 'bignumber.js';
 import { atom, useAtom } from '../../libs/atom';
 import { useQuery } from '@tanstack/react-query';
 import { QueryKey } from '../../libs/queryKey';
-import { SwapService } from '@tonkeeper/core/dist/swapsApi';
 import { useAssetWeiBalance } from '../home';
 import { CalculatedSwap } from './useCalculatedSwap';
 import { useRate } from '../rates';
+import { useSwapsConfig } from './useSwapsConfig';
 
 export const swapFromAsset$ = atom<TonAsset>(TON_ASSET);
 export const swapToAsset$ = atom<TonAsset>(TON_USDT_ASSET);
@@ -71,10 +71,12 @@ export const useMaxSwapValue = () => {
 };
 
 export const useSwapGasConfig = () => {
+    const { swapService } = useSwapsConfig();
+
     return useQuery({
         queryKey: [QueryKey.swapGasConfig],
         queryFn: async () => {
-            return SwapService.swapGas();
+            return swapService.swapGas();
         }
     });
 };

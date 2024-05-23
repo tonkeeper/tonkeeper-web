@@ -7,7 +7,7 @@ import { useAppContext } from '../../../hooks/appContext';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 const SwapTokensListWrapper = styled.div`
-    height: calc(100% - 53px);
+    height: 500px;
     overflow-y: auto;
     width: calc(100% + 2rem);
     margin: 0 -1rem;
@@ -51,6 +51,7 @@ const TokenListItemWrapper = styled.button`
     padding: 8px 1rem;
     display: flex;
     gap: 12px;
+    background-color: transparent;
 
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;

@@ -78,7 +78,7 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
-import SwapPage from "@tonkeeper/uikit/dist/pages/swap";
+import SwapPage from '@tonkeeper/uikit/dist/pages/swap';
 
 const queryClient = new QueryClient({
     defaultOptions: {

@@ -1,29 +1,33 @@
 import { useMutation } from '@tanstack/react-query';
 import { CalculatedSwap } from './useCalculatedSwap';
-import { SwapService } from '@tonkeeper/core/dist/swapsApi';
+import type { SwapService } from '@tonkeeper/core/dist/swapsApi';
 import { assertUnreachable, NonNullableFields } from '@tonkeeper/core/dist/utils/types';
 import { Address } from '@ton/core';
-import { useWalletContext } from '../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useSwapsConfig } from './useSwapsConfig';
+import { useSwapOptions } from './useSwapForm';
+import BigNumber from 'bignumber.js';
 
 export function useExecuteSwap() {
     const { active } = useWalletContext();
+    const { swapService } = useSwapsConfig();
+    const { config } = useAppContext();
+    const [{ slippagePercent }] = useSwapOptions();
+    const referral = config.web_swaps_referral_address;
+
     return useMutation<
         { value: string; to: string; body: string },
         Error,
         NonNullableFields<CalculatedSwap>
-    >(async swap => {
-        const encoded = await SwapService.encodeSwap({
+    >(swap => {
+        return swapService.encodeSwap({
             swap: swapToProviderSwap(swap),
             options: {
                 senderAddress: active.rawAddress,
-                slippage: '0.01', // TODO
-                referralAddress: Address.parse(
-                    'UQD2NmD_lH5f5u1Kj3KfGyTvhZSX0Eg6qp2a5IQUKXxOGzCi'
-                ).toRawString() // TODO
+                slippage: new BigNumber(slippagePercent).div(100).decimalPlaces(5).toString(),
+                ...(referral && { referralAddress: Address.parse(referral).toRawString() })
             }
         });
-
-        return encoded;
     });
 }
 

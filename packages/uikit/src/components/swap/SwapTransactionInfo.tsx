@@ -60,6 +60,7 @@ const AccordionBody = styled.div`
 const AccordionButton = styled(IconButton)<{ isOpened: boolean }>`
     transform: ${p => (p.isOpened ? 'rotate(180deg)' : 'rotate(0deg)')};
     transition: transform 0.2s ease-in-out;
+    border: none;
 `;
 
 const InfoRow = styled.div`
