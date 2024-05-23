@@ -7,9 +7,10 @@ import { SwapAmountFiat } from './SwapAmountFiat';
 import { SwapFromAmountBalance } from './SwapAmountBalance';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { useOpenSwapTokensList } from "./tokens-list/SwapTokensListNotification";
+import { FC, PropsWithChildren } from 'react';
 
 const FiledContainerStyled = styled.div`
+    position: relative;
     background: ${p => p.theme.backgroundContent};
     border-radius: ${p =>
         p.theme.displayType === 'full-width' ? p.theme.corner2xSmall : p.theme.cornerSmall};
@@ -54,7 +55,7 @@ const SwapAmountInputStyled = styled(SwapAmountInput)`
     flex: 1;
 `;
 
-export const SwapFromField = () => {
+export const SwapFromField: FC<PropsWithChildren> = ({ children }) => {
     const [swapAmount, setSwapAmount] = useSwapFromAmount();
     const [fromAsset, setFromAsset] = useSwapFromAsset();
     const { data: max } = useMaxSwapValue();
@@ -81,6 +82,7 @@ export const SwapFromField = () => {
             <FieldFooter>
                 <SwapAmountFiat amount={swapAmount} asset={fromAsset} />
             </FieldFooter>
+            {children}
         </FiledContainerStyled>
     );
 };
