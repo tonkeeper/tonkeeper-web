@@ -10,6 +10,7 @@ import { useSelectedSwap } from '../../state/swap/useSwapForm';
 import { NonNullableFields } from '@tonkeeper/core/dist/utils/types';
 import { CalculatedSwap } from '../../state/swap/useCalculatedSwap';
 import { Address } from '@ton/core';
+import { SwapTokensListNotification } from './tokens-list/SwapTokensListNotification';
 
 const MainFormWrapper = styled.div`
     width: 292px;
@@ -47,6 +48,7 @@ export const SwapMainForm = () => {
                 handleClose={() => setModalParams(null)}
                 params={modalParams}
             />
+            <SwapTokensListNotification />
         </MainFormWrapper>
     );
 };

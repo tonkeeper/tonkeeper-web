@@ -7,6 +7,7 @@ import { SwapAmountFiat } from './SwapAmountFiat';
 import { SwapFromAmountBalance } from './SwapAmountBalance';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { useOpenSwapTokensList } from "./tokens-list/SwapTokensListNotification";
 
 const FiledContainerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};

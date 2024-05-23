@@ -1,8 +1,9 @@
-import { FC } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { styled } from 'styled-components';
 import { Label2 } from '../Text';
 import { SwitchIcon } from '../Icon';
+import { useOpenSwapTokensList } from './tokens-list/SwapTokensListNotification';
 
 const SelectContainer = styled.button`
     border: none;
@@ -35,8 +36,19 @@ export const SwapTokenSelect: FC<{
     onTokenChange: (token: TonAsset) => void;
     className?: string;
 }> = ({ token, onTokenChange, className }) => {
+    const onClose = useCallback(
+        (t: TonAsset | undefined) => t && onTokenChange(t),
+        [onTokenChange]
+    );
+
+    const openList = useOpenSwapTokensList(onClose);
+
+    useEffect(() => {
+        openList();
+    }, []);
+
     return (
-        <SelectContainer className={className}>
+        <SelectContainer className={className} onClick={openList}>
             <TokenImage src={token.image} />
             <TokenSymbol>{token.symbol}</TokenSymbol>
             <SwitchIcon />

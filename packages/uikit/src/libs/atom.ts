@@ -33,10 +33,11 @@ export function useAtom<T>(a: Atom<T>): [T, (value: T | ((prev: T) => T)) => voi
     const [value, setValue] = useState(a.value);
 
     useEffect(() => {
+        setValue(a.value);
         return a.subscribe(v => {
             setValue(v);
         });
-    }, [atom]);
+    }, [a]);
 
     const next = useCallback(
         (newValue: T | ((prev: T) => T)) => {
