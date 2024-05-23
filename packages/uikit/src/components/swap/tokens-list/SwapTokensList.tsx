@@ -1,6 +1,6 @@
 import { styled } from 'styled-components';
 import { FC, Fragment } from 'react';
-import { Body3, Label2 } from '../../Text';
+import { Body2, Body3, Label2 } from '../../Text';
 import { WalletSwapAsset } from '../../../state/swap/useSwapAssets';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { useAppContext } from '../../../hooks/appContext';
@@ -20,21 +20,36 @@ const SwapTokensListWrapper = styled.div`
     scrollbar-width: none;
 `;
 
+const TokensNotFoundContainer = styled.div`
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: ${p => p.theme.textSecondary};
+`;
+
 export const SwapTokensList: FC<{
     walletSwapAssets: WalletSwapAsset[];
     onSelect: (asset: TonAsset) => void;
 }> = ({ walletSwapAssets, onSelect }) => {
     return (
         <SwapTokensListWrapper>
-            {walletSwapAssets.map(swapAsset => (
-                <Fragment key={swapAsset.assetAmount.asset.id}>
-                    <TokenListItem
-                        onClick={() => onSelect(swapAsset.assetAmount.asset)}
-                        swapAsset={swapAsset}
-                    />
-                    <Divider />
-                </Fragment>
-            ))}
+            {walletSwapAssets.length ? (
+                walletSwapAssets.map(swapAsset => (
+                    <Fragment key={swapAsset.assetAmount.asset.id}>
+                        <TokenListItem
+                            onClick={() => onSelect(swapAsset.assetAmount.asset)}
+                            swapAsset={swapAsset}
+                        />
+                        <Divider />
+                    </Fragment>
+                ))
+            ) : (
+                <TokensNotFoundContainer>
+                    <Body2>Tokens not found</Body2>
+                </TokensNotFoundContainer>
+            )}
         </SwapTokensListWrapper>
     );
 };

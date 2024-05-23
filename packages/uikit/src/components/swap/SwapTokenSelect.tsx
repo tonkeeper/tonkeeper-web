@@ -5,6 +5,17 @@ import { Label2 } from '../Text';
 import { SwitchIcon } from '../Icon';
 import { useOpenSwapTokensList } from './tokens-list/SwapTokensListNotification';
 
+const TokenSymbol = styled(Label2)`
+    display: block;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+    color: ${p => p.theme.textPrimary};
+
+    transition: color 0.15s ease-in-out;
+`;
+
 const SelectContainer = styled.button`
     border: none;
     display: flex;
@@ -15,14 +26,12 @@ const SelectContainer = styled.button`
     gap: 6px;
     height: 36px;
     width: fit-content;
-`;
 
-const TokenSymbol = styled(Label2)`
-    display: block;
-    max-width: 80px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex-shrink: 0;
+    &:hover {
+        > ${TokenSymbol} {
+            color: ${p => p.theme.accentBlue};
+        }
+    }
 `;
 
 const TokenImage = styled.img`
