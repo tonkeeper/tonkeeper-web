@@ -22,11 +22,11 @@ export const SwapAmountFiat: FC<{
     const { fiat } = useAppContext();
     const { data: rate, isLoading } = useRate(tonAssetAddressToString(asset.address));
     if (!amount) {
-        return null;
+        return <div />;
     }
 
     if (!isLoading && !rate?.prices) {
-        return null;
+        return <div />;
     }
 
     if (isLoading) {

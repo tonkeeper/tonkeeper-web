@@ -7,6 +7,7 @@ import { SwapToAmountBalance } from './SwapAmountBalance';
 import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
 import { Skeleton } from '../shared/Skeleton';
 import { SwapTransactionInfo } from './SwapTransactionInfo';
+import { SwapRate } from './SwapRate';
 
 const FiledContainerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
@@ -52,7 +53,7 @@ const FieldFooter = styled.div`
     align-items: center;
     height: 16px;
 
-    > * {
+    > :last-child {
         margin-left: auto;
     }
 `;
@@ -90,10 +91,8 @@ export const SwapToField = () => {
                 </ToAmountField>
             </FieldBody>
             <FieldFooter>
-                <SwapAmountFiat
-                    amount={isFetching ? undefined : selectedSwap?.trade?.to.relativeAmount}
-                    asset={toAsset}
-                />
+                <SwapRate />
+                <SwapAmountFiat amount={selectedSwap?.trade?.to.relativeAmount} asset={toAsset} />
             </FieldFooter>
             <SwapTransactionInfo />
         </FiledContainerStyled>

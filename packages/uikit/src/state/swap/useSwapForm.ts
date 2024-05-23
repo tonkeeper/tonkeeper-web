@@ -114,7 +114,7 @@ export const useSwapPriceImpact = () => {
     return fromFiat.minus(toFiat).dividedBy(fromFiat);
 };
 
-export const priceImpactStatus = (priceImpact: BigNumber | undefined) => {
+export const priceImpactStatus = (priceImpact: BigNumber | null) => {
     if (!priceImpact) return 'unknown';
     if (priceImpact.isGreaterThan(0.05)) return 'high';
     if (priceImpact.isGreaterThan(0.01)) return 'medium';
