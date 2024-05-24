@@ -16,20 +16,19 @@ export const parseSignerSignature = (payload: string): Buffer => {
     }
 
     const {
-        query: { boc }
+        query: { sign }
     } = queryString.parseUrl(payload);
 
-    if (typeof boc != 'string') {
-        throw new Error('Unexpected QR code, missing boc parameter');
+    if (typeof sign != 'string') {
+        throw new Error('Unexpected QR code, missing sign parameter');
     }
 
-    return Buffer.from(boc, 'base64');
+    return Buffer.from(sign, 'hex');
 };
 
 export const createTransferQr = (publicKey: string, boc: string) => {
-    const pk = encodeURIComponent(Buffer.from(publicKey, 'hex').toString('base64'));
-    const body = encodeURIComponent(boc);
-    return `tonsign://?network=ton&pk=${pk}&body=${body}`;
+    const body = Buffer.from(boc, 'base64').toString('hex');
+    return `tonsign://v1/?network=ton&pk=${publicKey}&body=${body}`;
 };
 
 export const storeTransactionAndCreateDeepLink = async (
@@ -39,17 +38,16 @@ export const storeTransactionAndCreateDeepLink = async (
 ) => {
     await sdk.storage.set(AppKey.SIGNER_MESSAGE, messageBase64);
 
-    const pk = encodeURIComponent(Buffer.from(publicKey, 'hex').toString('base64'));
-    const body = encodeURIComponent(messageBase64);
+    const body = Buffer.from(messageBase64, 'base64').toString('hex');
     const back = encodeURIComponent('https://wallet.tonkeeper.com/');
-    return `tonsign://?network=ton&pk=${pk}&body=${body}&return=${back}`;
+    return `tonsign://v1/?network=ton&pk=${publicKey}&body=${body}&return=${back}`;
 };
 
 export const publishSignerMessage = async (
     sdk: IAppSdk,
     api: APIConfig,
     walletState: WalletState,
-    signatureBase64: string
+    signatureHex: string
 ) => {
     const messageBase64 = await sdk.storage.get<string>(AppKey.SIGNER_MESSAGE);
     if (!messageBase64) {
@@ -57,7 +55,7 @@ export const publishSignerMessage = async (
     }
     const contract = walletContractFromState(walletState);
     const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
-    const signature = Buffer.from(decodeURIComponent(signatureBase64), 'base64');
+    const signature = Buffer.from(signatureHex, 'hex');
     const message = Cell.fromBase64(messageBase64).asBuilder();
 
     const transfer = beginCell();

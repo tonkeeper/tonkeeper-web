@@ -11,21 +11,18 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 
-const usePublishMessage = (signatureBase64: string) => {
+const usePublishMessage = (signatureHex: string) => {
     const sdk = useAppSdk();
     const { api } = useAppContext();
     const wallet = useWalletContext();
-    return useQuery([signatureBase64], async () => {
-        return await publishSignerMessage(sdk, api, wallet, signatureBase64);
+    return useQuery([signatureHex], async () => {
+        return await publishSignerMessage(sdk, api, wallet, signatureHex);
     });
 };
 
-const Confirm: FC<{ signatureBase64: string; onClose: () => void }> = ({
-    signatureBase64,
-    onClose
-}) => {
+const Confirm: FC<{ signatureHex: string; onClose: () => void }> = ({ signatureHex, onClose }) => {
     const { t } = useTranslation();
-    const { isFetched, isError } = usePublishMessage(signatureBase64);
+    const { isFetched, isError } = usePublishMessage(signatureHex);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -69,21 +66,21 @@ const SignerPublishNotification = () => {
     const { t } = useTranslation();
     let [searchParams, setParams] = useSearchParams();
 
-    const signatureBase64 = searchParams.get('boc');
+    const signatureHex = searchParams.get('sign');
 
     const onClose = useCallback(() => {
-        searchParams.delete('boc');
+        searchParams.delete('sign');
         setParams(searchParams);
     }, [searchParams, setParams]);
 
     const Content = useCallback(() => {
-        if (!signatureBase64) return <></>;
-        return <Confirm signatureBase64={signatureBase64} onClose={onClose} />;
-    }, [signatureBase64, onClose]);
+        if (!signatureHex) return <></>;
+        return <Confirm signatureHex={signatureHex} onClose={onClose} />;
+    }, [signatureHex, onClose]);
 
     return (
         <Notification
-            isOpen={signatureBase64 != null}
+            isOpen={signatureHex != null}
             handleClose={onClose}
             title={t('publish_message')}
         >
