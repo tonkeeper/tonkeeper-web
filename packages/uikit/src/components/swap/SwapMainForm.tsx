@@ -18,6 +18,8 @@ import { Address } from '@ton/core';
 import { SwapTokensListNotification } from './tokens-list/SwapTokensListNotification';
 import { IconButton } from '../fields/IconButton';
 import { ArrowDownIcon } from '../Icon';
+import { useNavigate } from 'react-router-dom';
+import { AppRoute } from '../../libs/routes';
 
 const MainFormWrapper = styled.div`
     width: 292px;
@@ -48,6 +50,7 @@ export const SwapMainForm = () => {
     const [fromAsset, setFromAsset] = useSwapFromAsset();
     const [toAsset, setToAsset] = useSwapToAsset();
     const [_, setFromAmount] = useSwapFromAmount();
+    const navigate = useNavigate();
 
     const onConfirm = async () => {
         const result = await encode(selectedSwap! as NonNullableFields<CalculatedSwap>);
@@ -72,6 +75,13 @@ export const SwapMainForm = () => {
         }
     };
 
+    const onCloseConfirmModal = (boc?: string) => {
+        setModalParams(null);
+        if (boc) {
+            navigate(AppRoute.activity);
+        }
+    };
+
     return (
         <MainFormWrapper>
             <SwapFromField>
@@ -81,10 +91,7 @@ export const SwapMainForm = () => {
             </SwapFromField>
             <SwapToField />
             <SwapButton onClick={onConfirm} isEncodingProcess={isLoading || !!modalParams} />
-            <TonTransactionNotification
-                handleClose={() => setModalParams(null)}
-                params={modalParams}
-            />
+            <TonTransactionNotification handleClose={onCloseConfirmModal} params={modalParams} />
             <SwapTokensListNotification />
         </MainFormWrapper>
     );

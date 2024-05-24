@@ -11,6 +11,8 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useStonfiSwapLink } from '../../state/stonfi';
 import { swapFromAsset$, swapToAsset$ } from '../../state/swap/useSwapForm';
 import { Navigate } from 'react-router-dom';
+import { fallbackRenderOver } from '../../components/Error';
+import { ErrorBoundary } from 'react-error-boundary';
 
 const SwapPageWrapper = styled.div`
     overflow-y: auto;
@@ -64,4 +66,10 @@ const SwapPage = () => {
     );
 };
 
-export default SwapPage;
+export default () => {
+    return (
+        <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Swaps page')}>
+            <SwapPage />
+        </ErrorBoundary>
+    );
+};
