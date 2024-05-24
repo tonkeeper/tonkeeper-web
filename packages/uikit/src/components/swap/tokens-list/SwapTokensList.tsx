@@ -1,12 +1,18 @@
 import { styled } from 'styled-components';
-import { FC, Fragment, useState } from 'react';
+import React, { FC, Fragment, useEffect, useRef, useState } from 'react';
 import { Body2, Body3, Label2 } from '../../Text';
-import { useSwapCustomTokenSearch, WalletSwapAsset } from '../../../state/swap/useSwapAssets';
+import {
+    useAddUserCustomSwapAsset,
+    useSwapCustomTokenSearch,
+    WalletSwapAsset
+} from '../../../state/swap/useSwapAssets';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { useAppContext } from '../../../hooks/appContext';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { SpinnerIcon } from '../../Icon';
+import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { LinkOutIcon, SpinnerIcon } from '../../Icon';
 import { ConfirmImportNotification } from './ConfirmImportNotification';
+import { useAppSdk } from '../../../hooks/appSdk';
+import { throttle } from '@tonkeeper/core/dist/utils/common';
 
 const SwapTokensListWrapper = styled.div`
     height: 500px;
@@ -32,10 +38,29 @@ export const SwapTokensList: FC<{
     walletSwapAssets: WalletSwapAsset[];
     onSelect: (asset: TonAsset) => void;
 }> = ({ walletSwapAssets, onSelect }) => {
+    const [displayingAssets, setDisplayingAssets] = useState(walletSwapAssets.slice(0, 25));
+    const ref = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        setDisplayingAssets(walletSwapAssets.slice(0, 25));
+    }, [walletSwapAssets]);
+
+    const onScroll = () => {
+        if (!ref?.current) {
+            return;
+        }
+        const scrollHeightLeft =
+            ref.current.scrollHeight - ref.current.clientHeight - ref.current.scrollTop;
+
+        if (scrollHeightLeft < 300) {
+            setDisplayingAssets(d => walletSwapAssets.slice(0, d.length + 25));
+        }
+    };
+
     return (
-        <SwapTokensListWrapper>
+        <SwapTokensListWrapper ref={ref} onScroll={throttle(onScroll, 100)}>
             {walletSwapAssets.length ? (
-                walletSwapAssets.map(swapAsset => (
+                displayingAssets.map(swapAsset => (
                     <Fragment key={swapAsset.assetAmount.asset.id}>
                         <TokenListItem
                             onClick={() => onSelect(swapAsset.assetAmount.asset)}
@@ -63,6 +88,7 @@ const TokensNotFoundContainer = styled.div`
 const TokenNotFound: FC<{ onSelect: (asset: TonAsset) => void }> = ({ onSelect }) => {
     const { data: swapAsset, isFetching } = useSwapCustomTokenSearch();
     const [isOpened, setIsOpened] = useState(false);
+    const { mutate } = useAddUserCustomSwapAsset();
 
     if (isFetching) {
         return (
@@ -83,6 +109,7 @@ const TokenNotFound: FC<{ onSelect: (asset: TonAsset) => void }> = ({ onSelect }
     const onClose = (confirmed?: boolean) => {
         setIsOpened(false);
         if (confirmed) {
+            mutate(swapAsset.assetAmount.asset);
             onSelect(swapAsset.assetAmount.asset);
         }
     };
@@ -131,7 +158,7 @@ const TokenInfo = styled.div`
 const TokenInfoLine = styled.div`
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
 
     > *:first-child {
         display: block;
@@ -139,8 +166,17 @@ const TokenInfoLine = styled.div`
         text-overflow: ellipsis;
     }
 
-    > *:nth-child(2) {
+    > *:nth-child(3) {
         margin-left: auto;
+    }
+`;
+
+const LinkOutIconWrapper = styled.div`
+    cursor: pointer;
+    &:hover {
+        > svg {
+            color: ${p => p.theme.iconSecondary};
+        }
     }
 `;
 
@@ -158,12 +194,33 @@ const TokenListItem: FC<{ swapAsset: WalletSwapAsset; onClick: () => void }> = (
 }) => {
     const isZeroBalance = swapAsset.assetAmount.relativeAmount.isZero();
     const { fiat } = useAppContext();
+    const sdk = useAppSdk();
+
+    const onOpenExplorer = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        let explorerUrl;
+        if (isTon(swapAsset.assetAmount.asset.address)) {
+            explorerUrl = 'https://tonviewer.com/price';
+        } else {
+            explorerUrl = `https://tonviewer.com/${swapAsset.assetAmount.asset.address.toString({
+                urlSafe: true
+            })}`;
+        }
+
+        sdk.openPage(explorerUrl);
+    };
+
     return (
         <TokenListItemWrapper onClick={onClick}>
             <TokenImage src={swapAsset.assetAmount.asset.image} />
             <TokenInfo>
                 <TokenInfoLine>
                     <Label2>{swapAsset.assetAmount.asset.symbol}</Label2>
+                    <LinkOutIconWrapper onClick={onOpenExplorer}>
+                        <LinkOutIcon />
+                    </LinkOutIconWrapper>
                     <BalanceLabel isZero={isZeroBalance}>
                         {swapAsset.assetAmount.stringRelativeAmount}
                     </BalanceLabel>

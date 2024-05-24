@@ -1,6 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '../../libs/queryKey';
-import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import {
+    isTon,
+    TonAsset,
+    tonAssetAddressFromString,
+    tonAssetAddressToString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Address } from '@ton/core';
 import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
@@ -14,30 +19,38 @@ import { atom, useAtom } from '../../libs/atom';
 import { useMemo } from 'react';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useSwapsConfig } from './useSwapsConfig';
-import { JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useWalletJettonList } from '../wallet';
+import { JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { useAppSdk } from '../../hooks/appSdk';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 
 export function useAllSwapAssets() {
     const { swapService } = useSwapsConfig();
+    const { data: customAssets } = useUserCustomSwapAssets();
 
     return useQuery<TonAsset[]>({
-        queryKey: [QueryKey.swapAllAssets],
+        queryKey: [QueryKey.swapAllAssets, customAssets],
         queryFn: async () => {
             const assets = await swapService.swapAssets();
-            return assets.map(asset => {
-                const address = asset.address === 'ton' ? 'TON' : Address.parse(asset.address);
+            const fetchedAssets = assets
+                .map(asset => {
+                    const address = asset.address === 'ton' ? 'TON' : Address.parse(asset.address);
 
-                return {
-                    id: packAssetId(BLOCKCHAIN_NAME.TON, address),
-                    symbol: asset.symbol,
-                    decimals: asset.decimals,
-                    name: asset.name,
-                    image: asset.image,
-                    blockchain: BLOCKCHAIN_NAME.TON,
-                    address
-                };
-            });
-        }
+                    return {
+                        id: packAssetId(BLOCKCHAIN_NAME.TON, address),
+                        symbol: asset.symbol,
+                        decimals: asset.decimals,
+                        name: asset.name,
+                        image: asset.image,
+                        blockchain: BLOCKCHAIN_NAME.TON,
+                        address
+                    };
+                })
+                .filter(asset => !(customAssets || []).some(ca => ca.id === asset.id));
+
+            return (fetchedAssets as TonAsset[]).concat(customAssets || []);
+        },
+        enabled: !!customAssets
     });
 }
 
@@ -94,7 +107,12 @@ export function useWalletSwapAssets() {
                 };
             });
 
-            assetsAmounts.sort((a, b) => b.fiatAmount.comparedTo(a.fiatAmount));
+            assetsAmounts.sort((a, b) => {
+                if (a.fiatAmount.isZero() && b.fiatAmount.isZero()) {
+                    return b.assetAmount.weiAmount.comparedTo(a.assetAmount.weiAmount);
+                }
+                return b.fiatAmount.comparedTo(a.fiatAmount);
+            });
 
             return assetsAmounts;
         },
@@ -184,5 +202,47 @@ export const useSwapCustomTokenSearch = () => {
             }
         },
         enabled: isAddress && !!jettons
+    });
+};
+
+type TonAssetSerialized = {
+    address: string;
+    image: string;
+    blockchain: string;
+    name: string;
+    symbol: string;
+    decimals: number;
+    id: string;
+};
+
+export const useUserCustomSwapAssets = () => {
+    const sdk = useAppSdk();
+    return useQuery<TonAsset[]>([AppKey.SWAP_CUSTOM_ASSETS], async () => {
+        const assetsSerialized = await sdk.storage.get<TonAssetSerialized[]>(
+            AppKey.SWAP_CUSTOM_ASSETS
+        );
+
+        return (
+            assetsSerialized?.map(s => ({
+                ...s,
+                blockchain: s.blockchain as BLOCKCHAIN_NAME.TON,
+                address: tonAssetAddressFromString(s.address),
+                id: packAssetId(s.blockchain as BLOCKCHAIN_NAME, s.address)
+            })) || []
+        );
+    });
+};
+
+export const useAddUserCustomSwapAsset = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+    return useMutation<void, Error, TonAsset>(async asset => {
+        const current =
+            (await sdk.storage.get<TonAssetSerialized[]>(AppKey.SWAP_CUSTOM_ASSETS)) || [];
+        await sdk.storage.set(AppKey.SWAP_CUSTOM_ASSETS, [
+            ...current,
+            { ...asset, address: tonAssetAddressToString(asset.address) }
+        ]);
+        await client.invalidateQueries([AppKey.SWAP_CUSTOM_ASSETS]);
     });
 };

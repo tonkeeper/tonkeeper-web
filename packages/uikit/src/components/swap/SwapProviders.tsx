@@ -105,7 +105,9 @@ const ProviderCard: FC<{ provider: keyof typeof providersConfig }> = ({ provider
     const swap = fetchedSwaps.find(t => t.provider === provider);
     const trade = swap?.trade;
     const [toAsset] = useSwapToAsset();
-    const { data: rate } = useRate(tonAssetAddressToString(toAsset.address));
+    const { data: rate, isFetching: isRateFetching } = useRate(
+        tonAssetAddressToString(toAsset.address)
+    );
     const isBest = fetchedSwaps.findIndex(t => t.provider === provider) === 0 && !!swap?.trade;
 
     const providerConfig = providersConfig[provider];
@@ -135,8 +137,10 @@ const ProviderCard: FC<{ provider: keyof typeof providersConfig }> = ({ provider
                         )}
                         {rate && trade ? (
                             <Body3Styled>≈&nbsp;{fiatAmount}</Body3Styled>
-                        ) : (
+                        ) : isRateFetching ? (
                             <Skeleton width="60px" height="12px" margin="2px 0" />
+                        ) : (
+                            <div />
                         )}
                         <Body3Styled></Body3Styled>
                     </>

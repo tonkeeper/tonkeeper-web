@@ -28,7 +28,11 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
     const isNotCompleted = useIsSwapFormNotCompleted();
 
     if (isNotCompleted) {
-        return <Button disabled>Enter an amount</Button>;
+        return (
+            <Button secondary disabled>
+                Enter an amount
+            </Button>
+        );
     }
 
     if (!isFetching && calculatedSwaps?.every(s => !s.trade)) {
@@ -36,22 +40,38 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
     }
 
     if ((isFetching && !selectedSwap?.trade) || !max || priceImpact === undefined) {
-        return <Button loading={true}>Continue</Button>;
+        return (
+            <Button secondary loading={true}>
+                Continue
+            </Button>
+        );
     }
 
     if (!selectedSwap || !selectedSwap.trade) {
-        return <Button disabled>Trading is not available</Button>;
+        return (
+            <Button secondary disabled>
+                Trading is not available
+            </Button>
+        );
     }
 
     const isNotEnoughFunds = swapAmount?.gt(shiftedDecimals(max!, fromAsset.decimals));
 
     if (isNotEnoughFunds) {
-        return <Button disabled>Not enough funds</Button>;
+        return (
+            <Button secondary disabled>
+                Not enough funds
+            </Button>
+        );
     }
 
     const priceImpactTooHigh = priceImpact?.gt(maxPriceImpact);
     if (priceImpactTooHigh) {
-        return <Button disabled>Price impact too high</Button>;
+        return (
+            <Button secondary disabled>
+                Price impact too high
+            </Button>
+        );
     }
 
     return (

@@ -122,15 +122,19 @@ export const useSwapPriceImpact = () => {
     const [toAsset] = useSwapToAsset();
     const [selectedSwap] = useSelectedSwap();
 
-    const { data: fromAssetRate } = useRate(tonAssetAddressToString(fromAsset.address));
-    const { data: toAssetRate } = useRate(tonAssetAddressToString(toAsset.address));
+    const { data: fromAssetRate, isLoading: fromAssetRateLoading } = useRate(
+        tonAssetAddressToString(fromAsset.address)
+    );
+    const { data: toAssetRate, isLoading: toAssetRateLoading } = useRate(
+        tonAssetAddressToString(toAsset.address)
+    );
 
     const trade = selectedSwap?.trade;
-    if (!trade || !toAssetRate || !fromAssetRate) {
+    if (!trade || toAssetRateLoading || fromAssetRateLoading) {
         return undefined;
     }
 
-    if (!fromAssetRate.prices || !toAssetRate.prices) {
+    if (!fromAssetRate?.prices || !toAssetRate?.prices) {
         return null;
     }
 

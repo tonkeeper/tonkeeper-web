@@ -86,11 +86,9 @@ const PriceImpact = styled(Body3)<{ status: ReturnType<typeof priceImpactStatus>
     color: ${p =>
         p.status === 'low'
             ? p.theme.accentGreen
-            : p.status === 'medium'
+            : p.status === 'medium' || p.status === 'unknown'
             ? p.theme.accentOrange
-            : p.status === 'high'
-            ? p.theme.accentRed
-            : p.theme.textSecondary};
+            : p.theme.accentRed};
 `;
 
 export const SwapTransactionInfo = () => {
@@ -131,19 +129,23 @@ export const SwapTransactionInfo = () => {
                             </div>
                             <Tooltip id={priceImpactId}>TODO</Tooltip>
                             <InfoRowRight>
-                                {!priceImpact || !trade ? (
+                                {priceImpact === undefined || !trade ? (
                                     <InfoSkeleton />
                                 ) : (
                                     <PriceImpact status={priceImpactStatus(priceImpact)}>
-                                        ≈&nbsp;
-                                        {priceImpact
-                                            ? `${priceImpact
-                                                  .multipliedBy(100)
-                                                  .decimalPlaces(2)
-                                                  .toString()
-                                                  .replace('.', getDecimalSeparator())
-                                                  .replace('-', '+')}%`
-                                            : 'Unknown price impact'}
+                                        {priceImpact ? (
+                                            <>
+                                                ≈&nbsp;
+                                                {`${priceImpact
+                                                    .multipliedBy(100)
+                                                    .decimalPlaces(2)
+                                                    .toString()
+                                                    .replace('.', getDecimalSeparator())
+                                                    .replace('-', '+')}%`}
+                                            </>
+                                        ) : (
+                                            'Unknown price impact'
+                                        )}
                                     </PriceImpact>
                                 )}
                             </InfoRowRight>
