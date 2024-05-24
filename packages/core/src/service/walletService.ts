@@ -258,7 +258,7 @@ export const walletStateFromKeystone = (ur: UR) => {
     };
 
     const pathInfo =
-        account.path && account.xfp ? { path: account.path, xfp: account.xfp } : undefined;
+        account.path && account.xfp ? { path: account.path, mfp: account.xfp } : undefined;
 
     const state: WalletState = {
         publicKey: account.publicKey,

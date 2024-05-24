@@ -20,6 +20,7 @@ import {
     signEstimateMessage
 } from './common';
 import { createLedgerJettonTransfer } from '../ledger/transfer';
+import { createKeystoneJettonTransfer } from '../keystone/transfer';
 
 export const jettonTransferAmount = toNano(0.1);
 export const jettonTransferForwardAmount = BigInt(1);
@@ -145,8 +146,10 @@ export const sendJettonTransfer = async (
     ] as const;
     if (signer.type === 'ledger') {
         buffer = await createLedgerJettonTransfer(...params, signer);
-    } else {
+    } else if(signer.type === 'cell') {
         buffer = await createJettonTransfer(...params, signer);
+    } else {
+        buffer = await createKeystoneJettonTransfer(...params, signer);
     }
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({

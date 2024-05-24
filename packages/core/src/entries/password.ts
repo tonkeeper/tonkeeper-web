@@ -1,3 +1,5 @@
+import { KeystonePathInfo } from "../service/keystone/types";
+
 export type AuthState =
     | AuthNone
     | AuthPassword
@@ -36,11 +38,6 @@ export interface AuthLedger {
 export interface AuthKeystone {
     kind: 'keystone';
     info?: KeystonePathInfo;
-}
-
-export interface KeystonePathInfo {
-    path: string;
-    xfp: string;
 }
 
 export interface WebAuthn {

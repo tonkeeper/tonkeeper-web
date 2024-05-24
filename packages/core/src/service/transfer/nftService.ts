@@ -16,6 +16,7 @@ import {
     getWalletBalance,
     signEstimateMessage
 } from './common';
+import { createKeystoneNftTransfer } from '../keystone/transfer';
 
 const initNftTransferAmount = toNano('1');
 export const nftTransferForwardAmount = BigInt('1');
@@ -155,8 +156,10 @@ export const sendNftTransfer = async (
     let buffer;
     if (signer.type === 'ledger') {
         buffer = await createLedgerNftTransfer(...params, signer);
-    } else {
+    } else if(signer.type === 'cell') {
         buffer = await createNftTransfer(...params, signer);
+    } else {
+        buffer = await createKeystoneNftTransfer(...params, signer);
     }
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({

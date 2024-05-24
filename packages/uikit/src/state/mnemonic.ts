@@ -13,6 +13,7 @@ import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import nacl from 'tweetnacl';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
+import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
 
 export const signTonConnectOver = (
     sdk: IAppSdk,
@@ -92,6 +93,19 @@ export const getSigner = async (
                 };
                 callback.type = 'cell' as const;
                 return callback as CellSigner;
+            }
+            case 'keystone': {
+                const callback = async (message: Cell, messageType: KeystoneMessageType, pathInfo?: {path: string, mfp: string}) => {
+                    const result = await pairKeystoneByNotification(
+                        sdk,
+                        message.toBoc({ idx: false }),
+                        messageType,
+                        pathInfo
+                    );
+                    return Buffer.from(result, 'hex');
+                };
+                callback.type = 'keystone' as const;
+                return callback;
             }
             default: {
                 const mnemonic = await getMnemonic(sdk, publicKey, checkTouchId);
@@ -174,6 +188,45 @@ const pairSignerByNotification = async (sdk: IAppSdk, boc: string): Promise<stri
             method: 'signer',
             id,
             params: boc
+        });
+
+        const onCallback = (message: {
+            method: 'response';
+            id?: number | undefined;
+            params: string | Error;
+        }) => {
+            if (message.id === id) {
+                const { params } = message;
+                sdk.uiEvents.off('response', onCallback);
+
+                if (typeof params === 'string') {
+                    resolve(params);
+                } else {
+                    reject(params);
+                }
+            }
+        };
+
+        sdk.uiEvents.on('response', onCallback);
+    });
+};
+
+const pairKeystoneByNotification = async (
+    sdk: IAppSdk,
+    message: Buffer,
+    messageType: KeystoneMessageType,
+    pathInfo?: { path: string; mfp: string }
+): Promise<string> => {
+    const id = Date.now();
+    return new Promise<string>((resolve, reject) => {
+        sdk.uiEvents.emit('keystone', {
+            method: 'keystone',
+            id,
+            params: {
+                message,
+                messageType,
+                pathInfo
+            }
         });
 
         const onCallback = (message: {

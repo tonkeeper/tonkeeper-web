@@ -1,3 +1,4 @@
+import { IStorage, MemoryStorage } from './Storage';
 import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
@@ -5,7 +6,7 @@ import { AuthState } from './entries/password';
 import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
 import { WalletState } from './entries/wallet';
 import { TonTransferParams } from './service/deeplinkingService';
-import { IStorage, MemoryStorage } from './Storage';
+import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTransaction } from './service/ledger/connector';
 
 export type GetPasswordType = 'confirm' | 'unlock';
@@ -39,6 +40,7 @@ export interface UIEvents {
     getPassword: GetPasswordParams;
     signer: string;
     ledger: { path: number[]; transaction: LedgerTransaction };
+    keystone: {message: Buffer, messageType: KeystoneMessageType, pathInfo?: KeystonePathInfo};
     loading: void;
     transfer: TransferInitParams;
     receive: ReceiveInitParams;

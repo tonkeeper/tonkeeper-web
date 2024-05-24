@@ -23,6 +23,7 @@ import {
     seeIfTransferBounceable,
     signEstimateMessage
 } from './common';
+import { createKeystoneTonTransfer } from '../keystone/transfer';
 
 export type EstimateData = {
     accountEvent: TransferEstimationEvent;
@@ -218,8 +219,10 @@ export const sendTonTransfer = async (
     const params = [timestamp, seqno, walletState, recipient, amount.weiAmount, isMax] as const;
     if (signer.type === 'ledger') {
         buffer = await createLedgerTonTransfer(...params, signer);
-    } else {
+    } else if (signer.type === 'cell') {
         buffer = await createTonTransfer(...params, signer);
+    } else {
+        buffer = await createKeystoneTonTransfer(...params, signer);
     }
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({

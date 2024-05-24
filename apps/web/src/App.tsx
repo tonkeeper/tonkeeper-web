@@ -76,6 +76,9 @@ const SendNftNotification = React.lazy(
 const PairSignerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
 );
+const PairKeystoneNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
+);
 const SignerLinkPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/signer/LinkPage'));
 const SignerPublishNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/pages/signer/PublishNotification')
@@ -374,6 +377,7 @@ export const Content: FC<{
                     <PairSignerNotification />
                     <SignerPublishNotification />
                     <ConnectLedgerNotification />
+                    <PairKeystoneNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>
