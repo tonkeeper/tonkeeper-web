@@ -5,7 +5,10 @@ import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { styled } from 'styled-components';
 import { SwapSearchInput } from './SwapSearchInput';
 import { SwapTokensList } from './SwapTokensList';
-import { useWalletFilteredSwapAssets } from '../../../state/swap/useSwapAssets';
+import {
+    useSwapTokensFilter,
+    useWalletFilteredSwapAssets
+} from '../../../state/swap/useSwapAssets';
 import { SpinnerIcon } from '../../Icon';
 
 const swapTokensListOpened$ = atom<{ onClose: (token: TonAsset | undefined) => void } | undefined>(
@@ -65,9 +68,11 @@ const SwapTokensListContent: FC<{ onSelect: (token: TonAsset | undefined) => voi
 }) => {
     const walletSwapAssets = useWalletFilteredSwapAssets();
     const inputRef = useRef<HTMLInputElement | undefined>();
+    const [_, setFilter] = useSwapTokensFilter();
 
     useEffect(() => {
         setTimeout(() => inputRef?.current?.focus(), 100);
+        return () => setFilter('');
     }, []);
 
     return (

@@ -11,6 +11,8 @@ import { useAssetWeiBalance } from '../home';
 import { CalculatedSwap } from './useCalculatedSwap';
 import { useRate } from '../rates';
 import { useSwapsConfig } from './useSwapsConfig';
+import { useCallback } from 'react';
+import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 
 export const swapFromAsset$ = atom<TonAsset>(TON_ASSET);
 export const swapToAsset$ = atom<TonAsset>(TON_USDT_ASSET);
@@ -22,11 +24,39 @@ const swapOptions$ = atom({
 });
 
 export const useSwapFromAsset = () => {
-    return useAtom(swapFromAsset$);
+    const [fromAsset, _setFromAsset] = useAtom(swapFromAsset$);
+    const [_, _setToAsset] = useAtom(swapToAsset$);
+
+    const setFromAsset = useCallback(
+        (asset: TonAsset) => {
+            if (eqAddresses(asset.address, swapToAsset$.value.address)) {
+                _setToAsset(swapFromAsset$.value);
+            }
+
+            _setFromAsset(asset);
+        },
+        [_setFromAsset, _setToAsset]
+    );
+
+    return [fromAsset, setFromAsset] as const;
 };
 
 export const useSwapToAsset = () => {
-    return useAtom(swapToAsset$);
+    const [toAsset, _setToAsset] = useAtom(swapToAsset$);
+    const [_, _setFromAsset] = useAtom(swapFromAsset$);
+
+    const setToAsset = useCallback(
+        (asset: TonAsset) => {
+            if (eqAddresses(asset.address, swapFromAsset$.value.address)) {
+                _setFromAsset(swapToAsset$.value);
+            }
+
+            _setToAsset(asset);
+        },
+        [_setToAsset, _setFromAsset]
+    );
+
+    return [toAsset, setToAsset] as const;
 };
 
 export const useSwapFromAmount = () => {

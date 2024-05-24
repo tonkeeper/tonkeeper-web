@@ -14,6 +14,8 @@ import { atom, useAtom } from '../../libs/atom';
 import { useMemo } from 'react';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useSwapsConfig } from './useSwapsConfig';
+import { JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { useWalletJettonList } from '../wallet';
 
 export function useAllSwapAssets() {
     const { swapService } = useSwapsConfig();
@@ -128,4 +130,59 @@ export const useWalletFilteredSwapAssets = () => {
             }
         });
     }, [filter, walletSwapAssets]);
+};
+
+export const useSwapCustomTokenSearch = () => {
+    const [filter] = useSwapTokensFilter();
+
+    const isAddress = seeIfValidTonAddress(filter);
+    const { api, fiat } = useAppContext();
+    const { data: jettons } = useWalletJettonList();
+
+    return useQuery<WalletSwapAsset | null>({
+        queryKey: [QueryKey.swapCustomToken, filter, jettons, fiat],
+        queryFn: async () => {
+            if (!isAddress) {
+                return null;
+            }
+
+            try {
+                const address = Address.parse(filter);
+                const response = await new JettonsApi(api.tonApiV2).getJettonInfo({
+                    accountId: address.toRawString()
+                });
+
+                const tonAsset: TonAsset = {
+                    address,
+                    image: response.metadata.image,
+                    blockchain: BLOCKCHAIN_NAME.TON,
+                    name: response.metadata.name,
+                    symbol: response.metadata.symbol,
+                    decimals: Number(response.metadata.decimals),
+                    id: packAssetId(BLOCKCHAIN_NAME.TON, address)
+                };
+
+                const jb = jettons?.balances.find(j =>
+                    Address.parse(j.jetton.address).equals(address)
+                );
+
+                const assetAmount = new AssetAmount({
+                    asset: tonAsset,
+                    weiAmount: jb?.balance || new BigNumber(0)
+                });
+
+                return {
+                    assetAmount,
+                    fiatAmount: shiftedDecimals(
+                        new BigNumber(jb?.balance || 0),
+                        tonAsset.decimals
+                    ).multipliedBy(new BigNumber(jb?.price?.prices?.[fiat] || 0))
+                };
+            } catch (e) {
+                console.error(e);
+                return null;
+            }
+        },
+        enabled: isAddress && !!jettons
+    });
 };

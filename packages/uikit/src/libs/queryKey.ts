@@ -42,7 +42,8 @@ export enum QueryKey {
     swapGasConfig = 'swapCalculate',
     swapMaxValue = 'swapMaxValue',
     swapAllAssets = 'swapAllAssets',
-    swapWalletAssets = 'swapWalletAssets'
+    swapWalletAssets = 'swapWalletAssets',
+    swapCustomToken = 'swapCustomToken'
 }
 
 export enum JettonKey {

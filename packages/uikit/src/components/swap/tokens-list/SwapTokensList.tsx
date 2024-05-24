@@ -1,10 +1,12 @@
 import { styled } from 'styled-components';
-import { FC, Fragment } from 'react';
+import { FC, Fragment, useState } from 'react';
 import { Body2, Body3, Label2 } from '../../Text';
-import { WalletSwapAsset } from '../../../state/swap/useSwapAssets';
+import { useSwapCustomTokenSearch, WalletSwapAsset } from '../../../state/swap/useSwapAssets';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { useAppContext } from '../../../hooks/appContext';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { SpinnerIcon } from '../../Icon';
+import { ConfirmImportNotification } from './ConfirmImportNotification';
 
 const SwapTokensListWrapper = styled.div`
     height: 500px;
@@ -20,13 +22,10 @@ const SwapTokensListWrapper = styled.div`
     scrollbar-width: none;
 `;
 
-const TokensNotFoundContainer = styled.div`
-    height: 100%;
+const Divider = styled.div`
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: ${p => p.theme.textSecondary};
+    height: 1px;
+    background-color: ${p => p.theme.separatorCommon};
 `;
 
 export const SwapTokensList: FC<{
@@ -46,19 +45,59 @@ export const SwapTokensList: FC<{
                     </Fragment>
                 ))
             ) : (
-                <TokensNotFoundContainer>
-                    <Body2>Tokens not found</Body2>
-                </TokensNotFoundContainer>
+                <TokenNotFound onSelect={onSelect} />
             )}
         </SwapTokensListWrapper>
     );
 };
 
-const Divider = styled.div`
+const TokensNotFoundContainer = styled.div`
+    height: 100%;
     width: 100%;
-    height: 1px;
-    background-color: ${p => p.theme.separatorCommon};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: ${p => p.theme.textSecondary};
 `;
+
+const TokenNotFound: FC<{ onSelect: (asset: TonAsset) => void }> = ({ onSelect }) => {
+    const { data: swapAsset, isFetching } = useSwapCustomTokenSearch();
+    const [isOpened, setIsOpened] = useState(false);
+
+    if (isFetching) {
+        return (
+            <TokensNotFoundContainer>
+                <SpinnerIcon />
+            </TokensNotFoundContainer>
+        );
+    }
+
+    if (!swapAsset) {
+        return (
+            <TokensNotFoundContainer>
+                <Body2>Tokens not found</Body2>
+            </TokensNotFoundContainer>
+        );
+    }
+
+    const onClose = (confirmed?: boolean) => {
+        setIsOpened(false);
+        if (confirmed) {
+            onSelect(swapAsset.assetAmount.asset);
+        }
+    };
+
+    return (
+        <>
+            <ConfirmImportNotification
+                isOpen={isOpened}
+                onClose={onClose}
+                tokenSymbol={swapAsset.assetAmount.asset.symbol}
+            />
+            <TokenListItem onClick={() => setIsOpened(true)} swapAsset={swapAsset} />
+        </>
+    );
+};
 
 const TokenListItemWrapper = styled.button`
     border: none;
@@ -113,7 +152,7 @@ const BalanceLabel = styled(Label2)<{ isZero: boolean }>`
     color: ${p => (p.isZero ? p.theme.textTertiary : p.theme.textPrimary)};
 `;
 
-const TokenListItem: FC<{ swapAsset: WalletSwapAsset; onClick?: () => void }> = ({
+const TokenListItem: FC<{ swapAsset: WalletSwapAsset; onClick: () => void }> = ({
     swapAsset,
     onClick
 }) => {
