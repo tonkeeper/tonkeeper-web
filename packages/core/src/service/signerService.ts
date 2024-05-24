@@ -26,21 +26,39 @@ export const parseSignerSignature = (payload: string): Buffer => {
     return Buffer.from(sign, 'hex');
 };
 
-export const createTransferQr = (publicKey: string, boc: string) => {
+const walletVersionText = (version: WalletVersion) => {
+    switch (version) {
+        case WalletVersion.V3R1:
+            return 'v3r1';
+        case WalletVersion.V3R2:
+            return 'v3r2';
+        case WalletVersion.V4R2:
+            return 'v4r2';
+        case WalletVersion.W5:
+            return 'v5r1';
+        default:
+            return String(version);
+    }
+};
+
+export const createTransferQr = (publicKey: string, version: WalletVersion, boc: string) => {
     const body = Buffer.from(boc, 'base64').toString('hex');
-    return `tonsign://v1/?network=ton&pk=${publicKey}&body=${body}`;
+    return `tonsign://v1/?network=ton&pk=${publicKey}&body=${body}&v=${walletVersionText(version)}`;
 };
 
 export const storeTransactionAndCreateDeepLink = async (
     sdk: IAppSdk,
     publicKey: string,
+    version: WalletVersion,
     messageBase64: string
 ) => {
     await sdk.storage.set(AppKey.SIGNER_MESSAGE, messageBase64);
 
     const body = Buffer.from(messageBase64, 'base64').toString('hex');
     const back = encodeURIComponent('https://wallet.tonkeeper.com/');
-    return `tonsign://v1/?network=ton&pk=${publicKey}&body=${body}&return=${back}`;
+    return `tonsign://v1/?network=ton&pk=${publicKey}&body=${body}&v=${walletVersionText(
+        version
+    )}&return=${back}`;
 };
 
 export const publishSignerMessage = async (

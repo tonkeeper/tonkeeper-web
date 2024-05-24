@@ -9,6 +9,7 @@ import {
     parseSignerSignature,
     storeTransactionAndCreateDeepLink
 } from '@tonkeeper/core/dist/service/signerService';
+import { getWalletStateOrDie } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import nacl from 'tweetnacl';
@@ -77,9 +78,11 @@ export const getSigner = async (
             }
             case 'signer-deeplink': {
                 const callback = async (message: Cell) => {
+                    const wallet = await getWalletStateOrDie(sdk.storage, publicKey);
                     const deeplink = await storeTransactionAndCreateDeepLink(
                         sdk,
                         publicKey,
+                        wallet.active.version,
                         message.toBoc({ idx: false }).toString('base64')
                     );
 
