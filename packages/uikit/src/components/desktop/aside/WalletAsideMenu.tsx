@@ -8,7 +8,8 @@ import {
     CoinsIcon,
     NotCoinIcon,
     SaleBadgeIcon,
-    SettingsSmoothIcon
+    SettingsSmoothIcon,
+    SwapIcon
 } from '../../Icon';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
@@ -32,6 +33,10 @@ const WalletAsideContainer = styled.div`
 const AsideMenuItemStyled = styled(AsideMenuItem)`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
     padding-right: 50px;
+`;
+
+const SwapIconStyled = styled(SwapIcon)`
+    transform: rotate(90deg) scale(1, -1);
 `;
 
 export const WalletAsideMenu = () => {
@@ -63,6 +68,14 @@ export const WalletAsideMenu = () => {
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SaleBadgeIcon />
                         <Label2>{t('wallet_aside_purchases')}</Label2>
+                    </AsideMenuItemStyled>
+                )}
+            </NavLink>
+            <NavLink to={AppRoute.swap}>
+                {({ isActive }) => (
+                    <AsideMenuItemStyled isSelected={isActive}>
+                        <SwapIconStyled />
+                        <Label2>{t('wallet_swap')}</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>

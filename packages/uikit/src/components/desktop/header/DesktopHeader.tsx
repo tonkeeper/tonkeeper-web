@@ -7,7 +7,6 @@ import { formatFiatCurrency } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { usePreFetchRates } from '../../../state/rates';
-import { useStonfiSwapLink } from '../../../state/stonfi';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
 import { useWalletTotalBalance } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
@@ -16,7 +15,7 @@ import { Num2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { IconButton } from '../../fields/IconButton';
 import { Link } from 'react-router-dom';
-import { AppProRoute } from '../../../libs/routes';
+import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { BuyNotification } from '../../home/BuyAction';
 import { Skeleton } from '../../shared/Skeleton';
 
@@ -37,6 +36,10 @@ const ButtonsContainer = styled.div`
     display: flex;
     gap: 0.5rem;
     padding: 1rem;
+
+    > * {
+        text-decoration: none;
+    }
 `;
 
 const DesktopRightPart = styled.div`
@@ -101,7 +104,6 @@ const DesktopHeaderPayload = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: buy } = useTonendpointBuyMethods();
     const { t } = useTranslation();
-    const swapLink = useStonfiSwapLink('ton');
 
     return (
         <DesktopHeaderStyled>
@@ -148,10 +150,12 @@ const DesktopHeaderPayload = () => {
                     </ButtonStyled>
                 </ButtonsContainer>
                 <ButtonsContainer>
-                    <ButtonStyled size="small" onClick={() => sdk.openPage(swapLink)}>
-                        <SwapIcon />
-                        {t('wallet_swap')}
-                    </ButtonStyled>
+                    <Link to={AppRoute.swap}>
+                        <ButtonStyled size="small">
+                            <SwapIcon />
+                            {t('wallet_swap')}
+                        </ButtonStyled>
+                    </Link>
                     <ButtonStyled size="small" onClick={onOpen}>
                         <PlusIcon />
                         {t('wallet_buy')}

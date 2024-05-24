@@ -137,11 +137,13 @@ export function useCalculatedSwap() {
                             return;
                         }
 
-                        totalFetchedSwaps = sortSwaps(totalFetchedSwaps.concat(swap));
+                        const providerBestSwap = sortSwaps(swap)[0];
+
+                        totalFetchedSwaps = sortSwaps(totalFetchedSwaps.concat(providerBestSwap));
                         if (totalFetchedSwaps[0].trade) {
                             setSelectedSwap(totalFetchedSwaps[0]);
                         }
-                        setFetchedSwaps(s => sortSwaps([...s, ...swap]));
+                        setFetchedSwaps(s => sortSwaps([...s, providerBestSwap]));
 
                         fetchedProvidersNumber = fetchedProvidersNumber + 1;
                         if (fetchedProvidersNumber === swapProviders.length) {
@@ -155,7 +157,7 @@ export function useCalculatedSwap() {
 
                         console.error(e);
                         const swap: CalculatedSwap = {
-                            provider: provider as 'dedust' | 'stonfi',
+                            provider,
                             trade: null
                         };
                         totalFetchedSwaps = sortSwaps(totalFetchedSwaps.concat(swap));
@@ -228,11 +230,11 @@ const providerSwapToSwap = async (
             trade: {
                 from: new AssetAmount({
                     asset: fromAsset,
-                    weiAmount: t.steps[0].fromAmount
+                    weiAmount: t.fromAmount
                 }),
                 to: new AssetAmount({
                     asset: toAsset,
-                    weiAmount: t.steps[t.steps.length - 1].toAmount
+                    weiAmount: t.toAmount
                 }),
                 path: t.steps.reduce((acc, s, index) => {
                     acc.push(

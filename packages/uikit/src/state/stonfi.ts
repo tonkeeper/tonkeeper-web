@@ -4,7 +4,7 @@ import { stonfiApi, StonfiAsset } from '@tonkeeper/core/dist/service/stonfiServi
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { useAppContext } from '../hooks/appContext';
-import { Address } from '@ton/core';
+import { isTon, TonAssetAddress } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 export const useStonfiAssets = () => {
     return useQuery<StonfiAsset[]>([QueryKey.stonfiAssets], () => stonfiApi.fetchAssets());
@@ -30,26 +30,24 @@ export const useIsStonfiAsset = (address: string) => {
     );
 };
 
-export const useStonfiSwapLink = <T extends string | undefined>(
-    token: T
-): T extends string ? string : undefined => {
+export const useStonfiSwapLink = (fromToken: TonAssetAddress, toToken: TonAssetAddress): string => {
     const { tonendpoint, env } = useAppContext();
 
-    if (token === undefined) {
-        return undefined as T extends string ? string : undefined;
-    }
-
-    const isTon = token.toLowerCase() === CryptoCurrency.TON.toLowerCase();
-
-    const tt = isTon ? 'jUSDT' : 'ton';
     const url = new URL('https://app.ston.fi/swap');
-    url.searchParams.append('ft', isTon ? 'ton' : Address.parse(token).toString({ urlSafe: true }));
-    url.searchParams.append('tt', tt);
+    url.searchParams.append('ft', addressToStonfiAddress(fromToken));
+    url.searchParams.append('tt', addressToStonfiAddress(toToken));
     url.searchParams.append('referral_address', env?.stonfiReferralAddress || '');
     url.searchParams.append('utm_source', `tokeeper-${tonendpoint.targetEnv}`);
     url.searchParams.append('utm_medium', 'organic');
     url.searchParams.append('utm_campaign', 'swap_button');
     url.searchParams.append('utm_content', 'TODO');
 
-    return url.toString() as T extends string ? string : undefined;
+    return url.toString();
+};
+
+const addressToStonfiAddress = (address: TonAssetAddress) => {
+    if (isTon(address)) {
+        return 'ton';
+    }
+    return address.toString({ urlSafe: true });
 };

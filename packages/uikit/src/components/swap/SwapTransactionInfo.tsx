@@ -141,7 +141,8 @@ export const SwapTransactionInfo = () => {
                                                   .multipliedBy(100)
                                                   .decimalPlaces(2)
                                                   .toString()
-                                                  .replace('.', getDecimalSeparator())}%`
+                                                  .replace('.', getDecimalSeparator())
+                                                  .replace('-', '+')}%`
                                             : 'Unknown price impact'}
                                     </PriceImpact>
                                 )}

@@ -417,8 +417,9 @@ const WalletContent = () => {
                                 path={any(AppRoute.walletSettings)}
                                 element={<DesktopWalletSettingsRouting />}
                             />
+                            <Route path={AppRoute.swap} element={<SwapPage />} />
                             <Route path={AppRoute.notcoin} element={<NotcoinPage />} />
-                            <Route path="*" element={<SwapPage />} />
+                            <Route path="*" element={<DesktopTokens />} />
                         </Route>
                     </Routes>
                 </WalletRoutingWrapper>
