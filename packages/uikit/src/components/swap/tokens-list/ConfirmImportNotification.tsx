@@ -29,7 +29,7 @@ const ButtonsBlock = styled.div`
 
 const WrapperStyles = createGlobalStyle`
       .confirm-import-swap-token-notification {
-        max-width: 400px;
+        ${p => p.theme.displayType === 'full-width' && 'max-width: 400px;'}
       }
     `;
 

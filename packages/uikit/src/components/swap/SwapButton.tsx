@@ -11,6 +11,7 @@ import {
 } from '../../state/swap/useSwapForm';
 import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
 import { FC } from 'react';
+import { useIsActiveWalletLedger } from '../../state/ledger';
 
 export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }> = ({
     onClick,
@@ -26,22 +27,35 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
     const [{ maxPriceImpact }] = useSwapOptions();
 
     const isNotCompleted = useIsSwapFormNotCompleted();
+    const activeIsLedger = useIsActiveWalletLedger();
+
+    if (activeIsLedger) {
+        return (
+            <Button size="large" secondary disabled>
+                Swaps with Ledger are not supported
+            </Button>
+        );
+    }
 
     if (isNotCompleted) {
         return (
-            <Button secondary disabled>
+            <Button size="large" secondary disabled>
                 Enter an amount
             </Button>
         );
     }
 
     if (!isFetching && calculatedSwaps?.every(s => !s.trade)) {
-        return <Button disabled>Trading is not available</Button>;
+        return (
+            <Button size="large" disabled>
+                Trading is not available
+            </Button>
+        );
     }
 
     if ((isFetching && !selectedSwap?.trade) || !max || priceImpact === undefined) {
         return (
-            <Button secondary loading={true}>
+            <Button size="large" secondary loading={true}>
                 Continue
             </Button>
         );
@@ -49,7 +63,7 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
 
     if (!selectedSwap || !selectedSwap.trade) {
         return (
-            <Button secondary disabled>
+            <Button size="large" secondary disabled>
                 Trading is not available
             </Button>
         );
@@ -59,7 +73,7 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
 
     if (isNotEnoughFunds) {
         return (
-            <Button secondary disabled>
+            <Button size="large" secondary disabled>
                 Not enough funds
             </Button>
         );
@@ -68,14 +82,14 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
     const priceImpactTooHigh = priceImpact?.gt(maxPriceImpact);
     if (priceImpactTooHigh) {
         return (
-            <Button secondary disabled>
+            <Button size="large" secondary disabled>
                 Price impact too high
             </Button>
         );
     }
 
     return (
-        <Button primary onClick={onClick} loading={isEncodingProcess}>
+        <Button size="large" primary onClick={onClick} loading={isEncodingProcess}>
             Continue
         </Button>
     );

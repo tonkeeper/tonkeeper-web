@@ -2,7 +2,7 @@ import { Notification } from '../../Notification';
 import { FC, Ref, useCallback, useEffect, useRef } from 'react';
 import { atom, useAtom } from '../../../libs/atom';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { styled } from 'styled-components';
+import { css, styled } from 'styled-components';
 import { SwapSearchInput } from './SwapSearchInput';
 import { SwapTokensList } from './SwapTokensList';
 import {
@@ -46,7 +46,14 @@ const SwapSearchInputStyled = styled(SwapSearchInput)`
 `;
 
 const SwapTokensListContentWrapper = styled.div`
-    height: calc(100% - 80px);
+    ${p =>
+        p.theme.displayType === 'full-width'
+            ? css`
+                  height: 580px;
+              `
+            : css`
+                  height: calc(var(--app-height) - 6rem);
+              `}
 `;
 
 const Divider = styled.div`

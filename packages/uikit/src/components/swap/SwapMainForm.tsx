@@ -1,4 +1,4 @@
-import { styled } from 'styled-components';
+import { styled, useTheme } from 'styled-components';
 import { SwapFromField } from './SwapFromField';
 import { SwapToField } from './SwapToField';
 import { SwapButton } from './SwapButton';
@@ -20,9 +20,11 @@ import { IconButton } from '../fields/IconButton';
 import { ArrowDownIcon } from '../Icon';
 import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
+import { SwapProviders } from './SwapProviders';
+import { useSwapMobileNotification } from '../../state/swap/useSwapMobileNotification';
 
 const MainFormWrapper = styled.div`
-    width: 292px;
+    width: ${p => (p.theme.displayType === 'full-width' ? '292px' : '100%')};
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -44,6 +46,7 @@ const ChangeIconStyled = styled(IconButton)`
 `;
 
 export const SwapMainForm = () => {
+    const theme = useTheme();
     const { isLoading, mutateAsync: encode } = useExecuteSwap();
     const [modalParams, setModalParams] = useState<TonConnectTransactionPayload | null>(null);
     const [selectedSwap] = useSelectedSwap();
@@ -51,7 +54,7 @@ export const SwapMainForm = () => {
     const [toAsset, setToAsset] = useSwapToAsset();
     const [_, setFromAmount] = useSwapFromAmount();
     const navigate = useNavigate();
-
+    const [__, setIsMobileSwapOpen] = useSwapMobileNotification();
     const onConfirm = async () => {
         const result = await encode(selectedSwap! as NonNullableFields<CalculatedSwap>);
 
@@ -79,6 +82,7 @@ export const SwapMainForm = () => {
         setModalParams(null);
         if (boc) {
             navigate(AppRoute.activity);
+            setIsMobileSwapOpen(false);
         }
     };
 
@@ -90,6 +94,7 @@ export const SwapMainForm = () => {
                 </ChangeIconStyled>
             </SwapFromField>
             <SwapToField />
+            {theme.displayType === 'compact' && <SwapProviders />}
             <SwapButton onClick={onConfirm} isEncodingProcess={isLoading || !!modalParams} />
             <TonTransactionNotification handleClose={onCloseConfirmModal} params={modalParams} />
             <SwapTokensListNotification />

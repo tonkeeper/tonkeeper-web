@@ -15,10 +15,10 @@ import { useAppSdk } from '../../../hooks/appSdk';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 
 const SwapTokensListWrapper = styled.div`
-    height: 500px;
     overflow-y: auto;
     width: calc(100% + 2rem);
     margin: 0 -1rem;
+    height: calc(100% - 57px);
 
     &::-webkit-scrollbar {
         display: none;

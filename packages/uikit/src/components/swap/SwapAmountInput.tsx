@@ -95,6 +95,7 @@ export const SwapAmountInput: FC<{
             placeholder={`0${decimalSeparator}00`}
             className={className}
             isErrored={isErrored}
+            inputMode="decimal"
         />
     );
 };

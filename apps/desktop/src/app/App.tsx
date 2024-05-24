@@ -78,7 +78,7 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
-import SwapPage from '@tonkeeper/uikit/dist/pages/swap';
+import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -338,7 +338,6 @@ export const Loader: FC = () => {
 
 const usePrefetch = () => {
     useRecommendations();
-    useStonfiAssets();
     useCanPromptTouchId();
 };
 
@@ -417,9 +416,9 @@ const WalletContent = () => {
                                 path={any(AppRoute.walletSettings)}
                                 element={<DesktopWalletSettingsRouting />}
                             />
-                            <Route path={AppRoute.swap} element={<SwapPage />} />
+                            <Route path={AppRoute.swap} element={<DesktopSwapPage />} />
                             <Route path={AppRoute.notcoin} element={<NotcoinPage />} />
-                            <Route path="*" element={<SwapPage />} />
+                            <Route path="*" element={<DesktopTokens />} />
                         </Route>
                     </Routes>
                 </WalletRoutingWrapper>

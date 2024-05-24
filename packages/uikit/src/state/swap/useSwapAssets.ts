@@ -31,24 +31,30 @@ export function useAllSwapAssets() {
     return useQuery<TonAsset[]>({
         queryKey: [QueryKey.swapAllAssets, customAssets],
         queryFn: async () => {
-            const assets = await swapService.swapAssets();
-            const fetchedAssets = assets
-                .map(asset => {
-                    const address = asset.address === 'ton' ? 'TON' : Address.parse(asset.address);
+            try {
+                const assets = await swapService.swapAssets();
+                const fetchedAssets = assets
+                    .map(asset => {
+                        const address =
+                            asset.address === 'ton' ? 'TON' : Address.parse(asset.address);
 
-                    return {
-                        id: packAssetId(BLOCKCHAIN_NAME.TON, address),
-                        symbol: asset.symbol,
-                        decimals: asset.decimals,
-                        name: asset.name,
-                        image: asset.image,
-                        blockchain: BLOCKCHAIN_NAME.TON,
-                        address
-                    };
-                })
-                .filter(asset => !(customAssets || []).some(ca => ca.id === asset.id));
+                        return {
+                            id: packAssetId(BLOCKCHAIN_NAME.TON, address),
+                            symbol: asset.symbol,
+                            decimals: asset.decimals,
+                            name: asset.name,
+                            image: asset.image,
+                            blockchain: BLOCKCHAIN_NAME.TON,
+                            address
+                        };
+                    })
+                    .filter(asset => !(customAssets || []).some(ca => ca.id === asset.id));
 
-            return (fetchedAssets as TonAsset[]).concat(customAssets || []);
+                return (fetchedAssets as TonAsset[]).concat(customAssets || []);
+            } catch (e) {
+                console.error(e);
+                return [];
+            }
         },
         enabled: !!customAssets
     });
