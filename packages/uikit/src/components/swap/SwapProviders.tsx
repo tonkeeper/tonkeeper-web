@@ -14,7 +14,6 @@ import BigNumber from 'bignumber.js';
 import { useTranslation } from '../../hooks/translation';
 
 const SwapProvidersContainer = styled.div`
-    box-sizing: border-box;
     padding: 0 12px 12px;
     background: ${p => p.theme.backgroundContent};
     border-radius: ${p =>
@@ -32,7 +31,7 @@ export const SwapProviders = () => {
     const isNotCompleted = useIsSwapFormNotCompleted();
 
     if (isNotCompleted) {
-        return null;
+        return <div />;
     }
 
     return (

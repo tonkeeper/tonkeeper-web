@@ -62,7 +62,9 @@ const DesktopSwapPageContent = () => {
             </DesktopViewHeader>
             <ContentWrapper>
                 <SwapMainForm />
-                <SwapProviders />
+                <div>
+                    <SwapProviders />
+                </div>
             </ContentWrapper>
         </SwapPageWrapper>
     );
