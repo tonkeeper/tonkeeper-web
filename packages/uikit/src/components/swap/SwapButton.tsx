@@ -6,12 +6,12 @@ import {
     useSelectedSwap,
     useSwapFromAmount,
     useSwapFromAsset,
-    useSwapOptions,
     useSwapPriceImpact
 } from '../../state/swap/useSwapForm';
 import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
 import { FC } from 'react';
 import { useIsActiveWalletLedger } from '../../state/ledger';
+import { useSwapOptions } from '../../state/swap/useSwapOptions';
 
 export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }> = ({
     onClick,
@@ -24,7 +24,7 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
     const [selectedSwap] = useSelectedSwap();
 
     const priceImpact = useSwapPriceImpact();
-    const [{ maxPriceImpact }] = useSwapOptions();
+    const { data: swapOptions } = useSwapOptions();
 
     const isNotCompleted = useIsSwapFormNotCompleted();
     const activeIsLedger = useIsActiveWalletLedger();
@@ -53,7 +53,7 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
         );
     }
 
-    if ((isFetching && !selectedSwap?.trade) || !max || priceImpact === undefined) {
+    if ((isFetching && !selectedSwap?.trade) || !max || priceImpact === undefined || !swapOptions) {
         return (
             <Button size="large" secondary loading={true}>
                 Continue
@@ -79,7 +79,7 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
         );
     }
 
-    const priceImpactTooHigh = priceImpact?.gt(maxPriceImpact);
+    const priceImpactTooHigh = priceImpact?.gt(swapOptions.maxPriceImpact);
     if (priceImpactTooHigh) {
         return (
             <Button size="large" secondary disabled>

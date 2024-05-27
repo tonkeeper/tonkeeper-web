@@ -5,14 +5,14 @@ import { assertUnreachable, NonNullableFields } from '@tonkeeper/core/dist/utils
 import { Address } from '@ton/core';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useSwapsConfig } from './useSwapsConfig';
-import { useSwapOptions } from './useSwapForm';
 import BigNumber from 'bignumber.js';
+import { useSwapOptions } from './useSwapOptions';
 
 export function useExecuteSwap() {
     const { active } = useWalletContext();
     const { swapService } = useSwapsConfig();
     const { config } = useAppContext();
-    const [{ slippagePercent }] = useSwapOptions();
+    const { data: swapOpaitons } = useSwapOptions();
     const referral = config.web_swaps_referral_address;
 
     return useMutation<
@@ -20,11 +20,17 @@ export function useExecuteSwap() {
         Error,
         NonNullableFields<CalculatedSwap>
     >(swap => {
+        if (!swapOpaitons) {
+            throw new Error('SwapOptions query was not resolved yet');
+        }
         return swapService.encodeSwap({
             swap: swapToProviderSwap(swap),
             options: {
                 senderAddress: active.rawAddress,
-                slippage: new BigNumber(slippagePercent).div(100).decimalPlaces(5).toString(),
+                slippage: new BigNumber(swapOpaitons.slippagePercent)
+                    .div(100)
+                    .decimalPlaces(5)
+                    .toString(),
                 ...(referral && { referralAddress: Address.parse(referral).toRawString() })
             }
         });

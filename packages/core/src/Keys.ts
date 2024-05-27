@@ -25,5 +25,6 @@ export enum AppKey {
     PRO_BACKUP = 'pro_backup',
 
     SIGNER_MESSAGE = 'signer_message',
-    SWAP_CUSTOM_ASSETS = 'swap_custom_assets'
+    SWAP_CUSTOM_ASSETS = 'swap_custom_assets',
+    SWAP_OPTIONS = 'swap_options'
 }

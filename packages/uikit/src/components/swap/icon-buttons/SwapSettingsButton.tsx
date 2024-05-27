@@ -1,6 +1,8 @@
 import { IconButton } from '../../fields/IconButton';
 import { SlidersIcon } from '../../Icon';
 import { styled } from 'styled-components';
+import { SwapSettingsNotification } from '../SwapSettingsNotification';
+import { useState } from 'react';
 
 const IconButtonStyled = styled(IconButton)`
     padding: 10px;
@@ -12,9 +14,14 @@ const IconButtonStyled = styled(IconButton)`
 `;
 
 export const SwapSettingsButton = () => {
+    const [isOpen, setIsOpen] = useState(false);
+
     return (
-        <IconButtonStyled transparent>
-            <SlidersIcon />
-        </IconButtonStyled>
+        <>
+            <IconButtonStyled transparent onClick={() => setIsOpen(true)}>
+                <SlidersIcon />
+            </IconButtonStyled>
+            <SwapSettingsNotification isOpen={isOpen} onClose={() => setIsOpen(false)} />
+        </>
     );
 };

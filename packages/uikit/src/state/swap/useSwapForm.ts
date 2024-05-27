@@ -18,11 +18,6 @@ export const swapFromAsset$ = atom<TonAsset>(TON_ASSET);
 export const swapToAsset$ = atom<TonAsset>(TON_USDT_ASSET);
 export const swapAmount$ = atom<BigNumber | undefined>(new BigNumber(1));
 
-const swapOptions$ = atom({
-    slippagePercent: 1,
-    maxPriceImpact: 0.3
-});
-
 export const useSwapFromAsset = () => {
     const [fromAsset, _setFromAsset] = useAtom(swapFromAsset$);
     const [_, _setToAsset] = useAtom(swapToAsset$);
@@ -61,10 +56,6 @@ export const useSwapToAsset = () => {
 
 export const useSwapFromAmount = () => {
     return useAtom(swapAmount$);
-};
-
-export const useSwapOptions = () => {
-    return useAtom(swapOptions$);
 };
 
 export const useMaxSwapValue = () => {

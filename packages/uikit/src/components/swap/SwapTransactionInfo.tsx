@@ -9,12 +9,12 @@ import {
     priceImpactStatus,
     useIsSwapFormNotCompleted,
     useSelectedSwap,
-    useSwapOptions,
     useSwapPriceImpact
 } from '../../state/swap/useSwapForm';
 import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { useSwapOptions } from '../../state/swap/useSwapOptions';
 
 const TxInfoContainer = styled.div``;
 
@@ -96,7 +96,7 @@ export const SwapTransactionInfo = () => {
     const { isFetching } = useCalculatedSwap();
     const [swap] = useSelectedSwap();
     const priceImpact = useSwapPriceImpact();
-    const [{ slippagePercent }] = useSwapOptions();
+    const { data: swapOptions } = useSwapOptions();
     const isNotCompleted = useIsSwapFormNotCompleted();
 
     const priceImpactId = useId();
@@ -157,7 +157,7 @@ export const SwapTransactionInfo = () => {
                             </div>
                             <Tooltip id={minimumReceivedId}>TODO</Tooltip>
                             <InfoRowRight>
-                                {!trade ? (
+                                {!trade || !swapOptions ? (
                                     <InfoSkeleton />
                                 ) : (
                                     <Body3>
@@ -165,7 +165,7 @@ export const SwapTransactionInfo = () => {
                                         {
                                             new AssetAmount({
                                                 weiAmount: trade!.to.weiAmount
-                                                    .multipliedBy(100 - slippagePercent)
+                                                    .multipliedBy(100 - swapOptions.slippagePercent)
                                                     .div(100),
                                                 asset: trade!.to.asset
                                             }).stringAssetRelativeAmount
@@ -181,7 +181,11 @@ export const SwapTransactionInfo = () => {
                             </div>
                             <Tooltip id={slippageId}>TODO</Tooltip>
                             <InfoRowRight>
-                                {!trade ? <InfoSkeleton /> : <Body3>{slippagePercent}%</Body3>}
+                                {!trade || !swapOptions ? (
+                                    <InfoSkeleton />
+                                ) : (
+                                    <Body3>{swapOptions.slippagePercent}%</Body3>
+                                )}
                             </InfoRowRight>
                         </InfoRow>
                         <InfoRow>
