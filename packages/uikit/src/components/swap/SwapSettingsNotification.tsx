@@ -1,10 +1,8 @@
 import React, { FC, useLayoutEffect, useState } from 'react';
 import { styled } from 'styled-components';
-import { Body2, Body3, Label2 } from '../Text';
+import { Body3, Label2 } from '../Text';
 import { RadioFlatInput } from '../shared/RadioFlatInput';
 import { Notification } from '../Notification';
-import { InputBlock, InputField } from '../fields/Input';
-import { BorderSmallResponsive } from '../shared/Styles';
 import { Button } from '../fields/Button';
 import { useMutateSwapOptions, useSwapOptions } from '../../state/swap/useSwapOptions';
 import { SpinnerIcon } from '../Icon';
@@ -41,9 +39,8 @@ const SlippageOptionsContainer = styled.div`
 `;
 
 const RadioFlatInputStyled = styled(RadioFlatInput)`
-    width: 80px;
     height: 36px;
-    flex-shrink: 0;
+    flex: 1;
 `;
 
 const ButtonsContainer = styled.div`
@@ -54,23 +51,8 @@ const ButtonsContainer = styled.div`
     }
 `;
 
-const slippagePercentValues = [0.5, 1, 3];
-
-const InputBlockStyled = styled(InputBlock)`
-    min-height: unset;
-    height: fit-content;
-    padding: 0 12px;
-    ${BorderSmallResponsive};
-    display: flex;
-    align-items: center;
-`;
-
-const InputFieldStyled = styled(InputField)`
-    width: 100%;
-    padding: 8px 0;
-    height: 20px;
-    box-sizing: content-box;
-`;
+const slippagePercentValues = [0.5, 1, 3, 5];
+const defaultPercent = slippagePercentValues[1];
 
 const LoadingContainer = styled.div`
     height: 200px;
@@ -81,42 +63,21 @@ const LoadingContainer = styled.div`
 
 const SwapSettingsNotificationContent: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { data: swapOptions } = useSwapOptions();
-    const [isTouched, setIsTouched] = useState(false);
     const { mutate } = useMutateSwapOptions();
-    const [input, setInput] = useState('');
-    const [inputFocus, setInputFocus] = useState(false);
     const [checkedRadioValue, setCheckedRadioValue] = useState<
         (typeof slippagePercentValues)[number] | undefined
     >();
-
-    let isValid = !isTouched;
-    if (isFinite(Number(input))) {
-        const inputNum = Number(input);
-        if (inputNum >= 0 && inputNum <= 100 && inputNum > 0.1) {
-            isValid = true;
-        }
-    }
-
-    if (checkedRadioValue) {
-        isValid = true;
-    }
 
     useLayoutEffect(() => {
         if (swapOptions?.slippagePercent) {
             if (slippagePercentValues.includes(swapOptions?.slippagePercent)) {
                 setCheckedRadioValue(swapOptions?.slippagePercent);
             } else {
-                setInput(swapOptions?.slippagePercent.toString());
-                setInputFocus(true);
+                setCheckedRadioValue(defaultPercent);
+                mutate({ slippagePercent: defaultPercent });
             }
         }
     }, [swapOptions?.slippagePercent]);
-
-    useLayoutEffect(() => {
-        if (checkedRadioValue) {
-            setInputFocus(false);
-        }
-    }, [checkedRadioValue]);
 
     if (!swapOptions) {
         return (
@@ -126,22 +87,8 @@ const SwapSettingsNotificationContent: FC<{ onClose: () => void }> = ({ onClose 
         );
     }
 
-    const onFocus = () => {
-        setCheckedRadioValue(undefined);
-        setInputFocus(true);
-    };
-
-    const onBlur = () => {
-        setIsTouched(true);
-        if (!isValid) {
-            setInputFocus(false);
-        }
-    };
-
-    const formValue = checkedRadioValue ?? Number(input);
-
     const onSave = () => {
-        mutate({ slippagePercent: formValue });
+        mutate({ slippagePercent: checkedRadioValue });
         onClose?.();
     };
 
@@ -163,25 +110,6 @@ const SwapSettingsNotificationContent: FC<{ onClose: () => void }> = ({ onClose 
                         {value}%
                     </RadioFlatInputStyled>
                 ))}
-                <InputBlockStyled valid={isValid} focus={inputFocus}>
-                    <InputFieldStyled
-                        onChange={e => {
-                            if (
-                                /^[0-9]{1,2}([.,][0-9]{0,2})?$/.test(e.target.value) ||
-                                !e.target.value
-                            ) {
-                                setIsTouched(true);
-                                setInput(e.target.value.replace(',', '.'));
-                            }
-                        }}
-                        onFocus={onFocus}
-                        onBlur={onBlur}
-                        value={input}
-                        placeholder="Custom"
-                        inputMode="decimal"
-                    />
-                    <Body2>%</Body2>
-                </InputBlockStyled>
             </SlippageOptionsContainer>
             <ButtonsContainer>
                 <Button secondary onClick={onClose}>
@@ -189,10 +117,7 @@ const SwapSettingsNotificationContent: FC<{ onClose: () => void }> = ({ onClose 
                 </Button>
                 <Button
                     primary
-                    disabled={
-                        (!isValid && !checkedRadioValue) ||
-                        formValue === swapOptions.slippagePercent
-                    }
+                    disabled={checkedRadioValue === swapOptions.slippagePercent}
                     onClick={onSave}
                 >
                     Save
