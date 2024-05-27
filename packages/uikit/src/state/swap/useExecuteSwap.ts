@@ -43,13 +43,24 @@ const swapToProviderSwap = (
     if (swap.provider === 'stonfi') {
         return {
             provider: 'stonfi',
-            stonfiTrade: swap.trade.rawTrade
+            stonfiTrade: swap.trade.rawTrade as {
+                fromAsset: string;
+                toAsset: string;
+                fromAmount: string;
+                toAmount: string;
+            }
         };
     }
     if (swap.provider === 'dedust') {
         return {
             provider: 'dedust',
-            dedustTrade: swap.trade.rawTrade
+            dedustTrade: swap.trade.rawTrade as Array<{
+                fromAsset: string;
+                toAsset: string;
+                fromAmount: string;
+                toAmount: string;
+                poolAddress: string;
+            }>
         };
     }
 

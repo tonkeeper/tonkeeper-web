@@ -35,13 +35,7 @@ export type BasicCalculatedTrade = {
 
 export type DedustCalculatedTrade = BasicCalculatedTrade & {
     path: TonAsset[];
-    rawTrade: {
-        fromAsset: string;
-        toAsset: string;
-        fromAmount: string;
-        toAmount: string;
-        poolAddress: string;
-    }[];
+    rawTrade: unknown;
 };
 
 export type DedustCalculatedSwap = {
@@ -51,12 +45,7 @@ export type DedustCalculatedSwap = {
 
 export type StonfiCalculatedTrade = BasicCalculatedTrade & {
     path: TonAsset[];
-    rawTrade: {
-        fromAsset: string;
-        toAsset: string;
-        fromAmount: string;
-        toAmount: string;
-    };
+    rawTrade: unknown;
 };
 
 export type StonfiCalculatedSwap = {
@@ -214,6 +203,8 @@ const providerSwapToSwap = async (
     fromAsset: TonAsset,
     toAsset: TonAsset
 ): Promise<CalculatedSwap[]> => {
+    const assetsInfo = await getPathAssets(providerSwap.trades, api);
+
     if (providerSwap.provider === 'dedust') {
         if (providerSwap.trades.length === 0) {
             return [
@@ -224,7 +215,6 @@ const providerSwapToSwap = async (
             ];
         }
 
-        const assetsInfo = await getDedustAssets(providerSwap.trades, api);
         return providerSwap.trades.map(t => ({
             provider: 'dedust',
             trade: {
@@ -236,25 +226,15 @@ const providerSwapToSwap = async (
                     asset: toAsset,
                     weiAmount: t.toAmount
                 }),
-                path: t.steps.reduce((acc, s, index) => {
-                    acc.push(
-                        assetsInfo.find(a => eqAddresses(a.address, fromTradeAssetId(s.fromAsset)))!
-                    );
-                    if (index === t.steps.length - 1) {
-                        acc.push(
-                            assetsInfo.find(a =>
-                                eqAddresses(a.address, fromTradeAssetId(s.toAsset))
-                            )!
-                        );
-                    }
-
-                    return acc;
-                }, [] as TonAsset[]),
+                path: t.path.map(
+                    address =>
+                        assetsInfo.find(a => eqAddresses(a.address, fromTradeAssetId(address)))!
+                ),
                 blockchainFee: new AssetAmount({
                     asset: TON_ASSET,
                     weiAmount: t.blockchainFee
                 }),
-                rawTrade: t.steps
+                rawTrade: t.dedustRawTrade
             }
         }));
     }
@@ -280,8 +260,11 @@ const providerSwapToSwap = async (
                         asset: TON_ASSET,
                         weiAmount: trade.blockchainFee
                     }),
-                    rawTrade: trade,
-                    path: [fromAsset, toAsset]
+                    rawTrade: trade.stonfiRawTrade,
+                    path: trade.path.map(
+                        address =>
+                            assetsInfo.find(a => eqAddresses(a.address, fromTradeAssetId(address)))!
+                    )
                 }
             }
         ];
@@ -290,18 +273,8 @@ const providerSwapToSwap = async (
     return [];
 };
 
-const getDedustAssets = async (
-    trades: Array<{
-        steps: Array<{
-            fromAsset: string;
-            toAsset: string;
-        }>;
-    }>,
-    api: APIConfig
-) => {
-    const addresses = trades
-        .flatMap(trade => trade.steps)
-        .flatMap(step => [fromTradeAssetId(step.toAsset), fromTradeAssetId(step.fromAsset)]);
+const getPathAssets = async (trades: { path: string[] }[], api: APIConfig) => {
+    const addresses = trades.flatMap(trade => trade.path.map(fromTradeAssetId));
 
     return Promise.all(addresses.map(address => getAsset(api, address)));
 };

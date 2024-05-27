@@ -23,13 +23,21 @@ export class SwapService {
         referral?: string,
     ): CancelablePromise<({
         provider: 'stonfi';
-        trades: Array<{
+        trades: Array<({
             fromAsset: string;
             toAsset: string;
             fromAmount: string;
             toAmount: string;
             blockchainFee: string;
-        }>;
+            path: Array<string>;
+        } & {
+            stonfiRawTrade: {
+                fromAsset: string;
+                toAsset: string;
+                fromAmount: string;
+                toAmount: string;
+            };
+        })>;
     } | {
         provider: 'dedust';
         trades: Array<({
@@ -38,8 +46,9 @@ export class SwapService {
             fromAmount: string;
             toAmount: string;
             blockchainFee: string;
+            path: Array<string>;
         } & {
-            steps: Array<{
+            dedustRawTrade: Array<{
                 fromAsset: string;
                 toAsset: string;
                 fromAmount: string;
