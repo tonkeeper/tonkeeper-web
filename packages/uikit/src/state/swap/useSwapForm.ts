@@ -59,6 +59,7 @@ export const useSwapFromAmount = () => {
 };
 
 export const useMaxSwapValue = () => {
+    const TON_GAS_SAFETY_NANO_CONST = 100000;
     const { data: swapGas, isError } = useSwapGasConfig();
     const [fromAsset] = useSwapFromAsset();
     const balance = useAssetWeiBalance(fromAsset);
@@ -77,7 +78,9 @@ export const useMaxSwapValue = () => {
                 const dedustGas = new BigNumber(swapGas.dedust.tonToJetton);
                 const stonfiGas = new BigNumber(swapGas.stonfi.tonToJetton);
 
-                const balanceWithoutFee = balance.minus(BigNumber.max(dedustGas, stonfiGas));
+                const balanceWithoutFee = balance
+                    .minus(BigNumber.max(dedustGas, stonfiGas))
+                    .minus(TON_GAS_SAFETY_NANO_CONST);
                 if (balanceWithoutFee.lt(0)) {
                     return new BigNumber(0);
                 }
