@@ -1,4 +1,4 @@
-import { css, styled } from 'styled-components';
+import { css, styled, useTheme } from 'styled-components';
 import { Body3 } from '../Text';
 import { IconButton } from '../fields/IconButton';
 import { useId, useState } from 'react';
@@ -92,8 +92,14 @@ const PriceImpact = styled(Body3)<{ status: ReturnType<typeof priceImpactStatus>
             : p.theme.accentRed};
 `;
 
+const TooltipStyled = styled(Tooltip)`
+    max-width: 300px;
+    z-index: 100;
+`;
+
 export const SwapTransactionInfo = () => {
     const { t } = useTranslation();
+    const theme = useTheme();
     const [isOpened, setIsOpened] = useState(false);
     const { isFetching } = useCalculatedSwap();
     const [swap] = useSelectedSwap();
@@ -112,6 +118,8 @@ export const SwapTransactionInfo = () => {
         return null;
     }
 
+    const tooltipPlace = theme.displayType === 'full-width' ? 'top' : 'right';
+
     return (
         <TxInfoContainer>
             <TxInfoHeader onClick={() => setIsOpened(s => !s)}>
@@ -128,7 +136,9 @@ export const SwapTransactionInfo = () => {
                             <div data-tooltip-id={priceImpactId}>
                                 <InfoCircleIcon />
                             </div>
-                            <Tooltip id={priceImpactId}>{t('swap_price_impact_tooltip')}</Tooltip>
+                            <TooltipStyled id={priceImpactId} place={tooltipPlace}>
+                                {t('swap_price_impact_tooltip')}
+                            </TooltipStyled>
                             <InfoRowRight>
                                 {priceImpact === undefined || !trade ? (
                                     <InfoSkeleton />
@@ -156,9 +166,9 @@ export const SwapTransactionInfo = () => {
                             <div data-tooltip-id={minimumReceivedId}>
                                 <InfoCircleIcon />
                             </div>
-                            <Tooltip id={minimumReceivedId}>
+                            <TooltipStyled id={minimumReceivedId} place={tooltipPlace}>
                                 {t('swap_minimum_received_tooltip')}
-                            </Tooltip>
+                            </TooltipStyled>
                             <InfoRowRight>
                                 {!trade || !swapOptions ? (
                                     <InfoSkeleton />
@@ -182,7 +192,9 @@ export const SwapTransactionInfo = () => {
                             <div data-tooltip-id={slippageId}>
                                 <InfoCircleIcon />
                             </div>
-                            <Tooltip id={slippageId}>{t('swap_slippage_tooltip')}</Tooltip>
+                            <TooltipStyled id={slippageId} place={tooltipPlace}>
+                                {t('swap_slippage_tooltip')}
+                            </TooltipStyled>
                             <InfoRowRight>
                                 {!trade || !swapOptions ? (
                                     <InfoSkeleton />
@@ -196,9 +208,9 @@ export const SwapTransactionInfo = () => {
                             <div data-tooltip-id={blockchainFeeId}>
                                 <InfoCircleIcon />
                             </div>
-                            <Tooltip id={blockchainFeeId}>
+                            <TooltipStyled id={blockchainFeeId} place={tooltipPlace}>
                                 {t('swap_blockchain_fee_tooltip')}
-                            </Tooltip>
+                            </TooltipStyled>
                             <InfoRowRight>
                                 {!trade ? (
                                     <InfoSkeleton />
