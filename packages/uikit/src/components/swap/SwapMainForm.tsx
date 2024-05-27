@@ -3,7 +3,7 @@ import { SwapFromField } from './SwapFromField';
 import { SwapToField } from './SwapToField';
 import { SwapButton } from './SwapButton';
 import { TonTransactionNotification } from '../connect/TonTransactionNotification';
-import { useExecuteSwap } from '../../state/swap/useExecuteSwap';
+import { useEncodeSwap } from '../../state/swap/useEncodeSwap';
 import { FC, useState } from 'react';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
@@ -46,7 +46,7 @@ const ChangeIconStyled = styled(IconButton)`
 
 export const SwapMainForm: FC<{ className?: string }> = ({ className }) => {
     const theme = useTheme();
-    const { isLoading, mutateAsync: encode } = useExecuteSwap();
+    const { isLoading, mutateAsync: encode } = useEncodeSwap();
     const [modalParams, setModalParams] = useState<TonConnectTransactionPayload | null>(null);
     const [selectedSwap] = useSelectedSwap();
     const [fromAsset, setFromAsset] = useSwapFromAsset();
@@ -95,7 +95,11 @@ export const SwapMainForm: FC<{ className?: string }> = ({ className }) => {
             <SwapToField />
             {theme.displayType === 'compact' && <SwapProviders />}
             <SwapButton onClick={onConfirm} isEncodingProcess={isLoading || !!modalParams} />
-            <TonTransactionNotification handleClose={onCloseConfirmModal} params={modalParams} />
+            <TonTransactionNotification
+                handleClose={onCloseConfirmModal}
+                params={modalParams}
+                waitInvalidation
+            />
             <SwapTokensListNotification />
         </MainFormWrapper>
     );
