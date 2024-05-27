@@ -1,6 +1,7 @@
 import React, { FC, PropsWithChildren } from 'react';
 import styled, { css } from 'styled-components';
 import { SpinnerIcon } from '../Icon';
+import { Body2Class } from '../Text';
 
 export interface ButtonProps {
     loading?: boolean;
@@ -29,11 +30,17 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
     align-items: center;
     gap: 8px;
 
-    font-family: 'Montserrat', sans-serif;
     font-style: normal;
-    font-weight: 600;
 
     transition: background-color 0.1s ease, color 0.1s ease;
+
+    ${p =>
+        p.theme.displayType === 'full-width'
+            ? Body2Class
+            : css`
+                  font-family: 'Montserrat', sans-serif;
+                  font-weight: 600;
+              `}
 
     ${props =>
         !props.disabled
