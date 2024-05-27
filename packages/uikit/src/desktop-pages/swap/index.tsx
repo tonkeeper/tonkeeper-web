@@ -12,6 +12,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
 import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSettingsButton';
+import { useTranslation } from '../../hooks/translation';
 
 const SwapPageWrapper = styled.div`
     overflow-y: auto;
@@ -40,6 +41,7 @@ const ContentWrapper = styled.div`
 `;
 
 const DesktopSwapPageContent = () => {
+    const { t } = useTranslation();
     const { isSwapsEnabled } = useSwapsConfig();
     const sdk = useAppSdk();
     const swapLink = useStonfiSwapLink(swapFromAsset$.value.address, swapToAsset$.value.address);
@@ -52,7 +54,7 @@ const DesktopSwapPageContent = () => {
     return (
         <SwapPageWrapper>
             <DesktopViewHeader backButton={false}>
-                <Label2>Swap</Label2>
+                <Label2>{t('wallet_swap')}</Label2>
                 <HeaderButtons>
                     <SwapRefreshButton />
                     <SwapSettingsButton />

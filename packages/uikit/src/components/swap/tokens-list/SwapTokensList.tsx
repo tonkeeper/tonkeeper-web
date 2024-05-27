@@ -13,6 +13,7 @@ import { LinkOutIcon, SpinnerIcon } from '../../Icon';
 import { ConfirmImportNotification } from './ConfirmImportNotification';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
+import { useTranslation } from '../../../hooks/translation';
 
 const SwapTokensListWrapper = styled.div`
     overflow-y: auto;
@@ -86,6 +87,7 @@ const TokensNotFoundContainer = styled.div`
 `;
 
 const TokenNotFound: FC<{ onSelect: (asset: TonAsset) => void }> = ({ onSelect }) => {
+    const { t } = useTranslation();
     const { data: swapAsset, isFetching } = useSwapCustomTokenSearch();
     const [isOpened, setIsOpened] = useState(false);
     const { mutate } = useAddUserCustomSwapAsset();
@@ -101,7 +103,7 @@ const TokenNotFound: FC<{ onSelect: (asset: TonAsset) => void }> = ({ onSelect }
     if (!swapAsset) {
         return (
             <TokensNotFoundContainer>
-                <Body2>Tokens not found</Body2>
+                <Body2>{t('swap_tokens_not_found')}</Body2>
             </TokensNotFoundContainer>
         );
     }

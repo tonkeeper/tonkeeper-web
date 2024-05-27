@@ -10,6 +10,7 @@ import {
     useWalletFilteredSwapAssets
 } from '../../../state/swap/useSwapAssets';
 import { SpinnerIcon } from '../../Icon';
+import { useTranslation } from '../../../hooks/translation';
 
 const swapTokensListOpened$ = atom<{ onClose: (token: TonAsset | undefined) => void } | undefined>(
     undefined
@@ -27,6 +28,7 @@ export const useOpenSwapTokensList = (onClose: (token: TonAsset | undefined) => 
 };
 
 export const SwapTokensListNotification: FC = () => {
+    const { t } = useTranslation();
     const [onSelect, setIsOpen] = useAtom(swapTokensListOpened$);
 
     const onClose = (asset: TonAsset | undefined) => {
@@ -35,7 +37,11 @@ export const SwapTokensListNotification: FC = () => {
     };
 
     return (
-        <Notification isOpen={!!onSelect} handleClose={() => onClose(undefined)} title="Tokens">
+        <Notification
+            isOpen={!!onSelect}
+            handleClose={() => onClose(undefined)}
+            title={t('swap_tokens')}
+        >
             {() => <SwapTokensListContent onSelect={onClose} />}
         </Notification>
     );

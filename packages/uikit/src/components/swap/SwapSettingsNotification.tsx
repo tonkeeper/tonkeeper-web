@@ -6,14 +6,16 @@ import { Notification } from '../Notification';
 import { Button } from '../fields/Button';
 import { useMutateSwapOptions, useSwapOptions } from '../../state/swap/useSwapOptions';
 import { SpinnerIcon } from '../Icon';
+import { useTranslation } from '../../hooks/translation';
 
 export const SwapSettingsNotification: FC<{
     isOpen: boolean;
     onClose: (confirmed?: boolean) => void;
 }> = ({ isOpen, onClose }) => {
+    const { t } = useTranslation();
     return (
         <>
-            <Notification isOpen={isOpen} handleClose={onClose} title="Settings">
+            <Notification isOpen={isOpen} handleClose={onClose} title={t('swap_settings')}>
                 {() => <SwapSettingsNotificationContent onClose={onClose} />}
             </Notification>
         </>
@@ -62,6 +64,7 @@ const LoadingContainer = styled.div`
 `;
 
 const SwapSettingsNotificationContent: FC<{ onClose: () => void }> = ({ onClose }) => {
+    const { t } = useTranslation();
     const { data: swapOptions } = useSwapOptions();
     const { mutate } = useMutateSwapOptions();
     const [checkedRadioValue, setCheckedRadioValue] = useState<
@@ -95,8 +98,8 @@ const SwapSettingsNotificationContent: FC<{ onClose: () => void }> = ({ onClose 
     return (
         <>
             <SlippageToleranceTextWrapper>
-                <Label2>Slippage Tolerance</Label2>
-                <Body3>The amount the price can change unfavorably before the trade reverts.</Body3>
+                <Label2>{t('swap_slippage')}</Label2>
+                <Body3>{t('swap_slippage_description')}</Body3>
             </SlippageToleranceTextWrapper>
             <SlippageOptionsContainer>
                 {slippagePercentValues.map(value => (
@@ -113,14 +116,14 @@ const SwapSettingsNotificationContent: FC<{ onClose: () => void }> = ({ onClose 
             </SlippageOptionsContainer>
             <ButtonsContainer>
                 <Button secondary onClick={onClose}>
-                    Cancel
+                    {t('cancel')}
                 </Button>
                 <Button
                     primary
                     disabled={checkedRadioValue === swapOptions.slippagePercent}
                     onClick={onSave}
                 >
-                    Save
+                    {t('save')}
                 </Button>
             </ButtonsContainer>
         </>

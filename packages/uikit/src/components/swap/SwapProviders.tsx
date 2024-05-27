@@ -11,6 +11,7 @@ import {
 } from '../../state/swap/useSwapForm';
 import { Skeleton } from '../shared/Skeleton';
 import BigNumber from 'bignumber.js';
+import { useTranslation } from '../../hooks/translation';
 
 const SwapProvidersContainer = styled.div`
     box-sizing: border-box;
@@ -27,6 +28,7 @@ const Heading = styled.div`
 `;
 
 export const SwapProviders = () => {
+    const { t } = useTranslation();
     const isNotCompleted = useIsSwapFormNotCompleted();
 
     if (isNotCompleted) {
@@ -36,7 +38,7 @@ export const SwapProviders = () => {
     return (
         <SwapProvidersContainer>
             <Heading>
-                <Body3>Provider</Body3>
+                <Body3>{t('swap_provider')}</Body3>
             </Heading>
             <ProviderCard provider="stonfi" />
             <ProviderCard provider="dedust" />
@@ -97,6 +99,7 @@ const providersConfig = {
 };
 
 const ProviderCard: FC<{ provider: keyof typeof providersConfig }> = ({ provider }) => {
+    const { t } = useTranslation();
     const [selectedSwap, setSelectedSwap] = useSelectedSwap();
     const isActive = selectedSwap?.provider === provider;
 
@@ -123,11 +126,11 @@ const ProviderCard: FC<{ provider: keyof typeof providersConfig }> = ({ provider
             <ProviderImage src={providerConfig.imageUrl} />
             <ProviderLabelContainer>
                 <Label2>{providerConfig.label}</Label2>
-                {isBest && <Body3Styled>Best price</Body3Styled>}
+                {isBest && <Body3Styled>{t('swap_best_price')}</Body3Styled>}
             </ProviderLabelContainer>
             <ProviderPriceContainer>
                 {!isFetching && !trade ? (
-                    <Body3Styled>Trade is not available</Body3Styled>
+                    <Body3Styled>{t('swap_trade_is_not_available')}</Body3Styled>
                 ) : (
                     <>
                         {trade ? (
@@ -142,7 +145,6 @@ const ProviderCard: FC<{ provider: keyof typeof providersConfig }> = ({ provider
                         ) : (
                             <div />
                         )}
-                        <Body3Styled></Body3Styled>
                     </>
                 )}
             </ProviderPriceContainer>

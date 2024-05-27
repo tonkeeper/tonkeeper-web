@@ -8,6 +8,7 @@ import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
 import { Skeleton } from '../shared/Skeleton';
 import { SwapTransactionInfo } from './SwapTransactionInfo';
 import { SwapRate } from './SwapRate';
+import { useTranslation } from '../../hooks/translation';
 
 const FiledContainerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
@@ -67,6 +68,7 @@ const Num2Tertiary = styled(Num2)`
 `;
 
 export const SwapToField = () => {
+    const { t } = useTranslation();
     const [toAsset, setToAsset] = useSwapToAsset();
     const { isFetching } = useCalculatedSwap();
 
@@ -75,7 +77,7 @@ export const SwapToField = () => {
     return (
         <FiledContainerStyled>
             <FiledHeader>
-                <Body3>Receive</Body3>
+                <Body3>{t('swap_receive')}</Body3>
                 <SwapToAmountBalance />
             </FiledHeader>
             <FieldBody>

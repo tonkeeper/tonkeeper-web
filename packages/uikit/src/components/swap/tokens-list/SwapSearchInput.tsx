@@ -2,6 +2,7 @@ import { styled } from 'styled-components';
 import { Body2Class } from '../../Text';
 import { forwardRef } from 'react';
 import { useSwapTokensFilter } from '../../../state/swap/useSwapAssets';
+import { useTranslation } from '../../../hooks/translation';
 
 const SearchTokenInputElement = styled.input`
     border-radius: ${p =>
@@ -34,6 +35,7 @@ export const SwapSearchInput = forwardRef<
     HTMLInputElement,
     { className?: string; isDisabled: boolean }
 >(({ className, isDisabled }, ref) => {
+    const { t } = useTranslation();
     const [value, setValue] = useSwapTokensFilter();
 
     return (
@@ -41,7 +43,7 @@ export const SwapSearchInput = forwardRef<
             ref={ref}
             disabled={isDisabled}
             className={className}
-            placeholder="Search"
+            placeholder={t('swap_search')}
             value={value}
             onChange={e => {
                 setValue(e.target.value);

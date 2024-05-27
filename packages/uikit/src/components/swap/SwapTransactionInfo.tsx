@@ -15,6 +15,7 @@ import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useSwapOptions } from '../../state/swap/useSwapOptions';
+import { useTranslation } from '../../hooks/translation';
 
 const TxInfoContainer = styled.div``;
 
@@ -92,6 +93,7 @@ const PriceImpact = styled(Body3)<{ status: ReturnType<typeof priceImpactStatus>
 `;
 
 export const SwapTransactionInfo = () => {
+    const { t } = useTranslation();
     const [isOpened, setIsOpened] = useState(false);
     const { isFetching } = useCalculatedSwap();
     const [swap] = useSelectedSwap();
@@ -103,7 +105,6 @@ export const SwapTransactionInfo = () => {
     const minimumReceivedId = useId();
     const slippageId = useId();
     const blockchainFeeId = useId();
-    const routeId = useId();
 
     const trade = swap?.trade;
 
@@ -114,7 +115,7 @@ export const SwapTransactionInfo = () => {
     return (
         <TxInfoContainer>
             <TxInfoHeader onClick={() => setIsOpened(s => !s)}>
-                <Body3>Transaction Information</Body3>
+                <Body3>{t('swap_tx_info')}</Body3>
                 <AccordionButton transparent isOpened={isOpened}>
                     <ChevronDownIcon />
                 </AccordionButton>
@@ -123,11 +124,11 @@ export const SwapTransactionInfo = () => {
                 <AccordionBody>
                     <AccordionContent>
                         <InfoRow>
-                            <InfoRowLabel>Price impact</InfoRowLabel>
+                            <InfoRowLabel>{t('swap_price_impact')}</InfoRowLabel>
                             <div data-tooltip-id={priceImpactId}>
                                 <InfoCircleIcon />
                             </div>
-                            <Tooltip id={priceImpactId}>TODO</Tooltip>
+                            <Tooltip id={priceImpactId}>{t('swap_price_impact_tooltip')}</Tooltip>
                             <InfoRowRight>
                                 {priceImpact === undefined || !trade ? (
                                     <InfoSkeleton />
@@ -144,18 +145,20 @@ export const SwapTransactionInfo = () => {
                                                     .replace('-', '+')}%`}
                                             </>
                                         ) : (
-                                            'Unknown price impact'
+                                            t('swap_unknown_price_impact')
                                         )}
                                     </PriceImpact>
                                 )}
                             </InfoRowRight>
                         </InfoRow>
                         <InfoRow>
-                            <InfoRowLabel>Minimum received</InfoRowLabel>
+                            <InfoRowLabel>{t('swap_minimum_received')}</InfoRowLabel>
                             <div data-tooltip-id={minimumReceivedId}>
                                 <InfoCircleIcon />
                             </div>
-                            <Tooltip id={minimumReceivedId}>TODO</Tooltip>
+                            <Tooltip id={minimumReceivedId}>
+                                {t('swap_minimum_received_tooltip')}
+                            </Tooltip>
                             <InfoRowRight>
                                 {!trade || !swapOptions ? (
                                     <InfoSkeleton />
@@ -175,11 +178,11 @@ export const SwapTransactionInfo = () => {
                             </InfoRowRight>
                         </InfoRow>
                         <InfoRow>
-                            <InfoRowLabel>Slippage</InfoRowLabel>
+                            <InfoRowLabel>{t('swap_slippage')}</InfoRowLabel>
                             <div data-tooltip-id={slippageId}>
                                 <InfoCircleIcon />
                             </div>
-                            <Tooltip id={slippageId}>TODO</Tooltip>
+                            <Tooltip id={slippageId}>{t('swap_slippage_tooltip')}</Tooltip>
                             <InfoRowRight>
                                 {!trade || !swapOptions ? (
                                     <InfoSkeleton />
@@ -189,11 +192,13 @@ export const SwapTransactionInfo = () => {
                             </InfoRowRight>
                         </InfoRow>
                         <InfoRow>
-                            <InfoRowLabel>Blockchain fee</InfoRowLabel>
+                            <InfoRowLabel>{t('swap_blockchain_fee')}</InfoRowLabel>
                             <div data-tooltip-id={blockchainFeeId}>
                                 <InfoCircleIcon />
                             </div>
-                            <Tooltip id={blockchainFeeId}>TODO</Tooltip>
+                            <Tooltip id={blockchainFeeId}>
+                                {t('swap_blockchain_fee_tooltip')}
+                            </Tooltip>
                             <InfoRowRight>
                                 {!trade ? (
                                     <InfoSkeleton />
@@ -205,16 +210,12 @@ export const SwapTransactionInfo = () => {
                             </InfoRowRight>
                         </InfoRow>
                         <InfoRow>
-                            <InfoRowLabel>Route</InfoRowLabel>
-                            <div data-tooltip-id={routeId}>
-                                <InfoCircleIcon />
-                            </div>
-                            <Tooltip id={routeId}>TODO</Tooltip>
+                            <InfoRowLabel>{t('swap_route')}</InfoRowLabel>
                             <InfoRowRight>
                                 {!trade ? (
                                     <InfoSkeleton />
                                 ) : (
-                                    <Body3>{trade!.path.map(t => t.symbol).join(' → ')}</Body3>
+                                    <Body3>{trade!.path.map(ta => ta.symbol).join(' → ')}</Body3>
                                 )}
                             </InfoRowRight>
                         </InfoRow>

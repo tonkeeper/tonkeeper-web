@@ -3,6 +3,7 @@ import { Notification } from '../../Notification';
 import { createGlobalStyle, styled } from 'styled-components';
 import { Body2, Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
+import { useTranslation } from '../../../hooks/translation';
 
 const ConfirmImportNotificationContent = styled.div`
     display: flex;
@@ -38,6 +39,7 @@ export const ConfirmImportNotification: FC<{
     onClose: (confirmed?: boolean) => void;
     tokenSymbol: string;
 }> = ({ isOpen, onClose, tokenSymbol }) => {
+    const { t } = useTranslation();
     return (
         <>
             <WrapperStyles />
@@ -48,17 +50,16 @@ export const ConfirmImportNotification: FC<{
             >
                 {() => (
                     <ConfirmImportNotificationContent>
-                        <Label2>Import {tokenSymbol} token?</Label2>
-                        <DescriptionBlock>
-                            This token isn't included in the active token list. Make sure you are
-                            aware of the risks associated with imported tokens.
-                        </DescriptionBlock>
+                        <Label2>
+                            {t('swap_import_token_title').replace('%token%', tokenSymbol)}
+                        </Label2>
+                        <DescriptionBlock>{t('swap_unknown_token_description')}</DescriptionBlock>
                         <ButtonsBlock>
                             <Button primary onClick={() => onClose(false)}>
-                                Cancel
+                                {t('cancel')}
                             </Button>
                             <Button secondary onClick={() => onClose(true)}>
-                                Import
+                                {t('swap_import')}
                             </Button>
                         </ButtonsBlock>
                     </ConfirmImportNotificationContent>

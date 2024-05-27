@@ -13,6 +13,7 @@ import {
 } from '../../state/swap/useSwapForm';
 import { useAssetWeiBalance } from '../../state/home';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { useTranslation } from '../../hooks/translation';
 
 const Body3Styled = styled(Body3)`
     color: ${p => p.theme.textSecondary};
@@ -68,11 +69,12 @@ const SwapAmountContent: FC<{
     decimals: number;
     onMax?: () => void;
 }> = ({ balance, decimals = 0, onMax }) => {
+    const { t } = useTranslation();
     const format = useFormatCoinValue();
 
     return (
         <BalanceContainer>
-            <Body3Styled>Balance:&nbsp;</Body3Styled>
+            <Body3Styled>{t('swap_balance')}:&nbsp;</Body3Styled>
             {balance ? (
                 <Body3Styled>{format(balance, decimals)}</Body3Styled>
             ) : (
@@ -80,7 +82,7 @@ const SwapAmountContent: FC<{
             )}
             {onMax && (
                 <MaxButton disabled={!balance || balance.isZero()} onClick={onMax}>
-                    <Label3>Max</Label3>
+                    <Label3>{t('swap_max')}</Label3>
                 </MaxButton>
             )}
         </BalanceContainer>

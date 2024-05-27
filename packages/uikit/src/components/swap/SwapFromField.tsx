@@ -8,6 +8,7 @@ import { SwapFromAmountBalance } from './SwapAmountBalance';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC, PropsWithChildren } from 'react';
+import { useTranslation } from '../../hooks/translation';
 
 const FiledContainerStyled = styled.div`
     position: relative;
@@ -56,6 +57,7 @@ const SwapAmountInputStyled = styled(SwapAmountInput)`
 `;
 
 export const SwapFromField: FC<PropsWithChildren> = ({ children }) => {
+    const { t } = useTranslation();
     const [swapAmount, setSwapAmount] = useSwapFromAmount();
     const [fromAsset, setFromAsset] = useSwapFromAsset();
     const { data: max } = useMaxSwapValue();
@@ -63,7 +65,7 @@ export const SwapFromField: FC<PropsWithChildren> = ({ children }) => {
     return (
         <FiledContainerStyled>
             <FiledHeader>
-                <Body3>Send</Body3>
+                <Body3>{t('swap_send')}</Body3>
                 <SwapFromAmountBalance />
             </FiledHeader>
             <FieldBody>
