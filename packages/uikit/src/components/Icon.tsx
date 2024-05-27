@@ -1,4 +1,4 @@
-import React, { FC, Suspense, useContext } from 'react';
+import React, { FC, Suspense, useContext, useId } from 'react';
 import styled, { useTheme } from 'styled-components';
 
 const TonkeeperLottieIcon = React.lazy(() => import('./lottie/TonkeeperLottie'));
@@ -1619,6 +1619,65 @@ export const RefreshIcon: FC<{ className?: string; color?: string }> = ({ color,
                 d="M2.5 8C2.5 4.96243 4.96243 2.5 8 2.5C9.82096 2.5 11.4363 3.38501 12.4377 4.75H10.5C10.0858 4.75 9.75 5.08579 9.75 5.5C9.75 5.91421 10.0858 6.25 10.5 6.25H13.7135C13.7247 6.25025 13.7359 6.25025 13.7471 6.25H14.25C14.6642 6.25 15 5.91421 15 5.5V1.75C15 1.33579 14.6642 1 14.25 1C13.8358 1 13.5 1.33579 13.5 1.75V3.66963C12.2187 2.04438 10.2318 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15C10.7611 15 13.1473 13.4014 14.2863 11.0826C14.4689 10.7108 14.3156 10.2613 13.9438 10.0787C13.572 9.89611 13.1226 10.0495 12.9399 10.4212C12.0435 12.2464 10.1674 13.5 8 13.5C4.96243 13.5 2.5 11.0376 2.5 8Z"
                 fill="currentColor"
             />
+        </svg>
+    );
+};
+
+export const RefreshIconAnimated: FC<{ className?: string; color?: string }> = ({
+    color,
+    className
+}) => {
+    const theme = useTheme();
+    const clipId = useId().replaceAll(':', '_');
+    const arrowId = useId().replaceAll(':', '_');
+
+    return (
+        <svg
+            height="16px"
+            width="16px"
+            viewBox="0 0 16 16"
+            xmlns="http://www.w3.org/2000/svg"
+            color={theme[color || 'iconSecondary']}
+            className={className}
+        >
+            <path
+                d="M2.5 8C2.5 4.96243 4.96243 2.5 8 2.5C9.82096 2.5 11.4363 3.38501 12.4377 4.75H10.5C10.0858 4.75 9.75 5.08579 9.75 5.5C9.75 5.91421 10.0858 6.25 10.5 6.25H13.7135C13.7247 6.25025 13.7359 6.25025 13.7471 6.25H14.25C14.6642 6.25 15 5.91421 15 5.5V1.75C15 1.33579 14.6642 1 14.25 1C13.8358 1 13.5 1.33579 13.5 1.75V3.66963C12.2187 2.04438 10.2318 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15C10.7611 15 13.1473 13.4014 14.2863 11.0826C14.4689 10.7108 14.3156 10.2613 13.9438 10.0787C13.572 9.89611 13.1226 10.0495 12.9399 10.4212C12.0435 12.2464 10.1674 13.5 8 13.5C4.96243 13.5 2.5 11.0376 2.5 8Z"
+                stroke="none"
+                fill={theme.iconPrimary}
+            />
+            <defs>
+                <path
+                    d="M2.5 8C2.5 4.96243 4.96243 2.5 8 2.5C9.82096 2.5 11.4363 3.38501 12.4377 4.75H10.5C10.0858 4.75 9.75 5.08579 9.75 5.5C9.75 5.91421 10.0858 6.25 10.5 6.25H13.7135C13.7247 6.25025 13.7359 6.25025 13.7471 6.25H14.25C14.6642 6.25 15 5.91421 15 5.5V1.75C15 1.33579 14.6642 1 14.25 1C13.8358 1 13.5 1.33579 13.5 1.75V3.66963C12.2187 2.04438 10.2318 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15C10.7611 15 13.1473 13.4014 14.2863 11.0826C14.4689 10.7108 14.3156 10.2613 13.9438 10.0787C13.572 9.89611 13.1226 10.0495 12.9399 10.4212C12.0435 12.2464 10.1674 13.5 8 13.5C4.96243 13.5 2.5 11.0376 2.5 8Z"
+                    id={arrowId}
+                    stroke="none"
+                    fill="none"
+                />
+                <clipPath id={clipId}>
+                    <use href={`#${arrowId}`}></use>
+                </clipPath>
+            </defs>
+            <g clipPath={`url(#${clipId})`}>
+                <circle
+                    cx="8"
+                    cy="8"
+                    r="5"
+                    transform="rotate(360,12,12)"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="10"
+                    strokeDasharray="30"
+                    strokeDashoffset="0"
+                >
+                    <animate
+                        attributeName="stroke-dashoffset"
+                        values="60;30"
+                        begin="0"
+                        repeatCount="indefinite"
+                        dur="15s"
+                    ></animate>
+                </circle>
+            </g>
+            <use href={`#${arrowId}`}></use>
         </svg>
     );
 };

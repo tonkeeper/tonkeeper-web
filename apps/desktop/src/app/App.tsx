@@ -58,7 +58,6 @@ import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useAuthState, useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
-import { useStonfiAssets } from '@tonkeeper/uikit/dist/state/stonfi';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
