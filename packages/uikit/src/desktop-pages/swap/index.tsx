@@ -31,6 +31,12 @@ const ContentWrapper = styled.div`
     padding: 0 1rem;
     display: flex;
     gap: 0.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+
+    > * {
+        flex: 1;
+    }
 `;
 
 const DesktopSwapPageContent = () => {

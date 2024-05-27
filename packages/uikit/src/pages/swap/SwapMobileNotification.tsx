@@ -37,8 +37,8 @@ const HeaderLabel = styled(Label2)`
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 3rem;
-    right: 0;
+    left: 5rem;
+    right: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -59,7 +59,7 @@ const NotificationHeader = () => {
 
 const SwapPageWrapper = styled.div`
     overflow-y: auto;
-    min-height: calc(var(--app-height) - 5rem);
+    min-height: calc(var(--app-height) - 7rem);
 `;
 
 const NotificationContent = () => {

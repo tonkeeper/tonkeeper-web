@@ -182,6 +182,10 @@ const LinkOutIconWrapper = styled.div`
 
 const TokenInfoSecondLine = styled(TokenInfoLine)`
     color: ${p => p.theme.textSecondary};
+
+    > *:nth-child(2) {
+        margin-left: auto;
+    }
 `;
 
 const BalanceLabel = styled(Label2)<{ isZero: boolean }>`

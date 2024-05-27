@@ -14,7 +14,6 @@ import BigNumber from 'bignumber.js';
 
 const SwapProvidersContainer = styled.div`
     box-sizing: border-box;
-    width: ${p => (p.theme.displayType === 'full-width' ? '292px' : '100%')};
     padding: 0 12px 12px;
     background: ${p => p.theme.backgroundContent};
     border-radius: ${p =>
