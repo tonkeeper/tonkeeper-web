@@ -41,6 +41,7 @@ const TokensHeaderContainer = styled(DesktopViewHeader)`
     flex-shrink: 0;
     justify-content: space-between;
     border-bottom: 1px solid ${p => p.theme.separatorCommon};
+    padding-right: 0;
 `;
 
 const TokensPageBody = styled.div`
