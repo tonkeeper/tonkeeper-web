@@ -39,8 +39,15 @@ const ChangeIconStyled = styled(IconButton)`
 
     background-color: ${props => props.theme.buttonTertiaryBackground};
 
+    > svg {
+        transition: color 0.15s ease-in-out;
+    }
+
     &:hover {
         background-color: ${props => props.theme.buttonTertiaryBackgroundHighlighted};
+        > svg {
+            color: ${props => props.theme.iconPrimary};
+        }
     }
 `;
 

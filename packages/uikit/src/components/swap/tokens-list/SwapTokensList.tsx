@@ -19,7 +19,7 @@ const SwapTokensListWrapper = styled.div`
     overflow-y: auto;
     width: calc(100% + 2rem);
     margin: 0 -1rem;
-    height: calc(100% - 57px);
+    height: calc(100% - 54px);
 
     &::-webkit-scrollbar {
         display: none;
@@ -61,13 +61,13 @@ export const SwapTokensList: FC<{
     return (
         <SwapTokensListWrapper ref={ref} onScroll={throttle(onScroll, 100)}>
             {walletSwapAssets.length ? (
-                displayingAssets.map(swapAsset => (
+                displayingAssets.map((swapAsset, index) => (
                     <Fragment key={swapAsset.assetAmount.asset.id}>
                         <TokenListItem
                             onClick={() => onSelect(swapAsset.assetAmount.asset)}
                             swapAsset={swapAsset}
                         />
-                        <Divider />
+                        {index !== walletSwapAssets.length - 1 && <Divider />}
                     </Fragment>
                 ))
             ) : (

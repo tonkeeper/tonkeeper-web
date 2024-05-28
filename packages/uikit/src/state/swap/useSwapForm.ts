@@ -59,7 +59,7 @@ export const useSwapFromAmount = () => {
 };
 
 export const useMaxSwapValue = () => {
-    const TON_GAS_SAFETY_NANO_CONST = 100000;
+    const TON_GAS_SAFETY_NANO_CONST = 1000000;
     const { data: swapGas, isError } = useSwapGasConfig();
     const [fromAsset] = useSwapFromAsset();
     const balance = useAssetWeiBalance(fromAsset);

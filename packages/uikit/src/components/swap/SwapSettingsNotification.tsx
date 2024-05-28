@@ -27,6 +27,7 @@ const SlippageToleranceTextWrapper = styled.div`
 
     > * {
         display: block;
+        cursor: default;
     }
 
     > ${Body3} {

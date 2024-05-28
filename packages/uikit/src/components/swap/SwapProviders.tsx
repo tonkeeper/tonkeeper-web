@@ -24,6 +24,11 @@ const SwapProvidersContainer = styled.div`
 const Heading = styled.div`
     color: ${p => p.theme.textSecondary};
     padding: 10px 0;
+    display: flex;
+    align-items: center;
+    > * {
+        cursor: default;
+    }
 `;
 
 export const SwapProviders = () => {
@@ -80,6 +85,7 @@ const ProviderPriceContainer = styled.div`
     margin-left: auto;
     display: flex;
     flex-direction: column;
+    align-items: flex-end;
 `;
 
 const Body3Styled = styled(Body3)`

@@ -69,6 +69,14 @@ const InfoRow = styled.div`
     padding: 4px 0;
     gap: 6px;
     align-items: center;
+
+    > * {
+        cursor: default;
+    }
+`;
+
+const TooltipWrapper = styled.div`
+    cursor: pointer;
 `;
 
 const InfoRowLabel = styled(Body3)`
@@ -133,9 +141,9 @@ export const SwapTransactionInfo = () => {
                     <AccordionContent>
                         <InfoRow>
                             <InfoRowLabel>{t('swap_price_impact')}</InfoRowLabel>
-                            <div data-tooltip-id={priceImpactId}>
+                            <TooltipWrapper data-tooltip-id={priceImpactId}>
                                 <InfoCircleIcon />
-                            </div>
+                            </TooltipWrapper>
                             <TooltipStyled id={priceImpactId} place={tooltipPlace}>
                                 {t('swap_price_impact_tooltip')}
                             </TooltipStyled>
@@ -163,9 +171,9 @@ export const SwapTransactionInfo = () => {
                         </InfoRow>
                         <InfoRow>
                             <InfoRowLabel>{t('swap_minimum_received')}</InfoRowLabel>
-                            <div data-tooltip-id={minimumReceivedId}>
+                            <TooltipWrapper data-tooltip-id={minimumReceivedId}>
                                 <InfoCircleIcon />
-                            </div>
+                            </TooltipWrapper>
                             <TooltipStyled id={minimumReceivedId} place={tooltipPlace}>
                                 {t('swap_minimum_received_tooltip')}
                             </TooltipStyled>
@@ -189,9 +197,9 @@ export const SwapTransactionInfo = () => {
                         </InfoRow>
                         <InfoRow>
                             <InfoRowLabel>{t('swap_slippage')}</InfoRowLabel>
-                            <div data-tooltip-id={slippageId}>
+                            <TooltipWrapper data-tooltip-id={slippageId}>
                                 <InfoCircleIcon />
-                            </div>
+                            </TooltipWrapper>
                             <TooltipStyled id={slippageId} place={tooltipPlace}>
                                 {t('swap_slippage_tooltip')}
                             </TooltipStyled>
@@ -205,9 +213,9 @@ export const SwapTransactionInfo = () => {
                         </InfoRow>
                         <InfoRow>
                             <InfoRowLabel>{t('swap_blockchain_fee')}</InfoRowLabel>
-                            <div data-tooltip-id={blockchainFeeId}>
+                            <TooltipWrapper data-tooltip-id={blockchainFeeId}>
                                 <InfoCircleIcon />
-                            </div>
+                            </TooltipWrapper>
                             <TooltipStyled id={blockchainFeeId} place={tooltipPlace}>
                                 {t('swap_blockchain_fee_tooltip')}
                             </TooltipStyled>
