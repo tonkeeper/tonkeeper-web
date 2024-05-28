@@ -10,12 +10,12 @@ import { usePreFetchRates } from '../../../state/rates';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
 import { useWalletTotalBalance } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../Icon';
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon, PlusIconSmall } from "../../Icon";
 import { Num2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { IconButton } from '../../fields/IconButton';
 import { Link } from 'react-router-dom';
-import { AppProRoute, AppRoute } from '../../../libs/routes';
+import { AppProRoute } from '../../../libs/routes';
 import { BuyNotification } from '../../home/BuyAction';
 import { Skeleton } from '../../shared/Skeleton';
 
@@ -148,16 +148,8 @@ const DesktopHeaderPayload = () => {
                         <ArrowDownIcon />
                         {t('wallet_receive')}
                     </ButtonStyled>
-                </ButtonsContainer>
-                <ButtonsContainer>
-                    <Link to={AppRoute.swap}>
-                        <ButtonStyled size="small">
-                            <SwapIcon />
-                            {t('wallet_swap')}
-                        </ButtonStyled>
-                    </Link>
                     <ButtonStyled size="small" onClick={onOpen}>
-                        <PlusIcon />
+                        <PlusIconSmall />
                         {t('wallet_buy')}
                     </ButtonStyled>
                 </ButtonsContainer>
