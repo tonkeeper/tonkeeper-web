@@ -169,8 +169,35 @@ const main = async () => {
 
     fillMissingLocales(resources, defaultResource);
     writeFiles(resources, defaultResource);
+    checkForDuplicates(resources);
 
     console.log('----------End Build Locales----------');
 };
+
+const checkForDuplicates = (resources: Record<string, { translation: Record<string, string> }>) => {
+    Object.entries(resources).forEach(([locale, { translation }]) => {
+        const keys = Object.keys(translation);
+
+        const checked = new Map<string, Record<string, string>>();
+        keys.forEach(key => {
+            if (checked.has(key.toLowerCase())) {
+              return;
+            }
+
+            const duplicates = keys.filter(k => k.toLowerCase() === key.toLowerCase());
+            if (duplicates.length > 1) {
+                const values = duplicates.reduce((acc, d) => {
+                    return {
+                        ...acc,
+                        [d]: translation[d]
+                    }
+                }, {});
+                console.error('⚠️ ERR: Find duplicating keys in', `"${locale}"`, 'locale ', values);
+                checked.set(key.toLowerCase(), values);
+            }
+        })
+    })
+
+}
 
 main().catch(() => process.exit(1));
