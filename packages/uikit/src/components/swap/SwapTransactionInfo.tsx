@@ -1,5 +1,5 @@
 import { css, styled, useTheme } from 'styled-components';
-import { Body3 } from '../Text';
+import { Body2Class, Body3 } from '../Text';
 import { IconButton } from '../fields/IconButton';
 import { useId, useState } from 'react';
 import { ChevronDownIcon, InfoCircleIcon } from '../Icon';
@@ -103,6 +103,7 @@ const PriceImpact = styled(Body3)<{ status: ReturnType<typeof priceImpactStatus>
 const TooltipStyled = styled(Tooltip)`
     max-width: 300px;
     z-index: 100;
+    ${Body2Class};
 `;
 
 export const SwapTransactionInfo = () => {
