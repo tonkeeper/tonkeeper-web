@@ -51,7 +51,6 @@
   "Lock_screen" : "Lock screen",
   "logout_on_unlock_many" : "This will erase keys to all your wallets. Make sure you have backed up your secret recovery phrases.",
   "logout_on_unlock_one" : "This will erase keys to the wallet. Make sure you have backed up your secret recovery phrase.",
-  "manage" : "Manage",
   "Manage" : "Manage",
   "Manage_wallets" : "Manage wallets",
   "MinPassword" : "Must be at least 6 characters.",
