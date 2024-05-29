@@ -1,9 +1,8 @@
-import { css, styled, useTheme } from 'styled-components';
+import { css, styled } from 'styled-components';
 import { Body2Class, Body3 } from '../Text';
 import { IconButton } from '../fields/IconButton';
-import { useId, useState } from 'react';
+import { useRef, useState } from 'react';
 import { ChevronDownIcon, InfoCircleIcon } from '../Icon';
-import { Tooltip } from '../shared/Tooltip';
 import { Skeleton } from '../shared/Skeleton';
 import {
     priceImpactStatus,
@@ -16,6 +15,7 @@ import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useSwapOptions } from '../../state/swap/useSwapOptions';
 import { useTranslation } from '../../hooks/translation';
+import { BorderSmallResponsive } from '../shared/Styles';
 
 const TxInfoContainer = styled.div``;
 
@@ -38,10 +38,10 @@ const AccordionContent = styled.div`
     transition: transform 0.2s ease-in-out, visibility 0.2s ease-in-out;
 `;
 
-const AccordionAnimation = styled.div<{ isOpened: boolean }>`
+const AccordionAnimation = styled.div<{ isOpened: boolean; animationCompleted: boolean }>`
     display: grid;
     grid-template-rows: ${p => (p.isOpened ? '1fr' : '0fr')};
-    overflow: hidden;
+    overflow: ${p => (p.animationCompleted && p.isOpened ? 'visible' : 'hidden')};
     transition: grid-template-rows 0.2s ease-in-out;
 
     ${AccordionContent} {
@@ -65,6 +65,7 @@ const AccordionButton = styled(IconButton)<{ isOpened: boolean }>`
 `;
 
 const InfoRow = styled.div`
+    position: relative;
     display: flex;
     padding: 4px 0;
     gap: 6px;
@@ -75,8 +76,39 @@ const InfoRow = styled.div`
     }
 `;
 
-const TooltipWrapper = styled.div`
+const Tooltip = styled.div<{ placement: 'top' | 'bottom' }>`
+    pointer-events: none;
+    transform: translate3d(0, -10px, 0);
+    z-index: 100;
+    left: 0;
+    right: 0;
+    transition: all 0.15s ease-in-out;
+    opacity: 0;
+    position: absolute;
+    background-color: ${p => p.theme.backgroundContentTint};
+    padding: 8px 12px;
+    ${BorderSmallResponsive};
+    ${Body2Class};
+
+    ${p =>
+        p.placement === 'top'
+            ? css`
+                  transform: translate3d(0, 10px, 0);
+                  bottom: 30px;
+              `
+            : css`
+                  transform: translate3d(0, -10px, 0);
+                  top: 30px;
+              `}
+`;
+
+const TooltipHost = styled.div`
     cursor: pointer;
+
+    &:hover + ${Tooltip} {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
 `;
 
 const InfoRowLabel = styled(Body3)`
@@ -100,26 +132,16 @@ const PriceImpact = styled(Body3)<{ status: ReturnType<typeof priceImpactStatus>
             : p.theme.accentRed};
 `;
 
-const TooltipStyled = styled(Tooltip)`
-    max-width: 300px;
-    z-index: 100;
-    ${Body2Class};
-`;
-
 export const SwapTransactionInfo = () => {
     const { t } = useTranslation();
-    const theme = useTheme();
     const [isOpened, setIsOpened] = useState(false);
+    const [isAnimationCompleted, setIsAnimationCompleted] = useState(false);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
     const { isFetching } = useCalculatedSwap();
     const [swap] = useSelectedSwap();
     const priceImpact = useSwapPriceImpact();
     const { data: swapOptions } = useSwapOptions();
     const isNotCompleted = useIsSwapFormNotCompleted();
-
-    const priceImpactId = useId();
-    const minimumReceivedId = useId();
-    const slippageId = useId();
-    const blockchainFeeId = useId();
 
     const trade = swap?.trade;
 
@@ -127,27 +149,34 @@ export const SwapTransactionInfo = () => {
         return null;
     }
 
-    const tooltipPlace = theme.displayType === 'full-width' ? 'top' : 'right';
+    const onToggleAccordion = () => {
+        clearTimeout(timeoutRef.current);
+        if (isOpened) {
+            setIsAnimationCompleted(false);
+            setIsOpened(false);
+        } else {
+            setIsOpened(true);
+            timeoutRef.current = setTimeout(() => setIsAnimationCompleted(true), 400);
+        }
+    };
 
     return (
         <TxInfoContainer>
-            <TxInfoHeader onClick={() => setIsOpened(s => !s)}>
+            <TxInfoHeader onClick={onToggleAccordion}>
                 <Body3>{t('swap_tx_info')}</Body3>
                 <AccordionButton transparent isOpened={isOpened}>
                     <ChevronDownIcon />
                 </AccordionButton>
             </TxInfoHeader>
-            <AccordionAnimation isOpened={isOpened}>
+            <AccordionAnimation isOpened={isOpened} animationCompleted={isAnimationCompleted}>
                 <AccordionBody>
                     <AccordionContent>
                         <InfoRow>
                             <InfoRowLabel>{t('swap_price_impact')}</InfoRowLabel>
-                            <TooltipWrapper data-tooltip-id={priceImpactId}>
+                            <TooltipHost>
                                 <InfoCircleIcon />
-                            </TooltipWrapper>
-                            <TooltipStyled id={priceImpactId} place={tooltipPlace}>
-                                {t('swap_price_impact_tooltip')}
-                            </TooltipStyled>
+                            </TooltipHost>
+                            <Tooltip placement="top">{t('swap_price_impact_tooltip')}</Tooltip>
                             <InfoRowRight>
                                 {priceImpact === undefined || !trade ? (
                                     <InfoSkeleton />
@@ -172,12 +201,12 @@ export const SwapTransactionInfo = () => {
                         </InfoRow>
                         <InfoRow>
                             <InfoRowLabel>{t('swap_minimum_received')}</InfoRowLabel>
-                            <TooltipWrapper data-tooltip-id={minimumReceivedId}>
+                            <TooltipHost>
                                 <InfoCircleIcon />
-                            </TooltipWrapper>
-                            <TooltipStyled id={minimumReceivedId} place={tooltipPlace}>
+                            </TooltipHost>
+                            <Tooltip placement="top">
                                 {t('swap_minimum_received_tooltip')}
-                            </TooltipStyled>
+                            </Tooltip>
                             <InfoRowRight>
                                 {!trade || !swapOptions ? (
                                     <InfoSkeleton />
@@ -198,12 +227,10 @@ export const SwapTransactionInfo = () => {
                         </InfoRow>
                         <InfoRow>
                             <InfoRowLabel>{t('swap_slippage')}</InfoRowLabel>
-                            <TooltipWrapper data-tooltip-id={slippageId}>
+                            <TooltipHost>
                                 <InfoCircleIcon />
-                            </TooltipWrapper>
-                            <TooltipStyled id={slippageId} place={tooltipPlace}>
-                                {t('swap_slippage_tooltip')}
-                            </TooltipStyled>
+                            </TooltipHost>
+                            <Tooltip placement="top">{t('swap_slippage_tooltip')}</Tooltip>
                             <InfoRowRight>
                                 {!trade || !swapOptions ? (
                                     <InfoSkeleton />
@@ -214,12 +241,10 @@ export const SwapTransactionInfo = () => {
                         </InfoRow>
                         <InfoRow>
                             <InfoRowLabel>{t('swap_blockchain_fee')}</InfoRowLabel>
-                            <TooltipWrapper data-tooltip-id={blockchainFeeId}>
+                            <TooltipHost>
                                 <InfoCircleIcon />
-                            </TooltipWrapper>
-                            <TooltipStyled id={blockchainFeeId} place={tooltipPlace}>
-                                {t('swap_blockchain_fee_tooltip')}
-                            </TooltipStyled>
+                            </TooltipHost>
+                            <Tooltip placement="top">{t('swap_blockchain_fee_tooltip')}</Tooltip>
                             <InfoRowRight>
                                 {!trade ? (
                                     <InfoSkeleton />
