@@ -22,7 +22,7 @@ import { BackButton, ButtonMock } from './fields/BackButton';
 import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
-import { H2, H3 } from './Text';
+import { H2, H3, Label2 } from './Text';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -244,6 +244,12 @@ const RowTitle = styled(H3)`
     flex: 1;
 `;
 
+const RowTitleDesktop = styled(Label2)`
+    margin: 0;
+    user-select: none;
+    flex: 1;
+`;
+
 const BackShadow = styled.div`
     width: var(--app-width);
     height: 60vh;
@@ -262,10 +268,15 @@ const BackShadow = styled.div`
 export const NotificationTitleRow: FC<
     PropsWithChildren<{ handleClose?: () => void; center?: boolean }>
 > = ({ handleClose, children, center = false }) => {
+    const isFullWidthMode = useIsFullWidthMode();
     return (
         <TitleRow>
             {center && <ButtonMock />}
-            <RowTitle>{children}</RowTitle>
+            {isFullWidthMode ? (
+                <RowTitleDesktop>{children}</RowTitleDesktop>
+            ) : (
+                <RowTitle>{children}</RowTitle>
+            )}
             {handleClose ? <NotificationCancelButton handleClose={handleClose} /> : <ButtonMock />}
         </TitleRow>
     );

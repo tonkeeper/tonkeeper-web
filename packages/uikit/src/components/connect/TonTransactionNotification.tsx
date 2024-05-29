@@ -24,7 +24,7 @@ import {
     NotificationFooterPortal
 } from '../Notification';
 import { SkeletonList } from '../Skeleton';
-import { Body2, H2, Label2 } from '../Text';
+import { H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
@@ -50,7 +50,7 @@ const ButtonRowStyled = styled.div`
     }
 `;
 
-const useSendMutation = (params: TonConnectTransactionPayload, estimate?: EstimateData) => {
+const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?: boolean) => {
     const wallet = useWalletContext();
     const sdk = useAppSdk();
     const { api } = useAppContext();
@@ -64,9 +64,14 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }
         const value = await sendTonConnectTransfer(api, wallet, params, signer);
-        client.invalidateQueries({
+        const invalidationPromise = client.invalidateQueries({
             predicate: query => query.queryKey.includes(wallet.active.rawAddress)
         });
+
+        if (waitInvalidation) {
+            await invalidationPromise;
+        }
+
         return value;
     });
 };
@@ -106,9 +111,6 @@ const ErrorStyled = styled.div`
 const Header = styled(H2)`
     text-align: center;
 `;
-const Secondary = styled(Body2)`
-    color: ${props => props.theme.textSecondary};
-`;
 
 const NotificationIssue: FC<{
     kind: 'not-enough-balance';
@@ -140,7 +142,8 @@ const NotificationIssue: FC<{
 const ConnectContent: FC<{
     params: TonConnectTransactionPayload;
     handleClose: (result?: string) => void;
-}> = ({ params, handleClose }) => {
+    waitInvalidation?: boolean;
+}> = ({ params, handleClose, waitInvalidation }) => {
     const sdk = useAppSdk();
     const [done, setDone] = useState(false);
 
@@ -148,7 +151,7 @@ const ConnectContent: FC<{
 
     const { data: issues, isFetched } = useTransactionError(params);
     const { data: estimate, isLoading: isEstimating, isError } = useEstimation(params, isFetched);
-    const { mutateAsync, isLoading } = useSendMutation(params, estimate);
+    const { mutateAsync, isLoading } = useSendMutation(params, waitInvalidation);
 
     useEffect(() => {
         if (sdk.twaExpand) {
@@ -243,12 +246,19 @@ const useTransactionError = (params: TonConnectTransactionPayload) => {
 export const TonTransactionNotification: FC<{
     params: TonConnectTransactionPayload | null;
     handleClose: (result?: string) => void;
-}> = ({ params, handleClose }) => {
+    waitInvalidation?: boolean;
+}> = ({ params, handleClose, waitInvalidation }) => {
     const { t } = useTranslation();
 
     const Content = useCallback(() => {
         if (!params) return undefined;
-        return <ConnectContent params={params} handleClose={handleClose} />;
+        return (
+            <ConnectContent
+                params={params}
+                handleClose={handleClose}
+                waitInvalidation={waitInvalidation}
+            />
+        );
     }, [origin, params, handleClose]);
 
     return (

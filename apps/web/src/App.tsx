@@ -56,6 +56,7 @@ const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
+const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
@@ -82,6 +83,7 @@ const SignerPublishNotification = React.lazy(
 );
 
 const ConnectLedgerNotification = React.lazy(() => import("@tonkeeper/uikit/dist/components/ConnectLedgerNotification"));
+const SwapMobileNotification = React.lazy(() => import("@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification"));
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -347,6 +349,11 @@ export const Content: FC<{
                             }
                         />
                     </Route>
+                    <Route path={AppRoute.swap} element={
+                        <Suspense fallback={null}>
+                            <SwapPage />
+                        </Suspense>
+                    } />
                     <Route
                         path="*"
                         element={
@@ -374,6 +381,7 @@ export const Content: FC<{
                     <PairSignerNotification />
                     <SignerPublishNotification />
                     <ConnectLedgerNotification />
+                    <SwapMobileNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>

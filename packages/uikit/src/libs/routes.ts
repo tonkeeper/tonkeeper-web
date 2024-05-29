@@ -9,9 +9,9 @@ export enum AppRoute {
     coins = '/coins',
     signer = '/signer',
     publish = '/publish',
-    home = '/',
-
-    notcoin = '/notcoin'
+    swap = '/swap',
+    notcoin = '/notcoin',
+    home = '/'
 }
 
 export enum AppProRoute {

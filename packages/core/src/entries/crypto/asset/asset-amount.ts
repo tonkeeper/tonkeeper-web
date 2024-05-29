@@ -63,7 +63,7 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
     constructor({ weiAmount, asset, image }: AssetAmountStruct<T>) {
         this.weiAmount = new BigNumber(weiAmount);
         this.asset = asset;
-        this.image = image;
+        this.image = image || asset.image;
 
         this.relativeAmount = this.weiAmount.div(10 ** this.asset.decimals);
     }

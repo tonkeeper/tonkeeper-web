@@ -7,11 +7,10 @@ import { formatFiatCurrency } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { usePreFetchRates } from '../../../state/rates';
-import { useStonfiSwapLink } from '../../../state/stonfi';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
 import { useWalletTotalBalance } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../Icon';
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon, PlusIconSmall } from "../../Icon";
 import { Num2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { IconButton } from '../../fields/IconButton';
@@ -37,6 +36,10 @@ const ButtonsContainer = styled.div`
     display: flex;
     gap: 0.5rem;
     padding: 1rem;
+
+    > * {
+        text-decoration: none;
+    }
 `;
 
 const DesktopRightPart = styled.div`
@@ -101,7 +104,6 @@ const DesktopHeaderPayload = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: buy } = useTonendpointBuyMethods();
     const { t } = useTranslation();
-    const swapLink = useStonfiSwapLink('ton');
 
     return (
         <DesktopHeaderStyled>
@@ -146,14 +148,8 @@ const DesktopHeaderPayload = () => {
                         <ArrowDownIcon />
                         {t('wallet_receive')}
                     </ButtonStyled>
-                </ButtonsContainer>
-                <ButtonsContainer>
-                    <ButtonStyled size="small" onClick={() => sdk.openPage(swapLink)}>
-                        <SwapIcon />
-                        {t('wallet_swap')}
-                    </ButtonStyled>
                     <ButtonStyled size="small" onClick={onOpen}>
-                        <PlusIcon />
+                        <PlusIconSmall />
                         {t('wallet_buy')}
                     </ButtonStyled>
                 </ButtonsContainer>

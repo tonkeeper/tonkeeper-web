@@ -4,7 +4,7 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { getDecimalSeparator, getNotDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { isNumeric, removeGroupSeparator, seeIfLargeTail } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { useAppContext, useWalletContext } from '../../../hooks/appContext';
 import { formatter } from '../../../hooks/balance';
@@ -186,8 +186,8 @@ export const seeIfValueValid = (value: string, decimals: number) => {
     if (value.length > 21) return false;
     if (value !== '') {
         if (value.endsWith('e')) return false;
-        const separators = value.match(getDecimalSeparator());
-        if (separators && separators.length > 1) return false;
+        const separators = value.matchAll(new RegExp(`\\${getDecimalSeparator()}`, 'g'));
+        if (separators && [...separators].length > 1) return false;
         if (/^[a-zA-Z]+$/.test(value)) return false;
         if (!isNumeric(removeGroupSeparator(value))) return false;
         if (seeIfLargeTail(value, decimals)) return false;
