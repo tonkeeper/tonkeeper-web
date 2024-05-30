@@ -61,6 +61,7 @@ const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
+const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
 );
@@ -75,6 +76,9 @@ const SendNftNotification = React.lazy(
 );
 const ConnectLedgerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/ConnectLedgerNotification')
+);
+const PairKeystoneNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
 );
 
 const queryClient = new QueryClient({
@@ -214,6 +218,9 @@ export const Loader: FC = React.memo(() => {
                     <AppContext.Provider value={context}>
                         <Content activeWallet={activeWallet} lock={lock} />
                         <CopyNotification />
+                        <Suspense fallback={<></>}>
+                            <QrScanner />
+                        </Suspense>
                     </AppContext.Provider>
                 </AfterImportAction.Provider>
             </OnImportAction.Provider>
@@ -330,6 +337,7 @@ export const Content: FC<{
                     <AddFavoriteNotification />
                     <EditFavoriteNotification />
                     <ConnectLedgerNotification />
+                    <PairKeystoneNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>

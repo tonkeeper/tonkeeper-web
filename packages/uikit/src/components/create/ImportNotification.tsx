@@ -112,24 +112,22 @@ export const ImportNotification: FC<{
                             </ButtonIcon>
                         </ButtonBlock>
                     )}
-                    {hideSigner === true ? null : (
-                        <ButtonBlock
-                            onClick={() => {
-                                onClose(() => onImport(AppRoute.import + ImportRoute.keystone));
-                            }}
-                        >
-                            <ButtonIcon>
-                                <KeystoneIcon />
-                            </ButtonIcon>
-                            <ColumnTextStyled
-                                text={t('keystone_pair_title')}
-                                secondary={t('keystone_pair_subtitle')}
-                            />
-                            <ButtonIcon>
-                                <RightIcon />
-                            </ButtonIcon>
-                        </ButtonBlock>
-                    )}
+                    <ButtonBlock
+                        onClick={() => {
+                            onClose(() => onImport(AppRoute.import + ImportRoute.keystone));
+                        }}
+                    >
+                        <ButtonIcon>
+                            <KeystoneIcon />
+                        </ButtonIcon>
+                        <ColumnTextStyled
+                            text={t('keystone_pair_title')}
+                            secondary={t('keystone_pair_subtitle')}
+                        />
+                        <ButtonIcon>
+                            <RightIcon />
+                        </ButtonIcon>
+                    </ButtonBlock>
                     <ButtonBlock
                         onClick={() => {
                             onClose(() => onImport(AppRoute.import + ImportRoute.ledger));

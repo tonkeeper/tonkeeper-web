@@ -3,6 +3,7 @@ import { mnemonicToPrivateKey, sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
+import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
 import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import {
@@ -13,7 +14,6 @@ import { getWalletAuthState } from '@tonkeeper/core/dist/service/walletService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import nacl from 'tweetnacl';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
-import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
 
 export const signTonConnectOver = (
     sdk: IAppSdk,
@@ -36,6 +36,15 @@ export const signTonConnectOver = (
             }
             case 'ledger': {
                 throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+            }
+            case 'keystone': {
+                const result = await pairKeystoneByNotification(
+                    sdk,
+                    bufferToSign,
+                    'signProof',
+                    auth.info
+                );
+                return Buffer.from(result, 'hex');
             }
             default: {
                 const mnemonic = await getMnemonic(sdk, publicKey, checkTouchId);
@@ -95,7 +104,11 @@ export const getSigner = async (
                 return callback as CellSigner;
             }
             case 'keystone': {
-                const callback = async (message: Cell, messageType: KeystoneMessageType, pathInfo?: {path: string, mfp: string}) => {
+                const callback = async (
+                    message: Cell,
+                    messageType: KeystoneMessageType,
+                    pathInfo?: { path: string; mfp: string }
+                ) => {
                     const result = await pairKeystoneByNotification(
                         sdk,
                         message.toBoc({ idx: false }),

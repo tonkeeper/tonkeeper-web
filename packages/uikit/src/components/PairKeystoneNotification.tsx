@@ -81,8 +81,6 @@ const PairKeystoneNotification = () => {
 
     const handleResult = useCallback(
         (result: string) => {
-            console.log(result);
-
             sdk.uiEvents.emit('response', {
                 method: 'response',
                 id: requestId,

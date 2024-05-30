@@ -3355,23 +3355,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethereumjs/rlp@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "@ethereumjs/rlp@npm:4.0.1"
+"@ethereumjs/rlp@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "@ethereumjs/rlp@npm:5.0.2"
   bin:
-    rlp: bin/rlp
-  checksum: 10/bfdffd634ce72f3b17e3d085d071f2fe7ce9680aebdf10713d74b30afd80ef882d17f19ff7175fcb049431a56e800bd3558d3b028bd0d82341927edb303ab450
+    rlp: bin/rlp.cjs
+  checksum: 10/2af80d98faf7f64dfb6d739c2df7da7350ff5ad52426c3219897e843ee441215db0ffa346873200a6be6d11142edb9536e66acd62436b5005fa935baaf7eb6bd
   languageName: node
   linkType: hard
 
-"@ethereumjs/util@npm:^8.0.0":
-  version: 8.1.0
-  resolution: "@ethereumjs/util@npm:8.1.0"
+"@ethereumjs/util@npm:^9.0.3":
+  version: 9.0.3
+  resolution: "@ethereumjs/util@npm:9.0.3"
   dependencies:
-    "@ethereumjs/rlp": "npm:^4.0.1"
-    ethereum-cryptography: "npm:^2.0.0"
-    micro-ftch: "npm:^0.3.1"
-  checksum: 10/cc35338932e49b15e54ca6e548b32a1f48eed7d7e1d34ee743e4d3600dd616668bd50f70139e86c5c35f55aac35fba3b6cc4e6f679cf650aeba66bf93016200c
+    "@ethereumjs/rlp": "npm:^5.0.2"
+    ethereum-cryptography: "npm:^2.1.3"
+  checksum: 10/d9c313a0672e0b4842ba80e2f413ccd5302c3942dc4ed718d6e3faab89c4eeeaaeb6661e9275679c22b83b1cb6502ea772e1c837d105b6a9faf5957a59bc3e4c
   languageName: node
   linkType: hard
 
@@ -3887,15 +3886,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@keystonehq/bc-ur-registry-eth@npm:^0.15.2":
-  version: 0.15.2
-  resolution: "@keystonehq/bc-ur-registry-eth@npm:0.15.2"
+"@keystonehq/bc-ur-registry-eth@npm:^0.20.0":
+  version: 0.20.0
+  resolution: "@keystonehq/bc-ur-registry-eth@npm:0.20.0"
   dependencies:
-    "@ethereumjs/util": "npm:^8.0.0"
-    "@keystonehq/bc-ur-registry": "npm:0.5.4"
+    "@ethereumjs/util": "npm:^9.0.3"
+    "@keystonehq/bc-ur-registry": "npm:^0.6.0"
     hdkey: "npm:^2.0.1"
     uuid: "npm:^8.3.2"
-  checksum: 10/2c374250b7a0122aa6a80b766c266789e85d308288b9358d902f10a1ddf335a48353c32eb9b71b573a6add044a33b66bbf006b9447d3d5205e68959cc23943cb
+  checksum: 10/226238f2d8e0bc6fa9e10eef542415c6936110be51389caf8309c0b965eb53c99cf0f507777baa188c17a4d6d1911c14abddc208e7ff8971e2c064edac231be6
   languageName: node
   linkType: hard
 
@@ -3951,13 +3950,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@keystonehq/bc-ur-registry-ton@npm:^0.1.0":
-  version: 0.1.0
-  resolution: "@keystonehq/bc-ur-registry-ton@npm:0.1.0"
+"@keystonehq/bc-ur-registry-ton@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "@keystonehq/bc-ur-registry-ton@npm:0.1.1"
   dependencies:
     "@keystonehq/bc-ur-registry": "npm:^0.5.4"
     uuid: "npm:^9.0.0"
-  checksum: 10/65a1d8ffc5363093819c79dc8d35b207ac33b726cb9626e49553de1f2243eca77699e786a01a53fe9ede94da5f6cbdd9750de8c93d6df8f6224b4acfa4b62cb8
+  checksum: 10/07c37b9747e0eae597f2415c38fcf1f59890352305bc1e3b5defe4fb093380668f299a173f10f27ed52488ad1bbe131e51f5940ab7404a459e8c0c555ab996fe
   languageName: node
   linkType: hard
 
@@ -3983,7 +3982,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@keystonehq/bc-ur-registry@npm:^0.6.4":
+"@keystonehq/bc-ur-registry@npm:^0.6.0, @keystonehq/bc-ur-registry@npm:^0.6.4":
   version: 0.6.4
   resolution: "@keystonehq/bc-ur-registry@npm:0.6.4"
   dependencies:
@@ -3994,9 +3993,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@keystonehq/keystone-sdk@npm:0.4.1":
-  version: 0.4.1
-  resolution: "@keystonehq/keystone-sdk@npm:0.4.1"
+"@keystonehq/keystone-sdk@npm:^0.5.1":
+  version: 0.5.1
+  resolution: "@keystonehq/keystone-sdk@npm:0.5.1"
   dependencies:
     "@bufbuild/protobuf": "npm:^1.2.0"
     "@keystonehq/bc-ur-registry": "npm:^0.6.4"
@@ -4005,19 +4004,19 @@ __metadata:
     "@keystonehq/bc-ur-registry-btc": "npm:^0.1.0"
     "@keystonehq/bc-ur-registry-cardano": "npm:^0.3.0"
     "@keystonehq/bc-ur-registry-cosmos": "npm:^0.2.2"
-    "@keystonehq/bc-ur-registry-eth": "npm:^0.15.2"
+    "@keystonehq/bc-ur-registry-eth": "npm:^0.20.0"
     "@keystonehq/bc-ur-registry-evm": "npm:^0.5.2"
     "@keystonehq/bc-ur-registry-keystone": "npm:^0.1.0"
     "@keystonehq/bc-ur-registry-near": "npm:^0.8.0"
     "@keystonehq/bc-ur-registry-sol": "npm:^0.6.2"
     "@keystonehq/bc-ur-registry-sui": "npm:^0.3.0"
-    "@keystonehq/bc-ur-registry-ton": "npm:^0.1.0"
+    "@keystonehq/bc-ur-registry-ton": "npm:^0.1.1"
     "@ngraveio/bc-ur": "npm:^1.1.6"
     bs58check: "npm:^3.0.1"
     pako: "npm:^2.1.0"
     ripple-binary-codec: "npm:^1.4.3"
     uuid: "npm:^9.0.0"
-  checksum: 10/4b7828a82fee4ae560154e1536887e72c376db7dec003b3eb6446a7b45774c1640b78b89cc3a18ee3c6526a257d5cfc2b8a7592fd6b154c941cd960c2fc2db28
+  checksum: 10/117d334bfd218206b21d81c85ae1f866094a6cf66a565e93a925b6315397fcaf042e9d0b33b93e9512cad6f711d43c550d47b3e012921150a813ee4d72d41a34
   languageName: node
   linkType: hard
 
@@ -6454,7 +6453,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/core@workspace:packages/core"
   dependencies:
-    "@keystonehq/keystone-sdk": "npm:0.4.1"
+    "@keystonehq/keystone-sdk": "npm:^0.5.1"
     "@ledgerhq/hw-transport-webhid": "npm:^6.28.6"
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
     "@ton-community/ton-ledger": "npm:^7.0.1"
@@ -6639,7 +6638,7 @@ __metadata:
     "@amplitude/analytics-browser": "npm:^2.1.0"
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
-    "@keystonehq/keystone-sdk": "npm:0.4.1"
+    "@keystonehq/keystone-sdk": "npm:^0.5.1"
     "@polkadot/react-qr": "npm:^3.1.1"
     "@storybook/addon-actions": "npm:^6.5.14"
     "@storybook/addon-essentials": "npm:^6.5.14"
@@ -13843,7 +13842,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethereum-cryptography@npm:^2.0.0":
+"ethereum-cryptography@npm:^2.1.3":
   version: 2.1.3
   resolution: "ethereum-cryptography@npm:2.1.3"
   dependencies:
@@ -18992,13 +18991,6 @@ __metadata:
   version: 1.1.2
   resolution: "methods@npm:1.1.2"
   checksum: 10/a385dd974faa34b5dd021b2bbf78c722881bf6f003bfe6d391d7da3ea1ed625d1ff10ddd13c57531f628b3e785be38d3eed10ad03cebd90b76932413df9a1820
-  languageName: node
-  linkType: hard
-
-"micro-ftch@npm:^0.3.1":
-  version: 0.3.1
-  resolution: "micro-ftch@npm:0.3.1"
-  checksum: 10/a7ab07d25e28ec4ae492ce4542ea9b06eee85538742b3b1263b247366ee8872f2c5ce9c8651138b2f1d22c8212f691a7b8b5384fe86ead5aff1852e211f1c035
   languageName: node
   linkType: hard
 
