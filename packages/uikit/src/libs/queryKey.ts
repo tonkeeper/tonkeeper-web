@@ -50,7 +50,8 @@ export enum QueryKey {
 export enum JettonKey {
     info,
     history,
-    balance
+    balance,
+    raw
 }
 
 export enum TonkeeperApiKey {

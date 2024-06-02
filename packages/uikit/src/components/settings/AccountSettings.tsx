@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, relative, WalletSettingsRoute } from '../../libs/routes';
-import { useWalletJettonList } from '../../state/wallet';
+import { useJettonList } from '../../state/jetton';
 import { LogOutWalletNotification } from './LogOutNotification';
 import {
     AppsIcon,
@@ -22,7 +22,7 @@ const SingleAccountSettings = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const wallet = useWalletContext();
-    const { data: jettons } = useWalletJettonList();
+    const { data: jettons } = useJettonList();
     const { proFeatures } = useAppContext();
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [
@@ -98,7 +98,7 @@ const MultipleAccountSettings = () => {
     const navigate = useNavigate();
     const wallet = useWalletContext();
 
-    const { data: jettons } = useWalletJettonList();
+    const { data: jettons } = useJettonList();
     const { proFeatures } = useAppContext();
 
     const accountItems = useMemo(() => {

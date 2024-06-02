@@ -9,18 +9,32 @@ import {
 } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
-import { ReorderIcon } from '../../components/Icon';
+import { InvisibleIcon, PinIcon, ReorderIcon, VisibleIcon } from '../../components/Icon';
 import { ColumnText } from '../../components/Layout';
-import { Radio } from '../../components/fields/Checkbox';
-
 import { ListBlock, ListItemElement, ListItemPayload } from '../../components/List';
 import { SkeletonList } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
+import { Radio } from '../../components/fields/Checkbox';
 import { useWalletContext } from '../../hooks/appContext';
 import { useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
-import { hideEmptyJettons, sortJettons, useToggleJettonMutation } from '../../state/jetton';
-import { useMutateWalletProperty, useWalletJettonList } from '../../state/wallet';
+import {
+    hideEmptyJettons,
+    sortJettons,
+    useJettonRawList,
+    useToggleJettonMutation
+} from '../../state/jetton';
+import { useMutateWalletProperty } from '../../state/wallet';
+
+const TurnOnIcon = styled.span`
+    color: ${props => props.theme.accentBlue};
+    display: flex;
+`;
+
+const TurnOffIcon = styled.span`
+    color: ${props => props.theme.iconSecondary};
+    display: flex;
+`;
 
 const Row = styled.div`
     display: flex;
@@ -40,7 +54,61 @@ const Icon = styled.span`
 const RadioWrapper = styled.span`
     margin: 2px;
     display: flex;
+    cursor: pointer;
 `;
+
+const SampleJettonRow: FC<{ jetton: JettonBalance }> = ({ jetton }) => {
+    const { t } = useTranslation();
+    const wallet = useWalletContext();
+
+    const balance = useCoinFullBalance(jetton.balance, jetton.jetton.decimals);
+
+    const pinned = false;
+
+    const visible = useMemo(() => {
+        return !(wallet.hiddenTokens ?? []).includes(jetton.jetton.address);
+    }, [wallet.hiddenTokens]);
+
+    const onChangeVisible: React.MouseEventHandler<HTMLSpanElement> = () => {};
+
+    return (
+        <ListItemPayload>
+            <Row>
+                <Logo src={jetton.jetton.image} />
+                <ColumnText
+                    text={jetton.jetton.name ?? t('Unknown_COIN')}
+                    secondary={`${balance} ${jetton.jetton.symbol}`}
+                />
+            </Row>
+            <Row>
+                {visible && (
+                    <RadioWrapper onClick={() => {}}>
+                        {pinned ? (
+                            <TurnOnIcon>
+                                <PinIcon />
+                            </TurnOnIcon>
+                        ) : (
+                            <TurnOffIcon>
+                                <PinIcon />
+                            </TurnOffIcon>
+                        )}
+                    </RadioWrapper>
+                )}
+                <RadioWrapper onClick={onChangeVisible}>
+                    {visible ? (
+                        <TurnOnIcon>
+                            <VisibleIcon />
+                        </TurnOnIcon>
+                    ) : (
+                        <TurnOffIcon>
+                            <InvisibleIcon />
+                        </TurnOffIcon>
+                    )}
+                </RadioWrapper>
+            </Row>
+        </ListItemPayload>
+    );
+};
 
 const JettonRow: FC<{
     jetton: JettonBalance;
@@ -99,7 +167,7 @@ const JettonSkeleton = () => {
 export const JettonsSettings = () => {
     const { t } = useTranslation();
     const wallet = useWalletContext();
-    const { data } = useWalletJettonList();
+    const { data } = useJettonRawList();
 
     const [jettons, setJettons] = useState<JettonBalance[]>([]);
 
@@ -167,6 +235,14 @@ export const JettonsSettings = () => {
                         )}
                     </Droppable>
                 </DragDropContext>
+
+                <ListBlock>
+                    {jettons.map(jetton => (
+                        <ListItemElement key={jetton.jetton.address} hover={false} ios={true}>
+                            <SampleJettonRow jetton={jetton} />
+                        </ListItemElement>
+                    ))}
+                </ListBlock>
             </InnerBody>
         </>
     );

@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Address } from '@ton/core';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { updateWalletProperty } from '@tonkeeper/core/dist/service/walletService';
 import {
@@ -8,10 +10,14 @@ import {
     JettonsApi,
     JettonsBalances
 } from '@tonkeeper/core/dist/tonApiV2';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useStorage } from '../hooks/storage';
 import { JettonKey, QueryKey } from '../libs/queryKey';
+import { getRateKey, toTokenRate } from './rates';
+import { DefaultRefetchInterval } from './tonendpoint';
 
 export const useJettonInfo = (jettonAddress: string) => {
     const wallet = useWalletContext();
@@ -25,6 +31,104 @@ export const useJettonInfo = (jettonAddress: string) => {
                 accountId: jettonAddress
             });
             return result;
+        }
+    );
+};
+
+const filterTokens = (balances: JettonBalance[], hiddenTokens: string[]) => {
+    return balances.filter(
+        item =>
+            item.jetton.verification !== 'blacklist' &&
+            new BigNumber(item.balance).gt(0) &&
+            !hiddenTokens.includes(item.jetton.address)
+    );
+};
+
+const getTokenBalance = ({ price, balance, jetton }: JettonBalance, fiat: FiatCurrencies) => {
+    if (!price || !price.prices || !price.prices[fiat]) return new BigNumber(0);
+    const p = price.prices[fiat];
+    return shiftedDecimals(balance, jetton.decimals).multipliedBy(p);
+};
+
+const compareTokensOver = (fiat: FiatCurrencies) => {
+    return (a: JettonBalance, b: JettonBalance) => {
+        return getTokenBalance(b, fiat).minus(getTokenBalance(a, fiat)).toNumber();
+    };
+};
+
+export const useJettonRawList = () => {
+    const wallet = useWalletContext();
+    const { api, fiat } = useAppContext();
+
+    return useQuery<JettonsBalances, Error>(
+        [wallet.active.rawAddress, JettonKey.raw, QueryKey.jettons, fiat, wallet.network],
+        async () => {
+            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
+                accountId: wallet.active.rawAddress,
+                currencies: [fiat]
+            });
+            const balances = filterTokens(result.balances, wallet.hiddenTokens ?? []).sort(
+                compareTokensOver(fiat)
+            );
+            return { balances };
+        }
+    );
+};
+
+export const useJettonList = () => {
+    const wallet = useWalletContext();
+    const { api, fiat } = useAppContext();
+    const client = useQueryClient();
+
+    return useQuery<JettonsBalances, Error>(
+        [wallet.active.rawAddress, QueryKey.jettons, fiat, wallet.network],
+        async () => {
+            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
+                accountId: wallet.active.rawAddress,
+                currencies: [fiat]
+            });
+
+            const balances = filterTokens(result.balances, wallet.hiddenTokens ?? []).sort(
+                compareTokensOver(fiat)
+            );
+
+            result.balances.forEach(item => {
+                client.setQueryData(
+                    [wallet.publicKey, QueryKey.jettons, JettonKey.balance, item.jetton.address],
+                    item
+                );
+
+                if (item.price) {
+                    try {
+                        const tokenRate = toTokenRate(item.price, fiat);
+                        client.setQueryData(
+                            getRateKey(fiat, Address.parse(item.jetton.address).toString()),
+                            tokenRate
+                        );
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            });
+
+            const pinned = (wallet.pinnedTokens ?? []).reduce((acc, address) => {
+                const item = balances.find(item => item.jetton.address === address);
+                if (item) {
+                    acc.push(item);
+                }
+                return acc;
+            }, [] as JettonBalance[]);
+
+            const rest = balances.filter(
+                item => !(wallet.pinnedTokens ?? []).includes(item.jetton.address)
+            );
+            return { balances: pinned.concat(rest) };
+        },
+        {
+            refetchInterval: DefaultRefetchInterval,
+            refetchIntervalInBackground: true,
+            refetchOnWindowFocus: true,
+            keepPreviousData: true
         }
     );
 };

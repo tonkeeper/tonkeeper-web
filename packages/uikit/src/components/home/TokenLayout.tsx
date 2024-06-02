@@ -1,5 +1,7 @@
+import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from '../../hooks/translation';
 import { TokenRate } from '../../state/rates';
 import { Body2, Label1, Label4 } from '../Text';
 
@@ -68,6 +70,10 @@ const Symbol = styled(Label1)`
     color: ${props => props.theme.textSecondary};
 `;
 
+const Unverified = styled.span`
+    color: ${props => props.theme.accentOrange};
+`;
+
 export const TokenLayout: FC<{
     name: string;
     symbol?: string;
@@ -76,7 +82,10 @@ export const TokenLayout: FC<{
     fiatAmount?: string;
     label?: string;
     rate: TokenRate | undefined;
-}> = ({ name, symbol, balance, secondary, fiatAmount, label, rate }) => {
+    verification?: JettonVerificationType;
+}> = ({ name, symbol, balance, secondary, fiatAmount, label, rate, verification }) => {
+    const { t } = useTranslation();
+
     return (
         <Description>
             <FirstLine>
@@ -89,11 +98,13 @@ export const TokenLayout: FC<{
             </FirstLine>
             <SecondLine>
                 <Secondary>
-                    {
+                    {verification === 'none' ? (
+                        <Unverified>{t('approval_unverified_token')}</Unverified>
+                    ) : (
                         <>
                             {secondary} <Delta data={rate} />
                         </>
-                    }
+                    )}
                 </Secondary>
                 <Secondary>{fiatAmount}</Secondary>
             </SecondLine>
