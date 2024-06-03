@@ -137,6 +137,14 @@ export class TonConnect implements TonConnectBridge {
                     payload: {}
                 });
             });
+
+            provider.on('tonConnect_event', params => {
+                this.notify({
+                    event: params.event,
+                    id: params.id ?? Date.now(),
+                    payload: params.payload
+                });
+            });
         }
     }
 

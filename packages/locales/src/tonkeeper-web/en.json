@@ -41,7 +41,7 @@
   "ledger_connect_header" : "Connect Ledger",
   "ledger_continue_with_ledger" : "Continue with Ledger",
   "ledger_operation_not_supported" : "The operation is not available for Ledger wallets. Select another wallet and try again.",
-  "ledger_pair_subtitle" : "A higher level of security with hardware wallet",
+  "ledger_pair_subtitle" : "Hardware module, Bluetooth or USB-C, limited TON features",
   "ledger_pair_title" : "Pair with Ledger",
   "ledger_steps_confirm_tx" : "Confirm your transaction on Ledger",
   "ledger_steps_connect" : "Connect Ledger to your device",

@@ -53,7 +53,7 @@ export class TonConnectSSE {
         this.connections = [];
         this.dist = {};
 
-        for (let key of account.publicKeys) {
+        for (const key of account.publicKeys) {
             const wallet = await getWalletState(mainStorage, key);
             const walletConnections = await getAccountConnection(mainStorage, wallet);
 
@@ -64,7 +64,20 @@ export class TonConnectSSE {
         }
     }
 
-    private disconnect = async ({ connection, request }: TonConnectAppRequest) => {
+    public sendDisconnect = async (connection: AccountConnection | AccountConnection[]) => {
+        const connectionsToDisconnect = Array.isArray(connection) ? connection : [connection];
+        await Promise.allSettled(
+            connectionsToDisconnect.map((item, index) =>
+                replyDisconnectResponse({
+                    connection: item,
+                    request: { id: (Date.now() + index).toString() }
+                })
+            )
+        );
+        await this.reconnect();
+    };
+
+    private onDisconnect = async ({ connection, request }: TonConnectAppRequest) => {
         const wallet = await getWalletState(mainStorage, this.dist[connection.clientSessionId]);
         await disconnectAppConnection({
             storage: mainStorage,
@@ -73,12 +86,13 @@ export class TonConnectSSE {
         });
         await replyDisconnectResponse({ connection, request });
         await this.reconnect();
+        MainWindow.mainWindow.webContents.send('disconnect', connection);
     };
 
     private handleMessage = async (params: TonConnectAppRequest) => {
         switch (params.request.method) {
             case 'disconnect': {
-                return this.disconnect(params);
+                return this.onDisconnect(params);
             }
             case 'sendTransaction': {
                 const value = {

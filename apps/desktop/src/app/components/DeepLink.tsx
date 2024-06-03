@@ -2,7 +2,7 @@ import { ConnectItemReply, DAppManifest } from '@tonkeeper/core/dist/entries/ton
 import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
-    responseConnectionMutation,
+    useResponseConnectionMutation,
     useGetConnectInfo
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
@@ -14,7 +14,7 @@ export const DeepLinkSubscription = () => {
 
     const { mutateAsync, reset } = useGetConnectInfo();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
-        responseConnectionMutation();
+        useResponseConnectionMutation();
 
     const handlerClose = async (replyItems?: ConnectItemReply[], manifest?: DAppManifest) => {
         if (!params) return;

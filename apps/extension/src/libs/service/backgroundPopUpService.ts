@@ -71,6 +71,11 @@ popUpEventEmitter.on('accountsChanged', message => {
     backgroundEventsEmitter.emit('accountsChanged', message);
 });
 
+popUpEventEmitter.on('tonConnectDisconnect', message => {
+    backgroundEventsEmitter.emit('tonConnectDisconnect', message);
+});
+
+
 popUpEventEmitter.on('proxyChanged', message => {
     backgroundEventsEmitter.emit('proxyChanged', message);
 });
