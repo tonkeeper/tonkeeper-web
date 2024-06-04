@@ -1,7 +1,7 @@
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { AppsIcon, CoinsIcon, ExitIcon, KeyIcon, SwitchIcon } from "../../components/Icon";
+import { AppsIcon, CoinsIcon, ExitIcon, KeyIcon, SwitchIcon } from '../../components/Icon';
 import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
@@ -92,7 +92,7 @@ export const DesktopWalletSettingsPage = () => {
                 <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}>
                     <SettingsListItem>
                         <AppsIcon />
-                        <Label2>Connected Apps</Label2>
+                        <Label2>{t('settings_connected_apps')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
             </SettingsListBlock>

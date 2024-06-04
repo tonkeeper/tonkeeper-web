@@ -11,6 +11,7 @@ import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/conne
 import { formatDappUrl } from './utils';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { ListBlock, ListItem } from '../List';
+import { useTranslation } from '../../hooks/translation';
 
 const DesktopListContainer = styled.ul`
     padding: 0;
@@ -86,6 +87,7 @@ const DisconnectButton = styled(Button)`
 `;
 
 export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => {
+    const { t } = useTranslation();
     const { data: connections } = useActiveWalletTonConnectConnections();
     const [modalData, setModalData] = useState<AccountConnection | undefined | 'all'>();
     const { mutate: disconnectDapp } = useDisconnectTonConnectApp();
@@ -110,7 +112,7 @@ export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => 
     if (!connections.length) {
         return (
             <FullHeightContainer className={className}>
-                <Body2Styled>No connected apps</Body2Styled>
+                <Body2Styled>{t('no_connected_apps')}</Body2Styled>
             </FullHeightContainer>
         );
     }
@@ -150,6 +152,7 @@ const MobileList: FC<{
     connections: AccountConnection[];
     onDisconnect: (app: AccountConnection) => void;
 }> = ({ className, connections, onDisconnect }) => {
+    const { t } = useTranslation();
     return (
         <ListBlock className={className}>
             {connections.map((app, index) => (
@@ -161,7 +164,7 @@ const MobileList: FC<{
                             <Body3>{app.manifest.name}</Body3>
                         </DappTextBlock>
                         <DisconnectButton size="small" onClick={() => onDisconnect(app)}>
-                            Disconnect
+                            {t('disconnect')}
                         </DisconnectButton>
                     </MobileListItem>
                     {index !== connections.length - 1 && <Divider />}
@@ -176,6 +179,7 @@ const DesktopList: FC<{
     connections: AccountConnection[];
     onDisconnect: (app: AccountConnection) => void;
 }> = ({ className, connections, onDisconnect }) => {
+    const { t } = useTranslation();
     return (
         <DesktopListContainer className={className}>
             {connections.map(app => (
@@ -186,7 +190,7 @@ const DesktopList: FC<{
                         <Body3>{app.manifest.name}</Body3>
                     </DappTextBlock>
                     <DisconnectButton secondary size="small" onClick={() => onDisconnect(app)}>
-                        Disconnect
+                        {t('disconnect')}
                     </DisconnectButton>
                 </DesktopListItem>
             ))}

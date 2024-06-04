@@ -5,7 +5,7 @@ import { WalletVersion } from '../../pages/settings/Version';
 import { JettonsSettings } from '../../pages/settings/Jettons';
 import styled from 'styled-components';
 import { DesktopWalletSettingsPage } from './DesktopWalletSettingsPage';
-import { ConnectedAppsSettingsDesktop } from './ConnectedAppsSettingsDesktop';
+import { DesktopConnectedAppsSettings } from './DesktopConnectedAppsSettings';
 
 const OldSettingsLayoutWrapper = styled.div`
     padding-top: 64px;
@@ -33,7 +33,7 @@ export const DesktopWalletSettingsRouting = () => {
             </Route>
             <Route
                 path={WalletSettingsRoute.connectedApps}
-                element={<ConnectedAppsSettingsDesktop />}
+                element={<DesktopConnectedAppsSettings />}
             />
             <Route path="*" element={<DesktopWalletSettingsPage />} />
         </Routes>

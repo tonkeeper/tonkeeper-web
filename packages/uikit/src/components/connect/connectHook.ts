@@ -97,6 +97,7 @@ export const useResponseConnectionMutation = () => {
                 });
 
                 await client.invalidateQueries([QueryKey.tonConnectConnection]);
+                await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
             } else {
                 await sendEventToBridge({
                     response: connectRejectResponse(),

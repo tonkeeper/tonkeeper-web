@@ -4,6 +4,8 @@ import { styled } from 'styled-components';
 import { Button } from '../fields/Button';
 import { formatDappUrl } from './utils';
 import { usePrevious } from '../../hooks/usePrevious';
+import { useTranslation } from '../../hooks/translation';
+import { Label1 } from '../Text';
 
 const NotificationText = styled.div`
     text-align: center;
@@ -27,6 +29,7 @@ export const ConfirmDisconnectNotification: FC<{
     onClose: (confirmed?: boolean) => void;
     app?: { url: string } | 'all';
 }> = ({ isOpen, onClose, app }) => {
+    const { t } = useTranslation();
     const prev = usePrevious(app);
 
     const appWithFallback = app || prev;
@@ -36,16 +39,22 @@ export const ConfirmDisconnectNotification: FC<{
             {() => (
                 <>
                     <NotificationText>
-                        {appWithFallback === 'all'
-                            ? 'Disconnect all apps?'
-                            : `Disconnect ${formatDappUrl(appWithFallback?.url)}?`}
+                        <Label1>
+                            {appWithFallback === 'all' ? (
+                                t('disconnect_all_apps_confirm')
+                            ) : (
+                                <>
+                                    {t('disconnect')}&nbsp;{formatDappUrl(appWithFallback?.url)}?
+                                </>
+                            )}
+                        </Label1>
                     </NotificationText>
                     <ButtonsBlock>
                         <Button secondary onClick={() => onClose(false)}>
-                            Cancel
+                            {t('cancel')}
                         </Button>
                         <Button primary onClick={() => onClose(true)}>
-                            Disconnect
+                            {t('disconnect')}
                         </Button>
                     </ButtonsBlock>
                 </>

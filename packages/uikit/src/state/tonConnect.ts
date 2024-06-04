@@ -144,6 +144,7 @@ export const useConnectTonConnectAppMutation = () => {
         }
 
         await client.invalidateQueries([QueryKey.tonConnectConnection]);
+        await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
 
         return result;
     });

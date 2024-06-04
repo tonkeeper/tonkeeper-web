@@ -69,7 +69,7 @@ const SingleAccountSettings = () => {
             action: () => navigate(relative(SettingsRoute.security))
         });
         items.push({
-            name: 'Apps',
+            name: t('settings_connected_apps'),
             icon: <AppsIcon />,
             action: () => navigate(relative(WalletSettingsRoute.connectedApps))
         });
@@ -156,7 +156,7 @@ const MultipleAccountSettings = () => {
             action: () => navigate(relative(SettingsRoute.security))
         });
         items.push({
-            name: 'Apps',
+            name: t('settings_connected_apps'),
             icon: <AppsIcon />,
             action: () => navigate(relative(WalletSettingsRoute.connectedApps))
         });
