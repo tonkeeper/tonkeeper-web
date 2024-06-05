@@ -5,6 +5,7 @@ import { MainWindow } from './mainWindow';
 
 export const setDefaultProtocolClient = () => {
     if (!app.isDefaultProtocolClient('tc')) {
+        app.setAsDefaultProtocolClient('ton');
         app.setAsDefaultProtocolClient('tc');
         app.setAsDefaultProtocolClient('tonkeeper');
         app.setAsDefaultProtocolClient('tonkeeper-tc');
