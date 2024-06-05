@@ -1,15 +1,32 @@
 import { Address, Cell, SendMode, internal } from '@ton/core';
 import BigNumber from 'bignumber.js';
+import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
+import { TonAsset } from '../../entries/crypto/asset/ton-asset';
+import { AuthKeystone } from '../../entries/password';
 import { TonRecipientData } from '../../entries/send';
 import { KeystoneSigner } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
-import { walletContractFromState } from '../wallet/contractService';
-import { TonAsset } from '../../entries/crypto/asset/ton-asset';
-import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
-import { createTransferMessage, externalMessage, getTTL, getTonkeeperQueryId, seeIfTransferBounceable } from '../transfer/common';
-import { AuthKeystone } from '../../entries/password';
+import {
+    createTransferMessage,
+    externalMessage,
+    getServerTime,
+    getTTL,
+    getTonkeeperQueryId,
+    getWalletSeqNo,
+    seeIfAddressBounceable,
+    seeIfTransferBounceable
+} from '../transfer/common';
+import {
+    jettonTransferAmount,
+    jettonTransferBody,
+    jettonTransferForwardAmount
+} from '../transfer/jettonService';
 import { nftTransferBody, nftTransferForwardAmount } from '../transfer/nftService';
-import { jettonTransferAmount, jettonTransferBody, jettonTransferForwardAmount } from '../transfer/jettonService';
+import { walletContractFromState } from '../wallet/contractService';
+import { APIConfig } from '../../entries/apis';
+import { TonConnectTransactionPayload } from '../../entries/tonConnect';
+import { toStateInit } from '../transfer/tonService';
+import { BlockchainApi } from '../../tonApiV2';
 
 export const createKeystoneTonTransfer = async (
     timestamp: number,
@@ -24,7 +41,7 @@ export const createKeystoneTonTransfer = async (
     const contract = walletContractFromState(walletState);
     const innerSigner = (message: Cell) => {
         return signer(message, 'transaction', pathInfo);
-    }
+    };
     const transfer = await contract.createTransferAndSignRequestAsync({
         seqno,
         signer: innerSigner,
@@ -58,7 +75,7 @@ export const createKeystoneNftTransfer = async (
     const pathInfo = (walletState.auth as AuthKeystone).info;
     const innerSigner = (message: Cell) => {
         return signer(message, 'transaction', pathInfo);
-    }
+    };
     const body = nftTransferBody({
         queryId: getTonkeeperQueryId(),
         newOwnerAddress: Address.parse(recipientAddress),
@@ -66,7 +83,6 @@ export const createKeystoneNftTransfer = async (
         forwardAmount: nftTransferForwardAmount,
         forwardPayload
     });
-
 
     return createTransferMessage(
         { timestamp, seqno, state: walletState, signer: innerSigner },
@@ -89,7 +105,7 @@ export const createKeystoneJettonTransfer = async (
     const pathInfo = (walletState.auth as AuthKeystone).info;
     const innerSigner = (message: Cell) => {
         return signer(message, 'transaction', pathInfo);
-    }
+    };
 
     const body = jettonTransferBody({
         queryId: getTonkeeperQueryId(),
@@ -117,4 +133,56 @@ export const createKeystoneJettonTransfer = async (
     });
 
     return externalMessage(contract, seqno, transfer).toBoc();
+};
+
+export const sendKeystoneTonConnectTransfer = async (
+    api: APIConfig,
+    walletState: WalletState,
+    params: TonConnectTransactionPayload,
+    signer: KeystoneSigner
+) => {
+    const timestamp = await getServerTime(api);
+    const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
+
+    const external = await createKeystoneTonConnectTransfer(timestamp, seqno, walletState, params, signer);
+
+    const boc = external.toString('base64');
+
+    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
+        sendBlockchainMessageRequest: { boc }
+    });
+
+    return boc;
+};
+
+const createKeystoneTonConnectTransfer = async (
+    timestamp: number,
+    seqno: number,
+    walletState: WalletState,
+    params: TonConnectTransactionPayload,
+    signer: KeystoneSigner
+) => {
+    const contract = walletContractFromState(walletState);
+
+    const pathInfo = (walletState.auth as AuthKeystone).info;
+    const innerSigner = (message: Cell) => {
+        return signer(message, 'transaction', pathInfo);
+    };
+
+    const transfer = await contract.createTransferAndSignRequestAsync({
+        seqno,
+        signer: innerSigner,
+        timeout: getTTL(timestamp),
+        sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+        messages: params.messages.map(item =>
+            internal({
+                to: Address.parse(item.address),
+                bounce: seeIfAddressBounceable(item.address),
+                value: BigInt(item.amount),
+                init: toStateInit(item.stateInit),
+                body: item.payload ? Cell.fromBase64(item.payload) : undefined
+            })
+        )
+    });
+    return externalMessage(contract, seqno, transfer).toBoc({ idx: false });
 };

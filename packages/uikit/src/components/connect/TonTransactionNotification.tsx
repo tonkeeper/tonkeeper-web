@@ -7,6 +7,7 @@ import {
     sendTonConnectTransfer,
     tonConnectTransferError
 } from '@tonkeeper/core/dist/service/transfer/tonService';
+import { sendKeystoneTonConnectTransfer } from '@tonkeeper/core/dist/service/keystone/transfer';
 import { FC, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -60,14 +61,22 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
 
     return useMutation<string, Error>(async () => {
         const signer = await getSigner(sdk, wallet.publicKey, checkTouchId);
-        if (signer.type !== 'cell') {
+        if (signer.type !== 'cell' && signer.type !== 'keystone') {
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }
-        const value = await sendTonConnectTransfer(api, wallet, params, signer);
-        client.invalidateQueries({
-            predicate: query => query.queryKey.includes(wallet.active.rawAddress)
-        });
-        return value;
+        if (signer.type === 'cell') {
+            const value = await sendTonConnectTransfer(api, wallet, params, signer);
+            client.invalidateQueries({
+                predicate: query => query.queryKey.includes(wallet.active.rawAddress)
+            });
+            return value;
+        } else {
+            const value = await sendKeystoneTonConnectTransfer(api, wallet, params, signer);
+            client.invalidateQueries({
+                predicate: query => query.queryKey.includes(wallet.active.rawAddress)
+            });
+            return value;
+        }
     });
 };
 
