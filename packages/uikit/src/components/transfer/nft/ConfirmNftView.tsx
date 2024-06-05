@@ -22,8 +22,10 @@ import {
     TransferEstimationEvent
 } from '@tonkeeper/core/dist/entries/send';
 import { useTransactionAnalytics } from '../../../hooks/amplitude';
+import { TxConfirmationCustomError } from '../../../libs/errors/TxConfirmationCustomError';
 import { QueryKey } from '../../../libs/queryKey';
 import { getSigner } from '../../../state/mnemonic';
+import { useCheckTouchId } from '../../../state/password';
 import { Image, ImageMock, Info, SendingTitle, Title } from '../Confirm';
 import {
     ConfirmViewContext,
@@ -32,8 +34,6 @@ import {
     ConfirmViewDetailsRecipient
 } from '../ConfirmView';
 import { NftDetailsBlock } from './Common';
-import { TxConfirmationCustomError } from '../../../libs/errors/TxConfirmationCustomError';
-import { useCheckTouchId } from '../../../state/password';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -83,7 +83,7 @@ const useSendNft = (
         if (!fee) return false;
 
         const signer = await getSigner(sdk, wallet.publicKey, checkTouchId).catch(() => null);
-        if (signer?.type !== 'cell') {
+        if (signer?.type !== 'cell' && signer?.type !== 'keystone') {
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }
         if (signer === null) return false;
