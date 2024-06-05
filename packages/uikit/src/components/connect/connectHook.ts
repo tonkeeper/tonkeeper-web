@@ -47,11 +47,7 @@ export const useGetConnectInfo = () => {
         const params = parseTonConnect({ url });
 
         if (typeof params === 'string') {
-            sdk.uiEvents.emit('copy', {
-                method: 'copy',
-                id: Date.now(),
-                params: params
-            });
+            console.error(params);
             return null;
         }
 
