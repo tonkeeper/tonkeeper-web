@@ -45,8 +45,8 @@ export const ProTrialStartNotification: FC<{
     const { mutateAsync, isLoading } = useActivateTrialMutation();
 
     const onConfirm = async () => {
-        await mutateAsync();
-        onClose(true);
+        const result = await mutateAsync();
+        onClose(result);
     };
 
     return (
