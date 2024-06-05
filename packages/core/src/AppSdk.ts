@@ -106,6 +106,7 @@ export interface IAppSdk {
     hapticNotification: (type: 'success' | 'error') => void;
 
     notifications?: NotificationService;
+    targetEnv: TargetEnv;
 }
 
 export abstract class BaseApp implements IAppSdk {
@@ -158,9 +159,13 @@ export abstract class BaseApp implements IAppSdk {
     hapticNotification = (type: 'success' | 'error') => {};
 
     version = '0.0.0';
+
+    abstract targetEnv: TargetEnv;
 }
 
 export class MockAppSdk extends BaseApp {
+    targetEnv = 'web' as const;
+
     constructor() {
         super(new MemoryStorage());
     }

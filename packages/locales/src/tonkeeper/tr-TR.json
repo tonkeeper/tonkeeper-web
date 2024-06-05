@@ -47,6 +47,7 @@
     "notification_desc_will_change" : "5 Ekim'de cüzdan adresiniz daha iyi bir format olan UQ formatına güncellenecektir. Eski adresiniz de kullanılmaya devam edeceğinden hiçbir şey yapmanıza gerek bulunmamaktadır.",
     "old_style" : "Eski adres",
     "post_dates" : "\n5 Ekim 2023: Tonkeeper'da tüm adresler UQ formatına geçiş yapacak. 1 Ocak 2024: Tonkeeper, sözleşme durumunu kontrol etmeyi bırakacak ve adresin doğruluğunu kontrol etmek için 'bounceable' bayrağını kullanacak. Bu sayede, EQ adresi ile başlamayan, henüz yayınlanmamış sözleşmelere gönderilen tutarlar göndericiye geri gönderilecektir.",
+    "post_published_date" : "Yayınlanma Tarihi: 27 Eylül 2023",
     "post_rest" : "TON blockchain'de iki adres stili bulunmaktadır ve şimdiye kadar uygulamalar ve cüzdanlar için yalnızca biri kullanılmaktadır. EQ formatı, gelen fonları işleyen akıllı sözleşmeler için en iyi formattır. Bir akıllı sözleşme henüz yayınlanmadıysa - yani kod blokzincirine yüklenmediyse - o adrese gönderilen TON'lar gönderene geri dönecektir. Bu bir güvenlik özelliği olup, herhangi bir hata olduğu taktirde, TON coinlerin geri göndericinin hesabına geri dönmesini sağlar. UQ formatı, cüzdanlar için en iyi formattır. Cüzdanlar sadece fonları saklamak için tasarlandığından, böyle bir durumda gönderilen kripto tutarları asla cüzdana geri dönmez. Her cüzdan, blok zincirinde kod yüklenmiş olmaksızın yalın bir adres olarak kullanılmaya başlandığından, meblağların geri dönmesi anlamsız olur. Bu yıl cüzdan adreslerinde daha uygun format olan UQ formatının kullanımına geçiş yapıyoruz. Eğer size verilen eski bir EQ adresine fon göndermeye devam ederseniz, şu iki seçeneğe sahip olacaksınız;",
     "post_top" : "Bu yılın sonuna kadar TON ağındaki tüm cüzdan adresleri farklı formatlarıyla görüntülenmeye başlanacaktır. Yeni adres UQ ile başlayacak ve son dört harfi değişecektir. Eski adres de kullanılmaya devam edecek olup aynı cüzdana yönlendirecektir. Bu durum cüzdanınızda saklanan kriptoların güvenliğini herhangi bir şekilde etkilemeyecektir.",
     "second_option" : "Cüzdanın herhangi bir ödeme için kullanılmamış olması ihtimali daha azdır. Ve Tonkeeper gelecek yıldan itibaren o adrese coin göndermeyecektir. Alıcından yeni bir UQ adresi istemeniz gerekecektir.",
@@ -176,6 +177,7 @@
   "battery" : {
     "description" : {
       "empty" : "Ana bakiyeniz boş olsa bile token ve NFT gönderin, staking işlemleri gerçekleştirin.",
+      "less_10" : "10'dan az işlem için bataryanızda yeterli şarj seviyesi mevcut.",
       "other" : "%{cnt} işlem için bataryanızda yeterli şarj seviyesi mevcut."
     },
     "ok" : "TAMAM",

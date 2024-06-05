@@ -52,7 +52,8 @@ export enum WalletSettingsRoute {
     index = '/',
     recovery = '/recovery',
     version = '/version',
-    jettons = '/jettons'
+    jettons = '/jettons',
+    connectedApps = '/connected-apps'
 }
 
 export enum BrowserRoute {

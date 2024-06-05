@@ -239,12 +239,14 @@ const HeaderWrapper = styled.div`
 `;
 
 const RowTitle = styled(H3)`
+    overflow: hidden;
     margin: 0;
     user-select: none;
     flex: 1;
 `;
 
 const RowTitleDesktop = styled(Label2)`
+    overflow: hidden;
     margin: 0;
     user-select: none;
     flex: 1;
@@ -266,11 +268,11 @@ const BackShadow = styled.div`
 `;
 
 export const NotificationTitleRow: FC<
-    PropsWithChildren<{ handleClose?: () => void; center?: boolean }>
-> = ({ handleClose, children, center = false }) => {
+    PropsWithChildren<{ handleClose?: () => void; center?: boolean; className?: string }>
+> = ({ handleClose, children, center = false, className }) => {
     const isFullWidthMode = useIsFullWidthMode();
     return (
-        <TitleRow>
+        <TitleRow className={className}>
             {center && <ButtonMock />}
             {isFullWidthMode ? (
                 <RowTitleDesktop>{children}</RowTitleDesktop>

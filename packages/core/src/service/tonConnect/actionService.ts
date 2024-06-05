@@ -16,7 +16,9 @@ export const replyBadRequestResponse = async ({
 export const replyDisconnectResponse = async ({
     connection,
     request: { id }
-}: TonConnectAppRequest) => {
+}: Pick<TonConnectAppRequest, 'connection'> & {
+    request: Pick<TonConnectAppRequest['request'], 'id'>;
+}) => {
     await sendEventToBridge({
         response: disconnectResponse(id),
         sessionKeyPair: connection.sessionKeyPair,

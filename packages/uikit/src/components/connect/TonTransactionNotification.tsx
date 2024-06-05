@@ -7,7 +7,7 @@ import {
     sendTonConnectTransfer,
     tonConnectTransferError
 } from '@tonkeeper/core/dist/service/transfer/tonService';
-import { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -21,13 +21,18 @@ import {
     Notification,
     NotificationBlock,
     NotificationFooter,
-    NotificationFooterPortal
+    NotificationFooterPortal,
+    NotificationHeader,
+    NotificationHeaderPortal,
+    NotificationTitleRow
 } from '../Notification';
 import { SkeletonList } from '../Skeleton';
-import { H2, Label2 } from '../Text';
+import { Body2, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -243,32 +248,83 @@ const useTransactionError = (params: TonConnectTransactionPayload) => {
     });
 };
 
+const NotificationTitleRowStyled = styled(NotificationTitleRow)`
+    align-items: flex-start;
+`;
+
+const WalletInfoStyled = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: ${p => p.theme.textSecondary};
+
+    > ${Body2} {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+`;
+
+const NotificationTitleWithWalletName: FC<{ onClose: () => void }> = ({ onClose }) => {
+    const wallet = useWalletContext();
+    const { t } = useTranslation();
+
+    return (
+        <NotificationHeaderPortal>
+            <NotificationHeader>
+                <NotificationTitleRowStyled handleClose={onClose}>
+                    <div>
+                        {t('txActions_signRaw_title')}
+                        <WalletInfoStyled>
+                            <Body2>
+                                {t('confirmSendModal_wallet')}&nbsp;
+                                {wallet.name ?? toShortValue(wallet.active.friendlyAddress)}
+                            </Body2>
+                            <WalletEmoji
+                                emojiSize="20px"
+                                containerSize="20px"
+                                emoji={wallet.emoji}
+                            />
+                        </WalletInfoStyled>
+                    </div>
+                </NotificationTitleRowStyled>
+            </NotificationHeader>
+        </NotificationHeaderPortal>
+    );
+};
+
 export const TonTransactionNotification: FC<{
     params: TonConnectTransactionPayload | null;
     handleClose: (result?: string) => void;
     waitInvalidation?: boolean;
 }> = ({ params, handleClose, waitInvalidation }) => {
     const { t } = useTranslation();
-
+    const { account } = useAppContext();
     const Content = useCallback(() => {
         if (!params) return undefined;
         return (
-            <ConnectContent
-                params={params}
-                handleClose={handleClose}
-                waitInvalidation={waitInvalidation}
-            />
+            <>
+                {account.publicKeys.length > 1 && (
+                    <NotificationTitleWithWalletName onClose={() => handleClose()} />
+                )}
+                <ConnectContent
+                    params={params}
+                    handleClose={handleClose}
+                    waitInvalidation={waitInvalidation}
+                />
+            </>
         );
-    }, [origin, params, handleClose]);
+    }, [origin, params, handleClose, account.publicKeys.length]);
 
     return (
-        <Notification
-            isOpen={params != null}
-            handleClose={() => handleClose()}
-            title={t('txActions_signRaw_title')}
-            hideButton
-        >
-            {Content}
-        </Notification>
+        <>
+            <Notification
+                isOpen={params != null}
+                handleClose={() => handleClose()}
+                title={account.publicKeys.length > 1 ? undefined : t('txActions_signRaw_title')}
+                hideButton
+            >
+                {Content}
+            </Notification>
+        </>
     );
 };

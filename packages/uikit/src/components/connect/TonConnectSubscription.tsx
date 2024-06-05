@@ -1,54 +1,23 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { useMutation } from '@tanstack/react-query';
 import { TonConnectAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     replyBadRequestResponse,
     replyDisconnectResponse
 } from '@tonkeeper/core/dist/service/tonConnect/actionService';
-import {
-    disconnectAppConnection,
-    getAccountConnection
-} from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import {
-    getLastEventId,
-    subscribeTonConnect
-} from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
+import { subscribeTonConnect } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSendNotificationAnalytics } from '../../hooks/amplitude';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { QueryKey } from '../../libs/queryKey';
 import { TonTransactionNotification } from './TonTransactionNotification';
-import { SendTransactionAppRequest, responseSendMutation } from './connectHook';
-
-const useConnections = (sdk: IAppSdk) => {
-    const wallet = useWalletContext();
-    return useQuery([wallet.publicKey, QueryKey.connection], async () => {
-        const lastEventId = await getLastEventId(sdk.storage);
-        const connections = await getAccountConnection(sdk.storage, wallet);
-        return { lastEventId, connections };
-    });
-};
-
-const useDisconnectMutation = (sdk: IAppSdk) => {
-    const wallet = useWalletContext();
-    return useMutation<void, Error, TonConnectAppRequest>(async ({ connection, request }) => {
-        await disconnectAppConnection({
-            storage: sdk.storage,
-            wallet,
-            clientSessionId: connection.clientSessionId
-        });
-        await replyDisconnectResponse({ connection, request });
-
-        if (sdk.notifications) {
-            try {
-                await sdk.notifications.unsubscribeTonConnect(connection.clientSessionId);
-            } catch (e) {
-                if (e instanceof Error) sdk.topMessage(e.message);
-            }
-        }
-    });
-};
+import { SendTransactionAppRequest, useResponseSendMutation } from './connectHook';
+import {
+    tonConnectAppManuallyDisconnected$,
+    useDisconnectTonConnectApp,
+    useAppTonConnectConnections,
+    useTonConnectLastEventId
+} from '../../state/tonConnect';
+import { useMutateActiveWallet } from '../../state/account';
 
 const useUnSupportMethodMutation = () => {
     return useMutation<void, Error, TonConnectAppRequest>(replyBadRequestResponse);
@@ -59,19 +28,23 @@ const TonConnectSubscription = () => {
 
     const sdk = useAppSdk();
     const wallet = useWalletContext();
-    const { data } = useConnections(sdk);
+    const { data: appConnections } = useAppTonConnectConnections();
+    const { data: lastEventId } = useTonConnectLastEventId();
 
-    const { mutate: disconnect } = useDisconnectMutation(sdk);
+    const { mutateAsync: disconnect } = useDisconnectTonConnectApp();
     const { mutate: badRequestResponse } = useUnSupportMethodMutation();
-    const { mutateAsync: responseSendAsync } = responseSendMutation();
+    const { mutateAsync: responseSendAsync } = useResponseSendMutation();
 
     useSendNotificationAnalytics(request?.connection?.manifest);
+    const { mutateAsync: setActiveWallet } = useMutateActiveWallet();
 
     useEffect(() => {
         const handleMessage = (params: TonConnectAppRequest) => {
             switch (params.request.method) {
                 case 'disconnect': {
-                    return disconnect(params);
+                    return disconnect(params.connection).then(() =>
+                        replyDisconnectResponse({ ...params })
+                    );
                 }
                 case 'sendTransaction': {
                     setRequest(undefined);
@@ -80,9 +53,24 @@ const TonConnectSubscription = () => {
                         id: params.request.id,
                         payload: JSON.parse(params.request.params[0])
                     };
-                    setTimeout(() => {
-                        setRequest(value);
-                    }, 100);
+                    const walletToActivate = appConnections?.find(i =>
+                        i.connections.some(
+                            c => c.clientSessionId === params.connection.clientSessionId
+                        )
+                    );
+
+                    if (walletToActivate) {
+                        setActiveWallet(walletToActivate.wallet.publicKey).then(() =>
+                            setTimeout(() => {
+                                setRequest(value);
+                            }, 100)
+                        );
+                    } else {
+                        setTimeout(() => {
+                            setRequest(value);
+                        }, 100);
+                    }
+
                     return;
                 }
                 default: {
@@ -93,11 +81,11 @@ const TonConnectSubscription = () => {
 
         const { notifications } = sdk;
         (async () => {
-            if (notifications && data) {
+            if (notifications && appConnections) {
                 try {
                     const enable = await notifications.subscribed(wallet.active.rawAddress);
                     if (enable) {
-                        for (let connection of data.connections) {
+                        for (const connection of appConnections.flatMap(i => i.connections)) {
                             await notifications.subscribeTonConnect(
                                 connection.clientSessionId,
                                 new URL(connection.manifest.url).host
@@ -113,14 +101,14 @@ const TonConnectSubscription = () => {
         const close = subscribeTonConnect({
             storage: sdk.storage,
             handleMessage,
-            connections: data?.connections,
-            lastEventId: data?.lastEventId
+            connections: appConnections?.flatMap(i => i.connections),
+            lastEventId
         });
 
         return () => {
             close();
         };
-    }, [sdk, data, disconnect, setRequest, badRequestResponse]);
+    }, [sdk, appConnections, lastEventId, disconnect, setRequest, badRequestResponse]);
 
     const handleClose = useCallback(
         async (boc?: string) => {
@@ -133,6 +121,18 @@ const TonConnectSubscription = () => {
         },
         [request, responseSendAsync, setRequest]
     );
+
+    useEffect(() => {
+        return tonConnectAppManuallyDisconnected$.subscribe(connection => {
+            const connectionsToDisconnect = Array.isArray(connection) ? connection : [connection];
+            connectionsToDisconnect.forEach((item, index) =>
+                replyDisconnectResponse({
+                    connection: item,
+                    request: { id: (Date.now() + index).toString() }
+                })
+            );
+        });
+    }, []);
 
     return (
         <>

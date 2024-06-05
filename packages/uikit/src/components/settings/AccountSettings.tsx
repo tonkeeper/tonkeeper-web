@@ -3,10 +3,11 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { SettingsRoute, relative } from '../../libs/routes';
+import { SettingsRoute, relative, WalletSettingsRoute } from '../../libs/routes';
 import { useWalletJettonList } from '../../state/wallet';
 import { LogOutWalletNotification } from './LogOutNotification';
 import {
+    AppsIcon,
     ListOfTokensIcon,
     LogOutIcon,
     RecoveryPhraseIcon,
@@ -66,6 +67,11 @@ const SingleAccountSettings = () => {
             name: t('settings_security'),
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
+        });
+        items.push({
+            name: t('settings_connected_apps'),
+            icon: <AppsIcon />,
+            action: () => navigate(relative(WalletSettingsRoute.connectedApps))
         });
         items.push({
             name: t('settings_reset'),
@@ -148,6 +154,11 @@ const MultipleAccountSettings = () => {
             name: t('settings_security'),
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
+        });
+        items.push({
+            name: t('settings_connected_apps'),
+            icon: <AppsIcon />,
+            action: () => navigate(relative(WalletSettingsRoute.connectedApps))
         });
         return items;
     }, [t, navigate, wallet, jettons]);

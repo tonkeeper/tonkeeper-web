@@ -54,6 +54,7 @@ import { Notifications } from './components/Notifications';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
+import { TonConnectSubscription } from "./components/TonConnectSubscription";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -329,6 +330,7 @@ export const Content: FC<{
                 </Routes>
                 <Footer />
                 <MemoryScroll />
+                <TonConnectSubscription />
                 <Suspense>
                     <SendActionNotification />
                     <ReceiveNotification />

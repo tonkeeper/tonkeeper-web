@@ -90,6 +90,12 @@ export class TonProvider extends EventEmitter {
     }
 
     const message = data.message;
+
+    if ('event' in message) {
+      this.emit(`tonConnect_event`, { event: message.event, payload: message.payload, id: message.id });
+      return;
+    }
+
     const { id, method, error, result } = message;
 
     if (typeof id !== 'undefined') {

@@ -73,7 +73,7 @@ export interface AppConnectionProps {
     manifest?: DAppManifest;
 }
 
-export const responseConnectionMutation = () => {
+export const useResponseConnectionMutation = () => {
     const sdk = useAppSdk();
     const wallet = useWalletContext();
     const client = useQueryClient();
@@ -96,7 +96,8 @@ export const responseConnectionMutation = () => {
                     clientSessionId: params.clientSessionId
                 });
 
-                await client.invalidateQueries([wallet.publicKey, QueryKey.connection]);
+                await client.invalidateQueries([QueryKey.tonConnectConnection]);
+                await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
             } else {
                 await sendEventToBridge({
                     response: connectRejectResponse(),
@@ -121,7 +122,7 @@ export interface ResponseSendProps {
     boc?: string;
 }
 
-export const responseSendMutation = () => {
+export const useResponseSendMutation = () => {
     return useMutation<undefined, Error, ResponseSendProps>(
         async ({ request: { connection, id }, boc }) => {
             const response = boc

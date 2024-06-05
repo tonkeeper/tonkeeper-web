@@ -506,6 +506,7 @@
   "import_existing_wallet_description" : "Добавить кошелёк с помощью секретного ключа из 24 слов",
   "import_new_wallet" : "Новый кошелёк",
   "import_new_wallet_description" : "Создать новый кошелёк",
+  "import_signer" : "Подключить Signer",
   "import_wallet_caption" : "Чтобы восстановить доступ, введите 24 секретных слова, которые вы получили при создании кошелька.",
   "import_wallet_reset_caption" : "Чтобы восстановить доступ, введите 24 секретных слова, которые вы получили при создании кошелька.",
   "import_wallet_title" : "Введите секретный ключ",
@@ -1089,6 +1090,8 @@
     "token_id" : "ID токена",
     "tonviewer_button" : "Открыть в Tonviewer"
   },
+  "tonkeeper_pro" : "Tonkeeper Pro",
+  "tonkeeper_pro_description" : "Подписка Tonkeeper Pro включает в себя расширенную функцию кошелька, предлагающую набор инструментов для управления крипто активами.",
   "ton_login_back_to_button" : "Вернуться в {name}",
   "ton_login_caption" : "{name} запрашивает доступ к адресу вашего кошелька",
   "ton_login_connect_button" : "Подключить кошелёк",

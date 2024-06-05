@@ -30,6 +30,8 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
             return await keytar.getPassword(service, `Wallet-${message.publicKey}`);
         case 'reconnect':
             return await TonConnectSSE.getInstance().reconnect();
+        case 'ton-connect-send-disconnect':
+            return await TonConnectSSE.getInstance().sendDisconnect(message.connection);
         case 'can-prompt-touch-id':
             try {
                 return !!systemPreferences?.canPromptTouchID?.();
