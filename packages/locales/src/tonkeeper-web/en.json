@@ -1,4 +1,5 @@
 {
+  "about_tonkeeper_pro" : "About Tonkeeper Pro",
   "actionTitle" : "Open the wallet",
   "add_dns_address" : "Add wallet address that domain %1% will link to.",
   "appExtensionDescription" : "Your extension wallet on The Open Network",
@@ -109,6 +110,12 @@
   "pro_banner_start_trial" : "Try Pro for Free",
   "pro_banner_subtitle" : "Access advanced features and tools to boost your work",
   "pro_banner_title" : "Get more with Tonkeeper Pro",
+  "pro_feature_multisend" : "Multi-Send",
+  "pro_feature_multisend_description" : "With multi-send feature you can send funds up to 255 addresses at once. Tonkeeper Pro saves time and simplifies the process of mass transactions.",
+  "pro_features_dashboard" : "Inside Tonkeeper Pro – Dashboard",
+  "pro_features_dashboard_description" : "In the Dashboard you will have access to wallet analysis. This feature will benefit professional users who use Tonkeeper in their daily business.",
+  "pro_features_description" : "A Tonkeeper Pro subscription includes advanced wallet functionality, offering a suite of tools for managing your cryptocurrency.",
+  "pro_other_features" : "And other cool features are on the way.",
   "publish_message" : "Publishing Message to Internet",
   "receive_ton" : "Receive Toncoin",
   "receive_ton_description" : "Send only Toncoin TON and tokens\nin TON network to this address, or you\nmight lose your funds.",

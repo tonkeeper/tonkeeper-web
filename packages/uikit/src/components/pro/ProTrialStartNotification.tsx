@@ -37,22 +37,22 @@ const ImageStyled = styled.img`
     margin-bottom: 1rem;
 `;
 
-export const ProTrialStartNotification: FC<{ isOpen: boolean; onClose: () => void }> = ({
-    isOpen,
-    onClose
-}) => {
+export const ProTrialStartNotification: FC<{
+    isOpen: boolean;
+    onClose: (confirmed?: boolean) => void;
+}> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
     const { mutateAsync, isLoading } = useActivateTrialMutation();
 
     const onConfirm = async () => {
         await mutateAsync();
-        onClose();
+        onClose(true);
     };
 
     return (
         <Notification
             isOpen={isOpen}
-            handleClose={onClose}
+            handleClose={() => onClose()}
             footer={
                 <FooterStyled>
                     <ButtonStyled primary fullWidth loading={isLoading} onClick={onConfirm}>
