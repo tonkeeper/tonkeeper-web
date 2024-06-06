@@ -136,6 +136,7 @@ export const AmountView: FC<{
 
     const onJetton = useCallback(
         (address: string) => {
+            if (!jettons) return;
             dispatch({
                 kind: 'select',
                 payload: { token: jettonToTonAsset(address, jettons) }
@@ -196,7 +197,7 @@ export const AmountView: FC<{
                             info={info}
                             jetton={legacyTonAssetId(amountState.token as TonAsset)}
                             setJetton={onJetton}
-                            jettons={jettons}
+                            jettons={jettons ?? { balances: [] }}
                         />
                     ) : (
                         <AssetBadge>
