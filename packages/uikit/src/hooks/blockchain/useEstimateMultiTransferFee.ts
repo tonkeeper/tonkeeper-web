@@ -1,22 +1,22 @@
 import { useMutation } from '@tanstack/react-query';
+import { Address } from '@ton/core';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { useAppContext, useWalletContext } from '../appContext';
-import { useWalletJettonList } from '../../state/wallet';
 import {
-    estimateTonMultiTransfer,
-    estimateJettonMultiTransfer
+    estimateJettonMultiTransfer,
+    estimateTonMultiTransfer
 } from '@tonkeeper/core/dist/service/transfer/multiSendService';
-import { MultiSendFormTokenized, multiSendFormToTransferMessages } from './useSendMultiTransfer';
-import BigNumber from 'bignumber.js';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { Address } from '@ton/core';
 import { AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
+import BigNumber from 'bignumber.js';
+import { useJettonList } from '../../state/jetton';
+import { useAppContext, useWalletContext } from '../appContext';
+import { MultiSendFormTokenized, multiSendFormToTransferMessages } from './useSendMultiTransfer';
 
 export function useEstimateMultiTransfer() {
     const { api } = useAppContext();
     const wallet = useWalletContext();
-    const { data: jettons } = useWalletJettonList();
+    const { data: jettons } = useJettonList();
 
     return useMutation<
         { fee: AssetAmount<TonAsset>; estimation: AccountEvent },

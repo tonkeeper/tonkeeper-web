@@ -1,6 +1,4 @@
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { isTonAddress } from '@tonkeeper/core/dist/utils/common';
-import BigNumber from 'bignumber.js';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import styled, { css } from 'styled-components';
@@ -12,7 +10,6 @@ import {
 } from '../../components/desktop/DesktopViewLayout';
 import { TokensPieChart } from '../../components/desktop/tokens/TokensPieChart';
 import { JettonAsset, TonAsset } from '../../components/home/Jettons';
-import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useAssets } from '../../state/home';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
@@ -77,7 +74,6 @@ const DesktopTokensPayload = () => {
     const { data: uiPreferences } = useUserUIPreferences();
     const { mutate } = useMutateUserUIPreferences();
     const [showChart, setShowChart] = useState(true);
-    const { fiat } = useAppContext();
     const jettonsRef = useRef<Record<string, HTMLDivElement>>({});
     const tonRef = useRef<HTMLDivElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -96,24 +92,8 @@ const DesktopTokensPayload = () => {
     };
 
     const sortedAssets = useMemo(() => {
-        if (!assets?.ton) {
-            return [];
-        }
-
-        return assets.ton.jettons.balances.slice().sort((a, b) => {
-            const priceA = a.price?.prices?.[fiat] || 0;
-            const priceB = b.price?.prices?.[fiat] || 0;
-
-            const aFiat = shiftedDecimals(new BigNumber(a.balance), a.jetton.decimals).multipliedBy(
-                priceA
-            );
-            const bFiat = shiftedDecimals(new BigNumber(b.balance), b.jetton.decimals).multipliedBy(
-                priceB
-            );
-
-            return bFiat.comparedTo(aFiat);
-        });
-    }, [assets, fiat]);
+        return assets?.ton?.jettons?.balances ?? [];
+    }, [assets]);
 
     const onTokenClick = useCallback((address: string) => {
         if (isTonAddress(address) && tonRef.current) {

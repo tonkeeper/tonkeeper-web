@@ -1,4 +1,5 @@
 {
+  "about_tonkeeper_pro" : "О Tonkeeper Pro",
   "actionTitle" : "Открыть Кошелек",
   "add_dns_address" : "Добавьте адрес кошелька, на который будет ссылаться домен %1%",
   "appExtensionDescription" : "Your extension wallet on The Open Network",
@@ -108,6 +109,12 @@
   "pro_banner_start_trial" : "Попробуйте Pro бесплатно",
   "pro_banner_subtitle" : "Получите доступ к расширенным функциям и инструментам для улучшения вашей работы",
   "pro_banner_title" : "Откройте все возможности с Tonkeeper Pro",
+  "pro_feature_multisend" : "Множественная отправка",
+  "pro_feature_multisend_description" : "Благодаря функции мультиотправки вы можете отправлять средства на 255 адресов одновременно. Tonkeeper Pro экономит время и упрощает процесс массовых транзакций.",
+  "pro_features_dashboard" : "Встроенная панель управления кошельками",
+  "pro_features_dashboard_description" : "На панели управления вы получите доступ к анализу кошельков. Эта функция будет полезна профессиональным пользователям, которые используют Tonkeeper в своем ежедневном бизнесе.",
+  "pro_features_description" : "Подписка Tonkeeper Pro включает расширенную функциональность кошелька, предлагающую набор инструментов для управления криптовалютой.",
+  "pro_other_features" : "И другие крутые функции на подходе.",
   "publish_message" : "Публикация сообщения в Интернет",
   "receive_ton" : "Получить Toncoin",
   "receive_ton_description" : "Отправляйте на этот адрес только Toncoin TON и токены в сети TON, иначе вы можете потерять свои средства.",

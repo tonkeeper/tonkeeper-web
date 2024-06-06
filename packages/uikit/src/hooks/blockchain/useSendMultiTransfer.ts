@@ -10,14 +10,14 @@ import {
 } from '@tonkeeper/core/dist/service/transfer/multiSendService';
 import BigNumber from 'bignumber.js';
 import { notifyError } from '../../components/transfer/common';
+import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
+import { useJettonList } from '../../state/jetton';
 import { getSigner } from '../../state/mnemonic';
-import { useWalletJettonList } from '../../state/wallet';
+import { useCheckTouchId } from '../../state/password';
 import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
-import { useCheckTouchId } from '../../state/password';
 
 export type MultiSendFormTokenized = {
     rows: {
@@ -45,7 +45,7 @@ export function useSendMultiTransfer() {
     const wallet = useWalletContext();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
-    const { data: jettons } = useWalletJettonList();
+    const { data: jettons } = useJettonList();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<

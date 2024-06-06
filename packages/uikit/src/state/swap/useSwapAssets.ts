@@ -1,28 +1,28 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { QueryKey } from '../../libs/queryKey';
+import { Address } from '@ton/core';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
 import {
-    isTon,
     TonAsset,
+    isTon,
     tonAssetAddressFromString,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { Address } from '@ton/core';
-import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
-import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { useAssets } from '../home';
-import BigNumber from 'bignumber.js';
-import { useRate } from '../rates';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { useAppContext } from '../../hooks/appContext';
-import { atom, useAtom } from '../../libs/atom';
-import { useMemo } from 'react';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
-import { useSwapsConfig } from './useSwapsConfig';
-import { useWalletJettonList } from '../wallet';
 import { JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import BigNumber from 'bignumber.js';
+import { useMemo } from 'react';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { atom, useAtom } from '../../libs/atom';
+import { QueryKey } from '../../libs/queryKey';
+import { useAssets } from '../home';
+import { useJettonList } from '../jetton';
+import { useRate } from '../rates';
+import { useSwapsConfig } from './useSwapsConfig';
 
 export function useAllSwapAssets() {
     const { swapService } = useSwapsConfig();
@@ -161,7 +161,7 @@ export const useSwapCustomTokenSearch = () => {
 
     const isAddress = seeIfValidTonAddress(filter);
     const { api, fiat } = useAppContext();
-    const { data: jettons } = useWalletJettonList();
+    const { data: jettons } = useJettonList();
 
     return useQuery<WalletSwapAsset | null>({
         queryKey: [QueryKey.swapCustomToken, filter, jettons, fiat],
