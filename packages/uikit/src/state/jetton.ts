@@ -70,15 +70,7 @@ export const useJettonRawList = () => {
                 accountId: wallet.active.rawAddress,
                 currencies: [fiat]
             });
-            const config = await getActiveWalletConfig(
-                sdk.storage,
-                wallet.active.rawAddress,
-                wallet.network
-            );
-
-            const balances = filterTokens(result.balances, config.hiddenTokens).sort(
-                compareTokensOver(fiat)
-            );
+            const balances = filterTokens(result.balances, []).sort(compareTokensOver(fiat));
             return { balances };
         }
     );

@@ -221,7 +221,9 @@ const JettonSkeleton = () => {
     return (
         <>
             <SubHeader title={t('settings_jettons_list')} />
-            <SkeletonList size={5} />
+            <InnerBody>
+                <SkeletonList size={5} />
+            </InnerBody>
         </>
     );
 };
