@@ -33,9 +33,8 @@ import { useAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { openIosKeyboard } from '@tonkeeper/uikit/dist/hooks/ios';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
-import { useUserJettonList } from '@tonkeeper/uikit/dist/state/jetton';
+import { useJettonList } from '@tonkeeper/uikit/dist/state/jetton';
 import { useTronBalances } from '@tonkeeper/uikit/dist/state/tron/tron';
-import { useWalletJettonList } from '@tonkeeper/uikit/dist/state/wallet';
 import BigNumber from 'bignumber.js';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -66,8 +65,7 @@ const SendContent: FC<{
     const sdk = useAppSdk();
     const { ios } = useAppContext();
     const { t } = useTranslation();
-    const { data: jettons } = useWalletJettonList();
-    const filter = useUserJettonList(jettons);
+    const { data: filter } = useJettonList();
 
     const recipientRef = useRef<HTMLDivElement>(null);
     const amountRef = useRef<HTMLDivElement>(null);
@@ -160,7 +158,7 @@ const SendContent: FC<{
 
     const processJetton = useCallback(
         async ({ amount: a, jetton }: TonTransferParams) => {
-            if (jetton) {
+            if (jetton && filter) {
                 let actualAsset;
                 try {
                     actualAsset = jettonToTonAsset(jetton, filter);
@@ -298,7 +296,7 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
     const [open, setOpen] = useState(false);
     const [chain, setChain] = useState<BLOCKCHAIN_NAME | undefined>(undefined);
     const [tonTransfer, setTonTransfer] = useState<InitTransferData | undefined>(undefined);
-    const { data: jettons } = useWalletJettonList();
+    const { data: jettons } = useJettonList();
 
     const { mutateAsync: getAccountAsync, reset } = useGetToAccount();
 
