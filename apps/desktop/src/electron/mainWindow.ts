@@ -1,6 +1,7 @@
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { BrowserWindow, ipcMain } from 'electron';
 import isDev from 'electron-is-dev';
+import log from 'electron-log/main';
 import path from 'path';
 import { Cookie, CookieJar } from 'tough-cookie';
 import { handleBackgroundMessage } from '../electron/background';
@@ -73,9 +74,6 @@ export abstract class MainWindow {
             { urls: [] },
             (details, callback) => {
                 cookieJar.getCookies(details.url).then(cookies => {
-                    if (!cookies.length) {
-                        return callback({});
-                    }
                     const result = cookies
                         .map(cookie => `${cookie.key}=${cookie.value}`)
                         .join('; ');
