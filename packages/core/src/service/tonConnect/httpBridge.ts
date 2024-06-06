@@ -13,7 +13,7 @@ import {
 import { AccountConnection } from './connectionService';
 import { SessionCrypto } from './protocol';
 
-const defaultBridgeUrl = 'https://bridge.tonapi.io/bridge';
+const defaultBridgeUrl = 'https://testbridge.tonapi.io/bridge';
 const defaultTtl = 300;
 
 export const sendEventToBridge = async <T extends RpcMethod>({
@@ -30,7 +30,7 @@ export const sendEventToBridge = async <T extends RpcMethod>({
     bridgeUrl?: string;
 }) => {
     const sessionCrypto = new SessionCrypto(sessionKeyPair);
-    const url = `${bridgeUrl}/message?client_id=${sessionCrypto.sessionId}&to=${clientSessionId}&ttl=${ttl}`;
+    const url = `${defaultBridgeUrl}/message?client_id=${sessionCrypto.sessionId}&to=${clientSessionId}&ttl=${ttl}`;
 
     const encodedResponse = sessionCrypto.encrypt(
         JSON.stringify(response),
@@ -80,7 +80,7 @@ export const subscribeTonConnect = ({
         .map(item => new SessionCrypto(item.sessionKeyPair).sessionId)
         .join(',');
 
-    let url = `${bridgeUrl}/events?client_id=${walletSessionIds}`;
+    let url = `${defaultBridgeUrl}/events?client_id=${walletSessionIds}`;
 
     if (lastEventId) {
         url += `&last_event_id=${lastEventId}`;
