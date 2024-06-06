@@ -1,5 +1,6 @@
+import { ActiveWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import {
     DragDropContext,
     Draggable,
@@ -14,17 +15,15 @@ import { ColumnText } from '../../components/Layout';
 import { ListBlock, ListItemElement, ListItemPayload } from '../../components/List';
 import { SkeletonList } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
-import { Radio } from '../../components/fields/Checkbox';
-import { useWalletContext } from '../../hooks/appContext';
 import { useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import {
-    hideEmptyJettons,
-    sortJettons,
+    useActiveWalletConfig,
     useJettonRawList,
-    useToggleJettonMutation
+    useSavePinnedJettonOrderMutation,
+    useToggleHideJettonMutation,
+    useTogglePinJettonMutation
 } from '../../state/jetton';
-import { useMutateWalletProperty } from '../../state/wallet';
 
 const TurnOnIcon = styled.span`
     color: ${props => props.theme.accentBlue};
@@ -57,19 +56,24 @@ const RadioWrapper = styled.span`
     cursor: pointer;
 `;
 
-const SampleJettonRow: FC<{ jetton: JettonBalance }> = ({ jetton }) => {
+const SampleJettonRow: FC<{ jetton: JettonBalance; config: ActiveWalletConfig }> = ({
+    jetton,
+    config
+}) => {
     const { t } = useTranslation();
-    const wallet = useWalletContext();
 
     const balance = useCoinFullBalance(jetton.balance, jetton.jetton.decimals);
 
-    const pinned = false;
+    const { mutate: togglePin } = useTogglePinJettonMutation();
+    const { mutate: toggleHide } = useToggleHideJettonMutation();
 
     const visible = useMemo(() => {
-        return !(wallet.hiddenTokens ?? []).includes(jetton.jetton.address);
-    }, [wallet.hiddenTokens]);
+        return !config.hiddenTokens.includes(jetton.jetton.address);
+    }, [config.hiddenTokens]);
 
-    const onChangeVisible: React.MouseEventHandler<HTMLSpanElement> = () => {};
+    const pinned = useMemo(() => {
+        return config.pinnedTokens.includes(jetton.jetton.address);
+    }, [config.pinnedTokens]);
 
     return (
         <ListItemPayload>
@@ -82,7 +86,7 @@ const SampleJettonRow: FC<{ jetton: JettonBalance }> = ({ jetton }) => {
             </Row>
             <Row>
                 {visible && (
-                    <RadioWrapper onClick={() => {}}>
+                    <RadioWrapper onClick={() => togglePin({ config, jetton })}>
                         {pinned ? (
                             <TurnOnIcon>
                                 <PinIcon />
@@ -94,7 +98,7 @@ const SampleJettonRow: FC<{ jetton: JettonBalance }> = ({ jetton }) => {
                         )}
                     </RadioWrapper>
                 )}
-                <RadioWrapper onClick={onChangeVisible}>
+                <RadioWrapper onClick={() => toggleHide({ config, jetton })}>
                     {visible ? (
                         <TurnOnIcon>
                             <VisibleIcon />
@@ -110,46 +114,102 @@ const SampleJettonRow: FC<{ jetton: JettonBalance }> = ({ jetton }) => {
     );
 };
 
+export const PinnedJettonList: FC<{
+    config: ActiveWalletConfig;
+    jettons: JettonBalance[];
+}> = ({ config, jettons }) => {
+    const { mutate } = useSavePinnedJettonOrderMutation();
+
+    const list = useMemo(
+        () =>
+            config.pinnedTokens.reduce((acc, item) => {
+                const jetton = jettons.find(j => j.jetton.address === item);
+                if (jetton) {
+                    acc.push(jetton);
+                }
+                return acc;
+            }, [] as JettonBalance[]),
+        [jettons, config]
+    );
+
+    const handleDrop: OnDragEndResponder = useCallback(
+        droppedItem => {
+            if (!droppedItem.destination) return;
+            const updatedList = [...list];
+            const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
+            updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
+
+            const pinnedTokens = updatedList.map(item => item.jetton.address);
+            mutate({ config, pinnedTokens });
+        },
+        [config, list, mutate]
+    );
+
+    return (
+        <DragDropContext onDragEnd={handleDrop}>
+            <Droppable droppableId="jettons">
+                {provided => (
+                    <ListBlock {...provided.droppableProps} ref={provided.innerRef} noUserSelect>
+                        {list.map((jetton, index) => (
+                            <Draggable
+                                key={jetton.jetton.address}
+                                draggableId={jetton.jetton.address}
+                                index={index}
+                            >
+                                {p => (
+                                    <ListItemElement
+                                        ref={p.innerRef}
+                                        {...p.draggableProps}
+                                        hover={false}
+                                        ios={true}
+                                    >
+                                        <JettonRow
+                                            config={config}
+                                            dragHandleProps={p.dragHandleProps}
+                                            jetton={jetton}
+                                        />
+                                    </ListItemElement>
+                                )}
+                            </Draggable>
+                        ))}
+                        {provided.placeholder}
+                    </ListBlock>
+                )}
+            </Droppable>{' '}
+        </DragDropContext>
+    );
+};
+
 const JettonRow: FC<{
     jetton: JettonBalance;
+    config: ActiveWalletConfig;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-}> = ({ jetton, dragHandleProps }) => {
+}> = ({ jetton, config, dragHandleProps }) => {
     const { t } = useTranslation();
-    const wallet = useWalletContext();
 
-    const { mutate, reset } = useToggleJettonMutation();
-
-    const onChange = useCallback(() => {
-        reset();
-        mutate(jetton);
-    }, [jetton]);
-
-    const checked = useMemo(() => {
-        if (jetton.jetton.verification === 'whitelist') {
-            return (wallet.hiddenJettons ?? []).every(item => item !== jetton.jetton.address);
-        } else {
-            return (wallet.shownJettons ?? []).some(item => item === jetton.jetton.address);
-        }
-    }, [wallet.hiddenJettons, wallet.shownJettons]);
+    const { mutate: togglePin } = useTogglePinJettonMutation();
 
     const balance = useCoinFullBalance(jetton.balance, jetton.jetton.decimals);
 
     return (
         <ListItemPayload>
             <Row>
-                <RadioWrapper>
-                    <Radio checked={checked} onChange={onChange} />
-                </RadioWrapper>
-
                 <Logo src={jetton.jetton.image} />
                 <ColumnText
                     text={jetton.jetton.name ?? t('Unknown_COIN')}
                     secondary={`${balance} ${jetton.jetton.symbol}`}
                 />
             </Row>
-            <Icon {...dragHandleProps}>
-                <ReorderIcon />
-            </Icon>
+            <Row>
+                <RadioWrapper onClick={() => togglePin({ config, jetton })}>
+                    <TurnOnIcon>
+                        <PinIcon />
+                    </TurnOnIcon>
+                </RadioWrapper>
+                <Icon {...dragHandleProps}>
+                    <ReorderIcon />
+                </Icon>
+            </Row>
         </ListItemPayload>
     );
 };
@@ -164,36 +224,14 @@ const JettonSkeleton = () => {
         </>
     );
 };
+
 export const JettonsSettings = () => {
     const { t } = useTranslation();
-    const wallet = useWalletContext();
-    const { data } = useJettonRawList();
 
-    const [jettons, setJettons] = useState<JettonBalance[]>([]);
+    const { data: jettons } = useJettonRawList();
+    const { data: config } = useActiveWalletConfig();
 
-    useEffect(() => {
-        const sort = sortJettons(wallet.orderJettons, data?.balances ?? []);
-        setJettons(hideEmptyJettons(sort));
-    }, [data, wallet.orderJettons]);
-
-    const { mutate } = useMutateWalletProperty();
-    const handleDrop: OnDragEndResponder = useCallback(
-        droppedItem => {
-            if (!droppedItem.destination) return;
-            const updatedList = [...jettons];
-            const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
-            updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
-
-            // Optimistic sync update;
-            setJettons(updatedList);
-
-            // Pessimistic async update:
-            mutate({ orderJettons: updatedList.map(item => item.jetton.address) });
-        },
-        [jettons, mutate]
-    );
-
-    if (!data) {
+    if (!jettons || !config) {
         return <JettonSkeleton />;
     }
 
@@ -201,45 +239,12 @@ export const JettonsSettings = () => {
         <>
             <SubHeader title={t('settings_jettons_list')} />
             <InnerBody>
-                <DragDropContext onDragEnd={handleDrop}>
-                    <Droppable droppableId="jettons">
-                        {provided => (
-                            <ListBlock
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
-                                noUserSelect
-                            >
-                                {jettons.map((jetton, index) => (
-                                    <Draggable
-                                        key={jetton.jetton.address}
-                                        draggableId={jetton.jetton.address}
-                                        index={index}
-                                    >
-                                        {p => (
-                                            <ListItemElement
-                                                ref={p.innerRef}
-                                                {...p.draggableProps}
-                                                hover={false}
-                                                ios={true}
-                                            >
-                                                <JettonRow
-                                                    dragHandleProps={p.dragHandleProps}
-                                                    jetton={jetton}
-                                                />
-                                            </ListItemElement>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </ListBlock>
-                        )}
-                    </Droppable>
-                </DragDropContext>
+                <PinnedJettonList jettons={jettons.balances} config={config} />
 
                 <ListBlock>
-                    {jettons.map(jetton => (
+                    {jettons.balances.map(jetton => (
                         <ListItemElement key={jetton.jetton.address} hover={false} ios={true}>
-                            <SampleJettonRow jetton={jetton} />
+                            <SampleJettonRow jetton={jetton} config={config} />
                         </ListItemElement>
                     ))}
                 </ListBlock>

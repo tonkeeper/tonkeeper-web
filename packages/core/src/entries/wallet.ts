@@ -78,12 +78,13 @@ export interface WalletState {
     proxy?: WalletProxy;
 
     tron?: TronWalletStorage;
+}
 
-    pinnedTokens?: string[];
-    hiddenTokens?: string[];
-
-    pinnedHfts?: string[];
-    hiddenHfts?: string[];
+export interface ActiveWalletConfig {
+    pinnedTokens: string[];
+    hiddenTokens: string[];
+    pinnedHfts: string[];
+    hiddenHfts: string[];
 }
 
 export interface TronWalletStorage {

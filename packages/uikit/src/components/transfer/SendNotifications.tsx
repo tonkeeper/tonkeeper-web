@@ -17,7 +17,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { useJettonList, useUserJettonList } from '../../state/jetton';
+import { useJettonList } from '../../state/jetton';
 import { useTronBalances } from '../../state/tron/tron';
 import {
     Notification,
@@ -59,8 +59,7 @@ const SendContent: FC<{
     const sdk = useAppSdk();
     const { standalone, ios, extension } = useAppContext();
     const { t } = useTranslation();
-    const { data: jettons } = useJettonList();
-    const filter = useUserJettonList(jettons);
+    const { data: filter } = useJettonList();
     const isFullWidth = useIsFullWidthMode();
 
     const [view, setView] = useState<'recipient' | 'amount' | 'confirm'>('recipient');
@@ -141,7 +140,7 @@ const SendContent: FC<{
 
     const processJetton = useCallback(
         async ({ amount: a, jetton }: TonTransferParams) => {
-            if (jetton) {
+            if (jetton && filter) {
                 let actualAsset;
                 try {
                     actualAsset = jettonToTonAsset(jetton, filter);
