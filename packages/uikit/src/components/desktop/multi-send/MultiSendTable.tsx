@@ -45,9 +45,9 @@ import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
 import { useEnableW5, useEnableW5Mutation } from '../../../state/experemental';
 import { useProState } from '../../../state/pro';
-import { ProNotification } from '../../pro/ProNotification';
 import { useTranslation } from '../../../hooks/translation';
 import { useIsActiveWalletLedger } from '../../../state/ledger';
+import { ProFeaturesNotification } from '../pro/ProFeaturesNotification';
 
 const AssetSelectWrapper = styled.div`
     padding-bottom: 1rem;
@@ -531,7 +531,7 @@ const MultiSendFooter: FC<{
                 totalValue={willBeSent}
                 willDiscard={blocker.state === 'blocked'}
             />
-            <ProNotification isOpen={isProModalOpened} onClose={onProModalClose} />
+            <ProFeaturesNotification isOpen={isProModalOpened} onClose={onProModalClose} />
         </>
     );
 };

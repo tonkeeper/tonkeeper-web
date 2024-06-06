@@ -549,21 +549,16 @@ export const Notification: FC<{
                                         className="dialog-content"
                                     >
                                         <HeaderWrapper ref={headerRef}>
-                                            {title && (
-                                                <NotificationHeader>
-                                                    <NotificationTitleRow handleClose={handleClose}>
-                                                        {title}
-                                                    </NotificationTitleRow>
-                                                </NotificationHeader>
-                                            )}
+                                            <NotificationHeader>
+                                                <NotificationTitleRow
+                                                    handleClose={
+                                                        hideButton ? undefined : handleClose
+                                                    }
+                                                >
+                                                    {title}
+                                                </NotificationTitleRow>
+                                            </NotificationHeader>
                                         </HeaderWrapper>
-                                        {!hideButton && !title && (
-                                            <ButtonContainer>
-                                                <NotificationCancelButton
-                                                    handleClose={handleClose}
-                                                />
-                                            </ButtonContainer>
-                                        )}
                                         {Child}
                                         <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
                                     </Content>
