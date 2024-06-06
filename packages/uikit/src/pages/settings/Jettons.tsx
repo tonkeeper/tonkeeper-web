@@ -15,6 +15,7 @@ import { ColumnText } from '../../components/Layout';
 import { ListBlock, ListItemElement, ListItemPayload } from '../../components/List';
 import { SkeletonList } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
+import { H3 } from '../../components/Text';
 import { useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import {
@@ -225,6 +226,10 @@ const JettonSkeleton = () => {
     );
 };
 
+const Title = styled(H3)`
+    margin: 14px 0;
+`;
+
 export const JettonsSettings = () => {
     const { t } = useTranslation();
 
@@ -239,8 +244,14 @@ export const JettonsSettings = () => {
         <>
             <SubHeader title={t('settings_jettons_list')} />
             <InnerBody>
-                <PinnedJettonList jettons={jettons.balances} config={config} />
+                {config.pinnedTokens.length > 0 ? (
+                    <>
+                        <Title>{t('pinned_jettons')}</Title>
+                        <PinnedJettonList jettons={jettons.balances} config={config} />
+                    </>
+                ) : undefined}
 
+                <Title>{t('all_assets_jettons')}</Title>
                 <ListBlock>
                     {jettons.balances.map(jetton => (
                         <ListItemElement key={jetton.jetton.address} hover={false} ios={true}>
