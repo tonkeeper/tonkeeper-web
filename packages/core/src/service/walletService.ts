@@ -190,7 +190,7 @@ export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) =>
         publicKey,
         active,
         revision: 0,
-        name: name ? Buffer.from(name, 'hex').toString('utf8') : undefined,
+        name: name ? name : undefined,
         auth: { kind: 'signer' },
         emoji: getFallbackWalletEmoji(publicKey)
     };
@@ -209,7 +209,7 @@ export const walletStateFromSignerDeepLink = async (
         publicKey,
         active,
         revision: 0,
-        name: name ? Buffer.from(name, 'hex').toString('utf8') : undefined,
+        name: name ? name : undefined,
         auth: { kind: 'signer-deeplink' },
         emoji: getFallbackWalletEmoji(publicKey)
     };
