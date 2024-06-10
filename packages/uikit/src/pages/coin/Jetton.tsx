@@ -18,6 +18,9 @@ import { useFetchNext } from '../../hooks/useFetchNext';
 import { JettonKey, QueryKey } from '../../libs/queryKey';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
 import { useFormatFiat, useRate } from '../../state/rates';
+import { SwapAction } from '../../components/home/SwapAction';
+import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 
 const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTMLDivElement> }> = ({
     balance,
@@ -77,9 +80,14 @@ const JettonHeader: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ info, 
 export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) => {
     const { data: info } = useJettonInfo(jettonAddress);
     const { data: balance } = useJettonBalance(jettonAddress);
+    const { data: swapAssets } = useAllSwapAssets();
 
+    const jettonAddressRaw = Address.parse(jettonAddress).toRawString();
+    const swapAsset = swapAssets?.find(
+        a => tonAssetAddressToString(a.address) === jettonAddressRaw
+    );
     const ref = useRef<HTMLDivElement>(null);
-    if (!info || !balance) {
+    if (!info || !balance || !swapAssets) {
         return <CoinSkeletonPage />;
     }
 
@@ -91,6 +99,7 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) 
                 <ActionsRow>
                     <SendAction asset={info.metadata.address} chain={BLOCKCHAIN_NAME.TON} />
                     <ReceiveAction jetton={info.metadata.address} />
+                    {swapAsset && <SwapAction fromAsset={swapAsset} />}
                 </ActionsRow>
 
                 <JettonHistory balance={balance} innerRef={ref} />

@@ -1,7 +1,7 @@
 {
     "name": "@tonkeeper/desktop",
     "license": "Apache-2.0",
-    "version": "3.12.6",
+    "version": "3.14.0",
     "description": "Your desktop wallet on The Open Network",
     "main": ".webpack/main",
     "repository": {
@@ -26,8 +26,8 @@
     },
     "keywords": [],
     "author": {
-        "name": "Nikita Kuznetsov",
-        "email": "nkuz915@gmail.com"
+        "name": "Ton APPS UK Limited",
+        "email": "support@tonkeeper.com"
     },
     "devDependencies": {
         "@electron-forge/cli": "^7.2.0",

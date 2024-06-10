@@ -32,6 +32,7 @@ import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/Deskto
 import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
 import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
+import { NotcoinPage } from '@tonkeeper/uikit/dist/desktop-pages/notcoin/NotcoinPage';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 import { DesktopPurchases } from '@tonkeeper/uikit/dist/desktop-pages/purchases/DesktopPurchases';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
@@ -57,7 +58,6 @@ import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useAuthState, useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
-import { useStonfiAssets } from '@tonkeeper/uikit/dist/state/stonfi';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -77,6 +77,7 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
+import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -336,7 +337,6 @@ export const Loader: FC = () => {
 
 const usePrefetch = () => {
     useRecommendations();
-    useStonfiAssets();
     useCanPromptTouchId();
 };
 
@@ -415,6 +415,8 @@ const WalletContent = () => {
                                 path={any(AppRoute.walletSettings)}
                                 element={<DesktopWalletSettingsRouting />}
                             />
+                            <Route path={AppRoute.swap} element={<DesktopSwapPage />} />
+                            <Route path={AppRoute.notcoin} element={<NotcoinPage />} />
                             <Route path="*" element={<DesktopTokens />} />
                         </Route>
                     </Routes>

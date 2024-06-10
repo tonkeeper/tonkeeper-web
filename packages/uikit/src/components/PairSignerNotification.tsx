@@ -26,7 +26,7 @@ export const SignerContent: FC<{
     const openScanner = useScanner(null, onSubmit);
 
     const message = useMemo(() => {
-        return createTransferQr(wallet.publicKey, boc);
+        return createTransferQr(wallet.publicKey, wallet.active.version, boc);
     }, [wallet, boc]);
 
     return (

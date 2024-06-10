@@ -9,9 +9,9 @@ export enum AppRoute {
     coins = '/coins',
     signer = '/signer',
     publish = '/publish',
-    home = '/',
-
-    notcoin = '/notcoin'
+    swap = '/swap',
+    notcoin = '/notcoin',
+    home = '/'
 }
 
 export enum AppProRoute {
@@ -53,7 +53,8 @@ export enum WalletSettingsRoute {
     index = '/',
     recovery = '/recovery',
     version = '/version',
-    jettons = '/jettons'
+    jettons = '/jettons',
+    connectedApps = '/connected-apps'
 }
 
 export enum BrowserRoute {

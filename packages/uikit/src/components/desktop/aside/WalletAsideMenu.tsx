@@ -3,7 +3,14 @@ import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
 import { AppRoute } from '../../../libs/routes';
-import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon, SettingsSmoothIcon } from '../../Icon';
+import {
+    ClockSmoothIcon,
+    CoinsIcon,
+    NotCoinIcon,
+    SaleBadgeIcon,
+    SettingsSmoothIcon,
+    SwapIcon
+} from '../../Icon';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
 
@@ -26,6 +33,10 @@ const WalletAsideContainer = styled.div`
 const AsideMenuItemStyled = styled(AsideMenuItem)`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
     padding-right: 50px;
+`;
+
+const SwapIconStyled = styled(SwapIcon)`
+    transform: rotate(90deg) scale(1, -1);
 `;
 
 export const WalletAsideMenu = () => {
@@ -60,11 +71,27 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
+            <NavLink to={AppRoute.swap}>
+                {({ isActive }) => (
+                    <AsideMenuItemStyled isSelected={isActive}>
+                        <SwapIconStyled />
+                        <Label2>{t('wallet_swap')}</Label2>
+                    </AsideMenuItemStyled>
+                )}
+            </NavLink>
             <NavLink to={AppRoute.walletSettings}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
+                    </AsideMenuItemStyled>
+                )}
+            </NavLink>
+            <NavLink to={AppRoute.notcoin}>
+                {({ isActive }) => (
+                    <AsideMenuItemStyled isSelected={isActive}>
+                        <NotCoinIcon />
+                        <Label2>NOT Vouchers</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>

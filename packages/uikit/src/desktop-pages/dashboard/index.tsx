@@ -50,7 +50,7 @@ const DashboardPage: FC = () => {
             <DashboardTableStyled />
             <ButtonContainerStyled>
                 <Button size="small" corner="2xSmall" onClick={() => setIsOpen(true)}>
-                    {t('manage')}
+                    {t('Manage')}
                 </Button>
             </ButtonContainerStyled>
             {shouldShowProBanner && (

@@ -17,18 +17,22 @@ import {
     SendTransactionRpcResponseError,
     SendTransactionRpcResponseSuccess,
     TonAddressItemReply,
+    TonConnectAccount,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import { walletContractFromState } from '../wallet/contractService';
-import { getCurrentWallet } from '../wallet/storeService';
+import { getCurrentWallet, getWalletState } from '../wallet/storeService';
 import {
     TonConnectParams,
     disconnectAccountConnection,
     getAccountConnection,
-    saveAccountConnection
+    saveAccountConnection,
+    AccountConnection
 } from './connectionService';
 import { SessionCrypto } from './protocol';
+import { AccountState } from '../../entries/account';
+import { AppKey } from '../../Keys';
 
 export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
@@ -163,6 +167,59 @@ export const getDeviceInfo = (appVersion: string): DeviceInfo => {
     };
 };
 
+export const getDappConnection = async (
+    storage: IStorage,
+    origin: string,
+    account?: TonConnectAccount
+): Promise<{ wallet: WalletState; connection: AccountConnection } | undefined> => {
+    const appConnections = await getAppConnections(storage);
+    if (account) {
+        const walletState = appConnections.find(
+            c => c.wallet.active.rawAddress === account?.address
+        );
+        const connection = walletState?.connections.find(item => item.webViewUrl === origin);
+        if (walletState && connection) {
+            return { wallet: walletState.wallet, connection };
+        }
+    }
+
+    return (
+        appConnections
+            .map(item => {
+                const connection = item.connections.find(ac => ac.webViewUrl === origin);
+                if (connection) {
+                    return { wallet: item.wallet, connection };
+                }
+                return null;
+            })
+            .filter(Boolean)[0] ?? undefined
+    );
+};
+
+export const getAppConnections = async (
+    storage: IStorage
+): Promise<{ wallet: WalletState; connections: AccountConnection[] }[]> => {
+    const state = await storage.get<AccountState>(AppKey.ACCOUNT);
+
+    if (!state) {
+        throw new TonConnectError(
+            'Missing active wallet',
+            CONNECT_EVENT_ERROR_CODES.UNKNOWN_APP_ERROR
+        );
+    }
+
+    const wallets = (
+        await Promise.all(state.publicKeys.map(pk => getWalletState(storage, pk)))
+    ).filter(Boolean) as WalletState[];
+
+    return Promise.all(
+        wallets.map(async wallet => {
+            const walletConnections = await getAccountConnection(storage, wallet);
+            return { wallet, connections: walletConnections };
+        })
+    );
+};
+
 export const checkWalletConnectionOrDie = async (options: {
     storage: IStorage;
     wallet: WalletState;
@@ -185,11 +242,14 @@ export const tonReConnectRequest = async (
     storage: IStorage,
     webViewUrl: string
 ): Promise<ConnectItem[]> => {
-    const wallet = await getCurrentWallet(storage);
-    console.log(wallet);
-
-    await checkWalletConnectionOrDie({ storage, wallet, webViewUrl });
-    return [toTonAddressItemReply(wallet)];
+    const connection = await getDappConnection(storage, webViewUrl);
+    if (!connection) {
+        throw new TonConnectError(
+            'Missing connection',
+            CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
+        );
+    }
+    return [toTonAddressItemReply(connection.wallet)];
 };
 
 export const toTonAddressItemReply = (wallet: WalletState) => {

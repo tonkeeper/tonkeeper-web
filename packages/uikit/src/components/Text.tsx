@@ -83,11 +83,15 @@ export const Body3 = styled.span`
     line-height: 16px;
 `;
 
-export const Num2 = styled.span`
+export const Num2Class = css`
     font-style: normal;
     font-weight: 600;
     font-size: 28px;
     line-height: 36px;
+`;
+
+export const Num2 = styled.span`
+    ${Num2Class}
 `;
 
 export const Num3 = styled.span`

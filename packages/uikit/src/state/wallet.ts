@@ -5,7 +5,7 @@ import { KNOWN_TON_ASSETS } from '@tonkeeper/core/dist/entries/crypto/asset/cons
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { WalletState, WalletVersion, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import {
@@ -19,7 +19,6 @@ import {
     DNSApi,
     DnsRecord,
     JettonBalance,
-    JettonsBalances,
     NFTApi,
     NftCollection,
     NftItem,
@@ -31,14 +30,12 @@ import BigNumber from 'bignumber.js';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
-import { JettonKey, QueryKey } from '../libs/queryKey';
+import { QueryKey } from '../libs/queryKey';
 import { useAssets } from './home';
 import {
     getJettonsFiatAmount,
-    getRateKey,
     tokenRate as getTokenRate,
     getTonFiatAmount,
-    toTokenRate,
     useRate
 } from './rates';
 import { DefaultRefetchInterval } from './tonendpoint';
@@ -163,61 +160,6 @@ export const useWalletAccountInfo = () => {
             refetchOnWindowFocus: true,
             keepPreviousData: true
         }
-    );
-};
-
-export const useWalletJettonList = () => {
-    const wallet = useWalletContext();
-    const { api, fiat } = useAppContext();
-    const client = useQueryClient();
-    return useQuery<JettonsBalances, Error>(
-        [wallet.active.rawAddress, QueryKey.jettons, fiat, wallet.network],
-        async () => {
-            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.active.rawAddress,
-                currencies: [fiat]
-            });
-
-            result.balances.forEach(item => {
-                client.setQueryData(
-                    [wallet.publicKey, QueryKey.jettons, JettonKey.balance, item.jetton.address],
-                    item
-                );
-
-                if (item.price) {
-                    try {
-                        const tokenRate = toTokenRate(item.price, fiat);
-                        client.setQueryData(
-                            getRateKey(fiat, Address.parse(item.jetton.address).toString()),
-                            tokenRate
-                        );
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            });
-
-            return result;
-        },
-        {
-            refetchInterval: DefaultRefetchInterval,
-            refetchIntervalInBackground: true,
-            refetchOnWindowFocus: true,
-            keepPreviousData: true
-        }
-    );
-};
-
-const getActiveWallet = (accounts: Account[], version: WalletVersion) => {
-    return accounts.find(
-        item =>
-            (item.balance > 0 || item.status === 'active') &&
-            item.interfaces &&
-            item.interfaces.some(
-                v =>
-                    v === `wallet_${walletVersionText(version)}` ||
-                    v === `wallet_${walletVersionText(version).toLowerCase()}`
-            )
     );
 };
 

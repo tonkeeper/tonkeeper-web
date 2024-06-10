@@ -67,9 +67,11 @@ const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings')
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
+const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
 );
+const SwapMobileNotification = React.lazy(() => import("@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification"));
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -387,6 +389,11 @@ const MainPages: FC<{ showQrScan: boolean }> = ({ showQrScan }) => {
                             }
                         />
                     </Route>
+                    <Route path={AppRoute.swap} element={
+                        <Suspense fallback={null}>
+                            <SwapPage />
+                        </Suspense>
+                    } />
                     <Route
                         path="*"
                         element={
@@ -405,6 +412,7 @@ const MainPages: FC<{ showQrScan: boolean }> = ({ showQrScan }) => {
                 <MemoryScroll />
                 <Suspense>
                     <TonConnectSubscription />
+                    <SwapMobileNotification />
                 </Suspense>
             </Wrapper>
         </TwaNotification>

@@ -1,6 +1,7 @@
 export enum AppKey {
     ACCOUNT = 'account',
     WALLET = 'wallet',
+    WALLET_CONFIG = 'wallet_config',
     MNEMONIC = 'mnemonic',
 
     THEME = 'theme',
@@ -24,5 +25,7 @@ export enum AppKey {
     PRO = 'pro_state',
     PRO_BACKUP = 'pro_backup',
 
-    SIGNER_MESSAGE = 'signer_message'
+    SIGNER_MESSAGE = 'signer_message',
+    SWAP_CUSTOM_ASSETS = 'swap_custom_assets',
+    SWAP_OPTIONS = 'swap_options'
 }

@@ -6,7 +6,7 @@ import { useRequestNotificationAnalytics } from '../../hooks/amplitude';
 import { useAppSdk } from '../../hooks/appSdk';
 import { ScanIcon } from '../Icon';
 import { TonConnectNotification } from './TonConnectNotification';
-import { responseConnectionMutation, useGetConnectInfo } from './connectHook';
+import { useResponseConnectionMutation, useGetConnectInfo } from './connectHook';
 
 const ScanBlock = styled.div`
     position: absolute;
@@ -23,7 +23,7 @@ export const ScanButton = () => {
 
     const { mutateAsync, reset } = useGetConnectInfo();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
-        responseConnectionMutation();
+        useResponseConnectionMutation();
 
     const onScan = useCallback(
         async (link: string) => {

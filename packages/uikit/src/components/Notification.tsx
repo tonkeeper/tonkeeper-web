@@ -22,7 +22,7 @@ import { BackButton, ButtonMock } from './fields/BackButton';
 import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
-import { H2, H3 } from './Text';
+import { H2, H3, Label2 } from './Text';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -239,6 +239,14 @@ const HeaderWrapper = styled.div`
 `;
 
 const RowTitle = styled(H3)`
+    overflow: hidden;
+    margin: 0;
+    user-select: none;
+    flex: 1;
+`;
+
+const RowTitleDesktop = styled(Label2)`
+    overflow: hidden;
     margin: 0;
     user-select: none;
     flex: 1;
@@ -260,12 +268,17 @@ const BackShadow = styled.div`
 `;
 
 export const NotificationTitleRow: FC<
-    PropsWithChildren<{ handleClose?: () => void; center?: boolean }>
-> = ({ handleClose, children, center = false }) => {
+    PropsWithChildren<{ handleClose?: () => void; center?: boolean; className?: string }>
+> = ({ handleClose, children, center = false, className }) => {
+    const isFullWidthMode = useIsFullWidthMode();
     return (
-        <TitleRow>
+        <TitleRow className={className}>
             {center && <ButtonMock />}
-            <RowTitle>{children}</RowTitle>
+            {isFullWidthMode ? (
+                <RowTitleDesktop>{children}</RowTitleDesktop>
+            ) : (
+                <RowTitle>{children}</RowTitle>
+            )}
             {handleClose ? <NotificationCancelButton handleClose={handleClose} /> : <ButtonMock />}
         </TitleRow>
     );
@@ -536,21 +549,16 @@ export const Notification: FC<{
                                         className="dialog-content"
                                     >
                                         <HeaderWrapper ref={headerRef}>
-                                            {title && (
-                                                <NotificationHeader>
-                                                    <NotificationTitleRow handleClose={handleClose}>
-                                                        {title}
-                                                    </NotificationTitleRow>
-                                                </NotificationHeader>
-                                            )}
+                                            <NotificationHeader>
+                                                <NotificationTitleRow
+                                                    handleClose={
+                                                        hideButton ? undefined : handleClose
+                                                    }
+                                                >
+                                                    {title}
+                                                </NotificationTitleRow>
+                                            </NotificationHeader>
                                         </HeaderWrapper>
-                                        {!hideButton && !title && (
-                                            <ButtonContainer>
-                                                <NotificationCancelButton
-                                                    handleClose={handleClose}
-                                                />
-                                            </ButtonContainer>
-                                        )}
                                         {Child}
                                         <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
                                     </Content>

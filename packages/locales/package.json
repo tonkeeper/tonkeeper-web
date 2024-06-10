@@ -1,7 +1,7 @@
 {
     "name": "@tonkeeper/locales",
     "version": "0.1.0",
-    "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
+    "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "Tonkeeper locales",
     "scripts": {
         "build": "ts-node ./task/build",

@@ -1,3 +1,5 @@
+import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+
 export interface GetStorageMessage {
     king: 'storage-get';
     key: string;
@@ -56,6 +58,11 @@ export interface PromptTouchIdMessage {
     reason: string;
 }
 
+export interface TonConnectSendDisconnectMessage {
+    king: 'ton-connect-send-disconnect';
+    connection: AccountConnection | AccountConnection[];
+}
+
 export type Message =
     | GetStorageMessage
     | SetStorageMessage
@@ -68,4 +75,5 @@ export type Message =
     | TonConnectMessage
     | CanPromptTouchIdMessage
     | PromptTouchIdMessage
-    | GetPreferredSystemLanguagesMessage;
+    | GetPreferredSystemLanguagesMessage
+    | TonConnectSendDisconnectMessage;

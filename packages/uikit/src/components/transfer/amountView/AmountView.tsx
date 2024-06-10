@@ -20,10 +20,11 @@ import { useAppContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { formatter } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
+import { useIsFullWidthMode } from '../../../hooks/useIsFullWidthMode';
 import { useUserAssetBalance } from '../../../state/asset';
-import { useUserJettonList } from '../../../state/jetton';
+import { useJettonList } from '../../../state/jetton';
 import { useRate } from '../../../state/rates';
-import { useWalletAccountInfo, useWalletJettonList } from '../../../state/wallet';
+import { useWalletAccountInfo } from '../../../state/wallet';
 import { Gap } from '../../Layout';
 import {
     FullHeightBlock,
@@ -59,8 +60,6 @@ import {
     toInitAmountState,
     toTokenRateSymbol
 } from './amountState';
-import { useTheme } from 'styled-components';
-import {useIsFullWidthMode} from "../../../hooks/useIsFullWidthMode";
 
 export const AmountView: FC<{
     onClose: () => void;
@@ -88,8 +87,7 @@ export const AmountView: FC<{
     const isFullWidth = useIsFullWidthMode();
     const shouldHideHeaderAndFooter = isFullWidth && isAnimationProcess;
 
-    const { data: notFilteredJettons } = useWalletJettonList();
-    const jettons = useUserJettonList(notFilteredJettons);
+    const { data: jettons } = useJettonList();
     const { data: info } = useWalletAccountInfo();
 
     const [amountState, dispatch] = useReducer(
@@ -138,6 +136,7 @@ export const AmountView: FC<{
 
     const onJetton = useCallback(
         (address: string) => {
+            if (!jettons) return;
             dispatch({
                 kind: 'select',
                 payload: { token: jettonToTonAsset(address, jettons) }
@@ -198,7 +197,7 @@ export const AmountView: FC<{
                             info={info}
                             jetton={legacyTonAssetId(amountState.token as TonAsset)}
                             setJetton={onJetton}
-                            jettons={jettons}
+                            jettons={jettons ?? { balances: [] }}
                         />
                     ) : (
                         <AssetBadge>

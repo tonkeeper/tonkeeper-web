@@ -183,7 +183,7 @@ export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) =>
         throw new Error('Unexpected QR code');
     }
 
-    const publicKey = Buffer.from(pk, 'base64').toString('hex');
+    const publicKey = pk;
 
     const active = await findWalletAddress(api, publicKey);
 
@@ -191,7 +191,7 @@ export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) =>
         publicKey,
         active,
         revision: 0,
-        name,
+        name: name ? Buffer.from(name, 'hex').toString('utf8') : undefined,
         auth: { kind: 'signer' },
         emoji: getFallbackWalletEmoji(publicKey)
     };
@@ -201,18 +201,16 @@ export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) =>
 
 export const walletStateFromSignerDeepLink = async (
     api: APIConfig,
-    pk: string,
+    publicKey: string,
     name: string | null
 ) => {
-    const publicKey = Buffer.from(pk, 'base64').toString('hex');
-
     const active = await findWalletAddress(api, publicKey);
 
     const state: WalletState = {
         publicKey,
         active,
         revision: 0,
-        name: name ?? undefined,
+        name: name ? Buffer.from(name, 'hex').toString('utf8') : undefined,
         auth: { kind: 'signer-deeplink' },
         emoji: getFallbackWalletEmoji(publicKey)
     };

@@ -54,6 +54,7 @@ import { Notifications } from './components/Notifications';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
+import { TonConnectSubscription } from "./components/TonConnectSubscription";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -61,6 +62,7 @@ const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
+const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
@@ -77,6 +79,7 @@ const SendNftNotification = React.lazy(
 const ConnectLedgerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/ConnectLedgerNotification')
 );
+const SwapMobileNotification = React.lazy(() => import("@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification"));
 const PairKeystoneNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
 );
@@ -325,10 +328,16 @@ export const Content: FC<{
                             }
                         />
                     </Route>
+                    <Route path={AppRoute.swap} element={
+                        <Suspense fallback={null}>
+                            <SwapPage />
+                        </Suspense>
+                    } />
                     <Route path="*" element={<IndexPage />} />
                 </Routes>
                 <Footer />
                 <MemoryScroll />
+                <TonConnectSubscription />
                 <Suspense>
                     <SendActionNotification />
                     <ReceiveNotification />
@@ -337,6 +346,7 @@ export const Content: FC<{
                     <AddFavoriteNotification />
                     <EditFavoriteNotification />
                     <ConnectLedgerNotification />
+                    <SwapMobileNotification />
                     <PairKeystoneNotification />
                 </Suspense>
             </WalletStateContext.Provider>

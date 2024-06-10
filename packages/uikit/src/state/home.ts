@@ -1,24 +1,24 @@
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { AssetIdentification } from '@tonkeeper/core/dist/entries/crypto/asset/asset-identification';
+import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { AssetData } from '../components/home/Jettons';
 import { useWalletContext } from '../hooks/appContext';
-import { filterTonAssetList } from './jetton';
+import { useJettonList } from './jetton';
 import { useTronBalances } from './tron/tron';
-import { useWalletAccountInfo, useWalletJettonList } from './wallet';
-import { AssetIdentification } from '@tonkeeper/core/dist/entries/crypto/asset/asset-identification';
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import BigNumber from 'bignumber.js';
+import { useWalletAccountInfo } from './wallet';
 
 export const useAssets = () => {
     const wallet = useWalletContext();
 
     const { data: info, error, isFetching: isAccountLoading } = useWalletAccountInfo();
-    const { data: jettons, isFetching: isJettonLoading } = useWalletJettonList();
+    const { data: jettons, isFetching: isJettonLoading } = useJettonList();
     const { data: tronBalances, isFetching: isTronLoading } = useTronBalances();
 
     const assets = useMemo<AssetData | undefined>(() => {
         if (!info || !jettons || !tronBalances) return undefined;
         return {
-            ton: { info, jettons: filterTonAssetList(jettons, wallet) },
+            ton: { info, jettons: jettons ?? { balances: [] } },
             tron: tronBalances
         };
     }, [info, jettons, wallet, tronBalances]);

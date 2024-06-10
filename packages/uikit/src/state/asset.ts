@@ -8,15 +8,16 @@ import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/
 import { TonAsset, legacyTonAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import BigNumber from 'bignumber.js';
+import { useJettonList } from './jetton';
 import { useRate } from './rates';
 import { useTronBalances } from './tron/tron';
-import { useWalletAccountInfo, useWalletJettonList } from './wallet';
+import { useWalletAccountInfo } from './wallet';
 
 export function useUserAssetBalance<
     T extends AssetIdentification = AssetIdentification,
     R extends Asset = Asset
 >(asset: T): { isLoading: boolean; data: T extends Asset ? AssetAmount<R> : string } {
-    const jettons = useWalletJettonList();
+    const jettons = useJettonList();
     const tronBalances = useTronBalances();
     const tonWalletInfo = useWalletAccountInfo();
 
@@ -58,7 +59,7 @@ export function useUserAssetBalance<
 
 export function useAssetImage({ blockchain, address }: AssetIdentification): string | undefined {
     const id = packAssetId(blockchain, address);
-    const { data: jettons } = useWalletJettonList();
+    const { data: jettons } = useJettonList();
     const { data: balances } = useTronBalances();
 
     if (id === TON_ASSET.id) {

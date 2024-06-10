@@ -1,7 +1,7 @@
 {
     "name": "@tonkeeper/core",
     "version": "0.1.0",
-    "author": "Nikita Kuznetsov <nkuz915@gmail.com>",
+    "author": "NikitaTon APPS UK Limited <support@tonkeeper.com>",
     "description": "Core features and state for tonkeeper web wallet",
     "main": "index.js",
     "scripts": {
@@ -11,6 +11,7 @@
         "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f resource/Dockerfile.apiV2 . -t tonapisdkv2 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv2",
         "generate:tronApi": "rm -fr src/tronApi && docker build -f resource/Dockerfile.tronApi . -t tronapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tronapisdk",
         "generate:tonConsoleApi": "rm -r ./src/tonConsoleApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/tonconsole_backend/dev/swagger.yaml?token=GHSAT0AAAAAACKHFPNI4HJL4Q4RIAYDUQ3MZPAKM2A' --output ./src/tonConsoleApi",
+        "generate:swapsApi": "rm -r ./src/swapsApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/swaps-backend/master/swagger.yaml?token=GHSAT0AAAAAACJYQUODBKR67AB7WULZBFWEZSUUGFQ' --output ./src/swapsApi",
         "build:pkg": "yarn build"
     },
     "devDependencies": {

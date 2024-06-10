@@ -1,4 +1,3 @@
-import { FiatCurrencies } from './fiat';
 import { Language } from './language';
 import { Network } from './network';
 import { AuthState } from './password';
@@ -79,6 +78,13 @@ export interface WalletState {
     proxy?: WalletProxy;
 
     tron?: TronWalletStorage;
+}
+
+export interface ActiveWalletConfig {
+    pinnedTokens: string[];
+    hiddenTokens: string[];
+    pinnedHfts: string[];
+    hiddenHfts: string[];
 }
 
 export interface TronWalletStorage {
