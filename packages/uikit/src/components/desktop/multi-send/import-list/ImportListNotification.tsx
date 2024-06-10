@@ -1,11 +1,8 @@
 import { Notification } from '../../../Notification';
-import { ChangeEvent, FC } from 'react';
+import { FC } from 'react';
 import { styled } from 'styled-components';
-import {
-    ListImportError,
-    useMutateUserMultiSendList,
-    useParseCsvListMutation
-} from '../../../../state/multiSend';
+import { MultiSendList, useMutateUserMultiSendList } from '../../../../state/multiSend';
+import { ImportListFileInput } from './ImportListFileInput';
 
 export const ImportListNotification: FC<{
     isOpen: boolean;
@@ -27,31 +24,17 @@ const ImportListNotificationContent: FC<{
     isOpen: boolean;
     onClose: (newListId?: number) => void;
 }> = ({ isOpen, onClose }) => {
-    const { mutateAsync, isLoading, error } = useParseCsvListMutation();
-    const { mutateAsync: addList } = useMutateUserMultiSendList();
-    const onSelect = async (e: ChangeEvent<HTMLInputElement>) => {
-        try {
-            const result = await mutateAsync(e.target.files![0]);
-            if (isOpen) {
-                await addList(result);
-                onClose(result.id);
-            }
-        } catch (err) {
-            console.log(err);
+    const { mutateAsync: addList, isLoading } = useMutateUserMultiSendList();
+    const onImported = async (list: MultiSendList) => {
+        if (isOpen) {
+            await addList(list);
+            onClose(list.id);
         }
     };
 
-    const importError = error
-        ? error instanceof ListImportError
-            ? error
-            : new ListImportError('Unknown error', 'unknown')
-        : undefined;
-
     return (
         <ImportContentWrapper>
-            <input type="file" onChange={onSelect} />
-            {importError?.type}
-            {importError?.position.line}:{importError?.position.column}
+            <ImportListFileInput isLoading={isLoading} onImported={onImported} />
         </ImportContentWrapper>
     );
 };
