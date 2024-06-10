@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
+import { sendKeystoneTonConnectTransfer } from '@tonkeeper/core/dist/service/keystone/transfer';
 import {
     ConnectTransferError,
     EstimateData,
@@ -7,8 +8,8 @@ import {
     sendTonConnectTransfer,
     tonConnectTransferError
 } from '@tonkeeper/core/dist/service/transfer/tonService';
-import { sendKeystoneTonConnectTransfer } from '@tonkeeper/core/dist/service/keystone/transfer';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { FC, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -30,10 +31,9 @@ import {
 import { SkeletonList } from '../Skeleton';
 import { Body2, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
+import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -66,28 +66,29 @@ const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?
 
     return useMutation<string, Error>(async () => {
         const signer = await getSigner(sdk, wallet.publicKey, checkTouchId);
-        if (signer.type !== 'cell' && signer.type !== 'keystone') {
-            throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+
+        let boc: string;
+        switch (signer.type) {
+            case 'cell': {
+                boc = await sendTonConnectTransfer(api, wallet, params, signer);
+                break;
+            }
+            case 'keystone': {
+                boc = await sendKeystoneTonConnectTransfer(api, wallet, params, signer);
+                break;
+            }
+            default: {
+                throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+            }
         }
-        if (signer.type === 'cell') {
-            const value = await sendTonConnectTransfer(api, wallet, params, signer);
-            const invalidationPromise = client.invalidateQueries({
-                predicate: query => query.queryKey.includes(wallet.active.rawAddress)
-            });
-	      if (waitInvalidation) {
-            await invalidationPromise;
-        }
-            return value;
-        } else {
-            const value = await sendKeystoneTonConnectTransfer(api, wallet, params, signer);
-            const invalidationPromise = client.invalidateQueries({
-                predicate: query => query.queryKey.includes(wallet.active.rawAddress)
-            });
+
+        const invalidationPromise = client.invalidateQueries({
+            predicate: query => query.queryKey.includes(wallet.active.rawAddress)
+        });
         if (waitInvalidation) {
             await invalidationPromise;
         }
-            return value;
-        }
+        return boc;
     });
 };
 

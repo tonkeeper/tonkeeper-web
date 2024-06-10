@@ -5,6 +5,7 @@ import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi, NftItem } from '../../tonApiV2';
+import { createKeystoneNftTransfer } from '../keystone/transfer';
 import { createLedgerNftTransfer } from '../ledger/transfer';
 import {
     checkWalletBalanceOrDie,
@@ -16,7 +17,6 @@ import {
     getWalletBalance,
     signEstimateMessage
 } from './common';
-import { createKeystoneNftTransfer } from '../keystone/transfer';
 
 const initNftTransferAmount = toNano('1');
 export const nftTransferForwardAmount = BigInt('1');
@@ -153,13 +153,20 @@ export const sendNftTransfer = async (
         recipient.comment ? comment(recipient.comment) : null
     ] as const;
 
-    let buffer;
-    if (signer.type === 'ledger') {
-        buffer = await createLedgerNftTransfer(...params, signer);
-    } else if(signer.type === 'cell') {
-        buffer = await createNftTransfer(...params, signer);
-    } else {
-        buffer = await createKeystoneNftTransfer(...params, signer);
+    let buffer: Buffer;
+    switch (signer.type) {
+        case 'cell': {
+            buffer = await createNftTransfer(...params, signer);
+            break;
+        }
+        case 'ledger': {
+            buffer = await createLedgerNftTransfer(...params, signer);
+            break;
+        }
+        case 'keystone': {
+            buffer = await createKeystoneNftTransfer(...params, signer);
+            break;
+        }
     }
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
