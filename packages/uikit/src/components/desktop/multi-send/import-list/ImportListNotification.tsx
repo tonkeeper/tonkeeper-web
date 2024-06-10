@@ -3,6 +3,8 @@ import { FC } from 'react';
 import { styled } from 'styled-components';
 import { MultiSendList, useMutateUserMultiSendList } from '../../../../state/multiSend';
 import { ImportListFileInput } from './ImportListFileInput';
+import { Body2 } from '../../../Text';
+import { ImportListTable } from './ImportListTable';
 
 export const ImportListNotification: FC<{
     isOpen: boolean;
@@ -20,6 +22,16 @@ const ImportContentWrapper = styled.div`
     flex-direction: column;
 `;
 
+const ImportListFileStyled = styled(ImportListFileInput)`
+    margin-bottom: 1rem;
+`;
+
+const TableLabel = styled.div`
+    margin: 1rem 0;
+    text-align: center;
+    color: ${p => p.theme.textSecondary};
+`;
+
 const ImportListNotificationContent: FC<{
     isOpen: boolean;
     onClose: (newListId?: number) => void;
@@ -34,7 +46,11 @@ const ImportListNotificationContent: FC<{
 
     return (
         <ImportContentWrapper>
-            <ImportListFileInput isLoading={isLoading} onImported={onImported} />
+            <ImportListFileStyled isLoading={isLoading} onImported={onImported} />
+            <TableLabel>
+                <Body2>Пример таблицы</Body2>
+            </TableLabel>
+            <ImportListTable />
         </ImportContentWrapper>
     );
 };

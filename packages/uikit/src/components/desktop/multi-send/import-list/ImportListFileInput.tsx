@@ -60,7 +60,8 @@ const SpinnerRingStyled = styled(SpinnerRing)`
 export const ImportListFileInput: FC<{
     onImported: (list: MultiSendList) => void;
     isLoading: boolean;
-}> = ({ onImported, isLoading }) => {
+    className?: string;
+}> = ({ onImported, isLoading, className }) => {
     const inputId = useId();
     const { mutateAsync, isLoading: isParsing, error } = useParseCsvListMutation();
     const [isDragProcess, setIsDragProcess] = useState(false);
@@ -121,7 +122,7 @@ export const ImportListFileInput: FC<{
 
     if (isLoading || isParsing) {
         return (
-            <ImportFileContainer>
+            <ImportFileContainer className={className}>
                 <SpinnerRingStyled />
             </ImportFileContainer>
         );
@@ -153,6 +154,7 @@ export const ImportListFileInput: FC<{
                 onDragLeave={() => setIsDragOverZone(false)}
                 onDrop={onDrop}
                 dropOver={isDragOverZone}
+                className={className}
             >
                 <Body2>Drop the file</Body2>
             </ImportFileContainerDrop>
@@ -160,7 +162,7 @@ export const ImportListFileInput: FC<{
     }
 
     return (
-        <ImportFileContainer>
+        <ImportFileContainer className={className}>
             <ImportLabel>Import .CSV</ImportLabel>
             <ImportDescription>
                 Drag and drop the file or click the button below to upload it.
