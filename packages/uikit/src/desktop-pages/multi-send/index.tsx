@@ -16,6 +16,8 @@ import { fallbackRenderOver } from '../../components/Error';
 import { useAssetWeiBalance } from '../../state/home';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useTranslation } from '../../hooks/translation';
+import { useDisclosure } from '../../hooks/useDisclosure';
+import { ImportListNotification } from '../../components/desktop/multi-send/import-list/ImportListNotification';
 
 const PageWrapper = styled.div`
     overflow: auto;
@@ -103,6 +105,7 @@ export const DesktopMultiSendPage: FC = () => {
     const { t } = useTranslation();
     const { data: lists } = useUserMultiSendLists();
     const navigate = useNavigate();
+    const { isOpen, onClose, onOpen } = useDisclosure();
 
     useEffect(() => {
         if (lists && !lists.length) {
@@ -113,6 +116,13 @@ export const DesktopMultiSendPage: FC = () => {
     const onCreateList = () => {
         const id = Math.max(1, ...lists!.map(l => l.id)) + 1;
         navigate('./list/' + id);
+    };
+
+    const onImportList = (newListId?: number) => {
+        onClose();
+        if (newListId !== undefined) {
+            navigate('./list/' + newListId);
+        }
     };
 
     if (!lists) {
@@ -155,6 +165,12 @@ export const DesktopMultiSendPage: FC = () => {
                                             <ChevronRightIcon />
                                         </IconContainerStyled>
                                     </ListItemStyled>
+                                    <ListItemStyled onClick={onOpen}>
+                                        <Body2>Import CSV</Body2>
+                                        <IconContainerStyled>
+                                            <ChevronRightIcon />
+                                        </IconContainerStyled>
+                                    </ListItemStyled>
                                     {lists.map(list => (
                                         <MultiSendListElement
                                             list={list}
@@ -165,6 +181,7 @@ export const DesktopMultiSendPage: FC = () => {
                                     ))}
                                 </ListBlockStyled>
                             </PageBodyWrapper>
+                            <ImportListNotification isOpen={isOpen} onClose={onImportList} />
                         </PageWrapper>
                     </ErrorBoundary>
                 }
