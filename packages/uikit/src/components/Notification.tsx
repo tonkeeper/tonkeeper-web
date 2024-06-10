@@ -550,13 +550,11 @@ export const Notification: FC<{
                                     >
                                         <HeaderWrapper ref={headerRef}>
                                             <NotificationHeader>
-                                                <NotificationTitleRow
-                                                    handleClose={
-                                                        hideButton ? undefined : handleClose
-                                                    }
-                                                >
-                                                    {title}
-                                                </NotificationTitleRow>
+                                                {hideButton ? undefined : (
+                                                    <NotificationTitleRow handleClose={handleClose}>
+                                                        {title}
+                                                    </NotificationTitleRow>
+                                                )}
                                             </NotificationHeader>
                                         </HeaderWrapper>
                                         {Child}
