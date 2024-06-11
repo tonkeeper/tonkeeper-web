@@ -8,7 +8,7 @@ import { ReceiverInput } from './ReceiverInput';
 import { Button } from '../../fields/Button';
 import { Body2, Body3 } from '../../Text';
 import { IconButton } from '../../fields/IconButton';
-import { CloseIcon } from '../../Icon';
+import { CloseIcon, DocIcon, ExportIcon } from '../../Icon';
 import { ControllerRenderProps } from 'react-hook-form/dist/types/controller';
 import BigNumber from 'bignumber.js';
 import { formatter } from '../../../hooks/balance';
@@ -23,11 +23,11 @@ import {
 } from '../../../state/multiSend';
 import { SaveListNotification } from './SaveListNotification';
 import { useDisclosure } from '../../../hooks/useDisclosure';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { EditListNotification } from './EditListNotification';
 import { DeleteListNotification } from './DeleteListNotification';
 import { UpdateListNotification } from './UpdateListNotification';
-import { Link, useBlocker } from 'react-router-dom';
+import { Link, useBlocker, useNavigate } from 'react-router-dom';
 import { AssetSelect } from './AssetSelect';
 import { useAssets } from '../../../state/home';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
@@ -39,7 +39,7 @@ import {
     AsyncValidatorsStateProvider,
     useAsyncValidationState
 } from '../../../hooks/useAsyncValidator';
-import { useWalletContext } from '../../../hooks/appContext';
+import { useAppContext, useWalletContext } from '../../../hooks/appContext';
 import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/transfer/multiSendService';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
@@ -48,9 +48,17 @@ import { useProState } from '../../../state/pro';
 import { useTranslation } from '../../../hooks/translation';
 import { useIsActiveWalletLedger } from '../../../state/ledger';
 import { ProFeaturesNotification } from '../pro/ProFeaturesNotification';
+import { arrayToCsvString } from '@tonkeeper/core/dist/service/parserService';
+import { ImportListNotification } from './import-list/ImportListNotification';
 
-const AssetSelectWrapper = styled.div`
+const FormHeadingWrapper = styled.div`
+    display: flex;
+    gap: 0.5rem;
     padding-bottom: 1rem;
+
+    a {
+        text-decoration: none;
+    }
 `;
 
 const MultiSendTableGrid = styled.div`
@@ -176,11 +184,58 @@ export const MultiSendTable: FC<{
 
     const rowsValue = methods.watch('rows');
 
+    const { fiat } = useAppContext();
+
+    const downloadContent = arrayToCsvString(
+        rowsValue.map(item => [
+            !item.receiver
+                ? ''
+                : 'dns' in item.receiver
+                ? item.receiver.dns.account.name
+                : item.receiver.address,
+            item.amount?.value || '0',
+            item.amount?.inFiat
+                ? fiat
+                : isTon(list.token.address)
+                ? 'TON'
+                : list.token.address.toString({ urlSafe: true, bounceable: true }),
+            item.comment || ''
+        ])
+    );
+
+    const { isOpen: isImportOpen, onClose: onImportClose, onOpen: onImportOpen } = useDisclosure();
+    const navigate = useNavigate();
+
+    const onImportList = (newListId?: number) => {
+        onImportClose();
+        if (newListId !== undefined) {
+            navigate('../' + newListId, { relative: 'path', replace: true });
+        }
+    };
+
+    const canImport = asset.id === list.token.id && eqForms(rowsValue, list.form.rows);
+
     return (
         <>
-            <AssetSelectWrapper>
+            <ImportListNotification isOpen={isImportOpen} onClose={onImportList} />
+            <FormHeadingWrapper>
                 <AssetSelect asset={asset} onAssetChange={setAsset} />
-            </AssetSelectWrapper>
+                <Button
+                    secondary
+                    as="a"
+                    href={encodeURI('data:text/csv;charset=utf-8,' + downloadContent)}
+                    download={list.name + '.csv'}
+                >
+                    <ExportIcon />
+                    Export .CSV
+                </Button>
+                {canImport && (
+                    <Button secondary onClick={onImportOpen}>
+                        <DocIcon color="buttonSecondaryForeground" />
+                        Import .CSV
+                    </Button>
+                )}
+            </FormHeadingWrapper>
             <FormProvider {...methods}>
                 <AsyncValidatorsStateProvider>
                     <TableFormWrapper

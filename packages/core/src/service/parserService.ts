@@ -15,3 +15,19 @@ export const csvStringToArray = (strData: string) => {
     }
     return arrData;
 };
+
+export const arrayToCsvString = (arrData: string[][]) => {
+    const formatRow = (row: string[]) => {
+        return row
+            .map(val => {
+                val = val.replace(/"/g, '""');
+                if (val.search(/([",\n])/g) >= 0) {
+                    val = '"' + val + '"';
+                }
+                return val;
+            })
+            .join(',');
+    };
+
+    return arrData.map(formatRow).join('\n');
+};

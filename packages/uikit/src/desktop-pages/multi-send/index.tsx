@@ -9,7 +9,7 @@ import { useRate } from '../../state/rates';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { SkeletonText } from '../../components/shared/Skeleton';
 import { DesktopMultiSendFormPage } from './MultiSendFormPage';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { getWillBeMultiSendValue } from '../../components/desktop/multi-send/utils';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
@@ -135,16 +135,7 @@ export const DesktopMultiSendPage: FC = () => {
 
     return (
         <Routes>
-            <Route
-                path="/list/:id"
-                element={
-                    <ErrorBoundary
-                        fallbackRender={fallbackRenderOver('Failed to display multi-send page')}
-                    >
-                        <DesktopMultiSendFormPage />
-                    </ErrorBoundary>
-                }
-            />
+            <Route path="/list/:id" element={<ListRouteElement />} />
             <Route
                 path="*"
                 element={
@@ -187,6 +178,19 @@ export const DesktopMultiSendPage: FC = () => {
                 }
             ></Route>
         </Routes>
+    );
+};
+
+const ListRouteElement = () => {
+    const { id } = useParams();
+
+    return (
+        <ErrorBoundary
+            fallbackRender={fallbackRenderOver('Failed to display multi-send page')}
+            key={id}
+        >
+            <DesktopMultiSendFormPage />
+        </ErrorBoundary>
     );
 };
 
