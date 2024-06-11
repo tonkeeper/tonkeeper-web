@@ -1,6 +1,7 @@
 import { css, styled } from 'styled-components';
 import { Body2, Body3 } from '../../../Text';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
+import { useTranslation } from '../../../../hooks/translation';
 
 const ImportTableContainer = styled.div`
     display: grid;
@@ -59,19 +60,20 @@ const Gap = styled.div`
 `;
 
 export const ImportListTable = () => {
+    const { t } = useTranslation();
     return (
         <ImportTableContainer>
             <TH borderBottom>
-                <Body3>EQ или UQ адрес /  hex адрес / домен .ton</Body3>
+                <Body3>{t('import_multisend_table_heading_address')}</Body3>
             </TH>
             <TH borderBottom>
-                <Body3>Сумма</Body3>
+                <Body3>{t('import_multisend_table_heading_amount')}</Body3>
             </TH>
             <TH borderBottom>
-                <Body3>Фиатный тикер / TON / hex, EQ или UQ адрес жетон мастера</Body3>
+                <Body3>{t('import_multisend_table_heading_asset')}</Body3>
             </TH>
             <TH borderBottom>
-                <Body3>Комментарий, необязательно</Body3>
+                <Body3>{t('import_multisend_table_heading_comment')}</Body3>
             </TH>
             <Gap />
             <Gap />
@@ -123,7 +125,7 @@ export const ImportListTable = () => {
                 <Body2>UQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_p0p</Body2>
             </TD>
             <TD corner="bottom-right" borderBottom>
-                <Body2Tertiary>Comment</Body2Tertiary>
+                <Body2Tertiary>{t('import_multisend_table_comment')}</Body2Tertiary>
             </TD>
         </ImportTableContainer>
     );

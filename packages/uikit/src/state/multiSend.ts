@@ -321,13 +321,13 @@ const parseAmount = (val: string) => {
         throw new Error('Not a valid number');
     }
 
-    val = val.replace(',', getDecimalSeparator()).replaceAll(' ', '');
+    val = val.replace(',', '.').replaceAll(' ', '');
     const number = parseFloat(val);
     if (!isFinite(number)) {
         throw new Error('Not a valid number');
     }
 
-    return val;
+    return val.replace('.', getDecimalSeparator());
 };
 
 const parseAsset = (val: string) => {

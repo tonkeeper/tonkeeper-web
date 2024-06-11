@@ -1,4 +1,7 @@
 export const csvStringToArray = (strData: string) => {
+    if (!strData) {
+        return [];
+    }
     // TODO review and throw errors if format is wrong
     const objPattern = new RegExp(
         '(\\,|\\r?\\n|\\r|^)(?:"([^"]*(?:""[^"]*)*)"|([^\\,\\r\\n]*))',

@@ -1,6 +1,6 @@
 import { styled } from 'styled-components';
 import { BorderSmallResponsive } from '../../../shared/Styles';
-import { Body2, Label2 } from '../../../Text';
+import { Body2, Body2Class, Label2 } from '../../../Text';
 import { Button } from '../../../fields/Button';
 import { ChangeEvent, DragEvent, FC, useId, useRef, useState } from 'react';
 import {
@@ -14,12 +14,13 @@ import { useAppContext } from '../../../../hooks/appContext';
 import { ImportFiatWarningNotification } from './ImportFiatWarningNotification';
 import { useDisclosure } from '../../../../hooks/useDisclosure';
 import { useMutateUserFiat } from '../../../../state/fiat';
+import { useTranslation } from '../../../../hooks/translation';
 
 const ImportFileContainer = styled.div`
     width: 100%;
     ${BorderSmallResponsive};
     background: ${p => p.theme.backgroundContent};
-    padding: 12px 0;
+    padding: 12px 48px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -55,6 +56,7 @@ const FileInput = styled.input`
 const ErrorContainer = styled.div`
     margin-top: 1rem;
     color: ${p => p.theme.accentRed};
+    ${Body2Class};
 `;
 
 const SpinnerRingStyled = styled(SpinnerRing)`
@@ -66,6 +68,7 @@ export const ImportListFileInput: FC<{
     isLoading: boolean;
     className?: string;
 }> = ({ onImported, isLoading, className }) => {
+    const { t } = useTranslation();
     const inputId = useId();
     const {
         mutateAsync,
@@ -129,6 +132,7 @@ export const ImportListFileInput: FC<{
     };
 
     const onFileUploaded = async (file: File) => {
+        setDropError(false);
         try {
             const result = await mutateAsync(file);
 
@@ -171,7 +175,7 @@ export const ImportListFileInput: FC<{
                 dropOver={isDragOverZone}
                 className={className}
             >
-                <Body2>Drop the file</Body2>
+                <Body2>{t('import_multisend_drop_file')}</Body2>
             </ImportFileContainerDrop>
         );
     }
@@ -186,22 +190,44 @@ export const ImportListFileInput: FC<{
         }
     };
 
+    let errorPosition = '';
+    if (importError?.position?.line !== undefined) {
+        errorPosition = `${t('import_multisend_error_line')} ${importError.position.line + 1}`;
+    }
+
+    if (importError?.position?.column !== undefined) {
+        if (errorPosition) {
+            errorPosition += ', ';
+        }
+
+        errorPosition += `${t('import_multisend_error_column')} ${importError.position.column + 1}`;
+    }
+
+    if (errorPosition) {
+        errorPosition = ` (${errorPosition})`;
+    }
+
     return (
         <ImportFileContainer className={className}>
             {isLoading || isParsing || isFiatModalOpen ? (
                 <SpinnerRingStyled />
             ) : (
                 <>
-                    <ImportLabel>Import .CSV</ImportLabel>
-                    <ImportDescription>
-                        Drag and drop the file or click the button below to upload it.
-                        Please review the example table structure below to avoid errors.
-                    </ImportDescription>
+                    <ImportLabel>{t('import_csv')}</ImportLabel>
+                    <ImportDescription>{t('import_csv_description')}</ImportDescription>
                     <Button primary size="small" as="label" htmlFor={inputId}>
-                        Upload file
+                        {t('upload_file')}
                     </Button>
                     <FileInput id={inputId} type="file" accept=".csv" onChange={onSelect} />
-                    {importError && <ErrorContainer>{importError.message}</ErrorContainer>}
+                    {importError && (
+                        <ErrorContainer>
+                            {t('error_occurred') + errorPosition}.{' '}
+                            {t('import_multisend_error_' + importError.type)}
+                        </ErrorContainer>
+                    )}
+                    {dropError && (
+                        <ErrorContainer>{t('import_multisend_dnd_error')}</ErrorContainer>
+                    )}
                 </>
             )}
             <ImportFiatWarningNotification

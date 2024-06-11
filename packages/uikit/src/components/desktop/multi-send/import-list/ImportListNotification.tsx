@@ -5,13 +5,15 @@ import { MultiSendList, useMutateUserMultiSendList } from '../../../../state/mul
 import { ImportListFileInput } from './ImportListFileInput';
 import { Body2 } from '../../../Text';
 import { ImportListTable } from './ImportListTable';
+import { useTranslation } from '../../../../hooks/translation';
 
 export const ImportListNotification: FC<{
     isOpen: boolean;
     onClose: (newListId?: number) => void;
 }> = ({ isOpen, onClose }) => {
+    const { t } = useTranslation();
     return (
-        <Notification title="Import CSV" isOpen={isOpen} handleClose={() => onClose()}>
+        <Notification title={t('import_csv')} isOpen={isOpen} handleClose={() => onClose()}>
             {() => <ImportListNotificationContent onClose={onClose} isOpen={isOpen} />}
         </Notification>
     );
@@ -36,6 +38,7 @@ const ImportListNotificationContent: FC<{
     isOpen: boolean;
     onClose: (newListId?: number) => void;
 }> = ({ isOpen, onClose }) => {
+    const { t } = useTranslation();
     const { mutateAsync: addList, isLoading } = useMutateUserMultiSendList();
     const onImported = async (list: MultiSendList) => {
         if (isOpen) {
@@ -48,7 +51,7 @@ const ImportListNotificationContent: FC<{
         <ImportContentWrapper>
             <ImportListFileStyled isLoading={isLoading} onImported={onImported} />
             <TableLabel>
-                <Body2>Пример таблицы</Body2>
+                <Body2>{t('import_multisend_table_example')}</Body2>
             </TableLabel>
             <ImportListTable />
         </ImportContentWrapper>
