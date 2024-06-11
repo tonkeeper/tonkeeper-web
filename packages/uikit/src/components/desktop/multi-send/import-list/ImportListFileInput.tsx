@@ -10,6 +10,10 @@ import {
 } from '../../../../state/multiSend';
 import { SpinnerRing } from '../../../Icon';
 import { useEventListener } from '../../../../hooks/useEventListener';
+import { useAppContext } from '../../../../hooks/appContext';
+import { ImportFiatWarningNotification } from './ImportFiatWarningNotification';
+import { useDisclosure } from '../../../../hooks/useDisclosure';
+import { useMutateUserFiat } from '../../../../state/fiat';
 
 const ImportFileContainer = styled.div`
     width: 100%;
@@ -63,12 +67,25 @@ export const ImportListFileInput: FC<{
     className?: string;
 }> = ({ onImported, isLoading, className }) => {
     const inputId = useId();
-    const { mutateAsync, isLoading: isParsing, error } = useParseCsvListMutation();
+    const {
+        mutateAsync,
+        isLoading: isParsing,
+        error,
+        data: mutationData,
+        reset
+    } = useParseCsvListMutation();
     const [isDragProcess, setIsDragProcess] = useState(false);
     const [isDragOverZone, setIsDragOverZone] = useState(false);
     const [dropError, setDropError] = useState(false);
     const element = useRef(window.document.body);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+    const { mutateAsync: mutateFiat } = useMutateUserFiat();
+
+    const {
+        isOpen: isFiatModalOpen,
+        onClose: onFiatModalClose,
+        onOpen: onFiatModalOpen
+    } = useDisclosure();
 
     useEventListener(
         'dragenter',
@@ -105,10 +122,21 @@ export const ImportListFileInput: FC<{
         element
     );
 
-    const onSelect = async (e: ChangeEvent<HTMLInputElement>) => {
+    const { fiat } = useAppContext();
+
+    const onSelect = (e: ChangeEvent<HTMLInputElement>) => {
+        onFileUploaded(e.target.files![0]);
+    };
+
+    const onFileUploaded = async (file: File) => {
         try {
-            const result = await mutateAsync(e.target.files![0]);
-            onImported(result);
+            const result = await mutateAsync(file);
+
+            if (result.selectedFiat && result.selectedFiat !== fiat) {
+                onFiatModalOpen();
+            } else {
+                onImported(result.list);
+            }
         } catch (err) {
             console.error(err);
         }
@@ -120,15 +148,7 @@ export const ImportListFileInput: FC<{
             : new ListImportError('Unknown error', 'unknown')
         : undefined;
 
-    if (isLoading || isParsing) {
-        return (
-            <ImportFileContainer className={className}>
-                <SpinnerRingStyled />
-            </ImportFileContainer>
-        );
-    }
-
-    const onDrop = async (e: DragEvent<HTMLDivElement>) => {
+    const onDrop = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragProcess(false);
         setIsDragOverZone(false);
@@ -138,12 +158,7 @@ export const ImportListFileInput: FC<{
             return;
         }
 
-        try {
-            const result = await mutateAsync(file);
-            onImported(result);
-        } catch (err) {
-            console.error(err);
-        }
+        onFileUploaded(file);
     };
 
     if (isDragProcess) {
@@ -161,18 +176,39 @@ export const ImportListFileInput: FC<{
         );
     }
 
+    const handleCloseFiatModal = async (confirmed?: boolean) => {
+        onFiatModalClose();
+        if (confirmed) {
+            await mutateFiat(mutationData!.selectedFiat!);
+            onImported(mutationData!.list);
+        } else {
+            reset();
+        }
+    };
+
     return (
         <ImportFileContainer className={className}>
-            <ImportLabel>Import .CSV</ImportLabel>
-            <ImportDescription>
-                Drag and drop the file or click the button below to upload it.
-                Please review the example table structure below to avoid errors.
-            </ImportDescription>
-            <Button primary size="small" as="label" htmlFor={inputId}>
-                Upload file
-            </Button>
-            <FileInput id={inputId} type="file" accept=".csv" onChange={onSelect} />
-            {importError && <ErrorContainer>{importError.message}</ErrorContainer>}
+            {isLoading || isParsing || isFiatModalOpen ? (
+                <SpinnerRingStyled />
+            ) : (
+                <>
+                    <ImportLabel>Import .CSV</ImportLabel>
+                    <ImportDescription>
+                        Drag and drop the file or click the button below to upload it.
+                        Please review the example table structure below to avoid errors.
+                    </ImportDescription>
+                    <Button primary size="small" as="label" htmlFor={inputId}>
+                        Upload file
+                    </Button>
+                    <FileInput id={inputId} type="file" accept=".csv" onChange={onSelect} />
+                    {importError && <ErrorContainer>{importError.message}</ErrorContainer>}
+                </>
+            )}
+            <ImportFiatWarningNotification
+                isOpen={isFiatModalOpen}
+                onClose={handleCloseFiatModal}
+                newFiat={mutationData?.selectedFiat}
+            />
         </ImportFileContainer>
     );
 };

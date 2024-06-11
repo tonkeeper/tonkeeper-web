@@ -191,92 +191,97 @@ export const useParseCsvListMutation = () => {
     const { data: lists } = useUserMultiSendLists();
     const receiverValidator = useMultiSendReceiverValidator();
 
-    return useMutation<MultiSendList, Error, File>(async (csv: File) => {
-        const id = Math.max(1, ...(lists || []).map(l => l.id)) + 1;
+    return useMutation<{ list: MultiSendList; selectedFiat: FiatCurrencies | null }, Error, File>(
+        async (csv: File) => {
+            const id = Math.max(1, ...(lists || []).map(l => l.id)) + 1;
 
-        let arr: string[][] = [];
-        try {
-            const textContent = await csv.text();
-            arr = csvStringToArray(textContent);
-        } catch (e) {
-            console.error(e);
-            throw new ListImportError('Cannot parse CSV', 'invalid_csv');
-        }
+            let arr: string[][] = [];
+            try {
+                const textContent = await csv.text();
+                arr = csvStringToArray(textContent);
+            } catch (e) {
+                console.error(e);
+                throw new ListImportError('Cannot parse CSV', 'invalid_csv');
+            }
 
-        if (arr.length === 0) {
-            throw new ListImportError('List is empty', 'list_empty');
-        }
+            if (arr.length === 0) {
+                throw new ListImportError('List is empty', 'list_empty');
+            }
 
-        const parsedList = arr.map(parseTableRow);
+            const parsedList = arr.map(parseTableRow);
 
-        const fiat = getUsedFiat(parsedList);
-        console.log(fiat); // TODO if fiat differs form selected in the app one
-        const crypto = getUsedCryptoAsset(parsedList);
+            const fiat = getUsedFiat(parsedList);
+            const crypto = getUsedCryptoAsset(parsedList);
 
-        let token = TON_ASSET;
-        if (crypto && !isTon(crypto)) {
-            const response = await new JettonsApi(api.tonApiV2).getJettonInfo({
-                accountId: crypto.toRawString()
-            });
+            let token = TON_ASSET;
+            if (crypto && !isTon(crypto)) {
+                const response = await new JettonsApi(api.tonApiV2).getJettonInfo({
+                    accountId: crypto.toRawString()
+                });
 
-            token = {
-                address: crypto,
-                image: response.metadata.image,
-                blockchain: BLOCKCHAIN_NAME.TON,
-                name: response.metadata.name,
-                symbol: response.metadata.symbol,
-                decimals: Number(response.metadata.decimals),
-                id: packAssetId(BLOCKCHAIN_NAME.TON, crypto)
+                token = {
+                    address: crypto,
+                    image: response.metadata.image,
+                    blockchain: BLOCKCHAIN_NAME.TON,
+                    name: response.metadata.name,
+                    symbol: response.metadata.symbol,
+                    decimals: Number(response.metadata.decimals),
+                    id: packAssetId(BLOCKCHAIN_NAME.TON, crypto)
+                };
+            }
+
+            const receivers = await Promise.allSettled(
+                parsedList.map(item =>
+                    receiverValidator(item[0]).then(res => {
+                        if (res && typeof res === 'object' && 'success' in res && res.success) {
+                            return res.result;
+                        }
+
+                        throw new ListImportError(
+                            res && typeof res === 'object' && 'message' in res && res.message
+                                ? res.message
+                                : 'Invalid receiver',
+                            'invalid_receiver'
+                        );
+                    })
+                )
+            );
+
+            const wrongReceiverIndex = receivers.findIndex(r => r.status === 'rejected');
+            if (wrongReceiverIndex !== -1) {
+                throw new ListImportError('Invalid receiver', 'invalid_receiver', {
+                    line: wrongReceiverIndex,
+                    column: 0
+                });
+            }
+
+            let name = csv.name || `List ${id}`;
+            const originalName = name;
+            let nameI = 1;
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
+            while (lists?.some(l => l.name === name)) {
+                name = `${originalName} (${nameI})`;
+                nameI = nameI + 1;
+            }
+
+            return {
+                list: {
+                    id,
+                    name,
+                    token,
+                    form: {
+                        rows: parsedList.map((item, index) => ({
+                            receiver: (receivers[index] as PromiseFulfilledResult<TonRecipient>)
+                                .value,
+                            amount: { inFiat: item[2].type === 'fiat', value: item[1] },
+                            comment: item[3]
+                        }))
+                    }
+                },
+                selectedFiat: fiat
             };
         }
-
-        const receivers = await Promise.allSettled(
-            parsedList.map(item =>
-                receiverValidator(item[0]).then(res => {
-                    if (res && typeof res === 'object' && 'success' in res && res.success) {
-                        return res.result;
-                    }
-
-                    throw new ListImportError(
-                        res && typeof res === 'object' && 'message' in res && res.message
-                            ? res.message
-                            : 'Invalid receiver',
-                        'invalid_receiver'
-                    );
-                })
-            )
-        );
-
-        const wrongReceiverIndex = receivers.findIndex(r => r.status === 'rejected');
-        if (wrongReceiverIndex !== -1) {
-            throw new ListImportError('Invalid receiver', 'invalid_receiver', {
-                line: wrongReceiverIndex,
-                column: 0
-            });
-        }
-
-        let name = csv.name || `List ${id}`;
-        const originalName = name;
-        let nameI = 1;
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        while (lists?.some(l => l.name === name)) {
-            name = `${originalName} (${nameI})`;
-            nameI = nameI + 1;
-        }
-
-        return {
-            id,
-            name,
-            token,
-            form: {
-                rows: parsedList.map((item, index) => ({
-                    receiver: (receivers[index] as PromiseFulfilledResult<TonRecipient>).value,
-                    amount: { inFiat: item[2].type === 'fiat', value: item[1] },
-                    comment: item[3]
-                }))
-            }
-        };
-    });
+    );
 };
 
 const parseTableRow = (row: string[], rowIndex: number) => {
