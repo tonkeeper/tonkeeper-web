@@ -192,7 +192,7 @@ export const MultiSendTable: FC<{
             !item.receiver
                 ? ''
                 : 'dns' in item.receiver
-                ? item.receiver.dns.account.name
+                ? item.receiver.dns.account.name || item.receiver.address
                 : item.receiver.address,
             item.amount?.value || '0',
             item.amount?.inFiat
