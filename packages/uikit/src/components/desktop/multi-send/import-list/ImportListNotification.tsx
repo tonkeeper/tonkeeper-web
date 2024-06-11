@@ -13,7 +13,7 @@ export const ImportListNotification: FC<{
 }> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
     return (
-        <Notification title={t('import_csv')} isOpen={isOpen} handleClose={() => onClose()}>
+        <Notification title={t('import_dot_csv')} isOpen={isOpen} handleClose={() => onClose()}>
             {() => <ImportListNotificationContent onClose={onClose} isOpen={isOpen} />}
         </Notification>
     );

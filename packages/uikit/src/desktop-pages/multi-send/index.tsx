@@ -157,7 +157,7 @@ export const DesktopMultiSendPage: FC = () => {
                                         </IconContainerStyled>
                                     </ListItemStyled>
                                     <ListItemStyled onClick={onOpen}>
-                                        <Body2>Import CSV</Body2>
+                                        <Body2>{t('import_csv')}</Body2>
                                         <IconContainerStyled>
                                             <ChevronRightIcon />
                                         </IconContainerStyled>

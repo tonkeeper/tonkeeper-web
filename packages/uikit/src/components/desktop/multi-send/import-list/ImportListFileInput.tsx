@@ -213,7 +213,7 @@ export const ImportListFileInput: FC<{
                 <SpinnerRingStyled />
             ) : (
                 <>
-                    <ImportLabel>{t('import_csv')}</ImportLabel>
+                    <ImportLabel>{t('import_dot_csv')}</ImportLabel>
                     <ImportDescription>{t('import_csv_description')}</ImportDescription>
                     <Button primary size="small" as="label" htmlFor={inputId}>
                         {t('upload_file')}

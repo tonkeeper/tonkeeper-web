@@ -153,6 +153,7 @@ export const MultiSendTable: FC<{
     list: MultiSendList;
     onBack: () => void;
 }> = ({ className, list, onBack }) => {
+    const { t } = useTranslation();
     const [asset, setAsset] = useState<TonAsset>(list.token);
     const methods = useForm<MultiSendForm>({
         defaultValues: {
@@ -227,12 +228,12 @@ export const MultiSendTable: FC<{
                     download={list.name + '.csv'}
                 >
                     <ExportIcon />
-                    Export .CSV
+                    {t('export_dot_csv')}
                 </Button>
                 {canImport && (
                     <Button secondary onClick={onImportOpen}>
                         <DocIcon color="buttonSecondaryForeground" />
-                        Import .CSV
+                        {t('import_dot_csv')}
                     </Button>
                 )}
             </FormHeadingWrapper>
