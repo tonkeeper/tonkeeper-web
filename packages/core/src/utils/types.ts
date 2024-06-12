@@ -7,3 +7,7 @@ export function assertUnreachable(_: never): never {
 export type NonNullableFields<T> = {
     [P in keyof T]: NonNullable<T[P]>;
 };
+
+export function notNullish<T>(x: T | null | undefined): x is T {
+    return x !== null && x !== undefined;
+}

@@ -9,13 +9,15 @@ import { useRate } from '../../state/rates';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { SkeletonText } from '../../components/shared/Skeleton';
 import { DesktopMultiSendFormPage } from './MultiSendFormPage';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { getWillBeMultiSendValue } from '../../components/desktop/multi-send/utils';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { useAssetWeiBalance } from '../../state/home';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useTranslation } from '../../hooks/translation';
+import { useDisclosure } from '../../hooks/useDisclosure';
+import { ImportListNotification } from '../../components/desktop/multi-send/import-list/ImportListNotification';
 
 const PageWrapper = styled.div`
     overflow: auto;
@@ -103,6 +105,7 @@ export const DesktopMultiSendPage: FC = () => {
     const { t } = useTranslation();
     const { data: lists } = useUserMultiSendLists();
     const navigate = useNavigate();
+    const { isOpen, onClose, onOpen } = useDisclosure();
 
     useEffect(() => {
         if (lists && !lists.length) {
@@ -115,6 +118,13 @@ export const DesktopMultiSendPage: FC = () => {
         navigate('./list/' + id);
     };
 
+    const onImportList = (newListId?: number) => {
+        onClose();
+        if (newListId !== undefined) {
+            navigate('./list/' + newListId);
+        }
+    };
+
     if (!lists) {
         return (
             <LoadingWrapper>
@@ -125,16 +135,7 @@ export const DesktopMultiSendPage: FC = () => {
 
     return (
         <Routes>
-            <Route
-                path="/list/:id"
-                element={
-                    <ErrorBoundary
-                        fallbackRender={fallbackRenderOver('Failed to display multi-send page')}
-                    >
-                        <DesktopMultiSendFormPage />
-                    </ErrorBoundary>
-                }
-            />
+            <Route path="/list/:id" element={<ListRouteElement />} />
             <Route
                 path="*"
                 element={
@@ -155,6 +156,12 @@ export const DesktopMultiSendPage: FC = () => {
                                             <ChevronRightIcon />
                                         </IconContainerStyled>
                                     </ListItemStyled>
+                                    <ListItemStyled onClick={onOpen}>
+                                        <Body2>{t('import_csv')}</Body2>
+                                        <IconContainerStyled>
+                                            <ChevronRightIcon />
+                                        </IconContainerStyled>
+                                    </ListItemStyled>
                                     {lists.map(list => (
                                         <MultiSendListElement
                                             list={list}
@@ -165,11 +172,25 @@ export const DesktopMultiSendPage: FC = () => {
                                     ))}
                                 </ListBlockStyled>
                             </PageBodyWrapper>
+                            <ImportListNotification isOpen={isOpen} onClose={onImportList} />
                         </PageWrapper>
                     </ErrorBoundary>
                 }
             ></Route>
         </Routes>
+    );
+};
+
+const ListRouteElement = () => {
+    const { id } = useParams();
+
+    return (
+        <ErrorBoundary
+            fallbackRender={fallbackRenderOver('Failed to display multi-send page')}
+            key={id}
+        >
+            <DesktopMultiSendFormPage />
+        </ErrorBoundary>
     );
 };
 
