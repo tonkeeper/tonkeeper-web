@@ -40,7 +40,7 @@ jobs:
                   name: Extension Chrome
                   retention-days: 10
                   path: |
-                      ${{ github.workspace }}/apps/extension/chrome
+                      ${{ github.workspace }}/apps/extension/dist/chrome
 
             - name: Upload Extension Firefox to artifacts
               uses: actions/upload-artifact@v4
@@ -48,4 +48,4 @@ jobs:
                   name: Extension Firefox
                   retention-days: 10
                   path: |
-                      ${{ github.workspace }}/apps/extension/firefox
+                      ${{ github.workspace }}/apps/extension/dist/firefox
