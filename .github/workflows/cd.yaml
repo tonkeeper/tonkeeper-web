@@ -165,19 +165,14 @@ jobs:
               with:
                   cmd: build:extension
 
-            - name: Get the version
-              id: get_version
-              run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
-
             - name: Upload Tonkeeper Chrome Extension to release
               uses: svenstaro/upload-release-action@v2
               with:
                   repo_token: ${{ secrets.GH_TOKEN }}
                   file:
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{
-                      steps.get_version.outputs.VERSION }}.zip
-                  asset_name:
-                      Tonkeeper Chrome Extension ${{ steps.get_version.outputs.VERSION }}.zip
+                      github.ref_name }}.zip
+                  asset_name: Tonkeeper Chrome Extension ${{ github.ref_name }}.zip
                   tag: ${{ github.ref }}
                   overwrite: true
 
@@ -187,8 +182,7 @@ jobs:
                   repo_token: ${{ secrets.GH_TOKEN }}
                   file:
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_firefox_${{
-                      steps.get_version.outputs.VERSION }}.zip
-                  asset_name:
-                      Tonkeeper Firefox Extension ${{ steps.get_version.outputs.VERSION }}.zip
+                      github.ref_name }}.zip
+                  asset_name: Tonkeeper Firefox Extension ${{ github.ref_name }}.zip
                   tag: ${{ github.ref }}
                   overwrite: true
