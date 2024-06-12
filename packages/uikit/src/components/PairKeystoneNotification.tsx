@@ -54,7 +54,10 @@ export const SignerContent: FC<{
                 openScanner();
             }}
         >
-            <HeaderBlock title={t('import_signer')} description={t('signer_scan_tx_description')} />
+            <HeaderBlock
+                title={t('keystone_sign_title')}
+                description={t('keystone_sign_subtitle')}
+            />
             <Background extension={extension} margin>
                 <KeystoneAnimatedQRCode data={ur} />
             </Background>
