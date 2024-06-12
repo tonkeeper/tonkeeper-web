@@ -1,34 +1,37 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Address } from '@ton/core';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { useAppSdk } from '../hooks/appSdk';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import {
-    isTon,
     TonAsset,
+    isTon,
     tonAssetAddressFromString,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import { csvStringToArray } from '@tonkeeper/core/dist/service/parserService';
-import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
-import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { Address } from '@ton/core';
-import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { DNSApi, JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useAppContext } from '../hooks/appContext';
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
+import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { useCallback } from 'react';
 import { ErrorOption } from 'react-hook-form';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { seeIfInvalidDns } from '../components/transfer/RecipientView';
+import { replaceSingleDecimalSeparator } from '../components/transfer/amountView/AmountViewUI';
+import { useAppContext } from '../hooks/appContext';
+import { useAppSdk } from '../hooks/appSdk';
+
+export type MultiSendRow = {
+    receiver: TonRecipient | null;
+    amount: { inFiat: boolean; value: string } | null;
+    comment?: string;
+};
 
 export type MultiSendForm = {
-    rows: {
-        receiver: TonRecipient | null;
-        amount: { inFiat: boolean; value: string } | null;
-        comment?: string;
-    }[];
+    rows: MultiSendRow[];
 };
 
 export interface MultiSendList {
@@ -394,4 +397,70 @@ const getUsedCryptoAsset = (parsedList: ReturnType<typeof parseTableRow>[]) => {
     }
 
     return tonAssetAddressFromString([...cryptoValues.values()][0]!);
+};
+
+const validatePastedRow = async (
+    row: string[],
+    receiverValidator: (val: string) => Promise<
+        | ErrorOption
+        | undefined
+        | null
+        | {
+              success: true;
+              result: TonRecipient;
+          }
+    >
+): Promise<MultiSendRow> => {
+    if (row.length < 2 || row.length > 3) {
+        throw new ListImportError('Invalid input', 'invalid_row_length');
+    }
+
+    let receiver: TonRecipient;
+
+    const res = await receiverValidator(row[0]);
+    if (res && typeof res === 'object' && 'success' in res && res.success) {
+        receiver = res.result;
+    } else {
+        throw new ListImportError(
+            res && typeof res === 'object' && 'message' in res && res.message
+                ? res.message
+                : 'Invalid receiver',
+            'invalid_receiver'
+        );
+    }
+
+    return {
+        receiver,
+        amount: { inFiat: false, value: replaceSingleDecimalSeparator(row[1]) },
+        comment: row[2]
+    };
+};
+
+export const getPastedTable = async (
+    clipText: string,
+    receiverValidator: (val: string) => Promise<
+        | ErrorOption
+        | undefined
+        | null
+        | {
+              success: true;
+              result: TonRecipient;
+          }
+    >
+): Promise<MultiSendRow[] | null> => {
+    if (clipText.trim() == '') return null;
+
+    const clipRows = clipText.split('\n');
+
+    const rows = clipRows.map(row => row.split('\t'));
+
+    const receivers = await Promise.allSettled(
+        rows.map(item => validatePastedRow(item, receiverValidator))
+    );
+
+    if (receivers.some(r => r.status === 'rejected')) {
+        return null;
+    }
+
+    return (receivers as PromiseFulfilledResult<MultiSendRow>[]).map(item => item.value);
 };
