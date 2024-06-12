@@ -172,7 +172,7 @@ jobs:
                   file:
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{
                       github.ref_name }}.zip
-                  asset_name: Tonkeeper Chrome Extension ${{ github.ref_name }}.zip
+                  asset_name: Tonkeeper_Chrome_Extension_${{ github.ref_name }}.zip
                   tag: ${{ github.ref }}
                   overwrite: true
 
@@ -183,6 +183,6 @@ jobs:
                   file:
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_firefox_${{
                       github.ref_name }}.zip
-                  asset_name: Tonkeeper Firefox Extension ${{ github.ref_name }}.zip
+                  asset_name: Tonkeeper_Firefox_Extension_${{ github.ref_name }}.zip
                   tag: ${{ github.ref }}
                   overwrite: true
