@@ -168,7 +168,7 @@ jobs:
                   wranglerVersion: '3'
 
     extension-build:
-        name: web-build
+        name: extension-build
         runs-on: ubuntu-latest
         timeout-minutes: 10
 
