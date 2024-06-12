@@ -1,19 +1,29 @@
-import React, { FC, useEffect, useState } from 'react';
+import { Address } from '@ton/core';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { TonAsset, isTon } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { DnsRecipient, TonRecipient } from '@tonkeeper/core/dist/entries/send';
-import styled, { css } from 'styled-components';
-import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
-import { AmountInput } from './AmountInput';
-import { CommentInput } from './CommentInput';
-import { ReceiverInput } from './ReceiverInput';
-import { Button } from '../../fields/Button';
-import { Body2, Body3 } from '../../Text';
-import { IconButton } from '../../fields/IconButton';
-import { CloseIcon, DocIcon, ExportIcon } from '../../Icon';
-import { ControllerRenderProps } from 'react-hook-form/dist/types/controller';
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { arrayToCsvString } from '@tonkeeper/core/dist/service/parserService';
+import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/transfer/multiSendService';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
+import { FC, useEffect, useState } from 'react';
+import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
+import { ControllerRenderProps } from 'react-hook-form/dist/types/controller';
+import { Link, useBlocker, useNavigate } from 'react-router-dom';
+import styled, { css } from 'styled-components';
+import { useAppContext, useWalletContext } from '../../../hooks/appContext';
 import { formatter } from '../../../hooks/balance';
-import { useRate } from '../../../state/rates';
-import { SkeletonText } from '../../shared/Skeleton';
+import { useTranslation } from '../../../hooks/translation';
+import {
+    AsyncValidatorsStateProvider,
+    useAsyncValidationState
+} from '../../../hooks/useAsyncValidator';
+import { useDisclosure } from '../../../hooks/useDisclosure';
+import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
+import { useEnableW5, useEnableW5Mutation } from '../../../state/experemental';
+import { useAssets } from '../../../state/home';
+import { useIsActiveWalletLedger } from '../../../state/ledger';
 import {
     MultiSendForm,
     MultiSendList,
@@ -21,35 +31,25 @@ import {
     useMutateUserMultiSendList,
     useUserMultiSendLists
 } from '../../../state/multiSend';
-import { SaveListNotification } from './SaveListNotification';
-import { useDisclosure } from '../../../hooks/useDisclosure';
-import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { EditListNotification } from './EditListNotification';
-import { DeleteListNotification } from './DeleteListNotification';
-import { UpdateListNotification } from './UpdateListNotification';
-import { Link, useBlocker, useNavigate } from 'react-router-dom';
-import { AssetSelect } from './AssetSelect';
-import { useAssets } from '../../../state/home';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { Address } from '@ton/core';
-import { MultiSendConfirmNotification } from './MultiSendConfirmNotification';
-import { getWillBeMultiSendValue } from './utils';
-import {
-    AsyncValidatorsStateProvider,
-    useAsyncValidationState
-} from '../../../hooks/useAsyncValidator';
-import { useAppContext, useWalletContext } from '../../../hooks/appContext';
-import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/transfer/multiSendService';
-import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
-import { useEnableW5, useEnableW5Mutation } from '../../../state/experemental';
 import { useProState } from '../../../state/pro';
-import { useTranslation } from '../../../hooks/translation';
-import { useIsActiveWalletLedger } from '../../../state/ledger';
+import { useRate } from '../../../state/rates';
+import { CloseIcon, DocIcon, ExportIcon } from '../../Icon';
+import { Body2, Body3 } from '../../Text';
+import { Button } from '../../fields/Button';
+import { IconButton } from '../../fields/IconButton';
+import { SkeletonText } from '../../shared/Skeleton';
 import { ProFeaturesNotification } from '../pro/ProFeaturesNotification';
-import { arrayToCsvString } from '@tonkeeper/core/dist/service/parserService';
+import { AmountInput } from './AmountInput';
+import { AssetSelect } from './AssetSelect';
+import { CommentInput } from './CommentInput';
+import { DeleteListNotification } from './DeleteListNotification';
+import { EditListNotification } from './EditListNotification';
+import { MultiSendConfirmNotification } from './MultiSendConfirmNotification';
+import { ReceiverInput } from './ReceiverInput';
+import { SaveListNotification } from './SaveListNotification';
+import { UpdateListNotification } from './UpdateListNotification';
 import { ImportListNotification } from './import-list/ImportListNotification';
+import { getWillBeMultiSendValue } from './utils';
 
 const FormHeadingWrapper = styled.div`
     display: flex;
@@ -613,6 +613,7 @@ const FormRow: FC<{ index: number; asset: TonAsset }> = ({ index, asset }) => {
                             >
                         }
                         fieldState={fieldState}
+                        index={index}
                     />
                 )}
                 name={`rows.${index}.receiver`}
