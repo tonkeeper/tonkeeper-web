@@ -20,6 +20,7 @@ import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { useCallback } from 'react';
 import { ErrorOption } from 'react-hook-form';
 import { seeIfInvalidDns } from '../components/transfer/RecipientView';
+import { replaceSingleDecimalSeparator } from '../components/transfer/amountView/AmountViewUI';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 
@@ -430,7 +431,7 @@ const validatePastedRow = async (
 
     return {
         receiver,
-        amount: { inFiat: false, value: row[1] },
+        amount: { inFiat: false, value: replaceSingleDecimalSeparator(row[1]) },
         comment: row[2]
     };
 };

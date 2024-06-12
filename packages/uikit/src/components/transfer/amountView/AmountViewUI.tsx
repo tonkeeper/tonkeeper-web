@@ -182,6 +182,17 @@ export const replaceTypedDecimalSeparator = (value: string): string => {
     return value;
 };
 
+export const replaceSingleDecimalSeparator = (value: string): string => {
+    const notSeparator = getNotDecimalSeparator();
+    if (notSeparator) {
+        const separators = value.matchAll(new RegExp(`\\${notSeparator}`, 'g'));
+        if (separators && [...separators].length === 1) {
+            return value.replace(notSeparator, getDecimalSeparator());
+        }
+    }
+    return value;
+};
+
 export const seeIfValueValid = (value: string, decimals: number) => {
     if (value.length > 21) return false;
     if (value !== '') {
