@@ -166,10 +166,14 @@ jobs:
                   cmd: build:extension
 
             - name: Upload Tonkeeper Extension to release
-              uses: AButler/upload-release-assets@v3.0
+              uses: softprops/action-gh-release@v2
               with:
-                  files:
-                      '${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{
-                      github.ref_name }}.zip;${{ github.workspace
-                      }}/apps/extension/dist/tonkeeper_firefox_${{ github.ref_name }}.zip'
-                  repo-token: ${{ secrets.GH_TOKEN }}
+                  name: 'Tonkeeper ${{ github.ref_name }}'
+                  draft: true
+                  generate_release_notes: true
+                  token: ${{ secrets.GH_TOKEN }}
+                  files: |
+                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{
+                          github.ref_name }}.zip
+                      ${{ github.workspace
+                          }}/apps/extension/dist/tonkeeper_firefox_${{ github.ref_name }}.zip
