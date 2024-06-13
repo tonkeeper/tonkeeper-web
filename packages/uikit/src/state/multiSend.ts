@@ -15,6 +15,7 @@ import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import { csvStringToArray } from '@tonkeeper/core/dist/service/parserService';
 import { DNSApi, JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { useCallback } from 'react';
 import { ErrorOption } from 'react-hook-form';
