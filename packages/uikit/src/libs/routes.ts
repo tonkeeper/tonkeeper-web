@@ -6,6 +6,7 @@ export enum AppRoute {
     browser = '/browser',
     activity = '/activity',
     purchases = '/purchases',
+    dns = '/dns',
     coins = '/coins',
     signer = '/signer',
     publish = '/publish',

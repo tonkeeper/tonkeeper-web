@@ -32,9 +32,12 @@ const Icon = styled.span`
     margin-left: 4px;
 `;
 
-const TonDnsRoot = '0:b774d95eb20543f186c06b371ab88ad704f7e256130caf96189368a7d0cb6ccf';
-const TelegramUsernames = '0:80d78a35f955a14b679faa887ff4cd5bfc0f43b4a4eea2a7e6927f3701b273c2';
-const TelegramNumbers = '0:0e41dc1dc3c9067ed24248580e12b3359818d83dee0304fabcf80845eafafdb2';
+export const TonDnsRootCollectionAddress =
+    '0:b774d95eb20543f186c06b371ab88ad704f7e256130caf96189368a7d0cb6ccf';
+export const TelegramUsernamesCollectionAddress =
+    '0:80d78a35f955a14b679faa887ff4cd5bfc0f43b4a4eea2a7e6927f3701b273c2';
+export const TelegramNumbersCollectionAddress =
+    '0:0e41dc1dc3c9067ed24248580e12b3359818d83dee0304fabcf80845eafafdb2';
 
 const Title = styled(H2)`
     word-break: break-word;
@@ -68,11 +71,11 @@ export const NftPreview: FC<{
 
     const itemKind = useMemo(() => {
         switch (nftItem.collection?.address) {
-            case TonDnsRoot:
+            case TonDnsRootCollectionAddress:
                 return 'ton.dns';
-            case TelegramUsernames:
+            case TelegramUsernamesCollectionAddress:
                 return 'telegram.name';
-            case TelegramNumbers:
+            case TelegramNumbersCollectionAddress:
                 return 'telegram.number';
             default:
                 return 'token';

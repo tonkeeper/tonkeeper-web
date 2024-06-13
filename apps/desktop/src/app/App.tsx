@@ -34,7 +34,6 @@ import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
 import { NotcoinPage } from '@tonkeeper/uikit/dist/desktop-pages/notcoin/NotcoinPage';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
-import { DesktopPurchases } from '@tonkeeper/uikit/dist/desktop-pages/purchases/DesktopPurchases';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
@@ -78,6 +77,8 @@ import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
+import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
+import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -407,7 +408,11 @@ const WalletContent = () => {
                     <Routes>
                         <Route element={<OldAppRouting />}>
                             <Route path={AppRoute.activity} element={<DesktopHistoryPage />} />
-                            <Route path={any(AppRoute.purchases)} element={<DesktopPurchases />} />
+                            <Route
+                                path={any(AppRoute.purchases)}
+                                element={<DesktopCollectables />}
+                            />
+                            <Route path={any(AppRoute.dns)} element={<DesktopDns />} />
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<DesktopCoinPage />} />
                             </Route>

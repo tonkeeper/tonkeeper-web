@@ -11,6 +11,12 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
+import { useMemo } from 'react';
+import {
+    TelegramNumbersCollectionAddress,
+    TelegramUsernamesCollectionAddress,
+    TonDnsRootCollectionAddress
+} from '../../components/nft/NftView';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -62,17 +68,32 @@ const LinkStyled = styled(Link)`
     margin: 0 auto;
 `;
 
-export const DesktopPurchases = () => {
+const collectionsToFilter = [
+    TonDnsRootCollectionAddress,
+    TelegramNumbersCollectionAddress,
+    TelegramUsernamesCollectionAddress
+];
+
+export const DesktopDns = () => {
     const { data: nfts } = useWalletNftList();
     const { t } = useTranslation();
 
     const { ref: scrollRef, closeTop } = useIsScrolled();
 
-    if (!nfts) {
+    const filteredNft = useMemo(
+        () =>
+            nfts?.filter(
+                nft =>
+                    nft.collection?.address && collectionsToFilter.includes(nft.collection.address)
+            ),
+        [nfts]
+    );
+
+    if (!filteredNft) {
         return null;
     }
 
-    if (!nfts.length) {
+    if (!filteredNft.length) {
         return (
             <NFTEmptyPage>
                 <NFTEmptyContainer>
@@ -91,7 +112,7 @@ export const DesktopPurchases = () => {
             <DesktopViewHeader borderBottom={!closeTop}>
                 <Label2>{t('page_header_purchases')}</Label2>
             </DesktopViewHeader>
-            <NFTPageBody>{nfts && <NftsListStyled nfts={nfts} />}</NFTPageBody>
+            <NFTPageBody>{filteredNft && <NftsListStyled nfts={filteredNft} />}</NFTPageBody>
         </DesktopViewPageLayout>
     );
 };
