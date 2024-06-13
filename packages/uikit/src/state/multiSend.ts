@@ -15,12 +15,11 @@ import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import { csvStringToArray } from '@tonkeeper/core/dist/service/parserService';
 import { DNSApi, JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
-import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
+import { formatSendValue, isNumeric } from '@tonkeeper/core/dist/utils/send';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { useCallback } from 'react';
 import { ErrorOption } from 'react-hook-form';
 import { seeIfInvalidDns } from '../components/transfer/RecipientView';
-import { replaceSingleDecimalSeparator } from '../components/transfer/amountView/AmountViewUI';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 
@@ -320,17 +319,10 @@ const parseTableRow = (row: string[], rowIndex: number) => {
 };
 
 const parseAmount = (val: string) => {
-    if (!/^[0-9 ]+([\.,][0-9]+)?$/.test(val)) {
+    if (!isNumeric(val)) {
         throw new Error('Not a valid number');
     }
-
-    val = val.replace(',', '.').replaceAll(' ', '');
-    const number = parseFloat(val);
-    if (!isFinite(number)) {
-        throw new Error('Not a valid number');
-    }
-
-    return val.replace('.', getDecimalSeparator());
+    return formatSendValue(val);
 };
 
 const parseAsset = (val: string) => {
@@ -415,6 +407,8 @@ const validatePastedRow = async (
         throw new ListImportError('Invalid input', 'invalid_row_length');
     }
 
+    const amount = parseAmount(row[1]);
+
     let receiver: TonRecipient;
 
     const res = await receiverValidator(row[0]);
@@ -431,7 +425,7 @@ const validatePastedRow = async (
 
     return {
         receiver,
-        amount: { inFiat: false, value: replaceSingleDecimalSeparator(row[1]) },
+        amount: { inFiat: false, value: amount },
         comment: row[2]
     };
 };
