@@ -15,7 +15,6 @@ import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import { csvStringToArray } from '@tonkeeper/core/dist/service/parserService';
 import { DNSApi, JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
-import { formatSendValue, isNumeric } from '@tonkeeper/core/dist/utils/send';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { useCallback } from 'react';
 import { ErrorOption } from 'react-hook-form';
@@ -319,10 +318,17 @@ const parseTableRow = (row: string[], rowIndex: number) => {
 };
 
 const parseAmount = (val: string) => {
-    if (!isNumeric(val)) {
+    if (!/^[0-9 ]+([\.,][0-9]+)?$/.test(val)) {
         throw new Error('Not a valid number');
     }
-    return formatSendValue(val);
+
+    val = val.replace(',', '.').replaceAll(' ', '');
+    const number = parseFloat(val);
+    if (!isFinite(number)) {
+        throw new Error('Not a valid number');
+    }
+
+    return val.replace('.', getDecimalSeparator());
 };
 
 const parseAsset = (val: string) => {
