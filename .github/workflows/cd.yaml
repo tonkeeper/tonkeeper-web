@@ -166,25 +166,19 @@ jobs:
                   cmd: build:extension
 
             - name: Upload Tonkeeper Chrome Extension to release
-              uses: svenstaro/upload-release-action@v2
+              uses: AButler/upload-release-assets@v3.0
               with:
-                  repo_token: ${{ secrets.GH_TOKEN }}
-                  file:
-                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{
-                      github.ref_name }}.zip
-                  asset_name: Tonkeeper_Chrome_Extension_${{ github.ref_name }}.zip
-                  tag: ${{ github.ref }}
-                  overwrite: true
-                  draft: true
+                  files:
+                      '${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{
+                      github.ref_name }}.zip'
+                  repo-token: ${{ secrets.GH_TOKEN }}
+                  release-tag: ${{ github.ref }}
 
             - name: Upload Tonkeeper Firefox Extension to release
-              uses: svenstaro/upload-release-action@v2
+              uses: AButler/upload-release-assets@v3.0
               with:
-                  repo_token: ${{ secrets.GH_TOKEN }}
-                  file:
-                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_firefox_${{
-                      github.ref_name }}.zip
-                  asset_name: Tonkeeper_Firefox_Extension_${{ github.ref_name }}.zip
-                  tag: ${{ github.ref }}
-                  overwrite: true
-                  draft: true
+                  files:
+                      '${{ github.workspace }}/apps/extension/dist/tonkeeper_firefox_${{
+                      github.ref_name }}.zip'
+                  repo-token: ${{ secrets.GH_TOKEN }}
+                  release-tag: ${{ github.ref }}
