@@ -1,4 +1,4 @@
-name: Tonkeeper Desktop Distributives
+name: Tonkeeper Pull-Request Distributives
 on:
     workflow_dispatch:
     pull_request:
