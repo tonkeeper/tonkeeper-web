@@ -1,6 +1,9 @@
 import { UR } from '@keystonehq/keystone-sdk';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { addWalletWithCustomAuthState } from '@tonkeeper/core/dist/service/accountService';
+import {
+    addWalletWithCustomAuthState,
+    preventDuplicatedWallet
+} from '@tonkeeper/core/dist/service/accountService';
 import { walletStateFromKeystone } from '@tonkeeper/core/dist/service/walletService';
 import { useNavigate } from 'react-router-dom';
 import { useAppSdk } from '../hooks/appSdk';
@@ -15,6 +18,7 @@ export const usePairKeystoneMutation = () => {
     return useMutation<void, Error, UR>(async ur => {
         try {
             const state = await walletStateFromKeystone(ur);
+            await preventDuplicatedWallet(sdk.storage, state);
 
             await addWalletWithCustomAuthState(sdk.storage, state);
 

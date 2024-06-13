@@ -31,6 +31,7 @@
   "Delete_all_accounts_and_logout" : "Delete all accounts and logout",
   "Delete_wallet_data" : "Delete wallet data",
   "Delete_wallet_data_description" : "Wallet keys and all personal data will be erased from this device.",
+  "Delete_keystone_wallet_data_description" : "Wallet data and all personal data will be erased from this device.",
   "dns_linked_with_another_address_warn" : "The domain is not linked to your current address. Be careful with transactions to this domain.",
   "Edit_jettons" : "Edit",
   "Enable_storing_config" : "Enable storing config",
