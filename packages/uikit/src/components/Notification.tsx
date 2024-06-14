@@ -236,6 +236,10 @@ const HeaderWrapper = styled.div`
                 padding-bottom: 1rem;
             }
         `}
+
+    > *:not(:last-child) {
+        display: none;
+    }
 `;
 
 const RowTitle = styled(H3)`
@@ -549,15 +553,17 @@ export const Notification: FC<{
                                         className="dialog-content"
                                     >
                                         <HeaderWrapper ref={headerRef}>
-                                            <NotificationHeader>
-                                                <NotificationTitleRow
-                                                    handleClose={
-                                                        hideButton ? undefined : handleClose
-                                                    }
-                                                >
-                                                    {title}
-                                                </NotificationTitleRow>
-                                            </NotificationHeader>
+                                            {(title || !hideButton) && (
+                                                <NotificationHeader>
+                                                    <NotificationTitleRow
+                                                        handleClose={
+                                                            hideButton ? undefined : handleClose
+                                                        }
+                                                    >
+                                                        {title}
+                                                    </NotificationTitleRow>
+                                                </NotificationHeader>
+                                            )}
                                         </HeaderWrapper>
                                         {Child}
                                         <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
