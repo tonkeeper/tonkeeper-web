@@ -17,7 +17,6 @@ const SwapMobileNotification = () => {
                 isOpen={isOpen}
                 handleClose={() => setIsOpen(false)}
                 title={<NotificationHeader />}
-                hideButton
             >
                 {() => <NotificationContent />}
             </Notification>
