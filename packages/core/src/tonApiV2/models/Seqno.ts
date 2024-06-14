@@ -30,8 +30,8 @@ export interface Seqno {
 /**
  * Check if a given object implements the Seqno interface.
  */
-export function instanceOfSeqno(value: object): boolean {
-    if (!('seqno' in value)) return false;
+export function instanceOfSeqno(value: object): value is Seqno {
+    if (!('seqno' in value) || value['seqno'] === undefined) return false;
     return true;
 }
 

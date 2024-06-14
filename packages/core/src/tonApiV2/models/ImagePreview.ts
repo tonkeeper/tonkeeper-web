@@ -36,9 +36,9 @@ export interface ImagePreview {
 /**
  * Check if a given object implements the ImagePreview interface.
  */
-export function instanceOfImagePreview(value: object): boolean {
-    if (!('resolution' in value)) return false;
-    if (!('url' in value)) return false;
+export function instanceOfImagePreview(value: object): value is ImagePreview {
+    if (!('resolution' in value) || value['resolution'] === undefined) return false;
+    if (!('url' in value) || value['url'] === undefined) return false;
     return true;
 }
 

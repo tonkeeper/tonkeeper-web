@@ -61,12 +61,12 @@ export interface DomainBid {
 /**
  * Check if a given object implements the DomainBid interface.
  */
-export function instanceOfDomainBid(value: object): boolean {
-    if (!('success' in value)) return false;
-    if (!('value' in value)) return false;
-    if (!('txTime' in value)) return false;
-    if (!('txHash' in value)) return false;
-    if (!('bidder' in value)) return false;
+export function instanceOfDomainBid(value: object): value is DomainBid {
+    if (!('success' in value) || value['success'] === undefined) return false;
+    if (!('value' in value) || value['value'] === undefined) return false;
+    if (!('txTime' in value) || value['txTime'] === undefined) return false;
+    if (!('txHash' in value) || value['txHash'] === undefined) return false;
+    if (!('bidder' in value) || value['bidder'] === undefined) return false;
     return true;
 }
 

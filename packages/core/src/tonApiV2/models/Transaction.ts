@@ -13,30 +13,48 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
+import type { StoragePhase } from './StoragePhase';
 import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
+    StoragePhaseFromJSON,
+    StoragePhaseFromJSONTyped,
+    StoragePhaseToJSON,
+} from './StoragePhase';
 import type { AccountStatus } from './AccountStatus';
 import {
     AccountStatusFromJSON,
     AccountStatusFromJSONTyped,
     AccountStatusToJSON,
 } from './AccountStatus';
+import type { TransactionType } from './TransactionType';
+import {
+    TransactionTypeFromJSON,
+    TransactionTypeFromJSONTyped,
+    TransactionTypeToJSON,
+} from './TransactionType';
 import type { ActionPhase } from './ActionPhase';
 import {
     ActionPhaseFromJSON,
     ActionPhaseFromJSONTyped,
     ActionPhaseToJSON,
 } from './ActionPhase';
+import type { Message } from './Message';
+import {
+    MessageFromJSON,
+    MessageFromJSONTyped,
+    MessageToJSON,
+} from './Message';
 import type { BouncePhaseType } from './BouncePhaseType';
 import {
     BouncePhaseTypeFromJSON,
     BouncePhaseTypeFromJSONTyped,
     BouncePhaseTypeToJSON,
 } from './BouncePhaseType';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 import type { ComputePhase } from './ComputePhase';
 import {
     ComputePhaseFromJSON,
@@ -49,24 +67,6 @@ import {
     CreditPhaseFromJSONTyped,
     CreditPhaseToJSON,
 } from './CreditPhase';
-import type { Message } from './Message';
-import {
-    MessageFromJSON,
-    MessageFromJSONTyped,
-    MessageToJSON,
-} from './Message';
-import type { StoragePhase } from './StoragePhase';
-import {
-    StoragePhaseFromJSON,
-    StoragePhaseFromJSONTyped,
-    StoragePhaseToJSON,
-} from './StoragePhase';
-import type { TransactionType } from './TransactionType';
-import {
-    TransactionTypeFromJSON,
-    TransactionTypeFromJSONTyped,
-    TransactionTypeToJSON,
-} from './TransactionType';
 
 /**
  * 
@@ -218,28 +218,35 @@ export interface Transaction {
      * @memberof Transaction
      */
     destroyed: boolean;
+    /**
+     * hex encoded boc with raw transaction
+     * @type {string}
+     * @memberof Transaction
+     */
+    raw: string;
 }
 
 /**
  * Check if a given object implements the Transaction interface.
  */
-export function instanceOfTransaction(value: object): boolean {
-    if (!('hash' in value)) return false;
-    if (!('lt' in value)) return false;
-    if (!('account' in value)) return false;
-    if (!('success' in value)) return false;
-    if (!('utime' in value)) return false;
-    if (!('origStatus' in value)) return false;
-    if (!('endStatus' in value)) return false;
-    if (!('totalFees' in value)) return false;
-    if (!('endBalance' in value)) return false;
-    if (!('transactionType' in value)) return false;
-    if (!('stateUpdateOld' in value)) return false;
-    if (!('stateUpdateNew' in value)) return false;
-    if (!('outMsgs' in value)) return false;
-    if (!('block' in value)) return false;
-    if (!('aborted' in value)) return false;
-    if (!('destroyed' in value)) return false;
+export function instanceOfTransaction(value: object): value is Transaction {
+    if (!('hash' in value) || value['hash'] === undefined) return false;
+    if (!('lt' in value) || value['lt'] === undefined) return false;
+    if (!('account' in value) || value['account'] === undefined) return false;
+    if (!('success' in value) || value['success'] === undefined) return false;
+    if (!('utime' in value) || value['utime'] === undefined) return false;
+    if (!('origStatus' in value) || value['origStatus'] === undefined) return false;
+    if (!('endStatus' in value) || value['endStatus'] === undefined) return false;
+    if (!('totalFees' in value) || value['totalFees'] === undefined) return false;
+    if (!('endBalance' in value) || value['endBalance'] === undefined) return false;
+    if (!('transactionType' in value) || value['transactionType'] === undefined) return false;
+    if (!('stateUpdateOld' in value) || value['stateUpdateOld'] === undefined) return false;
+    if (!('stateUpdateNew' in value) || value['stateUpdateNew'] === undefined) return false;
+    if (!('outMsgs' in value) || value['outMsgs'] === undefined) return false;
+    if (!('block' in value) || value['block'] === undefined) return false;
+    if (!('aborted' in value) || value['aborted'] === undefined) return false;
+    if (!('destroyed' in value) || value['destroyed'] === undefined) return false;
+    if (!('raw' in value) || value['raw'] === undefined) return false;
     return true;
 }
 
@@ -277,6 +284,7 @@ export function TransactionFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'bouncePhase': json['bounce_phase'] == null ? undefined : BouncePhaseTypeFromJSON(json['bounce_phase']),
         'aborted': json['aborted'],
         'destroyed': json['destroyed'],
+        'raw': json['raw'],
     };
 }
 
@@ -310,6 +318,7 @@ export function TransactionToJSON(value?: Transaction | null): any {
         'bounce_phase': BouncePhaseTypeToJSON(value['bouncePhase']),
         'aborted': value['aborted'],
         'destroyed': value['destroyed'],
+        'raw': value['raw'],
     };
 }
 

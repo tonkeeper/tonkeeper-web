@@ -55,8 +55,8 @@ export interface DnsRecord {
 /**
  * Check if a given object implements the DnsRecord interface.
  */
-export function instanceOfDnsRecord(value: object): boolean {
-    if (!('sites' in value)) return false;
+export function instanceOfDnsRecord(value: object): value is DnsRecord {
+    if (!('sites' in value) || value['sites'] === undefined) return false;
     return true;
 }
 

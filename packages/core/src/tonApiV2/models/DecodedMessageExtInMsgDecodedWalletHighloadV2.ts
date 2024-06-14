@@ -49,10 +49,10 @@ export interface DecodedMessageExtInMsgDecodedWalletHighloadV2 {
 /**
  * Check if a given object implements the DecodedMessageExtInMsgDecodedWalletHighloadV2 interface.
  */
-export function instanceOfDecodedMessageExtInMsgDecodedWalletHighloadV2(value: object): boolean {
-    if (!('subwalletId' in value)) return false;
-    if (!('boundedQueryId' in value)) return false;
-    if (!('rawMessages' in value)) return false;
+export function instanceOfDecodedMessageExtInMsgDecodedWalletHighloadV2(value: object): value is DecodedMessageExtInMsgDecodedWalletHighloadV2 {
+    if (!('subwalletId' in value) || value['subwalletId'] === undefined) return false;
+    if (!('boundedQueryId' in value) || value['boundedQueryId'] === undefined) return false;
+    if (!('rawMessages' in value) || value['rawMessages'] === undefined) return false;
     return true;
 }
 

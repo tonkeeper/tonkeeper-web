@@ -49,16 +49,16 @@ export interface MethodExecutionResult {
      * @type {any}
      * @memberof MethodExecutionResult
      */
-    decoded?: any;
+    decoded?: any | null;
 }
 
 /**
  * Check if a given object implements the MethodExecutionResult interface.
  */
-export function instanceOfMethodExecutionResult(value: object): boolean {
-    if (!('success' in value)) return false;
-    if (!('exitCode' in value)) return false;
-    if (!('stack' in value)) return false;
+export function instanceOfMethodExecutionResult(value: object): value is MethodExecutionResult {
+    if (!('success' in value) || value['success'] === undefined) return false;
+    if (!('exitCode' in value) || value['exitCode'] === undefined) return false;
+    if (!('stack' in value) || value['stack'] === undefined) return false;
     return true;
 }
 

@@ -43,9 +43,9 @@ export interface BlockCurrencyCollection {
 /**
  * Check if a given object implements the BlockCurrencyCollection interface.
  */
-export function instanceOfBlockCurrencyCollection(value: object): boolean {
-    if (!('grams' in value)) return false;
-    if (!('other' in value)) return false;
+export function instanceOfBlockCurrencyCollection(value: object): value is BlockCurrencyCollection {
+    if (!('grams' in value) || value['grams'] === undefined) return false;
+    if (!('other' in value) || value['other'] === undefined) return false;
     return true;
 }
 

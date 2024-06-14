@@ -5,10 +5,11 @@ import { Network } from '../../entries/network';
 import { ActiveWalletConfig } from '../../entries/wallet';
 
 const defaultConfig: ActiveWalletConfig = {
-    pinnedHfts: [],
-    hiddenHfts: [],
+    pinnedNfts: [],
+    hiddenNfts: [],
     pinnedTokens: [],
-    hiddenTokens: []
+    hiddenTokens: [],
+    trustedNfts: []
 };
 
 export const getActiveWalletConfig = async (

@@ -67,13 +67,13 @@ export interface GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack {
 /**
  * Check if a given object implements the GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack interface.
  */
-export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack(value: object): boolean {
-    if (!('toKeyBlock' in value)) return false;
-    if (!('from' in value)) return false;
-    if (!('to' in value)) return false;
-    if (!('destProof' in value)) return false;
-    if (!('proof' in value)) return false;
-    if (!('stateProof' in value)) return false;
+export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack(value: object): value is GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack {
+    if (!('toKeyBlock' in value) || value['toKeyBlock'] === undefined) return false;
+    if (!('from' in value) || value['from'] === undefined) return false;
+    if (!('to' in value) || value['to'] === undefined) return false;
+    if (!('destProof' in value) || value['destProof'] === undefined) return false;
+    if (!('proof' in value) || value['proof'] === undefined) return false;
+    if (!('stateProof' in value) || value['stateProof'] === undefined) return false;
     return true;
 }
 

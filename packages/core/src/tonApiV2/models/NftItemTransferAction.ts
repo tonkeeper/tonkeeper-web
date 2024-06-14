@@ -13,24 +13,24 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
-import type { EncryptedComment } from './EncryptedComment';
-import {
-    EncryptedCommentFromJSON,
-    EncryptedCommentFromJSONTyped,
-    EncryptedCommentToJSON,
-} from './EncryptedComment';
 import type { Refund } from './Refund';
 import {
     RefundFromJSON,
     RefundFromJSONTyped,
     RefundToJSON,
 } from './Refund';
+import type { EncryptedComment } from './EncryptedComment';
+import {
+    EncryptedCommentFromJSON,
+    EncryptedCommentFromJSONTyped,
+    EncryptedCommentToJSON,
+} from './EncryptedComment';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -85,8 +85,8 @@ export interface NftItemTransferAction {
 /**
  * Check if a given object implements the NftItemTransferAction interface.
  */
-export function instanceOfNftItemTransferAction(value: object): boolean {
-    if (!('nft' in value)) return false;
+export function instanceOfNftItemTransferAction(value: object): value is NftItemTransferAction {
+    if (!('nft' in value) || value['nft'] === undefined) return false;
     return true;
 }
 

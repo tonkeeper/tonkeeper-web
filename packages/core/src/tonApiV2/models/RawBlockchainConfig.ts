@@ -30,8 +30,8 @@ export interface RawBlockchainConfig {
 /**
  * Check if a given object implements the RawBlockchainConfig interface.
  */
-export function instanceOfRawBlockchainConfig(value: object): boolean {
-    if (!('config' in value)) return false;
+export function instanceOfRawBlockchainConfig(value: object): value is RawBlockchainConfig {
+    if (!('config' in value) || value['config'] === undefined) return false;
     return true;
 }
 

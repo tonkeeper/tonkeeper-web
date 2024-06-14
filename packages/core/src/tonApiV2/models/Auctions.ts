@@ -43,9 +43,9 @@ export interface Auctions {
 /**
  * Check if a given object implements the Auctions interface.
  */
-export function instanceOfAuctions(value: object): boolean {
-    if (!('data' in value)) return false;
-    if (!('total' in value)) return false;
+export function instanceOfAuctions(value: object): value is Auctions {
+    if (!('data' in value) || value['data'] === undefined) return false;
+    if (!('total' in value) || value['total'] === undefined) return false;
     return true;
 }
 

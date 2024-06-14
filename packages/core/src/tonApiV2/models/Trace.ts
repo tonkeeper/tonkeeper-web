@@ -55,9 +55,9 @@ export interface Trace {
 /**
  * Check if a given object implements the Trace interface.
  */
-export function instanceOfTrace(value: object): boolean {
-    if (!('transaction' in value)) return false;
-    if (!('interfaces' in value)) return false;
+export function instanceOfTrace(value: object): value is Trace {
+    if (!('transaction' in value) || value['transaction'] === undefined) return false;
+    if (!('interfaces' in value) || value['interfaces'] === undefined) return false;
     return true;
 }
 

@@ -13,24 +13,24 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
-import type { JettonMetadata } from './JettonMetadata';
-import {
-    JettonMetadataFromJSON,
-    JettonMetadataFromJSONTyped,
-    JettonMetadataToJSON,
-} from './JettonMetadata';
 import type { JettonVerificationType } from './JettonVerificationType';
 import {
     JettonVerificationTypeFromJSON,
     JettonVerificationTypeFromJSONTyped,
     JettonVerificationTypeToJSON,
 } from './JettonVerificationType';
+import type { JettonMetadata } from './JettonMetadata';
+import {
+    JettonMetadataFromJSON,
+    JettonMetadataFromJSONTyped,
+    JettonMetadataToJSON,
+} from './JettonMetadata';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -79,12 +79,12 @@ export interface JettonInfo {
 /**
  * Check if a given object implements the JettonInfo interface.
  */
-export function instanceOfJettonInfo(value: object): boolean {
-    if (!('mintable' in value)) return false;
-    if (!('totalSupply' in value)) return false;
-    if (!('metadata' in value)) return false;
-    if (!('verification' in value)) return false;
-    if (!('holdersCount' in value)) return false;
+export function instanceOfJettonInfo(value: object): value is JettonInfo {
+    if (!('mintable' in value) || value['mintable'] === undefined) return false;
+    if (!('totalSupply' in value) || value['totalSupply'] === undefined) return false;
+    if (!('metadata' in value) || value['metadata'] === undefined) return false;
+    if (!('verification' in value) || value['verification'] === undefined) return false;
+    if (!('holdersCount' in value) || value['holdersCount'] === undefined) return false;
     return true;
 }
 

@@ -30,8 +30,8 @@ export interface DomainNames {
 /**
  * Check if a given object implements the DomainNames interface.
  */
-export function instanceOfDomainNames(value: object): boolean {
-    if (!('domains' in value)) return false;
+export function instanceOfDomainNames(value: object): value is DomainNames {
+    if (!('domains' in value) || value['domains'] === undefined) return false;
     return true;
 }
 

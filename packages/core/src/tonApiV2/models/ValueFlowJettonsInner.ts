@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
 import type { JettonPreview } from './JettonPreview';
 import {
     JettonPreviewFromJSON,
     JettonPreviewFromJSONTyped,
     JettonPreviewToJSON,
 } from './JettonPreview';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -55,10 +55,10 @@ export interface ValueFlowJettonsInner {
 /**
  * Check if a given object implements the ValueFlowJettonsInner interface.
  */
-export function instanceOfValueFlowJettonsInner(value: object): boolean {
-    if (!('account' in value)) return false;
-    if (!('jetton' in value)) return false;
-    if (!('quantity' in value)) return false;
+export function instanceOfValueFlowJettonsInner(value: object): value is ValueFlowJettonsInner {
+    if (!('account' in value) || value['account'] === undefined) return false;
+    if (!('jetton' in value) || value['jetton'] === undefined) return false;
+    if (!('quantity' in value) || value['quantity'] === undefined) return false;
     return true;
 }
 

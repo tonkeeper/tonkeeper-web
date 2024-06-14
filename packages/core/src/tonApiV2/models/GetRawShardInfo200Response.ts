@@ -55,11 +55,11 @@ export interface GetRawShardInfo200Response {
 /**
  * Check if a given object implements the GetRawShardInfo200Response interface.
  */
-export function instanceOfGetRawShardInfo200Response(value: object): boolean {
-    if (!('id' in value)) return false;
-    if (!('shardblk' in value)) return false;
-    if (!('shardProof' in value)) return false;
-    if (!('shardDescr' in value)) return false;
+export function instanceOfGetRawShardInfo200Response(value: object): value is GetRawShardInfo200Response {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('shardblk' in value) || value['shardblk'] === undefined) return false;
+    if (!('shardProof' in value) || value['shardProof'] === undefined) return false;
+    if (!('shardDescr' in value) || value['shardDescr'] === undefined) return false;
     return true;
 }
 

@@ -37,8 +37,8 @@ export interface DnsExpiring {
 /**
  * Check if a given object implements the DnsExpiring interface.
  */
-export function instanceOfDnsExpiring(value: object): boolean {
-    if (!('items' in value)) return false;
+export function instanceOfDnsExpiring(value: object): value is DnsExpiring {
+    if (!('items' in value) || value['items'] === undefined) return false;
     return true;
 }
 

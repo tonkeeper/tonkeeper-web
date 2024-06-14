@@ -30,8 +30,8 @@ export interface StateInit {
 /**
  * Check if a given object implements the StateInit interface.
  */
-export function instanceOfStateInit(value: object): boolean {
-    if (!('boc' in value)) return false;
+export function instanceOfStateInit(value: object): value is StateInit {
+    if (!('boc' in value) || value['boc'] === undefined) return false;
     return true;
 }
 

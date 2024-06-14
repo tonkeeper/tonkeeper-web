@@ -61,11 +61,11 @@ export interface TonConnectProofRequestProof {
 /**
  * Check if a given object implements the TonConnectProofRequestProof interface.
  */
-export function instanceOfTonConnectProofRequestProof(value: object): boolean {
-    if (!('timestamp' in value)) return false;
-    if (!('domain' in value)) return false;
-    if (!('signature' in value)) return false;
-    if (!('payload' in value)) return false;
+export function instanceOfTonConnectProofRequestProof(value: object): value is TonConnectProofRequestProof {
+    if (!('timestamp' in value) || value['timestamp'] === undefined) return false;
+    if (!('domain' in value) || value['domain'] === undefined) return false;
+    if (!('signature' in value) || value['signature'] === undefined) return false;
+    if (!('payload' in value) || value['payload'] === undefined) return false;
     return true;
 }
 

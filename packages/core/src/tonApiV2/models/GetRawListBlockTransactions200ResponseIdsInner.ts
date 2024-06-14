@@ -48,8 +48,8 @@ export interface GetRawListBlockTransactions200ResponseIdsInner {
 /**
  * Check if a given object implements the GetRawListBlockTransactions200ResponseIdsInner interface.
  */
-export function instanceOfGetRawListBlockTransactions200ResponseIdsInner(value: object): boolean {
-    if (!('mode' in value)) return false;
+export function instanceOfGetRawListBlockTransactions200ResponseIdsInner(value: object): value is GetRawListBlockTransactions200ResponseIdsInner {
+    if (!('mode' in value) || value['mode'] === undefined) return false;
     return true;
 }
 

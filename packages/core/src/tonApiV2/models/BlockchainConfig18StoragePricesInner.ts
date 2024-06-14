@@ -54,12 +54,12 @@ export interface BlockchainConfig18StoragePricesInner {
 /**
  * Check if a given object implements the BlockchainConfig18StoragePricesInner interface.
  */
-export function instanceOfBlockchainConfig18StoragePricesInner(value: object): boolean {
-    if (!('utimeSince' in value)) return false;
-    if (!('bitPricePs' in value)) return false;
-    if (!('cellPricePs' in value)) return false;
-    if (!('mcBitPricePs' in value)) return false;
-    if (!('mcCellPricePs' in value)) return false;
+export function instanceOfBlockchainConfig18StoragePricesInner(value: object): value is BlockchainConfig18StoragePricesInner {
+    if (!('utimeSince' in value) || value['utimeSince'] === undefined) return false;
+    if (!('bitPricePs' in value) || value['bitPricePs'] === undefined) return false;
+    if (!('cellPricePs' in value) || value['cellPricePs'] === undefined) return false;
+    if (!('mcBitPricePs' in value) || value['mcBitPricePs'] === undefined) return false;
+    if (!('mcCellPricePs' in value) || value['mcCellPricePs'] === undefined) return false;
     return true;
 }
 

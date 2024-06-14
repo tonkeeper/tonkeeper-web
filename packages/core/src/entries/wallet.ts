@@ -83,8 +83,9 @@ export interface WalletState {
 export interface ActiveWalletConfig {
     pinnedTokens: string[];
     hiddenTokens: string[];
-    pinnedHfts: string[];
-    hiddenHfts: string[];
+    pinnedNfts: string[];
+    hiddenNfts: string[];
+    trustedNfts: string[];
 }
 
 export interface TronWalletStorage {

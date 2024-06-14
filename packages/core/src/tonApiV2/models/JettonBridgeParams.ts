@@ -79,11 +79,11 @@ export interface JettonBridgeParams {
 /**
  * Check if a given object implements the JettonBridgeParams interface.
  */
-export function instanceOfJettonBridgeParams(value: object): boolean {
-    if (!('bridgeAddress' in value)) return false;
-    if (!('oraclesAddress' in value)) return false;
-    if (!('stateFlags' in value)) return false;
-    if (!('oracles' in value)) return false;
+export function instanceOfJettonBridgeParams(value: object): value is JettonBridgeParams {
+    if (!('bridgeAddress' in value) || value['bridgeAddress'] === undefined) return false;
+    if (!('oraclesAddress' in value) || value['oraclesAddress'] === undefined) return false;
+    if (!('stateFlags' in value) || value['stateFlags'] === undefined) return false;
+    if (!('oracles' in value) || value['oracles'] === undefined) return false;
     return true;
 }
 

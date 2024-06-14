@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
 import type { PoolImplementationType } from './PoolImplementationType';
 import {
     PoolImplementationTypeFromJSON,
     PoolImplementationTypeFromJSONTyped,
     PoolImplementationTypeToJSON,
 } from './PoolImplementationType';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * validator's participation in elections
@@ -61,11 +61,11 @@ export interface WithdrawStakeAction {
 /**
  * Check if a given object implements the WithdrawStakeAction interface.
  */
-export function instanceOfWithdrawStakeAction(value: object): boolean {
-    if (!('amount' in value)) return false;
-    if (!('staker' in value)) return false;
-    if (!('pool' in value)) return false;
-    if (!('implementation' in value)) return false;
+export function instanceOfWithdrawStakeAction(value: object): value is WithdrawStakeAction {
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('staker' in value) || value['staker'] === undefined) return false;
+    if (!('pool' in value) || value['pool'] === undefined) return false;
+    if (!('implementation' in value) || value['implementation'] === undefined) return false;
     return true;
 }
 

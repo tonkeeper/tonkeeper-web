@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
 import type { Refund } from './Refund';
 import {
     RefundFromJSON,
     RefundFromJSONTyped,
     RefundToJSON,
 } from './Refund';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -73,11 +73,11 @@ export interface SmartContractAction {
 /**
  * Check if a given object implements the SmartContractAction interface.
  */
-export function instanceOfSmartContractAction(value: object): boolean {
-    if (!('executor' in value)) return false;
-    if (!('contract' in value)) return false;
-    if (!('tonAttached' in value)) return false;
-    if (!('operation' in value)) return false;
+export function instanceOfSmartContractAction(value: object): value is SmartContractAction {
+    if (!('executor' in value) || value['executor'] === undefined) return false;
+    if (!('contract' in value) || value['contract'] === undefined) return false;
+    if (!('tonAttached' in value) || value['tonAttached'] === undefined) return false;
+    if (!('operation' in value) || value['operation'] === undefined) return false;
     return true;
 }
 

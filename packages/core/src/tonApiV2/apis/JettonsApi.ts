@@ -19,7 +19,7 @@ import type {
   JettonHolders,
   JettonInfo,
   Jettons,
-  ReduceIndexingLatencyDefaultResponse,
+  StatusDefaultResponse,
 } from '../models/index';
 import {
     EventFromJSON,
@@ -30,8 +30,8 @@ import {
     JettonInfoToJSON,
     JettonsFromJSON,
     JettonsToJSON,
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetJettonHoldersRequest {

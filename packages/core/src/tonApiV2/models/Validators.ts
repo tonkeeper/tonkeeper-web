@@ -61,12 +61,12 @@ export interface Validators {
 /**
  * Check if a given object implements the Validators interface.
  */
-export function instanceOfValidators(value: object): boolean {
-    if (!('electAt' in value)) return false;
-    if (!('electClose' in value)) return false;
-    if (!('minStake' in value)) return false;
-    if (!('totalStake' in value)) return false;
-    if (!('validators' in value)) return false;
+export function instanceOfValidators(value: object): value is Validators {
+    if (!('electAt' in value) || value['electAt'] === undefined) return false;
+    if (!('electClose' in value) || value['electClose'] === undefined) return false;
+    if (!('minStake' in value) || value['minStake'] === undefined) return false;
+    if (!('totalStake' in value) || value['totalStake'] === undefined) return false;
+    if (!('validators' in value) || value['validators'] === undefined) return false;
     return true;
 }
 

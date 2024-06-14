@@ -90,18 +90,18 @@ export interface MisbehaviourPunishmentConfig {
 /**
  * Check if a given object implements the MisbehaviourPunishmentConfig interface.
  */
-export function instanceOfMisbehaviourPunishmentConfig(value: object): boolean {
-    if (!('defaultFlatFine' in value)) return false;
-    if (!('defaultProportionalFine' in value)) return false;
-    if (!('severityFlatMult' in value)) return false;
-    if (!('severityProportionalMult' in value)) return false;
-    if (!('unpunishableInterval' in value)) return false;
-    if (!('longInterval' in value)) return false;
-    if (!('longFlatMult' in value)) return false;
-    if (!('longProportionalMult' in value)) return false;
-    if (!('mediumInterval' in value)) return false;
-    if (!('mediumFlatMult' in value)) return false;
-    if (!('mediumProportionalMult' in value)) return false;
+export function instanceOfMisbehaviourPunishmentConfig(value: object): value is MisbehaviourPunishmentConfig {
+    if (!('defaultFlatFine' in value) || value['defaultFlatFine'] === undefined) return false;
+    if (!('defaultProportionalFine' in value) || value['defaultProportionalFine'] === undefined) return false;
+    if (!('severityFlatMult' in value) || value['severityFlatMult'] === undefined) return false;
+    if (!('severityProportionalMult' in value) || value['severityProportionalMult'] === undefined) return false;
+    if (!('unpunishableInterval' in value) || value['unpunishableInterval'] === undefined) return false;
+    if (!('longInterval' in value) || value['longInterval'] === undefined) return false;
+    if (!('longFlatMult' in value) || value['longFlatMult'] === undefined) return false;
+    if (!('longProportionalMult' in value) || value['longProportionalMult'] === undefined) return false;
+    if (!('mediumInterval' in value) || value['mediumInterval'] === undefined) return false;
+    if (!('mediumFlatMult' in value) || value['mediumFlatMult'] === undefined) return false;
+    if (!('mediumProportionalMult' in value) || value['mediumProportionalMult'] === undefined) return false;
     return true;
 }
 

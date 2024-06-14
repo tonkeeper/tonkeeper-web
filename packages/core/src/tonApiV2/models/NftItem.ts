@@ -13,30 +13,36 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
-import type { ImagePreview } from './ImagePreview';
-import {
-    ImagePreviewFromJSON,
-    ImagePreviewFromJSONTyped,
-    ImagePreviewToJSON,
-} from './ImagePreview';
-import type { NftItemCollection } from './NftItemCollection';
-import {
-    NftItemCollectionFromJSON,
-    NftItemCollectionFromJSONTyped,
-    NftItemCollectionToJSON,
-} from './NftItemCollection';
 import type { Sale } from './Sale';
 import {
     SaleFromJSON,
     SaleFromJSONTyped,
     SaleToJSON,
 } from './Sale';
+import type { ImagePreview } from './ImagePreview';
+import {
+    ImagePreviewFromJSON,
+    ImagePreviewFromJSONTyped,
+    ImagePreviewToJSON,
+} from './ImagePreview';
+import type { TrustType } from './TrustType';
+import {
+    TrustTypeFromJSON,
+    TrustTypeFromJSONTyped,
+    TrustTypeToJSON,
+} from './TrustType';
+import type { NftItemCollection } from './NftItemCollection';
+import {
+    NftItemCollectionFromJSON,
+    NftItemCollectionFromJSONTyped,
+    NftItemCollectionToJSON,
+} from './NftItemCollection';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -104,6 +110,18 @@ export interface NftItem {
      * @memberof NftItem
      */
     approvedBy: Array<NftItemApprovedByEnum>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof NftItem
+     */
+    includeCnft?: boolean;
+    /**
+     * 
+     * @type {TrustType}
+     * @memberof NftItem
+     */
+    trust: TrustType;
 }
 
 
@@ -121,12 +139,13 @@ export type NftItemApprovedByEnum = typeof NftItemApprovedByEnum[keyof typeof Nf
 /**
  * Check if a given object implements the NftItem interface.
  */
-export function instanceOfNftItem(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('index' in value)) return false;
-    if (!('verified' in value)) return false;
-    if (!('metadata' in value)) return false;
-    if (!('approvedBy' in value)) return false;
+export function instanceOfNftItem(value: object): value is NftItem {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('index' in value) || value['index'] === undefined) return false;
+    if (!('verified' in value) || value['verified'] === undefined) return false;
+    if (!('metadata' in value) || value['metadata'] === undefined) return false;
+    if (!('approvedBy' in value) || value['approvedBy'] === undefined) return false;
+    if (!('trust' in value) || value['trust'] === undefined) return false;
     return true;
 }
 
@@ -150,6 +169,8 @@ export function NftItemFromJSONTyped(json: any, ignoreDiscriminator: boolean): N
         'previews': json['previews'] == null ? undefined : ((json['previews'] as Array<any>).map(ImagePreviewFromJSON)),
         'dns': json['dns'] == null ? undefined : json['dns'],
         'approvedBy': json['approved_by'],
+        'includeCnft': json['include_cnft'] == null ? undefined : json['include_cnft'],
+        'trust': TrustTypeFromJSON(json['trust']),
     };
 }
 
@@ -169,6 +190,8 @@ export function NftItemToJSON(value?: NftItem | null): any {
         'previews': value['previews'] == null ? undefined : ((value['previews'] as Array<any>).map(ImagePreviewToJSON)),
         'dns': value['dns'],
         'approved_by': value['approvedBy'],
+        'include_cnft': value['includeCnft'],
+        'trust': TrustTypeToJSON(value['trust']),
     };
 }
 

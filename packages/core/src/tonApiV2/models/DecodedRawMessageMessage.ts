@@ -42,14 +42,14 @@ export interface DecodedRawMessageMessage {
      * @type {any}
      * @memberof DecodedRawMessageMessage
      */
-    decodedBody?: any;
+    decodedBody?: any | null;
 }
 
 /**
  * Check if a given object implements the DecodedRawMessageMessage interface.
  */
-export function instanceOfDecodedRawMessageMessage(value: object): boolean {
-    if (!('boc' in value)) return false;
+export function instanceOfDecodedRawMessageMessage(value: object): value is DecodedRawMessageMessage {
+    if (!('boc' in value) || value['boc'] === undefined) return false;
     return true;
 }
 

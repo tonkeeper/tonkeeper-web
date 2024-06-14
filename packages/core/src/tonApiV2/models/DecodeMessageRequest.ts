@@ -30,8 +30,8 @@ export interface DecodeMessageRequest {
 /**
  * Check if a given object implements the DecodeMessageRequest interface.
  */
-export function instanceOfDecodeMessageRequest(value: object): boolean {
-    if (!('boc' in value)) return false;
+export function instanceOfDecodeMessageRequest(value: object): value is DecodeMessageRequest {
+    if (!('boc' in value) || value['boc'] === undefined) return false;
     return true;
 }
 

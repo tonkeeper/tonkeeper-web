@@ -13,24 +13,24 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
-import type { EncryptedComment } from './EncryptedComment';
-import {
-    EncryptedCommentFromJSON,
-    EncryptedCommentFromJSONTyped,
-    EncryptedCommentToJSON,
-} from './EncryptedComment';
 import type { Refund } from './Refund';
 import {
     RefundFromJSON,
     RefundFromJSONTyped,
     RefundToJSON,
 } from './Refund';
+import type { EncryptedComment } from './EncryptedComment';
+import {
+    EncryptedCommentFromJSON,
+    EncryptedCommentFromJSONTyped,
+    EncryptedCommentToJSON,
+} from './EncryptedComment';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -79,10 +79,10 @@ export interface TonTransferAction {
 /**
  * Check if a given object implements the TonTransferAction interface.
  */
-export function instanceOfTonTransferAction(value: object): boolean {
-    if (!('sender' in value)) return false;
-    if (!('recipient' in value)) return false;
-    if (!('amount' in value)) return false;
+export function instanceOfTonTransferAction(value: object): value is TonTransferAction {
+    if (!('sender' in value) || value['sender'] === undefined) return false;
+    if (!('recipient' in value) || value['recipient'] === undefined) return false;
+    if (!('amount' in value) || value['amount'] === undefined) return false;
     return true;
 }
 
