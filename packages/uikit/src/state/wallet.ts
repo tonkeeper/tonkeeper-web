@@ -39,6 +39,7 @@ import {
     useRate
 } from './rates';
 import { DefaultRefetchInterval } from './tonendpoint';
+import { useActiveWalletConfig } from './jetton';
 
 export const useActiveWallet = () => {
     const sdk = useAppSdk();
@@ -168,9 +169,15 @@ export const useWalletNftList = () => {
     const {
         api: { tonApiV2 }
     } = useAppContext();
+    const { data: walletConfig } = useActiveWalletConfig();
 
     return useQuery<NFT[], Error>(
-        [wallet.active.rawAddress, QueryKey.nft],
+        [
+            wallet.active.rawAddress,
+            QueryKey.nft,
+            walletConfig?.hiddenNfts,
+            walletConfig?.trustedNfts
+        ],
         async () => {
             const { nftItems } = await new AccountsApi(tonApiV2).getAccountNftItems({
                 accountId: wallet.active.rawAddress,
@@ -178,9 +185,20 @@ export const useWalletNftList = () => {
                 limit: 1000,
                 indirectOwnership: true
             });
-            return nftItems;
+            return nftItems.filter(item => {
+                if (item.trust === 'blacklist') {
+                    return walletConfig?.trustedNfts.includes(item.address);
+                }
+
+                if (item.trust !== 'whitelist') {
+                    return !walletConfig?.hiddenNfts.includes(item.address);
+                }
+
+                return true;
+            });
         },
         {
+            enabled: !!walletConfig,
             refetchInterval: DefaultRefetchInterval,
             refetchIntervalInBackground: true,
             refetchOnWindowFocus: true,

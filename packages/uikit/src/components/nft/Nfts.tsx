@@ -141,7 +141,10 @@ export const NftItemView: FC<{
     );
 });
 
-export const NftsList: FC<{ nfts: NFT[] | undefined, className?: string }> = ({ nfts, className }) => {
+export const NftsList: FC<{ nfts: NFT[] | undefined; className?: string }> = ({
+    nfts,
+    className
+}) => {
     const sdk = useAppSdk();
     return (
         <Grid className={className}>

@@ -1,8 +1,9 @@
-import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
+import { NftItem, TrustType } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { VerificationIcon } from '../Icon';
 import { Body2, Body3, Label2 } from '../Text';
+import { useActiveWalletConfig } from '../../state/jetton';
 
 const TextContent = styled.span`
     display: inline-block;
@@ -42,6 +43,10 @@ const HeaderBody3Secondary = styled(Body3)<{ verified?: boolean }>`
         `}
 `;
 
+const HeaderSuspicious = styled(Body3)`
+    color: ${props => props.theme.accentOrange};
+`;
+
 const IconBody = styled.span`
     position: absolute;
     top: 0;
@@ -49,7 +54,15 @@ const IconBody = styled.span`
 `;
 
 export const NftCollectionBody3: FC<{ nft: NftItem }> = React.memo(({ nft }) => {
+    const { data } = useActiveWalletConfig();
+    const isTrusted = data?.trustedNfts.includes(nft.address);
+    const isSuspicious = nft.trust !== TrustType.Whitelist;
     const verified = nft.approvedBy && nft.approvedBy.length > 0;
+
+    if (isSuspicious && !isTrusted) {
+        return <HeaderSuspicious>Unverified</HeaderSuspicious>;
+    }
+
     return (
         <HeaderBody3Secondary verified={verified}>
             <TextContent>{nft.collection?.name ?? nft.metadata.description}</TextContent>
