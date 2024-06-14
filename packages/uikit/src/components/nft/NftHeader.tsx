@@ -57,7 +57,8 @@ export const NftCollectionBody3: FC<{ nft: NftItem }> = React.memo(({ nft }) => 
     const { data } = useActiveWalletConfig();
     const isTrusted = data?.trustedNfts.includes(nft.address);
     const isSuspicious = nft.trust !== TrustType.Whitelist;
-    const verified = nft.approvedBy && nft.approvedBy.length > 0;
+
+    const verified = nft.trust === TrustType.Whitelist;
 
     if (isSuspicious && !isTrusted) {
         return <HeaderSuspicious>Unverified</HeaderSuspicious>;
