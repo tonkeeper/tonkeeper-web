@@ -5,12 +5,14 @@ import { useTranslation } from '../../hooks/translation';
 import { useNftCollectionData } from '../../state/wallet';
 import { ChevronDownIcon, VerificationIcon } from '../Icon';
 import { NotificationBlock, NotificationTitleBlock } from '../Notification';
-import { H2, H3, Label1, Label4 } from '../Text';
+import { Body2, H2, H3, Label1, Label4 } from '../Text';
 import { BackButton, ButtonMock } from '../fields/BackButton';
 import { Body, CroppedBodyText } from '../jettons/CroppedText';
 import { NftAction } from './NftAction';
 import { NftDetails } from './NftDetails';
 import { Image, NftBlock } from './Nfts';
+import { useActiveWalletConfig } from '../../state/jetton';
+import { TrustType } from '@tonkeeper/core/dist/tonApiV2';
 
 const Text = styled.div`
     display: flex;
@@ -58,10 +60,23 @@ const SaleBlock = styled(Label4)`
     white-space: nowrap;
 `;
 
+const UnverifiedLabel = styled(Body2)<{ isTrusted: boolean }>`
+    color: ${props => (props.isTrusted ? props.theme.textSecondary : props.theme.accentOrange)};
+    display: block;
+`;
+
+const NftNameContainer = styled.div`
+    text-align: center;
+`;
+
 export const NftPreview: FC<{
     onClose?: () => void;
     nftItem: NFT;
 }> = ({ onClose, nftItem }) => {
+    const { data } = useActiveWalletConfig();
+    const isTrusted = !!data?.trustedNfts.includes(nftItem.address);
+    const isSuspicious = nftItem.trust !== TrustType.Whitelist;
+
     const ref = useRef<HTMLImageElement | null>(null);
     const { t } = useTranslation();
     const { data: collection } = useNftCollectionData(nftItem);
@@ -93,7 +108,12 @@ export const NftPreview: FC<{
                     <BackButton onClick={onClose}>
                         <ChevronDownIcon />
                     </BackButton>
-                    <H3>{nftItem.dns ?? nftItem.metadata.name}</H3>
+                    <NftNameContainer>
+                        <H3>{nftItem.dns ?? nftItem.metadata.name}</H3>
+                        {isSuspicious && (
+                            <UnverifiedLabel isTrusted={isTrusted}>Unverified NFT</UnverifiedLabel>
+                        )}
+                    </NftNameContainer>
                     <ButtonMock />
                 </NotificationTitleBlock>
             )}
