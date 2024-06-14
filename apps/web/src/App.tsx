@@ -187,12 +187,12 @@ export const Loader: FC = () => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
-    const tonendpoint = useTonendpoint(
-        TARGET_ENV,
-        sdk.version,
-        activeWallet?.network,
-        activeWallet?.lang
-    );
+    const tonendpoint = useTonendpoint({
+          targetEnv: TARGET_ENV,
+          build: sdk.version,
+          network: activeWallet?.network,
+          lang: activeWallet?.lang
+    });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
