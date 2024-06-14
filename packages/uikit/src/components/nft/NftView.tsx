@@ -13,6 +13,7 @@ import { NftDetails } from './NftDetails';
 import { Image, NftBlock } from './Nfts';
 import { useActiveWalletConfig } from '../../state/jetton';
 import { TrustType } from '@tonkeeper/core/dist/tonApiV2';
+import { Button } from '../fields/Button';
 
 const Text = styled.div`
     display: flex;
@@ -69,6 +70,16 @@ const NftNameContainer = styled.div`
     text-align: center;
 `;
 
+const ButtonsBlock = styled.div`
+    display: flex;
+    gap: 8px;
+    width: 100%;
+
+    > * {
+        flex: 1;
+    }
+`;
+
 export const NftPreview: FC<{
     onClose?: () => void;
     nftItem: NFT;
@@ -116,6 +127,14 @@ export const NftPreview: FC<{
                     </NftNameContainer>
                     <ButtonMock />
                 </NotificationTitleBlock>
+            )}
+            {isSuspicious && !isTrusted && (
+                <ButtonsBlock>
+                    <Button warn type="button">
+                        Report Spam
+                    </Button>
+                    <Button type="button">Not Spam</Button>
+                </ButtonsBlock>
             )}
             <NftBlock>
                 {image && <Image ref={ref} url={image.url} />}

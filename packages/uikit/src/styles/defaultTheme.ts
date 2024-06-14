@@ -28,17 +28,22 @@ export const defaultTheme: DefaultTheme = {
     buttonSecondaryForeground: '#EBEBEB',
     buttonTertiaryBackground: '#2E3847',
     buttonTertiaryForeground: '#EBEBEB',
+    buttonWarnBackground: '#F5A73B',
+    buttonWarnForeground: '#FFFFFF',
     buttonPrimaryBackgroundDisabled: '#378AC2',
     buttonSecondaryBackgroundDisabled: '#171F29',
     buttonTertiaryBackgroundDisabled: '#28303D',
+    buttonWarnBackgroundDisabled: '#C2842F',
 
     buttonTertiaryForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
     buttonSecondaryForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
     buttonPrimaryForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
+    buttonWarnForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
 
     buttonPrimaryBackgroundHighlighted: 'rgba(91, 184, 246, 1)',
     buttonSecondaryBackgroundHighlighted: 'rgba(34, 44, 59, 1)',
     buttonTertiaryBackgroundHighlighted: 'rgba(54, 64, 82, 1)',
+    buttonWarnBackgroundHighlighted: '#F5AF4E',
 
     fieldBackground: '#1D2633',
     fieldActiveBorder: '#45AEF5',
