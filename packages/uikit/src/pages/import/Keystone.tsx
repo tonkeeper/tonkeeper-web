@@ -1,4 +1,4 @@
-import { UR } from '@keystonehq/keystone-sdk';
+import type { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
 import { useCallback } from 'react';
 import { styled } from 'styled-components';
 import { IconPage } from '../../components/Layout';

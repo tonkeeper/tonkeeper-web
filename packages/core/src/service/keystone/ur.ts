@@ -1,4 +1,4 @@
-import { KeystoneSDK } from '@keystonehq/keystone-sdk';
+import { KeystoneTonSDK } from '@keystonehq/keystone-sdk/dist/chains/ton';
 import { KeystoneMessageType, KeystonePathInfo } from './types';
 
 export const constructKeystoneSignRequest = (
@@ -7,9 +7,8 @@ export const constructKeystoneSignRequest = (
     address: string,
     pathInfo?: KeystonePathInfo
 ) => {
-    const sdk = new KeystoneSDK({ origin: 'TonKeeper' });
-
-    return sdk.ton.generateSignRequest({
+    const tonSdk = new KeystoneTonSDK({ origin: 'TonKeeper' });
+    return tonSdk.generateSignRequest({
         signData: message.toString('hex'),
         dataType: messageType === 'transaction' ? 1 : 2,
         address,

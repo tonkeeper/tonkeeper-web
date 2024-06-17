@@ -1,4 +1,5 @@
-import KeystoneSDK, { UR } from '@keystonehq/keystone-sdk';
+import { KeystoneTonSDK } from '@keystonehq/keystone-sdk/dist/chains/ton';
+import type { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { KeystoneMessageType, KeystonePathInfo } from '@tonkeeper/core/dist/service/keystone/types';
 import { constructKeystoneSignRequest } from '@tonkeeper/core/dist/service/keystone/ur';
@@ -28,10 +29,9 @@ export const SignerContent: FC<{
     const { extension } = useAppContext();
 
     useNavigate(sdk, onClose);
-    const keystoneSDK = new KeystoneSDK();
 
     const onSubmit = useCallback((ur: UR) => {
-        const signature = keystoneSDK.ton.parseSignature(ur);
+        const signature = new KeystoneTonSDK().parseSignature(ur);
         handleResult(signature.signature);
     }, []);
 

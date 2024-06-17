@@ -1,4 +1,5 @@
-import KeystoneSDK, { UR } from '@keystonehq/keystone-sdk';
+import { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
+import { parseTonAccount } from '@keystonehq/keystone-sdk/dist/wallet/hdKey';
 import { Address } from '@ton/core';
 import { mnemonicToPrivateKey } from '@ton/crypto';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
@@ -243,8 +244,7 @@ export const walletStateFromLedger = (walletInfo: {
 };
 
 export const walletStateFromKeystone = (ur: UR) => {
-    const sdk = new KeystoneSDK();
-    const account = sdk.parseTonAccount(ur);
+    const account = parseTonAccount(ur);
     const contact = WalletContractV4.create({
         workchain: 0,
         publicKey: Buffer.from(account.publicKey, 'hex')

@@ -1,4 +1,5 @@
-import { UR, UREncoder } from '@keystonehq/keystone-sdk';
+import type { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
+import UREncoder from '@ngraveio/bc-ur/dist/urEncoder';
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import { styled } from 'styled-components';
