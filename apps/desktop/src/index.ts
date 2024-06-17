@@ -23,17 +23,22 @@ if (require('electron-squirrel-startup')) {
 
 const connection = TonConnectSSE.getInstance();
 
+
 const onUnLock = () => {
     log.info('unlock-screen');
     connection.reconnect();
 };
-powerMonitor.on('unlock-screen', onUnLock);
+
+if (process.platform != "linux") {
+    powerMonitor.on('unlock-screen', onUnLock);
+}
 
 app.on('before-quit', async e => {
     e.preventDefault();
     connection.destroy();
-
-    powerMonitor.off('unlock-screen', onUnLock);
+    if (process.platform != "linux") {
+        powerMonitor.off('unlock-screen', onUnLock);
+    }
 
     await delay(100);
     app.exit();

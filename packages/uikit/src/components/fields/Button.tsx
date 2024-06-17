@@ -221,7 +221,7 @@ const SpinnerIconStyled = styled(SpinnerIcon)`
 
 export const Button: FC<
     PropsWithChildren<
-        ButtonProps & Omit<React.HTMLProps<HTMLButtonElement>, 'size' | 'children' | 'ref' | 'as'>
+        ButtonProps & Omit<React.HTMLProps<HTMLButtonElement>, 'size' | 'children' | 'ref'>
     >
 > = ({ children, loading, ...props }) => {
     const theme = useTheme();

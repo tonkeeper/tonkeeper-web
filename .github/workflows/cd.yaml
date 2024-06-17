@@ -1,4 +1,4 @@
-name: Tonkeeper Desktop CD
+name: Tonkeeper CD
 on:
     push:
         tags:
@@ -132,3 +132,48 @@ jobs:
                   directory: apps/web/dist
                   branch: main
                   wranglerVersion: '3'
+
+    extension-build:
+        name: extension-build
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.7.0
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Run install
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: install
+
+            - name: Run build
+              uses: borales/actions-yarn@v5
+              env:
+                  REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
+                  REACT_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
+                  REACT_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
+              with:
+                  cmd: build:extension
+
+            - name: Upload Tonkeeper Extension to release
+              uses: softprops/action-gh-release@v2
+              with:
+                  name: 'Tonkeeper ${{ github.ref_name }}'
+                  draft: true
+                  generate_release_notes: true
+                  token: ${{ secrets.GH_TOKEN }}
+                  files: |
+                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{
+                          github.ref_name }}.zip
+                      ${{ github.workspace
+                          }}/apps/extension/dist/tonkeeper_firefox_${{ github.ref_name }}.zip
