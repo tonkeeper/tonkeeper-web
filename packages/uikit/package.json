@@ -17,6 +17,7 @@
         "@amplitude/analytics-browser": "^2.1.0",
         "@aptabase/web": "^0.4.2",
         "@keystonehq/keystone-sdk": "^0.5.1",
+        "@ngraveio/bc-ur": "^1.1.13",
         "@polkadot/react-qr": "^3.1.1",
         "@tanstack/react-query": "4.3.4",
         "@ton/core": "0.53.0",

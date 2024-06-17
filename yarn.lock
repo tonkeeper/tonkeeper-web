@@ -4160,7 +4160,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ngraveio/bc-ur@npm:^1.1.5, @ngraveio/bc-ur@npm:^1.1.6":
+"@ngraveio/bc-ur@npm:^1.1.13, @ngraveio/bc-ur@npm:^1.1.5, @ngraveio/bc-ur@npm:^1.1.6":
   version: 1.1.13
   resolution: "@ngraveio/bc-ur@npm:1.1.13"
   dependencies:
@@ -6639,6 +6639,7 @@ __metadata:
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
     "@keystonehq/keystone-sdk": "npm:^0.5.1"
+    "@ngraveio/bc-ur": "npm:^1.1.13"
     "@polkadot/react-qr": "npm:^3.1.1"
     "@storybook/addon-actions": "npm:^6.5.14"
     "@storybook/addon-essentials": "npm:^6.5.14"

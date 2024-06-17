@@ -1,4 +1,4 @@
-import type { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
+import UR from '@ngraveio/bc-ur/dist/ur';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     addWalletWithCustomAuthState,

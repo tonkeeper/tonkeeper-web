@@ -1,4 +1,5 @@
-import { UR, URDecoder } from '@keystonehq/keystone-sdk';
+import UR from '@ngraveio/bc-ur/dist/ur';
+import URDecoder from '@ngraveio/bc-ur/dist/urDecoder';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppSdk } from './appSdk';
 
