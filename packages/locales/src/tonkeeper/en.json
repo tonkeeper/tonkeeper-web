@@ -839,8 +839,6 @@
       "to" : "To: {name}"
     }
   },
-  "keystone_sign_title": "Connect Keystone",
-  "keystone_sign_subtitle": "Please open Keystone and scan QR code with transaction",
   "send_sending_failed" : "Sending failed",
   "send_sending_wrong_time_description" : "Turn on automatic time and date in your device settings. Then retry your transfer.",
   "send_sending_wrong_time_title" : "Error occurred",
