@@ -43,9 +43,9 @@ export interface GetRawShardBlockProof200ResponseLinksInner {
 /**
  * Check if a given object implements the GetRawShardBlockProof200ResponseLinksInner interface.
  */
-export function instanceOfGetRawShardBlockProof200ResponseLinksInner(value: object): boolean {
-    if (!('id' in value)) return false;
-    if (!('proof' in value)) return false;
+export function instanceOfGetRawShardBlockProof200ResponseLinksInner(value: object): value is GetRawShardBlockProof200ResponseLinksInner {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('proof' in value) || value['proof'] === undefined) return false;
     return true;
 }
 

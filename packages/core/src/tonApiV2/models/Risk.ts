@@ -61,11 +61,11 @@ export interface Risk {
 /**
  * Check if a given object implements the Risk interface.
  */
-export function instanceOfRisk(value: object): boolean {
-    if (!('transferAllRemainingBalance' in value)) return false;
-    if (!('ton' in value)) return false;
-    if (!('jettons' in value)) return false;
-    if (!('nfts' in value)) return false;
+export function instanceOfRisk(value: object): value is Risk {
+    if (!('transferAllRemainingBalance' in value) || value['transferAllRemainingBalance'] === undefined) return false;
+    if (!('ton' in value) || value['ton'] === undefined) return false;
+    if (!('jettons' in value) || value['jettons'] === undefined) return false;
+    if (!('nfts' in value) || value['nfts'] === undefined) return false;
     return true;
 }
 

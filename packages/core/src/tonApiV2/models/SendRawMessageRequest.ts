@@ -30,8 +30,8 @@ export interface SendRawMessageRequest {
 /**
  * Check if a given object implements the SendRawMessageRequest interface.
  */
-export function instanceOfSendRawMessageRequest(value: object): boolean {
-    if (!('body' in value)) return false;
+export function instanceOfSendRawMessageRequest(value: object): value is SendRawMessageRequest {
+    if (!('body' in value) || value['body'] === undefined) return false;
     return true;
 }
 

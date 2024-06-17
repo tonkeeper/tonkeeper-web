@@ -37,8 +37,8 @@ export interface Accounts {
 /**
  * Check if a given object implements the Accounts interface.
  */
-export function instanceOfAccounts(value: object): boolean {
-    if (!('accounts' in value)) return false;
+export function instanceOfAccounts(value: object): value is Accounts {
+    if (!('accounts' in value) || value['accounts'] === undefined) return false;
     return true;
 }
 

@@ -36,9 +36,9 @@ export interface ApyHistory {
 /**
  * Check if a given object implements the ApyHistory interface.
  */
-export function instanceOfApyHistory(value: object): boolean {
-    if (!('apy' in value)) return false;
-    if (!('time' in value)) return false;
+export function instanceOfApyHistory(value: object): value is ApyHistory {
+    if (!('apy' in value) || value['apy'] === undefined) return false;
+    if (!('time' in value) || value['time'] === undefined) return false;
     return true;
 }
 

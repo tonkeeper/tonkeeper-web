@@ -30,8 +30,8 @@ export interface GetAccountsRequest {
 /**
  * Check if a given object implements the GetAccountsRequest interface.
  */
-export function instanceOfGetAccountsRequest(value: object): boolean {
-    if (!('accountIds' in value)) return false;
+export function instanceOfGetAccountsRequest(value: object): value is GetAccountsRequest {
+    if (!('accountIds' in value) || value['accountIds'] === undefined) return false;
     return true;
 }
 

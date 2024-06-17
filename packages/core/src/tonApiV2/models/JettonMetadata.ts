@@ -78,11 +78,11 @@ export interface JettonMetadata {
 /**
  * Check if a given object implements the JettonMetadata interface.
  */
-export function instanceOfJettonMetadata(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('name' in value)) return false;
-    if (!('symbol' in value)) return false;
-    if (!('decimals' in value)) return false;
+export function instanceOfJettonMetadata(value: object): value is JettonMetadata {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('symbol' in value) || value['symbol'] === undefined) return false;
+    if (!('decimals' in value) || value['decimals'] === undefined) return false;
     return true;
 }
 

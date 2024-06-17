@@ -37,8 +37,8 @@ export interface Jettons {
 /**
  * Check if a given object implements the Jettons interface.
  */
-export function instanceOfJettons(value: object): boolean {
-    if (!('jettons' in value)) return false;
+export function instanceOfJettons(value: object): value is Jettons {
+    if (!('jettons' in value) || value['jettons'] === undefined) return false;
     return true;
 }
 

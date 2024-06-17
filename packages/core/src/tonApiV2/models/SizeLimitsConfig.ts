@@ -72,13 +72,13 @@ export interface SizeLimitsConfig {
 /**
  * Check if a given object implements the SizeLimitsConfig interface.
  */
-export function instanceOfSizeLimitsConfig(value: object): boolean {
-    if (!('maxMsgBits' in value)) return false;
-    if (!('maxMsgCells' in value)) return false;
-    if (!('maxLibraryCells' in value)) return false;
-    if (!('maxVmDataDepth' in value)) return false;
-    if (!('maxExtMsgSize' in value)) return false;
-    if (!('maxExtMsgDepth' in value)) return false;
+export function instanceOfSizeLimitsConfig(value: object): value is SizeLimitsConfig {
+    if (!('maxMsgBits' in value) || value['maxMsgBits'] === undefined) return false;
+    if (!('maxMsgCells' in value) || value['maxMsgCells'] === undefined) return false;
+    if (!('maxLibraryCells' in value) || value['maxLibraryCells'] === undefined) return false;
+    if (!('maxVmDataDepth' in value) || value['maxVmDataDepth'] === undefined) return false;
+    if (!('maxExtMsgSize' in value) || value['maxExtMsgSize'] === undefined) return false;
+    if (!('maxExtMsgDepth' in value) || value['maxExtMsgDepth'] === undefined) return false;
     return true;
 }
 

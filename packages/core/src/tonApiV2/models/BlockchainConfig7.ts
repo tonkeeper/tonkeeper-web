@@ -37,8 +37,8 @@ export interface BlockchainConfig7 {
 /**
  * Check if a given object implements the BlockchainConfig7 interface.
  */
-export function instanceOfBlockchainConfig7(value: object): boolean {
-    if (!('currencies' in value)) return false;
+export function instanceOfBlockchainConfig7(value: object): value is BlockchainConfig7 {
+    if (!('currencies' in value) || value['currencies'] === undefined) return false;
     return true;
 }
 

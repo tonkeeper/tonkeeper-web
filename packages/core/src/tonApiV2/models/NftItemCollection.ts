@@ -42,10 +42,10 @@ export interface NftItemCollection {
 /**
  * Check if a given object implements the NftItemCollection interface.
  */
-export function instanceOfNftItemCollection(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('name' in value)) return false;
-    if (!('description' in value)) return false;
+export function instanceOfNftItemCollection(value: object): value is NftItemCollection {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('description' in value) || value['description'] === undefined) return false;
     return true;
 }
 

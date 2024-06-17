@@ -66,13 +66,13 @@ export interface ActionPhase {
 /**
  * Check if a given object implements the ActionPhase interface.
  */
-export function instanceOfActionPhase(value: object): boolean {
-    if (!('success' in value)) return false;
-    if (!('resultCode' in value)) return false;
-    if (!('totalActions' in value)) return false;
-    if (!('skippedActions' in value)) return false;
-    if (!('fwdFees' in value)) return false;
-    if (!('totalFees' in value)) return false;
+export function instanceOfActionPhase(value: object): value is ActionPhase {
+    if (!('success' in value) || value['success'] === undefined) return false;
+    if (!('resultCode' in value) || value['resultCode'] === undefined) return false;
+    if (!('totalActions' in value) || value['totalActions'] === undefined) return false;
+    if (!('skippedActions' in value) || value['skippedActions'] === undefined) return false;
+    if (!('fwdFees' in value) || value['fwdFees'] === undefined) return false;
+    if (!('totalFees' in value) || value['totalFees'] === undefined) return false;
     return true;
 }
 

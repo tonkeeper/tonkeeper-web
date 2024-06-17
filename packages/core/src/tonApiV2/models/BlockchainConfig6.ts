@@ -36,9 +36,9 @@ export interface BlockchainConfig6 {
 /**
  * Check if a given object implements the BlockchainConfig6 interface.
  */
-export function instanceOfBlockchainConfig6(value: object): boolean {
-    if (!('mintNewPrice' in value)) return false;
-    if (!('mintAddPrice' in value)) return false;
+export function instanceOfBlockchainConfig6(value: object): value is BlockchainConfig6 {
+    if (!('mintNewPrice' in value) || value['mintNewPrice'] === undefined) return false;
+    if (!('mintAddPrice' in value) || value['mintAddPrice'] === undefined) return false;
     return true;
 }
 

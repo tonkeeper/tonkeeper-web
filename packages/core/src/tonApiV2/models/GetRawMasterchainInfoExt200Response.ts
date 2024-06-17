@@ -85,15 +85,15 @@ export interface GetRawMasterchainInfoExt200Response {
 /**
  * Check if a given object implements the GetRawMasterchainInfoExt200Response interface.
  */
-export function instanceOfGetRawMasterchainInfoExt200Response(value: object): boolean {
-    if (!('mode' in value)) return false;
-    if (!('version' in value)) return false;
-    if (!('capabilities' in value)) return false;
-    if (!('last' in value)) return false;
-    if (!('lastUtime' in value)) return false;
-    if (!('now' in value)) return false;
-    if (!('stateRootHash' in value)) return false;
-    if (!('init' in value)) return false;
+export function instanceOfGetRawMasterchainInfoExt200Response(value: object): value is GetRawMasterchainInfoExt200Response {
+    if (!('mode' in value) || value['mode'] === undefined) return false;
+    if (!('version' in value) || value['version'] === undefined) return false;
+    if (!('capabilities' in value) || value['capabilities'] === undefined) return false;
+    if (!('last' in value) || value['last'] === undefined) return false;
+    if (!('lastUtime' in value) || value['lastUtime'] === undefined) return false;
+    if (!('now' in value) || value['now'] === undefined) return false;
+    if (!('stateRootHash' in value) || value['stateRootHash'] === undefined) return false;
+    if (!('init' in value) || value['init'] === undefined) return false;
     return true;
 }
 

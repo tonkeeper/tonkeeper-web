@@ -103,13 +103,13 @@ export interface Account {
 /**
  * Check if a given object implements the Account interface.
  */
-export function instanceOfAccount(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('balance' in value)) return false;
-    if (!('lastActivity' in value)) return false;
-    if (!('status' in value)) return false;
-    if (!('getMethods' in value)) return false;
-    if (!('isWallet' in value)) return false;
+export function instanceOfAccount(value: object): value is Account {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('balance' in value) || value['balance'] === undefined) return false;
+    if (!('lastActivity' in value) || value['lastActivity'] === undefined) return false;
+    if (!('status' in value) || value['status'] === undefined) return false;
+    if (!('getMethods' in value) || value['getMethods'] === undefined) return false;
+    if (!('isWallet' in value) || value['isWallet'] === undefined) return false;
     return true;
 }
 

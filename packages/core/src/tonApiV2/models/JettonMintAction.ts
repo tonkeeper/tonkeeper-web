@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
 import type { JettonPreview } from './JettonPreview';
 import {
     JettonPreviewFromJSON,
     JettonPreviewFromJSONTyped,
     JettonPreviewToJSON,
 } from './JettonPreview';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -61,11 +61,11 @@ export interface JettonMintAction {
 /**
  * Check if a given object implements the JettonMintAction interface.
  */
-export function instanceOfJettonMintAction(value: object): boolean {
-    if (!('recipient' in value)) return false;
-    if (!('recipientsWallet' in value)) return false;
-    if (!('amount' in value)) return false;
-    if (!('jetton' in value)) return false;
+export function instanceOfJettonMintAction(value: object): value is JettonMintAction {
+    if (!('recipient' in value) || value['recipient'] === undefined) return false;
+    if (!('recipientsWallet' in value) || value['recipientsWallet'] === undefined) return false;
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('jetton' in value) || value['jetton'] === undefined) return false;
     return true;
 }
 

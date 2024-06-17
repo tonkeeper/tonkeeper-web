@@ -72,15 +72,15 @@ export interface ConfigProposalSetup {
 /**
  * Check if a given object implements the ConfigProposalSetup interface.
  */
-export function instanceOfConfigProposalSetup(value: object): boolean {
-    if (!('minTotRounds' in value)) return false;
-    if (!('maxTotRounds' in value)) return false;
-    if (!('minWins' in value)) return false;
-    if (!('maxLosses' in value)) return false;
-    if (!('minStoreSec' in value)) return false;
-    if (!('maxStoreSec' in value)) return false;
-    if (!('bitPrice' in value)) return false;
-    if (!('cellPrice' in value)) return false;
+export function instanceOfConfigProposalSetup(value: object): value is ConfigProposalSetup {
+    if (!('minTotRounds' in value) || value['minTotRounds'] === undefined) return false;
+    if (!('maxTotRounds' in value) || value['maxTotRounds'] === undefined) return false;
+    if (!('minWins' in value) || value['minWins'] === undefined) return false;
+    if (!('maxLosses' in value) || value['maxLosses'] === undefined) return false;
+    if (!('minStoreSec' in value) || value['minStoreSec'] === undefined) return false;
+    if (!('maxStoreSec' in value) || value['maxStoreSec'] === undefined) return false;
+    if (!('bitPrice' in value) || value['bitPrice'] === undefined) return false;
+    if (!('cellPrice' in value) || value['cellPrice'] === undefined) return false;
     return true;
 }
 

@@ -43,9 +43,9 @@ export interface JettonHolders {
 /**
  * Check if a given object implements the JettonHolders interface.
  */
-export function instanceOfJettonHolders(value: object): boolean {
-    if (!('addresses' in value)) return false;
-    if (!('total' in value)) return false;
+export function instanceOfJettonHolders(value: object): value is JettonHolders {
+    if (!('addresses' in value) || value['addresses'] === undefined) return false;
+    if (!('total' in value) || value['total'] === undefined) return false;
     return true;
 }
 

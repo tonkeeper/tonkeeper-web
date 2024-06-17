@@ -91,16 +91,16 @@ export interface BlockValueFlow {
 /**
  * Check if a given object implements the BlockValueFlow interface.
  */
-export function instanceOfBlockValueFlow(value: object): boolean {
-    if (!('fromPrevBlk' in value)) return false;
-    if (!('toNextBlk' in value)) return false;
-    if (!('imported' in value)) return false;
-    if (!('exported' in value)) return false;
-    if (!('feesCollected' in value)) return false;
-    if (!('feesImported' in value)) return false;
-    if (!('recovered' in value)) return false;
-    if (!('created' in value)) return false;
-    if (!('minted' in value)) return false;
+export function instanceOfBlockValueFlow(value: object): value is BlockValueFlow {
+    if (!('fromPrevBlk' in value) || value['fromPrevBlk'] === undefined) return false;
+    if (!('toNextBlk' in value) || value['toNextBlk'] === undefined) return false;
+    if (!('imported' in value) || value['imported'] === undefined) return false;
+    if (!('exported' in value) || value['exported'] === undefined) return false;
+    if (!('feesCollected' in value) || value['feesCollected'] === undefined) return false;
+    if (!('feesImported' in value) || value['feesImported'] === undefined) return false;
+    if (!('recovered' in value) || value['recovered'] === undefined) return false;
+    if (!('created' in value) || value['created'] === undefined) return false;
+    if (!('minted' in value) || value['minted'] === undefined) return false;
     return true;
 }
 

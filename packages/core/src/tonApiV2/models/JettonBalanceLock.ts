@@ -36,9 +36,9 @@ export interface JettonBalanceLock {
 /**
  * Check if a given object implements the JettonBalanceLock interface.
  */
-export function instanceOfJettonBalanceLock(value: object): boolean {
-    if (!('amount' in value)) return false;
-    if (!('till' in value)) return false;
+export function instanceOfJettonBalanceLock(value: object): value is JettonBalanceLock {
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('till' in value) || value['till'] === undefined) return false;
     return true;
 }
 

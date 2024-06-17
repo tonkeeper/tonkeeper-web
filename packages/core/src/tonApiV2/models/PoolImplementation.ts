@@ -48,11 +48,11 @@ export interface PoolImplementation {
 /**
  * Check if a given object implements the PoolImplementation interface.
  */
-export function instanceOfPoolImplementation(value: object): boolean {
-    if (!('name' in value)) return false;
-    if (!('description' in value)) return false;
-    if (!('url' in value)) return false;
-    if (!('socials' in value)) return false;
+export function instanceOfPoolImplementation(value: object): value is PoolImplementation {
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('description' in value) || value['description'] === undefined) return false;
+    if (!('url' in value) || value['url'] === undefined) return false;
+    if (!('socials' in value) || value['socials'] === undefined) return false;
     return true;
 }
 
