@@ -6519,6 +6519,7 @@ __metadata:
     react-dom: "npm:18.2.0"
     react-i18next: "npm:^13.5.0"
     react-router-dom: "npm:^6.20.1"
+    stream-browserify: "npm:^3.0.0"
     style-loader: "npm:^3.0.0"
     styled-components: "npm:^6.1.1"
     tough-cookie: "npm:^4.1.3"
