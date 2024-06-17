@@ -54,12 +54,12 @@ export interface AccountStakingInfo {
 /**
  * Check if a given object implements the AccountStakingInfo interface.
  */
-export function instanceOfAccountStakingInfo(value: object): boolean {
-    if (!('pool' in value)) return false;
-    if (!('amount' in value)) return false;
-    if (!('pendingDeposit' in value)) return false;
-    if (!('pendingWithdraw' in value)) return false;
-    if (!('readyWithdraw' in value)) return false;
+export function instanceOfAccountStakingInfo(value: object): value is AccountStakingInfo {
+    if (!('pool' in value) || value['pool'] === undefined) return false;
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('pendingDeposit' in value) || value['pendingDeposit'] === undefined) return false;
+    if (!('pendingWithdraw' in value) || value['pendingWithdraw'] === undefined) return false;
+    if (!('readyWithdraw' in value) || value['readyWithdraw'] === undefined) return false;
     return true;
 }
 

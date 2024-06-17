@@ -43,9 +43,9 @@ export interface BlockchainConfig11 {
 /**
  * Check if a given object implements the BlockchainConfig11 interface.
  */
-export function instanceOfBlockchainConfig11(value: object): boolean {
-    if (!('normalParams' in value)) return false;
-    if (!('criticalParams' in value)) return false;
+export function instanceOfBlockchainConfig11(value: object): value is BlockchainConfig11 {
+    if (!('normalParams' in value) || value['normalParams'] === undefined) return false;
+    if (!('criticalParams' in value) || value['criticalParams'] === undefined) return false;
     return true;
 }
 

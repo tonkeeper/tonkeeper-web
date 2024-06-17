@@ -49,10 +49,10 @@ export interface BlockLimits {
 /**
  * Check if a given object implements the BlockLimits interface.
  */
-export function instanceOfBlockLimits(value: object): boolean {
-    if (!('bytes' in value)) return false;
-    if (!('gas' in value)) return false;
-    if (!('ltDelta' in value)) return false;
+export function instanceOfBlockLimits(value: object): value is BlockLimits {
+    if (!('bytes' in value) || value['bytes'] === undefined) return false;
+    if (!('gas' in value) || value['gas'] === undefined) return false;
+    if (!('ltDelta' in value) || value['ltDelta'] === undefined) return false;
     return true;
 }
 

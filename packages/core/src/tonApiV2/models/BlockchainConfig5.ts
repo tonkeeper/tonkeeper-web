@@ -42,9 +42,9 @@ export interface BlockchainConfig5 {
 /**
  * Check if a given object implements the BlockchainConfig5 interface.
  */
-export function instanceOfBlockchainConfig5(value: object): boolean {
-    if (!('feeBurnNom' in value)) return false;
-    if (!('feeBurnDenom' in value)) return false;
+export function instanceOfBlockchainConfig5(value: object): value is BlockchainConfig5 {
+    if (!('feeBurnNom' in value) || value['feeBurnNom'] === undefined) return false;
+    if (!('feeBurnDenom' in value) || value['feeBurnDenom'] === undefined) return false;
     return true;
 }
 

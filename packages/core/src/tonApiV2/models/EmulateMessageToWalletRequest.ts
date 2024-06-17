@@ -43,8 +43,8 @@ export interface EmulateMessageToWalletRequest {
 /**
  * Check if a given object implements the EmulateMessageToWalletRequest interface.
  */
-export function instanceOfEmulateMessageToWalletRequest(value: object): boolean {
-    if (!('boc' in value)) return false;
+export function instanceOfEmulateMessageToWalletRequest(value: object): value is EmulateMessageToWalletRequest {
+    if (!('boc' in value) || value['boc'] === undefined) return false;
     return true;
 }
 

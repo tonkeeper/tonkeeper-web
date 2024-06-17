@@ -37,8 +37,8 @@ export interface BlockchainConfig20 {
 /**
  * Check if a given object implements the BlockchainConfig20 interface.
  */
-export function instanceOfBlockchainConfig20(value: object): boolean {
-    if (!('gasLimitsPrices' in value)) return false;
+export function instanceOfBlockchainConfig20(value: object): value is BlockchainConfig20 {
+    if (!('gasLimitsPrices' in value) || value['gasLimitsPrices'] === undefined) return false;
     return true;
 }
 

@@ -49,9 +49,9 @@ export interface StoragePhase {
 /**
  * Check if a given object implements the StoragePhase interface.
  */
-export function instanceOfStoragePhase(value: object): boolean {
-    if (!('feesCollected' in value)) return false;
-    if (!('statusChange' in value)) return false;
+export function instanceOfStoragePhase(value: object): value is StoragePhase {
+    if (!('feesCollected' in value) || value['feesCollected'] === undefined) return false;
+    if (!('statusChange' in value) || value['statusChange'] === undefined) return false;
     return true;
 }
 

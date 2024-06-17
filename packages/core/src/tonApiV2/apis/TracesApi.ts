@@ -15,12 +15,12 @@
 
 import * as runtime from '../runtime';
 import type {
-  ReduceIndexingLatencyDefaultResponse,
+  StatusDefaultResponse,
   Trace,
 } from '../models/index';
 import {
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
     TraceFromJSON,
     TraceToJSON,
 } from '../models/index';

@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
 import type { ValueFlowJettonsInner } from './ValueFlowJettonsInner';
 import {
     ValueFlowJettonsInnerFromJSON,
     ValueFlowJettonsInnerFromJSONTyped,
     ValueFlowJettonsInnerToJSON,
 } from './ValueFlowJettonsInner';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -61,10 +61,10 @@ export interface ValueFlow {
 /**
  * Check if a given object implements the ValueFlow interface.
  */
-export function instanceOfValueFlow(value: object): boolean {
-    if (!('account' in value)) return false;
-    if (!('ton' in value)) return false;
-    if (!('fees' in value)) return false;
+export function instanceOfValueFlow(value: object): value is ValueFlow {
+    if (!('account' in value) || value['account'] === undefined) return false;
+    if (!('ton' in value) || value['ton'] === undefined) return false;
+    if (!('fees' in value) || value['fees'] === undefined) return false;
     return true;
 }
 

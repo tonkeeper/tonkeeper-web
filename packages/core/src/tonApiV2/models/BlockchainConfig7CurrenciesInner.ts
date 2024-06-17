@@ -36,9 +36,9 @@ export interface BlockchainConfig7CurrenciesInner {
 /**
  * Check if a given object implements the BlockchainConfig7CurrenciesInner interface.
  */
-export function instanceOfBlockchainConfig7CurrenciesInner(value: object): boolean {
-    if (!('currencyId' in value)) return false;
-    if (!('amount' in value)) return false;
+export function instanceOfBlockchainConfig7CurrenciesInner(value: object): value is BlockchainConfig7CurrenciesInner {
+    if (!('currencyId' in value) || value['currencyId'] === undefined) return false;
+    if (!('amount' in value) || value['amount'] === undefined) return false;
     return true;
 }
 

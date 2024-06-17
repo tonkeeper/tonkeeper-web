@@ -30,8 +30,8 @@ export interface TonConnectProof200Response {
 /**
  * Check if a given object implements the TonConnectProof200Response interface.
  */
-export function instanceOfTonConnectProof200Response(value: object): boolean {
-    if (!('token' in value)) return false;
+export function instanceOfTonConnectProof200Response(value: object): value is TonConnectProof200Response {
+    if (!('token' in value) || value['token'] === undefined) return false;
     return true;
 }
 

@@ -36,9 +36,9 @@ export interface BlockchainAccountInspectMethodsInner {
 /**
  * Check if a given object implements the BlockchainAccountInspectMethodsInner interface.
  */
-export function instanceOfBlockchainAccountInspectMethodsInner(value: object): boolean {
-    if (!('id' in value)) return false;
-    if (!('method' in value)) return false;
+export function instanceOfBlockchainAccountInspectMethodsInner(value: object): value is BlockchainAccountInspectMethodsInner {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('method' in value) || value['method'] === undefined) return false;
     return true;
 }
 

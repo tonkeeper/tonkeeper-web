@@ -49,10 +49,10 @@ export interface GetAllRawShardsInfo200Response {
 /**
  * Check if a given object implements the GetAllRawShardsInfo200Response interface.
  */
-export function instanceOfGetAllRawShardsInfo200Response(value: object): boolean {
-    if (!('id' in value)) return false;
-    if (!('proof' in value)) return false;
-    if (!('data' in value)) return false;
+export function instanceOfGetAllRawShardsInfo200Response(value: object): value is GetAllRawShardsInfo200Response {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('proof' in value) || value['proof'] === undefined) return false;
+    if (!('data' in value) || value['data'] === undefined) return false;
     return true;
 }
 

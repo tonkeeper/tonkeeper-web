@@ -60,13 +60,13 @@ export interface JettonBridgePrices {
 /**
  * Check if a given object implements the JettonBridgePrices interface.
  */
-export function instanceOfJettonBridgePrices(value: object): boolean {
-    if (!('bridgeBurnFee' in value)) return false;
-    if (!('bridgeMintFee' in value)) return false;
-    if (!('walletMinTonsForStorage' in value)) return false;
-    if (!('walletGasConsumption' in value)) return false;
-    if (!('minterMinTonsForStorage' in value)) return false;
-    if (!('discoverGasConsumption' in value)) return false;
+export function instanceOfJettonBridgePrices(value: object): value is JettonBridgePrices {
+    if (!('bridgeBurnFee' in value) || value['bridgeBurnFee'] === undefined) return false;
+    if (!('bridgeMintFee' in value) || value['bridgeMintFee'] === undefined) return false;
+    if (!('walletMinTonsForStorage' in value) || value['walletMinTonsForStorage'] === undefined) return false;
+    if (!('walletGasConsumption' in value) || value['walletGasConsumption'] === undefined) return false;
+    if (!('minterMinTonsForStorage' in value) || value['minterMinTonsForStorage'] === undefined) return false;
+    if (!('discoverGasConsumption' in value) || value['discoverGasConsumption'] === undefined) return false;
     return true;
 }
 

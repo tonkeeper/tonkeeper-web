@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
 import type { Action } from './Action';
 import {
     ActionFromJSON,
     ActionFromJSONTyped,
     ActionToJSON,
 } from './Action';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * An event is built on top of a trace which is a series of transactions caused by one inbound message. TonAPI looks for known patterns inside the trace and splits the trace into actions, where a single action represents a meaningful high-level operation like a Jetton Transfer or an NFT Purchase. Actions are expected to be shown to users. It is advised not to build any logic on top of actions because actions can be changed at any time.
@@ -85,15 +85,15 @@ export interface AccountEvent {
 /**
  * Check if a given object implements the AccountEvent interface.
  */
-export function instanceOfAccountEvent(value: object): boolean {
-    if (!('eventId' in value)) return false;
-    if (!('account' in value)) return false;
-    if (!('timestamp' in value)) return false;
-    if (!('actions' in value)) return false;
-    if (!('isScam' in value)) return false;
-    if (!('lt' in value)) return false;
-    if (!('inProgress' in value)) return false;
-    if (!('extra' in value)) return false;
+export function instanceOfAccountEvent(value: object): value is AccountEvent {
+    if (!('eventId' in value) || value['eventId'] === undefined) return false;
+    if (!('account' in value) || value['account'] === undefined) return false;
+    if (!('timestamp' in value) || value['timestamp'] === undefined) return false;
+    if (!('actions' in value) || value['actions'] === undefined) return false;
+    if (!('isScam' in value) || value['isScam'] === undefined) return false;
+    if (!('lt' in value) || value['lt'] === undefined) return false;
+    if (!('inProgress' in value) || value['inProgress'] === undefined) return false;
+    if (!('extra' in value) || value['extra'] === undefined) return false;
     return true;
 }
 

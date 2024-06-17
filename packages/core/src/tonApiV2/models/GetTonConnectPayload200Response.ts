@@ -30,8 +30,8 @@ export interface GetTonConnectPayload200Response {
 /**
  * Check if a given object implements the GetTonConnectPayload200Response interface.
  */
-export function instanceOfGetTonConnectPayload200Response(value: object): boolean {
-    if (!('payload' in value)) return false;
+export function instanceOfGetTonConnectPayload200Response(value: object): value is GetTonConnectPayload200Response {
+    if (!('payload' in value) || value['payload'] === undefined) return false;
     return true;
 }
 

@@ -13,24 +13,24 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
-import type { NftItem } from './NftItem';
-import {
-    NftItemFromJSON,
-    NftItemFromJSONTyped,
-    NftItemToJSON,
-} from './NftItem';
 import type { Price } from './Price';
 import {
     PriceFromJSON,
     PriceFromJSONTyped,
     PriceToJSON,
 } from './Price';
+import type { NftItem } from './NftItem';
+import {
+    NftItemFromJSON,
+    NftItemFromJSONTyped,
+    NftItemToJSON,
+} from './NftItem';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -86,11 +86,11 @@ export type AuctionBidActionAuctionTypeEnum = typeof AuctionBidActionAuctionType
 /**
  * Check if a given object implements the AuctionBidAction interface.
  */
-export function instanceOfAuctionBidAction(value: object): boolean {
-    if (!('auctionType' in value)) return false;
-    if (!('amount' in value)) return false;
-    if (!('bidder' in value)) return false;
-    if (!('auction' in value)) return false;
+export function instanceOfAuctionBidAction(value: object): value is AuctionBidAction {
+    if (!('auctionType' in value) || value['auctionType'] === undefined) return false;
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('bidder' in value) || value['bidder'] === undefined) return false;
+    if (!('auction' in value) || value['auction'] === undefined) return false;
     return true;
 }
 

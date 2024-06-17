@@ -36,9 +36,9 @@ export interface ContractDeployAction {
 /**
  * Check if a given object implements the ContractDeployAction interface.
  */
-export function instanceOfContractDeployAction(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('interfaces' in value)) return false;
+export function instanceOfContractDeployAction(value: object): value is ContractDeployAction {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('interfaces' in value) || value['interfaces'] === undefined) return false;
     return true;
 }
 

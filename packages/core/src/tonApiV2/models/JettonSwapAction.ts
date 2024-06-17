@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
 import type { JettonPreview } from './JettonPreview';
 import {
     JettonPreviewFromJSON,
     JettonPreviewFromJSONTyped,
     JettonPreviewToJSON,
 } from './JettonPreview';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -103,12 +103,12 @@ export type JettonSwapActionDexEnum = typeof JettonSwapActionDexEnum[keyof typeo
 /**
  * Check if a given object implements the JettonSwapAction interface.
  */
-export function instanceOfJettonSwapAction(value: object): boolean {
-    if (!('dex' in value)) return false;
-    if (!('amountIn' in value)) return false;
-    if (!('amountOut' in value)) return false;
-    if (!('userWallet' in value)) return false;
-    if (!('router' in value)) return false;
+export function instanceOfJettonSwapAction(value: object): value is JettonSwapAction {
+    if (!('dex' in value) || value['dex'] === undefined) return false;
+    if (!('amountIn' in value) || value['amountIn'] === undefined) return false;
+    if (!('amountOut' in value) || value['amountOut'] === undefined) return false;
+    if (!('userWallet' in value) || value['userWallet'] === undefined) return false;
+    if (!('router' in value) || value['router'] === undefined) return false;
     return true;
 }
 

@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { BlockRaw } from './BlockRaw';
-import {
-    BlockRawFromJSON,
-    BlockRawFromJSONTyped,
-    BlockRawToJSON,
-} from './BlockRaw';
 import type { GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures } from './GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures';
 import {
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesFromJSON,
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesFromJSONTyped,
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesToJSON,
 } from './GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures';
+import type { BlockRaw } from './BlockRaw';
+import {
+    BlockRawFromJSON,
+    BlockRawFromJSONTyped,
+    BlockRawToJSON,
+} from './BlockRaw';
 
 /**
  * 
@@ -73,13 +73,13 @@ export interface GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward
 /**
  * Check if a given object implements the GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward interface.
  */
-export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward(value: object): boolean {
-    if (!('toKeyBlock' in value)) return false;
-    if (!('from' in value)) return false;
-    if (!('to' in value)) return false;
-    if (!('destProof' in value)) return false;
-    if (!('configProof' in value)) return false;
-    if (!('signatures' in value)) return false;
+export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward(value: object): value is GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward {
+    if (!('toKeyBlock' in value) || value['toKeyBlock'] === undefined) return false;
+    if (!('from' in value) || value['from'] === undefined) return false;
+    if (!('to' in value) || value['to'] === undefined) return false;
+    if (!('destProof' in value) || value['destProof'] === undefined) return false;
+    if (!('configProof' in value) || value['configProof'] === undefined) return false;
+    if (!('signatures' in value) || value['signatures'] === undefined) return false;
     return true;
 }
 

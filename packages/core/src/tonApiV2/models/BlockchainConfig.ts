@@ -13,96 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { BlockchainConfig10 } from './BlockchainConfig10';
-import {
-    BlockchainConfig10FromJSON,
-    BlockchainConfig10FromJSONTyped,
-    BlockchainConfig10ToJSON,
-} from './BlockchainConfig10';
-import type { BlockchainConfig11 } from './BlockchainConfig11';
-import {
-    BlockchainConfig11FromJSON,
-    BlockchainConfig11FromJSONTyped,
-    BlockchainConfig11ToJSON,
-} from './BlockchainConfig11';
-import type { BlockchainConfig12 } from './BlockchainConfig12';
-import {
-    BlockchainConfig12FromJSON,
-    BlockchainConfig12FromJSONTyped,
-    BlockchainConfig12ToJSON,
-} from './BlockchainConfig12';
-import type { BlockchainConfig13 } from './BlockchainConfig13';
-import {
-    BlockchainConfig13FromJSON,
-    BlockchainConfig13FromJSONTyped,
-    BlockchainConfig13ToJSON,
-} from './BlockchainConfig13';
-import type { BlockchainConfig14 } from './BlockchainConfig14';
-import {
-    BlockchainConfig14FromJSON,
-    BlockchainConfig14FromJSONTyped,
-    BlockchainConfig14ToJSON,
-} from './BlockchainConfig14';
-import type { BlockchainConfig15 } from './BlockchainConfig15';
-import {
-    BlockchainConfig15FromJSON,
-    BlockchainConfig15FromJSONTyped,
-    BlockchainConfig15ToJSON,
-} from './BlockchainConfig15';
-import type { BlockchainConfig16 } from './BlockchainConfig16';
-import {
-    BlockchainConfig16FromJSON,
-    BlockchainConfig16FromJSONTyped,
-    BlockchainConfig16ToJSON,
-} from './BlockchainConfig16';
-import type { BlockchainConfig17 } from './BlockchainConfig17';
-import {
-    BlockchainConfig17FromJSON,
-    BlockchainConfig17FromJSONTyped,
-    BlockchainConfig17ToJSON,
-} from './BlockchainConfig17';
-import type { BlockchainConfig18 } from './BlockchainConfig18';
-import {
-    BlockchainConfig18FromJSON,
-    BlockchainConfig18FromJSONTyped,
-    BlockchainConfig18ToJSON,
-} from './BlockchainConfig18';
-import type { BlockchainConfig20 } from './BlockchainConfig20';
-import {
-    BlockchainConfig20FromJSON,
-    BlockchainConfig20FromJSONTyped,
-    BlockchainConfig20ToJSON,
-} from './BlockchainConfig20';
-import type { BlockchainConfig21 } from './BlockchainConfig21';
-import {
-    BlockchainConfig21FromJSON,
-    BlockchainConfig21FromJSONTyped,
-    BlockchainConfig21ToJSON,
-} from './BlockchainConfig21';
-import type { BlockchainConfig22 } from './BlockchainConfig22';
-import {
-    BlockchainConfig22FromJSON,
-    BlockchainConfig22FromJSONTyped,
-    BlockchainConfig22ToJSON,
-} from './BlockchainConfig22';
-import type { BlockchainConfig23 } from './BlockchainConfig23';
-import {
-    BlockchainConfig23FromJSON,
-    BlockchainConfig23FromJSONTyped,
-    BlockchainConfig23ToJSON,
-} from './BlockchainConfig23';
-import type { BlockchainConfig24 } from './BlockchainConfig24';
-import {
-    BlockchainConfig24FromJSON,
-    BlockchainConfig24FromJSONTyped,
-    BlockchainConfig24ToJSON,
-} from './BlockchainConfig24';
-import type { BlockchainConfig25 } from './BlockchainConfig25';
-import {
-    BlockchainConfig25FromJSON,
-    BlockchainConfig25FromJSONTyped,
-    BlockchainConfig25ToJSON,
-} from './BlockchainConfig25';
 import type { BlockchainConfig28 } from './BlockchainConfig28';
 import {
     BlockchainConfig28FromJSON,
@@ -115,36 +25,60 @@ import {
     BlockchainConfig29FromJSONTyped,
     BlockchainConfig29ToJSON,
 } from './BlockchainConfig29';
-import type { BlockchainConfig31 } from './BlockchainConfig31';
+import type { BlockchainConfig24 } from './BlockchainConfig24';
 import {
-    BlockchainConfig31FromJSON,
-    BlockchainConfig31FromJSONTyped,
-    BlockchainConfig31ToJSON,
-} from './BlockchainConfig31';
-import type { BlockchainConfig40 } from './BlockchainConfig40';
+    BlockchainConfig24FromJSON,
+    BlockchainConfig24FromJSONTyped,
+    BlockchainConfig24ToJSON,
+} from './BlockchainConfig24';
+import type { BlockchainConfig25 } from './BlockchainConfig25';
 import {
-    BlockchainConfig40FromJSON,
-    BlockchainConfig40FromJSONTyped,
-    BlockchainConfig40ToJSON,
-} from './BlockchainConfig40';
-import type { BlockchainConfig43 } from './BlockchainConfig43';
+    BlockchainConfig25FromJSON,
+    BlockchainConfig25FromJSONTyped,
+    BlockchainConfig25ToJSON,
+} from './BlockchainConfig25';
+import type { BlockchainConfig22 } from './BlockchainConfig22';
 import {
-    BlockchainConfig43FromJSON,
-    BlockchainConfig43FromJSONTyped,
-    BlockchainConfig43ToJSON,
-} from './BlockchainConfig43';
+    BlockchainConfig22FromJSON,
+    BlockchainConfig22FromJSONTyped,
+    BlockchainConfig22ToJSON,
+} from './BlockchainConfig22';
 import type { BlockchainConfig44 } from './BlockchainConfig44';
 import {
     BlockchainConfig44FromJSON,
     BlockchainConfig44FromJSONTyped,
     BlockchainConfig44ToJSON,
 } from './BlockchainConfig44';
-import type { BlockchainConfig5 } from './BlockchainConfig5';
+import type { BlockchainConfig23 } from './BlockchainConfig23';
 import {
-    BlockchainConfig5FromJSON,
-    BlockchainConfig5FromJSONTyped,
-    BlockchainConfig5ToJSON,
-} from './BlockchainConfig5';
+    BlockchainConfig23FromJSON,
+    BlockchainConfig23FromJSONTyped,
+    BlockchainConfig23ToJSON,
+} from './BlockchainConfig23';
+import type { BlockchainConfig20 } from './BlockchainConfig20';
+import {
+    BlockchainConfig20FromJSON,
+    BlockchainConfig20FromJSONTyped,
+    BlockchainConfig20ToJSON,
+} from './BlockchainConfig20';
+import type { BlockchainConfig21 } from './BlockchainConfig21';
+import {
+    BlockchainConfig21FromJSON,
+    BlockchainConfig21FromJSONTyped,
+    BlockchainConfig21ToJSON,
+} from './BlockchainConfig21';
+import type { BlockchainConfig43 } from './BlockchainConfig43';
+import {
+    BlockchainConfig43FromJSON,
+    BlockchainConfig43FromJSONTyped,
+    BlockchainConfig43ToJSON,
+} from './BlockchainConfig43';
+import type { BlockchainConfig40 } from './BlockchainConfig40';
+import {
+    BlockchainConfig40FromJSON,
+    BlockchainConfig40FromJSONTyped,
+    BlockchainConfig40ToJSON,
+} from './BlockchainConfig40';
 import type { BlockchainConfig6 } from './BlockchainConfig6';
 import {
     BlockchainConfig6FromJSON,
@@ -157,18 +91,6 @@ import {
     BlockchainConfig7FromJSONTyped,
     BlockchainConfig7ToJSON,
 } from './BlockchainConfig7';
-import type { BlockchainConfig71 } from './BlockchainConfig71';
-import {
-    BlockchainConfig71FromJSON,
-    BlockchainConfig71FromJSONTyped,
-    BlockchainConfig71ToJSON,
-} from './BlockchainConfig71';
-import type { BlockchainConfig79 } from './BlockchainConfig79';
-import {
-    BlockchainConfig79FromJSON,
-    BlockchainConfig79FromJSONTyped,
-    BlockchainConfig79ToJSON,
-} from './BlockchainConfig79';
 import type { BlockchainConfig8 } from './BlockchainConfig8';
 import {
     BlockchainConfig8FromJSON,
@@ -187,6 +109,84 @@ import {
     ValidatorsSetFromJSONTyped,
     ValidatorsSetToJSON,
 } from './ValidatorsSet';
+import type { BlockchainConfig17 } from './BlockchainConfig17';
+import {
+    BlockchainConfig17FromJSON,
+    BlockchainConfig17FromJSONTyped,
+    BlockchainConfig17ToJSON,
+} from './BlockchainConfig17';
+import type { BlockchainConfig18 } from './BlockchainConfig18';
+import {
+    BlockchainConfig18FromJSON,
+    BlockchainConfig18FromJSONTyped,
+    BlockchainConfig18ToJSON,
+} from './BlockchainConfig18';
+import type { BlockchainConfig15 } from './BlockchainConfig15';
+import {
+    BlockchainConfig15FromJSON,
+    BlockchainConfig15FromJSONTyped,
+    BlockchainConfig15ToJSON,
+} from './BlockchainConfig15';
+import type { BlockchainConfig16 } from './BlockchainConfig16';
+import {
+    BlockchainConfig16FromJSON,
+    BlockchainConfig16FromJSONTyped,
+    BlockchainConfig16ToJSON,
+} from './BlockchainConfig16';
+import type { BlockchainConfig13 } from './BlockchainConfig13';
+import {
+    BlockchainConfig13FromJSON,
+    BlockchainConfig13FromJSONTyped,
+    BlockchainConfig13ToJSON,
+} from './BlockchainConfig13';
+import type { BlockchainConfig79 } from './BlockchainConfig79';
+import {
+    BlockchainConfig79FromJSON,
+    BlockchainConfig79FromJSONTyped,
+    BlockchainConfig79ToJSON,
+} from './BlockchainConfig79';
+import type { BlockchainConfig14 } from './BlockchainConfig14';
+import {
+    BlockchainConfig14FromJSON,
+    BlockchainConfig14FromJSONTyped,
+    BlockchainConfig14ToJSON,
+} from './BlockchainConfig14';
+import type { BlockchainConfig11 } from './BlockchainConfig11';
+import {
+    BlockchainConfig11FromJSON,
+    BlockchainConfig11FromJSONTyped,
+    BlockchainConfig11ToJSON,
+} from './BlockchainConfig11';
+import type { BlockchainConfig12 } from './BlockchainConfig12';
+import {
+    BlockchainConfig12FromJSON,
+    BlockchainConfig12FromJSONTyped,
+    BlockchainConfig12ToJSON,
+} from './BlockchainConfig12';
+import type { BlockchainConfig31 } from './BlockchainConfig31';
+import {
+    BlockchainConfig31FromJSON,
+    BlockchainConfig31FromJSONTyped,
+    BlockchainConfig31ToJSON,
+} from './BlockchainConfig31';
+import type { BlockchainConfig10 } from './BlockchainConfig10';
+import {
+    BlockchainConfig10FromJSON,
+    BlockchainConfig10FromJSONTyped,
+    BlockchainConfig10ToJSON,
+} from './BlockchainConfig10';
+import type { BlockchainConfig71 } from './BlockchainConfig71';
+import {
+    BlockchainConfig71FromJSON,
+    BlockchainConfig71FromJSONTyped,
+    BlockchainConfig71ToJSON,
+} from './BlockchainConfig71';
+import type { BlockchainConfig5 } from './BlockchainConfig5';
+import {
+    BlockchainConfig5FromJSON,
+    BlockchainConfig5FromJSONTyped,
+    BlockchainConfig5ToJSON,
+} from './BlockchainConfig5';
 
 /**
  * 
@@ -463,13 +463,13 @@ export interface BlockchainConfig {
 /**
  * Check if a given object implements the BlockchainConfig interface.
  */
-export function instanceOfBlockchainConfig(value: object): boolean {
-    if (!('raw' in value)) return false;
-    if (!('_0' in value)) return false;
-    if (!('_1' in value)) return false;
-    if (!('_2' in value)) return false;
-    if (!('_4' in value)) return false;
-    if (!('_44' in value)) return false;
+export function instanceOfBlockchainConfig(value: object): value is BlockchainConfig {
+    if (!('raw' in value) || value['raw'] === undefined) return false;
+    if (!('_0' in value) || value['_0'] === undefined) return false;
+    if (!('_1' in value) || value['_1'] === undefined) return false;
+    if (!('_2' in value) || value['_2'] === undefined) return false;
+    if (!('_4' in value) || value['_4'] === undefined) return false;
+    if (!('_44' in value) || value['_44'] === undefined) return false;
     return true;
 }
 

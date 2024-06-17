@@ -42,10 +42,10 @@ export interface MarketTonRates {
 /**
  * Check if a given object implements the MarketTonRates interface.
  */
-export function instanceOfMarketTonRates(value: object): boolean {
-    if (!('market' in value)) return false;
-    if (!('usdPrice' in value)) return false;
-    if (!('lastDateUpdate' in value)) return false;
+export function instanceOfMarketTonRates(value: object): value is MarketTonRates {
+    if (!('market' in value) || value['market'] === undefined) return false;
+    if (!('usdPrice' in value) || value['usdPrice'] === undefined) return false;
+    if (!('lastDateUpdate' in value) || value['lastDateUpdate'] === undefined) return false;
     return true;
 }
 
