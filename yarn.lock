@@ -3940,17 +3940,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@keystonehq/bc-ur-registry-stellar@npm:^0.0.3":
-  version: 0.0.3
-  resolution: "@keystonehq/bc-ur-registry-stellar@npm:0.0.3"
-  dependencies:
-    "@keystonehq/bc-ur-registry": "npm:^0.5.4"
-    bs58check: "npm:^2.1.2"
-    uuid: "npm:^8.3.2"
-  checksum: 10/d5bcd9162dd4ada0ea0d7f3142cb09a3092c7de6ea1ca249596ba37bd336c27c09b79746e1b5b5710209d48a23d8f14a3639cc07dd1a5868c87409524c02ebe6
-  languageName: node
-  linkType: hard
-
 "@keystonehq/bc-ur-registry-sui@npm:^0.3.0":
   version: 0.3.0
   resolution: "@keystonehq/bc-ur-registry-sui@npm:0.3.0"
@@ -4004,9 +3993,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@keystonehq/keystone-sdk@https://github.com/tonkeeper/keystone-sdk-web#build":
-  version: 0.6.1
-  resolution: "@keystonehq/keystone-sdk@https://github.com/tonkeeper/keystone-sdk-web.git#commit=878d8ac8e50fcdc6eb91cf09bd73826cf197f607"
+"@keystonehq/keystone-sdk@npm:^0.5.1":
+  version: 0.5.1
+  resolution: "@keystonehq/keystone-sdk@npm:0.5.1"
   dependencies:
     "@bufbuild/protobuf": "npm:^1.2.0"
     "@keystonehq/bc-ur-registry": "npm:^0.6.4"
@@ -4020,7 +4009,6 @@ __metadata:
     "@keystonehq/bc-ur-registry-keystone": "npm:^0.1.0"
     "@keystonehq/bc-ur-registry-near": "npm:^0.8.0"
     "@keystonehq/bc-ur-registry-sol": "npm:^0.6.2"
-    "@keystonehq/bc-ur-registry-stellar": "npm:^0.0.3"
     "@keystonehq/bc-ur-registry-sui": "npm:^0.3.0"
     "@keystonehq/bc-ur-registry-ton": "npm:^0.1.1"
     "@ngraveio/bc-ur": "npm:^1.1.6"
@@ -4028,7 +4016,7 @@ __metadata:
     pako: "npm:^2.1.0"
     ripple-binary-codec: "npm:^1.4.3"
     uuid: "npm:^9.0.0"
-  checksum: 10/7313923a549b6a4c5c7d31bd47e8730cdc7f2815bcfd758f59152128c02d75cfe91afefbafaf440d58faea433e5b363af60228b0bf348b1aecf19ec626184d46
+  checksum: 10/117d334bfd218206b21d81c85ae1f866094a6cf66a565e93a925b6315397fcaf042e9d0b33b93e9512cad6f711d43c550d47b3e012921150a813ee4d72d41a34
   languageName: node
   linkType: hard
 
@@ -6465,7 +6453,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/core@workspace:packages/core"
   dependencies:
-    "@keystonehq/keystone-sdk": "https://github.com/tonkeeper/keystone-sdk-web#build"
+    "@keystonehq/keystone-sdk": "npm:^0.5.1"
     "@ledgerhq/hw-transport-webhid": "npm:^6.28.6"
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
     "@ton-community/ton-ledger": "npm:^7.0.1"
@@ -6650,7 +6638,7 @@ __metadata:
     "@amplitude/analytics-browser": "npm:^2.1.0"
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
-    "@keystonehq/keystone-sdk": "https://github.com/tonkeeper/keystone-sdk-web#build"
+    "@keystonehq/keystone-sdk": "npm:^0.5.1"
     "@ngraveio/bc-ur": "npm:^1.1.13"
     "@polkadot/react-qr": "npm:^3.1.1"
     "@storybook/addon-actions": "npm:^6.5.14"
