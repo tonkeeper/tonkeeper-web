@@ -13,18 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
-import type { JettonBalanceLock } from './JettonBalanceLock';
-import {
-    JettonBalanceLockFromJSON,
-    JettonBalanceLockFromJSONTyped,
-    JettonBalanceLockToJSON,
-} from './JettonBalanceLock';
 import type { JettonPreview } from './JettonPreview';
 import {
     JettonPreviewFromJSON,
@@ -37,6 +25,18 @@ import {
     TokenRatesFromJSONTyped,
     TokenRatesToJSON,
 } from './TokenRates';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
+import type { JettonBalanceLock } from './JettonBalanceLock';
+import {
+    JettonBalanceLockFromJSON,
+    JettonBalanceLockFromJSONTyped,
+    JettonBalanceLockToJSON,
+} from './JettonBalanceLock';
 
 /**
  * 
@@ -79,10 +79,10 @@ export interface JettonBalance {
 /**
  * Check if a given object implements the JettonBalance interface.
  */
-export function instanceOfJettonBalance(value: object): boolean {
-    if (!('balance' in value)) return false;
-    if (!('walletAddress' in value)) return false;
-    if (!('jetton' in value)) return false;
+export function instanceOfJettonBalance(value: object): value is JettonBalance {
+    if (!('balance' in value) || value['balance'] === undefined) return false;
+    if (!('walletAddress' in value) || value['walletAddress'] === undefined) return false;
+    if (!('jetton' in value) || value['jetton'] === undefined) return false;
     return true;
 }
 

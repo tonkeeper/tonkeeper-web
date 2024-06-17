@@ -37,8 +37,8 @@ export interface BlockchainConfig71 {
 /**
  * Check if a given object implements the BlockchainConfig71 interface.
  */
-export function instanceOfBlockchainConfig71(value: object): boolean {
-    if (!('oracleBridgeParams' in value)) return false;
+export function instanceOfBlockchainConfig71(value: object): value is BlockchainConfig71 {
+    if (!('oracleBridgeParams' in value) || value['oracleBridgeParams'] === undefined) return false;
     return true;
 }
 

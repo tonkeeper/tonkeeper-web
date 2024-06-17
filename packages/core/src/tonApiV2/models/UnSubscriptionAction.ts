@@ -49,10 +49,10 @@ export interface UnSubscriptionAction {
 /**
  * Check if a given object implements the UnSubscriptionAction interface.
  */
-export function instanceOfUnSubscriptionAction(value: object): boolean {
-    if (!('subscriber' in value)) return false;
-    if (!('subscription' in value)) return false;
-    if (!('beneficiary' in value)) return false;
+export function instanceOfUnSubscriptionAction(value: object): value is UnSubscriptionAction {
+    if (!('subscriber' in value) || value['subscriber'] === undefined) return false;
+    if (!('subscription' in value) || value['subscription'] === undefined) return false;
+    if (!('beneficiary' in value) || value['beneficiary'] === undefined) return false;
     return true;
 }
 

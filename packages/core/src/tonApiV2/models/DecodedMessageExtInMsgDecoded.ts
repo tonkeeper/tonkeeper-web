@@ -13,24 +13,24 @@
  */
 
 import { mapValues } from '../runtime';
-import type { DecodedMessageExtInMsgDecodedWalletHighloadV2 } from './DecodedMessageExtInMsgDecodedWalletHighloadV2';
-import {
-    DecodedMessageExtInMsgDecodedWalletHighloadV2FromJSON,
-    DecodedMessageExtInMsgDecodedWalletHighloadV2FromJSONTyped,
-    DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSON,
-} from './DecodedMessageExtInMsgDecodedWalletHighloadV2';
-import type { DecodedMessageExtInMsgDecodedWalletV3 } from './DecodedMessageExtInMsgDecodedWalletV3';
-import {
-    DecodedMessageExtInMsgDecodedWalletV3FromJSON,
-    DecodedMessageExtInMsgDecodedWalletV3FromJSONTyped,
-    DecodedMessageExtInMsgDecodedWalletV3ToJSON,
-} from './DecodedMessageExtInMsgDecodedWalletV3';
 import type { DecodedMessageExtInMsgDecodedWalletV4 } from './DecodedMessageExtInMsgDecodedWalletV4';
 import {
     DecodedMessageExtInMsgDecodedWalletV4FromJSON,
     DecodedMessageExtInMsgDecodedWalletV4FromJSONTyped,
     DecodedMessageExtInMsgDecodedWalletV4ToJSON,
 } from './DecodedMessageExtInMsgDecodedWalletV4';
+import type { DecodedMessageExtInMsgDecodedWalletV3 } from './DecodedMessageExtInMsgDecodedWalletV3';
+import {
+    DecodedMessageExtInMsgDecodedWalletV3FromJSON,
+    DecodedMessageExtInMsgDecodedWalletV3FromJSONTyped,
+    DecodedMessageExtInMsgDecodedWalletV3ToJSON,
+} from './DecodedMessageExtInMsgDecodedWalletV3';
+import type { DecodedMessageExtInMsgDecodedWalletHighloadV2 } from './DecodedMessageExtInMsgDecodedWalletHighloadV2';
+import {
+    DecodedMessageExtInMsgDecodedWalletHighloadV2FromJSON,
+    DecodedMessageExtInMsgDecodedWalletHighloadV2FromJSONTyped,
+    DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSON,
+} from './DecodedMessageExtInMsgDecodedWalletHighloadV2';
 
 /**
  * 
@@ -61,7 +61,7 @@ export interface DecodedMessageExtInMsgDecoded {
 /**
  * Check if a given object implements the DecodedMessageExtInMsgDecoded interface.
  */
-export function instanceOfDecodedMessageExtInMsgDecoded(value: object): boolean {
+export function instanceOfDecodedMessageExtInMsgDecoded(value: object): value is DecodedMessageExtInMsgDecoded {
     return true;
 }
 

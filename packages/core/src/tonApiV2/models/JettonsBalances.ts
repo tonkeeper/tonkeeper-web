@@ -37,8 +37,8 @@ export interface JettonsBalances {
 /**
  * Check if a given object implements the JettonsBalances interface.
  */
-export function instanceOfJettonsBalances(value: object): boolean {
-    if (!('balances' in value)) return false;
+export function instanceOfJettonsBalances(value: object): value is JettonsBalances {
+    if (!('balances' in value) || value['balances'] === undefined) return false;
     return true;
 }
 

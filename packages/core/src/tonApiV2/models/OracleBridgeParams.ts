@@ -55,11 +55,11 @@ export interface OracleBridgeParams {
 /**
  * Check if a given object implements the OracleBridgeParams interface.
  */
-export function instanceOfOracleBridgeParams(value: object): boolean {
-    if (!('bridgeAddr' in value)) return false;
-    if (!('oracleMultisigAddress' in value)) return false;
-    if (!('externalChainAddress' in value)) return false;
-    if (!('oracles' in value)) return false;
+export function instanceOfOracleBridgeParams(value: object): value is OracleBridgeParams {
+    if (!('bridgeAddr' in value) || value['bridgeAddr'] === undefined) return false;
+    if (!('oracleMultisigAddress' in value) || value['oracleMultisigAddress'] === undefined) return false;
+    if (!('externalChainAddress' in value) || value['externalChainAddress'] === undefined) return false;
+    if (!('oracles' in value) || value['oracles'] === undefined) return false;
     return true;
 }
 

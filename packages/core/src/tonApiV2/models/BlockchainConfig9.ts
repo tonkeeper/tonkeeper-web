@@ -30,8 +30,8 @@ export interface BlockchainConfig9 {
 /**
  * Check if a given object implements the BlockchainConfig9 interface.
  */
-export function instanceOfBlockchainConfig9(value: object): boolean {
-    if (!('mandatoryParams' in value)) return false;
+export function instanceOfBlockchainConfig9(value: object): value is BlockchainConfig9 {
+    if (!('mandatoryParams' in value) || value['mandatoryParams'] === undefined) return false;
     return true;
 }
 

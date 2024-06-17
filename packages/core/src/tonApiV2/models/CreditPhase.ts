@@ -36,9 +36,9 @@ export interface CreditPhase {
 /**
  * Check if a given object implements the CreditPhase interface.
  */
-export function instanceOfCreditPhase(value: object): boolean {
-    if (!('feesCollected' in value)) return false;
-    if (!('credit' in value)) return false;
+export function instanceOfCreditPhase(value: object): value is CreditPhase {
+    if (!('feesCollected' in value) || value['feesCollected'] === undefined) return false;
+    if (!('credit' in value) || value['credit'] === undefined) return false;
     return true;
 }
 

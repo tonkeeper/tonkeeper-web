@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { BlockRaw } from './BlockRaw';
-import {
-    BlockRawFromJSON,
-    BlockRawFromJSONTyped,
-    BlockRawToJSON,
-} from './BlockRaw';
 import type { GetRawBlockProof200ResponseStepsInner } from './GetRawBlockProof200ResponseStepsInner';
 import {
     GetRawBlockProof200ResponseStepsInnerFromJSON,
     GetRawBlockProof200ResponseStepsInnerFromJSONTyped,
     GetRawBlockProof200ResponseStepsInnerToJSON,
 } from './GetRawBlockProof200ResponseStepsInner';
+import type { BlockRaw } from './BlockRaw';
+import {
+    BlockRawFromJSON,
+    BlockRawFromJSONTyped,
+    BlockRawToJSON,
+} from './BlockRaw';
 
 /**
  * 
@@ -61,11 +61,11 @@ export interface GetRawBlockProof200Response {
 /**
  * Check if a given object implements the GetRawBlockProof200Response interface.
  */
-export function instanceOfGetRawBlockProof200Response(value: object): boolean {
-    if (!('complete' in value)) return false;
-    if (!('from' in value)) return false;
-    if (!('to' in value)) return false;
-    if (!('steps' in value)) return false;
+export function instanceOfGetRawBlockProof200Response(value: object): value is GetRawBlockProof200Response {
+    if (!('complete' in value) || value['complete'] === undefined) return false;
+    if (!('from' in value) || value['from'] === undefined) return false;
+    if (!('to' in value) || value['to'] === undefined) return false;
+    if (!('steps' in value) || value['steps'] === undefined) return false;
     return true;
 }
 

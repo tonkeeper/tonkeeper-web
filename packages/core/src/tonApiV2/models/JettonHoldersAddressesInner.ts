@@ -49,10 +49,10 @@ export interface JettonHoldersAddressesInner {
 /**
  * Check if a given object implements the JettonHoldersAddressesInner interface.
  */
-export function instanceOfJettonHoldersAddressesInner(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('owner' in value)) return false;
-    if (!('balance' in value)) return false;
+export function instanceOfJettonHoldersAddressesInner(value: object): value is JettonHoldersAddressesInner {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('owner' in value) || value['owner'] === undefined) return false;
+    if (!('balance' in value) || value['balance'] === undefined) return false;
     return true;
 }
 

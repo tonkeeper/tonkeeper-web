@@ -19,18 +19,18 @@ import {
     AccountStatusFromJSONTyped,
     AccountStatusToJSON,
 } from './AccountStatus';
-import type { AccountStorageInfo } from './AccountStorageInfo';
-import {
-    AccountStorageInfoFromJSON,
-    AccountStorageInfoFromJSONTyped,
-    AccountStorageInfoToJSON,
-} from './AccountStorageInfo';
 import type { BlockchainRawAccountLibrariesInner } from './BlockchainRawAccountLibrariesInner';
 import {
     BlockchainRawAccountLibrariesInnerFromJSON,
     BlockchainRawAccountLibrariesInnerFromJSONTyped,
     BlockchainRawAccountLibrariesInnerToJSON,
 } from './BlockchainRawAccountLibrariesInner';
+import type { AccountStorageInfo } from './AccountStorageInfo';
+import {
+    AccountStorageInfoFromJSON,
+    AccountStorageInfoFromJSONTyped,
+    AccountStorageInfoToJSON,
+} from './AccountStorageInfo';
 
 /**
  * 
@@ -109,12 +109,12 @@ export interface BlockchainRawAccount {
 /**
  * Check if a given object implements the BlockchainRawAccount interface.
  */
-export function instanceOfBlockchainRawAccount(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('balance' in value)) return false;
-    if (!('lastTransactionLt' in value)) return false;
-    if (!('status' in value)) return false;
-    if (!('storage' in value)) return false;
+export function instanceOfBlockchainRawAccount(value: object): value is BlockchainRawAccount {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('balance' in value) || value['balance'] === undefined) return false;
+    if (!('lastTransactionLt' in value) || value['lastTransactionLt'] === undefined) return false;
+    if (!('status' in value) || value['status'] === undefined) return false;
+    if (!('storage' in value) || value['storage'] === undefined) return false;
     return true;
 }
 

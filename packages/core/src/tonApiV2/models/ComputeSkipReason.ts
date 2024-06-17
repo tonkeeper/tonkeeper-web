@@ -26,7 +26,14 @@ export type ComputeSkipReason = typeof ComputeSkipReason[keyof typeof ComputeSki
 
 
 export function instanceOfComputeSkipReason(value: any): boolean {
-    return Object.values(ComputeSkipReason).includes(value);
+    for (const key in ComputeSkipReason) {
+        if (Object.prototype.hasOwnProperty.call(ComputeSkipReason, key)) {
+            if ((ComputeSkipReason as Record<string, ComputeSkipReason>)[key] === value) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 export function ComputeSkipReasonFromJSON(json: any): ComputeSkipReason {

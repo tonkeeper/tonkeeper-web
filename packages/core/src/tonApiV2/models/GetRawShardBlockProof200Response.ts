@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { BlockRaw } from './BlockRaw';
-import {
-    BlockRawFromJSON,
-    BlockRawFromJSONTyped,
-    BlockRawToJSON,
-} from './BlockRaw';
 import type { GetRawShardBlockProof200ResponseLinksInner } from './GetRawShardBlockProof200ResponseLinksInner';
 import {
     GetRawShardBlockProof200ResponseLinksInnerFromJSON,
     GetRawShardBlockProof200ResponseLinksInnerFromJSONTyped,
     GetRawShardBlockProof200ResponseLinksInnerToJSON,
 } from './GetRawShardBlockProof200ResponseLinksInner';
+import type { BlockRaw } from './BlockRaw';
+import {
+    BlockRawFromJSON,
+    BlockRawFromJSONTyped,
+    BlockRawToJSON,
+} from './BlockRaw';
 
 /**
  * 
@@ -49,9 +49,9 @@ export interface GetRawShardBlockProof200Response {
 /**
  * Check if a given object implements the GetRawShardBlockProof200Response interface.
  */
-export function instanceOfGetRawShardBlockProof200Response(value: object): boolean {
-    if (!('masterchainId' in value)) return false;
-    if (!('links' in value)) return false;
+export function instanceOfGetRawShardBlockProof200Response(value: object): value is GetRawShardBlockProof200Response {
+    if (!('masterchainId' in value) || value['masterchainId'] === undefined) return false;
+    if (!('links' in value) || value['links'] === undefined) return false;
     return true;
 }
 

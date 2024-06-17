@@ -83,6 +83,15 @@ jobs:
                   cmd: make:universal
                   dir: 'apps/desktop'
 
+            - name: Upload zip distributives to artifacts
+              uses: actions/upload-artifact@v4
+              if: runner.os == 'Windows'
+              with:
+                  name: Tonkeeper Desktop ${{ runner.os }} x64 archive
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make/zip/**/*.zip
+
             - name: Upload distributives to artifacts
               uses: actions/upload-artifact@v4
               if: runner.os == 'macOS'

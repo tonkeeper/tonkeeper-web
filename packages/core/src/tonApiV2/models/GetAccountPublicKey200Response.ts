@@ -30,8 +30,8 @@ export interface GetAccountPublicKey200Response {
 /**
  * Check if a given object implements the GetAccountPublicKey200Response interface.
  */
-export function instanceOfGetAccountPublicKey200Response(value: object): boolean {
-    if (!('publicKey' in value)) return false;
+export function instanceOfGetAccountPublicKey200Response(value: object): value is GetAccountPublicKey200Response {
+    if (!('publicKey' in value) || value['publicKey'] === undefined) return false;
     return true;
 }
 

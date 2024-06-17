@@ -37,8 +37,8 @@ export interface GetRates200Response {
 /**
  * Check if a given object implements the GetRates200Response interface.
  */
-export function instanceOfGetRates200Response(value: object): boolean {
-    if (!('rates' in value)) return false;
+export function instanceOfGetRates200Response(value: object): value is GetRates200Response {
+    if (!('rates' in value) || value['rates'] === undefined) return false;
     return true;
 }
 

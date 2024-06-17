@@ -36,9 +36,9 @@ export interface GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward
 /**
  * Check if a given object implements the GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner interface.
  */
-export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner(value: object): boolean {
-    if (!('nodeIdShort' in value)) return false;
-    if (!('signature' in value)) return false;
+export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner(value: object): value is GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner {
+    if (!('nodeIdShort' in value) || value['nodeIdShort'] === undefined) return false;
+    if (!('signature' in value) || value['signature'] === undefined) return false;
     return true;
 }
 

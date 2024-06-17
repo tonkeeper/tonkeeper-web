@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
 import type { ImagePreview } from './ImagePreview';
 import {
     ImagePreviewFromJSON,
     ImagePreviewFromJSONTyped,
     ImagePreviewToJSON,
 } from './ImagePreview';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -91,11 +91,11 @@ export type NftCollectionApprovedByEnum = typeof NftCollectionApprovedByEnum[key
 /**
  * Check if a given object implements the NftCollection interface.
  */
-export function instanceOfNftCollection(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('nextItemIndex' in value)) return false;
-    if (!('rawCollectionContent' in value)) return false;
-    if (!('approvedBy' in value)) return false;
+export function instanceOfNftCollection(value: object): value is NftCollection {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('nextItemIndex' in value) || value['nextItemIndex'] === undefined) return false;
+    if (!('rawCollectionContent' in value) || value['rawCollectionContent'] === undefined) return false;
+    if (!('approvedBy' in value) || value['approvedBy'] === undefined) return false;
     return true;
 }
 

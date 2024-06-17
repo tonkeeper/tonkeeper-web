@@ -48,11 +48,11 @@ export interface Validator {
 /**
  * Check if a given object implements the Validator interface.
  */
-export function instanceOfValidator(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('adnlAddress' in value)) return false;
-    if (!('stake' in value)) return false;
-    if (!('maxFactor' in value)) return false;
+export function instanceOfValidator(value: object): value is Validator {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('adnlAddress' in value) || value['adnlAddress'] === undefined) return false;
+    if (!('stake' in value) || value['stake'] === undefined) return false;
+    if (!('maxFactor' in value) || value['maxFactor'] === undefined) return false;
     return true;
 }
 

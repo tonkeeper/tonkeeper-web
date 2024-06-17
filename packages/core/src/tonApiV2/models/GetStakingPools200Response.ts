@@ -49,9 +49,9 @@ export interface GetStakingPools200Response {
 /**
  * Check if a given object implements the GetStakingPools200Response interface.
  */
-export function instanceOfGetStakingPools200Response(value: object): boolean {
-    if (!('pools' in value)) return false;
-    if (!('implementations' in value)) return false;
+export function instanceOfGetStakingPools200Response(value: object): value is GetStakingPools200Response {
+    if (!('pools' in value) || value['pools'] === undefined) return false;
+    if (!('implementations' in value) || value['implementations'] === undefined) return false;
     return true;
 }
 

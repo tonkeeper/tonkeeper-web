@@ -37,8 +37,8 @@ export interface BlockchainConfig40 {
 /**
  * Check if a given object implements the BlockchainConfig40 interface.
  */
-export function instanceOfBlockchainConfig40(value: object): boolean {
-    if (!('misbehaviourPunishmentConfig' in value)) return false;
+export function instanceOfBlockchainConfig40(value: object): value is BlockchainConfig40 {
+    if (!('misbehaviourPunishmentConfig' in value) || value['misbehaviourPunishmentConfig'] === undefined) return false;
     return true;
 }
 

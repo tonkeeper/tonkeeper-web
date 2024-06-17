@@ -43,9 +43,9 @@ export interface TonConnectProofRequest {
 /**
  * Check if a given object implements the TonConnectProofRequest interface.
  */
-export function instanceOfTonConnectProofRequest(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('proof' in value)) return false;
+export function instanceOfTonConnectProofRequest(value: object): value is TonConnectProofRequest {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('proof' in value) || value['proof'] === undefined) return false;
     return true;
 }
 

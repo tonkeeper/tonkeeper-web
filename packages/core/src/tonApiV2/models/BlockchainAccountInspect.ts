@@ -65,10 +65,10 @@ export type BlockchainAccountInspectCompilerEnum = typeof BlockchainAccountInspe
 /**
  * Check if a given object implements the BlockchainAccountInspect interface.
  */
-export function instanceOfBlockchainAccountInspect(value: object): boolean {
-    if (!('code' in value)) return false;
-    if (!('codeHash' in value)) return false;
-    if (!('methods' in value)) return false;
+export function instanceOfBlockchainAccountInspect(value: object): value is BlockchainAccountInspect {
+    if (!('code' in value) || value['code'] === undefined) return false;
+    if (!('codeHash' in value) || value['codeHash'] === undefined) return false;
+    if (!('methods' in value) || value['methods'] === undefined) return false;
     return true;
 }
 

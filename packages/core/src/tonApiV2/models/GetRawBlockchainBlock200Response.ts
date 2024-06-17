@@ -43,9 +43,9 @@ export interface GetRawBlockchainBlock200Response {
 /**
  * Check if a given object implements the GetRawBlockchainBlock200Response interface.
  */
-export function instanceOfGetRawBlockchainBlock200Response(value: object): boolean {
-    if (!('id' in value)) return false;
-    if (!('data' in value)) return false;
+export function instanceOfGetRawBlockchainBlock200Response(value: object): value is GetRawBlockchainBlock200Response {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('data' in value) || value['data'] === undefined) return false;
     return true;
 }
 

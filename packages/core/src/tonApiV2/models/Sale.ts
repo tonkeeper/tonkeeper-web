@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
 import type { Price } from './Price';
 import {
     PriceFromJSON,
     PriceFromJSONTyped,
     PriceToJSON,
 } from './Price';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -61,10 +61,10 @@ export interface Sale {
 /**
  * Check if a given object implements the Sale interface.
  */
-export function instanceOfSale(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('market' in value)) return false;
-    if (!('price' in value)) return false;
+export function instanceOfSale(value: object): value is Sale {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('market' in value) || value['market'] === undefined) return false;
+    if (!('price' in value) || value['price'] === undefined) return false;
     return true;
 }
 

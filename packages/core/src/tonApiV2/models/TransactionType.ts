@@ -30,7 +30,14 @@ export type TransactionType = typeof TransactionType[keyof typeof TransactionTyp
 
 
 export function instanceOfTransactionType(value: any): boolean {
-    return Object.values(TransactionType).includes(value);
+    for (const key in TransactionType) {
+        if (Object.prototype.hasOwnProperty.call(TransactionType, key)) {
+            if ((TransactionType as Record<string, TransactionType>)[key] === value) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 export function TransactionTypeFromJSON(json: any): TransactionType {

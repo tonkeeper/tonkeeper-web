@@ -36,9 +36,9 @@ export interface BlockCurrencyCollectionOtherInner {
 /**
  * Check if a given object implements the BlockCurrencyCollectionOtherInner interface.
  */
-export function instanceOfBlockCurrencyCollectionOtherInner(value: object): boolean {
-    if (!('id' in value)) return false;
-    if (!('value' in value)) return false;
+export function instanceOfBlockCurrencyCollectionOtherInner(value: object): value is BlockCurrencyCollectionOtherInner {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('value' in value) || value['value'] === undefined) return false;
     return true;
 }
 
