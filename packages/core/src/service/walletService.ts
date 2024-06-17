@@ -1,4 +1,4 @@
-import { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
+import type { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
 import { parseTonAccount } from '@keystonehq/keystone-sdk/dist/wallet/hdKey';
 import { Address } from '@ton/core';
 import { mnemonicToPrivateKey } from '@ton/crypto';

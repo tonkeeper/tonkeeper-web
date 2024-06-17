@@ -1,5 +1,5 @@
 import { KeystoneTonSDK } from '@keystonehq/keystone-sdk/dist/chains/ton';
-import type { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
+import UR from '@ngraveio/bc-ur/dist/ur';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { KeystoneMessageType, KeystonePathInfo } from '@tonkeeper/core/dist/service/keystone/types';
 import { constructKeystoneSignRequest } from '@tonkeeper/core/dist/service/keystone/ur';
