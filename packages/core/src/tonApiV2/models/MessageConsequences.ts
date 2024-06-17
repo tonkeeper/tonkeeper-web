@@ -13,6 +13,12 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Trace } from './Trace';
+import {
+    TraceFromJSON,
+    TraceFromJSONTyped,
+    TraceToJSON,
+} from './Trace';
 import type { AccountEvent } from './AccountEvent';
 import {
     AccountEventFromJSON,
@@ -25,12 +31,6 @@ import {
     RiskFromJSONTyped,
     RiskToJSON,
 } from './Risk';
-import type { Trace } from './Trace';
-import {
-    TraceFromJSON,
-    TraceFromJSONTyped,
-    TraceToJSON,
-} from './Trace';
 
 /**
  * 
@@ -61,10 +61,10 @@ export interface MessageConsequences {
 /**
  * Check if a given object implements the MessageConsequences interface.
  */
-export function instanceOfMessageConsequences(value: object): boolean {
-    if (!('trace' in value)) return false;
-    if (!('risk' in value)) return false;
-    if (!('event' in value)) return false;
+export function instanceOfMessageConsequences(value: object): value is MessageConsequences {
+    if (!('trace' in value) || value['trace'] === undefined) return false;
+    if (!('risk' in value) || value['risk'] === undefined) return false;
+    if (!('event' in value) || value['event'] === undefined) return false;
     return true;
 }
 

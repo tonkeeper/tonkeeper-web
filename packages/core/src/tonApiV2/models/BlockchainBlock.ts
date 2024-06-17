@@ -211,34 +211,34 @@ export interface BlockchainBlock {
 /**
  * Check if a given object implements the BlockchainBlock interface.
  */
-export function instanceOfBlockchainBlock(value: object): boolean {
-    if (!('txQuantity' in value)) return false;
-    if (!('valueFlow' in value)) return false;
-    if (!('workchainId' in value)) return false;
-    if (!('shard' in value)) return false;
-    if (!('seqno' in value)) return false;
-    if (!('rootHash' in value)) return false;
-    if (!('fileHash' in value)) return false;
-    if (!('globalId' in value)) return false;
-    if (!('version' in value)) return false;
-    if (!('afterMerge' in value)) return false;
-    if (!('beforeSplit' in value)) return false;
-    if (!('afterSplit' in value)) return false;
-    if (!('wantSplit' in value)) return false;
-    if (!('wantMerge' in value)) return false;
-    if (!('keyBlock' in value)) return false;
-    if (!('genUtime' in value)) return false;
-    if (!('startLt' in value)) return false;
-    if (!('endLt' in value)) return false;
-    if (!('vertSeqno' in value)) return false;
-    if (!('genCatchainSeqno' in value)) return false;
-    if (!('minRefMcSeqno' in value)) return false;
-    if (!('prevKeyBlockSeqno' in value)) return false;
-    if (!('prevRefs' in value)) return false;
-    if (!('inMsgDescrLength' in value)) return false;
-    if (!('outMsgDescrLength' in value)) return false;
-    if (!('randSeed' in value)) return false;
-    if (!('createdBy' in value)) return false;
+export function instanceOfBlockchainBlock(value: object): value is BlockchainBlock {
+    if (!('txQuantity' in value) || value['txQuantity'] === undefined) return false;
+    if (!('valueFlow' in value) || value['valueFlow'] === undefined) return false;
+    if (!('workchainId' in value) || value['workchainId'] === undefined) return false;
+    if (!('shard' in value) || value['shard'] === undefined) return false;
+    if (!('seqno' in value) || value['seqno'] === undefined) return false;
+    if (!('rootHash' in value) || value['rootHash'] === undefined) return false;
+    if (!('fileHash' in value) || value['fileHash'] === undefined) return false;
+    if (!('globalId' in value) || value['globalId'] === undefined) return false;
+    if (!('version' in value) || value['version'] === undefined) return false;
+    if (!('afterMerge' in value) || value['afterMerge'] === undefined) return false;
+    if (!('beforeSplit' in value) || value['beforeSplit'] === undefined) return false;
+    if (!('afterSplit' in value) || value['afterSplit'] === undefined) return false;
+    if (!('wantSplit' in value) || value['wantSplit'] === undefined) return false;
+    if (!('wantMerge' in value) || value['wantMerge'] === undefined) return false;
+    if (!('keyBlock' in value) || value['keyBlock'] === undefined) return false;
+    if (!('genUtime' in value) || value['genUtime'] === undefined) return false;
+    if (!('startLt' in value) || value['startLt'] === undefined) return false;
+    if (!('endLt' in value) || value['endLt'] === undefined) return false;
+    if (!('vertSeqno' in value) || value['vertSeqno'] === undefined) return false;
+    if (!('genCatchainSeqno' in value) || value['genCatchainSeqno'] === undefined) return false;
+    if (!('minRefMcSeqno' in value) || value['minRefMcSeqno'] === undefined) return false;
+    if (!('prevKeyBlockSeqno' in value) || value['prevKeyBlockSeqno'] === undefined) return false;
+    if (!('prevRefs' in value) || value['prevRefs'] === undefined) return false;
+    if (!('inMsgDescrLength' in value) || value['inMsgDescrLength'] === undefined) return false;
+    if (!('outMsgDescrLength' in value) || value['outMsgDescrLength'] === undefined) return false;
+    if (!('randSeed' in value) || value['randSeed'] === undefined) return false;
+    if (!('createdBy' in value) || value['createdBy'] === undefined) return false;
     return true;
 }
 

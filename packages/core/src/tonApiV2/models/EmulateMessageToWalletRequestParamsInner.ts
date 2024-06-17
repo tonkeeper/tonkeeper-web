@@ -36,8 +36,8 @@ export interface EmulateMessageToWalletRequestParamsInner {
 /**
  * Check if a given object implements the EmulateMessageToWalletRequestParamsInner interface.
  */
-export function instanceOfEmulateMessageToWalletRequestParamsInner(value: object): boolean {
-    if (!('address' in value)) return false;
+export function instanceOfEmulateMessageToWalletRequestParamsInner(value: object): value is EmulateMessageToWalletRequestParamsInner {
+    if (!('address' in value) || value['address'] === undefined) return false;
     return true;
 }
 

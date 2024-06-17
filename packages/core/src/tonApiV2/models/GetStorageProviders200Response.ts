@@ -37,8 +37,8 @@ export interface GetStorageProviders200Response {
 /**
  * Check if a given object implements the GetStorageProviders200Response interface.
  */
-export function instanceOfGetStorageProviders200Response(value: object): boolean {
-    if (!('providers' in value)) return false;
+export function instanceOfGetStorageProviders200Response(value: object): value is GetStorageProviders200Response {
+    if (!('providers' in value) || value['providers'] === undefined) return false;
     return true;
 }
 

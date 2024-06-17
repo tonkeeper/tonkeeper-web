@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
 import type { DecodedMessageExtInMsgDecoded } from './DecodedMessageExtInMsgDecoded';
 import {
     DecodedMessageExtInMsgDecodedFromJSON,
     DecodedMessageExtInMsgDecodedFromJSONTyped,
     DecodedMessageExtInMsgDecodedToJSON,
 } from './DecodedMessageExtInMsgDecoded';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -55,9 +55,9 @@ export interface DecodedMessage {
 /**
  * Check if a given object implements the DecodedMessage interface.
  */
-export function instanceOfDecodedMessage(value: object): boolean {
-    if (!('destination' in value)) return false;
-    if (!('destinationWalletVersion' in value)) return false;
+export function instanceOfDecodedMessage(value: object): value is DecodedMessage {
+    if (!('destination' in value) || value['destination'] === undefined) return false;
+    if (!('destinationWalletVersion' in value) || value['destinationWalletVersion'] === undefined) return false;
     return true;
 }
 

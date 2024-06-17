@@ -59,11 +59,11 @@ export type InscriptionBalanceTypeEnum = typeof InscriptionBalanceTypeEnum[keyof
 /**
  * Check if a given object implements the InscriptionBalance interface.
  */
-export function instanceOfInscriptionBalance(value: object): boolean {
-    if (!('type' in value)) return false;
-    if (!('ticker' in value)) return false;
-    if (!('balance' in value)) return false;
-    if (!('decimals' in value)) return false;
+export function instanceOfInscriptionBalance(value: object): value is InscriptionBalance {
+    if (!('type' in value) || value['type'] === undefined) return false;
+    if (!('ticker' in value) || value['ticker'] === undefined) return false;
+    if (!('balance' in value) || value['balance'] === undefined) return false;
+    if (!('decimals' in value) || value['decimals'] === undefined) return false;
     return true;
 }
 

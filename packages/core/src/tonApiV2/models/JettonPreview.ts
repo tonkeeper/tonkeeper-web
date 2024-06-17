@@ -67,13 +67,13 @@ export interface JettonPreview {
 /**
  * Check if a given object implements the JettonPreview interface.
  */
-export function instanceOfJettonPreview(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('name' in value)) return false;
-    if (!('symbol' in value)) return false;
-    if (!('decimals' in value)) return false;
-    if (!('image' in value)) return false;
-    if (!('verification' in value)) return false;
+export function instanceOfJettonPreview(value: object): value is JettonPreview {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('symbol' in value) || value['symbol'] === undefined) return false;
+    if (!('decimals' in value) || value['decimals'] === undefined) return false;
+    if (!('image' in value) || value['image'] === undefined) return false;
+    if (!('verification' in value) || value['verification'] === undefined) return false;
     return true;
 }
 

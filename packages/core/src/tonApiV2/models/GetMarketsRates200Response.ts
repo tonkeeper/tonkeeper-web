@@ -37,8 +37,8 @@ export interface GetMarketsRates200Response {
 /**
  * Check if a given object implements the GetMarketsRates200Response interface.
  */
-export function instanceOfGetMarketsRates200Response(value: object): boolean {
-    if (!('markets' in value)) return false;
+export function instanceOfGetMarketsRates200Response(value: object): value is GetMarketsRates200Response {
+    if (!('markets' in value) || value['markets'] === undefined) return false;
     return true;
 }
 

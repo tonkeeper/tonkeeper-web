@@ -21,7 +21,7 @@ import type {
   EmulateMessageToWalletRequest,
   Event,
   MessageConsequences,
-  ReduceIndexingLatencyDefaultResponse,
+  StatusDefaultResponse,
   Trace,
 } from '../models/index';
 import {
@@ -37,8 +37,8 @@ import {
     EventToJSON,
     MessageConsequencesFromJSON,
     MessageConsequencesToJSON,
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
     TraceFromJSON,
     TraceToJSON,
 } from '../models/index';

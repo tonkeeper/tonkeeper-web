@@ -49,10 +49,10 @@ export interface GetRawBlockchainBlockHeader200Response {
 /**
  * Check if a given object implements the GetRawBlockchainBlockHeader200Response interface.
  */
-export function instanceOfGetRawBlockchainBlockHeader200Response(value: object): boolean {
-    if (!('id' in value)) return false;
-    if (!('mode' in value)) return false;
-    if (!('headerProof' in value)) return false;
+export function instanceOfGetRawBlockchainBlockHeader200Response(value: object): value is GetRawBlockchainBlockHeader200Response {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('mode' in value) || value['mode'] === undefined) return false;
+    if (!('headerProof' in value) || value['headerProof'] === undefined) return false;
     return true;
 }
 

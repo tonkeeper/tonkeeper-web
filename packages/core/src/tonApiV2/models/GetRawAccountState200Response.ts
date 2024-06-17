@@ -61,12 +61,12 @@ export interface GetRawAccountState200Response {
 /**
  * Check if a given object implements the GetRawAccountState200Response interface.
  */
-export function instanceOfGetRawAccountState200Response(value: object): boolean {
-    if (!('id' in value)) return false;
-    if (!('shardblk' in value)) return false;
-    if (!('shardProof' in value)) return false;
-    if (!('proof' in value)) return false;
-    if (!('state' in value)) return false;
+export function instanceOfGetRawAccountState200Response(value: object): value is GetRawAccountState200Response {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('shardblk' in value) || value['shardblk'] === undefined) return false;
+    if (!('shardProof' in value) || value['shardProof'] === undefined) return false;
+    if (!('proof' in value) || value['proof'] === undefined) return false;
+    if (!('state' in value) || value['state'] === undefined) return false;
     return true;
 }
 

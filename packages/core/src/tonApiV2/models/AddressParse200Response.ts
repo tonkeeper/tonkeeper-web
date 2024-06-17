@@ -61,12 +61,12 @@ export interface AddressParse200Response {
 /**
  * Check if a given object implements the AddressParse200Response interface.
  */
-export function instanceOfAddressParse200Response(value: object): boolean {
-    if (!('rawForm' in value)) return false;
-    if (!('bounceable' in value)) return false;
-    if (!('nonBounceable' in value)) return false;
-    if (!('givenType' in value)) return false;
-    if (!('testOnly' in value)) return false;
+export function instanceOfAddressParse200Response(value: object): value is AddressParse200Response {
+    if (!('rawForm' in value) || value['rawForm'] === undefined) return false;
+    if (!('bounceable' in value) || value['bounceable'] === undefined) return false;
+    if (!('nonBounceable' in value) || value['nonBounceable'] === undefined) return false;
+    if (!('givenType' in value) || value['givenType'] === undefined) return false;
+    if (!('testOnly' in value) || value['testOnly'] === undefined) return false;
     return true;
 }
 

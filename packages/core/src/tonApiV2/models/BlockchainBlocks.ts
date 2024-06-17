@@ -37,8 +37,8 @@ export interface BlockchainBlocks {
 /**
  * Check if a given object implements the BlockchainBlocks interface.
  */
-export function instanceOfBlockchainBlocks(value: object): boolean {
-    if (!('blocks' in value)) return false;
+export function instanceOfBlockchainBlocks(value: object): value is BlockchainBlocks {
+    if (!('blocks' in value) || value['blocks'] === undefined) return false;
     return true;
 }
 

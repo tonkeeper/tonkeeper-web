@@ -30,8 +30,8 @@ export interface GetWalletBackup200Response {
 /**
  * Check if a given object implements the GetWalletBackup200Response interface.
  */
-export function instanceOfGetWalletBackup200Response(value: object): boolean {
-    if (!('dump' in value)) return false;
+export function instanceOfGetWalletBackup200Response(value: object): value is GetWalletBackup200Response {
+    if (!('dump' in value) || value['dump'] === undefined) return false;
     return true;
 }
 

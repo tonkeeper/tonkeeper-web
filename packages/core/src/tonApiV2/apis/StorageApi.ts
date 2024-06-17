@@ -16,13 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   GetStorageProviders200Response,
-  ReduceIndexingLatencyDefaultResponse,
+  StatusDefaultResponse,
 } from '../models/index';
 import {
     GetStorageProviders200ResponseFromJSON,
     GetStorageProviders200ResponseToJSON,
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 /**

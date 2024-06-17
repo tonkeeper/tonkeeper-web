@@ -84,13 +84,13 @@ export type InscriptionTransferActionTypeEnum = typeof InscriptionTransferAction
 /**
  * Check if a given object implements the InscriptionTransferAction interface.
  */
-export function instanceOfInscriptionTransferAction(value: object): boolean {
-    if (!('sender' in value)) return false;
-    if (!('recipient' in value)) return false;
-    if (!('amount' in value)) return false;
-    if (!('type' in value)) return false;
-    if (!('ticker' in value)) return false;
-    if (!('decimals' in value)) return false;
+export function instanceOfInscriptionTransferAction(value: object): value is InscriptionTransferAction {
+    if (!('sender' in value) || value['sender'] === undefined) return false;
+    if (!('recipient' in value) || value['recipient'] === undefined) return false;
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('type' in value) || value['type'] === undefined) return false;
+    if (!('ticker' in value) || value['ticker'] === undefined) return false;
+    if (!('decimals' in value) || value['decimals'] === undefined) return false;
     return true;
 }
 

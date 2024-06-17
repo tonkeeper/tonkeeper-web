@@ -6,6 +6,7 @@ export * from './ConnectApi';
 export * from './DNSApi';
 export * from './EmulationApi';
 export * from './EventsApi';
+export * from './GaslessApi';
 export * from './InscriptionsApi';
 export * from './JettonsApi';
 export * from './LiteServerApi';

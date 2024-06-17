@@ -27,7 +27,14 @@ export type AccountStatus = typeof AccountStatus[keyof typeof AccountStatus];
 
 
 export function instanceOfAccountStatus(value: any): boolean {
-    return Object.values(AccountStatus).includes(value);
+    for (const key in AccountStatus) {
+        if (Object.prototype.hasOwnProperty.call(AccountStatus, key)) {
+            if ((AccountStatus as Record<string, AccountStatus>)[key] === value) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 export function AccountStatusFromJSON(json: any): AccountStatus {

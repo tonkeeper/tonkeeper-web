@@ -23,9 +23,9 @@ import type {
   BlockchainRawAccount,
   MethodExecutionResult,
   RawBlockchainConfig,
-  ReduceIndexingLatencyDefaultResponse,
   SendBlockchainMessageRequest,
   ServiceStatus,
+  StatusDefaultResponse,
   Transaction,
   Transactions,
   Validators,
@@ -47,12 +47,12 @@ import {
     MethodExecutionResultToJSON,
     RawBlockchainConfigFromJSON,
     RawBlockchainConfigToJSON,
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
     SendBlockchainMessageRequestFromJSON,
     SendBlockchainMessageRequestToJSON,
     ServiceStatusFromJSON,
     ServiceStatusToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
     TransactionFromJSON,
     TransactionToJSON,
     TransactionsFromJSON,
@@ -76,6 +76,7 @@ export interface GetBlockchainAccountTransactionsRequest {
     afterLt?: number;
     beforeLt?: number;
     limit?: number;
+    sortOrder?: GetBlockchainAccountTransactionsSortOrderEnum;
 }
 
 export interface GetBlockchainBlockRequest {
@@ -165,6 +166,7 @@ export interface BlockchainApiInterface {
      * @param {number} [afterLt] omit this parameter to get last transactions
      * @param {number} [beforeLt] omit this parameter to get last transactions
      * @param {number} [limit] 
+     * @param {'desc' | 'asc'} [sortOrder] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof BlockchainApiInterface
@@ -369,19 +371,6 @@ export interface BlockchainApiInterface {
     getRawBlockchainConfigFromBlock(requestParameters: GetRawBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RawBlockchainConfig>;
 
     /**
-     * Reduce indexing latency
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof BlockchainApiInterface
-     */
-    reduceIndexingLatencyRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ServiceStatus>>;
-
-    /**
-     * Reduce indexing latency
-     */
-    reduceIndexingLatency(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ServiceStatus>;
-
-    /**
      * Send message to blockchain
      * @param {SendBlockchainMessageRequest} sendBlockchainMessageRequest both a single boc and a batch of boc serialized in base64 are accepted
      * @param {*} [options] Override http request option.
@@ -394,6 +383,19 @@ export interface BlockchainApiInterface {
      * Send message to blockchain
      */
     sendBlockchainMessage(requestParameters: SendBlockchainMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * Status
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    statusRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ServiceStatus>>;
+
+    /**
+     * Status
+     */
+    status(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ServiceStatus>;
 
 }
 
@@ -502,6 +504,10 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
 
         if (requestParameters['limit'] != null) {
             queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['sortOrder'] != null) {
+            queryParameters['sort_order'] = requestParameters['sortOrder'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -959,32 +965,6 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
     }
 
     /**
-     * Reduce indexing latency
-     */
-    async reduceIndexingLatencyRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ServiceStatus>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/v2/status`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => ServiceStatusFromJSON(jsonValue));
-    }
-
-    /**
-     * Reduce indexing latency
-     */
-    async reduceIndexingLatency(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ServiceStatus> {
-        const response = await this.reduceIndexingLatencyRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Send message to blockchain
      */
     async sendBlockchainMessageRaw(requestParameters: SendBlockchainMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
@@ -1019,4 +999,39 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
         await this.sendBlockchainMessageRaw(requestParameters, initOverrides);
     }
 
+    /**
+     * Status
+     */
+    async statusRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ServiceStatus>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/status`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ServiceStatusFromJSON(jsonValue));
+    }
+
+    /**
+     * Status
+     */
+    async status(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ServiceStatus> {
+        const response = await this.statusRaw(initOverrides);
+        return await response.value();
+    }
+
 }
+
+/**
+ * @export
+ */
+export const GetBlockchainAccountTransactionsSortOrderEnum = {
+    Desc: 'desc',
+    Asc: 'asc'
+} as const;
+export type GetBlockchainAccountTransactionsSortOrderEnum = typeof GetBlockchainAccountTransactionsSortOrderEnum[keyof typeof GetBlockchainAccountTransactionsSortOrderEnum];

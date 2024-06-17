@@ -36,9 +36,9 @@ export interface ServiceStatus {
 /**
  * Check if a given object implements the ServiceStatus interface.
  */
-export function instanceOfServiceStatus(value: object): boolean {
-    if (!('restOnline' in value)) return false;
-    if (!('indexingLatency' in value)) return false;
+export function instanceOfServiceStatus(value: object): value is ServiceStatus {
+    if (!('restOnline' in value) || value['restOnline'] === undefined) return false;
+    if (!('indexingLatency' in value) || value['indexingLatency'] === undefined) return false;
     return true;
 }
 

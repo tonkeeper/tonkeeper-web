@@ -55,11 +55,11 @@ export interface GetRawConfig200Response {
 /**
  * Check if a given object implements the GetRawConfig200Response interface.
  */
-export function instanceOfGetRawConfig200Response(value: object): boolean {
-    if (!('mode' in value)) return false;
-    if (!('id' in value)) return false;
-    if (!('stateProof' in value)) return false;
-    if (!('configProof' in value)) return false;
+export function instanceOfGetRawConfig200Response(value: object): value is GetRawConfig200Response {
+    if (!('mode' in value) || value['mode'] === undefined) return false;
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('stateProof' in value) || value['stateProof'] === undefined) return false;
+    if (!('configProof' in value) || value['configProof'] === undefined) return false;
     return true;
 }
 

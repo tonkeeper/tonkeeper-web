@@ -16,6 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   GetAllRawShardsInfo200Response,
+  GetOutMsgQueueSizes200Response,
   GetRawAccountState200Response,
   GetRawBlockProof200Response,
   GetRawBlockchainBlock200Response,
@@ -29,13 +30,15 @@ import type {
   GetRawShardInfo200Response,
   GetRawTime200Response,
   GetRawTransactions200Response,
-  ReduceIndexingLatencyDefaultResponse,
   SendRawMessage200Response,
   SendRawMessageRequest,
+  StatusDefaultResponse,
 } from '../models/index';
 import {
     GetAllRawShardsInfo200ResponseFromJSON,
     GetAllRawShardsInfo200ResponseToJSON,
+    GetOutMsgQueueSizes200ResponseFromJSON,
+    GetOutMsgQueueSizes200ResponseToJSON,
     GetRawAccountState200ResponseFromJSON,
     GetRawAccountState200ResponseToJSON,
     GetRawBlockProof200ResponseFromJSON,
@@ -62,12 +65,12 @@ import {
     GetRawTime200ResponseToJSON,
     GetRawTransactions200ResponseFromJSON,
     GetRawTransactions200ResponseToJSON,
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
     SendRawMessage200ResponseFromJSON,
     SendRawMessage200ResponseToJSON,
     SendRawMessageRequestFromJSON,
     SendRawMessageRequestToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetAllRawShardsInfoRequest {
@@ -157,6 +160,19 @@ export interface LiteServerApiInterface {
      * Get all raw shards info
      */
     getAllRawShardsInfo(requestParameters: GetAllRawShardsInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetAllRawShardsInfo200Response>;
+
+    /**
+     * Get out msg queue sizes
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LiteServerApiInterface
+     */
+    getOutMsgQueueSizesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetOutMsgQueueSizes200Response>>;
+
+    /**
+     * Get out msg queue sizes
+     */
+    getOutMsgQueueSizes(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetOutMsgQueueSizes200Response>;
 
     /**
      * Get raw account state
@@ -404,6 +420,32 @@ export class LiteServerApi extends runtime.BaseAPI implements LiteServerApiInter
      */
     async getAllRawShardsInfo(requestParameters: GetAllRawShardsInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetAllRawShardsInfo200Response> {
         const response = await this.getAllRawShardsInfoRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get out msg queue sizes
+     */
+    async getOutMsgQueueSizesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetOutMsgQueueSizes200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/liteserver/get_out_msg_queue_sizes`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetOutMsgQueueSizes200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Get out msg queue sizes
+     */
+    async getOutMsgQueueSizes(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetOutMsgQueueSizes200Response> {
+        const response = await this.getOutMsgQueueSizesRaw(initOverrides);
         return await response.value();
     }
 

@@ -96,19 +96,19 @@ export interface WorkchainDescr {
 /**
  * Check if a given object implements the WorkchainDescr interface.
  */
-export function instanceOfWorkchainDescr(value: object): boolean {
-    if (!('workchain' in value)) return false;
-    if (!('enabledSince' in value)) return false;
-    if (!('actualMinSplit' in value)) return false;
-    if (!('minSplit' in value)) return false;
-    if (!('maxSplit' in value)) return false;
-    if (!('basic' in value)) return false;
-    if (!('active' in value)) return false;
-    if (!('acceptMsgs' in value)) return false;
-    if (!('flags' in value)) return false;
-    if (!('zerostateRootHash' in value)) return false;
-    if (!('zerostateFileHash' in value)) return false;
-    if (!('version' in value)) return false;
+export function instanceOfWorkchainDescr(value: object): value is WorkchainDescr {
+    if (!('workchain' in value) || value['workchain'] === undefined) return false;
+    if (!('enabledSince' in value) || value['enabledSince'] === undefined) return false;
+    if (!('actualMinSplit' in value) || value['actualMinSplit'] === undefined) return false;
+    if (!('minSplit' in value) || value['minSplit'] === undefined) return false;
+    if (!('maxSplit' in value) || value['maxSplit'] === undefined) return false;
+    if (!('basic' in value) || value['basic'] === undefined) return false;
+    if (!('active' in value) || value['active'] === undefined) return false;
+    if (!('acceptMsgs' in value) || value['acceptMsgs'] === undefined) return false;
+    if (!('flags' in value) || value['flags'] === undefined) return false;
+    if (!('zerostateRootHash' in value) || value['zerostateRootHash'] === undefined) return false;
+    if (!('zerostateFileHash' in value) || value['zerostateFileHash'] === undefined) return false;
+    if (!('version' in value) || value['version'] === undefined) return false;
     return true;
 }
 

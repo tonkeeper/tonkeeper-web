@@ -18,7 +18,7 @@ import type {
   AccountEvents,
   GetInscriptionOpTemplate200Response,
   InscriptionBalances,
-  ReduceIndexingLatencyDefaultResponse,
+  StatusDefaultResponse,
 } from '../models/index';
 import {
     AccountEventsFromJSON,
@@ -27,8 +27,8 @@ import {
     GetInscriptionOpTemplate200ResponseToJSON,
     InscriptionBalancesFromJSON,
     InscriptionBalancesToJSON,
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetAccountInscriptionsRequest {

@@ -42,9 +42,9 @@ export interface ValidatorsSetListInner {
 /**
  * Check if a given object implements the ValidatorsSetListInner interface.
  */
-export function instanceOfValidatorsSetListInner(value: object): boolean {
-    if (!('publicKey' in value)) return false;
-    if (!('weight' in value)) return false;
+export function instanceOfValidatorsSetListInner(value: object): value is ValidatorsSetListInner {
+    if (!('publicKey' in value) || value['publicKey'] === undefined) return false;
+    if (!('weight' in value) || value['weight'] === undefined) return false;
     return true;
 }
 

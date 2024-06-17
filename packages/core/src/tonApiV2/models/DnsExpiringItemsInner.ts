@@ -49,9 +49,9 @@ export interface DnsExpiringItemsInner {
 /**
  * Check if a given object implements the DnsExpiringItemsInner interface.
  */
-export function instanceOfDnsExpiringItemsInner(value: object): boolean {
-    if (!('expiringAt' in value)) return false;
-    if (!('name' in value)) return false;
+export function instanceOfDnsExpiringItemsInner(value: object): value is DnsExpiringItemsInner {
+    if (!('expiringAt' in value) || value['expiringAt'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
     return true;
 }
 
