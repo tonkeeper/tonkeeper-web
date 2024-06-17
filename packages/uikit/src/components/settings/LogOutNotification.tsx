@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import React, { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
@@ -39,7 +39,8 @@ const DisclaimerLink = styled(Label1)`
 const LotOutContent: FC<{
     onClose: (action: () => void) => void;
     publicKey: string;
-}> = ({ onClose, publicKey }) => {
+    isKeystone: boolean;
+}> = ({ onClose, publicKey, isKeystone }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
@@ -49,27 +50,38 @@ const LotOutContent: FC<{
         <NotificationBlock>
             <TextBlock>
                 <H2>{t('settings_reset_alert_title')}</H2>
-                <BodyText>{t('settings_reset_alert_caption')}</BodyText>
+                <BodyText>
+                    {t(
+                        isKeystone
+                            ? 'settings_keystone_reset_alert_caption'
+                            : 'settings_reset_alert_caption'
+                    )}
+                </BodyText>
             </TextBlock>
 
-            <DisclaimerBlock>
-                <DisclaimerText>
-                    <Checkbox checked={checked} onChange={setChecked}>
-                        {t('I_have_a_backup_copy_of_recovery_phrase')}
-                    </Checkbox>
-                </DisclaimerText>
-                <DisclaimerLink
-                    onClick={() =>
-                        onClose(() =>
-                            navigate(AppRoute.settings + SettingsRoute.recovery + '/' + publicKey)
-                        )
-                    }
-                >
-                    {t('Back_up_now')}
-                </DisclaimerLink>
-            </DisclaimerBlock>
+            {!isKeystone && (
+                <DisclaimerBlock>
+                    <DisclaimerText>
+                        <Checkbox checked={checked} onChange={setChecked}>
+                            {t('I_have_a_backup_copy_of_recovery_phrase')}
+                        </Checkbox>
+                    </DisclaimerText>
+                    <DisclaimerLink
+                        onClick={() =>
+                            onClose(() =>
+                                navigate(
+                                    AppRoute.settings + SettingsRoute.recovery + '/' + publicKey
+                                )
+                            )
+                        }
+                    >
+                        {t('Back_up_now')}
+                    </DisclaimerLink>
+                </DisclaimerBlock>
+            )}
+            {isKeystone && <div style={{ height: 16 }} />}
             <Button
-                disabled={!checked}
+                disabled={!checked && !isKeystone}
                 size="large"
                 fullWidth
                 loading={isLoading}
@@ -91,7 +103,13 @@ export const LogOutWalletNotification: FC<{
     const Content = useCallback(
         (afterClose: (action: () => void) => void) => {
             if (!wallet) return undefined;
-            return <LotOutContent publicKey={wallet?.publicKey} onClose={afterClose} />;
+            return (
+                <LotOutContent
+                    publicKey={wallet?.publicKey}
+                    onClose={afterClose}
+                    isKeystone={!!wallet.auth && wallet.auth.kind === 'keystone'}
+                />
+            );
         },
         [wallet]
     );
@@ -106,7 +124,8 @@ export const LogOutWalletNotification: FC<{
 const DeleteContent: FC<{
     onClose: (action: () => void) => void;
     publicKey: string;
-}> = ({ onClose, publicKey }) => {
+    isKeystone: boolean;
+}> = ({ onClose, publicKey, isKeystone }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
@@ -121,27 +140,38 @@ const DeleteContent: FC<{
         <NotificationBlock>
             <TextBlock>
                 <H2>{t('Delete_wallet_data')}</H2>
-                <BodyText>{t('Delete_wallet_data_description')}</BodyText>
+                <BodyText>
+                    {t(
+                        isKeystone
+                            ? 'Delete_keystone_wallet_data_description'
+                            : 'Delete_wallet_data_description'
+                    )}
+                </BodyText>
             </TextBlock>
 
-            <DisclaimerBlock>
-                <DisclaimerText>
-                    <Checkbox checked={checked} onChange={setChecked} light>
-                        {t('I_have_a_backup_copy_of_recovery_phrase')}
-                    </Checkbox>
-                </DisclaimerText>
-                <DisclaimerLink
-                    onClick={() =>
-                        onClose(() =>
-                            navigate(AppRoute.settings + SettingsRoute.recovery + '/' + publicKey)
-                        )
-                    }
-                >
-                    {t('Back_up_now')}
-                </DisclaimerLink>
-            </DisclaimerBlock>
+            {!isKeystone && (
+                <DisclaimerBlock>
+                    <DisclaimerText>
+                        <Checkbox checked={checked} onChange={setChecked} light>
+                            {t('I_have_a_backup_copy_of_recovery_phrase')}
+                        </Checkbox>
+                    </DisclaimerText>
+                    <DisclaimerLink
+                        onClick={() =>
+                            onClose(() =>
+                                navigate(
+                                    AppRoute.settings + SettingsRoute.recovery + '/' + publicKey
+                                )
+                            )
+                        }
+                    >
+                        {t('Back_up_now')}
+                    </DisclaimerLink>
+                </DisclaimerBlock>
+            )}
+            {isKeystone && <div style={{ height: 16 }} />}
             <Button
-                disabled={!checked}
+                disabled={!checked && !isKeystone}
                 size="large"
                 fullWidth
                 loading={isLoading}
@@ -160,7 +190,13 @@ export const DeleteWalletNotification: FC<{
     const Content = useCallback(
         (afterClose: (action: () => void) => void) => {
             if (!wallet) return undefined;
-            return <DeleteContent publicKey={wallet.publicKey} onClose={afterClose} />;
+            return (
+                <DeleteContent
+                    publicKey={wallet.publicKey}
+                    onClose={afterClose}
+                    isKeystone={!!wallet.auth && wallet.auth.kind === 'keystone'}
+                />
+            );
         },
         [wallet]
     );
