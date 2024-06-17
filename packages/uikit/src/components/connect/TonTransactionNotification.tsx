@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import { sendKeystoneTonConnectTransfer } from '@tonkeeper/core/dist/service/keystone/transfer';
 import {
     ConnectTransferError,
     EstimateData,
@@ -71,10 +70,6 @@ const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?
         switch (signer.type) {
             case 'cell': {
                 boc = await sendTonConnectTransfer(api, wallet, params, signer);
-                break;
-            }
-            case 'keystone': {
-                boc = await sendKeystoneTonConnectTransfer(api, wallet, params, signer);
                 break;
             }
             default: {

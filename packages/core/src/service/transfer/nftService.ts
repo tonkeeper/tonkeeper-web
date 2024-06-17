@@ -5,7 +5,6 @@ import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi, NftItem } from '../../tonApiV2';
-import { createKeystoneNftTransfer } from '../keystone/transfer';
 import { createLedgerNftTransfer } from '../ledger/transfer';
 import {
     checkWalletBalanceOrDie,
@@ -161,10 +160,6 @@ export const sendNftTransfer = async (
         }
         case 'ledger': {
             buffer = await createLedgerNftTransfer(...params, signer);
-            break;
-        }
-        case 'keystone': {
-            buffer = await createKeystoneNftTransfer(...params, signer);
             break;
         }
     }

@@ -107,20 +107,16 @@ export const getSigner = async (
                 return callback as CellSigner;
             }
             case 'keystone': {
-                const callback = async (
-                    message: Cell,
-                    messageType: KeystoneMessageType,
-                    pathInfo?: { path: string; mfp: string }
-                ) => {
+                const callback = async (message: Cell) => {
                     const result = await pairKeystoneByNotification(
                         sdk,
                         message.toBoc({ idx: false }),
-                        messageType,
-                        pathInfo
+                        'transaction',
+                        auth.info
                     );
                     return Buffer.from(result, 'hex');
                 };
-                callback.type = 'keystone' as const;
+                callback.type = 'cell' as const;
                 return callback;
             }
             default: {

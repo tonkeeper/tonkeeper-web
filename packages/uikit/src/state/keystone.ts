@@ -6,6 +6,7 @@ import {
 } from '@tonkeeper/core/dist/service/accountService';
 import { walletStateFromKeystone } from '@tonkeeper/core/dist/service/walletService';
 import { useNavigate } from 'react-router-dom';
+import { useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
@@ -30,4 +31,9 @@ export const usePairKeystoneMutation = () => {
             throw e;
         }
     });
+};
+
+export const useIsActiveWalletKeystone = () => {
+    const { auth } = useWalletContext();
+    return auth?.kind === 'keystone';
 };

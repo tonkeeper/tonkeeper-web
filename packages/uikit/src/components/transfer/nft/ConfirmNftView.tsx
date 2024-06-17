@@ -83,7 +83,7 @@ const useSendNft = (
         if (!fee) return false;
 
         const signer = await getSigner(sdk, wallet.publicKey, checkTouchId).catch(() => null);
-        if (signer?.type !== 'cell' && signer?.type !== 'keystone') {
+        if (signer?.type !== 'cell') {
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }
         if (signer === null) return false;
