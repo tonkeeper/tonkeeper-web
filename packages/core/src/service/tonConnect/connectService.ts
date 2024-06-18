@@ -275,6 +275,7 @@ export interface ConnectProofPayload {
     domainBuffer: Buffer;
     payload: string;
     origin: string;
+    messageBuffer: Buffer;
 }
 
 export const tonConnectProofPayload = (
@@ -318,7 +319,8 @@ export const tonConnectProofPayload = (
         bufferToSign,
         domainBuffer,
         payload,
-        origin
+        origin,
+        messageBuffer
     };
 };
 
@@ -328,9 +330,13 @@ export const toTonProofItemReply = async (options: {
     signTonConnect: (bufferToSign: Buffer) => Promise<Uint8Array>;
     proof: ConnectProofPayload;
 }): Promise<TonProofItemReplySuccess> => {
+    let signHash = true;
+    if (options.wallet.auth) {
+        signHash = options.wallet.auth.kind !== 'keystone';
+    }
     const result: TonProofItemReplySuccess = {
         name: 'ton_proof',
-        proof: await toTonProofItem(options.signTonConnect, options.proof)
+        proof: await toTonProofItem(options.signTonConnect, options.proof, signHash)
     };
     return result;
 };
@@ -355,9 +361,10 @@ export const createTonProofItem = (
 export const toTonProofItem = async (
     signTonConnect: (bufferToSign: Buffer) => Promise<Uint8Array>,
     proof: ConnectProofPayload,
+    signHash: boolean = true,
     stateInit?: string
 ) => {
-    const signature = await signTonConnect(proof.bufferToSign);
+    const signature = await signTonConnect(signHash ? proof.bufferToSign : proof.messageBuffer);
     return createTonProofItem(signature, proof, stateInit);
 };
 

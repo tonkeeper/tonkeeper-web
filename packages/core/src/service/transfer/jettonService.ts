@@ -7,6 +7,7 @@ import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi } from '../../tonApiV2';
+import { createLedgerJettonTransfer } from '../ledger/transfer';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     checkWalletBalanceOrDie,
@@ -19,7 +20,6 @@ import {
     SendMode,
     signEstimateMessage
 } from './common';
-import { createLedgerJettonTransfer } from '../ledger/transfer';
 
 export const jettonTransferAmount = toNano(0.1);
 export const jettonTransferForwardAmount = BigInt(1);

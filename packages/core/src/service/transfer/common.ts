@@ -17,7 +17,7 @@ import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipient, TransferEstimationEvent } from '../../entries/send';
-import { CellSigner } from '../../entries/signer';
+import { BaseSigner, CellSigner } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
@@ -103,7 +103,7 @@ export const createTransferMessage = async (
     wallet: {
         seqno: number;
         state: WalletState;
-        signer: CellSigner;
+        signer: BaseSigner;
         timestamp: number;
     },
     transaction: {

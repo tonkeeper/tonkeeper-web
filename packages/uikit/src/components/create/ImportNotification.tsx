@@ -7,7 +7,7 @@ import { AppRoute, ImportRoute } from '../../libs/routes';
 import { ColumnText } from '../Layout';
 import { Notification } from '../Notification';
 import { Body1, H2 } from '../Text';
-import { AddIcon, ImportIcon, LedgerIcon, RightIcon, SignerIcon } from './ImportIcons';
+import { AddIcon, ImportIcon, KeystoneIcon, LedgerIcon, RightIcon, SignerIcon } from './ImportIcons';
 
 const Title = styled(H2)`
     user-select: none;
@@ -112,6 +112,22 @@ export const ImportNotification: FC<{
                             </ButtonIcon>
                         </ButtonBlock>
                     )}
+                    <ButtonBlock
+                        onClick={() => {
+                            onClose(() => onImport(AppRoute.import + ImportRoute.keystone));
+                        }}
+                    >
+                        <ButtonIcon>
+                            <KeystoneIcon />
+                        </ButtonIcon>
+                        <ColumnTextStyled
+                            text={t('keystone_pair_title')}
+                            secondary={t('keystone_pair_subtitle')}
+                        />
+                        <ButtonIcon>
+                            <RightIcon />
+                        </ButtonIcon>
+                    </ButtonBlock>
                     <ButtonBlock
                         onClick={() => {
                             onClose(() => onImport(AppRoute.import + ImportRoute.ledger));

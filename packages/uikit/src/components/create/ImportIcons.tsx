@@ -164,3 +164,32 @@ export const LedgerIcon: FC<{ size?: number }> = ({ size = 28 }) => {
         </svg>
     );
 };
+
+export const KeystoneIcon: FC<{ size?: number }> = ({ size = 28 }) => {
+    return (
+        <svg
+            width={size}
+            height={size}
+            viewBox="0 0 28 28"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <g clip-path="url(#clip0_2_109)">
+                <path
+                    d="M3.79167 2.77084H16.0417L7.875 20.125H1.75L3.79167 2.77084Z"
+                    fill="#45AEF5"
+                    fill-opacity="0.32"
+                />
+                <path
+                    d="M24.2083 25.2292L11.9583 25.2292L20.125 7.87499L26.25 7.87499L24.2083 25.2292Z"
+                    fill="#45AEF5"
+                />
+            </g>
+            <defs>
+                <clipPath id="clip0_2_109">
+                    <rect width="28" height="28" fill="white" />
+                </clipPath>
+            </defs>
+        </svg>
+    );
+};
