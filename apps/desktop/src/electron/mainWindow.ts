@@ -116,6 +116,19 @@ export abstract class MainWindow {
             });
         });
 
+        this.mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+            /* patch mercuryo cors  */
+            if (details.url.startsWith('https://api.mercuryo.io')) {
+                const corsHeader =
+                    Object.keys(details.responseHeaders).find(
+                        k => k.toLowerCase() === 'access-control-allow-origin'
+                    ) || 'access-control-allow-origin';
+                details.responseHeaders[corsHeader] = ['*'];
+            }
+
+            callback(details);
+        });
+
         this.mainWindow.webContents.session.on('select-hid-device', (event, details, callback) => {
             event.preventDefault();
             if (details.deviceList && details.deviceList.length > 0) {

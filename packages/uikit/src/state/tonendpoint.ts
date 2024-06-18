@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Language, localizationText } from '@tonkeeper/core/dist/entries/language';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import {
@@ -74,4 +74,33 @@ export const useTonendpointBuyMethods = () => {
             };
         }
     );
+};
+
+export const useCreateMercuryoProUrl = () => {
+    const { tonendpoint } = useAppContext();
+    const { data } = useTonenpointConfig(tonendpoint);
+
+    return useMutation<string, Error, string>(async baseUrl => {
+        try {
+            if (!data?.mercuryo_otc_id) {
+                throw new Error('Missing mercuryo get otc url');
+            }
+            const mercurioConfig = (await (await fetch(data.mercuryo_otc_id)).json()) as {
+                data: {
+                    otc_id: string;
+                };
+            };
+
+            if (!mercurioConfig.data.otc_id) {
+                throw new Error('Missing mercuryo otc_id');
+            }
+
+            const url = new URL(baseUrl);
+            url.searchParams.append('otc_id', mercurioConfig.data.otc_id);
+            return url.toString();
+        } catch (e) {
+            console.error(e);
+            return baseUrl;
+        }
+    });
 };

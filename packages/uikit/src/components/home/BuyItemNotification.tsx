@@ -22,6 +22,7 @@ import { Notification } from '../Notification';
 import { Body1, H3, Label1 } from '../Text';
 import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
+import { useCreateMercuryoProUrl } from '../../state/tonendpoint';
 
 const Logo = styled.img<{ large?: boolean }>`
     pointer-events: none;
@@ -215,10 +216,16 @@ export const BuyItemNotification: FC<{
 
     const { data: hided } = useShowDisclaimer(item.title, kind);
     const { mutate } = useHideDisclaimerMutation(item.title, kind);
+    const { mutateAsync: createMercuryoProUrl } = useCreateMercuryoProUrl();
 
-    const onForceOpen = () => {
+    const onForceOpen = async () => {
         track(item.action_button.url);
-        sdk.openPage(replacePlaceholders(item.action_button.url, config, wallet, fiat, kind));
+
+        let urlToOpen = item.action_button.url;
+        if (item.id === 'mercuryo_pro') {
+            urlToOpen = await createMercuryoProUrl(item.action_button.url);
+        }
+        sdk.openPage(replacePlaceholders(urlToOpen, config, wallet, fiat, kind));
         setOpen(false);
     };
     const onOpen: React.MouseEventHandler<HTMLDivElement> = () => {

@@ -50,6 +50,8 @@ export interface TonendpointConfig {
     web_swaps_url?: string;
     web_swaps_referral_address?: string;
 
+    mercuryo_otc_id?: string;
+
     /**
      * @deprecated use ton api
      */
