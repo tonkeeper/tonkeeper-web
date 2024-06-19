@@ -12,6 +12,7 @@ import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
+import PairKeystoneNotification from '@tonkeeper/uikit/dist/components/PairKeystoneNotification';
 import PairSignerNotification from '@tonkeeper/uikit/dist/components/PairSignerNotification';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
@@ -36,6 +37,7 @@ import { NotcoinPage } from '@tonkeeper/uikit/dist/desktop-pages/notcoin/Notcoin
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 import { DesktopPurchases } from '@tonkeeper/uikit/dist/desktop-pages/purchases/DesktopPurchases';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
+import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
@@ -77,7 +79,6 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
-import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -460,6 +461,7 @@ const BackgroundElements = () => {
             <DeepLinkSubscription />
             <PairSignerNotification />
             <ConnectLedgerNotification />
+            <PairKeystoneNotification />
         </>
     );
 };
