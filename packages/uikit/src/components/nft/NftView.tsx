@@ -3,7 +3,7 @@ import React, { FC, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveWalletConfig, useNftCollectionData } from '../../state/wallet';
-import { ChevronDownIcon, VerificationIcon } from '../Icon';
+import { ChevronDownIcon, InfoCircleIcon, VerificationIcon } from '../Icon';
 import { NotificationBlock, NotificationTitleBlock } from '../Notification';
 import { Body2, H2, H3, Label1, Label4 } from '../Text';
 import { BackButton, ButtonMock } from '../fields/BackButton';
@@ -14,6 +14,8 @@ import { Image, NftBlock } from './Nfts';
 import { TrustType } from '@tonkeeper/core/dist/tonApiV2';
 import { Button } from '../fields/Button';
 import { useMarkNftAsSpam, useMarkNftAsTrusted } from '../../state/nft';
+import { UnverifiedNftNotification } from './UnverifiedNftNotification';
+import { useDisclosure } from '../../hooks/useDisclosure';
 
 const Text = styled.div`
     display: flex;
@@ -63,7 +65,10 @@ const SaleBlock = styled(Label4)`
 
 const UnverifiedLabel = styled(Body2)<{ isTrusted: boolean }>`
     color: ${props => (props.isTrusted ? props.theme.textSecondary : props.theme.accentOrange)};
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 `;
 
 const NftNameContainer = styled.div`
@@ -114,6 +119,21 @@ export const NftPreview: FC<{
 
     const image = nftItem.previews?.find(item => item.resolution === '1500x1500');
 
+    const {
+        isOpen: isSpamModalOpen,
+        onClose: onCloseSpamModal,
+        onOpen: onOpenSpamModal
+    } = useDisclosure();
+
+    const handleCloseSpamModal = (action?: 'mark_spam' | 'mark_trusted') => {
+        if (action === 'mark_spam') {
+            markNftAsSpam(nftItem).then(onClose);
+        } else if (action === 'mark_trusted') {
+            markNftAsTrusted(nftItem);
+        }
+        onCloseSpamModal();
+    };
+
     return (
         <NotificationBlock>
             {onClose && (
@@ -124,9 +144,18 @@ export const NftPreview: FC<{
                     <NftNameContainer>
                         <H3>{nftItem.dns ?? nftItem.metadata.name}</H3>
                         {isSuspicious && (
-                            <UnverifiedLabel isTrusted={isTrusted}>Unverified NFT</UnverifiedLabel>
+                            <UnverifiedLabel isTrusted={isTrusted} onClick={onOpenSpamModal}>
+                                Unverified NFT{' '}
+                                <InfoCircleIcon
+                                    color={isTrusted ? 'textSecondary' : 'accentOrange'}
+                                />
+                            </UnverifiedLabel>
                         )}
                     </NftNameContainer>
+                    <UnverifiedNftNotification
+                        isOpen={isSpamModalOpen}
+                        onClose={handleCloseSpamModal}
+                    />
                     <ButtonMock />
                 </NotificationTitleBlock>
             )}

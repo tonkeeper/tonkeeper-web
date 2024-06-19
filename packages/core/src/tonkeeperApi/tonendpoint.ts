@@ -52,6 +52,8 @@ export interface TonendpointConfig {
 
     mercuryo_otc_id?: string;
 
+    scamEndpoint?: string;
+
     /**
      * @deprecated use ton api
      */

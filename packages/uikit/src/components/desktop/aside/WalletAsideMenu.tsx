@@ -4,13 +4,14 @@ import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
 import { AppRoute } from '../../../libs/routes';
 import {
-  ClockSmoothIcon,
-  CoinsIcon,
-  NotCoinIcon,
-  SaleBadgeIcon,
-  SettingsSmoothIcon, SparkIcon,
-  SwapIcon
-} from "../../Icon";
+    ClockSmoothIcon,
+    CoinsIcon,
+    NotCoinIcon,
+    SaleBadgeIcon,
+    SettingsSmoothIcon,
+    SparkIcon,
+    SwapIcon
+} from '../../Icon';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
 

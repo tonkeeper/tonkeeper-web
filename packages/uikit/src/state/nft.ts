@@ -1,13 +1,10 @@
-import { useWalletContext } from '../hooks/appContext';
+import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-    getActiveWalletConfig,
-    setActiveWalletConfig
-} from '@tonkeeper/core/dist/service/wallet/configService';
+import { useMutation } from '@tanstack/react-query';
+import { getActiveWalletConfig } from '@tonkeeper/core/dist/service/wallet/configService';
 import { useMutateActiveWalletConfig } from './wallet';
-import { QueryKey } from '../libs/queryKey';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
+import { useTonenpointConfig } from './tonendpoint';
 
 type NftWithCollectionId = Pick<NFT, 'address'> & { collection?: NFT['collection'] };
 
@@ -15,7 +12,8 @@ export const useMarkNftAsSpam = () => {
     const wallet = useWalletContext();
     const sdk = useAppSdk();
     const { mutateAsync } = useMutateActiveWalletConfig();
-    const client = useQueryClient();
+    const { tonendpoint } = useAppContext();
+    const { data: tonendpointConfig } = useTonenpointConfig(tonendpoint);
     return useMutation<void, Error, NftWithCollectionId | string>(async nft => {
         let config = await getActiveWalletConfig(
             sdk.storage,
@@ -25,23 +23,27 @@ export const useMarkNftAsSpam = () => {
 
         const address = typeof nft === 'string' ? nft : nft.collection?.address || nft.address;
 
-        if (!config.spamNfts.includes(address)) {
-            // TODO make post request
+        if (!config.spamNfts.includes(address) && tonendpointConfig?.scamEndpoint) {
+            let baseUrl = tonendpointConfig?.scamEndpoint;
+            if (baseUrl.endsWith('/')) {
+                baseUrl = baseUrl.slice(0, baseUrl.length - 1);
+            }
+            try {
+                await fetch(`${baseUrl}/report/${address}`, {
+                    method: 'POST'
+                });
+            } catch (e) {
+                console.error(e);
+            }
         }
 
         config = {
             ...config,
-            spamNfts: config.spamNfts.concat(address),
-            trustedNfts: config.trustedNfts.slice().filter(item => item !== address)
+            spamNfts: config.spamNfts.filter(i => i !== address).concat(address),
+            trustedNfts: config.trustedNfts.filter(item => item !== address)
         };
 
-        await setActiveWalletConfig(sdk.storage, wallet.active.rawAddress, wallet.network, config);
-
-        await client.invalidateQueries({
-            predicate: q => q.queryKey.includes(QueryKey.walletConfig)
-        });
-
-        //  await mutateAsync(config);
+        await mutateAsync(config);
     });
 };
 
@@ -49,7 +51,6 @@ export const useMarkNftAsTrusted = () => {
     const wallet = useWalletContext();
     const sdk = useAppSdk();
     const { mutateAsync } = useMutateActiveWalletConfig();
-    const client = useQueryClient();
     return useMutation<void, Error, NftWithCollectionId | string>(async nft => {
         let config = await getActiveWalletConfig(
             sdk.storage,
@@ -61,17 +62,11 @@ export const useMarkNftAsTrusted = () => {
 
         config = {
             ...config,
-            spamNfts: config.spamNfts.slice().filter(item => item !== address),
-            trustedNfts: config.trustedNfts.slice().concat(address)
+            spamNfts: config.spamNfts.filter(item => item !== address),
+            trustedNfts: config.trustedNfts.filter(i => i !== address).concat(address)
         };
 
-        await setActiveWalletConfig(sdk.storage, wallet.active.rawAddress, wallet.network, config);
-
-        await client.invalidateQueries({
-            predicate: q => q.queryKey.includes(QueryKey.walletConfig)
-        });
-
-        // await mutateAsync(config);
+        await mutateAsync(config);
     });
 };
 
@@ -94,7 +89,7 @@ export const useHideNft = () => {
 
         config = {
             ...config,
-            hiddenNfts: config.hiddenNfts.slice().concat(address)
+            hiddenNfts: config.hiddenNfts.filter(i => i !== address).concat(address)
         };
 
         await mutateAsync(config);
