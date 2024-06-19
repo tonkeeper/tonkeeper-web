@@ -12,6 +12,7 @@ import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
+import PairKeystoneNotification from '@tonkeeper/uikit/dist/components/PairKeystoneNotification';
 import PairSignerNotification from '@tonkeeper/uikit/dist/components/PairSignerNotification';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
@@ -35,6 +36,7 @@ import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-
 import { NotcoinPage } from '@tonkeeper/uikit/dist/desktop-pages/notcoin/NotcoinPage';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
+import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
@@ -261,12 +263,13 @@ export const Loader: FC = () => {
     const { data: auth } = useAuthState();
     const { data: fiat } = useUserFiat();
 
-    const tonendpoint = useTonendpoint(
-        TARGET_ENV,
-        sdk.version,
-        activeWallet?.network,
-        activeWallet?.lang
-    );
+    const tonendpoint = useTonendpoint({
+        targetEnv: TARGET_ENV,
+        build: sdk.version,
+        network: activeWallet?.network,
+        lang: activeWallet?.lang,
+        platform: 'desktop'
+    });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
@@ -464,6 +467,7 @@ const BackgroundElements = () => {
             <DeepLinkSubscription />
             <PairSignerNotification />
             <ConnectLedgerNotification />
+            <PairKeystoneNotification />
         </>
     );
 };

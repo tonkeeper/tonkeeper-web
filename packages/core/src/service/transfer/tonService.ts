@@ -28,7 +28,9 @@ export type EstimateData = {
     accountEvent: TransferEstimationEvent;
 };
 
-const toStateInit = (stateInit?: string): { code: Maybe<Cell>; data: Maybe<Cell> } | undefined => {
+export const toStateInit = (
+    stateInit?: string
+): { code: Maybe<Cell>; data: Maybe<Cell> } | undefined => {
     if (!stateInit) {
         return undefined;
     }

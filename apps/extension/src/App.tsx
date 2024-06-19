@@ -51,10 +51,10 @@ import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-rou
 import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
 import { Notifications } from './components/Notifications';
+import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
-import { TonConnectSubscription } from "./components/TonConnectSubscription";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -63,6 +63,7 @@ const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/A
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
 const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
+const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
 );
@@ -78,7 +79,12 @@ const SendNftNotification = React.lazy(
 const ConnectLedgerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/ConnectLedgerNotification')
 );
-const SwapMobileNotification = React.lazy(() => import("@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification"));
+const SwapMobileNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification')
+);
+const PairKeystoneNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -175,12 +181,12 @@ export const Loader: FC = React.memo(() => {
     const lock = useLock(sdk);
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
-    const tonendpoint = useTonendpoint(
-        TARGET_ENV,
-        sdk.version,
-        activeWallet?.network,
-        localizationFrom(browser.i18n.getUILanguage())
-    );
+    const tonendpoint = useTonendpoint({
+        targetEnv: TARGET_ENV,
+        build: sdk.version,
+        network: activeWallet?.network,
+        lang: localizationFrom(browser.i18n.getUILanguage())
+    });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const { data: tracker } = useAnalytics(sdk.storage, account, activeWallet, sdk.version);
@@ -217,6 +223,9 @@ export const Loader: FC = React.memo(() => {
                     <AppContext.Provider value={context}>
                         <Content activeWallet={activeWallet} lock={lock} />
                         <CopyNotification />
+                        <Suspense fallback={<></>}>
+                            <QrScanner />
+                        </Suspense>
                     </AppContext.Provider>
                 </AfterImportAction.Provider>
             </OnImportAction.Provider>
@@ -321,11 +330,14 @@ export const Content: FC<{
                             }
                         />
                     </Route>
-                    <Route path={AppRoute.swap} element={
-                        <Suspense fallback={null}>
-                            <SwapPage />
-                        </Suspense>
-                    } />
+                    <Route
+                        path={AppRoute.swap}
+                        element={
+                            <Suspense fallback={null}>
+                                <SwapPage />
+                            </Suspense>
+                        }
+                    />
                     <Route path="*" element={<IndexPage />} />
                 </Routes>
                 <Footer />
@@ -340,6 +352,7 @@ export const Content: FC<{
                     <EditFavoriteNotification />
                     <ConnectLedgerNotification />
                     <SwapMobileNotification />
+                    <PairKeystoneNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>

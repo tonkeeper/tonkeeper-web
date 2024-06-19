@@ -9,7 +9,7 @@ jobs:
         strategy:
             matrix:
                 os: [ubuntu-latest, macos-13, windows-latest]
-                node-version: [20.7.0]
+                node-version: [20.11.1]
 
         runs-on: ${{ matrix.os }}
         timeout-minutes: 30
@@ -83,6 +83,15 @@ jobs:
                   cmd: make:universal
                   dir: 'apps/desktop'
 
+            - name: Upload zip distributives to artifacts
+              uses: actions/upload-artifact@v4
+              if: runner.os == 'Windows'
+              with:
+                  name: Tonkeeper Desktop ${{ runner.os }} x64 archive
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make/zip/**/*.zip
+
             - name: Upload distributives to artifacts
               uses: actions/upload-artifact@v4
               if: runner.os == 'macOS'
@@ -136,7 +145,7 @@ jobs:
             - name: Set up Node
               uses: actions/setup-node@v4
               with:
-                  node-version: 20.7.0
+                  node-version: 20.11.1
 
             - name: Enable Corepack
               run: |
@@ -169,7 +178,7 @@ jobs:
 
     extension-build:
         name: extension-build
-        runs-on: ubuntu-latest
+        runs-on: macos-14
         timeout-minutes: 10
 
         steps:
@@ -179,7 +188,7 @@ jobs:
             - name: Set up Node
               uses: actions/setup-node@v4
               with:
-                  node-version: 20.7.0
+                  node-version: 20.11.1
 
             - name: Enable Corepack
               run: |

@@ -149,6 +149,9 @@ export const NftsList: FC<{ nfts: NFT[] | undefined; className?: string }> = ({
     return (
         <Grid className={className}>
             {(nfts ?? []).map(item => {
+                if (item.trust === 'blacklist') {
+                    return <></>;
+                }
                 if (item.metadata?.render_type === 'hidden') {
                     return <></>;
                 }
