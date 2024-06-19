@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Language, localizationFrom } from "@tonkeeper/core/dist/entries/language";
+import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
@@ -51,11 +51,10 @@ import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-rou
 import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
 import { Notifications } from './components/Notifications';
+import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
-import { TonConnectSubscription } from "./components/TonConnectSubscription";
-import { TargetEnv } from "@tonkeeper/core/dist/AppSdk";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -80,7 +79,9 @@ const SendNftNotification = React.lazy(
 const ConnectLedgerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/ConnectLedgerNotification')
 );
-const SwapMobileNotification = React.lazy(() => import("@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification"));
+const SwapMobileNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification')
+);
 const PairKeystoneNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
 );
@@ -181,10 +182,10 @@ export const Loader: FC = React.memo(() => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
     const tonendpoint = useTonendpoint({
-          targetEnv: TARGET_ENV,
-          build: sdk.version,
-          network: activeWallet?.network,
-          lang: localizationFrom(browser.i18n.getUILanguage())
+        targetEnv: TARGET_ENV,
+        build: sdk.version,
+        network: activeWallet?.network,
+        lang: localizationFrom(browser.i18n.getUILanguage())
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
@@ -329,11 +330,14 @@ export const Content: FC<{
                             }
                         />
                     </Route>
-                    <Route path={AppRoute.swap} element={
-                        <Suspense fallback={null}>
-                            <SwapPage />
-                        </Suspense>
-                    } />
+                    <Route
+                        path={AppRoute.swap}
+                        element={
+                            <Suspense fallback={null}>
+                                <SwapPage />
+                            </Suspense>
+                        }
+                    />
                     <Route path="*" element={<IndexPage />} />
                 </Routes>
                 <Footer />
