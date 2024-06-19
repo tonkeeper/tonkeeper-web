@@ -135,7 +135,7 @@ jobs:
 
     extension-build:
         name: extension-build
-        runs-on: ubuntu-latest
+        runs-on: macos-14
         timeout-minutes: 10
 
         steps:
