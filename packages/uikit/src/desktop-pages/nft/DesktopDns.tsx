@@ -1,5 +1,5 @@
 import { NftsList } from '../../components/nft/Nfts';
-import { useWalletNftList } from '../../state/wallet';
+import { useWalletFilteredNftList } from '../../state/wallet';
 import styled from 'styled-components';
 import { Body2, Label2 } from '../../components/Text';
 import { Button } from '../../components/fields/Button';
@@ -75,7 +75,7 @@ const collectionsToFilter = [
 ];
 
 export const DesktopDns = () => {
-    const { data: nfts } = useWalletNftList();
+    const { data: nfts } = useWalletFilteredNftList();
     const { t } = useTranslation();
 
     const { ref: scrollRef, closeTop } = useIsScrolled();

@@ -16,6 +16,7 @@ import { SecuritySettings } from './Security';
 import { Settings } from './Settings';
 import { WalletVersion } from './Version';
 import { ConnectedAppsSettings } from './ConnectedAppsSettings';
+import { NFTSettings } from './NFT';
 
 const SettingsRouter = () => {
     return (
@@ -32,6 +33,7 @@ const SettingsRouter = () => {
             </Route>
             <Route path={SettingsRoute.version} element={<WalletVersion />} />
             <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
+            <Route path={SettingsRoute.nft} element={<NFTSettings />} />
             <Route path={SettingsRoute.security} element={<SecuritySettings />} />
             <Route path={SettingsRoute.country} element={<CountrySettings />} />
             <Route path={SettingsRoute.pro} element={<ProSettings />} />

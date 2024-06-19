@@ -63,6 +63,14 @@ const SingleAccountSettings = () => {
             });
         }
 
+        if (jettons?.balances.length) {
+            items.push({
+                name: t('settings_jettons_list'),
+                icon: <ListOfTokensIcon />,
+                action: () => navigate(relative(SettingsRoute.nft))
+            });
+        }
+
         items.push({
             name: t('settings_security'),
             icon: <SecurityIcon />,

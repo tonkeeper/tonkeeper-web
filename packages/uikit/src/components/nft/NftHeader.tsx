@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { VerificationIcon } from '../Icon';
 import { Body2, Body3, Label2 } from '../Text';
-import { useActiveWalletConfig } from '../../state/jetton';
+import { useActiveWalletConfig } from '../../state/wallet';
 
 const TextContent = styled.span`
     display: inline-block;
@@ -55,7 +55,7 @@ const IconBody = styled.span`
 
 export const NftCollectionBody3: FC<{ nft: NftItem }> = React.memo(({ nft }) => {
     const { data } = useActiveWalletConfig();
-    const isTrusted = data?.trustedNfts.includes(nft.address);
+    const isTrusted = data?.trustedNfts.includes(nft.collection?.address || nft.address);
     const isSuspicious = nft.trust !== TrustType.Whitelist;
 
     const verified = nft.trust === TrustType.Whitelist;

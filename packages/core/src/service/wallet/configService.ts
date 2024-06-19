@@ -9,7 +9,8 @@ const defaultConfig: ActiveWalletConfig = {
     hiddenNfts: [],
     pinnedTokens: [],
     hiddenTokens: [],
-    trustedNfts: []
+    trustedNfts: [],
+    spamNfts: []
 };
 
 export const getActiveWalletConfig = async (
@@ -25,7 +26,7 @@ export const getActiveWalletConfig = async (
     if (!config) {
         return defaultConfig;
     }
-    return Object.assign(defaultConfig, config);
+    return { ...defaultConfig, ...config };
 };
 
 export const setActiveWalletConfig = async (

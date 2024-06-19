@@ -89,6 +89,12 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_jettons_list')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
+                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.nft}>
+                    <SettingsListItem>
+                        <CoinsIcon />
+                        <Label2>{t('settings_jettons_list')}</Label2>
+                    </SettingsListItem>
+                </LinkStyled>
                 <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}>
                     <SettingsListItem>
                         <AppsIcon />

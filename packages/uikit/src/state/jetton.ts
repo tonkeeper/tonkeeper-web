@@ -160,15 +160,6 @@ export const useJettonBalance = (jettonAddress: string) => {
     );
 };
 
-export const useActiveWalletConfig = () => {
-    const wallet = useWalletContext();
-    const sdk = useAppSdk();
-    return useQuery<ActiveWalletConfig, Error>(
-        [wallet.active.rawAddress, wallet.network, QueryKey.walletConfig],
-        async () => getActiveWalletConfig(sdk.storage, wallet.active.rawAddress, wallet.network)
-    );
-};
-
 export const useTogglePinJettonMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();

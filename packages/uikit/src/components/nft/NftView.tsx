@@ -2,7 +2,7 @@ import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import React, { FC, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
-import { useNftCollectionData } from '../../state/wallet';
+import { useActiveWalletConfig, useNftCollectionData } from '../../state/wallet';
 import { ChevronDownIcon, VerificationIcon } from '../Icon';
 import { NotificationBlock, NotificationTitleBlock } from '../Notification';
 import { Body2, H2, H3, Label1, Label4 } from '../Text';
@@ -11,9 +11,9 @@ import { Body, CroppedBodyText } from '../jettons/CroppedText';
 import { NftAction } from './NftAction';
 import { NftDetails } from './NftDetails';
 import { Image, NftBlock } from './Nfts';
-import { useActiveWalletConfig } from '../../state/jetton';
 import { TrustType } from '@tonkeeper/core/dist/tonApiV2';
 import { Button } from '../fields/Button';
+import { useMarkNftAsSpam, useMarkNftAsTrusted } from '../../state/nft';
 
 const Text = styled.div`
     display: flex;
@@ -84,9 +84,11 @@ export const NftPreview: FC<{
     onClose?: () => void;
     nftItem: NFT;
 }> = ({ onClose, nftItem }) => {
+    const { mutateAsync: markNftAsSpam, isLoading: markNftAsSpamLoading } = useMarkNftAsSpam();
+    const { mutate: markNftAsTrusted, isLoading: markNftAsTrustedLoading } = useMarkNftAsTrusted();
     const { data } = useActiveWalletConfig();
-    const isTrusted = !!data?.trustedNfts.includes(nftItem.address);
     const isSuspicious = nftItem.trust !== TrustType.Whitelist;
+    const isTrusted = !!data?.trustedNfts.includes(nftItem.collection?.address || nftItem.address);
 
     const ref = useRef<HTMLImageElement | null>(null);
     const { t } = useTranslation();
@@ -130,10 +132,21 @@ export const NftPreview: FC<{
             )}
             {isSuspicious && !isTrusted && (
                 <ButtonsBlock>
-                    <Button warn type="button">
+                    <Button
+                        warn
+                        type="button"
+                        onClick={() => markNftAsSpam(nftItem).then(onClose)}
+                        loading={markNftAsSpamLoading}
+                    >
                         Report Spam
                     </Button>
-                    <Button type="button">Not Spam</Button>
+                    <Button
+                        type="button"
+                        onClick={() => markNftAsTrusted(nftItem)}
+                        loading={markNftAsTrustedLoading}
+                    >
+                        Not Spam
+                    </Button>
                 </ButtonsBlock>
             )}
             <NftBlock>

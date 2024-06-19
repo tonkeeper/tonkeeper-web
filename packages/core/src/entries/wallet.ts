@@ -86,6 +86,7 @@ export interface ActiveWalletConfig {
     pinnedNfts: string[];
     hiddenNfts: string[];
     trustedNfts: string[];
+    spamNfts: string[];
 }
 
 export interface TronWalletStorage {
