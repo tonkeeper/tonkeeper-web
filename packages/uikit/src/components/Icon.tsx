@@ -54,7 +54,7 @@ export const ChevronLeftIcon = () => {
     );
 };
 
-export const ChevronRightIcon = () => {
+export const ChevronRightIcon: FC<{ className?: string }> = ({ className }) => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -62,6 +62,7 @@ export const ChevronRightIcon = () => {
             height="1rem"
             viewBox="0 0 16 16"
             fill="none"
+            className={className}
         >
             <path
                 d="M5.69254 3.50173C5.41544 3.19385 5.4404 2.71963 5.74828 2.44254C6.05617 2.16544 6.53038 2.1904 6.80748 2.49828L11.3075 7.49828C11.5642 7.78351 11.5642 8.2165 11.3075 8.50173L6.80748 13.5017C6.53038 13.8096 6.05617 13.8346 5.74828 13.5575C5.4404 13.2804 5.41544 12.8062 5.69254 12.4983L9.74098 8.00001L5.69254 3.50173Z"

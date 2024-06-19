@@ -1,7 +1,7 @@
 import { FC, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../../components/Body';
-import { MinusIcon, PlusIcon } from '../../../components/Icon';
+import { ChevronRightIcon, MinusIcon, PlusIcon } from '../../../components/Icon';
 import { ListBlock, ListItemElement, ListItemPayload } from '../../../components/List';
 import { SkeletonList } from '../../../components/Skeleton';
 import { SubHeader } from '../../../components/SubHeader';
@@ -13,6 +13,7 @@ import { BorderSmallResponsive } from '../../../components/shared/Styles';
 import { useHideNft, useMakeNftVisible, useMarkNftAsTrusted } from '../../../state/nft';
 import { SettingsNFTCollection, SettingsSingleNFT } from './models';
 import { SpamNftInfoNotification } from './SpamNftInfoNotification';
+import { Image } from '../../../components/shared/Image';
 
 const NFTSkeleton = () => {
     const { t } = useTranslation();
@@ -41,7 +42,7 @@ const ListItemPayloadStyled = styled(ListItemPayload)`
     justify-content: flex-start;
 `;
 
-const NftImageStyled = styled.img`
+const NftImageStyled = styled(Image)`
     height: 44px;
     width: 44px;
     ${BorderSmallResponsive}
@@ -49,6 +50,11 @@ const NftImageStyled = styled.img`
 
 const NftButton = styled(IconButton)`
     padding: 8px;
+
+    background-color: ${props => props.theme.backgroundContentTint};
+    &:hover {
+        background-color: ${props => props.theme.backgroundContentAttention};
+    }
 `;
 
 const NftTextContainer = styled.div`
@@ -64,6 +70,11 @@ const NftTextContainer = styled.div`
     > ${Body2} {
         color: ${props => props.theme.textSecondary};
     }
+`;
+
+const ChevronRightIconStyled = styled(ChevronRightIcon)`
+    margin-left: auto;
+    color: ${props => props.theme.iconTertiary};
 `;
 
 const NftsSection: FC<{
@@ -90,7 +101,7 @@ const NftsSection: FC<{
                             )}
                             <NftImageStyled src={collection.image} />
                             <NftTextContainer>
-                                <Label1>{collection.name}</Label1>
+                                <Label1>{collection.name || 'Unknown'}</Label1>
                                 <Body2>
                                     {collection.type === 'collection'
                                         ? collection.nfts.length > 1
@@ -99,6 +110,7 @@ const NftsSection: FC<{
                                         : 'Single NFT'}
                                 </Body2>
                             </NftTextContainer>
+                            {type === 'spam' && <ChevronRightIconStyled />}
                         </ListItemPayloadStyled>
                     </ListItemElement>
                 ))}
