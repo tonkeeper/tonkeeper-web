@@ -121,20 +121,20 @@ export interface PoolInfo {
 /**
  * Check if a given object implements the PoolInfo interface.
  */
-export function instanceOfPoolInfo(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('name' in value)) return false;
-    if (!('totalAmount' in value)) return false;
-    if (!('implementation' in value)) return false;
-    if (!('apy' in value)) return false;
-    if (!('minStake' in value)) return false;
-    if (!('cycleStart' in value)) return false;
-    if (!('cycleEnd' in value)) return false;
-    if (!('verified' in value)) return false;
-    if (!('currentNominators' in value)) return false;
-    if (!('maxNominators' in value)) return false;
-    if (!('nominatorsStake' in value)) return false;
-    if (!('validatorStake' in value)) return false;
+export function instanceOfPoolInfo(value: object): value is PoolInfo {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('totalAmount' in value) || value['totalAmount'] === undefined) return false;
+    if (!('implementation' in value) || value['implementation'] === undefined) return false;
+    if (!('apy' in value) || value['apy'] === undefined) return false;
+    if (!('minStake' in value) || value['minStake'] === undefined) return false;
+    if (!('cycleStart' in value) || value['cycleStart'] === undefined) return false;
+    if (!('cycleEnd' in value) || value['cycleEnd'] === undefined) return false;
+    if (!('verified' in value) || value['verified'] === undefined) return false;
+    if (!('currentNominators' in value) || value['currentNominators'] === undefined) return false;
+    if (!('maxNominators' in value) || value['maxNominators'] === undefined) return false;
+    if (!('nominatorsStake' in value) || value['nominatorsStake'] === undefined) return false;
+    if (!('validatorStake' in value) || value['validatorStake'] === undefined) return false;
     return true;
 }
 

@@ -43,9 +43,9 @@ export interface ElectionsRecoverStakeAction {
 /**
  * Check if a given object implements the ElectionsRecoverStakeAction interface.
  */
-export function instanceOfElectionsRecoverStakeAction(value: object): boolean {
-    if (!('amount' in value)) return false;
-    if (!('staker' in value)) return false;
+export function instanceOfElectionsRecoverStakeAction(value: object): value is ElectionsRecoverStakeAction {
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('staker' in value) || value['staker'] === undefined) return false;
     return true;
 }
 

@@ -54,10 +54,10 @@ export interface AccountAddress {
 /**
  * Check if a given object implements the AccountAddress interface.
  */
-export function instanceOfAccountAddress(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('isScam' in value)) return false;
-    if (!('isWallet' in value)) return false;
+export function instanceOfAccountAddress(value: object): value is AccountAddress {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('isScam' in value) || value['isScam'] === undefined) return false;
+    if (!('isWallet' in value) || value['isWallet'] === undefined) return false;
     return true;
 }
 

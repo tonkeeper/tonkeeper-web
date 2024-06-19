@@ -79,14 +79,14 @@ export interface Event {
 /**
  * Check if a given object implements the Event interface.
  */
-export function instanceOfEvent(value: object): boolean {
-    if (!('eventId' in value)) return false;
-    if (!('timestamp' in value)) return false;
-    if (!('actions' in value)) return false;
-    if (!('valueFlow' in value)) return false;
-    if (!('isScam' in value)) return false;
-    if (!('lt' in value)) return false;
-    if (!('inProgress' in value)) return false;
+export function instanceOfEvent(value: object): value is Event {
+    if (!('eventId' in value) || value['eventId'] === undefined) return false;
+    if (!('timestamp' in value) || value['timestamp'] === undefined) return false;
+    if (!('actions' in value) || value['actions'] === undefined) return false;
+    if (!('valueFlow' in value) || value['valueFlow'] === undefined) return false;
+    if (!('isScam' in value) || value['isScam'] === undefined) return false;
+    if (!('lt' in value) || value['lt'] === undefined) return false;
+    if (!('inProgress' in value) || value['inProgress'] === undefined) return false;
     return true;
 }
 

@@ -67,13 +67,13 @@ export interface WalletDNS {
 /**
  * Check if a given object implements the WalletDNS interface.
  */
-export function instanceOfWalletDNS(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('account' in value)) return false;
-    if (!('isWallet' in value)) return false;
-    if (!('hasMethodPubkey' in value)) return false;
-    if (!('hasMethodSeqno' in value)) return false;
-    if (!('names' in value)) return false;
+export function instanceOfWalletDNS(value: object): value is WalletDNS {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('account' in value) || value['account'] === undefined) return false;
+    if (!('isWallet' in value) || value['isWallet'] === undefined) return false;
+    if (!('hasMethodPubkey' in value) || value['hasMethodPubkey'] === undefined) return false;
+    if (!('hasMethodSeqno' in value) || value['hasMethodSeqno'] === undefined) return false;
+    if (!('names' in value) || value['names'] === undefined) return false;
     return true;
 }
 

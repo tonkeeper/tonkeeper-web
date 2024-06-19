@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
 import type { StateInit } from './StateInit';
 import {
     StateInitFromJSON,
     StateInitFromJSONTyped,
     StateInitToJSON,
 } from './StateInit';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -117,6 +117,12 @@ export interface Message {
      */
     init?: StateInit;
     /**
+     * 
+     * @type {string}
+     * @memberof Message
+     */
+    hash: string;
+    /**
      * hex-encoded BoC with raw message body
      * @type {string}
      * @memberof Message
@@ -133,7 +139,7 @@ export interface Message {
      * @type {any}
      * @memberof Message
      */
-    decodedBody?: any;
+    decodedBody?: any | null;
 }
 
 
@@ -151,17 +157,18 @@ export type MessageMsgTypeEnum = typeof MessageMsgTypeEnum[keyof typeof MessageM
 /**
  * Check if a given object implements the Message interface.
  */
-export function instanceOfMessage(value: object): boolean {
-    if (!('msgType' in value)) return false;
-    if (!('createdLt' in value)) return false;
-    if (!('ihrDisabled' in value)) return false;
-    if (!('bounce' in value)) return false;
-    if (!('bounced' in value)) return false;
-    if (!('value' in value)) return false;
-    if (!('fwdFee' in value)) return false;
-    if (!('ihrFee' in value)) return false;
-    if (!('importFee' in value)) return false;
-    if (!('createdAt' in value)) return false;
+export function instanceOfMessage(value: object): value is Message {
+    if (!('msgType' in value) || value['msgType'] === undefined) return false;
+    if (!('createdLt' in value) || value['createdLt'] === undefined) return false;
+    if (!('ihrDisabled' in value) || value['ihrDisabled'] === undefined) return false;
+    if (!('bounce' in value) || value['bounce'] === undefined) return false;
+    if (!('bounced' in value) || value['bounced'] === undefined) return false;
+    if (!('value' in value) || value['value'] === undefined) return false;
+    if (!('fwdFee' in value) || value['fwdFee'] === undefined) return false;
+    if (!('ihrFee' in value) || value['ihrFee'] === undefined) return false;
+    if (!('importFee' in value) || value['importFee'] === undefined) return false;
+    if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
+    if (!('hash' in value) || value['hash'] === undefined) return false;
     return true;
 }
 
@@ -189,6 +196,7 @@ export function MessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): M
         'createdAt': json['created_at'],
         'opCode': json['op_code'] == null ? undefined : json['op_code'],
         'init': json['init'] == null ? undefined : StateInitFromJSON(json['init']),
+        'hash': json['hash'],
         'rawBody': json['raw_body'] == null ? undefined : json['raw_body'],
         'decodedOpName': json['decoded_op_name'] == null ? undefined : json['decoded_op_name'],
         'decodedBody': json['decoded_body'] == null ? undefined : json['decoded_body'],
@@ -215,6 +223,7 @@ export function MessageToJSON(value?: Message | null): any {
         'created_at': value['createdAt'],
         'op_code': value['opCode'],
         'init': StateInitToJSON(value['init']),
+        'hash': value['hash'],
         'raw_body': value['rawBody'],
         'decoded_op_name': value['decodedOpName'],
         'decoded_body': value['decodedBody'],

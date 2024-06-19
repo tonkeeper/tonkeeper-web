@@ -42,10 +42,10 @@ export interface BlockParamLimits {
 /**
  * Check if a given object implements the BlockParamLimits interface.
  */
-export function instanceOfBlockParamLimits(value: object): boolean {
-    if (!('underload' in value)) return false;
-    if (!('softLimit' in value)) return false;
-    if (!('hardLimit' in value)) return false;
+export function instanceOfBlockParamLimits(value: object): value is BlockParamLimits {
+    if (!('underload' in value) || value['underload'] === undefined) return false;
+    if (!('softLimit' in value) || value['softLimit'] === undefined) return false;
+    if (!('hardLimit' in value) || value['hardLimit'] === undefined) return false;
     return true;
 }
 

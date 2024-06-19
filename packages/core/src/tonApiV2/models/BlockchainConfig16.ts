@@ -42,10 +42,10 @@ export interface BlockchainConfig16 {
 /**
  * Check if a given object implements the BlockchainConfig16 interface.
  */
-export function instanceOfBlockchainConfig16(value: object): boolean {
-    if (!('maxValidators' in value)) return false;
-    if (!('maxMainValidators' in value)) return false;
-    if (!('minValidators' in value)) return false;
+export function instanceOfBlockchainConfig16(value: object): value is BlockchainConfig16 {
+    if (!('maxValidators' in value) || value['maxValidators'] === undefined) return false;
+    if (!('maxMainValidators' in value) || value['maxMainValidators'] === undefined) return false;
+    if (!('minValidators' in value) || value['minValidators'] === undefined) return false;
     return true;
 }
 

@@ -373,8 +373,14 @@ export const ImportWords: FC<{
 
     const onChange = useCallback(
         (newValue: string, index: number) => {
-            if (newValue.includes(' ')) {
-                let values = newValue.trim().split(' ');
+            if (newValue.includes(' ') || newValue.includes(String.fromCharCode(160))) {
+                let values = newValue
+                    .trim()
+                    .replace(/\xA0/g, ' ') // replace chart 160
+                    .replace(/\s+/g, ' ') // remove double spaces
+                    .replace(/[0-9]/g, '') // remove numbers
+                    .replace(/\./g, '') // remove dots
+                    .split(' ');
                 if (values.length === 1) {
                     setMnemonic(items => items.map((v, i) => (i === index ? values[0] : v)));
                     focusInput(ref.current, index + 1);

@@ -37,8 +37,8 @@ export interface TraceIDs {
 /**
  * Check if a given object implements the TraceIDs interface.
  */
-export function instanceOfTraceIDs(value: object): boolean {
-    if (!('traces' in value)) return false;
+export function instanceOfTraceIDs(value: object): value is TraceIDs {
+    if (!('traces' in value) || value['traces'] === undefined) return false;
     return true;
 }
 

@@ -37,8 +37,8 @@ export interface Subscriptions {
 /**
  * Check if a given object implements the Subscriptions interface.
  */
-export function instanceOfSubscriptions(value: object): boolean {
-    if (!('subscriptions' in value)) return false;
+export function instanceOfSubscriptions(value: object): value is Subscriptions {
+    if (!('subscriptions' in value) || value['subscriptions'] === undefined) return false;
     return true;
 }
 

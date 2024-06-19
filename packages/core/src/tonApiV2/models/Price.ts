@@ -36,9 +36,9 @@ export interface Price {
 /**
  * Check if a given object implements the Price interface.
  */
-export function instanceOfPrice(value: object): boolean {
-    if (!('value' in value)) return false;
-    if (!('tokenName' in value)) return false;
+export function instanceOfPrice(value: object): value is Price {
+    if (!('value' in value) || value['value'] === undefined) return false;
+    if (!('tokenName' in value) || value['tokenName'] === undefined) return false;
     return true;
 }
 

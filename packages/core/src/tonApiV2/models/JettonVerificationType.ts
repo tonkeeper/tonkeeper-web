@@ -26,7 +26,14 @@ export type JettonVerificationType = typeof JettonVerificationType[keyof typeof 
 
 
 export function instanceOfJettonVerificationType(value: any): boolean {
-    return Object.values(JettonVerificationType).includes(value);
+    for (const key in JettonVerificationType) {
+        if (Object.prototype.hasOwnProperty.call(JettonVerificationType, key)) {
+            if ((JettonVerificationType as Record<string, JettonVerificationType>)[key] === value) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 export function JettonVerificationTypeFromJSON(json: any): JettonVerificationType {

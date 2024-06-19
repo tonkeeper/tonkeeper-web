@@ -1,3 +1,5 @@
+import { KeystonePathInfo } from "../service/keystone/types";
+
 export type AuthState =
     | AuthNone
     | AuthPassword
@@ -5,7 +7,8 @@ export type AuthState =
     | KeychainPassword
     | AuthSigner
     | AuthSignerDeepLink
-    | AuthLedger;
+    | AuthLedger
+    | AuthKeystone;
 
 export interface AuthNone {
     kind: 'none';
@@ -30,6 +33,11 @@ export interface AuthSignerDeepLink {
 export interface AuthLedger {
     kind: 'ledger';
     accountIndex: number;
+}
+
+export interface AuthKeystone {
+    kind: 'keystone';
+    info?: KeystonePathInfo;
 }
 
 export interface WebAuthn {

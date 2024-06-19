@@ -36,8 +36,8 @@ export interface TonConnectProofRequestProofDomain {
 /**
  * Check if a given object implements the TonConnectProofRequestProofDomain interface.
  */
-export function instanceOfTonConnectProofRequestProofDomain(value: object): boolean {
-    if (!('value' in value)) return false;
+export function instanceOfTonConnectProofRequestProofDomain(value: object): value is TonConnectProofRequestProofDomain {
+    if (!('value' in value) || value['value'] === undefined) return false;
     return true;
 }
 

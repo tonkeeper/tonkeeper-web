@@ -36,9 +36,9 @@ export interface AddressParse200ResponseBounceable {
 /**
  * Check if a given object implements the AddressParse200ResponseBounceable interface.
  */
-export function instanceOfAddressParse200ResponseBounceable(value: object): boolean {
-    if (!('b64' in value)) return false;
-    if (!('b64url' in value)) return false;
+export function instanceOfAddressParse200ResponseBounceable(value: object): value is AddressParse200ResponseBounceable {
+    if (!('b64' in value) || value['b64'] === undefined) return false;
+    if (!('b64url' in value) || value['b64url'] === undefined) return false;
     return true;
 }
 

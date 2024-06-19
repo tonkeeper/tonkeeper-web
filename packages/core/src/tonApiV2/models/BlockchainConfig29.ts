@@ -96,15 +96,15 @@ export interface BlockchainConfig29 {
 /**
  * Check if a given object implements the BlockchainConfig29 interface.
  */
-export function instanceOfBlockchainConfig29(value: object): boolean {
-    if (!('roundCandidates' in value)) return false;
-    if (!('nextCandidateDelayMs' in value)) return false;
-    if (!('consensusTimeoutMs' in value)) return false;
-    if (!('fastAttempts' in value)) return false;
-    if (!('attemptDuration' in value)) return false;
-    if (!('catchainMaxDeps' in value)) return false;
-    if (!('maxBlockBytes' in value)) return false;
-    if (!('maxCollatedBytes' in value)) return false;
+export function instanceOfBlockchainConfig29(value: object): value is BlockchainConfig29 {
+    if (!('roundCandidates' in value) || value['roundCandidates'] === undefined) return false;
+    if (!('nextCandidateDelayMs' in value) || value['nextCandidateDelayMs'] === undefined) return false;
+    if (!('consensusTimeoutMs' in value) || value['consensusTimeoutMs'] === undefined) return false;
+    if (!('fastAttempts' in value) || value['fastAttempts'] === undefined) return false;
+    if (!('attemptDuration' in value) || value['attemptDuration'] === undefined) return false;
+    if (!('catchainMaxDeps' in value) || value['catchainMaxDeps'] === undefined) return false;
+    if (!('maxBlockBytes' in value) || value['maxBlockBytes'] === undefined) return false;
+    if (!('maxCollatedBytes' in value) || value['maxCollatedBytes'] === undefined) return false;
     return true;
 }
 

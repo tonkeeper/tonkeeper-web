@@ -36,9 +36,9 @@ export interface AccountInfoByStateInit {
 /**
  * Check if a given object implements the AccountInfoByStateInit interface.
  */
-export function instanceOfAccountInfoByStateInit(value: object): boolean {
-    if (!('publicKey' in value)) return false;
-    if (!('address' in value)) return false;
+export function instanceOfAccountInfoByStateInit(value: object): value is AccountInfoByStateInit {
+    if (!('publicKey' in value) || value['publicKey'] === undefined) return false;
+    if (!('address' in value) || value['address'] === undefined) return false;
     return true;
 }
 

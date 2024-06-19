@@ -55,11 +55,11 @@ export interface GetRawBlockchainBlockState200Response {
 /**
  * Check if a given object implements the GetRawBlockchainBlockState200Response interface.
  */
-export function instanceOfGetRawBlockchainBlockState200Response(value: object): boolean {
-    if (!('id' in value)) return false;
-    if (!('rootHash' in value)) return false;
-    if (!('fileHash' in value)) return false;
-    if (!('data' in value)) return false;
+export function instanceOfGetRawBlockchainBlockState200Response(value: object): value is GetRawBlockchainBlockState200Response {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('rootHash' in value) || value['rootHash'] === undefined) return false;
+    if (!('fileHash' in value) || value['fileHash'] === undefined) return false;
+    if (!('data' in value) || value['data'] === undefined) return false;
     return true;
 }
 

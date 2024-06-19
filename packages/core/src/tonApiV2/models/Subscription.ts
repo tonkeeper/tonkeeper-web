@@ -90,18 +90,18 @@ export interface Subscription {
 /**
  * Check if a given object implements the Subscription interface.
  */
-export function instanceOfSubscription(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('walletAddress' in value)) return false;
-    if (!('beneficiaryAddress' in value)) return false;
-    if (!('amount' in value)) return false;
-    if (!('period' in value)) return false;
-    if (!('startTime' in value)) return false;
-    if (!('timeout' in value)) return false;
-    if (!('lastPaymentTime' in value)) return false;
-    if (!('lastRequestTime' in value)) return false;
-    if (!('subscriptionId' in value)) return false;
-    if (!('failedAttempts' in value)) return false;
+export function instanceOfSubscription(value: object): value is Subscription {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('walletAddress' in value) || value['walletAddress'] === undefined) return false;
+    if (!('beneficiaryAddress' in value) || value['beneficiaryAddress'] === undefined) return false;
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('period' in value) || value['period'] === undefined) return false;
+    if (!('startTime' in value) || value['startTime'] === undefined) return false;
+    if (!('timeout' in value) || value['timeout'] === undefined) return false;
+    if (!('lastPaymentTime' in value) || value['lastPaymentTime'] === undefined) return false;
+    if (!('lastRequestTime' in value) || value['lastRequestTime'] === undefined) return false;
+    if (!('subscriptionId' in value) || value['subscriptionId'] === undefined) return false;
+    if (!('failedAttempts' in value) || value['failedAttempts'] === undefined) return false;
     return true;
 }
 

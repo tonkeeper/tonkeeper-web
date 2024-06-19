@@ -30,8 +30,8 @@ export interface GetAccountInfoByStateInitRequest {
 /**
  * Check if a given object implements the GetAccountInfoByStateInitRequest interface.
  */
-export function instanceOfGetAccountInfoByStateInitRequest(value: object): boolean {
-    if (!('stateInit' in value)) return false;
+export function instanceOfGetAccountInfoByStateInitRequest(value: object): value is GetAccountInfoByStateInitRequest {
+    if (!('stateInit' in value) || value['stateInit'] === undefined) return false;
     return true;
 }
 

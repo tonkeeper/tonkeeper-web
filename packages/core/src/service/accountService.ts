@@ -25,6 +25,13 @@ export const addWalletWithCustomAuthState = async (storage: IStorage, state: Wal
     return addWalletsWithCustomAuthState(storage, [state]);
 };
 
+export const preventDuplicatedWallet = async (storage: IStorage, state: WalletState) => {
+    const account = await getAccountState(storage);
+    if (account.publicKeys.includes(state.publicKey)) {
+        throw new Error('Wallet already exist');
+    }
+};
+
 export const addWalletsWithCustomAuthState = async (
     storage: IStorage,
     states: WalletState[],

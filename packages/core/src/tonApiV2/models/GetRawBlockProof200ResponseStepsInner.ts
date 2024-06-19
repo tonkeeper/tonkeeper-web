@@ -49,9 +49,9 @@ export interface GetRawBlockProof200ResponseStepsInner {
 /**
  * Check if a given object implements the GetRawBlockProof200ResponseStepsInner interface.
  */
-export function instanceOfGetRawBlockProof200ResponseStepsInner(value: object): boolean {
-    if (!('liteServerBlockLinkBack' in value)) return false;
-    if (!('liteServerBlockLinkForward' in value)) return false;
+export function instanceOfGetRawBlockProof200ResponseStepsInner(value: object): value is GetRawBlockProof200ResponseStepsInner {
+    if (!('liteServerBlockLinkBack' in value) || value['liteServerBlockLinkBack'] === undefined) return false;
+    if (!('liteServerBlockLinkForward' in value) || value['liteServerBlockLinkForward'] === undefined) return false;
     return true;
 }
 
