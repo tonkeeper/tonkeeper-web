@@ -28,6 +28,7 @@ jobs:
             - name: Run build
               uses: borales/actions-yarn@v5
               env:
+                  CI: false
                   REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
                   REACT_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
                   REACT_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com

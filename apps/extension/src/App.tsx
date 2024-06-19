@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
+import { Language, localizationFrom } from "@tonkeeper/core/dist/entries/language";
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
@@ -55,6 +55,7 @@ import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
 import { TonConnectSubscription } from "./components/TonConnectSubscription";
+import { TargetEnv } from "@tonkeeper/core/dist/AppSdk";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -179,12 +180,12 @@ export const Loader: FC = React.memo(() => {
     const lock = useLock(sdk);
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
-    const tonendpoint = useTonendpoint(
-        TARGET_ENV,
-        sdk.version,
-        activeWallet?.network,
-        localizationFrom(browser.i18n.getUILanguage())
-    );
+    const tonendpoint = useTonendpoint({
+          targetEnv: TARGET_ENV,
+          build: sdk.version,
+          network: activeWallet?.network,
+          lang: localizationFrom(browser.i18n.getUILanguage())
+    });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const { data: tracker } = useAnalytics(sdk.storage, account, activeWallet, sdk.version);
