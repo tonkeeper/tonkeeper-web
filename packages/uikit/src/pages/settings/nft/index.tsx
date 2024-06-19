@@ -1,18 +1,18 @@
-import { NftItemCollection } from '@tonkeeper/core/dist/tonApiV2';
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { InnerBody } from '../../components/Body';
-import { MinusIcon, PlusIcon } from '../../components/Icon';
-import { ListBlock, ListItemElement, ListItemPayload } from '../../components/List';
-import { SkeletonList } from '../../components/Skeleton';
-import { SubHeader } from '../../components/SubHeader';
-import { Body2, H3, Label1 } from '../../components/Text';
-import { useTranslation } from '../../hooks/translation';
-import { useActiveWalletConfig, useWalletNftList } from '../../state/wallet';
-import { NFT } from '@tonkeeper/core/dist/entries/nft';
-import { IconButton } from '../../components/fields/IconButton';
-import { BorderSmallResponsive } from '../../components/shared/Styles';
-import { useHideNft, useMakeNftVisible } from '../../state/nft';
+import { InnerBody } from '../../../components/Body';
+import { MinusIcon, PlusIcon } from '../../../components/Icon';
+import { ListBlock, ListItemElement, ListItemPayload } from '../../../components/List';
+import { SkeletonList } from '../../../components/Skeleton';
+import { SubHeader } from '../../../components/SubHeader';
+import { Body2, H3, Label1 } from '../../../components/Text';
+import { useTranslation } from '../../../hooks/translation';
+import { useActiveWalletConfig, useWalletNftList } from '../../../state/wallet';
+import { IconButton } from '../../../components/fields/IconButton';
+import { BorderSmallResponsive } from '../../../components/shared/Styles';
+import { useHideNft, useMakeNftVisible, useMarkNftAsTrusted } from '../../../state/nft';
+import { SettingsNFTCollection, SettingsSingleNFT } from './models';
+import { SpamNftInfoNotification } from './SpamNftInfoNotification';
 
 const NFTSkeleton = () => {
     const { t } = useTranslation();
@@ -67,20 +67,24 @@ const NftTextContainer = styled.div`
 `;
 
 const NftsSection: FC<{
-    collections: (NFTCollection | SingleNFT)[];
+    collections: (SettingsNFTCollection | SettingsSingleNFT)[];
     type: 'visible' | 'hidden' | 'spam';
-    onClick: (nft: string) => void;
+    onClick: (nft: SettingsNFTCollection | SettingsSingleNFT) => void;
 }> = ({ collections, type, onClick }) => {
     const showButton = type !== 'spam';
     return (
         <NFTSection>
             <NftSectionTitle>{type}</NftSectionTitle>
             <ListBlock>
-                {collections.map((collection, index) => (
-                    <ListItemElement hover={false} key={collection.address}>
+                {collections.map(collection => (
+                    <ListItemElement
+                        hover={type === 'spam'}
+                        key={collection.address}
+                        onClick={() => type === 'spam' && onClick(collection)}
+                    >
                         <ListItemPayloadStyled>
                             {showButton && (
-                                <NftButton onClick={() => onClick(collection.address)}>
+                                <NftButton onClick={() => onClick(collection)}>
                                     {type === 'hidden' ? <PlusIcon /> : <MinusIcon />}
                                 </NftButton>
                             )}
@@ -103,30 +107,16 @@ const NftsSection: FC<{
     );
 };
 
-type NFTCollection = NftItemCollection & {
-    type: 'collection';
-    nfts: NFT[];
-    isSpam: boolean;
-    isHidden: boolean;
-    image?: string;
-    name: string;
-};
-
-type SingleNFT = NFT & {
-    type: 'single';
-    isSpam: boolean;
-    isHidden: boolean;
-    image?: string;
-    name: string;
-};
-
 export const NFTSettings = () => {
     const { t } = useTranslation();
+    const [selectedSpamNft, setSelectedSpamNft] = useState<
+        SettingsNFTCollection | SettingsSingleNFT | undefined
+    >();
 
     const { data: nfts } = useWalletNftList();
     const { data: config } = useActiveWalletConfig();
 
-    const collections: (NFTCollection | SingleNFT)[] = useMemo(() => {
+    const collections: (SettingsNFTCollection | SettingsSingleNFT)[] = useMemo(() => {
         if (!config || !nfts) return [];
         return nfts.reduce((acc, item) => {
             const image = item.previews?.find(i => i.resolution === '100x100')?.url;
@@ -142,9 +132,9 @@ export const NFTSettings = () => {
                     name: item.metadata.name
                 });
             }
-            let collection: NFTCollection | undefined = acc.find(
+            let collection: SettingsNFTCollection | undefined = acc.find(
                 c => c.type === 'collection' && c.address === item.collection!.address
-            ) as NFTCollection | undefined;
+            ) as SettingsNFTCollection | undefined;
 
             if (!collection) {
                 collection = {
@@ -173,7 +163,7 @@ export const NFTSettings = () => {
             }
 
             return acc;
-        }, [] as (NFTCollection | SingleNFT)[]);
+        }, [] as (SettingsNFTCollection | SettingsSingleNFT)[]);
     }, [nfts, config?.spamNfts, config?.hiddenNfts, config?.trustedNfts]);
 
     const visibleCollections = useMemo(
@@ -193,10 +183,19 @@ export const NFTSettings = () => {
 
     const { mutate: makeNftVisible } = useMakeNftVisible();
     const { mutate: hideNft } = useHideNft();
+    const { mutate: trustNft } = useMarkNftAsTrusted();
 
     if (!nfts || !config) {
         return <NFTSkeleton />;
     }
+
+    const onCloseSpamNftInfo = (confirmNotSpam?: boolean) => {
+        if (confirmNotSpam) {
+            trustNft(selectedSpamNft!.address);
+        }
+
+        setSelectedSpamNft(undefined);
+    };
 
     return (
         <>
@@ -206,19 +205,28 @@ export const NFTSettings = () => {
                     <NftsSection
                         collections={visibleCollections}
                         type="visible"
-                        onClick={hideNft}
+                        onClick={c => hideNft(c.address)}
                     />
                 )}
                 {hiddenCollections.length > 0 && (
                     <NftsSection
                         collections={hiddenCollections}
                         type="hidden"
-                        onClick={makeNftVisible}
+                        onClick={c => makeNftVisible(c.address)}
                     />
                 )}
                 {spamCollections.length > 0 && (
-                    <NftsSection collections={spamCollections} type="spam" onClick={() => {}} />
+                    <NftsSection
+                        collections={spamCollections}
+                        type="spam"
+                        onClick={setSelectedSpamNft}
+                    />
                 )}
+                <SpamNftInfoNotification
+                    isOpen={!!selectedSpamNft}
+                    onClose={onCloseSpamNftInfo}
+                    nft={selectedSpamNft}
+                />
             </InnerBody>
         </>
     );

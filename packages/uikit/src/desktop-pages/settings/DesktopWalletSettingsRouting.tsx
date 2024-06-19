@@ -6,7 +6,7 @@ import { JettonsSettings } from '../../pages/settings/Jettons';
 import styled from 'styled-components';
 import { DesktopWalletSettingsPage } from './DesktopWalletSettingsPage';
 import { DesktopConnectedAppsSettings } from './DesktopConnectedAppsSettings';
-import { NFTSettings } from '../../pages/settings/NFT';
+import { NFTSettings } from '../../pages/settings/nft';
 
 const OldSettingsLayoutWrapper = styled.div`
     padding-top: 64px;
