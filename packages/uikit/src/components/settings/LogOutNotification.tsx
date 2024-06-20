@@ -53,7 +53,7 @@ const LotOutContent: FC<{
                 <BodyText>
                     {t(
                         isKeystone
-                            ? 'settings_keystone_reset_alert_caption'
+                            ? 'Delete_keystone_wallet_data_description'
                             : 'settings_reset_alert_caption'
                     )}
                 </BodyText>

@@ -197,7 +197,7 @@ export const sendJettonMultiTransfer = async (
     );
 
     const attachValue = feeEstimate.div(transferMessages.length).plus(unShiftedDecimals(0.05));
-    checkWalletBalanceOrDie(attachValue, wallet);
+    checkWalletBalanceOrDie(attachValue.multipliedBy(transferMessages.length), wallet);
 
     const estimationCell = await createJettonMultiTransfer(
         timestamp,
@@ -332,7 +332,7 @@ export const sendNftMultiTransfer = async (
     );
 
     const attachValue = feeEstimate.div(transferMessages.length).plus(unShiftedDecimals(0.03));
-    checkWalletBalanceOrDie(attachValue, wallet);
+    checkWalletBalanceOrDie(attachValue.multipliedBy(transferMessages.length), wallet);
 
     const estimationCell = await createNftMultiTransfer(
         timestamp,

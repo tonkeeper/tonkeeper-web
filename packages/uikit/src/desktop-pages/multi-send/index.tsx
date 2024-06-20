@@ -200,13 +200,17 @@ const MultiSendListElement: FC<{
     onClick: () => void;
 }> = ({ list, asset, onClick }) => {
     const { t } = useTranslation();
-    const { data: rate } = useRate(
+    const { data: rate, isFetched } = useRate(
         typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
     );
 
     const weiBalance = useAssetWeiBalance(asset);
 
-    const { willBeSent, willBeSentBN } = getWillBeMultiSendValue(list.form.rows, asset, rate);
+    const { willBeSent, willBeSentBN } = getWillBeMultiSendValue(
+        list.form.rows,
+        asset,
+        rate || { prices: 0 }
+    );
 
     const isInsifficientBalance = weiBalance
         ? unShiftedDecimals(willBeSentBN, asset.decimals).gt(weiBalance)
@@ -221,7 +225,7 @@ const MultiSendListElement: FC<{
                 <SubText>
                     <Body3Secondary>
                         {list.form.rows.length}&nbsp;{t('multi_send_wallets')}&nbsp;·&nbsp;
-                        {rate ? willBeSent : <SkeletonTextStyled width="50px" size="small" />}
+                        {isFetched ? willBeSent : <SkeletonTextStyled width="50px" size="small" />}
                     </Body3Secondary>
                     {isInsifficientBalance && (
                         <Body3Secondary>
