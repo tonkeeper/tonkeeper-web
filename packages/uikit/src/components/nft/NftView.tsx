@@ -3,19 +3,31 @@ import React, { FC, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveWalletConfig, useNftCollectionData } from '../../state/wallet';
-import { ChevronDownIcon, InfoCircleIcon, VerificationIcon } from '../Icon';
+import {
+    BlockIcon,
+    ChevronDownIcon,
+    EllipsisIcon,
+    EyeDisableIcon,
+    GlobeIcon,
+    InfoCircleIcon,
+    VerificationIcon
+} from '../Icon';
 import { NotificationBlock, NotificationTitleBlock } from '../Notification';
 import { Body2, H2, H3, Label1, Label4 } from '../Text';
-import { BackButton, ButtonMock } from '../fields/BackButton';
+import { RoundedButton } from '../fields/RoundedButton';
 import { Body, CroppedBodyText } from '../jettons/CroppedText';
 import { NftAction } from './NftAction';
 import { NftDetails } from './NftDetails';
 import { Image, NftBlock } from './Nfts';
 import { TrustType } from '@tonkeeper/core/dist/tonApiV2';
 import { Button } from '../fields/Button';
-import { useMarkNftAsSpam, useMarkNftAsTrusted } from '../../state/nft';
+import { useHideNft, useMarkNftAsSpam, useMarkNftAsTrusted } from '../../state/nft';
 import { UnverifiedNftNotification } from './UnverifiedNftNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
+import { DropDown } from '../DropDown';
+import { ListBlock, ListItemElement, ListItemPayload } from '../List';
+import { useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 
 const Text = styled.div`
     display: flex;
@@ -43,6 +55,15 @@ export const TelegramUsernamesCollectionAddress =
     '0:80d78a35f955a14b679faa887ff4cd5bfc0f43b4a4eea2a7e6927f3701b273c2';
 export const TelegramNumbersCollectionAddress =
     '0:0e41dc1dc3c9067ed24248580e12b3359818d83dee0304fabcf80845eafafdb2';
+export const GetGemsDnsCollectionAddress =
+    '0:e1955aba7249f23e4fd2086654a176516d98b134e0df701302677c037c358b17';
+
+export const KnownNFTDnsCollections = [
+    TonDnsRootCollectionAddress,
+    TelegramNumbersCollectionAddress,
+    TelegramUsernamesCollectionAddress,
+    GetGemsDnsCollectionAddress
+];
 
 const Title = styled(H2)`
     word-break: break-word;
@@ -85,12 +106,30 @@ const ButtonsBlock = styled.div`
     }
 `;
 
+const DropDownWrapper = styled.div`
+    .drop-down-container {
+        z-index: 100;
+        top: calc(100% + 12px);
+        right: 0;
+    }
+`;
+
+const ListBlockStyled = styled(ListBlock)`
+    margin: 0;
+
+    svg {
+        color: ${p => p.theme.accentBlue};
+    }
+`;
+
 export const NftPreview: FC<{
     onClose?: () => void;
     nftItem: NFT;
 }> = ({ onClose, nftItem }) => {
     const { mutateAsync: markNftAsSpam, isLoading: markNftAsSpamLoading } = useMarkNftAsSpam();
     const { mutate: markNftAsTrusted, isLoading: markNftAsTrustedLoading } = useMarkNftAsTrusted();
+    const { mutateAsync: hideNft } = useHideNft();
+
     const { data } = useActiveWalletConfig();
     const isSuspicious = nftItem.trust !== TrustType.Whitelist;
     const isTrusted = !!data?.trustedNfts.includes(nftItem.collection?.address || nftItem.address);
@@ -134,13 +173,18 @@ export const NftPreview: FC<{
         onCloseSpamModal();
     };
 
+    const { config } = useAppContext();
+    const sdk = useAppSdk();
+
+    const explorerUrl = config.NFTOnExplorerUrl ?? 'https://tonviewer.com/nft/%s';
+
     return (
         <NotificationBlock>
             {onClose && (
                 <NotificationTitleBlock>
-                    <BackButton onClick={onClose}>
+                    <RoundedButton onClick={onClose}>
                         <ChevronDownIcon />
-                    </BackButton>
+                    </RoundedButton>
                     <NftNameContainer>
                         <H3>{nftItem.dns ?? nftItem.metadata.name}</H3>
                         {isSuspicious && (
@@ -156,7 +200,51 @@ export const NftPreview: FC<{
                         isOpen={isSpamModalOpen}
                         onClose={handleCloseSpamModal}
                     />
-                    <ButtonMock />
+                    <DropDownWrapper>
+                        <DropDown
+                            containerClassName="drop-down-container"
+                            payload={closeDropDown => (
+                                <ListBlockStyled>
+                                    <ListItemElement
+                                        onClick={() => {
+                                            closeDropDown();
+                                            hideNft(nftItem).then(onClose);
+                                        }}
+                                    >
+                                        <ListItemPayload>
+                                            <Label1>{t('nft_actions_hide_nft')}</Label1>
+                                            <EyeDisableIcon />
+                                        </ListItemPayload>
+                                    </ListItemElement>
+                                    <ListItemElement
+                                        onClick={() => {
+                                            closeDropDown();
+                                            markNftAsSpam(nftItem).then(onClose);
+                                        }}
+                                    >
+                                        <ListItemPayload>
+                                            <Label1>{t('nft_actions_hide_and_report')}</Label1>
+                                            <BlockIcon />
+                                        </ListItemPayload>
+                                    </ListItemElement>
+                                    <ListItemElement
+                                        onClick={() =>
+                                            sdk.openPage(explorerUrl.replace('%s', nftItem.address))
+                                        }
+                                    >
+                                        <ListItemPayload>
+                                            <Label1>{t('nft_actions_view_on_explorer')}</Label1>
+                                            <GlobeIcon />
+                                        </ListItemPayload>
+                                    </ListItemElement>
+                                </ListBlockStyled>
+                            )}
+                        >
+                            <RoundedButton>
+                                <EllipsisIcon />
+                            </RoundedButton>
+                        </DropDown>
+                    </DropDownWrapper>
                 </NotificationTitleBlock>
             )}
             {isSuspicious && !isTrusted && (

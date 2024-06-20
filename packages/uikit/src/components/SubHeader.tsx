@@ -5,7 +5,7 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useNativeBackButton } from './BackButton';
 import { ChevronLeftIcon } from './Icon';
 import { H3 } from './Text';
-import { BackButton } from './fields/BackButton';
+import { RoundedButton } from './fields/RoundedButton';
 import { DesktopBackButton } from './desktop/DesktopViewLayout';
 
 export const WithHeadingDivider = styled.div``;
@@ -53,7 +53,7 @@ export const SybHeaderGlobalStyle = createGlobalStyle`
   }
 `;
 
-export const BackButtonLeft = styled(BackButton)`
+export const BackButtonLeft = styled(RoundedButton)`
     position: absolute;
     top: 50%;
     margin-top: -1rem;

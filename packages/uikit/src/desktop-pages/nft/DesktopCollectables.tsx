@@ -11,11 +11,7 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
-import {
-    TelegramNumbersCollectionAddress,
-    TelegramUsernamesCollectionAddress,
-    TonDnsRootCollectionAddress
-} from '../../components/nft/NftView';
+import { KnownNFTDnsCollections } from '../../components/nft/NftView';
 import { useMemo } from 'react';
 
 const gap = '10px';
@@ -68,12 +64,6 @@ const LinkStyled = styled(Link)`
     margin: 0 auto;
 `;
 
-const collectionsToFilter = [
-    TonDnsRootCollectionAddress,
-    TelegramNumbersCollectionAddress,
-    TelegramUsernamesCollectionAddress
-];
-
 export const DesktopCollectables = () => {
     const { data: nfts } = useWalletFilteredNftList();
     const { t } = useTranslation();
@@ -85,7 +75,7 @@ export const DesktopCollectables = () => {
             nfts?.filter(
                 nft =>
                     !nft.collection?.address ||
-                    !collectionsToFilter.includes(nft.collection.address)
+                    !KnownNFTDnsCollections.includes(nft.collection.address)
             ),
         [nfts]
     );
@@ -98,7 +88,7 @@ export const DesktopCollectables = () => {
         return (
             <NFTEmptyPage>
                 <NFTEmptyContainer>
-                    <Label2>{t('nft_empty_header')}</Label2>
+                    <Label2>{t('collectibles_empty_header')}</Label2>
                     <Body2>{t('nft_empty_description')}</Body2>
                     <LinkStyled to={AppRoute.browser}>
                         <Button size="small">{t('nft_empty_go_discover_button')}</Button>
@@ -111,7 +101,7 @@ export const DesktopCollectables = () => {
     return (
         <DesktopViewPageLayout ref={scrollRef}>
             <DesktopViewHeader borderBottom={!closeTop}>
-                <Label2>{t('page_header_purchases')}</Label2>
+                <Label2>{t('wallet_aside_collectibles')}</Label2>
             </DesktopViewHeader>
             <NFTPageBody>{filteredNft && <NftsListStyled nfts={filteredNft} />}</NFTPageBody>
         </DesktopViewPageLayout>
