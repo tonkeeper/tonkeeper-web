@@ -1,7 +1,6 @@
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { BrowserWindow, ipcMain } from 'electron';
 import isDev from 'electron-is-dev';
-import log from 'electron-log/main';
 import path from 'path';
 import { Cookie, CookieJar } from 'tough-cookie';
 import { handleBackgroundMessage } from '../electron/background';
@@ -98,6 +97,15 @@ export abstract class MainWindow {
         this.mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
             const setCookie = details.responseHeaders['set-cookie'] ?? [];
 
+            /* patch mercuryo cors  */
+            if (details.url.startsWith('https://api.mercuryo.io')) {
+                const corsHeader =
+                    Object.keys(details.responseHeaders).find(
+                        k => k.toLowerCase() === 'access-control-allow-origin'
+                    ) || 'access-control-allow-origin';
+                details.responseHeaders[corsHeader] = ['*'];
+            }
+
             /* patch tg auth headers cors  */
             if (details.url === 'https://oauth.telegram.org/auth/get') {
                 const corsHeader =
@@ -114,19 +122,6 @@ export abstract class MainWindow {
             ).finally(() => {
                 callback(details);
             });
-        });
-
-        this.mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
-            /* patch mercuryo cors  */
-            if (details.url.startsWith('https://api.mercuryo.io')) {
-                const corsHeader =
-                    Object.keys(details.responseHeaders).find(
-                        k => k.toLowerCase() === 'access-control-allow-origin'
-                    ) || 'access-control-allow-origin';
-                details.responseHeaders[corsHeader] = ['*'];
-            }
-
-            callback(details);
         });
 
         this.mainWindow.webContents.session.on('select-hid-device', (event, details, callback) => {
