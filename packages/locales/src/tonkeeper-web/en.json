@@ -45,6 +45,7 @@
   "Enable_storing_config" : "Enable storing config",
   "enter_password" : "Enter password",
   "export_dot_csv" : "Export .CSV",
+  "history_spam_nft" : "Spam NFT",
   "I_have_a_backup_copy_of_recovery_phrase" : "I have a backup copy of recovery phrase",
   "import_csv" : "Import CSV",
   "import_csv_description" : "Drag and drop the file or click the button below to upload it. Please review the example table structure below to avoid errors.",

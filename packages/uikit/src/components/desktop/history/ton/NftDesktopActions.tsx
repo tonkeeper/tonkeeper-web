@@ -1,5 +1,5 @@
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import {
@@ -12,7 +12,12 @@ import {
     HistoryCellActionGeneric
 } from './HistoryCell';
 import { useWalletContext } from '../../../../hooks/appContext';
-import { useNftCollectionData, useNftItemData } from '../../../../state/wallet';
+import {
+    useActiveWalletConfig,
+    useNftCollectionData,
+    useNftItemData,
+    useWalletNftList
+} from '../../../../state/wallet';
 import styled, { css } from 'styled-components';
 import { Body2 } from '../../../Text';
 import { Skeleton } from '../../../shared/Skeleton';
@@ -21,15 +26,21 @@ import { ChevronRightIcon, CoinsIcon } from '../../../Icon';
 import { useTranslation } from '../../../../hooks/translation';
 import { ContractDeployIcon } from '../../../activity/ActivityIcons';
 
-const NftImage = styled.img`
+const NftImage = styled.img<{ isUnverified?: boolean }>`
     width: 20px;
     height: 20px;
     border-radius: ${props => props.theme.corner3xSmall};
     user-select: none;
     flex-shrink: 0;
+
+    ${props =>
+        props.isUnverified &&
+        css`
+            opacity: 0.5;
+        `};
 `;
 
-const NftTitle = styled(Body2)<{ isFailed: boolean }>`
+const NftTitle = styled(Body2)<{ isFailed: boolean; isUnverified?: boolean }>`
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -37,6 +48,12 @@ const NftTitle = styled(Body2)<{ isFailed: boolean }>`
         props.isFailed &&
         css`
             color: ${props.theme.textTertiary};
+        `};
+
+    ${props =>
+        props.isUnverified &&
+        css`
+            color: ${props.theme.textSecondary};
         `};
 `;
 
@@ -49,14 +66,22 @@ const NftPurchaseContainer = styled.div`
     display: flex;
 `;
 
-const ActionRowNftStyled = styled(ActionRow)`
-    grid-template-columns: 1fr minmax(50px, max-content);
+const ActionRowNftStyled = styled(ActionRow)<{ fullComment?: boolean }>`
+    grid-template-columns: ${p => (p.fullComment ? 'minmax(max-content, 1fr)' : '1fr')} minmax(
+            50px,
+            max-content
+        );
+`;
+
+const SpamNftPlaceholder = styled(Body2)`
+    color: ${p => p.theme.textTertiary};
 `;
 
 const HistoryCellNft: FC<{
     nftAddress: string;
     isFailed: boolean;
-}> = ({ nftAddress, isFailed }) => {
+    isUnverified?: boolean;
+}> = ({ nftAddress, isFailed, isUnverified }) => {
     const { data } = useNftItemData(nftAddress);
 
     if (!data) {
@@ -67,8 +92,12 @@ const HistoryCellNft: FC<{
 
     return (
         <NftContainer>
-            <NftTitle isFailed={isFailed}>{data.dns ?? data.metadata.name}</NftTitle>
-            {preview && <NftImage src={preview.url} alt="NFT Preview" />}
+            <NftTitle isUnverified={isUnverified} isFailed={isFailed}>
+                {data.dns ?? data.metadata.name}
+            </NftTitle>
+            {preview && (
+                <NftImage isUnverified={isUnverified} src={preview.url} alt="NFT Preview" />
+            )}
         </NftContainer>
     );
 };
@@ -96,8 +125,19 @@ export const NftTransferDesktopAction: FC<{
     action: Action;
     isScam: boolean;
 }> = ({ action, isScam }) => {
+    const { t } = useTranslation();
     const wallet = useWalletContext();
     const { nftItemTransfer } = action;
+    const { data: config } = useActiveWalletConfig();
+    const { data: nftList } = useWalletNftList();
+
+    const nftInList = useMemo(() => {
+        if (!nftList || !nftItemTransfer) {
+            return;
+        }
+
+        return nftList.find(item => item.address === nftItemTransfer.nft);
+    }, [nftList, nftItemTransfer?.nft]);
 
     if (!nftItemTransfer) {
         return <ErrorRow />;
@@ -118,16 +158,41 @@ export const NftTransferDesktopAction: FC<{
             </>
         );
     }
+
+    // TODO вынести куда-нибудь
+    const isUnverified =
+        nftInList?.trust !== 'whitelist' &&
+        nftInList &&
+        !config?.trustedNfts.includes(nftInList.collection?.address || nftInList.address);
+
+    isScam = Boolean(
+        isScam ||
+            (nftInList &&
+                (!!config?.spamNfts.includes(nftInList.collection?.address || nftInList.address) ||
+                    (nftInList.trust === 'blacklist' &&
+                        !config?.trustedNfts.includes(
+                            nftInList.collection?.address || nftInList.address
+                        ))))
+    );
+
     return (
         <>
             <HistoryCellActionReceived isScam={isScam} isFailed={action.status === 'failed'} />
             <HistoryCellAccount account={nftItemTransfer.sender} />
-            <ActionRowNftStyled>
-                <HistoryCellComment comment={nftItemTransfer.comment} isScam={isScam} />
-                <HistoryCellNft
-                    nftAddress={nftItemTransfer.nft}
-                    isFailed={action.status === 'failed'}
+            <ActionRowNftStyled fullComment={isUnverified}>
+                <HistoryCellComment
+                    comment={isUnverified ? t('suspicious_label_short') : nftItemTransfer.comment}
+                    isScam={isScam}
                 />
+                {isScam ? (
+                    <SpamNftPlaceholder>{t('history_spam_nft')}</SpamNftPlaceholder>
+                ) : (
+                    <HistoryCellNft
+                        nftAddress={nftItemTransfer.nft}
+                        isFailed={action.status === 'failed'}
+                        isUnverified={isUnverified}
+                    />
+                )}
             </ActionRowNftStyled>
         </>
     );

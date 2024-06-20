@@ -2,14 +2,14 @@ import { Action, ActionStatusEnum, NftItem, Price } from '@tonkeeper/core/dist/t
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useWalletContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
-import { useNftItemData } from '../../../state/wallet';
-import { VerificationIcon } from '../../Icon';
+import { useActiveWalletConfig, useNftItemData } from '../../../state/wallet';
+import { InfoCircleIcon, VerificationIcon } from '../../Icon';
 import { ListBlock } from '../../List';
-import { Body1 } from '../../Text';
+import { Body1, Body2 } from '../../Text';
 import { NftCollectionBody2, NftHeaderBody2 } from '../../nft/NftHeader';
 import { FailedNote } from '../ActivityActionLayout';
 import { FailedDetail, TransferComment } from '../ActivityDetailsLayout';
@@ -34,9 +34,13 @@ import {
     ActionSenderDetails,
     ActionTransactionDetails,
     ErrorActivityNotification,
+    SpamBadge,
     Title
 } from '../NotificationCommon';
 import { ActionData } from './ActivityNotification';
+import { useDisclosure } from '../../../hooks/useDisclosure';
+import { UnverifiedNftNotification } from '../../nft/UnverifiedNftNotification';
+import { useMarkNftAsSpam, useMarkNftAsTrusted } from '../../../state/nft';
 
 const NftBlock = styled.div`
     background: ${props => props.theme.backgroundContentTint};
@@ -200,12 +204,23 @@ const Amount = styled(Body1)`
     margin-bottom: 4px;
 `;
 
-const Image = styled.img`
+const Image = styled.img<{ isSpam: boolean; isUnverified: boolean }>`
     width: 96px;
-    width: 96px;
+    height: 96px;
     margin-bottom: 20px;
     border-radius: ${props => props.theme.cornerMedium};
     user-select: none;
+
+    ${p =>
+        p.isSpam
+            ? css`
+                  filter: blur(5px);
+              `
+            : p.isUnverified
+            ? css`
+                  opacity: 0.5;
+              `
+            : undefined}
 `;
 
 const Icon = styled.span`
@@ -215,6 +230,18 @@ const Icon = styled.span`
     user-select: none;
 `;
 
+const UnverifiedLabel = styled(Body2)`
+    color: ${props => props.theme.accentOrange};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+`;
+
+const SpamNftLabel = styled(Body2)`
+    color: ${p => p.theme.textPrimary};
+`;
+
 const NftActivityHeader: FC<{
     kind: 'send' | 'received';
     timestamp: number;
@@ -222,20 +249,81 @@ const NftActivityHeader: FC<{
     amount?: Price;
     status?: ActionStatusEnum;
 }> = ({ kind, timestamp, data, amount, status }) => {
+    const { t } = useTranslation();
+    const { data: config } = useActiveWalletConfig();
+    const isUnverified = Boolean(
+        data &&
+            data.trust !== 'whitelist' &&
+            !config?.trustedNfts.includes(data.collection?.address || data.address)
+    );
+    const isSpam = Boolean(
+        data &&
+            ((data.trust === 'blacklist' &&
+                !config?.trustedNfts.includes(data.collection?.address || data.address)) ||
+                config?.spamNfts.includes(data.collection?.address || data.address))
+    );
+
+    const {
+        isOpen: isSpamModalOpen,
+        onClose: onCloseSpamModal,
+        onOpen: onOpenSpamModal
+    } = useDisclosure();
+
+    const { mutate: markNftAsSpam } = useMarkNftAsSpam();
+    const { mutate: markNftAsTrusted } = useMarkNftAsTrusted();
+
+    const handleCloseSpamModal = (action?: 'mark_spam' | 'mark_trusted') => {
+        if (action === 'mark_spam') {
+            markNftAsSpam(data?.collection?.address || data!.address);
+        } else if (action === 'mark_trusted') {
+            markNftAsTrusted(data?.collection?.address || data!.address);
+        }
+        onCloseSpamModal();
+    };
+
     const preview = data?.previews?.find(item => item.resolution === '100x100');
 
     return (
         <div>
-            {preview && <Image src={preview.url} alt="NFT Preview" />}
+            {preview && (
+                <Image
+                    isSpam={isSpam}
+                    isUnverified={isUnverified}
+                    src={preview.url}
+                    alt="NFT Preview"
+                />
+            )}
             {data && (
                 <>
-                    <Title>{data.dns ?? data.metadata.name}</Title>
+                    <Title secondary={isUnverified && !isSpam} tertiary={isSpam}>
+                        {data.dns ?? data.metadata.name}
+                        {isSpam && (
+                            <SpamBadge color="accentOrange">{t('transactions_spam')}</SpamBadge>
+                        )}
+                    </Title>
                     <Amount>
-                        {data.collection?.name ?? data.metadata.description}
-                        {data && data.approvedBy && data.approvedBy.length > 0 && (
-                            <Icon>
-                                <VerificationIcon />
-                            </Icon>
+                        {isSpam ? (
+                            <SpamNftLabel>{t('history_spam_nft')}</SpamNftLabel>
+                        ) : isUnverified ? (
+                            <>
+                                <UnverifiedNftNotification
+                                    isOpen={isSpamModalOpen}
+                                    onClose={handleCloseSpamModal}
+                                />
+                                <UnverifiedLabel onClick={onOpenSpamModal}>
+                                    {t('suspicious_label_full')}&nbsp;
+                                    <InfoCircleIcon color="accentOrange" />
+                                </UnverifiedLabel>
+                            </>
+                        ) : (
+                            <>
+                                {data.collection?.name ?? data.metadata.description}
+                                {data && data.approvedBy && data.approvedBy.length > 0 && (
+                                    <Icon>
+                                        <VerificationIcon />
+                                    </Icon>
+                                )}
+                            </>
                         )}
                     </Amount>
                 </>
