@@ -1,10 +1,8 @@
 import { FC, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { InnerBody } from '../../../components/Body';
 import { ChevronRightIcon, MinusIcon, PlusIcon } from '../../../components/Icon';
 import { ListBlock, ListItemElement, ListItemPayload } from '../../../components/List';
 import { SkeletonList } from '../../../components/Skeleton';
-import { SubHeader } from '../../../components/SubHeader';
 import { Body2, H3, Label1 } from '../../../components/Text';
 import { useTranslation } from '../../../hooks/translation';
 import { useActiveWalletConfig, useWalletNftList } from '../../../state/wallet';
@@ -14,19 +12,6 @@ import { useHideNft, useMakeNftVisible, useMarkNftAsTrusted } from '../../../sta
 import { SettingsNFTCollection, SettingsSingleNFT } from './models';
 import { SpamNftInfoNotification } from './SpamNftInfoNotification';
 import { Image } from '../../../components/shared/Image';
-
-const NFTSkeleton = () => {
-    const { t } = useTranslation();
-
-    return (
-        <>
-            <SubHeader title={t('settings_jettons_list')} />
-            <InnerBody>
-                <SkeletonList size={5} />
-            </InnerBody>
-        </>
-    );
-};
 
 const NFTSection = styled.div`
     margin-bottom: 1rem;
@@ -126,8 +111,7 @@ const NftsSection: FC<{
     );
 };
 
-export const NFTSettings = () => {
-    const { t } = useTranslation();
+export const NFTSettingsContent = () => {
     const [selectedSpamNft, setSelectedSpamNft] = useState<
         SettingsNFTCollection | SettingsSingleNFT | undefined
     >();
@@ -205,7 +189,7 @@ export const NFTSettings = () => {
     const { mutate: trustNft } = useMarkNftAsTrusted();
 
     if (!nfts || !config) {
-        return <NFTSkeleton />;
+        return <SkeletonList size={5} />;
     }
 
     const onCloseSpamNftInfo = (confirmNotSpam?: boolean) => {
@@ -218,35 +202,32 @@ export const NFTSettings = () => {
 
     return (
         <>
-            <SubHeader title={t('settings_collectibles_list')} />
-            <InnerBody>
-                {visibleCollections.length > 0 && (
-                    <NftsSection
-                        collections={visibleCollections}
-                        type="visible"
-                        onClick={c => hideNft(c.address)}
-                    />
-                )}
-                {hiddenCollections.length > 0 && (
-                    <NftsSection
-                        collections={hiddenCollections}
-                        type="hidden"
-                        onClick={c => makeNftVisible(c.address)}
-                    />
-                )}
-                {spamCollections.length > 0 && (
-                    <NftsSection
-                        collections={spamCollections}
-                        type="spam"
-                        onClick={setSelectedSpamNft}
-                    />
-                )}
-                <SpamNftInfoNotification
-                    isOpen={!!selectedSpamNft}
-                    onClose={onCloseSpamNftInfo}
-                    nft={selectedSpamNft}
+            {visibleCollections.length > 0 && (
+                <NftsSection
+                    collections={visibleCollections}
+                    type="visible"
+                    onClick={c => hideNft(c.address)}
                 />
-            </InnerBody>
+            )}
+            {hiddenCollections.length > 0 && (
+                <NftsSection
+                    collections={hiddenCollections}
+                    type="hidden"
+                    onClick={c => makeNftVisible(c.address)}
+                />
+            )}
+            {spamCollections.length > 0 && (
+                <NftsSection
+                    collections={spamCollections}
+                    type="spam"
+                    onClick={setSelectedSpamNft}
+                />
+            )}
+            <SpamNftInfoNotification
+                isOpen={!!selectedSpamNft}
+                onClose={onCloseSpamNftInfo}
+                nft={selectedSpamNft}
+            />
         </>
     );
 };

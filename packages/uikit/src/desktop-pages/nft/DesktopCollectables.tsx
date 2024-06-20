@@ -3,8 +3,8 @@ import { useWalletFilteredNftList } from '../../state/wallet';
 import styled from 'styled-components';
 import { Body2, Label2 } from '../../components/Text';
 import { Button } from '../../components/fields/Button';
-import { Link } from 'react-router-dom';
-import { AppRoute } from '../../libs/routes';
+import { Link, useNavigate } from 'react-router-dom';
+import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useTranslation } from '../../hooks/translation';
 import {
     DesktopViewHeader,
@@ -13,6 +13,8 @@ import {
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { KnownNFTDnsCollections } from '../../components/nft/NftView';
 import { useMemo } from 'react';
+import { SlidersIcon } from '../../components/Icon';
+import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -64,9 +66,14 @@ const LinkStyled = styled(Link)`
     margin: 0 auto;
 `;
 
+const SettingsButtonStyled = styled(IconButtonTransparentBackground)`
+    margin-left: auto;
+`;
+
 export const DesktopCollectables = () => {
     const { data: nfts } = useWalletFilteredNftList();
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const { ref: scrollRef, closeTop } = useIsScrolled();
 
@@ -102,6 +109,11 @@ export const DesktopCollectables = () => {
         <DesktopViewPageLayout ref={scrollRef}>
             <DesktopViewHeader borderBottom={!closeTop}>
                 <Label2>{t('wallet_aside_collectibles')}</Label2>
+                <SettingsButtonStyled
+                    onClick={() => navigate(AppRoute.walletSettings + WalletSettingsRoute.nft)}
+                >
+                    <SlidersIcon />
+                </SettingsButtonStyled>
             </DesktopViewHeader>
             <NFTPageBody>{filteredNft && <NftsListStyled nfts={filteredNft} />}</NFTPageBody>
         </DesktopViewPageLayout>

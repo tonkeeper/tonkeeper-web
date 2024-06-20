@@ -16,7 +16,7 @@ import { SecuritySettings } from './Security';
 import { Settings } from './Settings';
 import { WalletVersion } from './Version';
 import { ConnectedAppsSettings } from './ConnectedAppsSettings';
-import { NFTSettings } from './nft';
+import { NFTSettings } from './Nft';
 
 const SettingsRouter = () => {
     return (
