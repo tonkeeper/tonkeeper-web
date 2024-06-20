@@ -17,10 +17,11 @@ import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipient, TransferEstimationEvent } from '../../entries/send';
-import { BaseSigner, CellSigner } from '../../entries/signer';
+import { BaseSigner } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
 import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
+import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
 
 export enum SendMode {
     CARRY_ALL_REMAINING_BALANCE = 128,
@@ -60,10 +61,12 @@ export const seeIfBalanceError = (e: unknown): e is Error => {
 
 export const checkWalletBalanceOrDie = (total: BigNumber, wallet: Account) => {
     if (total.isGreaterThanOrEqualTo(wallet.balance)) {
-        throw new Error(
+        throw new NotEnoughBalanceError(
             `Not enough account "${wallet.address}" amount: "${
                 wallet.balance
-            }", transaction total: ${total.toString()}`
+            }", transaction total: ${total.toString()}`,
+            new BigNumber(wallet.balance),
+            total
         );
     }
 };
