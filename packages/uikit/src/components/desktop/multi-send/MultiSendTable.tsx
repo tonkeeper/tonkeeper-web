@@ -50,6 +50,8 @@ import { SaveListNotification } from './SaveListNotification';
 import { UpdateListNotification } from './UpdateListNotification';
 import { ImportListNotification } from './import-list/ImportListNotification';
 import { getWillBeMultiSendValue } from './utils';
+import { removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
+import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 
 const FormHeadingWrapper = styled.div`
     display: flex;
@@ -400,10 +402,14 @@ const MultiSendFooter: FC<{
     const { mutate: updateList } = useMutateUserMultiSendList();
     const { mutate: deleteList } = useDeleteUserMultiSendList();
 
-    const { data: rate } = useRate(
+    const { data: rate, isFetched: isRateFetched } = useRate(
         typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
     );
-    const { willBeSent, willBeSentBN } = getWillBeMultiSendValue(rowsValue, asset, rate);
+    const { willBeSent, willBeSentBN } = getWillBeMultiSendValue(
+        rowsValue,
+        asset,
+        rate || { prices: 0 }
+    );
 
     const [balances] = useAssets();
 
@@ -426,7 +432,7 @@ const MultiSendFooter: FC<{
         }) +
         ' ' +
         asset.symbol;
-    const balancesLoading = !balances || !rate;
+    const balancesLoading = !balances || !isRateFetched;
 
     const listAlreadyExist = storedLists?.some(l => l.id === list.id);
     const onSaveList = (name: string, asNew: boolean) => {
@@ -621,7 +627,28 @@ const FormRow: FC<{ index: number; asset: TonAsset }> = ({ index, asset }) => {
             />
             <Controller
                 rules={{
-                    required: 'Required'
+                    required: 'Required',
+                    validate: amount => {
+                        if (!amount || !amount.value) {
+                            return 'Required';
+                        }
+
+                        let value;
+                        try {
+                            value = new BigNumber(
+                                removeGroupSeparator(amount.value).replace(
+                                    getDecimalSeparator(),
+                                    '.'
+                                )
+                            );
+                        } catch (e) {
+                            return 'Wrong value format';
+                        }
+
+                        if (!value.isFinite() || value.eq(0)) {
+                            return 'Value is 0';
+                        }
+                    }
                 }}
                 render={({ field, fieldState }) => (
                     <AmountInput

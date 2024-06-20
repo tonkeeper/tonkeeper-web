@@ -87,6 +87,7 @@
   "MinPassword" : "Должно быть не менее 6 символов.",
   "multi_send_about_w5" : "Подробнее о W5",
   "multi_send_add_more" : "Добавить еще",
+  "multisend_confirm_error_insufficient_ton_for_fee" : "Баланса кошелька %balance% недостаточно для покрытия комиссий блокчейна. Требуемый минимальный баланс: %required%. Неиспользованный остаток TON после транзакции будет возвращен на ваш кошелек.",
   "multi_send_continue-with_pro" : "Продолжить с Pro",
   "multi_send_delete_description" : "Это действие необратимо, и все данные будут потеряны.",
   "multi_send_delete_list" : "Удалить список",

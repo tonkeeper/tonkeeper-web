@@ -93,6 +93,7 @@
   "MinPassword" : "Must be at least 6 characters.",
   "multi_send_about_w5" : "About W5",
   "multi_send_add_more" : "Add More",
+  "multisend_confirm_error_insufficient_ton_for_fee" : "Wallet balance %balance% is not enough to cover the blockchain fees. Minimum balance required: %required%. Unused TON will be returned to your wallet after the transaction.",
   "multi_send_continue-with_pro" : "Continue with Pro",
   "multi_send_delete_description" : "This action is irreversible, and all data will be lost.",
   "multi_send_delete_list" : "Delete List",
