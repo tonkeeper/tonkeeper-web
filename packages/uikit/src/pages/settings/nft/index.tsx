@@ -33,7 +33,7 @@ const NFTSection = styled.div`
 `;
 
 const NftSectionTitle = styled(H3)`
-    padding: 14px 18px;
+    padding: 14px 18px 14px 0;
     margin: 0;
 `;
 
@@ -82,10 +82,17 @@ const NftsSection: FC<{
     type: 'visible' | 'hidden' | 'spam';
     onClick: (nft: SettingsNFTCollection | SettingsSingleNFT) => void;
 }> = ({ collections, type, onClick }) => {
+    const { t } = useTranslation();
     const showButton = type !== 'spam';
+    const typeTranslations = {
+        visible: 'approval_accepted',
+        hidden: 'approval_declined',
+        spam: 'approval_spam'
+    };
+
     return (
         <NFTSection>
-            <NftSectionTitle>{type}</NftSectionTitle>
+            <NftSectionTitle>{t(typeTranslations[type])}</NftSectionTitle>
             <ListBlock>
                 {collections.map(collection => (
                     <ListItemElement
@@ -107,7 +114,7 @@ const NftsSection: FC<{
                                         ? collection.nfts.length > 1
                                             ? `${collection.nfts.length} NFTs`
                                             : `${collection.nfts.length} NFT`
-                                        : 'Single NFT'}
+                                        : t('nft_single_nft')}
                                 </Body2>
                             </NftTextContainer>
                             {type === 'spam' && <ChevronRightIconStyled />}
@@ -211,7 +218,7 @@ export const NFTSettings = () => {
 
     return (
         <>
-            <SubHeader title={t('settings_jettons_list')} />
+            <SubHeader title={t('settings_collectibles_list')} />
             <InnerBody>
                 {visibleCollections.length > 0 && (
                     <NftsSection

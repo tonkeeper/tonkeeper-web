@@ -23,8 +23,8 @@ export const useMarkNftAsSpam = () => {
 
         const address = typeof nft === 'string' ? nft : nft.collection?.address || nft.address;
 
-        if (!config.spamNfts.includes(address) && tonendpointConfig?.scamEndpoint) {
-            let baseUrl = tonendpointConfig?.scamEndpoint;
+        if (!config.spamNfts.includes(address) && tonendpointConfig?.scam_api_url) {
+            let baseUrl = tonendpointConfig?.scam_api_url;
             if (baseUrl.endsWith('/')) {
                 baseUrl = baseUrl.slice(0, baseUrl.length - 1);
             }

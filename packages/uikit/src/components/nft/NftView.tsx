@@ -145,7 +145,7 @@ export const NftPreview: FC<{
                         <H3>{nftItem.dns ?? nftItem.metadata.name}</H3>
                         {isSuspicious && (
                             <UnverifiedLabel isTrusted={isTrusted} onClick={onOpenSpamModal}>
-                                Unverified NFT{' '}
+                                {t('suspicious_label_full')}&nbsp;
                                 <InfoCircleIcon
                                     color={isTrusted ? 'textSecondary' : 'accentOrange'}
                                 />
@@ -167,14 +167,14 @@ export const NftPreview: FC<{
                         onClick={() => markNftAsSpam(nftItem).then(onClose)}
                         loading={markNftAsSpamLoading}
                     >
-                        Report Spam
+                        {t('suspicious_buttons_report')}
                     </Button>
                     <Button
                         type="button"
                         onClick={() => markNftAsTrusted(nftItem)}
                         loading={markNftAsTrustedLoading}
                     >
-                        Not Spam
+                        {t('suspicious_buttons_not_spam')}
                     </Button>
                 </ButtonsBlock>
             )}

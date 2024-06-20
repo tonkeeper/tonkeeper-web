@@ -56,19 +56,19 @@ export const UnverifiedNftNotification: FC<{
         <Notification isOpen={isOpen} handleClose={() => onClose()}>
             {() => (
                 <ContentWrapper>
-                    <Title>{t('unverifiedTokenDetails_title')}</Title>
-                    <Description>{t('unverifiedTokenDetails_description')}</Description>
+                    <Title>{t('suspiciousNFTDetails_title')}</Title>
+                    <Description>{t('suspiciousNFTDetails_subtitle')}</Description>
                     <InfoBox>
-                        <InfoItem>{t('unverifiedTokenDetails_paragraphs_p1')}</InfoItem>
-                        <InfoItem>{t('unverifiedTokenDetails_paragraphs_p2')}</InfoItem>
-                        <InfoItem>{t('unverifiedTokenDetails_paragraphs_p3')}</InfoItem>
+                        <InfoItem>{t('suspiciousNFTDetails_paragraphs_p1')}</InfoItem>
+                        <InfoItem>{t('suspiciousNFTDetails_paragraphs_p2')}</InfoItem>
+                        <InfoItem>{t('suspiciousNFTDetails_paragraphs_p3')}</InfoItem>
                     </InfoBox>
                     <ButtonsContainer>
                         <Button warn onClick={() => onClose('mark_spam')}>
-                            {t('unverifiedTokenDetails_button')}
+                            {t('suspiciousNFTDetails_buttons_report')}
                         </Button>
                         <Button secondary onClick={() => onClose('mark_trusted')}>
-                            {t('unverifiedTokenDetails_button')}
+                            {t('suspiciousNFTDetails_buttons_not_spam')}
                         </Button>
                     </ButtonsContainer>
                 </ContentWrapper>

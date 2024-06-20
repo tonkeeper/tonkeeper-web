@@ -8,6 +8,7 @@ import { BorderSmallResponsive } from '../../../components/shared/Styles';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { Button } from '../../../components/fields/Button';
 import { CopyButton } from '../../../components/CopyButton';
+import { useTranslation } from '../../../hooks/translation';
 
 const ContentWrapper = styled.div``;
 
@@ -47,17 +48,22 @@ export const SpamNftInfoNotification: FC<{
     isOpen: boolean;
     onClose: (confirmNotSpam?: boolean) => void;
 }> = ({ isOpen, onClose, nft }) => {
+    const { t } = useTranslation();
     const address = nft ? toShortValue(formatAddress(nft.address)) : '';
     return (
-        <Notification title="Token Details" isOpen={isOpen} handleClose={() => onClose()}>
+        <Notification
+            title={t('approval_details_token')}
+            isOpen={isOpen}
+            handleClose={() => onClose()}
+        >
             {() => (
                 <ContentWrapper>
                     <ListBlockStyled>
                         <ListItemElement hover={false}>
                             <ListItemPayloadStyled>
                                 <TextBlock>
-                                    <Body2>Name</Body2>
-                                    <Body2>{nft?.name || 'Unknown'}</Body2>
+                                    <Body2>{t('approval_name')}</Body2>
+                                    <Body2>{nft?.name || ' '}</Body2>
                                 </TextBlock>
                                 <NftImage src={nft?.image} />
                             </ListItemPayloadStyled>
@@ -66,7 +72,9 @@ export const SpamNftInfoNotification: FC<{
                             <ListItemPayloadStyled>
                                 <TextBlock>
                                     <Body2>
-                                        {nft?.type === 'collection' ? 'Collection ID' : 'Token ID'}
+                                        {nft?.type === 'collection'
+                                            ? t('approval_id_collection')
+                                            : t('approval_id_token')}
                                     </Body2>
                                     <Body2>{address}</Body2>
                                 </TextBlock>
@@ -75,7 +83,7 @@ export const SpamNftInfoNotification: FC<{
                         </ListItemElement>
                     </ListBlockStyled>
                     <Button fullWidth size="medium" secondary onClick={() => onClose(true)}>
-                        Not Spam
+                        {t('approval_not_spam')}
                     </Button>
                 </ContentWrapper>
             )}

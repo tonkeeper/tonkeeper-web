@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 import { VerificationIcon } from '../Icon';
 import { Body2, Body3, Label2 } from '../Text';
 import { useActiveWalletConfig } from '../../state/wallet';
+import { useTranslation } from '../../hooks/translation';
 
 const TextContent = styled.span`
     display: inline-block;
@@ -54,6 +55,7 @@ const IconBody = styled.span`
 `;
 
 export const NftCollectionBody3: FC<{ nft: NftItem }> = React.memo(({ nft }) => {
+    const { t } = useTranslation();
     const { data } = useActiveWalletConfig();
     const isTrusted = data?.trustedNfts.includes(nft.collection?.address || nft.address);
     const isSuspicious = nft.trust !== TrustType.Whitelist;
@@ -61,7 +63,7 @@ export const NftCollectionBody3: FC<{ nft: NftItem }> = React.memo(({ nft }) => 
     const verified = nft.trust === TrustType.Whitelist;
 
     if (isSuspicious && !isTrusted) {
-        return <HeaderSuspicious>Unverified</HeaderSuspicious>;
+        return <HeaderSuspicious>{t('suspicious_label_short')}</HeaderSuspicious>;
     }
 
     return (

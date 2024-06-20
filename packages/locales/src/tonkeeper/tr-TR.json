@@ -1,4 +1,9 @@
 {
+  "about_risk_modal" : {
+    "description" : "Cüzdanınızdan gönderilecek olan tokenlerin toplam değeri. Geri ödemeler toplam değere dahil edilmez.",
+    "description_with_nft" : "Cüzdanınızdan gönderilecek NFT'lerin maliyeti hariç, tokenların toplam değeri. İadeler toplam değere dahil değildir.",
+    "ok_button" : "Tamam"
+  },
   "about_ton" : "TON, Telegram tarafından milyarlarca kullanıcıyı bünyesine katmak için tasarlanmış tamamen merkeziyetsiz bir layer-1 blokzinciridir. TON, ultra hızlı işlem hızına, düşük ücretlere, kullanımı kolay uygulamalara sahiptir ve çevre dostudur.",
   "access_confirmation_logout" : "Oturumu kapat",
   "access_confirmation_reset" : "Sıfırla",
@@ -65,6 +70,17 @@
       "subtitle" : "24 gizli kurtarma kelimesiyle cüzdanı içe aktarın",
       "title" : "Mevcut Cüzdan"
     },
+    "import_subtitle" : "Aşağıdaki seçeneklerden birini seçin.",
+    "import_title" : "Cüzdanı İçe Aktar",
+    "ledger" : {
+      "subtitle" : "Donanım cüzdanı ile daha yüksek seviyede güvenlik",
+      "title" : "Ledger'ı bağla"
+    },
+    "other_options" : "Diğer seçenekler",
+    "signer" : {
+      "subtitle" : "Daha yüksek düzeyde kontrol ve güvenlik",
+      "title" : "Signer ile Eşleştir"
+    },
     "subtitle" : "Yeni bir cüzdan oluşturun veya mevcut bir cüzdan ekleyin.",
     "testnet" : {
       "subtitle" : "24 gizli kurtarma kelimesi içeren cüzdanı Testnet'e aktarın",
@@ -112,6 +128,10 @@
     "approve_collection_many" : "\"{collection}\" koleksiyonundan gelen token'ları onaylayın",
     "approve_collection_one" : "\"{collection}\" koleksiyonundan gelen token'ı onaylayın",
     "approve_many" : "Gelen {count} token'ı onaylayın",
+    "approve_many.few" : "{count} gelen tokeni onayla",
+    "approve_many.many" : "{count} gelen token'ı onaylayın",
+    "approve_many.one" : "{count} gelen tokeni onayla",
+    "approve_many.other" : "Birden çok {count} girdi tokenini onayla",
     "approve_token" : "Gelen \"{name}\" token'ını onaylayın",
     "approve_two_collections" : "\"{collection1}\" \"{collection2}\" koleksiyonlarından gelen token'ları onaylayın",
     "approve_two_tokens" : "Gelen \"{name1}\" ve \"{name2}\" token'larını onaylayın",
@@ -133,11 +153,15 @@
     "move_to_declined_collection" : "Koleksiyonu cüzdanda gizle",
     "move_to_declined_token" : "Token'ı cüzdanda gizle",
     "name" : "İsim",
+    "not_spam" : "Spam Değil",
     "pending" : "Beklemede",
     "show_all" : "Tümünü göster",
     "single_token" : "Tek token",
+    "spam" : "Spam",
     "token_copied" : "Token kimliği kopyalandı",
     "token_count" : {
+      "few" : "{count} belirteç",
+      "many" : "{count} jeton",
       "one" : "{count} token",
       "other" : "{count} token"
     },
@@ -156,6 +180,7 @@
     "title" : "Yedekleme Kontrolü"
   },
   "backup_screen" : {
+    "backup_warning" : "Bakiyeniz {totalFiat}, ve yalnızca henüz yazmadığınız bir kurtarma ifadesi ile korunuyor. Cihaz sorunlarından dolayı fon kaybını önlemek için ifadeyi yedekleyin.",
     "last_backup_time" : "Son yedekleme %{time}",
     "manual_backup_on" : "Manuel Yedekleme Açık",
     "manual_button" : "Manuel Olarak Yedekleyin",
@@ -178,15 +203,47 @@
     "description" : {
       "empty" : "Ana bakiyeniz boş olsa bile token ve NFT gönderin, staking işlemleri gerçekleştirin.",
       "less_10" : "10'dan az işlem için bataryanızda yeterli şarj seviyesi mevcut.",
-      "other" : "%{cnt} işlem için bataryanızda yeterli şarj seviyesi mevcut."
+      "other" : "%{cnt} işlem için bataryanızda yeterli şarj seviyesi mevcut.",
+      "other.few" : "{count} charges",
+      "other.many" : "{count} charges",
+      "other.one" : "{count} charge",
+      "other.other" : "{count} charges"
     },
+    "max_input_amount" : "Maksimum giriş miktarı {amount}",
     "ok" : "TAMAM",
+    "other_ways" : {
+      "by_crypto" : {
+        "subtitle" : "{methods} kullanarak",
+        "title" : "{symbol} ile doldur"
+      },
+      "gift" : {
+        "subtitle" : "Arkadaşlarınızla paylaşın",
+        "title" : "Pil Hediyesi"
+      },
+      "promo" : {
+        "subtitle" : "Şanslısınız",
+        "title" : "Promosyon Kodunu Girin"
+      }
+    },
     "packages" : {
       "buy" : "Satın al",
       "disclaimer" : "Bu yaklaşık işlem sayısıdır. Bazı işlemlerinizin maliyeti daha yüksek olabilir.",
       "ok" : "TAMAM",
-      "refilled" : "Bataryanız şarj oldu"
+      "refilled" : "Bataryanız şarj oldu",
+      "refund" : "Şarj geçmişi",
+      "restore" : "Satın Almaları Geri Yükle",
+      "subtitle" : {
+        "few" : "{count} şarj",
+        "large" : "Büyük paket",
+        "many" : "{count} şarj",
+        "medium" : "Orta paket",
+        "one" : "{count} şarj",
+        "other" : "{count} şarj",
+        "small" : "Küçük paket"
+      },
+      "title" : "'{{'cnt'}}' işlem için '{{'price'}}'"
     },
+    "please_wait" : "Batarya birkaç dakika içinde şarj olacak",
     "promocode" : {
       "apply" : "Uygula",
       "button" : "Promosyon Kodu ile yükleme yapın",
@@ -194,8 +251,50 @@
       "success" : "Bataryanız şarj oldu",
       "title" : "Promosyon Kodu"
     },
+    "recharge_by_crypto" : {
+      "continue" : "Devam Et",
+      "other" : {
+        "subtitle" : "Miktarı manuel olarak girin",
+        "title" : "Diğer"
+      },
+      "title" : "Şarj etme",
+      "title_gift" : "Hediye",
+      "tokens" : "Tokenlar"
+    },
+    "refilled" : "Batarya yeniden dolduruldu",
+    "refund" : {
+      "subtitle" : "Yüklemeler ve Geri Ödemeler",
+      "title" : "Ücret Geçmişi"
+    },
     "screen_title" : "Batarya",
-    "settings" : "Batarya"
+    "send_widget" : {
+      "battery" : "Pil"
+    },
+    "settings" : "Batarya",
+    "title" : "Tonkeeper Pili",
+    "transactions" : {
+      "charges_per_action" : {
+        "few" : "≈ {count} şarj başına {transactionName}",
+        "many" : "≈ {count} şarj per {transactionName}",
+        "one" : "≈ {count} şarj başına {transactionName}",
+        "other" : "≈ {count} şarj per {transactionName}"
+      },
+      "description" : "Seçilen işlemler Tonkeeper pili tarafından ödenecektir.",
+      "settings" : "Pil Ayarları",
+      "supported" : "Desteklenen işlemler",
+      "title" : "İşlemler",
+      "types" : {
+        "jetton" : "jeton transferleri",
+        "nft" : "NFT transferleri",
+        "swap" : "Tonkeeper aracılığıyla takas",
+        "ton" : "TON transferleri"
+      },
+      "type" : {
+        "swap" : "swap",
+        "transfer" : "transfer"
+      },
+      "will_be_paid" : "Ödenecek: {enabledTransactions}"
+    }
   },
   "biometry" : {
     "android" : {
@@ -217,6 +316,20 @@
       "fingerprint" : "Touch ID",
       "fingerprint_genitive" : "Touch ID",
       "fingerprint_instrumental" : "Touch ID"
+    }
+  },
+  "bluetooth" : {
+    "permissions_alert" : {
+      "cancel" : "İptal",
+      "message" : "Lütfen bu özelliği kullanmak için ayarlarınızda Bluetooth izinlerini etkinleştirin",
+      "open_settings" : "Ayarları Aç",
+      "title" : "Bluetooth İzinleri"
+    },
+    "powered_off_alert" : {
+      "cancel" : "İptal",
+      "message" : "Lütfen bu özelliği kullanmak için Bluetooth'u açın",
+      "open_settings" : "Ayarları Aç",
+      "title" : "Bluetooth kapalı"
     }
   },
   "browser" : {
@@ -250,6 +363,10 @@
     "start_typing" : "Bir adres girin veya web'de arama yapın",
     "title" : "Tarayıcı",
     "web_search_title" : "{searchEngine} Arama"
+  },
+  "buy_ton" : {
+    "subtitle" : "Anında banka kartı ile",
+    "title" : "TON Satın Al"
   },
   "cancel" : "İptal",
   "chart" : {
@@ -307,9 +424,12 @@
     "header_title" : "Birincil para birimi"
   },
   "choose_wallets" : {
+    "already_added" : "Zaten eklendi",
     "subtitle" : "Eklemek istediğiniz cüzdanları seçin.",
     "title" : "Cüzdanları Seçin",
-    "tokens" : "Token'lar"
+    "tokens" : "Token'lar",
+    "w5_subtitle" : "Daha düşük blok zinciri ücretleri, gazsız işlemler ve çoklu transferler.",
+    "w5_subtitle_link" : "Daha fazla öğren"
   },
   "confirm" : "Onaylayın",
   "confirm_renew_all_domains_title" : "İşlemi onaylayın",
@@ -325,13 +445,17 @@
   "confirm_sending_recipient" : "Alıcı",
   "confirm_sending_recipient_address" : "Alıcı adresi",
   "confirm_sending_sent_caption_btc" : "İşleminiz ağa gönderildi ve bir saat içinde işleme alınacak.",
+  "confirm_sending_sent_caption_other" : "İşleminiz ağa gönderildi ve bir dakika içinde işlenecek.",
   "confirm_sending_sent_caption_ton" : "İşleminiz ağa gönderildi ve bir kaç saniye içinde işleme alınacak.",
+  "confirm_sending_sent_jetton_title" : "Jeton gönderildi",
+  "confirm_sending_sent_title" : "Para birimi gönderildi",
   "confirm_sending_submit" : "Onaylayın ve Gönderin",
   "confirm_sending_title" : "Göndermeyi onaylayın",
   "confirmSendModal" : {
     "network_fee" : "Ağ ücreti",
     "refund" : "İade",
     "title" : "İşlemi onaylayın",
+    "total_risk" : "Toplam: {totalAmount}",
     "to_your_address" : "Adresinize",
     "transaction_type" : {
       "burn" : "Yak",
@@ -387,6 +511,8 @@
   "dns_renew_toast_success" : "Alan adı 1 yıllığına yenilendi",
   "dns_renew_until_btn" : "{untilDate} tarihine kadar yenileyin",
   "dns_renew_valid_caption" : {
+    "few" : "{count} gün içinde sona erecek",
+    "many" : "{count} gün içinde sona erecek",
     "one" : "{count} gün içinde sona eriyor",
     "other" : "{count} gün içinde sona eriyor"
   },
@@ -417,9 +543,12 @@
   "exchange_method_open_warning" : "Tonkeeper tarafından işletilmeyen harici bir uygulamayı açıyorsunuz.",
   "exchange_modal" : {
     "buy" : "Satın al",
+    "buy_title" : "Toncoin satın al",
     "hide" : "Gizle",
     "other_ways_to_buy" : "Diğer satın alma seçenekleri",
+    "other_ways_to_sell" : "Diğer satış yöntemleri",
     "sell" : "Sat",
+    "sell_title" : "Toncoin sat",
     "show_all" : "Tümünü göster",
     "title" : "Satın Al veya Sat"
   },
@@ -435,9 +564,13 @@
     "done_button" : "Tamamlandı",
     "enable_notifications" : "İşlem bildirimlerini etkinleştirin",
     "header_title" : "Kurulumu tamamla",
+    "join_tg" : "Tonkeeper kanalına katılın",
     "use_biometry" : "İşlemi onaylamak için %{name} kullanın"
   },
   "form_optional_indicator" : "İsteğe bağlı",
+  "gasless" : {
+    "switch_label" : "Ödemek için {currency} tıklayın"
+  },
   "import_add_wallet" : "Cüzdan Ekle",
   "import_add_wallet_description" : "Yeni bir cüzdan oluşturun veya mevcut bir cüzdan ekleyin.",
   "import_existing_wallet" : "Mevcut Cüzdan",
@@ -450,6 +583,7 @@
   "import_wallet_reset_caption" : "Cüzdanınızı oluşturduğunuz sırada size verilen 24 harften oluşan gizli kurtarma ifadesini girerek cüzdanınıza erişimi geri kazanın.",
   "import_wallet_title" : "Gizli kurtarma ifadenizi girin",
   "import_wallet_wrong_words_err" : "Gizli kurtarma ifadesi hatalı",
+  "indexer_latency_error" : "Gönderme hatası, daha sonra tekrar deneyin",
   "info_about_inactive_back" : "Geri",
   "info_about_inactive_desc1" : "Tonkeeper bu adresin bir cüzdan adresi mi yoksa akıllı bir sözleşme adresi mi olduğunu bilmiyor.",
   "info_about_inactive_desc2" : "Amacınız sadece cüzdana para yatırmak ise, devam edebilirsiniz.",
@@ -465,8 +599,11 @@
   "intro_item3_caption" : "-",
   "intro_item3_title" : "-",
   "intro_title" : "XXXX'e hoş geldiniz",
+  "jetton_buy_tether" : "USD₮ Satın Al",
   "jetton_id" : "Token kimliği: {jettonAddress}",
   "jetton_id_copied" : "Token kimliği kopyalandı",
+  "jetton_locked_till" : "{date} tarihine kadar kilitli",
+  "jetton_migrate_tether" : "jUSDT'yi USD₮'ye takas et",
   "jetton_name" : "{name} Token",
   "jetton_open_explorer" : "Detayları görüntüleyin",
   "jetton_price" : "Fiyat:",
@@ -480,12 +617,33 @@
       "open" : "Ayarlar",
       "title" : "Uygulamanın dilini değiştirmek için cihaz Ayarları'na gidin"
     },
+    "languagesList" : {
+      "en" : "İngilizce",
+      "es" : "İspanyolca",
+      "id" : "Endonezce",
+      "ru" : "Rusça",
+      "system" : "Sistem",
+      "tr" : "Türkçe",
+      "uk" : "Ukraynaca",
+      "uz" : "Özbekçe",
+      "zh-Hans" : "Çince"
+    },
     "list_item" : {
       "title" : "Dil",
       "value" : "Türkçe"
-    }
+    },
+    "title" : "Dil"
   },
   "later" : "Daha sonra",
+  "ledger" : {
+    "confirm_title" : "İşlemi onaylayın",
+    "confirm_tx" : "Ledger'daki işleminizi onaylayın",
+    "connect" : "Bluetooth ile Ledger'i cihazınıza bağlayın",
+    "connect_title" : "Ledger'i Bağla",
+    "install_ton_app" : "TON Uygulamasını Yükle",
+    "open_ton_app" : "Kilidini aç ve TON Uygulamasını aç",
+    "operation_not_supported" : "İşlem Ledger cüzdanları için kullanılamaz. Başka bir cüzdan seçin ve tekrar deneyin."
+  },
   "legal_font_license" : "Montserrat yazı tipi",
   "legal_header_title" : "Hukuki açıklama",
   "legal_licenses_title" : "Lisanslar",
@@ -493,6 +651,16 @@
   "legal_terms" : "Kullanım şartları",
   "link_copied" : "Bağlantı kopyalandı",
   "loading" : "Yükleniyor",
+  "logout_modal" : {
+    "agreement" : "Bende kurtarma cümlesinin yedek kopyası var",
+    "backup_button" : "Yedekle",
+    "caption" : "Cüzdan anahtarları bu cihazdan silinecek.",
+    "delete_button" : "Cüzdan Verilerini Sil",
+    "delete_caption" : "Cüzdan anahtarları ve tüm kişisel veriler bu cihazdan silinecek.",
+    "delete_title" : "Cüzdan Verilerini Sil",
+    "logout_button" : "Çıkış Yap",
+    "title" : "Çıkış Yap"
+  },
   "manage_other_coins" : "Kripto paralarımı yönet",
   "migration_cancel_btn" : "Daha sonra yükselt",
   "migration_caption" : "Tonkeeper, üyelik ödemelerini destekleyen yeni bir cüzdan formatı sunuyor. Bakiyeniz yeni bir adrese transfer edilecektir. Gizli kurtarma ifadeniz aynı kalacaktır.",
@@ -511,6 +679,14 @@
   "migration_title" : "Cüzdanınızı yükseltin",
   "nft_about_collection" : "Koleksiyon hakkında",
   "nft_about_dns" : "TON DNS, kullanıcıların kripto cüzdanlarına, akıllı sözleşmelere ve web sitelerine insan tarafından okunabilir bir isim atamasına olanak tanıyan bir hizmettir. TON DNS ile merkeziyetsiz hizmetlere erişim, İnternetteki web sitelerine erişime benzer.",
+  "nft_actions" : {
+    "hide_and_report" : "Gizle ve Şikayet Et",
+    "hide" : {
+      "collection" : "Koleksiyonu Gizle",
+      "nft" : "NFT'yi gizle"
+    },
+    "view_on_explorer" : "Tonviewer'da görüntüle"
+  },
   "nft_browse_markets" : "Piyasalara göz atın",
   "nft_chain" : "Zincir",
   "nft_change_owner_title" : "Koleksiyon sahibini değiştir",
@@ -546,6 +722,7 @@
   "nft_on_sale_text" : "NFT şu anda pazar yerinde satışta. Transfer için önce satıştan kaldırmalısınız.",
   "nft_open_in_marketplace" : "NFT Marketi'nde görüntüleyin",
   "nft_operations_expired" : "İstek zaman aşımına uğradı, lütfen tekrar deneyin",
+  "nft_operation_slide_to_confirm" : "Onaylamak için Kaydırın",
   "nft_operation_success" : "Tamamlandı",
   "nft_owner_address" : "Sahibi",
   "nft_price" : "Fiyat",
@@ -581,6 +758,29 @@
   "nft_unnamed_collection" : "İsimsiz koleksiyon",
   "nft_view_in_explorer" : "Explorer'da görüntüleyin",
   "nokyc" : "KYC gerekli değildir",
+  "notcoin" : {
+    "all" : "Tonkeeper Pro'da hepsini değiştir",
+    "burn_not_available" : {
+      "hours" : "Değişim {count} saat içinde kullanılabilir olacak",
+      "minutes" : "Takas {count} dakika sonra kullanılabilir olacak",
+      "seconds" : "Exchange {count} saniye içinde kullanılabilir olacak"
+    },
+    "count" : "Kupon sayısı",
+    "count_max" : "Maksimum 4 özdeğişim başına",
+    "exchange" : "Hediye çeklerini\\nNOT'a dönüştür",
+    "exchange_all" : "Hepsini değiştir\\nTonkeeper Pro'da",
+    "exchange_subtitle" : "NOT takas işleminden kısa bir süre sonra bakiyenizde mevcut olacak.",
+    "exchange_title" : "Kuponlarınızı NOT ile değiştirin",
+    "exchange_to_not" : "NOT\" ile değiştir",
+    "name" : "Notcoin",
+    "not_vouchers" : "NOT kuponlar",
+    "open" : "Açık",
+    "open_bot" : "Notcoin Botunu Aç",
+    "slogan" : "Muhtemelen hiçbir şey değildir",
+    "total_amount" : "Toplam tutar",
+    "verify_subtitle" : "Doğrulama birkaç saat sürebilir.",
+    "verify_title" : "Notcoin Bot'a cüzdanı bağlayın ve yakmayı doğrulayın"
+  },
   "notifications" : {
     "alert" : {
       "cancel" : "İptal",
@@ -618,6 +818,13 @@
   "notify_incorrect_time_err_title" : "Saat ve tarih yanlış",
   "notify_no_signal_caption" : "Lütfen internet bağlantınızı kontrol edin.",
   "notify_no_signal_title" : "Sinyal yok",
+  "old_wallet_error" : "v4R2 sürümlü cüzdanı kullanın",
+  "pairSigner" : {
+    "about" : "Signer hakkında",
+    "open_signer" : "Bu cihazda imzacı aç",
+    "subtitle" : "Signer’i açın » Gerekli anahtarı seçin » QR kodu tarayın",
+    "title" : "QR kodunu tara"
+  },
   "passcode_changed" : "Şifre değiştirildi",
   "paste" : "Yapıştır",
   "pin_enter_faceid_err" : "Biyometrik doğrulama başarısız oldu",
@@ -680,12 +887,27 @@
   "require_create_wallet_modal_create_new" : "Yeni cüzdan oluşturun",
   "require_create_wallet_modal_import" : "Mevcut cüzdanı içe aktarın",
   "require_create_wallet_modal_title" : "Haydi şimdi cüzdanınızı ayarlayalım",
+  "restake_banner" : {
+    "stake_into_step" : "Mevcut TON'u Tonstakers'a yatır.",
+    "stake_into_tonstakers_action" : "Tonstakers'a yatırın",
+    "title" : "Tonstakers likit stakinginde %apy ile daha fazla TON kazanın",
+    "unstake_action_all" : "Çıkar {amount}",
+    "unstake_action_manual" : "Manuel girin",
+    "unstake_step" : "Geçerli staking sağlayıcınızdan TON'u çıkarın.",
+    "wait_step" : "TON'unuz kullanılabilir olana kadar bekleyin.",
+    "wait_step_collect" : "Topla",
+    "wait_step_cooldown" : "TON'unuz yakında kullanılabilir olacak. Onları kısa süre içinde toplayabileceksiniz.",
+    "wait_step_pending" : "TON'unuz {0, number}uration içinde kullanılabilir olacaktır. Bu süreden sonra onları toplayabilirsiniz.",
+    "wait_step_withdraw" : "Önceki staking sağlayıcınızdan mevcut TON'u alın."
+  },
   "scan_qr_open_settings" : "Ayarları Aç",
   "scan_qr_permission_error" : "QR kodlarını tarayabilmek için kameraya erişime izin verin",
   "scan_qr_title" : "QR kodunu tarayın",
   "secret_words_caption" : "Bu 24 kelimeyi aşağıda verilen sırayla not edin ve gizli, güvenli bir yerde saklayın.",
   "secret_words_title" : "Gizli kurtarma ifadeniz",
   "security_change_passcode" : "Şifreyi değiştirin",
+  "security_lock_screen_switch" : "Kilit Ekranı",
+  "security_lock_screen_tip" : "Cüzdan içeriğini görmek için parola gerekli.",
   "security_migration_caption" : "Artık bakiyeniz ve tüm işlemleriniz bir şifre ile güvence altına alınmıştır. Biyometrik kontrol ile de işlemlerinizi hızlandırabilirsiniz.",
   "security_migration_skip_button" : "Şimdi güncelleme yapmayın",
   "security_migration_submit_button" : "Güvenlik ayarlarını güncelleyin",
@@ -703,6 +925,7 @@
   "send_insufficient_funds" : "Yetersiz bakiye",
   "send_invalid_recipient_caption" : "Alan adı mevcut değil ya da cüzdan adresi ile bağlantılı değil",
   "send_invalid_recipient_title" : "Geçersiz alıcı",
+  "send_liquid_jetton_warning_title" : "Garantiye ait bakiyenin bir kısmını göndermek istediğinizden emin misiniz?",
   "send_lockup_warning_caption" : "Lütfen izin verilen adrese gönderdiğinizden emin olun. İşlem başarısız olsa bile işlem ücreti kesilecektir.",
   "send_lockup_warning_submit_button" : "Gönder",
   "send_lockup_warning_title" : "Tutar likit bakiyeyi aşıyor",
@@ -724,14 +947,22 @@
     "amount" : {
       "insufficient_balance" : "Yetersiz bakiye",
       "less_than_min" : "Minimum {minAmount} TON",
+      "less_than_min_with_symbol" : "Minimum {minAmount} {symbol}",
       "liquid_jetton_note" : "tsTON likidite tokeni gönderiliyor",
       "max" : "MAX",
       "recipient_label" : "Alıcı:",
       "remaining" : "Mevcut: {amount}",
       "title" : "Tutar"
     },
+    "choose_coin" : {
+      "subtitle" : "Sonraki adımda, alıcı ve tutarı gireceksiniz.",
+      "title" : "Göndermek için bir token seçin"
+    },
     "comfirm" : {
       "action" : "{coin} transferi",
+      "comment_ascii_text" : "Yalnızca ASCII karakterler kullanın: rakamlar, Latin alfabesi harfleri ve noktalama işaretleri.",
+      "comment_characters_exceeded" : "Mesaj boyutu {count} karakteri aştı.",
+      "comment_characters_left" : "Kalan {count} karakter.",
       "comment_decrypt" : "Şifreyi çöz",
       "comment_description" : "Herkes tarafından görülebilir olacaktır.",
       "comment_description_encrypted" : "Sadece alıcı ve siz tarafından görülebilecektir.",
@@ -739,10 +970,13 @@
       "comment_label" : "Yorum",
       "comment_label_encrypted" : "Şifrelenmiş yorum",
       "comment_label_required" : "Gerekli yorum",
+      "comment_placeholder" : "Mesaj veya bağlantı (isteğe bağlı)",
+      "comment_placeholder_required" : "Not veya etiket",
       "comment_required_text" : "Transfer için borsanın notunu eklemelisiniz. Aksi takdirde gönderdiğiniz tutarlar kaybolacaktır.",
       "details_label" : "Detaylar",
       "details_max_balance_label" : "Maksimum {currency} bakiye gönderiliyor",
       "title" : "İşlemi onaylayın",
+      "wallet" : "Cüzdan",
       "will_be_paid_with_battery" : "Batarya ile ödenecek"
     },
     "done" : {
@@ -763,15 +997,21 @@
   "send_title" : "{currency} gönder",
   "settings_appearance" : "Tema",
   "settings_backup_seed" : "Gizli kurtarma ifadesini göster",
+  "settings_bank_card" : "Banka kartı",
   "settings_contact_support" : "Bize Ulaşın",
   "settings_delete_account" : "Hesabı sil",
   "settings_delete_alert_button" : "Hesabı ve verileri sil",
   "settings_delete_alert_caption" : "Bu işlem hesabınızı ve bu uygulamadaki tüm verilerinizi silecektir.",
   "settings_delete_alert_title" : "Hesabınızı silmek istediğinize emin misiniz?",
+  "settings_delete_signer_account" : "Hesabı Sil?",
+  "settings_delete_watch_account" : "İzleme Hesabını Sil?",
+  "settings_delete_watch_account_button" : "Sil",
+  "settings_faq" : "SSS",
   "settings_jettons_list" : "Token'lar",
   "settings_legal_documents" : "Hukuki açıklama",
   "settings_network_alert_title" : "Ağ seçin",
   "settings_news" : "Tonkeeper Haberleri",
+  "settings_news_url" : "https://t.me/tonkeeper",
   "settings_notifications" : "Bildirimler",
   "settings_primary_currency" : "Para birimi",
   "settings_rate" : "Tonkeeper'i değerlendirin",
@@ -786,6 +1026,13 @@
   "settings_security" : "Güvenlik",
   "settings_subscriptions" : "Üyelikler",
   "settings_support" : "Destek",
+  "settings_theme" : "Tema",
+  "settings_theme_names" : {
+    "blue" : "Koyu Mavi",
+    "dark" : "Koyu",
+    "light" : "Açık",
+    "system" : "Sistem"
+  },
   "settings_title" : "Ayarlar",
   "settings_to_mainnet" : "Mainnet'e geçiş yapın",
   "settings_to_testnet" : "Testnet'e geçiş yapın",
@@ -797,6 +1044,13 @@
   "setup_notifications_caption" : "Cüzdanınıza TON, token ve NFT geldiğinde bildirimler alın.",
   "setup_notifications_enable_button" : "Bildirimleri etkinleştirin",
   "setup_notifications_title" : "Anlık bildirimler alın",
+  "signerConfirm" : {
+    "confirm" : "İşleminizi Signer'da onaylayın",
+    "scan_qr" : "Signer ile QR kodunu tarayın",
+    "scan_signed_qr" : "Signer tarafından imzalanan işlem QR kodunu tarayın",
+    "step" : "Adım {value}",
+    "title" : "İşlemi Onayla"
+  },
   "signer_scan_result" : "İmzalı işlemi tarayın",
   "signer_scan_tx_description" : "Lütfen Signer'ı açın ve işlemi QR koduyla tarayın",
   "skip" : "Atla",
@@ -819,7 +1073,8 @@
         "label" : "Alıcı"
       },
       "withdraw_amount" : {
-        "label" : "Çekilecek tutar"
+        "label" : "Çekilecek tutar",
+        "value" : "{value} TON"
       }
     },
     "confirm_deposit" : "Onaylayın ve yatırın",
@@ -841,7 +1096,11 @@
       },
       "frequency" : {
         "label" : "Ödül sıklığı",
-        "value" : "Her {count} saatte bir"
+        "value" : "Her {count} saatte bir",
+        "value.few" : "Her {count} saatte bir",
+        "value.many" : "Her {count} saatte",
+        "value.one" : "Her {count} saatte",
+        "value.zero" : "Her {count} saat"
       },
       "links_title" : "Bağlantılar",
       "liquidity_token" : {
@@ -858,6 +1117,7 @@
         "in" : ":",
         "message" : "Unstake talebi, {value} içindeki doğrulama döngüsünün bitiminden sonra işlenecektir.",
         "reward_title" : "Sonraki ödül",
+        "time" : "{time} içinde",
         "title" : "Sonraki döngü"
       },
       "note" : "Staking, üçüncü taraflar tarafından yazılan akıllı sözleşmelere dayanmaktadır. Tonkeeper, staking deneyiminizden sorumlu değildir.",
@@ -868,6 +1128,7 @@
         "label" : "Havuz adresi"
       },
       "readyWithdraw" : "Çekim için hazır",
+      "show_details" : "Ayrıntılar",
       "socials" : {
         "telegram" : "Topluluk",
         "twitter" : "Twitter"
@@ -889,6 +1150,7 @@
     "no_funds" : "Stake havuzundan geri alınacak herhangi bir meblağ bulunmuyor",
     "not_exists" : "Geçersiz havuz adresi",
     "other" : "Diğer",
+    "recommended" : "Tavsiye edilen",
     "rewards" : {
       "after_top_up" : "Yatırma işleminden sonra",
       "current" : "Güncel",
@@ -963,13 +1225,58 @@
   "subscription_title" : "Üyelik",
   "subscription_unsubscribe" : "Üyelikten çık",
   "success" : "Başarılı!",
+  "suspicious" : {
+    "buttons" : {
+      "not_spam" : "Bu Spam Değil",
+      "report" : "Şikayet Et"
+    },
+    "label" : {
+      "full" : "Doğrulanmamış NFT",
+      "short" : "Doğrulanmamış"
+    },
+    "status_update" : {
+      "hidden" : {
+        "collection" : "Koleksiyon gizlendi",
+        "nft" : "NFT gizli"
+      },
+      "spam" : {
+        "collection" : "Koleksiyon spam olarak işaretlendi",
+        "nft" : "NFT spam olarak işaretlendi"
+      }
+    }
+  },
+  "suspiciousNFTDetails" : {
+    "buttons" : {
+      "not_spam" : "Spam Değil",
+      "report" : "Spam Bildir"
+    },
+    "paragraphs" : {
+      "p1" : "Spam için kullanılır. Büyük çapta istenmeyen ve genellikle ilgisiz mesajlar göndermek için kullanılır.",
+      "p2" : "Dolandırıcılık için kullanılır. NFT'nin adı, açıklaması veya resmi kullanıcıları yanıltabilir.",
+      "p3" : "Bu NFT'nin yazarı ve geçmişi hakkında çok az şey biliyoruz."
+    },
+    "subtitle" : "NFT aşağıdaki nedenlerden biri nedeniyle güvenli olmayabilir.",
+    "title" : "Doğrulanmamış NFT"
+  },
   "swap_title" : "Takas",
   "tab_browser" : "Tarayıcı",
+  "tab_collectibles" : "Koleksiyonlar",
   "tab_nft" : "NFT'ler",
   "tab_settings" : "Ayarlar",
   "tab_swap" : "Takas",
   "tab_wallet" : "Cüzdan",
   "today" : "Bugün",
+  "tokenDetails" : {
+    "name" : "İsim",
+    "title" : "Token Detayları",
+    "token_id" : "Token Kimliği",
+    "tonviewer_button" : "Tonviewer'da Görüntüleyin"
+  },
+  "tonconnect_error" : {
+    "bad_request" : "Geçersiz istek",
+    "wrong_from" : "Yanlış 'from' parametresi",
+    "wrong_network" : "Yanlış ağ"
+  },
   "tonkeeper_pro" : "Tonkeeper Pro",
   "tonkeeper_pro_description" : "Tonkeeper Pro'nun aboneliği, kripto yönetimi için bir araç seti sunan genişletilmiş bir cüzdan özelliği ile birlikte gelir",
   "ton_login_back_to_button" : "{name}'e geri dön",
@@ -992,18 +1299,24 @@
   "transactionDetails" : {
     "address" : "Adres",
     "bid_collection_name" : "Koleksiyon yayıncısı",
+    "bid_date" : "Teklif {time}",
     "bid_name" : "İsim",
+    "call_contract_date" : "Sözleşme çağrısı {time}",
     "comment" : "Yorum",
     "description" : "Açıklama",
     "operation" : "İşlem",
     "payload" : "Bloğun yararlı yükü",
+    "purchase_date" : "Satın alma {time}",
+    "received_date" : "Alındı {time}",
     "recipient" : "Alıcı",
     "recipient_address" : "Alıcı adresi",
     "sender" : "Gönderen",
     "sender_address" : "Gönderen adresi",
+    "sent_date" : "Gönderildi {time}",
     "spam" : "İstenmeyen mesaj",
     "subscription_merchant_label" : "Satıcı",
     "subscription_product_label" : "Üyelik",
+    "swapped_date" : "Takas edilen {time}",
     "transaction" : "İşlem",
     "unsubscription_title" : "Üyelikten çıkıldı",
     "withdraw_amount" : "Çekilecek tutar"
@@ -1024,6 +1337,9 @@
     "contract_deploy" : "Sözleşme Dağıtımı",
     "deposit" : "Yatırma",
     "failed" : "Başarısız",
+    "failed_with_reason" : {
+      "swap_refund_no_liq" : "Başarısız. Bu hatayı önlemek için takas ayarlarında kayma toleransını artırın."
+    },
     "nft_purchase" : "NFT Satın Alma",
     "smartcontract_exec" : "Sözleşme çağrısı yap",
     "spam" : "İstenmeyen mesaj",
@@ -1068,18 +1384,26 @@
   "transfer_deeplink_amount_error" : "Hatalı tutar isteği",
   "transfer_deeplink_expired_error" : "Süresi dolmuş bağlantı",
   "transfer_deeplink_nft_address_error" : "Hatalı NFT adresi",
+  "transfer_deeplink_unknown_jetton_error" : "Bilinmeyen token",
   "transfer_deeplink_unknown_token" : "Bilinmeyen token",
   "transfer_deeplink_wrong_params" : "Yanlış parametreler",
   "transfer_from_old_wallet_btn" : "Transfer et",
   "transfer_from_old_wallet_caption" : "Tonkeeper, tüm coin'leri eski adresinizden yeni adresinize transfer edecek.",
   "transfer_from_old_wallet_in_progress" : "Transfer işlemi devam ediyor",
   "transfer_from_old_wallet_title" : "Mevcut adrese transfer et",
+  "transfer_pending_by_battery_error" : "Başka bir işlem pil tarafından işleniyor",
   "txActions" : {
     "amount" : "Tutar",
     "fee" : "Ücret",
     "refund" : "İade",
     "signRaw" : {
       "addressMismatch" : {
+        "switchWallet" : {
+          "close" : "İptal",
+          "description" : "Cüzdanı değiştirmek ve işlemi onaylamak.",
+          "switch" : "Geçiş Yap ve Devam Et",
+          "title" : "Cüzdanınız için eylem {value}"
+        },
         "wrongVersion" : {
           "close" : "İptal",
           "description" : "İşlemi onaylamak için etkin adresinizi {version} olarak değiştirin.",
@@ -1099,6 +1423,7 @@
         "stakingDeposit" : "Katılım için minimum bakiye:\n{amount} {currency}\n",
         "stakingFee" : "İşlem için {amount} TON gerekiyor. Tahminen {fee} TON ücret kesilecek, geri kalanı iade edilecektir.",
         "title" : "Yetersiz bakiye",
+        "title_multiwallet" : "Cüzdanınızda yeterli bakiye yok",
         "toBePaid" : "Ödenecek tutar: {amount} {currency}\n",
         "withFees" : "+ blokzinciri ücretleri.\n",
         "yourBalance" : "Bakiyeniz: {balance} {currency}."
@@ -1125,6 +1450,17 @@
       }
     }
   },
+  "unverifiedTokenDetails" : {
+    "button" : "Tamam",
+    "description" : "Bu belirteç bir veya birkaç nedenle şüpheli görünüyor.",
+    "paragraphs" : {
+      "p1" : "Düşük likidite. Tokenin bir değeri olabilir, ancak bu çok düşüktür.",
+      "p2" : "Token ticaret platformlarında listelenmemiştir ve sınırlı talebe sahiptir.",
+      "p3" : "Spam için kullanılır. Büyük ölçekli istenmeyen ve genellikle alakasız mesajlar göndermek için kullanılır.",
+      "p4" : "Dolandırıcılık için kullanılır. Token'in adı veya resmi kullanıcıları aldatabilir."
+    },
+    "title" : "Doğrulanmamış Token"
+  },
   "update" : {
     "description" : "Tonkeeper'in yeni bir sürümü mevcut. Şimdi indirebilirsiniz.",
     "download" : "İndir",
@@ -1136,20 +1472,55 @@
     "title" : "Tonkeeper'ı güncelleyin",
     "version" : "Sürüm '{{'version'}}'"
   },
+  "upgrade_to_w5" : {
+    "about_button" : "W5 Cüzdan hakkında",
+    "description" : "Gazsız USDT ödemeleri ve diğer harika özelliklerle yeni W5 cüzdan standardını deneyin.",
+    "hide_button" : "Gizle",
+    "settings" : "Cüzdan W5",
+    "title" : "Gassız Transferler",
+    "try_button" : "W5 Cüzdanı Dene"
+  },
   "username_issued_by_telegram" : "Telegram tarafından verilmiştir",
   "username_manage_name_button" : "İsmi yönet",
+  "w5_stories" : {
+    "0" : {
+      "description" : "W5, işlem işlemede daha verimli bir yaklaşım benimser ve bu da gaz maliyetlerini %25'e kadar düşürür.",
+      "title" : "Azaltılmış Blockchain Ücretleri"
+    },
+    "1" : {
+      "description" : "W5, aynı anda gerçekleştirilen işlem sayısını 4'ten 255'e çıkararak komisyon maliyetlerini azaltabilir.",
+      "title" : "Bir işlemde 255'e kadar işlem yapılabilir"
+    },
+    "2" : {
+      "description" : "TON'a sahip olmadan USDT gönderin – işlem ücretleri otomatik olarak birkaç sent USDT ile karşılanacaktır.",
+      "title" : "Gazsız USDT Transferleri"
+    },
+    "3" : {
+      "description" : "Eski hesaplar ve W5 aynı kurtarma ifadesini kullanır - yeni bir cihazda hesapları geri yüklerken, hem eski hem de yeni otomatik olarak görünecektir.",
+      "title" : "Kurtarma İfadesi Değişmez"
+    },
+    "4" : {
+      "button" : "W5 Cüzdanını Ekle",
+      "description" : "W5 standardı kesin değildir. Gazsız işlemler, nasıl çalıştığını test etmek için deneysel bir özellik olarak sunulmaktadır. Nihai sürüm yayınlanana kadar tüm varlıklarınızı W5 cüzdanına taşımayın.",
+      "title" : "W5 Beta"
+    }
+  },
   "wallet_about" : "Hakkında",
   "wallet_buy" : "Satın al",
   "wallet" : {
     "buy_btn" : "TON satın alın",
     "collectibles_tab_lable" : "Koleksiyon varlıkları",
     "edit_tokens_btn" : "Düzenle",
+    "inscriptions_tab_label" : "İnskripsiyonlar",
     "nft_tab_lable" : "Koleksiyon varlıkları",
     "old_wallets_title" : "Eski cüzdanlar",
     "old_wallet_title" : "Eski cüzdan",
     "receive_btn" : "Al",
+    "scan_btn" : "Tara",
     "screen_title" : "Cüzdan",
+    "sell_btn" : "Sat",
     "send_btn" : "Gönder",
+    "stake_btn" : "Stake Et",
     "swap_btn" : "Takas",
     "tonkens_tab_lable" : "Tokenlar",
     "updated_at" : "{value} tarihinde güncellendi"
@@ -1165,6 +1536,8 @@
   "wallet_source_code" : "Kaynak kodu",
   "wallet_swap" : "Takas",
   "wallet_title" : "Cüzdan",
+  "wallet_toncommunity_chat_link" : "https://t.me/toncoin_tr_chat",
+  "wallet_toncommunity_link" : "https://t.me/toncoin",
   "watch_only" : "Sadece izle",
   "yesterday" : "Dün"
 }

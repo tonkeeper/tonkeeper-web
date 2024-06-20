@@ -68,7 +68,7 @@ export const WalletAsideMenu = () => {
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SaleBadgeIcon />
-                        <Label2>Collectables</Label2>
+                        <Label2>{t('wallet_aside_collectibles')}</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
@@ -76,7 +76,7 @@ export const WalletAsideMenu = () => {
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SparkIcon />
-                        <Label2>Domains</Label2>
+                        <Label2>{t('wallet_aside_domains')}</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>

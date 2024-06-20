@@ -68,7 +68,7 @@ const SingleAccountSettings = () => {
 
         if (nft?.length) {
             items.push({
-                name: 'NFT', // TODO
+                name: t('settings_collectibles_list'),
                 icon: <SaleBadgeIcon />,
                 action: () => navigate(relative(SettingsRoute.nft))
             });
@@ -165,7 +165,7 @@ const MultipleAccountSettings = () => {
 
         if (nft?.length) {
             items.push({
-                name: 'NFT', // TODO
+                name: t('settings_collectibles_list'),
                 icon: <SaleBadgeIcon />,
                 action: () => navigate(relative(SettingsRoute.nft))
             });

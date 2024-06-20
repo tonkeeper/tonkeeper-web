@@ -99,7 +99,7 @@ export const DesktopWalletSettingsPage = () => {
                 <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.nft}>
                     <SettingsListItem>
                         <SaleBadgeIcon />
-                        <Label2>NFT</Label2>
+                        <Label2>{t('settings_collectibles_list')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
                 <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}>
