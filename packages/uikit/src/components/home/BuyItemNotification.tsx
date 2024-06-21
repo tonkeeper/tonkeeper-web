@@ -23,6 +23,7 @@ import { Body1, H3, Label1 } from '../Text';
 import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { useCreateMercuryoProUrl } from '../../state/tonendpoint';
+import { hexToRGBA } from '../../libs/css';
 
 const Logo = styled.img<{ large?: boolean }>`
     pointer-events: none;
@@ -193,10 +194,10 @@ const H3Styled = styled(H3)`
 `;
 
 const Badge = styled.div`
-    background: ${p => p.theme.backgroundContentTint};
+    color: ${p => p.theme.accentBlue};
+    background-color: ${p => hexToRGBA(p.theme.accentBlue, 0.26)};
     border-radius: 3px;
     padding: 2px 4px;
-    color: ${p => p.theme.textSecondary};
     font-size: 8.5px;
     font-style: normal;
     font-weight: 510;
