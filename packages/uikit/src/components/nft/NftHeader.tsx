@@ -47,6 +47,8 @@ const HeaderBody3Secondary = styled(Body3)<{ verified?: boolean }>`
 
 const HeaderSuspicious = styled(Body3)`
     color: ${props => props.theme.accentOrange};
+    overflow: hidden;
+    text-overflow: ellipsis;
 `;
 
 const IconBody = styled.span`
