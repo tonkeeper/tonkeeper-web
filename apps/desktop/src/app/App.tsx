@@ -78,7 +78,6 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
-import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
 import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
 
