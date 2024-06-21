@@ -344,6 +344,7 @@ const NftActivityHeader: FC<{
                                 <UnverifiedNftNotification
                                     isOpen={isSpamModalOpen}
                                     onClose={handleCloseSpamModal}
+                                    isTrusted={false}
                                 />
                                 <UnverifiedLabel onClick={onOpenSpamModal}>
                                     {t('suspicious_label_full')}&nbsp;

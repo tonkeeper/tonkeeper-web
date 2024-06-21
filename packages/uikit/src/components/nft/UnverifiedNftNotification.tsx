@@ -50,8 +50,10 @@ const ButtonsContainer = styled.div`
 export const UnverifiedNftNotification: FC<{
     isOpen: boolean;
     onClose: (action?: 'mark_spam' | 'mark_trusted') => void;
-}> = ({ isOpen, onClose }) => {
+    isTrusted: boolean;
+}> = ({ isOpen, onClose, isTrusted }) => {
     const { t } = useTranslation();
+
     return (
         <Notification isOpen={isOpen} handleClose={() => onClose()}>
             {() => (
@@ -67,9 +69,11 @@ export const UnverifiedNftNotification: FC<{
                         <Button warn onClick={() => onClose('mark_spam')}>
                             {t('suspiciousNFTDetails_buttons_report')}
                         </Button>
-                        <Button secondary onClick={() => onClose('mark_trusted')}>
-                            {t('suspiciousNFTDetails_buttons_not_spam')}
-                        </Button>
+                        {!isTrusted && (
+                            <Button secondary onClick={() => onClose('mark_trusted')}>
+                                {t('suspiciousNFTDetails_buttons_not_spam')}
+                            </Button>
+                        )}
                     </ButtonsContainer>
                 </ContentWrapper>
             )}

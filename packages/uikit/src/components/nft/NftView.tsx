@@ -199,6 +199,7 @@ export const NftPreview: FC<{
                     <UnverifiedNftNotification
                         isOpen={isSpamModalOpen}
                         onClose={handleCloseSpamModal}
+                        isTrusted={isTrusted}
                     />
                     <DropDownWrapper>
                         <DropDown
