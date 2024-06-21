@@ -5,6 +5,7 @@ import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { seeIfTonTransfer } from './ton/tonActivity';
+import { MixedActivity } from './mixedActivity';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -165,3 +166,20 @@ export const useFetchFilteredActivity = (asset: string) => {
         getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
     });
 };
+
+export type GroupedActivityItemSingle = {
+    type: 'single';
+    item: GenericActivity<MixedActivity>;
+    key: string;
+};
+
+export type GroupedActivityItemGroup = {
+    type: 'group';
+    items: GenericActivity<MixedActivity>[];
+    category: 'spam'; // probably will be other groupBy categories in the future
+    key: string;
+};
+
+export type GroupedActivityItem = GroupedActivityItemSingle | GroupedActivityItemGroup;
+
+export type GroupedActivity = GroupedActivityItem[];
