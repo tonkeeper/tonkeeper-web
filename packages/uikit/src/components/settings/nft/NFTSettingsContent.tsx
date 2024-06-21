@@ -8,7 +8,7 @@ import { useTranslation } from '../../../hooks/translation';
 import { useActiveWalletConfig, useWalletNftList } from '../../../state/wallet';
 import { IconButton } from '../../../components/fields/IconButton';
 import { BorderSmallResponsive } from '../../../components/shared/Styles';
-import { useHideNft, useMakeNftVisible, useMarkNftAsTrusted } from '../../../state/nft';
+import { isSpamNft, useHideNft, useMakeNftVisible, useMarkNftAsTrusted } from '../../../state/nft';
 import { SettingsNFTCollection, SettingsSingleNFT } from './models';
 import { SpamNftInfoNotification } from './SpamNftInfoNotification';
 import { Image } from '../../../components/shared/Image';
@@ -150,15 +150,7 @@ export const NFTSettingsContent = () => {
                 acc.push(collection);
             }
 
-            if (config.spamNfts.includes(collection.address)) {
-                collection.isSpam = true;
-            } else {
-                const isTrustedCollection = config.trustedNfts.includes(collection.address);
-                if (!isTrustedCollection) {
-                    collection.isSpam = collection.isSpam || item.trust === 'blacklist';
-                }
-            }
-
+            collection.isSpam ||= isSpamNft(item, config);
             collection.nfts.push(item);
 
             if (!collection.image && image) {

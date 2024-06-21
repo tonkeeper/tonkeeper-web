@@ -5,6 +5,7 @@ import { VerificationIcon } from '../Icon';
 import { Body2, Body3, Label2 } from '../Text';
 import { useActiveWalletConfig } from '../../state/wallet';
 import { useTranslation } from '../../hooks/translation';
+import { SpamBadge } from '../activity/NotificationCommon';
 
 const TextContent = styled.span`
     display: inline-block;
@@ -78,14 +79,47 @@ export const NftCollectionBody3: FC<{ nft: NftItem }> = React.memo(({ nft }) => 
     );
 });
 
-const BodyHeader = styled(Body2)`
+const BodyHeader = styled(Body2)<{ isSpam?: boolean; isUnverified?: boolean }>`
     overflow: hidden;
     text-overflow: ellipsis;
+
+    ${p =>
+        p.isSpam
+            ? css`
+                  color: ${p.theme.textTertiary};
+              `
+            : p.isUnverified
+            ? css`
+                  color: ${p.theme.textSecondary};
+              `
+            : undefined}
 `;
 
-export const NftHeaderBody2: FC<{ nft: NftItem }> = React.memo(({ nft }) => {
-    return <BodyHeader>{nft.dns ?? nft.metadata.name}</BodyHeader>;
-});
+const BodyHeaderContainer = styled.div`
+    display: flex;
+    overflow: hidden;
+    gap: 8px;
+
+    ${SpamBadge} {
+        flex-shrink: 0;
+    }
+`;
+
+export const NftHeaderBody2: FC<{ nft: NftItem; isSpam?: boolean; isUnverified?: boolean }> =
+    React.memo(({ nft, isSpam, isUnverified }) => {
+        const { t } = useTranslation();
+
+        if (isSpam) {
+            return (
+                <BodyHeaderContainer>
+                    <BodyHeader isSpam={true}>{nft.dns ?? nft.metadata.name}</BodyHeader>
+                    <SpamBadge>{t('spam_action')}</SpamBadge>
+                </BodyHeaderContainer>
+            );
+        }
+
+        return <BodyHeader isUnverified={isUnverified}>{nft.dns ?? nft.metadata.name}</BodyHeader>;
+    });
 
 const HeaderBody2Secondary = styled(Body2)<{ verified?: boolean }>`
     color: ${props => props.theme.textSecondary};

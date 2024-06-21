@@ -1,5 +1,5 @@
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import {
@@ -12,12 +12,7 @@ import {
     HistoryCellActionGeneric
 } from './HistoryCell';
 import { useWalletContext } from '../../../../hooks/appContext';
-import {
-    useActiveWalletConfig,
-    useNftCollectionData,
-    useNftItemData,
-    useWalletNftList
-} from '../../../../state/wallet';
+import { useNftCollectionData, useNftItemData } from '../../../../state/wallet';
 import styled, { css } from 'styled-components';
 import { Body2 } from '../../../Text';
 import { Skeleton } from '../../../shared/Skeleton';
@@ -25,6 +20,7 @@ import { useFormatCoinValue } from '../../../../hooks/balance';
 import { ChevronRightIcon, CoinsIcon } from '../../../Icon';
 import { useTranslation } from '../../../../hooks/translation';
 import { ContractDeployIcon } from '../../../activity/ActivityIcons';
+import { useIsSpamNft, useIsUnverifiedNft } from '../../../../state/nft';
 
 const NftImage = styled.img<{ isUnverified?: boolean }>`
     width: 20px;
@@ -71,6 +67,14 @@ const ActionRowNftStyled = styled(ActionRow)<{ fullComment?: boolean }>`
             50px,
             max-content
         );
+`;
+
+const UnverifiedNftComment = styled(Body2)`
+    color: ${p => p.theme.accentOrange};
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 40px;
 `;
 
 const SpamNftPlaceholder = styled(Body2)`
@@ -128,16 +132,11 @@ export const NftTransferDesktopAction: FC<{
     const { t } = useTranslation();
     const wallet = useWalletContext();
     const { nftItemTransfer } = action;
-    const { data: config } = useActiveWalletConfig();
-    const { data: nftList } = useWalletNftList();
 
-    const nftInList = useMemo(() => {
-        if (!nftList || !nftItemTransfer) {
-            return;
-        }
+    const { data: nftInfo } = useNftItemData(action.nftItemTransfer?.nft || '');
 
-        return nftList.find(item => item.address === nftItemTransfer.nft);
-    }, [nftList, nftItemTransfer?.nft]);
+    const isSpam = useIsSpamNft(nftInfo) || isScam;
+    const isUnverified = useIsUnverifiedNft(nftInfo);
 
     if (!nftItemTransfer) {
         return <ErrorRow />;
@@ -159,32 +158,17 @@ export const NftTransferDesktopAction: FC<{
         );
     }
 
-    // TODO вынести куда-нибудь
-    const isUnverified =
-        nftInList?.trust !== 'whitelist' &&
-        nftInList &&
-        !config?.trustedNfts.includes(nftInList.collection?.address || nftInList.address);
-
-    isScam = Boolean(
-        isScam ||
-            (nftInList &&
-                (!!config?.spamNfts.includes(nftInList.collection?.address || nftInList.address) ||
-                    (nftInList.trust === 'blacklist' &&
-                        !config?.trustedNfts.includes(
-                            nftInList.collection?.address || nftInList.address
-                        ))))
-    );
-
     return (
         <>
-            <HistoryCellActionReceived isScam={isScam} isFailed={action.status === 'failed'} />
+            <HistoryCellActionReceived isScam={isSpam} isFailed={action.status === 'failed'} />
             <HistoryCellAccount account={nftItemTransfer.sender} />
             <ActionRowNftStyled fullComment={isUnverified}>
-                <HistoryCellComment
-                    comment={isUnverified ? t('suspicious_label_short') : nftItemTransfer.comment}
-                    isScam={isScam}
-                />
-                {isScam ? (
+                {isUnverified && !isSpam ? (
+                    <UnverifiedNftComment>{t('suspicious_label_short')}</UnverifiedNftComment>
+                ) : (
+                    <HistoryCellComment comment={nftItemTransfer.comment} isScam={isSpam} />
+                )}
+                {isSpam ? (
                     <SpamNftPlaceholder>{t('history_spam_nft')}</SpamNftPlaceholder>
                 ) : (
                     <HistoryCellNft

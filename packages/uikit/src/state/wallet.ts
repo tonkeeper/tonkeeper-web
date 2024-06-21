@@ -44,6 +44,7 @@ import {
     setActiveWalletConfig
 } from '@tonkeeper/core/dist/service/wallet/configService';
 import { useMemo } from 'react';
+import { isSpamNft } from './nft';
 
 export const useActiveWallet = () => {
     const sdk = useAppSdk();
@@ -226,12 +227,8 @@ export const useWalletNftList = () => {
 };
 
 export const useWalletFilteredNftList = () => {
-    const { data: nfts, isLoading, isFetching } = useWalletNftList();
-    const {
-        data: walletConfig,
-        isLoading: isWalletConfigLoading,
-        isFetching: isWalletConfigFetching
-    } = useActiveWalletConfig();
+    const { data: nfts, ...rest } = useWalletNftList();
+    const { data: walletConfig } = useActiveWalletConfig();
 
     const filtered = useMemo(() => {
         if (!nfts || !walletConfig) return undefined;
@@ -239,26 +236,17 @@ export const useWalletFilteredNftList = () => {
         return nfts.filter(item => {
             const address = item.collection ? item.collection.address : item.address;
 
-            if (walletConfig?.hiddenNfts.includes(address)) {
+            if (isSpamNft(item, walletConfig)) {
                 return false;
             }
 
-            if (walletConfig?.trustedNfts.includes(address)) {
-                return true;
-            }
-
-            if (walletConfig?.spamNfts.includes(address)) {
-                return false;
-            }
-
-            return item.trust !== 'blacklist';
+            return !walletConfig?.hiddenNfts.includes(address);
         });
     }, [nfts, walletConfig?.trustedNfts, walletConfig?.spamNfts, walletConfig?.hiddenNfts]);
 
     return {
         data: filtered,
-        isLoading: isLoading || isWalletConfigLoading,
-        isFetching: isFetching || isWalletConfigFetching
+        ...rest
     };
 };
 

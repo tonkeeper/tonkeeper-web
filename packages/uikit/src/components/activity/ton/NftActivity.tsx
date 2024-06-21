@@ -1,12 +1,12 @@
 import { Action, ActionStatusEnum, NftItem, Price } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useWalletContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
-import { useActiveWalletConfig, useNftItemData } from '../../../state/wallet';
+import { useNftItemData } from '../../../state/wallet';
 import { InfoCircleIcon, VerificationIcon } from '../../Icon';
 import { ListBlock } from '../../List';
 import { Body1, Body2 } from '../../Text';
@@ -40,7 +40,12 @@ import {
 import { ActionData } from './ActivityNotification';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { UnverifiedNftNotification } from '../../nft/UnverifiedNftNotification';
-import { useMarkNftAsSpam, useMarkNftAsTrusted } from '../../../state/nft';
+import {
+    useIsSpamNft,
+    useIsUnverifiedNft,
+    useMarkNftAsSpam,
+    useMarkNftAsTrusted
+} from '../../../state/nft';
 
 const NftBlock = styled.div`
     background: ${props => props.theme.backgroundContentTint};
@@ -65,15 +70,35 @@ const Wrapper = styled.div`
     overflow: hidden;
 `;
 
-const NftImage = styled.img`
+const NftImage = styled.img<{ isSpam: boolean; isUnverified: boolean }>`
     user-select: none;
+
+    ${p =>
+        p.isSpam
+            ? css`
+                  filter: blur(5px);
+              `
+            : p.isUnverified
+            ? css`
+                  opacity: 0.5;
+              `
+            : undefined}
+`;
+
+const UnverifiedText = styled(Body2)`
+    color: ${p => p.theme.accentOrange};
 `;
 
 export const NftComment: FC<{
     address: string;
-}> = ({ address }) => {
+    isNftReceived?: boolean;
+}> = ({ address, isNftReceived }) => {
+    const { t } = useTranslation();
     const sdk = useAppSdk();
     const { data } = useNftItemData(address);
+
+    const isSpam = useIsSpamNft(data) && Boolean(isNftReceived);
+    const isUnverified = useIsUnverifiedNft(data) && Boolean(isNftReceived);
 
     if (!data) return <></>;
     const preview = data.previews?.find(item => item.resolution === '100x100');
@@ -87,10 +112,24 @@ export const NftComment: FC<{
                     }
                 }}
             >
-                {preview && <NftImage height="64" width="64" src={preview.url} />}
+                {preview && (
+                    <NftImage
+                        isSpam={isSpam}
+                        isUnverified={isUnverified}
+                        height="64"
+                        width="64"
+                        src={preview.url}
+                    />
+                )}
                 <NftText>
-                    <NftHeaderBody2 nft={data} />
-                    <NftCollectionBody2 nft={data} />
+                    <NftHeaderBody2 isSpam={isSpam} isUnverified={isUnverified} nft={data} />
+                    {isSpam ? (
+                        <UnverifiedText>{t('history_spam_nft')}</UnverifiedText>
+                    ) : isUnverified ? (
+                        <UnverifiedText>{t('suspicious_label_full')}</UnverifiedText>
+                    ) : (
+                        <NftCollectionBody2 nft={data} />
+                    )}
                 </NftText>
             </NftBlock>
         </Wrapper>
@@ -130,7 +169,7 @@ export const NftItemTransferAction: FC<{
                     date={date}
                 />
                 <FailedNote status={action.status}>
-                    <NftComment address={nftItemTransfer.nft} />
+                    <NftComment isNftReceived address={nftItemTransfer.nft} />
                     <Comment comment={nftItemTransfer.comment} />
                 </FailedNote>
             </ListItemGrid>
@@ -207,7 +246,8 @@ const Amount = styled(Body1)`
 const Image = styled.img<{ isSpam: boolean; isUnverified: boolean }>`
     width: 96px;
     height: 96px;
-    margin-bottom: 20px;
+    margin-top: 5px;
+    margin-bottom: 15px;
     border-radius: ${props => props.theme.cornerMedium};
     user-select: none;
 
@@ -221,6 +261,8 @@ const Image = styled.img<{ isSpam: boolean; isUnverified: boolean }>`
                   opacity: 0.5;
               `
             : undefined}
+
+    transition: filter 0.15s ease-in-out, opacity 0.15s ease-in-out;
 `;
 
 const Icon = styled.span`
@@ -249,19 +291,10 @@ const NftActivityHeader: FC<{
     amount?: Price;
     status?: ActionStatusEnum;
 }> = ({ kind, timestamp, data, amount, status }) => {
+    const [revealImage, setRevealImage] = useState(false);
     const { t } = useTranslation();
-    const { data: config } = useActiveWalletConfig();
-    const isUnverified = Boolean(
-        data &&
-            data.trust !== 'whitelist' &&
-            !config?.trustedNfts.includes(data.collection?.address || data.address)
-    );
-    const isSpam = Boolean(
-        data &&
-            ((data.trust === 'blacklist' &&
-                !config?.trustedNfts.includes(data.collection?.address || data.address)) ||
-                config?.spamNfts.includes(data.collection?.address || data.address))
-    );
+    const isUnverified = useIsUnverifiedNft(data);
+    const isSpam = useIsSpamNft(data);
 
     const {
         isOpen: isSpamModalOpen,
@@ -287,8 +320,10 @@ const NftActivityHeader: FC<{
         <div>
             {preview && (
                 <Image
-                    isSpam={isSpam}
-                    isUnverified={isUnverified}
+                    onMouseOver={() => setRevealImage(true)}
+                    onMouseLeave={() => setRevealImage(false)}
+                    isSpam={!revealImage && isSpam}
+                    isUnverified={!revealImage && isUnverified}
                     src={preview.url}
                     alt="NFT Preview"
                 />

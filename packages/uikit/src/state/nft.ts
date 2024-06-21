@@ -2,9 +2,10 @@ import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useMutation } from '@tanstack/react-query';
 import { getActiveWalletConfig } from '@tonkeeper/core/dist/service/wallet/configService';
-import { useMutateActiveWalletConfig } from './wallet';
+import { useActiveWalletConfig, useMutateActiveWalletConfig } from './wallet';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { useTonenpointConfig } from './tonendpoint';
+import { ActiveWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 
 type NftWithCollectionId = Pick<NFT, 'address'> & { collection?: NFT['collection'] };
 
@@ -116,4 +117,39 @@ export const useMakeNftVisible = () => {
 
         await mutateAsync(config);
     });
+};
+
+export function useIsSpamNft(nft: (NftWithCollectionId & { trust: NFT['trust'] }) | undefined) {
+    const { data: config } = useActiveWalletConfig();
+    return isSpamNft(nft, config);
+}
+
+export function useIsUnverifiedNft(
+    nft: (NftWithCollectionId & { trust: NFT['trust'] }) | undefined
+) {
+    const { data: config } = useActiveWalletConfig();
+    return isUnverifiedNft(nft, config);
+}
+
+export const isSpamNft = (
+    nft: (NftWithCollectionId & { trust: NFT['trust'] }) | undefined,
+    config: ActiveWalletConfig | undefined
+) => {
+    return Boolean(
+        nft &&
+            (!!config?.spamNfts.includes(nft.collection?.address || nft.address) ||
+                (nft.trust === 'blacklist' &&
+                    !config?.trustedNfts.includes(nft.collection?.address || nft.address)))
+    );
+};
+
+export const isUnverifiedNft = (
+    nft: (NftWithCollectionId & { trust: NFT['trust'] }) | undefined,
+    config: ActiveWalletConfig | undefined
+) => {
+    return Boolean(
+        nft &&
+            nft.trust !== 'whitelist' &&
+            !config?.trustedNfts.includes(nft.collection?.address || nft.address)
+    );
 };
