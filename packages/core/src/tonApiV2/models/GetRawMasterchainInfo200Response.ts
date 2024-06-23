@@ -55,10 +55,10 @@ export interface GetRawMasterchainInfo200Response {
 /**
  * Check if a given object implements the GetRawMasterchainInfo200Response interface.
  */
-export function instanceOfGetRawMasterchainInfo200Response(value: object): boolean {
-    if (!('last' in value)) return false;
-    if (!('stateRootHash' in value)) return false;
-    if (!('init' in value)) return false;
+export function instanceOfGetRawMasterchainInfo200Response(value: object): value is GetRawMasterchainInfo200Response {
+    if (!('last' in value) || value['last'] === undefined) return false;
+    if (!('stateRootHash' in value) || value['stateRootHash'] === undefined) return false;
+    if (!('init' in value) || value['init'] === undefined) return false;
     return true;
 }
 

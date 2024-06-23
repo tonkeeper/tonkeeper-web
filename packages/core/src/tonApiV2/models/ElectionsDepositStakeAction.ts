@@ -43,9 +43,9 @@ export interface ElectionsDepositStakeAction {
 /**
  * Check if a given object implements the ElectionsDepositStakeAction interface.
  */
-export function instanceOfElectionsDepositStakeAction(value: object): boolean {
-    if (!('amount' in value)) return false;
-    if (!('staker' in value)) return false;
+export function instanceOfElectionsDepositStakeAction(value: object): value is ElectionsDepositStakeAction {
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('staker' in value) || value['staker'] === undefined) return false;
     return true;
 }
 

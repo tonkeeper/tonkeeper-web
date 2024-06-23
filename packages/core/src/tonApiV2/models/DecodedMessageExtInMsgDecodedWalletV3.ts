@@ -55,11 +55,11 @@ export interface DecodedMessageExtInMsgDecodedWalletV3 {
 /**
  * Check if a given object implements the DecodedMessageExtInMsgDecodedWalletV3 interface.
  */
-export function instanceOfDecodedMessageExtInMsgDecodedWalletV3(value: object): boolean {
-    if (!('subwalletId' in value)) return false;
-    if (!('validUntil' in value)) return false;
-    if (!('seqno' in value)) return false;
-    if (!('rawMessages' in value)) return false;
+export function instanceOfDecodedMessageExtInMsgDecodedWalletV3(value: object): value is DecodedMessageExtInMsgDecodedWalletV3 {
+    if (!('subwalletId' in value) || value['subwalletId'] === undefined) return false;
+    if (!('validUntil' in value) || value['validUntil'] === undefined) return false;
+    if (!('seqno' in value) || value['seqno'] === undefined) return false;
+    if (!('rawMessages' in value) || value['rawMessages'] === undefined) return false;
     return true;
 }
 

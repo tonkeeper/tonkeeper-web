@@ -79,8 +79,8 @@ export interface ComputePhase {
 /**
  * Check if a given object implements the ComputePhase interface.
  */
-export function instanceOfComputePhase(value: object): boolean {
-    if (!('skipped' in value)) return false;
+export function instanceOfComputePhase(value: object): value is ComputePhase {
+    if (!('skipped' in value) || value['skipped'] === undefined) return false;
     return true;
 }
 

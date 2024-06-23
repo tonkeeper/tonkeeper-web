@@ -18,4 +18,5 @@ export const IconButton = styled.button<{ transparent?: boolean }>`
         background-color: ${props =>
             props.transparent ? 'transparent' : props.theme.backgroundContentTint};
     }
+    border: none;
 `;

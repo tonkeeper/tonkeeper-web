@@ -49,10 +49,10 @@ export interface GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward
 /**
  * Check if a given object implements the GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures interface.
  */
-export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures(value: object): boolean {
-    if (!('validatorSetHash' in value)) return false;
-    if (!('catchainSeqno' in value)) return false;
-    if (!('signatures' in value)) return false;
+export function instanceOfGetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures(value: object): value is GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures {
+    if (!('validatorSetHash' in value) || value['validatorSetHash'] === undefined) return false;
+    if (!('catchainSeqno' in value) || value['catchainSeqno'] === undefined) return false;
+    if (!('signatures' in value) || value['signatures'] === undefined) return false;
     return true;
 }
 

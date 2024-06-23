@@ -87,7 +87,7 @@ export function useCalculatedSwap() {
             toAsset.id,
             fromAmountRelative?.shiftedBy(fromAsset.decimals).toFixed(0)
         ],
-        queryFn: async () => {
+        queryFn: async ({ signal }) => {
             setFetchedSwaps([]);
             setSelectedSwap(undefined);
             calculationId = calculationId + 1;
@@ -107,12 +107,18 @@ export function useCalculatedSwap() {
                 let fetchedProvidersNumber = 0;
                 swapProviders.forEach(async provider => {
                     try {
-                        const providerSwap = await swapService.calculateSwap(
+                        const swapPromise = swapService.calculateSwap(
                             toTradeAssetId(fromAsset.address),
                             toTradeAssetId(toAsset.address),
                             fromAmountWei.toFixed(0),
                             provider
                         );
+
+                        if (signal) {
+                            signal.onabort = () => swapPromise.cancel();
+                        }
+
+                        const providerSwap = await swapPromise;
 
                         const swap = await providerSwapToSwap(
                             providerSwap,

@@ -36,7 +36,7 @@ export interface SendBlockchainMessageRequest {
 /**
  * Check if a given object implements the SendBlockchainMessageRequest interface.
  */
-export function instanceOfSendBlockchainMessageRequest(value: object): boolean {
+export function instanceOfSendBlockchainMessageRequest(value: object): value is SendBlockchainMessageRequest {
     return true;
 }
 

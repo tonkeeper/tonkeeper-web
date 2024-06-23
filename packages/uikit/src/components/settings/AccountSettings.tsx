@@ -3,10 +3,11 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { SettingsRoute, relative } from '../../libs/routes';
-import { useWalletJettonList } from '../../state/wallet';
+import { SettingsRoute, relative, WalletSettingsRoute } from '../../libs/routes';
+import { useJettonList } from '../../state/jetton';
 import { LogOutWalletNotification } from './LogOutNotification';
 import {
+    AppsIcon,
     ListOfTokensIcon,
     LogOutIcon,
     RecoveryPhraseIcon,
@@ -21,7 +22,7 @@ const SingleAccountSettings = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const wallet = useWalletContext();
-    const { data: jettons } = useWalletJettonList();
+    const { data: jettons } = useJettonList();
     const { proFeatures } = useAppContext();
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [
@@ -68,6 +69,11 @@ const SingleAccountSettings = () => {
             action: () => navigate(relative(SettingsRoute.security))
         });
         items.push({
+            name: t('settings_connected_apps'),
+            icon: <AppsIcon />,
+            action: () => navigate(relative(WalletSettingsRoute.connectedApps))
+        });
+        items.push({
             name: t('settings_reset'),
             icon: <LogOutIcon />,
             action: () => setLogout(true)
@@ -92,7 +98,7 @@ const MultipleAccountSettings = () => {
     const navigate = useNavigate();
     const wallet = useWalletContext();
 
-    const { data: jettons } = useWalletJettonList();
+    const { data: jettons } = useJettonList();
     const { proFeatures } = useAppContext();
 
     const accountItems = useMemo(() => {
@@ -148,6 +154,11 @@ const MultipleAccountSettings = () => {
             name: t('settings_security'),
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
+        });
+        items.push({
+            name: t('settings_connected_apps'),
+            icon: <AppsIcon />,
+            action: () => navigate(relative(WalletSettingsRoute.connectedApps))
         });
         return items;
     }, [t, navigate, wallet, jettons]);

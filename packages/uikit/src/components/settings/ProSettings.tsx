@@ -173,7 +173,7 @@ const SelectProPlans: FC<{
 
 const ConfirmNotification: FC<{
     state: ConfirmState | null;
-    onClose: () => void;
+    onClose: (success?: boolean) => void;
     waitResult: (state: ConfirmState) => void;
 }> = ({ state, onClose, waitResult }) => {
     const content = useCallback(() => {
@@ -185,7 +185,7 @@ const ConfirmNotification: FC<{
                     onClose={confirmed => {
                         if (confirmed) {
                             waitResult(state);
-                            setTimeout(onClose, 3000);
+                            setTimeout(() => onClose(true), 3000);
                         } else {
                             onClose();
                         }
@@ -196,7 +196,7 @@ const ConfirmNotification: FC<{
     }, [state]);
 
     return (
-        <Notification isOpen={state != null} hideButton handleClose={onClose} backShadow>
+        <Notification isOpen={state != null} hideButton handleClose={() => onClose()} backShadow>
             {content}
         </Notification>
     );
@@ -217,7 +217,11 @@ const ConfirmBuyProService: FC<
     return <ConfirmView estimation={estimation} {...mutation} {...rest} />;
 };
 
-const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, setReLogin }) => {
+const BuyProService: FC<{ data: ProState; setReLogin: () => void; onSuccess?: () => void }> = ({
+    data,
+    setReLogin,
+    onSuccess
+}) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);
@@ -282,7 +286,12 @@ const BuyProService: FC<{ data: ProState; setReLogin: () => void }> = ({ data, s
             </Line>
             <ConfirmNotification
                 state={confirm}
-                onClose={() => setConfirm(null)}
+                onClose={success => {
+                    if (success) {
+                        onSuccess?.();
+                    }
+                    setConfirm(null);
+                }}
                 waitResult={waitInvoice}
             />
             <div ref={ref}></div>
@@ -317,7 +326,7 @@ const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({ data
     );
 };
 
-const ProContent: FC<{ data: ProState }> = ({ data }) => {
+const ProContent: FC<{ data: ProState; onSuccess?: () => void }> = ({ data, onSuccess }) => {
     const [reLogin, setReLogin] = useState(false);
 
     if (!data.hasWalletAuthCookie || reLogin) {
@@ -326,10 +335,13 @@ const ProContent: FC<{ data: ProState }> = ({ data }) => {
     if (isPaidSubscription(data.subscription)) {
         return <PreServiceStatus data={data} setReLogin={() => setReLogin(true)} />;
     }
-    return <BuyProService data={data} setReLogin={() => setReLogin(true)} />;
+    return <BuyProService data={data} setReLogin={() => setReLogin(true)} onSuccess={onSuccess} />;
 };
 
-export const ProSettingsContent: FC<{ showLogo?: boolean }> = ({ showLogo = true }) => {
+export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void }> = ({
+    showLogo = true,
+    onSuccess
+}) => {
     const { t } = useTranslation();
 
     const { data } = useProState();
@@ -341,7 +353,7 @@ export const ProSettingsContent: FC<{ showLogo?: boolean }> = ({ showLogo = true
                 <Title>{t('tonkeeper_pro')}</Title>
                 <Description>{t('tonkeeper_pro_description')}</Description>
             </Block>
-            {data && <ProContent key={data.wallet.rawAddress} data={data} />}
+            {data && <ProContent key={data.wallet.rawAddress} data={data} onSuccess={onSuccess} />}
         </>
     );
 };

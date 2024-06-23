@@ -1,6 +1,7 @@
 export enum AppKey {
     ACCOUNT = 'account',
     WALLET = 'wallet',
+    WALLET_CONFIG = 'wallet_config',
     MNEMONIC = 'mnemonic',
 
     THEME = 'theme',

@@ -36,4 +36,6 @@ export class BrowserAppSdk extends BaseApp {
     isStandalone = () => iOS() && ((window.navigator as any).standalone as boolean);
 
     version = packageJson.version ?? 'Unknown';
+
+    targetEnv= 'web' as const;
 }

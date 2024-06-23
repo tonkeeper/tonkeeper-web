@@ -1,5 +1,5 @@
 import React, { FC, PropsWithChildren } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { SpinnerIcon } from '../Icon';
 import { Body2Class } from '../Text';
 
@@ -221,17 +221,28 @@ const SpinnerIconStyled = styled(SpinnerIcon)`
 
 export const Button: FC<
     PropsWithChildren<
-        ButtonProps & Omit<React.HTMLProps<HTMLButtonElement>, 'size' | 'children' | 'ref' | 'as'>
+        ButtonProps & Omit<React.HTMLProps<HTMLButtonElement>, 'size' | 'children' | 'ref'>
     >
 > = ({ children, loading, ...props }) => {
+    const theme = useTheme();
+
+    let size = props.size;
+    if (size === undefined && theme.displayType === 'full-width') {
+        size = 'small';
+    }
+
     if (loading) {
         return (
-            <ButtonElement {...props} disabled>
+            <ButtonElement {...props} size={size} disabled>
                 <ChildrenHidden>{children}</ChildrenHidden>
                 <SpinnerIconStyled />
             </ButtonElement>
         );
     } else {
-        return <ButtonElement {...props}>{children}</ButtonElement>;
+        return (
+            <ButtonElement {...props} size={size}>
+                {children}
+            </ButtonElement>
+        );
     }
 };

@@ -36,9 +36,9 @@ export interface Oracle {
 /**
  * Check if a given object implements the Oracle interface.
  */
-export function instanceOfOracle(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('secpPubkey' in value)) return false;
+export function instanceOfOracle(value: object): value is Oracle {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('secpPubkey' in value) || value['secpPubkey'] === undefined) return false;
     return true;
 }
 

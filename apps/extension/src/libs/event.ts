@@ -33,6 +33,7 @@ export interface PupUpEvents {
 
     chainChanged: string;
     accountsChanged: string[];
+    tonConnectDisconnect: string[];
 
     proxyChanged: ProxyConfiguration;
 
@@ -71,6 +72,7 @@ export interface BackgroundEvents {
 
     chainChanged: string;
     accountsChanged: string[];
+    tonConnectDisconnect: string[];
 
     proxyChanged: ProxyConfiguration;
 }

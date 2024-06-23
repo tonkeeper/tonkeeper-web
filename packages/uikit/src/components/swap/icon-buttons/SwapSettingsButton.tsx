@@ -11,6 +11,12 @@ const IconButtonStyled = styled(IconButton)`
     > svg {
         color: ${props => props.theme.iconSecondary};
     }
+
+    transition: opacity 0.15s ease-in-out;
+
+    &:hover {
+        opacity: 0.64;
+    }
 `;
 
 export const SwapSettingsButton = () => {

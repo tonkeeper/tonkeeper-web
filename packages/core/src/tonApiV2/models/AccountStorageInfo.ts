@@ -54,12 +54,12 @@ export interface AccountStorageInfo {
 /**
  * Check if a given object implements the AccountStorageInfo interface.
  */
-export function instanceOfAccountStorageInfo(value: object): boolean {
-    if (!('usedCells' in value)) return false;
-    if (!('usedBits' in value)) return false;
-    if (!('usedPublicCells' in value)) return false;
-    if (!('lastPaid' in value)) return false;
-    if (!('duePayment' in value)) return false;
+export function instanceOfAccountStorageInfo(value: object): value is AccountStorageInfo {
+    if (!('usedCells' in value) || value['usedCells'] === undefined) return false;
+    if (!('usedBits' in value) || value['usedBits'] === undefined) return false;
+    if (!('usedPublicCells' in value) || value['usedPublicCells'] === undefined) return false;
+    if (!('lastPaid' in value) || value['lastPaid'] === undefined) return false;
+    if (!('duePayment' in value) || value['duePayment'] === undefined) return false;
     return true;
 }
 

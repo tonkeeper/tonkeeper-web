@@ -2,6 +2,7 @@ export enum QueryKey {
     account = 'account',
     wallet = 'wallet',
     wallets = 'wallets',
+    walletConfig = 'wallet_config',
     lock = 'lock',
     touchId = 'touchId',
     canPromptTouchId = 'canPromptTouchId',
@@ -20,7 +21,8 @@ export enum QueryKey {
     syncDate = 'syncDate',
     analytics = 'analytics',
 
-    connection = 'connection',
+    tonConnectConnection = 'tonConnectConnection',
+    tonConnectLastEventId = 'tonConnectLastEventId',
     subscribed = 'subscribed',
     featuredRecommendations = 'recommendations',
     experimental = 'experimental',
@@ -49,7 +51,8 @@ export enum QueryKey {
 export enum JettonKey {
     info,
     history,
-    balance
+    balance,
+    raw
 }
 
 export enum TonkeeperApiKey {

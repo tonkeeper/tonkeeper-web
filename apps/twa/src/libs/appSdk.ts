@@ -47,4 +47,6 @@ export class TwaAppSdk extends BaseApp {
     isStandalone = () => false;
 
     version = packageJson.version ?? 'Unknown';
+
+    targetEnv= 'twa' as const;
 }

@@ -22,6 +22,8 @@ import { Notification } from '../Notification';
 import { Body1, H3, Label1 } from '../Text';
 import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
+import { useCreateMercuryoProUrl } from '../../state/tonendpoint';
+import { hexToRGBA } from '../../libs/css';
 
 const Logo = styled.img<{ large?: boolean }>`
     pointer-events: none;
@@ -179,6 +181,29 @@ const replacePlaceholders = (
     return url;
 };
 
+const Label1Styled = styled(Label1)`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+`;
+
+const H3Styled = styled(H3)`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+`;
+
+const Badge = styled.div`
+    color: ${p => p.theme.accentBlue};
+    background-color: ${p => hexToRGBA(p.theme.accentBlue, 0.26)};
+    border-radius: 3px;
+    padding: 2px 4px;
+    font-size: 8.5px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: 12px;
+`;
+
 export const BuyItemNotification: FC<{
     item: TonendpoinFiatItem;
     kind: 'buy' | 'sell';
@@ -192,10 +217,16 @@ export const BuyItemNotification: FC<{
 
     const { data: hided } = useShowDisclaimer(item.title, kind);
     const { mutate } = useHideDisclaimerMutation(item.title, kind);
+    const { mutateAsync: createMercuryoProUrl } = useCreateMercuryoProUrl();
 
-    const onForceOpen = () => {
+    const onForceOpen = async () => {
         track(item.action_button.url);
-        sdk.openPage(replacePlaceholders(item.action_button.url, config, wallet, fiat, kind));
+
+        let urlToOpen = item.action_button.url;
+        if (item.id === 'mercuryo_pro') {
+            urlToOpen = await createMercuryoProUrl(item.action_button.url);
+        }
+        sdk.openPage(replacePlaceholders(urlToOpen, config, wallet, fiat, kind));
         setOpen(false);
     };
     const onOpen: React.MouseEventHandler<HTMLDivElement> = () => {
@@ -213,7 +244,10 @@ export const BuyItemNotification: FC<{
                     <Description>
                         <Logo src={item.icon_url} />
                         <Text>
-                            <Label1>{item.title}</Label1>
+                            <Label1Styled>
+                                {item.title}
+                                {item.badge && <Badge>{item.badge}</Badge>}
+                            </Label1Styled>
                             <Body>{item.description}</Body>
                         </Text>
                     </Description>
@@ -226,7 +260,10 @@ export const BuyItemNotification: FC<{
                 {() => (
                     <NotificationBlock>
                         <Logo large src={item.icon_url} />
-                        <H3>{item.title}</H3>
+                        <H3Styled>
+                            {item.title}
+                            {item.badge && <Badge>{item.badge}</Badge>}
+                        </H3Styled>
                         <Center>
                             <Body>{item.description}</Body>
                         </Center>

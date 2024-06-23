@@ -77,6 +77,9 @@ const SendNftNotification = React.lazy(
 const PairSignerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
 );
+const PairKeystoneNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
+);
 const SignerLinkPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/signer/LinkPage'));
 const SignerPublishNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/pages/signer/PublishNotification')
@@ -187,12 +190,12 @@ export const Loader: FC = () => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
-    const tonendpoint = useTonendpoint(
-        TARGET_ENV,
-        sdk.version,
-        activeWallet?.network,
-        activeWallet?.lang
-    );
+    const tonendpoint = useTonendpoint({
+          targetEnv: TARGET_ENV,
+          build: sdk.version,
+          network: activeWallet?.network,
+          lang: activeWallet?.lang
+    });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
@@ -382,6 +385,7 @@ export const Content: FC<{
                     <SignerPublishNotification />
                     <ConnectLedgerNotification />
                     <SwapMobileNotification />
+                    <PairKeystoneNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>

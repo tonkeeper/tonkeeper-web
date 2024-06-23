@@ -36,9 +36,9 @@ export interface BlockchainConfig14 {
 /**
  * Check if a given object implements the BlockchainConfig14 interface.
  */
-export function instanceOfBlockchainConfig14(value: object): boolean {
-    if (!('masterchainBlockFee' in value)) return false;
-    if (!('basechainBlockFee' in value)) return false;
+export function instanceOfBlockchainConfig14(value: object): value is BlockchainConfig14 {
+    if (!('masterchainBlockFee' in value) || value['masterchainBlockFee'] === undefined) return false;
+    if (!('basechainBlockFee' in value) || value['basechainBlockFee'] === undefined) return false;
     return true;
 }
 

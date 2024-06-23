@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { BlockchainBlock } from './BlockchainBlock';
+import {
+    BlockchainBlockFromJSON,
+    BlockchainBlockFromJSONTyped,
+    BlockchainBlockToJSON,
+} from './BlockchainBlock';
+
 /**
  * 
  * @export
@@ -25,13 +32,20 @@ export interface BlockchainBlockShardsShardsInner {
      * @memberof BlockchainBlockShardsShardsInner
      */
     lastKnownBlockId: string;
+    /**
+     * 
+     * @type {BlockchainBlock}
+     * @memberof BlockchainBlockShardsShardsInner
+     */
+    lastKnownBlock: BlockchainBlock;
 }
 
 /**
  * Check if a given object implements the BlockchainBlockShardsShardsInner interface.
  */
-export function instanceOfBlockchainBlockShardsShardsInner(value: object): boolean {
-    if (!('lastKnownBlockId' in value)) return false;
+export function instanceOfBlockchainBlockShardsShardsInner(value: object): value is BlockchainBlockShardsShardsInner {
+    if (!('lastKnownBlockId' in value) || value['lastKnownBlockId'] === undefined) return false;
+    if (!('lastKnownBlock' in value) || value['lastKnownBlock'] === undefined) return false;
     return true;
 }
 
@@ -46,6 +60,7 @@ export function BlockchainBlockShardsShardsInnerFromJSONTyped(json: any, ignoreD
     return {
         
         'lastKnownBlockId': json['last_known_block_id'],
+        'lastKnownBlock': BlockchainBlockFromJSON(json['last_known_block']),
     };
 }
 
@@ -56,6 +71,7 @@ export function BlockchainBlockShardsShardsInnerToJSON(value?: BlockchainBlockSh
     return {
         
         'last_known_block_id': value['lastKnownBlockId'],
+        'last_known_block': BlockchainBlockToJSON(value['lastKnownBlock']),
     };
 }
 

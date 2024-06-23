@@ -8,7 +8,7 @@ import { useAssetImage } from '../../../state/asset';
 import { Body2, Body3, Label2, Num2 } from '../../Text';
 import { useRate } from '../../../state/rates';
 import { useAppContext } from '../../../hooks/appContext';
-import { formatFiatCurrency } from '../../../hooks/balance';
+import { formatFiatCurrency, useFormatCoinValue } from '../../../hooks/balance';
 import { ListBlock, ListItem } from '../../List';
 import { useWalletState } from '../../../state/wallet';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
@@ -29,6 +29,8 @@ import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { MultiSendReceiversNotification } from './MultiSendReceiversNotification';
+import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 const ConfirmWrapper = styled.div`
     display: flex;
@@ -135,13 +137,13 @@ const MultiSendConfirmContent: FC<{
         onOpen: allRowsOnOpen
     } = useDisclosure();
     const image = useAssetImage(asset);
-    const { data: rate } = useRate(
+    const { data: rate, isFetched: isRateFetched } = useRate(
         typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
     );
     const { data: tonRate } = useRate('TON');
 
     const { willBeSent, willBeSentBN, bnAmounts } = useMemo(
-        () => getWillBeMultiSendValue(form.rows, asset, rate ? { prices: rate.prices } : undefined),
+        () => getWillBeMultiSendValue(form.rows, asset, rate || { prices: 0 }),
         [form.rows, asset, rate?.prices]
     );
 
@@ -174,7 +176,11 @@ const MultiSendConfirmContent: FC<{
     } = useEstimateMultiTransfer();
 
     useEffect(() => {
-        estimate({ form: formTokenized, asset }).catch(() => setTimeout(onClose, 5000));
+        estimate({ form: formTokenized, asset }).catch(e => {
+            if (!(e instanceof NotEnoughBalanceError)) {
+                setTimeout(onClose, 5000);
+            }
+        });
     }, [asset, formTokenized]);
 
     const tonFee = estimateData?.fee.stringAssetRelativeAmount;
@@ -248,8 +254,8 @@ const MultiSendConfirmContent: FC<{
                             navigate(AppRoute.activity);
                         }, 2000);
                     }}
-                    isLoading={estimateLoading || !rate}
-                    estimationError={!!estimateError}
+                    isLoading={estimateLoading || !isRateFetched}
+                    estimationError={estimateError}
                 />
             </ConfirmWrapper>
             <MultiSendReceiversNotification
@@ -262,13 +268,25 @@ const MultiSendConfirmContent: FC<{
     );
 };
 
+const ExclamationMarkCircleIconStyled = styled(ExclamationMarkCircleIcon)`
+    flex-shrink: 0;
+`;
+
+const ResultButtonStyled = styled(ResultButton)`
+    height: fit-content;
+
+    ${Label2} {
+        text-align: center;
+    }
+`;
+
 const ButtonBlock: FC<{
     onSuccess: () => void;
     isLoading: boolean;
     form: MultiSendFormTokenized;
     asset: TonAsset;
     feeEstimation: BigNumber | undefined;
-    estimationError: boolean;
+    estimationError: Error | null;
 }> = ({ onSuccess, form, asset, feeEstimation, isLoading, estimationError }) => {
     const { t } = useTranslation();
     const {
@@ -278,6 +296,8 @@ const ButtonBlock: FC<{
         data: doneSend
     } = useSendMultiTransfer();
 
+    const format = useFormatCoinValue();
+
     const onClick = async () => {
         const confirmed = await send({ form, asset, feeEstimation: feeEstimation! });
         if (confirmed) {
@@ -285,10 +305,27 @@ const ButtonBlock: FC<{
         }
     };
 
+    if (estimationError instanceof NotEnoughBalanceError) {
+        const balance = format(estimationError.balanceWei, TON_ASSET.decimals) + ' TON';
+        const requiredBalance =
+            format(estimationError.requiredBalanceWei, TON_ASSET.decimals) + ' TON';
+
+        return (
+            <ResultButtonStyled>
+                <ExclamationMarkCircleIconStyled />
+                <Label2>
+                    {t('multisend_confirm_error_insufficient_ton_for_fee')
+                        .replace('%balance%', balance)
+                        .replace('%required%', requiredBalance)}
+                </Label2>
+            </ResultButtonStyled>
+        );
+    }
+
     if (estimationError) {
         return (
             <ResultButton>
-                <ExclamationMarkCircleIcon />
+                <ExclamationMarkCircleIconStyled />
                 <Label2>{t('send_fee_estimation_error')}</Label2>
             </ResultButton>
         );
@@ -306,7 +343,7 @@ const ButtonBlock: FC<{
     if (error) {
         return (
             <ResultButton>
-                <ExclamationMarkCircleIcon />
+                <ExclamationMarkCircleIconStyled />
                 <Label2>{t('send_publish_tx_error')}</Label2>
             </ResultButton>
         );

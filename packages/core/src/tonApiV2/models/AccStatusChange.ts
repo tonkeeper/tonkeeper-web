@@ -26,7 +26,14 @@ export type AccStatusChange = typeof AccStatusChange[keyof typeof AccStatusChang
 
 
 export function instanceOfAccStatusChange(value: any): boolean {
-    return Object.values(AccStatusChange).includes(value);
+    for (const key in AccStatusChange) {
+        if (Object.prototype.hasOwnProperty.call(AccStatusChange, key)) {
+            if ((AccStatusChange as Record<string, AccStatusChange>)[key] === value) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 export function AccStatusChangeFromJSON(json: any): AccStatusChange {

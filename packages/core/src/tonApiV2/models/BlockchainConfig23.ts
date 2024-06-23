@@ -37,8 +37,8 @@ export interface BlockchainConfig23 {
 /**
  * Check if a given object implements the BlockchainConfig23 interface.
  */
-export function instanceOfBlockchainConfig23(value: object): boolean {
-    if (!('blockLimits' in value)) return false;
+export function instanceOfBlockchainConfig23(value: object): value is BlockchainConfig23 {
+    if (!('blockLimits' in value) || value['blockLimits'] === undefined) return false;
     return true;
 }
 

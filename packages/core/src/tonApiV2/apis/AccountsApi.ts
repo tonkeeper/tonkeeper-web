@@ -26,9 +26,10 @@ import type {
   GetAccountDiff200Response,
   GetAccountPublicKey200Response,
   GetAccountsRequest,
+  JettonBalance,
   JettonsBalances,
   NftItems,
-  ReduceIndexingLatencyDefaultResponse,
+  StatusDefaultResponse,
   Subscriptions,
   TraceIDs,
 } from '../models/index';
@@ -55,12 +56,14 @@ import {
     GetAccountPublicKey200ResponseToJSON,
     GetAccountsRequestFromJSON,
     GetAccountsRequestToJSON,
+    JettonBalanceFromJSON,
+    JettonBalanceToJSON,
     JettonsBalancesFromJSON,
     JettonsBalancesToJSON,
     NftItemsFromJSON,
     NftItemsToJSON,
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
     SubscriptionsFromJSON,
     SubscriptionsToJSON,
     TraceIDsFromJSON,
@@ -108,6 +111,12 @@ export interface GetAccountEventsRequest {
     endDate?: number;
 }
 
+export interface GetAccountJettonBalanceRequest {
+    accountId: string;
+    jettonId: string;
+    currencies?: Array<string>;
+}
+
 export interface GetAccountJettonHistoryByIDRequest {
     accountId: string;
     jettonId: string;
@@ -150,6 +159,7 @@ export interface GetAccountSubscriptionsRequest {
 
 export interface GetAccountTracesRequest {
     accountId: string;
+    beforeLt?: number;
     limit?: number;
 }
 
@@ -284,6 +294,22 @@ export interface AccountsApiInterface {
     getAccountEvents(requestParameters: GetAccountEventsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents>;
 
     /**
+     * Get Jetton balance by owner address
+     * @param {string} accountId account ID
+     * @param {string} jettonId jetton ID
+     * @param {Array<string>} [currencies] accept ton and all possible fiat currencies, separated by commas
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApiInterface
+     */
+    getAccountJettonBalanceRaw(requestParameters: GetAccountJettonBalanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JettonBalance>>;
+
+    /**
+     * Get Jetton balance by owner address
+     */
+    getAccountJettonBalance(requestParameters: GetAccountJettonBalanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonBalance>;
+
+    /**
      * Get the transfer jetton history for account and jetton
      * @param {string} accountId account ID
      * @param {string} jettonId jetton ID
@@ -386,6 +412,7 @@ export interface AccountsApiInterface {
     /**
      * Get traces for account
      * @param {string} accountId account ID
+     * @param {number} [beforeLt] omit this parameter to get last events
      * @param {number} [limit] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -755,6 +782,50 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
     }
 
     /**
+     * Get Jetton balance by owner address
+     */
+    async getAccountJettonBalanceRaw(requestParameters: GetAccountJettonBalanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JettonBalance>> {
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountJettonBalance().'
+            );
+        }
+
+        if (requestParameters['jettonId'] == null) {
+            throw new runtime.RequiredError(
+                'jettonId',
+                'Required parameter "jettonId" was null or undefined when calling getAccountJettonBalance().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['currencies'] != null) {
+            queryParameters['currencies'] = requestParameters['currencies']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/accounts/{account_id}/jettons/{jetton_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))).replace(`{${"jetton_id"}}`, encodeURIComponent(String(requestParameters['jettonId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => JettonBalanceFromJSON(jsonValue));
+    }
+
+    /**
+     * Get Jetton balance by owner address
+     */
+    async getAccountJettonBalance(requestParameters: GetAccountJettonBalanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonBalance> {
+        const response = await this.getAccountJettonBalanceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Get the transfer jetton history for account and jetton
      */
     async getAccountJettonHistoryByIDRaw(requestParameters: GetAccountJettonHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>> {
@@ -1045,6 +1116,10 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['beforeLt'] != null) {
+            queryParameters['before_lt'] = requestParameters['beforeLt'];
+        }
 
         if (requestParameters['limit'] != null) {
             queryParameters['limit'] = requestParameters['limit'];

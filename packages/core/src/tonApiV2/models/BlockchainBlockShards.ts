@@ -37,8 +37,8 @@ export interface BlockchainBlockShards {
 /**
  * Check if a given object implements the BlockchainBlockShards interface.
  */
-export function instanceOfBlockchainBlockShards(value: object): boolean {
-    if (!('shards' in value)) return false;
+export function instanceOfBlockchainBlockShards(value: object): value is BlockchainBlockShards {
+    if (!('shards' in value) || value['shards'] === undefined) return false;
     return true;
 }
 

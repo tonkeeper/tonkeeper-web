@@ -17,8 +17,8 @@ import * as runtime from '../runtime';
 import type {
   Accounts,
   GetWalletBackup200Response,
-  ReduceIndexingLatencyDefaultResponse,
   Seqno,
+  StatusDefaultResponse,
   TonConnectProof200Response,
   TonConnectProofRequest,
 } from '../models/index';
@@ -27,10 +27,10 @@ import {
     AccountsToJSON,
     GetWalletBackup200ResponseFromJSON,
     GetWalletBackup200ResponseToJSON,
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
     SeqnoFromJSON,
     SeqnoToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
     TonConnectProof200ResponseFromJSON,
     TonConnectProof200ResponseToJSON,
     TonConnectProofRequestFromJSON,

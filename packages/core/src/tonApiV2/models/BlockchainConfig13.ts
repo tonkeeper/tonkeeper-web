@@ -42,10 +42,10 @@ export interface BlockchainConfig13 {
 /**
  * Check if a given object implements the BlockchainConfig13 interface.
  */
-export function instanceOfBlockchainConfig13(value: object): boolean {
-    if (!('deposit' in value)) return false;
-    if (!('bitPrice' in value)) return false;
-    if (!('cellPrice' in value)) return false;
+export function instanceOfBlockchainConfig13(value: object): value is BlockchainConfig13 {
+    if (!('deposit' in value) || value['deposit'] === undefined) return false;
+    if (!('bitPrice' in value) || value['bitPrice'] === undefined) return false;
+    if (!('cellPrice' in value) || value['cellPrice'] === undefined) return false;
     return true;
 }
 

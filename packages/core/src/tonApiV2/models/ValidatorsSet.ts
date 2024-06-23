@@ -67,12 +67,12 @@ export interface ValidatorsSet {
 /**
  * Check if a given object implements the ValidatorsSet interface.
  */
-export function instanceOfValidatorsSet(value: object): boolean {
-    if (!('utimeSince' in value)) return false;
-    if (!('utimeUntil' in value)) return false;
-    if (!('total' in value)) return false;
-    if (!('main' in value)) return false;
-    if (!('list' in value)) return false;
+export function instanceOfValidatorsSet(value: object): value is ValidatorsSet {
+    if (!('utimeSince' in value) || value['utimeSince'] === undefined) return false;
+    if (!('utimeUntil' in value) || value['utimeUntil'] === undefined) return false;
+    if (!('total' in value) || value['total'] === undefined) return false;
+    if (!('main' in value) || value['main'] === undefined) return false;
+    if (!('list' in value) || value['list'] === undefined) return false;
     return true;
 }
 

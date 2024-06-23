@@ -4,8 +4,8 @@ import { Network } from '../entries/network';
 import { DAppTrack } from '../service/urlService';
 import { FetchAPI } from '../tonApiV2';
 
-interface BootParams {
-    platform: 'ios' | 'android' | 'web';
+export interface BootParams {
+    platform: 'ios' | 'android' | 'web' | 'desktop';
     lang: 'en' | 'ru' | string;
     build: string; // "2.8.0"
     network: Network;
@@ -49,6 +49,8 @@ export interface TonendpointConfig {
 
     web_swaps_url?: string;
     web_swaps_referral_address?: string;
+
+    mercuryo_otc_id?: string;
 
     /**
      * @deprecated use ton api

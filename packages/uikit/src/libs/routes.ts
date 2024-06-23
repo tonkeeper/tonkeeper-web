@@ -27,7 +27,8 @@ export enum ImportRoute {
     import = '/import',
     create = '/create',
     signer = '/signer',
-    ledger = '/ledger'
+    ledger = '/ledger',
+    keystone = '/keystone'
 }
 
 export enum SettingsRoute {
@@ -52,7 +53,8 @@ export enum WalletSettingsRoute {
     index = '/',
     recovery = '/recovery',
     version = '/version',
-    jettons = '/jettons'
+    jettons = '/jettons',
+    connectedApps = '/connected-apps'
 }
 
 export enum BrowserRoute {

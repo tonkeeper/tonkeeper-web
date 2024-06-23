@@ -43,9 +43,9 @@ export interface AccountEvents {
 /**
  * Check if a given object implements the AccountEvents interface.
  */
-export function instanceOfAccountEvents(value: object): boolean {
-    if (!('events' in value)) return false;
-    if (!('nextFrom' in value)) return false;
+export function instanceOfAccountEvents(value: object): value is AccountEvents {
+    if (!('events' in value) || value['events'] === undefined) return false;
+    if (!('nextFrom' in value) || value['nextFrom'] === undefined) return false;
     return true;
 }
 

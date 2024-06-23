@@ -8,7 +8,7 @@ import { useSwapsConfig } from './useSwapsConfig';
 import BigNumber from 'bignumber.js';
 import { useSwapOptions } from './useSwapOptions';
 
-export function useExecuteSwap() {
+export function useEncodeSwap() {
     const { active } = useWalletContext();
     const { swapService } = useSwapsConfig();
     const { config } = useAppContext();

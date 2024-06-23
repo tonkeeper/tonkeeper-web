@@ -1,0 +1,51 @@
+name: Tonkeeper Build Extension
+on:
+    workflow_dispatch:
+jobs:
+    extension-build:
+        name: extension-build
+        runs-on: macos-14
+        timeout-minutes: 10
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.11.1
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Run install
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: install
+
+            - name: Run build
+              uses: borales/actions-yarn@v5
+              env:
+                  REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
+                  REACT_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
+                  REACT_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
+              with:
+                  cmd: build:extension
+
+            - name: Upload Extension Chrome to artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: Extension Chrome
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/extension/dist/chrome
+
+            - name: Upload Extension Firefox to artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: Extension Firefox
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/extension/dist/firefox

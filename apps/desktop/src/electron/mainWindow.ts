@@ -73,9 +73,6 @@ export abstract class MainWindow {
             { urls: [] },
             (details, callback) => {
                 cookieJar.getCookies(details.url).then(cookies => {
-                    if (!cookies.length) {
-                        return callback({});
-                    }
                     const result = cookies
                         .map(cookie => `${cookie.key}=${cookie.value}`)
                         .join('; ');
@@ -99,6 +96,15 @@ export abstract class MainWindow {
 
         this.mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
             const setCookie = details.responseHeaders['set-cookie'] ?? [];
+
+            /* patch mercuryo cors  */
+            if (details.url.startsWith('https://api.mercuryo.io')) {
+                const corsHeader =
+                    Object.keys(details.responseHeaders).find(
+                        k => k.toLowerCase() === 'access-control-allow-origin'
+                    ) || 'access-control-allow-origin';
+                details.responseHeaders[corsHeader] = ['*'];
+            }
 
             /* patch tg auth headers cors  */
             if (details.url === 'https://oauth.telegram.org/auth/get') {

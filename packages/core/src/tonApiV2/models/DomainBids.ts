@@ -37,8 +37,8 @@ export interface DomainBids {
 /**
  * Check if a given object implements the DomainBids interface.
  */
-export function instanceOfDomainBids(value: object): boolean {
-    if (!('data' in value)) return false;
+export function instanceOfDomainBids(value: object): value is DomainBids {
+    if (!('data' in value) || value['data'] === undefined) return false;
     return true;
 }
 

@@ -30,8 +30,8 @@ export interface GetRawTime200Response {
 /**
  * Check if a given object implements the GetRawTime200Response interface.
  */
-export function instanceOfGetRawTime200Response(value: object): boolean {
-    if (!('time' in value)) return false;
+export function instanceOfGetRawTime200Response(value: object): value is GetRawTime200Response {
+    if (!('time' in value) || value['time'] === undefined) return false;
     return true;
 }
 

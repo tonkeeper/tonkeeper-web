@@ -56,21 +56,3 @@ export const waitApprove = <Payload>(id: number, popupId?: number) => {
     backgroundEventsEmitter.on('closedPopUp', close);
   });
 };
-
-export const checkDAppConnection = async (
-  storage: IStorage,
-  origin: string,
-  from?: TonConnectAccount
-) => {
-  const wallet = await getCurrentWallet(storage);
-
-  const connections = await getAccountConnection(storage, wallet);
-
-  const connection = connections.find((item) => item.webViewUrl === origin);
-  if (!connection) {
-    throw new TonConnectError(
-      "dApp don't have an access to wallet",
-      CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
-    );
-  }
-};

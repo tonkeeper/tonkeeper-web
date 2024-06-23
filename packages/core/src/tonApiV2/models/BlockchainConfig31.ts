@@ -30,8 +30,8 @@ export interface BlockchainConfig31 {
 /**
  * Check if a given object implements the BlockchainConfig31 interface.
  */
-export function instanceOfBlockchainConfig31(value: object): boolean {
-    if (!('fundamentalSmcAddr' in value)) return false;
+export function instanceOfBlockchainConfig31(value: object): value is BlockchainConfig31 {
+    if (!('fundamentalSmcAddr' in value) || value['fundamentalSmcAddr'] === undefined) return false;
     return true;
 }
 
