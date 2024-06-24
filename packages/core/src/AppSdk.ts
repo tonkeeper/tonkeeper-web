@@ -50,6 +50,7 @@ export interface UIEvents {
     addSuggestion: LatestSuggestion;
     editSuggestion: FavoriteSuggestion;
     response: any;
+    toast: string;
 }
 
 export interface NativeBackButton {

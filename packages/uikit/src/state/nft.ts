@@ -6,8 +6,11 @@ import { useActiveWalletConfig, useMutateActiveWalletConfig } from './wallet';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { useTonenpointConfig } from './tonendpoint';
 import { ActiveWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
+import { useTranslation } from '../hooks/translation';
 
-type NftWithCollectionId = Pick<NFT, 'address'> & { collection?: NFT['collection'] };
+type NftWithCollectionId = Pick<NFT, 'address'> & {
+    collection?: Pick<Required<NFT>['collection'], 'address'>;
+};
 
 export const useMarkNftAsSpam = () => {
     const wallet = useWalletContext();
@@ -15,14 +18,15 @@ export const useMarkNftAsSpam = () => {
     const { mutateAsync } = useMutateActiveWalletConfig();
     const { tonendpoint } = useAppContext();
     const { data: tonendpointConfig } = useTonenpointConfig(tonendpoint);
-    return useMutation<void, Error, NftWithCollectionId | string>(async nft => {
+    const { t } = useTranslation();
+    return useMutation<void, Error, NftWithCollectionId>(async nft => {
         let config = await getActiveWalletConfig(
             sdk.storage,
             wallet.active.rawAddress,
             wallet.network
         );
 
-        const address = typeof nft === 'string' ? nft : nft.collection?.address || nft.address;
+        const address = nft.collection?.address || nft.address;
 
         if (!config.spamNfts.includes(address) && tonendpointConfig?.scam_api_url) {
             let baseUrl = tonendpointConfig?.scam_api_url;
@@ -45,6 +49,11 @@ export const useMarkNftAsSpam = () => {
         };
 
         await mutateAsync(config);
+        sdk.topMessage(
+            nft.collection?.address
+                ? t('suspicious_status_update_spam_collection')
+                : t('suspicious_status_update_spam_nft')
+        );
     });
 };
 
@@ -75,14 +84,15 @@ export const useHideNft = () => {
     const wallet = useWalletContext();
     const sdk = useAppSdk();
     const { mutateAsync } = useMutateActiveWalletConfig();
-    return useMutation<void, Error, NftWithCollectionId | string>(async nft => {
+    const { t } = useTranslation();
+    return useMutation<void, Error, NftWithCollectionId>(async nft => {
         let config = await getActiveWalletConfig(
             sdk.storage,
             wallet.active.rawAddress,
             wallet.network
         );
 
-        const address = typeof nft === 'string' ? nft : nft.collection?.address || nft.address;
+        const address = nft.collection?.address || nft.address;
 
         if (config.hiddenNfts.includes(address)) {
             return;
@@ -94,6 +104,11 @@ export const useHideNft = () => {
         };
 
         await mutateAsync(config);
+        sdk.topMessage(
+            nft.collection?.address
+                ? t('suspicious_status_update_hidden_collection')
+                : t('suspicious_status_update_hidden_nft')
+        );
     });
 };
 

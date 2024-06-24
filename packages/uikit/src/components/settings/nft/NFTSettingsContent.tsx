@@ -198,7 +198,13 @@ export const NFTSettingsContent = () => {
                 <NftsSection
                     collections={visibleCollections}
                     type="visible"
-                    onClick={c => hideNft(c.address)}
+                    onClick={c =>
+                        hideNft(
+                            c.type === 'collection'
+                                ? { collection: { address: c.address }, address: c.address }
+                                : { address: c.address }
+                        )
+                    }
                 />
             )}
             {hiddenCollections.length > 0 && (

@@ -307,9 +307,9 @@ const NftActivityHeader: FC<{
 
     const handleCloseSpamModal = (action?: 'mark_spam' | 'mark_trusted') => {
         if (action === 'mark_spam') {
-            markNftAsSpam(data?.collection?.address || data!.address);
+            markNftAsSpam(data!);
         } else if (action === 'mark_trusted') {
-            markNftAsTrusted(data?.collection?.address || data!.address);
+            markNftAsTrusted(data!);
         }
         onCloseSpamModal();
     };
