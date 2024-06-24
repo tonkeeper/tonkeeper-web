@@ -20,7 +20,7 @@ export const getActiveWalletConfig = async (
 ) => {
     const raw = Address.parse(address).toRawString();
     const config = await storage.get<ActiveWalletConfig>(
-        `${AppKey.WALLET_CONFIG}_${raw}_${network}`
+        `${AppKey.WALLET_CONFIG}_${raw}_${network ?? Network.MAINNET}`
     );
 
     if (!config) {
@@ -36,5 +36,5 @@ export const setActiveWalletConfig = async (
     config: ActiveWalletConfig
 ) => {
     const raw = Address.parse(address).toRawString();
-    await storage.set(`${AppKey.WALLET_CONFIG}_${raw}_${network}`, config);
+    await storage.set(`${AppKey.WALLET_CONFIG}_${raw}_${network ?? Network.MAINNET}`, config);
 };
