@@ -9,7 +9,7 @@ import { TabsView } from '../../components/home/TabsView';
 import { HomeActions } from '../../components/home/TonActions';
 import { useAssets } from '../../state/home';
 import { usePreFetchRates } from '../../state/rates';
-import { useWalletNftList } from '../../state/wallet';
+import { useWalletFilteredNftList } from '../../state/wallet';
 
 const HomeAssets: FC<{
     assets: AssetData;
@@ -30,7 +30,7 @@ const Home = () => {
 
     const [assets, error, isAssetLoading] = useAssets();
 
-    const { data: nfts, isFetching: isNftLoading } = useWalletNftList();
+    const { data: nfts, isFetching: isNftLoading } = useWalletFilteredNftList();
 
     const isLoading = isAssetLoading || isNftLoading;
 

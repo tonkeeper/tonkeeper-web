@@ -19,12 +19,12 @@ import { H3 } from '../../components/Text';
 import { useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import {
-    useActiveWalletConfig,
     useJettonRawList,
     useSavePinnedJettonOrderMutation,
     useToggleHideJettonMutation,
     useTogglePinJettonMutation
 } from '../../state/jetton';
+import { useActiveWalletConfig } from '../../state/wallet';
 
 const TurnOnIcon = styled.span`
     color: ${props => props.theme.accentBlue};

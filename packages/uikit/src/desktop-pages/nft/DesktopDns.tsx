@@ -1,16 +1,20 @@
 import { NftsList } from '../../components/nft/Nfts';
-import { useWalletNftList } from '../../state/wallet';
+import { useWalletFilteredNftList } from '../../state/wallet';
 import styled from 'styled-components';
 import { Body2, Label2 } from '../../components/Text';
 import { Button } from '../../components/fields/Button';
-import { Link } from 'react-router-dom';
-import { AppRoute } from '../../libs/routes';
+import { Link, useNavigate } from 'react-router-dom';
+import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useTranslation } from '../../hooks/translation';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
+import { useMemo } from 'react';
+import { KnownNFTDnsCollections } from '../../components/nft/NftView';
+import { SlidersIcon } from '../../components/Icon';
+import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -62,21 +66,36 @@ const LinkStyled = styled(Link)`
     margin: 0 auto;
 `;
 
-export const DesktopPurchases = () => {
-    const { data: nfts } = useWalletNftList();
+const SettingsButtonStyled = styled(IconButtonTransparentBackground)`
+    margin-left: auto;
+`;
+
+export const DesktopDns = () => {
+    const { data: nfts } = useWalletFilteredNftList();
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const { ref: scrollRef, closeTop } = useIsScrolled();
 
-    if (!nfts) {
+    const filteredNft = useMemo(
+        () =>
+            nfts?.filter(
+                nft =>
+                    nft.collection?.address &&
+                    KnownNFTDnsCollections.includes(nft.collection.address)
+            ),
+        [nfts]
+    );
+
+    if (!filteredNft) {
         return null;
     }
 
-    if (!nfts.length) {
+    if (!filteredNft.length) {
         return (
             <NFTEmptyPage>
                 <NFTEmptyContainer>
-                    <Label2>{t('nft_empty_header')}</Label2>
+                    <Label2>{t('domains_empty_header')}</Label2>
                     <Body2>{t('nft_empty_description')}</Body2>
                     <LinkStyled to={AppRoute.browser}>
                         <Button size="small">{t('nft_empty_go_discover_button')}</Button>
@@ -89,9 +108,14 @@ export const DesktopPurchases = () => {
     return (
         <DesktopViewPageLayout ref={scrollRef}>
             <DesktopViewHeader borderBottom={!closeTop}>
-                <Label2>{t('page_header_purchases')}</Label2>
+                <Label2>{t('wallet_aside_domains')}</Label2>
+                <SettingsButtonStyled
+                    onClick={() => navigate(AppRoute.walletSettings + WalletSettingsRoute.nft)}
+                >
+                    <SlidersIcon />
+                </SettingsButtonStyled>
             </DesktopViewHeader>
-            <NFTPageBody>{nfts && <NftsListStyled nfts={nfts} />}</NFTPageBody>
+            <NFTPageBody>{filteredNft && <NftsListStyled nfts={filteredNft} />}</NFTPageBody>
         </DesktopViewPageLayout>
     );
 };

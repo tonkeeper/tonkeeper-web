@@ -29,17 +29,22 @@ declare module 'styled-components' {
         buttonSecondaryForeground: string;
         buttonTertiaryBackground: string;
         buttonTertiaryForeground: string;
+        buttonWarnBackground: string;
+        buttonWarnForeground: string;
         buttonPrimaryBackgroundDisabled: string;
         buttonSecondaryBackgroundDisabled: string;
         buttonTertiaryBackgroundDisabled: string;
+        buttonWarnBackgroundDisabled: string;
 
         buttonPrimaryBackgroundHighlighted: string;
         buttonSecondaryBackgroundHighlighted: string;
         buttonTertiaryBackgroundHighlighted: string;
+        buttonWarnBackgroundHighlighted: string;
 
         buttonTertiaryForegroundDisabled: string;
         buttonSecondaryForegroundDisabled: string;
         buttonPrimaryForegroundDisabled: string;
+        buttonWarnForegroundDisabled: string;
 
         fieldBackground: string;
         fieldActiveBorder: string;

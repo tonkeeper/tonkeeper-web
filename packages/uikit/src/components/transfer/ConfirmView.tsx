@@ -34,7 +34,7 @@ import {
 import { Label2 } from '../Text';
 import { TransferComment } from '../activity/ActivityDetailsLayout';
 import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
-import { BackButton } from '../fields/BackButton';
+import { RoundedButton } from '../fields/RoundedButton';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
@@ -213,9 +213,9 @@ export const ConfirmViewTitle: FC<PropsWithChildren> = () => {
     return (
         <NotificationTitleBlock>
             {onBack ? (
-                <BackButton onClick={onBack}>
+                <RoundedButton onClick={onBack}>
                     <ChevronLeftIcon />
-                </BackButton>
+                </RoundedButton>
             ) : (
                 <div />
             )}

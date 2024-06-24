@@ -9,6 +9,7 @@ export interface ButtonProps {
     size?: 'small' | 'medium' | 'large';
     primary?: boolean;
     secondary?: boolean;
+    warn?: boolean;
     disabled?: boolean;
     fullWidth?: boolean;
     fitContent?: boolean;
@@ -142,6 +143,10 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
                 return css`
                     background-color: ${props.theme.buttonSecondaryBackgroundHighlighted};
                 `;
+            } else if (props.warn) {
+                return css`
+                    background-color: ${props.theme.buttonWarnBackgroundHighlighted};
+                `;
             } else {
                 return css`
                     background-color: ${props.theme.buttonTertiaryBackgroundHighlighted};
@@ -173,6 +178,18 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
                 return css`
                     color: ${props.theme.buttonSecondaryForeground};
                     background-color: ${props.theme.buttonSecondaryBackground};
+                `;
+            }
+        } else if (props.warn) {
+            if (props.disabled) {
+                return css`
+                    color: ${props.theme.buttonWarnForegroundDisabled};
+                    background-color: ${props.theme.buttonWarnBackgroundDisabled};
+                `;
+            } else {
+                return css`
+                    color: ${props.theme.buttonWarnForeground};
+                    background-color: ${props.theme.buttonWarnBackground};
                 `;
             }
         } else {

@@ -9,6 +9,7 @@ import {
     NotCoinIcon,
     SaleBadgeIcon,
     SettingsSmoothIcon,
+    SparkIcon,
     SwapIcon
 } from '../../Icon';
 import { Label2 } from '../../Text';
@@ -67,7 +68,15 @@ export const WalletAsideMenu = () => {
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SaleBadgeIcon />
-                        <Label2>{t('wallet_aside_purchases')}</Label2>
+                        <Label2>{t('wallet_aside_collectibles')}</Label2>
+                    </AsideMenuItemStyled>
+                )}
+            </NavLink>
+            <NavLink to={AppRoute.dns}>
+                {({ isActive }) => (
+                    <AsideMenuItemStyled isSelected={isActive}>
+                        <SparkIcon />
+                        <Label2>{t('wallet_aside_domains')}</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
@@ -79,19 +88,19 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            <NavLink to={AppRoute.walletSettings}>
-                {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
-                        <SettingsSmoothIcon />
-                        <Label2>{t('wallet_aside_settings')}</Label2>
-                    </AsideMenuItemStyled>
-                )}
-            </NavLink>
             <NavLink to={AppRoute.notcoin}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <NotCoinIcon />
                         <Label2>NOT Vouchers</Label2>
+                    </AsideMenuItemStyled>
+                )}
+            </NavLink>
+            <NavLink to={AppRoute.walletSettings}>
+                {({ isActive }) => (
+                    <AsideMenuItemStyled isSelected={isActive}>
+                        <SettingsSmoothIcon />
+                        <Label2>{t('wallet_aside_settings')}</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>

@@ -7,7 +7,7 @@ import { useTranslation } from '../hooks/translation';
 import { AppRoute } from '../libs/routes';
 import { ChevronLeftIcon } from './Icon';
 import { Label2 } from './Text';
-import { BackButton } from './fields/BackButton';
+import { RoundedButton } from './fields/RoundedButton';
 
 const BackBlock = styled.div`
     position: absolute;
@@ -38,9 +38,9 @@ export const BackButtonBlock: FC<{ onClick: () => void }> = ({ onClick }) => {
     } else {
         return (
             <BackBlock>
-                <BackButton onClick={onClick}>
+                <RoundedButton onClick={onClick}>
                     <ChevronLeftIcon />
-                </BackButton>
+                </RoundedButton>
             </BackBlock>
         );
     }

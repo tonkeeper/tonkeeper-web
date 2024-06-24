@@ -5,10 +5,12 @@ import { Network } from '../../entries/network';
 import { ActiveWalletConfig } from '../../entries/wallet';
 
 const defaultConfig: ActiveWalletConfig = {
-    pinnedHfts: [],
-    hiddenHfts: [],
+    pinnedNfts: [],
+    hiddenNfts: [],
     pinnedTokens: [],
-    hiddenTokens: []
+    hiddenTokens: [],
+    trustedNfts: [],
+    spamNfts: []
 };
 
 export const getActiveWalletConfig = async (
@@ -18,13 +20,13 @@ export const getActiveWalletConfig = async (
 ) => {
     const raw = Address.parse(address).toRawString();
     const config = await storage.get<ActiveWalletConfig>(
-        `${AppKey.WALLET_CONFIG}_${raw}_${network}`
+        `${AppKey.WALLET_CONFIG}_${raw}_${network ?? Network.MAINNET}`
     );
 
     if (!config) {
         return defaultConfig;
     }
-    return Object.assign(defaultConfig, config);
+    return { ...defaultConfig, ...config };
 };
 
 export const setActiveWalletConfig = async (
@@ -34,5 +36,5 @@ export const setActiveWalletConfig = async (
     config: ActiveWalletConfig
 ) => {
     const raw = Address.parse(address).toRawString();
-    await storage.set(`${AppKey.WALLET_CONFIG}_${raw}_${network}`, config);
+    await storage.set(`${AppKey.WALLET_CONFIG}_${raw}_${network ?? Network.MAINNET}`, config);
 };

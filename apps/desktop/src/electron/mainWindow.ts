@@ -97,17 +97,14 @@ export abstract class MainWindow {
         this.mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
             const setCookie = details.responseHeaders['set-cookie'] ?? [];
 
-            /* patch mercuryo cors  */
-            if (details.url.startsWith('https://api.mercuryo.io')) {
-                const corsHeader =
-                    Object.keys(details.responseHeaders).find(
-                        k => k.toLowerCase() === 'access-control-allow-origin'
-                    ) || 'access-control-allow-origin';
-                details.responseHeaders[corsHeader] = ['*'];
-            }
+            const patchMercuryCors = details.url.startsWith('https://api.mercuryo.io');
+            const patchTonkeeperCors = /https:\/\/(\w+\.){0,2}tonkeeper.com([?/].*)?/.test(
+                details.url
+            );
+            const patchTgCors = details.url === 'https://oauth.telegram.org/auth/get';
 
-            /* patch tg auth headers cors  */
-            if (details.url === 'https://oauth.telegram.org/auth/get') {
+            /* patch cors  */
+            if (patchMercuryCors || patchTonkeeperCors || patchTgCors) {
                 const corsHeader =
                     Object.keys(details.responseHeaders).find(
                         k => k.toLowerCase() === 'access-control-allow-origin'
