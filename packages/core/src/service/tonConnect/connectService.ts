@@ -1,7 +1,9 @@
 import { Address, beginCell, storeStateInit } from '@ton/core';
 import { getSecureRandomBytes, keyPairFromSeed, sha256_sync } from '@ton/crypto';
 import queryString from 'query-string';
+import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
+import { AccountState } from '../../entries/account';
 import { TonConnectError } from '../../entries/exception';
 import { Network } from '../../entries/network';
 import {
@@ -22,17 +24,15 @@ import {
 } from '../../entries/tonConnect';
 import { WalletState } from '../../entries/wallet';
 import { walletContractFromState } from '../wallet/contractService';
-import { getCurrentWallet, getWalletState } from '../wallet/storeService';
+import { getWalletState } from '../wallet/storeService';
 import {
+    AccountConnection,
     TonConnectParams,
     disconnectAccountConnection,
     getAccountConnection,
-    saveAccountConnection,
-    AccountConnection
+    saveAccountConnection
 } from './connectionService';
 import { SessionCrypto } from './protocol';
-import { AccountState } from '../../entries/account';
-import { AppKey } from '../../Keys';
 
 export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
@@ -369,8 +369,14 @@ export const toTonProofItem = async (
 };
 
 export const tonDisconnectRequest = async (options: { storage: IStorage; webViewUrl: string }) => {
-    const wallet = await getCurrentWallet(options.storage);
-    await disconnectAccountConnection({ ...options, wallet });
+    const connection = await getDappConnection(options.storage, options.webViewUrl);
+    if (!connection) {
+        throw new TonConnectError(
+            'Missing connection',
+            CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
+        );
+    }
+    await disconnectAccountConnection({ ...options, wallet: connection.wallet });
 };
 
 export const saveWalletTonConnect = async (options: {
