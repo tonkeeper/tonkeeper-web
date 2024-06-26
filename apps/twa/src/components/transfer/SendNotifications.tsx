@@ -237,55 +237,61 @@ const SendContent: FC<{
                         setTimeout(done, duration);
                     }}
                 >
-                    <div ref={nodeRef}>
-                        {view === 'recipient' && (
-                            <RecipientView
-                                data={recipient}
-                                setRecipient={onRecipient}
-                                onScan={onScan}
-                                keyboard="decimal"
-                                isExternalLoading={isAccountLoading}
-                                acceptBlockchains={chain ? [chain] : undefined}
-                                MainButton={RecipientTwaMainButton}
-                                HeaderBlock={() => <RecipientTwaHeaderBlock onClose={onClose} />}
-                                fitContent
-                            />
-                        )}
-                        {view === 'favorite' && (
-                            <FavoriteView state={favoriteState} onClose={backToRecipient} />
-                        )}
-                        {view === 'amount' && (
-                            <AmountView
-                                defaults={amountViewState}
-                                onClose={onClose}
-                                onBack={backToRecipient}
-                                recipient={recipient!}
-                                onConfirm={onConfirmAmount}
-                                MainButton={AmountTwaMainButton}
-                                HeaderBlock={AmountTwaHeaderBlock}
-                            />
-                        )}
-                        {view === 'confirm' && (
-                            <ConfirmTransferView
-                                onClose={onClose}
-                                onBack={backToAmount}
-                                recipient={recipient!}
-                                fitContent
-                                assetAmount={AssetAmount.fromRelativeAmount({
-                                    asset: amountViewState!.token!,
-                                    amount: amountViewState!.coinValue!
-                                })}
-                                isMax={amountViewState!.isMax!}
-                            >
-                                <ConfirmViewTitleSlot>
-                                    <RecipientTwaHeaderBlock onClose={backToAmount} />
-                                </ConfirmViewTitleSlot>
-                                <ConfirmViewButtonsSlot>
-                                    <ConfirmViewButtons MainButton={ConfirmTwaMainButton} />
-                                </ConfirmViewButtonsSlot>
-                            </ConfirmTransferView>
-                        )}
-                    </div>
+                    {status => (
+                        <div ref={nodeRef}>
+                            {view === 'recipient' && (
+                                <RecipientView
+                                    data={recipient}
+                                    setRecipient={onRecipient}
+                                    onScan={onScan}
+                                    keyboard="decimal"
+                                    isExternalLoading={isAccountLoading}
+                                    acceptBlockchains={chain ? [chain] : undefined}
+                                    MainButton={RecipientTwaMainButton}
+                                    HeaderBlock={() => (
+                                        <RecipientTwaHeaderBlock onClose={onClose} />
+                                    )}
+                                    fitContent
+                                    isAnimationProcess={status === 'exiting'}
+                                />
+                            )}
+                            {view === 'favorite' && (
+                                <FavoriteView state={favoriteState} onClose={backToRecipient} />
+                            )}
+                            {view === 'amount' && (
+                                <AmountView
+                                    defaults={amountViewState}
+                                    onClose={onClose}
+                                    onBack={backToRecipient}
+                                    recipient={recipient!}
+                                    onConfirm={onConfirmAmount}
+                                    MainButton={AmountTwaMainButton}
+                                    HeaderBlock={AmountTwaHeaderBlock}
+                                    isAnimationProcess={status === 'exiting'}
+                                />
+                            )}
+                            {view === 'confirm' && (
+                                <ConfirmTransferView
+                                    onClose={onClose}
+                                    onBack={backToAmount}
+                                    recipient={recipient!}
+                                    fitContent
+                                    assetAmount={AssetAmount.fromRelativeAmount({
+                                        asset: amountViewState!.token!,
+                                        amount: amountViewState!.coinValue!
+                                    })}
+                                    isMax={amountViewState!.isMax!}
+                                >
+                                    <ConfirmViewTitleSlot>
+                                        <RecipientTwaHeaderBlock onClose={backToAmount} />
+                                    </ConfirmViewTitleSlot>
+                                    <ConfirmViewButtonsSlot>
+                                        <ConfirmViewButtons MainButton={ConfirmTwaMainButton} />
+                                    </ConfirmViewButtonsSlot>
+                                </ConfirmTransferView>
+                            )}
+                        </div>
+                    )}
                 </CSSTransition>
             </TransitionGroup>
         </PageWrapper>

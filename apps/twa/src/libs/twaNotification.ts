@@ -1,9 +1,11 @@
 import { NotificationService } from '@tonkeeper/core/dist/AppSdk';
+import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
     toTonProofItem,
     tonConnectProofPayload
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
 import { walletStateInitFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
 import { InitResult } from '@twa.js/sdk';
 import { Configuration, DefaultApi } from '../twaApi';
@@ -22,22 +24,36 @@ export class TwaNotification implements NotificationService {
         return Buffer.from(initDataRaw, 'utf8').toString('base64');
     }
 
-    private getTonConnectProof = async (wallet: WalletState, mnemonic: string[]) => {
+    private getTonConnectProof = async (
+        api: APIConfig,
+        wallet: WalletState,
+        signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
+    ) => {
         const domain = 'https://twa.tonkeeper.com/';
         const { payload } = await twaApi.getTonConnectPayload();
-        const proofPayload = tonConnectProofPayload(domain, wallet.active.rawAddress, payload);
+        const timestamp = await getServerTime(api);
+        const proofPayload = tonConnectProofPayload(
+            timestamp,
+            domain,
+            wallet.active.rawAddress,
+            payload
+        );
         const stateInit = walletStateInitFromState(wallet);
-        return await toTonProofItem(mnemonic, proofPayload, stateInit);
+        return await toTonProofItem(signTonConnect, proofPayload, false, stateInit);
     };
 
-    subscribe = async (wallet: WalletState, mnemonic: string[]) => {
+    subscribe = async (
+        api: APIConfig,
+        wallet: WalletState,
+        signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
+    ) => {
         try {
             await this.components.webApp.requestWriteAccess();
         } catch (e) {
             console.error(e);
         }
 
-        const proof = await this.getTonConnectProof(wallet, mnemonic);
+        const proof = await this.getTonConnectProof(api, wallet, signTonConnect);
         await twaApi.subscribeToAccountEvents({
             subscribeToAccountEventsRequest: {
                 twaInitData: this.twaInitData,

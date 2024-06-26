@@ -1,4 +1,5 @@
 import { IStorage, MemoryStorage } from './Storage';
+import { APIConfig } from './entries/apis';
 import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
@@ -40,7 +41,7 @@ export interface UIEvents {
     getPassword: GetPasswordParams;
     signer: string;
     ledger: { path: number[]; transaction: LedgerTransaction };
-    keystone: {message: Buffer, messageType: KeystoneMessageType, pathInfo?: KeystonePathInfo};
+    keystone: { message: Buffer; messageType: KeystoneMessageType; pathInfo?: KeystonePathInfo };
     loading: void;
     transfer: TransferInitParams;
     receive: ReceiveInitParams;
@@ -71,7 +72,11 @@ export interface TouchId {
 }
 
 export interface NotificationService {
-    subscribe: (wallet: WalletState, mnemonic: string[]) => Promise<void>;
+    subscribe: (
+        api: APIConfig,
+        wallet: WalletState,
+        signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
+    ) => Promise<void>;
     unsubscribe: (address?: string) => Promise<void>;
 
     subscribeTonConnect: (clientId: string, origin: string) => Promise<void>;
