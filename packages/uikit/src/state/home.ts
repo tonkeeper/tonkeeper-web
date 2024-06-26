@@ -5,25 +5,23 @@ import { useMemo } from 'react';
 import { AssetData } from '../components/home/Jettons';
 import { useWalletContext } from '../hooks/appContext';
 import { useJettonList } from './jetton';
-import { useTronBalances } from './tron/tron';
 import { useWalletAccountInfo } from './wallet';
 
 export const useAssets = () => {
     const wallet = useWalletContext();
 
     const { data: info, error, isFetching: isAccountLoading } = useWalletAccountInfo();
-    const { data: jettons, isFetching: isJettonLoading } = useJettonList();
-    const { data: tronBalances, isFetching: isTronLoading } = useTronBalances();
+    const { data: jettons, error: jettonError, isFetching: isJettonLoading } = useJettonList();
 
     const assets = useMemo<AssetData | undefined>(() => {
-        if (!info || !jettons || !tronBalances) return undefined;
+        if (!info || !jettons) return undefined;
         return {
             ton: { info, jettons: jettons ?? { balances: [] } },
-            tron: tronBalances
+            tron: { balances: [] }
         };
-    }, [info, jettons, wallet, tronBalances]);
+    }, [info, jettons, wallet]);
 
-    return [assets, error, isJettonLoading || isAccountLoading || isTronLoading] as const;
+    return [assets, error, isJettonLoading || isAccountLoading, jettonError] as const;
 };
 
 export const useAssetWeiBalance = (asset: AssetIdentification) => {

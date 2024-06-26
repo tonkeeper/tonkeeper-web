@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
@@ -38,6 +37,7 @@ import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/di
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
+import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
@@ -58,7 +58,6 @@ import { TwaNftNotification } from './components/nft/NftNotification';
 import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
-import { useUserFiat } from "@tonkeeper/uikit/dist/state/fiat";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -71,7 +70,9 @@ const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
 );
-const SwapMobileNotification = React.lazy(() => import("@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification"));
+const SwapMobileNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -220,18 +221,24 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const { data: auth } = useAuthState();
 
     const tonendpoint = useTonendpoint({
-       targetEnv: TARGET_ENV,
-       build: sdk.version,
-       network: activeWallet?.network,
-       lang: activeWallet?.lang
-}
-    );
+        targetEnv: TARGET_ENV,
+        build: sdk.version,
+        network: activeWallet?.network,
+        lang: activeWallet?.lang
+    });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
     const { data: tracker } = useAnalytics(account, activeWallet);
+    const { components } = useSDK();
 
-    if (auth === undefined || account === undefined || config === undefined || lock === undefined || fiat === undefined) {
+    if (
+        auth === undefined ||
+        account === undefined ||
+        config === undefined ||
+        lock === undefined ||
+        fiat === undefined
+    ) {
         return <Loading />;
     }
 
@@ -259,21 +266,19 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
                     value={() => navigate(AppRoute.home, { replace: true })}
                 >
                     <AppContext.Provider value={context}>
-                        {/* <div
-                                onClick={() => sdk.copyToClipboard(window.location.hash.slice(1))}
-                                style={{
-                                    paddingTop: '100px',
-                                    minHeight: '200px',
-                                    width: '200px',
-                                    position: 'fixed',
-                                    zIndex: '100',
-                                    color: 'white'
-                                }}
-                            >
-                                {components.initDataRaw}
-                                {components.initData?.startParam}
-                                {window.location.hash.slice(1)}
-                            </div> */}
+                        <div
+                            onClick={() => sdk.copyToClipboard(window.location.hash.slice(1))}
+                            style={{
+                                paddingTop: '100px',
+                                minHeight: '200px',
+                                width: '200px',
+                                position: 'fixed',
+                                zIndex: '100',
+                                color: 'white'
+                            }}
+                        >
+                            {components?.initData?.startParam}
+                        </div>
                         <Content activeWallet={activeWallet} lock={lock} showQrScan={showQrScan} />
                         <CopyNotification />
                         {showQrScan && <TwaQrScanner />}
@@ -390,11 +395,14 @@ const MainPages: FC<{ showQrScan: boolean }> = ({ showQrScan }) => {
                             }
                         />
                     </Route>
-                    <Route path={AppRoute.swap} element={
-                        <Suspense fallback={null}>
-                            <SwapPage />
-                        </Suspense>
-                    } />
+                    <Route
+                        path={AppRoute.swap}
+                        element={
+                            <Suspense fallback={null}>
+                                <SwapPage />
+                            </Suspense>
+                        }
+                    />
                     <Route
                         path="*"
                         element={

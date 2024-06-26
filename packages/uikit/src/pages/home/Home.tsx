@@ -28,14 +28,19 @@ const HomeAssets: FC<{
 const Home = () => {
     const { isFetched } = usePreFetchRates();
 
-    const [assets, error, isAssetLoading] = useAssets();
+    const [assets, error, isAssetLoading, jettonError] = useAssets();
 
-    const { data: nfts, isFetching: isNftLoading } = useWalletFilteredNftList();
+    const { data: nfts, error: nftError, isFetching: isNftLoading } = useWalletFilteredNftList();
 
     const isLoading = isAssetLoading || isNftLoading;
 
     if (!nfts || !assets || !isFetched) {
-        return <HomeSkeleton />;
+        return (
+            <>
+                {JSON.stringify({ nfts, assets, jettonError, nftError, isFetched }, null, 2)}
+                <HomeSkeleton />
+            </>
+        );
     }
 
     return (

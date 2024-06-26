@@ -10,6 +10,10 @@ import { walletStateInitFromState } from '@tonkeeper/core/dist/service/wallet/co
 import { InitResult } from '@twa.js/sdk';
 import { Configuration, DefaultApi } from '../twaApi';
 
+const seeIfProduction = () => {
+    return window.location.hostname.includes('twa.tonkeeper.com');
+};
+
 const apiConfig = new Configuration({ basePath: 'https://twa-api.tonkeeper.com' });
 const twaApi = new DefaultApi(apiConfig);
 
@@ -91,6 +95,8 @@ export class TwaNotification implements NotificationService {
     };
 
     subscribed = async (address: string) => {
+        if (!seeIfProduction()) return false;
+
         const { subscribed } = await twaApi.accountEventsSubscriptionStatus({
             accountEventsSubscriptionStatusRequest: {
                 twaInitData: this.twaInitData,

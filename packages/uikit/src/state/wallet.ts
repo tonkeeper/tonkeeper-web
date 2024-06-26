@@ -7,6 +7,10 @@ import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { ActiveWalletConfig, WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
+import {
+    getActiveWalletConfig,
+    setActiveWalletConfig
+} from '@tonkeeper/core/dist/service/wallet/configService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import {
     getWalletAuthState,
@@ -27,24 +31,20 @@ import {
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
 import BigNumber from 'bignumber.js';
+import { useMemo } from 'react';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
 import { QueryKey } from '../libs/queryKey';
 import { useAssets } from './home';
+import { isSpamNft } from './nft';
 import {
     getJettonsFiatAmount,
-    getTonFiatAmount,
     tokenRate as getTokenRate,
+    getTonFiatAmount,
     useRate
 } from './rates';
 import { DefaultRefetchInterval } from './tonendpoint';
-import {
-    getActiveWalletConfig,
-    setActiveWalletConfig
-} from '@tonkeeper/core/dist/service/wallet/configService';
-import { useMemo } from 'react';
-import { isSpamNft } from './nft';
 
 export const useActiveWallet = () => {
     const sdk = useAppSdk();

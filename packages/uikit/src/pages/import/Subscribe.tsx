@@ -1,9 +1,10 @@
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { IconPage } from '../../components/Layout';
 import { Button } from '../../components/fields/Button';
 import { NotificationIcon } from '../../components/lottie/LottieIcons';
 import { useTranslation } from '../../hooks/translation';
+import { signTonConnectMnemonicOver } from '../../state/mnemonic';
 import { useSubscribeMutation } from '../../state/subscribe';
 
 export const Subscribe: FC<{ wallet: WalletState; mnemonic: string[]; onDone: () => void }> = ({
@@ -12,7 +13,11 @@ export const Subscribe: FC<{ wallet: WalletState; mnemonic: string[]; onDone: ()
     onDone
 }) => {
     const { t } = useTranslation();
-    const { mutate, reset, isLoading } = useSubscribeMutation(wallet, mnemonic, onDone);
+    const { mutate, reset, isLoading } = useSubscribeMutation(
+        wallet,
+        signTonConnectMnemonicOver(mnemonic),
+        onDone
+    );
     return (
         <IconPage
             skip={onDone}
