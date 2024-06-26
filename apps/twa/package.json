@@ -5,11 +5,11 @@
     "description": "Your telegram mini app wallet on The Open Network",
     "dependencies": {
         "@tanstack/react-query": "4.3.4",
+        "@tma.js/sdk": "latest",
+        "@tma.js/sdk-react": "latest",
         "@tonkeeper/core": "0.1.0",
         "@tonkeeper/locales": "0.1.0",
         "@tonkeeper/uikit": "0.1.0",
-        "@twa.js/sdk": "latest",
-        "@twa.js/sdk-react": "latest",
         "bignumber.js": "^9.1.2",
         "buffer": "^6.0.3",
         "copy-to-clipboard": "^3.3.3",

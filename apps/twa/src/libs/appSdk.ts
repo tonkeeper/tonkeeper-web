@@ -1,5 +1,18 @@
+import {
+    HapticFeedback,
+    LaunchParams,
+    MainButton,
+    MiniApp,
+    Utils,
+    Viewport,
+    initBackButton,
+    initHapticFeedback,
+    initMainButton,
+    initMiniApp,
+    initUtils,
+    retrieveLaunchParams
+} from '@tma.js/sdk';
 import { BaseApp, NativeBackButton, NotificationService } from '@tonkeeper/core/dist/AppSdk';
-import { InitResult } from '@twa.js/sdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
@@ -9,33 +22,53 @@ import { TwaNotification } from './twaNotification';
 export class TwaAppSdk extends BaseApp {
     nativeBackButton: NativeBackButton;
     notifications: NotificationService;
+    hapticFeedback: HapticFeedback;
+    public miniApp: MiniApp;
+    public launchParams: LaunchParams;
+    public mainButton: MainButton;
+    utils: Utils;
 
-    constructor(private components: InitResult) {
-        super(new TwaStorage(components.cloudStorage));
+    constructor(public viewport: Viewport) {
+        super(new TwaStorage());
+        const [miniApp] = initMiniApp();
+        this.miniApp = miniApp;
+        this.hapticFeedback = initHapticFeedback();
 
-        this.notifications = new TwaNotification(components);
-        this.nativeBackButton = components.backButton;
+        this.notifications = new TwaNotification(miniApp);
+
+        const [backButton] = initBackButton();
+
+        this.nativeBackButton = backButton;
+
+        this.launchParams = retrieveLaunchParams();
+
+        const [mainButton] = initMainButton();
+        this.mainButton = mainButton;
+
+        this.utils = initUtils();
     }
 
     copyToClipboard = (value: string, notification?: string) => {
         copyToClipboard(value);
 
         this.topMessage(notification);
-        this.components.haptic.notificationOccurred('success');
+        this.hapticFeedback.notificationOccurred('success');
     };
 
     openPage = async (url: string) => {
         if (url.includes('t.me')) {
-            this.components.webApp.openTelegramLink(url);
+            this.utils.openTelegramLink(url);
         } else {
-            this.components.webApp.openLink(url);
+            this.utils.openLink(url);
         }
     };
 
-    twaExpand = () => this.components.viewport.expand();
+    twaExpand = () => {
+        this.viewport.expand();
+    };
 
     hapticNotification = (type: 'success' | 'error') => {
-        this.components.haptic.notificationOccurred(type);
+        this.hapticFeedback.notificationOccurred(type);
     };
 
     disableScroll = disableScroll;
@@ -48,5 +81,5 @@ export class TwaAppSdk extends BaseApp {
 
     version = packageJson.version ?? 'Unknown';
 
-    targetEnv= 'twa' as const;
+    targetEnv = 'twa' as const;
 }

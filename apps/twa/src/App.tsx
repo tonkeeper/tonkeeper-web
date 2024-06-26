@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
@@ -32,7 +32,8 @@ import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/tra
 import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { Platform as TwaPlatform, initViewport } from '@tma.js/sdk';
+import { SDKProvider } from '@tma.js/sdk-react';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -44,8 +45,6 @@ import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
-import { Platform as TwaPlatform } from '@twa.js/sdk';
-import { SDKProvider, useSDK, useWebApp } from '@twa.js/sdk-react';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -89,55 +88,53 @@ export const App = () => {
     return (
         <StandardErrorBoundary>
             <SDKProvider>
-                <TwaLoader />
+                <QueryClientProvider client={queryClient}>
+                    <TwaLoader />
+                </QueryClientProvider>
             </SDKProvider>
         </StandardErrorBoundary>
     );
 };
 
 const TwaLoader = () => {
-    const { didInit, components, error } = useSDK();
-
-    const sdk = useMemo(() => {
-        if (!components) return undefined;
-        return new TwaAppSdk(components);
-    }, [components]);
+    const { data: sdk, error } = useQuery(['sdk'], async () => {
+        const [willViewport] = initViewport();
+        return new TwaAppSdk(await willViewport);
+    });
 
     useEffect(() => {
-        if (!components) return undefined;
+        if (!sdk) return undefined;
 
-        const theme = components.themeParams.isDark ? defaultTheme : lightTheme;
+        const theme = sdk.miniApp.isDark ? defaultTheme : lightTheme;
 
-        if (components.webApp.supports('setBackgroundColor')) {
-            components.webApp.setBackgroundColor((theme as any).backgroundPage);
+        if (sdk.miniApp.supports('setBackgroundColor')) {
+            sdk.miniApp.setBgColor((theme as any).backgroundPage);
         }
-        if (components.webApp.supports('setHeaderColor')) {
-            components.webApp.setHeaderColor((theme as any).backgroundPage);
+        if (sdk.miniApp.supports('setHeaderColor')) {
+            sdk.miniApp.setHeaderColor((theme as any).backgroundPage);
         }
-        components.mainButton.setBackgroundColor((theme as any).buttonPrimaryBackground);
-        components.mainButton.setTextColor((theme as any).buttonPrimaryForeground);
+        sdk.mainButton.setBgColor((theme as any).buttonPrimaryBackground);
+        sdk.mainButton.setTextColor((theme as any).buttonPrimaryForeground);
 
         document.body.style.backgroundColor = (theme as any).backgroundPage;
-    }, [components?.themeParams.isDark]);
+    }, [sdk]);
 
     if (error instanceof Error) {
         return <div>{error.message}</div>;
     }
 
-    if (!didInit || components == null || sdk == null) {
+    if (!sdk || sdk == null) {
         return <div></div>;
     }
 
     return (
         <AppSdkContext.Provider value={sdk}>
-            <QueryClientProvider client={queryClient}>
-                <ThemeProvider theme={components.themeParams.isDark ? defaultTheme : lightTheme}>
-                    <DarkThemeContext.Provider value={components.themeParams.isDark}>
-                        <GlobalStyle />
-                        <TwaApp sdk={sdk} />
-                    </DarkThemeContext.Provider>
-                </ThemeProvider>
-            </QueryClientProvider>
+            <ThemeProvider theme={sdk.miniApp.isDark ? defaultTheme : lightTheme}>
+                <DarkThemeContext.Provider value={sdk.miniApp.isDark}>
+                    <GlobalStyle />
+                    <TwaApp sdk={sdk} />
+                </DarkThemeContext.Provider>
+            </ThemeProvider>
         </AppSdkContext.Provider>
     );
 };
@@ -154,9 +151,8 @@ const getUsePadding = (platform: TwaPlatform): boolean => {
     }
 };
 
-const TwaApp: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
+const TwaApp: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { t, i18n } = useTranslation();
-    const webApp = useWebApp();
 
     const translation = useMemo(() => {
         const client: I18nContext = {
@@ -183,7 +179,10 @@ const TwaApp: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
 
                     <Loader sdk={sdk} />
                     <InitDataLogger />
-                    <UnlockNotification sdk={sdk} usePadding={getUsePadding(webApp.platform)} />
+                    <UnlockNotification
+                        sdk={sdk}
+                        usePadding={getUsePadding(sdk.launchParams.platform)}
+                    />
                 </StorageContext.Provider>
             </TranslationContext.Provider>
         </BrowserRouter>
@@ -211,9 +210,8 @@ const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
     }
 };
 
-export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
+export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { data: activeWallet } = useActiveWallet();
-    const webApp = useWebApp();
     const { data: fiat } = useUserFiat();
 
     const lock = useLock(sdk);
@@ -230,7 +228,6 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
 
     const navigate = useNavigate();
     const { data: tracker } = useAnalytics(account, activeWallet);
-    const { components } = useSDK();
 
     if (
         auth === undefined ||
@@ -242,7 +239,7 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
         return <Loading />;
     }
 
-    const showQrScan = seeIfShowQrScanner(webApp.platform);
+    const showQrScan = seeIfShowQrScanner(sdk.launchParams.platform);
 
     const network = activeWallet?.network ?? Network.MAINNET;
     const context: IAppContext = {
@@ -266,20 +263,12 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
                     value={() => navigate(AppRoute.home, { replace: true })}
                 >
                     <AppContext.Provider value={context}>
-                        <div
-                            onClick={() => sdk.copyToClipboard(window.location.hash.slice(1))}
-                            style={{
-                                paddingTop: '100px',
-                                minHeight: '200px',
-                                width: '200px',
-                                position: 'fixed',
-                                zIndex: '100',
-                                color: 'white'
-                            }}
-                        >
-                            {components?.initData?.startParam}
-                        </div>
-                        <Content activeWallet={activeWallet} lock={lock} showQrScan={showQrScan} />
+                        <Content
+                            activeWallet={activeWallet}
+                            lock={lock}
+                            showQrScan={showQrScan}
+                            sdk={sdk}
+                        />
                         <CopyNotification />
                         {showQrScan && <TwaQrScanner />}
                     </AppContext.Provider>
@@ -303,8 +292,8 @@ const InitWrapper = styled(Container)`
     position: relative;
 `;
 
-const InitPages = () => {
-    useTwaAppViewport(true);
+const InitPages: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
+    useTwaAppViewport(true, sdk);
     return (
         <InitWrapper>
             <Suspense fallback={<Loading />}>
@@ -318,10 +307,11 @@ const InitPages = () => {
 };
 
 const Content: FC<{
+    sdk: TwaAppSdk;
     activeWallet?: WalletState | null;
     lock: boolean;
     showQrScan: boolean;
-}> = ({ activeWallet, lock, showQrScan }) => {
+}> = ({ activeWallet, lock, showQrScan, sdk }) => {
     const location = useLocation();
     useWindowsScroll();
     useTrackLocation();
@@ -335,12 +325,12 @@ const Content: FC<{
     }
 
     if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
-        return <InitPages />;
+        return <InitPages sdk={sdk} />;
     }
 
     return (
         <WalletStateContext.Provider value={activeWallet}>
-            <MainPages showQrScan={showQrScan} />
+            <MainPages showQrScan={showQrScan} sdk={sdk} />
         </WalletStateContext.Provider>
     );
 };
@@ -355,8 +345,8 @@ const TwaNotification: FC<PropsWithChildren> = ({ children }) => {
     );
 };
 
-const MainPages: FC<{ showQrScan: boolean }> = ({ showQrScan }) => {
-    useTwaAppViewport(false);
+const MainPages: FC<{ showQrScan: boolean; sdk: TwaAppSdk }> = ({ showQrScan, sdk }) => {
+    useTwaAppViewport(false, sdk);
     return (
         <TwaNotification>
             <Wrapper>

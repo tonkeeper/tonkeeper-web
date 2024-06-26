@@ -1,6 +1,6 @@
+import { useMainButton } from '@tma.js/sdk-react';
 import { ConfirmMainButtonProps } from '@tonkeeper/uikit/dist/components/transfer/common';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
-import { useMainButton } from '@twa.js/sdk-react';
 import { useEffect } from 'react';
 
 export const HideTwaMainButton = () => {
@@ -19,9 +19,9 @@ export const useMainButtonLoading = (isLoading: boolean) => {
     const button = useMainButton();
     useEffect(() => {
         if (isLoading) {
-            button.showProgress();
+            button.showLoader();
         } else {
-            button.hideProgress();
+            button.hideLoader();
         }
     }, [button, isLoading]);
 };

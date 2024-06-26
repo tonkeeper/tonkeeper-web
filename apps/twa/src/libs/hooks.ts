@@ -1,21 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
+import { Viewport } from '@tma.js/sdk';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { Analytics, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
-import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
-import { Viewport } from '@twa.js/sdk';
-import { useMainButton, useViewport } from '@twa.js/sdk-react';
 import React, { useEffect } from 'react';
+import { TwaAppSdk } from './appSdk';
 
 export const ViewportContext = React.createContext<Viewport>(undefined!);
 
-export const useTwaAppViewport = (setAppHeight: boolean) => {
-    const sdk = useAppSdk();
-    const viewport = useViewport();
-    const mainButton = useMainButton();
-
+export const useTwaAppViewport = (setAppHeight: boolean, sdk: TwaAppSdk) => {
     useEffect(() => {
         const total = window.innerHeight;
         const doc = document.documentElement;
@@ -27,7 +22,7 @@ export const useTwaAppViewport = (setAppHeight: boolean) => {
         };
 
         const setHeight = (value: number) => {
-            const fixed = mainButton.isVisible ? value + 60 : value;
+            const fixed = sdk.mainButton.isVisible ? value + 60 : value;
             sdk.uiEvents.emit('keyboard', {
                 method: 'keyboard',
                 params: { total, viewport: fixed }
@@ -50,11 +45,11 @@ export const useTwaAppViewport = (setAppHeight: boolean) => {
             setHeight(this.height);
         };
 
-        setHeight(viewport.height);
-        setWidth(viewport.width);
+        setHeight(sdk.viewport.height);
+        setWidth(sdk.viewport.width);
 
-        viewport.on('heightChanged', setHeight);
-        viewport.on('widthChanged', setWidth);
+        sdk.viewport.on('change:height', setHeight);
+        sdk.viewport.on('change:width', setWidth);
 
         if (visualViewport) {
             visualViewport.addEventListener('resize', resizeHandler);
@@ -62,13 +57,13 @@ export const useTwaAppViewport = (setAppHeight: boolean) => {
         }
 
         return () => {
-            viewport.off('heightChanged', setHeight);
-            viewport.off('widthChanged', setWidth);
+            sdk.viewport.off('change:height', setHeight);
+            sdk.viewport.off('change:width', setWidth);
 
             visualViewport?.removeEventListener('resize', resizeHandler);
             window.removeEventListener('resize', callback);
         };
-    }, [sdk, viewport]);
+    }, [sdk]);
 };
 
 export const useAnalytics = (account?: AccountState, wallet?: WalletState | null) => {

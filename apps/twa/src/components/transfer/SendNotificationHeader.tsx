@@ -1,6 +1,6 @@
+import { useBackButton } from '@tma.js/sdk-react';
 import { AmountHeaderBlockComponent } from '@tonkeeper/uikit/dist/components/transfer/common';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { useBackButton } from '@twa.js/sdk-react';
 import { FC, useEffect } from 'react';
 import styled from 'styled-components';
 

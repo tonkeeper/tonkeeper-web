@@ -1,3 +1,4 @@
+import { MiniApp, retrieveLaunchParams } from '@tma.js/sdk';
 import { NotificationService } from '@tonkeeper/core/dist/AppSdk';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
@@ -7,7 +8,6 @@ import {
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
 import { walletStateInitFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
-import { InitResult } from '@twa.js/sdk';
 import { Configuration, DefaultApi } from '../twaApi';
 
 const seeIfProduction = () => {
@@ -18,10 +18,11 @@ const apiConfig = new Configuration({ basePath: 'https://twa-api.tonkeeper.com' 
 const twaApi = new DefaultApi(apiConfig);
 
 export class TwaNotification implements NotificationService {
-    constructor(private components: InitResult) {}
+    constructor(private miniApp: MiniApp) {}
 
     get twaInitData() {
-        const { initDataRaw } = this.components;
+        const { initDataRaw } = retrieveLaunchParams();
+
         if (!initDataRaw) {
             throw new Error('missing twa init data');
         }
@@ -52,7 +53,7 @@ export class TwaNotification implements NotificationService {
         signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
     ) => {
         try {
-            await this.components.webApp.requestWriteAccess();
+            await this.miniApp.requestWriteAccess();
         } catch (e) {
             console.error(e);
         }
