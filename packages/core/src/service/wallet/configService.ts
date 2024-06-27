@@ -18,10 +18,8 @@ export const getActiveWalletConfig = async (
     address: string,
     network: Network | undefined
 ) => {
-    const raw = Address.parse(address).toRawString();
-    const config = await storage.get<ActiveWalletConfig>(
-        `${AppKey.WALLET_CONFIG}_${raw}_${network ?? Network.MAINNET}`
-    );
+    const formatted = Address.parse(address).toString({ testOnly: network === Network.TESTNET });
+    const config = await storage.get<ActiveWalletConfig>(`${AppKey.WALLET_CONFIG}_${formatted}`);
 
     if (!config) {
         return defaultConfig;
@@ -35,6 +33,6 @@ export const setActiveWalletConfig = async (
     network: Network | undefined,
     config: ActiveWalletConfig
 ) => {
-    const raw = Address.parse(address).toRawString();
-    await storage.set(`${AppKey.WALLET_CONFIG}_${raw}_${network ?? Network.MAINNET}`, config);
+    const formatted = Address.parse(address).toString({ testOnly: network === Network.TESTNET });
+    await storage.set(`${AppKey.WALLET_CONFIG}_${formatted}`, config);
 };

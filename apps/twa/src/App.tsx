@@ -113,6 +113,7 @@ const TwaLoader = () => {
         if (sdk.miniApp.supports('setHeaderColor')) {
             sdk.miniApp.setHeaderColor((theme as any).backgroundPage);
         }
+
         sdk.mainButton.setBgColor((theme as any).buttonPrimaryBackground);
         sdk.mainButton.setTextColor((theme as any).buttonPrimaryForeground);
 

@@ -15,8 +15,10 @@ import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { scrollToTop } from '../../libs/common';
 import { QueryKey } from '../../libs/queryKey';
+import { useIsActiveWalletLedger } from '../../state/ledger';
 import { Gap } from '../Layout';
 import {
     FullHeightBlock,
@@ -30,9 +32,6 @@ import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
-import { MainButton } from './common';
-import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { useIsActiveWalletLedger } from '../../state/ledger';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -130,6 +129,7 @@ export const RecipientView: FC<{
     isExternalLoading,
     acceptBlockchains,
     HeaderBlock,
+    MainButton,
     fitContent,
     isAnimationProcess
 }) => {

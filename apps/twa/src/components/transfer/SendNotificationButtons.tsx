@@ -38,6 +38,7 @@ export const RecipientTwaMainButton = ({
 
     useEffect(() => {
         button.setText(t('continue'));
+
         button.show();
         button.enable();
     }, []);

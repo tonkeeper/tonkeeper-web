@@ -35,12 +35,7 @@ const Home = () => {
     const isLoading = isAssetLoading || isNftLoading;
 
     if (!nfts || !assets || !isFetched) {
-        return (
-            <>
-                {JSON.stringify({ nfts, assets, jettonError, nftError, isFetched }, null, 2)}
-                <HomeSkeleton />
-            </>
-        );
+        return <HomeSkeleton />;
     }
 
     return (
