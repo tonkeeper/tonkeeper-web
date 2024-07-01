@@ -2,6 +2,7 @@ import { useMainButton } from '@tma.js/sdk-react';
 import { ConfirmMainButtonProps } from '@tonkeeper/uikit/dist/components/transfer/common';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useEffect } from 'react';
+import { useTheme } from 'styled-components';
 
 export const HideTwaMainButton = () => {
     const button = useMainButton();
@@ -35,9 +36,13 @@ export const RecipientTwaMainButton = ({
 }) => {
     const button = useMainButton();
     const { t } = useTranslation();
+    const theme = useTheme();
 
     useEffect(() => {
         button.setText(t('continue'));
+
+        button.setBgColor(theme.buttonPrimaryBackground);
+        button.setTextColor(theme.buttonPrimaryForeground);
 
         button.show();
         button.enable();

@@ -7,7 +7,14 @@ import { AppRoute, ImportRoute } from '../../libs/routes';
 import { ColumnText } from '../Layout';
 import { Notification } from '../Notification';
 import { Body1, H2 } from '../Text';
-import { AddIcon, ImportIcon, KeystoneIcon, LedgerIcon, RightIcon, SignerIcon } from './ImportIcons';
+import {
+    AddIcon,
+    ImportIcon,
+    KeystoneIcon,
+    LedgerIcon,
+    RightIcon,
+    SignerIcon
+} from './ImportIcons';
 
 const Title = styled(H2)`
     user-select: none;
@@ -49,7 +56,7 @@ export const ImportNotification: FC<{
 }> = ({ isOpen, setOpen }) => {
     const { t } = useTranslation();
     const onImport = useOnImportAction();
-    const { hideSigner } = useAppContext();
+    const { hideSigner, hideLedger } = useAppContext();
 
     return (
         <Notification isOpen={isOpen} handleClose={() => setOpen(false)}>
@@ -128,22 +135,24 @@ export const ImportNotification: FC<{
                             <RightIcon />
                         </ButtonIcon>
                     </ButtonBlock>
-                    <ButtonBlock
-                        onClick={() => {
-                            onClose(() => onImport(AppRoute.import + ImportRoute.ledger));
-                        }}
-                    >
-                        <ButtonIcon>
-                            <LedgerIcon />
-                        </ButtonIcon>
-                        <ColumnTextStyled
-                            text={t('ledger_pair_title')}
-                            secondary={t('ledger_pair_subtitle')}
-                        />
-                        <ButtonIcon>
-                            <RightIcon />
-                        </ButtonIcon>
-                    </ButtonBlock>
+                    {hideLedger === true ? null : (
+                        <ButtonBlock
+                            onClick={() => {
+                                onClose(() => onImport(AppRoute.import + ImportRoute.ledger));
+                            }}
+                        >
+                            <ButtonIcon>
+                                <LedgerIcon />
+                            </ButtonIcon>
+                            <ColumnTextStyled
+                                text={t('ledger_pair_title')}
+                                secondary={t('ledger_pair_subtitle')}
+                            />
+                            <ButtonIcon>
+                                <RightIcon />
+                            </ButtonIcon>
+                        </ButtonBlock>
+                    )}
                 </div>
             )}
         </Notification>

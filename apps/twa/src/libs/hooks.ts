@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Viewport } from '@tma.js/sdk';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { Analytics, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
 import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import React, { useEffect } from 'react';
@@ -66,11 +67,22 @@ export const useTwaAppViewport = (setAppHeight: boolean, sdk: TwaAppSdk) => {
     }, [sdk]);
 };
 
-export const useAnalytics = (account?: AccountState, wallet?: WalletState | null) => {
+export const useAnalytics = (
+    account?: AccountState,
+    wallet?: WalletState | null,
+    version?: string
+) => {
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
-            const tracker = new Gtag(process.env.REACT_APP_MEASUREMENT_ID!);
+            const tracker = new AnalyticsGroup(
+                new AptabaseWeb(
+                    import.meta.env.VITE_APP_APTABASE_HOST,
+                    import.meta.env.VITE_APP_APTABASE,
+                    version
+                ),
+                new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID)
+            );
 
             tracker.init('Twa', toWalletType(wallet), account, wallet);
 

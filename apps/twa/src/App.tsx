@@ -40,6 +40,7 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
+import { useSwapMobileNotification } from '@tonkeeper/uikit/dist/state/swap/useSwapMobileNotification';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
@@ -54,6 +55,7 @@ import { InitDataLogger } from './components/InitData';
 import { TwaReceiveNotification } from './components/ReceiveNotifications';
 import { TwaQrScanner } from './components/TwaQrScanner';
 import { TwaNftNotification } from './components/nft/NftNotification';
+import { SwapScreen } from './components/swap/SwapNotification';
 import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
@@ -65,12 +67,8 @@ const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings')
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
-const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
-);
-const SwapMobileNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification')
 );
 
 const queryClient = new QueryClient({
@@ -108,16 +106,16 @@ const TwaLoader = () => {
         const theme = sdk.miniApp.isDark ? defaultTheme : lightTheme;
 
         if (sdk.miniApp.supports('setBackgroundColor')) {
-            sdk.miniApp.setBgColor((theme as any).backgroundPage);
+            sdk.miniApp.setBgColor(theme.backgroundPage);
         }
         if (sdk.miniApp.supports('setHeaderColor')) {
-            sdk.miniApp.setHeaderColor((theme as any).backgroundPage);
+            sdk.miniApp.setHeaderColor(theme.backgroundPage);
         }
 
-        sdk.mainButton.setBgColor((theme as any).buttonPrimaryBackground);
-        sdk.mainButton.setTextColor((theme as any).buttonPrimaryForeground);
+        sdk.mainButton.setBgColor(theme.buttonPrimaryBackground);
+        sdk.mainButton.setTextColor(theme.buttonPrimaryForeground);
 
-        document.body.style.backgroundColor = (theme as any).backgroundPage;
+        document.body.style.backgroundColor = theme.backgroundPage;
     }, [sdk]);
 
     if (error instanceof Error) {
@@ -192,12 +190,13 @@ const TwaApp: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
 
 const FullSizeWrapper = styled(Container)``;
 
-const Wrapper = styled(FullSizeWrapper)`
-    height: var(--app-height);
+const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
+    height: 100%;
     transition: height 0.4s ease;
 
     box-sizing: border-box;
     padding-top: 64px;
+    padding-bottom: 96px;
 `;
 
 const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
@@ -228,7 +227,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
-    const { data: tracker } = useAnalytics(account, activeWallet);
+    const { data: tracker } = useAnalytics(account, activeWallet, sdk.version);
 
     if (
         auth === undefined ||
@@ -254,6 +253,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         extension: false,
         ios: true,
         proFeatures: false,
+        hideLedger: false,
         hideQrScanner: !showQrScan
     };
 
@@ -264,6 +264,22 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
                     value={() => navigate(AppRoute.home, { replace: true })}
                 >
                     <AppContext.Provider value={context}>
+                        {/* <div
+                            style={{
+                                paddingTop: '100px',
+                                minHeight: '200px',
+                                width: '200px',
+                                position: 'fixed',
+                                zIndex: '100',
+                                color: 'white'
+                            }}
+                        >
+                            {JSON.stringify(
+                                { initData: sdk.launchParams.initData, viewport: sdk.viewport },
+                                null,
+                                2
+                            )}
+                        </div> */}
                         <Content
                             activeWallet={activeWallet}
                             lock={lock}
@@ -329,6 +345,14 @@ const Content: FC<{
         return <InitPages sdk={sdk} />;
     }
 
+    if (location.pathname.startsWith(AppRoute.swap)) {
+        return (
+            <WalletStateContext.Provider value={activeWallet}>
+                <SwapScreen />
+            </WalletStateContext.Provider>
+        );
+    }
+
     return (
         <WalletStateContext.Provider value={activeWallet}>
             <MainPages showQrScan={showQrScan} sdk={sdk} />
@@ -348,9 +372,19 @@ const TwaNotification: FC<PropsWithChildren> = ({ children }) => {
 
 const MainPages: FC<{ showQrScan: boolean; sdk: TwaAppSdk }> = ({ showQrScan, sdk }) => {
     useTwaAppViewport(false, sdk);
+
+    const [isOpen] = useSwapMobileNotification();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isOpen) {
+            navigate(AppRoute.swap);
+        }
+    }, [isOpen]);
+
     return (
         <TwaNotification>
-            <Wrapper>
+            <Wrapper standalone={false}>
                 <Routes>
                     <Route
                         path={AppRoute.activity}
@@ -387,14 +421,6 @@ const MainPages: FC<{ showQrScan: boolean; sdk: TwaAppSdk }> = ({ showQrScan, sd
                         />
                     </Route>
                     <Route
-                        path={AppRoute.swap}
-                        element={
-                            <Suspense fallback={null}>
-                                <SwapPage />
-                            </Suspense>
-                        }
-                    />
-                    <Route
                         path="*"
                         element={
                             <>
@@ -408,11 +434,10 @@ const MainPages: FC<{ showQrScan: boolean; sdk: TwaAppSdk }> = ({ showQrScan, sd
                         }
                     />
                 </Routes>
-                <Footer sticky />
+                <Footer standalone={false} />
                 <MemoryScroll />
                 <Suspense>
                     <TonConnectSubscription />
-                    <SwapMobileNotification />
                 </Suspense>
             </Wrapper>
         </TwaNotification>

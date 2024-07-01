@@ -1,27 +1,27 @@
-import { styled, useTheme } from 'styled-components';
-import { SwapFromField } from './SwapFromField';
-import { SwapToField } from './SwapToField';
-import { SwapButton } from './SwapButton';
-import { TonTransactionNotification } from '../connect/TonTransactionNotification';
-import { useEncodeSwap } from '../../state/swap/useEncodeSwap';
-import { FC, useState } from 'react';
+import { Address } from '@ton/core';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
+import { NonNullableFields } from '@tonkeeper/core/dist/utils/types';
+import { FC, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { styled, useTheme } from 'styled-components';
+import { AppRoute } from '../../libs/routes';
+import { CalculatedSwap } from '../../state/swap/useCalculatedSwap';
+import { useEncodeSwap } from '../../state/swap/useEncodeSwap';
 import {
     useSelectedSwap,
     useSwapFromAmount,
     useSwapFromAsset,
     useSwapToAsset
 } from '../../state/swap/useSwapForm';
-import { NonNullableFields } from '@tonkeeper/core/dist/utils/types';
-import { CalculatedSwap } from '../../state/swap/useCalculatedSwap';
-import { Address } from '@ton/core';
-import { SwapTokensListNotification } from './tokens-list/SwapTokensListNotification';
-import { IconButton } from '../fields/IconButton';
-import { SwapIcon } from '../Icon';
-import { useNavigate } from 'react-router-dom';
-import { AppRoute } from '../../libs/routes';
-import { SwapProviders } from './SwapProviders';
 import { useSwapMobileNotification } from '../../state/swap/useSwapMobileNotification';
+import { SwapIcon } from '../Icon';
+import { TonTransactionNotification } from '../connect/TonTransactionNotification';
+import { IconButton } from '../fields/IconButton';
+import { SwapButton } from './SwapButton';
+import { SwapFromField } from './SwapFromField';
+import { SwapProviders } from './SwapProviders';
+import { SwapToField } from './SwapToField';
+import { SwapTokensListNotification } from './tokens-list/SwapTokensListNotification';
 
 const MainFormWrapper = styled.div`
     display: flex;
@@ -50,6 +50,13 @@ const ChangeIconStyled = styled(IconButton)`
         }
     }
 `;
+
+export type SwapMainButton = (
+    props: PropsWithChildren<{
+        onConfirm: () => void;
+        isEncodingProcess: boolean;
+    }>
+) => JSX.Element;
 
 export const SwapMainForm: FC<{ className?: string }> = ({ className }) => {
     const theme = useTheme();
