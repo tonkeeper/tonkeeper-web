@@ -70,6 +70,12 @@ const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
 );
+const PairSignerNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
+);
+const PairKeystoneNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
+);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -253,7 +259,10 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         extension: false,
         ios: true,
         proFeatures: false,
-        hideLedger: false,
+        hideLedger: true,
+        hideBrowser: true,
+        hideSigner: !showQrScan,
+        hideKeystone: !showQrScan,
         hideQrScanner: !showQrScan
     };
 
@@ -264,22 +273,6 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
                     value={() => navigate(AppRoute.home, { replace: true })}
                 >
                     <AppContext.Provider value={context}>
-                        {/* <div
-                            style={{
-                                paddingTop: '100px',
-                                minHeight: '200px',
-                                width: '200px',
-                                position: 'fixed',
-                                zIndex: '100',
-                                color: 'white'
-                            }}
-                        >
-                            {JSON.stringify(
-                                { initData: sdk.launchParams.initData, viewport: sdk.viewport },
-                                null,
-                                2
-                            )}
-                        </div> */}
                         <Content
                             activeWallet={activeWallet}
                             lock={lock}
@@ -345,17 +338,16 @@ const Content: FC<{
         return <InitPages sdk={sdk} />;
     }
 
-    if (location.pathname.startsWith(AppRoute.swap)) {
-        return (
-            <WalletStateContext.Provider value={activeWallet}>
-                <SwapScreen />
-            </WalletStateContext.Provider>
-        );
-    }
-
     return (
         <WalletStateContext.Provider value={activeWallet}>
-            <MainPages showQrScan={showQrScan} sdk={sdk} />
+            <Routes>
+                <Route path={AppRoute.swap} element={<SwapScreen />} />
+                <Route path={'*'} element={<MainPages showQrScan={showQrScan} sdk={sdk} />} />
+            </Routes>
+            <Suspense>
+                <PairSignerNotification />
+                <PairKeystoneNotification />
+            </Suspense>
         </WalletStateContext.Provider>
     );
 };

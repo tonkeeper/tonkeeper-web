@@ -56,7 +56,7 @@ export const ImportNotification: FC<{
 }> = ({ isOpen, setOpen }) => {
     const { t } = useTranslation();
     const onImport = useOnImportAction();
-    const { hideSigner, hideLedger } = useAppContext();
+    const { hideSigner, hideLedger, hideKeystone } = useAppContext();
 
     return (
         <Notification isOpen={isOpen} handleClose={() => setOpen(false)}>
@@ -119,22 +119,24 @@ export const ImportNotification: FC<{
                             </ButtonIcon>
                         </ButtonBlock>
                     )}
-                    <ButtonBlock
-                        onClick={() => {
-                            onClose(() => onImport(AppRoute.import + ImportRoute.keystone));
-                        }}
-                    >
-                        <ButtonIcon>
-                            <KeystoneIcon />
-                        </ButtonIcon>
-                        <ColumnTextStyled
-                            text={t('keystone_pair_title')}
-                            secondary={t('keystone_pair_subtitle')}
-                        />
-                        <ButtonIcon>
-                            <RightIcon />
-                        </ButtonIcon>
-                    </ButtonBlock>
+                    {hideKeystone === true ? null : (
+                        <ButtonBlock
+                            onClick={() => {
+                                onClose(() => onImport(AppRoute.import + ImportRoute.keystone));
+                            }}
+                        >
+                            <ButtonIcon>
+                                <KeystoneIcon />
+                            </ButtonIcon>
+                            <ColumnTextStyled
+                                text={t('keystone_pair_title')}
+                                secondary={t('keystone_pair_subtitle')}
+                            />
+                            <ButtonIcon>
+                                <RightIcon />
+                            </ButtonIcon>
+                        </ButtonBlock>
+                    )}
                     {hideLedger === true ? null : (
                         <ButtonBlock
                             onClick={() => {

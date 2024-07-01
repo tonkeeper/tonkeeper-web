@@ -173,7 +173,16 @@ export class Tonendpoint {
     };
 
     getTrack = (): DAppTrack => {
-        return this.targetEnv === 'extension' ? 'extension' : 'desktop';
+        switch (this.targetEnv) {
+            case 'desktop':
+                return 'desktop';
+            case 'twa':
+                return 'twa';
+            case 'extension':
+            case 'web':
+            default:
+                return 'extension';
+        }
     };
 }
 

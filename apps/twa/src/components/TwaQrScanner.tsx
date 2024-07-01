@@ -9,6 +9,9 @@ export const TwaQrScanner = () => {
 
     useEffect(() => {
         const handler = async (options: { method: 'scan'; id?: number | undefined }) => {
+            if (scanner.isOpened) {
+                scanner.close();
+            }
             const signature = await scanner.open();
             if (signature) {
                 sdk.uiEvents.emit('response', {
