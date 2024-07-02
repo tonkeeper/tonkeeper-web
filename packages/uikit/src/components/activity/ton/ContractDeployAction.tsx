@@ -1,7 +1,6 @@
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
-import { useWalletContext } from '../../../hooks/appContext';
 import { useTranslation } from '../../../hooks/translation';
 import { ListBlock } from '../../List';
 import { ContractDeployActivityAction, WalletDeployActivityAction } from '../ActivityActionLayout';
@@ -19,6 +18,7 @@ import {
 } from '../NotificationCommon';
 import { ActionData } from './ActivityNotification';
 import { NftComment } from './NftActivity';
+import { useActiveWallet } from '../../../state/wallet';
 
 export const ContractDeployActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
     const { t } = useTranslation();
@@ -54,7 +54,7 @@ export const ContractDeployAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { contractDeploy } = action;
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     if (!contractDeploy) {
         return <ErrorAction />;
     }

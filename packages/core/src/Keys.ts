@@ -1,15 +1,18 @@
 export enum AppKey {
-    ACCOUNT = 'account',
-    WALLET = 'wallet',
+    DEPRECATED_ACCOUNT = 'account',
+    DEPRECATED_WALLET = 'wallet',
+    WALLETS = 'wallets',
+    ACTIVE_WALLET_ID = 'active_wallet_id',
     WALLET_CONFIG = 'wallet_config',
-    MNEMONIC = 'mnemonic',
+    DEPRECATED_MNEMONIC = 'mnemonic',
 
     THEME = 'theme',
     UI_PREFERENCES = 'ui_preferences',
     MULTI_SEND_LISTS = 'multi_send_lists',
     FIAT = 'fiat',
+    LANGUAGE = 'language',
 
-    GLOBAL_AUTH_STATE = 'password',
+    DEPRECATED_GLOBAL_AUTH_STATE = 'password',
     LOCK = 'lock',
     TOUCH_ID = 'touch_id',
     COUNTRY = 'country',

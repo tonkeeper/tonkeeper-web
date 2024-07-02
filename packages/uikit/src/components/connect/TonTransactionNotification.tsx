@@ -7,10 +7,10 @@ import {
     sendTonConnectTransfer,
     tonConnectTransferError
 } from '@tonkeeper/core/dist/service/transfer/tonService';
-import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
@@ -33,6 +33,7 @@ import { Button } from '../fields/Button';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
+import { useActiveStandardTonWallet, useActiveWallet, useWalletsState } from '../../state/wallet';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -56,7 +57,7 @@ const ButtonRowStyled = styled.div`
 `;
 
 const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?: boolean) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const sdk = useAppSdk();
     const { api } = useAppContext();
     const client = useQueryClient();
@@ -64,7 +65,7 @@ const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<string, Error>(async () => {
-        const signer = await getSigner(sdk, wallet.publicKey, checkTouchId);
+        const signer = await getSigner(sdk, wallet.id, checkTouchId);
 
         let boc: string;
         switch (signer.type) {
@@ -78,7 +79,7 @@ const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?
         }
 
         const invalidationPromise = client.invalidateQueries({
-            predicate: query => query.queryKey.includes(wallet.active.rawAddress)
+            predicate: query => query.queryKey.includes(wallet.rawAddress)
         });
         if (waitInvalidation) {
             await invalidationPromise;
@@ -233,7 +234,7 @@ const ConnectContent: FC<{
 
 const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boolean) => {
     const { api } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
 
     return useQuery<EstimateData, Error>(
         [QueryKey.estimate, params],
@@ -247,7 +248,7 @@ const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boole
 
 const useTransactionError = (params: TonConnectTransactionPayload) => {
     const { api } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
 
     return useQuery<ConnectTransferError, Error>([QueryKey.estimate, 'error', params], async () => {
         return tonConnectTransferError(api, wallet, params);
@@ -271,7 +272,7 @@ const WalletInfoStyled = styled.div`
 `;
 
 const NotificationTitleWithWalletName: FC<{ onClose: () => void }> = ({ onClose }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { t } = useTranslation();
 
     return (
@@ -283,7 +284,7 @@ const NotificationTitleWithWalletName: FC<{ onClose: () => void }> = ({ onClose 
                         <WalletInfoStyled>
                             <Body2>
                                 {t('confirmSendModal_wallet')}&nbsp;
-                                {wallet.name ?? toShortValue(wallet.active.friendlyAddress)}
+                                {wallet.name ?? toShortValue(formatAddress(wallet.rawAddress))}
                             </Body2>
                             <WalletEmoji
                                 emojiSize="20px"
@@ -304,12 +305,12 @@ export const TonTransactionNotification: FC<{
     waitInvalidation?: boolean;
 }> = ({ params, handleClose, waitInvalidation }) => {
     const { t } = useTranslation();
-    const { account } = useAppContext();
+    const wallets = useWalletsState();
     const Content = useCallback(() => {
         if (!params) return undefined;
         return (
             <>
-                {account.publicKeys.length > 1 && (
+                {wallets.length > 1 && (
                     <NotificationTitleWithWalletName onClose={() => handleClose()} />
                 )}
                 <ConnectContent
@@ -319,14 +320,14 @@ export const TonTransactionNotification: FC<{
                 />
             </>
         );
-    }, [origin, params, handleClose, account.publicKeys.length]);
+    }, [origin, params, handleClose, wallets.length]);
 
     return (
         <>
             <Notification
                 isOpen={params != null}
                 handleClose={() => handleClose()}
-                title={account.publicKeys.length > 1 ? undefined : t('txActions_signRaw_title')}
+                title={wallets.length > 1 ? undefined : t('txActions_signRaw_title')}
                 hideButton
             >
                 {Content}

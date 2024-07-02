@@ -2,7 +2,7 @@ import { Address } from '@ton/core';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset, isTon } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { DnsRecipient, TonRecipient } from '@tonkeeper/core/dist/entries/send';
-import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { StandardTonWalletState, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { arrayToCsvString } from '@tonkeeper/core/dist/service/parserService';
 import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/transfer/multiSendService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -12,7 +12,7 @@ import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from
 import { ControllerRenderProps } from 'react-hook-form/dist/types/controller';
 import { Link, useBlocker, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { useAppContext, useWalletContext } from '../../../hooks/appContext';
+import { useAppContext } from '../../../hooks/appContext';
 import { formatter } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import {
@@ -52,6 +52,7 @@ import { ImportListNotification } from './import-list/ImportListNotification';
 import { getWillBeMultiSendValue } from './utils';
 import { removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
+import { useActiveWallet } from '../../../state/wallet';
 
 const FormHeadingWrapper = styled.div`
     display: flex;
@@ -321,9 +322,9 @@ const MultiSendAddMore: FC<{
     const { data } = useEnableW5();
     const { mutate } = useEnableW5Mutation();
 
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet() as StandardTonWalletState;
 
-    if (fieldsNumber < MAX_ALLOWED_WALLET_MSGS[wallet.active.version]) {
+    if (fieldsNumber < MAX_ALLOWED_WALLET_MSGS[wallet.version]) {
         return (
             <Button
                 fitContent
@@ -348,7 +349,7 @@ const MultiSendAddMore: FC<{
         }
     };
 
-    if (wallet.active.version !== WalletVersion.W5) {
+    if (wallet.version !== WalletVersion.W5) {
         return (
             <MaximumReachedContainer>
                 <Body2>{t('multi_send_maximum_reached')}</Body2>
@@ -494,10 +495,10 @@ const MultiSendFooter: FC<{
 
     const { formState: formValidationState } = useAsyncValidationState();
 
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     const maxMsgsNumberExceeded =
-        watch('rows').length > MAX_ALLOWED_WALLET_MSGS[wallet.active.version];
+        watch('rows').length > MAX_ALLOWED_WALLET_MSGS[(wallet as StandardTonWalletState).version];
 
     const isLedger = useIsActiveWalletLedger();
 

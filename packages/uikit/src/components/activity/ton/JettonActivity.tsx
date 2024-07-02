@@ -1,7 +1,6 @@
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
-import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { FailedNote, ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayout';
@@ -19,6 +18,7 @@ import {
 } from '../CommonAction';
 import { toDexName } from '../NotificationCommon';
 import { useSwapValue } from './JettonNotifications';
+import { useActiveWallet } from '../../../state/wallet';
 
 export interface JettonActionProps {
     action: Action;
@@ -26,7 +26,7 @@ export interface JettonActionProps {
 }
 
 export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ action, date }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { jettonTransfer } = action;
 
     const format = useFormatCoinValue();
@@ -37,7 +37,7 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
 
     const isScam = jettonTransfer.jetton.verification === 'blacklist';
 
-    if (jettonTransfer.sender?.address === wallet.active.rawAddress) {
+    if (jettonTransfer.sender?.address === wallet.rawAddress) {
         return (
             <SendActivityAction
                 amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
@@ -123,7 +123,7 @@ export const JettonBurnAction: FC<JettonActionProps> = ({ action, date }) => {
     const { t } = useTranslation();
     const { jettonBurn } = action;
     const format = useFormatCoinValue();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     if (!jettonBurn) {
         return <ErrorAction />;
@@ -151,7 +151,7 @@ export const JettonMintAction: FC<JettonActionProps> = ({ action, date }) => {
     const { t } = useTranslation();
     const { jettonMint } = action;
     const format = useFormatCoinValue();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     if (!jettonMint) {
         return <ErrorAction />;

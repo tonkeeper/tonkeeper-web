@@ -1,7 +1,7 @@
-import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, relative, WalletSettingsRoute } from '../../libs/routes';
 import { useJettonList } from '../../state/jetton';
@@ -10,20 +10,19 @@ import {
     AppsIcon,
     ListOfTokensIcon,
     LogOutIcon,
-    RecoveryPhraseIcon,
     SaleBadgeIcon,
     SecurityIcon,
     SettingsProIcon,
     WalletsIcon
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
-import { useWalletNftList } from '../../state/wallet';
+import { useActiveWallet, useWalletNftList, useWalletsState } from "../../state/wallet";
 
 const SingleAccountSettings = () => {
     const [logout, setLogout] = useState(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
@@ -36,19 +35,21 @@ const SingleAccountSettings = () => {
             // },
         ];
 
-        if (wallet.auth == null) {
+        /*        if (wallet.auth == null) {
             items.push({
                 name: t('settings_recovery_phrase'),
                 icon: <RecoveryPhraseIcon />,
                 action: () => navigate(relative(SettingsRoute.recovery))
             });
-        }
+        }*/
 
-        items.push({
-            name: t('settings_wallet_version'),
-            icon: walletVersionText(wallet.active.version),
-            action: () => navigate(relative(SettingsRoute.version))
-        });
+        if (isStandardTonWallet(wallet)) {
+            items.push({
+                name: t('settings_wallet_version'),
+                icon: walletVersionText(wallet.version),
+                action: () => navigate(relative(SettingsRoute.version))
+            });
+        }
 
         if (proFeatures) {
             items.unshift({
@@ -107,7 +108,7 @@ const SingleAccountSettings = () => {
 const MultipleAccountSettings = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
@@ -141,19 +142,21 @@ const MultipleAccountSettings = () => {
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
 
-        if (wallet.auth == null) {
+        /*if (wallet.auth == null) {
             items.push({
                 name: t('settings_recovery_phrase'),
                 icon: <RecoveryPhraseIcon />,
                 action: () => navigate(relative(SettingsRoute.recovery))
             });
-        }
+        }*/
 
-        items.push({
-            name: t('settings_wallet_version'),
-            icon: walletVersionText(wallet.active.version),
-            action: () => navigate(relative(SettingsRoute.version))
-        });
+        if (isStandardTonWallet(wallet)) {
+            items.push({
+                name: t('settings_wallet_version'),
+                icon: walletVersionText(wallet.version),
+                action: () => navigate(relative(SettingsRoute.version))
+            });
+        }
 
         if (jettons?.balances.length) {
             items.push({
@@ -193,9 +196,9 @@ const MultipleAccountSettings = () => {
 };
 
 export const AccountSettings = () => {
-    const { account } = useAppContext();
+    const wallets = useWalletsState();
 
-    if (account.publicKeys.length > 1) {
+    if (wallets.length > 1) {
         return <MultipleAccountSettings />;
     } else {
         return <SingleAccountSettings />;

@@ -4,12 +4,11 @@ import {
     ConnectRequest,
     DAppManifest
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { getManifest } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
@@ -21,6 +20,7 @@ import { Body2, Body3, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { useConnectTonConnectAppMutation } from '../../state/tonConnect';
+import { useActiveWallet } from '../../state/wallet';
 
 const Title = styled(H2)`
     text-align: center;
@@ -84,7 +84,7 @@ const ConnectContent: FC<{
     const sdk = useAppSdk();
     const [done, setDone] = useState(false);
 
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     const { t } = useTranslation();
 
@@ -109,13 +109,17 @@ const ConnectContent: FC<{
         }
     };
 
-    const address = formatAddress(wallet.active.rawAddress, wallet.network);
+    const address = formatAddress(wallet.rawAddress, wallet.network);
 
     let shortUrl = manifest.url;
     try {
         shortUrl = new URL(manifest.url).hostname;
     } catch {
         /* eslint-stub */
+    }
+
+    if (!isStandardTonWallet(wallet)) {
+        return <></>;
     }
 
     return (
@@ -129,8 +133,7 @@ const ConnectContent: FC<{
                 <Title>{t('ton_login_title_web').replace('%{name}', shortUrl)}</Title>
                 <SubTitle>
                     {t('ton_login_caption').replace('%{name}', getDomain(manifest.name))}{' '}
-                    <Address>{toShortValue(address)}</Address>{' '}
-                    {walletVersionText(wallet.active.version)}
+                    <Address>{toShortValue(address)}</Address> {walletVersionText(wallet.version)}
                 </SubTitle>
             </div>
 

@@ -11,7 +11,7 @@ import {
 } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
@@ -33,6 +33,7 @@ import { SuggestionList } from './SuggestionList';
 import { MainButton } from './common';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { useIsActiveWalletLedger } from '../../state/ledger';
+import { useActiveWallet } from '../../state/wallet';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -135,7 +136,7 @@ export const RecipientView: FC<{
 }) => {
     const sdk = useAppSdk();
     const [submitted, setSubmit] = useState(false);
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { t } = useTranslation();
     const { standalone, ios } = useAppContext();
     const ref = useRef<HTMLTextAreaElement | null>(null);

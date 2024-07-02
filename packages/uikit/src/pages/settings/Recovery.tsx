@@ -1,31 +1,31 @@
-import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import React, { FC, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { BackButtonBlock } from '../../components/BackButton';
 import { Body1, Body2, H2 } from '../../components/Text';
 import { WorldNumber, WorldsGrid } from '../../components/create/Words';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { getMnemonic } from '../../state/mnemonic';
-import { useCheckTouchId } from "../../state/password";
+import { useCheckTouchId } from '../../state/password';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { useActiveWallet } from '../../state/wallet';
 
 export const ActiveRecovery = () => {
-    const wallet = useWalletContext();
-    return <RecoveryContent publicKey={wallet.publicKey} />;
+    const wallet = useActiveWallet();
+    return <RecoveryContent walletId={wallet.id} />;
 };
 
 export const Recovery = () => {
-    const { publicKey } = useParams();
-    if (publicKey) {
-        return <RecoveryContent publicKey={publicKey} />;
+    const { walletId } = useParams();
+    if (walletId) {
+        return <RecoveryContent walletId={walletId} />;
     } else {
         return <ActiveRecovery />;
     }
 };
 
-const useMnemonic = (publicKey: string, auth: AuthState) => {
+const useMnemonic = (walletId: string) => {
     const [mnemonic, setMnemonic] = useState<string[] | undefined>(undefined);
     const sdk = useAppSdk();
     const navigate = useNavigate();
@@ -34,12 +34,12 @@ const useMnemonic = (publicKey: string, auth: AuthState) => {
     useEffect(() => {
         (async () => {
             try {
-                setMnemonic(await getMnemonic(sdk, publicKey, checkTouchId));
+                setMnemonic(await getMnemonic(sdk, walletId, checkTouchId));
             } catch (e) {
                 navigate(-1);
             }
         })();
-    }, [publicKey]);
+    }, [walletId, checkTouchId]);
 
     return mnemonic;
 };
@@ -73,11 +73,10 @@ const Body = styled(Body2)`
     user-select: none;
 `;
 
-const RecoveryContent: FC<{ publicKey: string }> = ({ publicKey }) => {
-    const { auth } = useAppContext();
+const RecoveryContent: FC<{ walletId: WalletId }> = ({ walletId }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const mnemonic = useMnemonic(publicKey, auth);
+    const mnemonic = useMnemonic(walletId);
 
     const onBack = () => {
         navigate(-1);

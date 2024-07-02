@@ -3,13 +3,13 @@ import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { useEffect, useMemo, useRef } from 'react';
 import { useGetToAccount } from '../../components/transfer/RecipientView';
-import { useWalletContext } from '../appContext';
+import { useActiveWallet } from '../../state/wallet';
 
 export function useTonRecipient(address: string): {
     recipient: TonRecipientData;
     isLoading: boolean;
 } {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const isFirstRender = useRef(true);
     const { isLoading, data: toAccount, mutate: mutateRecipient } = useGetToAccount();
     useEffect(() => {

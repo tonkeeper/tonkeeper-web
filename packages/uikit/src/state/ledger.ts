@@ -6,17 +6,19 @@ import {
     waitLedgerTonAppReady
 } from '@tonkeeper/core/dist/service/ledger/connector';
 import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppContext } from '../hooks/appContext';
 import { AccountsApi, Account } from '@tonkeeper/core/dist/tonApiV2';
 import { Address } from '@ton/core';
 import { useAppSdk } from '../hooks/appSdk';
 import { useNavigate } from 'react-router-dom';
 import { walletStateFromLedger } from '@tonkeeper/core/dist/service/walletService';
-import { addWalletsWithCustomAuthState } from '@tonkeeper/core/dist/service/accountService';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
 import { useCallback, useState } from 'react';
 import { AuthLedger } from '@tonkeeper/core/dist/entries/password';
+import { useWalletsStorage } from '../hooks/useStorage';
+import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { useActiveWallet } from './wallet';
 
 export type LedgerAccount = {
     accountIndex: number;
@@ -94,6 +96,8 @@ export const useAddLedgerAccountsMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const navigate = useNavigate();
+    const walletsStorage = useWalletsStorage();
+
     return useMutation<void, Error, { accounts: LedgerAccount[]; name: string; emoji: string }>(
         async form => {
             try {
@@ -107,7 +111,7 @@ export const useAddLedgerAccountsMutation = () => {
                     }));
                 }
 
-                await addWalletsWithCustomAuthState(sdk.storage, states, { keepName: true });
+                await walletsStorage.addWalletsToState(states);
 
                 await client.invalidateQueries([QueryKey.account]);
 
@@ -121,6 +125,6 @@ export const useAddLedgerAccountsMutation = () => {
 };
 
 export const useIsActiveWalletLedger = () => {
-    const { auth } = useWalletContext();
-    return auth?.kind === 'ledger';
+    const wallet = useActiveWallet();
+    return isStandardTonWallet(wallet) && wallet.auth.kind === 'ledger';
 };

@@ -1,7 +1,7 @@
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { createTransferQr } from '@tonkeeper/core/dist/service/signerService';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useNavigate } from '../hooks/navigate';
 import { useScanner } from '../hooks/scanner';
@@ -10,6 +10,8 @@ import { Notification, NotificationBlock } from './Notification';
 import { Button } from './fields/Button';
 import { Background, HeaderBlock } from './home/AccountView';
 import { AnimatedQrCode } from './home/qrCodeView';
+import { useActiveWallet } from '../state/wallet';
+import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 
 export const SignerContent: FC<{
     sdk: IAppSdk;
@@ -17,7 +19,7 @@ export const SignerContent: FC<{
     onClose: () => void;
     onSubmit: (result: string) => void;
 }> = ({ sdk, boc, onClose, onSubmit }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { t } = useTranslation();
     const { extension } = useAppContext();
 
@@ -26,7 +28,10 @@ export const SignerContent: FC<{
     const openScanner = useScanner(null, onSubmit);
 
     const message = useMemo(() => {
-        return createTransferQr(wallet.publicKey, wallet.active.version, boc);
+        if (!isStandardTonWallet(wallet)) {
+            throw new Error('Unexpected wallet');
+        }
+        return createTransferQr(wallet.publicKey, wallet.version, boc);
     }, [wallet, boc]);
 
     return (

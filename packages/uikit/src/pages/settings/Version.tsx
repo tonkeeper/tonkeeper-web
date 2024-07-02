@@ -12,12 +12,12 @@ import { CheckIcon } from '../../components/Icon';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2 } from '../../components/Text';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useMutateWalletVersion } from '../../state/account';
 import { useEnableW5 } from '../../state/experemental';
 import { useIsActiveWalletKeystone } from '../../state/keystone';
 import { useIsActiveWalletLedger } from '../../state/ledger';
+import { useActiveStandardTonWallet } from '../../state/wallet';
 
 const LedgerError = styled(Body2)`
     margin: 0.5rem 0;
@@ -30,9 +30,7 @@ export const WalletVersion = () => {
     const isLedger = useIsActiveWalletLedger();
     const isKeystone = useIsActiveWalletKeystone();
     const { data: enableW5 } = useEnableW5();
-    const wallet = useWalletContext();
-
-    const { mutate, isLoading } = useMutateWalletVersion();
+    const wallet = useActiveStandardTonWallet();
 
     const items = useMemo<SettingsItem[]>(() => {
         const publicKey = Buffer.from(wallet.publicKey, 'hex');
@@ -45,22 +43,18 @@ export const WalletVersion = () => {
         return list.map(item => ({
             name: walletVersionText(item),
             secondary: toShortValue(
-                getWalletAddress(publicKey, item, wallet.network).friendlyAddress
+                getWalletAddress(publicKey, item, wallet.network).address.toString()
             ),
-            icon: wallet.active.version === item ? <CheckIcon /> : undefined,
-            action: () => mutate(item)
+            icon: wallet.version === item ? <CheckIcon /> : undefined,
+            action: () => {}
         }));
-    }, [wallet, mutate, experimental, enableW5]);
+    }, [wallet, experimental, enableW5]);
 
     return (
         <>
             <SubHeader title={t('settings_wallet_version')} />
             <InnerBody>
-                <SettingsList
-                    isDisabled={isLedger || isKeystone}
-                    items={items}
-                    loading={isLoading}
-                />
+                <SettingsList isDisabled={isLedger || isKeystone} items={items} loading={false} />
                 {isLedger && <LedgerError>{t('ledger_operation_not_supported')}</LedgerError>}
                 {isKeystone && <LedgerError>{t('operation_not_supported')}</LedgerError>}
             </InnerBody>

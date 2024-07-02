@@ -9,6 +9,7 @@ import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { useWalletsState } from '../wallet';
 import { ClientColumns, useDashboardColumnsAsForm } from './useDashboardColumns';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 
 export function useDashboardData() {
     const { data: columns } = useDashboardColumnsAsForm();
@@ -21,18 +22,18 @@ export function useDashboardData() {
     const selectedColIds = selectedColumns?.map(c => c.id);
     const client = useQueryClient();
 
-    const { data: walletsState } = useWalletsState();
-    const mainnetWallets = walletsState?.filter(w => w && w.network !== Network.TESTNET);
-    const publicKeysMainnet = mainnetWallets?.map(w => w!.publicKey);
+    const walletsState = useWalletsState();
+    const mainnetWallets = walletsState.filter(w => w && w.network !== Network.TESTNET);
+    const idsMainnet = mainnetWallets.map(w => w!.id);
 
     return useQuery<DashboardCell[][]>(
-        [QueryKey.dashboardData, selectedColIds, publicKeysMainnet, fiat, language],
+        [QueryKey.dashboardData, selectedColIds, idsMainnet, fiat, language],
         async ctx => {
-            if (!selectedColIds?.length || !publicKeysMainnet?.length || !mainnetWallets?.length) {
+            if (!selectedColIds?.length || !idsMainnet?.length || !mainnetWallets?.length) {
                 return [];
             }
 
-            const accounts = mainnetWallets.map(acc => acc!.active.friendlyAddress);
+            const accounts = mainnetWallets.map(acc => formatAddress(acc!.rawAddress));
 
             const loadData = async (query: { columns: string[]; accounts: string[] }) => {
                 const queryToFetch = {
@@ -53,9 +54,7 @@ export function useDashboardData() {
                 const result: DashboardCell[][] = query.accounts.map(() => []);
                 query.accounts.forEach((walletAddress, rowIndex) => {
                     const wallet = mainnetWallets.find(w =>
-                        Address.parse(w!.active.friendlyAddress).equals(
-                            Address.parse(walletAddress)
-                        )
+                        Address.parse(w!.rawAddress).equals(Address.parse(walletAddress))
                     );
                     query.columns.forEach((col, colIndex) => {
                         const ClientColumnName = ClientColumns.find(c => c.id === 'name')!;
@@ -92,12 +91,12 @@ export function useDashboardData() {
                 const walletsToQuerySet = new Set<WalletState>();
                 const columnsToQuerySet = new Set<string>();
 
-                const result: (DashboardCell | null)[][] = publicKeysMainnet.map(() => []);
-                publicKeysMainnet.forEach((pk, walletIndex) => {
+                const result: (DashboardCell | null)[][] = idsMainnet.map(() => []);
+                idsMainnet.forEach((id, walletIndex) => {
                     selectedColIds.forEach((col, colIndex) => {
                         const matchingQueries = pastQueries.filter(
                             ([key, _]) =>
-                                (key[2] as string[] | undefined)?.includes(pk) &&
+                                (key[2] as string[] | undefined)?.includes(id) &&
                                 (key[1] as string[] | undefined)?.includes(col)
                         );
 
@@ -110,7 +109,7 @@ export function useDashboardData() {
 
                         const [actualQueryKey, actualQueryValue] =
                             matchingQueries[matchingQueries.length - 1];
-                        const actualQueryWalletIndex = (actualQueryKey[2] as string[]).indexOf(pk);
+                        const actualQueryWalletIndex = (actualQueryKey[2] as string[]).indexOf(id);
                         const actualQueryColIndex = (actualQueryKey[1] as string[]).indexOf(col);
 
                         result[walletIndex][colIndex] = (actualQueryValue as DashboardCell[][])[
@@ -120,7 +119,7 @@ export function useDashboardData() {
                 });
 
                 const walletsToQuery = [...walletsToQuerySet.values()];
-                const accountsToQuery = walletsToQuery.map(acc => acc.active.friendlyAddress);
+                const accountsToQuery = walletsToQuery.map(acc => formatAddress(acc.rawAddress));
                 const columnsToQuery = [...columnsToQuerySet.values()];
 
                 if (!accountsToQuery.length || !columnsToQuery.length) {
@@ -133,9 +132,7 @@ export function useDashboardData() {
                 });
 
                 newData.forEach((row, rowIndex) => {
-                    const walletIndex = publicKeysMainnet.indexOf(
-                        walletsToQuery[rowIndex].publicKey
-                    );
+                    const walletIndex = idsMainnet.indexOf(walletsToQuery[rowIndex].id);
                     row.forEach(cell => {
                         const colIndex = selectedColIds.indexOf(cell.columnId);
                         result[walletIndex][colIndex] = cell;

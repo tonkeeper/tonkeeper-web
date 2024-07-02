@@ -19,8 +19,8 @@ import {
   openNotificationPopUp,
 } from './notificationService';
 import { waitApprove } from './utils';
-import { accountSelectWallet } from "@tonkeeper/core/dist/service/accountService";
 import { TonConnectError } from "@tonkeeper/core/dist/entries/exception";
+import { walletsStorage } from "@tonkeeper/core/dist/service/walletsService";
 
 const storage = new ExtensionStorage();
 
@@ -106,7 +106,7 @@ export const tonConnectTransaction = async (
     );
   }
 
-  await accountSelectWallet(storage, connection.wallet.publicKey);
+  await walletsStorage(storage).setActiveWalletId(connection.wallet.active.rawAddress);
   await delay(200);
 
   await cancelOpenedNotification();

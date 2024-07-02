@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { sha512_sync } from '@ton/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
     TonendpoinFiatButton,
     TonendpoinFiatItem,
@@ -12,7 +12,7 @@ import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import { useBuyAnalytics } from '../../hooks/amplitude';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
 import { useTranslation } from '../../hooks/translation';
@@ -24,6 +24,7 @@ import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { useCreateMercuryoProUrl } from '../../state/tonendpoint';
 import { hexToRGBA } from '../../libs/css';
+import { useActiveWallet } from '../../state/wallet';
 
 const Logo = styled.img<{ large?: boolean }>`
     pointer-events: none;
@@ -158,12 +159,12 @@ const useShowDisclaimer = (title: string, kind: 'buy' | 'sell') => {
 const replacePlaceholders = (
     url: string,
     config: TonendpointConfig,
-    wallet: WalletState,
+    wallet: TonWalletState,
     fiat: FiatCurrencies,
     kind: 'buy' | 'sell'
 ) => {
     const [CUR_FROM, CUR_TO] = kind === 'buy' ? [fiat, 'TON'] : ['TON', fiat];
-    const address = formatAddress(wallet.active.rawAddress, wallet.network);
+    const address = formatAddress(wallet.rawAddress, wallet.network);
     url = url
         .replace('{ADDRESS}', address)
         .replace('{CUR_FROM}', CUR_FROM)
@@ -210,7 +211,7 @@ export const BuyItemNotification: FC<{
 }> = ({ item, kind }) => {
     const track = useBuyAnalytics();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { config, fiat } = useAppContext();
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);

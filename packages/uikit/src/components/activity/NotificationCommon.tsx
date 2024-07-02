@@ -13,7 +13,7 @@ import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, PropsWithChildren, useMemo } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency, useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
@@ -25,6 +25,7 @@ import { ListItem, ListItemPayload } from '../List';
 import { Body1, H2, Label1 } from '../Text';
 import { Button } from '../fields/Button';
 import { hexToRGBA } from '../../libs/css';
+import { useActiveWallet } from '../../state/wallet';
 
 export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
     display: flex;
@@ -163,7 +164,7 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: b
 }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     return (
         <>
@@ -185,7 +186,7 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: b
 
 export const ActionPoolDetails: FC<{ pool: AccountAddress }> = ({ pool }) => {
     const { t } = useTranslation();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     return (
         <>
             <ListItem>
@@ -222,7 +223,7 @@ export const ActionSenderDetails: FC<{ sender: AccountAddress; bounced?: boolean
 }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     return (
         <>
@@ -245,7 +246,7 @@ export const ActionSenderDetails: FC<{ sender: AccountAddress; bounced?: boolean
 export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({ beneficiary }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     const address = formatAddress(beneficiary.address, wallet.network, true);
     return (
@@ -302,7 +303,7 @@ export const ActionDeployerAddress: FC<{ address?: string }> = ({ address }) => 
 };
 
 export const ActionDeployerDetails: FC<{ deployer: string }> = ({ deployer }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     return <ActionDeployerAddress address={formatAddress(deployer, wallet.network)} />;
 };
 
@@ -435,7 +436,7 @@ export const TronActionDetailsBlock: FC<PropsWithChildren<{ event: TronEvent }>>
     event,
     children
 }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const url =
         wallet.network === Network.TESTNET
             ? 'https://nile.tronscan.org/#/transaction/%s'

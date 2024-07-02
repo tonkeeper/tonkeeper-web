@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { AccountState } from '@tonkeeper/core/dist/entries/account';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { DeprecatedAccountState } from '@tonkeeper/core/dist/entries/account';
+import { DeprecatedWalletState, WalletsState, WalletState } from "@tonkeeper/core/dist/entries/wallet";
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { Amplitude } from '@tonkeeper/uikit/dist/hooks/analytics/amplitude';
@@ -34,8 +34,8 @@ export const useAppWidth = () => {
 
 export const useAnalytics = (
     storage: IStorage,
-    account?: AccountState,
-    wallet?: WalletState | null,
+    activeWallet?: WalletState,
+    wallets?: WalletsState,
     version?: string
 ) => {
     return useQuery<Analytics>(
@@ -59,10 +59,12 @@ export const useAnalytics = (
                 new Amplitude(process.env.REACT_APP_AMPLITUDE!, userId)
             );
 
-            tracker.init(extensionType ?? 'Extension', toWalletType(wallet), account, wallet);
+            tracker.init(extensionType ?? 'Extension',  toWalletType(activeWallet),
+              activeWallet,
+              wallets,);
 
             return tracker;
         },
-        { enabled: account != null }
+      { enabled: wallets != null && activeWallet !== undefined }
     );
 };

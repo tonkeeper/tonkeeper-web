@@ -6,32 +6,29 @@ import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Label1 } from '../../components/Text';
 import { Switch } from '../../components/fields/Switch';
-import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { getMnemonic } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
+import { useActiveStandardTonWallet, useActiveWallet } from '../../state/wallet';
 
 const useSubscribed = () => {
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
-    return useQuery<boolean, Error>(
-        [wallet.active.rawAddress, wallet.network, QueryKey.subscribed],
-        async () => {
-            const { notifications } = sdk;
-            if (!notifications) {
-                throw new Error('Missing notifications');
-            }
-            return notifications.subscribed(wallet.active.rawAddress);
+    return useQuery<boolean, Error>([wallet.id, wallet.network, QueryKey.subscribed], async () => {
+        const { notifications } = sdk;
+        if (!notifications) {
+            throw new Error('Missing notifications');
         }
-    );
+        return notifications.subscribed(wallet.id);
+    });
 };
 
 const useToggleSubscribe = () => {
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const client = useQueryClient();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
@@ -41,7 +38,7 @@ const useToggleSubscribe = () => {
             throw new Error('Missing notifications');
         }
         if (checked) {
-            const mnemonic = await getMnemonic(sdk, wallet.publicKey, checkTouchId);
+            const mnemonic = await getMnemonic(sdk, wallet.id, checkTouchId);
             try {
                 await notifications.subscribe(wallet, mnemonic);
             } catch (e) {
@@ -50,18 +47,14 @@ const useToggleSubscribe = () => {
             }
         } else {
             try {
-                await notifications.unsubscribe(wallet.active.rawAddress);
+                await notifications.unsubscribe(wallet.rawAddress);
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);
                 throw e;
             }
         }
 
-        await client.invalidateQueries([
-            wallet.active.rawAddress,
-            wallet.network,
-            QueryKey.subscribed
-        ]);
+        await client.invalidateQueries([wallet.id, wallet.network, QueryKey.subscribed]);
     });
 };
 

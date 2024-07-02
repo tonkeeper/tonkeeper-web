@@ -2,10 +2,11 @@ import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppContext } from '../hooks/appContext';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { seeIfTonTransfer } from './ton/tonActivity';
 import { MixedActivity } from './mixedActivity';
+import { useActiveWallet } from './wallet';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -136,15 +137,15 @@ export const groupActivityGeneric = <T>(
 };
 
 export const useFetchFilteredActivity = (asset: string) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { api } = useAppContext();
 
     return useInfiniteQuery({
-        queryKey: [wallet.active.rawAddress, QueryKey.activity, asset],
+        queryKey: [wallet.rawAddress, QueryKey.activity, asset],
         queryFn: async ({ pageParam = undefined }) => {
             if (asset.toLowerCase() === CryptoCurrency.TON.toLowerCase()) {
                 const activity = await new AccountsApi(api.tonApiV2).getAccountEvents({
-                    accountId: wallet.active.rawAddress,
+                    accountId: wallet.rawAddress,
                     limit: 20,
                     beforeLt: pageParam,
                     subjectOnly: true
@@ -156,7 +157,7 @@ export const useFetchFilteredActivity = (asset: string) => {
                 return activity;
             } else {
                 return new AccountsApi(api.tonApiV2).getAccountJettonHistoryByID({
-                    accountId: wallet.active.rawAddress,
+                    accountId: wallet.rawAddress,
                     jettonId: asset,
                     limit: 20,
                     beforeLt: pageParam

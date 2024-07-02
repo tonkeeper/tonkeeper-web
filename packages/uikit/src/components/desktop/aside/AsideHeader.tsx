@@ -2,8 +2,7 @@ import styled from 'styled-components';
 import { FC, useRef, useState } from 'react';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { Body3, Label2 } from '../../Text';
-import { useAppContext } from '../../../hooks/appContext';
-import { useWalletState } from '../../../state/wallet';
+import { useActiveWallet } from '../../../state/wallet';
 import { useTranslation } from '../../../hooks/translation';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
@@ -63,14 +62,13 @@ const DoneIconStyled = styled(DoneIcon)`
 
 export const AsideHeader: FC<{ width: number }> = ({ width }) => {
     const { t } = useTranslation();
-    const { account } = useAppContext();
-    const { data: wallet } = useWalletState(account.activePublicKey!);
+    const wallet = useActiveWallet();
     const route = useAsideActiveRoute();
     const [copied, setIsCopied] = useState(false);
     const sdk = useAppSdk();
     const [hovered, setHovered] = useState(false);
 
-    const address = wallet ? formatAddress(wallet.active.rawAddress) : '';
+    const address = wallet ? formatAddress(wallet.rawAddress) : '';
 
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 

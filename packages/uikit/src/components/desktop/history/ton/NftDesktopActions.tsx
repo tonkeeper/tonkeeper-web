@@ -11,8 +11,7 @@ import {
     ErrorRow,
     HistoryCellActionGeneric
 } from './HistoryCell';
-import { useWalletContext } from '../../../../hooks/appContext';
-import { useNftCollectionData, useNftItemData } from '../../../../state/wallet';
+import { useActiveWallet, useNftCollectionData, useNftItemData } from '../../../../state/wallet';
 import styled, { css } from 'styled-components';
 import { Body2 } from '../../../Text';
 import { Skeleton } from '../../../shared/Skeleton';
@@ -130,7 +129,7 @@ export const NftTransferDesktopAction: FC<{
     isScam: boolean;
 }> = ({ action, isScam }) => {
     const { t } = useTranslation();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { nftItemTransfer } = action;
 
     const { data: nftInfo } = useNftItemData(action.nftItemTransfer?.nft || '');
@@ -142,7 +141,7 @@ export const NftTransferDesktopAction: FC<{
         return <ErrorRow />;
     }
 
-    if (eqAddresses(wallet.active.rawAddress, nftItemTransfer.sender?.address)) {
+    if (eqAddresses(wallet.rawAddress, nftItemTransfer.sender?.address)) {
         return (
             <>
                 <HistoryCellActionSent isFailed={action.status === 'failed'} />

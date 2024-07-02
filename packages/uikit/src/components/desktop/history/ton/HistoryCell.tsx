@@ -6,8 +6,8 @@ import { FC, ReactNode } from 'react';
 import { Body2, Body2Class } from '../../../Text';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useFormatCoinValue } from '../../../../hooks/balance';
-import { useWalletContext } from '../../../../hooks/appContext';
 import { HistoryGridCell, HistoryGridCellFillRow } from './HistoryGrid';
+import { useActiveWallet } from '../../../../state/wallet';
 
 export const HistoryCellAction = styled(HistoryGridCell)`
     display: flex;
@@ -103,7 +103,7 @@ export const HistoryCellAccount: FC<{
     account?: { address?: string; name?: string };
     fallbackAddress?: string;
 }> = ({ account, fallbackAddress }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { t } = useTranslation();
 
     return (

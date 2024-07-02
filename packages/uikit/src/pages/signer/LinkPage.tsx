@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { addWalletWithCustomAuthState } from '@tonkeeper/core/dist/service/accountService';
 import { walletStateFromSignerDeepLink } from '@tonkeeper/core/dist/service/walletService';
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -8,9 +7,11 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { QueryKey } from '../../libs/queryKey';
 import { AppRoute } from '../../libs/routes';
+import { useWalletsStorage } from '../../hooks/useStorage';
 
 const useAddWalletMutation = () => {
     const sdk = useAppSdk();
+    const walletsStorage = useWalletsStorage();
     const client = useQueryClient();
     const { api } = useAppContext();
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ const useAddWalletMutation = () => {
                 sdk.topMessage('Missing public key');
             } else {
                 const state = await walletStateFromSignerDeepLink(api, publicKey, name);
-                await addWalletWithCustomAuthState(sdk.storage, state);
+                await walletsStorage.addWalletToState(state);
                 await client.invalidateQueries([QueryKey.account]);
             }
             navigate(AppRoute.home);
@@ -30,7 +31,7 @@ const useAddWalletMutation = () => {
 };
 
 const SignerLinkPage = () => {
-    let [searchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const { mutate } = useAddWalletMutation();
 
     useEffect(() => {

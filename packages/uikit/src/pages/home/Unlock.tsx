@@ -1,15 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
-import { getWalletWithGlobalAuth } from '@tonkeeper/core/dist/service/accountService';
-import { validateWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { TonkeeperIcon } from '../../components/Icon';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useMutateDeleteAll } from '../../state/account';
+import { useIsPasswordSet, useMutateDeleteAll, useWalletsState } from '../../state/wallet';
+import { passwordStorage } from '@tonkeeper/core/dist/service/passwordService';
 
 const Block = styled.form<{ minHeight?: string }>`
     display: flex;
@@ -44,11 +42,9 @@ const useMutateUnlock = () => {
     const sdk = useAppSdk();
 
     return useMutation<void, Error, string>(async password => {
-        const publicKey = await getWalletWithGlobalAuth(sdk.storage);
-
-        const isValid = await validateWalletMnemonic(sdk.storage, publicKey, password);
+        const isValid = await passwordStorage(sdk.storage).isPasswordValid(password);
         if (!isValid) {
-            throw new Error('Mnemonic not valid');
+            throw new Error('Password not valid');
         }
         sdk.uiEvents.emit('unlock');
     });
@@ -57,7 +53,7 @@ const useMutateUnlock = () => {
 export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    const { account } = useAppContext();
+    const wallets = useWalletsState();
 
     const ref = useRef<HTMLInputElement | null>(null);
     const { mutate: mutateLogOut, isLoading: isLogOutLoading } = useMutateDeleteAll();
@@ -84,7 +80,7 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
 
     const onLogOut = async () => {
         const confirm = await sdk.confirm(
-            t(account.publicKeys.length > 1 ? 'logout_on_unlock_many' : 'logout_on_unlock_one')
+            t(wallets.length > 1 ? 'logout_on_unlock_many' : 'logout_on_unlock_one')
         );
         if (confirm) {
             await mutateLogOut();
@@ -136,9 +132,9 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
 };
 
 export const Unlock = () => {
-    const { auth } = useAppContext();
+    const isPasswordSet = useIsPasswordSet();
 
-    if (auth.kind === 'password') {
+    if (isPasswordSet) {
         return <PasswordUnlock />;
     } else {
         return <div>Other auth</div>;

@@ -17,9 +17,10 @@ import { useJettonList } from '../../state/jetton';
 import { getSigner } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
 import { useTransactionAnalytics } from '../amplitude';
-import { useAppContext, useWalletContext } from '../appContext';
+import { useAppContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
+import { useActiveStandardTonWallet } from '../../state/wallet';
 
 export function useSendTransfer<T extends Asset>(
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,
@@ -30,14 +31,14 @@ export function useSendTransfer<T extends Asset>(
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
     const { data: jettons } = useJettonList();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<boolean, Error>(async () => {
-        const signer = await getSigner(sdk, wallet.publicKey, checkTouchId).catch(() => null);
+        const signer = await getSigner(sdk, wallet.id, checkTouchId).catch(() => null);
         if (signer === null) return false;
         try {
             if (isTonAsset(amount.asset)) {
@@ -88,7 +89,7 @@ export function useSendTransfer<T extends Asset>(
         }
 
         await client.invalidateQueries({
-            predicate: query => query.queryKey.includes(wallet.active.rawAddress)
+            predicate: query => query.queryKey.includes(wallet.id)
         });
         return true;
     });

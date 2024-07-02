@@ -26,7 +26,7 @@ const RenameWalletContent: FC<{
         afterClose(() => null);
     };
 
-    const address = formatAddress(wallet.active.rawAddress, wallet.network);
+    const address = formatAddress(wallet.rawAddress, wallet.network);
 
     return (
         <NotificationBlock onSubmit={onSubmit}>

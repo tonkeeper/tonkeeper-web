@@ -10,7 +10,7 @@ import { useRate } from '../../../state/rates';
 import { useAppContext } from '../../../hooks/appContext';
 import { formatFiatCurrency, useFormatCoinValue } from '../../../hooks/balance';
 import { ListBlock, ListItem } from '../../List';
-import { useWalletState } from '../../../state/wallet';
+import { useActiveWallet } from '../../../state/wallet';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { useTranslation } from '../../../hooks/translation';
 import { useEstimateMultiTransfer } from '../../../hooks/blockchain/useEstimateMultiTransferFee';
@@ -165,8 +165,7 @@ const MultiSendConfirmContent: FC<{
         willBeSentBN?.multipliedBy(rate?.prices || 0)
     );
 
-    const { account } = useAppContext();
-    const { data: wallet } = useWalletState(account.activePublicKey!);
+    const wallet = useActiveWallet();
 
     const {
         mutateAsync: estimate,

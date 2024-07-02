@@ -8,7 +8,6 @@ import {
     ContractDeployIcon,
     SentIcon
 } from '../../../components/activity/ActivityIcons';
-import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { FailedNote, ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayout';
@@ -37,13 +36,14 @@ import {
     WithdrawStakeAction
 } from './StakeActivity';
 import { SubscribeAction, UnSubscribeAction } from './SubscribeAction';
+import { useActiveWallet } from '../../../state/wallet';
 
 const TonTransferAction: FC<{
     action: Action;
     date: string;
     isScam: boolean;
 }> = ({ action, date, isScam }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { tonTransfer } = action;
 
     const format = useFormatCoinValue();
@@ -52,7 +52,7 @@ const TonTransferAction: FC<{
         return <ErrorAction />;
     }
 
-    if (tonTransfer.recipient.address === wallet.active.rawAddress) {
+    if (tonTransfer.recipient.address === wallet.rawAddress) {
         return (
             <ReceiveActivityAction
                 amount={format(tonTransfer.amount)}
@@ -90,14 +90,14 @@ export const SmartContractExecAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { smartContractExec } = action;
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const format = useFormatCoinValue();
 
     if (!smartContractExec) {
         return <ErrorAction />;
     }
 
-    if (seeIfAddressEqual(smartContractExec.contract.address, wallet.active.rawAddress)) {
+    if (seeIfAddressEqual(smartContractExec.contract.address, wallet.rawAddress)) {
         return (
             <ListItemGrid>
                 <ActivityIcon status={action.status}>
@@ -143,7 +143,7 @@ const AuctionBidAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { auctionBid } = action;
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const format = useFormatCoinValue();
 
     if (!auctionBid) {
@@ -181,10 +181,7 @@ const DomainRenewAction: FC<{
     action: Action;
     date: string;
 }> = ({ action, date }) => {
-    const { t } = useTranslation();
     const { domainRenew, simplePreview } = action;
-    const wallet = useWalletContext();
-    const format = useFormatCoinValue();
 
     if (!domainRenew) {
         return <ErrorAction />;

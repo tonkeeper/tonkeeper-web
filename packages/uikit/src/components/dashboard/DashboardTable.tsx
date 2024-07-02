@@ -101,10 +101,8 @@ const isNumericColumn = (columnType: DashboardColumnType): boolean => {
 export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
     const { data: columns } = useDashboardColumnsAsForm();
     const { data: dashboardData } = useDashboardData();
-    const { data: wallets, isFetched: isWalletsFetched } = useWalletsState();
-    const mainnetPubkeys = wallets
-        ?.filter(w => w && w.network !== Network.TESTNET)
-        .map(w => w!.publicKey);
+    const wallets = useWalletsState();
+    const mainnetIds = wallets?.filter(w => w && w.network !== Network.TESTNET).map(w => w!.id);
 
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [hoverOnColumn, setHoverOnColumn] = useState<number | undefined>(undefined);
@@ -159,7 +157,7 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
         return hoverOnColumn !== undefined && hoverOnColumn >= i && hoverOnColumn <= i + 1;
     };
 
-    if (!columns || !isWalletsFetched) {
+    if (!columns) {
         return null;
     }
 
@@ -224,7 +222,7 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
                               ))}
                           </TrStyled>
                       ))
-                    : (mainnetPubkeys || [1, 2, 3]).map(key => (
+                    : (mainnetIds || [1, 2, 3]).map(key => (
                           <TrStyled key={key}>
                               {selectedColumns.map((col, colIndex) => (
                                   <Td key={col.id}>

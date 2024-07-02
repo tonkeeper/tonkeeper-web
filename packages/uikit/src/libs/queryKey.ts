@@ -20,6 +20,7 @@ export enum QueryKey {
     system = 'system',
     syncDate = 'syncDate',
     analytics = 'analytics',
+    language = 'language',
 
     tonConnectConnection = 'tonConnectConnection',
     tonConnectLastEventId = 'tonConnectLastEventId',

@@ -1,4 +1,4 @@
-import { WalletState } from '../../entries/wallet';
+import { StandardTonWalletState } from '../../entries/wallet';
 import { TonRecipientData } from '../../entries/send';
 import BigNumber from 'bignumber.js';
 import {
@@ -21,7 +21,7 @@ import { LedgerSigner } from '../../entries/signer';
 export const createLedgerTonTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean,
@@ -48,7 +48,7 @@ export const createLedgerTonTransfer = async (
 export const createLedgerJettonTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     recipientAddress: string,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string,
@@ -71,7 +71,7 @@ export const createLedgerJettonTransfer = async (
             queryId: getTonkeeperQueryId(),
             amount: jettonAmount,
             destination: Address.parse(recipientAddress),
-            responseDestination: Address.parse(walletState.active.rawAddress),
+            responseDestination: Address.parse(walletState.rawAddress),
             forwardAmount: jettonTransferForwardAmount,
             forwardPayload,
             customPayload: null
@@ -84,7 +84,7 @@ export const createLedgerJettonTransfer = async (
 export const createLedgerNftTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     recipientAddress: string,
     nftAddress: string,
     nftTransferAmount: bigint,
@@ -105,7 +105,7 @@ export const createLedgerNftTransfer = async (
             type: 'nft-transfer',
             queryId: getTonkeeperQueryId(),
             newOwner: Address.parse(recipientAddress),
-            responseDestination: Address.parse(walletState.active.rawAddress),
+            responseDestination: Address.parse(walletState.rawAddress),
             forwardAmount: nftTransferForwardAmount,
             forwardPayload,
             customPayload: null

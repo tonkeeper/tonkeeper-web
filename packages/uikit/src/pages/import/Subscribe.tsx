@@ -1,4 +1,4 @@
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import React, { FC } from 'react';
 import { IconPage } from '../../components/Layout';
 import { Button } from '../../components/fields/Button';
@@ -6,11 +6,11 @@ import { NotificationIcon } from '../../components/lottie/LottieIcons';
 import { useTranslation } from '../../hooks/translation';
 import { useSubscribeMutation } from '../../state/subscribe';
 
-export const Subscribe: FC<{ wallet: WalletState; mnemonic: string[]; onDone: () => void }> = ({
-    wallet,
-    mnemonic,
-    onDone
-}) => {
+export const Subscribe: FC<{
+    wallet: StandardTonWalletState;
+    mnemonic: string[];
+    onDone: () => void;
+}> = ({ wallet, mnemonic, onDone }) => {
     const { t } = useTranslation();
     const { mutate, reset, isLoading } = useSubscribeMutation(wallet, mnemonic, onDone);
     return (

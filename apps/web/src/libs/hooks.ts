@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { AccountState } from '@tonkeeper/core/dist/entries/account';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { DeprecatedAccountState } from '@tonkeeper/core/dist/entries/account';
+import { DeprecatedWalletState, WalletsState, WalletState } from "@tonkeeper/core/dist/entries/wallet";
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
@@ -49,8 +49,8 @@ export const useAppWidth = (standalone: boolean) => {
 };
 
 export const useAnalytics = (
-    account?: AccountState,
-    wallet?: WalletState | null,
+    activeWallet?: WalletState,
+    wallets?: WalletsState,
     version?: string
 ) => {
     return useQuery<Analytics>(
@@ -65,10 +65,12 @@ export const useAnalytics = (
                 new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID)
             );
 
-            tracker.init('Web', toWalletType(wallet), account, wallet);
+            tracker.init('Web',  toWalletType(activeWallet),
+              activeWallet,
+              wallets,);
 
             return tracker;
         },
-        { enabled: account != null }
+      { enabled: wallets != null && activeWallet !== undefined }
     );
 };

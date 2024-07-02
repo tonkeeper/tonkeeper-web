@@ -3,9 +3,8 @@ import { ethers } from 'ethers';
 import { IStorage } from '../../Storage';
 import { Network } from '../../entries/network';
 import { Factories, TronChain, WalletImplementations } from '../../entries/tron';
-import { TronWalletState, TronWalletStorage, WalletState } from '../../entries/wallet';
+import { TronWalletState, TronWalletStorage, DeprecatedWalletState } from '../../entries/wallet';
 import { Configuration, TronApi } from '../../tronApi';
-import { setWalletState } from '../wallet/storeService';
 import { calculateCreate2 } from './addressCalculation';
 import { TronAddress } from './tronUtils';
 
@@ -32,7 +31,7 @@ const getOwnerAddress = async (mnemonic: string[]): Promise<string> => {
 export const getTronWallet = async (
     tronApi: Configuration,
     mnemonic: string[],
-    wallet: WalletState
+    wallet: DeprecatedWalletState
 ): Promise<TronWalletStorage> => {
     const ownerWalletAddress = await getOwnerAddress(mnemonic);
 
@@ -52,14 +51,14 @@ export const getTronWallet = async (
 export const importTronWallet = async (
     storage: IStorage,
     tronApi: Configuration,
-    wallet: WalletState,
+    wallet: DeprecatedWalletState,
     mnemonic: string[]
 ): Promise<TronWalletStorage> => {
     const tron = await getTronWallet(tronApi, mnemonic, wallet);
 
     const updated = { ...wallet, tron };
 
-    await setWalletState(storage, updated);
+    //  await setWalletState(storage, updated);
 
     return tron;
 };

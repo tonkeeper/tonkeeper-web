@@ -2,12 +2,12 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
-import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { FailedNote } from '../ActivityActionLayout';
 import { ActivityIcon, ReceiveIcon, SentIcon } from '../ActivityIcons';
 import { ColumnLayout, ErrorAction, ListItemGrid } from '../CommonAction';
+import { useActiveWallet } from '../../../state/wallet';
 
 export const DepositStakeAction: FC<{
     action: Action;
@@ -15,7 +15,7 @@ export const DepositStakeAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { depositStake } = action;
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const format = useFormatCoinValue();
 
     if (!depositStake) {
@@ -48,7 +48,7 @@ export const WithdrawStakeAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { withdrawStake } = action;
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const format = useFormatCoinValue();
     if (!withdrawStake) {
         return <ErrorAction />;
@@ -80,7 +80,7 @@ export const WithdrawRequestStakeAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { withdrawStakeRequest } = action;
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const format = useFormatCoinValue();
     if (!withdrawStakeRequest) {
         return <ErrorAction />;

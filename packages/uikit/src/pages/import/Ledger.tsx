@@ -22,7 +22,7 @@ import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { Checkbox } from '../../components/fields/Checkbox';
 import { LedgerConnectionSteps } from '../../components/ledger/LedgerConnectionSteps';
 import { UpdateWalletName } from '../../components/create/WalletName';
-import { getFallbackWalletEmoji } from '@tonkeeper/core/dist/service/wallet/storeService';
+import { getFallbackWalletEmoji } from '@tonkeeper/core/dist/service/walletService';
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;

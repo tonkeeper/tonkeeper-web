@@ -1,11 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, TonWalletState, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useMutateDeleteAll } from '../../state/account';
+import { useMutateDeleteAll } from '../../state/wallet';
 import { useMutateLogOut } from '../../state/wallet';
 import { Notification } from '../Notification';
 import { Body1, H2, Label1, Label2 } from '../Text';
@@ -38,13 +38,13 @@ const DisclaimerLink = styled(Label1)`
 
 const LotOutContent: FC<{
     onClose: (action: () => void) => void;
-    publicKey: string;
+    walletId: WalletId;
     isKeystone: boolean;
-}> = ({ onClose, publicKey, isKeystone }) => {
+}> = ({ onClose, walletId, isKeystone }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
-    const { mutateAsync, isLoading } = useMutateLogOut(publicKey);
+    const { mutateAsync, isLoading } = useMutateLogOut();
 
     return (
         <NotificationBlock>
@@ -70,7 +70,7 @@ const LotOutContent: FC<{
                         onClick={() =>
                             onClose(() =>
                                 navigate(
-                                    AppRoute.settings + SettingsRoute.recovery + '/' + publicKey
+                                    AppRoute.settings + SettingsRoute.recovery + '/' + walletId
                                 )
                             )
                         }
@@ -86,7 +86,7 @@ const LotOutContent: FC<{
                 fullWidth
                 loading={isLoading}
                 onClick={async () => {
-                    await mutateAsync();
+                    await mutateAsync(walletId);
                     onClose(() => navigate(AppRoute.home));
                 }}
             >
@@ -97,7 +97,7 @@ const LotOutContent: FC<{
 };
 
 export const LogOutWalletNotification: FC<{
-    wallet?: WalletState;
+    wallet?: TonWalletState;
     handleClose: () => void;
 }> = ({ wallet, handleClose }) => {
     const Content = useCallback(
@@ -105,9 +105,9 @@ export const LogOutWalletNotification: FC<{
             if (!wallet) return undefined;
             return (
                 <LotOutContent
-                    publicKey={wallet?.publicKey}
+                    walletId={wallet?.id}
                     onClose={afterClose}
-                    isKeystone={!!wallet.auth && wallet.auth.kind === 'keystone'}
+                    isKeystone={isStandardTonWallet(wallet) && wallet.auth.kind === 'keystone'}
                 />
             );
         },
@@ -123,16 +123,16 @@ export const LogOutWalletNotification: FC<{
 
 const DeleteContent: FC<{
     onClose: (action: () => void) => void;
-    publicKey: string;
+    walletId: WalletId;
     isKeystone: boolean;
-}> = ({ onClose, publicKey, isKeystone }) => {
+}> = ({ onClose, walletId, isKeystone }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
-    const { mutateAsync, isLoading } = useMutateLogOut(publicKey, true);
+    const { mutateAsync, isLoading } = useMutateLogOut();
 
     const onDelete = async () => {
-        await mutateAsync();
+        await mutateAsync(walletId);
         onClose(() => navigate(AppRoute.home));
     };
 
@@ -160,7 +160,7 @@ const DeleteContent: FC<{
                         onClick={() =>
                             onClose(() =>
                                 navigate(
-                                    AppRoute.settings + SettingsRoute.recovery + '/' + publicKey
+                                    AppRoute.settings + SettingsRoute.recovery + '/' + walletId
                                 )
                             )
                         }
@@ -184,7 +184,7 @@ const DeleteContent: FC<{
 };
 
 export const DeleteWalletNotification: FC<{
-    wallet?: WalletState;
+    wallet?: TonWalletState;
     handleClose: () => void;
 }> = ({ wallet, handleClose }) => {
     const Content = useCallback(
@@ -192,9 +192,9 @@ export const DeleteWalletNotification: FC<{
             if (!wallet) return undefined;
             return (
                 <DeleteContent
-                    publicKey={wallet.publicKey}
+                    walletId={wallet.id}
                     onClose={afterClose}
-                    isKeystone={!!wallet.auth && wallet.auth.kind === 'keystone'}
+                    isKeystone={isStandardTonWallet(wallet) && wallet.auth.kind === 'keystone'}
                 />
             );
         },

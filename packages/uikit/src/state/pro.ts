@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { ProState, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
     authViaTonConnect,
     createProServiceInvoice,
@@ -15,16 +15,19 @@ import {
     startProServiceTrial,
     waitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
-import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
 import { useMemo } from 'react';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { QueryKey } from '../libs/queryKey';
 import { signTonConnectOver } from './mnemonic';
 import { useCheckTouchId } from './password';
+import { walletsStorage } from '@tonkeeper/core/dist/service/walletsService';
+import { useActiveWallet } from './wallet';
+import { useUserLanguage } from './language';
+import { useWalletsStorage } from '../hooks/useStorage';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -36,11 +39,13 @@ export const useProBackupState = () => {
 };
 
 export const useProState = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const sdk = useAppSdk();
     const client = useQueryClient();
     return useQuery<ProState, Error>([QueryKey.pro], async () => {
-        const state = await getProState(sdk.storage, wallet);
+        // TODO а что если активный кошелек не стандартный?
+        // TODO сделать флоу подписки
+        const state = await getProState(sdk.storage, wallet as StandardTonWalletState);
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
         return state;
@@ -54,13 +59,17 @@ export const useSelectWalletMutation = () => {
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
-    return useMutation<void, Error, string>(async publicKey => {
-        const state = await getWalletState(sdk.storage, publicKey);
+    return useMutation<void, Error, string>(async walletId => {
+        const state = await walletsStorage(sdk.storage).getWallet(walletId);
         if (!state) {
             throw new Error('Missing wallet state');
         }
 
-        await authViaTonConnect(api, state, signTonConnectOver(sdk, publicKey, t, checkTouchId));
+        if (!isStandardTonWallet(state)) {
+            throw new Error("Can't use non-standard ton wallet for pro auth");
+        }
+
+        await authViaTonConnect(api, state, signTonConnectOver(sdk, walletId, t, checkTouchId));
 
         await client.invalidateQueries([QueryKey.pro]);
     });
@@ -75,15 +84,15 @@ export const useProLogout = () => {
 };
 
 export const useProPlans = (promoCode?: string) => {
-    const wallet = useWalletContext();
+    const { data: lang } = useUserLanguage();
 
-    const all = useQuery<ProServiceTier[], Error>([QueryKey.pro, 'plans', wallet.lang], () =>
-        getProServiceTiers(wallet.lang)
+    const all = useQuery<ProServiceTier[], Error>([QueryKey.pro, 'plans', lang], () =>
+        getProServiceTiers(lang)
     );
 
     const promo = useQuery<ProServiceTier[], Error>(
-        [QueryKey.pro, 'promo', wallet.lang, promoCode],
-        () => getProServiceTiers(wallet.lang, promoCode !== '' ? promoCode : undefined),
+        [QueryKey.pro, 'promo', lang, promoCode],
+        () => getProServiceTiers(lang, promoCode !== '' ? promoCode : undefined),
         { enabled: promoCode !== '' }
     );
 
@@ -100,11 +109,11 @@ export interface ConfirmState {
     invoice: InvoicesInvoice;
     recipient: RecipientData;
     assetAmount: AssetAmount;
-    wallet: WalletState;
+    wallet: StandardTonWalletState;
 }
 
 export const useCreateInvoiceMutation = () => {
-    const sdk = useAppSdk();
+    const ws = useWalletsStorage();
     const { api } = useAppContext();
     return useMutation<
         ConfirmState,
@@ -115,8 +124,8 @@ export const useCreateInvoiceMutation = () => {
             throw new Error('missing tier');
         }
 
-        const wallet = await getWalletState(sdk.storage, data.state.wallet.publicKey);
-        if (!wallet) {
+        const wallet = await ws.getWallet(data.state.wallet.rawAddress);
+        if (!wallet || !isStandardTonWallet(wallet)) {
             throw new Error('Missing wallet');
         }
 

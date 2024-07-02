@@ -2,19 +2,13 @@ import { IStorage, MemoryStorage } from './Storage';
 import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
-import { AuthState } from './entries/password';
 import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
-import { WalletState } from './entries/wallet';
+import { StandardTonWalletState } from './entries/wallet';
 import { TonTransferParams } from './service/deeplinkingService';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTransaction } from './service/ledger/connector';
 
 export type GetPasswordType = 'confirm' | 'unlock';
-
-export type GetPasswordParams = {
-    auth: AuthState;
-    type?: GetPasswordType;
-};
 
 export type TransferInitParams = {
     transfer?: TonTransferParams;
@@ -37,10 +31,10 @@ export interface UIEvents {
     scan: void;
     resize: void;
     navigate: void;
-    getPassword: GetPasswordParams;
+    getPassword: void;
     signer: string;
     ledger: { path: number[]; transaction: LedgerTransaction };
-    keystone: {message: Buffer, messageType: KeystoneMessageType, pathInfo?: KeystonePathInfo};
+    keystone: { message: Buffer; messageType: KeystoneMessageType; pathInfo?: KeystonePathInfo };
     loading: void;
     transfer: TransferInitParams;
     receive: ReceiveInitParams;
@@ -71,7 +65,7 @@ export interface TouchId {
 }
 
 export interface NotificationService {
-    subscribe: (wallet: WalletState, mnemonic: string[]) => Promise<void>;
+    subscribe: (wallet: StandardTonWalletState, mnemonic: string[]) => Promise<void>;
     unsubscribe: (address?: string) => Promise<void>;
 
     subscribeTonConnect: (clientId: string, origin: string) => Promise<void>;

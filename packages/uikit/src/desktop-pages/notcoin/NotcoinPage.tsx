@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Address, SendMode, beginCell, internal, toNano } from '@ton/core';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
     checkWalletBalanceOrDie,
     externalMessage,
@@ -17,7 +17,7 @@ import { walletContractFromState } from '@tonkeeper/core/dist/service/wallet/con
 import { AccountsApi, BlockchainApi, EmulationApi, NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import { TonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { delay } from '@tonkeeper/core/dist/utils/common';
+import { delay, formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { FC, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { NotCoinIcon, SpinnerIcon } from '../../components/Icon';
@@ -29,22 +29,23 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { Button } from '../../components/fields/Button';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk, useToast } from '../../hooks/appSdk';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { getSigner } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
 import { chooseAddress } from './address';
+import { useActiveStandardTonWallet, useActiveWallet } from '../../state/wallet';
 
 const useVouchers = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { api } = useAppContext();
 
     const limit = 1000;
 
     const getItems = async (offset: number) => {
         const items = await new AccountsApi(api.tonApiV2).getAccountNftItems({
-            accountId: wallet.active.rawAddress,
+            accountId: wallet.rawAddress,
             collection: 'EQDmkj65Ab_m0aZaW8IpKw4kYqIgITw_HRstYEkVQ6NIYCyW',
             limit: limit,
             offset: offset
@@ -53,7 +54,7 @@ const useVouchers = () => {
         return items.nftItems;
     };
 
-    return useQuery(['notcoin', 'length', wallet.active.rawAddress], async () => {
+    return useQuery(['notcoin', 'length', wallet.rawAddress], async () => {
         const result: NftItem[] = [];
         let page: NftItem[] = [];
         let offset = 0;
@@ -97,7 +98,7 @@ const getNotcoinBurnAddress = (nftAddress: string, config: TonendpointConfig) =>
         return match;
     }
 
-    var item = burnAddresses[Math.floor(Math.random() * burnAddresses.length)];
+    const item = burnAddresses[Math.floor(Math.random() * burnAddresses.length)];
     return Address.parse(item);
 };
 
@@ -117,7 +118,7 @@ const checkBurnDate = async (api: APIConfig, config: TonendpointConfig) => {
 const createNftMultiTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     chunk: NftItem[],
     config: TonendpointConfig,
     signer: CellSigner
@@ -138,7 +139,7 @@ const createNftMultiTransfer = async (
                     .storeUint(0x5fcc3d14, 32) // transfer op
                     .storeUint(getTonkeeperQueryId(), 64)
                     .storeAddress(getNotcoinBurnAddress(nft.address, config))
-                    .storeAddress(Address.parse(walletState.active.rawAddress))
+                    .storeAddress(Address.parse(walletState.rawAddress))
                     .storeBit(false)
                     .storeCoins(toNano('0.05'))
                     .storeBit(false)
@@ -154,7 +155,7 @@ const createNftMultiTransfer = async (
 
 const sendNftMultiTransfer = async (
     api: APIConfig,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     chunk: NftItem[],
     config: TonendpointConfig,
     signer: CellSigner
@@ -193,7 +194,7 @@ const sendNftMultiTransfer = async (
 };
 
 const useBurnMutation = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const { api } = useAppContext();
 
     return useMutation<
@@ -205,13 +206,13 @@ const useBurnMutation = () => {
             throw new Error('Unable to sign transaction.');
         }
 
-        const seqno = await getWalletSeqNo(api, wallet.active.rawAddress);
+        const seqno = await getWalletSeqNo(api, wallet.rawAddress);
 
         console.log('send', chunk);
 
         await sendNftMultiTransfer(api, wallet, chunk, config, signer as CellSigner);
 
-        await confirmWalletSeqNo(wallet.active.rawAddress, api, seqno);
+        await confirmWalletSeqNo(wallet.rawAddress, api, seqno);
 
         return true;
     });
@@ -274,7 +275,7 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
     const toast = useToast();
 
     const { mutateAsync: checkTouchId } = useCheckTouchId();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
 
     const process = useRef(true);
     const sdk = useAppSdk();
@@ -307,7 +308,7 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
         setBurning(true);
 
         if (!data) return;
-        const signer: Signer | null = await getSigner(sdk, wallet.publicKey, checkTouchId).catch(
+        const signer: Signer | null = await getSigner(sdk, wallet.id, checkTouchId).catch(
             () => null
         );
 
@@ -340,7 +341,9 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
                     <TgLink
                         onClick={e => {
                             e.stopPropagation();
-                            sdk.openPage(`https://tonviewer.com/${wallet.active.friendlyAddress}`);
+                            sdk.openPage(
+                                `https://tonviewer.com/${formatAddress(wallet.rawAddress)}`
+                            );
                         }}
                     >
                         Check Tonviewer!

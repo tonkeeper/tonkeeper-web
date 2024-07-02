@@ -4,13 +4,11 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { WalletStateContext } from '../../hooks/appContext';
 import { useNotifyError } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
 import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
 import { useTranslation } from '../../hooks/translation';
-import { useAccountState } from '../../state/account';
 import {
     ConfirmState,
     useCreateInvoiceMutation,
@@ -20,7 +18,7 @@ import {
     useSelectWalletMutation,
     useWaitInvoiceMutation
 } from '../../state/pro';
-import { useWalletState } from '../../state/wallet';
+import { useWalletsState, useWalletState } from '../../state/wallet';
 import { InnerBody } from '../Body';
 import { SubscriptionStatus } from '../desktop/aside/SubscriptionInfo';
 import { Button } from '../fields/Button';
@@ -33,6 +31,7 @@ import { Notification } from '../Notification';
 import { SubHeader } from '../SubHeader';
 import { Body1, Label1, Title } from '../Text';
 import { ConfirmView } from '../transfer/ConfirmView';
+import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 
 const Block = styled.div`
     display: flex;
@@ -56,12 +55,11 @@ const Description = styled(Body1)`
     margin-bottom: 16px;
 `;
 
-const WalletItem: FC<{ publicKey: string }> = ({ publicKey }) => {
+const WalletItem: FC<{ wallet: WalletState }> = ({ wallet }) => {
     const { t } = useTranslation();
-    const { data: wallet } = useWalletState(publicKey);
 
     const address = wallet
-        ? toShortValue(formatAddress(wallet.active.rawAddress, wallet.network))
+        ? toShortValue(formatAddress(wallet.rawAddress, wallet.network))
         : undefined;
 
     return (
@@ -80,23 +78,21 @@ const SelectLabel = styled(Label1)`
 
 const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { t } = useTranslation();
-    const { data: accounts } = useAccountState();
     const { mutateAsync, error } = useSelectWalletMutation();
     useNotifyError(error);
-
-    if (!accounts) return <></>;
+    const wallets = useWalletsState();
 
     return (
         <>
             <SelectLabel>{t('select_wallet_for_authorization')}</SelectLabel>
             <ListBlock>
-                {accounts.publicKeys.map(publicKey => (
+                {wallets.map(wallet => (
                     <ListItem
-                        key={publicKey}
-                        onClick={() => mutateAsync(publicKey).then(() => onClose())}
+                        key={wallet.id}
+                        onClick={() => mutateAsync(wallet.id).then(() => onClose())}
                     >
                         <ListItemPayload>
-                            <WalletItem publicKey={publicKey} />
+                            <WalletItem wallet={wallet} />
                         </ListItemPayload>
                     </ListItem>
                 ))}
@@ -116,11 +112,13 @@ const ProWallet: FC<{
     onClick: () => void;
     disabled?: boolean;
 }> = ({ data, onClick, disabled }) => {
+    const wallet = useWalletState(data.wallet.rawAddress)!;
+
     return (
         <ListBlock>
             <ListItem onClick={() => !disabled && onClick()}>
                 <ListItemPayload>
-                    <WalletItem publicKey={data.wallet.publicKey} />
+                    <WalletItem wallet={wallet} />
                     <SelectIconWrapper>
                         <DoneIcon />
                     </SelectIconWrapper>
@@ -179,19 +177,17 @@ const ConfirmNotification: FC<{
     const content = useCallback(() => {
         if (!state) return <></>;
         return (
-            <WalletStateContext.Provider value={state.wallet}>
-                <ConfirmBuyProService
-                    {...state}
-                    onClose={confirmed => {
-                        if (confirmed) {
-                            waitResult(state);
-                            setTimeout(() => onClose(true), 3000);
-                        } else {
-                            onClose();
-                        }
-                    }}
-                />
-            </WalletStateContext.Provider>
+            <ConfirmBuyProService
+                {...state}
+                onClose={confirmed => {
+                    if (confirmed) {
+                        waitResult(state);
+                        setTimeout(() => onClose(true), 3000);
+                    } else {
+                        onClose();
+                    }
+                }}
+            />
         );
     }, [state]);
 

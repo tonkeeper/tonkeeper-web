@@ -1,6 +1,6 @@
 import { Network } from '../../entries/network';
 import { ConnectRequest, DAppManifest, KeyPair } from '../../entries/tonConnect';
-import { WalletState } from '../../entries/wallet';
+import { DeprecatedWalletState, StandardTonWalletState } from '../../entries/wallet';
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
 
@@ -20,7 +20,7 @@ export interface AccountConnection {
 
 export const getAccountConnection = async (
     storage: IStorage,
-    wallet: Pick<WalletState, 'publicKey' | 'network'>
+    wallet: Pick<StandardTonWalletState, 'publicKey' | 'network'>
 ) => {
     const result = await storage.get<AccountConnection[]>(
         `${AppKey.CONNECTIONS}_${wallet.publicKey}_${wallet.network ?? Network.MAINNET}`
@@ -30,7 +30,7 @@ export const getAccountConnection = async (
 
 export const setAccountConnection = async (
     storage: IStorage,
-    wallet: Pick<WalletState, 'publicKey' | 'network'>,
+    wallet: Pick<DeprecatedWalletState, 'publicKey' | 'network'>, // TODO migrate
     items: AccountConnection[]
 ) => {
     await storage.set(
@@ -41,7 +41,7 @@ export const setAccountConnection = async (
 
 export const saveAccountConnection = async (options: {
     storage: IStorage;
-    wallet: WalletState;
+    wallet: StandardTonWalletState;
     manifest: DAppManifest;
     params: TonConnectParams;
     webViewUrl?: string;
@@ -68,7 +68,7 @@ export const saveAccountConnection = async (options: {
  */
 export const disconnectAccountConnection = async (options: {
     storage: IStorage;
-    wallet: WalletState;
+    wallet: StandardTonWalletState;
     webViewUrl: string;
 }) => {
     let connections = await getAccountConnection(options.storage, options.wallet);
@@ -83,7 +83,7 @@ export const disconnectAccountConnection = async (options: {
  */
 export const disconnectAppConnection = async (options: {
     storage: IStorage;
-    wallet: WalletState;
+    wallet: StandardTonWalletState;
     clientSessionId: string;
 }) => {
     let connections = await getAccountConnection(options.storage, options.wallet);

@@ -3,10 +3,10 @@ import React, { useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useEnableW5, useEnableW5Mutation } from '../../state/experemental';
-import { useMutateWalletProperty } from '../../state/wallet';
+import { useActiveWallet, useMutateWalletProperty } from '../../state/wallet';
 
 const SettingsW5 = () => {
     const { experimental } = useAppContext();
@@ -31,7 +31,7 @@ const SettingsW5 = () => {
 export const DevSettings = React.memo(() => {
     const { t } = useTranslation();
 
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { mutate } = useMutateWalletProperty(true);
 
     const items = useMemo<SettingsItem[]>(() => {

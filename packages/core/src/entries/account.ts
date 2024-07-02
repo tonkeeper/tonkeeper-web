@@ -1,8 +1,11 @@
-export interface AccountState {
+/**
+ * @deprecated
+ */
+export interface DeprecatedAccountState {
     publicKeys: string[];
     activePublicKey?: string;
 }
 
-export const defaultAccountState: AccountState = {
+export const defaultAccountState: DeprecatedAccountState = {
     publicKeys: []
 };

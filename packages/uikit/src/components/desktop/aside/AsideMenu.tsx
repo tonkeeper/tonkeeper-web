@@ -8,9 +8,8 @@ import { useTranslation } from '../../../hooks/translation';
 import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
-import { useMutateActiveWallet } from '../../../state/account';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
-import { useWalletState } from '../../../state/wallet';
+import { useActiveWallet, useMutateActiveWallet, useWalletsState } from "../../../state/wallet";
 import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { Label2 } from '../../Text';
@@ -19,6 +18,7 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { AsideHeader } from './AsideHeader';
 import { SubscriptionInfo } from './SubscriptionInfo';
+import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -92,18 +92,17 @@ const SubscriptionInfoStyled = styled(SubscriptionInfo)`
     padding: 6px 16px 6px 8px;
 `;
 
-export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = ({
-    publicKey,
+export const AsideMenuAccount: FC<{ wallet: WalletState; isSelected: boolean }> = ({
+    wallet,
     isSelected
 }) => {
     const { t } = useTranslation();
-    const { data: wallet } = useWalletState(publicKey);
     const { mutateAsync } = useMutateActiveWallet();
     const navigate = useNavigate();
     const location = useLocation();
 
-    const { account } = useAppContext();
-    const shouldShowIcon = account.publicKeys.length > 1;
+    const wallets = useWalletsState();
+    const shouldShowIcon = wallets.length > 1;
 
     const handleNavigateHome = useCallback(() => {
         const navigateHomeFromRoutes = [AppProRoute.dashboard, AppRoute.settings, AppRoute.browser];
@@ -115,8 +114,8 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
     }, [location.pathname]);
 
     const onClick = useCallback(() => {
-        mutateAsync(publicKey).then(handleNavigateHome);
-    }, [publicKey, mutateAsync, handleNavigateHome]);
+        mutateAsync(wallet.id).then(handleNavigateHome);
+    }, [wallet.id, mutateAsync, handleNavigateHome]);
 
     if (!wallet) {
         return null;
@@ -137,7 +136,9 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
 const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const [isOpenImport, setIsOpenImport] = useState(false);
-    const { account, proFeatures } = useAppContext();
+    const { proFeatures } = useAppContext();
+    const wallets = useWalletsState();
+    const activeWallet = useActiveWallet();
     const navigate = useNavigate();
     const location = useLocation();
     const { ref, closeBottom } = useIsScrolled();
@@ -209,15 +210,11 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_dashboard')}</Label2>
                         </AsideMenuItem>
                     )}
-                    {account.publicKeys.map(publicKey => (
+                    {wallets.map(wallet => (
                         <AsideMenuAccount
-                            key={publicKey}
-                            publicKey={publicKey}
-                            isSelected={
-                                !activeRoute &&
-                                !!account.activePublicKey &&
-                                account.activePublicKey === publicKey
-                            }
+                            key={wallet.id}
+                            wallet={wallet}
+                            isSelected={!activeRoute && activeWallet.id === wallet.id}
                         />
                     ))}
                 </ScrollContainer>

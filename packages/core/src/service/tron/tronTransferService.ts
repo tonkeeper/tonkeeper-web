@@ -4,7 +4,7 @@ import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { toTronAsset } from '../../entries/crypto/asset/constants';
 import { TronAsset } from '../../entries/crypto/asset/tron-asset';
 import { RecipientData, TransferEstimation, TronRecipient } from '../../entries/send';
-import { TronWalletStorage, WalletState } from '../../entries/wallet';
+import { TronWalletStorage, DeprecatedWalletState } from '../../entries/wallet';
 import {
     Configuration,
     EstimatePayload,
@@ -78,7 +78,7 @@ async function estimateTronFee({
     address,
     amount
 }: {
-    wallet: WalletState;
+    wallet: DeprecatedWalletState;
     tronApi: Configuration;
     address: TronRecipient;
     amount: AssetAmount<TronAsset>;
@@ -105,7 +105,7 @@ export async function estimateTron({
     amount: AssetAmount<TronAsset>;
     isMax: boolean;
     tronApi: Configuration;
-    wallet: WalletState;
+    wallet: DeprecatedWalletState;
     balances: TronBalances | undefined;
 }): Promise<TransferEstimation<TronAsset>> {
     if (isMax) {

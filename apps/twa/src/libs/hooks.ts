@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { AccountState } from '@tonkeeper/core/dist/entries/account';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { DeprecatedAccountState } from '@tonkeeper/core/dist/entries/account';
+import { DeprecatedWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { Analytics, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
@@ -71,7 +71,7 @@ export const useTwaAppViewport = (setAppHeight: boolean) => {
     }, [sdk, viewport]);
 };
 
-export const useAnalytics = (account?: AccountState, wallet?: WalletState | null) => {
+export const useAnalytics = (account?: DeprecatedAccountState, wallet?: DeprecatedWalletState | null) => {
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {

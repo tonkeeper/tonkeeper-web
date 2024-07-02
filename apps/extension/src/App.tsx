@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { DeprecatedWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -203,8 +203,6 @@ export const Loader: FC = React.memo(() => {
 
     const context: IAppContext = {
         api: getApiConfig(config, network),
-        account,
-        auth,
         fiat,
         config,
         tonendpoint,
@@ -246,7 +244,7 @@ const InitialRedirect: FC<PropsWithChildren> = ({ children }) => {
 };
 
 export const Content: FC<{
-    activeWallet?: WalletState | null;
+    activeWallet?: DeprecatedWalletState | null;
     lock: boolean;
 }> = ({ activeWallet, lock }) => {
     const location = useLocation();

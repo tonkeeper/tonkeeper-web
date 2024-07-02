@@ -1,5 +1,4 @@
 import { TonConnectAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
-import { accountSelectWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
 import {
     replyBadRequestResponse,
     replyDisconnectResponse
@@ -13,20 +12,21 @@ import {
     getLastEventId,
     subscribeTonConnect
 } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
-import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
+import { walletsStorage } from '@tonkeeper/core/dist/service/walletsService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { Buffer as BufferPolyfill } from 'buffer';
 import log from 'electron-log/main';
 import EventSourcePolyfill from 'eventsource';
 import { MainWindow } from './mainWindow';
 import { mainStorage } from './storageService';
+import { isStandardTonWallet, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 
 globalThis.Buffer = BufferPolyfill;
 
 export class TonConnectSSE {
     private lastEventId: string;
     private connections: AccountConnection[];
-    private dist: Record<string, string>;
+    private dist: Record<string, WalletId>;
     private closeConnection: () => void | null = null;
 
     private static instance: TonConnectSSE = null;
@@ -48,18 +48,19 @@ export class TonConnectSSE {
     public async init() {
         this.lastEventId = await getLastEventId(mainStorage);
 
-        const account = await getAccountState(mainStorage);
+        const walletsState = (await walletsStorage(mainStorage).getWallets()).filter(
+            isStandardTonWallet
+        );
 
         this.connections = [];
         this.dist = {};
 
-        for (const key of account.publicKeys) {
-            const wallet = await getWalletState(mainStorage, key);
+        for (const wallet of walletsState) {
             const walletConnections = await getAccountConnection(mainStorage, wallet);
 
             this.connections = this.connections.concat(walletConnections);
             walletConnections.forEach(item => {
-                this.dist[item.clientSessionId] = key;
+                this.dist[item.clientSessionId] = wallet.id;
             });
         }
     }
@@ -78,7 +79,14 @@ export class TonConnectSSE {
     };
 
     private onDisconnect = async ({ connection, request }: TonConnectAppRequest) => {
-        const wallet = await getWalletState(mainStorage, this.dist[connection.clientSessionId]);
+        const wallet = await walletsStorage(mainStorage).getWallet(
+            this.dist[connection.clientSessionId]
+        );
+
+        if (!wallet || !isStandardTonWallet(wallet)) {
+            return;
+        }
+
         await disconnectAppConnection({
             storage: mainStorage,
             wallet,
@@ -101,14 +109,14 @@ export class TonConnectSSE {
                     payload: JSON.parse(params.request.params[0])
                 };
 
-                const walletPublicKey = this.dist[params.connection.clientSessionId];
+                const walletId = this.dist[params.connection.clientSessionId];
 
-                const account = await getAccountState(mainStorage);
+                const activeWalletId = await walletsStorage(mainStorage).getActiveWalletId();
 
                 const window = await MainWindow.bringToFront();
 
-                if (account.activePublicKey !== walletPublicKey) {
-                    await accountSelectWallet(mainStorage, walletPublicKey);
+                if (activeWalletId !== walletId) {
+                    await walletsStorage(mainStorage).setActiveWalletId(walletId);
                     window.webContents.send('refresh');
                     await delay(500);
                 }

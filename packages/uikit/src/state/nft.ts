@@ -1,8 +1,8 @@
-import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useMutation } from '@tanstack/react-query';
 import { getActiveWalletConfig } from '@tonkeeper/core/dist/service/wallet/configService';
-import { useActiveWalletConfig, useMutateActiveWalletConfig } from './wallet';
+import { useActiveWallet, useActiveWalletConfig, useMutateActiveWalletConfig } from './wallet';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { useTonenpointConfig } from './tonendpoint';
 import { ActiveWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
@@ -13,18 +13,14 @@ type NftWithCollectionId = Pick<NFT, 'address'> & {
 };
 
 export const useMarkNftAsSpam = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const sdk = useAppSdk();
     const { mutateAsync } = useMutateActiveWalletConfig();
     const { tonendpoint } = useAppContext();
     const { data: tonendpointConfig } = useTonenpointConfig(tonendpoint);
     const { t } = useTranslation();
     return useMutation<void, Error, NftWithCollectionId>(async nft => {
-        let config = await getActiveWalletConfig(
-            sdk.storage,
-            wallet.active.rawAddress,
-            wallet.network
-        );
+        let config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, wallet.network);
 
         const address = nft.collection?.address || nft.address;
 
@@ -58,15 +54,11 @@ export const useMarkNftAsSpam = () => {
 };
 
 export const useMarkNftAsTrusted = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const sdk = useAppSdk();
     const { mutateAsync } = useMutateActiveWalletConfig();
     return useMutation<void, Error, NftWithCollectionId | string>(async nft => {
-        let config = await getActiveWalletConfig(
-            sdk.storage,
-            wallet.active.rawAddress,
-            wallet.network
-        );
+        let config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, wallet.network);
 
         const address = typeof nft === 'string' ? nft : nft.collection?.address || nft.address;
 
@@ -81,16 +73,12 @@ export const useMarkNftAsTrusted = () => {
 };
 
 export const useHideNft = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const sdk = useAppSdk();
     const { mutateAsync } = useMutateActiveWalletConfig();
     const { t } = useTranslation();
     return useMutation<void, Error, NftWithCollectionId>(async nft => {
-        let config = await getActiveWalletConfig(
-            sdk.storage,
-            wallet.active.rawAddress,
-            wallet.network
-        );
+        let config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, wallet.network);
 
         const address = nft.collection?.address || nft.address;
 
@@ -113,15 +101,11 @@ export const useHideNft = () => {
 };
 
 export const useMakeNftVisible = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const sdk = useAppSdk();
     const { mutateAsync } = useMutateActiveWalletConfig();
     return useMutation<void, Error, NftWithCollectionId | string>(async nft => {
-        let config = await getActiveWalletConfig(
-            sdk.storage,
-            wallet.active.rawAddress,
-            wallet.network
-        );
+        let config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, wallet.network);
 
         const address = typeof nft === 'string' ? nft : nft.collection?.address || nft.address;
 

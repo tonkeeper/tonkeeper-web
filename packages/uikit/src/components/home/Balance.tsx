@@ -2,15 +2,16 @@ import { useQueryClient } from '@tanstack/react-query';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useEffect } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { QueryKey } from '../../libs/queryKey';
-import { useWalletAuthState, useWalletTotalBalance } from '../../state/wallet';
+import { useActiveWallet, useWalletTotalBalance } from '../../state/wallet';
 import { Body3, Label2, Num2 } from '../Text';
 import { Badge } from '../shared';
 import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
+import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 
 const Block = styled.div`
     display: flex;
@@ -67,9 +68,13 @@ export const BalanceSkeleton = () => {
 };
 
 const Label = () => {
-    const wallet = useWalletContext();
-    const { data: state } = useWalletAuthState(wallet.publicKey);
-    switch (state?.kind) {
+    const wallet = useActiveWallet();
+
+    if (!isStandardTonWallet(wallet)) {
+        return <></>;
+    }
+
+    switch (wallet.auth.kind) {
         case 'signer':
         case 'signer-deeplink':
             return (
@@ -110,10 +115,10 @@ export const Balance: FC<{
 }> = ({ error, isFetching }) => {
     const sdk = useAppSdk();
     const { fiat } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const client = useQueryClient();
 
-    const address = formatAddress(wallet.active.rawAddress, wallet.network);
+    const address = formatAddress(wallet.rawAddress, wallet.network);
 
     const { data: total } = useWalletTotalBalance(fiat);
 

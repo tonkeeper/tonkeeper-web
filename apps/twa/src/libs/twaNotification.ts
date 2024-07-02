@@ -1,5 +1,5 @@
 import { NotificationService } from '@tonkeeper/core/dist/AppSdk';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { StandardTonWalletState } from "@tonkeeper/core/dist/entries/wallet";
 import {
     toTonProofItem,
     tonConnectProofPayload
@@ -7,6 +7,7 @@ import {
 import { walletStateInitFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
 import { InitResult } from '@twa.js/sdk';
 import { Configuration, DefaultApi } from '../twaApi';
+import { getServerTime } from "@tonkeeper/core/dist/service/transfer/common";
 
 const apiConfig = new Configuration({ basePath: 'https://twa-api.tonkeeper.com' });
 const twaApi = new DefaultApi(apiConfig);
@@ -22,15 +23,16 @@ export class TwaNotification implements NotificationService {
         return Buffer.from(initDataRaw, 'utf8').toString('base64');
     }
 
-    private getTonConnectProof = async (wallet: WalletState, mnemonic: string[]) => {
+    private getTonConnectProof = async (wallet: StandardTonWalletState, mnemonic: string[]) => {
         const domain = 'https://twa.tonkeeper.com/';
         const { payload } = await twaApi.getTonConnectPayload();
-        const proofPayload = tonConnectProofPayload(domain, wallet.active.rawAddress, payload);
+        const timestamp = await getServerTime(api);
+        const proofPayload = tonConnectProofPayload(Date.now(), domain, wallet.rawAddress, payload);
         const stateInit = walletStateInitFromState(wallet);
         return await toTonProofItem(mnemonic, proofPayload, stateInit);
     };
 
-    subscribe = async (wallet: WalletState, mnemonic: string[]) => {
+    subscribe = async (wallet: StandardTonWalletState, mnemonic: string[]) => {
         try {
             await this.components.webApp.requestWriteAccess();
         } catch (e) {
@@ -41,7 +43,7 @@ export class TwaNotification implements NotificationService {
         await twaApi.subscribeToAccountEvents({
             subscribeToAccountEventsRequest: {
                 twaInitData: this.twaInitData,
-                address: wallet.active.rawAddress,
+                address: wallet.rawAddress,
                 proof
             }
         });

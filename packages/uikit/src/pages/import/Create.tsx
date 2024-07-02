@@ -1,5 +1,4 @@
 import { mnemonicNew } from '@ton/crypto';
-import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { FC, useEffect, useState } from 'react';
 import { IconPage } from '../../components/Layout';
@@ -14,9 +13,10 @@ import {
 } from '../../components/lottie/LottieIcons';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveWallet } from '../../state/wallet';
 import { FinalView, useAddWalletMutation } from './Password';
 import { Subscribe } from './Subscribe';
+import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { useWalletsState } from '../../state/wallet';
 
 const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
     const sdk = useAppSdk();
@@ -27,9 +27,9 @@ const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
         reset
     } = useAddWalletMutation();
 
-    const { data: wallet } = useActiveWallet();
+    const existingWallets = useWalletsState();
     const [mnemonic, setMnemonic] = useState<string[]>([]);
-    const [account, setAccount] = useState<AccountState | undefined>(undefined);
+    const [wallet, setWallet] = useState<StandardTonWalletState | undefined>(undefined);
 
     const [create, setCreate] = useState(false);
     const [open, setOpen] = useState(false);
@@ -92,13 +92,16 @@ const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
                 mnemonic={mnemonic}
                 onBack={() => setCheck(false)}
                 onConfirm={() =>
-                    checkPasswordAndCreateWalletAsync({ mnemonic, listOfAuth }).then(state => {
+                    checkPasswordAndCreateWalletAsync({
+                        mnemonic,
+                        supportedAuthTypes: listOfAuth
+                    }).then(state => {
                         setChecked(true);
                         if (state === false) {
                             setHasPassword(false);
                         } else {
                             setHasPassword(true);
-                            setAccount(state);
+                            setWallet(state);
                         }
                     })
                 }
@@ -115,7 +118,7 @@ const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
                     checkPasswordAndCreateWalletAsync({ mnemonic, password }).then(state => {
                         if (state !== false) {
                             setHasPassword(true);
-                            setAccount(state);
+                            setWallet(state);
                         }
                     });
                 }}
@@ -124,9 +127,18 @@ const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
         );
     }
 
-    if (account && account.publicKeys.length > 1 && wallet && wallet.name == null) {
+    if (wallet && existingWallets.length > 1) {
         return (
-            <UpdateWalletName account={account} onUpdate={setAccount} walletEmoji={wallet.emoji} />
+            <UpdateWalletName
+                name={wallet.name}
+                submitHandler={val =>
+                    setWallet(w => ({
+                        ...w!,
+                        ...val
+                    }))
+                }
+                walletEmoji={wallet.emoji}
+            />
         );
     }
 

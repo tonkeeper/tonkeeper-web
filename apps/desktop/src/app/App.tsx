@@ -39,7 +39,7 @@ import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-page
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
-import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
+import { AppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
     AppSdkContext,
@@ -55,12 +55,11 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
-import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useAuthState, useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
+import { useActiveWalletQuery, useWalletsStateQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -80,6 +79,7 @@ import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
 import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
+import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -254,19 +254,19 @@ const FullSizeWrapperBounded = styled(FullSizeWrapper)`
 `;
 
 export const Loader: FC = () => {
-    const { data: activeWallet } = useActiveWallet();
+    const { data: activeWallet, isLoading: activeWalletLoading } = useActiveWalletQuery();
+    const { data: wallets, isLoading: isWalletsLoading } = useWalletsStateQuery();
+    const { data: lang, isLoading: isLangLoading } = useUserLanguage();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
-    const { data: account } = useAccountState();
-    const { data: auth } = useAuthState();
     const { data: fiat } = useUserFiat();
 
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,
         build: sdk.version,
         network: activeWallet?.network,
-        lang: activeWallet?.lang,
+        lang,
         platform: 'desktop'
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
@@ -274,27 +274,24 @@ export const Loader: FC = () => {
     const navigate = useNavigate();
     useAppHeight();
 
-    const { data: tracker } = useAnalytics(sdk.version, account, activeWallet);
+    const { data: tracker } = useAnalytics(sdk.version, activeWallet, wallets);
 
     useEffect(() => {
-        if (
-            activeWallet &&
-            activeWallet.lang &&
-            i18n.language !== localizationText(activeWallet.lang)
-        ) {
-            i18n.reloadResources([localizationText(activeWallet.lang)]).then(() =>
-                i18n.changeLanguage(localizationText(activeWallet.lang))
+        if (lang && i18n.language !== localizationText(lang)) {
+            i18n.reloadResources([localizationText(lang)]).then(() =>
+                i18n.changeLanguage(localizationText(lang))
             );
         }
-    }, [activeWallet, i18n]);
+    }, [lang, i18n]);
 
     useEffect(() => {
         window.backgroundApi.onRefresh(() => queryClient.invalidateQueries());
     }, []);
 
     if (
-        auth === undefined ||
-        account === undefined ||
+        activeWalletLoading ||
+        isLangLoading ||
+        isWalletsLoading ||
         config === undefined ||
         lock === undefined ||
         fiat === undefined
@@ -305,9 +302,7 @@ export const Loader: FC = () => {
     const network = activeWallet?.network ?? Network.MAINNET;
     const context = {
         api: getApiConfig(config, network, REACT_APP_TONCONSOLE_API),
-        auth,
         fiat,
-        account,
         config,
         tonendpoint,
         standalone: true,
@@ -378,24 +373,19 @@ export const Content: FC<{
     }
 
     return (
-        <WalletStateContext.Provider value={activeWallet}>
-            <WideLayout>
-                <AsideMenu />
-                <WideContent>
-                    <Routes>
-                        <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
-                        <Route path={AppRoute.browser} element={<DesktopBrowser />} />
-                        <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
-                        <Route
-                            path={any(AppProRoute.multiSend)}
-                            element={<DesktopMultiSendPage />}
-                        />
-                        <Route path="*" element={<WalletContent />} />
-                    </Routes>
-                </WideContent>
-                <BackgroundElements />
-            </WideLayout>
-        </WalletStateContext.Provider>
+        <WideLayout>
+            <AsideMenu />
+            <WideContent>
+                <Routes>
+                    <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
+                    <Route path={AppRoute.browser} element={<DesktopBrowser />} />
+                    <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
+                    <Route path={any(AppProRoute.multiSend)} element={<DesktopMultiSendPage />} />
+                    <Route path="*" element={<WalletContent />} />
+                </Routes>
+            </WideContent>
+            <BackgroundElements />
+        </WideLayout>
     );
 };
 

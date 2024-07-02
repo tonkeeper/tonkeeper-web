@@ -1,8 +1,5 @@
-import { AccountState, defaultAccountState } from '@tonkeeper/core/dist/entries/account';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { AuthState, defaultAuthState } from '@tonkeeper/core/dist/entries/password';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { Configuration as ConfigurationV2 } from '@tonkeeper/core/dist/tonApiV2';
 import {
     Tonendpoint,
@@ -14,8 +11,6 @@ import React, { useContext } from 'react';
 
 export interface IAppContext {
     api: APIConfig;
-    account: AccountState;
-    auth: AuthState;
     fiat: FiatCurrencies;
     config: TonendpointConfig;
     tonendpoint: Tonendpoint;
@@ -37,8 +32,6 @@ export const AppContext = React.createContext<IAppContext>({
         tonApiV2: new ConfigurationV2(),
         tronApi: new TronConfiguration()
     },
-    account: defaultAccountState,
-    auth: defaultAuthState,
     fiat: FiatCurrencies.USD,
     config: defaultTonendpointConfig,
     tonendpoint: new Tonendpoint({ targetEnv: 'web' }, {}),
@@ -51,12 +44,6 @@ export const AppContext = React.createContext<IAppContext>({
 
 export const useAppContext = () => {
     return useContext(AppContext);
-};
-
-export const WalletStateContext = React.createContext<WalletState>(undefined!);
-
-export const useWalletContext = () => {
-    return useContext(WalletStateContext);
 };
 
 export const AppSelectionContext = React.createContext<EventTarget | null>(null);

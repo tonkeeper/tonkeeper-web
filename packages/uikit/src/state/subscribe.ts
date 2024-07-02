@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { useAppSdk } from '../hooks/appSdk';
 
 export const useSubscribeMutation = (
-    wallet: WalletState,
+    wallet: StandardTonWalletState,
     mnemonic: string[],
     onDone: () => void
 ) => {

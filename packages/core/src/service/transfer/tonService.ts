@@ -6,7 +6,7 @@ import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
-import { WalletState } from '../../entries/wallet';
+import { StandardTonWalletState } from '../../entries/wallet';
 import { AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { createLedgerTonTransfer } from '../ledger/transfer';
 import { walletContractFromState } from '../wallet/contractService';
@@ -44,7 +44,7 @@ export const toStateInit = (
 const createTonTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean,
@@ -73,7 +73,7 @@ const createTonTransfer = async (
 const createTonConnectTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     params: TonConnectTransactionPayload,
     signer: CellSigner
 ) => {
@@ -99,7 +99,7 @@ const createTonConnectTransfer = async (
 
 export const estimateTonTransfer = async (
     api: APIConfig,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean
@@ -133,11 +133,11 @@ export type ConnectTransferError = { kind: 'not-enough-balance' } | { kind: unde
 
 export const tonConnectTransferError = async (
     api: APIConfig,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     params: TonConnectTransactionPayload
 ): Promise<ConnectTransferError> => {
     const wallet = await new AccountsApi(api.tonApiV2).getAccount({
-        accountId: walletState.active.rawAddress
+        accountId: walletState.rawAddress
     });
 
     const total = params.messages.reduce(
@@ -154,7 +154,7 @@ export const tonConnectTransferError = async (
 
 export const estimateTonConnectTransfer = async (
     api: APIConfig,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     params: TonConnectTransactionPayload
 ): Promise<TransferEstimationEvent> => {
     const timestamp = await getServerTime(api);
@@ -180,12 +180,12 @@ export const estimateTonConnectTransfer = async (
 
 export const sendTonConnectTransfer = async (
     api: APIConfig,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     params: TonConnectTransactionPayload,
     signer: CellSigner
 ) => {
     const timestamp = await getServerTime(api);
-    const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
+    const seqno = await getWalletSeqNo(api, walletState.rawAddress);
 
     const external = await createTonConnectTransfer(timestamp, seqno, walletState, params, signer);
 
@@ -200,7 +200,7 @@ export const sendTonConnectTransfer = async (
 
 export const sendTonTransfer = async (
     api: APIConfig,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     recipient: TonRecipientData,
     amount: AssetAmount,
     isMax: boolean,

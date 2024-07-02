@@ -3,7 +3,7 @@ import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, Suspense, useMemo, useRef } from 'react';
 import { ActivitySkeletonPage } from '../../components/Skeleton';
 
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
 import { getMixedActivity } from '../../state/mixedActivity';
@@ -18,6 +18,7 @@ import { useTranslation } from '../../hooks/translation';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { mergeRefs } from '../../libs/common';
+import { useActiveWallet } from '../../state/wallet';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
@@ -28,7 +29,7 @@ const HistoryContainer = styled.div`
 `;
 
 export const DesktopHistoryPage: FC = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { api, standalone } = useAppContext();
     const { t } = useTranslation();
 
@@ -41,10 +42,10 @@ export const DesktopHistoryPage: FC = () => {
         isFetchingNextPage: isTonFetchingNextPage,
         data: tonEvents
     } = useInfiniteQuery({
-        queryKey: [wallet.active.rawAddress, QueryKey.activity, 'all'],
+        queryKey: [wallet.rawAddress, QueryKey.activity, 'all'],
         queryFn: ({ pageParam = undefined }) =>
             new AccountsApi(api.tonApiV2).getAccountEvents({
-                accountId: wallet.active.rawAddress,
+                accountId: wallet.rawAddress,
                 limit: 20,
                 beforeLt: pageParam,
                 subjectOnly: true

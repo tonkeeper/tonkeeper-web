@@ -29,6 +29,7 @@ import { Skeleton } from '../../shared/Skeleton';
 import { useProState } from '../../../state/pro';
 import { availableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA } from '../../../libs/css';
+import { useWalletsState } from '../../../state/wallet';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -83,13 +84,14 @@ export const PreferencesAsideMenu = () => {
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
     const sdk = useAppSdk();
-    const { config, account } = useAppContext();
+    const { config } = useAppContext();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: countryData } = useCountrySetting();
     const country = countryData === null ? t('auto') : countryData;
     const { data: proState } = useProState();
     const { data: uiPreferences } = useUserUIPreferences();
     const { fiat } = useAppContext();
+    const wallets = useWalletsState();
 
     return (
         <PreferencesAsideContainer>
@@ -233,7 +235,7 @@ export const PreferencesAsideMenu = () => {
                 <AsideMenuItemStyled onClick={onOpen} isSelected={false}>
                     <ExitIcon />
                     <Label2>
-                        {account.publicKeys.length > 1
+                        {wallets.length > 1
                             ? t('preferences_aside_sign_out_all')
                             : t('preferences_aside_sign_out')}
                     </Label2>

@@ -1,18 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { AuthState, defaultAuthState } from '@tonkeeper/core/dist/entries/password';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { useTranslation } from '../hooks/translation';
-
-export const useAuthState = () => {
-    const sdk = useAppSdk();
-    return useQuery([QueryKey.password], async () => {
-        const auth = await sdk.storage.get<AuthState>(AppKey.GLOBAL_AUTH_STATE);
-        return auth ?? defaultAuthState;
-    });
-};
 
 export const useLookScreen = () => {
     const sdk = useAppSdk();

@@ -3,11 +3,11 @@ import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useDateFormat } from '../../hooks/dateFormat';
 import { useTranslation } from '../../hooks/translation';
-import { useNftDNSExpirationDate, useNftItemData } from '../../state/wallet';
+import { useActiveWallet, useNftDNSExpirationDate, useNftItemData } from '../../state/wallet';
 import { SpinnerIcon } from '../Icon';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Body1, H3, Label1 } from '../Text';
@@ -34,7 +34,7 @@ const RightText = styled(Body1)`
 `;
 
 export const NftDetails: FC<{ nftItem: NftItem; kind: NFTKind }> = React.memo(({ nftItem }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { t } = useTranslation();
     const { data } = useNftItemData(nftItem.address);
     const { data: expirationDate, isLoading: isExpirationDateLoading } =

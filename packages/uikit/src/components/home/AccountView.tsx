@@ -5,7 +5,7 @@ import { FC, useRef, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled, { css } from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useTronWalletState } from '../../state/tron/tron';
@@ -21,6 +21,7 @@ import { Body1, H3 } from '../Text';
 import { Button } from '../fields/Button';
 import { Wrapper, childFactoryCreator, duration } from '../transfer/common';
 import { QrWrapper } from './qrCodeView';
+import { useActiveWallet } from '../../state/wallet';
 
 const CopyBlock = styled.div`
     display: flex;
@@ -138,10 +139,10 @@ const CopyButton: FC<{ address: string }> = ({ address }) => {
 const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     const sdk = useAppSdk();
     const { extension } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { t } = useTranslation();
 
-    const address = formatAddress(wallet.active.rawAddress, wallet.network);
+    const address = formatAddress(wallet.rawAddress, wallet.network);
     return (
         <NotificationBlock>
             <HeaderBlock title={t('receive_ton')} description={t('receive_ton_description')} />
@@ -216,7 +217,7 @@ export const ReceiveContent: FC<{
     handleClose?: () => void;
 }> = ({ chain = BLOCKCHAIN_NAME.TON, jetton, handleClose }) => {
     const { standalone } = useAppContext();
-    const [active, setActive] = useState(chain);
+    const [active] = useState(chain);
     const { data: tron } = useTronWalletState(active === BLOCKCHAIN_NAME.TRON);
     const tonRef = useRef<HTMLDivElement>(null);
     const tronRef = useRef<HTMLDivElement>(null);

@@ -1,10 +1,9 @@
-import { KeystonePathInfo } from "../service/keystone/types";
+import { KeystonePathInfo } from '../service/keystone/types';
 
 export type AuthState =
-    | AuthNone
     | AuthPassword
     | WebAuthn
-    | KeychainPassword
+    | AuthKeychain
     | AuthSigner
     | AuthSignerDeepLink
     | AuthLedger
@@ -16,9 +15,10 @@ export interface AuthNone {
 
 export interface AuthPassword {
     kind: 'password';
+    encryptedMnemonic: string;
 }
 
-export interface KeychainPassword {
+export interface AuthKeychain {
     kind: 'keychain';
 }
 
@@ -27,7 +27,7 @@ export interface AuthSigner {
 }
 
 export interface AuthSignerDeepLink {
-  kind: 'signer-deeplink';
+    kind: 'signer-deeplink';
 }
 
 export interface AuthLedger {
@@ -47,4 +47,25 @@ export interface WebAuthn {
     transports?: AuthenticatorTransport[];
 }
 
-export const defaultAuthState: AuthState = { kind: 'none' };
+export const defaultAuthState: DeprecatedAuthState = { kind: 'none' };
+
+/**
+ * @deprecated
+ */
+export type DeprecatedAuthState =
+    | AuthNone
+    | DeprecatedAuthPassword
+    | WebAuthn
+    | DeprecatedKeychainPassword
+    | AuthSigner
+    | AuthSignerDeepLink
+    | AuthLedger
+    | AuthKeystone;
+
+export interface DeprecatedAuthPassword {
+    kind: 'password';
+}
+
+export interface DeprecatedKeychainPassword {
+    kind: 'keychain';
+}

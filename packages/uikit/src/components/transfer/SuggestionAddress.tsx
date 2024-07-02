@@ -2,15 +2,15 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useMemo } from 'react';
-import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Label1 } from '../Text';
 import { Label } from './common';
+import { useActiveWallet } from '../../state/wallet';
 
 export const useSuggestionAddress = (item: Suggestion) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     return useMemo(() => {
         return item.blockchain === BLOCKCHAIN_NAME.TRON

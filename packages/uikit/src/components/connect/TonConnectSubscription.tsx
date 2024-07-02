@@ -7,7 +7,6 @@ import {
 import { subscribeTonConnect } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSendNotificationAnalytics } from '../../hooks/amplitude';
-import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { TonTransactionNotification } from './TonTransactionNotification';
 import { SendTransactionAppRequest, useResponseSendMutation } from './connectHook';
@@ -17,7 +16,8 @@ import {
     useAppTonConnectConnections,
     useTonConnectLastEventId
 } from '../../state/tonConnect';
-import { useMutateActiveWallet } from '../../state/account';
+
+import { useActiveWallet, useMutateActiveWallet } from '../../state/wallet';
 
 const useUnSupportMethodMutation = () => {
     return useMutation<void, Error, TonConnectAppRequest>(replyBadRequestResponse);
@@ -27,7 +27,7 @@ const TonConnectSubscription = () => {
     const [request, setRequest] = useState<SendTransactionAppRequest | undefined>(undefined);
 
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { data: appConnections } = useAppTonConnectConnections();
     const { data: lastEventId } = useTonConnectLastEventId();
 
@@ -83,7 +83,7 @@ const TonConnectSubscription = () => {
         (async () => {
             if (notifications && appConnections) {
                 try {
-                    const enable = await notifications.subscribed(wallet.active.rawAddress);
+                    const enable = await notifications.subscribed(wallet.rawAddress);
                     if (enable) {
                         for (const connection of appConnections.flatMap(i => i.connections)) {
                             await notifications.subscribeTonConnect(

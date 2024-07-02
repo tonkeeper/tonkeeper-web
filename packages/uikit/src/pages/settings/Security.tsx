@@ -8,7 +8,6 @@ import { ChangePasswordNotification } from '../../components/create/ChangePasswo
 import { Switch } from '../../components/fields/Switch';
 import { KeyIcon, LockIcon } from '../../components/settings/SettingsIcons';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useIsActiveWalletLedger } from '../../state/ledger';
@@ -19,16 +18,17 @@ import {
     useMutateTouchId,
     useTouchIdEnabled
 } from '../../state/password';
+import { useIsPasswordSet } from '../../state/wallet';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
 
-    const { auth } = useAppContext();
+    const isPasswordSet = useIsPasswordSet();
 
     const { data } = useLookScreen();
     const { mutate: toggleLock } = useMutateLookScreen();
 
-    if (auth.kind === 'password') {
+    if (isPasswordSet) {
         return (
             <ListBlock>
                 <ListItem hover={false}>
@@ -73,8 +73,7 @@ const ChangePassword = () => {
     const { t } = useTranslation();
     const [isOpen, setOpen] = useState(false);
 
-    const { auth: walletAuth } = useWalletContext();
-    const { auth: globalAuth } = useAppContext();
+    const isPasswordSet = useIsPasswordSet();
     const items = useMemo(() => {
         const i: SettingsItem[] = [
             {
@@ -86,7 +85,7 @@ const ChangePassword = () => {
         return i;
     }, []);
 
-    if (walletAuth == null && globalAuth.kind === 'password') {
+    if (isPasswordSet) {
         return (
             <>
                 <SettingsList items={items} />

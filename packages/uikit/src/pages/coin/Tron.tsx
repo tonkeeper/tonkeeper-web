@@ -1,7 +1,6 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TronWalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { TronApi, TronBalance } from '@tonkeeper/core/dist/tronApi';
+import { TronBalance } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
@@ -10,15 +9,11 @@ import { InnerBody } from '../../components/Body';
 import { CoinSkeletonPage } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2 } from '../../components/Text';
-import { ActivityList } from '../../components/activity/ActivityGroup';
 import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
 import { SendAction } from '../../components/transfer/SendActionButton';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useFormatBalance } from '../../hooks/balance';
-import { useFetchNext } from '../../hooks/useFetchNext';
-import { QueryKey } from '../../libs/queryKey';
 import { AppRoute } from '../../libs/routes';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useTronBalance, useTronWalletState } from '../../state/tron/tron';
@@ -37,8 +32,8 @@ const TronActivity: FC<{
     tron: TronWalletState;
     innerRef: React.RefObject<HTMLDivElement>;
 }> = ({ tron, innerRef }) => {
-    const wallet = useWalletContext();
-    const {
+    return null;
+    /*const {
         standalone,
         api: { tronApi }
     } = useAppContext();
@@ -61,7 +56,7 @@ const TronActivity: FC<{
             isFetchingNextPage={isFetchingNextPage}
             tronEvents={data}
         />
-    );
+    );*/
 };
 
 const Layout = styled.div`

@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { DeprecatedWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -240,9 +240,7 @@ export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
     const network = activeWallet?.network ?? Network.MAINNET;
     const context: IAppContext = {
         api: getApiConfig(config, network),
-        auth,
         fiat,
-        account,
         config,
         tonendpoint,
         standalone: false,
@@ -313,7 +311,7 @@ const InitPages = () => {
 };
 
 const Content: FC<{
-    activeWallet?: WalletState | null;
+    activeWallet?: DeprecatedWalletState | null;
     lock: boolean;
     showQrScan: boolean;
 }> = ({ activeWallet, lock, showQrScan }) => {

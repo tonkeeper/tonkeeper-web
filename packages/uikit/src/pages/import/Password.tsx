@@ -1,19 +1,9 @@
 import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
 import { mnemonicValidate } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import {
-    addWalletWithCustomAuthState,
-    addWalletWithGlobalAuthState,
-    getAccountState
-} from '@tonkeeper/core/dist/service/accountService';
-import {
-    createNewWalletState,
-    encryptWalletMnemonic
-} from '@tonkeeper/core/dist/service/walletService';
+import { createNewStandardTonWalletStateFromMnemonic } from '@tonkeeper/core/dist/service/walletService';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { IconPage } from '../../components/Layout';
@@ -23,6 +13,9 @@ import { useAfterImportAction, useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { getPasswordByNotification } from '../../state/mnemonic';
+import { walletsStorage } from '@tonkeeper/core/dist/service/walletsService';
+import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { encrypt } from '@tonkeeper/core/dist/service/cryptoService';
 
 const createWalletWithKeychain = async (
     client: QueryClient,
@@ -34,15 +27,17 @@ const createWalletWithKeychain = async (
         throw new Error('Keychain is not define');
     }
 
-    const state = await createNewWalletState(api, mnemonic);
+    const state = await createNewStandardTonWalletStateFromMnemonic(api, mnemonic, {
+        kind: 'keychain'
+    });
     state.auth = { kind: 'keychain' };
 
     await sdk.keychain.setPassword(state.publicKey, mnemonic.join(' '));
 
-    await addWalletWithCustomAuthState(sdk.storage, state);
+    await walletsStorage(sdk.storage).addWalletToState(state);
 
     await client.invalidateQueries([QueryKey.account]);
-    return getAccountState(sdk.storage);
+    return state;
 };
 
 const createWallet = async (
@@ -50,20 +45,21 @@ const createWallet = async (
     api: APIConfig,
     sdk: IAppSdk,
     mnemonic: string[],
-    auth: AuthState,
-    password?: string
+    password: string
 ) => {
-    const key = auth.kind === 'none' ? 'none' : password;
-    if (!key) {
+    if (!password) {
         throw new Error('Missing encrypt password key');
     }
 
-    const state = await createNewWalletState(api, mnemonic);
-    const encryptedMnemonic = await encryptWalletMnemonic(mnemonic, key);
-    await addWalletWithGlobalAuthState(sdk.storage, state, auth, encryptedMnemonic);
+    const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
+    const state = await createNewStandardTonWalletStateFromMnemonic(api, mnemonic, {
+        kind: 'password',
+        encryptedMnemonic
+    });
+    await walletsStorage(sdk.storage).addWalletToState(state);
 
     await client.invalidateQueries([QueryKey.account]);
-    return getAccountState(sdk.storage);
+    return state;
 };
 
 export const useAddWalletMutation = () => {
@@ -72,37 +68,33 @@ export const useAddWalletMutation = () => {
     const client = useQueryClient();
 
     return useMutation<
-        false | AccountState,
+        false | StandardTonWalletState,
         Error,
-        { mnemonic: string[]; password?: string; listOfAuth?: AuthState['kind'][] }
-    >(async ({ mnemonic, password, listOfAuth }) => {
+        { mnemonic: string[]; password?: string; supportedAuthTypes?: AuthState['kind'][] }
+    >(async ({ mnemonic, password, supportedAuthTypes }) => {
         const valid = await mnemonicValidate(mnemonic);
         if (!valid) {
             throw new Error('Mnemonic is not valid.');
         }
 
-        if (listOfAuth && listOfAuth.length === 1 && listOfAuth[0] == 'keychain') {
+        if (
+            supportedAuthTypes &&
+            supportedAuthTypes.length === 1 &&
+            supportedAuthTypes[0] === 'keychain'
+        ) {
             return createWalletWithKeychain(client, api, sdk, mnemonic);
         }
 
-        const auth = await sdk.storage.get<AuthState>(AppKey.GLOBAL_AUTH_STATE);
-        if (auth === null) {
+        const walletsState = await walletsStorage(sdk.storage).getWallets();
+        if (walletsState.length === 0 && password === undefined) {
             return false;
-        }
-        const account = await getAccountState(sdk.storage);
-        if (account.publicKeys.length === 0 && password == undefined) {
-            return false;
-        }
-
-        if (auth.kind === 'none') {
-            return createWallet(client, api, sdk, mnemonic, auth);
         }
 
         if (!password) {
-            password = await getPasswordByNotification(sdk, auth);
+            password = await getPasswordByNotification(sdk);
         }
 
-        return createWallet(client, api, sdk, mnemonic, auth, password);
+        return createWallet(client, api, sdk, mnemonic, password);
     });
 };
 

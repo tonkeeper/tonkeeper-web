@@ -5,7 +5,7 @@ import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
-import { WalletState } from '../../entries/wallet';
+import { StandardTonWalletState } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { createLedgerJettonTransfer } from '../ledger/transfer';
 import { walletContractFromState } from '../wallet/contractService';
@@ -47,7 +47,7 @@ export const jettonTransferBody = (params: {
 const createJettonTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     recipientAddress: string,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string,
@@ -60,7 +60,7 @@ const createJettonTransfer = async (
         queryId: getTonkeeperQueryId(),
         jettonAmount,
         toAddress: Address.parse(recipientAddress),
-        responseAddress: Address.parse(walletState.active.rawAddress),
+        responseAddress: Address.parse(walletState.rawAddress),
         forwardAmount: jettonTransferForwardAmount,
         forwardPayload
     });
@@ -86,7 +86,7 @@ const createJettonTransfer = async (
 
 export const estimateJettonTransfer = async (
     api: APIConfig,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     recipient: TonRecipientData,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string
@@ -117,7 +117,7 @@ export const estimateJettonTransfer = async (
 
 export const sendJettonTransfer = async (
     api: APIConfig,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     recipient: TonRecipientData,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string,

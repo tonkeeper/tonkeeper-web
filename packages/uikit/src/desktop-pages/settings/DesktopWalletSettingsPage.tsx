@@ -1,4 +1,4 @@
-import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -18,10 +18,10 @@ import {
 import { LogOutWalletNotification } from '../../components/settings/LogOutNotification';
 import { RenameWalletNotification } from '../../components/settings/wallet-name/WalletNameNotification';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
-import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
+import { useActiveWallet } from '../../state/wallet';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -55,7 +55,7 @@ const LinkStyled = styled(Link)`
 
 export const DesktopWalletSettingsPage = () => {
     const { t } = useTranslation();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { isOpen: isRenameOpen, onClose: onRenameClose, onOpen: onRenameOpen } = useDisclosure();
     const { isOpen: isLogoutOpen, onClose: onLogoutClose, onOpen: onLogoutOpen } = useDisclosure();
 
@@ -81,15 +81,17 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_backup_seed')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
-                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>
-                    <SettingsListItem>
-                        <SwitchIcon />
-                        <SettingsListText>
-                            <Label2>{t('settings_wallet_version')}</Label2>
-                            <Body3>{walletVersionText(wallet.active.version)}</Body3>
-                        </SettingsListText>
-                    </SettingsListItem>
-                </LinkStyled>
+                {isStandardTonWallet(wallet) && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>
+                        <SettingsListItem>
+                            <SwitchIcon />
+                            <SettingsListText>
+                                <Label2>{t('settings_wallet_version')}</Label2>
+                                <Body3>{walletVersionText(wallet.version)}</Body3>
+                            </SettingsListText>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
                 <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.jettons}>
                     <SettingsListItem>
                         <CoinsIcon />

@@ -1,7 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { AccountState } from '@tonkeeper/core/dist/entries/account';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { DeprecatedAccountState } from '@tonkeeper/core/dist/entries/account';
+import {
+    DeprecatedWalletState,
+    WalletsState,
+    WalletState
+} from '@tonkeeper/core/dist/entries/wallet';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { Amplitude } from '@tonkeeper/uikit/dist/hooks/analytics/amplitude';
@@ -50,8 +54,8 @@ declare const REACT_APP_AMPLITUDE: string;
 
 export const useAnalytics = (
     version: string,
-    account?: AccountState,
-    wallet?: WalletState | null
+    activeWallet?: WalletState,
+    wallets?: WalletsState
 ) => {
     const sdk = useAppSdk();
 
@@ -77,15 +81,15 @@ export const useAnalytics = (
 
             tracker.init(
                 'Desktop',
-                toWalletType(wallet),
-                account,
-                wallet,
+                toWalletType(activeWallet),
+                activeWallet,
+                wallets,
                 version,
                 `${window.backgroundApi.platform()}-${window.backgroundApi.arch()}`
             );
 
             return tracker;
         },
-        { enabled: account != null }
+        { enabled: wallets != null && activeWallet !== undefined }
     );
 };

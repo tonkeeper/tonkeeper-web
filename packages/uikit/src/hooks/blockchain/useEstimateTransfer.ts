@@ -5,26 +5,24 @@ import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ass
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import {
     RecipientData,
     TonRecipientData,
     TransferEstimation,
     TransferEstimationEvent
 } from '@tonkeeper/core/dist/entries/send';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
-import { estimateTron } from '@tonkeeper/core/dist/service/tron/tronTransferService';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import { notifyError } from '../../components/transfer/common';
 import { QueryKey } from '../../libs/queryKey';
 import { useJettonList } from '../../state/jetton';
 import { DefaultRefetchInterval } from '../../state/tonendpoint';
-import { useTronBalances } from '../../state/tron/tron';
-import { useAppContext, useWalletContext } from '../appContext';
+import { useAppContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
+import { useActiveStandardTonWallet } from '../../state/wallet';
 
 async function estimateTon({
     recipient,
@@ -38,7 +36,7 @@ async function estimateTon({
     amount: AssetAmount<TonAsset>;
     isMax: boolean;
     api: APIConfig;
-    wallet: WalletState;
+    wallet: StandardTonWalletState;
     jettons: JettonsBalances | undefined;
 }): Promise<TransferEstimation<TonAsset>> {
     let payload: TransferEstimationEvent;
@@ -75,10 +73,10 @@ export function useEstimateTransfer(
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const client = useQueryClient();
     const { data: jettons } = useJettonList();
-    const { data: balances } = useTronBalances();
+    /*const { data: balances } = useTronBalances();*/
 
     return useQuery<TransferEstimation<Asset>, Error>(
         [QueryKey.estimate, recipient, amount],
@@ -94,14 +92,16 @@ export function useEstimateTransfer(
                         jettons
                     });
                 } else {
-                    return await estimateTron({
+                    /* return await estimateTron({
                         amount: amount as AssetAmount<TronAsset>,
                         tronApi: api.tronApi,
                         wallet,
                         recipient,
                         isMax,
                         balances
-                    });
+                    });*/
+
+                    throw new Error('Tron is not supported');
                 }
             } catch (e) {
                 await notifyError(client, sdk, t, e);

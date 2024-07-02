@@ -1,7 +1,6 @@
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
-import { useWalletContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
 import { ChevronLeftIcon } from '../../Icon';
@@ -10,6 +9,7 @@ import { NotificationCancelButton, NotificationTitleBlock } from '../../Notifica
 import { Label1 } from '../../Text';
 import { RoundedButton } from '../../fields/RoundedButton';
 import { Label } from '../common';
+import { useActiveWallet } from '../../../state/wallet';
 
 export type ConfirmHeaderBlockComponent = (props: {
     onBack: () => void;
@@ -30,7 +30,7 @@ export const ConfirmHeaderBlock: ConfirmHeaderBlockComponent = ({ onBack, onClos
 export const NftDetailsBlock: FC<{ nftItem: NFT }> = ({ nftItem }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     return (
         <ListBlock fullWidth>

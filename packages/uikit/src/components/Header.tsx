@@ -2,12 +2,10 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute } from '../libs/routes';
-import { useMutateActiveWallet } from '../state/account';
 import { useUserCountry } from '../state/country';
-import { useWalletState } from '../state/wallet';
+import { useActiveWallet, useMutateActiveWallet, useWalletsState } from '../state/wallet';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
@@ -17,6 +15,7 @@ import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
+import { TonWalletState } from '@tonkeeper/core/dist/entries/wallet';
 
 const Block = styled.div<{
     center?: boolean;
@@ -115,33 +114,24 @@ const Row = styled.div`
 `;
 
 const WalletRow: FC<{
-    activePublicKey?: string;
-    publicKey: string;
-    index: number;
+    walletState: TonWalletState;
     onClose: () => void;
-}> = ({ activePublicKey, publicKey, index, onClose }) => {
+}> = ({ walletState, onClose }) => {
     const { mutate } = useMutateActiveWallet();
-    const { t } = useTranslation();
-    const { data: wallet } = useWalletState(publicKey);
-    const address = wallet
-        ? toShortValue(formatAddress(wallet.active.rawAddress, wallet.network))
-        : undefined;
+    const address = toShortValue(formatAddress(walletState.rawAddress, walletState.network));
+    const activeWallet = useActiveWallet();
     return (
         <ListItem
             dropDown
             onClick={() => {
-                mutate(publicKey);
+                mutate(walletState.id);
                 onClose();
             }}
         >
             <ListItemPayload>
-                {wallet && <WalletEmoji emoji={wallet.emoji} />}
-                <ColumnText
-                    noWrap
-                    text={wallet?.name ? wallet.name : `${t('wallet_title')} ${index + 1}`}
-                    secondary={address}
-                />
-                {activePublicKey === publicKey ? (
+                <WalletEmoji emoji={walletState.emoji} />
+                <ColumnText noWrap text={walletState.name} secondary={address} />
+                {activeWallet?.id === walletState.id ? (
                     <Icon>
                         <DoneIcon />
                     </Icon>
@@ -156,10 +146,14 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
     onCreate
 }) => {
     const navigate = useNavigate();
-    const { account } = useAppContext();
     const { t } = useTranslation();
+    const wallets = useWalletsState();
 
-    if (account.publicKeys.length === 1) {
+    if (!wallets) {
+        return null;
+    }
+
+    if (wallets.length === 1) {
         return (
             <Row
                 onClick={() => {
@@ -176,14 +170,8 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
     } else {
         return (
             <>
-                {account.publicKeys.map((publicKey, index) => (
-                    <WalletRow
-                        key={publicKey}
-                        publicKey={publicKey}
-                        activePublicKey={account.activePublicKey}
-                        index={index}
-                        onClose={onClose}
-                    />
+                {wallets.map(wallet => (
+                    <WalletRow key={wallet.id} walletState={wallet} onClose={onClose} />
                 ))}
                 <Divider />
                 <Row
@@ -204,11 +192,11 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
 
 export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const { t } = useTranslation();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const [isOpen, setOpen] = useState(false);
 
-    const { account } = useAppContext();
-    const shouldShowIcon = account.publicKeys.length > 1;
+    const wallets = useWalletsState();
+    const shouldShowIcon = wallets.length > 1;
 
     return (
         <Block center>

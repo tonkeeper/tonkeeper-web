@@ -3,7 +3,7 @@ import queryString from 'query-string';
 import { IAppSdk } from '../AppSdk';
 import { AppKey } from '../Keys';
 import { APIConfig } from '../entries/apis';
-import { WalletState, WalletVersion } from '../entries/wallet';
+import { StandardTonWalletState, WalletVersion } from '../entries/wallet';
 import { BlockchainApi } from '../tonApiV2';
 import { externalMessage, getWalletSeqNo } from './transfer/common';
 import { walletContractFromState } from './wallet/contractService';
@@ -64,7 +64,7 @@ export const storeTransactionAndCreateDeepLink = async (
 export const publishSignerMessage = async (
     sdk: IAppSdk,
     api: APIConfig,
-    walletState: WalletState,
+    walletState: StandardTonWalletState,
     signatureHex: string
 ) => {
     const messageBase64 = await sdk.storage.get<string>(AppKey.SIGNER_MESSAGE);
@@ -72,12 +72,12 @@ export const publishSignerMessage = async (
         throw new Error('missing message');
     }
     const contract = walletContractFromState(walletState);
-    const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
+    const seqno = await getWalletSeqNo(api, walletState.rawAddress);
     const signature = Buffer.from(signatureHex, 'hex');
     const message = Cell.fromBase64(messageBase64).asBuilder();
 
     const transfer = beginCell();
-    if (walletState.active.version === WalletVersion.W5) {
+    if (walletState.version === WalletVersion.W5) {
         transfer.storeBuilder(message).storeBuffer(signature);
     } else {
         transfer.storeBuffer(signature).storeBuilder(message);

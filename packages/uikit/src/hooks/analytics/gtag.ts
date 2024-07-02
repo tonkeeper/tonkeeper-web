@@ -1,6 +1,5 @@
-import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { WalletsState, WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import ReactGA from 'react-ga4';
 import { Analytics } from '.';
 
@@ -12,16 +11,16 @@ export class Gtag implements Analytics {
     init(
         application: string,
         walletType: string,
-        account?: AccountState,
-        wallet?: WalletState | null,
+        activeWallet?: WalletState,
+        wallets?: WalletsState,
         version?: string,
         platform?: string
     ) {
         ReactGA.gtag('set', 'user_properties', {
             application,
             walletType,
-            network: wallet?.network === Network.TESTNET ? 'testnet' : 'mainnet',
-            accounts: account!.publicKeys.length,
+            network: activeWallet?.network === Network.TESTNET ? 'testnet' : 'mainnet',
+            accounts: wallets?.length || 0,
             version,
             platform
         });

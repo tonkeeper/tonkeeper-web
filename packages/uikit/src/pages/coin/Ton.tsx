@@ -10,14 +10,14 @@ import { SubHeader } from '../../components/SubHeader';
 import { ActivityList } from '../../components/activity/ActivityGroup';
 import { HomeActions } from '../../components/home/TonActions';
 import { CoinInfo } from '../../components/jettons/Info';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useFormatBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { groupAndFilterTonActivityItems } from '../../state/ton/tonActivity';
-import { useWalletAccountInfo } from '../../state/wallet';
+import { useActiveWallet, useWalletAccountInfo } from '../../state/wallet';
 
 const TonHeader: FC<{ info: Account }> = ({ info: { balance } }) => {
     const { t } = useTranslation();
@@ -46,13 +46,13 @@ export const TonPage = () => {
     const { data: info } = useWalletAccountInfo();
 
     const { api, standalone } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     const { fetchNextPage, hasNextPage, isFetchingNextPage, data, isFetched } = useInfiniteQuery({
-        queryKey: [wallet.active.rawAddress, QueryKey.activity, 'ton'],
+        queryKey: [wallet.rawAddress, QueryKey.activity, 'ton'],
         queryFn: ({ pageParam = undefined }) =>
             new AccountsApi(api.tonApiV2).getAccountEvents({
-                accountId: wallet.active.rawAddress,
+                accountId: wallet.rawAddress,
                 limit: 20,
                 beforeLt: pageParam,
                 subjectOnly: true

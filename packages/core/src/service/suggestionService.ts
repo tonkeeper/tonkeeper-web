@@ -2,7 +2,7 @@ import { IAppSdk } from '../AppSdk';
 import { APIConfig } from '../entries/apis';
 import { BLOCKCHAIN_NAME } from '../entries/crypto';
 import { FavoriteSuggestion, LatestSuggestion } from '../entries/suggestion';
-import { WalletState } from '../entries/wallet';
+import { DeprecatedWalletState, StandardTonWalletState, TonWalletState } from '../entries/wallet';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { AccountsApi } from '../tonApiV2';
@@ -44,7 +44,7 @@ export const deleteFavoriteSuggestion = async (
 
 const getTronSuggestionsList = async (
     api: APIConfig,
-    wallet: WalletState,
+    wallet: DeprecatedWalletState,
     seeIfAddressIsAdded: (list: LatestSuggestion[], address: string) => boolean
 ) => {
     const list = [] as LatestSuggestion[];
@@ -74,13 +74,13 @@ const getTronSuggestionsList = async (
 
 const getTonSuggestionsList = async (
     api: APIConfig,
-    wallet: WalletState,
+    wallet: TonWalletState,
     seeIfAddressIsAdded: (list: LatestSuggestion[], address: string) => boolean
 ) => {
     const list = [] as LatestSuggestion[];
 
     const items = await new AccountsApi(api.tonApiV2).getAccountEvents({
-        accountId: wallet.active.rawAddress,
+        accountId: wallet.rawAddress,
         limit: 100,
         subjectOnly: true
     });
@@ -90,7 +90,7 @@ const getTonSuggestionsList = async (
         if (!tonTransferEvent) return;
 
         const recipient = event.actions.find(
-            item => item.tonTransfer?.recipient.address !== wallet.active.rawAddress
+            item => item.tonTransfer?.recipient.address !== wallet.rawAddress
         );
         if (!recipient) return;
 
@@ -112,7 +112,7 @@ const getTonSuggestionsList = async (
 export const getSuggestionsList = async (
     sdk: IAppSdk,
     api: APIConfig,
-    wallet: WalletState,
+    wallet: StandardTonWalletState,
     acceptBlockchains: BLOCKCHAIN_NAME[] = [BLOCKCHAIN_NAME.TON, BLOCKCHAIN_NAME.TRON]
 ) => {
     const favorites = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);
@@ -129,8 +129,8 @@ export const getSuggestionsList = async (
             switch (name) {
                 case BLOCKCHAIN_NAME.TON:
                     return getTonSuggestionsList(api, wallet, seeIfAddressIsAdded);
-                case BLOCKCHAIN_NAME.TRON:
-                    return getTronSuggestionsList(api, wallet, seeIfAddressIsAdded);
+                /*                case BLOCKCHAIN_NAME.TRON:
+                    return getTronSuggestionsList(api, wallet, seeIfAddressIsAdded);*/
                 default:
                     throw new Error('Unexpected chain');
             }

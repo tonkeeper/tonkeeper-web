@@ -26,11 +26,10 @@ import { SetUpWalletIcon } from '../../components/settings/SettingsIcons';
 import { SettingsList } from '../../components/settings/SettingsList';
 import { RenameWalletNotification } from '../../components/settings/wallet-name/WalletNameNotification';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
-import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useMutateAccountState } from '../../state/account';
-import { useWalletState } from '../../state/wallet';
+import { useMutateWalletsState, useWalletsState } from '../../state/wallet';
+import { isMnemonicAuthWallet, WalletState } from '@tonkeeper/core/dist/entries/wallet';
 
 const Row = styled.div`
     display: flex;
@@ -46,11 +45,10 @@ const Icon = styled.span`
 `;
 
 const WalletRow: FC<{
-    publicKey: string;
+    wallet: WalletState;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-}> = ({ publicKey, dragHandleProps }) => {
+}> = ({ wallet, dragHandleProps }) => {
     const navigate = useNavigate();
-    const { data: wallet } = useWalletState(publicKey);
     const { t } = useTranslation();
 
     const [rename, setRename] = useState<boolean>(false);
@@ -61,7 +59,7 @@ const WalletRow: FC<{
         return <SkeletonListPayload />;
     }
 
-    const address = formatAddress(wallet.active.rawAddress, wallet.network);
+    const address = formatAddress(wallet.rawAddress, wallet.network);
 
     return (
         <>
@@ -90,14 +88,14 @@ const WalletRow: FC<{
                                         <Label1>{t('Rename')}</Label1>
                                     </ListItemPayload>
                                 </ListItem>
-                                {wallet.auth == null && (
+                                {isMnemonicAuthWallet(wallet) && (
                                     <ListItem
                                         dropDown
                                         onClick={() => {
                                             navigate(
                                                 AppRoute.settings +
                                                     SettingsRoute.recovery +
-                                                    `/${wallet.publicKey}`
+                                                    `/${wallet.id}`
                                             );
                                         }}
                                     >
@@ -158,8 +156,8 @@ export const Account = () => {
     const [isOpen, setOpen] = useState(false);
     const { t } = useTranslation();
 
-    const { account } = useAppContext();
-    const { mutate } = useMutateAccountState();
+    const wallets = useWalletsState();
+    const { mutate } = useMutateWalletsState();
 
     const createItems = useMemo(() => {
         return [
@@ -174,15 +172,12 @@ export const Account = () => {
     const handleDrop: OnDragEndResponder = useCallback(
         droppedItem => {
             if (!droppedItem.destination) return;
-            const updatedList = [...account.publicKeys];
+            const updatedList = [...wallets];
             const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
             updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
-            mutate({
-                activePublicKey: account.activePublicKey,
-                publicKeys: updatedList
-            });
+            mutate(updatedList);
         },
-        [account, mutate]
+        [wallets, mutate]
     );
 
     return (
@@ -193,10 +188,10 @@ export const Account = () => {
                     <Droppable droppableId="wallets">
                         {provided => (
                             <ListBlock {...provided.droppableProps} ref={provided.innerRef}>
-                                {account.publicKeys.map((publicKey, index) => (
+                                {wallets.map((wallet, index) => (
                                     <Draggable
-                                        key={publicKey}
-                                        draggableId={publicKey}
+                                        key={wallet.id}
+                                        draggableId={wallet.id}
                                         index={index}
                                     >
                                         {p => (
@@ -208,7 +203,7 @@ export const Account = () => {
                                             >
                                                 <WalletRow
                                                     dragHandleProps={p.dragHandleProps}
-                                                    publicKey={publicKey}
+                                                    wallet={wallet}
                                                 />
                                             </ListItemElement>
                                         )}

@@ -1,17 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { TronWalletState } from '@tonkeeper/core/dist/entries/wallet';
-import {
-    getTronWalletState,
-    importTronWallet
-} from '@tonkeeper/core/dist/service/tron/tronService';
-import { setWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { TronApi, TronBalance, TronBalances, TronToken } from '@tonkeeper/core/dist/tronApi';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { QueryKey } from '../../libs/queryKey';
-import { getMnemonic } from '../mnemonic';
 import { DefaultRefetchInterval } from '../tonendpoint';
-import { useCheckTouchId } from '../password';
 
 enum TronKeys {
     state,
@@ -23,14 +16,14 @@ export const useTronWalletState = (enabled = true) => {
     const {
         api: { tronApi }
     } = useAppContext();
-    const wallet = useWalletContext();
-    const client = useQueryClient();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    /*    const client = useQueryClient();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();*/
 
-    return useQuery<TronWalletState, Error>(
-        [wallet.publicKey, QueryKey.tron, wallet.network, TronKeys.state],
+    return useQuery<TronWalletState | undefined, Error>(
+        [TronKeys.state],
         async () => {
-            if (wallet.tron) {
+            return undefined;
+            /*  if (wallet.tron) {
                 return getTronWalletState(wallet.tron, wallet.network);
             }
 
@@ -40,7 +33,7 @@ export const useTronWalletState = (enabled = true) => {
             const result = getTronWalletState(tron, wallet.network);
 
             client.invalidateQueries([QueryKey.account, QueryKey.wallet]);
-            return result;
+            return result;*/
         },
         { enabled }
     );
@@ -50,9 +43,9 @@ export const useTronTokens = () => {
     const {
         api: { tronApi }
     } = useAppContext();
-    const wallet = useWalletContext();
+    // const wallet = useWalletContext();
     return useQuery<TronToken[], Error>(
-        [QueryKey.tron, wallet.network, TronKeys.balance, wallet.tron],
+        [QueryKey.tron, /*wallet.network,*/ TronKeys.balance],
         async () => {
             const sdk = new TronApi(tronApi);
             const { tokens } = await sdk.getSettings();
@@ -65,12 +58,13 @@ export const useTronBalances = () => {
     const {
         api: { tronApi }
     } = useAppContext();
-    const wallet = useWalletContext();
+    /*const wallet = useWalletContext();*/
 
     return useQuery<TronBalances, Error>(
-        [wallet.publicKey, QueryKey.tron, wallet.network, TronKeys.balance, wallet.tron],
+        [QueryKey.tron, /*wallet.network,*/ TronKeys.balance],
         async () => {
-            const sdk = new TronApi(tronApi);
+            return { balances: [] };
+            /*const sdk = new TronApi(tronApi);
 
             if (wallet.tron) {
                 const { walletAddress } = getTronWalletState(wallet.tron, wallet.network);
@@ -82,7 +76,7 @@ export const useTronBalances = () => {
                 return {
                     balances: [] // tokens.map(token => ({ token, weiAmount: '0' }))
                 };
-            }
+            }*/
         },
         {
             refetchInterval: DefaultRefetchInterval,
@@ -97,9 +91,9 @@ export const useTronBalance = (tron: TronWalletState, address: string | undefine
     const {
         api: { tronApi }
     } = useAppContext();
-    const wallet = useWalletContext();
+    // const wallet = useWalletContext();
 
-    return useQuery<TronBalance, Error>([wallet.publicKey, QueryKey.tron, address], async () => {
+    return useQuery<TronBalance, Error>([QueryKey.tron, address], async () => {
         if (!address) {
             throw new Error('missing token address');
         }
@@ -118,6 +112,7 @@ export const useTronBalance = (tron: TronWalletState, address: string | undefine
     });
 };
 
+/*
 export const useCleanUpTronStore = () => {
     const wallet = useWalletContext();
     const sdk = useAppSdk();
@@ -132,3 +127,4 @@ export const useCleanUpTronStore = () => {
         }
     });
 };
+*/

@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
-import { useWalletContext } from '../../../../hooks/appContext';
 import {
     ActionRow,
     ErrorRow,
@@ -13,12 +12,13 @@ import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { CodeIcon } from '../../../Icon';
 import { useTranslation } from '../../../../hooks/translation';
+import { useActiveWallet } from '../../../../state/wallet';
 
 export const SmartContractExecDesktopAction: FC<{
     action: Action;
     isScam: boolean;
 }> = ({ action, isScam }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { smartContractExec } = action;
     const { t } = useTranslation();
 
@@ -43,9 +43,7 @@ export const SmartContractExecDesktopAction: FC<{
                     decimals={9}
                     isFailed={action.status === 'failed'}
                     isSpam={isScam}
-                    isNegative={
-                        !eqAddresses(smartContractExec.contract.address, wallet.active.rawAddress)
-                    }
+                    isNegative={!eqAddresses(smartContractExec.contract.address, wallet.rawAddress)}
                 />
             </ActionRow>
         </>

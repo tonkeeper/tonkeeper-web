@@ -15,19 +15,20 @@ import {
 } from '@tonkeeper/core/dist/tonApiV2';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { JettonKey, QueryKey } from '../libs/queryKey';
 import { getRateKey, toTokenRate } from './rates';
 import { DefaultRefetchInterval } from './tonendpoint';
+import { useActiveWallet } from './wallet';
 
 export const useJettonInfo = (jettonAddress: string) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const {
         api: { tonApiV2 }
     } = useAppContext();
     return useQuery<JettonInfo, Error>(
-        [wallet.active.rawAddress, QueryKey.jettons, JettonKey.info, jettonAddress],
+        [wallet.id, QueryKey.jettons, JettonKey.info, jettonAddress],
         async () => {
             const result = await new JettonsApi(tonApiV2).getJettonInfo({
                 accountId: jettonAddress
@@ -59,15 +60,14 @@ const compareTokensOver = (fiat: FiatCurrencies) => {
 };
 
 export const useJettonRawList = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { api, fiat } = useAppContext();
-    const sdk = useAppSdk();
 
     return useQuery<JettonsBalances, Error>(
-        [wallet.active.rawAddress, JettonKey.raw, QueryKey.jettons, fiat, wallet.network],
+        [wallet.id, JettonKey.raw, QueryKey.jettons, fiat, wallet.network],
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.active.rawAddress,
+                accountId: wallet.rawAddress,
                 currencies: [fiat]
             });
             const balances = filterTokens(result.balances, []).sort(compareTokensOver(fiat));
@@ -77,22 +77,22 @@ export const useJettonRawList = () => {
 };
 
 export const useJettonList = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { api, fiat } = useAppContext();
     const client = useQueryClient();
     const sdk = useAppSdk();
 
     return useQuery<JettonsBalances, Error>(
-        [wallet.active.rawAddress, QueryKey.jettons, fiat, wallet.network],
+        [wallet.id, QueryKey.jettons, fiat, wallet.network],
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.active.rawAddress,
+                accountId: wallet.rawAddress,
                 currencies: [fiat]
             });
 
             const config = await getActiveWalletConfig(
                 sdk.storage,
-                wallet.active.rawAddress,
+                wallet.rawAddress,
                 wallet.network
             );
 
@@ -102,7 +102,7 @@ export const useJettonList = () => {
 
             result.balances.forEach(item => {
                 client.setQueryData(
-                    [wallet.publicKey, QueryKey.jettons, JettonKey.balance, item.jetton.address],
+                    [wallet.id, QueryKey.jettons, JettonKey.balance, item.jetton.address],
                     item
                 );
 
@@ -120,7 +120,7 @@ export const useJettonList = () => {
             });
 
             const pinned = config.pinnedTokens.reduce((acc, address) => {
-                const item = balances.find(item => item.jetton.address === address);
+                const item = balances.find(i => i.jetton.address === address);
                 if (item) {
                     acc.push(item);
                 }
@@ -142,13 +142,13 @@ export const useJettonList = () => {
 };
 
 export const useJettonBalance = (jettonAddress: string) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { api } = useAppContext();
     return useQuery<JettonBalance, Error>(
-        [wallet.publicKey, QueryKey.jettons, JettonKey.balance, jettonAddress],
+        [wallet.id, QueryKey.jettons, JettonKey.balance, jettonAddress],
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.active.rawAddress
+                accountId: wallet.rawAddress
             });
 
             const balance = result.balances.find(item => item.jetton.address === jettonAddress);
@@ -163,7 +163,7 @@ export const useJettonBalance = (jettonAddress: string) => {
 export const useTogglePinJettonMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     return useMutation<void, Error, { config: ActiveWalletConfig; jetton: JettonBalance }>(
         async ({ config, jetton }) => {
@@ -176,19 +176,11 @@ export const useTogglePinJettonMutation = () => {
                 pinnedTokens
             };
 
-            client.setQueryData(
-                [wallet.active.rawAddress, wallet.network, QueryKey.walletConfig],
-                newConfig
-            );
+            client.setQueryData([wallet.id, wallet.network, QueryKey.walletConfig], newConfig);
 
-            await setActiveWalletConfig(
-                sdk.storage,
-                wallet.active.rawAddress,
-                wallet.network,
-                newConfig
-            );
+            await setActiveWalletConfig(sdk.storage, wallet.rawAddress, wallet.network, newConfig);
 
-            await client.invalidateQueries([wallet.active.rawAddress, QueryKey.jettons]);
+            await client.invalidateQueries([wallet.id, QueryKey.jettons]);
         }
     );
 };
@@ -196,23 +188,15 @@ export const useTogglePinJettonMutation = () => {
 export const useSavePinnedJettonOrderMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     return useMutation<void, Error, { config: ActiveWalletConfig; pinnedTokens: string[] }>(
         async ({ config, pinnedTokens }) => {
             const newConfig = { ...config, pinnedTokens };
-            client.setQueryData(
-                [wallet.active.rawAddress, wallet.network, QueryKey.walletConfig],
-                newConfig
-            );
+            client.setQueryData([wallet.id, wallet.network, QueryKey.walletConfig], newConfig);
 
-            await setActiveWalletConfig(
-                sdk.storage,
-                wallet.active.rawAddress,
-                wallet.network,
-                newConfig
-            );
-            await client.invalidateQueries([wallet.active.rawAddress, QueryKey.jettons]);
+            await setActiveWalletConfig(sdk.storage, wallet.rawAddress, wallet.network, newConfig);
+            await client.invalidateQueries([wallet.id, QueryKey.jettons]);
         }
     );
 };
@@ -220,7 +204,7 @@ export const useSavePinnedJettonOrderMutation = () => {
 export const useToggleHideJettonMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     return useMutation<void, Error, { config: ActiveWalletConfig; jetton: JettonBalance }>(
         async ({ config, jetton }) => {
@@ -246,19 +230,11 @@ export const useToggleHideJettonMutation = () => {
                 };
             }
 
-            client.setQueryData(
-                [wallet.active.rawAddress, wallet.network, QueryKey.walletConfig],
-                newConfig
-            );
+            client.setQueryData([wallet.id, wallet.network, QueryKey.walletConfig], newConfig);
 
-            await setActiveWalletConfig(
-                sdk.storage,
-                wallet.active.rawAddress,
-                wallet.network,
-                newConfig
-            );
+            await setActiveWalletConfig(sdk.storage, wallet.id, wallet.network, newConfig);
 
-            await client.invalidateQueries([wallet.active.rawAddress, QueryKey.jettons]);
+            await client.invalidateQueries([wallet.id, QueryKey.jettons]);
         }
     );
 };
