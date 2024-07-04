@@ -13,14 +13,28 @@ const defaultConfig: ActiveWalletConfig = {
     spamNfts: []
 };
 
+const migration = async (storage: IStorage, address: string, network: Network | undefined) => {
+    const raw = Address.parse(address).toRawString();
+    const config = await storage.get<ActiveWalletConfig>(
+        `${AppKey.WALLET_CONFIG}_${raw}_${network ?? Network.MAINNET}`
+    );
+    if (config != null) {
+        await setActiveWalletConfig(storage, address, network, config);
+    }
+    return config;
+};
+
 export const getActiveWalletConfig = async (
     storage: IStorage,
     address: string,
     network: Network | undefined
 ) => {
     const formatted = Address.parse(address).toString({ testOnly: network === Network.TESTNET });
-    const config = await storage.get<ActiveWalletConfig>(`${AppKey.WALLET_CONFIG}_${formatted}`);
+    let config = await storage.get<ActiveWalletConfig>(`${AppKey.WALLET_CONFIG}_${formatted}`);
 
+    if (!config) {
+        config = await migration(storage, address, network);
+    }
     if (!config) {
         return defaultConfig;
     }
