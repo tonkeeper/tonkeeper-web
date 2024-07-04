@@ -197,7 +197,7 @@ const TwaApp: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
 const FullSizeWrapper = styled(Container)``;
 
 const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
-    height: 100%;
+    height: var(--app-height);
     transition: height 0.4s ease;
 
     box-sizing: border-box;
@@ -255,7 +255,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         account,
         config,
         tonendpoint,
-        standalone: false,
+        standalone: true,
         extension: false,
         ios: true,
         proFeatures: false,
@@ -376,7 +376,7 @@ const MainPages: FC<{ showQrScan: boolean; sdk: TwaAppSdk }> = ({ showQrScan, sd
 
     return (
         <TwaNotification>
-            <Wrapper standalone={false}>
+            <Wrapper standalone={getUsePadding(sdk.launchParams.platform)}>
                 <Routes>
                     <Route
                         path={AppRoute.activity}
@@ -426,7 +426,7 @@ const MainPages: FC<{ showQrScan: boolean; sdk: TwaAppSdk }> = ({ showQrScan, sd
                         }
                     />
                 </Routes>
-                <Footer standalone={false} />
+                <Footer standalone={getUsePadding(sdk.launchParams.platform)} />
                 <MemoryScroll />
                 <Suspense>
                     <TonConnectSubscription />

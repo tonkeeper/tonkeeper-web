@@ -51,13 +51,6 @@ const ChangeIconStyled = styled(IconButton)`
     }
 `;
 
-export type SwapMainButton = (
-    props: PropsWithChildren<{
-        onConfirm: () => void;
-        isEncodingProcess: boolean;
-    }>
-) => JSX.Element;
-
 export const SwapMainForm: FC<{ className?: string }> = ({ className }) => {
     const theme = useTheme();
     const { isLoading, mutateAsync: encode } = useEncodeSwap();

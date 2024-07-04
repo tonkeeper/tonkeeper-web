@@ -64,7 +64,9 @@ export class TwaAppSdk extends BaseApp {
     };
 
     twaExpand = () => {
-        this.viewport.expand();
+        if (!this.viewport.isExpanded) {
+            this.viewport.expand();
+        }
     };
 
     hapticNotification = (type: 'success' | 'error') => {
