@@ -1,6 +1,7 @@
 import { FC, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
+import { useAppContext } from '../hooks/appContext';
 import { useTranslation } from '../hooks/translation';
 import { scrollToTop } from '../libs/common';
 import { AppRoute } from '../libs/routes';
@@ -73,6 +74,7 @@ export const Footer: FC<{ standalone?: boolean; sticky?: boolean }> = ({ standal
     const { t } = useTranslation();
     const location = useLocation();
     const navigate = useNavigate();
+    const { hideBrowser } = useAppContext();
 
     const active = useMemo<AppRoute>(() => {
         if (location.pathname.includes(AppRoute.activity)) {
@@ -111,13 +113,15 @@ export const Footer: FC<{ standalone?: boolean; sticky?: boolean }> = ({ standal
                 <ActivityIcon />
                 <Label3>{t('activity_screen_title')}</Label3>
             </Button>
-            <Button
-                active={active === AppRoute.browser}
-                onClick={() => handleClick(AppRoute.browser)}
-            >
-                <BrowserIcon />
-                <Label3>{t('browser_title')}</Label3>
-            </Button>
+            {hideBrowser === true ? null : (
+                <Button
+                    active={active === AppRoute.browser}
+                    onClick={() => handleClick(AppRoute.browser)}
+                >
+                    <BrowserIcon />
+                    <Label3>{t('browser_title')}</Label3>
+                </Button>
+            )}
             <Button
                 active={active === AppRoute.settings}
                 onClick={() => handleClick(AppRoute.settings)}

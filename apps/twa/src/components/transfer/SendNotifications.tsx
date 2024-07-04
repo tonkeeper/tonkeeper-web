@@ -249,6 +249,7 @@ const SendContent: FC<{
                                 MainButton={RecipientTwaMainButton}
                                 HeaderBlock={() => <RecipientTwaHeaderBlock onClose={onClose} />}
                                 fitContent
+                                isAnimationProcess={false}
                             />
                         )}
                         {view === 'favorite' && (
@@ -263,6 +264,7 @@ const SendContent: FC<{
                                 onConfirm={onConfirmAmount}
                                 MainButton={AmountTwaMainButton}
                                 HeaderBlock={AmountTwaHeaderBlock}
+                                isAnimationProcess={false}
                             />
                         )}
                         {view === 'confirm' && (

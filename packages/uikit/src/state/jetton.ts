@@ -61,7 +61,6 @@ const compareTokensOver = (fiat: FiatCurrencies) => {
 export const useJettonRawList = () => {
     const wallet = useWalletContext();
     const { api, fiat } = useAppContext();
-    const sdk = useAppSdk();
 
     return useQuery<JettonsBalances, Error>(
         [wallet.active.rawAddress, JettonKey.raw, QueryKey.jettons, fiat, wallet.network],
