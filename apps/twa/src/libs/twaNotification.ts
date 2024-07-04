@@ -44,7 +44,7 @@ export class TwaNotification implements NotificationService {
             payload
         );
         const stateInit = walletStateInitFromState(wallet);
-        return await toTonProofItem(signTonConnect, proofPayload, false, stateInit);
+        return await toTonProofItem(signTonConnect, proofPayload, true, stateInit);
     };
 
     subscribe = async (
