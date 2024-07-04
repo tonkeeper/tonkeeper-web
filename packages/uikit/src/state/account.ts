@@ -2,7 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { accountSelectWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
+import {
+    accountLogOutWallet,
+    accountSelectWallet,
+    getAccountState
+} from '@tonkeeper/core/dist/service/accountService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { updateWalletVersion } from '@tonkeeper/core/dist/service/walletService';
 import { useWalletContext } from '../hooks/appContext';
@@ -53,6 +57,12 @@ export const useMutateDeleteAll = () => {
     const sdk = useAppSdk();
     return useMutation<void, Error, void>(async () => {
         // TODO: clean remote storage by api
+
+        // clear don't work on twa desktop
+        const account = await getAccountState(sdk.storage);
+        for (let key of account.publicKeys) {
+            await accountLogOutWallet(sdk.storage, key);
+        }
         await sdk.storage.clear();
     });
 };

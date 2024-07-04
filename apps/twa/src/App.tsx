@@ -202,7 +202,7 @@ const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
 
     box-sizing: border-box;
     padding-top: 64px;
-    padding-bottom: 96px;
+    padding-bottom: ${props => (props.standalone ? '96' : '80')}px;
 `;
 
 const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
