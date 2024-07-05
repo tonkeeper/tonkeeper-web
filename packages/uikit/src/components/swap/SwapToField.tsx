@@ -27,6 +27,10 @@ const FiledHeader = styled.div`
     > *:first-child {
         margin-right: auto;
     }
+
+    > * {
+        cursor: default;
+    }
 `;
 
 const FieldBody = styled.div`
@@ -38,6 +42,8 @@ const FieldBody = styled.div`
 const ToAmountField = styled.div`
     margin-left: auto;
     overflow: auto;
+
+    cursor: default;
 
     &::-webkit-scrollbar {
         display: none;

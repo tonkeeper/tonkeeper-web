@@ -79,4 +79,6 @@ export class ExtensionAppSdk extends BaseApp {
     };
 
     version = packageJson.version ?? 'Unknown';
+
+    targetEnv= 'extension' as const;
 }

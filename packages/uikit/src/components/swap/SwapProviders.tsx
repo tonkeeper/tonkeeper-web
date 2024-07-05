@@ -14,7 +14,6 @@ import BigNumber from 'bignumber.js';
 import { useTranslation } from '../../hooks/translation';
 
 const SwapProvidersContainer = styled.div`
-    box-sizing: border-box;
     padding: 0 12px 12px;
     background: ${p => p.theme.backgroundContent};
     border-radius: ${p =>
@@ -25,6 +24,11 @@ const SwapProvidersContainer = styled.div`
 const Heading = styled.div`
     color: ${p => p.theme.textSecondary};
     padding: 10px 0;
+    display: flex;
+    align-items: center;
+    > * {
+        cursor: default;
+    }
 `;
 
 export const SwapProviders = () => {
@@ -32,7 +36,7 @@ export const SwapProviders = () => {
     const isNotCompleted = useIsSwapFormNotCompleted();
 
     if (isNotCompleted) {
-        return null;
+        return <div />;
     }
 
     return (
@@ -81,6 +85,7 @@ const ProviderPriceContainer = styled.div`
     margin-left: auto;
     display: flex;
     flex-direction: column;
+    align-items: flex-end;
 `;
 
 const Body3Styled = styled(Body3)`

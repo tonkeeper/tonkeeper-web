@@ -60,13 +60,13 @@ export interface MsgForwardPrices {
 /**
  * Check if a given object implements the MsgForwardPrices interface.
  */
-export function instanceOfMsgForwardPrices(value: object): boolean {
-    if (!('lumpPrice' in value)) return false;
-    if (!('bitPrice' in value)) return false;
-    if (!('cellPrice' in value)) return false;
-    if (!('ihrPriceFactor' in value)) return false;
-    if (!('firstFrac' in value)) return false;
-    if (!('nextFrac' in value)) return false;
+export function instanceOfMsgForwardPrices(value: object): value is MsgForwardPrices {
+    if (!('lumpPrice' in value) || value['lumpPrice'] === undefined) return false;
+    if (!('bitPrice' in value) || value['bitPrice'] === undefined) return false;
+    if (!('cellPrice' in value) || value['cellPrice'] === undefined) return false;
+    if (!('ihrPriceFactor' in value) || value['ihrPriceFactor'] === undefined) return false;
+    if (!('firstFrac' in value) || value['firstFrac'] === undefined) return false;
+    if (!('nextFrac' in value) || value['nextFrac'] === undefined) return false;
     return true;
 }
 

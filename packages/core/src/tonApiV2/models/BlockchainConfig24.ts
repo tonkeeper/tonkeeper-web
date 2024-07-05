@@ -37,8 +37,8 @@ export interface BlockchainConfig24 {
 /**
  * Check if a given object implements the BlockchainConfig24 interface.
  */
-export function instanceOfBlockchainConfig24(value: object): boolean {
-    if (!('msgForwardPrices' in value)) return false;
+export function instanceOfBlockchainConfig24(value: object): value is BlockchainConfig24 {
+    if (!('msgForwardPrices' in value) || value['msgForwardPrices'] === undefined) return false;
     return true;
 }
 

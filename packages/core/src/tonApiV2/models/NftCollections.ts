@@ -37,8 +37,8 @@ export interface NftCollections {
 /**
  * Check if a given object implements the NftCollections interface.
  */
-export function instanceOfNftCollections(value: object): boolean {
-    if (!('nftCollections' in value)) return false;
+export function instanceOfNftCollections(value: object): value is NftCollections {
+    if (!('nftCollections' in value) || value['nftCollections'] === undefined) return false;
     return true;
 }
 

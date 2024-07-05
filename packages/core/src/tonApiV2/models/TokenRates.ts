@@ -48,7 +48,7 @@ export interface TokenRates {
 /**
  * Check if a given object implements the TokenRates interface.
  */
-export function instanceOfTokenRates(value: object): boolean {
+export function instanceOfTokenRates(value: object): value is TokenRates {
     return true;
 }
 

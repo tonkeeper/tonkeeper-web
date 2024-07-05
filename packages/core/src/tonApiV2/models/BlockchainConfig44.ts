@@ -36,9 +36,9 @@ export interface BlockchainConfig44 {
 /**
  * Check if a given object implements the BlockchainConfig44 interface.
  */
-export function instanceOfBlockchainConfig44(value: object): boolean {
-    if (!('accounts' in value)) return false;
-    if (!('suspendedUntil' in value)) return false;
+export function instanceOfBlockchainConfig44(value: object): value is BlockchainConfig44 {
+    if (!('accounts' in value) || value['accounts'] === undefined) return false;
+    if (!('suspendedUntil' in value) || value['suspendedUntil'] === undefined) return false;
     return true;
 }
 

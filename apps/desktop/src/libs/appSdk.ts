@@ -51,4 +51,6 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
     touchId = new TouchIdDesktop();
 
     version = packageJson.version ?? 'Unknown';
+
+    targetEnv = 'desktop' as const;
 }

@@ -18,7 +18,10 @@ export interface AccountConnection {
     webViewUrl?: string;
 }
 
-export const getAccountConnection = async (storage: IStorage, wallet: WalletState) => {
+export const getAccountConnection = async (
+    storage: IStorage,
+    wallet: Pick<WalletState, 'publicKey' | 'network'>
+) => {
     const result = await storage.get<AccountConnection[]>(
         `${AppKey.CONNECTIONS}_${wallet.publicKey}_${wallet.network ?? Network.MAINNET}`
     );
@@ -27,7 +30,7 @@ export const getAccountConnection = async (storage: IStorage, wallet: WalletStat
 
 export const setAccountConnection = async (
     storage: IStorage,
-    wallet: WalletState,
+    wallet: Pick<WalletState, 'publicKey' | 'network'>,
     items: AccountConnection[]
 ) => {
     await storage.set(

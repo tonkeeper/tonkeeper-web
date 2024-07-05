@@ -1,7 +1,7 @@
 import queryString from 'query-string';
 
 export type DAppSource = 'recommendation' | 'featured';
-export type DAppTrack = 'desktop' | 'extension';
+export type DAppTrack = 'desktop' | 'extension' | 'twa';
 
 export const formatBrowserUrl = (source: string, camp: DAppSource, track: DAppTrack): string => {
     const date = new Date();

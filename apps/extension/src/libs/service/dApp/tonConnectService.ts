@@ -1,10 +1,12 @@
 import {
+  CONNECT_EVENT_ERROR_CODES,
   ConnectItemReply,
   ConnectRequest,
   TonConnectAccount,
   TonConnectTransactionPayload,
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
+  getDappConnection,
   tonDisconnectRequest,
   tonReConnectRequest,
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
@@ -16,7 +18,9 @@ import {
   getActiveTabLogo,
   openNotificationPopUp,
 } from './notificationService';
-import { checkDAppConnection, waitApprove } from './utils';
+import { waitApprove } from './utils';
+import { accountSelectWallet } from "@tonkeeper/core/dist/service/accountService";
+import { TonConnectError } from "@tonkeeper/core/dist/entries/exception";
 
 const storage = new ExtensionStorage();
 
@@ -80,13 +84,30 @@ export const tonConnectRequest = async (
   }
 };
 
+export const isDappConnectedToExtension = async (
+  origin: string
+): Promise<boolean> => {
+  const connection = await getDappConnection(storage, origin);
+  return !!connection;
+}
+
 export const tonConnectTransaction = async (
   id: number,
   origin: string,
   data: TonConnectTransactionPayload,
   account: TonConnectAccount | undefined
 ) => {
-  await checkDAppConnection(storage, origin, account);
+  const connection = await getDappConnection(storage, origin, account);
+
+  if (!connection) {
+    throw new TonConnectError(
+      "dApp don't have an access to wallet",
+      CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
+    );
+  }
+
+  await accountSelectWallet(storage, connection.wallet.publicKey);
+  await delay(200);
 
   await cancelOpenedNotification();
   memoryStore.addNotification({

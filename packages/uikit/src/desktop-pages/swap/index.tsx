@@ -16,6 +16,7 @@ import { useTranslation } from '../../hooks/translation';
 
 const SwapPageWrapper = styled.div`
     overflow-y: auto;
+    min-width: 640px;
 `;
 
 const HeaderButtons = styled.div`
@@ -36,7 +37,7 @@ const ContentWrapper = styled.div`
     margin: 0 auto;
 
     > * {
-        flex: 1;
+        width: calc(50% - 4px);
     }
 `;
 
@@ -62,7 +63,9 @@ const DesktopSwapPageContent = () => {
             </DesktopViewHeader>
             <ContentWrapper>
                 <SwapMainForm />
-                <SwapProviders />
+                <div>
+                    <SwapProviders />
+                </div>
             </ContentWrapper>
         </SwapPageWrapper>
     );

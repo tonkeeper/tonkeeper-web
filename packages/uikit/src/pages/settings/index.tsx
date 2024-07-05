@@ -2,7 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import { InnerBody } from '../../components/Body';
 import { SettingsHeader } from '../../components/Header';
 import { ProSettings } from '../../components/settings/ProSettings';
-import { SettingsRoute } from '../../libs/routes';
+import { SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
 import { Account } from './Account';
 import { CountrySettings } from './Country';
 import { DevSettings } from './Dev';
@@ -15,6 +15,8 @@ import { ActiveRecovery, Recovery } from './Recovery';
 import { SecuritySettings } from './Security';
 import { Settings } from './Settings';
 import { WalletVersion } from './Version';
+import { ConnectedAppsSettings } from './ConnectedAppsSettings';
+import { NFTSettings } from './Nft';
 
 const SettingsRouter = () => {
     return (
@@ -31,9 +33,11 @@ const SettingsRouter = () => {
             </Route>
             <Route path={SettingsRoute.version} element={<WalletVersion />} />
             <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
+            <Route path={SettingsRoute.nft} element={<NFTSettings />} />
             <Route path={SettingsRoute.security} element={<SecuritySettings />} />
             <Route path={SettingsRoute.country} element={<CountrySettings />} />
             <Route path={SettingsRoute.pro} element={<ProSettings />} />
+            <Route path={WalletSettingsRoute.connectedApps} element={<ConnectedAppsSettings />} />
             <Route
                 path="*"
                 element={

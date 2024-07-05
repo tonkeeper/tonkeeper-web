@@ -29,7 +29,7 @@ const SelectContainer = styled.button`
 
     &:hover {
         > ${TokenSymbol} {
-            color: ${p => p.theme.accentBlue};
+            color: ${p => p.theme.textSecondary};
         }
     }
 `;

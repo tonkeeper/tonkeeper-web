@@ -19,7 +19,7 @@ import type {
   DnsRecord,
   DomainBids,
   DomainInfo,
-  ReduceIndexingLatencyDefaultResponse,
+  StatusDefaultResponse,
 } from '../models/index';
 import {
     AuctionsFromJSON,
@@ -30,8 +30,8 @@ import {
     DomainBidsToJSON,
     DomainInfoFromJSON,
     DomainInfoToJSON,
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface DnsResolveRequest {

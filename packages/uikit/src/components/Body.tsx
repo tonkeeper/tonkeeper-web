@@ -1,14 +1,22 @@
+import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import React, { PropsWithChildren, useLayoutEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 
-const BodyElement = styled.div`
+const BodyElement = styled.div<{ targetEnv: TargetEnv }>`
     flex-grow: 1;
     padding: 0 1rem;
     -webkit-overflow-scrolling: touch;
     background-color: ${props => props.theme.backgroundPage};
+
+    ${p =>
+        p.targetEnv === 'twa' &&
+        css`
+            height: 100%;
+            overflow: auto;
+        `}
 
     ${p =>
         p.theme.displayType === 'full-width' &&
@@ -170,6 +178,8 @@ export const InnerBody = React.forwardRef<
             timer = setTimeout(function () {
                 document.body.classList.remove('scroll');
             }, 300);
+
+            sdk.twaExpand && sdk.twaExpand();
         }, 50);
 
         element.addEventListener('scroll', handlerScroll);
@@ -191,7 +201,7 @@ export const InnerBody = React.forwardRef<
     const id = standalone ? 'body' : undefined;
 
     return (
-        <BodyElement ref={elementRef} id={id} className={className}>
+        <BodyElement ref={elementRef} id={id} className={className} targetEnv={sdk.targetEnv}>
             <AppSelectionContext.Provider value={selection}>
                 {children}
             </AppSelectionContext.Provider>

@@ -48,9 +48,9 @@ export type RefundTypeEnum = typeof RefundTypeEnum[keyof typeof RefundTypeEnum];
 /**
  * Check if a given object implements the Refund interface.
  */
-export function instanceOfRefund(value: object): boolean {
-    if (!('type' in value)) return false;
-    if (!('origin' in value)) return false;
+export function instanceOfRefund(value: object): value is Refund {
+    if (!('type' in value) || value['type'] === undefined) return false;
+    if (!('origin' in value) || value['origin'] === undefined) return false;
     return true;
 }
 

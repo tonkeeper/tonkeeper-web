@@ -68,8 +68,8 @@ export type TvmStackRecordTypeEnum = typeof TvmStackRecordTypeEnum[keyof typeof 
 /**
  * Check if a given object implements the TvmStackRecord interface.
  */
-export function instanceOfTvmStackRecord(value: object): boolean {
-    if (!('type' in value)) return false;
+export function instanceOfTvmStackRecord(value: object): value is TvmStackRecord {
+    if (!('type' in value) || value['type'] === undefined) return false;
     return true;
 }
 

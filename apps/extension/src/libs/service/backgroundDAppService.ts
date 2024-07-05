@@ -16,11 +16,12 @@ import {
 } from '../../entries/message';
 import { backgroundEventsEmitter } from '../event';
 import {
+  isDappConnectedToExtension,
   tonConnectDisconnect,
   tonConnectReConnect,
   tonConnectRequest,
-  tonConnectTransaction,
-} from './dApp/tonConnectService';
+  tonConnectTransaction
+} from "./dApp/tonConnectService";
 
 let contentScriptPorts = new Set<browser.Runtime.Port>();
 
@@ -43,6 +44,21 @@ const providerResponse = (
             code: error.code,
           }
         : undefined,
+    },
+  };
+};
+
+const providerTonConnectEvent = (
+  id: number,
+  event: 'disconnect'
+) => {
+  return {
+    type: 'TonkeeperAPI',
+    message: {
+      jsonrpc: '2.0',
+      id,
+      event: 'disconnect',
+      payload: {}
     },
   };
 };
@@ -78,7 +94,13 @@ export const handleDAppConnection = (port: browser.Runtime.Port) => {
       );
     }
   });
-  port.onDisconnect.addListener((port) => {
+  port.onDisconnect.addListener(async (port) => {
+    if (port.sender?.url) {
+      const dappIsConnected = await isDappConnectedToExtension(new URL(port.sender.url).origin);
+      if (dappIsConnected) {
+        return;
+      }
+    }
     contentScriptPorts.delete(port);
   });
 };
@@ -126,5 +148,19 @@ export const subscriptionDAppNotifications = () => {
     contentScriptPorts.forEach((port) => {
       port.postMessage(providerEvent('accountsChanged', message.params));
     });
+  });
+
+  backgroundEventsEmitter.on('tonConnectDisconnect', async (message) => {
+    const dappHosts = message.params.map(parap => new URL(parap).host);
+    const ports = [...contentScriptPorts.values()].filter(p => p.sender?.url && dappHosts.includes(new URL(p.sender.url).host));
+
+    if (ports.length) {
+      ports.forEach(port => {
+        try {
+          port.postMessage(providerTonConnectEvent(Date.now(), 'disconnect'));
+        } catch (e) { }
+        contentScriptPorts.delete(port);
+      })
+    }
   });
 };

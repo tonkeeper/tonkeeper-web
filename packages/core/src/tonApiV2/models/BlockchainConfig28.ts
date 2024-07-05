@@ -60,11 +60,11 @@ export interface BlockchainConfig28 {
 /**
  * Check if a given object implements the BlockchainConfig28 interface.
  */
-export function instanceOfBlockchainConfig28(value: object): boolean {
-    if (!('mcCatchainLifetime' in value)) return false;
-    if (!('shardCatchainLifetime' in value)) return false;
-    if (!('shardValidatorsLifetime' in value)) return false;
-    if (!('shardValidatorsNum' in value)) return false;
+export function instanceOfBlockchainConfig28(value: object): value is BlockchainConfig28 {
+    if (!('mcCatchainLifetime' in value) || value['mcCatchainLifetime'] === undefined) return false;
+    if (!('shardCatchainLifetime' in value) || value['shardCatchainLifetime'] === undefined) return false;
+    if (!('shardValidatorsLifetime' in value) || value['shardValidatorsLifetime'] === undefined) return false;
+    if (!('shardValidatorsNum' in value) || value['shardValidatorsNum'] === undefined) return false;
     return true;
 }
 

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" style="--app-height:100vh;">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tonkeeper TWA</title>
+    <meta name="description" content="Tonkeeper is the easiest way to store, send, and receive Toncoin on The Open Network.">
+
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no,viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-title" content="Tonkeeper TWA">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Tonkeeper TWA">
+    <meta name="application-name" content="Tonkeeper TWA">
+    <meta name="theme-color" content="#10161F">
+    <meta name="color-scheme" content="dark">
+    <meta name="google" content="notranslate">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://wallet.tonkeeper.com/">
+    <meta property="og:title" content="Tonkeeper Web">
+    <meta property="og:description" content="Tonkeeper is the easiest way to store, send, and receive Toncoin on The Open Network.">
+
+    <link rel="canonical" href="https://wallet.tonkeeper.com/">
+
+    <link rel="apple-touch-icon" sizes="288x288" href="https://tonkeeper.com/assets/tonconnect-icon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo-16x16.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="/logo-64x64.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="/logo-128x128.png">
+    <link rel="alternate icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="/manifest.json" />
+
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="module">
+      import { Buffer } from "buffer";
+      window.Buffer = Buffer;
+
+      import process from "process";
+      window.process = process;
+    </script>
+  </head>
+  <body style="background:#10161F;margin: 0;" class="top bottom">
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script type="module" src="./src/index.tsx"></script>
+  </body>
+</html>

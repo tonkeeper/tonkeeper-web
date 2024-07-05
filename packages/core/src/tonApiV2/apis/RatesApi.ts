@@ -18,7 +18,7 @@ import type {
   GetChartRates200Response,
   GetMarketsRates200Response,
   GetRates200Response,
-  ReduceIndexingLatencyDefaultResponse,
+  StatusDefaultResponse,
 } from '../models/index';
 import {
     GetChartRates200ResponseFromJSON,
@@ -27,8 +27,8 @@ import {
     GetMarketsRates200ResponseToJSON,
     GetRates200ResponseFromJSON,
     GetRates200ResponseToJSON,
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetChartRatesRequest {

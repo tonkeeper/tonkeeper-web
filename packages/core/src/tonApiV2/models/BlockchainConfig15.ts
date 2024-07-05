@@ -48,11 +48,11 @@ export interface BlockchainConfig15 {
 /**
  * Check if a given object implements the BlockchainConfig15 interface.
  */
-export function instanceOfBlockchainConfig15(value: object): boolean {
-    if (!('validatorsElectedFor' in value)) return false;
-    if (!('electionsStartBefore' in value)) return false;
-    if (!('electionsEndBefore' in value)) return false;
-    if (!('stakeHeldFor' in value)) return false;
+export function instanceOfBlockchainConfig15(value: object): value is BlockchainConfig15 {
+    if (!('validatorsElectedFor' in value) || value['validatorsElectedFor'] === undefined) return false;
+    if (!('electionsStartBefore' in value) || value['electionsStartBefore'] === undefined) return false;
+    if (!('electionsEndBefore' in value) || value['electionsEndBefore'] === undefined) return false;
+    if (!('stakeHeldFor' in value) || value['stakeHeldFor'] === undefined) return false;
     return true;
 }
 

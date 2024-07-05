@@ -48,11 +48,11 @@ export interface BlockchainConfig17 {
 /**
  * Check if a given object implements the BlockchainConfig17 interface.
  */
-export function instanceOfBlockchainConfig17(value: object): boolean {
-    if (!('minStake' in value)) return false;
-    if (!('maxStake' in value)) return false;
-    if (!('minTotalStake' in value)) return false;
-    if (!('maxStakeFactor' in value)) return false;
+export function instanceOfBlockchainConfig17(value: object): value is BlockchainConfig17 {
+    if (!('minStake' in value) || value['minStake'] === undefined) return false;
+    if (!('maxStake' in value) || value['maxStake'] === undefined) return false;
+    if (!('minTotalStake' in value) || value['minTotalStake'] === undefined) return false;
+    if (!('maxStakeFactor' in value) || value['maxStakeFactor'] === undefined) return false;
     return true;
 }
 

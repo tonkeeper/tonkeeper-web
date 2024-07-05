@@ -43,9 +43,9 @@ export interface GetRawTransactions200Response {
 /**
  * Check if a given object implements the GetRawTransactions200Response interface.
  */
-export function instanceOfGetRawTransactions200Response(value: object): boolean {
-    if (!('ids' in value)) return false;
-    if (!('transactions' in value)) return false;
+export function instanceOfGetRawTransactions200Response(value: object): value is GetRawTransactions200Response {
+    if (!('ids' in value) || value['ids'] === undefined) return false;
+    if (!('transactions' in value) || value['transactions'] === undefined) return false;
     return true;
 }
 

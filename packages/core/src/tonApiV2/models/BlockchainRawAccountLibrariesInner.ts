@@ -36,9 +36,9 @@ export interface BlockchainRawAccountLibrariesInner {
 /**
  * Check if a given object implements the BlockchainRawAccountLibrariesInner interface.
  */
-export function instanceOfBlockchainRawAccountLibrariesInner(value: object): boolean {
-    if (!('_public' in value)) return false;
-    if (!('root' in value)) return false;
+export function instanceOfBlockchainRawAccountLibrariesInner(value: object): value is BlockchainRawAccountLibrariesInner {
+    if (!('_public' in value) || value['_public'] === undefined) return false;
+    if (!('root' in value) || value['root'] === undefined) return false;
     return true;
 }
 

@@ -36,9 +36,9 @@ export interface EncryptedComment {
 /**
  * Check if a given object implements the EncryptedComment interface.
  */
-export function instanceOfEncryptedComment(value: object): boolean {
-    if (!('encryptionType' in value)) return false;
-    if (!('cipherText' in value)) return false;
+export function instanceOfEncryptedComment(value: object): value is EncryptedComment {
+    if (!('encryptionType' in value) || value['encryptionType'] === undefined) return false;
+    if (!('cipherText' in value) || value['cipherText'] === undefined) return false;
     return true;
 }
 

@@ -49,10 +49,10 @@ export interface DomainRenewAction {
 /**
  * Check if a given object implements the DomainRenewAction interface.
  */
-export function instanceOfDomainRenewAction(value: object): boolean {
-    if (!('domain' in value)) return false;
-    if (!('contractAddress' in value)) return false;
-    if (!('renewer' in value)) return false;
+export function instanceOfDomainRenewAction(value: object): value is DomainRenewAction {
+    if (!('domain' in value) || value['domain'] === undefined) return false;
+    if (!('contractAddress' in value) || value['contractAddress'] === undefined) return false;
+    if (!('renewer' in value) || value['renewer'] === undefined) return false;
     return true;
 }
 

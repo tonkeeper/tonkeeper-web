@@ -42,10 +42,10 @@ export interface FoundAccountsAddressesInner {
 /**
  * Check if a given object implements the FoundAccountsAddressesInner interface.
  */
-export function instanceOfFoundAccountsAddressesInner(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('name' in value)) return false;
-    if (!('preview' in value)) return false;
+export function instanceOfFoundAccountsAddressesInner(value: object): value is FoundAccountsAddressesInner {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('preview' in value) || value['preview'] === undefined) return false;
     return true;
 }
 

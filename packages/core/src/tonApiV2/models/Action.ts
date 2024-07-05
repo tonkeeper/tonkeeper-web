@@ -13,66 +13,24 @@
  */
 
 import { mapValues } from '../runtime';
-import type { ActionSimplePreview } from './ActionSimplePreview';
+import type { UnSubscriptionAction } from './UnSubscriptionAction';
 import {
-    ActionSimplePreviewFromJSON,
-    ActionSimplePreviewFromJSONTyped,
-    ActionSimplePreviewToJSON,
-} from './ActionSimplePreview';
-import type { AuctionBidAction } from './AuctionBidAction';
-import {
-    AuctionBidActionFromJSON,
-    AuctionBidActionFromJSONTyped,
-    AuctionBidActionToJSON,
-} from './AuctionBidAction';
-import type { ContractDeployAction } from './ContractDeployAction';
-import {
-    ContractDeployActionFromJSON,
-    ContractDeployActionFromJSONTyped,
-    ContractDeployActionToJSON,
-} from './ContractDeployAction';
-import type { DepositStakeAction } from './DepositStakeAction';
-import {
-    DepositStakeActionFromJSON,
-    DepositStakeActionFromJSONTyped,
-    DepositStakeActionToJSON,
-} from './DepositStakeAction';
+    UnSubscriptionActionFromJSON,
+    UnSubscriptionActionFromJSONTyped,
+    UnSubscriptionActionToJSON,
+} from './UnSubscriptionAction';
 import type { DomainRenewAction } from './DomainRenewAction';
 import {
     DomainRenewActionFromJSON,
     DomainRenewActionFromJSONTyped,
     DomainRenewActionToJSON,
 } from './DomainRenewAction';
-import type { ElectionsDepositStakeAction } from './ElectionsDepositStakeAction';
-import {
-    ElectionsDepositStakeActionFromJSON,
-    ElectionsDepositStakeActionFromJSONTyped,
-    ElectionsDepositStakeActionToJSON,
-} from './ElectionsDepositStakeAction';
 import type { ElectionsRecoverStakeAction } from './ElectionsRecoverStakeAction';
 import {
     ElectionsRecoverStakeActionFromJSON,
     ElectionsRecoverStakeActionFromJSONTyped,
     ElectionsRecoverStakeActionToJSON,
 } from './ElectionsRecoverStakeAction';
-import type { InscriptionMintAction } from './InscriptionMintAction';
-import {
-    InscriptionMintActionFromJSON,
-    InscriptionMintActionFromJSONTyped,
-    InscriptionMintActionToJSON,
-} from './InscriptionMintAction';
-import type { InscriptionTransferAction } from './InscriptionTransferAction';
-import {
-    InscriptionTransferActionFromJSON,
-    InscriptionTransferActionFromJSONTyped,
-    InscriptionTransferActionToJSON,
-} from './InscriptionTransferAction';
-import type { JettonBurnAction } from './JettonBurnAction';
-import {
-    JettonBurnActionFromJSON,
-    JettonBurnActionFromJSONTyped,
-    JettonBurnActionToJSON,
-} from './JettonBurnAction';
 import type { JettonMintAction } from './JettonMintAction';
 import {
     JettonMintActionFromJSON,
@@ -85,12 +43,24 @@ import {
     JettonSwapActionFromJSONTyped,
     JettonSwapActionToJSON,
 } from './JettonSwapAction';
-import type { JettonTransferAction } from './JettonTransferAction';
+import type { ElectionsDepositStakeAction } from './ElectionsDepositStakeAction';
 import {
-    JettonTransferActionFromJSON,
-    JettonTransferActionFromJSONTyped,
-    JettonTransferActionToJSON,
-} from './JettonTransferAction';
+    ElectionsDepositStakeActionFromJSON,
+    ElectionsDepositStakeActionFromJSONTyped,
+    ElectionsDepositStakeActionToJSON,
+} from './ElectionsDepositStakeAction';
+import type { DepositStakeAction } from './DepositStakeAction';
+import {
+    DepositStakeActionFromJSON,
+    DepositStakeActionFromJSONTyped,
+    DepositStakeActionToJSON,
+} from './DepositStakeAction';
+import type { WithdrawStakeAction } from './WithdrawStakeAction';
+import {
+    WithdrawStakeActionFromJSON,
+    WithdrawStakeActionFromJSONTyped,
+    WithdrawStakeActionToJSON,
+} from './WithdrawStakeAction';
 import type { NftItemTransferAction } from './NftItemTransferAction';
 import {
     NftItemTransferActionFromJSON,
@@ -103,42 +73,72 @@ import {
     NftPurchaseActionFromJSONTyped,
     NftPurchaseActionToJSON,
 } from './NftPurchaseAction';
-import type { SmartContractAction } from './SmartContractAction';
-import {
-    SmartContractActionFromJSON,
-    SmartContractActionFromJSONTyped,
-    SmartContractActionToJSON,
-} from './SmartContractAction';
 import type { SubscriptionAction } from './SubscriptionAction';
 import {
     SubscriptionActionFromJSON,
     SubscriptionActionFromJSONTyped,
     SubscriptionActionToJSON,
 } from './SubscriptionAction';
-import type { TonTransferAction } from './TonTransferAction';
-import {
-    TonTransferActionFromJSON,
-    TonTransferActionFromJSONTyped,
-    TonTransferActionToJSON,
-} from './TonTransferAction';
-import type { UnSubscriptionAction } from './UnSubscriptionAction';
-import {
-    UnSubscriptionActionFromJSON,
-    UnSubscriptionActionFromJSONTyped,
-    UnSubscriptionActionToJSON,
-} from './UnSubscriptionAction';
-import type { WithdrawStakeAction } from './WithdrawStakeAction';
-import {
-    WithdrawStakeActionFromJSON,
-    WithdrawStakeActionFromJSONTyped,
-    WithdrawStakeActionToJSON,
-} from './WithdrawStakeAction';
 import type { WithdrawStakeRequestAction } from './WithdrawStakeRequestAction';
 import {
     WithdrawStakeRequestActionFromJSON,
     WithdrawStakeRequestActionFromJSONTyped,
     WithdrawStakeRequestActionToJSON,
 } from './WithdrawStakeRequestAction';
+import type { InscriptionTransferAction } from './InscriptionTransferAction';
+import {
+    InscriptionTransferActionFromJSON,
+    InscriptionTransferActionFromJSONTyped,
+    InscriptionTransferActionToJSON,
+} from './InscriptionTransferAction';
+import type { SmartContractAction } from './SmartContractAction';
+import {
+    SmartContractActionFromJSON,
+    SmartContractActionFromJSONTyped,
+    SmartContractActionToJSON,
+} from './SmartContractAction';
+import type { ActionSimplePreview } from './ActionSimplePreview';
+import {
+    ActionSimplePreviewFromJSON,
+    ActionSimplePreviewFromJSONTyped,
+    ActionSimplePreviewToJSON,
+} from './ActionSimplePreview';
+import type { JettonTransferAction } from './JettonTransferAction';
+import {
+    JettonTransferActionFromJSON,
+    JettonTransferActionFromJSONTyped,
+    JettonTransferActionToJSON,
+} from './JettonTransferAction';
+import type { AuctionBidAction } from './AuctionBidAction';
+import {
+    AuctionBidActionFromJSON,
+    AuctionBidActionFromJSONTyped,
+    AuctionBidActionToJSON,
+} from './AuctionBidAction';
+import type { ContractDeployAction } from './ContractDeployAction';
+import {
+    ContractDeployActionFromJSON,
+    ContractDeployActionFromJSONTyped,
+    ContractDeployActionToJSON,
+} from './ContractDeployAction';
+import type { InscriptionMintAction } from './InscriptionMintAction';
+import {
+    InscriptionMintActionFromJSON,
+    InscriptionMintActionFromJSONTyped,
+    InscriptionMintActionToJSON,
+} from './InscriptionMintAction';
+import type { JettonBurnAction } from './JettonBurnAction';
+import {
+    JettonBurnActionFromJSON,
+    JettonBurnActionFromJSONTyped,
+    JettonBurnActionToJSON,
+} from './JettonBurnAction';
+import type { TonTransferAction } from './TonTransferAction';
+import {
+    TonTransferActionFromJSON,
+    TonTransferActionFromJSONTyped,
+    TonTransferActionToJSON,
+} from './TonTransferAction';
 
 /**
  * 
@@ -334,11 +334,11 @@ export type ActionStatusEnum = typeof ActionStatusEnum[keyof typeof ActionStatus
 /**
  * Check if a given object implements the Action interface.
  */
-export function instanceOfAction(value: object): boolean {
-    if (!('type' in value)) return false;
-    if (!('status' in value)) return false;
-    if (!('simplePreview' in value)) return false;
-    if (!('baseTransactions' in value)) return false;
+export function instanceOfAction(value: object): value is Action {
+    if (!('type' in value) || value['type'] === undefined) return false;
+    if (!('status' in value) || value['status'] === undefined) return false;
+    if (!('simplePreview' in value) || value['simplePreview'] === undefined) return false;
+    if (!('baseTransactions' in value) || value['baseTransactions'] === undefined) return false;
     return true;
 }
 

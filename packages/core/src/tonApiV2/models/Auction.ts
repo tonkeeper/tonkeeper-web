@@ -54,12 +54,12 @@ export interface Auction {
 /**
  * Check if a given object implements the Auction interface.
  */
-export function instanceOfAuction(value: object): boolean {
-    if (!('domain' in value)) return false;
-    if (!('owner' in value)) return false;
-    if (!('price' in value)) return false;
-    if (!('bids' in value)) return false;
-    if (!('date' in value)) return false;
+export function instanceOfAuction(value: object): value is Auction {
+    if (!('domain' in value) || value['domain'] === undefined) return false;
+    if (!('owner' in value) || value['owner'] === undefined) return false;
+    if (!('price' in value) || value['price'] === undefined) return false;
+    if (!('bids' in value) || value['bids'] === undefined) return false;
+    if (!('date' in value) || value['date'] === undefined) return false;
     return true;
 }
 

@@ -2,7 +2,7 @@ import { Notification } from '../../Notification';
 import { FC, Ref, useCallback, useEffect, useRef } from 'react';
 import { atom, useAtom } from '../../../libs/atom';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { css, styled } from 'styled-components';
+import { createGlobalStyle, css, styled } from 'styled-components';
 import { SwapSearchInput } from './SwapSearchInput';
 import { SwapTokensList } from './SwapTokensList';
 import {
@@ -27,6 +27,12 @@ export const useOpenSwapTokensList = (onClose: (token: TonAsset | undefined) => 
     );
 };
 
+const WrapperStyles = createGlobalStyle`
+  .tokens-list-notification-wrapper .dialog-content {
+    padding-bottom: 0;
+  }
+`;
+
 export const SwapTokensListNotification: FC = () => {
     const { t } = useTranslation();
     const [onSelect, setIsOpen] = useAtom(swapTokensListOpened$);
@@ -37,13 +43,18 @@ export const SwapTokensListNotification: FC = () => {
     };
 
     return (
-        <Notification
-            isOpen={!!onSelect}
-            handleClose={() => onClose(undefined)}
-            title={t('swap_tokens')}
-        >
-            {() => <SwapTokensListContent onSelect={onClose} />}
-        </Notification>
+        <>
+            <WrapperStyles />
+            <Notification
+                isOpen={!!onSelect}
+                handleClose={() => onClose(undefined)}
+                title={t('swap_tokens')}
+                footer={<div />}
+                wrapperClassName="tokens-list-notification-wrapper"
+            >
+                {() => <SwapTokensListContent onSelect={onClose} />}
+            </Notification>
+        </>
     );
 };
 

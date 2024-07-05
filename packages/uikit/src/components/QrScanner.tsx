@@ -79,7 +79,6 @@ const QrScanner = () => {
         <Notification
             isOpen={scanId !== undefined}
             handleClose={onCancel}
-            hideButton
             title={t('scan_qr_title')}
         >
             {Content}

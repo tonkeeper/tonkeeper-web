@@ -49,8 +49,8 @@ export interface DomainInfo {
 /**
  * Check if a given object implements the DomainInfo interface.
  */
-export function instanceOfDomainInfo(value: object): boolean {
-    if (!('name' in value)) return false;
+export function instanceOfDomainInfo(value: object): value is DomainInfo {
+    if (!('name' in value) || value['name'] === undefined) return false;
     return true;
 }
 

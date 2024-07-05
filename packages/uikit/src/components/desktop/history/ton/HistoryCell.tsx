@@ -69,7 +69,7 @@ export const HistoryCellActionSent: FC<{
 export const HistoryBadge = styled.div<{ color: string }>`
     padding: 2px 4px;
     color: ${p => p.theme[p.color]};
-    border-radius: ${p => p.theme.corner2xSmall};
+    border-radius: ${p => p.theme.corner3xSmall};
     background-color: ${p => hexToRGBA(p.theme[p.color], 0.16)};
     text-transform: uppercase;
 

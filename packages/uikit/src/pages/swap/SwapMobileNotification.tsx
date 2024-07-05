@@ -7,6 +7,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSettingsButton';
 import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
+import { useTranslation } from '../../hooks/translation';
 
 const SwapMobileNotification = () => {
     const [isOpen, setIsOpen] = useSwapMobileNotification();
@@ -17,7 +18,6 @@ const SwapMobileNotification = () => {
                 isOpen={isOpen}
                 handleClose={() => setIsOpen(false)}
                 title={<NotificationHeader />}
-                hideButton
             >
                 {() => <NotificationContent />}
             </Notification>
@@ -46,13 +46,14 @@ const HeaderLabel = styled(Label2)`
 `;
 
 const NotificationHeader = () => {
+    const { t } = useTranslation();
     return (
         <NotificationHeaderContainer>
             <HeaderButtons>
                 <SwapRefreshButton />
                 <SwapSettingsButton />
             </HeaderButtons>
-            <HeaderLabel>Swap</HeaderLabel>
+            <HeaderLabel>{t('wallet_swap')}</HeaderLabel>
         </NotificationHeaderContainer>
     );
 };

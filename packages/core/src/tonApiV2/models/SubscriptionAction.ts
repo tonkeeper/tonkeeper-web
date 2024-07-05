@@ -61,12 +61,12 @@ export interface SubscriptionAction {
 /**
  * Check if a given object implements the SubscriptionAction interface.
  */
-export function instanceOfSubscriptionAction(value: object): boolean {
-    if (!('subscriber' in value)) return false;
-    if (!('subscription' in value)) return false;
-    if (!('beneficiary' in value)) return false;
-    if (!('amount' in value)) return false;
-    if (!('initial' in value)) return false;
+export function instanceOfSubscriptionAction(value: object): value is SubscriptionAction {
+    if (!('subscriber' in value) || value['subscriber'] === undefined) return false;
+    if (!('subscription' in value) || value['subscription'] === undefined) return false;
+    if (!('beneficiary' in value) || value['beneficiary'] === undefined) return false;
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('initial' in value) || value['initial'] === undefined) return false;
     return true;
 }
 

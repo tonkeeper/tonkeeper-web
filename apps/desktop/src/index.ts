@@ -1,5 +1,6 @@
 import { initialize as aptabaseInitialize } from '@aptabase/electron/main';
-import { BrowserWindow, app } from 'electron';
+import { delay } from '@tonkeeper/core/dist/utils/common';
+import { BrowserWindow, app, powerMonitor } from 'electron';
 import log from 'electron-log/main';
 import { updateElectronApp } from 'update-electron-app';
 import { MainWindow } from './electron/mainWindow';
@@ -21,8 +22,26 @@ if (require('electron-squirrel-startup')) {
 }
 
 const connection = TonConnectSSE.getInstance();
-app.on('before-quit', e => {
+
+
+const onUnLock = () => {
+    log.info('unlock-screen');
+    connection.reconnect();
+};
+
+if (process.platform != "linux") {
+    powerMonitor.on('unlock-screen', onUnLock);
+}
+
+app.on('before-quit', async e => {
+    e.preventDefault();
     connection.destroy();
+    if (process.platform != "linux") {
+        powerMonitor.off('unlock-screen', onUnLock);
+    }
+
+    await delay(100);
+    app.exit();
 });
 
 setDefaultProtocolClient();

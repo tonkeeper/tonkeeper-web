@@ -146,8 +146,12 @@ export const useActivateTrialMutation = () => {
         i18n: { language }
     } = useTranslation();
 
-    return useMutation<void, Error>(async () => {
-        await startProServiceTrial((ctx.env as { tgAuthBotId: string }).tgAuthBotId, language);
+    return useMutation<boolean, Error>(async () => {
+        const result = await startProServiceTrial(
+            (ctx.env as { tgAuthBotId: string }).tgAuthBotId,
+            language
+        );
         await client.invalidateQueries([QueryKey.pro]);
+        return result;
     });
 };

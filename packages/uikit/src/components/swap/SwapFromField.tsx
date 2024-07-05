@@ -28,6 +28,10 @@ const FiledHeader = styled.div`
     > *:first-child {
         margin-right: auto;
     }
+
+    > * {
+        cursor: default;
+    }
 `;
 
 const FieldBody = styled.div`

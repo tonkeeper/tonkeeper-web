@@ -13,6 +13,7 @@ import { useAppContext } from '../../hooks/appContext';
 
 const Body3Styled = styled(Body3)`
     color: ${p => p.theme.textSecondary};
+    cursor: default;
 `;
 
 export const SwapAmountFiat: FC<{

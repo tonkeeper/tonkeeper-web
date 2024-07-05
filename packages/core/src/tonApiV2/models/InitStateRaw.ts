@@ -42,10 +42,10 @@ export interface InitStateRaw {
 /**
  * Check if a given object implements the InitStateRaw interface.
  */
-export function instanceOfInitStateRaw(value: object): boolean {
-    if (!('workchain' in value)) return false;
-    if (!('rootHash' in value)) return false;
-    if (!('fileHash' in value)) return false;
+export function instanceOfInitStateRaw(value: object): value is InitStateRaw {
+    if (!('workchain' in value) || value['workchain'] === undefined) return false;
+    if (!('rootHash' in value) || value['rootHash'] === undefined) return false;
+    if (!('fileHash' in value) || value['fileHash'] === undefined) return false;
     return true;
 }
 

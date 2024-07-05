@@ -60,13 +60,13 @@ export interface StorageProvider {
 /**
  * Check if a given object implements the StorageProvider interface.
  */
-export function instanceOfStorageProvider(value: object): boolean {
-    if (!('address' in value)) return false;
-    if (!('acceptNewContracts' in value)) return false;
-    if (!('ratePerMbDay' in value)) return false;
-    if (!('maxSpan' in value)) return false;
-    if (!('minimalFileSize' in value)) return false;
-    if (!('maximalFileSize' in value)) return false;
+export function instanceOfStorageProvider(value: object): value is StorageProvider {
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('acceptNewContracts' in value) || value['acceptNewContracts'] === undefined) return false;
+    if (!('ratePerMbDay' in value) || value['ratePerMbDay'] === undefined) return false;
+    if (!('maxSpan' in value) || value['maxSpan'] === undefined) return false;
+    if (!('minimalFileSize' in value) || value['minimalFileSize'] === undefined) return false;
+    if (!('maximalFileSize' in value) || value['maximalFileSize'] === undefined) return false;
     return true;
 }
 

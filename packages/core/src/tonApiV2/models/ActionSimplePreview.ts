@@ -67,10 +67,10 @@ export interface ActionSimplePreview {
 /**
  * Check if a given object implements the ActionSimplePreview interface.
  */
-export function instanceOfActionSimplePreview(value: object): boolean {
-    if (!('name' in value)) return false;
-    if (!('description' in value)) return false;
-    if (!('accounts' in value)) return false;
+export function instanceOfActionSimplePreview(value: object): value is ActionSimplePreview {
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('description' in value) || value['description'] === undefined) return false;
+    if (!('accounts' in value) || value['accounts'] === undefined) return false;
     return true;
 }
 

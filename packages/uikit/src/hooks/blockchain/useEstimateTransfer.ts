@@ -19,9 +19,9 @@ import { estimateTron } from '@tonkeeper/core/dist/service/tron/tronTransferServ
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import { notifyError } from '../../components/transfer/common';
 import { QueryKey } from '../../libs/queryKey';
+import { useJettonList } from '../../state/jetton';
 import { DefaultRefetchInterval } from '../../state/tonendpoint';
 import { useTronBalances } from '../../state/tron/tron';
-import { useWalletJettonList } from '../../state/wallet';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
@@ -77,7 +77,7 @@ export function useEstimateTransfer(
     const { api } = useAppContext();
     const wallet = useWalletContext();
     const client = useQueryClient();
-    const { data: jettons } = useWalletJettonList();
+    const { data: jettons } = useJettonList();
     const { data: balances } = useTronBalances();
 
     return useQuery<TransferEstimation<Asset>, Error>(

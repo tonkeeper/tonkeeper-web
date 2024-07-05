@@ -22,6 +22,10 @@ const AmountInputFieldStyled = styled(InputFieldStyled)<{ color?: string }>`
 
     transition: color 0.1s ease-in-out;
 
+    &:disabled {
+        cursor: not-allowed;
+    }
+
     ${p =>
         p.color &&
         css`
@@ -29,11 +33,17 @@ const AmountInputFieldStyled = styled(InputFieldStyled)<{ color?: string }>`
         `};
 `;
 
-const AmountInputFieldRight = styled(Body2)<{ color?: string }>`
+const AmountInputFieldRight = styled(Body2)<{ color?: string; isDisabled?: boolean }>`
     height: fit-content;
     align-self: center;
 
     transition: color 0.1s ease-in-out;
+
+    ${p =>
+        p.isDisabled &&
+        css`
+            cursor: not-allowed;
+        `}
 
     ${p =>
         p.color &&
@@ -67,7 +77,8 @@ export const AmountInput: FC<{
         typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
     );
 
-    const price = data?.prices || 1;
+    const price = data?.prices || 0;
+    const isFiatInputDisabled = !price;
 
     const onInput = (inFiat: boolean, newValue: string) => {
         const decimals = currencyAmount.inFiat ? 2 : asset.decimals;
@@ -105,7 +116,9 @@ export const AmountInput: FC<{
                 removeGroupSeparator(inputValue).replace(getDecimalSeparator(), '.')
             );
             if (inFiat) {
-                tokenValue = formatter.format(bnInput.div(price), { decimals: asset.decimals });
+                tokenValue = formatter.format(!price ? new BigNumber(0) : bnInput.div(price), {
+                    decimals: asset.decimals
+                });
 
                 fiatValue = formattedInput;
             } else {
@@ -135,8 +148,13 @@ export const AmountInput: FC<{
             return;
         }
 
-        onInput(field.value.inFiat, field.value.value);
-    }, [isFetched]);
+        if (!price && field.value.inFiat) {
+            setCurrencyAmount({ inFiat: false, tokenValue: '', fiatValue: '', inputValue: '' });
+            field.onChange(null);
+        } else {
+            onInput(field.value.inFiat, field.value.value);
+        }
+    }, [price, isFetched]);
 
     const tokenId = useId();
     const fiatId = useId();
@@ -151,6 +169,11 @@ export const AmountInput: FC<{
                 inFiat,
                 inputValue: inFiat ? s.fiatValue : s.tokenValue
             }));
+
+            field.onChange({
+                inFiat,
+                value: inFiat ? currencyAmount.fiatValue : currencyAmount.tokenValue
+            });
         }
     };
 
@@ -200,11 +223,16 @@ export const AmountInput: FC<{
                 color={currencyAmount.inFiat ? 'textPrimary' : 'textTertiary'}
                 type="text"
                 autoComplete="off"
+                disabled={isFiatInputDisabled}
                 ref={fiatRef}
             />
             <AmountInputFieldRight
                 color={currencyAmount.inFiat ? 'textPrimary' : 'textTertiary'}
+                isDisabled={isFiatInputDisabled}
                 onClick={() => {
+                    if (isFiatInputDisabled) {
+                        return;
+                    }
                     fiatRef.current?.focus();
                     onFocus(true);
                 }}

@@ -5,8 +5,12 @@ import { KNOWN_TON_ASSETS } from '@tonkeeper/core/dist/entries/crypto/asset/cons
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { WalletState, WalletVersion, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { ActiveWalletConfig, WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { accountLogOutWallet, getAccountState } from '@tonkeeper/core/dist/service/accountService';
+import {
+    getActiveWalletConfig,
+    setActiveWalletConfig
+} from '@tonkeeper/core/dist/service/wallet/configService';
 import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import {
     getWalletAuthState,
@@ -19,7 +23,6 @@ import {
     DNSApi,
     DnsRecord,
     JettonBalance,
-    JettonsBalances,
     NFTApi,
     NftCollection,
     NftItem,
@@ -28,17 +31,17 @@ import {
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
 import BigNumber from 'bignumber.js';
+import { useMemo } from 'react';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useStorage } from '../hooks/storage';
-import { JettonKey, QueryKey } from '../libs/queryKey';
+import { QueryKey } from '../libs/queryKey';
 import { useAssets } from './home';
+import { isSpamNft } from './nft';
 import {
     getJettonsFiatAmount,
-    getRateKey,
     tokenRate as getTokenRate,
     getTonFiatAmount,
-    toTokenRate,
     useRate
 } from './rates';
 import { DefaultRefetchInterval } from './tonendpoint';
@@ -166,59 +169,35 @@ export const useWalletAccountInfo = () => {
     );
 };
 
-export const useWalletJettonList = () => {
+export const useActiveWalletConfig = () => {
     const wallet = useWalletContext();
-    const { api, fiat } = useAppContext();
-    const client = useQueryClient();
-    return useQuery<JettonsBalances, Error>(
-        [wallet.active.rawAddress, QueryKey.jettons, fiat, wallet.network],
-        async () => {
-            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.active.rawAddress,
-                currencies: [fiat]
-            });
-
-            result.balances.forEach(item => {
-                client.setQueryData(
-                    [wallet.publicKey, QueryKey.jettons, JettonKey.balance, item.jetton.address],
-                    item
-                );
-
-                if (item.price) {
-                    try {
-                        const tokenRate = toTokenRate(item.price, fiat);
-                        client.setQueryData(
-                            getRateKey(fiat, Address.parse(item.jetton.address).toString()),
-                            tokenRate
-                        );
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            });
-
-            return result;
-        },
-        {
-            refetchInterval: DefaultRefetchInterval,
-            refetchIntervalInBackground: true,
-            refetchOnWindowFocus: true,
-            keepPreviousData: true
-        }
+    const sdk = useAppSdk();
+    return useQuery<ActiveWalletConfig, Error>(
+        [wallet.active.rawAddress, wallet.network, QueryKey.walletConfig],
+        async () => getActiveWalletConfig(sdk.storage, wallet.active.rawAddress, wallet.network)
     );
 };
 
-const getActiveWallet = (accounts: Account[], version: WalletVersion) => {
-    return accounts.find(
-        item =>
-            (item.balance > 0 || item.status === 'active') &&
-            item.interfaces &&
-            item.interfaces.some(
-                v =>
-                    v === `wallet_${walletVersionText(version)}` ||
-                    v === `wallet_${walletVersionText(version).toLowerCase()}`
-            )
-    );
+export const useMutateActiveWalletConfig = () => {
+    const wallet = useWalletContext();
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+    return useMutation<void, Error, Partial<ActiveWalletConfig>>(async newConfig => {
+        const config = await getActiveWalletConfig(
+            sdk.storage,
+            wallet.active.rawAddress,
+            wallet.network
+        );
+
+        await setActiveWalletConfig(sdk.storage, wallet.active.rawAddress, wallet.network, {
+            ...config,
+            ...newConfig
+        });
+
+        await client.invalidateQueries({
+            predicate: q => q.queryKey.includes(QueryKey.walletConfig)
+        });
+    });
 };
 
 export const useWalletNftList = () => {
@@ -245,6 +224,30 @@ export const useWalletNftList = () => {
             keepPreviousData: true
         }
     );
+};
+
+export const useWalletFilteredNftList = () => {
+    const { data: nfts, ...rest } = useWalletNftList();
+    const { data: walletConfig } = useActiveWalletConfig();
+
+    const filtered = useMemo(() => {
+        if (!nfts || !walletConfig) return undefined;
+
+        return nfts.filter(item => {
+            const address = item.collection ? item.collection.address : item.address;
+
+            if (isSpamNft(item, walletConfig)) {
+                return false;
+            }
+
+            return !walletConfig?.hiddenNfts.includes(address);
+        });
+    }, [nfts, walletConfig?.trustedNfts, walletConfig?.spamNfts, walletConfig?.hiddenNfts]);
+
+    return {
+        data: filtered,
+        ...rest
+    };
 };
 
 export const useNftDNSLinkData = (nft: NFT) => {

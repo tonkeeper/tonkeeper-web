@@ -1,104 +1,26 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
     ConnectItemReply,
     ConnectRequest,
     DAppManifest
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
-import {
-    getManifest,
-    getTonConnectParams,
-    toTonAddressItemReply,
-    toTonProofItemReply,
-    tonConnectProofPayload
-} from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import { saveAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
+import { getManifest } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 import { QueryKey } from '../../libs/queryKey';
 import { useIsActiveWalletLedger } from '../../state/ledger';
-import { signTonConnectOver } from '../../state/mnemonic';
-import { useCheckTouchId } from '../../state/password';
 import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
-
-const useConnectMutation = (
-    request: ConnectRequest,
-    manifest: DAppManifest,
-    webViewUrl?: string
-) => {
-    const wallet = useWalletContext();
-    const sdk = useAppSdk();
-    const client = useQueryClient();
-    const { api } = useAppContext();
-    const { t } = useTranslation();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
-
-    return useMutation<ConnectItemReply[], Error>(async () => {
-        const params = await getTonConnectParams(request);
-
-        const result = [] as ConnectItemReply[];
-
-        for (const item of request.items) {
-            if (item.name === 'ton_addr') {
-                result.push(toTonAddressItemReply(wallet));
-            }
-            if (item.name === 'ton_proof') {
-                const signTonConnect = signTonConnectOver(sdk, wallet.publicKey, t, checkTouchId);
-                const timestamp = await getServerTime(api);
-                const proof = tonConnectProofPayload(
-                    timestamp,
-                    webViewUrl ?? manifest.url,
-                    wallet.active.rawAddress,
-                    item.payload
-                );
-                result.push(
-                    await toTonProofItemReply({
-                        storage: sdk.storage,
-                        wallet,
-                        signTonConnect,
-                        proof
-                    })
-                );
-            }
-        }
-
-        await saveAccountConnection({
-            storage: sdk.storage,
-            wallet,
-            manifest,
-            params,
-            webViewUrl
-        });
-
-        if (sdk.notifications) {
-            try {
-                const enable = await sdk.notifications.subscribed(wallet.active.rawAddress);
-                if (enable) {
-                    await sdk.notifications.subscribeTonConnect(
-                        params.clientSessionId,
-                        new URL(manifest.url).host
-                    );
-                }
-            } catch (e) {
-                if (e instanceof Error) sdk.topMessage(e.message);
-            }
-        }
-
-        await client.invalidateQueries([wallet.publicKey, QueryKey.connection]);
-
-        return result;
-    });
-};
+import { useConnectTonConnectAppMutation } from '../../state/tonConnect';
 
 const Title = styled(H2)`
     text-align: center;
@@ -173,17 +95,17 @@ const ConnectContent: FC<{
     }, []);
 
     const [error, setError] = useState<Error | null>(null);
-    const { mutateAsync, isLoading } = useConnectMutation(params, manifest, origin);
+    const { mutateAsync, isLoading } = useConnectTonConnectAppMutation();
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
         try {
-            const result = await mutateAsync();
+            const result = await mutateAsync({ request: params, manifest, webViewUrl: origin });
             setDone(true);
             setTimeout(() => handleClose(result, manifest), 300);
-        } catch (e) {
+        } catch (err) {
             setDone(true);
-            setError(e as Error);
+            setError(err as Error);
         }
     };
 

@@ -21,7 +21,7 @@ import type {
   NftCollections,
   NftItem,
   NftItems,
-  ReduceIndexingLatencyDefaultResponse,
+  StatusDefaultResponse,
 } from '../models/index';
 import {
     AccountEventsFromJSON,
@@ -36,8 +36,8 @@ import {
     NftItemToJSON,
     NftItemsFromJSON,
     NftItemsToJSON,
-    ReduceIndexingLatencyDefaultResponseFromJSON,
-    ReduceIndexingLatencyDefaultResponseToJSON,
+    StatusDefaultResponseFromJSON,
+    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetAccountNftHistoryRequest {

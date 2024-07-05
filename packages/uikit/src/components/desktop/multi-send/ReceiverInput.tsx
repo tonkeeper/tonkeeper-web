@@ -1,25 +1,22 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form/dist/types/controller';
-import { ErrorOption, useFormContext } from 'react-hook-form';
-import { useAppContext } from '../../../hooks/appContext';
+import { Address } from '@ton/core';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
-import {
-    formatAddress,
-    seeIfValidTonAddress,
-    toShortValue
-} from '@tonkeeper/core/dist/utils/common';
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { DNSApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useAsyncValidator } from '../../../hooks/useAsyncValidator';
-import { InputBlockStyled, InputFieldStyled } from './InputStyled';
-import { SpinnerRing, XMarkCircleIcon } from '../../Icon';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form/dist/types/controller';
 import styled from 'styled-components';
+import { useTranslation } from '../../../hooks/translation';
+import { useAsyncValidator } from '../../../hooks/useAsyncValidator';
+import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard';
+import {
+    MultiSendForm,
+    getPastedTable,
+    useMultiSendReceiverValidator
+} from '../../../state/multiSend';
+import { SpinnerRing, XMarkCircleIcon } from '../../Icon';
 import { Body2 } from '../../Text';
 import { IconButton } from '../../fields/IconButton';
-import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard';
-import { useTranslation } from '../../../hooks/translation';
-import { seeIfInvalidDns } from '../../transfer/RecipientView';
-import { Address } from '@ton/core';
+import { InputBlockStyled, InputFieldStyled } from './InputStyled';
 
 const SpinnerRingStyled = styled(SpinnerRing)`
     transform: scale(1.2);
@@ -49,70 +46,15 @@ export const ReceiverInput: FC<{
         `rows.${number}.receiver`
     >;
     fieldState: ControllerFieldState;
-}> = ({ field, fieldState }) => {
+    index: number;
+}> = ({ field, fieldState, index }) => {
     const { t } = useTranslation();
     const methods = useFormContext();
     const [focus, setFocus] = useState(false);
-    const { api } = useAppContext();
     const [inputValue, setInputValue] = useState('');
     const inputTouched = useRef(false);
 
-    const validator = useCallback<
-        (
-            val: string
-        ) => Promise<ErrorOption | undefined | null | { success: true; result: TonRecipient }>
-    >(
-        async (value: string) => {
-            value = value.trim();
-
-            if (seeIfValidTonAddress(value)) {
-                let bounce = false;
-                if (Address.isFriendly(value)) {
-                    bounce = Address.parseFriendly(value).isBounceable;
-                }
-
-                return {
-                    success: true,
-                    result: {
-                        address: value,
-                        bounce,
-                        blockchain: BLOCKCHAIN_NAME.TON
-                    }
-                };
-            }
-
-            if (seeIfInvalidDns(value)) {
-                return {
-                    message: 'Wrong address format'
-                };
-            }
-            value = value.toLowerCase();
-
-            try {
-                const result = await new DNSApi(api.tonApiV2).dnsResolve({ domainName: value });
-                if (result.wallet) {
-                    return {
-                        success: true,
-                        result: {
-                            address: result.wallet.address,
-                            dns: result.wallet,
-                            blockchain: BLOCKCHAIN_NAME.TON
-                        }
-                    };
-                } else {
-                    return {
-                        message: 'Wrong DNS wallet'
-                    };
-                }
-            } catch (e) {
-                console.error(e);
-                return {
-                    message: 'Wrong DNS wallet'
-                };
-            }
-        },
-        [api]
-    );
+    const validator = useMultiSendReceiverValidator();
 
     const [validationState, validationProduct] = useAsyncValidator<string, string, TonRecipient>(
         methods,
@@ -147,6 +89,24 @@ export const ReceiverInput: FC<{
             : ''
     );
 
+    const validate = useMultiSendReceiverValidator();
+    const onPaste = useCallback(
+        async (e: React.ClipboardEvent<HTMLInputElement>) => {
+            console.log('paste');
+
+            const clipText = e.clipboardData.getData('Text');
+
+            const values = await getPastedTable(clipText, validate);
+
+            if (values == null) return;
+
+            const form = methods.getValues() as MultiSendForm;
+            form.rows.splice(index, values.length, ...values);
+            methods.reset(form);
+        },
+        [methods, validate]
+    );
+
     return (
         <InputBlockStyled valid={!fieldState.invalid} focus={focus}>
             <ReceiverInputFieldStyled
@@ -156,9 +116,11 @@ export const ReceiverInput: FC<{
                 onChange={e => {
                     inputTouched.current = true;
                     setInputValue(e.target.value);
+                    console.log(e.target.value);
                 }}
                 value={inputValue}
                 placeholder={t('transactionDetails_recipient')}
+                onPaste={onPaste}
             />
             {isValidating && <SpinnerRingStyled />}
             {!isValidating &&
