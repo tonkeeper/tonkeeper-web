@@ -5,6 +5,7 @@ apis/ConnectApi.ts
 apis/DNSApi.ts
 apis/EmulationApi.ts
 apis/EventsApi.ts
+apis/GaslessApi.ts
 apis/InscriptionsApi.ts
 apis/JettonsApi.ts
 apis/LiteServerApi.ts
@@ -113,6 +114,11 @@ models/Event.ts
 models/FoundAccounts.ts
 models/FoundAccountsAddressesInner.ts
 models/GasLimitPrices.ts
+models/GaslessConfig.ts
+models/GaslessConfigGasJettonsInner.ts
+models/GaslessEstimateRequest.ts
+models/GaslessEstimateRequestMessagesInner.ts
+models/GaslessSendRequest.ts
 models/GetAccountDiff200Response.ts
 models/GetAccountInfoByStateInitRequest.ts
 models/GetAccountPublicKey200Response.ts
@@ -121,6 +127,8 @@ models/GetAllRawShardsInfo200Response.ts
 models/GetChartRates200Response.ts
 models/GetInscriptionOpTemplate200Response.ts
 models/GetMarketsRates200Response.ts
+models/GetOutMsgQueueSizes200Response.ts
+models/GetOutMsgQueueSizes200ResponseShardsInner.ts
 models/GetRates200Response.ts
 models/GetRawAccountState200Response.ts
 models/GetRawBlockProof200Response.ts
@@ -192,7 +200,6 @@ models/PoolImplementationType.ts
 models/PoolInfo.ts
 models/Price.ts
 models/RawBlockchainConfig.ts
-models/ReduceIndexingLatencyDefaultResponse.ts
 models/Refund.ts
 models/Risk.ts
 models/Sale.ts
@@ -201,9 +208,12 @@ models/SendRawMessage200Response.ts
 models/SendRawMessageRequest.ts
 models/Seqno.ts
 models/ServiceStatus.ts
+models/SignRawMessage.ts
+models/SignRawParams.ts
 models/SizeLimitsConfig.ts
 models/SmartContractAction.ts
 models/StateInit.ts
+models/StatusDefaultResponse.ts
 models/StoragePhase.ts
 models/StorageProvider.ts
 models/Subscription.ts
@@ -221,6 +231,7 @@ models/TraceIDs.ts
 models/Transaction.ts
 models/TransactionType.ts
 models/Transactions.ts
+models/TrustType.ts
 models/TvmStackRecord.ts
 models/UnSubscriptionAction.ts
 models/Validator.ts

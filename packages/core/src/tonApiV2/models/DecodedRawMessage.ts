@@ -43,9 +43,9 @@ export interface DecodedRawMessage {
 /**
  * Check if a given object implements the DecodedRawMessage interface.
  */
-export function instanceOfDecodedRawMessage(value: object): boolean {
-    if (!('message' in value)) return false;
-    if (!('mode' in value)) return false;
+export function instanceOfDecodedRawMessage(value: object): value is DecodedRawMessage {
+    if (!('message' in value) || value['message'] === undefined) return false;
+    if (!('mode' in value) || value['mode'] === undefined) return false;
     return true;
 }
 

@@ -78,13 +78,13 @@ export interface GasLimitPrices {
 /**
  * Check if a given object implements the GasLimitPrices interface.
  */
-export function instanceOfGasLimitPrices(value: object): boolean {
-    if (!('gasPrice' in value)) return false;
-    if (!('gasLimit' in value)) return false;
-    if (!('gasCredit' in value)) return false;
-    if (!('blockGasLimit' in value)) return false;
-    if (!('freezeDueLimit' in value)) return false;
-    if (!('deleteDueLimit' in value)) return false;
+export function instanceOfGasLimitPrices(value: object): value is GasLimitPrices {
+    if (!('gasPrice' in value) || value['gasPrice'] === undefined) return false;
+    if (!('gasLimit' in value) || value['gasLimit'] === undefined) return false;
+    if (!('gasCredit' in value) || value['gasCredit'] === undefined) return false;
+    if (!('blockGasLimit' in value) || value['blockGasLimit'] === undefined) return false;
+    if (!('freezeDueLimit' in value) || value['freezeDueLimit'] === undefined) return false;
+    if (!('deleteDueLimit' in value) || value['deleteDueLimit'] === undefined) return false;
     return true;
 }
 

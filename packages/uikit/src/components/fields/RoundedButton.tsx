@@ -36,13 +36,13 @@ export const CommonCountryButton: FC<{
     onClick: () => void;
 }> = ({ country, onClick }) => {
     return (
-        <BackButton onClick={onClick}>
+        <RoundedButton onClick={onClick}>
             {country ? <CountryIcon country={country} /> : <GlobIcon />}
-        </BackButton>
+        </RoundedButton>
     );
 };
 
-export const BackButton = styled(ButtonMock)`
+export const RoundedButton = styled(ButtonMock)`
     color: ${props => props.theme.textPrimary};
     background-color: ${props => props.theme.backgroundContent};
     transition: background-color 0.1s ease;

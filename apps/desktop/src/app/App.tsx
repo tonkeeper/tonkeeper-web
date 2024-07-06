@@ -12,6 +12,7 @@ import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
+import PairKeystoneNotification from '@tonkeeper/uikit/dist/components/PairKeystoneNotification';
 import PairSignerNotification from '@tonkeeper/uikit/dist/components/PairSignerNotification';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
@@ -34,8 +35,8 @@ import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
 import { NotcoinPage } from '@tonkeeper/uikit/dist/desktop-pages/notcoin/NotcoinPage';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
-import { DesktopPurchases } from '@tonkeeper/uikit/dist/desktop-pages/purchases/DesktopPurchases';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
+import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
@@ -58,7 +59,6 @@ import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useAuthState, useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
-import { useStonfiAssets } from '@tonkeeper/uikit/dist/state/stonfi';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -78,6 +78,8 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
+import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
+import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -260,12 +262,13 @@ export const Loader: FC = () => {
     const { data: auth } = useAuthState();
     const { data: fiat } = useUserFiat();
 
-    const tonendpoint = useTonendpoint(
-        TARGET_ENV,
-        sdk.version,
-        activeWallet?.network,
-        activeWallet?.lang
-    );
+    const tonendpoint = useTonendpoint({
+        targetEnv: TARGET_ENV,
+        build: sdk.version,
+        network: activeWallet?.network,
+        lang: activeWallet?.lang,
+        platform: 'desktop'
+    });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
@@ -337,7 +340,6 @@ export const Loader: FC = () => {
 
 const usePrefetch = () => {
     useRecommendations();
-    useStonfiAssets();
     useCanPromptTouchId();
 };
 
@@ -408,7 +410,11 @@ const WalletContent = () => {
                     <Routes>
                         <Route element={<OldAppRouting />}>
                             <Route path={AppRoute.activity} element={<DesktopHistoryPage />} />
-                            <Route path={any(AppRoute.purchases)} element={<DesktopPurchases />} />
+                            <Route
+                                path={any(AppRoute.purchases)}
+                                element={<DesktopCollectables />}
+                            />
+                            <Route path={any(AppRoute.dns)} element={<DesktopDns />} />
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<DesktopCoinPage />} />
                             </Route>
@@ -416,6 +422,7 @@ const WalletContent = () => {
                                 path={any(AppRoute.walletSettings)}
                                 element={<DesktopWalletSettingsRouting />}
                             />
+                            <Route path={AppRoute.swap} element={<DesktopSwapPage />} />
                             <Route path={AppRoute.notcoin} element={<NotcoinPage />} />
                             <Route path="*" element={<DesktopTokens />} />
                         </Route>
@@ -459,6 +466,7 @@ const BackgroundElements = () => {
             <DeepLinkSubscription />
             <PairSignerNotification />
             <ConnectLedgerNotification />
+            <PairKeystoneNotification />
         </>
     );
 };

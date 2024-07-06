@@ -67,12 +67,12 @@ export interface GetRawListBlockTransactions200Response {
 /**
  * Check if a given object implements the GetRawListBlockTransactions200Response interface.
  */
-export function instanceOfGetRawListBlockTransactions200Response(value: object): boolean {
-    if (!('id' in value)) return false;
-    if (!('reqCount' in value)) return false;
-    if (!('incomplete' in value)) return false;
-    if (!('ids' in value)) return false;
-    if (!('proof' in value)) return false;
+export function instanceOfGetRawListBlockTransactions200Response(value: object): value is GetRawListBlockTransactions200Response {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('reqCount' in value) || value['reqCount'] === undefined) return false;
+    if (!('incomplete' in value) || value['incomplete'] === undefined) return false;
+    if (!('ids' in value) || value['ids'] === undefined) return false;
+    if (!('proof' in value) || value['proof'] === undefined) return false;
     return true;
 }
 

@@ -1,4 +1,4 @@
-import { useBackButton, useLaunchParams, useMainButton } from '@twa.js/sdk-react';
+import { useBackButton, useLaunchParams, useMainButton } from '@tma.js/sdk-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 

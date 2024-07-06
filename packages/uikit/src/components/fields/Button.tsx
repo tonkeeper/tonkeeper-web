@@ -1,6 +1,7 @@
 import React, { FC, PropsWithChildren } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { SpinnerIcon } from '../Icon';
+import { Body2Class } from '../Text';
 
 export interface ButtonProps {
     loading?: boolean;
@@ -8,6 +9,7 @@ export interface ButtonProps {
     size?: 'small' | 'medium' | 'large';
     primary?: boolean;
     secondary?: boolean;
+    warn?: boolean;
     disabled?: boolean;
     fullWidth?: boolean;
     fitContent?: boolean;
@@ -29,18 +31,26 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
     align-items: center;
     gap: 8px;
 
-    font-family: 'Montserrat', sans-serif;
     font-style: normal;
-    font-weight: 600;
 
     transition: background-color 0.1s ease, color 0.1s ease;
+
+    ${p =>
+        p.theme.displayType === 'full-width'
+            ? Body2Class
+            : css`
+                  font-family: 'Montserrat', sans-serif;
+                  font-weight: 600;
+              `}
 
     ${props =>
         !props.disabled
             ? css`
                   cursor: pointer;
               `
-            : undefined}
+            : css`
+                  cursor: not-allowed;
+              `}
 
     flex-shrink: 0;
 
@@ -133,6 +143,10 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
                 return css`
                     background-color: ${props.theme.buttonSecondaryBackgroundHighlighted};
                 `;
+            } else if (props.warn) {
+                return css`
+                    background-color: ${props.theme.buttonWarnBackgroundHighlighted};
+                `;
             } else {
                 return css`
                     background-color: ${props.theme.buttonTertiaryBackgroundHighlighted};
@@ -164,6 +178,18 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
                 return css`
                     color: ${props.theme.buttonSecondaryForeground};
                     background-color: ${props.theme.buttonSecondaryBackground};
+                `;
+            }
+        } else if (props.warn) {
+            if (props.disabled) {
+                return css`
+                    color: ${props.theme.buttonWarnForegroundDisabled};
+                    background-color: ${props.theme.buttonWarnBackgroundDisabled};
+                `;
+            } else {
+                return css`
+                    color: ${props.theme.buttonWarnForeground};
+                    background-color: ${props.theme.buttonWarnBackground};
                 `;
             }
         } else {
@@ -212,17 +238,28 @@ const SpinnerIconStyled = styled(SpinnerIcon)`
 
 export const Button: FC<
     PropsWithChildren<
-        ButtonProps & Omit<React.HTMLProps<HTMLButtonElement>, 'size' | 'children' | 'ref' | 'as'>
+        ButtonProps & Omit<React.HTMLProps<HTMLButtonElement>, 'size' | 'children' | 'ref'>
     >
 > = ({ children, loading, ...props }) => {
+    const theme = useTheme();
+
+    let size = props.size;
+    if (size === undefined && theme.displayType === 'full-width') {
+        size = 'small';
+    }
+
     if (loading) {
         return (
-            <ButtonElement {...props} disabled>
+            <ButtonElement {...props} size={size} disabled>
                 <ChildrenHidden>{children}</ChildrenHidden>
                 <SpinnerIconStyled />
             </ButtonElement>
         );
     } else {
-        return <ButtonElement {...props}>{children}</ButtonElement>;
+        return (
+            <ButtonElement {...props} size={size}>
+                {children}
+            </ButtonElement>
+        );
     }
 };

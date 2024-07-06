@@ -1,3 +1,4 @@
+import { useMainButton } from '@tma.js/sdk-react';
 import { FavoriteSuggestion, LatestSuggestion } from '@tonkeeper/core/dist/entries/suggestion';
 import { Input } from '@tonkeeper/uikit/dist/components/fields/Input';
 import { SuggestionAddress } from '@tonkeeper/uikit/dist/components/transfer/SuggestionAddress';
@@ -5,7 +6,6 @@ import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useInputRefAutoFocus } from '@tonkeeper/uikit/dist/hooks/input';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useAddFavorite, useEditFavorite } from '@tonkeeper/uikit/dist/state/suggestions';
-import { useMainButton } from '@twa.js/sdk-react';
 import { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useMainButtonLoading } from './SendNotificationButtons';

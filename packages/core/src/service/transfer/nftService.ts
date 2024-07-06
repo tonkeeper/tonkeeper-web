@@ -152,11 +152,16 @@ export const sendNftTransfer = async (
         recipient.comment ? comment(recipient.comment) : null
     ] as const;
 
-    let buffer;
-    if (signer.type === 'ledger') {
-        buffer = await createLedgerNftTransfer(...params, signer);
-    } else {
-        buffer = await createNftTransfer(...params, signer);
+    let buffer: Buffer;
+    switch (signer.type) {
+        case 'cell': {
+            buffer = await createNftTransfer(...params, signer);
+            break;
+        }
+        case 'ledger': {
+            buffer = await createLedgerNftTransfer(...params, signer);
+            break;
+        }
     }
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({

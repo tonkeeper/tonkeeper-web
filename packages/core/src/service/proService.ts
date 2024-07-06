@@ -230,9 +230,10 @@ export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
 
 export async function startProServiceTrial(botId: string, lang?: string) {
     const tgData = await loginViaTG(botId, lang);
-    if (tgData) {
-        return ProServiceService.proServiceTrial(tgData);
+    if (!tgData) {
+        return false;
     }
+    return (await ProServiceService.proServiceTrial(tgData)).ok;
 }
 
 export async function getDashboardColumns(lang?: string): Promise<DashboardColumn[]> {

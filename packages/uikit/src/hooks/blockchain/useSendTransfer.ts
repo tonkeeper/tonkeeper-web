@@ -13,13 +13,13 @@ import {
 import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { notifyError } from '../../components/transfer/common';
+import { useJettonList } from '../../state/jetton';
 import { getSigner } from '../../state/mnemonic';
-import { useWalletJettonList } from '../../state/wallet';
+import { useCheckTouchId } from '../../state/password';
 import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext, useWalletContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import { useCheckTouchId } from '../../state/password';
 
 export function useSendTransfer<T extends Asset>(
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,
@@ -33,7 +33,7 @@ export function useSendTransfer<T extends Asset>(
     const wallet = useWalletContext();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
-    const { data: jettons } = useWalletJettonList();
+    const { data: jettons } = useJettonList();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<boolean, Error>(async () => {

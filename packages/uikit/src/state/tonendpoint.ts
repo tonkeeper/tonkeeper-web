@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Language, localizationText } from '@tonkeeper/core/dist/entries/language';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import {
@@ -6,7 +6,8 @@ import {
     TonendpoinFiatItem,
     Tonendpoint,
     TonendpointConfig,
-    getServerConfig
+    getServerConfig,
+    BootParams
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
@@ -14,15 +15,25 @@ import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
 import { useUserCountry } from './country';
 import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
 
-export const useTonendpoint = (
-    targetEnv: TargetEnv,
-    build: string,
-    network?: Network,
-    lang?: Language
-) => {
+export const useTonendpoint = (options: {
+    targetEnv: TargetEnv;
+    build: string;
+    network?: Network;
+    lang?: Language;
+    platform?: BootParams['platform'];
+}) => {
     return useMemo(() => {
-        return new Tonendpoint({ build, network, lang: localizationText(lang), targetEnv }, {});
-    }, [targetEnv, build, network, lang]);
+        return new Tonendpoint(
+            {
+                build: options.build,
+                network: options.network,
+                lang: localizationText(options.lang),
+                targetEnv: options.targetEnv,
+                platform: options.platform
+            },
+            {}
+        );
+    }, [options.targetEnv, options.build, options.network, options.lang, options.platform]);
 };
 
 export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
@@ -63,4 +74,33 @@ export const useTonendpointBuyMethods = () => {
             };
         }
     );
+};
+
+export const useCreateMercuryoProUrl = () => {
+    const { tonendpoint } = useAppContext();
+    const { data } = useTonenpointConfig(tonendpoint);
+
+    return useMutation<string, Error, string>(async baseUrl => {
+        try {
+            if (!data?.mercuryo_otc_id) {
+                throw new Error('Missing mercuryo get otc url');
+            }
+            const mercurioConfig = (await (await fetch(data.mercuryo_otc_id)).json()) as {
+                data: {
+                    otc_id: string;
+                };
+            };
+
+            if (!mercurioConfig.data.otc_id) {
+                throw new Error('Missing mercuryo otc_id');
+            }
+
+            const url = new URL(baseUrl);
+            url.searchParams.append('otc_id', mercurioConfig.data.otc_id);
+            return url.toString();
+        } catch (e) {
+            console.error(e);
+            return baseUrl;
+        }
+    });
 };

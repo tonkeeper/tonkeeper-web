@@ -1,4 +1,6 @@
-import React, { FC, useEffect, useState } from 'react';
+import UR from '@ngraveio/bc-ur/dist/ur';
+import UREncoder from '@ngraveio/bc-ur/dist/urEncoder';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import { styled } from 'styled-components';
 
@@ -61,3 +63,34 @@ export const AnimatedQrCode: FC<{ message: string }> = React.memo(({ message }) 
         </QrWrapper>
     );
 });
+
+export const KeystoneAnimatedQRCode: FC<{ data: UR }> = ({ data }) => {
+    const urEncoder = useMemo(() => {
+        return new UREncoder(data);
+    }, []);
+
+    const [value, setValue] = useState(urEncoder.nextPart());
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setValue(urEncoder.nextPart().toUpperCase());
+        }, 200);
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
+
+    return (
+        <QrWrapper>
+            <QRCode
+                size={400}
+                value={value}
+                qrStyle="dots"
+                eyeRadius={{
+                    inner: 2,
+                    outer: 16
+                }}
+            />
+        </QrWrapper>
+    );
+};

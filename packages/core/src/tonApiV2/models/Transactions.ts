@@ -37,8 +37,8 @@ export interface Transactions {
 /**
  * Check if a given object implements the Transactions interface.
  */
-export function instanceOfTransactions(value: object): boolean {
-    if (!('transactions' in value)) return false;
+export function instanceOfTransactions(value: object): value is Transactions {
+    if (!('transactions' in value) || value['transactions'] === undefined) return false;
     return true;
 }
 

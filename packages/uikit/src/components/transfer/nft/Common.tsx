@@ -8,7 +8,7 @@ import { ChevronLeftIcon } from '../../Icon';
 import { ListBlock, ListItem, ListItemPayload } from '../../List';
 import { NotificationCancelButton, NotificationTitleBlock } from '../../Notification';
 import { Label1 } from '../../Text';
-import { BackButton } from '../../fields/BackButton';
+import { RoundedButton } from '../../fields/RoundedButton';
 import { Label } from '../common';
 
 export type ConfirmHeaderBlockComponent = (props: {
@@ -19,9 +19,9 @@ export type ConfirmHeaderBlockComponent = (props: {
 export const ConfirmHeaderBlock: ConfirmHeaderBlockComponent = ({ onBack, onClose }) => {
     return (
         <NotificationTitleBlock>
-            <BackButton onClick={onBack}>
+            <RoundedButton onClick={onBack}>
                 <ChevronLeftIcon />
-            </BackButton>
+            </RoundedButton>
             <NotificationCancelButton handleClose={onClose} />
         </NotificationTitleBlock>
     );

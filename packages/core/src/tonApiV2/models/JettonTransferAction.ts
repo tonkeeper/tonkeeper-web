@@ -13,18 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccountAddress } from './AccountAddress';
-import {
-    AccountAddressFromJSON,
-    AccountAddressFromJSONTyped,
-    AccountAddressToJSON,
-} from './AccountAddress';
-import type { EncryptedComment } from './EncryptedComment';
-import {
-    EncryptedCommentFromJSON,
-    EncryptedCommentFromJSONTyped,
-    EncryptedCommentToJSON,
-} from './EncryptedComment';
 import type { JettonPreview } from './JettonPreview';
 import {
     JettonPreviewFromJSON,
@@ -37,6 +25,18 @@ import {
     RefundFromJSONTyped,
     RefundToJSON,
 } from './Refund';
+import type { EncryptedComment } from './EncryptedComment';
+import {
+    EncryptedCommentFromJSON,
+    EncryptedCommentFromJSONTyped,
+    EncryptedCommentToJSON,
+} from './EncryptedComment';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+} from './AccountAddress';
 
 /**
  * 
@@ -103,11 +103,11 @@ export interface JettonTransferAction {
 /**
  * Check if a given object implements the JettonTransferAction interface.
  */
-export function instanceOfJettonTransferAction(value: object): boolean {
-    if (!('sendersWallet' in value)) return false;
-    if (!('recipientsWallet' in value)) return false;
-    if (!('amount' in value)) return false;
-    if (!('jetton' in value)) return false;
+export function instanceOfJettonTransferAction(value: object): value is JettonTransferAction {
+    if (!('sendersWallet' in value) || value['sendersWallet'] === undefined) return false;
+    if (!('recipientsWallet' in value) || value['recipientsWallet'] === undefined) return false;
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('jetton' in value) || value['jetton'] === undefined) return false;
     return true;
 }
 

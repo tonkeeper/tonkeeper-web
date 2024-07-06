@@ -1,3 +1,5 @@
+import { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
+import { parseTonAccount } from '@keystonehq/keystone-sdk/dist/wallet/hdKey';
 import { Address } from '@ton/core';
 import { mnemonicToPrivateKey } from '@ton/crypto';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
@@ -190,7 +192,7 @@ export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) =>
         publicKey,
         active,
         revision: 0,
-        name: name ? Buffer.from(name, 'hex').toString('utf8') : undefined,
+        name: name ? name : undefined,
         auth: { kind: 'signer' },
         emoji: getFallbackWalletEmoji(publicKey)
     };
@@ -209,7 +211,7 @@ export const walletStateFromSignerDeepLink = async (
         publicKey,
         active,
         revision: 0,
-        name: name ? Buffer.from(name, 'hex').toString('utf8') : undefined,
+        name: name ? name : undefined,
         auth: { kind: 'signer-deeplink' },
         emoji: getFallbackWalletEmoji(publicKey)
     };
@@ -236,6 +238,33 @@ export const walletStateFromLedger = (walletInfo: {
         name: `Ledger ${walletInfo.accountIndex + 1}`,
         auth: { kind: 'ledger', accountIndex: walletInfo.accountIndex },
         emoji: getFallbackWalletEmoji(publicKey)
+    };
+
+    return state;
+};
+
+export const walletStateFromKeystone = (ur: UR) => {
+    const account = parseTonAccount(ur);
+    const contact = WalletContractV4.create({
+        workchain: 0,
+        publicKey: Buffer.from(account.publicKey, 'hex')
+    });
+    const wallet: WalletAddress = {
+        rawAddress: contact.address.toRawString(),
+        friendlyAddress: contact.address.toString(),
+        version: WalletVersion.V4R2
+    };
+
+    const pathInfo =
+        account.path && account.xfp ? { path: account.path, mfp: account.xfp } : undefined;
+
+    const state: WalletState = {
+        publicKey: account.publicKey,
+        active: wallet,
+        revision: 0,
+        name: account.name ?? `Keystone`,
+        auth: { kind: 'keystone', info: pathInfo },
+        emoji: getFallbackWalletEmoji(account.publicKey)
     };
 
     return state;

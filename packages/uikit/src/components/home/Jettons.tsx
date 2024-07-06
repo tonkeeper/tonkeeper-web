@@ -93,6 +93,7 @@ export const JettonAsset = forwardRef<
                 <TokenLogo src={jetton.jetton.image} />
                 <TokenLayout
                     name={jetton.jetton.name ?? t('Unknown_COIN')}
+                    verification={jetton.jetton.verification}
                     symbol={jetton.jetton.symbol}
                     balance={balance}
                     secondary={fiatPrice}

@@ -3,6 +3,7 @@ import { mnemonicToPrivateKey, sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
+import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
 import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
 import { getWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
 import {
@@ -37,6 +38,15 @@ export const signTonConnectOver = (
             case 'ledger': {
                 throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
             }
+            case 'keystone': {
+                const result = await pairKeystoneByNotification(
+                    sdk,
+                    bufferToSign,
+                    'signProof',
+                    auth.info
+                );
+                return Buffer.from(result, 'hex');
+            }
             default: {
                 const mnemonic = await getMnemonic(sdk, publicKey, checkTouchId);
                 const keyPair = await mnemonicToPrivateKey(mnemonic);
@@ -47,6 +57,17 @@ export const signTonConnectOver = (
                 return signature;
             }
         }
+    };
+};
+
+export const signTonConnectMnemonicOver = (mnemonic: string[]) => {
+    return async (bufferToSign: Buffer) => {
+        const keyPair = await mnemonicToPrivateKey(mnemonic);
+        const signature = nacl.sign.detached(
+            Buffer.from(sha256_sync(bufferToSign)),
+            keyPair.secretKey
+        );
+        return signature;
     };
 };
 
@@ -95,6 +116,19 @@ export const getSigner = async (
                 };
                 callback.type = 'cell' as const;
                 return callback as CellSigner;
+            }
+            case 'keystone': {
+                const callback = async (message: Cell) => {
+                    const result = await pairKeystoneByNotification(
+                        sdk,
+                        message.toBoc({ idx: false }),
+                        'transaction',
+                        auth.info
+                    );
+                    return Buffer.from(result, 'hex');
+                };
+                callback.type = 'cell' as const;
+                return callback;
             }
             default: {
                 const mnemonic = await getMnemonic(sdk, publicKey, checkTouchId);
@@ -177,6 +211,45 @@ const pairSignerByNotification = async (sdk: IAppSdk, boc: string): Promise<stri
             method: 'signer',
             id,
             params: boc
+        });
+
+        const onCallback = (message: {
+            method: 'response';
+            id?: number | undefined;
+            params: string | Error;
+        }) => {
+            if (message.id === id) {
+                const { params } = message;
+                sdk.uiEvents.off('response', onCallback);
+
+                if (typeof params === 'string') {
+                    resolve(params);
+                } else {
+                    reject(params);
+                }
+            }
+        };
+
+        sdk.uiEvents.on('response', onCallback);
+    });
+};
+
+const pairKeystoneByNotification = async (
+    sdk: IAppSdk,
+    message: Buffer,
+    messageType: KeystoneMessageType,
+    pathInfo?: { path: string; mfp: string }
+): Promise<string> => {
+    const id = Date.now();
+    return new Promise<string>((resolve, reject) => {
+        sdk.uiEvents.emit('keystone', {
+            method: 'keystone',
+            id,
+            params: {
+                message,
+                messageType,
+                pathInfo
+            }
         });
 
         const onCallback = (message: {

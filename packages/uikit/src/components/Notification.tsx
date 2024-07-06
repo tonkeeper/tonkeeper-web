@@ -18,11 +18,11 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useClickOutside } from '../hooks/useClickOutside';
 import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
 import { Container } from '../styles/globalStyle';
-import { BackButton, ButtonMock } from './fields/BackButton';
+import { RoundedButton, ButtonMock } from './fields/RoundedButton';
 import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
-import { H2, H3 } from './Text';
+import { H2, H3, Label2 } from './Text';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -236,9 +236,21 @@ const HeaderWrapper = styled.div`
                 padding-bottom: 1rem;
             }
         `}
+
+    > *:not(:last-child) {
+        display: none;
+    }
 `;
 
 const RowTitle = styled(H3)`
+    overflow: hidden;
+    margin: 0;
+    user-select: none;
+    flex: 1;
+`;
+
+const RowTitleDesktop = styled(Label2)`
+    overflow: hidden;
     margin: 0;
     user-select: none;
     flex: 1;
@@ -260,12 +272,17 @@ const BackShadow = styled.div`
 `;
 
 export const NotificationTitleRow: FC<
-    PropsWithChildren<{ handleClose?: () => void; center?: boolean }>
-> = ({ handleClose, children, center = false }) => {
+    PropsWithChildren<{ handleClose?: () => void; center?: boolean; className?: string }>
+> = ({ handleClose, children, center = false, className }) => {
+    const isFullWidthMode = useIsFullWidthMode();
     return (
-        <TitleRow>
+        <TitleRow className={className}>
             {center && <ButtonMock />}
-            <RowTitle>{children}</RowTitle>
+            {isFullWidthMode ? (
+                <RowTitleDesktop>{children}</RowTitleDesktop>
+            ) : (
+                <RowTitle>{children}</RowTitle>
+            )}
             {handleClose ? <NotificationCancelButton handleClose={handleClose} /> : <ButtonMock />}
         </TitleRow>
     );
@@ -326,9 +343,9 @@ export const NotificationTitleBlock = styled.div`
 
 export const NotificationCancelButton: FC<{ handleClose: () => void }> = ({ handleClose }) => {
     return (
-        <BackButton onClick={handleClose}>
+        <RoundedButton onClick={handleClose}>
             <CloseIcon />
-        </BackButton>
+        </RoundedButton>
     );
 };
 
@@ -536,21 +553,18 @@ export const Notification: FC<{
                                         className="dialog-content"
                                     >
                                         <HeaderWrapper ref={headerRef}>
-                                            {title && (
+                                            {(title || !hideButton) && (
                                                 <NotificationHeader>
-                                                    <NotificationTitleRow handleClose={handleClose}>
+                                                    <NotificationTitleRow
+                                                        handleClose={
+                                                            hideButton ? undefined : handleClose
+                                                        }
+                                                    >
                                                         {title}
                                                     </NotificationTitleRow>
                                                 </NotificationHeader>
                                             )}
                                         </HeaderWrapper>
-                                        {!hideButton && !title && (
-                                            <ButtonContainer>
-                                                <NotificationCancelButton
-                                                    handleClose={handleClose}
-                                                />
-                                            </ButtonContainer>
-                                        )}
                                         {Child}
                                         <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
                                     </Content>

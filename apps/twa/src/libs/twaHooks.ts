@@ -1,4 +1,4 @@
-import { useBackButton } from '@twa.js/sdk-react';
+import { useBackButton } from '@tma.js/sdk-react';
 import { useEffect } from 'react';
 
 export const useHandleBackButton = (handleClose: () => void) => {

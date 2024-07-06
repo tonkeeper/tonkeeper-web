@@ -36,9 +36,9 @@ export interface GetInscriptionOpTemplate200Response {
 /**
  * Check if a given object implements the GetInscriptionOpTemplate200Response interface.
  */
-export function instanceOfGetInscriptionOpTemplate200Response(value: object): boolean {
-    if (!('comment' in value)) return false;
-    if (!('destination' in value)) return false;
+export function instanceOfGetInscriptionOpTemplate200Response(value: object): value is GetInscriptionOpTemplate200Response {
+    if (!('comment' in value) || value['comment'] === undefined) return false;
+    if (!('destination' in value) || value['destination'] === undefined) return false;
     return true;
 }
 

@@ -30,8 +30,8 @@ export interface GetAccountDiff200Response {
 /**
  * Check if a given object implements the GetAccountDiff200Response interface.
  */
-export function instanceOfGetAccountDiff200Response(value: object): boolean {
-    if (!('balanceChange' in value)) return false;
+export function instanceOfGetAccountDiff200Response(value: object): value is GetAccountDiff200Response {
+    if (!('balanceChange' in value) || value['balanceChange'] === undefined) return false;
     return true;
 }
 

@@ -1,3 +1,5 @@
+import { IStorage, MemoryStorage } from './Storage';
+import { APIConfig } from './entries/apis';
 import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
@@ -5,7 +7,7 @@ import { AuthState } from './entries/password';
 import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
 import { WalletState } from './entries/wallet';
 import { TonTransferParams } from './service/deeplinkingService';
-import { IStorage, MemoryStorage } from './Storage';
+import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTransaction } from './service/ledger/connector';
 
 export type GetPasswordType = 'confirm' | 'unlock';
@@ -39,6 +41,7 @@ export interface UIEvents {
     getPassword: GetPasswordParams;
     signer: string;
     ledger: { path: number[]; transaction: LedgerTransaction };
+    keystone: { message: Buffer; messageType: KeystoneMessageType; pathInfo?: KeystonePathInfo };
     loading: void;
     transfer: TransferInitParams;
     receive: ReceiveInitParams;
@@ -48,6 +51,7 @@ export interface UIEvents {
     addSuggestion: LatestSuggestion;
     editSuggestion: FavoriteSuggestion;
     response: any;
+    toast: string;
 }
 
 export interface NativeBackButton {
@@ -68,7 +72,11 @@ export interface TouchId {
 }
 
 export interface NotificationService {
-    subscribe: (wallet: WalletState, mnemonic: string[]) => Promise<void>;
+    subscribe: (
+        api: APIConfig,
+        wallet: WalletState,
+        signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
+    ) => Promise<void>;
     unsubscribe: (address?: string) => Promise<void>;
 
     subscribeTonConnect: (clientId: string, origin: string) => Promise<void>;
@@ -106,6 +114,7 @@ export interface IAppSdk {
     hapticNotification: (type: 'success' | 'error') => void;
 
     notifications?: NotificationService;
+    targetEnv: TargetEnv;
 }
 
 export abstract class BaseApp implements IAppSdk {
@@ -158,9 +167,13 @@ export abstract class BaseApp implements IAppSdk {
     hapticNotification = (type: 'success' | 'error') => {};
 
     version = '0.0.0';
+
+    abstract targetEnv: TargetEnv;
 }
 
 export class MockAppSdk extends BaseApp {
+    targetEnv = 'web' as const;
+
     constructor() {
         super(new MemoryStorage());
     }

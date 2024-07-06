@@ -7,6 +7,7 @@ import {
     sendTonConnectTransfer,
     tonConnectTransferError
 } from '@tonkeeper/core/dist/service/transfer/tonService';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext, useWalletContext } from '../../hooks/appContext';
@@ -21,11 +22,15 @@ import {
     Notification,
     NotificationBlock,
     NotificationFooter,
-    NotificationFooterPortal
+    NotificationFooterPortal,
+    NotificationHeader,
+    NotificationHeaderPortal,
+    NotificationTitleRow
 } from '../Notification';
 import { SkeletonList } from '../Skeleton';
 import { Body2, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
+import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
 
@@ -50,7 +55,7 @@ const ButtonRowStyled = styled.div`
     }
 `;
 
-const useSendMutation = (params: TonConnectTransactionPayload, estimate?: EstimateData) => {
+const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?: boolean) => {
     const wallet = useWalletContext();
     const sdk = useAppSdk();
     const { api } = useAppContext();
@@ -60,14 +65,25 @@ const useSendMutation = (params: TonConnectTransactionPayload, estimate?: Estima
 
     return useMutation<string, Error>(async () => {
         const signer = await getSigner(sdk, wallet.publicKey, checkTouchId);
-        if (signer.type !== 'cell') {
-            throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+
+        let boc: string;
+        switch (signer.type) {
+            case 'cell': {
+                boc = await sendTonConnectTransfer(api, wallet, params, signer);
+                break;
+            }
+            default: {
+                throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+            }
         }
-        const value = await sendTonConnectTransfer(api, wallet, params, signer);
-        client.invalidateQueries({
+
+        const invalidationPromise = client.invalidateQueries({
             predicate: query => query.queryKey.includes(wallet.active.rawAddress)
         });
-        return value;
+        if (waitInvalidation) {
+            await invalidationPromise;
+        }
+        return boc;
     });
 };
 
@@ -106,9 +122,6 @@ const ErrorStyled = styled.div`
 const Header = styled(H2)`
     text-align: center;
 `;
-const Secondary = styled(Body2)`
-    color: ${props => props.theme.textSecondary};
-`;
 
 const NotificationIssue: FC<{
     kind: 'not-enough-balance';
@@ -140,7 +153,8 @@ const NotificationIssue: FC<{
 const ConnectContent: FC<{
     params: TonConnectTransactionPayload;
     handleClose: (result?: string) => void;
-}> = ({ params, handleClose }) => {
+    waitInvalidation?: boolean;
+}> = ({ params, handleClose, waitInvalidation }) => {
     const sdk = useAppSdk();
     const [done, setDone] = useState(false);
 
@@ -148,7 +162,7 @@ const ConnectContent: FC<{
 
     const { data: issues, isFetched } = useTransactionError(params);
     const { data: estimate, isLoading: isEstimating, isError } = useEstimation(params, isFetched);
-    const { mutateAsync, isLoading } = useSendMutation(params, estimate);
+    const { mutateAsync, isLoading } = useSendMutation(params, waitInvalidation);
 
     useEffect(() => {
         if (sdk.twaExpand) {
@@ -240,25 +254,83 @@ const useTransactionError = (params: TonConnectTransactionPayload) => {
     });
 };
 
+const NotificationTitleRowStyled = styled(NotificationTitleRow)`
+    align-items: flex-start;
+`;
+
+const WalletInfoStyled = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: ${p => p.theme.textSecondary};
+
+    > ${Body2} {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+`;
+
+const NotificationTitleWithWalletName: FC<{ onClose: () => void }> = ({ onClose }) => {
+    const wallet = useWalletContext();
+    const { t } = useTranslation();
+
+    return (
+        <NotificationHeaderPortal>
+            <NotificationHeader>
+                <NotificationTitleRowStyled handleClose={onClose}>
+                    <div>
+                        {t('txActions_signRaw_title')}
+                        <WalletInfoStyled>
+                            <Body2>
+                                {t('confirmSendModal_wallet')}&nbsp;
+                                {wallet.name ?? toShortValue(wallet.active.friendlyAddress)}
+                            </Body2>
+                            <WalletEmoji
+                                emojiSize="20px"
+                                containerSize="20px"
+                                emoji={wallet.emoji}
+                            />
+                        </WalletInfoStyled>
+                    </div>
+                </NotificationTitleRowStyled>
+            </NotificationHeader>
+        </NotificationHeaderPortal>
+    );
+};
+
 export const TonTransactionNotification: FC<{
     params: TonConnectTransactionPayload | null;
     handleClose: (result?: string) => void;
-}> = ({ params, handleClose }) => {
+    waitInvalidation?: boolean;
+}> = ({ params, handleClose, waitInvalidation }) => {
     const { t } = useTranslation();
-
+    const { account } = useAppContext();
     const Content = useCallback(() => {
         if (!params) return undefined;
-        return <ConnectContent params={params} handleClose={handleClose} />;
-    }, [origin, params, handleClose]);
+        return (
+            <>
+                {account.publicKeys.length > 1 && (
+                    <NotificationTitleWithWalletName onClose={() => handleClose()} />
+                )}
+                <ConnectContent
+                    params={params}
+                    handleClose={handleClose}
+                    waitInvalidation={waitInvalidation}
+                />
+            </>
+        );
+    }, [origin, params, handleClose, account.publicKeys.length]);
 
     return (
-        <Notification
-            isOpen={params != null}
-            handleClose={() => handleClose()}
-            title={t('txActions_signRaw_title')}
-            hideButton
-        >
-            {Content}
-        </Notification>
+        <>
+            <Notification
+                isOpen={params != null}
+                handleClose={() => handleClose()}
+                title={account.publicKeys.length > 1 ? undefined : t('txActions_signRaw_title')}
+                hideButton
+            >
+                {Content}
+            </Notification>
+        </>
     );
 };

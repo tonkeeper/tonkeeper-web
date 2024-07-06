@@ -28,17 +28,22 @@ export const lightTheme: DefaultTheme = {
     buttonSecondaryForeground: '#000000',
     buttonTertiaryBackground: '#FFFFFF',
     buttonTertiaryForeground: '#000000',
+    buttonWarnBackground: '#F5A73B',
+    buttonWarnForeground: '#FFFFFF',
     buttonPrimaryBackgroundDisabled: '#419EFB',
     buttonSecondaryBackgroundDisabled: '#ECECF0',
     buttonTertiaryBackgroundDisabled: '#FFFFFF',
+    buttonWarnBackgroundDisabled: '#C2842F',
 
     buttonTertiaryForegroundDisabled: 'rgba(0, 0, 0, 0.48)',
     buttonSecondaryForegroundDisabled: 'rgba(0, 0, 0, 0.48)',
     buttonPrimaryForegroundDisabled: 'rgba(0, 0, 0, 0.48)',
+    buttonWarnForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
 
     buttonPrimaryBackgroundHighlighted: '#3297FB',
     buttonSecondaryBackgroundHighlighted: '#D7D7DB',
     buttonTertiaryBackgroundHighlighted: '#FFFFFF',
+    buttonWarnBackgroundHighlighted: '#F5AF4E',
 
     fieldBackground: '#FFFFFF',
     fieldActiveBorder: '#198AFB',

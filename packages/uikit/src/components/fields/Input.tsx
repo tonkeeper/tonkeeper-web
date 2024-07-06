@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 import { XmarkIcon } from '../Icon';
 import { Body2 } from '../Text';
 import { TextareaAutosize } from './TextareaAutosize';
+import { BorderSmallResponsive } from '../shared/Styles';
 
 export const InputBlock = styled.div<{
     focus: boolean;
@@ -10,15 +11,26 @@ export const InputBlock = styled.div<{
     isSuccess?: boolean;
     scanner?: boolean;
     clearButton?: boolean;
+    size?: 'small' | 'medium';
 }>`
     width: 100%;
-    min-height: 64px;
-    border-radius: ${props => props.theme.cornerSmall};
+    ${p =>
+        p.size === 'small'
+            ? css`
+                  min-height: 36px;
+                  padding: 0 0.75rem;
+              `
+            : css`
+                  min-height: 64px;
+                  padding: 0 1rem;
+              `}
+
+    ${BorderSmallResponsive};
     display: flex;
-    padding: 0 1rem;
     gap: 0.5rem;
     box-sizing: border-box;
     position: relative;
+    transition: border-color 0.15s ease-in-out;
 
     ${props =>
         props.scanner &&
@@ -33,7 +45,14 @@ export const InputBlock = styled.div<{
         `}
 
   &:focus-within label {
-        transform: translate(0, 12px) scale(0.7);
+        ${p =>
+            p.size === 'small'
+                ? css`
+                      display: none;
+                  `
+                : css`
+                      transform: translate(0, 12px) scale(0.7);
+                  `}
     }
 
     ${props =>
@@ -63,7 +82,7 @@ export const InputBlock = styled.div<{
         `}
 `;
 
-export const InputField = styled.input<{ marginRight?: string }>`
+export const InputField = styled.input<{ marginRight?: string; size?: 'small' | 'medium' }>`
     outline: none;
     border: none;
     background: transparent;
@@ -72,6 +91,15 @@ export const InputField = styled.input<{ marginRight?: string }>`
     font-size: 16px;
     padding: 30px 0 10px;
     box-sizing: border-box;
+
+    ${p =>
+        p.size === 'small'
+            ? css`
+                  padding: 8px 0;
+              `
+            : css`
+                  padding: 30px 0 10px;
+              `}
 
     color: ${props => props.theme.textPrimary};
     ${props =>
@@ -133,6 +161,8 @@ const ClearBlock = styled(RightBlock)`
     cursor: pointer;
     color: ${props => props.theme.textSecondary};
 
+    transition: color 0.15s ease-in-out;
+
     &:hover {
         color: ${props => props.theme.textTertiary};
     }
@@ -152,6 +182,8 @@ export interface InputProps {
     clearButton?: boolean;
     rightElement?: ReactNode;
     marginRight?: string;
+    className?: string;
+    size?: 'small' | 'medium';
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -168,7 +200,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             tabIndex,
             clearButton,
             rightElement,
-            marginRight
+            marginRight,
+            className,
+            size
         },
         ref
     ) => {
@@ -182,12 +216,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         };
 
         return (
-            <OuterBlock>
+            <OuterBlock className={className}>
                 <InputBlock
                     focus={focus}
                     valid={isValid}
                     isSuccess={isSuccess}
                     clearButton={clearButton}
+                    size={size}
                 >
                     <InputField
                         ref={ref}
@@ -200,8 +235,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         onChange={e => onChange && onChange(e.target.value)}
                         onFocus={() => setFocus(true)}
                         onBlur={() => setFocus(false)}
+                        size={size}
+                        placeholder={size === 'small' ? label : undefined}
                     />
-                    {label && <Label active={value !== ''}>{label}</Label>}
+                    {label && size !== 'small' && <Label active={value !== ''}>{label}</Label>}
                     {rightElement && <RightBlock onClick={onClear}>{rightElement}</RightBlock>}
                     {!!value && clearButton && !rightElement && (
                         <ClearBlock onClick={onClear}>

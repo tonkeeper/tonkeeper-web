@@ -6,10 +6,11 @@ export interface BasicAsset {
     symbol: string;
     decimals: number;
     name?: string;
+    image?: string;
 }
 
 export function packAssetId(blockchain: BLOCKCHAIN_NAME, address: string | Address): string {
-    return blockchain + '__' + (typeof address === 'string' ? address : address.toRaw());
+    return blockchain + '__' + (typeof address === 'string' ? address : address.toRawString());
 }
 
 export function isBasicAsset(value: object): value is BasicAsset {

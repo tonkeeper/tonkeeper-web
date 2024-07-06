@@ -37,8 +37,8 @@ export interface BlockchainConfig79 {
 /**
  * Check if a given object implements the BlockchainConfig79 interface.
  */
-export function instanceOfBlockchainConfig79(value: object): boolean {
-    if (!('jettonBridgeParams' in value)) return false;
+export function instanceOfBlockchainConfig79(value: object): value is BlockchainConfig79 {
+    if (!('jettonBridgeParams' in value) || value['jettonBridgeParams'] === undefined) return false;
     return true;
 }
 

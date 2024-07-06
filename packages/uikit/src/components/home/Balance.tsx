@@ -89,6 +89,15 @@ const Label = () => {
                     </Badge>
                 </>
             );
+        case 'keystone':
+            return (
+                <>
+                    {' '}
+                    <Badge display="inline-block" color="accentGreen">
+                        Keystone
+                    </Badge>
+                </>
+            );
         default:
             return <></>;
     }

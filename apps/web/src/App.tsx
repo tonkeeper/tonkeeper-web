@@ -56,6 +56,7 @@ const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
+const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
@@ -76,12 +77,16 @@ const SendNftNotification = React.lazy(
 const PairSignerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
 );
+const PairKeystoneNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
+);
 const SignerLinkPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/signer/LinkPage'));
 const SignerPublishNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/pages/signer/PublishNotification')
 );
 
 const ConnectLedgerNotification = React.lazy(() => import("@tonkeeper/uikit/dist/components/ConnectLedgerNotification"));
+const SwapMobileNotification = React.lazy(() => import("@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification"));
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -185,12 +190,12 @@ export const Loader: FC = () => {
     const { data: account } = useAccountState();
     const { data: auth } = useAuthState();
 
-    const tonendpoint = useTonendpoint(
-        TARGET_ENV,
-        sdk.version,
-        activeWallet?.network,
-        activeWallet?.lang
-    );
+    const tonendpoint = useTonendpoint({
+          targetEnv: TARGET_ENV,
+          build: sdk.version,
+          network: activeWallet?.network,
+          lang: activeWallet?.lang
+    });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
@@ -347,6 +352,11 @@ export const Content: FC<{
                             }
                         />
                     </Route>
+                    <Route path={AppRoute.swap} element={
+                        <Suspense fallback={null}>
+                            <SwapPage />
+                        </Suspense>
+                    } />
                     <Route
                         path="*"
                         element={
@@ -374,6 +384,8 @@ export const Content: FC<{
                     <PairSignerNotification />
                     <SignerPublishNotification />
                     <ConnectLedgerNotification />
+                    <SwapMobileNotification />
+                    <PairKeystoneNotification />
                 </Suspense>
             </WalletStateContext.Provider>
         </Wrapper>

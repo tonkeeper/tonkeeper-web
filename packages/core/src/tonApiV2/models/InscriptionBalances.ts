@@ -37,8 +37,8 @@ export interface InscriptionBalances {
 /**
  * Check if a given object implements the InscriptionBalances interface.
  */
-export function instanceOfInscriptionBalances(value: object): boolean {
-    if (!('inscriptions' in value)) return false;
+export function instanceOfInscriptionBalances(value: object): value is InscriptionBalances {
+    if (!('inscriptions' in value) || value['inscriptions'] === undefined) return false;
     return true;
 }
 

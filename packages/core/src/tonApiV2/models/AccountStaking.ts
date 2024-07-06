@@ -37,8 +37,8 @@ export interface AccountStaking {
 /**
  * Check if a given object implements the AccountStaking interface.
  */
-export function instanceOfAccountStaking(value: object): boolean {
-    if (!('pools' in value)) return false;
+export function instanceOfAccountStaking(value: object): value is AccountStaking {
+    if (!('pools' in value) || value['pools'] === undefined) return false;
     return true;
 }
 

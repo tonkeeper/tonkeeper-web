@@ -26,7 +26,9 @@ import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useFetchFilteredActivity } from '../../state/activity';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
 import { getMixedActivity } from '../../state/mixedActivity';
-import { useIsStonfiAsset, useStonfiSwapLink } from '../../state/stonfi';
+import { useSwapFromAsset } from '../../state/swap/useSwapForm';
+import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -71,8 +73,18 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
 
     const { data: buy } = useTonendpointBuyMethods();
     const canBuy = token === CryptoCurrency.TON;
-    const { data: canSwap } = useIsStonfiAsset(token);
-    const swapLink = useStonfiSwapLink(canSwap ? token : undefined);
+    const { data: swapAssets } = useAllSwapAssets();
+
+    const currentAssetAddress = tonAssetAddressFromString(token);
+    const swapAsset = swapAssets?.find(a => eqAddresses(a.address, currentAssetAddress));
+
+    const [_, setSwapFromAsset] = useSwapFromAsset();
+    const navigate = useNavigate();
+
+    const onSwap = () => {
+        setSwapFromAsset(swapAsset!);
+        navigate(AppRoute.swap);
+    };
 
     const sdk = useAppSdk();
     return (
@@ -104,8 +116,8 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     <ArrowDownIcon />
                     {t('wallet_receive')}
                 </ButtonStyled>
-                {canSwap && (
-                    <ButtonStyled size="small" onClick={() => swapLink && sdk.openPage(swapLink)}>
+                {swapAsset && (
+                    <ButtonStyled size="small" onClick={onSwap}>
                         <SwapIcon />
                         {t('wallet_swap')}
                     </ButtonStyled>

@@ -24,10 +24,34 @@ import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
 import { Body1, H2, Label1 } from '../Text';
 import { Button } from '../fields/Button';
+import { hexToRGBA } from '../../libs/css';
 
-export const Title = styled(H2)<{ secondary?: boolean }>`
+export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     user-select: none;
-    color: ${props => (props.secondary ? props.theme.textSecondary : props.theme.textPrimary)};
+    color: ${props =>
+        props.secondary
+            ? props.theme.textSecondary
+            : props.tertiary
+            ? props.theme.textTertiary
+            : props.theme.textPrimary};
+`;
+
+export const SpamBadge = styled.div`
+    padding: 4px 8px;
+    color: ${p => p.theme.accentOrange};
+    border-radius: ${p => p.theme.corner3xSmall};
+    background-color: ${p => hexToRGBA(p.theme.accentOrange, 0.16)};
+    text-transform: uppercase;
+
+    font-style: normal;
+    font-size: 8.5px;
+    font-weight: 510;
+    line-height: 12px;
+    height: fit-content;
 `;
 
 const Timestamp = styled(Body1)`
