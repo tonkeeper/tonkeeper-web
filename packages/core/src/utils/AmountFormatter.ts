@@ -93,6 +93,16 @@ export class AmountFormatter {
             suffix
         };
 
+        // Custom formatting for numbers with more than 3 decimal zeros
+        if (bn.isGreaterThan(0) && bn.isLessThan('0.001')) {
+            const decimalStr = bn.toFixed(20).split('.')[1];
+            const leadingZeros = decimalStr.match(/^0+/)![0]!.length;
+            if (leadingZeros > 3) {
+                const significantDigits = decimalStr.slice(leadingZeros, leadingZeros + decimals);
+                return `${prefix}0${decimalSeparator}0{${leadingZeros}}${significantDigits}${suffix}`;
+            }
+        }
+
         // truncate decimals 1.00 -> 1
         if (!options.ignoreZeroTruncate && bn.isLessThan('0.01')) {
             bn = bn.decimalPlaces(new BigNumber(decimals).toNumber(), BigNumber.ROUND_DOWN);
