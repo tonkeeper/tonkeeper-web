@@ -35,6 +35,8 @@ const walletVersionText = (version: WalletVersion) => {
         case WalletVersion.V4R2:
             return 'v4r2';
         case WalletVersion.V5beta:
+            return 'v5beta';
+        case WalletVersion.V5R1:
             return 'v5r1';
         default:
             return String(version);
