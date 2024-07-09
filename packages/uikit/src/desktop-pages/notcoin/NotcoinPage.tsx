@@ -21,7 +21,7 @@ import { delay, formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { FC, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { NotCoinIcon, SpinnerIcon } from '../../components/Icon';
-import { SkeletonList } from '../../components/Skeleton';
+import { SkeletonListWithImages } from '../../components/Skeleton';
 import { Body1, Body2, Label2 } from '../../components/Text';
 import { ImportNotification } from '../../components/create/ImportNotification';
 import {
@@ -328,7 +328,7 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
     };
 
     if (!data) {
-        return <SkeletonList size={3} fullWidth />;
+        return <SkeletonListWithImages size={3} fullWidth />;
     }
 
     if (ok) {

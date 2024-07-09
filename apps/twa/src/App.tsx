@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { DeprecatedWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { WalletState } from "@tonkeeper/core/dist/entries/wallet";
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -21,7 +20,6 @@ import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader
 import {
     AppContext,
     IAppContext,
-    WalletStateContext
 } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
@@ -37,10 +35,8 @@ import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
-import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
+import { useActiveWalletQuery, useWalletsStateQuery } from "@tonkeeper/uikit/dist/state/wallet";
 import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
@@ -59,6 +55,7 @@ import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
 import { useUserFiat } from "@tonkeeper/uikit/dist/state/fiat";
+import { useUserLanguage } from "@tonkeeper/uikit/dist/state/language";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -211,27 +208,27 @@ const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
 };
 
 export const Loader: FC<{ sdk: IAppSdk }> = ({ sdk }) => {
-    const { data: activeWallet } = useActiveWallet();
+    const { data: activeWallet, isLoading: activeWalletLoading } = useActiveWalletQuery();
+    const { data: wallets, isLoading: isWalletsLoading } = useWalletsStateQuery();
+    const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const webApp = useWebApp();
     const { data: fiat } = useUserFiat();
 
     const lock = useLock(sdk);
-    const { data: account } = useAccountState();
-    const { data: auth } = useAuthState();
 
     const tonendpoint = useTonendpoint({
        targetEnv: TARGET_ENV,
        build: sdk.version,
        network: activeWallet?.network,
-       lang: activeWallet?.lang
+       lang
 }
     );
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
-    const { data: tracker } = useAnalytics(account, activeWallet);
+    const { data: tracker } = useAnalytics(activeWallet || undefined, wallets);
 
-    if (auth === undefined || account === undefined || config === undefined || lock === undefined || fiat === undefined) {
+    if (isWalletsLoading || activeWalletLoading || isLangLoading || config === undefined || lock === undefined || fiat === undefined) {
         return <Loading />;
     }
 
@@ -302,7 +299,7 @@ const InitPages = () => {
         <InitWrapper>
             <Suspense fallback={<Loading />}>
                 <Routes>
-                    <Route path={any(AppRoute.import)} element={<ImportRouter listOfAuth={[]} />} />
+                    <Route path={any(AppRoute.import)} element={<ImportRouter />} />
                     <Route path="*" element={<Initialize />} />
                 </Routes>
             </Suspense>
@@ -311,7 +308,7 @@ const InitPages = () => {
 };
 
 const Content: FC<{
-    activeWallet?: DeprecatedWalletState | null;
+    activeWallet?: WalletState | null;
     lock: boolean;
     showQrScan: boolean;
 }> = ({ activeWallet, lock, showQrScan }) => {
@@ -331,11 +328,7 @@ const Content: FC<{
         return <InitPages />;
     }
 
-    return (
-        <WalletStateContext.Provider value={activeWallet}>
-            <MainPages showQrScan={showQrScan} />
-        </WalletStateContext.Provider>
-    );
+    return <MainPages showQrScan={showQrScan} />
 };
 
 const TwaNotification: FC<PropsWithChildren> = ({ children }) => {

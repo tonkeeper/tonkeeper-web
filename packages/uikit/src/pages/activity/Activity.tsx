@@ -3,7 +3,7 @@ import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, Suspense, useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
-import { ActivitySkeletonPage, SkeletonList } from '../../components/Skeleton';
+import { ActivitySkeletonPage, SkeletonListWithImages } from '../../components/Skeleton';
 import { MixedActivityGroup } from '../../components/activity/ActivityGroup';
 
 import { useAppContext } from '../../hooks/appContext';
@@ -82,7 +82,7 @@ const Activity: FC = () => {
             <ActivityHeader />
             <InnerBody ref={ref}>
                 <MixedActivityGroup items={activity} />
-                {isFetchingNextPage && <SkeletonList size={3} />}
+                {isFetchingNextPage && <SkeletonListWithImages size={3} />}
             </InnerBody>
         </>
     );

@@ -1,6 +1,6 @@
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { AmountFormatter } from '@tonkeeper/core/dist/utils/AmountFormatter';
-import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { formatDecimals, shiftedDecimals } from "@tonkeeper/core/dist/utils/balance";
 import { getDecimalSeparator, getGroupSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import BigNumber from 'bignumber.js';
 import { useCallback, useMemo } from 'react';
@@ -11,6 +11,10 @@ export const formatter = new AmountFormatter({
         groupingSeparator: getGroupSeparator()
     })
 });
+
+export const toFormattedTonBalance = (weiBalance: number) => {
+    return formatter.format(shiftedDecimals(weiBalance, 9));
+};
 
 export const useCoinFullBalance = (balance: number | string, decimals: string | number = 9) => {
     return useMemo(

@@ -7,11 +7,12 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useDateFormat } from '../../hooks/dateFormat';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveWallet, useNftDNSExpirationDate, useNftItemData } from '../../state/wallet';
+import { useActiveWallet } from '../../state/wallet';
 import { SpinnerIcon } from '../Icon';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Body1, H3, Label1 } from '../Text';
 import { NFTKind } from './NftAction';
+import { useNftDNSExpirationDate, useNftItemData } from "../../state/nft";
 
 const Block = styled.div`
     width: 100%;

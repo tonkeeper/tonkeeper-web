@@ -106,7 +106,7 @@ export const tonConnectTransaction = async (
     );
   }
 
-  await walletsStorage(storage).setActiveWalletId(connection.wallet.active.rawAddress);
+  await walletsStorage(storage).setActiveWalletId(connection.wallet.rawAddress);
   await delay(200);
 
   await cancelOpenedNotification();

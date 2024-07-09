@@ -9,10 +9,6 @@ export type AuthState =
     | AuthLedger
     | AuthKeystone;
 
-export interface AuthNone {
-    kind: 'none';
-}
-
 export interface AuthPassword {
     kind: 'password';
     encryptedMnemonic: string;
@@ -20,6 +16,9 @@ export interface AuthPassword {
 
 export interface AuthKeychain {
     kind: 'keychain';
+
+    // currently eq to publicKey
+    keychainStoreKey: string;
 }
 
 export interface AuthSigner {
@@ -47,13 +46,11 @@ export interface WebAuthn {
     transports?: AuthenticatorTransport[];
 }
 
-export const defaultAuthState: DeprecatedAuthState = { kind: 'none' };
-
 /**
  * @deprecated
  */
 export type DeprecatedAuthState =
-    | AuthNone
+    | DeprecatedAuthNone
     | DeprecatedAuthPassword
     | WebAuthn
     | DeprecatedKeychainPassword
@@ -62,10 +59,23 @@ export type DeprecatedAuthState =
     | AuthLedger
     | AuthKeystone;
 
+/**
+ * @deprecated
+ */
+export interface DeprecatedAuthNone {
+    kind: 'none';
+}
+
+/**
+ * @deprecated
+ */
 export interface DeprecatedAuthPassword {
     kind: 'password';
 }
 
+/**
+ * @deprecated
+ */
 export interface DeprecatedKeychainPassword {
     kind: 'keychain';
 }

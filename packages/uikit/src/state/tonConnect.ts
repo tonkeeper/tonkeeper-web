@@ -28,7 +28,6 @@ import { signTonConnectOver } from './mnemonic';
 import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
 import { isStandardTonWallet, StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useActiveWallet, useWalletsState } from './wallet';
 
 export const useAppTonConnectConnections = () => {
@@ -174,12 +173,9 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
         } else {
             connectionsToDisconnect = (
                 await Promise.all(
-                    wallets.filter(isStandardTonWallet).map(w =>
-                        disconnectFromWallet(sdk.storage, connection, {
-                            publicKey: w.publicKey,
-                            network: Network.MAINNET
-                        })
-                    )
+                    wallets
+                        .filter(isStandardTonWallet)
+                        .map(w => disconnectFromWallet(sdk.storage, connection, w))
                 )
             ).flat();
         }
@@ -203,7 +199,7 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
 const disconnectFromWallet = async (
     storage: IStorage,
     connection: AccountConnection | 'all',
-    wallet: Pick<StandardTonWalletState, 'publicKey' | 'network'>
+    wallet: Pick<StandardTonWalletState, 'publicKey' | 'id' | 'network'>
 ) => {
     let connections = await getAccountConnection(storage, wallet);
     const connectionsToDisconnect = connection === 'all' ? connections : [connection];

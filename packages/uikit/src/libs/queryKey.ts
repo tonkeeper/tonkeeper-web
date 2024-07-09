@@ -21,6 +21,7 @@ export enum QueryKey {
     syncDate = 'syncDate',
     analytics = 'analytics',
     language = 'language',
+    walletVersions = 'walletVersions',
 
     tonConnectConnection = 'tonConnectConnection',
     tonConnectLastEventId = 'tonConnectLastEventId',

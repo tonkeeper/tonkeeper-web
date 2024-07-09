@@ -104,8 +104,10 @@ export class WalletsStorage {
         const state = await this.getWallets();
         const activeWalletId = await this.getActiveWalletId();
 
+        const newState = state.filter(w => w.id !== id);
+
         if (activeWalletId === id) {
-            await this.setActiveWalletId(state[0]?.id || null);
+            await this.setActiveWalletId(newState[0]?.id || null);
         }
 
         await this.storage.set(
@@ -172,6 +174,11 @@ async function migrateToWalletState(storage: IStorage): Promise<WalletsState | n
                 auth = {
                     kind: walletAuth.kind,
                     encryptedMnemonic
+                };
+            } else if (walletAuth.kind === 'keychain') {
+                auth = {
+                    kind: 'keychain',
+                    keychainStoreKey: w.publicKey
                 };
             } else {
                 auth = walletAuth;

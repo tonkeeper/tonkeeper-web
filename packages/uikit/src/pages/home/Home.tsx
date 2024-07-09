@@ -9,7 +9,8 @@ import { TabsView } from '../../components/home/TabsView';
 import { HomeActions } from '../../components/home/TonActions';
 import { useAssets } from '../../state/home';
 import { usePreFetchRates } from '../../state/rates';
-import { useWalletFilteredNftList } from '../../state/wallet';
+
+import { useWalletFilteredNftList } from "../../state/nft";
 
 const HomeAssets: FC<{
     assets: AssetData;

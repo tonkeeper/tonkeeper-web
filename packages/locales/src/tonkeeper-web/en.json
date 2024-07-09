@@ -1,6 +1,7 @@
 {
   "about_tonkeeper_pro" : "About Tonkeeper Pro",
   "actionTitle" : "Open the wallet",
+  "add" : "Add",
   "add_dns_address" : "Add wallet address that domain %1% will link to.",
   "all_assets_jettons" : "All Assets",
   "appExtensionDescription" : "Your extension wallet on The Open Network",
@@ -131,6 +132,7 @@
   "nft_on_sale_text" : "NFT is on sale at the marketplace now.\nFor transfer, you should remove it from sale first.",
   "no_connected_apps" : "No connected apps",
   "Old_password" : "Current password",
+  "open" : "Open",
   "operation_not_supported" : "The operation is not available for this wallets. Select another wallet and try again.",
   "page_header_history" : "History",
   "page_header_purchases" : "Purchases",
@@ -227,5 +229,6 @@
   "wallet_aside_tokens" : "Tokens",
   "wallet_multi_send" : "Multi Send",
   "Wallet_name" : "Wallet name",
-  "wallet_sell" : "Sell"
+  "wallet_sell" : "Sell",
+  "wallet_version_and_tokens" : ", tokens"
 }

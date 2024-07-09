@@ -16,13 +16,13 @@ const RenameWalletContent: FC<{
 }> = ({ animationTime, afterClose, wallet }) => {
     const { t } = useTranslation();
 
-    const { mutateAsync, isLoading, isError } = useMutateRenameWallet(wallet);
+    const { mutateAsync, isLoading, isError } = useMutateRenameWallet();
 
     const [name, setName] = useState(wallet.name ?? '');
     const [emoji, setEmoji] = useState(wallet.emoji ?? '');
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
-        await mutateAsync({ name, emoji });
+        await mutateAsync({ id: wallet.id, name, emoji });
         afterClose(() => null);
     };
 

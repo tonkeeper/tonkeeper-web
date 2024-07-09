@@ -27,7 +27,7 @@ import {
     NotificationHeaderPortal,
     NotificationTitleRow
 } from '../Notification';
-import { SkeletonList } from '../Skeleton';
+import { SkeletonListWithImages } from '../Skeleton';
 import { Body2, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
@@ -93,7 +93,7 @@ const NotificationSkeleton: FC<{ handleClose: (result?: string) => void }> = ({ 
 
     return (
         <NotificationBlock>
-            <SkeletonList size={3} margin fullWidth />
+            <SkeletonListWithImages size={3} margin fullWidth />
             <ButtonGap />
             <NotificationFooterPortal>
                 <NotificationFooter>

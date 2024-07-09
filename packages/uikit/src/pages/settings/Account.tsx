@@ -14,7 +14,7 @@ import { DropDown } from '../../components/DropDown';
 import { EllipsisIcon, ReorderIcon } from '../../components/Icon';
 import { ColumnText, Divider } from '../../components/Layout';
 import { ListBlock, ListItem, ListItemElement, ListItemPayload } from '../../components/List';
-import { SkeletonListPayload } from '../../components/Skeleton';
+import { SkeletonListPayloadWithImage } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { Label1 } from '../../components/Text';
 import { ImportNotification } from '../../components/create/ImportNotification';
@@ -56,7 +56,7 @@ const WalletRow: FC<{
     const [remove, setRemove] = useState<boolean>(false);
 
     if (!wallet) {
-        return <SkeletonListPayload />;
+        return <SkeletonListPayloadWithImage />;
     }
 
     const address = formatAddress(wallet.rawAddress, wallet.network);

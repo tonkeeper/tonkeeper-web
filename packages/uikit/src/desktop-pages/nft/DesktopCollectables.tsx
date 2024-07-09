@@ -1,5 +1,4 @@
 import { NftsList } from '../../components/nft/Nfts';
-import { useWalletFilteredNftList } from '../../state/wallet';
 import styled from 'styled-components';
 import { Body2, Label2 } from '../../components/Text';
 import { Button } from '../../components/fields/Button';
@@ -15,6 +14,7 @@ import { KnownNFTDnsCollections } from '../../components/nft/NftView';
 import { useMemo } from 'react';
 import { SlidersIcon } from '../../components/Icon';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
+import { useWalletFilteredNftList } from "../../state/nft";
 
 const gap = '10px';
 const maxColumnsNumber = 4;

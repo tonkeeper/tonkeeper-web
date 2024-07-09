@@ -16,7 +16,8 @@ import {
     WalletsIcon
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
-import { useActiveWallet, useWalletNftList, useWalletsState } from "../../state/wallet";
+import { useActiveWallet, useWalletsState } from "../../state/wallet";
+import { useWalletNftList } from "../../state/nft";
 
 const SingleAccountSettings = () => {
     const [logout, setLogout] = useState(false);

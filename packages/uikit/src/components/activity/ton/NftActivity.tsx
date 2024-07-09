@@ -5,7 +5,7 @@ import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
-import { useActiveWallet, useNftItemData } from '../../../state/wallet';
+import { useActiveWallet } from '../../../state/wallet';
 import { InfoCircleIcon, VerificationIcon } from '../../Icon';
 import { ListBlock } from '../../List';
 import { Body1, Body2 } from '../../Text';
@@ -40,11 +40,11 @@ import { ActionData } from './ActivityNotification';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { UnverifiedNftNotification } from '../../nft/UnverifiedNftNotification';
 import {
-    useIsSpamNft,
-    useIsUnverifiedNft,
-    useMarkNftAsSpam,
-    useMarkNftAsTrusted
-} from '../../../state/nft';
+  useIsSpamNft,
+  useIsUnverifiedNft,
+  useMarkNftAsSpam,
+  useMarkNftAsTrusted, useNftItemData
+} from "../../../state/nft";
 
 const NftBlock = styled.div`
     background: ${props => props.theme.backgroundContentTint};

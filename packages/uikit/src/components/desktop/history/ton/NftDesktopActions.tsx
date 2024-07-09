@@ -11,7 +11,7 @@ import {
     ErrorRow,
     HistoryCellActionGeneric
 } from './HistoryCell';
-import { useActiveWallet, useNftCollectionData, useNftItemData } from '../../../../state/wallet';
+import { useActiveWallet } from '../../../../state/wallet';
 import styled, { css } from 'styled-components';
 import { Body2 } from '../../../Text';
 import { Skeleton } from '../../../shared/Skeleton';
@@ -19,7 +19,7 @@ import { useFormatCoinValue } from '../../../../hooks/balance';
 import { ChevronRightIcon, CoinsIcon } from '../../../Icon';
 import { useTranslation } from '../../../../hooks/translation';
 import { ContractDeployIcon } from '../../../activity/ActivityIcons';
-import { useIsSpamNft, useIsUnverifiedNft } from '../../../../state/nft';
+import { useIsSpamNft, useIsUnverifiedNft, useNftCollectionData, useNftItemData } from "../../../../state/nft";
 
 const NftImage = styled.img<{ isUnverified?: boolean }>`
     width: 20px;

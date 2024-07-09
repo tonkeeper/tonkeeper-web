@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { DeprecatedAccountState } from '@tonkeeper/core/dist/entries/account';
-import { DeprecatedWalletState, WalletsState, WalletState } from "@tonkeeper/core/dist/entries/wallet";
+import { WalletsState, WalletState } from "@tonkeeper/core/dist/entries/wallet";
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { Amplitude } from '@tonkeeper/uikit/dist/hooks/analytics/amplitude';

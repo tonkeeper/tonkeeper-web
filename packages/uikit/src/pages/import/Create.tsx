@@ -1,6 +1,5 @@
 import { mnemonicNew } from '@ton/crypto';
-import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { FC, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IconPage } from '../../components/Layout';
 import { CreateAuthState } from '../../components/create/CreateAuth';
 import { UpdateWalletName } from '../../components/create/WalletName';
@@ -13,29 +12,30 @@ import {
 } from '../../components/lottie/LottieIcons';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { FinalView, useAddWalletMutation } from './Password';
+import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
-import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { useWalletsState } from '../../state/wallet';
+import { defaultWalletVersion, StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { useCreateStandardTonWalletsByMnemonic, useWalletsState } from '../../state/wallet';
 
-const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
+const Create = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const {
-        mutateAsync: checkPasswordAndCreateWalletAsync,
-        isLoading: isConfirmLoading,
-        reset
-    } = useAddWalletMutation();
+        mutateAsync: createWalletsAsync,
+        isLoading: isCreateWalletLoading,
+        reset: resetCreateWallets
+    } = useCreateStandardTonWalletsByMnemonic();
 
     const existingWallets = useWalletsState();
-    const [mnemonic, setMnemonic] = useState<string[]>([]);
+    const [mnemonic, setMnemonic] = useState<string[] | undefined>();
     const [wallet, setWallet] = useState<StandardTonWalletState | undefined>(undefined);
 
     const [create, setCreate] = useState(false);
     const [open, setOpen] = useState(false);
     const [check, setCheck] = useState(false);
     const [checked, setChecked] = useState(false);
-    const [hasPassword, setHasPassword] = useState(false);
+    const [createdPassword, setCreatedPassword] = useState<string | undefined>();
+    const [passName, setPassName] = useState(false);
     const [passNotifications, setPassNotification] = useState(false);
 
     useEffect(() => {
@@ -45,14 +45,31 @@ const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
     }, []);
 
     useEffect(() => {
-        if (mnemonic.length) {
+        if (mnemonic) {
             setTimeout(() => {
                 setCreate(true);
             }, 1500);
         }
     }, [mnemonic]);
 
-    if (mnemonic.length === 0) {
+    const authExists = createdPassword || existingWallets.length >= 1;
+
+    useEffect(() => {
+        if (authExists && mnemonic && checked) {
+            createWalletsAsync({
+                mnemonic,
+                password: createdPassword,
+                versions: [defaultWalletVersion],
+                activateFirstWallet: true
+            }).then(result => {
+                setWallet(result[0]);
+            });
+        }
+
+        return resetCreateWallets;
+    }, [authExists, createdPassword, mnemonic, checked, createWalletsAsync]);
+
+    if (!mnemonic) {
         return <IconPage icon={<GearLottieIcon />} title={t('create_wallet_generating')} />;
     }
 
@@ -91,52 +108,55 @@ const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
             <Check
                 mnemonic={mnemonic}
                 onBack={() => setCheck(false)}
-                onConfirm={() =>
-                    checkPasswordAndCreateWalletAsync({
-                        mnemonic,
-                        supportedAuthTypes: listOfAuth
-                    }).then(state => {
-                        setChecked(true);
-                        if (state === false) {
-                            setHasPassword(false);
-                        } else {
-                            setHasPassword(true);
-                            setWallet(state);
-                        }
-                    })
-                }
-                isLoading={isConfirmLoading}
+                onConfirm={() => setChecked(true)}
+                isLoading={isCreateWalletLoading}
             />
         );
     }
 
-    if (!hasPassword) {
-        return (
-            <CreateAuthState
-                afterCreate={(password?: string) => {
-                    reset();
-                    checkPasswordAndCreateWalletAsync({ mnemonic, password }).then(state => {
-                        if (state !== false) {
-                            setHasPassword(true);
-                            setWallet(state);
-                        }
-                    });
-                }}
-                isLoading={isConfirmLoading}
-            />
-        );
+    if (authExists) {
+        if (!wallet) {
+            return (
+                <Check
+                    mnemonic={mnemonic}
+                    onBack={() => setCheck(false)}
+                    onConfirm={() => setChecked(true)}
+                    isLoading={isCreateWalletLoading}
+                />
+            );
+        }
+    } else {
+        if (!checked) {
+            return (
+                <Check
+                    mnemonic={mnemonic}
+                    onBack={() => setCheck(false)}
+                    onConfirm={() => setChecked(true)}
+                />
+            );
+        }
+
+        if (!wallet) {
+            return (
+                <CreateAuthState
+                    afterCreate={setCreatedPassword}
+                    isLoading={isCreateWalletLoading}
+                />
+            );
+        }
     }
 
-    if (wallet && existingWallets.length > 1) {
+    if (existingWallets.length > 1 && !passName) {
         return (
             <UpdateWalletName
                 name={wallet.name}
-                submitHandler={val =>
+                submitHandler={val => {
                     setWallet(w => ({
                         ...w!,
                         ...val
-                    }))
-                }
+                    }));
+                    setPassName(true);
+                }}
                 walletEmoji={wallet.emoji}
             />
         );

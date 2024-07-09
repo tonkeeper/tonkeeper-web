@@ -150,6 +150,15 @@ export const getMnemonic = async (
     walletId: string,
     checkTouchId: () => Promise<void>
 ): Promise<string[]> => {
+    const { mnemonic } = await getMnemonicAndPassword(sdk, walletId, checkTouchId);
+    return mnemonic;
+};
+
+export const getMnemonicAndPassword = async (
+    sdk: IAppSdk,
+    walletId: string,
+    checkTouchId: () => Promise<void>
+): Promise<{ mnemonic: string[]; password?: string }> => {
     const wallet = await walletsStorage(sdk.storage).getWallet(walletId);
     if (!wallet || !('auth' in wallet)) {
         throw new Error('Unexpected auth method for wallet');
@@ -158,7 +167,14 @@ export const getMnemonic = async (
     switch (wallet.auth.kind) {
         case 'password': {
             const password = await getPasswordByNotification(sdk);
-            return decryptWalletMnemonic(wallet as WalletState & { auth: AuthPassword }, password);
+            const mnemonic = await decryptWalletMnemonic(
+                wallet as WalletState & { auth: AuthPassword },
+                password
+            );
+            return {
+                password,
+                mnemonic
+            };
         }
         case 'keychain': {
             if (!sdk.keychain) {
@@ -170,8 +186,8 @@ export const getMnemonic = async (
                 throw new Error('Unexpected auth method for wallet, keychain');
             }
 
-            const mnemonic = await sdk.keychain.getPassword(wallet.publicKey);
-            return mnemonic.split(' ');
+            const mnemonic = await sdk.keychain.getPassword(wallet.auth.keychainStoreKey);
+            return { mnemonic: mnemonic.split(' ') };
         }
         default:
             throw new Error('Unexpected auth method');

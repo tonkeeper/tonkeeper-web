@@ -2,11 +2,10 @@ import { IAppSdk } from '../AppSdk';
 import { APIConfig } from '../entries/apis';
 import { BLOCKCHAIN_NAME } from '../entries/crypto';
 import { FavoriteSuggestion, LatestSuggestion } from '../entries/suggestion';
-import { DeprecatedWalletState, StandardTonWalletState, TonWalletState } from '../entries/wallet';
+import { StandardTonWalletState, TonWalletState } from '../entries/wallet';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { AccountsApi } from '../tonApiV2';
-import { TronApi } from '../tronApi';
 
 export const getHiddenSuggestions = async (storage: IStorage, publicKey: string) => {
     const result = await storage.get<string[]>(`${AppKey.HIDDEN_SUGGESTIONS}_${publicKey}`);
@@ -42,7 +41,7 @@ export const deleteFavoriteSuggestion = async (
     storage.set(`${AppKey.FAVOURITES}_${publicKey}`, items);
 };
 
-const getTronSuggestionsList = async (
+/*const getTronSuggestionsList = async (
     api: APIConfig,
     wallet: DeprecatedWalletState,
     seeIfAddressIsAdded: (list: LatestSuggestion[], address: string) => boolean
@@ -70,7 +69,7 @@ const getTronSuggestionsList = async (
     }
 
     return list;
-};
+};*/
 
 const getTonSuggestionsList = async (
     api: APIConfig,

@@ -17,12 +17,11 @@ import { useNativeBackButton } from '../../components/BackButton';
 import { SpinnerIcon } from '../../components/Icon';
 import { ListBlock, ListItem } from '../../components/List';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
-import { formatter } from '../../hooks/balance';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { Checkbox } from '../../components/fields/Checkbox';
 import { LedgerConnectionSteps } from '../../components/ledger/LedgerConnectionSteps';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { getFallbackWalletEmoji } from '@tonkeeper/core/dist/service/walletService';
+import { toFormattedTonBalance } from "../../hooks/balance";
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;
@@ -174,10 +173,6 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
         return `${userFriendlyAddress.slice(0, 8)}...${userFriendlyAddress.slice(-8)}`;
     };
 
-    const toFormattedBalance = (weiBalance: number) => {
-        return formatter.format(shiftedDecimals(weiBalance, 9));
-    };
-
     const onAdd = () => {
         const chosenIndexes = Object.entries(selectedIndexes)
             .filter(([, v]) => v)
@@ -216,7 +211,7 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
                                 <Dot>·</Dot>
                                 &nbsp;
                                 <Body2Secondary>
-                                    {toFormattedBalance(account.balance)}&nbsp;TON
+                                    {toFormattedTonBalance(account.balance)}&nbsp;TON
                                 </Body2Secondary>
                                 <CheckboxStyled
                                     checked={selectedIndexes[account.accountIndex]}

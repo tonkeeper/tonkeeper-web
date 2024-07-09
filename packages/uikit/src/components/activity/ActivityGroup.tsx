@@ -4,7 +4,7 @@ import { TronEvents } from '@tonkeeper/core/dist/tronApi';
 import React, { FC, useMemo, useState } from 'react';
 import { GenericActivityGroup } from '../../state/activity';
 import { MixedActivity, getMixedActivityGroups } from '../../state/mixedActivity';
-import { CoinHistorySkeleton, HistoryBlock, SkeletonList } from '../Skeleton';
+import { CoinHistorySkeleton, HistoryBlock, SkeletonListWithImages } from '../Skeleton';
 import { ActivityBlock } from './ActivityLayout';
 import { ActionData, ActivityNotification } from './ton/ActivityNotification';
 import { TonActivityEvents } from './ton/TonActivityEvents';
@@ -27,7 +27,7 @@ export const ActivityList: FC<{
     return (
         <HistoryBlock>
             <MixedActivityGroup items={activity} />
-            {isFetchingNextPage && <SkeletonList size={3} />}
+            {isFetchingNextPage && <SkeletonListWithImages size={3} />}
         </HistoryBlock>
     );
 };

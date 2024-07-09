@@ -13,7 +13,7 @@ import { InnerBody } from '../../components/Body';
 import { InvisibleIcon, PinIcon, ReorderIcon, VisibleIcon } from '../../components/Icon';
 import { ColumnText } from '../../components/Layout';
 import { ListBlock, ListItemElement, ListItemPayload } from '../../components/List';
-import { SkeletonList } from '../../components/Skeleton';
+import { SkeletonListWithImages } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { H3 } from '../../components/Text';
 import { useCoinFullBalance } from '../../hooks/balance';
@@ -222,7 +222,7 @@ const JettonSkeleton = () => {
         <>
             <SubHeader title={t('settings_jettons_list')} />
             <InnerBody>
-                <SkeletonList size={5} />
+                <SkeletonListWithImages size={5} />
             </InnerBody>
         </>
     );

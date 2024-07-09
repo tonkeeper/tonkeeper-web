@@ -2,7 +2,7 @@ import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import React, { FC, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveWalletConfig, useNftCollectionData } from '../../state/wallet';
+import { useActiveWalletConfig } from '../../state/wallet';
 import {
     BlockIcon,
     ChevronDownIcon,
@@ -21,7 +21,7 @@ import { NftDetails } from './NftDetails';
 import { Image, NftBlock } from './Nfts';
 import { TrustType } from '@tonkeeper/core/dist/tonApiV2';
 import { Button } from '../fields/Button';
-import { useHideNft, useMarkNftAsSpam, useMarkNftAsTrusted } from '../../state/nft';
+import { useHideNft, useMarkNftAsSpam, useMarkNftAsTrusted, useNftCollectionData } from "../../state/nft";
 import { UnverifiedNftNotification } from './UnverifiedNftNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { DropDown } from '../DropDown';

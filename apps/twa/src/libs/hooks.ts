@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { DeprecatedAccountState } from '@tonkeeper/core/dist/entries/account';
-import { DeprecatedWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { WalletsState, WalletState } from "@tonkeeper/core/dist/entries/wallet";
 import { Analytics, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
@@ -71,16 +70,16 @@ export const useTwaAppViewport = (setAppHeight: boolean) => {
     }, [sdk, viewport]);
 };
 
-export const useAnalytics = (account?: DeprecatedAccountState, wallet?: DeprecatedWalletState | null) => {
+export const useAnalytics = (activeWallet?: WalletState, wallets?: WalletsState,) => {
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
             const tracker = new Gtag(process.env.REACT_APP_MEASUREMENT_ID!);
 
-            tracker.init('Twa', toWalletType(wallet), account, wallet);
+            tracker.init('Twa', toWalletType(activeWallet), activeWallet, wallets);
 
             return tracker;
         },
-        { enabled: account != null }
+      { enabled: wallets != null && activeWallet !== undefined }
     );
 };

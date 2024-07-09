@@ -11,6 +11,7 @@ import { AuthKeychain, AuthPassword } from '../entries/password';
 import {
     StandardTonWalletState,
     TonWalletState,
+    WalletId,
     WalletState,
     WalletVersion,
     WalletVersions
@@ -20,18 +21,33 @@ import { walletContract } from './wallet/contractService';
 import { BLOCKCHAIN_NAME } from '../entries/crypto';
 import { walletsStorage } from './walletsService';
 import { emojis } from '../utils/emojis';
+import { formatAddress } from '../utils/common';
 
-export const createNewStandardTonWalletStateFromMnemonic = async (
+export const createStandardTonWalletStateByMnemonic = async (
     api: APIConfig,
     mnemonic: string[],
-    auth: AuthPassword | AuthKeychain,
-    name?: string
+    options: {
+        version?: WalletVersion;
+        network?: Network;
+        auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+        name?: string;
+    }
 ) => {
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const publicKey = keyPair.publicKey.toString('hex');
 
-    const address = await findWalletAddress(api, publicKey);
+    const address = await findWalletAddress(api, publicKey, options.version, options.network);
+
+    let walletAuth: AuthPassword | AuthKeychain;
+    if (options.auth.kind === 'keychain') {
+        walletAuth = {
+            kind: 'keychain',
+            keychainStoreKey: publicKey
+        };
+    } else {
+        walletAuth = options.auth;
+    }
 
     const state: TonWalletState = {
         blockchain: BLOCKCHAIN_NAME.TON,
@@ -40,9 +56,9 @@ export const createNewStandardTonWalletStateFromMnemonic = async (
         publicKey,
         rawAddress: address.rawAddress,
         version: address.version,
-        name: name || getFallbackWalletName(Address.parse(address.rawAddress).toString()),
+        name: options.name || getFallbackWalletName(Address.parse(address.rawAddress)),
         emoji: getFallbackWalletEmoji(publicKey),
-        auth,
+        auth: walletAuth,
         network: Network.MAINNET
     };
 
@@ -69,8 +85,18 @@ const findWalletVersion = (interfaces?: string[]): WalletVersion => {
 
 const findWalletAddress = async (
     api: APIConfig,
-    publicKey: string
+    publicKey: string,
+    version?: WalletVersion,
+    network?: Network
 ): Promise<{ rawAddress: string; version: WalletVersion }> => {
+    if (version !== undefined) {
+        const parsed = getWalletAddress(publicKey, version, network);
+        return {
+            rawAddress: parsed.address.toRawString(),
+            version
+        };
+    }
+
     try {
         const result = await new WalletApi(api.tonApiV2).getWalletsByPublicKey({
             publicKey: publicKey
@@ -107,10 +133,13 @@ const findWalletAddress = async (
 };
 
 export const getWalletAddress = (
-    publicKey: Buffer,
+    publicKey: Buffer | string,
     version: WalletVersion,
     network?: Network
 ): { address: Address; version: WalletVersion } => {
+    if (typeof publicKey === 'string') {
+        publicKey = Buffer.from(publicKey, 'hex');
+    }
     const { address } = walletContract(publicKey, version, network);
     return {
         address,
@@ -136,9 +165,10 @@ export const getWalletsAddresses = (
 
 export const updateWalletProperty = async (
     storage: IStorage,
-    wallet: TonWalletState,
+    walletId: WalletId,
     props: Partial<Pick<TonWalletState, 'name' | 'network' | 'emoji'>>
 ) => {
+    const wallet = (await walletsStorage(storage).getWallet(walletId))!;
     const updated: WalletState = {
         ...wallet,
         ...props
@@ -257,11 +287,6 @@ export function getFallbackWalletEmoji(publicKey: string) {
     return emojis[index];
 }
 
-export function getFallbackWalletName(friendlyAddress: string | Address) {
-    return (
-        'Wallet ' +
-        (friendlyAddress instanceof Address ? friendlyAddress.toString() : friendlyAddress).slice(
-            -4
-        )
-    );
+export function getFallbackWalletName(address: Address) {
+    return 'Wallet ' + formatAddress(address).slice(-4);
 }

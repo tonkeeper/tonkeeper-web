@@ -22,7 +22,7 @@ import { DropDown } from '../DropDown';
 import { EllipsisIcon, StarIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
-import { SkeletonList } from '../Skeleton';
+import { SkeletonListWithImages } from '../Skeleton';
 import { Label1 } from '../Text';
 import { useSuggestionAddress } from './SuggestionAddress';
 import { useActiveStandardTonWallet } from '../../state/wallet';
@@ -237,7 +237,7 @@ export const SuggestionList: FC<{
         return (
             <>
                 <Label>{t('send_screen_steps_address_suggests_label')}</Label>
-                <SkeletonList size={4} margin={false} fullWidth />
+                <SkeletonListWithImages size={4} margin={false} fullWidth />
             </>
         );
     }

@@ -39,7 +39,7 @@ import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-page
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
-import { AppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
+import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
     AppSdkContext,
@@ -56,7 +56,7 @@ import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
-import { useAuthState, useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
+import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWalletQuery, useWalletsStateQuery } from '@tonkeeper/uikit/dist/state/wallet';
@@ -80,6 +80,7 @@ import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
 import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
+import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -121,7 +122,6 @@ const sdk = new DesktopAppSdk();
 const TARGET_ENV = 'desktop';
 
 const langs = 'en,zh_CN,ru,it,tr';
-const listOfAuth: AuthState['kind'][] = ['keychain'];
 
 declare const REACT_APP_TONCONSOLE_API: string;
 declare const REACT_APP_TG_BOT_ID: string;
@@ -300,7 +300,7 @@ export const Loader: FC = () => {
     }
 
     const network = activeWallet?.network ?? Network.MAINNET;
-    const context = {
+    const context: IAppContext = {
         api: getApiConfig(config, network, REACT_APP_TONCONSOLE_API),
         fiat,
         config,
@@ -347,6 +347,7 @@ export const Content: FC<{
     useAppWidth();
     useTrackLocation();
     usePrefetch();
+    useDebuggingTools();
 
     if (lock) {
         return (
@@ -361,10 +362,7 @@ export const Content: FC<{
             <FullSizeWrapperBounded className="full-size-wrapper">
                 <InitializeContainer fullHeight={false}>
                     <Routes>
-                        <Route
-                            path={any(AppRoute.import)}
-                            element={<ImportRouter listOfAuth={listOfAuth} />}
-                        />
+                        <Route path={any(AppRoute.import)} element={<ImportRouter />} />
                         <Route path="*" element={<Initialize />} />
                     </Routes>
                 </InitializeContainer>

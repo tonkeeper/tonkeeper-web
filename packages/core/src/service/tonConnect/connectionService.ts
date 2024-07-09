@@ -1,6 +1,6 @@
 import { Network } from '../../entries/network';
 import { ConnectRequest, DAppManifest, KeyPair } from '../../entries/tonConnect';
-import { DeprecatedWalletState, StandardTonWalletState } from '../../entries/wallet';
+import { StandardTonWalletState } from '../../entries/wallet';
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
 
@@ -20,23 +20,26 @@ export interface AccountConnection {
 
 export const getAccountConnection = async (
     storage: IStorage,
-    wallet: Pick<StandardTonWalletState, 'publicKey' | 'network'>
+    wallet: Pick<StandardTonWalletState, 'id' | 'network' | 'publicKey'>
 ) => {
-    const result = await storage.get<AccountConnection[]>(
-        `${AppKey.CONNECTIONS}_${wallet.publicKey}_${wallet.network ?? Network.MAINNET}`
+    let result = await storage.get<AccountConnection[]>(
+        `${AppKey.CONNECTIONS}_${wallet.id}_${wallet.network}`
     );
-    return result ?? [];
+
+    if (!result) {
+        result = await migrateAccountConnections(storage, wallet);
+        await setAccountConnection(storage, wallet, result);
+    }
+
+    return result;
 };
 
 export const setAccountConnection = async (
     storage: IStorage,
-    wallet: Pick<DeprecatedWalletState, 'publicKey' | 'network'>, // TODO migrate
+    wallet: Pick<StandardTonWalletState, 'id' | 'network'>,
     items: AccountConnection[]
 ) => {
-    await storage.set(
-        `${AppKey.CONNECTIONS}_${wallet.publicKey}_${wallet.network ?? Network.MAINNET}`,
-        items
-    );
+    await storage.set(`${AppKey.CONNECTIONS}_${wallet.id}_${wallet.network}`, items);
 };
 
 export const saveAccountConnection = async (options: {
@@ -92,3 +95,14 @@ export const disconnectAppConnection = async (options: {
 
     await setAccountConnection(options.storage, options.wallet, connections);
 };
+
+async function migrateAccountConnections(
+    storage: IStorage,
+    wallet: Pick<StandardTonWalletState, 'network' | 'publicKey'>
+) {
+    const oldConnections = await storage.get<AccountConnection[]>(
+        `${AppKey.CONNECTIONS}_${wallet.publicKey}_${wallet.network ?? Network.MAINNET}`
+    );
+
+    return oldConnections ?? [];
+}

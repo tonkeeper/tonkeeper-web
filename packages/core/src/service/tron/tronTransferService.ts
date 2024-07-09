@@ -1,17 +1,14 @@
-import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
-import { toTronAsset } from '../../entries/crypto/asset/constants';
 import { TronAsset } from '../../entries/crypto/asset/tron-asset';
-import { RecipientData, TransferEstimation, TronRecipient } from '../../entries/send';
-import { TronWalletStorage, DeprecatedWalletState } from '../../entries/wallet';
+import { TronRecipient } from '../../entries/send';
+import { TronWalletStorage } from '../../entries/wallet';
 import {
     Configuration,
     EstimatePayload,
     PublishPayload,
     RequestData,
-    TronApi,
-    TronBalances
+    TronApi
 } from '../../tronApi';
 import { hashRequest } from './tronEncoding';
 import { getPrivateKey } from './tronService';
@@ -72,7 +69,7 @@ export async function sendTronTransfer(
     });
 }
 
-async function estimateTronFee({
+/*async function estimateTronFee({
     wallet,
     tronApi,
     address,
@@ -91,8 +88,9 @@ async function estimateTronFee({
     });
 
     return payload.request.fee;
-}
+}*/
 
+/*
 export async function estimateTron({
     recipient,
     amount,
@@ -144,3 +142,4 @@ export async function estimateTron({
 
     return { fee, payload };
 }
+*/

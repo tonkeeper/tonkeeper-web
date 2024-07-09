@@ -8,7 +8,6 @@ import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { usePreFetchRates } from '../../../state/rates';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
-import { useWalletTotalBalance } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, PlusIconSmall } from "../../Icon";
 import { Num2 } from '../../Text';
@@ -18,6 +17,7 @@ import { Link } from 'react-router-dom';
 import { AppProRoute } from '../../../libs/routes';
 import { BuyNotification } from '../../home/BuyAction';
 import { Skeleton } from '../../shared/Skeleton';
+import { useWalletTotalBalance } from "../../../state/asset";
 
 const DesktopHeaderStyled = styled.div`
     padding-left: 1rem;

@@ -1,10 +1,8 @@
 import { hmac_sha512, mnemonicToPrivateKey } from '@ton/crypto';
 import { ethers } from 'ethers';
-import { IStorage } from '../../Storage';
 import { Network } from '../../entries/network';
 import { Factories, TronChain, WalletImplementations } from '../../entries/tron';
-import { TronWalletState, TronWalletStorage, DeprecatedWalletState } from '../../entries/wallet';
-import { Configuration, TronApi } from '../../tronApi';
+import { TronWalletState, TronWalletStorage } from '../../entries/wallet';
 import { calculateCreate2 } from './addressCalculation';
 import { TronAddress } from './tronUtils';
 
@@ -28,7 +26,7 @@ const getOwnerAddress = async (mnemonic: string[]): Promise<string> => {
     return TronAddress.hexToBase58(wallet.address);
 };
 
-export const getTronWallet = async (
+/*export const getTronWallet = async (
     tronApi: Configuration,
     mnemonic: string[],
     wallet: DeprecatedWalletState
@@ -61,7 +59,7 @@ export const importTronWallet = async (
     //  await setWalletState(storage, updated);
 
     return tron;
-};
+};*/
 
 export const getTronWalletState = (tron: TronWalletStorage, network?: Network): TronWalletState => {
     const chainId = network !== Network.TESTNET ? TronChain.MAINNET : TronChain.NILE;

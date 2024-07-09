@@ -19,7 +19,7 @@ import { useTonRecipient } from '../../hooks/blockchain/useTonRecipient';
 import { useTranslation } from '../../hooks/translation';
 import { useNotification } from '../../hooks/useNotification';
 import { useQueryChangeWait } from '../../hooks/useQueryChangeWait';
-import { useActiveWallet, useNftDNSLinkData } from '../../state/wallet';
+import { useActiveWallet } from '../../state/wallet';
 import { ColumnText, Gap } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
 import { Notification, NotificationBlock } from '../Notification';
@@ -38,6 +38,7 @@ import {
     ConfirmViewTitleSlot
 } from '../transfer/ConfirmView';
 import { ConfirmAndCancelMainButton } from '../transfer/common';
+import { useNftDNSLinkData } from "../../state/nft";
 
 export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
     const toast = useToast();

@@ -2,7 +2,7 @@ import React, { FC, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { InnerBody } from './Body';
-import {ActivityHeader, BrowserHeader, SettingsHeader} from './Header';
+import { ActivityHeader, BrowserHeader, SettingsHeader } from './Header';
 import { ActionsRow } from './home/Actions';
 import { BalanceSkeleton } from './home/Balance';
 import { CoinInfoSkeleton } from './jettons/Info';
@@ -11,8 +11,8 @@ import { ListBlock, ListItem, ListItemPayload } from './List';
 import { SubHeader } from './SubHeader';
 import { H3 } from './Text';
 import { SkeletonImage, SkeletonText } from './shared/Skeleton';
-import {randomIntFromInterval} from "../libs/common";
-import {RecommendationsPageBodySkeleton} from "./skeletons/BrowserSkeletons";
+import { randomIntFromInterval } from '../libs/common';
+import { RecommendationsPageBodySkeleton } from './skeletons/BrowserSkeletons';
 
 export const SkeletonSubHeader = React.memo(() => {
     return <SubHeader title={<SkeletonText size="large" />} />;
@@ -41,7 +41,7 @@ const ListItemBlock = styled.div`
     width: 100%;
 `;
 
-export const SkeletonListPayload = React.memo(() => {
+export const SkeletonListPayloadWithImage = React.memo(() => {
     return (
         <ListItemPayload>
             <ListItemBlock>
@@ -55,13 +55,45 @@ export const SkeletonListPayload = React.memo(() => {
     );
 });
 
-export const SkeletonList: FC<{
+export const SkeletonListWithImages: FC<{
     size?: number;
     margin?: boolean;
     fullWidth?: boolean;
 }> = React.memo(({ size = 1, margin, fullWidth }) => {
     return (
         <ListBlock margin={margin} fullWidth={fullWidth}>
+            {Array(size)
+                .fill(null)
+                .map((_, index) => (
+                    <ListItem key={index} hover={false}>
+                        <SkeletonListPayloadWithImage />
+                    </ListItem>
+                ))}
+        </ListBlock>
+    );
+});
+
+export const SkeletonListPayload = React.memo(() => {
+    return (
+        <ListItemPayload>
+            <ListItemBlock>
+                <ColumnText
+                    text={<SkeletonText width={randomIntFromInterval(30, 300) + 'px'} />}
+                    secondary={<SkeletonText size="small" width="40px" />}
+                ></ColumnText>
+            </ListItemBlock>
+        </ListItemPayload>
+    );
+});
+
+export const SkeletonList: FC<{
+    size?: number;
+    margin?: boolean;
+    fullWidth?: boolean;
+    className?: string;
+}> = React.memo(({ size = 1, margin, fullWidth, className }) => {
+    return (
+        <ListBlock margin={margin} fullWidth={fullWidth} className={className}>
             {Array(size)
                 .fill(null)
                 .map((_, index) => (
@@ -113,10 +145,10 @@ export const ActivitySkeletonPage = React.memo(() => {
                     <SkeletonText size="large" />
                 </Title>
                 <ActivityList>
-                    <SkeletonList size={1} margin={false} />
-                    <SkeletonList size={3} margin={false} />
-                    <SkeletonList size={2} margin={false} />
-                    <SkeletonList size={4} margin={false} />
+                    <SkeletonListWithImages size={1} margin={false} />
+                    <SkeletonListWithImages size={3} margin={false} />
+                    <SkeletonListWithImages size={2} margin={false} />
+                    <SkeletonListWithImages size={4} margin={false} />
                 </ActivityList>
             </InnerBody>
         </>
@@ -167,7 +199,7 @@ export const CoinHistorySkeleton = React.memo(() => {
             <Title>
                 <SkeletonText size="large" />
             </Title>
-            <SkeletonList size={3} />
+            <SkeletonListWithImages size={3} />
         </HistoryBlock>
     );
 });
@@ -209,7 +241,7 @@ export const HomeSkeleton = React.memo(() => {
                 <SkeletonAction />
                 {/* <SkeletonAction /> */}
             </ActionsRow>
-            <SkeletonList size={5} />
+            <SkeletonListWithImages size={5} />
         </>
     );
 });

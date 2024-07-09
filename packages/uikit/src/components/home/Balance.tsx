@@ -6,12 +6,13 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { QueryKey } from '../../libs/queryKey';
-import { useActiveWallet, useWalletTotalBalance } from '../../state/wallet';
+import { useActiveWallet } from '../../state/wallet';
 import { Body3, Label2, Num2 } from '../Text';
 import { Badge } from '../shared';
 import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { useWalletTotalBalance } from "../../state/asset";
 
 const Block = styled.div`
     display: flex;

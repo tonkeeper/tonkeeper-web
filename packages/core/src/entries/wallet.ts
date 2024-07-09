@@ -14,6 +14,8 @@ export enum WalletVersion {
 
 export const WalletVersions = [WalletVersion.V3R1, WalletVersion.V3R2, WalletVersion.V4R2];
 
+export const defaultWalletVersion = WalletVersion.V4R2;
+
 export const walletVersionText = (version: WalletVersion) => {
     switch (version) {
         case WalletVersion.V3R1:
@@ -62,7 +64,7 @@ export interface WalletVoucher {
 }
 
 /**
- * @deprecated
+ * @deprecated, use WalletsState instead
  */
 export interface DeprecatedWalletState {
     publicKey: string;

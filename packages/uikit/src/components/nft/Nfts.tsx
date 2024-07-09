@@ -5,9 +5,9 @@ import styled, { css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { toDaysLeft } from '../../hooks/dateFormat';
-import { useNftDNSExpirationDate } from '../../state/wallet';
 import { FireBadgeIcon, SaleIcon } from '../Icon';
 import { NftCollectionBody3, NftHeaderLabel2 } from './NftHeader';
+import { useNftDNSExpirationDate } from "../../state/nft";
 
 const Grid = styled.div`
     display: grid;
