@@ -9,19 +9,23 @@ export enum WalletVersion {
     V3R2 = 1,
     V4R1 = 2,
     V4R2 = 3,
-    V5beta = 4,
+    V5_BETA = 4,
     V5R1 = 5
 }
+
+export const isW5Version = (version: WalletVersion) => {
+    return version === WalletVersion.V5_BETA || version === WalletVersion.V5R1;
+};
 
 export const WalletVersions = [
     WalletVersion.V3R1,
     WalletVersion.V3R2,
     WalletVersion.V4R2,
-    WalletVersion.V5beta,
+    WalletVersion.V5_BETA,
     WalletVersion.V5R1
 ];
 
-export const defaultWalletVersion = WalletVersion.V4R2;
+export const defaultWalletVersion = WalletVersion.V5R1;
 
 export const walletVersionText = (version: WalletVersion) => {
     switch (version) {
@@ -31,28 +35,12 @@ export const walletVersionText = (version: WalletVersion) => {
             return 'v3R2';
         case WalletVersion.V4R2:
             return 'v4R2';
-        case WalletVersion.V5beta:
+        case WalletVersion.V5_BETA:
             return 'W5 beta';
         case WalletVersion.V5R1:
             return 'W5';
         default:
             return String(version);
-    }
-};
-
-export const walletVersionFromText = (value: string) => {
-    switch (value.toUpperCase()) {
-        case 'V3R1':
-            return WalletVersion.V3R1;
-        case 'V3R2':
-            return WalletVersion.V3R2;
-        case 'V4R2':
-            return WalletVersion.V4R2;
-        case 'W5':
-        case 'W5R1':
-            return WalletVersion.W5;
-        default:
-            throw new Error('Unsupported version');
     }
 };
 

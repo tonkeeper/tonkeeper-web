@@ -10,13 +10,14 @@ import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
 import { AuthKeychain, AuthPassword } from '../entries/password';
 import {
+    defaultWalletVersion,
     StandardTonWalletState,
     TonWalletState,
     WalletId,
     WalletState,
     WalletVersion,
     WalletVersions
-} from '../entries/wallet';
+} from "../entries/wallet";
 import { WalletApi } from '../tonApiV2';
 import { walletContract } from './wallet/contractService';
 import { BLOCKCHAIN_NAME } from '../entries/crypto';
@@ -70,7 +71,7 @@ const versionMap: Record<string, WalletVersion> = {
     wallet_v3r1: WalletVersion.V3R1,
     wallet_v3r2: WalletVersion.V3R2,
     wallet_v4r2: WalletVersion.V4R2,
-    wallet_v5_beta: WalletVersion.V5beta,
+    wallet_v5_beta: WalletVersion.V5_BETA,
     wallet_v5r1: WalletVersion.V5R1
 };
 
@@ -131,8 +132,7 @@ const findWalletAddress = async (
     });
     return {
         rawAddress: contact.address.toRawString(),
-        friendlyAddress: contact.address.toString(),
-        version: WalletVersion.V5R1
+        version: defaultWalletVersion
     };
 };
 

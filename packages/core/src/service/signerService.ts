@@ -3,7 +3,7 @@ import queryString from 'query-string';
 import { IAppSdk } from '../AppSdk';
 import { AppKey } from '../Keys';
 import { APIConfig } from '../entries/apis';
-import { StandardTonWalletState, WalletVersion } from '../entries/wallet';
+import { isW5Version, StandardTonWalletState, WalletVersion } from '../entries/wallet';
 import { BlockchainApi } from '../tonApiV2';
 import { externalMessage, getWalletSeqNo } from './transfer/common';
 import { walletContractFromState } from './wallet/contractService';
@@ -34,7 +34,7 @@ const walletVersionText = (version: WalletVersion) => {
             return 'v3r2';
         case WalletVersion.V4R2:
             return 'v4r2';
-        case WalletVersion.V5beta:
+        case WalletVersion.V5_BETA:
             return 'v5beta';
         case WalletVersion.V5R1:
             return 'v5r1';
@@ -79,10 +79,7 @@ export const publishSignerMessage = async (
     const message = Cell.fromBase64(messageBase64).asBuilder();
 
     const transfer = beginCell();
-    if (
-        walletState.active.version === WalletVersion.V5beta ||
-        walletState.active.version === WalletVersion.V5R1
-    ) {
+    if (isW5Version(walletState.version)) {
         transfer.storeBuilder(message).storeBuffer(signature);
     } else {
         transfer.storeBuffer(signature).storeBuilder(message);

@@ -2,12 +2,10 @@ import { Address } from '@ton/core';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset, isTon } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { DnsRecipient, TonRecipient } from '@tonkeeper/core/dist/entries/send';
-import { StandardTonWalletState, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { isW5Version, StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { arrayToCsvString } from '@tonkeeper/core/dist/service/parserService';
 import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/transfer/multiSendService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
-import { removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import { FC, useEffect, useState } from 'react';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
@@ -342,10 +340,7 @@ const MultiSendAddMore: FC<{
         );
     }
 
-    if (
-        wallet.active.version !== WalletVersion.V5beta &&
-        wallet.active.version !== WalletVersion.V5R1
-    ) {
+    if (isW5Version(wallet.version)) {
         return (
             <MaximumReachedContainer>
                 <Body2>{t('multi_send_maximum_reached')}</Body2>

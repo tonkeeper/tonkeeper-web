@@ -32,7 +32,7 @@ export type TransferMessage = {
 
 export const MAX_ALLOWED_WALLET_MSGS = {
     [WalletVersion.V5R1]: 255,
-    [WalletVersion.V5beta]: 255,
+    [WalletVersion.V5_BETA]: 255,
     [WalletVersion.V4R2]: 4,
     [WalletVersion.V4R1]: 4,
     [WalletVersion.V3R2]: 4,

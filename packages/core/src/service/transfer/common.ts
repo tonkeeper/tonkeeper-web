@@ -17,10 +17,8 @@ import { BaseSigner } from '../../entries/signer';
 import { StandardTonWalletState } from '../../entries/wallet';
 import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { walletContractFromState } from '../wallet/contractService';
-import { WalletState } from '../../entries/wallet';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
-import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
-import { WalletContract, walletContractFromState } from '../wallet/contractService';
+import { WalletContract } from '../wallet/contractService';
 
 export enum SendMode {
     CARRY_ALL_REMAINING_BALANCE = 128,

@@ -11,11 +11,7 @@ import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import { ProState, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
-import {
-    isStandardTonWallet,
-    StandardTonWalletState,
-    walletVersionFromText
-} from '../entries/wallet';
+import { isStandardTonWallet, StandardTonWalletState, WalletVersion } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
 import {
     FiatCurrencies as FiatCurrenciesGenerated,
@@ -73,6 +69,23 @@ const toEmptySubscription = (): ProSubscriptionInvalid => {
     };
 };
 
+export const walletVersionFromProServiceDTO = (value: string) => {
+    switch (value.toUpperCase()) {
+        case 'V3R1':
+            return WalletVersion.V3R1;
+        case 'V3R2':
+            return WalletVersion.V3R2;
+        case 'V4R2':
+            return WalletVersion.V4R2;
+        case 'V5_BETA':
+            return WalletVersion.V5_BETA;
+        case 'V5R1':
+            return WalletVersion.V5R1;
+        default:
+            throw new Error('Unsupported version');
+    }
+};
+
 export const loadProState = async (
     storage: IStorage,
     fallbackWallet: StandardTonWalletState
@@ -91,7 +104,7 @@ export const loadProState = async (
                 w =>
                     w.publicKey === user.pub_key &&
                     user.version &&
-                    w.version === walletVersionFromText(user.version)
+                    w.version === walletVersionFromProServiceDTO(user.version)
             );
         if (!actualWallet) {
             throw new Error('Unknown wallet');

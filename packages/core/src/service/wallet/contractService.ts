@@ -30,7 +30,7 @@ export const walletContract = (
             throw new Error('Unsupported wallet contract version - v4R1');
         case WalletVersion.V4R2:
             return WalletContractV4.create({ workchain, publicKey });
-        case WalletVersion.V5beta:
+        case WalletVersion.V5_BETA:
             return WalletContractV5Beta.create({
                 walletId: {
                     networkGlobalId: network
