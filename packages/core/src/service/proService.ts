@@ -53,6 +53,7 @@ export const getProState = async (
     try {
         return await loadProState(storage, wallet);
     } catch (e) {
+        console.error(e);
         return {
             subscription: toEmptySubscription(),
             hasWalletAuthCookie: false,

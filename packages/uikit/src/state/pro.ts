@@ -52,7 +52,7 @@ export const useProState = () => {
     });
 };
 
-export const useSelectWalletMutation = () => {
+export const useSelectWalletForProMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const { api } = useAppContext();

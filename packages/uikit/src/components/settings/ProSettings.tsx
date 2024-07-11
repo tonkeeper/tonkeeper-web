@@ -15,7 +15,7 @@ import {
     useProLogout,
     useProPlans,
     useProState,
-    useSelectWalletMutation,
+    useSelectWalletForProMutation,
     useWaitInvoiceMutation
 } from '../../state/pro';
 import { useWalletsState, useWalletState } from '../../state/wallet';
@@ -78,7 +78,7 @@ const SelectLabel = styled(Label1)`
 
 const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { t } = useTranslation();
-    const { mutateAsync, error } = useSelectWalletMutation();
+    const { mutateAsync, error } = useSelectWalletForProMutation();
     useNotifyError(error);
     const wallets = useWalletsState();
 
