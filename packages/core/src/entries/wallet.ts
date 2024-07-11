@@ -9,10 +9,17 @@ export enum WalletVersion {
     V3R2 = 1,
     V4R1 = 2,
     V4R2 = 3,
-    W5 = 4
+    V5beta = 4,
+    V5R1 = 5
 }
 
-export const WalletVersions = [WalletVersion.V3R1, WalletVersion.V3R2, WalletVersion.V4R2];
+export const WalletVersions = [
+    WalletVersion.V3R1,
+    WalletVersion.V3R2,
+    WalletVersion.V4R2,
+    WalletVersion.V5beta,
+    WalletVersion.V5R1
+];
 
 export const defaultWalletVersion = WalletVersion.V4R2;
 
@@ -24,7 +31,9 @@ export const walletVersionText = (version: WalletVersion) => {
             return 'v3R2';
         case WalletVersion.V4R2:
             return 'v4R2';
-        case WalletVersion.W5:
+        case WalletVersion.V5beta:
+            return 'W5 beta';
+        case WalletVersion.V5R1:
             return 'W5';
         default:
             return String(version);

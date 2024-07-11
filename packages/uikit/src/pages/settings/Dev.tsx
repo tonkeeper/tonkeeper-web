@@ -4,29 +4,11 @@ import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useAppContext } from '../../hooks/appContext';
+import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useEnableW5, useEnableW5Mutation } from '../../state/experemental';
 import { useActiveWallet, useMutateWalletProperty } from '../../state/wallet';
-
-const SettingsW5 = () => {
-    const { experimental } = useAppContext();
-    const { data } = useEnableW5();
-    const { mutate } = useEnableW5Mutation();
-
-    const items = useMemo<SettingsItem[]>(() => {
-        return [
-            {
-                name: 'Experimental W5',
-                icon: data ? 'Active' : 'Inactive',
-                action: () => mutate()
-            }
-        ];
-    }, [data, mutate]);
-
-    if (data === undefined || experimental !== true) return null;
-
-    return <SettingsList items={items} />;
-};
+import { useMutateWalletProperty } from '../../state/wallet';
 
 export const DevSettings = React.memo(() => {
     const { t } = useTranslation();
@@ -52,7 +34,6 @@ export const DevSettings = React.memo(() => {
                 <SettingsList items={items} />
                 {/* TODO: ENABLE TRON */}
                 {/* <SettingsList items={items2} /> */}
-                <SettingsW5 />
             </InnerBody>
         </>
     );

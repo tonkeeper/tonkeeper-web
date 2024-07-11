@@ -6,6 +6,8 @@ import { StandardTonWalletState, WalletVersion } from '@tonkeeper/core/dist/entr
 import { arrayToCsvString } from '@tonkeeper/core/dist/service/parserService';
 import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/transfer/multiSendService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
+import { removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import { FC, useEffect, useState } from 'react';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
@@ -21,7 +23,6 @@ import {
 } from '../../../hooks/useAsyncValidator';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
-import { useEnableW5, useEnableW5Mutation } from '../../../state/experemental';
 import { useAssets } from '../../../state/home';
 import { useIsActiveWalletLedger } from '../../../state/ledger';
 import {
@@ -319,8 +320,6 @@ const MultiSendAddMore: FC<{
     fieldsNumber: number;
 }> = ({ onAdd, fieldsNumber }) => {
     const { t } = useTranslation();
-    const { data } = useEnableW5();
-    const { mutate } = useEnableW5Mutation();
 
     const wallet = useActiveWallet() as StandardTonWalletState;
 
@@ -343,23 +342,17 @@ const MultiSendAddMore: FC<{
         );
     }
 
-    const onActivateW5 = () => {
-        if (!data) {
-            mutate();
-        }
-    };
-
-    if (wallet.version !== WalletVersion.W5) {
+    if (
+        wallet.active.version !== WalletVersion.V5beta &&
+        wallet.active.version !== WalletVersion.V5R1
+    ) {
         return (
             <MaximumReachedContainer>
                 <Body2>{t('multi_send_maximum_reached')}</Body2>
                 &nbsp;
                 <Dot>·</Dot>
                 &nbsp;
-                <LinkStyled
-                    onClick={onActivateW5}
-                    to={AppRoute.walletSettings + WalletSettingsRoute.version}
-                >
+                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>
                     {t('multi_send_switch_to_w5')}
                 </LinkStyled>
                 &nbsp;
