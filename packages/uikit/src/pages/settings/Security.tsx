@@ -10,6 +10,7 @@ import { KeyIcon, LockIcon } from '../../components/settings/SettingsIcons';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { useIsActiveWalletKeystone } from '../../state/keystone';
 import { useIsActiveWalletLedger } from '../../state/ledger';
 import {
     useCanPromptTouchId,
@@ -102,6 +103,7 @@ const ShowPhrases = () => {
     const { t } = useTranslation();
 
     const isLedger = useIsActiveWalletLedger();
+    const isKeystone = useIsActiveWalletKeystone();
 
     const items = useMemo(() => {
         const i: SettingsItem[] = [
@@ -114,7 +116,7 @@ const ShowPhrases = () => {
         return i;
     }, []);
 
-    if (isLedger) {
+    if (isLedger || isKeystone) {
         return <></>;
     }
 

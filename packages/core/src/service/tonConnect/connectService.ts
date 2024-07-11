@@ -23,11 +23,11 @@ import {
 import { isStandardTonWallet, StandardTonWalletState } from '../../entries/wallet';
 import { walletContractFromState } from '../wallet/contractService';
 import {
+    AccountConnection,
     TonConnectParams,
     disconnectAccountConnection,
     getAccountConnection,
-    saveAccountConnection,
-    AccountConnection
+    saveAccountConnection
 } from './connectionService';
 import { SessionCrypto } from './protocol';
 import { walletsStorage } from '../walletsService';
@@ -360,11 +360,14 @@ export const toTonProofItem = async (
 };
 
 export const tonDisconnectRequest = async (options: { storage: IStorage; webViewUrl: string }) => {
-    const wallet = await walletsStorage(options.storage).getActiveWallet();
-
-    if (wallet && isStandardTonWallet(wallet)) {
-        await disconnectAccountConnection({ ...options, wallet });
+    const connection = await getDappConnection(options.storage, options.webViewUrl);
+    if (!connection) {
+        throw new TonConnectError(
+            'Missing connection',
+            CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
+        );
     }
+    await disconnectAccountConnection({ ...options, wallet: connection.wallet });
 };
 
 export const saveWalletTonConnect = async (options: {

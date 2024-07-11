@@ -1,4 +1,5 @@
 import { IStorage, MemoryStorage } from './Storage';
+import { APIConfig } from './entries/apis';
 import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
@@ -65,7 +66,11 @@ export interface TouchId {
 }
 
 export interface NotificationService {
-    subscribe: (wallet: StandardTonWalletState, mnemonic: string[]) => Promise<void>;
+    subscribe: (
+        api: APIConfig,
+        wallet: StandardTonWalletState,
+        signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
+    ) => Promise<void>;
     unsubscribe: (address?: string) => Promise<void>;
 
     subscribeTonConnect: (clientId: string, origin: string) => Promise<void>;

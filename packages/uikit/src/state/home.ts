@@ -10,18 +10,17 @@ export const useAssets = () => {
     const wallet = useActiveWallet();
 
     const { data: info, error, isFetching: isAccountLoading } = useWalletAccountInfo();
-    const { data: jettons, isFetching: isJettonLoading } = useJettonList();
-    //  const { data: tronBalances, isFetching: isTronLoading } = useTronBalances();
+    const { data: jettons, error: jettonError, isFetching: isJettonLoading } = useJettonList();
 
     const assets = useMemo<AssetData | undefined>(() => {
-        if (!info || !jettons /*|| !tronBalances*/) return undefined;
+        if (!info || !jettons) return undefined;
         return {
             ton: { info, jettons: jettons ?? { balances: [] } },
-            tron: { balances: [] } /*tronBalances*/
+            tron: { balances: [] }
         };
     }, [info, jettons, wallet]);
 
-    return [assets, error, isJettonLoading || isAccountLoading] as const;
+    return [assets, error, isJettonLoading || isAccountLoading, jettonError] as const;
 };
 
 export const useAssetWeiBalance = (asset: AssetIdentification) => {

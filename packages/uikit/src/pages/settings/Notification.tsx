@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import React from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
@@ -9,9 +8,10 @@ import { Switch } from '../../components/fields/Switch';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { getMnemonic } from '../../state/mnemonic';
+import { signTonConnectOver } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
 import { useActiveStandardTonWallet, useActiveWallet } from '../../state/wallet';
+import { useAppContext } from '../../hooks/appContext';
 
 const useSubscribed = () => {
     const sdk = useAppSdk();
@@ -27,10 +27,12 @@ const useSubscribed = () => {
 };
 
 const useToggleSubscribe = () => {
+    const { t } = useTranslation();
     const sdk = useAppSdk();
     const wallet = useActiveStandardTonWallet();
     const client = useQueryClient();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { api } = useAppContext();
 
     return useMutation<void, Error, boolean>(async checked => {
         const { notifications } = sdk;
@@ -38,9 +40,12 @@ const useToggleSubscribe = () => {
             throw new Error('Missing notifications');
         }
         if (checked) {
-            const mnemonic = await getMnemonic(sdk, wallet.id, checkTouchId);
             try {
-                await notifications.subscribe(wallet, mnemonic);
+                await notifications.subscribe(
+                    api,
+                    wallet,
+                    signTonConnectOver(sdk, wallet.publicKey, t, checkTouchId)
+                );
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);
                 throw e;

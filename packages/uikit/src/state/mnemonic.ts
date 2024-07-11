@@ -66,6 +66,17 @@ export const signTonConnectOver = (
     };
 };
 
+export const signTonConnectMnemonicOver = (mnemonic: string[]) => {
+    return async (bufferToSign: Buffer) => {
+        const keyPair = await mnemonicToPrivateKey(mnemonic);
+        const signature = nacl.sign.detached(
+            Buffer.from(sha256_sync(bufferToSign)),
+            keyPair.secretKey
+        );
+        return signature;
+    };
+};
+
 export const getSigner = async (
     sdk: IAppSdk,
     walletId: WalletId,

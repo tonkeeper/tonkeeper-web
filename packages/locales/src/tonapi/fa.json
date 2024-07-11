@@ -1,0 +1,20 @@
+{
+  "auctionBidMessage" : "پیشنهاد {{.Amount}} برای {{.NftName}}",
+  "contractDeployAction" : "استقرار قرارداد {{ if .Interfaces }} با رابط {{.Interfaces}} {{ end }}",
+  "depositStakeAction" : "واریز {{.Value}} به استخر استیکینگ",
+  "electionsDepositStakeAction" : "واریز {{.Amount}} برای استیک",
+  "electionsRecoverStakeAction" : "بازیابی {{.Amount}} استیک",
+  "helloWorld" : "سلام دنیا!",
+  "jettonBurnAction" : "سوزاندن {{.Value}} {{.JettonName}}",
+  "jettonMintAction" : "ضرب کردن {{.Value}} {{.JettonName}}",
+  "jettonSwapAction" : "سواپ کردن {{.AmountIn}} {{.JettonIn}} برای {{.AmountOut}} {{.JettonOut}}",
+  "jettonTransferAction" : "انتقال {{.Value}} {{.JettonName}}",
+  "nftPurchaseAction" : "خرید {{.Name}}",
+  "nftTransferAction" : "در حال انتقال 1 NFT",
+  "poolImplementationDescription" : "حداقل واریز {{.Deposit}} تون",
+  "smartContractExecMessage" : "اجرای قرارداد هوشمند",
+  "subscriptionAction" : "پرداخت {{.Value}} برای عضویت",
+  "tonTransferAction" : "در حال انتقال {{.Value}}",
+  "withdrawStakeAction" : "برداشت {{.Value}} از استخر استیکینگ",
+  "withdrawStakeRequestAction" : "درخواست برداشت {{.Value}} از استخر استیکینگ."
+}

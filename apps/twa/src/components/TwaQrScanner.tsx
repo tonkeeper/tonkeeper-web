@@ -1,6 +1,6 @@
+import { useQRScanner } from '@tma.js/sdk-react';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { useQRScanner } from '@twa.js/sdk-react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 export const TwaQrScanner = () => {
     const scanner = useQRScanner();
@@ -9,6 +9,9 @@ export const TwaQrScanner = () => {
 
     useEffect(() => {
         const handler = async (options: { method: 'scan'; id?: number | undefined }) => {
+            if (scanner.isOpened) {
+                scanner.close();
+            }
             const signature = await scanner.open();
             if (signature) {
                 sdk.uiEvents.emit('response', {

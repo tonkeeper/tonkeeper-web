@@ -1,6 +1,6 @@
+import { useBackButton } from '@tma.js/sdk-react';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { NftPreview } from '@tonkeeper/uikit/dist/components/nft/NftView';
-import { useBackButton } from '@twa.js/sdk-react';
 import { FC, useEffect } from 'react';
 
 export const NftIndexView: FC<{ nftItem: NFT; handleClose: () => void }> = ({

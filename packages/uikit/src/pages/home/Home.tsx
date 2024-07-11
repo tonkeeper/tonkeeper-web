@@ -29,9 +29,9 @@ const HomeAssets: FC<{
 const Home = () => {
     const { isFetched } = usePreFetchRates();
 
-    const [assets, error, isAssetLoading] = useAssets();
+    const [assets, error, isAssetLoading, jettonError] = useAssets();
 
-    const { data: nfts, isFetching: isNftLoading } = useWalletFilteredNftList();
+    const { data: nfts, error: nftError, isFetching: isNftLoading } = useWalletFilteredNftList();
 
     const isLoading = isAssetLoading || isNftLoading;
 
