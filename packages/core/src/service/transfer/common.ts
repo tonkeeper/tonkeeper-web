@@ -9,19 +9,15 @@ import {
     toNano
 } from '@ton/core';
 import { sign } from '@ton/crypto';
-import { WalletContractV3R1 } from '@ton/ton/dist/wallets/WalletContractV3R1';
-import { WalletContractV3R2 } from '@ton/ton/dist/wallets/WalletContractV3R2';
-import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
-import { WalletContractV5 } from '@ton/ton/dist/wallets/WalletContractV5';
 import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipient, TransferEstimationEvent } from '../../entries/send';
 import { BaseSigner } from '../../entries/signer';
 import { WalletState } from '../../entries/wallet';
-import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
-import { walletContractFromState } from '../wallet/contractService';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
+import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
+import { WalletContract, walletContractFromState } from '../wallet/contractService';
 
 export enum SendMode {
     CARRY_ALL_REMAINING_BALANCE = 128,
@@ -32,11 +28,7 @@ export enum SendMode {
     NONE = 0
 }
 
-export const externalMessage = (
-    contract: WalletContractV3R1 | WalletContractV3R2 | WalletContractV4 | WalletContractV5,
-    seqno: number,
-    body: Cell
-) => {
+export const externalMessage = (contract: WalletContract, seqno: number, body: Cell) => {
     return beginCell()
         .storeWritable(
             storeMessage(

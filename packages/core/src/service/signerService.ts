@@ -34,7 +34,9 @@ const walletVersionText = (version: WalletVersion) => {
             return 'v3r2';
         case WalletVersion.V4R2:
             return 'v4r2';
-        case WalletVersion.W5:
+        case WalletVersion.V5beta:
+            return 'v5beta';
+        case WalletVersion.V5R1:
             return 'v5r1';
         default:
             return String(version);
@@ -77,7 +79,10 @@ export const publishSignerMessage = async (
     const message = Cell.fromBase64(messageBase64).asBuilder();
 
     const transfer = beginCell();
-    if (walletState.active.version === WalletVersion.W5) {
+    if (
+        walletState.active.version === WalletVersion.V5beta ||
+        walletState.active.version === WalletVersion.V5R1
+    ) {
         transfer.storeBuilder(message).storeBuffer(signature);
     } else {
         transfer.storeBuffer(signature).storeBuilder(message);
