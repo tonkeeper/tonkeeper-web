@@ -41,7 +41,7 @@ import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/imp
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import { useActiveWallet, useActiveWalletQuery, useWalletsStateQuery } from "@tonkeeper/uikit/dist/state/wallet";
+import { useActiveWalletQuery, useWalletsStateQuery } from "@tonkeeper/uikit/dist/state/wallet";
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -52,7 +52,7 @@ import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
-import { useMutateUserLanguage, useUserLanguage } from "@tonkeeper/uikit/dist/state/language";
+import { useMutateUserLanguage } from "@tonkeeper/uikit/dist/state/language";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
