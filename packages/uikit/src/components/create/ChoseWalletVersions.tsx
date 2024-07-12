@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Body1, Body2, H2, Label1 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import {
-    defaultWalletVersion,
     WalletVersion,
     WalletVersions,
     walletVersionText
@@ -18,6 +17,7 @@ import { Button } from '../fields/Button';
 import { mnemonicToWalletKey } from '@ton/crypto';
 import { ChevronLeftIcon } from '../Icon';
 import { RoundedButton } from '../fields/RoundedButton';
+import { useAppContext } from '../../hooks/appContext';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -71,6 +71,7 @@ export const ChoseWalletVersions: FC<{
     isLoading?: boolean;
 }> = ({ mnemonic, onSubmit, onBack, isLoading }) => {
     const { t } = useTranslation();
+    const { defaultWalletVersion } = useAppContext();
 
     const [publicKey, setPublicKey] = useState<string | undefined>(undefined);
     const { data: wallets } = useStandardTonWalletVersions(publicKey);

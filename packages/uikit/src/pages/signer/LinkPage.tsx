@@ -13,7 +13,7 @@ const useAddWalletMutation = () => {
     const sdk = useAppSdk();
     const walletsStorage = useWalletsStorage();
     const client = useQueryClient();
-    const { api, config } = useAppContext();
+    const context = useAppContext();
     const navigate = useNavigate();
 
     return useMutation<void, Error, { publicKey: string | null; name: string | null }>(
@@ -21,7 +21,7 @@ const useAddWalletMutation = () => {
             if (publicKey === null) {
                 sdk.topMessage('Missing public key');
             } else {
-                const state = await walletStateFromSignerDeepLink(api, publicKey, name, config);
+                const state = await walletStateFromSignerDeepLink(context, publicKey, name);
                 await walletsStorage.addWalletToState(state);
                 await client.invalidateQueries([QueryKey.account]);
             }

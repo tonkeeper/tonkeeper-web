@@ -3,21 +3,19 @@ import { parseTonAccount } from '@keystonehq/keystone-sdk/dist/wallet/hdKey';
 import { Address } from '@ton/core';
 import { mnemonicToPrivateKey } from '@ton/crypto';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
-import { WalletContractV5R1 } from '@ton/ton/dist/wallets/WalletContractV5R1';
 import queryString from 'query-string';
 import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
 import { AuthKeychain, AuthPassword } from '../entries/password';
 import {
-    defaultWalletVersion,
     StandardTonWalletState,
     TonWalletState,
     WalletId,
     WalletState,
     WalletVersion,
     WalletVersions
-} from "../entries/wallet";
+} from '../entries/wallet';
 import { WalletApi } from '../tonApiV2';
 import { walletContract } from './wallet/contractService';
 import { BLOCKCHAIN_NAME } from '../entries/crypto';
@@ -26,7 +24,7 @@ import { emojis } from '../utils/emojis';
 import { formatAddress } from '../utils/common';
 
 export const createStandardTonWalletStateByMnemonic = async (
-    api: APIConfig,
+    appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
     mnemonic: string[],
     options: {
         version?: WalletVersion;
@@ -39,7 +37,12 @@ export const createStandardTonWalletStateByMnemonic = async (
 
     const publicKey = keyPair.publicKey.toString('hex');
 
-    const address = await findWalletAddress(api, publicKey, options.version, options.network);
+    const address = await findWalletAddress(
+        appContext,
+        publicKey,
+        options.version,
+        options.network
+    );
 
     let walletAuth: AuthPassword | AuthKeychain;
     if (options.auth.kind === 'keychain') {
@@ -88,7 +91,7 @@ const findWalletVersion = (interfaces?: string[]): WalletVersion => {
 };
 
 const findWalletAddress = async (
-    api: APIConfig,
+    appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
     publicKey: string,
     version?: WalletVersion,
     network?: Network
@@ -102,7 +105,7 @@ const findWalletAddress = async (
     }
 
     try {
-        const result = await new WalletApi(api.tonApiV2).getWalletsByPublicKey({
+        const result = await new WalletApi(appContext.api.tonApiV2).getWalletsByPublicKey({
             publicKey: publicKey
         });
 
@@ -126,13 +129,10 @@ const findWalletAddress = async (
         console.warn(e);
     }
 
-    const contact = WalletContractV5R1.create({
-        workChain: 0,
-        publicKey: Buffer.from(publicKey, 'hex')
-    });
+    const contact = walletContract(Buffer.from(publicKey, 'hex'), appContext.defaultWalletVersion);
     return {
         rawAddress: contact.address.toRawString(),
-        version: defaultWalletVersion
+        version: appContext.defaultWalletVersion
     };
 };
 
@@ -181,7 +181,7 @@ export const updateWalletProperty = async (
 };
 
 export const walletStateFromSignerQr = async (
-    api: APIConfig,
+    appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
     qrCode: string
 ): Promise<StandardTonWalletState> => {
     if (!qrCode.startsWith('tonkeeper://signer')) {
@@ -201,7 +201,7 @@ export const walletStateFromSignerQr = async (
 
     const publicKey = pk;
 
-    const active = await findWalletAddress(api, publicKey, config.flags?.disable_v5r1 ?? true);
+    const active = await findWalletAddress(appContext, publicKey);
 
     return {
         type: 'standard',
@@ -218,11 +218,11 @@ export const walletStateFromSignerQr = async (
 };
 
 export const walletStateFromSignerDeepLink = async (
-    api: APIConfig,
+    appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
     publicKey: string,
     name: string | null
 ): Promise<WalletState> => {
-    const active = await findWalletAddress(api, publicKey);
+    const active = await findWalletAddress(appContext, publicKey);
 
     return {
         publicKey,

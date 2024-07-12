@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { WalletState } from "@tonkeeper/core/dist/entries/wallet";
+import { WalletState, WalletVersion } from "@tonkeeper/core/dist/entries/wallet";
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -36,7 +36,7 @@ import { SDKProvider } from '@tma.js/sdk-react';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
+import { isV5R1Enabled, useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
 import { useActiveWalletQuery, useWalletsStateQuery } from "@tonkeeper/uikit/dist/state/wallet";
 import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -254,7 +254,8 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         hideBrowser: true,
         hideSigner: !showQrScan,
         hideKeystone: !showQrScan,
-        hideQrScanner: !showQrScan
+        hideQrScanner: !showQrScan,
+        defaultWalletVersion: isV5R1Enabled(config) ? WalletVersion.V5R1 : WalletVersion.V4R2
     };
 
     return (

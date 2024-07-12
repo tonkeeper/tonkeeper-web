@@ -25,8 +25,6 @@ export const WalletVersions = [
     WalletVersion.V5R1
 ];
 
-export const defaultWalletVersion = WalletVersion.V5R1;
-
 export const walletVersionText = (version: WalletVersion) => {
     switch (version) {
         case WalletVersion.V3R1:

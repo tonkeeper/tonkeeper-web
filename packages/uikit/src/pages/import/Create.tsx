@@ -15,13 +15,13 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
-import { defaultWalletVersion, StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { useCreateStandardTonWalletsByMnemonic, useWalletsState } from '../../state/wallet';
 
 const Create = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const { defaultWalletVersion } = useAppContext();
     const {
         mutateAsync: createWalletsAsync,
         isLoading: isCreateWalletLoading,
@@ -69,7 +69,7 @@ const Create = () => {
         }
 
         return resetCreateWallets;
-    }, [authExists, createdPassword, mnemonic, checked, createWalletsAsync]);
+    }, [authExists, createdPassword, mnemonic, checked, createWalletsAsync, defaultWalletVersion]);
 
     if (!mnemonic) {
         return <IconPage icon={<GearLottieIcon />} title={t('create_wallet_generating')} />;

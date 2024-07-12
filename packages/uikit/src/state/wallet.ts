@@ -3,6 +3,7 @@ import {
     ActiveWalletConfig,
     isPasswordAuthWallet,
     isStandardTonWallet,
+    isW5Version,
     StandardTonWalletState,
     WalletId,
     WalletsState,
@@ -19,7 +20,7 @@ import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
-import { DefaultRefetchInterval } from './tonendpoint';
+import { DefaultRefetchInterval, isV5R1Enabled } from './tonendpoint';
 import {
     getActiveWalletConfig,
     setActiveWalletConfig
@@ -102,7 +103,7 @@ export const useMutateWalletsState = () => {
 
 export const useCreateStandardTonWalletsByMnemonic = () => {
     const sdk = useAppSdk();
-    const { api } = useAppContext();
+    const context = useAppContext();
     const { mutateAsync: addWalletsToState } = useAddWalletsToStateMutation();
     const { mutateAsync: selectWallet } = useMutateActiveWallet();
 
@@ -124,7 +125,7 @@ export const useCreateStandardTonWalletsByMnemonic = () => {
         if (sdk.keychain) {
             const states = await Promise.all(
                 versions.map(version =>
-                    createStandardTonWalletStateByMnemonic(api, mnemonic, {
+                    createStandardTonWalletStateByMnemonic(context, mnemonic, {
                         auth: {
                             kind: 'keychain'
                         },
@@ -152,7 +153,7 @@ export const useCreateStandardTonWalletsByMnemonic = () => {
         const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
         const states = await Promise.all(
             versions.map(version =>
-                createStandardTonWalletStateByMnemonic(api, mnemonic, {
+                createStandardTonWalletStateByMnemonic(context, mnemonic, {
                     auth: {
                         kind: 'password',
                         encryptedMnemonic
@@ -293,14 +294,17 @@ export const useMutateActiveWalletConfig = () => {
 };
 
 export const useStandardTonWalletVersions = (publicKey?: string, network = Network.MAINNET) => {
-    const { api, fiat } = useAppContext();
+    const { api, fiat, config } = useAppContext();
+    const isV5Enabled = isV5R1Enabled(config);
     return useQuery(
-        [QueryKey.walletVersions, publicKey, network],
+        [QueryKey.walletVersions, publicKey, network, isV5Enabled],
         async () => {
             if (!publicKey) {
                 return undefined;
             }
-            const versions = WalletVersions.map(v => getWalletAddress(publicKey, v, network));
+            const versions = WalletVersions.filter(v => isV5Enabled || !isW5Version(v)).map(v =>
+                getWalletAddress(publicKey, v, network)
+            );
 
             const response = await new AccountsApi(api.tonApiV2).getAccounts({
                 getAccountsRequest: { accountIds: versions.map(v => v.address.toRawString()) }

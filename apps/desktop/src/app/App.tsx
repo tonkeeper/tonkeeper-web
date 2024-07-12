@@ -1,8 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
+import { WalletState, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -49,7 +48,7 @@ import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecom
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
+import { any, AppProRoute, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
@@ -58,17 +57,21 @@ import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProv
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
-import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
+import {
+    isV5R1Enabled,
+    useTonendpoint,
+    useTonenpointConfig
+} from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveWalletQuery, useWalletsStateQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+    createMemoryRouter,
     Outlet,
     Route,
     RouterProvider,
     Routes,
-    createMemoryRouter,
     useLocation,
     useNavigate
 } from 'react-router-dom';
@@ -313,7 +316,8 @@ export const Loader: FC = () => {
         env: {
             tgAuthBotId: REACT_APP_TG_BOT_ID,
             stonfiReferralAddress: REACT_APP_STONFI_REFERRAL_ADDRESS
-        }
+        },
+        defaultWalletVersion: isV5R1Enabled(config) ? WalletVersion.V5R1 : WalletVersion.V4R2
     };
 
     return (

@@ -19,7 +19,7 @@ export type WalletContract = ReturnType<typeof walletContract>;
 export const walletContract = (
     publicKey: Buffer,
     version: WalletVersion,
-    network: Network | undefined
+    network = Network.MAINNET
 ) => {
     switch (version) {
         case WalletVersion.V3R1:
