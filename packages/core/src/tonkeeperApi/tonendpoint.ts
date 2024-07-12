@@ -19,7 +19,7 @@ interface BootOptions {
 type TonendpointResponse<Data> = { success: false } | { success: true; data: Data };
 
 export interface TonendpointConfig {
-    flags?: { [key: string]: boolean };
+    flags?: { disable_v5r1: boolean; [key: string]: boolean };
     tonendpoint: string;
 
     tonApiKey?: string;

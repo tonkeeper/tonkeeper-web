@@ -9,12 +9,12 @@ import { AppRoute } from '../libs/routes';
 
 export const usePairSignerMutation = () => {
     const sdk = useAppSdk();
-    const { api } = useAppContext();
+    const { api, config } = useAppContext();
     const client = useQueryClient();
     const navigate = useNavigate();
     return useMutation<void, Error, string>(async qrCode => {
         try {
-            const state = await walletStateFromSignerQr(api, qrCode);
+            const state = await walletStateFromSignerQr(api, qrCode, config);
 
             await addWalletWithCustomAuthState(sdk.storage, state);
 

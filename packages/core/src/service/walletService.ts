@@ -12,16 +12,22 @@ import { Network } from '../entries/network';
 import { AuthState } from '../entries/password';
 import { WalletAddress, WalletState, WalletVersion, WalletVersions } from '../entries/wallet';
 import { WalletApi } from '../tonApiV2';
+import { TonendpointConfig } from '../tonkeeperApi/tonendpoint';
 import { encrypt } from './cryptoService';
 import { walletContract } from './wallet/contractService';
 import { getFallbackWalletEmoji, getWalletStateOrDie, setWalletState } from './wallet/storeService';
 
-export const createNewWalletState = async (api: APIConfig, mnemonic: string[], name?: string) => {
+export const createNewWalletState = async (
+    api: APIConfig,
+    mnemonic: string[],
+    config: TonendpointConfig,
+    name?: string
+) => {
     const keyPair = await mnemonicToPrivateKey(mnemonic);
 
     const publicKey = keyPair.publicKey.toString('hex');
 
-    const active = await findWalletAddress(api, publicKey);
+    const active = await findWalletAddress(api, publicKey, config.flags?.disable_v5r1 ?? true);
 
     const state: WalletState = {
         publicKey,
@@ -60,7 +66,7 @@ const findWalletVersion = (interfaces?: string[]): WalletVersion => {
     throw new Error('Unexpected wallet version');
 };
 
-const findWalletAddress = async (api: APIConfig, publicKey: string) => {
+const findWalletAddress = async (api: APIConfig, publicKey: string, disable_v5r1: boolean) => {
     try {
         const result = await new WalletApi(api.tonApiV2).getWalletsByPublicKey({
             publicKey: publicKey
@@ -89,17 +95,30 @@ const findWalletAddress = async (api: APIConfig, publicKey: string) => {
         console.warn(e);
     }
 
-    const contact = WalletContractV5R1.create({
-        workChain: 0,
-        publicKey: Buffer.from(publicKey, 'hex')
-    });
-    const wallet: WalletAddress = {
-        rawAddress: contact.address.toRawString(),
-        friendlyAddress: contact.address.toString(),
-        version: WalletVersion.V5R1
-    };
+    if (disable_v5r1) {
+        const contact = WalletContractV4.create({
+            workchain: 0,
+            publicKey: Buffer.from(publicKey, 'hex')
+        });
+        const wallet: WalletAddress = {
+            rawAddress: contact.address.toRawString(),
+            friendlyAddress: contact.address.toString(),
+            version: WalletVersion.V4R2
+        };
+        return wallet;
+    } else {
+        const contact = WalletContractV5R1.create({
+            workChain: 0,
+            publicKey: Buffer.from(publicKey, 'hex')
+        });
+        const wallet: WalletAddress = {
+            rawAddress: contact.address.toRawString(),
+            friendlyAddress: contact.address.toString(),
+            version: WalletVersion.V5R1
+        };
 
-    return wallet;
+        return wallet;
+    }
 };
 
 export const getWalletAddress = (
@@ -171,7 +190,11 @@ export const updateWalletProperty = async (
     await setWalletState(storage, updated);
 };
 
-export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) => {
+export const walletStateFromSignerQr = async (
+    api: APIConfig,
+    qrCode: string,
+    config: TonendpointConfig
+) => {
     if (!qrCode.startsWith('tonkeeper://signer')) {
         throw new Error('Unexpected QR code');
     }
@@ -189,7 +212,7 @@ export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) =>
 
     const publicKey = pk;
 
-    const active = await findWalletAddress(api, publicKey);
+    const active = await findWalletAddress(api, publicKey, config.flags?.disable_v5r1 ?? true);
 
     const state: WalletState = {
         publicKey,
@@ -206,9 +229,10 @@ export const walletStateFromSignerQr = async (api: APIConfig, qrCode: string) =>
 export const walletStateFromSignerDeepLink = async (
     api: APIConfig,
     publicKey: string,
-    name: string | null
+    name: string | null,
+    config: TonendpointConfig
 ) => {
-    const active = await findWalletAddress(api, publicKey);
+    const active = await findWalletAddress(api, publicKey, config.flags?.disable_v5r1 ?? true);
 
     const state: WalletState = {
         publicKey,
