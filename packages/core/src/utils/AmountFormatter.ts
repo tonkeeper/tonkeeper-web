@@ -16,6 +16,7 @@ type AmountFormatOptions = {
     decimals?: number | string;
     currency?: FiatCurrency;
     ignoreZeroTruncate?: boolean;
+    fixedPrecision?: boolean;
 };
 
 type AmountNumber = string | number | BigNumber;
@@ -61,7 +62,7 @@ export class AmountFormatter {
     public format(amount: AmountNumber = 0, options: AmountFormatOptions = {}) {
         let bn = this.toBN(amount);
 
-        const decimals = options.decimals ?? this.getDefaultDecimals(bn);
+        const decimals = (options.decimals as number) ?? this.getDefaultDecimals(bn);
         let prefix = '';
         let suffix = '';
 
@@ -84,35 +85,26 @@ export class AmountFormatter {
         }
 
         const { decimalSeparator, groupingSeparator } = this.getLocaleFormat();
-        const formatConf = {
-            groupSeparator: groupingSeparator,
-            decimalSeparator,
-            fractionGroupSize: 2,
-            groupSize: 3,
-            prefix,
-            suffix
-        };
+        const [intPart, fractionalPart] = bn.toFixed(20).split('.');
+        const intPartWithGrouping = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, groupingSeparator);
 
-        // Custom formatting for numbers with more than 3 decimal zeros
-        if (bn.isGreaterThan(0) && bn.isLessThan('0.001')) {
-            const decimalStr = bn.toFixed(20).split('.')[1];
-            const leadingZeros = decimalStr.match(/^0+/)![0]!.length;
-            if (leadingZeros > 3) {
-                const significantDigits = decimalStr.slice(leadingZeros, leadingZeros + decimals);
-                return `${prefix}0${decimalSeparator}0{${leadingZeros}}${significantDigits}${suffix}`;
+        let leadingZerosCondensed = '';
+        let significantDigits = '';
+
+        if (options.fixedPrecision) {
+            significantDigits = fractionalPart.slice(0, decimals);
+        } else if (bn.isGreaterThan(0)) {
+            const leadingZeros = fractionalPart.match(/^0+/)?.[0]?.length || 0;
+            const allSignificantDigits = fractionalPart.slice(leadingZeros);
+            significantDigits = allSignificantDigits.slice(0, decimals);
+
+            if (significantDigits) {
+                leadingZerosCondensed =
+                    leadingZeros > 3 ? `0{${leadingZeros}}` : fractionalPart.slice(0, leadingZeros);
             }
         }
 
-        // truncate decimals 1.00 -> 1
-        if (!options.ignoreZeroTruncate && bn.isLessThan('0.01')) {
-            bn = bn.decimalPlaces(new BigNumber(decimals).toNumber(), BigNumber.ROUND_DOWN);
-            return bn.toFormat(formatConf);
-        }
-
-        return bn.toFormat(
-            Math.min(new BigNumber(decimals).toNumber(), 2),
-            BigNumber.ROUND_DOWN,
-            formatConf
-        );
+        const separator = significantDigits ? decimalSeparator : '';
+        return `${prefix}${intPartWithGrouping}${separator}${leadingZerosCondensed}${significantDigits}${suffix}`;
     }
 }

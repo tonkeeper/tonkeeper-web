@@ -101,7 +101,7 @@ export const useFormatFiat = (rate: TokenRate | undefined, tokenAmount: BigNumbe
         if (!rate) return [undefined, undefined] as const;
         return [
             formatFiatCurrency(fiat, rate.prices),
-            formatFiatCurrency(fiat, new BigNumber(rate.prices).multipliedBy(tokenAmount))
+            formatFiatCurrency(fiat, new BigNumber(rate.prices).multipliedBy(tokenAmount), true)
         ] as const;
     }, [rate, fiat, tokenAmount]);
     return {

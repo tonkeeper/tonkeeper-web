@@ -85,26 +85,27 @@ export const TokenLayout: FC<{
     verification?: JettonVerificationType;
 }> = ({ name, symbol, balance, secondary, fiatAmount, label, rate, verification }) => {
     const { t } = useTranslation();
+    const NameWrapper = verification === 'none' ? Unverified : React.Fragment;
 
     return (
         <Description>
             <FirstLine>
                 <CoinName>
-                    {symbol ?? name}
-                    {label ? <CoinLabel>{label}</CoinLabel> : null}
+                    <NameWrapper>
+                        {symbol ?? name ?? t('approval_unverified_token')}
+                        {label ? <CoinLabel>{label}</CoinLabel> : null}
+                    </NameWrapper>
                 </CoinName>
                 <Symbol></Symbol>
                 <Label1>{balance}</Label1>
             </FirstLine>
             <SecondLine>
+                <Secondary>{secondary}</Secondary>
                 <Secondary>
-                    {verification === 'none' ? (
-                        <Unverified>{t('approval_unverified_token')}</Unverified>
-                    ) : (
-                        <>
-                            {secondary} <Delta data={rate} />
-                        </>
-                    )}
+                    <>
+                        <Delta data={rate} />
+                        <Delta data={rate} time="7d" />
+                    </>
                 </Secondary>
                 <Secondary>{fiatAmount}</Secondary>
             </SecondLine>
@@ -126,8 +127,14 @@ const DeltaColor = styled.span<{ positive: boolean }>`
             `}}
 `;
 
-const Delta: FC<{ data: TokenRate | undefined }> = ({ data }) => {
-    if (!data || !data.diff24h || data.diff24h == '0.00%') return null;
-    const positive = data.diff24h.startsWith('+');
-    return <DeltaColor positive={positive}>{data.diff24h}</DeltaColor>;
+const Delta: FC<{ data: TokenRate | undefined; time?: string }> = ({ data, time = '24h' }) => {
+    const diff = `diff${time}` as keyof TokenRate;
+    const change: string = data![diff];
+    if (!change || change === '0.00%') return null;
+    const positive = change.startsWith('+');
+    return (
+        <DeltaColor positive={positive}>
+            {change} ({time})
+        </DeltaColor>
+    );
 };

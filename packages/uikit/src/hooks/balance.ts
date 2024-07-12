@@ -41,10 +41,15 @@ export const useFormatCoinValue = () => {
     }, []);
 };
 
-export const formatFiatCurrency = (currency: FiatCurrencies, balance: BigNumber.Value) => {
+export const formatFiatCurrency = (
+    currency: FiatCurrencies,
+    balance: BigNumber.Value,
+    fixedPrecision = false
+) => {
     return formatter.format(balance.toString(), {
         currency: currency,
         ignoreZeroTruncate: false,
-        decimals: 4
+        decimals: fixedPrecision ? 2 : 4,
+        fixedPrecision
     });
 };

@@ -132,7 +132,7 @@ export const Balance: FC<{
     return (
         <Block>
             <MessageBlock error={error} isFetching={isFetching} />
-            <Amount>{formatFiatCurrency(fiat, total || 0)}</Amount>
+            <Amount>{formatFiatCurrency(fiat, total || 0, true)}</Amount>
             <Body onClick={() => sdk.copyToClipboard(address)}>
                 {toShortValue(address)}
                 <Label />
