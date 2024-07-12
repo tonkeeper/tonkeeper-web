@@ -1,6 +1,15 @@
 name: Tonkeeper Web Deploy
 on:
     workflow_dispatch:
+        inputs:
+            environment:
+                type: choice
+                description: Deploy to env
+                required: true
+                options:
+                    - dev
+                    - main
+
 jobs:
     web-deploy:
         name: web-deploy
@@ -44,3 +53,4 @@ jobs:
                   projectName: tonkeeper-web
                   directory: apps/web/dist
                   wranglerVersion: '3'
+                  branch: ${{ inputs.environment }}
