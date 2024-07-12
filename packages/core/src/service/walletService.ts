@@ -201,7 +201,7 @@ export const walletStateFromSignerQr = async (
 
     const publicKey = pk;
 
-    const active = await findWalletAddress(api, publicKey);
+    const active = await findWalletAddress(api, publicKey, config.flags?.disable_v5r1 ?? true);
 
     return {
         type: 'standard',

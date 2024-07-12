@@ -76,16 +76,16 @@ export const publishSignerMessage = async (
     const contract = walletContractFromState(walletState);
     const seqno = await getWalletSeqNo(api, walletState.rawAddress);
     const signature = Buffer.from(signatureHex, 'hex');
-    const message = Cell.fromBase64(messageBase64).asBuilder();
+    const message = Cell.fromBase64(messageBase64).asSlice();
 
     const transfer = beginCell();
     if (isW5Version(walletState.version)) {
-        transfer.storeBuilder(message).storeBuffer(signature);
+        transfer.storeSlice(message).storeBuffer(signature);
     } else {
-        transfer.storeBuffer(signature).storeBuilder(message);
+        transfer.storeBuffer(signature).storeSlice(message);
     }
 
-    const external = externalMessage(contract, seqno, transfer.endCell()).toBoc({ idx: false });
+    const external = externalMessage(contract, seqno, transfer.endCell()).toBoc();
 
     const boc = external.toString('base64');
 

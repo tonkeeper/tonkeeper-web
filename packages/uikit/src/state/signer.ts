@@ -10,12 +10,12 @@ import { useWalletsStorage } from '../hooks/useStorage';
 export const usePairSignerMutation = () => {
     const sdk = useAppSdk();
     const walletsStorage = useWalletsStorage();
-    const { api } = useAppContext();
+    const { api, config } = useAppContext();
     const client = useQueryClient();
     const navigate = useNavigate();
     return useMutation<void, Error, string>(async qrCode => {
         try {
-            const state = await walletStateFromSignerQr(api, qrCode);
+            const state = await walletStateFromSignerQr(api, qrCode, config);
 
             await walletsStorage.addWalletToState(state);
 

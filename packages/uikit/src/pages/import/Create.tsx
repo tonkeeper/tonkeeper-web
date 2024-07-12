@@ -10,6 +10,7 @@ import {
     GearLottieIcon,
     WriteLottieIcon
 } from '../../components/lottie/LottieIcons';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { FinalView } from './Password';
@@ -20,6 +21,7 @@ import { useCreateStandardTonWalletsByMnemonic, useWalletsState } from '../../st
 const Create = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
+    const { config } = useAppContext();
     const {
         mutateAsync: createWalletsAsync,
         isLoading: isCreateWalletLoading,
