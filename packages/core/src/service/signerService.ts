@@ -88,7 +88,7 @@ export const publishSignerMessage = async (
         transfer.storeBuffer(signature).storeSlice(message);
     }
 
-    const external = externalMessage(contract, seqno, transfer.endCell()).toBoc({ idx: false });
+    const external = externalMessage(contract, seqno, transfer.endCell()).toBoc();
 
     const boc = external.toString('base64');
 
