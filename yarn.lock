@@ -6719,14 +6719,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton/core@npm:0.54.0":
-  version: 0.54.0
-  resolution: "@ton/core@npm:0.54.0"
+"@ton/core@npm:0.56.0":
+  version: 0.56.0
+  resolution: "@ton/core@npm:0.56.0"
   dependencies:
     symbol.inspect: "npm:1.0.1"
   peerDependencies:
     "@ton/crypto": ">=3.2.0"
-  checksum: 10/2af2f369ed9ce83e985550cdca078c332fa4ac2842d213ed4b9e0615ddba3ce2c9571f5ea99a4f3a9d8d3e3a3df347815b5454cb09c99bca282a5ca7dcf0ab92
+  checksum: 10/29ca0f84f4af806004453f81594d09257d32eb89374555604eb53c79123e70be30307307c75802621cb9355b8cc20f0adab27a2e82dba5a0a2c5a0c5065950e1
   languageName: node
   linkType: hard
 
@@ -6750,9 +6750,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton/ton@https://github.com/tonkeeper/tonkeeper-ton#build9":
+"@ton/ton@https://github.com/tonkeeper/tonkeeper-ton#build10":
   version: 13.11.1
-  resolution: "@ton/ton@https://github.com/tonkeeper/tonkeeper-ton.git#commit=2379b6373dfddd303831684a4fbff9aade62e6f9"
+  resolution: "@ton/ton@https://github.com/tonkeeper/tonkeeper-ton.git#commit=0b82d8f6dd324296b1290578f89d0cf1c21e5302"
   dependencies:
     axios: "npm:^1.6.7"
     dataloader: "npm:^2.0.0"
@@ -6762,7 +6762,7 @@ __metadata:
   peerDependencies:
     "@ton/core": ">=0.56.0"
     "@ton/crypto": ">=3.2.0"
-  checksum: 10/6687648d87ddc3c78f4d0709ccfc6083c3eacd20f5a778edad12d2244068f8ef98949f14504f9c03b251b52234a99d41beecbaab0c71a9bc22658d21711f17f9
+  checksum: 10/ee56a1391ee844dd169abba21de44112d87e1ae984a1769de655ea6b70918ab2ffe52ea525470ba6f7b4760d2e2050a15208a4679601ffe84b8fba006a6a3f47
   languageName: node
   linkType: hard
 
@@ -6774,9 +6774,9 @@ __metadata:
     "@ledgerhq/hw-transport-webhid": "npm:^6.28.6"
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
     "@ton-community/ton-ledger": "npm:^7.0.1"
-    "@ton/core": "npm:0.54.0"
+    "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
-    "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build9"
+    "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build10"
     bignumber.js: "npm:^9.1.1"
     ethers: "npm:^6.6.5"
     npm-run-all: "npm:^4.1.5"
@@ -6866,7 +6866,7 @@ __metadata:
     "@tonkeeper/uikit": "npm:0.1.0"
     "@types/fs-extra": "npm:^11.0.4"
     "@types/jest": "npm:^27.5.2"
-    "@types/node": "npm:^16.18.6"
+    "@types/node": "npm:^20.10.3"
     "@types/react": "npm:^18.0.26"
     "@types/react-dom": "npm:^18.0.9"
     "@types/react-is": "npm:^18"
@@ -6926,7 +6926,7 @@ __metadata:
     "@tonkeeper/uikit": "npm:0.1.0"
     "@types/fs-extra": "npm:^11.0.1"
     "@types/jest": "npm:^27.5.2"
-    "@types/node": "npm:^16.18.6"
+    "@types/node": "npm:^20.10.3"
     "@types/react": "npm:^18.0.26"
     "@types/react-dom": "npm:^18.0.9"
     "@types/react-transition-group": "npm:^4.4.5"
@@ -6975,7 +6975,7 @@ __metadata:
     "@storybook/react": "npm:^6.5.14"
     "@storybook/testing-library": "npm:^0.0.13"
     "@tanstack/react-query": "npm:4.3.4"
-    "@ton/core": "npm:0.54.0"
+    "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
     "@tonkeeper/core": "npm:0.1.0"
     "@types/country-list-js": "npm:^3.1.3"
@@ -7630,7 +7630,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^14.0.10 || ^16.0.0, @types/node@npm:^14.14.20 || ^16.0.0, @types/node@npm:^16.18.6":
+"@types/node@npm:^14.0.10 || ^16.0.0, @types/node@npm:^14.14.20 || ^16.0.0":
   version: 16.18.68
   resolution: "@types/node@npm:16.18.68"
   checksum: 10/a7df7d5761ec339aff812929fa7ab3f1b3951b2372fda7eeedf8bba134c52cbea9fb721ae99f3f1427f782094bffa0d85509b15bfe426858dd04f12c71d55988

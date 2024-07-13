@@ -34,7 +34,9 @@ const walletVersionText = (version: WalletVersion) => {
             return 'v3r2';
         case WalletVersion.V4R2:
             return 'v4r2';
-        case WalletVersion.W5:
+        case WalletVersion.V5beta:
+            return 'v5beta';
+        case WalletVersion.V5R1:
             return 'v5r1';
         default:
             return String(version);
@@ -74,16 +76,19 @@ export const publishSignerMessage = async (
     const contract = walletContractFromState(walletState);
     const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
     const signature = Buffer.from(signatureHex, 'hex');
-    const message = Cell.fromBase64(messageBase64).asBuilder();
+    const message = Cell.fromBase64(messageBase64).asSlice();
 
     const transfer = beginCell();
-    if (walletState.active.version === WalletVersion.W5) {
-        transfer.storeBuilder(message).storeBuffer(signature);
+    if (
+        walletState.active.version === WalletVersion.V5beta ||
+        walletState.active.version === WalletVersion.V5R1
+    ) {
+        transfer.storeSlice(message).storeBuffer(signature);
     } else {
-        transfer.storeBuffer(signature).storeBuilder(message);
+        transfer.storeBuffer(signature).storeSlice(message);
     }
 
-    const external = externalMessage(contract, seqno, transfer.endCell()).toBoc({ idx: false });
+    const external = externalMessage(contract, seqno, transfer.endCell()).toBoc();
 
     const boc = external.toString('base64');
 

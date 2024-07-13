@@ -12,6 +12,7 @@ import {
     GearLottieIcon,
     WriteLottieIcon
 } from '../../components/lottie/LottieIcons';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveWallet } from '../../state/wallet';
@@ -21,6 +22,7 @@ import { Subscribe } from './Subscribe';
 const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
+    const { config } = useAppContext();
     const {
         mutateAsync: checkPasswordAndCreateWalletAsync,
         isLoading: isConfirmLoading,
