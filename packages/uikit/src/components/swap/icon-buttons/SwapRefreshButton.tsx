@@ -1,23 +1,7 @@
-import { IconButton } from '../../fields/IconButton';
+import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { RefreshIcon, RefreshIconAnimated } from '../../Icon';
 import { useCalculatedSwap } from '../../../state/swap/useCalculatedSwap';
-import { styled } from 'styled-components';
 import { useEffect, useState } from 'react';
-
-const IconButtonStyled = styled(IconButton)`
-    padding: 10px;
-    border: none;
-
-    > svg {
-        color: ${props => props.theme.iconSecondary};
-    }
-
-    transition: opacity 0.15s ease-in-out;
-
-    &:hover {
-        opacity: 0.64;
-    }
-`;
 
 let isRefetchCalled = false;
 
@@ -49,8 +33,8 @@ export const SwapRefreshButton = () => {
     }, [isFetching]);
 
     return (
-        <IconButtonStyled transparent onClick={() => refetch()}>
+        <IconButtonTransparentBackground onClick={() => refetch()}>
             {isCounting ? <RefreshIconAnimated /> : <RefreshIcon />}
-        </IconButtonStyled>
+        </IconButtonTransparentBackground>
     );
 };

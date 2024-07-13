@@ -2,15 +2,32 @@ import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import React, { FC, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
-import { useNftCollectionData } from '../../state/wallet';
-import { ChevronDownIcon, VerificationIcon } from '../Icon';
+import { useActiveWalletConfig, useNftCollectionData } from '../../state/wallet';
+import {
+    BlockIcon,
+    ChevronDownIcon,
+    EllipsisIcon,
+    EyeDisableIcon,
+    GlobeIcon,
+    InfoCircleIcon,
+    VerificationIcon
+} from '../Icon';
 import { NotificationBlock, NotificationTitleBlock } from '../Notification';
-import { H2, H3, Label1, Label4 } from '../Text';
-import { BackButton, ButtonMock } from '../fields/BackButton';
+import { Body2, H2, H3, Label1, Label4 } from '../Text';
+import { RoundedButton } from '../fields/RoundedButton';
 import { Body, CroppedBodyText } from '../jettons/CroppedText';
 import { NftAction } from './NftAction';
 import { NftDetails } from './NftDetails';
 import { Image, NftBlock } from './Nfts';
+import { TrustType } from '@tonkeeper/core/dist/tonApiV2';
+import { Button } from '../fields/Button';
+import { useHideNft, useMarkNftAsSpam, useMarkNftAsTrusted } from '../../state/nft';
+import { UnverifiedNftNotification } from './UnverifiedNftNotification';
+import { useDisclosure } from '../../hooks/useDisclosure';
+import { DropDown } from '../DropDown';
+import { ListBlock, ListItemElement, ListItemPayload } from '../List';
+import { useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
 
 const Text = styled.div`
     display: flex;
@@ -32,9 +49,21 @@ const Icon = styled.span`
     margin-left: 4px;
 `;
 
-const TonDnsRoot = '0:b774d95eb20543f186c06b371ab88ad704f7e256130caf96189368a7d0cb6ccf';
-const TelegramUsernames = '0:80d78a35f955a14b679faa887ff4cd5bfc0f43b4a4eea2a7e6927f3701b273c2';
-const TelegramNumbers = '0:0e41dc1dc3c9067ed24248580e12b3359818d83dee0304fabcf80845eafafdb2';
+export const TonDnsRootCollectionAddress =
+    '0:b774d95eb20543f186c06b371ab88ad704f7e256130caf96189368a7d0cb6ccf';
+export const TelegramUsernamesCollectionAddress =
+    '0:80d78a35f955a14b679faa887ff4cd5bfc0f43b4a4eea2a7e6927f3701b273c2';
+export const TelegramNumbersCollectionAddress =
+    '0:0e41dc1dc3c9067ed24248580e12b3359818d83dee0304fabcf80845eafafdb2';
+export const GetGemsDnsCollectionAddress =
+    '0:e1955aba7249f23e4fd2086654a176516d98b134e0df701302677c037c358b17';
+
+export const KnownNFTDnsCollections = [
+    TonDnsRootCollectionAddress,
+    TelegramNumbersCollectionAddress,
+    TelegramUsernamesCollectionAddress,
+    GetGemsDnsCollectionAddress
+];
 
 const Title = styled(H2)`
     word-break: break-word;
@@ -55,10 +84,56 @@ const SaleBlock = styled(Label4)`
     white-space: nowrap;
 `;
 
+const UnverifiedLabel = styled(Body2)<{ isTrusted: boolean }>`
+    color: ${props => (props.isTrusted ? props.theme.textSecondary : props.theme.accentOrange)};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+`;
+
+const NftNameContainer = styled.div`
+    text-align: center;
+`;
+
+const ButtonsBlock = styled.div`
+    display: flex;
+    gap: 8px;
+    width: 100%;
+
+    > * {
+        flex: 1;
+    }
+`;
+
+const DropDownWrapper = styled.div`
+    .drop-down-container {
+        z-index: 100;
+        top: calc(100% + 12px);
+        right: 0;
+    }
+`;
+
+const ListBlockStyled = styled(ListBlock)`
+    margin: 0;
+
+    svg {
+        color: ${p => p.theme.accentBlue};
+    }
+`;
+
 export const NftPreview: FC<{
     onClose?: () => void;
     nftItem: NFT;
 }> = ({ onClose, nftItem }) => {
+    const { mutateAsync: markNftAsSpam, isLoading: markNftAsSpamLoading } = useMarkNftAsSpam();
+    const { mutate: markNftAsTrusted, isLoading: markNftAsTrustedLoading } = useMarkNftAsTrusted();
+    const { mutateAsync: hideNft } = useHideNft();
+
+    const { data } = useActiveWalletConfig();
+    const isSuspicious = nftItem.trust !== TrustType.Whitelist;
+    const isTrusted = !!data?.trustedNfts.includes(nftItem.collection?.address || nftItem.address);
+
     const ref = useRef<HTMLImageElement | null>(null);
     const { t } = useTranslation();
     const { data: collection } = useNftCollectionData(nftItem);
@@ -68,11 +143,11 @@ export const NftPreview: FC<{
 
     const itemKind = useMemo(() => {
         switch (nftItem.collection?.address) {
-            case TonDnsRoot:
+            case TonDnsRootCollectionAddress:
                 return 'ton.dns';
-            case TelegramUsernames:
+            case TelegramUsernamesCollectionAddress:
                 return 'telegram.name';
-            case TelegramNumbers:
+            case TelegramNumbersCollectionAddress:
                 return 'telegram.number';
             default:
                 return 'token';
@@ -83,16 +158,114 @@ export const NftPreview: FC<{
 
     const image = nftItem.previews?.find(item => item.resolution === '1500x1500');
 
+    const {
+        isOpen: isSpamModalOpen,
+        onClose: onCloseSpamModal,
+        onOpen: onOpenSpamModal
+    } = useDisclosure();
+
+    const handleCloseSpamModal = (action?: 'mark_spam' | 'mark_trusted') => {
+        if (action === 'mark_spam') {
+            markNftAsSpam(nftItem).then(onClose);
+        } else if (action === 'mark_trusted') {
+            markNftAsTrusted(nftItem);
+        }
+        onCloseSpamModal();
+    };
+
+    const { config } = useAppContext();
+    const sdk = useAppSdk();
+
+    const explorerUrl = config.NFTOnExplorerUrl ?? 'https://tonviewer.com/nft/%s';
+
     return (
         <NotificationBlock>
             {onClose && (
                 <NotificationTitleBlock>
-                    <BackButton onClick={onClose}>
+                    <RoundedButton onClick={onClose}>
                         <ChevronDownIcon />
-                    </BackButton>
-                    <H3>{nftItem.dns ?? nftItem.metadata.name}</H3>
-                    <ButtonMock />
+                    </RoundedButton>
+                    <NftNameContainer>
+                        <H3>{nftItem.dns ?? nftItem.metadata.name}</H3>
+                        {isSuspicious && (
+                            <UnverifiedLabel isTrusted={isTrusted} onClick={onOpenSpamModal}>
+                                {t('suspicious_label_full')}&nbsp;
+                                <InfoCircleIcon
+                                    color={isTrusted ? 'textSecondary' : 'accentOrange'}
+                                />
+                            </UnverifiedLabel>
+                        )}
+                    </NftNameContainer>
+                    <UnverifiedNftNotification
+                        isOpen={isSpamModalOpen}
+                        onClose={handleCloseSpamModal}
+                        isTrusted={isTrusted}
+                    />
+                    <DropDownWrapper>
+                        <DropDown
+                            containerClassName="drop-down-container"
+                            payload={closeDropDown => (
+                                <ListBlockStyled>
+                                    <ListItemElement
+                                        onClick={() => {
+                                            closeDropDown();
+                                            hideNft(nftItem).then(onClose);
+                                        }}
+                                    >
+                                        <ListItemPayload>
+                                            <Label1>{t('nft_actions_hide_nft')}</Label1>
+                                            <EyeDisableIcon />
+                                        </ListItemPayload>
+                                    </ListItemElement>
+                                    <ListItemElement
+                                        onClick={() => {
+                                            closeDropDown();
+                                            markNftAsSpam(nftItem).then(onClose);
+                                        }}
+                                    >
+                                        <ListItemPayload>
+                                            <Label1>{t('nft_actions_hide_and_report')}</Label1>
+                                            <BlockIcon />
+                                        </ListItemPayload>
+                                    </ListItemElement>
+                                    <ListItemElement
+                                        onClick={() =>
+                                            sdk.openPage(explorerUrl.replace('%s', nftItem.address))
+                                        }
+                                    >
+                                        <ListItemPayload>
+                                            <Label1>{t('nft_actions_view_on_explorer')}</Label1>
+                                            <GlobeIcon />
+                                        </ListItemPayload>
+                                    </ListItemElement>
+                                </ListBlockStyled>
+                            )}
+                        >
+                            <RoundedButton>
+                                <EllipsisIcon />
+                            </RoundedButton>
+                        </DropDown>
+                    </DropDownWrapper>
                 </NotificationTitleBlock>
+            )}
+            {isSuspicious && !isTrusted && (
+                <ButtonsBlock>
+                    <Button
+                        warn
+                        type="button"
+                        onClick={() => markNftAsSpam(nftItem).then(onClose)}
+                        loading={markNftAsSpamLoading}
+                    >
+                        {t('suspicious_buttons_report')}
+                    </Button>
+                    <Button
+                        type="button"
+                        onClick={() => markNftAsTrusted(nftItem)}
+                        loading={markNftAsTrustedLoading}
+                    >
+                        {t('suspicious_buttons_not_spam')}
+                    </Button>
+                </ButtonsBlock>
             )}
             <NftBlock>
                 {image && <Image ref={ref} url={image.url} />}

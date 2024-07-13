@@ -20,3 +20,21 @@ export const IconButton = styled.button<{ transparent?: boolean }>`
     }
     border: none;
 `;
+
+export const IconButtonTransparentBackground = styled(IconButton)`
+    padding: 10px;
+    border: none;
+
+    > svg {
+        color: ${props => props.theme.iconSecondary};
+    }
+
+    background-color: transparent;
+
+    transition: opacity 0.15s ease-in-out;
+
+    &:hover {
+        opacity: 0.64;
+        background-color: transparent;
+    }
+`;

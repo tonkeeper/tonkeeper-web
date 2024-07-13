@@ -13,7 +13,7 @@ import { useTranslation } from '../../hooks/translation';
 import { scrollToTop } from '../../libs/common';
 import { AppRoute } from '../../libs/routes';
 import { useAssets } from '../../state/home';
-import { useWalletNftList } from '../../state/wallet';
+import { useWalletFilteredNftList } from '../../state/wallet';
 
 const MainColumnSkeleton = memo(() => {
     const sdk = useAppSdk();
@@ -41,7 +41,7 @@ const Navigation = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { data: nfts } = useWalletNftList();
+    const { data: nfts } = useWalletFilteredNftList();
 
     const active = useMemo<AppRoute>(() => {
         if (location.pathname.includes(AppRoute.activity)) {

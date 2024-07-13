@@ -6,6 +6,7 @@ import { JettonsSettings } from '../../pages/settings/Jettons';
 import styled from 'styled-components';
 import { DesktopWalletSettingsPage } from './DesktopWalletSettingsPage';
 import { DesktopConnectedAppsSettings } from './DesktopConnectedAppsSettings';
+import { DesktopNftSettings } from './DesktopNftSettings';
 
 const OldSettingsLayoutWrapper = styled.div`
     padding-top: 64px;
@@ -35,6 +36,7 @@ export const DesktopWalletSettingsRouting = () => {
                 path={WalletSettingsRoute.connectedApps}
                 element={<DesktopConnectedAppsSettings />}
             />
+            <Route path={WalletSettingsRoute.nft} element={<DesktopNftSettings />} />
             <Route path="*" element={<DesktopWalletSettingsPage />} />
         </Routes>
     );

@@ -18,7 +18,7 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useClickOutside } from '../hooks/useClickOutside';
 import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
 import { Container } from '../styles/globalStyle';
-import { BackButton, ButtonMock } from './fields/BackButton';
+import { RoundedButton, ButtonMock } from './fields/RoundedButton';
 import { CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
@@ -343,9 +343,9 @@ export const NotificationTitleBlock = styled.div`
 
 export const NotificationCancelButton: FC<{ handleClose: () => void }> = ({ handleClose }) => {
     return (
-        <BackButton onClick={handleClose}>
+        <RoundedButton onClick={handleClose}>
             <CloseIcon />
-        </BackButton>
+        </RoundedButton>
     );
 };
 

@@ -5,19 +5,19 @@ import {
     replyDisconnectResponse
 } from '@tonkeeper/core/dist/service/tonConnect/actionService';
 import { subscribeTonConnect } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSendNotificationAnalytics } from '../../hooks/amplitude';
 import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { TonTransactionNotification } from './TonTransactionNotification';
-import { SendTransactionAppRequest, useResponseSendMutation } from './connectHook';
+import { useMutateActiveWallet } from '../../state/account';
 import {
     tonConnectAppManuallyDisconnected$,
-    useDisconnectTonConnectApp,
     useAppTonConnectConnections,
+    useDisconnectTonConnectApp,
     useTonConnectLastEventId
 } from '../../state/tonConnect';
-import { useMutateActiveWallet } from '../../state/account';
+import { TonTransactionNotification } from './TonTransactionNotification';
+import { SendTransactionAppRequest, useResponseSendMutation } from './connectHook';
 
 const useUnSupportMethodMutation = () => {
     return useMutation<void, Error, TonConnectAppRequest>(replyBadRequestResponse);

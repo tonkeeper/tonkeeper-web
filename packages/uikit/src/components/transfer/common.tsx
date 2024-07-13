@@ -13,7 +13,7 @@ import { useTranslation } from '../../hooks/translation';
 import { ChevronLeftIcon } from '../Icon';
 import { NotificationCancelButton, NotificationTitleBlock } from '../Notification';
 import { Body1, H3 } from '../Text';
-import { BackButton, ButtonMock } from '../fields/BackButton';
+import { RoundedButton, ButtonMock } from '../fields/RoundedButton';
 import { Button } from '../fields/Button';
 import { Center, Title } from './amountView/AmountViewUI';
 import { AmountState } from './amountView/amountState';
@@ -291,9 +291,9 @@ export const AmountHeaderBlock: AmountHeaderBlockComponent = ({ onBack, onClose,
     const { t } = useTranslation();
     return (
         <NotificationTitleBlock>
-            <BackButton onClick={onBack}>
+            <RoundedButton onClick={onBack}>
                 <ChevronLeftIcon />
-            </BackButton>
+            </RoundedButton>
             <Center>
                 <Title>{t('txActions_amount')}</Title>
                 {children}

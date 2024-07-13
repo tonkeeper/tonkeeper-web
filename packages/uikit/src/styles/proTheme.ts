@@ -28,17 +28,22 @@ export const proTheme: DefaultTheme = {
     buttonSecondaryForeground: '#EBEBEB',
     buttonTertiaryBackground: '#222224',
     buttonTertiaryForeground: '#EBEBEB',
+    buttonWarnBackground: '#F5A73B',
+    buttonWarnForeground: '#FFFFFF',
     buttonPrimaryBackgroundDisabled: '#CCAF21',
     buttonSecondaryBackgroundDisabled: '#0E0E0F',
     buttonTertiaryBackgroundDisabled: '#18181A',
+    buttonWarnBackgroundDisabled: '#C2842F',
 
     buttonTertiaryForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
     buttonSecondaryForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
     buttonPrimaryForegroundDisabled: 'rgba(0, 0, 0, 0.48)',
+    buttonWarnForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
 
     buttonPrimaryBackgroundHighlighted: '#FFDE3D',
     buttonSecondaryBackgroundHighlighted: '#202024',
     buttonTertiaryBackgroundHighlighted: '#2A2A2E',
+    buttonWarnBackgroundHighlighted: '#F5AF4E',
 
     fieldBackground: '#17171A',
     fieldActiveBorder: '#FFDB29',

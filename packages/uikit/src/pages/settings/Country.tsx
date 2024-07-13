@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
 import { SubHeader } from '../../components/SubHeader';
-import { CountryIcon } from '../../components/fields/BackButton';
+import { CountryIcon } from '../../components/fields/RoundedButton';
 import { Input } from '../../components/fields/Input';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useTranslation } from '../../hooks/translation';

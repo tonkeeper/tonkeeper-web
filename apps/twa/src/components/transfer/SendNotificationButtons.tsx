@@ -1,7 +1,8 @@
+import { useMainButton } from '@tma.js/sdk-react';
 import { ConfirmMainButtonProps } from '@tonkeeper/uikit/dist/components/transfer/common';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
-import { useMainButton } from '@twa.js/sdk-react';
 import { useEffect } from 'react';
+import { useTheme } from 'styled-components';
 
 export const HideTwaMainButton = () => {
     const button = useMainButton();
@@ -19,9 +20,9 @@ export const useMainButtonLoading = (isLoading: boolean) => {
     const button = useMainButton();
     useEffect(() => {
         if (isLoading) {
-            button.showProgress();
+            button.showLoader();
         } else {
-            button.hideProgress();
+            button.hideLoader();
         }
     }, [button, isLoading]);
 };
@@ -35,9 +36,14 @@ export const RecipientTwaMainButton = ({
 }) => {
     const button = useMainButton();
     const { t } = useTranslation();
+    const theme = useTheme();
 
     useEffect(() => {
         button.setText(t('continue'));
+
+        button.setBgColor(theme.buttonPrimaryBackground);
+        button.setTextColor(theme.buttonPrimaryForeground);
+
         button.show();
         button.enable();
     }, []);

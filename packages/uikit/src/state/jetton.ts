@@ -61,7 +61,6 @@ const compareTokensOver = (fiat: FiatCurrencies) => {
 export const useJettonRawList = () => {
     const wallet = useWalletContext();
     const { api, fiat } = useAppContext();
-    const sdk = useAppSdk();
 
     return useQuery<JettonsBalances, Error>(
         [wallet.active.rawAddress, JettonKey.raw, QueryKey.jettons, fiat, wallet.network],
@@ -157,15 +156,6 @@ export const useJettonBalance = (jettonAddress: string) => {
             }
             return balance;
         }
-    );
-};
-
-export const useActiveWalletConfig = () => {
-    const wallet = useWalletContext();
-    const sdk = useAppSdk();
-    return useQuery<ActiveWalletConfig, Error>(
-        [wallet.active.rawAddress, wallet.network, QueryKey.walletConfig],
-        async () => getActiveWalletConfig(sdk.storage, wallet.active.rawAddress, wallet.network)
     );
 };
 

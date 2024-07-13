@@ -1,4 +1,9 @@
 {
+  "about_risk_modal" : {
+    "description" : "从您的钱包发送的代币总价值。不包括退款在总价值内。",
+    "description_with_nft" : "从您的钱包发送的代币总价值，不包括NFT的成本。退款不包含在总价值中。",
+    "ok_button" : "确定"
+  },
   "about_ton" : "TON 是 Telegram 为数十亿用户设计的完全去中心化的第一层区块链。它拥有超快的交易速度、极低的费用、易于使用的应用程序，并且非常环保。",
   "access_confirmation_logout" : "退出登录",
   "access_confirmation_reset" : "重置",
@@ -6,6 +11,19 @@
   "access_confirmation_update_biometry" : "输入密码以使用生物识别身份验证数据",
   "access_denied" : "访问被禁止",
   "account_deleted" : "账户已删除",
+  "activityActionModal" : {
+    "bid" : "出价",
+    "burned" : "烧毁",
+    "call_contract" : "调用合约",
+    "deposit" : "存款",
+    "purchase" : "购买",
+    "received" : "收到",
+    "sent" : "已发送",
+    "swapped" : "交换",
+    "time_on" : "于 {time}",
+    "withdraw" : "提取",
+    "withdrawal_request" : "提现请求"
+  },
   "activity" : {
     "buy_toncoin_btn" : "购买Toncoin",
     "empty_transaction_caption" : "进行您的第一笔交易！",
@@ -26,6 +44,22 @@
   },
   "add_other_coins" : "增添代币",
   "address_copied" : "地址已复制",
+  "address_update" : {
+    "first_option" : "最有可能的是目标钱包已经在活跃使用中，你不会注意到任何区别。",
+    "learn_more" : "了解更多",
+    "new_style" : "新地址",
+    "notification_desc_did_change" : "您的钱包地址已更新为 UQ 格式。旧地址仍然可以使用。",
+    "notification_desc_will_change" : "10月5日，您的钱包地址将更新为更好的UQ格式。旧地址仍将继续工作。您不需要做任何事情。",
+    "old_style" : "旧地址",
+    "post_dates" : "\n2023年10月5日：Tonkeeper中的所有地址将切换到UQ格式。\n\n2024年1月1日：Tonkeeper停止检查合同状态，并在地址中使用“bounceable”标志。发送到EQ地址的未发布合同的币将退回发件人。",
+    "post_published_date" : "发布于：2023年9月27日",
+    "post_rest" : "在TON区块链中有两种地址样式，迄今为止仅一种用于应用程序和钱包。\n\nEQ格式最适合处理来款的智能合约。如果智能合约尚未发布——即代码未在区块链上——则发送到该地址的TON将退回给发送者。这是一种安全功能：如果出现任何错误，TON会退回。\n\nUQ格式最适合用于钱包。因为钱包只是用来存储资金的，所以硬币不会退回。每个钱包开始时都是没有区块链代码的普通地址。因此，硬币不会退回是有道理的。\n\n今年我们将钱包转换为更适合的UQ格式。如果您继续向某人给你的旧EQ地址发送资金，将会有两种选择：",
+    "post_top" : "到今年年底，整个TON网络将以不同的方式显示钱包地址。新地址将以UQ开头，而不是EQ。最后四个字母也会改变。旧地址仍然可用，并指向同一个钱包。这不会影响您钱包中存储资金的安全性。",
+    "second_option" : "不太可能钱包从未用于支付。且 Tonkeeper 明年将不会向该地址发送加密币。您需要请求收件人提供新的 UQ 地址。",
+    "title" : "地址更新",
+    "why_change" : "为什么更改？",
+    "your_wallet" : "你的钱包"
+  },
   "add_wallet" : "添加钱包",
   "add_wallet_modal" : {
     "create" : {
@@ -35,6 +69,17 @@
     "import" : {
       "subtitle" : "使用24个助记词导入钱包",
       "title" : "现有钱包"
+    },
+    "import_subtitle" : "从下面的选项中选择。",
+    "import_title" : "导入钱包",
+    "ledger" : {
+      "subtitle" : "更高等级的安全性与硬件钱包",
+      "title" : "连接 Ledger"
+    },
+    "other_options" : "其他选项",
+    "signer" : {
+      "subtitle" : "更高水平的控制和安全",
+      "title" : "连接 Signer"
     },
     "subtitle" : "创建一个新钱包或添加现有钱包。",
     "testnet" : {
@@ -52,6 +97,7 @@
     "title" : "观察账户",
     "wallet_not_found" : "钱包地址未找到"
   },
+  "all_regions" : "所有地区",
   "appearance_accent_name" : {
     "andromeda" : "仙女座",
     "arctic" : "北极",
@@ -76,10 +122,16 @@
     "accepted" : "已接受",
     "accepted_at_collection" : "在 {date} 接受",
     "accepted_at_token" : "在 {date} 接受",
+    "accepted_collection" : "接受的收藏",
+    "accepted_token" : "接受的令牌",
     "approve_all" : "接受所有",
     "approve_collection_many" : "批准来自 \"{collection}\" 集合的传入代币",
     "approve_collection_one" : "批准来自 \"{collection}\" 集合的传入代币",
     "approve_many" : "批准 {count} 传入的代币",
+    "approve_many.few" : "批准{count}个传入的令牌",
+    "approve_many.many" : "批准{count}个入站token",
+    "approve_many.one" : "批准{count}个入站令牌",
+    "approve_many.other" : "批准 {count} 个传入令牌",
     "approve_token" : "批准传入的代币\"{name}\"",
     "approve_two_collections" : "批准来自 \"{collection1}\" 和 \"{collection2}\" 集合的传入代币",
     "approve_two_tokens" : "批准传入的代币\"{name1}\" 和 \"{name2}\"",
@@ -95,16 +147,25 @@
     "id_token" : "代币ID",
     "manage_tokens" : "管理代币",
     "move_to_accepted" : "移至已接受",
+    "move_to_accepted_collection" : "在钱包中显示收藏品",
+    "move_to_accepted_token" : "在钱包中显示代币",
     "move_to_declined" : "移至已拒绝",
+    "move_to_declined_collection" : "从钱包中隐藏收藏",
+    "move_to_declined_token" : "将代币从钱包中隐藏",
     "name" : "名称",
+    "not_spam" : "这不是垃圾邮件",
     "pending" : "待定",
     "show_all" : "显示所有",
     "single_token" : "单一代币",
+    "spam" : "垃圾邮件",
     "token_copied" : "代币ID已复制",
     "token_count" : {
+      "few" : "{count} 令牌",
+      "many" : "{count} 令牌",
       "one" : "{count} 代币",
       "other" : "{count} 代币"
     },
+    "unverified_token" : "未验证的令牌",
     "verify_collection" : "验证集合",
     "verify_description_collection" : "这些代币来自未知发行者。要检测伪造品，请使用发行者的官方来源验证集合ID。您稍后可以在设置中更改代币的可见性。",
     "verify_description_token" : "此代币来自未知发行者。要检测伪造品，请使用发行者的官方来源验证代币ID。您稍后可以在设置中更改代币的可见性。",
@@ -119,6 +180,7 @@
     "title" : "备份检查"
   },
   "backup_screen" : {
+    "backup_warning" : "您的余额为{totalFiat}，它仅受您尚未记录的恢复短语的保护。请备份短语，以避免因设备问题而丢失资金。",
     "last_backup_time" : "上次备份 %{time}",
     "manual_backup_on" : "手动备份开启",
     "manual_button" : "手动备份",
@@ -142,13 +204,42 @@
       "empty" : "发送代币和 NFT，用空的主账户支付质押操作费用。",
       "other" : "您已有足够的电量以进行 %{cnt} 次交易"
     },
+    "max_input_amount" : "最大输入金额 {amount}",
     "ok" : "确定",
+    "other_ways" : {
+      "by_crypto" : {
+        "subtitle" : "使用{methods}",
+        "title" : "通过 {symbol} 充值"
+      },
+      "gift" : {
+        "subtitle" : "与朋友分享",
+        "title" : "电池礼品"
+      },
+      "promo" : {
+        "subtitle" : "你很幸运",
+        "title" : "输入促销代码"
+      }
+    },
     "packages" : {
       "buy" : "购买",
       "disclaimer" : "这是估计的转账数量。您的某些交易可能会花费更多。",
       "ok" : "确定",
-      "refilled" : "电池已充电"
+      "refilled" : "电池已充电",
+      "refund" : "充电历史",
+      "restore" : "恢复购买",
+      "subtitle" : {
+        "few" : "{count} 次充电",
+        "many" : "{count} 个充电",
+        "one" : "{count} 次充电",
+        "other" : "{count} 充电"
+      },
+      "title" : {
+        "large" : "大",
+        "medium" : "中等",
+        "small" : "小"
+      }
     },
+    "please_wait" : "电池将在几分钟内充电",
     "promocode" : {
       "apply" : "应用",
       "button" : "使用优惠码充值",
@@ -156,8 +247,50 @@
       "success" : "电池已充电",
       "title" : "优惠码"
     },
+    "recharge_by_crypto" : {
+      "continue" : "继续",
+      "other" : {
+        "subtitle" : "手动输入金额",
+        "title" : "其他"
+      },
+      "title" : "充电",
+      "title_gift" : "礼物",
+      "tokens" : "代币"
+    },
+    "refilled" : "电池已充满",
+    "refund" : {
+      "subtitle" : "充值和退款",
+      "title" : "收费历史"
+    },
     "screen_title" : "电池",
-    "settings" : "电池"
+    "send_widget" : {
+      "battery" : "电池"
+    },
+    "settings" : "电池",
+    "title" : "Tonkeeper 电池",
+    "transactions" : {
+      "charges_per_action" : {
+        "few" : "≈ {count} 次充电每 {transactionName}",
+        "many" : "≈ {count} 次充电每 {transactionName}",
+        "one" : "≈ {count} 次充电/{transactionName}",
+        "other" : "≈ {count} 次充电每 {transactionName}"
+      },
+      "description" : "所选交易将由Tonkeeper电池支付。",
+      "settings" : "电池设置",
+      "supported" : "支持的交易类型",
+      "title" : "交易",
+      "types" : {
+        "jetton" : "代币转账",
+        "nft" : "NFT转账",
+        "swap" : "通过Tonkeeper交换",
+        "ton" : "TON 转账"
+      },
+      "type" : {
+        "swap" : "交换",
+        "transfer" : "转移"
+      },
+      "will_be_paid" : "将被支付: {enabledTransactions}"
+    }
   },
   "biometry" : {
     "android" : {
@@ -181,6 +314,20 @@
       "fingerprint_instrumental" : "Touch ID"
     }
   },
+  "bluetooth" : {
+    "permissions_alert" : {
+      "cancel" : "取消",
+      "message" : "请在设置中启用蓝牙权限以使用此功能",
+      "open_settings" : "打开设置",
+      "title" : "蓝牙权限"
+    },
+    "powered_off_alert" : {
+      "cancel" : "取消",
+      "message" : "请打开蓝牙以使用此功能",
+      "open_settings" : "打开设置",
+      "title" : "Bluetooth已关闭"
+    }
+  },
   "browser" : {
     "about_dapps_caption" : "探索可以使用Tonkeeper进行登录和支付的应用和服务。",
     "about_dapps_learn_more" : "了解更多",
@@ -192,8 +339,13 @@
       "refresh" : "刷新",
       "share" : "分享"
     },
+    "apps_all" : "全部",
+    "connected" : "已连接",
+    "connected_empty_text" : "在Tonkeeper浏览器中探索应用程序和服务",
+    "connected_empty_title" : "已连接的应用将显示在此处",
     "connected_title" : "已连接",
     "empty_search" : "没有搜索到结果",
+    "explore" : "探索",
     "explore_all" : "探索所有",
     "more_description" : "市场、交易所等",
     "more_title" : "探索所有服务",
@@ -207,6 +359,10 @@
     "start_typing" : "输入地址或在网络上搜索",
     "title" : "浏览器",
     "web_search_title" : "{searchEngine} 搜索"
+  },
+  "buy_ton" : {
+    "subtitle" : "立即使用银行卡",
+    "title" : "购买 TON"
   },
   "cancel" : "取消",
   "chart" : {
@@ -226,6 +382,10 @@
   "check_words_success" : "恭喜！您已经设置了您的钱包",
   "check_words_title" : "让我们检查一下",
   "choose_country" : {
+    "auto" : "自动",
+    "cancel" : "取消",
+    "empty_placeholder" : "您的搜索没有返回任何结果",
+    "search" : "搜索",
     "title" : "选择您的国家"
   },
   "choose_currency" : {
@@ -250,6 +410,7 @@
       "NGN" : "尼日利亚奈拉",
       "RUB" : "俄罗斯卢布",
       "THB" : "泰铢",
+      "TON" : "Toncoin",
       "TRY" : "土耳其里拉",
       "UAH" : "乌克兰格里夫纳",
       "USD" : "美元",
@@ -259,16 +420,22 @@
     "header_title" : "主要货币"
   },
   "choose_wallets" : {
+    "already_added" : "已添加",
     "subtitle" : "选择您想添加的钱包。",
     "title" : "选择钱包",
-    "tokens" : "代币"
+    "tokens" : "代币",
+    "w5_subtitle" : "更低的区块链费用，无燃气的交易和多重转账。",
+    "w5_subtitle_link" : "了解更多"
   },
   "confirm" : "确认",
+  "confirm_renew_all_domains_title" : "确认操作",
   "confirm_sending_amount" : "金额",
   "confirm_sending_fee" : "手续费",
   "confirm_sending_inactive_warn_about" : "你应该做什么",
   "confirm_sending_inactive_warn_description" : "如果您期望区块链发生奇迹，请不要继续。不会的。真的不会的。",
   "confirm_sending_inactive_warn_title" : "非活跃合约",
+  "confirm_sending_liquid_warn_description" : "您将不再收到已发送的质押TON的奖励。新拥有者将开始获得奖励。",
+  "confirm_sending_liquid_warn_title" : "注意",
   "confirm_sending_message" : "Comment",
   "confirm_sending_method_title" : "将你的资金发送到{name}?",
   "confirm_sending_recipient" : "接收者",
@@ -281,6 +448,16 @@
   "confirm_sending_submit" : "确认并发送",
   "confirm_sending_title" : "确认发送",
   "confirmSendModal" : {
+    "network_fee" : "网络费用",
+    "refund" : "退款",
+    "title" : "确认操作",
+    "total_risk" : "总计：{totalAmount}",
+    "to_your_address" : "到您的地址",
+    "transaction_type" : {
+      "burn" : "烧",
+      "receive" : "接收",
+      "send" : "发送"
+    },
     "wallet" : "钱包：",
     "will_be_paid_with_battery" : "将使用电池进行支付"
   },
@@ -306,16 +483,32 @@
   "deploy_contract_button" : "确认并部署",
   "deploy_contract_title" : "部署合同",
   "disable_nft_marketplace_banner_description" : "收集和交换。",
+  "dns_addresses" : {
+    "few" : "{count} 地址",
+    "many" : "{count} 个地址",
+    "one" : "{count} 地址",
+    "other" : "{count} 地址"
+  },
   "dns_address_linked" : "地址已链接",
   "dns_address_unlinked" : "地址已取消链接",
+  "dns_alert_expiring_many" : {
+    "few" : "您有{count}个即将到期的域名。请在{untilDate}之前全部续费。",
+    "many" : "您有 {count} 个即将过期的域名。请在 {untilDate} 之前全部续订。",
+    "one" : "您有 {count} 个即将到期的域名。请在 {untilDate} 之前续订全部。",
+    "other" : "您有 {count} 个即将到期的域名。请在 {untilDate} 之前全部续订。"
+  },
+  "dns_alert_expiring_one" : "{domain} 将在 {count} 天内到期。请在 {untilDate} 之前续订。",
   "dns_current_address" : "您当前的地址",
   "dns_expiration_date" : "到期日期",
   "dns_link_title" : "确认交易",
   "dns_on_sale_text" : "域名现在在市场上出售。为了转移，你首先应该从销售中移除它。",
+  "dns_renew_all_until_btn" : "全都续订到 {untilDate}",
   "dns_renew_in_progress_btn" : "正在进行域名续期...",
   "dns_renew_toast_success" : "域名已续期1年",
   "dns_renew_until_btn" : "续期至 {untilDate}",
   "dns_renew_valid_caption" : {
+    "few" : "将在 {count} 天后到期",
+    "many" : "将在 {count} 天后过期",
     "one" : "在 {count} 天内到期",
     "other" : "在 {count} 天内到期"
   },
@@ -324,39 +517,69 @@
   "dns_replace_save" : "保存",
   "dns_unlink_title" : "确认取消链接",
   "dns_wallet_address" : "钱包地址",
+  "domains_renewed" : "续订域名",
   "edit_coins_add" : "添加",
   "edit_coins_added" : "已添加",
   "edit_coins_added_toast" : "已添加",
   "edit_coins_hide" : "隐藏",
   "edit_coins_title" : "添加加密货币",
+  "encryptedComments" : {
+    "encryptedComment" : "加密评论",
+    "encryptedCommentModal" : {
+      "button" : "解密评论",
+      "checkboxLabel" : "不要再次显示",
+      "description" : "评论由发送者加密，只有您可以解密。请注意内容并警惕诈骗。",
+      "title" : "加密评论"
+    },
+    "show" : "显示"
+  },
   "error_network" : "网络错误",
   "error_occurred" : "发生了一个错误",
   "exchange_method_dont_show_again" : "不再显示",
   "exchange_method_open_warning" : "您正在打开一个非Tonkeeper操作的外部应用。",
   "exchange_modal" : {
+    "buy" : "购买",
+    "buy_title" : "购买 Toncoin",
     "hide" : "隐藏",
     "other_ways_to_buy" : "其他购买方式",
+    "other_ways_to_sell" : "其他销售方式",
+    "sell" : "卖",
+    "sell_title" : "售出 Toncoin",
     "show_all" : "显示所有",
     "title" : "购买或出售"
+  },
+  "exchange" : {
+    "not_exists" : "无效的兑换ID"
   },
   "exchange_other_ways" : "其他购买或出售TON的方式",
   "exchange_telegram_bot" : "TELEGRAM机器人",
   "exchange_title" : "购买TON",
+  "expiring_domains" : "即将到期的域名",
   "finish_setup" : {
     "backup" : "备份钱包助记词",
     "done_button" : "完成",
     "enable_notifications" : "启用交易通知",
     "header_title" : "完成设置",
+    "join_tg" : "加入 Tonkeeper 频道",
     "use_biometry" : "使用 %{name} 批准交易"
   },
   "form_optional_indicator" : "可选",
+  "gasless" : {
+    "switch_label" : "点按以使用{currency}付款"
+  },
   "import_add_wallet" : "添加钱包",
   "import_add_wallet_description" : "创建一个新钱包或添加现有钱包。",
+  "import_existing_wallet" : "现有钱包",
   "import_existing_wallet_description" : "使用24个助记词导入钱包",
+  "import_new_wallet" : "导入新钱包",
+  "import_new_wallet_description" : "创建新钱包",
+  "import_signer" : "匹配签名人",
+  "import_signer_description" : "更高的控制和安全级别",
   "import_wallet_caption" : "为了恢复到您的钱包，请输入创建钱包时给您的24个助记词。",
   "import_wallet_reset_caption" : "请恢复您的钱包\n通过输入创建钱包时写下的24个助记词。",
   "import_wallet_title" : "输入您的\n恢复短语",
   "import_wallet_wrong_words_err" : "短语不正确",
+  "indexer_latency_error" : "发送错误，请稍后再试",
   "info_about_inactive_back" : "返回",
   "info_about_inactive_desc1" : "Tonkeeper不知道这个地址是钱包还是智能合约。",
   "info_about_inactive_desc2" : "如果你只是想存钱到一个钱包 - 你可以继续。",
@@ -372,8 +595,11 @@
   "intro_item3_caption" : "-",
   "intro_item3_title" : "-",
   "intro_title" : "欢迎",
+  "jetton_buy_tether" : "购买 USD₮",
   "jetton_id" : "代币ID: {jettonAddress}",
   "jetton_id_copied" : "代币ID已复制",
+  "jetton_locked_till" : "锁定至 {date}",
+  "jetton_migrate_tether" : "交换 jUSDT 至 USD₮",
   "jetton_name" : "{name} 代币",
   "jetton_open_explorer" : "查看详情",
   "jetton_price" : "价格:",
@@ -382,11 +608,38 @@
   "jettons_show_jettons" : "在钱包中显示代币",
   "jetton_token" : "代币",
   "language" : {
+    "language_alert" : {
+      "cancel" : "取消",
+      "open" : "设置",
+      "title" : "要更改应用程序的语言，请转到设备设置"
+    },
+    "languagesList" : {
+      "en" : "英语",
+      "es" : "西班牙语",
+      "id" : "印度尼西亚语",
+      "ru" : "俄语",
+      "system" : "系统",
+      "tr" : "土耳其语",
+      "uk" : "乌克兰语",
+      "uz" : "乌兹别克语",
+      "zh-Hans" : "中文"
+    },
     "list_item" : {
+      "title" : "语言",
       "value" : "中文"
-    }
+    },
+    "title" : "语言"
   },
   "later" : "稍后",
+  "ledger" : {
+    "confirm_title" : "确认操作",
+    "confirm_tx" : "请在Ledger上确认您的交易",
+    "connect" : "通过蓝牙将 Ledger 连接到您的设备",
+    "connect_title" : "连接 Ledger",
+    "install_ton_app" : "安装应用程序",
+    "open_ton_app" : "解锁并打开TON应用程序",
+    "operation_not_supported" : "操作不支持Ledger钱包。请选择其他钱包并重试。"
+  },
   "legal_font_license" : "Montserrat字体",
   "legal_header_title" : "法律",
   "legal_licenses_title" : "许可证",
@@ -394,6 +647,16 @@
   "legal_terms" : "服务条款",
   "link_copied" : "链接已复制",
   "loading" : "加载",
+  "logout_modal" : {
+    "agreement" : "我有恢复短语的备份副本",
+    "backup_button" : "备份",
+    "caption" : "钱包钥匙将从此设备中删除。",
+    "delete_button" : "删除钱包数据",
+    "delete_caption" : "钱包密钥和所有个人数据将从此设备中删除。",
+    "delete_title" : "删除钱包数据",
+    "logout_button" : "退出",
+    "title" : "退出"
+  },
   "manage_other_coins" : "管理我的代币",
   "migration_cancel_btn" : "稍后升级",
   "migration_caption" : "Tonkeeper引入了支持订阅付款的新钱包格式。您的余额将转移到新地址。您的恢复短语将保持不变。",
@@ -411,6 +674,14 @@
   },
   "migration_title" : "升级您的钱包",
   "nft_about_dns" : "TON DNS 是一项服务，允许用户为加密钱包、智能合约和网站分配人类可读的名称。\n\n 使用 TON DNS，像访问互联网上一样访问去中心化服务的网站。",
+  "nft_actions" : {
+    "hide_and_report" : "隐藏并举报",
+    "hide" : {
+      "collection" : "隐藏收藏",
+      "nft" : "隐藏 NFT"
+    },
+    "view_on_explorer" : "在 Tonviewer 查看"
+  },
   "nft_browse_markets" : "浏览市场",
   "nft_chain" : "链",
   "nft_change_owner_title" : "更改集合所有者",
@@ -446,6 +717,7 @@
   "nft_on_sale_text" : "NFT现在在市场上出售。为了转移，你首先应该从销售中移除它。",
   "nft_open_in_marketplace" : "在NFT市场上查看",
   "nft_operations_expired" : "请求超时，请重试",
+  "nft_operation_slide_to_confirm" : "滑动确认",
   "nft_operation_success" : "完成",
   "nft_owner_address" : "所有者",
   "nft_price" : "价格",
@@ -462,6 +734,16 @@
   "nft_token_id" : "代币ID",
   "nft_transaction_head_placeholder" : "NFT",
   "nft_transfer_comment" : "评论",
+  "nft_transfer" : {
+    "confirm" : {
+      "fee" : {
+        "label" : "费用",
+        "refund_label" : "退款",
+        "value" : "≈ {value} TON"
+      }
+    },
+    "title" : "NFT转移"
+  },
   "nft_transfer_description" : "NFT将发送到此地址。在向其他用户发送NFT时要小心。",
   "nft_transfer_dns" : "转移",
   "nft_transfer_nft" : "转移",
@@ -470,6 +752,30 @@
   "nft_unlink_domain_button" : "已与'{{'address'}}'链接",
   "nft_unnamed_collection" : "未命名的收藏",
   "nft_view_in_explorer" : "在浏览器中查看",
+  "nokyc" : "无需KYC",
+  "notcoin" : {
+    "all" : "用Tonkeeper Pro交换全部",
+    "burn_not_available" : {
+      "hours" : "兑换将在 {count} 小时内可用",
+      "minutes" : "交换将在{count}分钟后可用",
+      "seconds" : "兑换将在 {count} 秒后可用"
+    },
+    "count" : "优惠券数量",
+    "count_max" : "每次兑换最多4个",
+    "exchange" : "兑换\n代金券为NOT",
+    "exchange_all" : "交换所有至\nTonkeeper Pro",
+    "exchange_subtitle" : "NOT 将在兑换后不久出现在您的余额中。",
+    "exchange_title" : "用你的代金券兑换NOT",
+    "exchange_to_not" : "兑换为 NOT",
+    "name" : "非币",
+    "not_vouchers" : "NOT 优惠券",
+    "open" : "打开",
+    "open_bot" : "打开Notcoin Bot",
+    "slogan" : "可能没什么",
+    "total_amount" : "总金额",
+    "verify_subtitle" : "验证可能需要几个小时。",
+    "verify_title" : "连接钱包至Notcoin Bot以验证燃烧"
+  },
   "notifications" : {
     "alert" : {
       "cancel" : "取消",
@@ -507,6 +813,13 @@
   "notify_incorrect_time_err_title" : "时间和日期不正确",
   "notify_no_signal_caption" : "请确认你的网络连接",
   "notify_no_signal_title" : "没有信号",
+  "old_wallet_error" : "请使用 v4R2 版本的钱包",
+  "pairSigner" : {
+    "about" : "关于Signer",
+    "open_signer" : "在此设备上打开签名器",
+    "subtitle" : "打开 Signer » 选择所需钥匙 » 扫描 QR 码",
+    "title" : "扫描二维码"
+  },
   "passcode_changed" : "密码已更改",
   "paste" : "粘贴",
   "pin_enter_faceid_err" : "生物特征检查失败",
@@ -529,8 +842,23 @@
       "fingerprint_genitive" : "Touch ID"
     }
   },
+  "programmable_nfts" : {
+    "alert" : {
+      "cancel" : "取消",
+      "description" : "仅在您信任收藏夹作者的情况下访问此外部链接。\n\n'{{'uri'}}'",
+      "open" : "还是打开",
+      "title" : "您确定要打开外部链接吗？"
+    }
+  },
   "receive_address_title" : "或使用钱包地址",
   "receive_copy" : "复制",
+  "receiveModal" : {
+    "copy" : "复制",
+    "receive" : "接收",
+    "receive_description" : "仅将 {tokenName} 和 TON 网络中的代币发送到该地址，否则您可能会丢失资金。",
+    "receive_title" : "接收 {tokenName}",
+    "receive_ton" : "仅发送 Toncoin TON 和 TON 网络中的代币到该地址，否则您可能会损失资金。"
+  },
   "receive_qr_title" : "显示收款二维码",
   "receive_received_title" : "你已接收\n{amount} {currency}",
   "receive_share" : "分享",
@@ -543,20 +871,38 @@
     "title" : "助记词"
   },
   "refresh_app" : "重新刷新",
+  "region_nokyc" : "中立水域",
   "reminder_notifications_caption" : "当您收到TON、代币和NFT时获得通知。",
   "reminder_notifications_enable_button" : "启用通知",
   "reminder_notifications_later_button" : "稍后",
   "reminder_notifications_title" : "获得即时通知",
+  "renew_in_progress" : "正在续订…",
+  "renew_progress_of" : "{current} / {count}",
   "require_create_wallet_modal_caption" : "您需要一个已连接的钱包来使用\nTonkeeper。创建一个新钱包，或者导入一个现有的钱包。",
   "require_create_wallet_modal_create_new" : "创建新钱包",
   "require_create_wallet_modal_import" : "导入现有钱包",
   "require_create_wallet_modal_title" : "让我们设置您的钱包",
+  "restake_banner" : {
+    "stake_into_step" : "将可用的TON存入Tonstakers。",
+    "stake_into_tonstakers_action" : "质押到 Tonstakers",
+    "title" : "通过Tonstakers流动性质押以%apy赚取更多TON",
+    "unstake_action_all" : "解绑 {amount}",
+    "unstake_action_manual" : "手动输入",
+    "unstake_step" : "将 TON 从当前的质押服务提供商中解质押。",
+    "wait_step" : "等待您的TON可用。",
+    "wait_step_collect" : "收集",
+    "wait_step_cooldown" : "您的TON很快就会可用。您很快就可以收集它们了。",
+    "wait_step_pending" : "您的 TON 将在 {0, number}uration 内可用。届时您可以领取。",
+    "wait_step_withdraw" : "从之前的质押提供商那里提取可用的TON。"
+  },
   "scan_qr_open_settings" : "打开设置",
   "scan_qr_permission_error" : "允许摄像头访问以扫描二维码",
   "scan_qr_title" : "扫描二维码",
   "secret_words_caption" : "按下面给出的顺序写下这24个词，并将它们存放在一个秘密的、安全的地方。",
   "secret_words_title" : "您的恢复短语",
   "security_change_passcode" : "更改密码",
+  "security_lock_screen_switch" : "锁屏",
+  "security_lock_screen_tip" : "需要密码才能查看钱包内容。",
   "security_migration_caption" : "现在，您的余额和任何操作都受到密码的保护。您还可以使用生物密钥来加速登入。",
   "security_migration_skip_button" : "现在不更新",
   "security_migration_submit_button" : "更新安全设置",
@@ -596,23 +942,36 @@
     "amount" : {
       "insufficient_balance" : "余额不足",
       "less_than_min" : "最少 {minAmount} TON",
+      "less_than_min_with_symbol" : "至少 {minAmount} {symbol}",
+      "liquid_jetton_note" : "正在发送 tsTON 流动性代币",
       "max" : "最大",
       "recipient_label" : "至:",
       "remaining" : "剩余: {amount}",
       "title" : "金额"
     },
+    "choose_coin" : {
+      "subtitle" : "接下来，您将输入收件人和金额。",
+      "title" : "选择要发送的代币"
+    },
     "comfirm" : {
       "action" : "{coin} 转账",
+      "comment_ascii_text" : "仅使用ASCII字符：数字、拉丁字母和标点符号。",
+      "comment_characters_exceeded" : "消息大小超过{count}个字符。",
+      "comment_characters_left" : "还剩余 {count} 个字符。",
       "comment_decrypt" : "解密",
       "comment_description" : "所有人都可以看到。",
       "comment_description_encrypted" : "只有接收者和你可以看到。",
       "comment_encrypt" : "加密 Comment",
       "comment_label" : "Comment",
+      "comment_label_encrypted" : "加密评论",
       "comment_label_required" : "需要的 Comment",
+      "comment_placeholder" : "消息或引用（可选）",
+      "comment_placeholder_required" : "备注或标签",
       "comment_required_text" : "你必须包含交换的备注进行转账。否则你的资金将会丢失。",
       "details_label" : "详情",
       "details_max_balance_label" : "发送全部余额 {currency}",
       "title" : "确认交易",
+      "wallet" : "钱包",
       "will_be_paid_with_battery" : "将使用电池进行支付"
     },
     "done" : {
@@ -633,11 +992,16 @@
   "send_title" : "发送 {currency}",
   "settings_appearance" : "主题",
   "settings_backup_seed" : "显示恢复短语",
+  "settings_bank_card" : "银行卡",
   "settings_contact_support" : "联系我们",
   "settings_delete_account" : "删除账户",
   "settings_delete_alert_button" : "删除账户和数据",
   "settings_delete_alert_caption" : "此操作将从此应用中删除您的账户和所有数据。",
   "settings_delete_alert_title" : "您确定要删除您的账户吗？",
+  "settings_delete_signer_account" : "删除账户？",
+  "settings_delete_watch_account" : "删除观看账户？",
+  "settings_delete_watch_account_button" : "删除",
+  "settings_faq" : "常见问题",
   "settings_jettons_list" : "代币",
   "settings_legal_documents" : "法律文件",
   "settings_network_alert_title" : "选择网络",
@@ -657,6 +1021,13 @@
   "settings_security" : "安全",
   "settings_subscriptions" : "订阅",
   "settings_support" : "支持",
+  "settings_theme" : "主题",
+  "settings_theme_names" : {
+    "blue" : "深蓝",
+    "dark" : "暗",
+    "light" : "浅色",
+    "system" : "系统"
+  },
   "settings_title" : "设置",
   "settings_to_mainnet" : "切换到主网",
   "settings_to_testnet" : "切换到测试网",
@@ -668,6 +1039,15 @@
   "setup_notifications_caption" : "当您收到TON、代币和NFT时获得通知。",
   "setup_notifications_enable_button" : "启用通知",
   "setup_notifications_title" : "获得即时通知",
+  "signerConfirm" : {
+    "confirm" : "请在 Signer 中确认您的交易",
+    "scan_qr" : "使用 Signer 扫描 QR 码",
+    "scan_signed_qr" : "扫描来自Signer的已签名交易二维码",
+    "step" : "步骤 {value}",
+    "title" : "确认操作"
+  },
+  "signer_scan_result" : "扫描签名交易",
+  "signer_scan_tx_description" : "请打开Signer并通过QR码扫描交易",
   "skip" : "跳过",
   "spam_action" : "垃圾邮件",
   "staking" : {
@@ -677,7 +1057,8 @@
         "label" : "接收者地址"
       },
       "amount" : {
-        "label" : "金额"
+        "label" : "金额",
+        "value" : "{value} 吨"
       },
       "fee" : {
         "label" : "费用",
@@ -687,13 +1068,18 @@
         "label" : "接收者"
       },
       "withdraw_amount" : {
-        "label" : "提款金额"
+        "label" : "提款金额",
+        "value" : "{value} TON"
       }
     },
+    "confirm_deposit" : "确认并质押",
+    "confirm_unstake" : "确认并解除质押",
     "deposit" : "存款",
+    "desc_large" : "加入质押并获得奖励。质押有助于维护TON网络。",
     "details" : {
       "about_pool" : "关于质押池",
       "apy" : {
+        "highest_tag" : "最大",
         "label" : "预估年化收益率",
         "value" : "≈ {value}%"
       },
@@ -705,7 +1091,16 @@
       },
       "frequency" : {
         "label" : "奖励频率",
-        "value" : "每{count}小时"
+        "value" : "每{count}小时",
+        "value.few" : "每隔 {count} 小时",
+        "value.many" : "每隔 {count} 小时",
+        "value.one" : "每隔 {count} 小时",
+        "value.zero" : "每隔 {count} 小时"
+      },
+      "links_title" : "链接",
+      "liquidity_token" : {
+        "label" : "流动性代币 {token}",
+        "value" : "了解更多"
       },
       "min_deposit" : {
         "label" : "最小存款",
@@ -714,19 +1109,41 @@
       "next_cycle" : {
         "desc" : "所有交易在周期结束后生效",
         "desc_liquid" : "所有提款请求在周期结束后生效",
+        "in" : "在",
+        "message" : "解锁请求将在验证周期结束后处理，时间为 {value}",
+        "reward_title" : "下一个奖励",
         "time" : "在{time}内",
         "title" : "下一个周期"
       },
+      "note" : "Staking基于第三方的智能合约。Tonkeeper不对staking体验负责。",
       "pendingDeposit" : "待处理的存款",
       "pendingWithdraw" : "待处理的提款",
+      "pendingWithdrawDesc" : "在周期结束后",
       "pool_address" : {
         "label" : "质押池地址"
       },
       "readyWithdraw" : "提款已准备好",
       "show_details" : "详细信息",
+      "socials" : {
+        "telegram" : "社区",
+        "twitter" : "Twitter"
+      },
       "tap_to_collect" : "点击收集"
     },
+    "estimated_profit" : "{amount} TON – 如果你今天质押 TON 的年利润",
+    "estimated_profit_compare" : "比您当前的质押每年多收益 {amount} TON",
     "get_withdrawal" : "收到提款",
+    "highest_apy" : "最高 APY",
+    "jetton_note" : "当您将 TON 投入 {poolName} 池中时，您会收到一个名为 {token} 的代币，代表您在池中的份额。随着池中利润的积累，您的 {token} 会代表更多的 TON。",
+    "learn_more" : "了解更多",
+    "message" : {
+      "pendingDeposit" : "{amount} TON 待定",
+      "pendingWithdraw" : "{amount} TON 解押\n",
+      "pendingWithdrawLiquid" : "{amount} TON 将在周期结束后解除质押",
+      "readyWithdraw" : "{amount} TON 准备就绪。\n点击收集"
+    },
+    "no_funds" : "没有可用于取消质押的资金",
+    "not_exists" : "无效的矿池地址",
     "other" : "其他",
     "recommended" : "最高利息",
     "rewards" : {
@@ -735,17 +1152,24 @@
       "title" : "您的年度奖励",
       "value" : "≈ {value} TON"
     },
+    "send_staked_ton" : "质押的TON",
+    "staked" : "质押",
+    "staked_ton" : "质押的TON",
     "staking_desc" : "最低存款从{minStake} TON开始。\n赚取高达{maxApy}%的收益。",
     "staking_pool_desc" : "年化收益率 ≈ {apy}%",
     "title" : "质押",
+    "title_large" : "TON 质押",
     "top_up" : "充值",
     "transaction" : "交易",
     "warning" : {
       "about" : "关于{name}",
+      "beta_desc" : "我们不对稳定性和质押体验负责。使用需自担风险。",
       "desc" : "质押基于第三方智能合约。我们不对其工作负责。",
       "title" : "警告"
     },
     "widget_desc" : "在您的TONs上赚取高达 {apy}%的收益",
+    "widget_staking_options" : "质押选项",
+    "widget_title" : "质押 TON",
     "withdraw" : "提款",
     "withdrawal_fee_warning" : {
       "continue" : "继续操作",
@@ -796,13 +1220,58 @@
   "subscription_title" : "订阅",
   "subscription_unsubscribe" : "取消订阅",
   "success" : "成功!",
+  "suspicious" : {
+    "buttons" : {
+      "not_spam" : "这不是垃圾邮件",
+      "report" : "举报垃圾信息"
+    },
+    "label" : {
+      "full" : "未验证的NFT",
+      "short" : "未验证"
+    },
+    "status_update" : {
+      "hidden" : {
+        "collection" : "已隐藏收藏",
+        "nft" : "NFT隐藏"
+      },
+      "spam" : {
+        "collection" : "集合被标记为垃圾邮件",
+        "nft" : "NFT 标记为垃圾信息"
+      }
+    }
+  },
+  "suspiciousNFTDetails" : {
+    "buttons" : {
+      "not_spam" : "这不是垃圾邮件",
+      "report" : "举报垃圾广告"
+    },
+    "paragraphs" : {
+      "p1" : "用于垃圾邮件。适用于大规模发送无关和不需要的信息。",
+      "p2" : "用于诈骗。NFT 的名称、描述或图像可能会误导用户。",
+      "p3" : "我们对这个 NFT 的作者和历史了解甚少。"
+    },
+    "subtitle" : "NFT 可能因以下原因之一而不安全。",
+    "title" : "未验证的NFT"
+  },
   "swap_title" : "交换",
   "tab_browser" : "浏览器",
+  "tab_collectibles" : "藏品",
   "tab_nft" : "NFTs",
   "tab_settings" : "设置",
   "tab_swap" : "交换",
   "tab_wallet" : "钱包",
   "today" : "今天",
+  "tokenDetails" : {
+    "name" : "姓名",
+    "title" : "令牌详情",
+    "token_id" : "令牌ID",
+    "tonviewer_button" : "在Tonviewer中查看"
+  },
+  "tonconnect_error" : {
+    "bad_request" : "错误的请求",
+    "wrong_from" : "错误的 'from' 参数",
+    "wrong_network" : "网络错误"
+  },
   "tonkeeper_pro" : "Tonkeeper Pro",
   "ton_login_back_to_button" : "返回到{name}",
   "ton_login_caption" : "{name}正在请求访问您的钱包地址",
@@ -826,7 +1295,9 @@
     "bid_collection_name" : "发行者",
     "bid_date" : "在 {time} 出价",
     "bid_name" : "名称",
+    "call_contract_date" : "调用合同 {time}",
     "comment" : "评论",
+    "description" : "描述",
     "operation" : "操作",
     "payload" : "有效载荷",
     "purchase_date" : "在 {time} 购买",
@@ -837,8 +1308,12 @@
     "sender_address" : "发送者地址",
     "sent_date" : "在 {time} 发送",
     "spam" : "垃圾邮件",
+    "subscription_merchant_label" : "商家",
+    "subscription_product_label" : "订阅",
     "swapped_date" : "在 {time} 交换",
-    "transaction" : "交易"
+    "transaction" : "交易",
+    "unsubscription_title" : "取消订阅",
+    "withdraw_amount" : "提现金额"
   },
   "transaction_exchange_from_currency" : "从",
   "transaction_fee" : "手续费",
@@ -852,8 +1327,13 @@
   "transaction_refund" : "退款",
   "transactions" : {
     "bid" : "出价",
+    "burned" : "烧毁",
     "contract_deploy" : "部署合约",
+    "deposit" : "存款",
     "failed" : "失败",
+    "failed_with_reason" : {
+      "swap_refund_no_liq" : "失败。增加兑换设置中的滑点容差以避免此错误。"
+    },
     "nft_purchase" : "NFT购买",
     "smartcontract_exec" : "调用合约",
     "spam" : "垃圾消息",
@@ -862,7 +1342,9 @@
     "unknown" : "未知",
     "unknown_description" : "发生了一些事情，但我们无法识别",
     "unsubscription" : "已退订",
-    "wallet_initialized" : "钱包已初始化"
+    "wallet_initialized" : "钱包已初始化",
+    "withdraw" : "提现",
+    "withdrawal_request" : "提款请求"
   },
   "transaction_sender" : "付款方",
   "transaction_sender_address" : "付款方地址",
@@ -894,17 +1376,28 @@
   "transaction_your_bid" : "你的出价",
   "transfer_deeplink_address_error" : "收件人地址不正确",
   "transfer_deeplink_amount_error" : "金额请求不正确",
+  "transfer_deeplink_expired_error" : "链接已过期",
   "transfer_deeplink_nft_address_error" : "NFT地址不正确",
+  "transfer_deeplink_unknown_jetton_error" : "未知的代币",
+  "transfer_deeplink_unknown_token" : "未知令牌",
+  "transfer_deeplink_wrong_params" : "参数错误",
   "transfer_from_old_wallet_btn" : "转移",
   "transfer_from_old_wallet_caption" : "Tonkeeper将从您的旧地址转移所有硬币到您的当前地址。",
   "transfer_from_old_wallet_in_progress" : "转移正在进行中",
   "transfer_from_old_wallet_title" : "转移到当前地址",
+  "transfer_pending_by_battery_error" : "另一个事务正在由电池处理",
   "txActions" : {
     "amount" : "金额",
     "fee" : "费用",
     "refund" : "退款",
     "signRaw" : {
       "addressMismatch" : {
+        "switchWallet" : {
+          "close" : "取消",
+          "description" : "切换钱包以确认操作。",
+          "switch" : "切换并继续",
+          "title" : "为您的钱包执行操作 {value}"
+        },
         "wrongVersion" : {
           "close" : "取消",
           "description" : "切换您的活动地址至{version}以确认此操作。",
@@ -921,7 +1414,10 @@
       "insufficientFunds" : {
         "rechargeBattery" : "给电池充电",
         "rechargeWallet" : "充值钱包",
+        "stakingDeposit" : "参与的最低余额:\n{amount} {currency}\n",
+        "stakingFee" : "完成交易需要{count} TON。预计手续费为{fee} TON，将被扣除，剩余部分将被退还。",
         "title" : "资金不足",
+        "title_multiwallet" : "钱包余额不足",
         "toBePaid" : "支付金额: {amount} {currency}\n",
         "withFees" : "+ 区块链费用。\n",
         "yourBalance" : "您的余额: {balance} {currency}。"
@@ -948,6 +1444,17 @@
       }
     }
   },
+  "unverifiedTokenDetails" : {
+    "button" : "好的",
+    "description" : "该令牌因一种或多种原因看起来很可疑。",
+    "paragraphs" : {
+      "p1" : "低流动性。代币可能有一定的价值，但非常低。",
+      "p2" : "代币未在交易平台上列出，需求有限。",
+      "p3" : "用于垃圾邮件。用于大规模发送不需要且常常无关的信息。",
+      "p4" : "用于诈骗。令牌的名称或图像可能会引导用户上当受骗。"
+    },
+    "title" : "未验证的令牌"
+  },
   "update" : {
     "description" : "Tonkeeper的新版本现已可用。您现在可以下载它。",
     "download" : "下载",
@@ -959,21 +1466,58 @@
     "title" : "更新Tonkeeper",
     "version" : "版本 '{{'version'}}'"
   },
+  "upgrade_to_w5" : {
+    "about_button" : "关于W5钱包",
+    "description" : "尝试全新的 W5 钱包标准，支持无 gas USDT 支付和其他酷炫功能。",
+    "hide_button" : "隐藏",
+    "settings" : "钱包 W5",
+    "title" : "无气体转账",
+    "try_button" : "试用 W5"
+  },
   "username_issued_by_telegram" : "由Telegram发布。",
   "username_manage_name_button" : "管理名称",
+  "w5_stories" : {
+    "0" : {
+      "description" : "W5采用了更高效的交易处理方法，意味着最多降低25%的燃气成本。",
+      "title" : "降低区块链费用"
+    },
+    "1" : {
+      "description" : "W5 将同时操作次数从 4 增加到 255，可节省费用。",
+      "title" : "单个交易中最多可进行255次操作"
+    },
+    "2" : {
+      "description" : "发送 USDT，无需拥有 TON——交易手续费将自动由少量 USDT 覆盖。",
+      "title" : "免Gas USDT转账"
+    },
+    "3" : {
+      "description" : "旧账户和W5使用相同的恢复短语——在新设备上恢复账户时，旧的和新的都会自动出现。",
+      "title" : "恢复短语不变"
+    },
+    "4" : {
+      "button" : "添加W5钱包",
+      "description" : "W5标准尚未最终确定。无汽油交易作为试验功能提供以测试其效果。不要将所有资产转移到W5钱包，直到最终版本发布。",
+      "title" : "W5 是测试版"
+    }
+  },
   "wallet_about" : "关于",
   "wallet_buy" : "购买",
   "wallet" : {
     "buy_btn" : "购买TON",
     "collectibles_tab_lable" : "收藏品",
     "edit_tokens_btn" : "编辑",
+    "inscriptions_tab_label" : "铭文",
+    "nft_tab_lable" : "藏品",
     "old_wallets_title" : "旧钱包",
     "old_wallet_title" : "旧钱包",
     "receive_btn" : "接收",
+    "scan_btn" : "扫描",
     "screen_title" : "钱包",
+    "sell_btn" : "卖",
     "send_btn" : "发送",
+    "stake_btn" : "质押",
     "swap_btn" : "交换",
-    "tonkens_tab_lable" : "代币"
+    "tonkens_tab_lable" : "代币",
+    "updated_at" : "更新于{value}"
   },
   "wallet_chat" : "聊天室",
   "wallet_community" : "社区",

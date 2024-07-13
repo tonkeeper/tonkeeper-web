@@ -19,7 +19,7 @@ interface BootOptions {
 type TonendpointResponse<Data> = { success: false } | { success: true; data: Data };
 
 export interface TonendpointConfig {
-    flags?: { [key: string]: boolean };
+    flags?: { disable_v5r1: boolean; [key: string]: boolean };
     tonendpoint: string;
 
     tonApiKey?: string;
@@ -52,6 +52,8 @@ export interface TonendpointConfig {
 
     mercuryo_otc_id?: string;
 
+    scam_api_url?: string;
+
     /**
      * @deprecated use ton api
      */
@@ -67,7 +69,7 @@ const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:13
 export const defaultTonendpointConfig: TonendpointConfig = {
     tonendpoint: defaultTonendpoint,
     tonEndpoint: '',
-    flags: {}
+    flags: { disable_v5r1: true }
 };
 
 const defaultFetch: FetchAPI = (input, init) => window.fetch(input, init);
@@ -171,7 +173,16 @@ export class Tonendpoint {
     };
 
     getTrack = (): DAppTrack => {
-        return this.targetEnv === 'extension' ? 'extension' : 'desktop';
+        switch (this.targetEnv) {
+            case 'desktop':
+                return 'desktop';
+            case 'twa':
+                return 'twa';
+            case 'extension':
+            case 'web':
+            default:
+                return 'extension';
+        }
     };
 }
 
@@ -179,7 +190,7 @@ export const getServerConfig = async (tonendpoint: Tonendpoint): Promise<Tonendp
     const result = await tonendpoint.boot();
 
     return {
-        flags: {},
+        flags: { disable_v5r1: true, ...result.flags },
         ...result
     };
 };

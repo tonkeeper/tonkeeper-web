@@ -11,11 +11,13 @@ import {
     ListOfTokensIcon,
     LogOutIcon,
     RecoveryPhraseIcon,
+    SaleBadgeIcon,
     SecurityIcon,
     SettingsProIcon,
     WalletsIcon
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
+import { useWalletNftList } from '../../state/wallet';
 
 const SingleAccountSettings = () => {
     const [logout, setLogout] = useState(false);
@@ -23,6 +25,7 @@ const SingleAccountSettings = () => {
     const navigate = useNavigate();
     const wallet = useWalletContext();
     const { data: jettons } = useJettonList();
+    const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [
@@ -63,6 +66,14 @@ const SingleAccountSettings = () => {
             });
         }
 
+        if (nft?.length) {
+            items.push({
+                name: t('settings_collectibles_list'),
+                icon: <SaleBadgeIcon />,
+                action: () => navigate(relative(SettingsRoute.nft))
+            });
+        }
+
         items.push({
             name: t('settings_security'),
             icon: <SecurityIcon />,
@@ -80,7 +91,7 @@ const SingleAccountSettings = () => {
         });
 
         return items;
-    }, [t, navigate, wallet, jettons]);
+    }, [t, navigate, wallet, jettons, nft]);
 
     return (
         <>
@@ -99,6 +110,7 @@ const MultipleAccountSettings = () => {
     const wallet = useWalletContext();
 
     const { data: jettons } = useJettonList();
+    const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
 
     const accountItems = useMemo(() => {
@@ -150,6 +162,15 @@ const MultipleAccountSettings = () => {
                 action: () => navigate(relative(SettingsRoute.jettons))
             });
         }
+
+        if (nft?.length) {
+            items.push({
+                name: t('settings_collectibles_list'),
+                icon: <SaleBadgeIcon />,
+                action: () => navigate(relative(SettingsRoute.nft))
+            });
+        }
+
         items.push({
             name: t('settings_security'),
             icon: <SecurityIcon />,
@@ -161,7 +182,7 @@ const MultipleAccountSettings = () => {
             action: () => navigate(relative(WalletSettingsRoute.connectedApps))
         });
         return items;
-    }, [t, navigate, wallet, jettons]);
+    }, [t, navigate, wallet, jettons, nft]);
 
     return (
         <>

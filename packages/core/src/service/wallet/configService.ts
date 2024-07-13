@@ -5,10 +5,23 @@ import { Network } from '../../entries/network';
 import { ActiveWalletConfig } from '../../entries/wallet';
 
 const defaultConfig: ActiveWalletConfig = {
-    pinnedHfts: [],
-    hiddenHfts: [],
+    pinnedNfts: [],
+    hiddenNfts: [],
     pinnedTokens: [],
-    hiddenTokens: []
+    hiddenTokens: [],
+    trustedNfts: [],
+    spamNfts: []
+};
+
+const migration = async (storage: IStorage, address: string, network: Network | undefined) => {
+    const raw = Address.parse(address).toRawString();
+    const config = await storage.get<ActiveWalletConfig>(
+        `${AppKey.WALLET_CONFIG}_${raw}_${network ?? Network.MAINNET}`
+    );
+    if (config != null) {
+        await setActiveWalletConfig(storage, address, network, config);
+    }
+    return config;
 };
 
 export const getActiveWalletConfig = async (
@@ -16,15 +29,16 @@ export const getActiveWalletConfig = async (
     address: string,
     network: Network | undefined
 ) => {
-    const raw = Address.parse(address).toRawString();
-    const config = await storage.get<ActiveWalletConfig>(
-        `${AppKey.WALLET_CONFIG}_${raw}_${network}`
-    );
+    const formatted = Address.parse(address).toString({ testOnly: network === Network.TESTNET });
+    let config = await storage.get<ActiveWalletConfig>(`${AppKey.WALLET_CONFIG}_${formatted}`);
 
+    if (!config) {
+        config = await migration(storage, address, network);
+    }
     if (!config) {
         return defaultConfig;
     }
-    return Object.assign(defaultConfig, config);
+    return { ...defaultConfig, ...config };
 };
 
 export const setActiveWalletConfig = async (
@@ -33,6 +47,6 @@ export const setActiveWalletConfig = async (
     network: Network | undefined,
     config: ActiveWalletConfig
 ) => {
-    const raw = Address.parse(address).toRawString();
-    await storage.set(`${AppKey.WALLET_CONFIG}_${raw}_${network}`, config);
+    const formatted = Address.parse(address).toString({ testOnly: network === Network.TESTNET });
+    await storage.set(`${AppKey.WALLET_CONFIG}_${formatted}`, config);
 };
