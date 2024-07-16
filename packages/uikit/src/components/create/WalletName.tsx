@@ -24,7 +24,8 @@ export const UpdateWalletName: FC<{
     walletEmoji: string;
     name?: string;
     submitHandler: ({ name, emoji }: { name: string; emoji: string }) => void;
-}> = ({ walletEmoji, submitHandler, name: nameProp }) => {
+    isLoading?: boolean;
+}> = ({ walletEmoji, submitHandler, name: nameProp, isLoading }) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLInputElement | null>(null);
@@ -67,7 +68,15 @@ export const UpdateWalletName: FC<{
                 />
                 <EmojisList keepShortListForMS={500} onClick={setEmoji} />
 
-                <Button size="large" fullWidth marginTop primary disabled={!isValid} type="submit">
+                <Button
+                    size="large"
+                    fullWidth
+                    marginTop
+                    primary
+                    disabled={!isValid}
+                    type="submit"
+                    loading={isLoading}
+                >
                     {t('add_edit_favorite_save')}
                 </Button>
             </Block>

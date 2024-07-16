@@ -5,7 +5,11 @@ import { ImportWords } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
 import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
-import { useCreateStandardTonWalletsByMnemonic, useWalletsState } from '../../state/wallet';
+import {
+    useCreateStandardTonWalletsByMnemonic,
+    useMutateRenameWallet,
+    useWalletsState
+} from '../../state/wallet';
 import { StandardTonWalletState, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
 
@@ -22,6 +26,7 @@ const Import = () => {
     const [passName, setPassName] = useState(false);
     const [passNotifications, setPassNotification] = useState(false);
     const existingWallets = useWalletsState();
+    const { mutateAsync: renameWallet, isLoading: renameLoading } = useMutateRenameWallet();
 
     const {
         mutateAsync: createWalletsAsync,
@@ -89,9 +94,13 @@ const Import = () => {
                 name={wallets[0].name}
                 submitHandler={val => {
                     setWallets(w => [{ ...w![0], ...val }]);
-                    setPassName(true);
+                    renameWallet({
+                        id: wallets![0].id,
+                        ...val
+                    }).then(() => setPassName(true));
                 }}
                 walletEmoji={wallets[0].emoji}
+                isLoading={renameLoading}
             />
         );
     }
