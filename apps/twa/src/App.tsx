@@ -57,6 +57,7 @@ import { useAnalytics, useTwaAppViewport } from './libs/hooks';
 import { useUserFiat } from "@tonkeeper/uikit/dist/state/fiat";
 import { useUserLanguage } from "@tonkeeper/uikit/dist/state/language";
 import { useSwapMobileNotification } from "@tonkeeper/uikit/dist/state/swap/useSwapMobileNotification";
+import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -219,6 +220,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { data: wallets, isLoading: isWalletsLoading } = useWalletsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: fiat } = useUserFiat();
+    const { data: devSettings } = useDevSettings();
 
     const lock = useLock(sdk);
 
@@ -234,7 +236,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const navigate = useNavigate();
     const { data: tracker } = useAnalytics(activeWallet  || undefined,wallets, sdk.version);
 
-    if (isWalletsLoading || activeWalletLoading || isLangLoading || config === undefined || lock === undefined || fiat === undefined) {
+    if (isWalletsLoading || activeWalletLoading || isLangLoading || config === undefined || lock === undefined || fiat === undefined || !devSettings) {
         return <Loading />;
     }
 
@@ -255,7 +257,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         hideSigner: !showQrScan,
         hideKeystone: !showQrScan,
         hideQrScanner: !showQrScan,
-        defaultWalletVersion: isV5R1Enabled(config) ? WalletVersion.V5R1 : WalletVersion.V4R2
+        defaultWalletVersion: (isV5R1Enabled(config) || devSettings.enableV5) ? WalletVersion.V5R1 : WalletVersion.V4R2
     };
 
     return (

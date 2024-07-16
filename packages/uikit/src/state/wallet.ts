@@ -33,6 +33,7 @@ import { mnemonicValidate } from '@ton/crypto';
 import { getPasswordByNotification } from './mnemonic';
 import { encrypt } from '@tonkeeper/core/dist/service/cryptoService';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useDevSettings } from './dev';
 
 export const useActiveWalletQuery = () => {
     const storage = useWalletsStorage();
@@ -295,7 +296,8 @@ export const useMutateActiveWalletConfig = () => {
 
 export const useStandardTonWalletVersions = (publicKey?: string, network = Network.MAINNET) => {
     const { api, fiat, config } = useAppContext();
-    const isV5Enabled = isV5R1Enabled(config);
+    const { data: devSettings } = useDevSettings();
+    const isV5Enabled = isV5R1Enabled(config) || devSettings?.enableV5;
     return useQuery(
         [QueryKey.walletVersions, publicKey, network, isV5Enabled],
         async () => {

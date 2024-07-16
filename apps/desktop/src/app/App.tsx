@@ -84,6 +84,7 @@ import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
 import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
+import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -260,6 +261,7 @@ export const Loader: FC = () => {
     const { data: activeWallet, isLoading: activeWalletLoading } = useActiveWalletQuery();
     const { data: wallets, isLoading: isWalletsLoading } = useWalletsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
+    const { data: devSettings } = useDevSettings();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
@@ -297,7 +299,8 @@ export const Loader: FC = () => {
         isWalletsLoading ||
         config === undefined ||
         lock === undefined ||
-        fiat === undefined
+        fiat === undefined ||
+        !devSettings
     ) {
         return <Loading />;
     }
@@ -317,7 +320,8 @@ export const Loader: FC = () => {
             tgAuthBotId: REACT_APP_TG_BOT_ID,
             stonfiReferralAddress: REACT_APP_STONFI_REFERRAL_ADDRESS
         },
-        defaultWalletVersion: isV5R1Enabled(config) ? WalletVersion.V5R1 : WalletVersion.V4R2
+        defaultWalletVersion:
+            isV5R1Enabled(config) || devSettings.enableV5 ? WalletVersion.V5R1 : WalletVersion.V4R2
     };
 
     return (

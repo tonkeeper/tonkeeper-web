@@ -53,6 +53,7 @@ import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
 import { useMutateUserLanguage } from "@tonkeeper/uikit/dist/state/language";
+import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -177,6 +178,7 @@ export const Loader: FC = React.memo(() => {
     const { data: wallets, isLoading: isWalletsLoading } = useWalletsStateQuery();
     const { data: fiat } = useUserFiat();
     const { mutate: setLang } = useMutateUserLanguage();
+    const { data: devSettings } = useDevSettings();
 
     useEffect(() => {
         setLang(localizationFrom(browser.i18n.getUILanguage()))
@@ -193,7 +195,7 @@ export const Loader: FC = React.memo(() => {
 
     const { data: tracker } = useAnalytics(sdk.storage, activeWallet || undefined, wallets, sdk.version);
 
-    if (activeWalletLoading || isWalletsLoading || !config || lock === undefined || fiat === undefined) {
+    if (activeWalletLoading || isWalletsLoading || !config || lock === undefined || fiat === undefined || !devSettings) {
         return (
             <FullSizeWrapper standalone={false}>
                 <Loading />
@@ -214,7 +216,7 @@ export const Loader: FC = React.memo(() => {
         proFeatures: false,
         hideQrScanner: true,
         hideSigner: true,
-        defaultWalletVersion: isV5R1Enabled(config) ? WalletVersion.V5R1 : WalletVersion.V4R2
+        defaultWalletVersion: (isV5R1Enabled(config) || devSettings.enableV5) ? WalletVersion.V5R1 : WalletVersion.V4R2
     };
 
     return (

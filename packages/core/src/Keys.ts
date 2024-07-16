@@ -11,6 +11,7 @@ export enum AppKey {
     MULTI_SEND_LISTS = 'multi_send_lists',
     FIAT = 'fiat',
     LANGUAGE = 'language',
+    DEV_SETTINGS = 'dev_settings',
 
     DEPRECATED_GLOBAL_AUTH_STATE = 'password',
     LOCK = 'lock',

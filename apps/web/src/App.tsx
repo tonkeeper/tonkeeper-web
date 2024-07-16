@@ -48,6 +48,7 @@ import styled, { css } from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from './libs/hooks';
 import { useUserLanguage } from "@tonkeeper/uikit/dist/state/language";
+import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -181,6 +182,7 @@ export const Loader: FC = () => {
     const { data: wallets, isLoading: isWalletsLoading } = useWalletsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: fiat } = useUserFiat();
+    const { data: devSettings } = useDevSettings();
 
     const [ios, standalone] = useMemo(() => {
         return [sdk.isIOs(), sdk.isStandalone()] as const;
@@ -220,7 +222,8 @@ export const Loader: FC = () => {
         isLangLoading ||
         config === undefined ||
         lock === undefined ||
-        fiat === undefined
+        fiat === undefined ||
+        !devSettings
     ) {
         return <Loading />;
     }
@@ -235,7 +238,7 @@ export const Loader: FC = () => {
         extension: false,
         proFeatures: false,
         ios,
-        defaultWalletVersion: isV5R1Enabled(config) ? WalletVersion.V5R1 : WalletVersion.V4R2
+        defaultWalletVersion: (isV5R1Enabled(config) || devSettings.enableV5) ? WalletVersion.V5R1 : WalletVersion.V4R2
     };
 
     return (
