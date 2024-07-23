@@ -1,3 +1,4 @@
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { isTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -18,7 +19,6 @@ import { useAssetsDistribution } from '../../state/wallet';
 const DesktopAssetStylesOverride = css`
     background-color: transparent;
     transition: background-color 0.15s ease-in-out;
-    margin: 0 -16px;
     border-radius: 0;
 
     & > * {
@@ -27,6 +27,8 @@ const DesktopAssetStylesOverride = css`
 `;
 
 const TonAssetStyled = styled(TonAsset)`
+    margin: 0 -16px;
+
     ${DesktopAssetStylesOverride}
 `;
 
@@ -67,6 +69,8 @@ const Divider = styled.div`
     width: calc(100% + 32px);
 `;
 
+const itemSize = 77;
+
 const DesktopTokensPayload = () => {
     const [assets] = useAssets();
     const { t } = useTranslation();
@@ -95,40 +99,33 @@ const DesktopTokensPayload = () => {
         return assets?.ton?.jettons?.balances ?? [];
     }, [assets]);
 
-    const onTokenClick = useCallback((address: string) => {
-        if (isTonAddress(address) && tonRef.current) {
-            containerRef.current?.scroll({
-                top: tonRef.current.offsetTop - 53,
-                behavior: 'smooth'
-            });
-            tonRef.current?.classList.add('highlight-asset');
-            const tonRefElement = tonRef.current;
-            addEventListener('mousemove', () => tonRefElement.classList.remove('highlight-asset'), {
-                once: true
-            });
-            return;
-        }
+    const rowVirtualizer = useVirtualizer({
+        count: sortedAssets.length,
+        getScrollElement: () => containerRef.current,
+        estimateSize: () => itemSize,
+        getItemKey: index => sortedAssets[index].jetton.address,
+        paddingStart: showChart ? 192 + itemSize : itemSize
+    });
 
-        if (address === 'others') {
-            containerRef.current?.scroll({
-                top: containerRef.current!.scrollHeight,
-                behavior: 'smooth'
-            });
-            return;
-        }
+    const onTokenClick = useCallback(
+        (address: string) => {
+            if (isTonAddress(address) && tonRef.current) {
+                return rowVirtualizer.scrollToOffset(tonRef.current.offsetTop);
+            }
 
-        const jettonRef = jettonsRef.current[address];
-        if (jettonRef) {
-            containerRef.current?.scrollTo({
-                top: jettonRef.offsetTop - 53,
-                behavior: 'smooth'
-            });
-            jettonRef.classList.add('highlight-asset');
-            addEventListener('mousemove', () => jettonRef.classList.remove('highlight-asset'), {
-                once: true
-            });
-        }
-    }, []);
+            if (address === 'others') {
+                return rowVirtualizer.scrollToOffset(containerRef.current!.scrollHeight);
+            }
+
+            const index = sortedAssets.findIndex(item => item.jetton.address === address);
+            if (index !== undefined) {
+                rowVirtualizer.scrollToOffset(
+                    (tonRef.current?.offsetTop ?? 0) + (index + 1) * itemSize
+                );
+            }
+        },
+        [sortedAssets, rowVirtualizer, rowVirtualizer.elementsCache]
+    );
 
     return (
         <DesktopViewPageLayout ref={containerRef}>
@@ -146,7 +143,9 @@ const DesktopTokensPayload = () => {
                     </HideButton>
                 )}
             </TokensHeaderContainer>
-            <TokensPageBody>
+            <TokensPageBody
+                style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }}
+            >
                 {sortedAssets && assets && distribution && uiPreferences && (
                     <>
                         {canShowChart && showChart && (
@@ -162,23 +161,27 @@ const DesktopTokensPayload = () => {
                         )}
                         <TonAssetStyled ref={tonRef} info={assets.ton.info} />
                         <Divider />
-                        {sortedAssets.map(jetton => (
-                            <ErrorBoundary
-                                fallbackRender={fallbackRenderOver('Failed to display tokens list')}
+                        {rowVirtualizer.getVirtualItems().map(virtualRow => (
+                            <div
+                                key={virtualRow.index}
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: `100%`,
+                                    height: `${virtualRow.size}px`,
+                                    transform: `translateY(${virtualRow.start}px)`
+                                }}
                             >
-                                <JettonAssetStyled
-                                    ref={e => {
-                                        if (e) {
-                                            jettonsRef.current[jetton.jetton.address] = e;
-                                        } else {
-                                            delete jettonsRef.current[jetton.jetton.address];
-                                        }
-                                    }}
-                                    key={jetton.jetton.address}
-                                    jetton={jetton}
-                                />
-                                <Divider />
-                            </ErrorBoundary>
+                                <ErrorBoundary
+                                    fallbackRender={fallbackRenderOver(
+                                        'Failed to display tokens list'
+                                    )}
+                                >
+                                    <JettonAssetStyled jetton={sortedAssets[virtualRow.index]} />
+                                    <Divider />
+                                </ErrorBoundary>
+                            </div>
                         ))}
                     </>
                 )}
