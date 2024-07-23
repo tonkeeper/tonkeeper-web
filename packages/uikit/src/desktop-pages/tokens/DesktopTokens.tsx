@@ -144,7 +144,11 @@ const DesktopTokensPayload = () => {
                 )}
             </TokensHeaderContainer>
             <TokensPageBody
-                style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }}
+                style={{
+                    height: `${rowVirtualizer.getTotalSize()}px`,
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}
             >
                 {sortedAssets && assets && distribution && uiPreferences && (
                     <>
