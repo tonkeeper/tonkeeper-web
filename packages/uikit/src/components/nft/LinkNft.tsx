@@ -19,7 +19,7 @@ import { useTonRecipient } from '../../hooks/blockchain/useTonRecipient';
 import { useTranslation } from '../../hooks/translation';
 import { useNotification } from '../../hooks/useNotification';
 import { useQueryChangeWait } from '../../hooks/useQueryChangeWait';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 import { ColumnText, Gap } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
 import { Notification, NotificationBlock } from '../Notification';
@@ -38,7 +38,7 @@ import {
     ConfirmViewTitleSlot
 } from '../transfer/ConfirmView';
 import { ConfirmAndCancelMainButton } from '../transfer/common';
-import { useNftDNSLinkData } from "../../state/nft";
+import { useNftDNSLinkData } from '../../state/nft';
 
 export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
     const toast = useToast();
@@ -143,6 +143,7 @@ const LinkNftUnlinked: FC<{
     });
 
     const isSelectedCurrentAddress = areEqAddresses(linkToAddress, walletState.rawAddress);
+    const network = useActiveTonNetwork();
 
     const confirmChild = () => (
         <ConfirmView
@@ -165,7 +166,7 @@ const LinkNftUnlinked: FC<{
                         </Label>
                         <ColumnText
                             right
-                            text={toShortValue(formatAddress(linkToAddress, walletState.network))}
+                            text={toShortValue(formatAddress(linkToAddress, network))}
                             secondary={
                                 <ReplaceButton
                                     isDisabled={mutation.isLoading}
@@ -368,11 +369,10 @@ const LinkNftLinked: FC<{
         }
         setIsOpen(true);
     };
+    const network = useActiveTonNetwork();
 
     const isLinkedWithAnotherWallet = Object.values<{ address: Address; version: WalletVersion }>(
-        isStandardTonWallet(walletState)
-            ? getWalletsAddresses(walletState.publicKey, walletState.network)
-            : {}
+        isStandardTonWallet(walletState) ? getWalletsAddresses(walletState.publicKey, network) : {}
     ).every(({ address }) => !areEqAddresses(address.toRawString(), linkedAddress));
 
     return (
@@ -388,7 +388,7 @@ const LinkNftLinked: FC<{
             >
                 {t('nft_unlink_domain_button').replace(
                     '{{address}}',
-                    toShortValue(formatAddress(linkedAddress, walletState.network))
+                    toShortValue(formatAddress(linkedAddress, network))
                 )}
             </Button>
             {isLinkedWithAnotherWallet && !isLoading && (

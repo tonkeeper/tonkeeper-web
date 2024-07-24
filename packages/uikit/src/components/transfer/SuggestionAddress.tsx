@@ -7,16 +7,16 @@ import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Label1 } from '../Text';
 import { Label } from './common';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveTonNetwork } from '../../state/wallet';
 
 export const useSuggestionAddress = (item: Suggestion) => {
-    const wallet = useActiveWallet();
+    const network = useActiveTonNetwork();
 
     return useMemo(() => {
         return item.blockchain === BLOCKCHAIN_NAME.TRON
             ? item.address
-            : formatAddress(item.address, wallet.network);
-    }, [item]);
+            : formatAddress(item.address, network);
+    }, [item, network]);
 };
 
 export const SuggestionAddress: FC<{ item: Suggestion }> = ({ item }) => {

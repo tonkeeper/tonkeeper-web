@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
-import { StandardTonWalletState } from '../../entries/wallet';
+import { Account, getAccountActiveTonWallet, TonWalletStandard } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi, NftItem } from '../../tonApiV2';
 import { createLedgerNftTransfer } from '../ledger/transfer';
 import {
@@ -68,7 +68,7 @@ const nftLinkBody = (params: { queryId: bigint; linkToAddress: string }) => {
 const createNftTransfer = (
     timestamp: number,
     seqno: number,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     recipientAddress: string,
     nftAddress: string,
     nftTransferAmount: bigint,
@@ -91,7 +91,7 @@ const createNftTransfer = (
 
 export const estimateNftTransfer = async (
     api: APIConfig,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     recipient: TonRecipientData,
     nftItem: NftItem
 ): Promise<TransferEstimationEvent> => {
@@ -120,7 +120,7 @@ export const estimateNftTransfer = async (
 
 export const sendNftTransfer = async (
     api: APIConfig,
-    walletState: StandardTonWalletState,
+    account: Account,
     recipient: TonRecipientData,
     nftItem: NftItem,
     fee: TransferEstimationEvent,
@@ -139,27 +139,39 @@ export const sendNftTransfer = async (
         throw new Error(`Unexpected nft transfer amount: ${nftTransferAmount.toString()}`);
     }
 
+    const walletState = getAccountActiveTonWallet(account);
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
-
-    const params = [
-        timestamp,
-        seqno,
-        walletState,
-        recipient.toAccount.address,
-        nftItem.address,
-        BigInt(nftTransferAmount.toString()),
-        recipient.comment ? comment(recipient.comment) : null
-    ] as const;
 
     let buffer: Buffer;
     switch (signer.type) {
         case 'cell': {
-            buffer = await createNftTransfer(...params, signer);
+            buffer = await createNftTransfer(
+                timestamp,
+                seqno,
+                walletState,
+                recipient.toAccount.address,
+                nftItem.address,
+                BigInt(nftTransferAmount.toString()),
+                recipient.comment ? comment(recipient.comment) : null,
+                signer
+            );
             break;
         }
         case 'ledger': {
-            buffer = await createLedgerNftTransfer(...params, signer);
+            if (account.type !== 'ledger') {
+                throw new Error(`Unexpected account type: ${account.type}`);
+            }
+            buffer = await createLedgerNftTransfer(
+                timestamp,
+                seqno,
+                account,
+                recipient.toAccount.address,
+                nftItem.address,
+                BigInt(nftTransferAmount.toString()),
+                recipient.comment ? comment(recipient.comment) : null,
+                signer
+            );
             break;
         }
     }
@@ -171,14 +183,16 @@ export const sendNftTransfer = async (
 
 export const sendNftRenew = async (options: {
     api: APIConfig;
-    walletState: StandardTonWalletState;
+    account: Account;
     nftAddress: string;
     fee: TransferEstimationEvent;
     signer: CellSigner;
     amount: BigNumber;
 }) => {
+    const walletState = getAccountActiveTonWallet(options.account);
+
     const timestamp = await getServerTime(options.api);
-    const { seqno } = await getKeyPairAndSeqno(options);
+    const { seqno } = await getKeyPairAndSeqno({ ...options, walletState });
 
     const body = nftRenewBody({ queryId: getTonkeeperQueryId() });
 
@@ -186,7 +200,7 @@ export const sendNftRenew = async (options: {
         {
             timestamp,
             seqno,
-            state: options.walletState,
+            state: walletState,
             signer: options.signer
         },
         { to: options.nftAddress, value: options.amount, body }
@@ -199,7 +213,7 @@ export const sendNftRenew = async (options: {
 
 export const estimateNftRenew = async (options: {
     api: APIConfig;
-    walletState: StandardTonWalletState;
+    walletState: TonWalletStandard;
     nftAddress: string;
     amount: BigNumber;
 }) => {
@@ -224,15 +238,16 @@ export const estimateNftRenew = async (options: {
 
 export const sendNftLink = async (options: {
     api: APIConfig;
-    walletState: StandardTonWalletState;
+    account: Account;
     nftAddress: string;
     linkToAddress: string;
     fee: TransferEstimationEvent;
     signer: CellSigner;
     amount: BigNumber;
 }) => {
+    const walletState = getAccountActiveTonWallet(options.account);
     const timestamp = await getServerTime(options.api);
-    const { seqno } = await getKeyPairAndSeqno(options);
+    const { seqno } = await getKeyPairAndSeqno({ ...options, walletState });
 
     const body = nftLinkBody({ ...options, queryId: getTonkeeperQueryId() });
 
@@ -240,7 +255,7 @@ export const sendNftLink = async (options: {
         {
             timestamp,
             seqno,
-            state: options.walletState,
+            state: walletState,
             signer: options.signer
         },
         { to: options.nftAddress, value: options.amount, body }
@@ -253,7 +268,7 @@ export const sendNftLink = async (options: {
 
 export const estimateNftLink = async (options: {
     api: APIConfig;
-    walletState: StandardTonWalletState;
+    walletState: TonWalletStandard;
     nftAddress: string;
     linkToAddress: string;
     amount: BigNumber;

@@ -32,7 +32,7 @@ import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveTonNetwork } from '../../state/wallet';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -136,7 +136,7 @@ export const RecipientView: FC<{
 }) => {
     const sdk = useAppSdk();
     const [submitted, setSubmit] = useState(false);
-    const wallet = useActiveWallet();
+    const network = useActiveTonNetwork();
     const { t } = useTranslation();
     const { standalone, ios } = useAppContext();
     const ref = useRef<HTMLTextAreaElement | null>(null);
@@ -243,7 +243,7 @@ export const RecipientView: FC<{
             if (recipient.blockchain === BLOCKCHAIN_NAME.TRON) {
                 return recipient.address;
             } else {
-                return formatAddress(recipient.address, wallet.network);
+                return formatAddress(recipient.address, network);
             }
         }
 
@@ -252,7 +252,7 @@ export const RecipientView: FC<{
         }
 
         return recipient.address;
-    }, [recipient]);
+    }, [recipient, network]);
 
     const showAddress = useShowAddress(ref, formatted, toAccount);
 
@@ -294,7 +294,7 @@ export const RecipientView: FC<{
 
     const onSelect = async (item: Suggestion) => {
         if (item.blockchain === BLOCKCHAIN_NAME.TON) {
-            item.address = formatAddress(item.address, wallet.network);
+            item.address = formatAddress(item.address, network);
         }
         setAddress(item);
         ref.current?.focus();

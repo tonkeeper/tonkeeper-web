@@ -11,14 +11,12 @@ import { AccountsApi, Account } from '@tonkeeper/core/dist/tonApiV2';
 import { Address } from '@ton/core';
 import { useAppSdk } from '../hooks/appSdk';
 import { useNavigate } from 'react-router-dom';
-import { walletStateFromLedger } from '@tonkeeper/core/dist/service/walletService';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
 import { useCallback, useState } from 'react';
-import { AuthLedger } from '@tonkeeper/core/dist/entries/password';
-import { useWalletsStorage } from '../hooks/useStorage';
-import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
-import { useActiveWallet } from './wallet';
+import { useAccountsStorage } from '../hooks/useStorage';
+import { useActiveAccount } from './wallet';
+import { accountByLedger } from '@tonkeeper/core/dist/service/walletService';
 
 export type LedgerAccount = {
     accountIndex: number;
@@ -96,22 +94,14 @@ export const useAddLedgerAccountsMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const navigate = useNavigate();
-    const walletsStorage = useWalletsStorage();
+    const accStorage = useAccountsStorage();
 
     return useMutation<void, Error, { accounts: LedgerAccount[]; name: string; emoji: string }>(
         async form => {
             try {
-                let states = form.accounts.map(walletStateFromLedger);
-                if (form.name) {
-                    const suffix = (index: number) => (states.length > 1 ? ' ' + (index + 1) : '');
-                    states = states.map((s, i) => ({
-                        ...s,
-                        name: form.name + suffix((s.auth as AuthLedger).accountIndex),
-                        ...(i === 0 && !!form.emoji && { emoji: form.emoji })
-                    }));
-                }
+                const states = accountByLedger(form.accounts, form.name, form.emoji);
 
-                await walletsStorage.addWalletsToState(states);
+                await accStorage.addAccountToState(states);
 
                 await client.invalidateQueries([QueryKey.account]);
 
@@ -125,6 +115,6 @@ export const useAddLedgerAccountsMutation = () => {
 };
 
 export const useIsActiveWalletLedger = () => {
-    const wallet = useActiveWallet();
-    return isStandardTonWallet(wallet) && wallet.auth.kind === 'ledger';
+    const wallet = useActiveAccount();
+    return wallet.type === 'ledger';
 };

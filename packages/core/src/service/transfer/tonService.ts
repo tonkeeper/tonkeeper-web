@@ -6,7 +6,7 @@ import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
-import { StandardTonWalletState } from '../../entries/wallet';
+import { Account, getAccountActiveTonWallet, TonWalletStandard } from '../../entries/wallet';
 import { AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { createLedgerTonTransfer } from '../ledger/transfer';
 import { walletContractFromState } from '../wallet/contractService';
@@ -44,7 +44,7 @@ export const toStateInit = (
 const createTonTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean,
@@ -73,7 +73,7 @@ const createTonTransfer = async (
 const createTonConnectTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     params: TonConnectTransactionPayload,
     signer: CellSigner
 ) => {
@@ -99,7 +99,7 @@ const createTonConnectTransfer = async (
 
 export const estimateTonTransfer = async (
     api: APIConfig,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean
@@ -133,7 +133,7 @@ export type ConnectTransferError = { kind: 'not-enough-balance' } | { kind: unde
 
 export const tonConnectTransferError = async (
     api: APIConfig,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     params: TonConnectTransactionPayload
 ): Promise<ConnectTransferError> => {
     const wallet = await new AccountsApi(api.tonApiV2).getAccount({
@@ -154,7 +154,7 @@ export const tonConnectTransferError = async (
 
 export const estimateTonConnectTransfer = async (
     api: APIConfig,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     params: TonConnectTransactionPayload
 ): Promise<TransferEstimationEvent> => {
     const timestamp = await getServerTime(api);
@@ -180,7 +180,7 @@ export const estimateTonConnectTransfer = async (
 
 export const sendTonConnectTransfer = async (
     api: APIConfig,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     params: TonConnectTransactionPayload,
     signer: CellSigner
 ) => {
@@ -200,7 +200,7 @@ export const sendTonConnectTransfer = async (
 
 export const sendTonTransfer = async (
     api: APIConfig,
-    walletState: StandardTonWalletState,
+    account: Account,
     recipient: TonRecipientData,
     amount: AssetAmount,
     isMax: boolean,
@@ -211,17 +211,36 @@ export const sendTonTransfer = async (
 
     const total = new BigNumber(fee.event.extra).multipliedBy(-1).plus(amount.weiAmount);
 
-    const [wallet, seqno] = await getWalletBalance(api, walletState);
+    const wallet = getAccountActiveTonWallet(account);
+    const [tonapiWallet, seqno] = await getWalletBalance(api, wallet);
     if (!isMax) {
-        checkWalletBalanceOrDie(total, wallet);
+        checkWalletBalanceOrDie(total, tonapiWallet);
     }
 
     let buffer: Buffer;
-    const params = [timestamp, seqno, walletState, recipient, amount.weiAmount, isMax] as const;
     if (signer.type === 'ledger') {
-        buffer = await createLedgerTonTransfer(...params, signer);
+        if (account.type !== 'ledger') {
+            throw new Error(`Unexpected account type: ${account.type}`);
+        }
+        buffer = await createLedgerTonTransfer(
+            timestamp,
+            seqno,
+            account,
+            recipient,
+            amount.weiAmount,
+            isMax,
+            signer
+        );
     } else {
-        buffer = await createTonTransfer(...params, signer);
+        buffer = await createTonTransfer(
+            timestamp,
+            seqno,
+            wallet,
+            recipient,
+            amount.weiAmount,
+            isMax,
+            signer
+        );
     }
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({

@@ -1,4 +1,4 @@
-import { isStandardTonWallet, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { getAccountActiveTonWallet, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -15,13 +15,13 @@ import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { LogOutWalletNotification } from '../../components/settings/LogOutNotification';
+import { LogOutAccountNotification } from '../../components/settings/LogOutNotification';
 import { RenameWalletNotification } from '../../components/settings/wallet-name/WalletNameNotification';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveAccount } from '../../state/wallet';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -55,9 +55,12 @@ const LinkStyled = styled(Link)`
 
 export const DesktopWalletSettingsPage = () => {
     const { t } = useTranslation();
-    const wallet = useActiveWallet();
+    const account = useActiveAccount();
     const { isOpen: isRenameOpen, onClose: onRenameClose, onOpen: onRenameOpen } = useDisclosure();
     const { isOpen: isLogoutOpen, onClose: onLogoutClose, onOpen: onLogoutOpen } = useDisclosure();
+
+    const canChangeVersion = account.type === 'mnemonic';
+    const activeWallet = getAccountActiveTonWallet(account);
 
     return (
         <DesktopViewPageLayout>
@@ -66,9 +69,9 @@ export const DesktopWalletSettingsPage = () => {
             </DesktopViewHeader>
             <SettingsListBlock>
                 <SettingsListItem onClick={onRenameOpen}>
-                    <WalletEmoji containerSize="16px" emojiSize="16px" emoji={wallet.emoji} />
+                    <WalletEmoji containerSize="16px" emojiSize="16px" emoji={account.emoji} />
                     <SettingsListText>
-                        <Label2>{wallet.name || t('wallet_title')}</Label2>
+                        <Label2>{account.name || t('wallet_title')}</Label2>
                         <Body3>{t('customize')}</Body3>
                     </SettingsListText>
                 </SettingsListItem>
@@ -81,13 +84,13 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_backup_seed')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
-                {isStandardTonWallet(wallet) && (
+                {canChangeVersion && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>
                         <SettingsListItem>
                             <SwitchIcon />
                             <SettingsListText>
                                 <Label2>{t('settings_wallet_version')}</Label2>
-                                <Body3>{walletVersionText(wallet.version)}</Body3>
+                                <Body3>{walletVersionText(activeWallet.version)}</Body3>
                             </SettingsListText>
                         </SettingsListItem>
                     </LinkStyled>
@@ -121,11 +124,11 @@ export const DesktopWalletSettingsPage = () => {
             <DesktopViewDivider />
 
             <RenameWalletNotification
-                wallet={isRenameOpen ? wallet : undefined}
+                account={isRenameOpen ? account : undefined}
                 handleClose={onRenameClose}
             />
-            <LogOutWalletNotification
-                wallet={isLogoutOpen ? wallet : undefined}
+            <LogOutAccountNotification
+                account={isLogoutOpen ? account : undefined}
                 handleClose={onLogoutClose}
             />
         </DesktopViewPageLayout>

@@ -5,7 +5,12 @@ import styled, { createGlobalStyle, css } from 'styled-components';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute } from '../libs/routes';
 import { useUserCountry } from '../state/country';
-import { useActiveWallet, useMutateActiveWallet, useWalletsState } from '../state/wallet';
+import {
+    useActiveWallet,
+    useAccountsState,
+    useMutateActiveTonWallet,
+    useActiveTonNetwork
+} from '../state/wallet';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
@@ -15,7 +20,7 @@ import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
-import { TonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { getAccountAllTonWallets, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 
 const Block = styled.div<{
     center?: boolean;
@@ -114,11 +119,12 @@ const Row = styled.div`
 `;
 
 const WalletRow: FC<{
-    walletState: TonWalletState;
+    walletState: TonWalletStandard;
     onClose: () => void;
 }> = ({ walletState, onClose }) => {
-    const { mutate } = useMutateActiveWallet();
-    const address = toShortValue(formatAddress(walletState.rawAddress, walletState.network));
+    const network = useActiveTonNetwork();
+    const { mutate } = useMutateActiveTonWallet();
+    const address = toShortValue(formatAddress(walletState.rawAddress, network));
     const activeWallet = useActiveWallet();
     return (
         <ListItem
@@ -147,7 +153,7 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
 }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const wallets = useWalletsState();
+    const wallets = useAccountsState().flatMap(getAccountAllTonWallets);
 
     if (!wallets) {
         return null;
@@ -195,7 +201,7 @@ export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const wallet = useActiveWallet();
     const [isOpen, setOpen] = useState(false);
 
-    const wallets = useWalletsState();
+    const wallets = useAccountsState();
     const shouldShowIcon = wallets.length > 1;
 
     return (

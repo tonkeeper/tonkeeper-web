@@ -37,7 +37,7 @@ import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/di
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { isV5R1Enabled, useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
-import { useActiveWalletQuery, useWalletsStateQuery } from "@tonkeeper/uikit/dist/state/wallet";
+import { useActiveAccountQuery, useAccountsStateQuery } from "@tonkeeper/uikit/dist/state/wallet";
 import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
@@ -216,8 +216,8 @@ const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
 };
 
 export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
-    const { data: activeWallet, isLoading: activeWalletLoading } = useActiveWalletQuery();
-    const { data: wallets, isLoading: isWalletsLoading } = useWalletsStateQuery();
+    const { data: activeWallet, isLoading: activeWalletLoading } = useActiveAccountQuery();
+    const { data: wallets, isLoading: isWalletsLoading } = useAccountsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: fiat } = useUserFiat();
     const { data: devSettings } = useDevSettings();

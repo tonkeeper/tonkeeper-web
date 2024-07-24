@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { isStandardTonWallet, TonWalletState, WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { AccountId } from '@tonkeeper/core/dist/entries/wallet';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -12,6 +12,7 @@ import { Body1, H2, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
+import { Account } from '@tonkeeper/core/dist/entries/wallet';
 
 const NotificationBlock = styled.form`
     display: flex;
@@ -38,9 +39,9 @@ const DisclaimerLink = styled(Label1)`
 
 const LotOutContent: FC<{
     onClose: (action: () => void) => void;
-    walletId: WalletId;
+    accountId: AccountId;
     isKeystone: boolean;
-}> = ({ onClose, walletId, isKeystone }) => {
+}> = ({ onClose, accountId, isKeystone }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
@@ -70,7 +71,7 @@ const LotOutContent: FC<{
                         onClick={() =>
                             onClose(() =>
                                 navigate(
-                                    AppRoute.settings + SettingsRoute.recovery + '/' + walletId
+                                    AppRoute.settings + SettingsRoute.recovery + '/' + accountId
                                 )
                             )
                         }
@@ -86,7 +87,7 @@ const LotOutContent: FC<{
                 fullWidth
                 loading={isLoading}
                 onClick={async () => {
-                    await mutateAsync(walletId);
+                    await mutateAsync(accountId);
                     onClose(() => navigate(AppRoute.home));
                 }}
             >
@@ -96,26 +97,26 @@ const LotOutContent: FC<{
     );
 };
 
-export const LogOutWalletNotification: FC<{
-    wallet?: TonWalletState;
+export const LogOutAccountNotification: FC<{
+    account?: Account;
     handleClose: () => void;
-}> = ({ wallet, handleClose }) => {
+}> = ({ account, handleClose }) => {
     const Content = useCallback(
         (afterClose: (action: () => void) => void) => {
-            if (!wallet) return undefined;
+            if (!account) return undefined;
             return (
                 <LotOutContent
-                    walletId={wallet?.id}
+                    accountId={account.id}
                     onClose={afterClose}
-                    isKeystone={isStandardTonWallet(wallet) && wallet.auth.kind === 'keystone'}
+                    isKeystone={account.type === 'keystone'}
                 />
             );
         },
-        [wallet]
+        [account]
     );
 
     return (
-        <Notification isOpen={wallet != null} handleClose={handleClose}>
+        <Notification isOpen={account != null} handleClose={handleClose}>
             {Content}
         </Notification>
     );
@@ -123,16 +124,16 @@ export const LogOutWalletNotification: FC<{
 
 const DeleteContent: FC<{
     onClose: (action: () => void) => void;
-    walletId: WalletId;
+    accountId: AccountId;
     isKeystone: boolean;
-}> = ({ onClose, walletId, isKeystone }) => {
+}> = ({ onClose, accountId, isKeystone }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
     const { mutateAsync, isLoading } = useMutateLogOut();
 
     const onDelete = async () => {
-        await mutateAsync(walletId);
+        await mutateAsync(accountId);
         onClose(() => navigate(AppRoute.home));
     };
 
@@ -160,7 +161,7 @@ const DeleteContent: FC<{
                         onClick={() =>
                             onClose(() =>
                                 navigate(
-                                    AppRoute.settings + SettingsRoute.recovery + '/' + walletId
+                                    AppRoute.settings + SettingsRoute.recovery + '/' + accountId
                                 )
                             )
                         }
@@ -183,26 +184,26 @@ const DeleteContent: FC<{
     );
 };
 
-export const DeleteWalletNotification: FC<{
-    wallet?: TonWalletState;
+export const DeleteAccountNotification: FC<{
+    account?: Account;
     handleClose: () => void;
-}> = ({ wallet, handleClose }) => {
+}> = ({ account, handleClose }) => {
     const Content = useCallback(
         (afterClose: (action: () => void) => void) => {
-            if (!wallet) return undefined;
+            if (!account) return undefined;
             return (
                 <DeleteContent
-                    walletId={wallet.id}
+                    accountId={account.id}
                     onClose={afterClose}
-                    isKeystone={isStandardTonWallet(wallet) && wallet.auth.kind === 'keystone'}
+                    isKeystone={account.type === 'keystone'}
                 />
             );
         },
-        [wallet]
+        [account]
     );
 
     return (
-        <Notification isOpen={wallet != null} handleClose={handleClose}>
+        <Notification isOpen={account != null} handleClose={handleClose}>
             {Content}
         </Notification>
     );

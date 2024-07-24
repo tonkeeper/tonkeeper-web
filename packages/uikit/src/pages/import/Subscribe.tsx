@@ -1,6 +1,5 @@
-import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import React, { FC } from 'react';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { IconPage } from '../../components/Layout';
 import { Button } from '../../components/fields/Button';
 import { NotificationIcon } from '../../components/lottie/LottieIcons';
@@ -9,7 +8,7 @@ import { signTonConnectMnemonicOver } from '../../state/mnemonic';
 import { useSubscribeMutation } from '../../state/subscribe';
 
 export const Subscribe: FC<{
-    wallet: StandardTonWalletState;
+    wallet: TonWalletStandard;
     mnemonic: string[];
     onDone: () => void;
 }> = ({ wallet, mnemonic, onDone }) => {

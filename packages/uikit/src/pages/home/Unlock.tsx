@@ -6,7 +6,7 @@ import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useIsPasswordSet, useMutateDeleteAll, useWalletsState } from '../../state/wallet';
+import { useIsPasswordSet, useMutateDeleteAll, useAccountsState } from '../../state/wallet';
 import { passwordStorage } from '@tonkeeper/core/dist/service/passwordService';
 
 const Block = styled.form<{ minHeight?: string }>`
@@ -53,7 +53,7 @@ const useMutateUnlock = () => {
 export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    const wallets = useWalletsState();
+    const wallets = useAccountsState();
 
     const ref = useRef<HTMLInputElement | null>(null);
     const { mutate: mutateLogOut, isLoading: isLogOutLoading } = useMutateDeleteAll();

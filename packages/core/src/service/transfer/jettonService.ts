@@ -5,7 +5,7 @@ import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
-import { StandardTonWalletState } from '../../entries/wallet';
+import { Account, getAccountActiveTonWallet, TonWalletStandard } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { createLedgerJettonTransfer } from '../ledger/transfer';
 import { walletContractFromState } from '../wallet/contractService';
@@ -47,7 +47,7 @@ export const jettonTransferBody = (params: {
 const createJettonTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     recipientAddress: string,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string,
@@ -86,7 +86,7 @@ const createJettonTransfer = async (
 
 export const estimateJettonTransfer = async (
     api: APIConfig,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     recipient: TonRecipientData,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string
@@ -117,7 +117,7 @@ export const estimateJettonTransfer = async (
 
 export const sendJettonTransfer = async (
     api: APIConfig,
-    walletState: StandardTonWalletState,
+    account: Account,
     recipient: TonRecipientData,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string,
@@ -130,23 +130,37 @@ export const sendJettonTransfer = async (
         .multipliedBy(-1)
         .plus(jettonTransferAmount.toString());
 
+    const walletState = getAccountActiveTonWallet(account);
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
     let buffer: Buffer;
-    const params = [
-        timestamp,
-        seqno,
-        walletState,
-        recipient.toAccount.address,
-        amount,
-        jettonWalletAddress,
-        recipient.comment ? comment(recipient.comment) : null
-    ] as const;
+
     if (signer.type === 'ledger') {
-        buffer = await createLedgerJettonTransfer(...params, signer);
+        if (account.type !== 'ledger') {
+            throw new Error(`Unexpected account type: ${account.type}`);
+        }
+        buffer = await createLedgerJettonTransfer(
+            timestamp,
+            seqno,
+            account,
+            recipient.toAccount.address,
+            amount,
+            jettonWalletAddress,
+            recipient.comment ? comment(recipient.comment) : null,
+            signer
+        );
     } else {
-        buffer = await createJettonTransfer(...params, signer);
+        buffer = await createJettonTransfer(
+            timestamp,
+            seqno,
+            walletState,
+            recipient.toAccount.address,
+            amount,
+            jettonWalletAddress,
+            recipient.comment ? comment(recipient.comment) : null,
+            signer
+        );
     }
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({

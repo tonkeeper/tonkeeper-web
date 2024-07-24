@@ -2,7 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { ProState, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { isStandardTonWallet, StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    getAccountAllTonWallets,
+    getWalletById,
+    isStandardTonWallet,
+    TonWalletStandard
+} from '@tonkeeper/core/dist/entries/wallet';
 import {
     authViaTonConnect,
     createProServiceInvoice,
@@ -24,10 +29,9 @@ import { useTranslation } from '../hooks/translation';
 import { QueryKey } from '../libs/queryKey';
 import { signTonConnectOver } from './mnemonic';
 import { useCheckTouchId } from './password';
-import { walletsStorage } from '@tonkeeper/core/dist/service/walletsService';
 import { useActiveWallet } from './wallet';
 import { useUserLanguage } from './language';
-import { useWalletsStorage } from '../hooks/useStorage';
+import { useAccountsStorage } from '../hooks/useStorage';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -45,7 +49,7 @@ export const useProState = () => {
     return useQuery<ProState, Error>([QueryKey.pro], async () => {
         // TODO а что если активный кошелек не стандартный?
         // TODO сделать флоу подписки
-        const state = await getProState(sdk.storage, wallet as StandardTonWalletState);
+        const state = await getProState(sdk.storage, wallet);
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
         return state;
@@ -58,9 +62,12 @@ export const useSelectWalletForProMutation = () => {
     const { api } = useAppContext();
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const accountsStorage = useAccountsStorage();
 
     return useMutation<void, Error, string>(async walletId => {
-        const state = await walletsStorage(sdk.storage).getWallet(walletId);
+        const accounts = await accountsStorage.getAccounts();
+        const state = getWalletById(accounts, walletId);
+
         if (!state) {
             throw new Error('Missing wallet state');
         }
@@ -109,11 +116,11 @@ export interface ConfirmState {
     invoice: InvoicesInvoice;
     recipient: RecipientData;
     assetAmount: AssetAmount;
-    wallet: StandardTonWalletState;
+    wallet: TonWalletStandard;
 }
 
 export const useCreateInvoiceMutation = () => {
-    const ws = useWalletsStorage();
+    const ws = useAccountsStorage();
     const { api } = useAppContext();
     return useMutation<
         ConfirmState,
@@ -124,7 +131,9 @@ export const useCreateInvoiceMutation = () => {
             throw new Error('missing tier');
         }
 
-        const wallet = await ws.getWallet(data.state.wallet.rawAddress);
+        const wallet = (await ws.getAccounts())
+            .flatMap(getAccountAllTonWallets)
+            .find(w => w.id === data.state.wallet.rawAddress);
         if (!wallet || !isStandardTonWallet(wallet)) {
             throw new Error('Missing wallet');
         }

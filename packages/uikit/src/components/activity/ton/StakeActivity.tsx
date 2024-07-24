@@ -7,7 +7,7 @@ import { useTranslation } from '../../../hooks/translation';
 import { FailedNote } from '../ActivityActionLayout';
 import { ActivityIcon, ReceiveIcon, SentIcon } from '../ActivityIcons';
 import { ColumnLayout, ErrorAction, ListItemGrid } from '../CommonAction';
-import { useActiveWallet } from '../../../state/wallet';
+import { useActiveTonNetwork } from '../../../state/wallet';
 
 export const DepositStakeAction: FC<{
     action: Action;
@@ -15,7 +15,7 @@ export const DepositStakeAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { depositStake } = action;
-    const wallet = useActiveWallet();
+    const network = useActiveTonNetwork();
     const format = useFormatCoinValue();
 
     if (!depositStake) {
@@ -33,7 +33,7 @@ export const DepositStakeAction: FC<{
                 entry={CryptoCurrency.TON}
                 address={
                     depositStake.pool.name ??
-                    toShortValue(formatAddress(depositStake.pool.address, wallet.network, true))
+                    toShortValue(formatAddress(depositStake.pool.address, network, true))
                 }
                 date={date}
             />
@@ -48,7 +48,7 @@ export const WithdrawStakeAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { withdrawStake } = action;
-    const wallet = useActiveWallet();
+    const network = useActiveTonNetwork();
     const format = useFormatCoinValue();
     if (!withdrawStake) {
         return <ErrorAction />;
@@ -65,7 +65,7 @@ export const WithdrawStakeAction: FC<{
                 green
                 address={
                     withdrawStake.pool.name ??
-                    toShortValue(formatAddress(withdrawStake.pool.address, wallet.network, true))
+                    toShortValue(formatAddress(withdrawStake.pool.address, network, true))
                 }
                 date={date}
             />
@@ -80,7 +80,7 @@ export const WithdrawRequestStakeAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { withdrawStakeRequest } = action;
-    const wallet = useActiveWallet();
+    const network = useActiveTonNetwork();
     const format = useFormatCoinValue();
     if (!withdrawStakeRequest) {
         return <ErrorAction />;
@@ -101,9 +101,7 @@ export const WithdrawRequestStakeAction: FC<{
                 entry={withdrawStakeRequest.amount ? CryptoCurrency.TON : ''}
                 address={
                     withdrawStakeRequest.pool.name ??
-                    toShortValue(
-                        formatAddress(withdrawStakeRequest.pool.address, wallet.network, true)
-                    )
+                    toShortValue(formatAddress(withdrawStakeRequest.pool.address, network, true))
                 }
                 date={date}
             />

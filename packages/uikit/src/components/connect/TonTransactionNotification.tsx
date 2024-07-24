@@ -33,7 +33,7 @@ import { Button } from '../fields/Button';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
-import { useActiveStandardTonWallet, useActiveWallet, useWalletsState } from '../../state/wallet';
+import { useActiveStandardTonWallet, useActiveWallet, useAccountsState } from '../../state/wallet';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -305,7 +305,7 @@ export const TonTransactionNotification: FC<{
     waitInvalidation?: boolean;
 }> = ({ params, handleClose, waitInvalidation }) => {
     const { t } = useTranslation();
-    const wallets = useWalletsState();
+    const wallets = useAccountsState();
     const Content = useCallback(() => {
         if (!params) return undefined;
         return (

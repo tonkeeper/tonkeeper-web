@@ -18,7 +18,7 @@ import {
 } from '../NotificationCommon';
 import { ActionData } from './ActivityNotification';
 import { NftComment } from './NftActivity';
-import { useActiveWallet } from '../../../state/wallet';
+import { useActiveTonNetwork } from '../../../state/wallet';
 
 export const ContractDeployActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
     const { t } = useTranslation();
@@ -54,7 +54,7 @@ export const ContractDeployAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { contractDeploy } = action;
-    const wallet = useActiveWallet();
+    const network = useActiveTonNetwork();
     if (!contractDeploy) {
         return <ErrorAction />;
     }
@@ -62,7 +62,7 @@ export const ContractDeployAction: FC<{
     const address = toShortValue(
         formatAddress(
             contractDeploy.address,
-            wallet.network,
+            network,
             !interfaces.some(value => value.includes('wallet'))
         )
     );

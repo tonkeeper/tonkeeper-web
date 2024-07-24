@@ -18,7 +18,7 @@ import {
 } from '../CommonAction';
 import { toDexName } from '../NotificationCommon';
 import { useSwapValue } from './JettonNotifications';
-import { useActiveWallet } from '../../../state/wallet';
+import { useActiveTonNetwork, useActiveWallet } from '../../../state/wallet';
 
 export interface JettonActionProps {
     action: Action;
@@ -27,6 +27,7 @@ export interface JettonActionProps {
 
 export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ action, date }) => {
     const wallet = useActiveWallet();
+    const network = useActiveTonNetwork();
     const { jettonTransfer } = action;
 
     const format = useFormatCoinValue();
@@ -47,7 +48,7 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
                     toShortValue(
                         formatAddress(
                             jettonTransfer.recipient?.address ?? jettonTransfer.recipientsWallet,
-                            wallet.network
+                            network
                         )
                     )
                 }
@@ -68,7 +69,7 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
                 toShortValue(
                     formatAddress(
                         jettonTransfer.sender?.address ?? jettonTransfer.sendersWallet,
-                        wallet.network
+                        network
                     )
                 )
             }
@@ -123,7 +124,7 @@ export const JettonBurnAction: FC<JettonActionProps> = ({ action, date }) => {
     const { t } = useTranslation();
     const { jettonBurn } = action;
     const format = useFormatCoinValue();
-    const wallet = useActiveWallet();
+    const network = useActiveTonNetwork();
 
     if (!jettonBurn) {
         return <ErrorAction />;
@@ -137,9 +138,7 @@ export const JettonBurnAction: FC<JettonActionProps> = ({ action, date }) => {
                 title={t('transactions_burned')}
                 amount={<>-&thinsp;{format(jettonBurn.amount, jettonBurn.jetton.decimals)}</>}
                 entry={jettonBurn.jetton.symbol}
-                address={toShortValue(
-                    formatAddress(jettonBurn.jetton.address, wallet.network, true)
-                )}
+                address={toShortValue(formatAddress(jettonBurn.jetton.address, network, true))}
                 date={date}
             />
             <FailedNote status={action.status} />
@@ -151,7 +150,7 @@ export const JettonMintAction: FC<JettonActionProps> = ({ action, date }) => {
     const { t } = useTranslation();
     const { jettonMint } = action;
     const format = useFormatCoinValue();
-    const wallet = useActiveWallet();
+    const network = useActiveTonNetwork();
 
     if (!jettonMint) {
         return <ErrorAction />;
@@ -165,9 +164,7 @@ export const JettonMintAction: FC<JettonActionProps> = ({ action, date }) => {
                 title={t('transaction_type_mint')}
                 amount={<>+&thinsp;{format(jettonMint.amount, jettonMint.jetton.decimals)}</>}
                 entry={jettonMint.jetton.symbol}
-                address={toShortValue(
-                    formatAddress(jettonMint.jetton.address, wallet.network, true)
-                )}
+                address={toShortValue(formatAddress(jettonMint.jetton.address, network, true))}
                 date={date}
                 green
             />

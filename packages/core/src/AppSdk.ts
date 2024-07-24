@@ -4,10 +4,10 @@ import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
 import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
-import { StandardTonWalletState } from './entries/wallet';
 import { TonTransferParams } from './service/deeplinkingService';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTransaction } from './service/ledger/connector';
+import { TonWalletStandard } from './entries/wallet';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -68,7 +68,7 @@ export interface TouchId {
 export interface NotificationService {
     subscribe: (
         api: APIConfig,
-        wallet: StandardTonWalletState,
+        wallet: TonWalletStandard,
         signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
     ) => Promise<void>;
     unsubscribe: (address?: string) => Promise<void>;

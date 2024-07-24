@@ -29,7 +29,7 @@ import { Skeleton } from '../../shared/Skeleton';
 import { useProState } from '../../../state/pro';
 import { availableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA } from '../../../libs/css';
-import { useWalletsState } from '../../../state/wallet';
+import { useAccountsState } from '../../../state/wallet';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -91,7 +91,7 @@ export const PreferencesAsideMenu = () => {
     const { data: proState } = useProState();
     const { data: uiPreferences } = useUserUIPreferences();
     const { fiat } = useAppContext();
-    const wallets = useWalletsState();
+    const wallets = useAccountsState();
 
     return (
         <PreferencesAsideContainer>

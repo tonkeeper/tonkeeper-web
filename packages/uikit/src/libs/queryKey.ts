@@ -22,6 +22,7 @@ export enum QueryKey {
     analytics = 'analytics',
     language = 'language',
     walletVersions = 'walletVersions',
+    globalPreferencesConfig = 'globalPreferencesConfig',
 
     tonConnectConnection = 'tonConnectConnection',
     tonConnectLastEventId = 'tonConnectLastEventId',

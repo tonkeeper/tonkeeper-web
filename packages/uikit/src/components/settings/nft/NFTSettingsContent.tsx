@@ -5,7 +5,7 @@ import { ListBlock, ListItemElement, ListItemPayload } from '../../../components
 import { SkeletonListWithImages } from '../../../components/Skeleton';
 import { Body2, H3, Label1 } from '../../../components/Text';
 import { useTranslation } from '../../../hooks/translation';
-import { useActiveWalletConfig } from '../../../state/wallet';
+import { useActiveTonWalletConfig } from '../../../state/wallet';
 import { IconButton } from '../../../components/fields/IconButton';
 import { BorderSmallResponsive } from '../../../components/shared/Styles';
 import { isSpamNft, useHideNft, useMakeNftVisible, useMarkNftAsTrusted, useWalletNftList } from "../../../state/nft";
@@ -117,7 +117,7 @@ export const NFTSettingsContent = () => {
     >();
 
     const { data: nfts } = useWalletNftList();
-    const { data: config } = useActiveWalletConfig();
+    const { data: config } = useActiveTonWalletConfig();
 
     const collections: (SettingsNFTCollection | SettingsSingleNFT)[] = useMemo(() => {
         if (!config || !nfts) return [];

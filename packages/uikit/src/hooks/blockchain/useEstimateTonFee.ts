@@ -4,15 +4,15 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TransferEstimation } from '@tonkeeper/core/dist/entries/send';
-import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { EmulationApi } from '@tonkeeper/core/dist/tonApiV2';
 import { Omit } from 'react-beautiful-dnd';
 import { useAppContext } from '../appContext';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveStandardTonWallet } from '../../state/wallet';
 
 export type ContractCallerParams = {
     api: APIConfig;
-    walletState: StandardTonWalletState;
+    walletState: TonWalletStandard;
 };
 
 export function useEstimateTonFee<Args extends ContractCallerParams>(
@@ -28,7 +28,7 @@ export function useEstimateTonFee<Args extends ContractCallerParams>(
     args: Omit<Args, 'api' | 'walletState'>
 ) {
     const { api } = useAppContext();
-    const walletState = useActiveWallet() as StandardTonWalletState;
+    const walletState = useActiveStandardTonWallet();
 
     return useQuery<TransferEstimation<TonAsset>, Error>(
         queryKey,

@@ -18,7 +18,7 @@ import {
     useSelectWalletForProMutation,
     useWaitInvoiceMutation
 } from '../../state/pro';
-import { useWalletsState, useWalletState } from '../../state/wallet';
+import { useAccountsState, useActiveTonNetwork, useWalletState } from '../../state/wallet';
 import { InnerBody } from '../Body';
 import { SubscriptionStatus } from '../desktop/aside/SubscriptionInfo';
 import { Button } from '../fields/Button';
@@ -31,7 +31,7 @@ import { Notification } from '../Notification';
 import { SubHeader } from '../SubHeader';
 import { Body1, Label1, Title } from '../Text';
 import { ConfirmView } from '../transfer/ConfirmView';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { getAccountAllTonWallets, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 
 const Block = styled.div`
     display: flex;
@@ -55,12 +55,11 @@ const Description = styled(Body1)`
     margin-bottom: 16px;
 `;
 
-const WalletItem: FC<{ wallet: WalletState }> = ({ wallet }) => {
+const WalletItem: FC<{ wallet: TonWalletStandard }> = ({ wallet }) => {
     const { t } = useTranslation();
+    const network = useActiveTonNetwork();
 
-    const address = wallet
-        ? toShortValue(formatAddress(wallet.rawAddress, wallet.network))
-        : undefined;
+    const address = wallet ? toShortValue(formatAddress(wallet.rawAddress, network)) : undefined;
 
     return (
         <ColumnText
@@ -80,7 +79,7 @@ const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { t } = useTranslation();
     const { mutateAsync, error } = useSelectWalletForProMutation();
     useNotifyError(error);
-    const wallets = useWalletsState();
+    const wallets = useAccountsState().flatMap(getAccountAllTonWallets);
 
     return (
         <>

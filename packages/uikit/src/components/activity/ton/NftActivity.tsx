@@ -5,7 +5,7 @@ import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
-import { useActiveWallet } from '../../../state/wallet';
+import { useActiveTonNetwork, useActiveWallet } from '../../../state/wallet';
 import { InfoCircleIcon, VerificationIcon } from '../../Icon';
 import { ListBlock } from '../../List';
 import { Body1, Body2 } from '../../Text';
@@ -40,11 +40,12 @@ import { ActionData } from './ActivityNotification';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { UnverifiedNftNotification } from '../../nft/UnverifiedNftNotification';
 import {
-  useIsSpamNft,
-  useIsUnverifiedNft,
-  useMarkNftAsSpam,
-  useMarkNftAsTrusted, useNftItemData
-} from "../../../state/nft";
+    useIsSpamNft,
+    useIsUnverifiedNft,
+    useMarkNftAsSpam,
+    useMarkNftAsTrusted,
+    useNftItemData
+} from '../../../state/nft';
 
 const NftBlock = styled.div`
     background: ${props => props.theme.backgroundContentTint};
@@ -141,6 +142,7 @@ export const NftItemTransferAction: FC<{
 }> = ({ action, date }) => {
     const { t } = useTranslation();
     const wallet = useActiveWallet();
+    const network = useActiveTonNetwork();
     const { nftItemTransfer } = action;
     if (!nftItemTransfer) {
         return <ErrorAction />;
@@ -160,7 +162,7 @@ export const NftItemTransferAction: FC<{
                         toShortValue(
                             formatAddress(
                                 nftItemTransfer.sender?.address ?? nftItemTransfer.nft,
-                                wallet.network,
+                                network,
                                 !nftItemTransfer.sender?.address
                             )
                         )
@@ -188,7 +190,7 @@ export const NftItemTransferAction: FC<{
                     toShortValue(
                         formatAddress(
                             nftItemTransfer.recipient?.address ?? nftItemTransfer.nft,
-                            wallet.network,
+                            network,
                             !nftItemTransfer.recipient?.address
                         )
                     )

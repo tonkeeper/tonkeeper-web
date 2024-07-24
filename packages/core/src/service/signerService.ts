@@ -3,7 +3,7 @@ import queryString from 'query-string';
 import { IAppSdk } from '../AppSdk';
 import { AppKey } from '../Keys';
 import { APIConfig } from '../entries/apis';
-import { isW5Version, StandardTonWalletState, WalletVersion } from '../entries/wallet';
+import { isW5Version, TonWalletStandard, WalletVersion } from '../entries/wallet';
 import { BlockchainApi } from '../tonApiV2';
 import { externalMessage, getWalletSeqNo } from './transfer/common';
 import { walletContractFromState } from './wallet/contractService';
@@ -66,7 +66,7 @@ export const storeTransactionAndCreateDeepLink = async (
 export const publishSignerMessage = async (
     sdk: IAppSdk,
     api: APIConfig,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     signatureHex: string
 ) => {
     const messageBase64 = await sdk.storage.get<string>(AppKey.SIGNER_MESSAGE);

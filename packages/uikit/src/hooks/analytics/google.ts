@@ -1,7 +1,7 @@
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { WalletsState, WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/wallet';
 import { v4 as uuidv4 } from 'uuid';
 import { Analytics } from '.';
 
@@ -30,22 +30,23 @@ export class GoogleAnalytics4 implements Analytics {
         }
     }
 
-    init(
-        application: string,
-        walletType: string,
-        activeWallet?: WalletState,
-        wallets?: WalletsState,
-        version?: string,
-        platform?: string
-    ) {
-        this.user_properties.application = { value: application };
-        this.user_properties.walletType = { value: walletType };
+    init(params: {
+        application: string;
+        walletType: string;
+        activeAccount: Account;
+        accounts: Account[];
+        network?: Network;
+        version?: string;
+        platform?: string;
+    }) {
+        this.user_properties.application = { value: params.application };
+        this.user_properties.walletType = { value: params.walletType };
         this.user_properties.network = {
-            value: activeWallet?.network === Network.TESTNET ? 'testnet' : 'mainnet'
+            value: params.network === Network.TESTNET ? 'testnet' : 'mainnet'
         };
-        this.user_properties.accounts = { value: wallets?.length || 0 };
-        this.user_properties.version = { value: version };
-        this.user_properties.platform = { value: platform };
+        this.user_properties.accounts = { value: params.accounts?.length || 0 };
+        this.user_properties.version = { value: params.version };
+        this.user_properties.platform = { value: params.platform };
     }
 
     pageView(location: string) {

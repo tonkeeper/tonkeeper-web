@@ -1,29 +1,28 @@
 import UR from '@ngraveio/bc-ur/dist/ur';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { walletStateFromKeystone } from '@tonkeeper/core/dist/service/walletService';
+import { accountByKeystone } from '@tonkeeper/core/dist/service/walletService';
 import { useNavigate } from 'react-router-dom';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
-import { useWalletsStorage } from '../hooks/useStorage';
-import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
-import { useActiveWallet } from './wallet';
+import { useAccountsStorage } from '../hooks/useStorage';
+import { useActiveAccount } from './wallet';
 
 export const usePairKeystoneMutation = () => {
     const sdk = useAppSdk();
-    const walletsStorage = useWalletsStorage();
+    const accountsStorage = useAccountsStorage();
     const navigate = useNavigate();
     const client = useQueryClient();
 
     return useMutation<void, Error, UR>(async ur => {
         try {
-            const state = await walletStateFromKeystone(ur);
-            const duplicatedWallet = await walletsStorage.getWallet(state.id);
+            const state = await accountByKeystone(ur);
+            const duplicatedWallet = await accountsStorage.getAccount(state.id);
             if (duplicatedWallet) {
                 throw new Error('Wallet already exist');
             }
 
-            await walletsStorage.addWalletToState(state);
+            await accountsStorage.addAccountToState(state);
 
             await client.invalidateQueries([QueryKey.account]);
 
@@ -36,6 +35,6 @@ export const usePairKeystoneMutation = () => {
 };
 
 export const useIsActiveWalletKeystone = () => {
-    const wallet = useActiveWallet();
-    return isStandardTonWallet(wallet) && wallet.auth.kind === 'keystone';
+    const account = useActiveAccount();
+    return account.type === 'keystone';
 };

@@ -1,8 +1,8 @@
-import { Network } from '../../entries/network';
 import { ConnectRequest, DAppManifest, KeyPair } from '../../entries/tonConnect';
-import { StandardTonWalletState } from '../../entries/wallet';
+import { TonWalletStandard } from '../../entries/wallet';
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
+import { getDevSettings } from '../devStorage';
 
 export interface TonConnectParams {
     protocolVersion: number;
@@ -18,12 +18,14 @@ export interface AccountConnection {
     webViewUrl?: string;
 }
 
-export const getAccountConnection = async (
+export const getTonWalletConnections = async (
     storage: IStorage,
-    wallet: Pick<StandardTonWalletState, 'id' | 'network' | 'publicKey'>
+    wallet: Pick<TonWalletStandard, 'id' | 'publicKey'>
 ) => {
+    const network = (await getDevSettings(storage)).tonNetwork;
+
     let result = await storage.get<AccountConnection[]>(
-        `${AppKey.CONNECTIONS}_${wallet.id}_${wallet.network}`
+        `${AppKey.CONNECTIONS}_${wallet.id}_${network}`
     );
 
     if (!result) {
@@ -36,20 +38,22 @@ export const getAccountConnection = async (
 
 export const setAccountConnection = async (
     storage: IStorage,
-    wallet: Pick<StandardTonWalletState, 'id' | 'network'>,
+    wallet: Pick<TonWalletStandard, 'id'>,
     items: AccountConnection[]
 ) => {
-    await storage.set(`${AppKey.CONNECTIONS}_${wallet.id}_${wallet.network}`, items);
+    const network = (await getDevSettings(storage)).tonNetwork;
+
+    await storage.set(`${AppKey.CONNECTIONS}_${wallet.id}_${network}`, items);
 };
 
 export const saveAccountConnection = async (options: {
     storage: IStorage;
-    wallet: StandardTonWalletState;
+    wallet: TonWalletStandard;
     manifest: DAppManifest;
     params: TonConnectParams;
     webViewUrl?: string;
 }): Promise<void> => {
-    let connections = await getAccountConnection(options.storage, options.wallet);
+    let connections = await getTonWalletConnections(options.storage, options.wallet);
 
     const old = connections.find(item => item.manifest.url === options.manifest.url);
     if (old) {
@@ -71,10 +75,10 @@ export const saveAccountConnection = async (options: {
  */
 export const disconnectAccountConnection = async (options: {
     storage: IStorage;
-    wallet: StandardTonWalletState;
+    wallet: TonWalletStandard;
     webViewUrl: string;
 }) => {
-    let connections = await getAccountConnection(options.storage, options.wallet);
+    let connections = await getTonWalletConnections(options.storage, options.wallet);
 
     connections = connections.filter(item => item.webViewUrl !== options.webViewUrl);
 
@@ -86,10 +90,10 @@ export const disconnectAccountConnection = async (options: {
  */
 export const disconnectAppConnection = async (options: {
     storage: IStorage;
-    wallet: StandardTonWalletState;
+    wallet: Pick<TonWalletStandard, 'id' | 'publicKey'>;
     clientSessionId: string;
 }) => {
-    let connections = await getAccountConnection(options.storage, options.wallet);
+    let connections = await getTonWalletConnections(options.storage, options.wallet);
 
     connections = connections.filter(item => item.clientSessionId !== options.clientSessionId);
 
@@ -98,10 +102,11 @@ export const disconnectAppConnection = async (options: {
 
 async function migrateAccountConnections(
     storage: IStorage,
-    wallet: Pick<StandardTonWalletState, 'network' | 'publicKey'>
+    wallet: Pick<TonWalletStandard, 'publicKey'>
 ) {
+    const network = (await getDevSettings(storage)).tonNetwork;
     const oldConnections = await storage.get<AccountConnection[]>(
-        `${AppKey.CONNECTIONS}_${wallet.publicKey}_${wallet.network ?? Network.MAINNET}`
+        `${AppKey.CONNECTIONS}_${wallet.publicKey}_${network}`
     );
 
     return oldConnections ?? [];

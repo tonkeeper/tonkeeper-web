@@ -39,7 +39,7 @@ import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { isV5R1Enabled, useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
-import { useActiveWalletQuery, useWalletsStateQuery } from "@tonkeeper/uikit/dist/state/wallet";
+import { useActiveAccountQuery, useAccountsStateQuery } from "@tonkeeper/uikit/dist/state/wallet";
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -178,8 +178,8 @@ const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
 `;
 
 export const Loader: FC = () => {
-    const { data: activeWallet, isLoading: activeWalletLoading } = useActiveWalletQuery();
-    const { data: wallets, isLoading: isWalletsLoading } = useWalletsStateQuery();
+    const { data: activeWallet, isLoading: activeWalletLoading } = useActiveAccountQuery();
+    const { data: wallets, isLoading: isWalletsLoading } = useAccountsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: fiat } = useUserFiat();
     const { data: devSettings } = useDevSettings();

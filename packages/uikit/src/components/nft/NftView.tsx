@@ -2,7 +2,7 @@ import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import React, { FC, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveWalletConfig } from '../../state/wallet';
+import { useActiveTonWalletConfig } from '../../state/wallet';
 import {
     BlockIcon,
     ChevronDownIcon,
@@ -130,7 +130,7 @@ export const NftPreview: FC<{
     const { mutate: markNftAsTrusted, isLoading: markNftAsTrustedLoading } = useMarkNftAsTrusted();
     const { mutateAsync: hideNft } = useHideNft();
 
-    const { data } = useActiveWalletConfig();
+    const { data } = useActiveTonWalletConfig();
     const isSuspicious = nftItem.trust !== TrustType.Whitelist;
     const isTrusted = !!data?.trustedNfts.includes(nftItem.collection?.address || nftItem.address);
 

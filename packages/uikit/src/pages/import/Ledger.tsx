@@ -20,7 +20,7 @@ import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { Checkbox } from '../../components/fields/Checkbox';
 import { LedgerConnectionSteps } from '../../components/ledger/LedgerConnectionSteps';
 import { UpdateWalletName } from '../../components/create/WalletName';
-import { getFallbackWalletEmoji } from '@tonkeeper/core/dist/service/walletService';
+import { getFallbackAccountEmoji } from '@tonkeeper/core/dist/service/walletService';
 import { toFormattedTonBalance } from "../../hooks/balance";
 
 const ConnectLedgerWrapper = styled.div`
@@ -183,7 +183,7 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
     };
 
     if (accountsToAdd) {
-        const fallbackEmoji = getFallbackWalletEmoji(accountsToAdd[0].publicKey.toString('hex'));
+        const fallbackEmoji = getFallbackAccountEmoji(accountsToAdd[0].publicKey.toString('hex'));
         return (
             <UpdateWalletName
                 walletEmoji={fallbackEmoji}

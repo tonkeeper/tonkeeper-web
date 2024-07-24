@@ -10,7 +10,7 @@ import { ListItem, ListItemPayload } from '../List';
 import { Label1 } from '../Text';
 import { getRecipientAddress } from './amountView/AmountViewUI';
 import { Label } from './common';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveTonNetwork } from '../../state/wallet';
 
 export const cropName = (name: string) => {
     return name.length > 19 ? toShortValue(name, 8) : name;
@@ -46,8 +46,8 @@ const RecipientItemAddress: FC<{ address: string }> = ({ address }) => {
 
 export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient }) => {
     const { address } = recipient;
-    const wallet = useActiveWallet();
-    const addrValue = getRecipientAddress(recipient, wallet);
+    const network = useActiveTonNetwork();
+    const addrValue = getRecipientAddress(recipient, network);
 
     if ('isFavorite' in address && address.isFavorite) {
         if (address.blockchain === BLOCKCHAIN_NAME.TRON) {

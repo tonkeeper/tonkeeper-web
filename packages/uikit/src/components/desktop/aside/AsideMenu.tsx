@@ -9,7 +9,7 @@ import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
-import { useActiveWallet, useMutateActiveWallet, useWalletsState } from "../../../state/wallet";
+import { useActiveWallet, useAccountsState, useMutateActiveTonWallet } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { Label2 } from '../../Text';
@@ -18,7 +18,7 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { AsideHeader } from './AsideHeader';
 import { SubscriptionInfo } from './SubscriptionInfo';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { getAccountAllTonWallets, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -92,16 +92,16 @@ const SubscriptionInfoStyled = styled(SubscriptionInfo)`
     padding: 6px 16px 6px 8px;
 `;
 
-export const AsideMenuAccount: FC<{ wallet: WalletState; isSelected: boolean }> = ({
+export const AsideMenuAccount: FC<{ wallet: TonWalletStandard; isSelected: boolean }> = ({
     wallet,
     isSelected
 }) => {
     const { t } = useTranslation();
-    const { mutateAsync } = useMutateActiveWallet();
+    const { mutateAsync } = useMutateActiveTonWallet();
     const navigate = useNavigate();
     const location = useLocation();
 
-    const wallets = useWalletsState();
+    const wallets = useAccountsState();
     const shouldShowIcon = wallets.length > 1;
 
     const handleNavigateHome = useCallback(() => {
@@ -137,7 +137,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const [isOpenImport, setIsOpenImport] = useState(false);
     const { proFeatures } = useAppContext();
-    const wallets = useWalletsState();
+    const wallets = useAccountsState().flatMap(getAccountAllTonWallets);
     const activeWallet = useActiveWallet();
     const navigate = useNavigate();
     const location = useLocation();

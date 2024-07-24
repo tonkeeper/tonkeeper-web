@@ -1,11 +1,15 @@
-import { isStandardTonWallet, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    getAccountActiveTonWallet,
+    isStandardTonWallet,
+    walletVersionText
+} from '@tonkeeper/core/dist/entries/wallet';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, relative, WalletSettingsRoute } from '../../libs/routes';
 import { useJettonList } from '../../state/jetton';
-import { LogOutWalletNotification } from './LogOutNotification';
+import { LogOutAccountNotification } from './LogOutNotification';
 import {
     AppsIcon,
     ListOfTokensIcon,
@@ -16,14 +20,15 @@ import {
     WalletsIcon
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
-import { useActiveWallet, useWalletsState } from "../../state/wallet";
-import { useWalletNftList } from "../../state/nft";
+import { useActiveWallet, useAccountsState, useActiveAccount } from '../../state/wallet';
+import { useWalletNftList } from '../../state/nft';
 
 const SingleAccountSettings = () => {
     const [logout, setLogout] = useState(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const wallet = useActiveWallet();
+    const account = useActiveAccount();
+    const wallet = getAccountActiveTonWallet(account);
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
@@ -44,7 +49,7 @@ const SingleAccountSettings = () => {
             });
         }*/
 
-        if (isStandardTonWallet(wallet)) {
+        if (account.type === 'mnemonic') {
             items.push({
                 name: t('settings_wallet_version'),
                 icon: walletVersionText(wallet.version),
@@ -93,13 +98,13 @@ const SingleAccountSettings = () => {
         });
 
         return items;
-    }, [t, navigate, wallet, jettons, nft]);
+    }, [t, navigate, account, jettons, nft]);
 
     return (
         <>
             <SettingsList items={mainItems} />
-            <LogOutWalletNotification
-                wallet={logout ? wallet : undefined}
+            <LogOutAccountNotification
+                account={logout ? account : undefined}
                 handleClose={() => setLogout(false)}
             />
         </>
@@ -197,7 +202,7 @@ const MultipleAccountSettings = () => {
 };
 
 export const AccountSettings = () => {
-    const wallets = useWalletsState();
+    const wallets = useAccountsState();
 
     if (wallets.length > 1) {
         return <MultipleAccountSettings />;

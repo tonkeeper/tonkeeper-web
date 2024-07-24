@@ -15,11 +15,11 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
-import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { Account, getAccountActiveTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import {
-    useCreateStandardTonWalletsByMnemonic,
-    useMutateRenameWallet,
-    useWalletsState
+    useCreateAccountMnemonic,
+    useMutateRenameAccount,
+    useAccountsState
 } from '../../state/wallet';
 
 const Create = () => {
@@ -30,12 +30,12 @@ const Create = () => {
         mutateAsync: createWalletsAsync,
         isLoading: isCreateWalletLoading,
         reset: resetCreateWallets
-    } = useCreateStandardTonWalletsByMnemonic();
-    const { mutateAsync: renameWallet, isLoading: renameLoading } = useMutateRenameWallet();
+    } = useCreateAccountMnemonic();
+    const { mutateAsync: renameWallet, isLoading: renameLoading } = useMutateRenameAccount();
 
-    const existingWallets = useWalletsState();
+    const existingWallets = useAccountsState();
     const [mnemonic, setMnemonic] = useState<string[] | undefined>();
-    const [wallet, setWallet] = useState<StandardTonWalletState | undefined>(undefined);
+    const [account, setAccount] = useState<Account | undefined>(undefined);
 
     const [create, setCreate] = useState(false);
     const [open, setOpen] = useState(false);
@@ -67,10 +67,8 @@ const Create = () => {
                 mnemonic,
                 password: createdPassword,
                 versions: [defaultWalletVersion],
-                activateFirstWallet: true
-            }).then(result => {
-                setWallet(result[0]);
-            });
+                selectAccount: true
+            }).then(setAccount);
         }
 
         return resetCreateWallets;
@@ -122,7 +120,7 @@ const Create = () => {
     }
 
     if (authExists) {
-        if (!wallet) {
+        if (!account) {
             return (
                 <Check
                     mnemonic={mnemonic}
@@ -143,7 +141,7 @@ const Create = () => {
             );
         }
 
-        if (!wallet) {
+        if (!account) {
             return (
                 <CreateAuthState
                     afterCreate={setCreatedPassword}
@@ -156,18 +154,17 @@ const Create = () => {
     if (existingWallets.length > 1 && !passName) {
         return (
             <UpdateWalletName
-                name={wallet.name}
+                name={account.name}
                 submitHandler={val => {
-                    setWallet(w => ({
-                        ...w!,
-                        ...val
-                    }));
                     renameWallet({
-                        id: wallet.id,
+                        id: account.id,
                         ...val
-                    }).then(() => setPassName(true));
+                    }).then(newAcc => {
+                        setPassName(true);
+                        setAccount(newAcc);
+                    });
                 }}
-                walletEmoji={wallet.emoji}
+                walletEmoji={account.emoji}
                 isLoading={renameLoading}
             />
         );
@@ -176,7 +173,7 @@ const Create = () => {
     if (sdk.notifications && !passNotifications) {
         return (
             <Subscribe
-                wallet={wallet!}
+                wallet={getAccountActiveTonWallet(account)}
                 mnemonic={mnemonic}
                 onDone={() => setPassNotification(true)}
             />

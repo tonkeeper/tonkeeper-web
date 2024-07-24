@@ -20,7 +20,7 @@ import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import { useActiveStandardTonWallet } from '../../state/wallet';
+import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../state/wallet';
 
 export function useSendTransfer<T extends Asset>(
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,
@@ -31,14 +31,15 @@ export function useSendTransfer<T extends Asset>(
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useActiveStandardTonWallet();
+    const account = useActiveAccount();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
     const { data: jettons } = useJettonList();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
     return useMutation<boolean, Error>(async () => {
-        const signer = await getSigner(sdk, wallet.id, checkTouchId).catch(() => null);
+        const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
         if (signer === null) return false;
         try {
             if (isTonAsset(amount.asset)) {
@@ -46,7 +47,7 @@ export function useSendTransfer<T extends Asset>(
                     track2('send-ton');
                     await sendTonTransfer(
                         api,
-                        wallet,
+                        account,
                         recipient as TonRecipientData,
                         amount,
                         isMax,
@@ -62,7 +63,7 @@ export function useSendTransfer<T extends Asset>(
                     )!;
                     await sendJettonTransfer(
                         api,
-                        wallet,
+                        account,
                         recipient as TonRecipientData,
                         amount as AssetAmount<TonAsset>,
                         jettonInfo!.walletAddress.address,
@@ -88,9 +89,7 @@ export function useSendTransfer<T extends Asset>(
             await notifyError(client, sdk, t, e);
         }
 
-        await client.invalidateQueries({
-            predicate: query => query.queryKey.includes(wallet.id)
-        });
+        await invalidateAccountQueries();
         return true;
     });
 }

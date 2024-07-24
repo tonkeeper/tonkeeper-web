@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Address, SendMode, beginCell, internal, toNano } from '@ton/core';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
-import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import {
     checkWalletBalanceOrDie,
     externalMessage,
@@ -118,7 +118,7 @@ const checkBurnDate = async (api: APIConfig, config: TonendpointConfig) => {
 const createNftMultiTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     chunk: NftItem[],
     config: TonendpointConfig,
     signer: CellSigner
@@ -155,7 +155,7 @@ const createNftMultiTransfer = async (
 
 const sendNftMultiTransfer = async (
     api: APIConfig,
-    walletState: StandardTonWalletState,
+    walletState: TonWalletStandard,
     chunk: NftItem[],
     config: TonendpointConfig,
     signer: CellSigner

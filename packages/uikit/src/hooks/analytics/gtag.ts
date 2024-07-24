@@ -1,5 +1,5 @@
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { WalletsState, WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/wallet';
 import ReactGA from 'react-ga4';
 import { Analytics } from '.';
 
@@ -8,21 +8,22 @@ export class Gtag implements Analytics {
         ReactGA.initialize(this.measurementId);
     }
 
-    init(
-        application: string,
-        walletType: string,
-        activeWallet?: WalletState,
-        wallets?: WalletsState,
-        version?: string,
-        platform?: string
-    ) {
+    init(params: {
+        application: string;
+        walletType: string;
+        activeAccount: Account;
+        accounts: Account[];
+        network?: Network;
+        version?: string;
+        platform?: string;
+    }) {
         ReactGA.gtag('set', 'user_properties', {
-            application,
-            walletType,
-            network: activeWallet?.network === Network.TESTNET ? 'testnet' : 'mainnet',
-            accounts: wallets?.length || 0,
-            version,
-            platform
+            application: params.application,
+            walletType: params.walletType,
+            network: params.network === Network.TESTNET ? 'testnet' : 'mainnet',
+            accounts: params.accounts.length,
+            version: params.version,
+            platform: params.version
         });
     }
 

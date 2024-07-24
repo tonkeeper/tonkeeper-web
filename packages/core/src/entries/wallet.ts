@@ -1,8 +1,15 @@
 import { Language } from './language';
 import { Network } from './network';
-import { AuthKeychain, AuthPassword, AuthState, DeprecatedAuthState } from './password';
+import {
+    AuthKeychain,
+    AuthPassword,
+    AuthSigner,
+    AuthSignerDeepLink,
+    DeprecatedAuthState
+} from './password';
 import { WalletProxy } from './proxy';
-import { BLOCKCHAIN_NAME } from './crypto';
+import { assertUnreachable } from '../utils/types';
+import { KeystonePathInfo } from '../service/keystone/types';
 
 export enum WalletVersion {
     V3R1 = 0,
@@ -86,62 +93,259 @@ export interface DeprecatedWalletState {
 }
 
 export type WalletId = string;
+export type AccountId = string;
 
-export interface WalletBasic {
-    blockchain: BLOCKCHAIN_NAME;
+export type TonContract = {
     id: WalletId;
-}
+    rawAddress: string; // rawAddress
+};
 
-export interface TonWalletStateBasic extends WalletBasic {
-    blockchain: BLOCKCHAIN_NAME.TON;
-    rawAddress: string;
+export type TonWalletStandard = TonContract & {
     name: string;
     emoji: string;
-    network: Network;
-}
-
-export interface StandardTonWalletState extends TonWalletStateBasic {
-    type: 'standard';
     publicKey: string;
     version: WalletVersion;
-    auth: AuthState;
+};
+
+export type DerivationItem = {
+    index: number;
+    name: string;
+    emoji: string;
+    activeTonWalletId: WalletId;
+    tonWallets: TonWalletStandard[];
+    //  tronWallets: never;
+};
+
+export interface AccountBasic {
+    emoji: string;
+    name: string;
 }
 
-export interface MultisigTonWalletState extends TonWalletStateBasic {
+export type AccountTonMnemonic = AccountBasic & {
+    id: AccountId; // ton public key
+    type: 'mnemonic';
+    auth: AuthPassword | AuthKeychain;
+
+    activeTonWalletId: WalletId;
+    tonWallets: TonWalletStandard[];
+    //   tronWallet: never;
+};
+
+export type AccountLedger = AccountBasic & {
+    id: AccountId; // first acc public key
+    type: 'ledger';
+
+    activeDerivationIndex: number;
+    derivations: DerivationItem[];
+};
+
+export type AccountKeystone = AccountBasic & {
+    id: AccountId; // ton wallet id
+    type: 'keystone';
+    pathInfo?: KeystonePathInfo;
+
+    tonWallet: TonWalletStandard;
+};
+
+/**
+ * temporary, will be removed when signer supports tron
+ */
+export type AccountTonOnly = AccountBasic & {
+    id: AccountId; // ton wallet id
+    type: 'ton-only';
+    auth: AuthSigner | AuthSignerDeepLink;
+
+    activeTonWalletId: WalletId;
+    tonWallets: TonWalletStandard[];
+};
+
+export type AccountTonMultisig = AccountBasic & {
+    id: AccountId;
     type: 'multisig';
+
+    //  tonWallet: TonContract;
+    //...
+};
+
+export type AccountKeeperMnemonic = AccountBasic & {
+    id: AccountId;
+    type: 'root-mnemonic';
+    auth: AuthPassword | AuthKeychain;
+
+    derivations: DerivationItem[];
+};
+
+export type Account = AccountTonMnemonic | AccountLedger | AccountTonOnly | AccountKeystone; //| AccountTonMultisig; // | AccountKeeperMnemonic;
+
+export type AccountsState = Account[];
+
+export const defaultAccountState = [];
+
+export function isAccountTonMnemonic(account: Account): account is AccountTonMnemonic {
+    return account.type === 'mnemonic';
 }
 
-export type TonWalletState = StandardTonWalletState | MultisigTonWalletState;
-
-export type WalletState = TonWalletState;
-export type WalletsState = WalletState[];
-
-export const defaultWalletsState = [];
-
-export function isTonWallet(state: WalletState): state is TonWalletState {
-    return state.blockchain === BLOCKCHAIN_NAME.TON;
+export function isAccountLedger(account: Account): account is AccountLedger {
+    return account.type === 'ledger';
 }
 
-export function isStandardTonWallet(state: WalletState): state is StandardTonWalletState {
-    return state.blockchain === BLOCKCHAIN_NAME.TON && state.type === 'standard';
+export function isAccountTonOnly(account: Account): account is AccountTonOnly {
+    return account.type === 'ton-only';
 }
 
-export function isPasswordAuthWallet(
-    state: WalletState
-): state is WalletState & { auth: AuthPassword } {
-    return isStandardTonWallet(state) && state.auth.kind === 'password';
+export function isStandardTonWallet(wallet: TonContract): wallet is TonWalletStandard {
+    return 'version' in wallet && 'publicKey' in wallet;
 }
 
-export function isMnemonicAuthWallet(
-    state: WalletState
-): state is WalletState & { auth: AuthPassword | AuthKeychain } {
-    return (
-        isStandardTonWallet(state) &&
-        (state.auth.kind === 'password' || state.auth.kind === 'keychain')
-    );
+export function getWalletById(
+    accounts: Account[],
+    walletId: WalletId
+): TonWalletStandard | undefined {
+    for (const account of accounts || []) {
+        const wallet = getAccountAllTonWallets(account).find(w => w.id === walletId);
+        if (wallet) {
+            return wallet;
+        }
+    }
 }
 
-export interface ActiveWalletConfig {
+export function getAccountAllTonWallets(account: Account): TonWalletStandard[] {
+    if (account.type === 'mnemonic') {
+        return account.tonWallets;
+    }
+
+    if (account.type === 'ledger') {
+        return account.derivations.flatMap(d => d.tonWallets);
+    }
+
+    if (account.type === 'ton-only') {
+        return account.tonWallets;
+    }
+
+    if (account.type === 'keystone') {
+        return [account.tonWallet];
+    }
+
+    assertUnreachable(account);
+}
+
+export function getAccountActiveDerivationTonWallets(account: Account): TonWalletStandard[] {
+    if (account.type === 'mnemonic') {
+        return account.tonWallets;
+    }
+
+    if (account.type === 'ledger') {
+        return account.derivations.find(d => account.activeDerivationIndex === d.index)!.tonWallets;
+    }
+
+    if (account.type === 'ton-only') {
+        return account.tonWallets;
+    }
+
+    if (account.type === 'keystone') {
+        return [account.tonWallet];
+    }
+
+    assertUnreachable(account);
+}
+
+export function getAccountActiveTonWallet(account: Account): TonWalletStandard {
+    if (account.type === 'mnemonic' || account.type === 'ton-only') {
+        return account.tonWallets.find(w => w.id === account.activeTonWalletId)!;
+    }
+
+    if (account.type === 'ledger') {
+        const derivation = account.derivations.find(
+            d => d.index === account.activeDerivationIndex
+        )!;
+        return derivation.tonWallets.find(w => w.id === derivation.activeTonWalletId)!;
+    }
+
+    if (account.type === 'keystone') {
+        return account.tonWallet;
+    }
+
+    assertUnreachable(account);
+}
+
+export function accountWithUpdatedTonWallet(
+    account: Account,
+    tonWallet: TonWalletStandard
+): Account {
+    const newAcc: Account = JSON.parse(JSON.stringify(account));
+    if (newAcc.type === 'mnemonic' || newAcc.type === 'ton-only') {
+        const index = newAcc.tonWallets.findIndex(w => w.id === tonWallet.id)!;
+        newAcc.tonWallets[index] = tonWallet;
+        return newAcc;
+    }
+
+    if (newAcc.type === 'ledger') {
+        for (const derivation of newAcc.derivations) {
+            const index = derivation.tonWallets.findIndex(w => w.id === tonWallet.id)!;
+            if (index !== -1) {
+                derivation.tonWallets[index] = tonWallet;
+                return newAcc;
+            }
+        }
+
+        throw new Error('Derivation not found');
+    }
+
+    if (newAcc.type === 'keystone') {
+        newAcc.tonWallet = tonWallet;
+        return newAcc;
+    }
+
+    assertUnreachable(newAcc);
+}
+
+export function accountWithUpdatedActiveTonWalletId(account: Account, walletId: WalletId): Account {
+    const newAcc: Account = JSON.parse(JSON.stringify(account));
+    if (newAcc.type === 'mnemonic' || newAcc.type === 'ton-only') {
+        newAcc.activeTonWalletId = walletId;
+        return newAcc;
+    }
+
+    if (newAcc.type === 'ledger') {
+        for (const derivation of newAcc.derivations) {
+            const index = derivation.tonWallets.findIndex(w => w.id === walletId)!;
+            if (index !== -1) {
+                derivation.activeTonWalletId = walletId;
+                return newAcc;
+            }
+        }
+
+        throw new Error('Derivation not found');
+    }
+
+    if (newAcc.type === 'keystone') {
+        return newAcc;
+    }
+
+    assertUnreachable(newAcc);
+}
+
+export function accountWithAddedTonWallet(account: Account, tonWallet: TonWalletStandard): Account {
+    const newAcc: Account = JSON.parse(JSON.stringify(account));
+    if (newAcc.type === 'mnemonic' || newAcc.type === 'ton-only') {
+        newAcc.tonWallets.push(tonWallet);
+        return newAcc;
+    }
+
+    if (newAcc.type === 'ledger') {
+        const derivation = newAcc.derivations.find(d => d.index === newAcc.activeDerivationIndex)!;
+        derivation.tonWallets.push(tonWallet);
+        return newAcc;
+    }
+
+    if (newAcc.type === 'keystone') {
+        throw new Error('Cannot add ton wallet to keystone account');
+    }
+
+    assertUnreachable(newAcc);
+}
+
+export interface TonWalletConfig {
     pinnedTokens: string[];
     hiddenTokens: string[];
     pinnedNfts: string[];
@@ -149,6 +353,15 @@ export interface ActiveWalletConfig {
     trustedNfts: string[];
     spamNfts: string[];
 }
+
+export const defaultPreferencesConfig: TonWalletConfig = {
+    pinnedTokens: [],
+    hiddenTokens: [],
+    pinnedNfts: [],
+    hiddenNfts: [],
+    trustedNfts: [],
+    spamNfts: []
+};
 
 export interface TronWalletStorage {
     ownerWalletAddress: string;

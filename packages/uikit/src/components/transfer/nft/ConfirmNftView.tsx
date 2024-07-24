@@ -34,7 +34,11 @@ import {
     ConfirmViewDetailsRecipient
 } from '../ConfirmView';
 import { NftDetailsBlock } from './Common';
-import { useActiveStandardTonWallet } from '../../../state/wallet';
+import {
+    useActiveAccount,
+    useActiveStandardTonWallet,
+    useInvalidateActiveWalletQueries
+} from '../../../state/wallet';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -75,15 +79,16 @@ const useSendNft = (
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useActiveStandardTonWallet();
+    const account = useActiveAccount();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
     return useMutation<boolean, Error>(async () => {
         if (!fee) return false;
 
-        const signer = await getSigner(sdk, wallet.id, checkTouchId).catch(() => null);
+        const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
         if (signer?.type !== 'cell') {
             throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
         }
@@ -91,13 +96,12 @@ const useSendNft = (
 
         track2('send-nft');
         try {
-            await sendNftTransfer(api, wallet, recipient, nftItem, fee, signer);
+            await sendNftTransfer(api, account, recipient, nftItem, fee, signer);
         } catch (e) {
             await notifyError(client, sdk, t, e);
         }
 
-        await client.invalidateQueries([wallet.id]);
-        await client.invalidateQueries();
+        await invalidateAccountQueries();
         return true;
     });
 };

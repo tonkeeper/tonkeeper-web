@@ -5,11 +5,11 @@ import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import { WalletContractV5Beta } from '@ton/ton/dist/wallets/WalletContractV5Beta';
 import { WalletContractV5R1 } from '@ton/ton/dist/wallets/WalletContractV5R1';
 import { Network } from '../../entries/network';
-import { StandardTonWalletState, WalletVersion } from '../../entries/wallet';
+import { TonWalletStandard, WalletVersion } from '../../entries/wallet';
 
-export const walletContractFromState = (wallet: StandardTonWalletState) => {
+export const walletContractFromState = (wallet: TonWalletStandard) => {
     const publicKey = Buffer.from(wallet.publicKey, 'hex');
-    return walletContract(publicKey, wallet.version, wallet.network);
+    return walletContract(publicKey, wallet.version);
 };
 
 const workchain = 0;
@@ -42,7 +42,7 @@ export const walletContract = (
     }
 };
 
-export const walletStateInitFromState = (wallet: StandardTonWalletState) => {
+export const walletStateInitFromState = (wallet: TonWalletStandard) => {
     const contract = walletContractFromState(wallet);
 
     return beginCell()

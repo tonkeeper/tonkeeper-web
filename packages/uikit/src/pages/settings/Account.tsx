@@ -1,4 +1,3 @@
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useCallback, useMemo, useState } from 'react';
 import {
     DragDropContext,
@@ -19,8 +18,8 @@ import { SubHeader } from '../../components/SubHeader';
 import { Label1 } from '../../components/Text';
 import { ImportNotification } from '../../components/create/ImportNotification';
 import {
-    DeleteWalletNotification,
-    LogOutWalletNotification
+    DeleteAccountNotification,
+    LogOutAccountNotification
 } from '../../components/settings/LogOutNotification';
 import { SetUpWalletIcon } from '../../components/settings/SettingsIcons';
 import { SettingsList } from '../../components/settings/SettingsList';
@@ -28,8 +27,9 @@ import { RenameWalletNotification } from '../../components/settings/wallet-name/
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useMutateWalletsState, useWalletsState } from '../../state/wallet';
-import { isMnemonicAuthWallet, WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { useMutateAccountsState, useAccountsState } from '../../state/wallet';
+import { Account as AccountType } from '@tonkeeper/core/dist/entries/wallet';
+import { useAccountLabel } from '../../hooks/accountUtils';
 
 const Row = styled.div`
     display: flex;
@@ -45,9 +45,9 @@ const Icon = styled.span`
 `;
 
 const WalletRow: FC<{
-    wallet: WalletState;
+    account: AccountType;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-}> = ({ wallet, dragHandleProps }) => {
+}> = ({ account, dragHandleProps }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
@@ -55,11 +55,11 @@ const WalletRow: FC<{
     const [logout, setLogout] = useState<boolean>(false);
     const [remove, setRemove] = useState<boolean>(false);
 
-    if (!wallet) {
+    const secondary = useAccountLabel(account);
+
+    if (!account) {
         return <SkeletonListPayloadWithImage />;
     }
-
-    const address = formatAddress(wallet.rawAddress, wallet.network);
 
     return (
         <>
@@ -68,12 +68,8 @@ const WalletRow: FC<{
                     <Icon {...dragHandleProps}>
                         <ReorderIcon />
                     </Icon>
-                    <WalletEmoji emoji={wallet.emoji} />
-                    <ColumnText
-                        noWrap
-                        text={wallet.name ? wallet.name : t('wallet_title')}
-                        secondary={toShortValue(address)}
-                    />
+                    <WalletEmoji emoji={account.emoji} />
+                    <ColumnText noWrap text={account.name} secondary={secondary} />
                     <DropDown
                         payload={onClose => (
                             <ListBlock margin={false} dropDown>
@@ -88,14 +84,14 @@ const WalletRow: FC<{
                                         <Label1>{t('Rename')}</Label1>
                                     </ListItemPayload>
                                 </ListItem>
-                                {isMnemonicAuthWallet(wallet) && (
+                                {account.type === 'mnemonic' && (
                                     <ListItem
                                         dropDown
                                         onClick={() => {
                                             navigate(
                                                 AppRoute.settings +
                                                     SettingsRoute.recovery +
-                                                    `/${wallet.id}`
+                                                    `/${account.id}`
                                             );
                                         }}
                                     >
@@ -137,15 +133,15 @@ const WalletRow: FC<{
                 </Row>
             </ListItemPayload>
             <RenameWalletNotification
-                wallet={rename ? wallet : undefined}
+                account={rename ? account : undefined}
                 handleClose={() => setRename(false)}
             />
-            <LogOutWalletNotification
-                wallet={logout ? wallet : undefined}
+            <LogOutAccountNotification
+                account={logout ? account : undefined}
                 handleClose={() => setLogout(false)}
             />
-            <DeleteWalletNotification
-                wallet={remove ? wallet : undefined}
+            <DeleteAccountNotification
+                account={remove ? account : undefined}
                 handleClose={() => setRemove(false)}
             />
         </>
@@ -156,8 +152,8 @@ export const Account = () => {
     const [isOpen, setOpen] = useState(false);
     const { t } = useTranslation();
 
-    const wallets = useWalletsState();
-    const { mutate } = useMutateWalletsState();
+    const accounts = useAccountsState();
+    const { mutate } = useMutateAccountsState();
 
     const createItems = useMemo(() => {
         return [
@@ -172,12 +168,12 @@ export const Account = () => {
     const handleDrop: OnDragEndResponder = useCallback(
         droppedItem => {
             if (!droppedItem.destination) return;
-            const updatedList = [...wallets];
+            const updatedList = [...accounts];
             const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
             updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
             mutate(updatedList);
         },
-        [wallets, mutate]
+        [accounts, mutate]
     );
 
     return (
@@ -188,10 +184,10 @@ export const Account = () => {
                     <Droppable droppableId="wallets">
                         {provided => (
                             <ListBlock {...provided.droppableProps} ref={provided.innerRef}>
-                                {wallets.map((wallet, index) => (
+                                {accounts.map((account, index) => (
                                     <Draggable
-                                        key={wallet.id}
-                                        draggableId={wallet.id}
+                                        key={account.id}
+                                        draggableId={account.id}
                                         index={index}
                                     >
                                         {p => (
@@ -203,7 +199,7 @@ export const Account = () => {
                                             >
                                                 <WalletRow
                                                     dragHandleProps={p.dragHandleProps}
-                                                    wallet={wallet}
+                                                    account={account}
                                                 />
                                             </ListItemElement>
                                         )}

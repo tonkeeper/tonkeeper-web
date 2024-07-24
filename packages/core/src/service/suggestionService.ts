@@ -2,7 +2,7 @@ import { IAppSdk } from '../AppSdk';
 import { APIConfig } from '../entries/apis';
 import { BLOCKCHAIN_NAME } from '../entries/crypto';
 import { FavoriteSuggestion, LatestSuggestion } from '../entries/suggestion';
-import { StandardTonWalletState, TonWalletState } from '../entries/wallet';
+import { TonWalletStandard } from '../entries/wallet';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { AccountsApi } from '../tonApiV2';
@@ -73,7 +73,7 @@ export const deleteFavoriteSuggestion = async (
 
 const getTonSuggestionsList = async (
     api: APIConfig,
-    wallet: TonWalletState,
+    wallet: TonWalletStandard,
     seeIfAddressIsAdded: (list: LatestSuggestion[], address: string) => boolean
 ) => {
     const list = [] as LatestSuggestion[];
@@ -111,7 +111,7 @@ const getTonSuggestionsList = async (
 export const getSuggestionsList = async (
     sdk: IAppSdk,
     api: APIConfig,
-    wallet: StandardTonWalletState,
+    wallet: TonWalletStandard,
     acceptBlockchains: BLOCKCHAIN_NAME[] = [BLOCKCHAIN_NAME.TON, BLOCKCHAIN_NAME.TRON]
 ) => {
     const favorites = await getFavoriteSuggestions(sdk.storage, wallet.publicKey);

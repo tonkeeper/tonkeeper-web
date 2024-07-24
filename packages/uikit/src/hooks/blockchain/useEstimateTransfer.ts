@@ -11,7 +11,7 @@ import {
     TransferEstimation,
     TransferEstimationEvent
 } from '@tonkeeper/core/dist/entries/send';
-import { StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { estimateJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { estimateTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
@@ -36,7 +36,7 @@ async function estimateTon({
     amount: AssetAmount<TonAsset>;
     isMax: boolean;
     api: APIConfig;
-    wallet: StandardTonWalletState;
+    wallet: TonWalletStandard;
     jettons: JettonsBalances | undefined;
 }): Promise<TransferEstimation<TonAsset>> {
     let payload: TransferEstimationEvent;

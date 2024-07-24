@@ -1,36 +1,36 @@
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { Account } from '@tonkeeper/core/dist/entries/wallet';
 import React, { FC, useCallback, useState } from 'react';
 import { useTranslation } from '../../../hooks/translation';
-import { useMutateRenameWallet } from '../../../state/wallet';
+import { useMutateRenameAccount } from '../../../state/wallet';
 import { Notification, NotificationBlock } from '../../Notification';
 import { Button } from '../../fields/Button';
 import { Input } from '../../fields/Input';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { EmojisList } from '../../shared/emoji/EmojisList';
+import { useAccountLabel } from '../../../hooks/accountUtils';
 
 const RenameWalletContent: FC<{
-    wallet: WalletState;
+    account: Account;
     afterClose: (action: () => void) => void;
     animationTime?: number;
-}> = ({ animationTime, afterClose, wallet }) => {
+}> = ({ animationTime, afterClose, account }) => {
     const { t } = useTranslation();
 
-    const { mutateAsync, isLoading, isError } = useMutateRenameWallet();
+    const { mutateAsync, isLoading, isError } = useMutateRenameAccount();
 
-    const [name, setName] = useState(wallet.name ?? '');
-    const [emoji, setEmoji] = useState(wallet.emoji ?? '');
+    const [name, setName] = useState(account.name);
+    const [emoji, setEmoji] = useState(account.emoji);
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
-        await mutateAsync({ id: wallet.id, name, emoji });
+        await mutateAsync({ id: account.id, name, emoji });
         afterClose(() => null);
     };
 
-    const address = formatAddress(wallet.rawAddress, wallet.network);
+    const label = useAccountLabel(account);
 
     return (
         <NotificationBlock onSubmit={onSubmit}>
-            <Input value={address} disabled label={t('add_edit_favorite_address_label')} />
+            <Input value={label} disabled label={t('add_edit_favorite_address_label')} />
             <Input
                 value={name}
                 onChange={setName}
@@ -56,24 +56,28 @@ const RenameWalletContent: FC<{
 };
 
 export const RenameWalletNotification: FC<{
-    wallet?: WalletState;
+    account?: Account;
     handleClose: () => void;
-}> = ({ wallet, handleClose }) => {
+}> = ({ account, handleClose }) => {
     const { t } = useTranslation();
 
     const Content = useCallback(
         (afterClose: (action: () => void) => void) => {
-            if (!wallet) return undefined;
+            if (!account) return undefined;
             return (
-                <RenameWalletContent animationTime={1000} wallet={wallet} afterClose={afterClose} />
+                <RenameWalletContent
+                    animationTime={1000}
+                    account={account}
+                    afterClose={afterClose}
+                />
             );
         },
-        [wallet]
+        [account]
     );
 
     return (
         <Notification
-            isOpen={wallet != null}
+            isOpen={account != null}
             handleClose={handleClose}
             hideButton
             title={t('Rename')}

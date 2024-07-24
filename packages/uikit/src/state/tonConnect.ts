@@ -3,7 +3,7 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     AccountConnection,
-    getAccountConnection,
+    getTonWalletConnections,
     saveAccountConnection,
     setAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
@@ -26,15 +26,19 @@ import {
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { signTonConnectOver } from './mnemonic';
 import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
-import { isStandardTonWallet, StandardTonWalletState } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    getAccountAllTonWallets,
+    isStandardTonWallet,
+    TonWalletStandard
+} from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { useActiveWallet, useWalletsState } from './wallet';
+import { useActiveWallet, useAccountsState, useActiveAccount, useActiveTonNetwork } from './wallet';
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();
-    const wallets = useWalletsState().filter(isStandardTonWallet);
+    const wallets = useAccountsState().flatMap(getAccountAllTonWallets);
 
-    return useQuery<{ wallet: StandardTonWalletState; connections: AccountConnection[] }[]>(
+    return useQuery<{ wallet: TonWalletStandard; connections: AccountConnection[] }[]>(
         [QueryKey.tonConnectConnection, wallets.map(i => i.id)],
         async () => {
             return getAppConnections(sdk.storage);
@@ -78,11 +82,13 @@ export const useActiveWalletTonConnectConnections = () => {
 
 export const useConnectTonConnectAppMutation = () => {
     const wallet = useActiveWallet();
+    const account = useActiveAccount();
     const sdk = useAppSdk();
     const client = useQueryClient();
     const { api } = useAppContext();
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const network = useActiveTonNetwork();
 
     return useMutation<
         ConnectItemReply[],
@@ -102,7 +108,7 @@ export const useConnectTonConnectAppMutation = () => {
 
         for (const item of request.items) {
             if (item.name === 'ton_addr') {
-                result.push(toTonAddressItemReply(wallet));
+                result.push(toTonAddressItemReply(wallet, network));
             }
             if (item.name === 'ton_proof') {
                 const signTonConnect = signTonConnectOver(sdk, wallet.publicKey, t, checkTouchId);
@@ -116,7 +122,7 @@ export const useConnectTonConnectAppMutation = () => {
                 result.push(
                     await toTonProofItemReply({
                         storage: sdk.storage,
-                        wallet,
+                        account,
                         signTonConnect,
                         proof
                     })
@@ -161,7 +167,7 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
     const client = useQueryClient();
-    const wallets = useWalletsState();
+    const accounts = useAccountsState();
 
     return useMutation(async (connection: AccountConnection | 'all') => {
         if (!isStandardTonWallet(wallet)) {
@@ -173,8 +179,8 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
         } else {
             connectionsToDisconnect = (
                 await Promise.all(
-                    wallets
-                        .filter(isStandardTonWallet)
+                    accounts
+                        .flatMap(getAccountAllTonWallets)
                         .map(w => disconnectFromWallet(sdk.storage, connection, w))
                 )
             ).flat();
@@ -199,9 +205,9 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
 const disconnectFromWallet = async (
     storage: IStorage,
     connection: AccountConnection | 'all',
-    wallet: Pick<StandardTonWalletState, 'publicKey' | 'id' | 'network'>
+    wallet: Pick<TonWalletStandard, 'publicKey' | 'id'>
 ) => {
-    let connections = await getAccountConnection(storage, wallet);
+    let connections = await getTonWalletConnections(storage, wallet);
     const connectionsToDisconnect = connection === 'all' ? connections : [connection];
 
     connections =

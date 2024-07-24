@@ -21,7 +21,7 @@ import { Body1, H3 } from '../Text';
 import { Button } from '../fields/Button';
 import { Wrapper, childFactoryCreator, duration } from '../transfer/common';
 import { QrWrapper } from './qrCodeView';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 
 const CopyBlock = styled.div`
     display: flex;
@@ -98,10 +98,10 @@ const Description = styled(Body1)`
     color: ${props => props.theme.textSecondary};
 `;
 
-const values = [
+/*const values = [
     { name: BLOCKCHAIN_NAME.TON, id: BLOCKCHAIN_NAME.TON },
     { name: 'TRC20', id: BLOCKCHAIN_NAME.TRON }
-];
+];*/
 
 export const HeaderBlock: FC<{ title?: string; description: string }> = ({
     title,
@@ -141,8 +141,9 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     const { extension } = useAppContext();
     const wallet = useActiveWallet();
     const { t } = useTranslation();
+    const network = useActiveTonNetwork();
 
-    const address = formatAddress(wallet.rawAddress, wallet.network);
+    const address = formatAddress(wallet.rawAddress, network);
     return (
         <NotificationBlock>
             <HeaderBlock title={t('receive_ton')} description={t('receive_ton_description')} />

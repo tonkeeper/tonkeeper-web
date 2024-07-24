@@ -6,13 +6,12 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { QueryKey } from '../../libs/queryKey';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveAccount, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 import { Body3, Label2, Num2 } from '../Text';
 import { Badge } from '../shared';
 import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
-import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
-import { useWalletTotalBalance } from "../../state/asset";
+import { useWalletTotalBalance } from '../../state/asset';
 
 const Block = styled.div`
     display: flex;
@@ -69,15 +68,10 @@ export const BalanceSkeleton = () => {
 };
 
 const Label = () => {
-    const wallet = useActiveWallet();
+    const account = useActiveAccount();
 
-    if (!isStandardTonWallet(wallet)) {
-        return <></>;
-    }
-
-    switch (wallet.auth.kind) {
-        case 'signer':
-        case 'signer-deeplink':
+    switch (account.type) {
+        case 'ton-only':
             return (
                 <>
                     {' '}
@@ -118,8 +112,9 @@ export const Balance: FC<{
     const { fiat } = useAppContext();
     const wallet = useActiveWallet();
     const client = useQueryClient();
+    const network = useActiveTonNetwork();
 
-    const address = formatAddress(wallet.rawAddress, wallet.network);
+    const address = formatAddress(wallet.rawAddress, network);
 
     const { data: total } = useWalletTotalBalance(fiat);
 

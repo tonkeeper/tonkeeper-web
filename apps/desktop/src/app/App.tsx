@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
-import { WalletState, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { Account, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -62,7 +62,11 @@ import {
     useTonendpoint,
     useTonenpointConfig
 } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import { useActiveWalletQuery, useWalletsStateQuery } from '@tonkeeper/uikit/dist/state/wallet';
+import {
+    useActiveAccountQuery,
+    useAccountsStateQuery,
+    useActiveTonNetwork
+} from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -258,8 +262,9 @@ const FullSizeWrapperBounded = styled(FullSizeWrapper)`
 `;
 
 export const Loader: FC = () => {
-    const { data: activeWallet, isLoading: activeWalletLoading } = useActiveWalletQuery();
-    const { data: wallets, isLoading: isWalletsLoading } = useWalletsStateQuery();
+    const network = useActiveTonNetwork();
+    const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
+    const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: devSettings } = useDevSettings();
 
@@ -270,7 +275,7 @@ export const Loader: FC = () => {
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,
         build: sdk.version,
-        network: activeWallet?.network,
+        network,
         lang,
         platform: 'desktop'
     });
@@ -279,7 +284,7 @@ export const Loader: FC = () => {
     const navigate = useNavigate();
     useAppHeight();
 
-    const { data: tracker } = useAnalytics(sdk.version, activeWallet, wallets);
+    const { data: tracker } = useAnalytics(sdk.version, activeAccount, accounts);
 
     useEffect(() => {
         if (lang && i18n.language !== localizationText(lang)) {
@@ -305,7 +310,6 @@ export const Loader: FC = () => {
         return <Loading />;
     }
 
-    const network = activeWallet?.network ?? Network.MAINNET;
     const context: IAppContext = {
         api: getApiConfig(config, network, REACT_APP_TONCONSOLE_API),
         fiat,
@@ -331,7 +335,7 @@ export const Loader: FC = () => {
                     value={() => navigate(AppRoute.home, { replace: true })}
                 >
                     <AppContext.Provider value={context}>
-                        <Content activeWallet={activeWallet} lock={lock} />
+                        <Content activeAccount={activeAccount} lock={lock} />
                         <CopyNotification hideSimpleCopyNotifications />
                         <QrScanner />
                     </AppContext.Provider>
@@ -347,9 +351,9 @@ const usePrefetch = () => {
 };
 
 export const Content: FC<{
-    activeWallet?: WalletState | null;
+    activeAccount?: Account | null;
     lock: boolean;
-}> = ({ activeWallet, lock }) => {
+}> = ({ activeAccount, lock }) => {
     const location = useLocation();
     useWindowsScroll();
     useAppWidth();
@@ -365,7 +369,7 @@ export const Content: FC<{
         );
     }
 
-    if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
+    if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
         return (
             <FullSizeWrapperBounded className="full-size-wrapper">
                 <InitializeContainer fullHeight={false}>

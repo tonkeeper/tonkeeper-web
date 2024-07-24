@@ -11,7 +11,12 @@ import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import { ProState, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
-import { isStandardTonWallet, StandardTonWalletState, WalletVersion } from '../entries/wallet';
+import {
+    getAccountAllTonWallets,
+    isStandardTonWallet,
+    TonWalletStandard,
+    WalletVersion
+} from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
 import {
     FiatCurrencies as FiatCurrenciesGenerated,
@@ -31,7 +36,7 @@ import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './transfer/common';
 import { walletStateInitFromState } from './wallet/contractService';
-import { walletsStorage } from './walletsService';
+import { accountsStorage } from './accountsStorage';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -44,7 +49,7 @@ export const getBackupState = async (storage: IStorage) => {
 
 export const getProState = async (
     storage: IStorage,
-    wallet: StandardTonWalletState
+    wallet: TonWalletStandard
 ): Promise<ProState> => {
     try {
         return await loadProState(storage, wallet);
@@ -88,7 +93,7 @@ export const walletVersionFromProServiceDTO = (value: string) => {
 
 export const loadProState = async (
     storage: IStorage,
-    fallbackWallet: StandardTonWalletState
+    fallbackWallet: TonWalletStandard
 ): Promise<ProState> => {
     const user = await ProServiceService.proServiceGetUserInfo();
 
@@ -97,7 +102,9 @@ export const loadProState = async (
         rawAddress: fallbackWallet.rawAddress
     };
     if (user.pub_key && user.version) {
-        const wallets = await walletsStorage(storage).getWallets();
+        const wallets = (await accountsStorage(storage).getAccounts()).flatMap(
+            getAccountAllTonWallets
+        );
         const actualWallet = wallets
             .filter(isStandardTonWallet)
             .find(
@@ -160,7 +167,7 @@ export const checkAuthCookie = async () => {
 
 export const authViaTonConnect = async (
     api: APIConfig,
-    wallet: StandardTonWalletState,
+    wallet: TonWalletStandard,
     signProof: (bufferToSing: Buffer) => Promise<Uint8Array>
 ) => {
     const domain = 'https://tonkeeper.com/';

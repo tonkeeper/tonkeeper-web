@@ -1,5 +1,6 @@
 import {
-    StandardTonWalletState,
+    getAccountActiveDerivationTonWallets,
+    TonWalletStandard,
     WalletVersion as WalletVersionType,
     WalletVersions,
     walletVersionText
@@ -15,11 +16,11 @@ import { useIsActiveWalletKeystone } from '../../state/keystone';
 import { useIsActiveWalletLedger } from '../../state/ledger';
 import {
     useActiveStandardTonWallet,
-    useCreateStandardTonWalletsByMnemonic,
-    useMutateActiveWallet,
-    useMutateRenameWallet,
     useStandardTonWalletVersions,
-    useWalletsState
+    useActiveAccount,
+    useAddTonWalletVersionToActiveAccount,
+    useRenameTonWallet,
+    useMutateActiveTonWallet
 } from '../../state/wallet';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { toFormattedTonBalance } from '../../hooks/balance';
@@ -29,9 +30,6 @@ import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { Notification } from '../../components/Notification';
 import { UpdateWalletName } from '../../components/create/WalletName';
-import { useCheckTouchId } from '../../state/password';
-import { getMnemonicAndPassword } from '../../state/mnemonic';
-import { useAppSdk } from '../../hooks/appSdk';
 import { SkeletonList } from '../../components/Skeleton';
 
 const LedgerError = styled(Body2)`
@@ -51,23 +49,21 @@ const Body2Secondary = styled(Body2)`
 
 export const WalletVersion = () => {
     const { t } = useTranslation();
-    const sdk = useAppSdk();
     const isLedger = useIsActiveWalletLedger();
     const isKeystone = useIsActiveWalletKeystone();
     const currentWallet = useActiveStandardTonWallet();
-    const connectedWallets = useWalletsState();
-    const { mutateAsync: selectWallet, isLoading: isSelectWalletLoading } = useMutateActiveWallet();
-    const navigate = useNavigate();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const currentAccount = useActiveAccount();
+    const currentAccountWalletsVersions = getAccountActiveDerivationTonWallets(currentAccount);
 
-    const { data: wallets } = useStandardTonWalletVersions(
-        currentWallet.publicKey,
-        currentWallet.network
-    );
+    const { mutateAsync: selectWallet, isLoading: isSelectWalletLoading } =
+        useMutateActiveTonWallet();
+    const navigate = useNavigate();
+
+    const { data: wallets } = useStandardTonWalletVersions(currentWallet.publicKey);
 
     const { mutateAsync: createWalletAsync, isLoading: isCreateWalletLoading } =
-        useCreateStandardTonWalletsByMnemonic();
-    const { mutateAsync: renameWallet, isLoading: isRenameWalletLoading } = useMutateRenameWallet();
+        useAddTonWalletVersionToActiveAccount();
+    const { mutateAsync: renameWallet, isLoading: isRenameWalletLoading } = useRenameTonWallet();
 
     const onOpenWallet = async (address: Address) => {
         if (address.toRawString() !== currentWallet.rawAddress) {
@@ -77,24 +73,14 @@ export const WalletVersion = () => {
     };
 
     const [editWalletNameNotificationPayload, setEditWalletNameNotificationPayload] = useState<
-        StandardTonWalletState | undefined
+        TonWalletStandard | undefined
     >();
 
     const onAddWallet = async (w: { version: WalletVersionType; address: Address }) => {
-        const { mnemonic, password } = await getMnemonicAndPassword(
-            sdk,
-            currentWallet.id,
-            checkTouchId
-        );
         const newWallet = await createWalletAsync({
-            mnemonic,
-            versions: [w.version],
-            password
+            version: w.version
         });
-        if (!newWallet) {
-            return;
-        }
-        setEditWalletNameNotificationPayload(newWallet[0]);
+        setEditWalletNameNotificationPayload(newWallet);
     };
 
     const onChangeName = async (args: { name: string; emoji: string; id: string }) => {
@@ -122,7 +108,7 @@ export const WalletVersion = () => {
                 {!isLedger && !isKeystone && (
                     <ListBlock>
                         {wallets.map(wallet => {
-                            const isWalletAdded = connectedWallets.some(
+                            const isWalletAdded = currentAccountWalletsVersions.some(
                                 w => w.rawAddress === wallet.address.toRawString()
                             );
 
@@ -176,7 +162,7 @@ export const WalletVersion = () => {
 const UpdateWalletNameNotification: FC<{
     isOpen: boolean;
     onClose: (isAdded: { name: string; emoji: string; id: string }) => void;
-    wallet: StandardTonWalletState | undefined;
+    wallet: TonWalletStandard | undefined;
 }> = ({ isOpen, onClose, wallet }) => {
     return (
         <Notification

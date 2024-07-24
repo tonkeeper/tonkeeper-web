@@ -20,7 +20,7 @@ import { Body2, Body3, H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { useConnectTonConnectAppMutation } from '../../state/tonConnect';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 
 const Title = styled(H2)`
     text-align: center;
@@ -109,7 +109,8 @@ const ConnectContent: FC<{
         }
     };
 
-    const address = formatAddress(wallet.rawAddress, wallet.network);
+    const network = useActiveTonNetwork();
+    const address = formatAddress(wallet.rawAddress, network);
 
     let shortUrl = manifest.url;
     try {
