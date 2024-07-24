@@ -1,4 +1,4 @@
-import { app } from 'electron';
+import AppUpdate from './autoUpdate';
 
 const EditMenu: Electron.MenuItemConstructorOptions = {
     label: 'Edit',
@@ -34,7 +34,7 @@ const EditMenu: Electron.MenuItemConstructorOptions = {
         {
             label: 'Select All',
             accelerator: 'CmdOrCtrl+A',
-            role: 'selectall'
+            role: 'selectAll'
         }
     ]
 };
@@ -52,11 +52,18 @@ const WindowMenu: Electron.MenuItemConstructorOptions = {
             label: 'Close',
             accelerator: 'CmdOrCtrl+W',
             role: 'close'
+        },
+        {
+            type: 'separator'
+        },
+        {
+            label: 'Bring All to Front',
+            role: 'front'
         }
     ]
 };
 
-const getDarwinMenu = (): Electron.MenuItemConstructorOptions => {
+const getDarwinMenu = (update: AppUpdate): Electron.MenuItemConstructorOptions => {
     return {
         label: 'Tonkeeper',
         submenu: [
@@ -69,7 +76,9 @@ const getDarwinMenu = (): Electron.MenuItemConstructorOptions => {
             },
             {
                 label: 'Check for Updates',
-                click: function () {}
+                click: function () {
+                    update.check();
+                }
             },
             {
                 type: 'separator'
@@ -82,7 +91,7 @@ const getDarwinMenu = (): Electron.MenuItemConstructorOptions => {
             {
                 label: 'Hide Others',
                 accelerator: 'Command+Shift+H',
-                role: 'hideothers'
+                role: 'hideOthers'
             },
             {
                 label: 'Show All',
@@ -94,15 +103,13 @@ const getDarwinMenu = (): Electron.MenuItemConstructorOptions => {
             {
                 label: 'Quit Tonkeeper Pro',
                 accelerator: 'Command+Q',
-                click: function () {
-                    app.quit();
-                }
+                role: 'quit'
             }
         ]
     };
 };
 
-const getWinMenu = (): Electron.MenuItemConstructorOptions => {
+const getWinMenu = (update: AppUpdate): Electron.MenuItemConstructorOptions => {
     return {
         label: 'Tonkeeper',
         submenu: [
@@ -115,7 +122,9 @@ const getWinMenu = (): Electron.MenuItemConstructorOptions => {
             },
             {
                 label: 'Check for Updates',
-                click: function () {}
+                click: function () {
+                    update.check();
+                }
             },
             {
                 type: 'separator'
@@ -123,9 +132,7 @@ const getWinMenu = (): Electron.MenuItemConstructorOptions => {
             {
                 label: 'Quit Tonkeeper Pro',
                 accelerator: 'Command+Q',
-                click: function () {
-                    app.quit();
-                }
+                role: 'quit'
             }
         ]
     };
@@ -140,6 +147,11 @@ const ViewMenu: Electron.MenuItemConstructorOptions = {
             click: function (item, focusedWindow) {
                 if (focusedWindow) focusedWindow.reload();
             }
+        },
+        {
+            label: 'Force Reload',
+            accelerator: 'Shift+CmdOrCtrl+R',
+            role: 'forceReload'
         },
         {
             label: 'Toggle Full Screen',
@@ -167,9 +179,11 @@ const ViewMenu: Electron.MenuItemConstructorOptions = {
     ]
 };
 
-export const AppMenu = (): (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] => {
+export const AppMenu = (
+    update: AppUpdate
+): (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] => {
     return [
-        process.platform === 'darwin' ? getDarwinMenu() : getWinMenu(),
+        process.platform === 'darwin' ? getDarwinMenu(update) : getWinMenu(update),
         EditMenu,
         ViewMenu,
         WindowMenu
