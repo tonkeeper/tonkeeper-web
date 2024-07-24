@@ -78,7 +78,6 @@ const DesktopTokensPayload = () => {
     const { data: uiPreferences } = useUserUIPreferences();
     const { mutate } = useMutateUserUIPreferences();
     const [showChart, setShowChart] = useState(true);
-    const jettonsRef = useRef<Record<string, HTMLDivElement>>({});
     const tonRef = useRef<HTMLDivElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -104,7 +103,7 @@ const DesktopTokensPayload = () => {
         getScrollElement: () => containerRef.current,
         estimateSize: () => itemSize,
         getItemKey: index => sortedAssets[index].jetton.address,
-        paddingStart: showChart ? 192 + itemSize : itemSize
+        paddingStart: canShowChart && showChart ? 192 + itemSize : itemSize
     });
 
     const onTokenClick = useCallback(
