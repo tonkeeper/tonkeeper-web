@@ -5,7 +5,7 @@ import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
-import { Account, getAccountActiveTonWallet, TonWalletStandard } from '../../entries/wallet';
+import { TonWalletStandard } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { createLedgerJettonTransfer } from '../ledger/transfer';
 import { walletContractFromState } from '../wallet/contractService';
@@ -20,6 +20,7 @@ import {
     SendMode,
     signEstimateMessage
 } from './common';
+import { Account } from '../../entries/account';
 
 export const jettonTransferAmount = toNano(0.1);
 export const jettonTransferForwardAmount = BigInt(1);
@@ -130,7 +131,7 @@ export const sendJettonTransfer = async (
         .multipliedBy(-1)
         .plus(jettonTransferAmount.toString());
 
-    const walletState = getAccountActiveTonWallet(account);
+    const walletState = account.activeTonWallet;
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 

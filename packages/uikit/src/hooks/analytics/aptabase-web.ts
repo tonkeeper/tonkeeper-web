@@ -1,7 +1,7 @@
 import { init, trackEvent } from '@aptabase/web';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Analytics } from '.';
-import { Account } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 
 export class AptabaseWeb implements Analytics {
     private user_properties: Record<string, any> = {};

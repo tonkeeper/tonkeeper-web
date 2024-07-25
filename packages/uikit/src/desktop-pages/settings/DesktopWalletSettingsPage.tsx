@@ -1,4 +1,4 @@
-import { getAccountActiveTonWallet, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -60,7 +60,7 @@ export const DesktopWalletSettingsPage = () => {
     const { isOpen: isLogoutOpen, onClose: onLogoutClose, onOpen: onLogoutOpen } = useDisclosure();
 
     const canChangeVersion = account.type === 'mnemonic';
-    const activeWallet = getAccountActiveTonWallet(account);
+    const activeWallet = account.activeTonWallet;
 
     return (
         <DesktopViewPageLayout>

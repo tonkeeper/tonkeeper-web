@@ -1,35 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-    Account,
-    AccountId,
-    AccountsState,
-    AccountTonMnemonic,
-    accountWithAddedTonWallet,
-    accountWithUpdatedActiveTonWalletId,
-    accountWithUpdatedTonWallet,
-    getAccountActiveTonWallet,
-    getAccountAllTonWallets,
-    getWalletById,
-    isAccountTonMnemonic,
     isStandardTonWallet,
     isW5Version,
-    TonWalletConfig,
-    TonWalletStandard,
-    WalletId,
     WalletVersion,
-    WalletVersions
+    WalletVersions,
+    WalletId,
+    TonWalletStandard,
+    TonWalletConfig
 } from '@tonkeeper/core/dist/entries/wallet';
 import {
     createStandardTonAccountByMnemonic,
     getFallbackTonStandardWalletEmoji,
     getFallbackWalletName,
-    getWalletAddress,
-    updateAccountProperty
+    getWalletAddress
 } from '@tonkeeper/core/dist/service/walletService';
 import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
-import { QueryKey } from '../libs/queryKey';
+import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { DefaultRefetchInterval, isV5R1Enabled } from './tonendpoint';
 import { useMemo } from 'react';
 import { useAccountsStorage } from '../hooks/useStorage';
@@ -43,6 +31,13 @@ import {
     getActiveWalletConfig,
     setActiveWalletConfig
 } from '@tonkeeper/core/dist/service/wallet/configService';
+import {
+    Account,
+    AccountId,
+    AccountsState,
+    AccountTonMnemonic,
+    getWalletById
+} from '@tonkeeper/core/dist/entries/account';
 
 export const useActiveAccountQuery = () => {
     const storage = useAccountsStorage();
@@ -68,7 +63,7 @@ export const useActiveAccount = () => {
 
 export const useActiveWallet = () => {
     const account = useActiveAccount();
-    return getAccountActiveTonWallet(account);
+    return account.activeTonWallet;
 };
 
 export const useActiveStandardTonWallet = () => {
@@ -84,8 +79,7 @@ export const useMutateActiveAccount = () => {
     const client = useQueryClient();
     return useMutation<void, Error, AccountId>(async accountId => {
         await storage.setActiveAccountId(accountId);
-        await client.invalidateQueries([QueryKey.account]);
-        await client.invalidateQueries([accountId]);
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.account, accountId));
     });
 };
 
@@ -94,15 +88,15 @@ export const useMutateActiveTonWallet = () => {
     const client = useQueryClient();
     return useMutation<void, Error, WalletId>(async walletId => {
         const accounts = await storage.getAccounts();
-        const account = accounts.find(a => getAccountAllTonWallets(a).some(w => w.id === walletId));
+        const account = accounts.find(a => !!a.getTonWallet(walletId));
 
         if (!account) {
             throw new Error('Account not found');
         }
-        await storage.updateAccountInState(accountWithUpdatedActiveTonWalletId(account, walletId));
+        account.setActiveTonWallet(walletId);
+        await storage.updateAccountInState(account);
         await storage.setActiveAccountId(account.id);
-        await client.invalidateQueries([QueryKey.account]);
-        await client.invalidateQueries([walletId]);
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.account, walletId));
     });
 };
 
@@ -209,7 +203,7 @@ export const useAddTonWalletVersionToActiveAccount = () => {
             version: WalletVersion;
         }
     >(async ({ version }) => {
-        const publicKey = getAccountActiveTonWallet(account).publicKey;
+        const publicKey = account.activeTonWallet.publicKey;
         const w = getWalletAddress(publicKey, version);
         const wallet: TonWalletStandard = {
             id: w.address.toRawString(),
@@ -220,7 +214,8 @@ export const useAddTonWalletVersionToActiveAccount = () => {
             emoji: getFallbackTonStandardWalletEmoji(publicKey, version)
         };
 
-        await accountsStore.updateAccountInState(accountWithAddedTonWallet(account, wallet));
+        account.addTonWalletToActiveDerivation(wallet);
+        await accountsStore.updateAccountInState(account);
         return wallet;
     });
 };
@@ -228,6 +223,7 @@ export const useAddTonWalletVersionToActiveAccount = () => {
 export const useRenameTonWallet = () => {
     const accountsStore = useAccountsStorage();
     const account = useActiveAccount();
+    const client = useQueryClient();
 
     return useMutation<
         TonWalletStandard,
@@ -238,7 +234,7 @@ export const useRenameTonWallet = () => {
             emoji?: string;
         }
     >(async ({ id, name, emoji }) => {
-        const wallet = getAccountAllTonWallets(account).find(w => w.id === id);
+        const wallet = account.getTonWallet(id);
         if (!wallet) {
             throw new Error('Wallet to rename not found');
         }
@@ -249,7 +245,9 @@ export const useRenameTonWallet = () => {
             emoji: emoji || wallet.emoji
         };
 
-        await accountsStore.updateAccountInState(accountWithUpdatedTonWallet(account, newWallet));
+        account.updateTonWallet(newWallet);
+        await accountsStore.updateAccountInState(account);
+        await client.invalidateQueries([QueryKey.account]);
         return wallet;
     });
 };
@@ -276,7 +274,7 @@ export const useMutateDeleteAll = () => {
 
 export const useIsPasswordSet = () => {
     const wallets = useAccountsState();
-    return (wallets || []).some(acc => isAccountTonMnemonic(acc) && acc.auth.kind === 'password');
+    return (wallets || []).some(acc => acc.type === 'mnemonic' && acc.auth.kind === 'password');
 };
 
 export const useMutateLogOut = () => {
@@ -289,23 +287,28 @@ export const useMutateLogOut = () => {
 };
 
 export const useMutateRenameAccount = <T extends Account>() => {
-    const sdk = useAppSdk();
     const client = useQueryClient();
+    const storage = useAccountsStorage();
 
     return useMutation<T, Error, { id: WalletId; name?: string; emoji?: string }>(async form => {
         if (form.name !== undefined && form.name.length <= 0) {
             throw new Error('Missing name');
         }
 
-        const formToUpdate = {
-            ...(form.emoji && { emoji: form.emoji }),
-            ...(form.name && { name: form.name })
-        };
+        const account = (await storage.getAccount(form.id))!;
+        if (form.emoji) {
+            account.emoji = form.emoji;
+        }
 
-        const newAccount = await updateAccountProperty(sdk.storage, form.id, formToUpdate);
+        if (form.name) {
+            account.name = form.name;
+        }
+
+        await storage.updateAccountInState(account);
+
         await client.invalidateQueries([QueryKey.account]);
 
-        return newAccount as T;
+        return account.clone() as T;
     });
 };
 
@@ -408,7 +411,7 @@ export function useInvalidateActiveWalletQueries() {
     const account = useActiveAccount();
     const client = useQueryClient();
     return useMutation(async () => {
-        const activeTonWallet = getAccountActiveTonWallet(account);
+        const activeTonWallet = account.activeTonWallet;
         await client.invalidateQueries({
             predicate: query =>
                 query.queryKey.includes(activeTonWallet.id) || query.queryKey.includes(account.id)

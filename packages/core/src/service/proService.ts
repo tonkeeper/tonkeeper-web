@@ -11,12 +11,7 @@ import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import { ProState, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
-import {
-    getAccountAllTonWallets,
-    isStandardTonWallet,
-    TonWalletStandard,
-    WalletVersion
-} from '../entries/wallet';
+import { isStandardTonWallet, TonWalletStandard, WalletVersion } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
 import {
     FiatCurrencies as FiatCurrenciesGenerated,
@@ -103,7 +98,7 @@ export const loadProState = async (
     };
     if (user.pub_key && user.version) {
         const wallets = (await accountsStorage(storage).getAccounts()).flatMap(
-            getAccountAllTonWallets
+            a => a.allTonWallets
         );
         const actualWallet = wallets
             .filter(isStandardTonWallet)

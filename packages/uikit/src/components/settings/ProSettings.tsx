@@ -31,7 +31,7 @@ import { Notification } from '../Notification';
 import { SubHeader } from '../SubHeader';
 import { Body1, Label1, Title } from '../Text';
 import { ConfirmView } from '../transfer/ConfirmView';
-import { getAccountAllTonWallets, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 
 const Block = styled.div`
     display: flex;
@@ -79,7 +79,7 @@ const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { t } = useTranslation();
     const { mutateAsync, error } = useSelectWalletForProMutation();
     useNotifyError(error);
-    const wallets = useAccountsState().flatMap(getAccountAllTonWallets);
+    const wallets = useAccountsState().flatMap(a => a.allTonWallets);
 
     return (
         <>

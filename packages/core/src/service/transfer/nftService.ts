@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
-import { Account, getAccountActiveTonWallet, TonWalletStandard } from '../../entries/wallet';
+import { TonWalletStandard } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi, NftItem } from '../../tonApiV2';
 import { createLedgerNftTransfer } from '../ledger/transfer';
 import {
@@ -16,6 +16,7 @@ import {
     getWalletBalance,
     signEstimateMessage
 } from './common';
+import { Account } from '../../entries/account';
 
 const initNftTransferAmount = toNano('1');
 export const nftTransferForwardAmount = BigInt('1');
@@ -139,7 +140,7 @@ export const sendNftTransfer = async (
         throw new Error(`Unexpected nft transfer amount: ${nftTransferAmount.toString()}`);
     }
 
-    const walletState = getAccountActiveTonWallet(account);
+    const walletState = account.activeTonWallet;
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
@@ -189,7 +190,7 @@ export const sendNftRenew = async (options: {
     signer: CellSigner;
     amount: BigNumber;
 }) => {
-    const walletState = getAccountActiveTonWallet(options.account);
+    const walletState = options.account.activeTonWallet;
 
     const timestamp = await getServerTime(options.api);
     const { seqno } = await getKeyPairAndSeqno({ ...options, walletState });
@@ -245,7 +246,7 @@ export const sendNftLink = async (options: {
     signer: CellSigner;
     amount: BigNumber;
 }) => {
-    const walletState = getAccountActiveTonWallet(options.account);
+    const walletState = options.account.activeTonWallet;
     const timestamp = await getServerTime(options.api);
     const { seqno } = await getKeyPairAndSeqno({ ...options, walletState });
 

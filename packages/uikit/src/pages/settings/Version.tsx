@@ -1,5 +1,4 @@
 import {
-    getAccountActiveDerivationTonWallets,
     TonWalletStandard,
     WalletVersion as WalletVersionType,
     WalletVersions,
@@ -53,7 +52,7 @@ export const WalletVersion = () => {
     const isKeystone = useIsActiveWalletKeystone();
     const currentWallet = useActiveStandardTonWallet();
     const currentAccount = useActiveAccount();
-    const currentAccountWalletsVersions = getAccountActiveDerivationTonWallets(currentAccount);
+    const currentAccountWalletsVersions = currentAccount.activeDerivationTonWallets;
 
     const { mutateAsync: selectWallet, isLoading: isSelectWalletLoading } =
         useMutateActiveTonWallet();

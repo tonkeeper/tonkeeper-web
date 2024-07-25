@@ -20,7 +20,7 @@ import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
-import { getAccountAllTonWallets, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 
 const Block = styled.div<{
     center?: boolean;
@@ -153,7 +153,7 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
 }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const wallets = useAccountsState().flatMap(getAccountAllTonWallets);
+    const wallets = useAccountsState().flatMap(a => a.allTonWallets);
 
     if (!wallets) {
         return null;

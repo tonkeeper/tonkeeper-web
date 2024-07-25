@@ -20,7 +20,7 @@ import {
     TonConnectAccount,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
-import { Account, getAccountAllTonWallets, TonWalletStandard } from '../../entries/wallet';
+import { TonWalletStandard } from '../../entries/wallet';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     AccountConnection,
@@ -32,6 +32,7 @@ import {
 import { SessionCrypto } from './protocol';
 import { accountsStorage } from '../accountsStorage';
 import { getDevSettings } from '../devStorage';
+import { Account } from '../../entries/account';
 
 export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
@@ -205,10 +206,12 @@ export const getAppConnections = async (
     }
 
     return Promise.all(
-        accounts.flatMap(getAccountAllTonWallets).map(async wallet => {
-            const walletConnections = await getTonWalletConnections(storage, wallet);
-            return { wallet, connections: walletConnections };
-        })
+        accounts
+            .flatMap(a => a.allTonWallets)
+            .map(async wallet => {
+                const walletConnections = await getTonWalletConnections(storage, wallet);
+                return { wallet, connections: walletConnections };
+            })
     );
 };
 

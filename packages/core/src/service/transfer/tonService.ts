@@ -6,7 +6,7 @@ import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
-import { Account, getAccountActiveTonWallet, TonWalletStandard } from '../../entries/wallet';
+import { TonWalletStandard } from '../../entries/wallet';
 import { AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { createLedgerTonTransfer } from '../ledger/transfer';
 import { walletContractFromState } from '../wallet/contractService';
@@ -23,6 +23,7 @@ import {
     seeIfTransferBounceable,
     signEstimateMessage
 } from './common';
+import { Account } from '../../entries/account';
 
 export type EstimateData = {
     accountEvent: TransferEstimationEvent;
@@ -211,7 +212,7 @@ export const sendTonTransfer = async (
 
     const total = new BigNumber(fee.event.extra).multipliedBy(-1).plus(amount.weiAmount);
 
-    const wallet = getAccountActiveTonWallet(account);
+    const wallet = account.activeTonWallet;
     const [tonapiWallet, seqno] = await getWalletBalance(api, wallet);
     if (!isMax) {
         checkWalletBalanceOrDie(total, tonapiWallet);

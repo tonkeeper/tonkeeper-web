@@ -18,15 +18,9 @@ import log from 'electron-log/main';
 import EventSourcePolyfill from 'eventsource';
 import { MainWindow } from './mainWindow';
 import { mainStorage } from './storageService';
-import {
-    accountWithUpdatedActiveTonWalletId,
-    getAccountActiveTonWallet,
-    getAccountAllTonWallets,
-    getWalletById,
-    isStandardTonWallet,
-    WalletId
-} from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
+import { getWalletById } from '@tonkeeper/core/dist/entries/account';
 
 globalThis.Buffer = BufferPolyfill;
 
@@ -56,7 +50,7 @@ export class TonConnectSSE {
         this.lastEventId = await getLastEventId(mainStorage);
 
         const walletsState = (await accountsStorage(mainStorage).getAccounts()).flatMap(
-            getAccountAllTonWallets
+            a => a.allTonWallets
         );
 
         this.connections = [];
@@ -118,20 +112,16 @@ export class TonConnectSSE {
                 const walletId = this.dist[params.connection.clientSessionId];
 
                 const activeAccount = await accountsStorage(mainStorage).getActiveAccount();
-                const activeWallet = getAccountActiveTonWallet(activeAccount);
+                const activeWallet = activeAccount.activeTonWallet;
 
                 const window = await MainWindow.bringToFront();
 
                 if (activeWallet.id !== walletId) {
-                    let accountToActivate = (await accountsStorage(mainStorage).getAccounts()).find(
-                        a => getAccountAllTonWallets(a).some(w => w.id === walletId)
-                    );
+                    const accountToActivate = (
+                        await accountsStorage(mainStorage).getAccounts()
+                    ).find(a => a.getTonWallet(walletId) !== undefined);
 
-                    accountToActivate = accountWithUpdatedActiveTonWalletId(
-                        accountToActivate,
-                        walletId
-                    );
-
+                    accountToActivate.setActiveTonWallet(walletId);
                     await accountsStorage(mainStorage).updateAccountInState(accountToActivate);
                     await accountsStorage(mainStorage).setActiveAccountId(accountToActivate.id);
                     window.webContents.send('refresh');

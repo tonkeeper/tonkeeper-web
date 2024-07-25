@@ -28,7 +28,7 @@ import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useMutateAccountsState, useAccountsState } from '../../state/wallet';
-import { Account as AccountType } from '@tonkeeper/core/dist/entries/wallet';
+import { Account as AccountType } from '@tonkeeper/core/dist/entries/account';
 import { useAccountLabel } from '../../hooks/accountUtils';
 
 const Row = styled.div`

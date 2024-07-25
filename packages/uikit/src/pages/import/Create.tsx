@@ -15,7 +15,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
-import { Account, getAccountActiveTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import {
     useCreateAccountMnemonic,
     useMutateRenameAccount,
@@ -173,7 +173,7 @@ const Create = () => {
     if (sdk.notifications && !passNotifications) {
         return (
             <Subscribe
-                wallet={getAccountActiveTonWallet(account)}
+                wallet={account.activeTonWallet}
                 mnemonic={mnemonic}
                 onDone={() => setPassNotification(true)}
             />

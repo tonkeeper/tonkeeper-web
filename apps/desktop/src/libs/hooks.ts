@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { Account, getAccountActiveTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { Amplitude } from '@tonkeeper/uikit/dist/hooks/analytics/amplitude';
@@ -74,7 +74,7 @@ export const useAnalytics = (version: string, activeAccount?: Account, accounts?
 
             tracker.init({
                 application: 'Desktop',
-                walletType: toWalletType(getAccountActiveTonWallet(activeAccount)),
+                walletType: toWalletType(activeAccount.activeTonWallet),
                 activeAccount,
                 accounts,
                 network,

@@ -13,9 +13,9 @@ import {
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import nacl from 'tweetnacl';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
-import { AccountId, getAccountActiveTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { AccountId } from '@tonkeeper/core/dist/entries/account';
 
 export const signTonConnectOver = (
     sdk: IAppSdk,
@@ -98,7 +98,7 @@ export const getSigner = async (
                 }
 
                 if (account.auth.kind === 'signer-deeplink') {
-                    const wallet = getAccountActiveTonWallet(account);
+                    const wallet = account.activeTonWallet;
                     const callback = async (message: Cell) => {
                         const deeplink = await storeTransactionAndCreateDeepLink(
                             sdk,

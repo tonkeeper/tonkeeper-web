@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { CellSigner } from '@tonkeeper/core/dist/entries/signer';
 import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
-import { Account } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Omit } from 'react-beautiful-dnd';
 import { notifyError } from '../../components/transfer/common';
 import { getSigner } from '../../state/mnemonic';

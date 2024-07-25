@@ -1,5 +1,4 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { AccountId } from '@tonkeeper/core/dist/entries/wallet';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -12,7 +11,7 @@ import { Body1, H2, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
-import { Account } from '@tonkeeper/core/dist/entries/wallet';
+import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
 
 const NotificationBlock = styled.form`
     display: flex;

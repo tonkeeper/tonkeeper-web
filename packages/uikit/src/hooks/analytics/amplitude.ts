@@ -1,6 +1,6 @@
 import * as amplitude from '@amplitude/analytics-browser';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { Account } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Analytics } from '.';
 
 export class Amplitude implements Analytics {

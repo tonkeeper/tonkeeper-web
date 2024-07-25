@@ -18,7 +18,7 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { AsideHeader } from './AsideHeader';
 import { SubscriptionInfo } from './SubscriptionInfo';
-import { getAccountAllTonWallets, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -137,7 +137,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const [isOpenImport, setIsOpenImport] = useState(false);
     const { proFeatures } = useAppContext();
-    const wallets = useAccountsState().flatMap(getAccountAllTonWallets);
+    const wallets = useAccountsState().flatMap(a => a.allTonWallets);
     const activeWallet = useActiveWallet();
     const navigate = useNavigate();
     const location = useLocation();

@@ -1,8 +1,4 @@
-import {
-    getAccountActiveTonWallet,
-    isStandardTonWallet,
-    walletVersionText
-} from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
@@ -28,7 +24,7 @@ const SingleAccountSettings = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const account = useActiveAccount();
-    const wallet = getAccountActiveTonWallet(account);
+    const wallet = account.activeTonWallet;
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();

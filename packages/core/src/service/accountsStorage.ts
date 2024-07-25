@@ -1,5 +1,7 @@
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
+import { DeprecatedWalletState, TonWalletStandard, WalletId } from '../entries/wallet';
+
 import {
     Account,
     AccountId,
@@ -9,11 +11,9 @@ import {
     AccountTonMnemonic,
     AccountTonOnly,
     defaultAccountState,
-    DeprecatedWalletState,
-    getAccountAllTonWallets,
-    TonWalletStandard,
-    WalletId
-} from '../entries/wallet';
+    bindAccountToClass
+} from '../entries/account';
+
 import { DeprecatedAccountState } from '../entries/account';
 import { AuthState, DeprecatedAuthState } from '../entries/password';
 import { assertUnreachable, notNullish } from '../utils/types';
@@ -33,6 +33,8 @@ export class AccountsStorage {
             if (state) {
                 await this.setAccounts(state);
             }
+        } else {
+            state.forEach(bindAccountToClass);
         }
         return state ?? defaultAccountState;
     };
@@ -127,9 +129,8 @@ export class AccountsStorage {
 
         const accounts = await this.getAccounts();
         return (
-            accounts.find(a =>
-                getAccountAllTonWallets(a).some(w => w.publicKey === state.activePublicKey)
-            )?.id || null
+            accounts.find(a => a.allTonWallets.some(w => w.publicKey === state.activePublicKey))
+                ?.id || null
         );
     };
 }
@@ -206,58 +207,33 @@ async function migrateToAccountsState(storage: IStorage): Promise<AccountsState 
             switch (authKind) {
                 case 'password':
                 case 'keychain':
-                    return {
-                        id: w.publicKey,
+                    return new AccountTonMnemonic(
+                        w.publicKey,
                         name,
                         emoji,
                         auth,
-                        type: 'mnemonic',
-                        activeTonWalletId: w.active.rawAddress,
-                        tonWallets: [tonWallet]
-                    } satisfies AccountTonMnemonic;
-
+                        w.active.rawAddress,
+                        [tonWallet]
+                    );
                 case 'signer':
                 case 'signer-deeplink':
-                    return {
-                        id: w.publicKey,
-                        name,
-                        emoji,
-                        auth,
-                        type: 'ton-only',
-                        activeTonWalletId: w.active.rawAddress,
-                        tonWallets: [tonWallet]
-                    } satisfies AccountTonOnly;
+                    return new AccountTonOnly(w.publicKey, name, emoji, auth, w.active.rawAddress, [
+                        tonWallet
+                    ]);
 
                 case 'keystone':
-                    return {
-                        id: w.publicKey,
-                        name,
-                        emoji,
-                        pathInfo: auth.info,
-                        type: 'keystone',
-                        tonWallet
-                    } satisfies AccountKeystone;
+                    return new AccountKeystone(w.publicKey, name, emoji, auth.info, tonWallet);
 
                 case 'ledger':
-                    return {
-                        id: w.publicKey,
-                        name,
-                        emoji,
-                        type: 'ledger',
-                        activeDerivationIndex: auth.accountIndex,
-                        derivations: [
-                            {
-                                index: auth.accountIndex,
-                                activeTonWalletId: tonWallet.rawAddress,
-                                name,
-                                emoji: getFallbackDerivationItemEmoji(
-                                    w.publicKey,
-                                    auth.accountIndex
-                                ),
-                                tonWallets: [tonWallet]
-                            }
-                        ]
-                    } satisfies AccountLedger;
+                    return new AccountLedger(w.publicKey, name, emoji, auth.accountIndex, [
+                        {
+                            index: auth.accountIndex,
+                            activeTonWalletId: tonWallet.rawAddress,
+                            name,
+                            emoji: getFallbackDerivationItemEmoji(w.publicKey, auth.accountIndex),
+                            tonWallets: [tonWallet]
+                        }
+                    ]);
                 default:
                     assertUnreachable(authKind);
             }

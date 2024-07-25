@@ -1,10 +1,10 @@
-import { Account, getAccountAllTonWallets } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useActiveTonNetwork } from '../state/wallet';
 import { useTranslation } from './translation';
 
 export function useAccountLabel(account: Account) {
-    const tonWallets = getAccountAllTonWallets(account);
+    const tonWallets = account.allTonWallets;
     const network = useActiveTonNetwork();
     const { t } = useTranslation();
 

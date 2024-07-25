@@ -1,4 +1,4 @@
-import { AccountLedger, getAccountActiveTonWallet } from '../../entries/wallet';
+import { AccountLedger } from '../../entries/account';
 import { TonRecipientData } from '../../entries/send';
 import BigNumber from 'bignumber.js';
 import {
@@ -27,7 +27,7 @@ export const createLedgerTonTransfer = async (
     signer: LedgerSigner
 ) => {
     const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
-    const walletState = getAccountActiveTonWallet(account);
+    const walletState = account.activeTonWallet;
     const contract = walletContractFromState(walletState);
 
     const transfer = await signer(path, {
@@ -57,8 +57,8 @@ export const createLedgerJettonTransfer = async (
 ) => {
     const jettonAmount = BigInt(amount.stringWeiAmount);
     const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
-    const wallet = getAccountActiveTonWallet(account);
-    const contract = walletContractFromState(getAccountActiveTonWallet(account));
+    const wallet = account.activeTonWallet;
+    const contract = walletContractFromState(wallet);
 
     const transfer = await signer(path, {
         to: Address.parse(jettonWalletAddress),
@@ -93,7 +93,7 @@ export const createLedgerNftTransfer = async (
     signer: LedgerSigner
 ) => {
     const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
-    const walletState = getAccountActiveTonWallet(account);
+    const walletState = account.activeTonWallet;
     const contract = walletContractFromState(walletState);
 
     const transfer = await signer(path, {

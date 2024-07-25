@@ -10,12 +10,9 @@ import {
     useMutateRenameAccount,
     useAccountsState
 } from '../../state/wallet';
-import {
-    AccountTonMnemonic,
-    getAccountActiveTonWallet,
-    WalletVersion
-} from '@tonkeeper/core/dist/entries/wallet';
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
+import { AccountTonMnemonic } from '@tonkeeper/core/dist/entries/account';
 
 const Import = () => {
     const sdk = useAppSdk();
@@ -115,7 +112,7 @@ const Import = () => {
     if (sdk.notifications && !passNotifications) {
         return (
             <Subscribe
-                wallet={getAccountActiveTonWallet(account)}
+                wallet={account.activeTonWallet}
                 mnemonic={mnemonic}
                 onDone={() => setPassNotification(true)}
             />

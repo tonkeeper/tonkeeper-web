@@ -4,7 +4,7 @@ import { OpenAPI, SwapService } from '@tonkeeper/core/dist/swapsApi';
 export const useSwapsConfig = () => {
     const { config } = useAppContext();
 
-    OpenAPI.BASE = 'http://localhost:8080'; //config.web_swaps_url!;
+    OpenAPI.BASE = config.web_swaps_url!;
     return {
         swapService: SwapService,
         referralAddress: config.web_swaps_referral_address,

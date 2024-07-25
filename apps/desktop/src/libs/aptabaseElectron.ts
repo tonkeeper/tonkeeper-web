@@ -1,7 +1,7 @@
 import { trackEvent } from '@aptabase/electron/renderer';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Analytics } from '@tonkeeper/uikit/dist/hooks/analytics';
-import { Account } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 
 export class AptabaseElectron implements Analytics {
     private user_properties: Record<string, any> = {};

@@ -1,7 +1,7 @@
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { Account } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import { v4 as uuidv4 } from 'uuid';
 import { Analytics } from '.';
 

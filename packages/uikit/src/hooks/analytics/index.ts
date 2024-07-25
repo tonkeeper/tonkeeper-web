@@ -1,9 +1,9 @@
 import {
     isStandardTonWallet,
     walletVersionText,
-    Account,
     TonWalletStandard
 } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 
 export interface Analytics {

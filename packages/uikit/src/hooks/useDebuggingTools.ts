@@ -1,5 +1,5 @@
 import { useAppSdk } from './appSdk';
-import { AccountsState } from '@tonkeeper/core/dist/entries/wallet';
+import { AccountsState } from '@tonkeeper/core/dist/entries/account';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 
 export const useDebuggingTools = () => {

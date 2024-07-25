@@ -26,17 +26,13 @@ import {
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { signTonConnectOver } from './mnemonic';
 import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
-import {
-    getAccountAllTonWallets,
-    isStandardTonWallet,
-    TonWalletStandard
-} from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { useActiveWallet, useAccountsState, useActiveAccount, useActiveTonNetwork } from './wallet';
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();
-    const wallets = useAccountsState().flatMap(getAccountAllTonWallets);
+    const wallets = useAccountsState().flatMap(a => a.allTonWallets);
 
     return useQuery<{ wallet: TonWalletStandard; connections: AccountConnection[] }[]>(
         [QueryKey.tonConnectConnection, wallets.map(i => i.id)],
@@ -180,7 +176,7 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
             connectionsToDisconnect = (
                 await Promise.all(
                     accounts
-                        .flatMap(getAccountAllTonWallets)
+                        .flatMap(a => a.allTonWallets)
                         .map(w => disconnectFromWallet(sdk.storage, connection, w))
                 )
             ).flat();

@@ -2,12 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { ProState, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import {
-    getAccountAllTonWallets,
-    getWalletById,
-    isStandardTonWallet,
-    TonWalletStandard
-} from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import {
     authViaTonConnect,
     createProServiceInvoice,
@@ -32,6 +27,7 @@ import { useCheckTouchId } from './password';
 import { useActiveWallet } from './wallet';
 import { useUserLanguage } from './language';
 import { useAccountsStorage } from '../hooks/useStorage';
+import { getWalletById } from '@tonkeeper/core/dist/entries/account';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -132,7 +128,7 @@ export const useCreateInvoiceMutation = () => {
         }
 
         const wallet = (await ws.getAccounts())
-            .flatMap(getAccountAllTonWallets)
+            .flatMap(a => a.allTonWallets)
             .find(w => w.id === data.state.wallet.rawAddress);
         if (!wallet || !isStandardTonWallet(wallet)) {
             throw new Error('Missing wallet');
