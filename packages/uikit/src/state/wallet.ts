@@ -195,6 +195,7 @@ export const useCreateAccountMnemonic = () => {
 export const useAddTonWalletVersionToActiveAccount = () => {
     const accountsStore = useAccountsStorage();
     const account = useActiveAccount();
+    const client = useQueryClient();
 
     return useMutation<
         TonWalletStandard,
@@ -216,7 +217,26 @@ export const useAddTonWalletVersionToActiveAccount = () => {
 
         account.addTonWalletToActiveDerivation(wallet);
         await accountsStore.updateAccountInState(account);
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.account, account.id, wallet.id));
         return wallet;
+    });
+};
+
+export const useRemoveTonWalletVersionFromActiveAccount = () => {
+    const accountsStore = useAccountsStorage();
+    const account = useActiveAccount();
+    const client = useQueryClient();
+
+    return useMutation<
+        void,
+        Error,
+        {
+            walletId: WalletId;
+        }
+    >(async ({ walletId }) => {
+        account.removeTonWalletFromActiveDerivation(walletId);
+        await accountsStore.updateAccountInState(account);
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.account, account.id, walletId));
     });
 };
 

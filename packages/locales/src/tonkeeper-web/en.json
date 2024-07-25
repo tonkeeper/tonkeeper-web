@@ -46,6 +46,7 @@
   "Enable_storing_config" : "Enable storing config",
   "enter_password" : "Enter password",
   "export_dot_csv" : "Export .CSV",
+  "hide" : "Hide",
   "history_spam_nft" : "Spam NFT",
   "I_have_a_backup_copy_of_recovery_phrase" : "I have a backup copy of recovery phrase",
   "import_csv" : "Import CSV",

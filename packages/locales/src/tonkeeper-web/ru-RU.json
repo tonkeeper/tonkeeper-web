@@ -44,6 +44,7 @@
   "Enable_storing_config" : "Cохранение конфигурации",
   "enter_password" : "Введите пароль",
   "export_dot_csv" : "Экспорт в .CSV",
+  "hide" : "Скрыть",
   "history_spam_nft" : "Спам NFT",
   "I_have_a_backup_copy_of_recovery_phrase" : "У меня есть резервная копия фразы восстановления",
   "import_csv" : "Импорт CSV",

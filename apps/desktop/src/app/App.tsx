@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { Account, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -89,6 +89,8 @@ import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/Des
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
+import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -338,6 +340,7 @@ export const Loader: FC = () => {
                         <Content activeAccount={activeAccount} lock={lock} />
                         <CopyNotification hideSimpleCopyNotifications />
                         <QrScanner />
+                        <ModalsRoot />
                     </AppContext.Provider>
                 </AfterImportAction.Provider>
             </OnImportAction.Provider>

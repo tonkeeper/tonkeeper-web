@@ -14,7 +14,7 @@ import { Notifications } from './Notification';
 import { ActiveRecovery, Recovery } from './Recovery';
 import { SecuritySettings } from './Security';
 import { Settings } from './Settings';
-import { WalletVersion } from './Version';
+import { WalletVersionPage } from './Version';
 import { ConnectedAppsSettings } from './ConnectedAppsSettings';
 import { NFTSettings } from './Nft';
 
@@ -31,7 +31,7 @@ const SettingsRouter = () => {
                 <Route path=":walletId" element={<Recovery />} />
                 <Route index element={<ActiveRecovery />} />
             </Route>
-            <Route path={SettingsRoute.version} element={<WalletVersion />} />
+            <Route path={SettingsRoute.version} element={<WalletVersionPage />} />
             <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
             <Route path={SettingsRoute.nft} element={<NFTSettings />} />
             <Route path={SettingsRoute.security} element={<SecuritySettings />} />

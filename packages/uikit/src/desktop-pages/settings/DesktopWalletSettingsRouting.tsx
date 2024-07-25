@@ -1,7 +1,7 @@
 import { Outlet, Route, Routes } from 'react-router-dom';
 import { WalletSettingsRoute } from '../../libs/routes';
 import { ActiveRecovery, Recovery } from '../../pages/settings/Recovery';
-import { WalletVersion } from '../../pages/settings/Version';
+import { WalletVersionPage } from '../../pages/settings/Version';
 import { JettonsSettings } from '../../pages/settings/Jettons';
 import styled from 'styled-components';
 import { DesktopWalletSettingsPage } from './DesktopWalletSettingsPage';
@@ -29,7 +29,7 @@ export const DesktopWalletSettingsRouting = () => {
                     <Route path=":walletId" element={<Recovery />} />
                     <Route index element={<ActiveRecovery />} />
                 </Route>
-                <Route path={WalletSettingsRoute.version} element={<WalletVersion />} />
+                <Route path={WalletSettingsRoute.version} element={<WalletVersionPage />} />
                 <Route path={WalletSettingsRoute.jettons} element={<JettonsSettings />} />
             </Route>
             <Route

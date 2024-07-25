@@ -24,6 +24,7 @@ export interface IAccount {
     getTonWallet(id: WalletId): TonWalletStandard | undefined;
     updateTonWallet(wallet: TonWalletStandard): void;
     addTonWalletToActiveDerivation(wallet: TonWalletStandard): void;
+    removeTonWalletFromActiveDerivation(walletId: WalletId): void;
     setActiveTonWallet(walletId: WalletId): void;
 }
 
@@ -56,7 +57,7 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
         public emoji: string,
         public auth: AuthPassword | AuthKeychain,
         public activeTonWalletId: WalletId,
-        public readonly tonWallets: TonWalletStandard[]
+        public tonWallets: TonWalletStandard[]
     ) {
         super();
     }
@@ -75,6 +76,17 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
 
     addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
         this.tonWallets.push(wallet);
+    }
+
+    removeTonWalletFromActiveDerivation(walletId: WalletId) {
+        if (this.tonWallets.length === 1) {
+            throw new Error('Cannot remove last wallet');
+        }
+
+        this.tonWallets = this.tonWallets.filter(w => w.id !== walletId);
+        if (this.activeTonWalletId === walletId) {
+            this.activeTonWalletId = this.tonWallets[0].id;
+        }
     }
 
     setActiveTonWallet(walletId: WalletId) {
@@ -134,6 +146,19 @@ export class AccountLedger extends Clonable implements IAccount {
         this.activeDerivation.tonWallets.push(wallet);
     }
 
+    removeTonWalletFromActiveDerivation(walletId: WalletId) {
+        if (this.activeDerivation.tonWallets.length === 1) {
+            throw new Error('Cannot remove last wallet');
+        }
+
+        this.activeDerivation.tonWallets = this.activeDerivation.tonWallets.filter(
+            w => w.id !== walletId
+        );
+        if (this.activeDerivation.activeTonWalletId === walletId) {
+            this.activeDerivation.activeTonWalletId = this.activeDerivation.tonWallets[0].id;
+        }
+    }
+
     setActiveTonWallet(walletId: WalletId) {
         for (const derivation of this.derivations) {
             const index = derivation.tonWallets.findIndex(w => w.id === walletId);
@@ -185,6 +210,10 @@ export class AccountKeystone extends Clonable implements IAccount {
         throw new Error('Cannot add ton wallet to keystone account');
     }
 
+    removeTonWalletFromActiveDerivation() {
+        throw new Error('Cannot remove ton wallet from keystone account');
+    }
+
     setActiveTonWallet(walletId: WalletId) {
         if (walletId !== this.tonWallet.id) {
             throw new Error('Cannot add ton wallet to keystone account');
@@ -213,7 +242,7 @@ export class AccountTonOnly extends Clonable implements IAccount {
         public emoji: string,
         public readonly auth: AuthSigner | AuthSignerDeepLink,
         public activeTonWalletId: WalletId,
-        public readonly tonWallets: TonWalletStandard[]
+        public tonWallets: TonWalletStandard[]
     ) {
         super();
     }
@@ -232,6 +261,17 @@ export class AccountTonOnly extends Clonable implements IAccount {
 
     addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
         this.tonWallets.push(wallet);
+    }
+
+    removeTonWalletFromActiveDerivation(walletId: WalletId) {
+        if (this.tonWallets.length === 1) {
+            throw new Error('Cannot remove last wallet');
+        }
+
+        this.tonWallets = this.tonWallets.filter(w => w.id !== walletId);
+        if (this.activeTonWalletId === walletId) {
+            this.activeTonWalletId = this.tonWallets[0].id;
+        }
     }
 
     setActiveTonWallet(walletId: WalletId) {
