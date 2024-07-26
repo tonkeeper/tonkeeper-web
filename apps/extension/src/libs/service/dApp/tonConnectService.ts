@@ -20,7 +20,7 @@ import {
 } from './notificationService';
 import { waitApprove } from './utils';
 import { TonConnectError } from "@tonkeeper/core/dist/entries/exception";
-import { walletsStorage } from "@tonkeeper/core/dist/service/walletsService";
+import { accountsStorage } from "@tonkeeper/core/dist/service/accountsStorage";
 
 const storage = new ExtensionStorage();
 
@@ -106,7 +106,16 @@ export const tonConnectTransaction = async (
     );
   }
 
-  await walletsStorage(storage).setActiveWalletId(connection.wallet.rawAddress);
+  const accounts = await accountsStorage(storage).getAccounts();
+  const accToActivate = accounts.find(a => a.allTonWallets.some(w => w.id === connection.wallet.rawAddress));
+
+  if (accToActivate) {
+    accToActivate.setActiveTonWallet(connection.wallet.rawAddress);
+    await accountsStorage(storage).updateAccountInState(accToActivate);
+    await accountsStorage(storage).setActiveAccountId(accToActivate.id);
+
+  }
+
   await delay(200);
 
   await cancelOpenedNotification();
