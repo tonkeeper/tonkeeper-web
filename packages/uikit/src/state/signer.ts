@@ -15,7 +15,7 @@ export const usePairSignerMutation = () => {
     const navigate = useNavigate();
     return useMutation<void, Error, string>(async qrCode => {
         try {
-            const state = await accountBySignerQr(context, qrCode);
+            const state = await accountBySignerQr(context, sdk.storage, qrCode);
 
             await accountsStorage.addAccountToState(state);
 

@@ -14,6 +14,7 @@ export interface DeprecatedAccountState {
 export type AccountId = string;
 
 export interface IAccount {
+    id: AccountId;
     name: string;
     emoji: string;
 
@@ -51,6 +52,9 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
         return this.tonWallets.find(w => w.id === this.activeTonWalletId)!;
     }
 
+    /**
+     *  @param id ton public key hex string without 0x corresponding to the mnemonic
+     */
     constructor(
         public readonly id: AccountId,
         public name: string,
@@ -75,7 +79,12 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
     }
 
     addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
-        this.tonWallets.push(wallet);
+        const walletExists = this.tonWallets.findIndex(w => w.id === wallet.id);
+        if (walletExists === -1) {
+            this.tonWallets = this.tonWallets.concat(wallet);
+        } else {
+            this.tonWallets[walletExists] = wallet;
+        }
     }
 
     removeTonWalletFromActiveDerivation(walletId: WalletId) {
@@ -90,6 +99,9 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
     }
 
     setActiveTonWallet(walletId: WalletId) {
+        if (this.tonWallets.every(w => w.id !== walletId)) {
+            throw new Error('Wallet not found');
+        }
         this.activeTonWalletId = walletId;
     }
 }
@@ -116,6 +128,9 @@ export class AccountLedger extends Clonable implements IAccount {
         )!;
     }
 
+    /**
+     *  @param id index 0 derivation ton public key hex string without 0x
+     */
     constructor(
         public readonly id: AccountId,
         public name: string,
@@ -143,7 +158,12 @@ export class AccountLedger extends Clonable implements IAccount {
     }
 
     addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
-        this.activeDerivation.tonWallets.push(wallet);
+        const walletExists = this.activeDerivation.tonWallets.findIndex(w => w.id === wallet.id);
+        if (walletExists === -1) {
+            this.activeDerivation.tonWallets = this.activeDerivation.tonWallets.concat(wallet);
+        } else {
+            this.activeDerivation.tonWallets[walletExists] = wallet;
+        }
     }
 
     removeTonWalletFromActiveDerivation(walletId: WalletId) {
@@ -161,8 +181,8 @@ export class AccountLedger extends Clonable implements IAccount {
 
     setActiveTonWallet(walletId: WalletId) {
         for (const derivation of this.derivations) {
-            const index = derivation.tonWallets.findIndex(w => w.id === walletId);
-            if (index !== -1) {
+            const walletInDerivation = derivation.tonWallets.some(w => w.id === walletId);
+            if (walletInDerivation) {
                 derivation.activeTonWalletId = walletId;
                 this.activeDerivationIndex = derivation.index;
                 return;
@@ -188,6 +208,9 @@ export class AccountKeystone extends Clonable implements IAccount {
         return this.tonWallet;
     }
 
+    /**
+     *  @param id ton public key hex string without 0x
+     */
     constructor(
         public readonly id: AccountId,
         public name: string,
@@ -236,6 +259,9 @@ export class AccountTonOnly extends Clonable implements IAccount {
         return this.tonWallets.find(w => w.id === this.activeTonWalletId)!;
     }
 
+    /**
+     *  @param id ton public key hex string without 0x
+     */
     constructor(
         public readonly id: AccountId,
         public name: string,
@@ -260,7 +286,12 @@ export class AccountTonOnly extends Clonable implements IAccount {
     }
 
     addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
-        this.tonWallets.push(wallet);
+        const walletExists = this.tonWallets.findIndex(w => w.id === wallet.id);
+        if (walletExists === -1) {
+            this.tonWallets = this.tonWallets.concat(wallet);
+        } else {
+            this.tonWallets[walletExists] = wallet;
+        }
     }
 
     removeTonWalletFromActiveDerivation(walletId: WalletId) {
@@ -275,6 +306,10 @@ export class AccountTonOnly extends Clonable implements IAccount {
     }
 
     setActiveTonWallet(walletId: WalletId) {
+        if (this.tonWallets.every(w => w.id !== walletId)) {
+            throw new Error('Wallet not found');
+        }
+
         this.activeTonWalletId = walletId;
     }
 }

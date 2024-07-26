@@ -62,56 +62,110 @@ export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T =
     };
 };
 
-export const useLedgerAccounts = (
-    accountsNumber: number
-): ReturnType<typeof useMutation<LedgerAccount[], Error, LedgerTonTransport>> => {
+export const useLedgerWallets = (
+    walletsNumber: number
+): ReturnType<
+    typeof useMutation<
+        {
+            wallets: LedgerAccount[];
+            accountId: string;
+            name: string;
+            emoji: string;
+            preselectedIndexes: Record<number, boolean>;
+        },
+        Error,
+        LedgerTonTransport
+    >
+> => {
     const { api } = useAppContext();
+    const accountsStorage = useAccountsStorage();
 
-    return useMutation<LedgerAccount[], Error, LedgerTonTransport>(async tonTransport => {
-        const accountIds = await Promise.all(
-            [...new Array(accountsNumber)].map((_, i) =>
+    return useMutation<
+        {
+            wallets: LedgerAccount[];
+            accountId: string;
+            name: string;
+            emoji: string;
+            preselectedIndexes: Record<number, boolean>;
+        },
+        Error,
+        LedgerTonTransport
+    >(async tonTransport => {
+        const walletsIds = await Promise.all(
+            [...new Array(walletsNumber)].map((_, i) =>
                 tonTransport.getAddress(getLedgerAccountPathByIndex(i))
             )
         );
 
-        const addresses = accountIds.map(account => Address.parse(account.address).toRawString());
+        const addresses = walletsIds.map(account => Address.parse(account.address).toRawString());
 
         const response = await new AccountsApi(api.tonApiV2).getAccounts({
             getAccountsRequest: { accountIds: addresses }
         });
 
-        return accountIds.map((acc, i) => ({
+        const accountId = walletsIds[0].publicKey.toString('hex');
+        const { name, emoji } = await accountsStorage.getNewAccountNameAndEmoji(accountId);
+        const existingAccountWallets =
+            (await accountsStorage.getAccount(accountId))?.allTonWallets || [];
+
+        const wallets = walletsIds.map((acc, i) => ({
             accountIndex: i,
             publicKey: acc.publicKey,
             ...response.accounts.find(a =>
                 Address.parse(a.address).equals(Address.parse(acc.address))
             )! // tonapi bug, should filter here
         }));
+
+        const preselectedIndexes: Record<number, boolean> = {};
+
+        wallets
+            .filter(
+                w =>
+                    w.balance > 0 ||
+                    existingAccountWallets.some(
+                        item => item.id === Address.parse(w.address).toRawString()
+                    )
+            )
+            .forEach(w => (preselectedIndexes[w.accountIndex] = true));
+
+        if (Object.keys(preselectedIndexes).length === 0) {
+            preselectedIndexes[0] = true;
+        }
+
+        return {
+            wallets,
+            name,
+            emoji,
+            accountId,
+            preselectedIndexes
+        };
     });
 };
 
-export const useAddLedgerAccountsMutation = () => {
+export const useAddLedgerAccountMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const navigate = useNavigate();
     const accStorage = useAccountsStorage();
 
-    return useMutation<void, Error, { accounts: LedgerAccount[]; name: string; emoji: string }>(
-        async form => {
-            try {
-                const states = accountByLedger(form.accounts, form.name, form.emoji);
+    return useMutation<
+        void,
+        Error,
+        { accountId: string; wallets: LedgerAccount[]; name: string; emoji: string }
+    >(async form => {
+        try {
+            const state = accountByLedger(form.accountId, form.wallets, form.name, form.emoji);
 
-                await accStorage.addAccountToState(states);
+            await accStorage.addAccountToState(state);
 
-                await client.invalidateQueries([QueryKey.account]);
+            await client.invalidateQueries([QueryKey.account]);
 
-                navigate(AppRoute.home);
-            } catch (e) {
-                if (e instanceof Error) sdk.alert(e.message);
-                throw e;
-            }
+            navigate(AppRoute.home);
+        } catch (e) {
+            if (e instanceof Error) sdk.alert(e.message);
+            throw e;
         }
-    );
+    });
 };
 
 export const useIsActiveWalletLedger = () => {

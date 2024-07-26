@@ -3,9 +3,9 @@ import { Button } from '../../components/fields/Button';
 import { useTranslation } from '../../hooks/translation';
 import {
     LedgerAccount,
-    useAddLedgerAccountsMutation,
+    useAddLedgerAccountMutation,
     useConnectLedgerMutation,
-    useLedgerAccounts
+    useLedgerWallets
 } from '../../state/ledger';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { LedgerTonTransport } from '@tonkeeper/core/dist/service/ledger/connector';
@@ -20,8 +20,7 @@ import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { Checkbox } from '../../components/fields/Checkbox';
 import { LedgerConnectionSteps } from '../../components/ledger/LedgerConnectionSteps';
 import { UpdateWalletName } from '../../components/create/WalletName';
-import { getFallbackAccountEmoji } from '@tonkeeper/core/dist/service/walletService';
-import { toFormattedTonBalance } from "../../hooks/balance";
+import { toFormattedTonBalance } from '../../hooks/balance';
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;
@@ -155,15 +154,16 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
 }) => {
     const { t } = useTranslation();
     const totalAccounts = 10;
-    const { mutate: getLedgerAccounts, data: ledgerAccounts } = useLedgerAccounts(totalAccounts);
+    const { mutateAsync: getLedgerWallets, data: ledgerAccountData } =
+        useLedgerWallets(totalAccounts);
     const [selectedIndexes, setSelectedIndexes] = useState<Record<number, boolean>>({});
 
-    const { mutate: addAccountsMutation, isLoading: isAdding } = useAddLedgerAccountsMutation();
+    const { mutate: addAccountsMutation, isLoading: isAdding } = useAddLedgerAccountMutation();
 
     const [accountsToAdd, setAccountsToAdd] = useState<LedgerAccount[]>();
 
     useEffect(() => {
-        getLedgerAccounts(tonTransport);
+        getLedgerWallets(tonTransport).then(data => setSelectedIndexes(data.preselectedIndexes));
     }, [tonTransport]);
 
     const chosenSomeAccounts = !!Object.values(selectedIndexes).filter(Boolean).length;
@@ -178,17 +178,24 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
             .filter(([, v]) => v)
             .map(([k]) => Number(k));
         setAccountsToAdd(
-            ledgerAccounts!.filter(account => chosenIndexes.includes(account.accountIndex))
+            ledgerAccountData!.wallets.filter(account =>
+                chosenIndexes.includes(account.accountIndex)
+            )
         );
     };
 
     if (accountsToAdd) {
-        const fallbackEmoji = getFallbackAccountEmoji(accountsToAdd[0].publicKey.toString('hex'));
         return (
             <UpdateWalletName
-                walletEmoji={fallbackEmoji}
+                walletEmoji={ledgerAccountData!.emoji}
+                name={ledgerAccountData!.name}
                 submitHandler={({ name, emoji }) =>
-                    addAccountsMutation({ name, emoji, accounts: accountsToAdd })
+                    addAccountsMutation({
+                        name,
+                        emoji,
+                        wallets: accountsToAdd,
+                        accountId: ledgerAccountData!.accountId
+                    })
                 }
             />
         );
@@ -198,13 +205,13 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
         <ConnectLedgerWrapper>
             <H2Styled>{t('ledger_choose_wallets')}</H2Styled>
             <AccountsListWrapper>
-                {!ledgerAccounts ? (
+                {!ledgerAccountData ? (
                     <AccountsLoadingWrapper>
                         <SpinnerIcon />
                     </AccountsLoadingWrapper>
                 ) : (
                     <ListBlock margin={false}>
-                        {ledgerAccounts.map(account => (
+                        {ledgerAccountData.wallets.map(account => (
                             <ListItemStyled key={account.accountIndex} hover={false}>
                                 <Body2>{toFormattedAddress(account.address)}</Body2>
                                 &nbsp;
@@ -233,7 +240,7 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
                 </Button>
                 <Button
                     primary
-                    loading={!ledgerAccounts || isAdding}
+                    loading={!ledgerAccountData || isAdding}
                     disabled={!chosenSomeAccounts}
                     onClick={onAdd}
                 >

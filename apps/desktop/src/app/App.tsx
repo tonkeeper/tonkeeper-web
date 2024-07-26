@@ -326,8 +326,7 @@ export const Loader: FC = () => {
             tgAuthBotId: REACT_APP_TG_BOT_ID,
             stonfiReferralAddress: REACT_APP_STONFI_REFERRAL_ADDRESS
         },
-        defaultWalletVersion:
-            isV5R1Enabled(config) || devSettings.enableV5 ? WalletVersion.V5R1 : WalletVersion.V4R2
+        defaultWalletVersion: WalletVersion.V5R1
     };
 
     return (

@@ -198,7 +198,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                         onClick={e => {
                             e.preventDefault();
                             e.stopPropagation();
-                            openWalletVersionSettings({ account });
+                            openWalletVersionSettings({ accountId: account.id });
                         }}
                         isShown={isHovered}
                     >

@@ -100,9 +100,12 @@ export const useMutateActiveTonWallet = () => {
     });
 };
 
-export const useAccountState = (id: AccountId) => {
+export const useAccountState = (id: AccountId | undefined) => {
     const accounts = useAccountsState();
-    return useMemo(() => (accounts || []).find(w => w.id === id), [accounts]);
+    return useMemo(
+        () => (id !== undefined ? (accounts || []).find(w => w.id === id) : undefined),
+        [accounts, id]
+    );
 };
 
 export const useWalletState = (id: WalletId): TonWalletStandard | undefined => {
@@ -152,12 +155,17 @@ export const useCreateAccountMnemonic = () => {
         }
 
         if (sdk.keychain) {
-            const account = await createStandardTonAccountByMnemonic(context, mnemonic, {
-                auth: {
-                    kind: 'keychain'
-                },
-                versions
-            });
+            const account = await createStandardTonAccountByMnemonic(
+                context,
+                sdk.storage,
+                mnemonic,
+                {
+                    auth: {
+                        kind: 'keychain'
+                    },
+                    versions
+                }
+            );
 
             await sdk.keychain.setPassword(
                 (account.auth as AuthKeychain).keychainStoreKey,
@@ -176,7 +184,7 @@ export const useCreateAccountMnemonic = () => {
         }
 
         const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
-        const account = await createStandardTonAccountByMnemonic(context, mnemonic, {
+        const account = await createStandardTonAccountByMnemonic(context, sdk.storage, mnemonic, {
             auth: {
                 kind: 'password',
                 encryptedMnemonic
@@ -192,18 +200,19 @@ export const useCreateAccountMnemonic = () => {
     });
 };
 
-export const useAddTonWalletVersionToActiveAccount = () => {
+export const useAddTonWalletVersionToAccount = () => {
     const accountsStore = useAccountsStorage();
-    const account = useActiveAccount();
     const client = useQueryClient();
 
     return useMutation<
         TonWalletStandard,
         Error,
         {
+            accountId: AccountId;
             version: WalletVersion;
         }
-    >(async ({ version }) => {
+    >(async ({ accountId, version }) => {
+        const account = (await accountsStore.getAccount(accountId))!;
         const publicKey = account.activeTonWallet.publicKey;
         const w = getWalletAddress(publicKey, version);
         const wallet: TonWalletStandard = {
@@ -222,20 +231,21 @@ export const useAddTonWalletVersionToActiveAccount = () => {
     });
 };
 
-export const useRemoveTonWalletVersionFromActiveAccount = () => {
-    const accountsStore = useAccountsStorage();
-    const account = useActiveAccount();
+export const useRemoveTonWalletVersionFromAccount = () => {
+    const storage = useAccountsStorage();
     const client = useQueryClient();
 
     return useMutation<
         void,
         Error,
         {
+            accountId: AccountId;
             walletId: WalletId;
         }
-    >(async ({ walletId }) => {
+    >(async ({ walletId, accountId }) => {
+        const account = (await storage.getAccount(accountId))!;
         account.removeTonWalletFromActiveDerivation(walletId);
-        await accountsStore.updateAccountInState(account);
+        await storage.updateAccountInState(account);
         await client.invalidateQueries(anyOfKeysParts(QueryKey.account, account.id, walletId));
     });
 };
@@ -386,8 +396,7 @@ export const useMutateActiveTonWalletConfig = () => {
 
 export const useStandardTonWalletVersions = (publicKey?: string) => {
     const { api, fiat, config } = useAppContext();
-    const { data: devSettings } = useDevSettings();
-    const isV5Enabled = isV5R1Enabled(config) || devSettings?.enableV5;
+    const isV5Enabled = isV5R1Enabled(config);
     const network = useActiveTonNetwork();
 
     return useQuery(

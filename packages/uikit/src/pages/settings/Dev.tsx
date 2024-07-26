@@ -21,11 +21,6 @@ export const DevSettings = React.memo(() => {
                 name: t('settings_network_alert_title'),
                 icon: network === Network.MAINNET ? 'Mainnet' : 'Testnet',
                 action: () => mutateDevSettings({ tonNetwork: switchNetwork(network) })
-            },
-            {
-                name: t('Enable wallet V5'),
-                icon: devSettings?.enableV5 ? 'Enabled' : 'Disabled',
-                action: () => mutateDevSettings({ enableV5: !devSettings?.enableV5 })
             }
         ];
     }, [t, wallet, devSettings]);

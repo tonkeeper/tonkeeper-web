@@ -5,21 +5,20 @@ import {
     walletVersionText
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { Account } from '@tonkeeper/core/dist/entries/account';
+import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Label1 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
-import { useIsActiveWalletKeystone } from '../../state/keystone';
-import { useIsActiveWalletLedger } from '../../state/ledger';
 import {
     useStandardTonWalletVersions,
     useActiveAccount,
-    useAddTonWalletVersionToActiveAccount,
     useMutateActiveTonWallet,
-    useRemoveTonWalletVersionFromActiveAccount
+    useRemoveTonWalletVersionFromAccount,
+    useAddTonWalletVersionToAccount,
+    useAccountState
 } from '../../state/wallet';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { toFormattedTonBalance } from '../../hooks/balance';
@@ -63,13 +62,12 @@ export const WalletVersionPage = () => {
 
 export const WalletVersionPageContent: FC<{
     afterWalletOpened?: () => void;
-    account?: Account;
-}> = ({ afterWalletOpened, account }) => {
+    accountId?: AccountId;
+}> = ({ afterWalletOpened, accountId }) => {
     const { t } = useTranslation();
-    const isLedger = useIsActiveWalletLedger();
-    const isKeystone = useIsActiveWalletKeystone();
     const activeAccount = useActiveAccount();
-    const selectedAccount = account || activeAccount;
+    const passedAccount = useAccountState(accountId);
+    const selectedAccount = passedAccount ?? activeAccount;
     const selectedWallet = selectedAccount.activeTonWallet;
     const appActiveWallet = activeAccount.activeTonWallet;
     const currentAccountWalletsVersions = selectedAccount.activeDerivationTonWallets;
@@ -81,10 +79,10 @@ export const WalletVersionPageContent: FC<{
     const { data: wallets } = useStandardTonWalletVersions(selectedWallet.publicKey);
 
     const { mutate: createWallet, isLoading: isCreateWalletLoading } =
-        useAddTonWalletVersionToActiveAccount();
+        useAddTonWalletVersionToAccount();
 
     const { mutate: hideWallet, isLoading: isHideWalletLoading } =
-        useRemoveTonWalletVersionFromActiveAccount();
+        useRemoveTonWalletVersionFromAccount();
 
     const onOpenWallet = async (address: Address) => {
         if (address.toRawString() !== appActiveWallet.rawAddress) {
@@ -96,12 +94,14 @@ export const WalletVersionPageContent: FC<{
 
     const onAddWallet = async (w: { version: WalletVersionType; address: Address }) => {
         createWallet({
+            accountId: selectedAccount.id,
             version: w.version
         });
     };
 
     const onHideWallet = async (w: { address: Address }) => {
         hideWallet({
+            accountId: selectedAccount.id,
             walletId: w.address.toRawString()
         });
     };
@@ -120,6 +120,9 @@ export const WalletVersionPageContent: FC<{
             w.tonBalance ||
             w.hasJettons
     );
+
+    const isLedger = selectedAccount.type === 'ledger';
+    const isKeystone = selectedAccount.type === 'keystone';
 
     return (
         <>

@@ -16,7 +16,7 @@ export const usePairKeystoneMutation = () => {
 
     return useMutation<void, Error, UR>(async ur => {
         try {
-            const state = await accountByKeystone(ur);
+            const state = await accountByKeystone(ur, sdk.storage);
             const duplicatedWallet = await accountsStorage.getAccount(state.id);
             if (duplicatedWallet) {
                 throw new Error('Wallet already exist');

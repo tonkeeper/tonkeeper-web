@@ -18,9 +18,12 @@ import {
     AccountTonMnemonic,
     AccountTonOnly
 } from '../entries/account';
+import { IStorage } from '../Storage';
+import { accountsStorage } from './accountsStorage';
 
 export const createStandardTonAccountByMnemonic = async (
     appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
+    storage: IStorage,
     mnemonic: string[],
     options: {
         versions?: WalletVersion[];
@@ -54,10 +57,12 @@ export const createStandardTonAccountByMnemonic = async (
         walletAuth = options.auth;
     }
 
+    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(publicKey);
+
     return new AccountTonMnemonic(
         publicKey,
-        getFallbackAccountName(publicKey),
-        getFallbackAccountEmoji(publicKey),
+        name,
+        emoji,
         walletAuth,
         tonWallets[0].rawAddress,
         tonWallets.map(w => ({
@@ -160,6 +165,7 @@ export const getWalletsAddresses = (
 
 export const accountBySignerQr = async (
     appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
+    storage: IStorage,
     qrCode: string
 ): Promise<AccountTonOnly> => {
     if (!qrCode.startsWith('tonkeeper://signer')) {
@@ -182,10 +188,14 @@ export const accountBySignerQr = async (
     // TODO support multiple wallets versions configuration
     const active = await findWalletAddress(appContext, publicKey);
 
+    const { name: fallbackName, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
+        publicKey
+    );
+
     return new AccountTonOnly(
         publicKey,
-        name || getFallbackAccountName(publicKey),
-        getFallbackAccountEmoji(publicKey),
+        name || fallbackName,
+        emoji,
         { kind: 'signer' },
         active.rawAddress,
         [
@@ -203,15 +213,20 @@ export const accountBySignerQr = async (
 
 export const accountBySignerDeepLink = async (
     appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
+    storage: IStorage,
     publicKey: string,
     name: string | null
 ): Promise<AccountTonOnly> => {
     const active = await findWalletAddress(appContext, publicKey);
 
+    const { name: fallbackName, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
+        publicKey
+    );
+
     return new AccountTonOnly(
         publicKey,
-        name || getFallbackAccountName(publicKey),
-        getFallbackAccountEmoji(publicKey),
+        name || fallbackName,
+        emoji,
         { kind: 'signer-deeplink' },
         active.rawAddress,
         [
@@ -228,6 +243,7 @@ export const accountBySignerDeepLink = async (
 };
 
 export const accountByLedger = (
+    accountId: string,
     walletsInfo: {
         address: string;
         publicKey: Buffer;
@@ -236,9 +252,9 @@ export const accountByLedger = (
     name: string,
     emoji: string
 ): AccountLedger => {
-    const zeroAccPublicKey = walletsInfo[0].publicKey.toString('hex');
+    // const zeroAccPublicKey = walletsInfo[0].publicKey.toString('hex');
     return new AccountLedger(
-        zeroAccPublicKey,
+        accountId,
         name,
         emoji,
         walletsInfo[0].accountIndex,
@@ -267,7 +283,7 @@ export const accountByLedger = (
     );
 };
 
-export const accountByKeystone = (ur: UR): AccountKeystone => {
+export const accountByKeystone = async (ur: UR, storage: IStorage): Promise<AccountKeystone> => {
     const account = parseTonAccount(ur);
     const contact = WalletContractV4.create({
         workchain: 0,
@@ -277,20 +293,18 @@ export const accountByKeystone = (ur: UR): AccountKeystone => {
     const pathInfo =
         account.path && account.xfp ? { path: account.path, mfp: account.xfp } : undefined;
 
-    return new AccountKeystone(
-        account.publicKey,
-        getFallbackAccountName(account.publicKey),
-        getFallbackAccountEmoji(account.publicKey),
-        pathInfo,
-        {
-            id: contact.address.toRawString(),
-            publicKey: account.publicKey,
-            version: WalletVersion.V4R2,
-            rawAddress: contact.address.toRawString(),
-            name: getFallbackWalletName(contact.address.toRawString()),
-            emoji: getFallbackTonStandardWalletEmoji(account.publicKey, WalletVersion.V4R2)
-        }
+    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
+        account.publicKey
     );
+
+    return new AccountKeystone(account.publicKey, name, emoji, pathInfo, {
+        id: contact.address.toRawString(),
+        publicKey: account.publicKey,
+        version: WalletVersion.V4R2,
+        rawAddress: contact.address.toRawString(),
+        name: getFallbackWalletName(contact.address.toRawString()),
+        emoji: getFallbackTonStandardWalletEmoji(account.publicKey, WalletVersion.V4R2)
+    });
 };
 
 export function getFallbackAccountEmoji(publicKey: string) {

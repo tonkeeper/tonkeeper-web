@@ -3,12 +3,10 @@ import { Network } from '../entries/network';
 import { AppKey } from '../Keys';
 
 export interface DevSettings {
-    enableV5: boolean;
     tonNetwork: Network;
 }
 
 const defaultDevSettings: DevSettings = {
-    enableV5: false,
     tonNetwork: Network.MAINNET
 };
 

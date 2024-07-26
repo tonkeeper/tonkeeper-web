@@ -9,7 +9,8 @@ import {
     useActiveWallet,
     useAccountsState,
     useMutateActiveTonWallet,
-    useActiveTonNetwork
+    useActiveTonNetwork,
+    useActiveAccount
 } from '../state/wallet';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
@@ -20,7 +21,8 @@ import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
-import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 
 const Block = styled.div<{
     center?: boolean;
@@ -101,6 +103,7 @@ const Icon = styled.span`
     padding-left: 0.5rem;
     color: ${props => props.theme.accentBlue};
     display: flex;
+    margin-left: auto;
 `;
 
 const Row = styled.div`
@@ -118,10 +121,40 @@ const Row = styled.div`
     }
 `;
 
+const Badge = styled.div`
+    padding: 2px 4px;
+    margin-left: -4px;
+    height: fit-content;
+    background: ${p => p.theme.backgroundContentAttention};
+    border-radius: 3px;
+    color: ${p => p.theme.textSecondary};
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 510;
+    line-height: 12px;
+`;
+
+const ListItemPayloadStyled = styled(ListItemPayload)`
+    justify-content: flex-start;
+`;
+
+const ColumnTextStyled = styled(ColumnText)`
+    flex-grow: 0;
+`;
+
+const DropDownContainerStyle = createGlobalStyle`
+  .header-dd-container {
+    margin-left: -135px;
+    width: 270px;
+  }
+`;
+
 const WalletRow: FC<{
+    account: Account;
     walletState: TonWalletStandard;
     onClose: () => void;
-}> = ({ walletState, onClose }) => {
+    badge?: string;
+}> = ({ account, walletState, onClose, badge }) => {
     const network = useActiveTonNetwork();
     const { mutate } = useMutateActiveTonWallet();
     const address = toShortValue(formatAddress(walletState.rawAddress, network));
@@ -134,15 +167,16 @@ const WalletRow: FC<{
                 onClose();
             }}
         >
-            <ListItemPayload>
-                <WalletEmoji emoji={walletState.emoji} />
-                <ColumnText noWrap text={walletState.name} secondary={address} />
+            <ListItemPayloadStyled>
+                <WalletEmoji emoji={account.emoji} />
+                <ColumnTextStyled noWrap text={account.name} secondary={address} />
+                {badge && <Badge>{badge}</Badge>}
                 {activeWallet?.id === walletState.id ? (
                     <Icon>
                         <DoneIcon />
                     </Icon>
                 ) : undefined}
-            </ListItemPayload>
+            </ListItemPayloadStyled>
         </ListItem>
     );
 };
@@ -153,13 +187,41 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
 }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const wallets = useAccountsState().flatMap(a => a.allTonWallets);
+    const accountsWallets: { wallet: TonWalletStandard; account: Account; badge?: string }[] =
+        useAccountsState().flatMap(a => {
+            if (a.type === 'ledger') {
+                return a.derivations.map(
+                    d =>
+                        ({
+                            wallet: d.tonWallets.find(w => w.id === d.activeTonWalletId)!,
+                            account: a,
+                            badge: `LEDGER #${d.index}`
+                        } as { wallet: TonWalletStandard; account: Account; badge?: string })
+                );
+            }
 
-    if (!wallets) {
+            return a.allTonWallets.map(
+                w =>
+                    ({
+                        wallet: w,
+                        account: a,
+                        badge:
+                            a.type === 'ton-only'
+                                ? 'SIGNER'
+                                : a.type === 'keystone'
+                                ? 'KEYSTONE'
+                                : a.allTonWallets.length > 1
+                                ? walletVersionText(w.version)
+                                : undefined
+                    } as { wallet: TonWalletStandard; account: Account; badge?: string })
+            );
+        });
+
+    if (!accountsWallets) {
         return null;
     }
 
-    if (wallets.length === 1) {
+    if (accountsWallets.length === 1) {
         return (
             <Row
                 onClick={() => {
@@ -176,8 +238,14 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
     } else {
         return (
             <>
-                {wallets.map(wallet => (
-                    <WalletRow key={wallet.id} walletState={wallet} onClose={onClose} />
+                {accountsWallets.map(({ wallet, account, badge }) => (
+                    <WalletRow
+                        account={account}
+                        key={wallet.id}
+                        walletState={wallet}
+                        onClose={onClose}
+                        badge={badge}
+                    />
                 ))}
                 <Divider />
                 <Row
@@ -196,30 +264,45 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
     }
 };
 
+const TitleStyled = styled(Title)`
+    align-items: center;
+`;
+
 export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
-    const { t } = useTranslation();
-    const wallet = useActiveWallet();
+    const account = useActiveAccount();
     const [isOpen, setOpen] = useState(false);
 
     const wallets = useAccountsState();
     const shouldShowIcon = wallets.length > 1;
 
+    const accountBadge =
+        account.allTonWallets.length === 1
+            ? undefined
+            : account.type === 'ledger'
+            ? `LEDGER #${account.activeDerivation.index}`
+            : account.type === 'mnemonic'
+            ? walletVersionText(account.activeTonWallet.version)
+            : undefined;
+
     return (
         <Block center>
+            <DropDownContainerStyle />
             <DropDown
                 center
                 payload={onClose => (
                     <DropDownPayload onClose={onClose} onCreate={() => setOpen(true)} />
                 )}
+                containerClassName="header-dd-container"
             >
-                <Title>
-                    {shouldShowIcon && <WalletEmoji emoji={wallet.emoji} />}
-                    <TitleName> {wallet.name ? wallet.name : t('wallet_title')}</TitleName>
+                <TitleStyled>
+                    {shouldShowIcon && <WalletEmoji emoji={account.emoji} />}
+                    <TitleName>{account.name}</TitleName>
+                    {accountBadge && <Badge>{accountBadge}</Badge>}
 
                     <DownIconWrapper>
                         <DownIcon />
                     </DownIconWrapper>
-                </Title>
+                </TitleStyled>
             </DropDown>
 
             {showQrScan && <ScanButton />}

@@ -18,6 +18,7 @@ import { DeprecatedAccountState } from '../entries/account';
 import { AuthState, DeprecatedAuthState } from '../entries/password';
 import { assertUnreachable, notNullish } from '../utils/types';
 import {
+    getFallbackAccountEmoji,
     getFallbackDerivationItemEmoji,
     getFallbackTonStandardWalletEmoji,
     getWalletNameAddress
@@ -69,6 +70,10 @@ export class AccountsStorage {
     };
 
     setActiveAccountId = async (activeAccountId: AccountId | null) => {
+        const accounts = await this.getAccounts();
+        if (accounts.every(a => a.id !== activeAccountId)) {
+            throw new Error('Account not found');
+        }
         await this.storage.set(AppKey.ACTIVE_ACCOUNT_ID, activeAccountId);
     };
 
@@ -78,9 +83,15 @@ export class AccountsStorage {
 
     addAccountsToState = async (accounts: Account[]) => {
         const state = await this.getAccounts();
-        await this.setAccounts(
-            state.concat(accounts.filter(acc => state.every(a => a.id !== acc.id)))
-        );
+        accounts.forEach(account => {
+            const existingAccIndex = state.findIndex(a => a.id === account.id);
+            if (existingAccIndex !== -1) {
+                state[existingAccIndex] = account;
+                return;
+            }
+            state.push(account);
+        });
+        await this.setAccounts(state);
     };
 
     /**
@@ -120,6 +131,14 @@ export class AccountsStorage {
 
         await this.setAccounts(state.filter(w => w.id !== id));
     };
+
+    async getNewAccountNameAndEmoji(accountId: AccountId) {
+        const existingAccounts = await this.getAccounts();
+        const existingAccount = existingAccounts.find(a => a.id === accountId);
+        const name = existingAccount?.name || 'Account ' + (existingAccounts.length + 1);
+        const emoji = existingAccount?.emoji || getFallbackAccountEmoji(accountId);
+        return { name, emoji };
+    }
 
     private migrateToActiveAccountIdState = async (): Promise<WalletId | null> => {
         const state = await this.storage.get<DeprecatedAccountState>(AppKey.DEPRECATED_ACCOUNT);
