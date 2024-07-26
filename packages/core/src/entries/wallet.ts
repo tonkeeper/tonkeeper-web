@@ -12,6 +12,29 @@ export enum WalletVersion {
     V5R1 = 5
 }
 
+export function sortWalletsByVersion(
+    w1: { version: WalletVersion },
+    w2: { version: WalletVersion }
+) {
+    if (w1.version < w2.version) {
+        return 1;
+    }
+    if (w1.version > w2.version) {
+        return -1;
+    }
+    return 0;
+}
+
+export function sortDerivationsByIndex(w1: { index: number }, w2: { index: number }) {
+    if (w1.index < w2.index) {
+        return -1;
+    }
+    if (w1.index > w2.index) {
+        return 1;
+    }
+    return 0;
+}
+
 export const isW5Version = (version: WalletVersion) => {
     return version === WalletVersion.V5_BETA || version === WalletVersion.V5R1;
 };
@@ -23,6 +46,8 @@ export const WalletVersions = [
     WalletVersion.V5_BETA,
     WalletVersion.V5R1
 ];
+
+export const backwardCompatibilityOnlyWalletVersions = [WalletVersion.V5_BETA];
 
 export const walletVersionText = (version: WalletVersion) => {
     switch (version) {

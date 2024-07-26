@@ -1,9 +1,11 @@
 import {
+    backwardCompatibilityOnlyWalletVersions,
     WalletVersion as WalletVersionType,
     WalletVersions,
     walletVersionText
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
@@ -13,7 +15,6 @@ import { useTranslation } from '../../hooks/translation';
 import { useIsActiveWalletKeystone } from '../../state/keystone';
 import { useIsActiveWalletLedger } from '../../state/ledger';
 import {
-    useActiveStandardTonWallet,
     useStandardTonWalletVersions,
     useActiveAccount,
     useAddTonWalletVersionToActiveAccount,
@@ -60,21 +61,24 @@ export const WalletVersionPage = () => {
     );
 };
 
-export const WalletVersionPageContent: FC<{ afterWalletOpened?: () => void }> = ({
-    afterWalletOpened
-}) => {
+export const WalletVersionPageContent: FC<{
+    afterWalletOpened?: () => void;
+    account?: Account;
+}> = ({ afterWalletOpened, account }) => {
     const { t } = useTranslation();
     const isLedger = useIsActiveWalletLedger();
     const isKeystone = useIsActiveWalletKeystone();
-    const currentWallet = useActiveStandardTonWallet();
-    const currentAccount = useActiveAccount();
-    const currentAccountWalletsVersions = currentAccount.activeDerivationTonWallets;
+    const activeAccount = useActiveAccount();
+    const selectedAccount = account || activeAccount;
+    const selectedWallet = selectedAccount.activeTonWallet;
+    const appActiveWallet = activeAccount.activeTonWallet;
+    const currentAccountWalletsVersions = selectedAccount.activeDerivationTonWallets;
 
     const { mutateAsync: selectWallet, isLoading: isSelectWalletLoading } =
         useMutateActiveTonWallet();
     const navigate = useNavigate();
 
-    const { data: wallets } = useStandardTonWalletVersions(currentWallet.publicKey);
+    const { data: wallets } = useStandardTonWalletVersions(selectedWallet.publicKey);
 
     const { mutate: createWallet, isLoading: isCreateWalletLoading } =
         useAddTonWalletVersionToActiveAccount();
@@ -83,7 +87,7 @@ export const WalletVersionPageContent: FC<{ afterWalletOpened?: () => void }> = 
         useRemoveTonWalletVersionFromActiveAccount();
 
     const onOpenWallet = async (address: Address) => {
-        if (address.toRawString() !== currentWallet.rawAddress) {
+        if (address.toRawString() !== appActiveWallet.rawAddress) {
             await selectWallet(address.toRawString());
         }
         navigate(AppRoute.home);
@@ -107,12 +111,21 @@ export const WalletVersionPageContent: FC<{ afterWalletOpened?: () => void }> = 
     }
 
     const isLoading = isSelectWalletLoading || isCreateWalletLoading || isHideWalletLoading;
+    const canHide = currentAccountWalletsVersions.length > 1;
+
+    const walletsToShow = wallets.filter(
+        w =>
+            !backwardCompatibilityOnlyWalletVersions.includes(w.version) ||
+            currentAccountWalletsVersions.some(item => item.version === w.version) ||
+            w.tonBalance ||
+            w.hasJettons
+    );
 
     return (
         <>
             {!isLedger && !isKeystone && (
                 <ListBlock>
-                    {wallets.map(wallet => {
+                    {walletsToShow.map(wallet => {
                         const isWalletAdded = currentAccountWalletsVersions.some(
                             w => w.rawAddress === wallet.address.toRawString()
                         );
@@ -137,12 +150,14 @@ export const WalletVersionPageContent: FC<{ afterWalletOpened?: () => void }> = 
                                             >
                                                 {t('open')}
                                             </Button>
-                                            <Button
-                                                onClick={() => onHideWallet(wallet)}
-                                                loading={isLoading}
-                                            >
-                                                {t('hide')}
-                                            </Button>
+                                            {canHide && (
+                                                <Button
+                                                    onClick={() => onHideWallet(wallet)}
+                                                    loading={isLoading}
+                                                >
+                                                    {t('hide')}
+                                                </Button>
+                                            )}
                                         </ButtonsContainer>
                                     ) : (
                                         <Button

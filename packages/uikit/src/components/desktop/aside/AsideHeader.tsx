@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { FC, useRef, useState } from 'react';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { Body3, Label2 } from '../../Text';
-import { useActiveWallet } from '../../../state/wallet';
+import { useActiveAccount } from '../../../state/wallet';
 import { useTranslation } from '../../../hooks/translation';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
@@ -62,13 +62,14 @@ const DoneIconStyled = styled(DoneIcon)`
 
 export const AsideHeader: FC<{ width: number }> = ({ width }) => {
     const { t } = useTranslation();
-    const wallet = useActiveWallet();
+    const account = useActiveAccount();
+    const activeWallet = account.activeTonWallet;
     const route = useAsideActiveRoute();
     const [copied, setIsCopied] = useState(false);
     const sdk = useAppSdk();
     const [hovered, setHovered] = useState(false);
 
-    const address = wallet ? formatAddress(wallet.rawAddress) : '';
+    const address = formatAddress(activeWallet.rawAddress);
 
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -96,10 +97,10 @@ export const AsideHeader: FC<{ width: number }> = ({ width }) => {
             onMouseOver={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
         >
-            {wallet && !route && (
+            {!route && (
                 <>
                     <TextContainer>
-                        <Label2>{wallet.name || t('wallet_title')}</Label2>
+                        <Label2>{account.name || t('wallet_title')}</Label2>
                         <AddressWrapper>
                             <Body3>{toShortValue(address)}</Body3>
                             <Transition
@@ -119,7 +120,7 @@ export const AsideHeader: FC<{ width: number }> = ({ width }) => {
                             </Transition>
                         </AddressWrapper>
                     </TextContainer>
-                    <WalletEmoji emoji={wallet.emoji} emojiSize="24px" containerSize="24px" />
+                    <WalletEmoji emoji={account.emoji} emojiSize="24px" containerSize="24px" />
                 </>
             )}
         </HeaderContainer>
