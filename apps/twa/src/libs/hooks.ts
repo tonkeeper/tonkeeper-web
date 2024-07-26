@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { WalletsState, WalletState } from "@tonkeeper/core/dist/entries/wallet";
+import { Account } from "@tonkeeper/core/dist/entries/account";
+import { Network } from "@tonkeeper/core/dist/entries/network";
 import { Analytics, AnalyticsGroup, toWalletType } from "@tonkeeper/uikit/dist/hooks/analytics";
 import { Viewport } from '@tma.js/sdk';
 import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
@@ -66,9 +67,9 @@ export const useTwaAppViewport = (setAppHeight: boolean, sdk: TwaAppSdk) => {
     }, [sdk]);
 };
 
-export const useAnalytics = (activeWallet?: WalletState, wallets?: WalletsState, version?: string) => {
+export const useAnalytics = (activeAccount?: Account, accounts?: Account[], network?: Network, version?: string) => {
     return useQuery<Analytics>(
-        [QueryKey.analytics],
+        [QueryKey.analytics, activeAccount, accounts, network],
         async () => {
           const tracker = new AnalyticsGroup(
             new AptabaseWeb(
@@ -79,10 +80,16 @@ export const useAnalytics = (activeWallet?: WalletState, wallets?: WalletsState,
             new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID)
           );
 
-            tracker.init('Twa', toWalletType(activeWallet), activeWallet, wallets);
+            tracker.init({
+                application:'Twa',
+                walletType: toWalletType(activeAccount?.activeTonWallet),
+                activeAccount: activeAccount!,
+                accounts: accounts!,
+                network
+            });
 
             return tracker;
         },
-      { enabled: wallets != null && activeWallet !== undefined }
+      { enabled: accounts != null && activeAccount !== undefined }
     );
 };

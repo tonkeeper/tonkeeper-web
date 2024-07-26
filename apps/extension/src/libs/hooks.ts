@@ -38,7 +38,7 @@ export const useAnalytics = (
     version?: string
 ) => {
     return useQuery<Analytics>(
-        [QueryKey.analytics],
+        [QueryKey.analytics, activeAccount, accounts],
         async () => {
             let userId: string | undefined = undefined;
             if (extensionType === 'FireFox') {
