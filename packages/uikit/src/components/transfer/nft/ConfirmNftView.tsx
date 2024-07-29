@@ -22,7 +22,6 @@ import {
     TransferEstimationEvent
 } from '@tonkeeper/core/dist/entries/send';
 import { useTransactionAnalytics } from '../../../hooks/amplitude';
-import { TxConfirmationCustomError } from '../../../libs/errors/TxConfirmationCustomError';
 import { QueryKey } from '../../../libs/queryKey';
 import { getSigner } from '../../../state/mnemonic';
 import { useCheckTouchId } from '../../../state/password';
@@ -83,9 +82,6 @@ const useSendNft = (
         if (!fee) return false;
 
         const signer = await getSigner(sdk, wallet.publicKey, checkTouchId).catch(() => null);
-        if (signer?.type !== 'cell') {
-            throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
-        }
         if (signer === null) return false;
 
         track2('send-nft');

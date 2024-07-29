@@ -6725,16 +6725,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton-community/ton-ledger@npm:^7.0.1":
-  version: 7.0.1
-  resolution: "@ton-community/ton-ledger@npm:7.0.1"
+"@ton-community/ton-ledger@npm:^7.2.0-pre.2":
+  version: 7.2.0-pre.2
+  resolution: "@ton-community/ton-ledger@npm:7.2.0-pre.2"
   dependencies:
     "@ledgerhq/hw-transport": "npm:^6.28.4"
     "@ton/crypto": "npm:^3.2.0"
     teslabot: "npm:^1.5.0"
   peerDependencies:
     "@ton/core": ">=0.52.2"
-  checksum: 10/9ab8d2f4c8102bed988a56101ea17d873fc48ba071ce51b1a2c04c7f08fba1800381e71d14db548b6badb0ff9789a74a904508758902371a2ed91fc0210c07b0
+  checksum: 10/9ddd536a8484b0afe34975f2e7b82c998134612c394ba94aa64140398d795daf2f734368300c28d09f2d697166b30387f7542bcfcd3fc73031ba233b7e09630d
   languageName: node
   linkType: hard
 
@@ -6792,7 +6792,7 @@ __metadata:
     "@keystonehq/keystone-sdk": "npm:0.7.2"
     "@ledgerhq/hw-transport-webhid": "npm:^6.28.6"
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
-    "@ton-community/ton-ledger": "npm:^7.0.1"
+    "@ton-community/ton-ledger": "npm:^7.2.0-pre.2"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
     "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build10"

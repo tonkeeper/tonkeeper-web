@@ -23,6 +23,9 @@ import {
     seeIfTransferBounceable,
     signEstimateMessage
 } from './common';
+import { getLedgerAccountPathByIndex } from '../ledger/utils';
+import { AuthLedger } from '../../entries/password';
+import { LedgerError } from '../../errors/LedgerError';
 
 export type EstimateData = {
     accountEvent: TransferEstimationEvent;
@@ -75,9 +78,48 @@ const createTonConnectTransfer = async (
     seqno: number,
     walletState: WalletState,
     params: TonConnectTransactionPayload,
-    signer: CellSigner
+    signer: Signer
 ) => {
     const contract = walletContractFromState(walletState);
+
+    if (signer.type === 'ledger') {
+        if (params.messages.length !== 1) {
+            throw new Error('Ledger signer does not support multiple messages');
+        }
+
+        const message = params.messages[0];
+        const path = getLedgerAccountPathByIndex((walletState.auth as AuthLedger).accountIndex);
+
+        let transfer: Cell;
+        try {
+            transfer = await signer(path, {
+                to: Address.parse(message.address),
+                bounce: seeIfAddressBounceable(message.address),
+                amount: BigInt(message.amount),
+                seqno,
+                timeout: getTTL(timestamp),
+                sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+                payload: message.payload
+                    ? {
+                          type: 'unsafe',
+                          message: Cell.fromBase64(message.payload)
+                      }
+                    : undefined,
+                stateInit: toStateInit(message.stateInit)
+            });
+        } catch (e) {
+            console.error(e);
+            throw new LedgerError(
+                typeof e === 'string'
+                    ? e
+                    : typeof e === 'object' && e && 'message' in e
+                    ? (e.message as string)
+                    : 'Unknown error'
+            );
+        }
+
+        return externalMessage(contract, seqno, transfer).toBoc();
+    }
 
     const transfer = await contract.createTransferAndSignRequestAsync({
         seqno,
@@ -182,7 +224,7 @@ export const sendTonConnectTransfer = async (
     api: APIConfig,
     walletState: WalletState,
     params: TonConnectTransactionPayload,
-    signer: CellSigner
+    signer: Signer
 ) => {
     const timestamp = await getServerTime(api);
     const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);

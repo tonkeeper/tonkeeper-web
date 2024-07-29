@@ -67,6 +67,7 @@ export const createLedgerJettonTransfer = async (
         timeout: getTTL(timestamp),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
         payload: {
+            knownJetton: null,
             type: 'jetton-transfer',
             queryId: getTonkeeperQueryId(),
             amount: jettonAmount,
