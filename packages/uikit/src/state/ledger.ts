@@ -1,22 +1,24 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Address } from '@ton/core';
+import { AuthLedger } from '@tonkeeper/core/dist/entries/password';
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { addWalletsWithCustomAuthState } from '@tonkeeper/core/dist/service/accountService';
 import {
+    LedgerTonTransport,
     connectLedger,
     isTransportReady,
-    LedgerTonTransport,
     waitLedgerTonAppReady
 } from '@tonkeeper/core/dist/service/ledger/connector';
 import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
-import { AccountsApi, Account } from '@tonkeeper/core/dist/tonApiV2';
-import { Address } from '@ton/core';
-import { useAppSdk } from '../hooks/appSdk';
-import { useNavigate } from 'react-router-dom';
+import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
 import { walletStateFromLedger } from '@tonkeeper/core/dist/service/walletService';
-import { addWalletsWithCustomAuthState } from '@tonkeeper/core/dist/service/accountService';
+import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
-import { useCallback, useState } from 'react';
-import { AuthLedger } from '@tonkeeper/core/dist/entries/password';
 
 export type LedgerAccount = {
     accountIndex: number;
@@ -70,7 +72,7 @@ export const useLedgerAccounts = (
     return useMutation<LedgerAccount[], Error, LedgerTonTransport>(async tonTransport => {
         const accountIds = await Promise.all(
             [...new Array(accountsNumber)].map((_, i) =>
-                tonTransport.getAddress(getLedgerAccountPathByIndex(i))
+                tonTransport.getAddress(getLedgerAccountPathByIndex(i), { walletVersion: 'v4' })
             )
         );
 
