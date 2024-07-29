@@ -569,7 +569,7 @@
   "import_signer_description" : "Completely offline, air-gapped, all TON features",
   "import_wallet_caption" : "To restore access to your wallet, enter the 24 secret recovery words given to you when you created your wallet.",
   "import_wallet_reset_caption" : "Please restore access to your wallet\n8by entering 24 secret words you wrote down then creating the wallet.",
-  "import_wallet_title" : "Enter your\nrecovery phrase",
+  "import_wallet_title" : "Enter your\nrecovery phrase",
   "import_wallet_wrong_words_err" : "Incorrect phrase",
   "indexer_latency_error" : "Sending error, try again later",
   "info_about_inactive_back" : "Back",

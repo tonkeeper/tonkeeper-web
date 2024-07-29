@@ -1,6 +1,7 @@
 {
   "about_tonkeeper_pro" : "О Tonkeeper Pro",
   "actionTitle" : "Открыть Кошелек",
+  "add" : "Добавить",
   "add_dns_address" : "Добавьте адрес кошелька, на который будет ссылаться домен %1%",
   "appExtensionDescription" : "Your extension wallet on The Open Network",
   "appName" : "Tonkeeper",
@@ -43,6 +44,7 @@
   "Enable_storing_config" : "Cохранение конфигурации",
   "enter_password" : "Введите пароль",
   "export_dot_csv" : "Экспорт в .CSV",
+  "hide" : "Скрыть",
   "history_spam_nft" : "Спам NFT",
   "I_have_a_backup_copy_of_recovery_phrase" : "У меня есть резервная копия фразы восстановления",
   "import_csv" : "Импорт CSV",
@@ -124,6 +126,7 @@
   "nft_on_sale_text" : "NFT сейчас выставлен на продажу на маркете.\nЧтобы передать, необходимо сначала снять его с продажи.",
   "no_connected_apps" : "Нет подключенных приложений",
   "Old_password" : "Текущий пароль",
+  "open" : "Открыть",
   "page_header_history" : "История",
   "page_header_purchases" : "Покупки",
   "Password" : "Пароль",
@@ -218,5 +221,6 @@
   "wallet_aside_tokens" : "Токены",
   "wallet_multi_send" : "Мульти отправка",
   "Wallet_name" : "Имя кошелька",
-  "wallet_sell" : "Продать"
+  "wallet_sell" : "Продать",
+  "wallet_version_and_tokens" : ", токены"
 }
