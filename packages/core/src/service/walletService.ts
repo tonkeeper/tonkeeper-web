@@ -46,7 +46,7 @@ export const encryptWalletMnemonic = async (mnemonic: string[], password: string
     return encrypt(mnemonic.join(' '), password);
 };
 
-export const versionMap: Record<string, WalletVersion> = {
+const versionMap: Record<string, WalletVersion> = {
     wallet_v3r1: WalletVersion.V3R1,
     wallet_v3r2: WalletVersion.V3R2,
     wallet_v4r2: WalletVersion.V4R2,
@@ -54,7 +54,7 @@ export const versionMap: Record<string, WalletVersion> = {
     wallet_v5r1: WalletVersion.V5R1
 };
 
-export const findWalletVersion = (interfaces?: string[]): WalletVersion => {
+const findWalletVersion = (interfaces?: string[]): WalletVersion => {
     if (!interfaces) {
         throw new Error('Unexpected wallet version');
     }
@@ -250,7 +250,6 @@ export const walletStateFromLedger = (walletInfo: {
     address: string;
     publicKey: Buffer;
     accountIndex: number;
-    version: WalletVersion;
 }) => {
     const address = Address.parse(walletInfo.address);
     const publicKey = walletInfo.publicKey.toString('hex');
@@ -260,7 +259,7 @@ export const walletStateFromLedger = (walletInfo: {
         active: {
             friendlyAddress: address.toString({ bounceable: false }),
             rawAddress: address.toRawString(),
-            version: walletInfo.version
+            version: WalletVersion.V4R2
         },
         revision: 0,
         name: `Ledger ${walletInfo.accountIndex + 1}`,

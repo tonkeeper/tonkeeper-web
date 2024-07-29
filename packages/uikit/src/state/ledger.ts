@@ -1,32 +1,26 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Address } from '@ton/core';
-import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
-import { AuthLedger } from '@tonkeeper/core/dist/entries/password';
-import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { addWalletsWithCustomAuthState } from '@tonkeeper/core/dist/service/accountService';
 import {
-    LedgerTonTransport,
     connectLedger,
     isTransportReady,
+    LedgerTonTransport,
     waitLedgerTonAppReady
 } from '@tonkeeper/core/dist/service/ledger/connector';
 import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
-import {
-    findWalletVersion,
-    walletStateFromLedger
-} from '@tonkeeper/core/dist/service/walletService';
-import { Account, AccountsApi, WalletApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { AccountsApi, Account } from '@tonkeeper/core/dist/tonApiV2';
+import { Address } from '@ton/core';
 import { useAppSdk } from '../hooks/appSdk';
+import { useNavigate } from 'react-router-dom';
+import { walletStateFromLedger } from '@tonkeeper/core/dist/service/walletService';
+import { addWalletsWithCustomAuthState } from '@tonkeeper/core/dist/service/accountService';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
+import { useCallback, useState } from 'react';
+import { AuthLedger } from '@tonkeeper/core/dist/entries/password';
 
 export type LedgerAccount = {
     accountIndex: number;
     publicKey: Buffer;
-    version: WalletVersion;
 } & Account;
 
 type T = ReturnType<typeof useMutation<LedgerTonTransport, Error>>;
@@ -68,51 +62,6 @@ export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T =
     };
 };
 
-interface LedgerWallet {
-    address: string;
-    publicKey: Buffer;
-    version: WalletVersion;
-}
-
-const getAddresses = async (
-    api: APIConfig,
-    accountIds: {
-        address: string;
-        publicKey: Buffer;
-    }[]
-) => {
-    const list: LedgerWallet[] = [];
-    for (let account of accountIds) {
-        const result = await new WalletApi(api.tonApiV2).getWalletsByPublicKey({
-            publicKey: account.publicKey.toString('hex')
-        });
-
-        const [activeWallet] = result.accounts
-            .filter(wallet => {
-                return wallet.balance > 0 || wallet.status === 'active';
-            })
-            .sort((one, two) => two.balance - one.balance);
-
-        if (activeWallet) {
-            list.push({
-                address: Address.parse(activeWallet.address).toRawString(),
-                publicKey: account.publicKey,
-                version: activeWallet.interfaces?.length
-                    ? findWalletVersion(activeWallet.interfaces)
-                    : WalletVersion.V3R2
-            });
-        } else {
-            list.push({
-                address: Address.parse(account.address).toRawString(),
-                publicKey: account.publicKey,
-                version: WalletVersion.V3R2
-            });
-        }
-    }
-
-    return list;
-};
-
 export const useLedgerAccounts = (
     accountsNumber: number
 ): ReturnType<typeof useMutation<LedgerAccount[], Error, LedgerTonTransport>> => {
@@ -125,16 +74,15 @@ export const useLedgerAccounts = (
             )
         );
 
-        const addresses = await getAddresses(api, accountIds);
+        const addresses = accountIds.map(account => Address.parse(account.address).toRawString());
 
         const response = await new AccountsApi(api.tonApiV2).getAccounts({
-            getAccountsRequest: { accountIds: addresses.map(item => item.address) }
+            getAccountsRequest: { accountIds: addresses }
         });
 
-        return addresses.map((acc, i) => ({
+        return accountIds.map((acc, i) => ({
             accountIndex: i,
             publicKey: acc.publicKey,
-            version: acc.version,
             ...response.accounts.find(a =>
                 Address.parse(a.address).equals(Address.parse(acc.address))
             )! // tonapi bug, should filter here
