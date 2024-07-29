@@ -184,7 +184,7 @@
   "form_optional_indicator" : "Facoltativo",
   "import_wallet_caption" : "Per ripristinare l'accesso al tuo wallet, inserisci le 24 parole di recupero segrete che ti sono state fornite quando hai creato il tuo wallet.",
   "import_wallet_reset_caption" : "Ripristina l'accesso al tuo wallet  immettendo 24 parole segrete che hai annotato e creando il wallet.",
-  "import_wallet_title" : "Inserisci la tua\frase di recupero",
+  "import_wallet_title" : "Inserisci la tua\nfrase di recupero",
   "import_wallet_wrong_words_err" : "Frase errata",
   "info_about_inactive_back" : "Indietro",
   "info_about_inactive_desc1" : "Tonkeeper non sa se questo indirizzo è un portafoglio o uno smart contract.",
