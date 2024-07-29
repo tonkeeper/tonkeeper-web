@@ -25,6 +25,7 @@ import {
 } from './common';
 import { getLedgerAccountPathByIndex } from '../ledger/utils';
 import { AuthLedger } from '../../entries/password';
+import { LedgerError } from '../../errors/LedgerError';
 
 export type EstimateData = {
     accountEvent: TransferEstimationEvent;
@@ -89,21 +90,33 @@ const createTonConnectTransfer = async (
         const message = params.messages[0];
         const path = getLedgerAccountPathByIndex((walletState.auth as AuthLedger).accountIndex);
 
-        const transfer = await signer(path, {
-            to: Address.parse(message.address),
-            bounce: seeIfAddressBounceable(message.address),
-            amount: BigInt(message.amount),
-            seqno,
-            timeout: getTTL(timestamp),
-            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-            payload: message.payload
-                ? {
-                      type: 'unsafe',
-                      message: Cell.fromBase64(message.payload)
-                  }
-                : undefined,
-            stateInit: toStateInit(message.stateInit)
-        });
+        let transfer: Cell;
+        try {
+            transfer = await signer(path, {
+                to: Address.parse(message.address),
+                bounce: seeIfAddressBounceable(message.address),
+                amount: BigInt(message.amount),
+                seqno,
+                timeout: getTTL(timestamp),
+                sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+                payload: message.payload
+                    ? {
+                          type: 'unsafe',
+                          message: Cell.fromBase64(message.payload)
+                      }
+                    : undefined,
+                stateInit: toStateInit(message.stateInit)
+            });
+        } catch (e) {
+            console.error(e);
+            throw new LedgerError(
+                typeof e === 'string'
+                    ? e
+                    : typeof e === 'object' && e && 'message' in e
+                    ? (e.message as string)
+                    : 'Unknown error'
+            );
+        }
 
         return externalMessage(contract, seqno, transfer).toBoc();
     }

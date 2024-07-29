@@ -32,6 +32,7 @@ import { Button } from '../fields/Button';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
+import { LedgerError } from '@tonkeeper/core/dist/errors/LedgerError';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -193,7 +194,7 @@ const ConnectContent: FC<{
     }
 
     const done = sendResult !== undefined;
-    const shouldUpdateLedger = sendError && sendError?.message?.includes('Ledger');
+    const shouldUpdateLedger = sendError && sendError instanceof LedgerError;
 
     return (
         <NotificationBlock>
