@@ -211,6 +211,7 @@
   "Unexpected_QR_Code" : "Неожиданный QR-код",
   "Unlock" : "Разблокировать",
   "update" : "Обновить",
+  "update_ledger_error" : "Убедитесь, что программное обеспечение Ledger обновлено",
   "upload_file" : "Загрузить файл",
   "wallet_address" : "Адрес кошелька",
   "wallet_aside_collectibles" : "Коллекции",

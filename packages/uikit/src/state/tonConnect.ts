@@ -29,6 +29,7 @@ import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
 import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useIsActiveWalletLedger } from './ledger';
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();
@@ -83,6 +84,7 @@ export const useConnectTonConnectAppMutation = () => {
     const { api } = useAppContext();
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const activeIsLedger = useIsActiveWalletLedger();
 
     return useMutation<
         ConnectItemReply[],
@@ -102,6 +104,9 @@ export const useConnectTonConnectAppMutation = () => {
                 result.push(toTonAddressItemReply(wallet));
             }
             if (item.name === 'ton_proof') {
+                if (activeIsLedger) {
+                    throw new Error('Ledger doesnt support ton_proof');
+                }
                 const signTonConnect = signTonConnectOver(sdk, wallet.publicKey, t, checkTouchId);
                 const timestamp = await getServerTime(api);
                 const proof = tonConnectProofPayload(
