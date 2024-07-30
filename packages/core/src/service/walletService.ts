@@ -303,7 +303,7 @@ export const accountByKeystone = async (ur: UR, storage: IStorage): Promise<Acco
         publicKey: account.publicKey,
         version: WalletVersion.V4R2,
         rawAddress: contact.address.toRawString(),
-        name: getFallbackWalletName(contact.address.toRawString()),
+        name: account.name || getFallbackWalletName(contact.address.toRawString()),
         emoji: getFallbackTonStandardWalletEmoji(account.publicKey, WalletVersion.V4R2)
     });
 };
