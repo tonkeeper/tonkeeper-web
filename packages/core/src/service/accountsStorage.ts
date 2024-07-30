@@ -163,7 +163,7 @@ async function migrateToAccountsState(storage: IStorage): Promise<AccountsState 
     }
 
     const accounts: (Account | null)[] = await Promise.all(
-        state.publicKeys.map(async pk => {
+        state.publicKeys.map(async (pk, index) => {
             const w = await storage.get<DeprecatedWalletState>(`${AppKey.DEPRECATED_WALLET}_${pk}`);
             if (!w) {
                 return null;
@@ -210,7 +210,7 @@ async function migrateToAccountsState(storage: IStorage): Promise<AccountsState 
                 auth = walletAuth;
             }
 
-            const name = w.name || 'Account ' + w.active.friendlyAddress.slice(-4);
+            const name = w.name || 'Account ' + (index + 1);
             const emoji = w.emoji;
 
             const tonWallet: TonWalletStandard = {

@@ -27,7 +27,7 @@ import { useCheckTouchId } from './password';
 import { useActiveWallet } from './wallet';
 import { useUserLanguage } from './language';
 import { useAccountsStorage } from '../hooks/useStorage';
-import { getWalletById } from '@tonkeeper/core/dist/entries/account';
+import { getAccountByWalletById, getWalletById } from '@tonkeeper/core/dist/entries/account';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -62,17 +62,22 @@ export const useSelectWalletForProMutation = () => {
 
     return useMutation<void, Error, string>(async walletId => {
         const accounts = await accountsStorage.getAccounts();
-        const state = getWalletById(accounts, walletId);
+        const account = getAccountByWalletById(accounts, walletId);
+        const wallet = getWalletById(accounts, walletId);
 
-        if (!state) {
+        if (!account) {
+            throw new Error('Account not found');
+        }
+
+        if (!wallet) {
             throw new Error('Missing wallet state');
         }
 
-        if (!isStandardTonWallet(state)) {
+        if (!isStandardTonWallet(wallet)) {
             throw new Error("Can't use non-standard ton wallet for pro auth");
         }
 
-        await authViaTonConnect(api, state, signTonConnectOver(sdk, walletId, t, checkTouchId));
+        await authViaTonConnect(api, wallet, signTonConnectOver(sdk, account.id, t, checkTouchId));
 
         await client.invalidateQueries([QueryKey.pro]);
     });

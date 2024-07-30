@@ -77,7 +77,6 @@ export const useActiveWalletTonConnectConnections = () => {
 };
 
 export const useConnectTonConnectAppMutation = () => {
-    const wallet = useActiveWallet();
     const account = useActiveAccount();
     const sdk = useAppSdk();
     const client = useQueryClient();
@@ -96,6 +95,7 @@ export const useConnectTonConnectAppMutation = () => {
             webViewUrl?: string;
         }
     >(async ({ request, manifest, webViewUrl }) => {
+        const wallet = account.activeTonWallet;
         if (!isStandardTonWallet(wallet)) {
             throw new Error('Only standard ton wallets can be connected');
         }
@@ -111,7 +111,7 @@ export const useConnectTonConnectAppMutation = () => {
                 if (activeIsLedger) {
                     throw new Error('Ledger doesnt support ton_proof');
                 }
-                const signTonConnect = signTonConnectOver(sdk, wallet.publicKey, t, checkTouchId);
+                const signTonConnect = signTonConnectOver(sdk, account.id, t, checkTouchId);
                 const timestamp = await getServerTime(api);
                 const proof = tonConnectProofPayload(
                     timestamp,

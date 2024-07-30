@@ -35,7 +35,7 @@ import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { getSigner } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
 import { chooseAddress } from './address';
-import { useActiveStandardTonWallet, useActiveWallet } from '../../state/wallet';
+import { useActiveAccount, useActiveStandardTonWallet, useActiveWallet } from '../../state/wallet';
 
 const useVouchers = () => {
     const wallet = useActiveWallet();
@@ -275,7 +275,8 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
     const toast = useToast();
 
     const { mutateAsync: checkTouchId } = useCheckTouchId();
-    const wallet = useActiveStandardTonWallet();
+    const account = useActiveAccount();
+    const wallet = account.activeTonWallet;
 
     const process = useRef(true);
     const sdk = useAppSdk();
@@ -308,7 +309,7 @@ const BurnBlock: FC<{ data: NftItem[] | undefined }> = ({ data }) => {
         setBurning(true);
 
         if (!data) return;
-        const signer: Signer | null = await getSigner(sdk, wallet.id, checkTouchId).catch(
+        const signer: Signer | null = await getSigner(sdk, account.id, checkTouchId).catch(
             () => null
         );
 

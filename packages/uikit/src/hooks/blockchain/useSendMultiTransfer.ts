@@ -18,7 +18,7 @@ import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import { useActiveStandardTonWallet } from '../../state/wallet';
+import { useActiveAccount } from '../../state/wallet';
 
 export type MultiSendFormTokenized = {
     rows: {
@@ -43,7 +43,7 @@ export function useSendMultiTransfer() {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useActiveStandardTonWallet();
+    const account = useActiveAccount();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
     const { data: jettons } = useJettonList();
@@ -54,7 +54,8 @@ export function useSendMultiTransfer() {
         Error,
         { form: MultiSendFormTokenized; asset: TonAsset; feeEstimation: BigNumber }
     >(async ({ form, asset, feeEstimation }) => {
-        const signer = await getSigner(sdk, wallet.id, checkTouchId).catch(() => null);
+        const wallet = account.activeTonWallet;
+        const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
         if (signer === null) return false;
         try {
             if (signer.type !== 'cell') {

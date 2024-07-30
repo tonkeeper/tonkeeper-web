@@ -346,3 +346,15 @@ export function getWalletById(
         }
     }
 }
+
+export function getAccountByWalletById(
+    accounts: Account[],
+    walletId: WalletId
+): Account | undefined {
+    for (const account of accounts || []) {
+        const wallet = account.getTonWallet(walletId);
+        if (wallet) {
+            return account;
+        }
+    }
+}
