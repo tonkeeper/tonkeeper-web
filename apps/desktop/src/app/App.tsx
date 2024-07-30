@@ -33,6 +33,8 @@ import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/Deskto
 import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
 import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
+import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
+import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
 import { NotcoinPage } from '@tonkeeper/uikit/dist/desktop-pages/notcoin/NotcoinPage';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
@@ -78,8 +80,6 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
-import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
-import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -120,7 +120,7 @@ const GlobalStyle = createGlobalStyle`
 const sdk = new DesktopAppSdk();
 const TARGET_ENV = 'desktop';
 
-const langs = 'en,zh_CN,ru,it,tr';
+const langs = 'en,zh_CN,ru,it,tr,bg';
 const listOfAuth: AuthState['kind'][] = ['keychain'];
 
 declare const REACT_APP_TONCONSOLE_API: string;
