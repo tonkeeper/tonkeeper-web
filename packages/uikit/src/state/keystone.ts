@@ -16,13 +16,14 @@ export const usePairKeystoneMutation = () => {
 
     return useMutation<void, Error, UR>(async ur => {
         try {
-            const state = await accountByKeystone(ur, sdk.storage);
-            const duplicatedWallet = await accountsStorage.getAccount(state.id);
+            const newAccount = await accountByKeystone(ur, sdk.storage);
+            const duplicatedWallet = await accountsStorage.getAccount(newAccount.id);
             if (duplicatedWallet) {
                 throw new Error('Wallet already exist');
             }
 
-            await accountsStorage.addAccountToState(state);
+            await accountsStorage.addAccountToState(newAccount);
+            await accountsStorage.setActiveAccountId(newAccount.id);
 
             await client.invalidateQueries([QueryKey.account]);
 

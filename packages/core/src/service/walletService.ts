@@ -7,7 +7,7 @@ import queryString from 'query-string';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
 import { AuthKeychain, AuthPassword } from '../entries/password';
-import { WalletVersion, WalletVersions } from '../entries/wallet';
+import { sortWalletsByVersion, WalletVersion, WalletVersions } from '../entries/wallet';
 import { WalletApi } from '../tonApiV2';
 import { walletContract } from './wallet/contractService';
 import { emojis } from '../utils/emojis';
@@ -59,12 +59,14 @@ export const createStandardTonAccountByMnemonic = async (
 
     const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(publicKey);
 
+    const walletIdToActivate = tonWallets.slice().sort(sortWalletsByVersion)[0].rawAddress;
+
     return new AccountTonMnemonic(
         publicKey,
         name,
         emoji,
         walletAuth,
-        tonWallets[0].rawAddress,
+        walletIdToActivate,
         tonWallets.map(w => ({
             id: w.rawAddress,
             publicKey,

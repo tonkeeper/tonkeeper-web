@@ -157,9 +157,10 @@ export const useAddLedgerAccountMutation = () => {
         { accountId: string; wallets: LedgerAccount[]; name: string; emoji: string }
     >(async form => {
         try {
-            const state = accountByLedger(form.accountId, form.wallets, form.name, form.emoji);
+            const newAccount = accountByLedger(form.accountId, form.wallets, form.name, form.emoji);
 
-            await accStorage.addAccountToState(state);
+            await accStorage.addAccountToState(newAccount);
+            await accStorage.setActiveAccountId(newAccount.id);
 
             await client.invalidateQueries([QueryKey.account]);
 

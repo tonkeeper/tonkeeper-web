@@ -10,6 +10,8 @@ import { Input } from '../../components/fields/Input';
 import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { passwordStorage, validatePassword } from '@tonkeeper/core/dist/service/passwordService';
+import { useIsPasswordSet } from '../../state/wallet';
+import { CreatePassword } from '../../components/create/CreatePassword';
 
 const Block = styled.form<{ padding: number }>`
     display: flex;
@@ -25,12 +27,21 @@ const Block = styled.form<{ padding: number }>`
     }
 `;
 
+const CreatePasswordStyled = styled(CreatePassword)<{ padding: number }>`
+    @media (max-width: 440px) {
+        padding-bottom: ${props => props.padding}px;
+    }
+`;
+
 export const useMutateUnlock = (sdk: IAppSdk, requestId?: number) => {
+    const isPasswordSet = useIsPasswordSet();
     return useMutation<void, Error, string>(async password => {
-        const isValid = await passwordStorage(sdk.storage).isPasswordValid(password);
-        if (!isValid) {
-            sdk.hapticNotification('error');
-            throw new Error('Password not valid');
+        if (isPasswordSet) {
+            const isValid = await passwordStorage(sdk.storage).isPasswordValid(password);
+            if (!isValid) {
+                sdk.hapticNotification('error');
+                throw new Error('Password not valid');
+            }
         }
 
         sdk.uiEvents.emit('response', {
@@ -146,6 +157,8 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
         setId(undefined);
     }, []);
 
+    const isPasswordSet = useIsPasswordSet();
+
     const onSubmit = async (password: string) => {
         reset();
         try {
@@ -197,6 +210,16 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
 
     const Content = useCallback(() => {
         if (!requestId) return undefined;
+
+        if (!isPasswordSet) {
+            return (
+                <CreatePasswordStyled
+                    afterCreate={onSubmit}
+                    isLoading={isLoading}
+                    padding={usePadding ? padding : 0}
+                />
+            );
+        }
         return (
             <PasswordUnlock
                 sdk={sdk}
@@ -207,7 +230,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
                 padding={usePadding ? padding : 0}
             />
         );
-    }, [sdk, requestId, padding, onCancel, onSubmit]);
+    }, [sdk, requestId, padding, onCancel, onSubmit, isPasswordSet, isLoading, isError]);
 
     return (
         <Notification
