@@ -85,6 +85,7 @@ export const useConnectTonConnectAppMutation = () => {
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
     const network = useActiveTonNetwork();
+    const activeIsLedger = account.type === 'ledger';
 
     return useMutation<
         ConnectItemReply[],
@@ -107,6 +108,9 @@ export const useConnectTonConnectAppMutation = () => {
                 result.push(toTonAddressItemReply(wallet, network));
             }
             if (item.name === 'ton_proof') {
+                if (activeIsLedger) {
+                    throw new Error('Ledger doesnt support ton_proof');
+                }
                 const signTonConnect = signTonConnectOver(sdk, wallet.publicKey, t, checkTouchId);
                 const timestamp = await getServerTime(api);
                 const proof = tonConnectProofPayload(

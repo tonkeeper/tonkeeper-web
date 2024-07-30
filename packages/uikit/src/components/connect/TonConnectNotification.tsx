@@ -4,7 +4,7 @@ import {
     ConnectRequest,
     DAppManifest
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { isStandardTonWallet, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { getManifest } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
@@ -119,9 +119,8 @@ const ConnectContent: FC<{
         /* eslint-stub */
     }
 
-    if (!isStandardTonWallet(wallet)) {
-        return <></>;
-    }
+    const tonProofRequested = params.items.some(item => item.name === 'ton_proof');
+    const cantConnectLedger = activeIsLedger && tonProofRequested;
 
     return (
         <NotificationBlock onSubmit={onSubmit}>
@@ -161,13 +160,15 @@ const ConnectContent: FC<{
                         fullWidth
                         primary
                         loading={isLoading}
-                        disabled={isLoading || activeIsLedger}
+                        disabled={isLoading || cantConnectLedger}
                         type="submit"
                     >
                         {t('ton_login_connect_button')}
                     </Button>
                 )}
-                {activeIsLedger && <LedgerError>{t('ledger_operation_not_supported')}</LedgerError>}
+                {cantConnectLedger && (
+                    <LedgerError>{t('ledger_operation_not_supported')}</LedgerError>
+                )}
             </>
             <Notes>{t('ton_login_notice')}</Notes>
         </NotificationBlock>

@@ -220,6 +220,7 @@
   "Unexpected_QR_Code" : "Unexpected QR Code",
   "Unlock" : "Unlock",
   "update" : "Update",
+  "update_ledger_error" : "Make sure your Ledger software is updated",
   "upload_file" : "Upload file",
   "wallet_address" : "Wallet address",
   "wallet_aside_collectibles" : "Collectibles",
