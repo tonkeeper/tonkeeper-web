@@ -17,10 +17,12 @@ import { useCallback, useState } from 'react';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { useActiveAccount } from './wallet';
 import { accountByLedger } from '@tonkeeper/core/dist/service/walletService';
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 
 export type LedgerAccount = {
     accountIndex: number;
     publicKey: Buffer;
+    version: WalletVersion;
 } & Account;
 
 type T = ReturnType<typeof useMutation<LedgerTonTransport, Error>>;
@@ -93,7 +95,7 @@ export const useLedgerWallets = (
     >(async tonTransport => {
         const walletsIds = await Promise.all(
             [...new Array(walletsNumber)].map((_, i) =>
-                tonTransport.getAddress(getLedgerAccountPathByIndex(i))
+                tonTransport.getAddress(getLedgerAccountPathByIndex(i), { walletVersion: 'v4' })
             )
         );
 
@@ -111,6 +113,7 @@ export const useLedgerWallets = (
         const wallets = walletsIds.map((acc, i) => ({
             accountIndex: i,
             publicKey: acc.publicKey,
+            version: WalletVersion.V4R2,
             ...response.accounts.find(a =>
                 Address.parse(a.address).equals(Address.parse(acc.address))
             )! // tonapi bug, should filter here

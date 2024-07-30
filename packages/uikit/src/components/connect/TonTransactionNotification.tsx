@@ -13,7 +13,7 @@ import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { QueryKey } from '../../libs/queryKey';
+import { anyOfKeysParts, QueryKey } from '../../libs/queryKey';
 import { getSigner } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
 import { CheckmarkCircleIcon, ErrorIcon, ExclamationMarkCircleIcon } from '../Icon';
@@ -32,7 +32,12 @@ import { Button } from '../fields/Button';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
-import { useActiveStandardTonWallet, useActiveWallet, useAccountsState } from '../../state/wallet';
+import {
+    useActiveStandardTonWallet,
+    useActiveWallet,
+    useAccountsState,
+    useActiveAccount
+} from '../../state/wallet';
 import { LedgerError } from '@tonkeeper/core/dist/errors/LedgerError';
 
 const ButtonGap = styled.div`
@@ -57,20 +62,20 @@ const ButtonRowStyled = styled.div`
 `;
 
 const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?: boolean) => {
-    const wallet = useActiveStandardTonWallet();
+    const account = useActiveAccount();
     const sdk = useAppSdk();
     const { api } = useAppContext();
     const client = useQueryClient();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<string, Error>(async () => {
-        const signer = await getSigner(sdk, wallet.id, checkTouchId);
+        const signer = await getSigner(sdk, account.id, checkTouchId);
 
-        const boc = await sendTonConnectTransfer(api, wallet, params, signer);
+        const boc = await sendTonConnectTransfer(api, account, params, signer);
 
-        const invalidationPromise = client.invalidateQueries({
-            predicate: query => query.queryKey.includes(wallet.rawAddress)
-        });
+        const invalidationPromise = client.invalidateQueries(
+            anyOfKeysParts(account.id, account.activeTonWallet.id)
+        );
         if (waitInvalidation) {
             await invalidationPromise;
         }
@@ -245,12 +250,12 @@ const ConnectContent: FC<{
 
 const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boolean) => {
     const { api } = useAppContext();
-    const wallet = useActiveStandardTonWallet();
+    const account = useActiveAccount();
 
     return useQuery<EstimateData, Error>(
         [QueryKey.estimate, params],
         async () => {
-            const accountEvent = await estimateTonConnectTransfer(api, wallet, params);
+            const accountEvent = await estimateTonConnectTransfer(api, account, params);
             return { accountEvent };
         },
         { enabled: errorFetched }

@@ -24,7 +24,6 @@ import {
     signEstimateMessage
 } from './common';
 import { getLedgerAccountPathByIndex } from '../ledger/utils';
-import { AuthLedger } from '../../entries/password';
 import { LedgerError } from '../../errors/LedgerError';
 import { Account } from '../../entries/account';
 
@@ -77,19 +76,23 @@ const createTonTransfer = async (
 const createTonConnectTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: TonWalletStandard,
+    account: Account,
     params: TonConnectTransactionPayload,
     signer: Signer
 ) => {
+    const walletState = account.activeTonWallet;
     const contract = walletContractFromState(walletState);
 
     if (signer.type === 'ledger') {
         if (params.messages.length !== 1) {
             throw new Error('Ledger signer does not support multiple messages');
         }
+        if (account.type !== 'ledger') {
+            throw new Error('Ledger signer can only be used with ledger accounts');
+        }
 
         const message = params.messages[0];
-        const path = getLedgerAccountPathByIndex((walletState.auth as AuthLedger).accountIndex);
+        const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
 
         let transfer: Cell;
         try {
@@ -197,17 +200,17 @@ export const tonConnectTransferError = async (
 
 export const estimateTonConnectTransfer = async (
     api: APIConfig,
-    walletState: TonWalletStandard,
+    account: Account,
     params: TonConnectTransactionPayload
 ): Promise<TransferEstimationEvent> => {
     const timestamp = await getServerTime(api);
-    const [wallet, seqno] = await getWalletBalance(api, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, account.activeTonWallet);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = await createTonConnectTransfer(
         timestamp,
         seqno,
-        walletState,
+        account,
         params,
         signEstimateMessage
     );
@@ -223,14 +226,14 @@ export const estimateTonConnectTransfer = async (
 
 export const sendTonConnectTransfer = async (
     api: APIConfig,
-    walletState: TonWalletStandard,
+    account: Account,
     params: TonConnectTransactionPayload,
     signer: Signer
 ) => {
     const timestamp = await getServerTime(api);
-    const seqno = await getWalletSeqNo(api, walletState.rawAddress);
+    const seqno = await getWalletSeqNo(api, account.activeTonWallet.rawAddress);
 
-    const external = await createTonConnectTransfer(timestamp, seqno, walletState, params, signer);
+    const external = await createTonConnectTransfer(timestamp, seqno, account, params, signer);
 
     const boc = external.toString('base64');
 

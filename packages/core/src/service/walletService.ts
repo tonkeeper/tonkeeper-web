@@ -248,6 +248,7 @@ export const accountByLedger = (
         address: string;
         publicKey: Buffer;
         accountIndex: number;
+        version: WalletVersion;
     }[],
     name: string,
     emoji: string
@@ -270,12 +271,12 @@ export const accountByLedger = (
                 {
                     id: item.address,
                     publicKey: item.publicKey.toString('hex'),
-                    version: WalletVersion.V4R2,
+                    version: item.version,
                     rawAddress: item.address,
                     name: getFallbackWalletName(item.address),
                     emoji: getFallbackTonStandardWalletEmoji(
                         item.publicKey.toString('hex'),
-                        WalletVersion.V4R2
+                        item.version
                     )
                 }
             ]
