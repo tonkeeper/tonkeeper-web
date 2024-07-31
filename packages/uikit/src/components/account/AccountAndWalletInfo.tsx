@@ -12,18 +12,21 @@ import styled from 'styled-components';
 import type { AllOrNone } from '@tonkeeper/core/dist/utils/types';
 
 const WalletInfoStyled = styled.div`
+    overflow: hidden;
     display: flex;
     align-items: center;
     gap: 4px;
     color: ${p => p.theme.textSecondary};
-
-    > ${Body2} {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
 `;
 
-const Body2Tertiary = styled(Body2)`
+const NameText = styled(Body2)`
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+`;
+
+const AddressText = styled(Body2)`
+    flex-shrink: 0;
     color: ${p => p.theme.textTertiary};
 `;
 
@@ -42,17 +45,17 @@ export const AccountAndWalletInfo: FC<
 
     return (
         <WalletInfoStyled>
-            <Body2>
+            <NameText>
                 {t('confirmSendModal_wallet')}&nbsp;
                 {account.name}
-            </Body2>
+            </NameText>
             <WalletEmoji emojiSize="20px" containerSize="20px" emoji={account.emoji} />
             {account.allTonWallets.length > 1 ? (
                 <>
                     <Dot />
-                    <Body2Tertiary>
+                    <AddressText>
                         {toShortValue(formatAddress(wallet.rawAddress, network))}
-                    </Body2Tertiary>
+                    </AddressText>
                     <AccountAndWalletBadgesGroup account={account} walletId={wallet.id} />
                 </>
             ) : (
