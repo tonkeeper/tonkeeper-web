@@ -59,7 +59,7 @@ export const DesktopWalletSettingsPage = () => {
     const { isOpen: isRenameOpen, onClose: onRenameClose, onOpen: onRenameOpen } = useDisclosure();
     const { isOpen: isLogoutOpen, onClose: onLogoutClose, onOpen: onLogoutOpen } = useDisclosure();
 
-    const canChangeVersion = account.type === 'mnemonic';
+    const canChangeVersion = account.type === 'mnemonic' || account.type === 'ton-only';
     const activeWallet = account.activeTonWallet;
 
     return (

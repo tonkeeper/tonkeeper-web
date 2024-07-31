@@ -35,6 +35,7 @@ import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { useWalletVersionSettingsNotification } from '../../modals/WalletVersionSettingsNotification';
 import { useIsHovered } from '../../../hooks/useIsHovered';
+import { ScrollContainer } from '../../ScrollContainer';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -68,10 +69,6 @@ const AsideContentContainer = styled.div`
     display: flex;
     flex-direction: column;
     padding: 0.5rem 0.5rem 0;
-`;
-
-const ScrollContainer = styled.div`
-    overflow: auto;
 `;
 
 const DividerStyled = styled.div<{ isHidden?: boolean }>`
@@ -275,6 +272,16 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                     )}
                     <Label2>{account.name}</Label2>
                     <AccountBadge account={account} />
+                    <GearIconButtonStyled
+                        onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openWalletVersionSettings({ accountId: account.id });
+                        }}
+                        isShown={isHovered}
+                    >
+                        <GearIconEmpty />
+                    </GearIconButtonStyled>
                 </AsideMenuItem>
                 {account.tonWallets.length > 1 &&
                     account.tonWallets.map(wallet => (

@@ -1,4 +1,4 @@
-import { isStandardTonWallet, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
@@ -45,7 +45,7 @@ const SingleAccountSettings = () => {
             });
         }*/
 
-        if (account.type === 'mnemonic') {
+        if (account.type === 'mnemonic' || account.type === 'ton-only') {
             items.push({
                 name: t('settings_wallet_version'),
                 icon: walletVersionText(wallet.version),
@@ -115,6 +115,7 @@ const MultipleAccountSettings = () => {
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
+    const account = useActiveAccount();
 
     const accountItems = useMemo(() => {
         const items: SettingsItem[] = [
@@ -152,7 +153,7 @@ const MultipleAccountSettings = () => {
             });
         }*/
 
-        if (isStandardTonWallet(wallet)) {
+        if (account.type === 'mnemonic' || account.type === 'ton-only') {
             items.push({
                 name: t('settings_wallet_version'),
                 icon: walletVersionText(wallet.version),
