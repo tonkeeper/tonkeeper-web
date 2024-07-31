@@ -28,14 +28,14 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import {
     sortDerivationsByIndex,
     sortWalletsByVersion,
-    WalletId,
-    walletVersionText
+    WalletId
 } from '@tonkeeper/core/dist/entries/wallet';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { useWalletVersionSettingsNotification } from '../../modals/WalletVersionSettingsNotification';
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import { ScrollContainer } from '../../ScrollContainer';
+import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../AccountBadge';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -109,16 +109,16 @@ const AsideMenuSubItem = styled(AsideMenuItem)`
     padding-left: 36px;
 `;
 
-const Badge = styled.div`
-    padding: 2px 4px;
+const AccountBadgeStyled = styled(AccountBadge)`
     margin-left: -4px;
-    background: ${p => p.theme.backgroundContentAttention};
-    border-radius: 3px;
-    color: ${p => p.theme.textSecondary};
-    font-size: 9px;
-    font-style: normal;
-    font-weight: 510;
-    line-height: 12px;
+`;
+
+const WalletVersionBadgeStyled = styled(WalletVersionBadge)`
+    margin-left: -4px;
+`;
+
+const WalletIndexBadgeStyled = styled(WalletIndexBadge)`
+    margin-left: -4px;
 `;
 
 const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: boolean }>`
@@ -130,22 +130,6 @@ const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: 
     opacity: ${p => (p.isShown ? 1 : 0)};
     transition: opacity 0.15s ease-in-out;
 `;
-
-const AccountBadge: FC<{ account: Account }> = ({ account }) => {
-    if (account.type === 'ledger') {
-        return <Badge>LEDGER</Badge>;
-    }
-
-    if (account.type === 'ton-only') {
-        return <Badge>SIGNER</Badge>;
-    }
-
-    if (account.type === 'keystone') {
-        return <Badge>KEYSTONE</Badge>;
-    }
-
-    return null;
-};
 
 export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = ({
     account,
@@ -212,7 +196,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                             <Label2>
                                 {toShortValue(formatAddress(wallet.rawAddress, network))}
                             </Label2>
-                            <Badge>{walletVersionText(wallet.version)}</Badge>
+                            <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
                         </AsideMenuSubItem>
                     ))}
             </>
@@ -232,7 +216,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                         <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                     )}
                     <Label2>{account.name}</Label2>
-                    <AccountBadge account={account} />
+                    <AccountBadgeStyled accountType={account.type} size="s" />
                 </AsideMenuItem>
                 {sortedDerivations.length > 1 &&
                     sortedDerivations.map(derivation => {
@@ -251,7 +235,9 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                                 <Label2>
                                     {toShortValue(formatAddress(wallet.rawAddress, network))}
                                 </Label2>
-                                <Badge>{'#' + derivation.index}</Badge>
+                                <WalletIndexBadgeStyled size="s">
+                                    {'#' + derivation.index}
+                                </WalletIndexBadgeStyled>
                             </AsideMenuSubItem>
                         );
                     })}
@@ -271,7 +257,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                         <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                     )}
                     <Label2>{account.name}</Label2>
-                    <AccountBadge account={account} />
+                    <AccountBadgeStyled accountType={account.type} size="s" />
                     <GearIconButtonStyled
                         onClick={e => {
                             e.preventDefault();
@@ -293,6 +279,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                             <Label2>
                                 {toShortValue(formatAddress(wallet.rawAddress, network))}
                             </Label2>
+                            <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
                         </AsideMenuSubItem>
                     ))}
             </>
@@ -310,7 +297,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                     <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 )}
                 <Label2>{account.name}</Label2>
-                <AccountBadge account={account} />
+                <AccountBadgeStyled accountType={account.type} size="s" />
             </AsideMenuItem>
         );
     }

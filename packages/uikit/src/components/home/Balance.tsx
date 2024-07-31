@@ -8,10 +8,11 @@ import { formatFiatCurrency } from '../../hooks/balance';
 import { QueryKey } from '../../libs/queryKey';
 import { useActiveAccount, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 import { Body3, Label2, Num2 } from '../Text';
-import { Badge } from '../shared';
 import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
 import { useWalletTotalBalance } from '../../state/asset';
+import { AccountBadge, WalletVersionBadge } from '../AccountBadge';
+import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 
 const Block = styled.div`
     display: flex;
@@ -24,6 +25,12 @@ const Body = styled(Label2)`
     color: ${props => props.theme.textSecondary};
     user-select: none;
     display: flex;
+    cursor: pointer;
+
+    transition: transform 0.2s ease;
+    &:active {
+        transform: scale(0.97);
+    }
 `;
 
 const Amount = styled(Num2)`
@@ -67,40 +74,48 @@ export const BalanceSkeleton = () => {
     );
 };
 
+const AccountBadgeStyled = styled(AccountBadge)`
+    display: inline-block;
+    margin-left: 3px;
+`;
+
+const WalletVersionBadgeStyled = styled(WalletVersionBadge)`
+    display: inline-block;
+    margin-left: 3px;
+`;
+
 const Label = () => {
     const account = useActiveAccount();
 
-    switch (account.type) {
-        case 'ton-only':
-            return (
-                <>
-                    {' '}
-                    <Badge display="inline-block" color="accentPurple">
-                        Signer
-                    </Badge>
-                </>
-            );
-        case 'ledger':
-            return (
-                <>
-                    {' '}
-                    <Badge display="inline-block" color="accentGreen">
-                        Ledger
-                    </Badge>
-                </>
-            );
-        case 'keystone':
-            return (
-                <>
-                    {' '}
-                    <Badge display="inline-block" color="accentGreen">
-                        Keystone
-                    </Badge>
-                </>
-            );
-        default:
-            return <></>;
+    if (account.type === 'ledger') {
+        return (
+            <AccountBadgeStyled accountType={account.type}>
+                {account.derivations.length > 1
+                    ? `Ledger #${account.activeDerivationIndex}`
+                    : 'Ledger'}
+            </AccountBadgeStyled>
+        );
     }
+
+    if (account.type === 'ton-only') {
+        return (
+            <AccountBadgeStyled accountType={account.type}>
+                {account.tonWallets.length > 1
+                    ? `Signer ${walletVersionText(account.activeTonWallet.version)}`
+                    : 'Signer'}
+            </AccountBadgeStyled>
+        );
+    }
+
+    if (account.type === 'keystone') {
+        return <AccountBadgeStyled accountType={account.type} />;
+    }
+
+    if (account.type === 'mnemonic' && account.tonWallets.length > 1) {
+        return <WalletVersionBadgeStyled walletVersion={account.activeTonWallet.version} />;
+    }
+
+    return null;
 };
 
 export const Balance: FC<{

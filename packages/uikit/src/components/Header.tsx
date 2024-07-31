@@ -23,6 +23,7 @@ import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
 import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { Account } from '@tonkeeper/core/dist/entries/account';
+import { WalletIndexBadge } from './AccountBadge';
 
 const Block = styled.div<{
     center?: boolean;
@@ -121,19 +122,6 @@ const Row = styled.div`
     }
 `;
 
-const Badge = styled.div`
-    padding: 2px 4px;
-    margin-left: -4px;
-    height: fit-content;
-    background: ${p => p.theme.backgroundContentAttention};
-    border-radius: 3px;
-    color: ${p => p.theme.textSecondary};
-    font-size: 9px;
-    font-style: normal;
-    font-weight: 510;
-    line-height: 12px;
-`;
-
 const ListItemPayloadStyled = styled(ListItemPayload)`
     justify-content: flex-start;
 `;
@@ -170,7 +158,7 @@ const WalletRow: FC<{
             <ListItemPayloadStyled>
                 <WalletEmoji emoji={account.emoji} />
                 <ColumnTextStyled noWrap text={account.name} secondary={address} />
-                {badge && <Badge>{badge}</Badge>}
+                {badge && <WalletIndexBadge>{badge}</WalletIndexBadge>}
                 {activeWallet?.id === walletState.id ? (
                     <Icon>
                         <DoneIcon />
@@ -195,7 +183,7 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
                         ({
                             wallet: d.tonWallets.find(w => w.id === d.activeTonWalletId)!,
                             account: a,
-                            badge: `LEDGER #${d.index}`
+                            badge: a.derivations.length > 1 ? `Ledger #${d.index}` : undefined
                         } as { wallet: TonWalletStandard; account: Account; badge?: string })
                 );
             }
@@ -205,14 +193,7 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
                     ({
                         wallet: w,
                         account: a,
-                        badge:
-                            a.type === 'ton-only'
-                                ? 'SIGNER'
-                                : a.type === 'keystone'
-                                ? 'KEYSTONE'
-                                : a.allTonWallets.length > 1
-                                ? walletVersionText(w.version)
-                                : undefined
+                        badge: a.allTonWallets.length > 1 ? walletVersionText(w.version) : undefined
                     } as { wallet: TonWalletStandard; account: Account; badge?: string })
             );
         });
@@ -275,15 +256,6 @@ export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const wallets = useAccountsState();
     const shouldShowIcon = wallets.length > 1;
 
-    const accountBadge =
-        account.allTonWallets.length === 1
-            ? undefined
-            : account.type === 'ledger'
-            ? `LEDGER #${account.activeDerivation.index}`
-            : account.type === 'mnemonic'
-            ? walletVersionText(account.activeTonWallet.version)
-            : undefined;
-
     return (
         <Block center>
             <DropDownContainerStyle />
@@ -297,7 +269,6 @@ export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
                 <TitleStyled>
                     {shouldShowIcon && <WalletEmoji emoji={account.emoji} />}
                     <TitleName>{account.name}</TitleName>
-                    {accountBadge && <Badge>{accountBadge}</Badge>}
 
                     <DownIconWrapper>
                         <DownIcon />

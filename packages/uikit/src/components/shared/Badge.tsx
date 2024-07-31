@@ -1,26 +1,58 @@
 import { FC, PropsWithChildren } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { hexToRGBA } from '../../libs/css';
 
-const BadgeStyled = styled.div<{ color: string; display: string }>`
+const BadgeStyled = styled.div<{
+    color: string;
+    display: string;
+    size: 'm' | 's';
+    background?: string;
+}>`
     display: ${p => p.display};
-    padding: 3px 5px;
+    flex-shrink: 0;
+
+    ${p =>
+        p.size === 'm'
+            ? css`
+                  padding: 3px 5px;
+                  border-radius: ${p.theme.corner3xSmall};
+                  font-weight: 600;
+                  font-size: 10px;
+                  line-height: 14px;
+              `
+            : css`
+                  padding: 2px 4px;
+                  border-radius: 3px;
+                  font-size: 9px;
+                  font-style: normal;
+                  font-weight: 510;
+                  line-height: 12px;
+              `}
+
     color: ${p => p.theme[p.color]};
-    border-radius: ${p => p.theme.corner3xSmall};
-    background-color: ${p => hexToRGBA(p.theme[p.color], 0.16)};
+    background-color: ${p =>
+        p.background ? p.theme[p.background] : hexToRGBA(p.theme[p.color], 0.16)};
     text-transform: uppercase;
 
     font-style: normal;
-    font-weight: 600;
-    font-size: 10px;
-    line-height: 14px;
 `;
 
 export const Badge: FC<
-    PropsWithChildren<{ className?: string; color?: string; display?: string }>
-> = ({ color, className, children, display = 'block' }) => {
+    PropsWithChildren<{
+        className?: string;
+        color?: string;
+        display?: string;
+        size?: 'm' | 's';
+        background?: string;
+    }>
+> = ({ color, className, children, display = 'block', size = 'm' }) => {
     return (
-        <BadgeStyled className={className} color={color || 'accentBlue'} display={display}>
+        <BadgeStyled
+            className={className}
+            color={color || 'accentBlue'}
+            display={display}
+            size={size}
+        >
             {children}
         </BadgeStyled>
     );
