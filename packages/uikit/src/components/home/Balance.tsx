@@ -11,8 +11,7 @@ import { Body3, Label2, Num2 } from '../Text';
 import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
 import { useWalletTotalBalance } from '../../state/asset';
-import { AccountBadge, WalletVersionBadge } from '../AccountBadge';
-import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../AccountBadge';
 import { useTranslation } from '../../hooks/translation';
 
 const Block = styled.div`
@@ -85,26 +84,35 @@ const WalletVersionBadgeStyled = styled(WalletVersionBadge)`
     margin-left: 3px;
 `;
 
+const WalletIndexBadgeStyled = styled(WalletIndexBadge)`
+    display: inline-block;
+    margin-left: 3px;
+`;
+
 const Label = () => {
     const account = useActiveAccount();
 
     if (account.type === 'ledger') {
         return (
-            <AccountBadgeStyled accountType={account.type}>
-                {account.derivations.length > 1
-                    ? `Ledger #${account.activeDerivationIndex}`
-                    : 'Ledger'}
-            </AccountBadgeStyled>
+            <>
+                <AccountBadgeStyled accountType={account.type}>Ledger</AccountBadgeStyled>
+                {account.derivations.length > 1 && (
+                    <WalletIndexBadgeStyled>
+                        #{account.activeDerivationIndex + 1}
+                    </WalletIndexBadgeStyled>
+                )}
+            </>
         );
     }
 
     if (account.type === 'ton-only') {
         return (
-            <AccountBadgeStyled accountType={account.type}>
-                {account.tonWallets.length > 1
-                    ? `Signer ${walletVersionText(account.activeTonWallet.version)}`
-                    : 'Signer'}
-            </AccountBadgeStyled>
+            <>
+                <AccountBadgeStyled accountType={account.type}>Signer</AccountBadgeStyled>
+                {account.tonWallets.length > 1 && (
+                    <WalletVersionBadgeStyled walletVersion={account.activeTonWallet.version} />
+                )}
+            </>
         );
     }
 
