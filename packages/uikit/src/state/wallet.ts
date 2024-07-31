@@ -109,9 +109,16 @@ export const useAccountState = (id: AccountId | undefined) => {
     );
 };
 
-export const useWalletState = (id: WalletId): TonWalletStandard | undefined => {
+export const useAccountAndWalletByWalletId = (
+    id: WalletId
+): { account: Account | undefined; wallet: TonWalletStandard | undefined } => {
     const accounts = useAccountsState();
-    return useMemo(() => getWalletById(accounts, id), [accounts]);
+    return useMemo(() => {
+        return {
+            wallet: getWalletById(accounts, id),
+            account: getAccountByWalletById(accounts, id)
+        };
+    }, [accounts, id]);
 };
 
 export const useAccountsStateQuery = () => {

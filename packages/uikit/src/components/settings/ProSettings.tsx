@@ -18,7 +18,11 @@ import {
     useSelectWalletForProMutation,
     useWaitInvoiceMutation
 } from '../../state/pro';
-import { useAccountsState, useActiveTonNetwork, useWalletState } from '../../state/wallet';
+import {
+    useAccountAndWalletByWalletId,
+    useAccountsState,
+    useActiveTonNetwork
+} from '../../state/wallet';
 import { InnerBody } from '../Body';
 import { SubscriptionStatus } from '../desktop/aside/SubscriptionInfo';
 import { Button } from '../fields/Button';
@@ -31,7 +35,10 @@ import { Notification } from '../Notification';
 import { SubHeader } from '../SubHeader';
 import { Body1, Label1, Title } from '../Text';
 import { ConfirmView } from '../transfer/ConfirmView';
-import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { sortWalletsByVersion, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { AccountTonMnemonic, Account } from '@tonkeeper/core/dist/entries/account';
+import { WalletEmoji } from '../shared/emoji/WalletEmoji';
+import { WalletVersionBadge } from '../account/AccountBadge';
 
 const Block = styled.div`
     display: flex;
@@ -55,17 +62,35 @@ const Description = styled(Body1)`
     margin-bottom: 16px;
 `;
 
-const WalletItem: FC<{ wallet: TonWalletStandard }> = ({ wallet }) => {
-    const { t } = useTranslation();
-    const network = useActiveTonNetwork();
+const WalletEmojiStyled = styled(WalletEmoji)`
+    margin-left: 3px;
+    display: inline-flex;
+`;
 
-    const address = wallet ? toShortValue(formatAddress(wallet.rawAddress, network)) : undefined;
+const WalletBadgeStyled = styled(WalletVersionBadge)`
+    margin-left: 3px;
+    display: inline-block;
+`;
+
+const WalletItem: FC<{ account: Account; wallet: TonWalletStandard }> = ({ account, wallet }) => {
+    const network = useActiveTonNetwork();
+    const address = toShortValue(formatAddress(wallet.rawAddress, network));
 
     return (
         <ColumnText
             noWrap
-            text={wallet?.name ? wallet.name : `${t('wallet_title')}`}
-            secondary={address}
+            text={
+                <>
+                    {account.name}
+                    <WalletEmojiStyled emoji={account.emoji} />
+                </>
+            }
+            secondary={
+                <>
+                    {address}
+                    <WalletBadgeStyled walletVersion={wallet.version} />
+                </>
+            }
         />
     );
 };
@@ -79,22 +104,29 @@ const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { t } = useTranslation();
     const { mutateAsync, error } = useSelectWalletForProMutation();
     useNotifyError(error);
-    const wallets = useAccountsState().flatMap(a => a.allTonWallets);
+    const accounts = useAccountsState().filter(
+        acc => acc.type === 'mnemonic'
+    ) as AccountTonMnemonic[];
 
     return (
         <>
             <SelectLabel>{t('select_wallet_for_authorization')}</SelectLabel>
             <ListBlock>
-                {wallets.map(wallet => (
-                    <ListItem
-                        key={wallet.id}
-                        onClick={() => mutateAsync(wallet.id).then(() => onClose())}
-                    >
-                        <ListItemPayload>
-                            <WalletItem wallet={wallet} />
-                        </ListItemPayload>
-                    </ListItem>
-                ))}
+                {accounts.flatMap(account =>
+                    account.allTonWallets
+                        .slice()
+                        .sort(sortWalletsByVersion)
+                        .map(wallet => (
+                            <ListItem
+                                key={wallet.id}
+                                onClick={() => mutateAsync(wallet.id).then(() => onClose())}
+                            >
+                                <ListItemPayload>
+                                    <WalletItem account={account} wallet={wallet} />
+                                </ListItemPayload>
+                            </ListItem>
+                        ))
+                )}
             </ListBlock>
         </>
     );
@@ -111,13 +143,17 @@ const ProWallet: FC<{
     onClick: () => void;
     disabled?: boolean;
 }> = ({ data, onClick, disabled }) => {
-    const wallet = useWalletState(data.wallet.rawAddress)!;
+    const { account, wallet } = useAccountAndWalletByWalletId(data.wallet.rawAddress)!;
+
+    if (!account || !wallet) {
+        return null;
+    }
 
     return (
         <ListBlock>
             <ListItem onClick={() => !disabled && onClick()}>
                 <ListItemPayload>
-                    <WalletItem wallet={wallet} />
+                    <WalletItem account={account} wallet={wallet} />
                     <SelectIconWrapper>
                         <DoneIcon />
                     </SelectIconWrapper>
