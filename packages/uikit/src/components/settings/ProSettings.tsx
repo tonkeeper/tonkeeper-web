@@ -35,7 +35,11 @@ import { Notification } from '../Notification';
 import { SubHeader } from '../SubHeader';
 import { Body1, Label1, Title } from '../Text';
 import { ConfirmView } from '../transfer/ConfirmView';
-import { sortWalletsByVersion, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    backwardCompatibilityOnlyWalletVersions,
+    sortWalletsByVersion,
+    TonWalletStandard
+} from '@tonkeeper/core/dist/entries/wallet';
 import { AccountTonMnemonic, Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { WalletVersionBadge } from '../account/AccountBadge';
@@ -114,7 +118,7 @@ const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
             <ListBlock>
                 {accounts.flatMap(account =>
                     account.allTonWallets
-                        .slice()
+                        .filter(w => !backwardCompatibilityOnlyWalletVersions.includes(w.version))
                         .sort(sortWalletsByVersion)
                         .map(wallet => (
                             <ListItem
