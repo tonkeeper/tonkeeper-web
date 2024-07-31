@@ -35,7 +35,7 @@ import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { useWalletVersionSettingsNotification } from '../../modals/WalletVersionSettingsNotification';
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import { ScrollContainer } from '../../ScrollContainer';
-import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../AccountBadge';
+import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../account/AccountBadge';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;

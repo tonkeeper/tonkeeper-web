@@ -23,7 +23,7 @@ import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
 import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { AccountAndWalletBadgesGroup } from './AccountBadge';
+import { AccountAndWalletBadgesGroup } from './account/AccountBadge';
 
 const Block = styled.div<{
     center?: boolean;

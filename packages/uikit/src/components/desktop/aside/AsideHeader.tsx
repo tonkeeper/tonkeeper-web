@@ -9,7 +9,7 @@ import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute'
 import { useAppSdk } from '../../../hooks/appSdk';
 import { CopyIcon, DoneIcon } from '../../Icon';
 import { Transition } from 'react-transition-group';
-import { AccountAndWalletBadgesGroup } from '../../AccountBadge';
+import { AccountAndWalletBadgesGroup } from '../../account/AccountBadge';
 
 const HeaderContainer = styled.div<{ width: number }>`
     box-sizing: border-box;

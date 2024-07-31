@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { Badge } from './shared';
+import { Badge } from '../shared';
 import { WalletId, WalletVersion, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import styled from 'styled-components';
 

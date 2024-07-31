@@ -12,7 +12,7 @@ import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
 import { useWalletTotalBalance } from '../../state/asset';
 import { useTranslation } from '../../hooks/translation';
-import { AccountAndWalletBadgesGroup } from '../AccountBadge';
+import { AccountAndWalletBadgesGroup } from '../account/AccountBadge';
 
 const Block = styled.div`
     display: flex;
