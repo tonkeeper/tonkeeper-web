@@ -87,5 +87,5 @@ export const lightTheme: DefaultTheme = {
     cornerFull: '100%',
     fontMono: 'ui-monospace, SF Mono, monospace, Roboto Mono, Menlo, Consolas, Courier',
     displayType: 'compact',
-    desktopOs: undefined
+    os: undefined
 };

@@ -4,7 +4,7 @@ export const ScrollContainer = styled.div<{ thumbColor?: string }>`
     overflow: auto;
 
     ${p =>
-        (p.theme.desktopOs === 'windows' || p.theme.desktopOs === 'linux') &&
+        (p.theme.os === 'windows' || p.theme.os === 'linux') &&
         css`
             &:hover {
                 &::-webkit-scrollbar-thumb {

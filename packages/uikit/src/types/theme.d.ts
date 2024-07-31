@@ -88,6 +88,6 @@ declare module 'styled-components' {
          * 'compact' is default mode and 'full-width' is for desktop 'pro' mode
          */
         displayType: 'compact' | 'full-width';
-        desktopOs: 'mac' | 'windows' | 'linux' | undefined;
+        os: 'mac' | 'windows' | 'linux' | 'android' | 'ios' | undefined;
     }
 }
