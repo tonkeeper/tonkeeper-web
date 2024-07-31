@@ -28,7 +28,7 @@ const SettingsRouter = () => {
             <Route path={SettingsRoute.account} element={<Account />} />
             <Route path={SettingsRoute.notification} element={<Notifications />} />
             <Route path={SettingsRoute.recovery}>
-                <Route path=":walletId" element={<Recovery />} />
+                <Route path=":accountId" element={<Recovery />} />
                 <Route index element={<ActiveRecovery />} />
             </Route>
             <Route path={SettingsRoute.version} element={<WalletVersionPage />} />

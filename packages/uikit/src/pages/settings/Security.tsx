@@ -20,6 +20,7 @@ import {
     useTouchIdEnabled
 } from '../../state/password';
 import { useIsPasswordSet } from '../../state/wallet';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
@@ -104,6 +105,7 @@ const ShowPhrases = () => {
 
     const isLedger = useIsActiveWalletLedger();
     const isKeystone = useIsActiveWalletKeystone();
+    const isFullWidthMode = useIsFullWidthMode();
 
     const items = useMemo(() => {
         const i: SettingsItem[] = [
@@ -116,7 +118,7 @@ const ShowPhrases = () => {
         return i;
     }, []);
 
-    if (isLedger || isKeystone) {
+    if (isLedger || isKeystone || isFullWidthMode) {
         return <></>;
     }
 

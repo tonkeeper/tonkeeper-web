@@ -78,12 +78,14 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.recovery}>
-                    <SettingsListItem>
-                        <KeyIcon />
-                        <Label2>{t('settings_backup_seed')}</Label2>
-                    </SettingsListItem>
-                </LinkStyled>
+                {account.type === 'mnemonic' && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.recovery}>
+                        <SettingsListItem>
+                            <KeyIcon />
+                            <Label2>{t('settings_backup_seed')}</Label2>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
                 {canChangeVersion && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>
                         <SettingsListItem>

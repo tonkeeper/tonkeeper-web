@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 import { BackButtonBlock } from '../../components/BackButton';
 import { Body1, Body2, H2 } from '../../components/Text';
 import { WorldNumber, WorldsGrid } from '../../components/create/Words';
@@ -8,24 +8,28 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { getMnemonic } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveAccount } from '../../state/wallet';
+import { AccountId } from '@tonkeeper/core/dist/entries/account';
 
 export const ActiveRecovery = () => {
-    const wallet = useActiveWallet();
-    return <RecoveryContent walletId={wallet.id} />;
+    const account = useActiveAccount();
+    if (account.type === 'mnemonic') {
+        return <RecoveryContent accountId={account.id} />;
+    } else {
+        return <Navigate to="../" replace={true} />;
+    }
 };
 
 export const Recovery = () => {
-    const { walletId } = useParams();
-    if (walletId) {
-        return <RecoveryContent walletId={walletId} />;
+    const { accountId } = useParams();
+    if (accountId) {
+        return <RecoveryContent accountId={accountId} />;
     } else {
         return <ActiveRecovery />;
     }
 };
 
-const useMnemonic = (walletId: string) => {
+const useMnemonic = (accountId: AccountId) => {
     const [mnemonic, setMnemonic] = useState<string[] | undefined>(undefined);
     const sdk = useAppSdk();
     const navigate = useNavigate();
@@ -34,12 +38,12 @@ const useMnemonic = (walletId: string) => {
     useEffect(() => {
         (async () => {
             try {
-                setMnemonic(await getMnemonic(sdk, walletId, checkTouchId));
+                setMnemonic(await getMnemonic(sdk, accountId, checkTouchId));
             } catch (e) {
                 navigate(-1);
             }
         })();
-    }, [walletId, checkTouchId]);
+    }, [accountId, checkTouchId]);
 
     return mnemonic;
 };
@@ -73,10 +77,18 @@ const Body = styled(Body2)`
     user-select: none;
 `;
 
-const RecoveryContent: FC<{ walletId: WalletId }> = ({ walletId }) => {
+const BackButtonBlockStyled = styled(BackButtonBlock)`
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            margin-top: -64px;
+        `}
+`;
+
+const RecoveryContent: FC<{ accountId: AccountId }> = ({ accountId }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const mnemonic = useMnemonic(walletId);
+    const mnemonic = useMnemonic(accountId);
 
     const onBack = () => {
         navigate(-1);
@@ -88,7 +100,7 @@ const RecoveryContent: FC<{ walletId: WalletId }> = ({ walletId }) => {
 
     return (
         <Wrapper>
-            <BackButtonBlock onClick={onBack} />
+            <BackButtonBlockStyled onClick={onBack} />
             <Block>
                 <Title>{t('secret_words_title')}</Title>
                 <Body>{t('secret_words_caption')}</Body>

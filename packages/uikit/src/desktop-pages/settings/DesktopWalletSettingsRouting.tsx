@@ -26,7 +26,7 @@ export const DesktopWalletSettingsRouting = () => {
         <Routes>
             <Route element={<OldSettingsLayout />}>
                 <Route path={WalletSettingsRoute.recovery}>
-                    <Route path=":walletId" element={<Recovery />} />
+                    <Route path=":accountId" element={<Recovery />} />
                     <Route index element={<ActiveRecovery />} />
                 </Route>
                 <Route path={WalletSettingsRoute.version} element={<WalletVersionPage />} />
