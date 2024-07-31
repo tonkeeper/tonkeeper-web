@@ -13,7 +13,7 @@ import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
 import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
 
-const NotificationBlock = styled.form`
+const NotificationBlock = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -176,6 +176,7 @@ const DeleteContent: FC<{
                 fullWidth
                 loading={isLoading}
                 onClick={onDelete}
+                type="button"
             >
                 {t('Delete_wallet_data')}
             </Button>
@@ -250,6 +251,7 @@ const DeleteAllContent: FC<{ onClose: (action: () => void) => void }> = ({ onClo
                 fullWidth
                 loading={isLoading}
                 onClick={onDelete}
+                type="button"
             >
                 {t('Delete_wallet_data')}
             </Button>
