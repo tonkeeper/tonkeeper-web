@@ -9,6 +9,7 @@ import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute'
 import { useAppSdk } from '../../../hooks/appSdk';
 import { CopyIcon, DoneIcon } from '../../Icon';
 import { Transition } from 'react-transition-group';
+import { AccountAndWalletBadgesGroup } from '../../AccountBadge';
 
 const HeaderContainer = styled.div<{ width: number }>`
     box-sizing: border-box;
@@ -103,6 +104,11 @@ export const AsideHeader: FC<{ width: number }> = ({ width }) => {
                         <Label2>{account.name || t('wallet_title')}</Label2>
                         <AddressWrapper>
                             <Body3>{toShortValue(address)}</Body3>
+                            <AccountAndWalletBadgesGroup
+                                account={account}
+                                walletId={account.activeTonWallet.id}
+                                size="s"
+                            />
                             <Transition
                                 nodeRef={ref}
                                 in={hovered}

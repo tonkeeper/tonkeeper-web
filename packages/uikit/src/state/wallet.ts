@@ -36,6 +36,7 @@ import {
     AccountId,
     AccountsState,
     AccountTonMnemonic,
+    getAccountByWalletById,
     getWalletById
 } from '@tonkeeper/core/dist/entries/account';
 
@@ -88,7 +89,7 @@ export const useMutateActiveTonWallet = () => {
     const client = useQueryClient();
     return useMutation<void, Error, WalletId>(async walletId => {
         const accounts = await storage.getAccounts();
-        const account = accounts.find(a => !!a.getTonWallet(walletId));
+        const account = getAccountByWalletById(accounts, walletId);
 
         if (!account) {
             throw new Error('Account not found');

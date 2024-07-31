@@ -7,7 +7,6 @@ import {
     sendTonConnectTransfer,
     tonConnectTransferError
 } from '@tonkeeper/core/dist/service/transfer/tonService';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useCallback, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
@@ -32,13 +31,11 @@ import { Button } from '../fields/Button';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ResultButton } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
-import {
-    useActiveStandardTonWallet,
-    useActiveWallet,
-    useAccountsState,
-    useActiveAccount
-} from '../../state/wallet';
+import { useActiveStandardTonWallet, useAccountsState, useActiveAccount } from '../../state/wallet';
 import { LedgerError } from '@tonkeeper/core/dist/errors/LedgerError';
+import { Dot } from '../Dot';
+import { AccountAndWalletBadgesGroup } from '../AccountBadge';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -288,7 +285,7 @@ const WalletInfoStyled = styled.div`
 `;
 
 const NotificationTitleWithWalletName: FC<{ onClose: () => void }> = ({ onClose }) => {
-    const wallet = useActiveWallet();
+    const account = useActiveAccount();
     const { t } = useTranslation();
 
     return (
@@ -300,13 +297,32 @@ const NotificationTitleWithWalletName: FC<{ onClose: () => void }> = ({ onClose 
                         <WalletInfoStyled>
                             <Body2>
                                 {t('confirmSendModal_wallet')}&nbsp;
-                                {wallet.name ?? toShortValue(formatAddress(wallet.rawAddress))}
+                                {account.name}
                             </Body2>
                             <WalletEmoji
                                 emojiSize="20px"
                                 containerSize="20px"
-                                emoji={wallet.emoji}
+                                emoji={account.emoji}
                             />
+                            {account.allTonWallets.length > 1 ? (
+                                <>
+                                    <Dot />
+                                    <Body2>
+                                        {toShortValue(
+                                            formatAddress(account.activeTonWallet.rawAddress)
+                                        )}
+                                    </Body2>
+                                    <AccountAndWalletBadgesGroup
+                                        account={account}
+                                        walletId={account.activeTonWallet.id}
+                                    />
+                                </>
+                            ) : (
+                                <AccountAndWalletBadgesGroup
+                                    account={account}
+                                    walletId={account.activeTonWallet.id}
+                                />
+                            )}
                         </WalletInfoStyled>
                     </div>
                 </NotificationTitleRowStyled>

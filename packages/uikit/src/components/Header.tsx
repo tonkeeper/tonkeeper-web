@@ -21,9 +21,9 @@ import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
-import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { WalletIndexBadge } from './AccountBadge';
+import { AccountAndWalletBadgesGroup } from './AccountBadge';
 
 const Block = styled.div<{
     center?: boolean;
@@ -139,27 +139,26 @@ const DropDownContainerStyle = createGlobalStyle`
 
 const WalletRow: FC<{
     account: Account;
-    walletState: TonWalletStandard;
+    wallet: TonWalletStandard;
     onClose: () => void;
-    badge?: string;
-}> = ({ account, walletState, onClose, badge }) => {
+}> = ({ account, wallet, onClose }) => {
     const network = useActiveTonNetwork();
     const { mutate } = useMutateActiveTonWallet();
-    const address = toShortValue(formatAddress(walletState.rawAddress, network));
+    const address = toShortValue(formatAddress(wallet.rawAddress, network));
     const activeWallet = useActiveWallet();
     return (
         <ListItem
             dropDown
             onClick={() => {
-                mutate(walletState.id);
+                mutate(wallet.id);
                 onClose();
             }}
         >
             <ListItemPayloadStyled>
                 <WalletEmoji emoji={account.emoji} />
                 <ColumnTextStyled noWrap text={account.name} secondary={address} />
-                {badge && <WalletIndexBadge>{badge}</WalletIndexBadge>}
-                {activeWallet?.id === walletState.id ? (
+                <AccountAndWalletBadgesGroup account={account} walletId={wallet.id} />
+                {activeWallet?.id === wallet.id ? (
                     <Icon>
                         <DoneIcon />
                     </Icon>
@@ -175,27 +174,22 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
 }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const accountsWallets: { wallet: TonWalletStandard; account: Account; badge?: string }[] =
+    const accountsWallets: { wallet: TonWalletStandard; account: Account }[] =
         useAccountsState().flatMap(a => {
             if (a.type === 'ledger') {
                 return a.derivations.map(
                     d =>
                         ({
                             wallet: d.tonWallets.find(w => w.id === d.activeTonWalletId)!,
-                            account: a,
-                            badge: a.derivations.length > 1 ? `Ledger #${d.index}` : undefined
-                        } as { wallet: TonWalletStandard; account: Account; badge?: string })
+                            account: a
+                        } as { wallet: TonWalletStandard; account: Account })
                 );
             }
 
-            return a.allTonWallets.map(
-                w =>
-                    ({
-                        wallet: w,
-                        account: a,
-                        badge: a.allTonWallets.length > 1 ? walletVersionText(w.version) : undefined
-                    } as { wallet: TonWalletStandard; account: Account; badge?: string })
-            );
+            return a.allTonWallets.map(w => ({
+                wallet: w,
+                account: a
+            }));
         });
 
     if (!accountsWallets) {
@@ -219,13 +213,12 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
     } else {
         return (
             <>
-                {accountsWallets.map(({ wallet, account, badge }) => (
+                {accountsWallets.map(({ wallet, account }) => (
                     <WalletRow
                         account={account}
                         key={wallet.id}
-                        walletState={wallet}
+                        wallet={wallet}
                         onClose={onClose}
-                        badge={badge}
                     />
                 ))}
                 <Divider />

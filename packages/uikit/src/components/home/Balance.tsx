@@ -11,8 +11,8 @@ import { Body3, Label2, Num2 } from '../Text';
 import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
 import { useWalletTotalBalance } from '../../state/asset';
-import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../AccountBadge';
 import { useTranslation } from '../../hooks/translation';
+import { AccountAndWalletBadgesGroup } from '../AccountBadge';
 
 const Block = styled.div`
     display: flex;
@@ -48,6 +48,12 @@ const Text = styled(Body3)`
     line-height: 26px;
     color: ${props => props.theme.textSecondary};
 `;
+
+const AccountAndWalletBadgesGroupStyled = styled(AccountAndWalletBadgesGroup)`
+    display: inline-flex;
+    margin-left: 3px;
+`;
+
 const MessageBlock: FC<{ error?: Error | null; isFetching: boolean }> = ({ error }) => {
     if (error) {
         return (
@@ -74,65 +80,13 @@ export const BalanceSkeleton = () => {
     );
 };
 
-const AccountBadgeStyled = styled(AccountBadge)`
-    display: inline-block;
-    margin-left: 3px;
-`;
-
-const WalletVersionBadgeStyled = styled(WalletVersionBadge)`
-    display: inline-block;
-    margin-left: 3px;
-`;
-
-const WalletIndexBadgeStyled = styled(WalletIndexBadge)`
-    display: inline-block;
-    margin-left: 3px;
-`;
-
-const Label = () => {
-    const account = useActiveAccount();
-
-    if (account.type === 'ledger') {
-        return (
-            <>
-                <AccountBadgeStyled accountType={account.type}>Ledger</AccountBadgeStyled>
-                {account.derivations.length > 1 && (
-                    <WalletIndexBadgeStyled>
-                        #{account.activeDerivationIndex + 1}
-                    </WalletIndexBadgeStyled>
-                )}
-            </>
-        );
-    }
-
-    if (account.type === 'ton-only') {
-        return (
-            <>
-                <AccountBadgeStyled accountType={account.type}>Signer</AccountBadgeStyled>
-                {account.tonWallets.length > 1 && (
-                    <WalletVersionBadgeStyled walletVersion={account.activeTonWallet.version} />
-                )}
-            </>
-        );
-    }
-
-    if (account.type === 'keystone') {
-        return <AccountBadgeStyled accountType={account.type} />;
-    }
-
-    if (account.type === 'mnemonic' && account.tonWallets.length > 1) {
-        return <WalletVersionBadgeStyled walletVersion={account.activeTonWallet.version} />;
-    }
-
-    return null;
-};
-
 export const Balance: FC<{
     error?: Error | null;
     isFetching: boolean;
     assets: AssetData;
 }> = ({ error, isFetching }) => {
     const { t } = useTranslation();
+    const account = useActiveAccount();
     const sdk = useAppSdk();
     const { fiat } = useAppContext();
     const wallet = useActiveWallet();
@@ -161,7 +115,10 @@ export const Balance: FC<{
             <Amount>{formatFiatCurrency(fiat, total || 0)}</Amount>
             <Body onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
                 {toShortValue(address)}
-                <Label />
+                <AccountAndWalletBadgesGroupStyled
+                    account={account}
+                    walletId={account.activeTonWallet.id}
+                />
             </Body>
         </Block>
     );

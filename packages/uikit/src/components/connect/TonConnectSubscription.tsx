@@ -60,7 +60,7 @@ const TonConnectSubscription = () => {
                     );
 
                     if (walletToActivate) {
-                        setActiveWallet(walletToActivate.wallet.publicKey).then(() =>
+                        setActiveWallet(walletToActivate.wallet.rawAddress).then(() =>
                             setTimeout(() => {
                                 setRequest(value);
                             }, 100)
