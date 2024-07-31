@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
 import { DashboardCell } from '@tonkeeper/core/dist/entries/dashboard';
-import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
@@ -22,7 +22,9 @@ export function useDashboardData() {
     const client = useQueryClient();
 
     const accountsState = useAccountsState();
-    const mainnetWallets = accountsState.flatMap(a => a.allTonWallets);
+    const mainnetWallets = accountsState.flatMap(a =>
+        a.allTonWallets.map(item => ({ ...item, accountName: a.name, accountEmoji: a.emoji }))
+    );
     const idsMainnet = mainnetWallets.map(w => w!.id);
 
     return useQuery<DashboardCell[][]>(
@@ -61,7 +63,13 @@ export function useDashboardData() {
                             result[rowIndex][colIndex] = {
                                 columnId: ClientColumnName.id,
                                 type: 'string',
-                                value: wallet?.name || defaultWalletName
+                                value: wallet
+                                    ? wallet.accountName +
+                                      ' ' +
+                                      wallet.accountEmoji +
+                                      ' ' +
+                                      walletVersionText(wallet.version)
+                                    : defaultWalletName
                             };
                             return;
                         }
