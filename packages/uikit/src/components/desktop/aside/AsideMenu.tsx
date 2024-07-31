@@ -246,6 +246,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
     }
 
     if (account.type === 'ton-only') {
+        const sortedWallets = account.tonWallets.slice().sort(sortWalletsByVersion);
         return (
             <>
                 <AsideMenuItem
@@ -269,8 +270,8 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                         <GearIconEmpty />
                     </GearIconButtonStyled>
                 </AsideMenuItem>
-                {account.tonWallets.length > 1 &&
-                    account.tonWallets.map(wallet => (
+                {sortedWallets.length > 1 &&
+                    sortedWallets.map(wallet => (
                         <AsideMenuSubItem
                             key={wallet.id}
                             isSelected={isSelected && account.activeTonWallet.id === wallet.id}
