@@ -76,12 +76,7 @@ export const RenameWalletNotification: FC<{
     );
 
     return (
-        <Notification
-            isOpen={account != null}
-            handleClose={handleClose}
-            hideButton
-            title={t('Rename')}
-        >
+        <Notification isOpen={account != null} handleClose={handleClose} title={t('Rename')}>
             {Content}
         </Notification>
     );
