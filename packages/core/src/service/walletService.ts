@@ -296,16 +296,16 @@ export const accountByKeystone = async (ur: UR, storage: IStorage): Promise<Acco
     const pathInfo =
         account.path && account.xfp ? { path: account.path, mfp: account.xfp } : undefined;
 
-    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
+    const { name: fallbackName, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
         account.publicKey
     );
 
-    return new AccountKeystone(account.publicKey, name, emoji, pathInfo, {
+    return new AccountKeystone(account.publicKey, account.name || fallbackName, emoji, pathInfo, {
         id: contact.address.toRawString(),
         publicKey: account.publicKey,
         version: WalletVersion.V4R2,
         rawAddress: contact.address.toRawString(),
-        name: account.name || getFallbackWalletName(contact.address.toRawString()),
+        name: getFallbackWalletName(contact.address.toRawString()),
         emoji: getFallbackTonStandardWalletEmoji(account.publicKey, WalletVersion.V4R2)
     });
 };

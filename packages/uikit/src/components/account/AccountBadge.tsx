@@ -29,7 +29,7 @@ export const AccountBadge: FC<
 
     if (accountType === 'keystone') {
         return (
-            <Badge size={size} color="accentGreen" className={className}>
+            <Badge size={size} color="accentOrange" className={className}>
                 {children || 'Keystone'}
             </Badge>
         );
