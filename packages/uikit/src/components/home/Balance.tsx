@@ -13,6 +13,7 @@ import { AssetData } from './Jettons';
 import { useWalletTotalBalance } from '../../state/asset';
 import { AccountBadge, WalletVersionBadge } from '../AccountBadge';
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { useTranslation } from '../../hooks/translation';
 
 const Block = styled.div`
     display: flex;
@@ -123,6 +124,7 @@ export const Balance: FC<{
     isFetching: boolean;
     assets: AssetData;
 }> = ({ error, isFetching }) => {
+    const { t } = useTranslation();
     const sdk = useAppSdk();
     const { fiat } = useAppContext();
     const wallet = useActiveWallet();
@@ -149,7 +151,7 @@ export const Balance: FC<{
         <Block>
             <MessageBlock error={error} isFetching={isFetching} />
             <Amount>{formatFiatCurrency(fiat, total || 0)}</Amount>
-            <Body onClick={() => sdk.copyToClipboard(address)}>
+            <Body onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
                 {toShortValue(address)}
                 <Label />
             </Body>
