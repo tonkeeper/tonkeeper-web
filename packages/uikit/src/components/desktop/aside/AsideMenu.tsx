@@ -219,16 +219,20 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                     )}
                     <Label2>{account.name}</Label2>
                     <AccountBadgeStyled accountType={account.type} size="s" />
-                    <GearIconButtonStyled
-                        onClick={e => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            openLedgerIndexesSettings({ accountId: account.id });
-                        }}
-                        isShown={isHovered}
-                    >
-                        <GearIconEmpty />
-                    </GearIconButtonStyled>
+
+                    {/*show settings only for non-legacy added ledger accounts*/}
+                    {account.allAvailabelDerivations.length > 1 && (
+                        <GearIconButtonStyled
+                            onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                openLedgerIndexesSettings({ accountId: account.id });
+                            }}
+                            isShown={isHovered}
+                        >
+                            <GearIconEmpty />
+                        </GearIconButtonStyled>
+                    )}
                 </AsideMenuItem>
                 {sortedDerivations.length > 1 &&
                     sortedDerivations.map(derivation => {
