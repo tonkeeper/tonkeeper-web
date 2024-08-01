@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     isStandardTonWallet,
-    isW5Version,
     WalletVersion,
     WalletVersions,
     WalletId,
@@ -16,7 +15,7 @@ import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonA
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
-import { DefaultRefetchInterval, isV5R1Enabled } from './tonendpoint';
+import { DefaultRefetchInterval } from './tonendpoint';
 import { useMemo } from 'react';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { mnemonicValidate } from '@ton/crypto';
@@ -429,19 +428,16 @@ export const useMutateActiveTonWalletConfig = () => {
 };
 
 export const useStandardTonWalletVersions = (publicKey?: string) => {
-    const { api, fiat, config } = useAppContext();
-    const isV5Enabled = isV5R1Enabled(config);
+    const { api, fiat } = useAppContext();
     const network = useActiveTonNetwork();
 
     return useQuery(
-        [QueryKey.walletVersions, publicKey, network, isV5Enabled],
+        [QueryKey.walletVersions, publicKey, network],
         async () => {
             if (!publicKey) {
                 return undefined;
             }
-            const versions = WalletVersions.filter(v => isV5Enabled || !isW5Version(v)).map(v =>
-                getWalletAddress(publicKey, v, network)
-            );
+            const versions = WalletVersions.map(v => getWalletAddress(publicKey, v, network));
 
             const response = await new AccountsApi(api.tonApiV2).getAccounts({
                 getAccountsRequest: { accountIds: versions.map(v => v.address.toRawString()) }

@@ -56,11 +56,7 @@ import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProv
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
 import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
-import {
-    isV5R1Enabled,
-    useTonendpoint,
-    useTonenpointConfig
-} from '@tonkeeper/uikit/dist/state/tonendpoint';
+import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import {
     useActiveAccountQuery,
     useAccountsStateQuery,

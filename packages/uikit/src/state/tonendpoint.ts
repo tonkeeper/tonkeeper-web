@@ -45,10 +45,6 @@ export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
     );
 };
 
-export function isV5R1Enabled(config: TonendpointConfig) {
-    return config.flags?.disable_v5r1 === false;
-}
-
 export const DefaultRefetchInterval = 60000; // 60 sec
 
 export const useTonendpointBuyMethods = () => {

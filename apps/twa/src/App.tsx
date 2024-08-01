@@ -37,7 +37,7 @@ import { SDKProvider } from '@tma.js/sdk-react';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import { isV5R1Enabled, useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
+import { useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
 import { useActiveAccountQuery, useAccountsStateQuery, useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
 import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
