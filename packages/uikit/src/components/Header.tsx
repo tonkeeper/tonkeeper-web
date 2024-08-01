@@ -21,7 +21,11 @@ import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
-import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    sortDerivationsByIndex,
+    sortWalletsByVersion,
+    TonWalletStandard
+} from '@tonkeeper/core/dist/entries/wallet';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { AccountAndWalletBadgesGroup } from './account/AccountBadge';
 
@@ -177,19 +181,25 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
     const accountsWallets: { wallet: TonWalletStandard; account: Account }[] =
         useAccountsState().flatMap(a => {
             if (a.type === 'ledger') {
-                return a.derivations.map(
-                    d =>
-                        ({
-                            wallet: d.tonWallets.find(w => w.id === d.activeTonWalletId)!,
-                            account: a
-                        } as { wallet: TonWalletStandard; account: Account })
-                );
+                return a.derivations
+                    .slice()
+                    .sort(sortDerivationsByIndex)
+                    .map(
+                        d =>
+                            ({
+                                wallet: d.tonWallets.find(w => w.id === d.activeTonWalletId)!,
+                                account: a
+                            } as { wallet: TonWalletStandard; account: Account })
+                    );
             }
 
-            return a.allTonWallets.map(w => ({
-                wallet: w,
-                account: a
-            }));
+            return a.allTonWallets
+                .slice()
+                .sort(sortWalletsByVersion)
+                .map(w => ({
+                    wallet: w,
+                    account: a
+                }));
         });
 
     if (!accountsWallets) {
@@ -246,8 +256,8 @@ export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const account = useActiveAccount();
     const [isOpen, setOpen] = useState(false);
 
-    const wallets = useAccountsState();
-    const shouldShowIcon = wallets.length > 1;
+    const accounts = useAccountsState();
+    const shouldShowIcon = accounts.length > 1;
 
     return (
         <Block center>
