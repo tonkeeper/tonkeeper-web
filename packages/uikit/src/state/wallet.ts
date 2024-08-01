@@ -10,8 +10,6 @@ import {
 } from '@tonkeeper/core/dist/entries/wallet';
 import {
     createStandardTonAccountByMnemonic,
-    getFallbackTonStandardWalletEmoji,
-    getFallbackWalletName,
     getWalletAddress
 } from '@tonkeeper/core/dist/service/walletService';
 import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
@@ -227,9 +225,7 @@ export const useAddTonWalletVersionToAccount = () => {
             id: w.address.toRawString(),
             rawAddress: w.address.toRawString(),
             version,
-            publicKey,
-            name: getFallbackWalletName(w.address),
-            emoji: getFallbackTonStandardWalletEmoji(publicKey, version)
+            publicKey
         };
 
         account.addTonWalletToActiveDerivation(wallet);
@@ -255,38 +251,6 @@ export const useRemoveTonWalletVersionFromAccount = () => {
         account.removeTonWalletFromActiveDerivation(walletId);
         await storage.updateAccountInState(account);
         await client.invalidateQueries(anyOfKeysParts(QueryKey.account, account.id, walletId));
-    });
-};
-
-export const useRenameTonWallet = () => {
-    const accountsStore = useAccountsStorage();
-    const account = useActiveAccount();
-    const client = useQueryClient();
-
-    return useMutation<
-        TonWalletStandard,
-        Error,
-        {
-            id: WalletId;
-            name?: string;
-            emoji?: string;
-        }
-    >(async ({ id, name, emoji }) => {
-        const wallet = account.getTonWallet(id);
-        if (!wallet) {
-            throw new Error('Wallet to rename not found');
-        }
-
-        const newWallet = {
-            ...wallet,
-            name: name || wallet.name,
-            emoji: emoji || wallet.emoji
-        };
-
-        account.updateTonWallet(newWallet);
-        await accountsStore.updateAccountInState(account);
-        await client.invalidateQueries([QueryKey.account]);
-        return wallet;
     });
 };
 

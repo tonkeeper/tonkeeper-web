@@ -117,16 +117,12 @@ export type TonContract = {
 };
 
 export type TonWalletStandard = TonContract & {
-    name: string;
-    emoji: string;
     publicKey: string;
     version: WalletVersion;
 };
 
 export type DerivationItem = {
     index: number;
-    name: string;
-    emoji: string;
     activeTonWalletId: WalletId;
     tonWallets: TonWalletStandard[];
     //  tronWallets: never;

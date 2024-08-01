@@ -11,7 +11,6 @@ import { sortWalletsByVersion, WalletVersion, WalletVersions } from '../entries/
 import { WalletApi } from '../tonApiV2';
 import { walletContract } from './wallet/contractService';
 import { emojis } from '../utils/emojis';
-import { formatAddress } from '../utils/common';
 import {
     AccountKeystone,
     AccountLedger,
@@ -71,9 +70,7 @@ export const createStandardTonAccountByMnemonic = async (
             id: w.rawAddress,
             publicKey,
             version: w.version,
-            rawAddress: w.rawAddress,
-            name: getFallbackWalletName(w.rawAddress),
-            emoji: getFallbackTonStandardWalletEmoji(publicKey, w.version)
+            rawAddress: w.rawAddress
         }))
     );
 };
@@ -205,9 +202,7 @@ export const accountBySignerQr = async (
                 id: active.rawAddress,
                 publicKey,
                 version: active.version,
-                rawAddress: active.rawAddress,
-                name: getFallbackWalletName(active.rawAddress),
-                emoji: getFallbackTonStandardWalletEmoji(publicKey, active.version)
+                rawAddress: active.rawAddress
             }
         ]
     );
@@ -236,9 +231,7 @@ export const accountBySignerDeepLink = async (
                 id: active.rawAddress,
                 publicKey,
                 version: active.version,
-                rawAddress: active.rawAddress,
-                name: getFallbackWalletName(active.rawAddress),
-                emoji: getFallbackTonStandardWalletEmoji(publicKey, active.version)
+                rawAddress: active.rawAddress
             }
         ]
     );
@@ -263,23 +256,13 @@ export const accountByLedger = (
         walletsInfo[0].accountIndex,
         walletsInfo.map(item => ({
             index: item.accountIndex,
-            name: getFallbackWalletName(item.address),
-            emoji: getFallbackDerivationItemEmoji(
-                item.publicKey.toString('hex'),
-                item.accountIndex
-            ),
             activeTonWalletId: item.address,
             tonWallets: [
                 {
                     id: item.address,
                     publicKey: item.publicKey.toString('hex'),
                     version: item.version,
-                    rawAddress: item.address,
-                    name: getFallbackWalletName(item.address),
-                    emoji: getFallbackTonStandardWalletEmoji(
-                        item.publicKey.toString('hex'),
-                        item.version
-                    )
+                    rawAddress: item.address
                 }
             ]
         }))
@@ -304,37 +287,11 @@ export const accountByKeystone = async (ur: UR, storage: IStorage): Promise<Acco
         id: contact.address.toRawString(),
         publicKey: account.publicKey,
         version: WalletVersion.V4R2,
-        rawAddress: contact.address.toRawString(),
-        name: getFallbackWalletName(contact.address.toRawString()),
-        emoji: getFallbackTonStandardWalletEmoji(account.publicKey, WalletVersion.V4R2)
+        rawAddress: contact.address.toRawString()
     });
 };
 
 export function getFallbackAccountEmoji(publicKey: string) {
     const index = Number('0x' + publicKey.slice(-6)) % emojis.length;
     return emojis[index];
-}
-
-export function getFallbackTonStandardWalletEmoji(publicKey: string, version: WalletVersion) {
-    const index = Number('0x' + publicKey.slice(-6) + version.toString()) % emojis.length;
-    return emojis[index];
-}
-
-export function getFallbackDerivationItemEmoji(publicKey: string, derivationIndex: number) {
-    const index =
-        Number('0x' + derivationIndex.toString() + publicKey.slice(-6).toString()) % emojis.length;
-    return emojis[index];
-}
-
-export function getFallbackWalletName(address: Address | string) {
-    return 'Wallet ' + formatAddress(address).slice(-4);
-}
-
-export function getFallbackAccountName(id: string) {
-    return 'Account ' + id.slice(0, 4);
-}
-
-export function getWalletNameAddress(address: Address | string) {
-    const friendly = formatAddress(address);
-    return friendly.slice(0, 4) + '…' + friendly.slice(-4);
 }

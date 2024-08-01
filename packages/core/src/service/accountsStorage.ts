@@ -17,12 +17,7 @@ import {
 import { DeprecatedAccountState } from '../entries/account';
 import { AuthState, DeprecatedAuthState } from '../entries/password';
 import { assertUnreachable, notNullish } from '../utils/types';
-import {
-    getFallbackAccountEmoji,
-    getFallbackDerivationItemEmoji,
-    getFallbackTonStandardWalletEmoji,
-    getWalletNameAddress
-} from './walletService';
+import { getFallbackAccountEmoji } from './walletService';
 
 export class AccountsStorage {
     constructor(private storage: IStorage) {}
@@ -217,9 +212,7 @@ async function migrateToAccountsState(storage: IStorage): Promise<AccountsState 
                 id: w.active.rawAddress,
                 publicKey: w.publicKey,
                 version: w.active.version,
-                rawAddress: w.active.rawAddress,
-                name: getWalletNameAddress(w.active.rawAddress),
-                emoji: getFallbackTonStandardWalletEmoji(w.publicKey, w.active.version)
+                rawAddress: w.active.rawAddress
             };
 
             const authKind = auth.kind;
@@ -248,8 +241,6 @@ async function migrateToAccountsState(storage: IStorage): Promise<AccountsState 
                         {
                             index: auth.accountIndex,
                             activeTonWalletId: tonWallet.rawAddress,
-                            name,
-                            emoji: getFallbackDerivationItemEmoji(w.publicKey, auth.accountIndex),
                             tonWallets: [tonWallet]
                         }
                     ]);
