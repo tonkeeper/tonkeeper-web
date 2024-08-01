@@ -117,13 +117,19 @@ export const AccountAndWalletBadgesGroup: FC<{
     }
 
     if (account.type === 'keystone') {
-        return <AccountBadge size={size} accountType={account.type} />;
+        return <AccountBadge className={className} size={size} accountType={account.type} />;
     }
 
     if (account.type === 'mnemonic' && account.tonWallets.length > 1) {
         const wallet = account.tonWallets.find(w => w.id === walletId);
         if (wallet) {
-            return <WalletVersionBadge size={size} walletVersion={wallet.version} />;
+            return (
+                <WalletVersionBadge
+                    className={className}
+                    size={size}
+                    walletVersion={wallet.version}
+                />
+            );
         }
     }
 
