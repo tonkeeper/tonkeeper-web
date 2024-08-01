@@ -2,7 +2,6 @@ import { styled } from 'styled-components';
 import { Button } from '../../components/fields/Button';
 import { useTranslation } from '../../hooks/translation';
 import {
-    LedgerAccount,
     useAddLedgerAccountMutation,
     useConnectLedgerMutation,
     useLedgerWallets
@@ -160,7 +159,7 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
 
     const { mutate: addAccountsMutation, isLoading: isAdding } = useAddLedgerAccountMutation();
 
-    const [accountsToAdd, setAccountsToAdd] = useState<LedgerAccount[]>();
+    const [accountsSelected, setAccountsSelected] = useState<boolean>();
 
     useEffect(() => {
         getLedgerWallets(tonTransport).then(data => setSelectedIndexes(data.preselectedIndexes));
@@ -174,17 +173,10 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
     };
 
     const onAdd = () => {
-        const chosenIndexes = Object.entries(selectedIndexes)
-            .filter(([, v]) => v)
-            .map(([k]) => Number(k));
-        setAccountsToAdd(
-            ledgerAccountData!.wallets.filter(account =>
-                chosenIndexes.includes(account.accountIndex)
-            )
-        );
+        setAccountsSelected(true);
     };
 
-    if (accountsToAdd) {
+    if (accountsSelected) {
         return (
             <UpdateWalletName
                 walletEmoji={ledgerAccountData!.emoji}
@@ -193,7 +185,10 @@ const ChooseLedgerAccounts: FC<{ tonTransport: LedgerTonTransport; onCancel: () 
                     addAccountsMutation({
                         name,
                         emoji,
-                        wallets: accountsToAdd,
+                        allWallets: ledgerAccountData!.wallets,
+                        walletsIndexesToAdd: Object.entries(selectedIndexes)
+                            .filter(([, v]) => v)
+                            .map(([k]) => Number(k)),
                         accountId: ledgerAccountData!.accountId
                     })
                 }

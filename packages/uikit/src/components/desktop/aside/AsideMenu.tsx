@@ -36,6 +36,7 @@ import { useWalletVersionSettingsNotification } from '../../modals/WalletVersion
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import { ScrollContainer } from '../../ScrollContainer';
 import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../account/AccountBadge';
+import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -136,6 +137,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
     isSelected
 }) => {
     const { onOpen: openWalletVersionSettings } = useWalletVersionSettingsNotification();
+    const { onOpen: openLedgerIndexesSettings } = useLedgerIndexesSettingsNotification();
     const network = useActiveTonNetwork();
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
     const navigate = useNavigate();
@@ -217,6 +219,16 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                     )}
                     <Label2>{account.name}</Label2>
                     <AccountBadgeStyled accountType={account.type} size="s" />
+                    <GearIconButtonStyled
+                        onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openLedgerIndexesSettings({ accountId: account.id });
+                        }}
+                        isShown={isHovered}
+                    >
+                        <GearIconEmpty />
+                    </GearIconButtonStyled>
                 </AsideMenuItem>
                 {sortedDerivations.length > 1 &&
                     sortedDerivations.map(derivation => {
@@ -236,7 +248,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                                     {toShortValue(formatAddress(wallet.rawAddress, network))}
                                 </Label2>
                                 <WalletIndexBadgeStyled size="s">
-                                    {'#' + derivation.index}
+                                    {'#' + (derivation.index + 1)}
                                 </WalletIndexBadgeStyled>
                             </AsideMenuSubItem>
                         );

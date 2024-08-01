@@ -60,6 +60,7 @@ import { useUserLanguage } from "@tonkeeper/uikit/dist/state/language";
 import { useSwapMobileNotification } from "@tonkeeper/uikit/dist/state/swap/useSwapMobileNotification";
 import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
 import { ModalsRoot } from "@tonkeeper/uikit/dist/components/ModalsRoot";
+import { useDebuggingTools } from "@tonkeeper/uikit/dist/hooks/useDebuggingTools";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -322,6 +323,7 @@ const Content: FC<{
     const location = useLocation();
     useWindowsScroll();
     useTrackLocation();
+    useDebuggingTools();
 
     if (lock) {
         return (

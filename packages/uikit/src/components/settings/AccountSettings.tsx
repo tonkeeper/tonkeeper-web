@@ -53,6 +53,15 @@ const SingleAccountSettings = () => {
             });
         }
 
+        // check available derivations length to filter and keep only non-legacy added ledger accounts
+        if (account.type === 'ledger' && account.allAvailabelDerivations.length > 1) {
+            items.push({
+                name: t('settings_ledger_indexes'),
+                icon: `# ${account.activeDerivationIndex + 1}`,
+                action: () => navigate(relative(SettingsRoute.ledgerIndexes))
+            });
+        }
+
         if (proFeatures) {
             items.unshift({
                 name: t('tonkeeper_pro'),
@@ -158,6 +167,15 @@ const MultipleAccountSettings = () => {
                 name: t('settings_wallet_version'),
                 icon: walletVersionText(wallet.version),
                 action: () => navigate(relative(SettingsRoute.version))
+            });
+        }
+
+        // check available derivations length to filter and keep only non-legacy added ledger accounts
+        if (account.type === 'ledger' && account.allAvailabelDerivations.length > 1) {
+            items.push({
+                name: t('settings_ledger_indexes'),
+                icon: `# ${account.activeDerivationIndex + 1}`,
+                action: () => navigate(relative(SettingsRoute.ledgerIndexes))
             });
         }
 

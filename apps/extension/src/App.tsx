@@ -56,6 +56,7 @@ import { useMutateUserLanguage } from "@tonkeeper/uikit/dist/state/language";
 import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
 import { ModalsRoot } from "@tonkeeper/uikit/dist/components/ModalsRoot";
 import { Account } from "@tonkeeper/core/dist/entries/account";
+import { useDebuggingTools } from "@tonkeeper/uikit/dist/hooks/useDebuggingTools";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -261,6 +262,7 @@ export const Content: FC<{
     useWindowsScroll(!pageView);
     useAppWidth();
     useTrackLocation();
+    useDebuggingTools();
 
     if (lock) {
         return (

@@ -114,17 +114,21 @@ export class AccountsStorage {
         return this.updateAccountsInState([account]);
     };
 
-    removeAccountFromState = async (id: AccountId) => {
+    removeAccountsFromState = async (ids: AccountId[]) => {
         const state = await this.getAccounts();
         const activeAccountId = await this.getActiveAccountId();
 
-        const newState = state.filter(w => w.id !== id);
+        const newState = state.filter(w => !ids.includes(w.id));
 
-        if (activeAccountId === id) {
+        if (activeAccountId !== null && ids.includes(activeAccountId)) {
             await this.setActiveAccountId(newState[0]?.id || null);
         }
 
-        await this.setAccounts(state.filter(w => w.id !== id));
+        await this.setAccounts(newState);
+    };
+
+    removeAccountFromState = async (id: AccountId) => {
+        return this.removeAccountsFromState([id]);
     };
 
     async getNewAccountNameAndEmoji(accountId: AccountId) {
@@ -237,13 +241,20 @@ async function migrateToAccountsState(storage: IStorage): Promise<AccountsState 
                     return new AccountKeystone(w.publicKey, name, emoji, auth.info, tonWallet);
 
                 case 'ledger':
-                    return new AccountLedger(w.publicKey, name, emoji, auth.accountIndex, [
-                        {
-                            index: auth.accountIndex,
-                            activeTonWalletId: tonWallet.rawAddress,
-                            tonWallets: [tonWallet]
-                        }
-                    ]);
+                    return new AccountLedger(
+                        w.publicKey,
+                        name,
+                        emoji,
+                        auth.accountIndex,
+                        [auth.accountIndex],
+                        [
+                            {
+                                index: auth.accountIndex,
+                                activeTonWalletId: tonWallet.rawAddress,
+                                tonWallets: [tonWallet]
+                            }
+                        ]
+                    );
                 default:
                     assertUnreachable(authKind);
             }

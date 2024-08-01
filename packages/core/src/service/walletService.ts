@@ -239,6 +239,7 @@ export const accountBySignerDeepLink = async (
 
 export const accountByLedger = (
     accountId: string,
+    walletsIndexesToAdd: number[],
     walletsInfo: {
         address: string;
         publicKey: Buffer;
@@ -254,6 +255,7 @@ export const accountByLedger = (
         name,
         emoji,
         walletsInfo[0].accountIndex,
+        walletsIndexesToAdd,
         walletsInfo.map(item => ({
             index: item.accountIndex,
             activeTonWalletId: item.address,

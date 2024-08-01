@@ -107,8 +107,9 @@ export const useLedgerWallets = (
 
         const accountId = walletsIds[0].publicKey.toString('hex');
         const { name, emoji } = await accountsStorage.getNewAccountNameAndEmoji(accountId);
-        const existingAccountWallets =
-            (await accountsStorage.getAccount(accountId))?.allTonWallets || [];
+        const existingAccountWallets = (await accountsStorage.getAccounts()).flatMap(
+            a => a.allTonWallets
+        );
 
         const wallets = walletsIds.map((acc, i) => ({
             accountIndex: i,
@@ -154,10 +155,27 @@ export const useAddLedgerAccountMutation = () => {
     return useMutation<
         void,
         Error,
-        { accountId: string; wallets: LedgerAccount[]; name: string; emoji: string }
+        {
+            accountId: string;
+            allWallets: LedgerAccount[];
+            name: string;
+            emoji: string;
+            walletsIndexesToAdd: number[];
+        }
     >(async form => {
         try {
-            const newAccount = accountByLedger(form.accountId, form.wallets, form.name, form.emoji);
+            const newAccount = accountByLedger(
+                form.accountId,
+                form.walletsIndexesToAdd,
+                form.allWallets,
+                form.name,
+                form.emoji
+            );
+
+            // remove separately-added in legacy app version ledger wallets that should be replaced with a single account with subwallets
+            await accStorage.removeAccountsFromState(
+                form.allWallets.map(w => w.publicKey.toString('hex'))
+            );
 
             await accStorage.addAccountToState(newAccount);
             await accStorage.setActiveAccountId(newAccount.id);

@@ -43,6 +43,7 @@ export enum SettingsRoute {
     account = '/account',
     recovery = '/recovery',
     version = '/version',
+    ledgerIndexes = '/ledger-indexes',
     jettons = '/jettons',
     nft = '/nft',
     security = '/security',
@@ -55,6 +56,7 @@ export enum WalletSettingsRoute {
     index = '/',
     recovery = '/recovery',
     version = '/version',
+    ledgerIndexes = '/ledger-indexes',
     jettons = '/jettons',
     nft = '/nft',
     connectedApps = '/connected-apps'

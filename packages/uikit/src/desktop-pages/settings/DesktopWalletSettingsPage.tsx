@@ -60,6 +60,10 @@ export const DesktopWalletSettingsPage = () => {
     const { isOpen: isLogoutOpen, onClose: onLogoutClose, onOpen: onLogoutOpen } = useDisclosure();
 
     const canChangeVersion = account.type === 'mnemonic' || account.type === 'ton-only';
+
+    // check available derivations length to filter and keep only non-legacy added ledger accounts
+    const canChangeLedgerIndex =
+        account.type === 'ledger' && account.allAvailabelDerivations.length > 1;
     const activeWallet = account.activeTonWallet;
 
     return (
@@ -93,6 +97,17 @@ export const DesktopWalletSettingsPage = () => {
                             <SettingsListText>
                                 <Label2>{t('settings_wallet_version')}</Label2>
                                 <Body3>{walletVersionText(activeWallet.version)}</Body3>
+                            </SettingsListText>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
+                {canChangeLedgerIndex && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.ledgerIndexes}>
+                        <SettingsListItem>
+                            <SwitchIcon />
+                            <SettingsListText>
+                                <Label2>{t('settings_ledger_indexes')}</Label2>
+                                <Body3># {account.activeDerivationIndex + 1}</Body3>
                             </SettingsListText>
                         </SettingsListItem>
                     </LinkStyled>

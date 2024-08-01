@@ -128,6 +128,12 @@ export class AccountLedger extends Clonable implements IAccount {
         )!;
     }
 
+    get derivations(): DerivationItem[] {
+        return this.addedDerivationsIndexes.map(
+            index => this.allAvailabelDerivations.find(d => d.index === index)!
+        );
+    }
+
     /**
      *  @param id index 0 derivation ton public key hex string without 0x
      */
@@ -136,9 +142,20 @@ export class AccountLedger extends Clonable implements IAccount {
         public name: string,
         public emoji: string,
         public activeDerivationIndex: number,
-        public readonly derivations: DerivationItem[]
+        public addedDerivationsIndexes: number[],
+        public readonly allAvailabelDerivations: DerivationItem[]
     ) {
         super();
+
+        if (
+            addedDerivationsIndexes.some(index =>
+                allAvailabelDerivations.every(d => d.index !== index)
+            )
+        ) {
+            throw new Error('Derivations not found');
+        }
+
+        this.addedDerivationsIndexes = [...new Set(addedDerivationsIndexes)];
     }
 
     getTonWallet(id: WalletId) {
@@ -190,6 +207,31 @@ export class AccountLedger extends Clonable implements IAccount {
         }
 
         throw new Error('Derivation not found');
+    }
+
+    setActiveDerivationIndex(index: number) {
+        if (!this.addedDerivationsIndexes.includes(index)) {
+            throw new Error('Derivation not found');
+        }
+
+        this.activeDerivationIndex = index;
+    }
+
+    setAddedDerivationsIndexes(addedDerivationsIndexes: number[]) {
+        if (addedDerivationsIndexes.length === 0) {
+            throw new Error('Cant set empty derivations');
+        }
+        if (
+            addedDerivationsIndexes.some(index =>
+                this.allAvailabelDerivations.every(d => d.index !== index)
+            )
+        ) {
+            throw new Error('Derivations not found');
+        }
+        this.addedDerivationsIndexes = [...new Set(addedDerivationsIndexes)];
+        if (!this.addedDerivationsIndexes.includes(this.activeDerivationIndex)) {
+            this.activeDerivationIndex = this.addedDerivationsIndexes[0];
+        }
     }
 }
 

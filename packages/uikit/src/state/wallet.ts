@@ -99,6 +99,68 @@ export const useMutateActiveTonWallet = () => {
     });
 };
 
+export const useMutateActiveLedgerAccountDerivation = () => {
+    const storage = useAccountsStorage();
+    const client = useQueryClient();
+    return useMutation<void, Error, { derivationIndex: number; accountId: AccountId }>(
+        async ({ accountId, derivationIndex }) => {
+            const account = await storage.getAccount(accountId);
+
+            if (!account || account.type !== 'ledger') {
+                throw new Error('Account not found');
+            }
+
+            account.setActiveDerivationIndex(derivationIndex);
+            const walletId = account.activeTonWallet.id;
+            await storage.updateAccountInState(account);
+            await storage.setActiveAccountId(account.id);
+            await client.invalidateQueries(anyOfKeysParts(QueryKey.account, walletId));
+        }
+    );
+};
+
+export const useAddLedgerAccountDerivation = () => {
+    const storage = useAccountsStorage();
+    const client = useQueryClient();
+    return useMutation<void, Error, { derivationIndex: number; accountId: AccountId }>(
+        async ({ accountId, derivationIndex }) => {
+            const account = await storage.getAccount(accountId);
+
+            if (!account || account.type !== 'ledger') {
+                throw new Error('Account not found');
+            }
+
+            account.setAddedDerivationsIndexes(
+                account.addedDerivationsIndexes
+                    .filter(i => i !== derivationIndex)
+                    .concat(derivationIndex)
+            );
+            await storage.updateAccountInState(account);
+            await client.invalidateQueries(anyOfKeysParts(QueryKey.account));
+        }
+    );
+};
+
+export const useRemoveLedgerAccountDerivation = () => {
+    const storage = useAccountsStorage();
+    const client = useQueryClient();
+    return useMutation<void, Error, { derivationIndex: number; accountId: AccountId }>(
+        async ({ accountId, derivationIndex }) => {
+            const account = await storage.getAccount(accountId);
+
+            if (!account || account.type !== 'ledger') {
+                throw new Error('Account not found');
+            }
+
+            account.setAddedDerivationsIndexes(
+                account.addedDerivationsIndexes.filter(i => i !== derivationIndex)
+            );
+            await storage.updateAccountInState(account);
+            await client.invalidateQueries(anyOfKeysParts(QueryKey.account));
+        }
+    );
+};
+
 export const useAccountState = (id: AccountId | undefined) => {
     const accounts = useAccountsState();
     return useMemo(
@@ -396,6 +458,40 @@ export const useStandardTonWalletVersions = (publicKey?: string) => {
 
             return versions.map((v, index) => ({
                 ...v,
+                tonBalance: response.accounts[index].balance,
+                hasJettons: walletsJettonsBalances[index].balances.some(
+                    b => b.price?.prices && Number(b.balance) > 0
+                )
+            }));
+        },
+        {
+            keepPreviousData: true
+        }
+    );
+};
+
+export const useTonWalletsBalances = (addresses: string[]) => {
+    const { api, fiat } = useAppContext();
+    const network = useActiveTonNetwork();
+
+    return useQuery(
+        [QueryKey.walletVersions, addresses, network, fiat],
+        async () => {
+            const response = await new AccountsApi(api.tonApiV2).getAccounts({
+                getAccountsRequest: { accountIds: addresses }
+            });
+
+            const walletsJettonsBalances = await Promise.all(
+                addresses.map(address =>
+                    new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
+                        accountId: address,
+                        currencies: [fiat]
+                    })
+                )
+            );
+
+            return addresses.map((address, index) => ({
+                address,
                 tonBalance: response.accounts[index].balance,
                 hasJettons: walletsJettonsBalances[index].balances.some(
                     b => b.price?.prices && Number(b.balance) > 0

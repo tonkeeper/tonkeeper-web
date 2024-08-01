@@ -17,6 +17,7 @@ import { Settings } from './Settings';
 import { WalletVersionPage } from './Version';
 import { ConnectedAppsSettings } from './ConnectedAppsSettings';
 import { NFTSettings } from './Nft';
+import { LedgerIndexesPage } from "./LedgerIndexes";
 
 const SettingsRouter = () => {
     return (
@@ -32,6 +33,7 @@ const SettingsRouter = () => {
                 <Route index element={<ActiveRecovery />} />
             </Route>
             <Route path={SettingsRoute.version} element={<WalletVersionPage />} />
+            <Route path={SettingsRoute.ledgerIndexes} element={<LedgerIndexesPage />} />
             <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
             <Route path={SettingsRoute.nft} element={<NFTSettings />} />
             <Route path={SettingsRoute.security} element={<SecuritySettings />} />
