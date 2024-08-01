@@ -15,7 +15,7 @@ import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { LogOutAccountNotification } from '../../components/settings/LogOutNotification';
+import { DeleteAccountNotification } from '../../components/settings/DeleteAccountNotification';
 import { RenameWalletNotification } from '../../components/settings/wallet-name/WalletNameNotification';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
@@ -57,7 +57,7 @@ export const DesktopWalletSettingsPage = () => {
     const { t } = useTranslation();
     const account = useActiveAccount();
     const { isOpen: isRenameOpen, onClose: onRenameClose, onOpen: onRenameOpen } = useDisclosure();
-    const { isOpen: isLogoutOpen, onClose: onLogoutClose, onOpen: onLogoutOpen } = useDisclosure();
+    const { isOpen: isDeleteOpen, onClose: onDeleteClose, onOpen: onDeleteOpen } = useDisclosure();
 
     const canChangeVersion = account.type === 'mnemonic' || account.type === 'ton-only';
 
@@ -133,9 +133,9 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                <SettingsListItem onClick={onLogoutOpen}>
+                <SettingsListItem onClick={onDeleteOpen}>
                     <ExitIcon />
-                    <Label2>{t('preferences_aside_sign_out')}</Label2>
+                    <Label2>{t('Delete_wallet_data')}</Label2>
                 </SettingsListItem>
             </SettingsListBlock>
             <DesktopViewDivider />
@@ -144,9 +144,9 @@ export const DesktopWalletSettingsPage = () => {
                 account={isRenameOpen ? account : undefined}
                 handleClose={onRenameClose}
             />
-            <LogOutAccountNotification
-                account={isLogoutOpen ? account : undefined}
-                handleClose={onLogoutClose}
+            <DeleteAccountNotification
+                account={isDeleteOpen ? account : undefined}
+                handleClose={onDeleteClose}
             />
         </DesktopViewPageLayout>
     );

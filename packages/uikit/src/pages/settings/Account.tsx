@@ -17,10 +17,7 @@ import { SkeletonListPayloadWithImage } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { Label1 } from '../../components/Text';
 import { ImportNotification } from '../../components/create/ImportNotification';
-import {
-    DeleteAccountNotification,
-    LogOutAccountNotification
-} from '../../components/settings/LogOutNotification';
+import { DeleteAccountNotification } from '../../components/settings/DeleteAccountNotification';
 import { SetUpWalletIcon } from '../../components/settings/SettingsIcons';
 import { SettingsList } from '../../components/settings/SettingsList';
 import { RenameWalletNotification } from '../../components/settings/wallet-name/WalletNameNotification';
@@ -52,7 +49,6 @@ const WalletRow: FC<{
     const { t } = useTranslation();
 
     const [rename, setRename] = useState<boolean>(false);
-    const [logout, setLogout] = useState<boolean>(false);
     const [remove, setRemove] = useState<boolean>(false);
 
     const secondary = useAccountLabel(account);
@@ -104,17 +100,6 @@ const WalletRow: FC<{
                                 <ListItem
                                     dropDown
                                     onClick={() => {
-                                        setLogout(true);
-                                        onClose();
-                                    }}
-                                >
-                                    <ListItemPayload>
-                                        <Label1>{t('settings_reset')}</Label1>
-                                    </ListItemPayload>
-                                </ListItem>
-                                <ListItem
-                                    dropDown
-                                    onClick={() => {
                                         setRemove(true);
                                         onClose();
                                     }}
@@ -135,10 +120,6 @@ const WalletRow: FC<{
             <RenameWalletNotification
                 account={rename ? account : undefined}
                 handleClose={() => setRename(false)}
-            />
-            <LogOutAccountNotification
-                account={logout ? account : undefined}
-                handleClose={() => setLogout(false)}
             />
             <DeleteAccountNotification
                 account={remove ? account : undefined}

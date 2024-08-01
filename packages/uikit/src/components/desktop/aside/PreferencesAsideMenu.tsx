@@ -20,7 +20,7 @@ import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useAppContext } from '../../../hooks/appContext';
-import { DeleteAllNotification } from '../../settings/LogOutNotification';
+import { DeleteAllNotification } from '../../settings/DeleteAccountNotification';
 import React from 'react';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { capitalize, getCountryName, getLanguageName } from '../../../libs/common';

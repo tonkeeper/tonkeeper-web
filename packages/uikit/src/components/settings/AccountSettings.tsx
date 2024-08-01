@@ -5,7 +5,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, relative, WalletSettingsRoute } from '../../libs/routes';
 import { useJettonList } from '../../state/jetton';
-import { LogOutAccountNotification } from './LogOutNotification';
+import { DeleteAccountNotification } from './DeleteAccountNotification';
 import {
     AppsIcon,
     ListOfTokensIcon,
@@ -20,7 +20,7 @@ import { useActiveWallet, useAccountsState, useActiveAccount } from '../../state
 import { useWalletNftList } from '../../state/nft';
 
 const SingleAccountSettings = () => {
-    const [logout, setLogout] = useState(false);
+    const [deleteAccount, setDeleteAccount] = useState(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
     const account = useActiveAccount();
@@ -97,9 +97,9 @@ const SingleAccountSettings = () => {
             action: () => navigate(relative(WalletSettingsRoute.connectedApps))
         });
         items.push({
-            name: t('settings_reset'),
+            name: t('Delete_wallet_data'),
             icon: <LogOutIcon />,
-            action: () => setLogout(true)
+            action: () => setDeleteAccount(true)
         });
 
         return items;
@@ -108,9 +108,9 @@ const SingleAccountSettings = () => {
     return (
         <>
             <SettingsList items={mainItems} />
-            <LogOutAccountNotification
-                account={logout ? account : undefined}
-                handleClose={() => setLogout(false)}
+            <DeleteAccountNotification
+                account={deleteAccount ? account : undefined}
+                handleClose={() => setDeleteAccount(false)}
             />
         </>
     );
