@@ -6,14 +6,14 @@ import { createModalControl } from './createModalControl';
 import { LedgerIndexesPageContent } from '../../pages/settings/LedgerIndexes';
 import { useAccountState } from '../../state/wallet';
 
-const { hook, control } = createModalControl<{ accountId: AccountId }>();
+const { hook, paramsControl } = createModalControl<{ accountId: AccountId }>();
 
 export const useLedgerIndexesSettingsNotification = hook;
 
 export const LedgerIndexesSettingsNotification = () => {
     const { isOpen, onClose } = useLedgerIndexesSettingsNotification();
     const { t } = useTranslation();
-    const [params] = useAtom(control);
+    const [params] = useAtom(paramsControl);
     const account = useAccountState(params?.accountId);
     if (!account || account.type !== 'ledger') {
         return null;
@@ -22,7 +22,7 @@ export const LedgerIndexesSettingsNotification = () => {
     return (
         <Notification
             title={t('settings_ledger_indexes')}
-            isOpen={!!isOpen}
+            isOpen={isOpen}
             handleClose={() => onClose()}
         >
             {() => <LedgerIndexesPageContent afterWalletOpened={onClose} account={account} />}

@@ -3,18 +3,26 @@ import { atom, useAtom } from '../../libs/atom';
 import { useCallback } from 'react';
 
 export const createModalControl = <T extends object = object>() => {
-    const control = atom<T | undefined>(undefined);
+    const paramsControl = atom<T | undefined>(undefined);
+    const isOpenControl = atom(false);
 
     return {
         hook: () => {
-            const [isOpen, setOpenParams] = useAtom(control);
+            const [_, setParams] = useAtom(paramsControl);
+            const [isOpen, setIsOpen] = useAtom(isOpenControl);
 
             return {
                 isOpen,
-                onOpen: useCallback((params: T = {} as T) => setOpenParams(params), []),
-                onClose: useCallback(() => setOpenParams(undefined), [])
+                onOpen: useCallback(
+                    (p: T = {} as T) => {
+                        setParams(p);
+                        setIsOpen(true);
+                    },
+                    [setParams, setParams]
+                ),
+                onClose: useCallback(() => setIsOpen(false), [setIsOpen])
             };
         },
-        control
+        paramsControl
     };
 };
