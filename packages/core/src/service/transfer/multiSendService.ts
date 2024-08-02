@@ -72,11 +72,11 @@ export const estimateTonMultiTransfer = async (
 
     const emulationApi = new EmulationApi(api.tonApiV2);
 
-    return emulationApi.emulateMessageToAccountEvent({
-        ignoreSignatureCheck: true,
-        accountId: wallet.address,
-        decodeMessageRequest: { boc: cell.toString('base64') }
+    const { event } = await emulationApi.emulateMessageToWallet({
+        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
     });
+
+    return event;
 };
 
 export const sendTonMultiTransfer = async (
@@ -164,11 +164,10 @@ export const estimateJettonMultiTransfer = async (
 
     const emulationApi = new EmulationApi(api.tonApiV2);
 
-    return emulationApi.emulateMessageToAccountEvent({
-        ignoreSignatureCheck: true,
-        accountId: wallet.address,
-        decodeMessageRequest: { boc: cell.toString('base64') }
+    const { event } = await emulationApi.emulateMessageToWallet({
+        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
     });
+    return event;
 };
 
 export const sendJettonMultiTransfer = async (
@@ -198,14 +197,12 @@ export const sendJettonMultiTransfer = async (
         signEstimateMessage
     );
 
-    const res = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
-        ignoreSignatureCheck: true,
-        accountId: wallet.address,
-        decodeMessageRequest: { boc: estimationCell.toString('base64') }
+    const res = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+        emulateMessageToWalletRequest: { boc: estimationCell.toString('base64') }
     });
 
     if (
-        res.actions
+        res.event.actions
             .filter(action => action.type === 'JettonTransfer')
             .some(action => action.status !== 'ok')
     ) {
@@ -329,14 +326,12 @@ export const sendNftMultiTransfer = async (
         signEstimateMessage
     );
 
-    const res = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
-        ignoreSignatureCheck: true,
-        accountId: wallet.address,
-        decodeMessageRequest: { boc: estimationCell.toString('base64') }
+    const res = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+        emulateMessageToWalletRequest: { boc: estimationCell.toString('base64') }
     });
 
     if (
-        res.actions
+        res.event.actions
             .filter(action => action.type === 'JettonTransfer')
             .some(action => action.status !== 'ok')
     ) {
