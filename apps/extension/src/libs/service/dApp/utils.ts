@@ -8,11 +8,7 @@
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import {
   CONNECT_EVENT_ERROR_CODES,
-  TonConnectAccount,
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { getAccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { getCurrentWallet } from '@tonkeeper/core/dist/service/wallet/storeService';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { backgroundEventsEmitter, PayloadRequest } from '../../event';
 
 export const waitApprove = <Payload>(id: number, popupId?: number) => {

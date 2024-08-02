@@ -1,7 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useTranslation } from '../../hooks/translation';
-import { GenericActivityGroup, formatActivityDate, getActivityTitle } from '../../state/activity';
 import { ClockIcon } from '../Icon';
 import { ListBlock } from '../List';
 import { H3 } from '../Text';
@@ -33,34 +31,3 @@ export const ProgressIcon = () => {
         </ProgressWrapper>
     );
 };
-
-export function ActivityBlock<T>({
-    groups,
-    RenderItem
-}: {
-    groups: GenericActivityGroup<T>[];
-    RenderItem: (props: { event: T; date: string; timestamp: number }) => React.ReactElement;
-}) {
-    const { i18n } = useTranslation();
-    return (
-        <>
-            {groups.map(([eventKey, events]) => {
-                return (
-                    <Group key={eventKey}>
-                        <Title>
-                            {getActivityTitle(i18n.language, eventKey, events[0].timestamp)}
-                        </Title>
-                        {events.map(({ timestamp, event, key }) => {
-                            const date = formatActivityDate(i18n.language, eventKey, timestamp);
-                            return (
-                                <List key={key}>
-                                    <RenderItem event={event} date={date} timestamp={timestamp} />
-                                </List>
-                            );
-                        })}
-                    </Group>
-                );
-            })}
-        </>
-    );
-}

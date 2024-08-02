@@ -13,7 +13,7 @@ import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, PropsWithChildren, useMemo } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency, useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
@@ -25,6 +25,7 @@ import { ListItem, ListItemPayload } from '../List';
 import { Body1, H2, Label1 } from '../Text';
 import { Button } from '../fields/Button';
 import { hexToRGBA } from '../../libs/css';
+import { useActiveTonNetwork } from '../../state/wallet';
 
 export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
     display: flex;
@@ -163,7 +164,7 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: b
 }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const network = useActiveTonNetwork();
 
     return (
         <>
@@ -176,7 +177,7 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: b
                 </ListItem>
             )}
             <ActionRecipientAddress
-                address={formatAddress(recipient.address, wallet.network, bounced)}
+                address={formatAddress(recipient.address, network, bounced)}
                 name={recipient.name}
             />
         </>
@@ -185,7 +186,7 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: b
 
 export const ActionPoolDetails: FC<{ pool: AccountAddress }> = ({ pool }) => {
     const { t } = useTranslation();
-    const wallet = useWalletContext();
+    const network = useActiveTonNetwork();
     return (
         <>
             <ListItem>
@@ -195,7 +196,7 @@ export const ActionPoolDetails: FC<{ pool: AccountAddress }> = ({ pool }) => {
                 </ListItemPayload>
             </ListItem>
             <ActionRecipientAddress
-                address={formatAddress(pool.address, wallet.network, true)}
+                address={formatAddress(pool.address, network, true)}
                 label={t('staking_details_pool_address_label')}
             />
         </>
@@ -222,7 +223,7 @@ export const ActionSenderDetails: FC<{ sender: AccountAddress; bounced?: boolean
 }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const network = useActiveTonNetwork();
 
     return (
         <>
@@ -235,7 +236,7 @@ export const ActionSenderDetails: FC<{ sender: AccountAddress; bounced?: boolean
                 </ListItem>
             )}
             <ActionSenderAddress
-                address={formatAddress(sender.address, wallet.network, bounced)}
+                address={formatAddress(sender.address, network, bounced)}
                 name={sender.name}
             />
         </>
@@ -245,9 +246,9 @@ export const ActionSenderDetails: FC<{ sender: AccountAddress; bounced?: boolean
 export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({ beneficiary }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const network = useActiveTonNetwork();
 
-    const address = formatAddress(beneficiary.address, wallet.network, true);
+    const address = formatAddress(beneficiary.address, network, true);
     return (
         <>
             {beneficiary.name && (
@@ -302,8 +303,8 @@ export const ActionDeployerAddress: FC<{ address?: string }> = ({ address }) => 
 };
 
 export const ActionDeployerDetails: FC<{ deployer: string }> = ({ deployer }) => {
-    const wallet = useWalletContext();
-    return <ActionDeployerAddress address={formatAddress(deployer, wallet.network)} />;
+    const network = useActiveTonNetwork();
+    return <ActionDeployerAddress address={formatAddress(deployer, network)} />;
 };
 
 export const ActionFeeDetails: FC<{
@@ -435,9 +436,9 @@ export const TronActionDetailsBlock: FC<PropsWithChildren<{ event: TronEvent }>>
     event,
     children
 }) => {
-    const wallet = useWalletContext();
+    const network = useActiveTonNetwork();
     const url =
-        wallet.network === Network.TESTNET
+        network === Network.TESTNET
             ? 'https://nile.tronscan.org/#/transaction/%s'
             : 'https://tronscan.org/#/transaction/%s';
     return (

@@ -19,7 +19,7 @@ interface BootOptions {
 type TonendpointResponse<Data> = { success: false } | { success: true; data: Data };
 
 export interface TonendpointConfig {
-    flags?: { disable_v5r1: boolean; [key: string]: boolean };
+    flags?: { [key: string]: boolean };
     tonendpoint: string;
 
     tonApiKey?: string;
@@ -69,7 +69,7 @@ const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:13
 export const defaultTonendpointConfig: TonendpointConfig = {
     tonendpoint: defaultTonendpoint,
     tonEndpoint: '',
-    flags: { disable_v5r1: true }
+    flags: {}
 };
 
 const defaultFetch: FetchAPI = (input, init) => window.fetch(input, init);
@@ -190,7 +190,7 @@ export const getServerConfig = async (tonendpoint: Tonendpoint): Promise<Tonendp
     const result = await tonendpoint.boot();
 
     return {
-        flags: { disable_v5r1: true, ...result.flags },
+        flags: {},
         ...result
     };
 };

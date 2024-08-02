@@ -5,7 +5,7 @@ import {
 } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useState } from 'react';
-import { useAppContext, useWalletContext } from '../../../hooks/appContext';
+import { useAppContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
 import { Gap } from '../../Layout';
@@ -33,6 +33,11 @@ import {
     ConfirmViewDetailsRecipient
 } from '../ConfirmView';
 import { NftDetailsBlock } from './Common';
+import {
+    useActiveAccount,
+    useActiveStandardTonWallet,
+    useInvalidateActiveWalletQueries
+} from '../../../state/wallet';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -43,7 +48,7 @@ const useNftTransferEstimation = (nftItem: NftItem, data?: TonRecipientData) => 
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const client = useQueryClient();
 
     return useQuery<TransferEstimation<TonAsset>, Error>(
@@ -73,26 +78,26 @@ const useSendNft = (
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useWalletContext();
+    const account = useActiveAccount();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
     return useMutation<boolean, Error>(async () => {
         if (!fee) return false;
 
-        const signer = await getSigner(sdk, wallet.publicKey, checkTouchId).catch(() => null);
+        const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
         if (signer === null) return false;
 
         track2('send-nft');
         try {
-            await sendNftTransfer(api, wallet, recipient, nftItem, fee, signer);
+            await sendNftTransfer(api, account, recipient, nftItem, fee, signer);
         } catch (e) {
             await notifyError(client, sdk, t, e);
         }
 
-        await client.invalidateQueries([wallet.active.rawAddress]);
-        await client.invalidateQueries();
+        await invalidateAccountQueries();
         return true;
     });
 };

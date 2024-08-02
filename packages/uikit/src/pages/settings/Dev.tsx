@@ -3,26 +3,27 @@ import React, { useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
-import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useMutateWalletProperty } from '../../state/wallet';
+import { useActiveWallet } from '../../state/wallet';
+import { useDevSettings, useMutateDevSettings } from '../../state/dev';
 
 export const DevSettings = React.memo(() => {
     const { t } = useTranslation();
 
-    const wallet = useWalletContext();
-    const { mutate } = useMutateWalletProperty(true);
+    const wallet = useActiveWallet();
+    const { mutate: mutateDevSettings } = useMutateDevSettings();
+    const { data: devSettings } = useDevSettings();
 
     const items = useMemo<SettingsItem[]>(() => {
-        const network = wallet.network ?? Network.MAINNET;
+        const network = devSettings?.tonNetwork ?? Network.MAINNET;
         return [
             {
                 name: t('settings_network_alert_title'),
                 icon: network === Network.MAINNET ? 'Mainnet' : 'Testnet',
-                action: () => mutate({ network: switchNetwork(network) })
+                action: () => mutateDevSettings({ tonNetwork: switchNetwork(network) })
             }
         ];
-    }, [t, wallet]);
+    }, [t, wallet, devSettings]);
 
     return (
         <>

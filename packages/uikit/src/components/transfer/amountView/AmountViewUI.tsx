@@ -1,16 +1,17 @@
 import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { getDecimalSeparator, getNotDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { isNumeric, removeGroupSeparator, seeIfLargeTail } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import { FC } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../../hooks/appContext';
+import { useAppContext } from '../../../hooks/appContext';
 import { formatter } from '../../../hooks/balance';
 import { Body1, Body2, H3, Label2, Num2 } from '../../Text';
 import { cropName } from '../ConfirmListItem';
 import { AmountState } from './amountState';
+import { useActiveTonNetwork } from '../../../state/wallet';
 
 export const Center = styled.div`
     text-align: center;
@@ -159,18 +160,18 @@ export const RecipientName: FC<{ recipient: RecipientData }> = ({ recipient }) =
     return <></>;
 };
 
-export const getRecipientAddress = (recipient: RecipientData, wallet: WalletState) => {
+export const getRecipientAddress = (recipient: RecipientData, network: Network) => {
     if (isTonRecipientData(recipient)) {
         if ('dns' in recipient.address) {
-            return formatAddress(recipient.toAccount.address, wallet.network);
+            return formatAddress(recipient.toAccount.address, network);
         }
     }
     return recipient.address.address;
 };
 
 export const RecipientAddress: FC<{ recipient: RecipientData }> = ({ recipient }) => {
-    const wallet = useWalletContext();
-    const address = getRecipientAddress(recipient, wallet);
+    const network = useActiveTonNetwork();
+    const address = getRecipientAddress(recipient, network);
     return <Address>{toShortValue(address)}</Address>;
 };
 

@@ -6,7 +6,7 @@ import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
-import { WalletState } from '../../entries/wallet';
+import { TonWalletStandard } from '../../entries/wallet';
 import { AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
 import { createLedgerTonTransfer } from '../ledger/transfer';
 import { walletContractFromState } from '../wallet/contractService';
@@ -24,8 +24,8 @@ import {
     signEstimateMessage
 } from './common';
 import { getLedgerAccountPathByIndex } from '../ledger/utils';
-import { AuthLedger } from '../../entries/password';
 import { LedgerError } from '../../errors/LedgerError';
+import { Account } from '../../entries/account';
 
 export type EstimateData = {
     accountEvent: TransferEstimationEvent;
@@ -47,7 +47,7 @@ export const toStateInit = (
 const createTonTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: WalletState,
+    walletState: TonWalletStandard,
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean,
@@ -76,19 +76,23 @@ const createTonTransfer = async (
 const createTonConnectTransfer = async (
     timestamp: number,
     seqno: number,
-    walletState: WalletState,
+    account: Account,
     params: TonConnectTransactionPayload,
     signer: Signer
 ) => {
+    const walletState = account.activeTonWallet;
     const contract = walletContractFromState(walletState);
 
     if (signer.type === 'ledger') {
         if (params.messages.length !== 1) {
             throw new Error('Ledger signer does not support multiple messages');
         }
+        if (account.type !== 'ledger') {
+            throw new Error('Ledger signer can only be used with ledger accounts');
+        }
 
         const message = params.messages[0];
-        const path = getLedgerAccountPathByIndex((walletState.auth as AuthLedger).accountIndex);
+        const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
 
         let transfer: Cell;
         try {
@@ -141,7 +145,7 @@ const createTonConnectTransfer = async (
 
 export const estimateTonTransfer = async (
     api: APIConfig,
-    walletState: WalletState,
+    walletState: TonWalletStandard,
     recipient: TonRecipientData,
     weiAmount: BigNumber,
     isMax: boolean
@@ -175,11 +179,11 @@ export type ConnectTransferError = { kind: 'not-enough-balance' } | { kind: unde
 
 export const tonConnectTransferError = async (
     api: APIConfig,
-    walletState: WalletState,
+    walletState: TonWalletStandard,
     params: TonConnectTransactionPayload
 ): Promise<ConnectTransferError> => {
     const wallet = await new AccountsApi(api.tonApiV2).getAccount({
-        accountId: walletState.active.rawAddress
+        accountId: walletState.rawAddress
     });
 
     const total = params.messages.reduce(
@@ -196,17 +200,17 @@ export const tonConnectTransferError = async (
 
 export const estimateTonConnectTransfer = async (
     api: APIConfig,
-    walletState: WalletState,
+    account: Account,
     params: TonConnectTransactionPayload
 ): Promise<TransferEstimationEvent> => {
     const timestamp = await getServerTime(api);
-    const [wallet, seqno] = await getWalletBalance(api, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, account.activeTonWallet);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = await createTonConnectTransfer(
         timestamp,
         seqno,
-        walletState,
+        account,
         params,
         signEstimateMessage
     );
@@ -222,14 +226,14 @@ export const estimateTonConnectTransfer = async (
 
 export const sendTonConnectTransfer = async (
     api: APIConfig,
-    walletState: WalletState,
+    account: Account,
     params: TonConnectTransactionPayload,
     signer: Signer
 ) => {
     const timestamp = await getServerTime(api);
-    const seqno = await getWalletSeqNo(api, walletState.active.rawAddress);
+    const seqno = await getWalletSeqNo(api, account.activeTonWallet.rawAddress);
 
-    const external = await createTonConnectTransfer(timestamp, seqno, walletState, params, signer);
+    const external = await createTonConnectTransfer(timestamp, seqno, account, params, signer);
 
     const boc = external.toString('base64');
 
@@ -242,7 +246,7 @@ export const sendTonConnectTransfer = async (
 
 export const sendTonTransfer = async (
     api: APIConfig,
-    walletState: WalletState,
+    account: Account,
     recipient: TonRecipientData,
     amount: AssetAmount,
     isMax: boolean,
@@ -253,17 +257,36 @@ export const sendTonTransfer = async (
 
     const total = new BigNumber(fee.event.extra).multipliedBy(-1).plus(amount.weiAmount);
 
-    const [wallet, seqno] = await getWalletBalance(api, walletState);
+    const wallet = account.activeTonWallet;
+    const [tonapiWallet, seqno] = await getWalletBalance(api, wallet);
     if (!isMax) {
-        checkWalletBalanceOrDie(total, wallet);
+        checkWalletBalanceOrDie(total, tonapiWallet);
     }
 
     let buffer: Buffer;
-    const params = [timestamp, seqno, walletState, recipient, amount.weiAmount, isMax] as const;
     if (signer.type === 'ledger') {
-        buffer = await createLedgerTonTransfer(...params, signer);
+        if (account.type !== 'ledger') {
+            throw new Error(`Unexpected account type: ${account.type}`);
+        }
+        buffer = await createLedgerTonTransfer(
+            timestamp,
+            seqno,
+            account,
+            recipient,
+            amount.weiAmount,
+            isMax,
+            signer
+        );
     } else {
-        buffer = await createTonTransfer(...params, signer);
+        buffer = await createTonTransfer(
+            timestamp,
+            seqno,
+            wallet,
+            recipient,
+            amount.weiAmount,
+            isMax,
+            signer
+        );
     }
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({

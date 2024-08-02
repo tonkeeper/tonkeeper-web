@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { VerificationIcon } from '../Icon';
 import { Body2, Body3, Label2 } from '../Text';
-import { useActiveWalletConfig } from '../../state/wallet';
+import { useActiveTonWalletConfig } from '../../state/wallet';
 import { useTranslation } from '../../hooks/translation';
 import { SpamBadge } from '../activity/NotificationCommon';
 
@@ -59,7 +59,7 @@ const IconBody = styled.span`
 
 export const NftCollectionBody3: FC<{ nft: NftItem }> = React.memo(({ nft }) => {
     const { t } = useTranslation();
-    const { data } = useActiveWalletConfig();
+    const { data } = useActiveTonWalletConfig();
     const isTrusted = data?.trustedNfts.includes(nft.collection?.address || nft.address);
     const isSuspicious = nft.trust !== TrustType.Whitelist;
 

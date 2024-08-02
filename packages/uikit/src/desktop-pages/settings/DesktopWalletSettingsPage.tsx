@@ -15,13 +15,13 @@ import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { LogOutWalletNotification } from '../../components/settings/LogOutNotification';
+import { DeleteAccountNotification } from '../../components/settings/DeleteAccountNotification';
 import { RenameWalletNotification } from '../../components/settings/wallet-name/WalletNameNotification';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
-import { useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
+import { useActiveAccount } from '../../state/wallet';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -55,9 +55,16 @@ const LinkStyled = styled(Link)`
 
 export const DesktopWalletSettingsPage = () => {
     const { t } = useTranslation();
-    const wallet = useWalletContext();
+    const account = useActiveAccount();
     const { isOpen: isRenameOpen, onClose: onRenameClose, onOpen: onRenameOpen } = useDisclosure();
-    const { isOpen: isLogoutOpen, onClose: onLogoutClose, onOpen: onLogoutOpen } = useDisclosure();
+    const { isOpen: isDeleteOpen, onClose: onDeleteClose, onOpen: onDeleteOpen } = useDisclosure();
+
+    const canChangeVersion = account.type === 'mnemonic' || account.type === 'ton-only';
+
+    // check available derivations length to filter and keep only non-legacy added ledger accounts
+    const canChangeLedgerIndex =
+        account.type === 'ledger' && account.allAvailableDerivations.length > 1;
+    const activeWallet = account.activeTonWallet;
 
     return (
         <DesktopViewPageLayout>
@@ -66,30 +73,45 @@ export const DesktopWalletSettingsPage = () => {
             </DesktopViewHeader>
             <SettingsListBlock>
                 <SettingsListItem onClick={onRenameOpen}>
-                    <WalletEmoji containerSize="16px" emojiSize="16px" emoji={wallet.emoji} />
+                    <WalletEmoji containerSize="16px" emojiSize="16px" emoji={account.emoji} />
                     <SettingsListText>
-                        <Label2>{wallet.name || t('wallet_title')}</Label2>
+                        <Label2>{account.name || t('wallet_title')}</Label2>
                         <Body3>{t('customize')}</Body3>
                     </SettingsListText>
                 </SettingsListItem>
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.recovery}>
-                    <SettingsListItem>
-                        <KeyIcon />
-                        <Label2>{t('settings_backup_seed')}</Label2>
-                    </SettingsListItem>
-                </LinkStyled>
-                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>
-                    <SettingsListItem>
-                        <SwitchIcon />
-                        <SettingsListText>
-                            <Label2>{t('settings_wallet_version')}</Label2>
-                            <Body3>{walletVersionText(wallet.active.version)}</Body3>
-                        </SettingsListText>
-                    </SettingsListItem>
-                </LinkStyled>
+                {account.type === 'mnemonic' && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.recovery}>
+                        <SettingsListItem>
+                            <KeyIcon />
+                            <Label2>{t('settings_backup_seed')}</Label2>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
+                {canChangeVersion && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>
+                        <SettingsListItem>
+                            <SwitchIcon />
+                            <SettingsListText>
+                                <Label2>{t('settings_wallet_version')}</Label2>
+                                <Body3>{walletVersionText(activeWallet.version)}</Body3>
+                            </SettingsListText>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
+                {canChangeLedgerIndex && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.ledgerIndexes}>
+                        <SettingsListItem>
+                            <SwitchIcon />
+                            <SettingsListText>
+                                <Label2>{t('settings_ledger_indexes')}</Label2>
+                                <Body3># {account.activeDerivationIndex + 1}</Body3>
+                            </SettingsListText>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
                 <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.jettons}>
                     <SettingsListItem>
                         <CoinsIcon />
@@ -111,20 +133,20 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                <SettingsListItem onClick={onLogoutOpen}>
+                <SettingsListItem onClick={onDeleteOpen}>
                     <ExitIcon />
-                    <Label2>{t('preferences_aside_sign_out')}</Label2>
+                    <Label2>{t('Delete_wallet_data')}</Label2>
                 </SettingsListItem>
             </SettingsListBlock>
             <DesktopViewDivider />
 
             <RenameWalletNotification
-                wallet={isRenameOpen ? wallet : undefined}
+                account={isRenameOpen ? account : undefined}
                 handleClose={onRenameClose}
             />
-            <LogOutWalletNotification
-                wallet={isLogoutOpen ? wallet : undefined}
-                handleClose={onLogoutClose}
+            <DeleteAccountNotification
+                account={isDeleteOpen ? account : undefined}
+                handleClose={onDeleteClose}
             />
         </DesktopViewPageLayout>
     );

@@ -1,28 +1,28 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Address } from '@ton/core';
-import { AuthLedger } from '@tonkeeper/core/dist/entries/password';
-import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { addWalletsWithCustomAuthState } from '@tonkeeper/core/dist/service/accountService';
 import {
-    LedgerTonTransport,
     connectLedger,
     isTransportReady,
+    LedgerTonTransport,
     waitLedgerTonAppReady
 } from '@tonkeeper/core/dist/service/ledger/connector';
 import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
-import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
-import { walletStateFromLedger } from '@tonkeeper/core/dist/service/walletService';
-import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppContext } from '../hooks/appContext';
+import { AccountsApi, Account } from '@tonkeeper/core/dist/tonApiV2';
+import { Address } from '@ton/core';
 import { useAppSdk } from '../hooks/appSdk';
+import { useNavigate } from 'react-router-dom';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
+import { useCallback, useState } from 'react';
+import { useAccountsStorage } from '../hooks/useStorage';
+import { useActiveAccount } from './wallet';
+import { accountByLedger } from '@tonkeeper/core/dist/service/walletService';
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 
 export type LedgerAccount = {
     accountIndex: number;
     publicKey: Buffer;
+    version: WalletVersion;
 } & Account;
 
 type T = ReturnType<typeof useMutation<LedgerTonTransport, Error>>;
@@ -64,65 +64,135 @@ export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T =
     };
 };
 
-export const useLedgerAccounts = (
-    accountsNumber: number
-): ReturnType<typeof useMutation<LedgerAccount[], Error, LedgerTonTransport>> => {
+export const useLedgerWallets = (
+    walletsNumber: number
+): ReturnType<
+    typeof useMutation<
+        {
+            wallets: LedgerAccount[];
+            accountId: string;
+            name: string;
+            emoji: string;
+            preselectedIndexes: Record<number, boolean>;
+        },
+        Error,
+        LedgerTonTransport
+    >
+> => {
     const { api } = useAppContext();
+    const accountsStorage = useAccountsStorage();
 
-    return useMutation<LedgerAccount[], Error, LedgerTonTransport>(async tonTransport => {
-        const accountIds = await Promise.all(
-            [...new Array(accountsNumber)].map((_, i) =>
+    return useMutation<
+        {
+            wallets: LedgerAccount[];
+            accountId: string;
+            name: string;
+            emoji: string;
+            preselectedIndexes: Record<number, boolean>;
+        },
+        Error,
+        LedgerTonTransport
+    >(async tonTransport => {
+        const walletsIds = await Promise.all(
+            [...new Array(walletsNumber)].map((_, i) =>
                 tonTransport.getAddress(getLedgerAccountPathByIndex(i), { walletVersion: 'v4' })
             )
         );
 
-        const addresses = accountIds.map(account => Address.parse(account.address).toRawString());
+        const addresses = walletsIds.map(account => Address.parse(account.address).toRawString());
 
         const response = await new AccountsApi(api.tonApiV2).getAccounts({
             getAccountsRequest: { accountIds: addresses }
         });
 
-        return accountIds.map((acc, i) => ({
+        const accountId = walletsIds[0].publicKey.toString('hex');
+        const { name, emoji } = await accountsStorage.getNewAccountNameAndEmoji(accountId);
+        const existingAccountWallets = (await accountsStorage.getAccounts()).flatMap(
+            a => a.allTonWallets
+        );
+
+        const wallets = walletsIds.map((acc, i) => ({
             accountIndex: i,
             publicKey: acc.publicKey,
+            version: WalletVersion.V4R2,
             ...response.accounts.find(a =>
                 Address.parse(a.address).equals(Address.parse(acc.address))
             )! // tonapi bug, should filter here
         }));
+
+        const preselectedIndexes: Record<number, boolean> = {};
+
+        wallets
+            .filter(
+                w =>
+                    w.balance > 0 ||
+                    existingAccountWallets.some(
+                        item => item.id === Address.parse(w.address).toRawString()
+                    )
+            )
+            .forEach(w => (preselectedIndexes[w.accountIndex] = true));
+
+        if (Object.keys(preselectedIndexes).length === 0) {
+            preselectedIndexes[0] = true;
+        }
+
+        return {
+            wallets,
+            name,
+            emoji,
+            accountId,
+            preselectedIndexes
+        };
     });
 };
 
-export const useAddLedgerAccountsMutation = () => {
+export const useAddLedgerAccountMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const navigate = useNavigate();
-    return useMutation<void, Error, { accounts: LedgerAccount[]; name: string; emoji: string }>(
-        async form => {
-            try {
-                let states = form.accounts.map(walletStateFromLedger);
-                if (form.name) {
-                    const suffix = (index: number) => (states.length > 1 ? ' ' + (index + 1) : '');
-                    states = states.map((s, i) => ({
-                        ...s,
-                        name: form.name + suffix((s.auth as AuthLedger).accountIndex),
-                        ...(i === 0 && !!form.emoji && { emoji: form.emoji })
-                    }));
-                }
+    const accStorage = useAccountsStorage();
 
-                await addWalletsWithCustomAuthState(sdk.storage, states, { keepName: true });
-
-                await client.invalidateQueries([QueryKey.account]);
-
-                navigate(AppRoute.home);
-            } catch (e) {
-                if (e instanceof Error) sdk.alert(e.message);
-                throw e;
-            }
+    return useMutation<
+        void,
+        Error,
+        {
+            accountId: string;
+            allWallets: LedgerAccount[];
+            name: string;
+            emoji: string;
+            walletsIndexesToAdd: number[];
         }
-    );
+    >(async form => {
+        try {
+            const newAccount = accountByLedger(
+                form.accountId,
+                form.walletsIndexesToAdd,
+                form.allWallets,
+                form.name,
+                form.emoji
+            );
+
+            await accStorage.addAccountToState(newAccount);
+            await accStorage.setActiveAccountId(newAccount.id);
+
+            // remove separately-added in legacy app version ledger wallets that should be replaced with a single account with subwallets
+            await accStorage.removeAccountsFromState(
+                form.allWallets
+                    .filter(w => w.publicKey.toString('hex') !== newAccount.id)
+                    .map(w => w.publicKey.toString('hex'))
+            );
+
+            await client.invalidateQueries([QueryKey.account]);
+
+            navigate(AppRoute.home);
+        } catch (e) {
+            if (e instanceof Error) sdk.alert(e.message);
+            throw e;
+        }
+    });
 };
 
 export const useIsActiveWalletLedger = () => {
-    const { auth } = useWalletContext();
-    return auth?.kind === 'ledger';
+    const wallet = useActiveAccount();
+    return wallet.type === 'ledger';
 };

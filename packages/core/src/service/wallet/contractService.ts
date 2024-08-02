@@ -5,11 +5,11 @@ import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import { WalletContractV5Beta } from '@ton/ton/dist/wallets/WalletContractV5Beta';
 import { WalletContractV5R1 } from '@ton/ton/dist/wallets/WalletContractV5R1';
 import { Network } from '../../entries/network';
-import { WalletState, WalletVersion } from '../../entries/wallet';
+import { TonWalletStandard, WalletVersion } from '../../entries/wallet';
 
-export const walletContractFromState = (wallet: WalletState) => {
+export const walletContractFromState = (wallet: TonWalletStandard) => {
     const publicKey = Buffer.from(wallet.publicKey, 'hex');
-    return walletContract(publicKey, wallet.active.version, wallet.network);
+    return walletContract(publicKey, wallet.version);
 };
 
 const workchain = 0;
@@ -19,7 +19,7 @@ export type WalletContract = ReturnType<typeof walletContract>;
 export const walletContract = (
     publicKey: Buffer,
     version: WalletVersion,
-    network: Network | undefined
+    network = Network.MAINNET
 ) => {
     switch (version) {
         case WalletVersion.V3R1:
@@ -30,7 +30,7 @@ export const walletContract = (
             throw new Error('Unsupported wallet contract version - v4R1');
         case WalletVersion.V4R2:
             return WalletContractV4.create({ workchain, publicKey });
-        case WalletVersion.V5beta:
+        case WalletVersion.V5_BETA:
             return WalletContractV5Beta.create({
                 walletId: {
                     networkGlobalId: network
@@ -42,7 +42,7 @@ export const walletContract = (
     }
 };
 
-export const walletStateInitFromState = (wallet: WalletState) => {
+export const walletStateInitFromState = (wallet: TonWalletStandard) => {
     const contract = walletContractFromState(wallet);
 
     return beginCell()

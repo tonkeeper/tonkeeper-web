@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { ProState, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import {
     authViaTonConnect,
     createProServiceInvoice,
@@ -15,16 +15,19 @@ import {
     startProServiceTrial,
     waitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
-import { getWalletState } from '@tonkeeper/core/dist/service/wallet/storeService';
 import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
 import { useMemo } from 'react';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { QueryKey } from '../libs/queryKey';
 import { signTonConnectOver } from './mnemonic';
 import { useCheckTouchId } from './password';
+import { useActiveWallet } from './wallet';
+import { useUserLanguage } from './language';
+import { useAccountsStorage } from '../hooks/useStorage';
+import { getAccountByWalletById, getWalletById } from '@tonkeeper/core/dist/entries/account';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -36,10 +39,12 @@ export const useProBackupState = () => {
 };
 
 export const useProState = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const sdk = useAppSdk();
     const client = useQueryClient();
     return useQuery<ProState, Error>([QueryKey.pro], async () => {
+        // TODO а что если активный кошелек не стандартный?
+        // TODO сделать флоу подписки
         const state = await getProState(sdk.storage, wallet);
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
@@ -47,20 +52,32 @@ export const useProState = () => {
     });
 };
 
-export const useSelectWalletMutation = () => {
+export const useSelectWalletForProMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const { api } = useAppContext();
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const accountsStorage = useAccountsStorage();
 
-    return useMutation<void, Error, string>(async publicKey => {
-        const state = await getWalletState(sdk.storage, publicKey);
-        if (!state) {
+    return useMutation<void, Error, string>(async walletId => {
+        const accounts = await accountsStorage.getAccounts();
+        const account = getAccountByWalletById(accounts, walletId);
+        const wallet = getWalletById(accounts, walletId);
+
+        if (!account) {
+            throw new Error('Account not found');
+        }
+
+        if (!wallet) {
             throw new Error('Missing wallet state');
         }
 
-        await authViaTonConnect(api, state, signTonConnectOver(sdk, publicKey, t, checkTouchId));
+        if (!isStandardTonWallet(wallet)) {
+            throw new Error("Can't use non-standard ton wallet for pro auth");
+        }
+
+        await authViaTonConnect(api, wallet, signTonConnectOver(sdk, account.id, t, checkTouchId));
 
         await client.invalidateQueries([QueryKey.pro]);
     });
@@ -75,15 +92,15 @@ export const useProLogout = () => {
 };
 
 export const useProPlans = (promoCode?: string) => {
-    const wallet = useWalletContext();
+    const { data: lang } = useUserLanguage();
 
-    const all = useQuery<ProServiceTier[], Error>([QueryKey.pro, 'plans', wallet.lang], () =>
-        getProServiceTiers(wallet.lang)
+    const all = useQuery<ProServiceTier[], Error>([QueryKey.pro, 'plans', lang], () =>
+        getProServiceTiers(lang)
     );
 
     const promo = useQuery<ProServiceTier[], Error>(
-        [QueryKey.pro, 'promo', wallet.lang, promoCode],
-        () => getProServiceTiers(wallet.lang, promoCode !== '' ? promoCode : undefined),
+        [QueryKey.pro, 'promo', lang, promoCode],
+        () => getProServiceTiers(lang, promoCode !== '' ? promoCode : undefined),
         { enabled: promoCode !== '' }
     );
 
@@ -100,11 +117,11 @@ export interface ConfirmState {
     invoice: InvoicesInvoice;
     recipient: RecipientData;
     assetAmount: AssetAmount;
-    wallet: WalletState;
+    wallet: TonWalletStandard;
 }
 
 export const useCreateInvoiceMutation = () => {
-    const sdk = useAppSdk();
+    const ws = useAccountsStorage();
     const { api } = useAppContext();
     return useMutation<
         ConfirmState,
@@ -115,8 +132,10 @@ export const useCreateInvoiceMutation = () => {
             throw new Error('missing tier');
         }
 
-        const wallet = await getWalletState(sdk.storage, data.state.wallet.publicKey);
-        if (!wallet) {
+        const wallet = (await ws.getAccounts())
+            .flatMap(a => a.allTonWallets)
+            .find(w => w.id === data.state.wallet.rawAddress);
+        if (!wallet || !isStandardTonWallet(wallet)) {
             throw new Error('Missing wallet');
         }
 

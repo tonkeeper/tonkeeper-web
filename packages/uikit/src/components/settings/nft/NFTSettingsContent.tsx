@@ -2,13 +2,13 @@ import { FC, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { ChevronRightIcon, MinusIcon, PlusIcon } from '../../../components/Icon';
 import { ListBlock, ListItemElement, ListItemPayload } from '../../../components/List';
-import { SkeletonList } from '../../../components/Skeleton';
+import { SkeletonListWithImages } from '../../../components/Skeleton';
 import { Body2, H3, Label1 } from '../../../components/Text';
 import { useTranslation } from '../../../hooks/translation';
-import { useActiveWalletConfig, useWalletNftList } from '../../../state/wallet';
+import { useActiveTonWalletConfig } from '../../../state/wallet';
 import { IconButton } from '../../../components/fields/IconButton';
 import { BorderSmallResponsive } from '../../../components/shared/Styles';
-import { isSpamNft, useHideNft, useMakeNftVisible, useMarkNftAsTrusted } from '../../../state/nft';
+import { isSpamNft, useHideNft, useMakeNftVisible, useMarkNftAsTrusted, useWalletNftList } from "../../../state/nft";
 import { SettingsNFTCollection, SettingsSingleNFT } from './models';
 import { SpamNftInfoNotification } from './SpamNftInfoNotification';
 import { Image } from '../../../components/shared/Image';
@@ -117,7 +117,7 @@ export const NFTSettingsContent = () => {
     >();
 
     const { data: nfts } = useWalletNftList();
-    const { data: config } = useActiveWalletConfig();
+    const { data: config } = useActiveTonWalletConfig();
 
     const collections: (SettingsNFTCollection | SettingsSingleNFT)[] = useMemo(() => {
         if (!config || !nfts) return [];
@@ -181,7 +181,7 @@ export const NFTSettingsContent = () => {
     const { mutate: trustNft } = useMarkNftAsTrusted();
 
     if (!nfts || !config) {
-        return <SkeletonList size={5} />;
+        return <SkeletonListWithImages size={5} />;
     }
 
     const onCloseSpamNftInfo = (confirmNotSpam?: boolean) => {

@@ -66,8 +66,8 @@ export const toShortValue = (value: string, length = 4): string => {
     }
 };
 
-export const formatAddress = (value: string, network?: Network, bounceable = false) => {
-    return Address.parse(value).toString({
+export const formatAddress = (value: string | Address, network?: Network, bounceable = false) => {
+    return (typeof value === 'string' ? Address.parse(value) : value).toString({
         testOnly: network === Network.TESTNET,
         bounceable
     });

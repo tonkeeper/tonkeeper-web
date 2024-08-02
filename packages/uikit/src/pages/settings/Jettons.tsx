@@ -1,4 +1,4 @@
-import { ActiveWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
 import { FC, useCallback, useMemo } from 'react';
 import {
@@ -13,7 +13,7 @@ import { InnerBody } from '../../components/Body';
 import { InvisibleIcon, PinIcon, ReorderIcon, VisibleIcon } from '../../components/Icon';
 import { ColumnText } from '../../components/Layout';
 import { ListBlock, ListItemElement, ListItemPayload } from '../../components/List';
-import { SkeletonList } from '../../components/Skeleton';
+import { SkeletonListWithImages } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { H3 } from '../../components/Text';
 import { useCoinFullBalance } from '../../hooks/balance';
@@ -24,7 +24,7 @@ import {
     useToggleHideJettonMutation,
     useTogglePinJettonMutation
 } from '../../state/jetton';
-import { useActiveWalletConfig } from '../../state/wallet';
+import { useActiveTonWalletConfig } from '../../state/wallet';
 
 const TurnOnIcon = styled.span`
     color: ${props => props.theme.accentBlue};
@@ -57,7 +57,7 @@ const RadioWrapper = styled.span`
     cursor: pointer;
 `;
 
-const SampleJettonRow: FC<{ jetton: JettonBalance; config: ActiveWalletConfig }> = ({
+const SampleJettonRow: FC<{ jetton: JettonBalance; config: TonWalletConfig }> = ({
     jetton,
     config
 }) => {
@@ -116,7 +116,7 @@ const SampleJettonRow: FC<{ jetton: JettonBalance; config: ActiveWalletConfig }>
 };
 
 export const PinnedJettonList: FC<{
-    config: ActiveWalletConfig;
+    config: TonWalletConfig;
     jettons: JettonBalance[];
 }> = ({ config, jettons }) => {
     const { mutate } = useSavePinnedJettonOrderMutation();
@@ -183,7 +183,7 @@ export const PinnedJettonList: FC<{
 
 const JettonRow: FC<{
     jetton: JettonBalance;
-    config: ActiveWalletConfig;
+    config: TonWalletConfig;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
 }> = ({ jetton, config, dragHandleProps }) => {
     const { t } = useTranslation();
@@ -222,7 +222,7 @@ const JettonSkeleton = () => {
         <>
             <SubHeader title={t('settings_jettons_list')} />
             <InnerBody>
-                <SkeletonList size={5} />
+                <SkeletonListWithImages size={5} />
             </InnerBody>
         </>
     );
@@ -236,7 +236,7 @@ export const JettonsSettings = () => {
     const { t } = useTranslation();
 
     const { data: jettons } = useJettonRawList();
-    const { data: config } = useActiveWalletConfig();
+    const { data: config } = useActiveTonWalletConfig();
 
     if (!jettons || !config) {
         return <JettonSkeleton />;

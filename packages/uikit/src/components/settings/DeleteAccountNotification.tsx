@@ -1,19 +1,19 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useMutateDeleteAll } from '../../state/account';
+import { useMutateDeleteAll } from '../../state/wallet';
 import { useMutateLogOut } from '../../state/wallet';
 import { Notification } from '../Notification';
 import { Body1, H2, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
+import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
 
-const NotificationBlock = styled.form`
+const NotificationBlock = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -36,103 +36,18 @@ const DisclaimerLink = styled(Label1)`
     margin-left: 2.35rem;
 `;
 
-const LotOutContent: FC<{
-    onClose: (action: () => void) => void;
-    publicKey: string;
-    isKeystone: boolean;
-}> = ({ onClose, publicKey, isKeystone }) => {
-    const navigate = useNavigate();
-    const { t } = useTranslation();
-    const [checked, setChecked] = useState(false);
-    const { mutateAsync, isLoading } = useMutateLogOut(publicKey);
-
-    return (
-        <NotificationBlock>
-            <TextBlock>
-                <H2>{t('settings_reset_alert_title')}</H2>
-                <BodyText>
-                    {t(
-                        isKeystone
-                            ? 'Delete_keystone_wallet_data_description'
-                            : 'settings_reset_alert_caption'
-                    )}
-                </BodyText>
-            </TextBlock>
-
-            {!isKeystone && (
-                <DisclaimerBlock>
-                    <DisclaimerText>
-                        <Checkbox checked={checked} onChange={setChecked}>
-                            {t('I_have_a_backup_copy_of_recovery_phrase')}
-                        </Checkbox>
-                    </DisclaimerText>
-                    <DisclaimerLink
-                        onClick={() =>
-                            onClose(() =>
-                                navigate(
-                                    AppRoute.settings + SettingsRoute.recovery + '/' + publicKey
-                                )
-                            )
-                        }
-                    >
-                        {t('Back_up_now')}
-                    </DisclaimerLink>
-                </DisclaimerBlock>
-            )}
-            {isKeystone && <div style={{ height: 16 }} />}
-            <Button
-                disabled={!checked && !isKeystone}
-                size="large"
-                fullWidth
-                loading={isLoading}
-                onClick={async () => {
-                    await mutateAsync();
-                    onClose(() => navigate(AppRoute.home));
-                }}
-            >
-                {t('settings_reset')}
-            </Button>
-        </NotificationBlock>
-    );
-};
-
-export const LogOutWalletNotification: FC<{
-    wallet?: WalletState;
-    handleClose: () => void;
-}> = ({ wallet, handleClose }) => {
-    const Content = useCallback(
-        (afterClose: (action: () => void) => void) => {
-            if (!wallet) return undefined;
-            return (
-                <LotOutContent
-                    publicKey={wallet?.publicKey}
-                    onClose={afterClose}
-                    isKeystone={!!wallet.auth && wallet.auth.kind === 'keystone'}
-                />
-            );
-        },
-        [wallet]
-    );
-
-    return (
-        <Notification isOpen={wallet != null} handleClose={handleClose}>
-            {Content}
-        </Notification>
-    );
-};
-
 const DeleteContent: FC<{
     onClose: (action: () => void) => void;
-    publicKey: string;
+    accountId: AccountId;
     isKeystone: boolean;
-}> = ({ onClose, publicKey, isKeystone }) => {
+}> = ({ onClose, accountId, isKeystone }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
-    const { mutateAsync, isLoading } = useMutateLogOut(publicKey, true);
+    const { mutateAsync, isLoading } = useMutateLogOut();
 
     const onDelete = async () => {
-        await mutateAsync();
+        await mutateAsync(accountId);
         onClose(() => navigate(AppRoute.home));
     };
 
@@ -160,7 +75,7 @@ const DeleteContent: FC<{
                         onClick={() =>
                             onClose(() =>
                                 navigate(
-                                    AppRoute.settings + SettingsRoute.recovery + '/' + publicKey
+                                    AppRoute.settings + SettingsRoute.recovery + '/' + accountId
                                 )
                             )
                         }
@@ -176,6 +91,7 @@ const DeleteContent: FC<{
                 fullWidth
                 loading={isLoading}
                 onClick={onDelete}
+                type="button"
             >
                 {t('Delete_wallet_data')}
             </Button>
@@ -183,26 +99,26 @@ const DeleteContent: FC<{
     );
 };
 
-export const DeleteWalletNotification: FC<{
-    wallet?: WalletState;
+export const DeleteAccountNotification: FC<{
+    account?: Account;
     handleClose: () => void;
-}> = ({ wallet, handleClose }) => {
+}> = ({ account, handleClose }) => {
     const Content = useCallback(
         (afterClose: (action: () => void) => void) => {
-            if (!wallet) return undefined;
+            if (!account) return undefined;
             return (
                 <DeleteContent
-                    publicKey={wallet.publicKey}
+                    accountId={account.id}
                     onClose={afterClose}
-                    isKeystone={!!wallet.auth && wallet.auth.kind === 'keystone'}
+                    isKeystone={account.type === 'keystone'}
                 />
             );
         },
-        [wallet]
+        [account]
     );
 
     return (
-        <Notification isOpen={wallet != null} handleClose={handleClose}>
+        <Notification isOpen={account != null} handleClose={handleClose}>
             {Content}
         </Notification>
     );
@@ -250,6 +166,7 @@ const DeleteAllContent: FC<{ onClose: (action: () => void) => void }> = ({ onClo
                 fullWidth
                 loading={isLoading}
                 onClick={onDelete}
+                type="button"
             >
                 {t('Delete_wallet_data')}
             </Button>

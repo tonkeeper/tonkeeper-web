@@ -3,21 +3,23 @@ import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { FC, Suspense, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { ActivitySkeletonPage } from '../../components/Skeleton';
-import { Body2, Label2 } from '../../components/Text';
+import { useAppContext } from '../../hooks/appContext';
+import { useFetchNext } from '../../hooks/useFetchNext';
+import { QueryKey } from '../../libs/queryKey';
+import { getMixedActivity } from '../../state/mixedActivity';
 import EmptyActivity from '../../components/activity/EmptyActivity';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useFetchNext } from '../../hooks/useFetchNext';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { mergeRefs } from '../../libs/common';
-import { QueryKey } from '../../libs/queryKey';
-import { getMixedActivity } from '../../state/mixedActivity';
+import { useActiveWallet } from '../../state/wallet';
+import { Body2, Label2 } from '../../components/Text';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
@@ -47,7 +49,7 @@ const ExplorerButton = styled.button`
 `;
 
 export const DesktopHistoryPage: FC = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const sdk = useAppSdk();
     const { api, standalone, config } = useAppContext();
     const { t } = useTranslation();
@@ -61,10 +63,10 @@ export const DesktopHistoryPage: FC = () => {
         isFetchingNextPage: isTonFetchingNextPage,
         data: tonEvents
     } = useInfiniteQuery({
-        queryKey: [wallet.active.rawAddress, QueryKey.activity, 'all'],
+        queryKey: [wallet.rawAddress, QueryKey.activity, 'all'],
         queryFn: ({ pageParam = undefined }) =>
             new AccountsApi(api.tonApiV2).getAccountEvents({
-                accountId: wallet.active.rawAddress,
+                accountId: wallet.rawAddress,
                 limit: 20,
                 beforeLt: pageParam,
                 subjectOnly: true
@@ -104,7 +106,7 @@ export const DesktopHistoryPage: FC = () => {
                             ? sdk.openPage(
                                   config.accountExplorer.replace(
                                       '%s',
-                                      wallet.active.friendlyAddress
+                                      formatAddress(wallet.rawAddress)
                                   )
                               )
                             : undefined

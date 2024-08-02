@@ -172,6 +172,7 @@
   "save" : "Save",
   "settings_collectibles_list" : "Collectibles",
   "settings_connected_apps" : "Connected Apps",
+  "settings_ledger_indexes" : "Ledger subwallets",
   "start_trial_notification_description" : "Telegram connection is required solely for the purpose of verification that you are not a bot.",
   "start_trial_notification_heading" : "Connect Telegram to Pro for Free",
   "swap_balance" : "Balance",

@@ -251,7 +251,7 @@ export const Check: FC<{
     mnemonic: string[];
     onBack: () => void;
     onConfirm: () => void;
-    isLoading: boolean;
+    isLoading?: boolean;
 }> = ({ onBack, onConfirm, mnemonic, isLoading }) => {
     const { t, i18n } = useTranslation();
 
@@ -359,7 +359,7 @@ const focusInput = (current: HTMLDivElement | null, index: number) => {
 };
 
 export const ImportWords: FC<{
-    isLoading: boolean;
+    isLoading?: boolean;
     onMnemonic: (mnemonic: string[]) => void;
 }> = ({ isLoading, onMnemonic }) => {
     const sdk = useAppSdk();

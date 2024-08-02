@@ -1,22 +1,24 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { addWalletWithCustomAuthState } from '@tonkeeper/core/dist/service/accountService';
-import { walletStateFromSignerQr } from '@tonkeeper/core/dist/service/walletService';
+import { accountBySignerQr } from '@tonkeeper/core/dist/service/walletService';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
+import { useAccountsStorage } from '../hooks/useStorage';
 
 export const usePairSignerMutation = () => {
     const sdk = useAppSdk();
-    const { api, config } = useAppContext();
+    const accountsStorage = useAccountsStorage();
+    const context = useAppContext();
     const client = useQueryClient();
     const navigate = useNavigate();
     return useMutation<void, Error, string>(async qrCode => {
         try {
-            const state = await walletStateFromSignerQr(api, qrCode, config);
+            const newAccount = await accountBySignerQr(context, sdk.storage, qrCode);
 
-            await addWalletWithCustomAuthState(sdk.storage, state);
+            await accountsStorage.addAccountToState(newAccount);
+            await accountsStorage.setActiveAccountId(newAccount.id);
 
             await client.invalidateQueries([QueryKey.account]);
 

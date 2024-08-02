@@ -44,18 +44,6 @@ export const ThemeSettings = () => {
             icon: <LocalizationIcon />,
             action: () => navigate(relative(SettingsRoute.country))
         });
-
-        // TODO: REMOVE:
-        items.push({
-            name: i18n.language === 'ru' ? 'Обновление адреса' : 'Address Update',
-            icon: 'EQ » UQ',
-            action: () =>
-                sdk.openPage(
-                    i18n.language === 'ru'
-                        ? 'https://t.me/tonkeeper_ru/65'
-                        : 'https://t.me/tonkeeper_news/49'
-                )
-        });
         return items;
     }, [t, i18n.enable, navigate, fiat]);
 

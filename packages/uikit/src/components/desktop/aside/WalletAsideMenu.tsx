@@ -88,14 +88,6 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            <NavLink to={AppRoute.notcoin}>
-                {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
-                        <NotCoinIcon />
-                        <Label2>NOT Vouchers</Label2>
-                    </AsideMenuItemStyled>
-                )}
-            </NavLink>
             <NavLink to={AppRoute.walletSettings}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>

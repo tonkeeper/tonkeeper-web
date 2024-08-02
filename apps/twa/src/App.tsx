@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { WalletVersion } from "@tonkeeper/core/dist/entries/wallet";
+import { Account } from "@tonkeeper/core/dist/entries/account";
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -20,7 +21,6 @@ import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader
 import {
     AppContext,
     IAppContext,
-    WalletStateContext
 } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
@@ -37,12 +37,8 @@ import { SDKProvider } from '@tma.js/sdk-react';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
-import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
-import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
-import { useSwapMobileNotification } from '@tonkeeper/uikit/dist/state/swap/useSwapMobileNotification';
-import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
+import { useActiveAccountQuery, useAccountsStateQuery, useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
 import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
@@ -59,6 +55,12 @@ import { SwapScreen } from './components/swap/SwapNotification';
 import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
+import { useUserFiat } from "@tonkeeper/uikit/dist/state/fiat";
+import { useUserLanguage } from "@tonkeeper/uikit/dist/state/language";
+import { useSwapMobileNotification } from "@tonkeeper/uikit/dist/state/swap/useSwapMobileNotification";
+import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
+import { ModalsRoot } from "@tonkeeper/uikit/dist/components/ModalsRoot";
+import { useDebuggingTools } from "@tonkeeper/uikit/dist/hooks/useDebuggingTools";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -217,42 +219,36 @@ const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
 };
 
 export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
-    const { data: activeWallet } = useActiveWallet();
+    const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
+    const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
+    const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: fiat } = useUserFiat();
+    const { data: devSettings } = useDevSettings();
 
     const lock = useLock(sdk);
-    const { data: account } = useAccountState();
-    const { data: auth } = useAuthState();
+    const network = useActiveTonNetwork();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
-        build: sdk.version,
-        network: activeWallet?.network,
-        lang: activeWallet?.lang
-    });
+       targetEnv: TARGET_ENV,
+       build: sdk.version,
+       network,
+       lang
+}
+    );
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
-    const { data: tracker } = useAnalytics(account, activeWallet, sdk.version);
+    const { data: tracker } = useAnalytics(activeAccount || undefined, accounts, network, sdk.version);
 
-    if (
-        auth === undefined ||
-        account === undefined ||
-        config === undefined ||
-        lock === undefined ||
-        fiat === undefined
-    ) {
+    if (isWalletsLoading || activeWalletLoading || isLangLoading || config === undefined || lock === undefined || fiat === undefined || !devSettings) {
         return <Loading />;
     }
 
     const showQrScan = seeIfShowQrScanner(sdk.launchParams.platform);
 
-    const network = activeWallet?.network ?? Network.MAINNET;
     const context: IAppContext = {
         api: getApiConfig(config, network),
-        auth,
         fiat,
-        account,
         config,
         tonendpoint,
         standalone: true,
@@ -263,7 +259,8 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         hideBrowser: true,
         hideSigner: !showQrScan,
         hideKeystone: !showQrScan,
-        hideQrScanner: !showQrScan
+        hideQrScanner: !showQrScan,
+        defaultWalletVersion: WalletVersion.V5R1
     };
 
     return (
@@ -274,12 +271,13 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
                 >
                     <AppContext.Provider value={context}>
                         <Content
-                            activeWallet={activeWallet}
+                            activeAccount={activeAccount}
                             lock={lock}
                             showQrScan={showQrScan}
                             sdk={sdk}
                         />
                         <CopyNotification />
+                        <ModalsRoot />
                         {showQrScan && <TwaQrScanner />}
                     </AppContext.Provider>
                 </AfterImportAction.Provider>
@@ -308,7 +306,7 @@ const InitPages: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         <InitWrapper>
             <Suspense fallback={<Loading />}>
                 <Routes>
-                    <Route path={any(AppRoute.import)} element={<ImportRouter listOfAuth={[]} />} />
+                    <Route path={any(AppRoute.import)} element={<ImportRouter />} />
                     <Route path="*" element={<Initialize />} />
                 </Routes>
             </Suspense>
@@ -318,13 +316,14 @@ const InitPages: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
 
 const Content: FC<{
     sdk: TwaAppSdk;
-    activeWallet?: WalletState | null;
+    activeAccount?: Account | null;
     lock: boolean;
     showQrScan: boolean;
-}> = ({ activeWallet, lock, showQrScan, sdk }) => {
+}> = ({ activeAccount, lock, showQrScan, sdk }) => {
     const location = useLocation();
     useWindowsScroll();
     useTrackLocation();
+    useDebuggingTools();
 
     if (lock) {
         return (
@@ -334,21 +333,21 @@ const Content: FC<{
         );
     }
 
-    if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
+    if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
         return <InitPages sdk={sdk} />;
     }
 
     return (
-        <WalletStateContext.Provider value={activeWallet}>
-            <Routes>
-                <Route path={AppRoute.swap} element={<SwapScreen />} />
-                <Route path={'*'} element={<MainPages showQrScan={showQrScan} sdk={sdk} />} />
-            </Routes>
-            <Suspense>
-                <PairSignerNotification />
-                <PairKeystoneNotification />
-            </Suspense>
-        </WalletStateContext.Provider>
+        <>
+          <Routes>
+            <Route path={AppRoute.swap} element={<SwapScreen />} />
+            <Route path={'*'} element={<MainPages showQrScan={showQrScan} sdk={sdk} />} />
+          </Routes>
+          <Suspense>
+            <PairSignerNotification />
+            <PairKeystoneNotification />
+          </Suspense>
+        </>
     );
 };
 

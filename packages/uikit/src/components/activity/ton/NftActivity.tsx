@@ -3,10 +3,9 @@ import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useWalletContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
-import { useNftItemData } from '../../../state/wallet';
+import { useActiveTonNetwork, useActiveWallet } from '../../../state/wallet';
 import { InfoCircleIcon, VerificationIcon } from '../../Icon';
 import { ListBlock } from '../../List';
 import { Body1, Body2 } from '../../Text';
@@ -44,7 +43,8 @@ import {
     useIsSpamNft,
     useIsUnverifiedNft,
     useMarkNftAsSpam,
-    useMarkNftAsTrusted
+    useMarkNftAsTrusted,
+    useNftItemData
 } from '../../../state/nft';
 
 const NftBlock = styled.div`
@@ -141,13 +141,14 @@ export const NftItemTransferAction: FC<{
     date: string;
 }> = ({ action, date }) => {
     const { t } = useTranslation();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
+    const network = useActiveTonNetwork();
     const { nftItemTransfer } = action;
     if (!nftItemTransfer) {
         return <ErrorAction />;
     }
 
-    if (nftItemTransfer.recipient?.address === wallet.active.rawAddress) {
+    if (nftItemTransfer.recipient?.address === wallet.rawAddress) {
         return (
             <ListItemGrid>
                 <ActivityIcon status={action.status}>
@@ -161,7 +162,7 @@ export const NftItemTransferAction: FC<{
                         toShortValue(
                             formatAddress(
                                 nftItemTransfer.sender?.address ?? nftItemTransfer.nft,
-                                wallet.network,
+                                network,
                                 !nftItemTransfer.sender?.address
                             )
                         )
@@ -189,7 +190,7 @@ export const NftItemTransferAction: FC<{
                     toShortValue(
                         formatAddress(
                             nftItemTransfer.recipient?.address ?? nftItemTransfer.nft,
-                            wallet.network,
+                            network,
                             !nftItemTransfer.recipient?.address
                         )
                     )
@@ -376,7 +377,7 @@ const NftActivityHeader: FC<{
 };
 
 export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { nftItemTransfer } = action;
 
     const { data } = useNftItemData(nftItemTransfer?.nft);
@@ -385,8 +386,7 @@ export const NftItemTransferActionDetails: FC<ActionData> = ({ action, timestamp
         return <ErrorActivityNotification event={event} />;
     }
 
-    const kind =
-        nftItemTransfer.recipient?.address === wallet.active.rawAddress ? 'received' : 'send';
+    const kind = nftItemTransfer.recipient?.address === wallet.rawAddress ? 'received' : 'send';
 
     return (
         <ActionDetailsBlock event={event}>

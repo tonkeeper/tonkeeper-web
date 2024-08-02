@@ -1,31 +1,35 @@
-import { AuthState } from '@tonkeeper/core/dist/entries/password';
 import React, { FC, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 import { BackButtonBlock } from '../../components/BackButton';
 import { Body1, Body2, H2 } from '../../components/Text';
 import { WorldNumber, WorldsGrid } from '../../components/create/Words';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { getMnemonic } from '../../state/mnemonic';
-import { useCheckTouchId } from "../../state/password";
+import { useCheckTouchId } from '../../state/password';
+import { useActiveAccount } from '../../state/wallet';
+import { AccountId } from '@tonkeeper/core/dist/entries/account';
 
 export const ActiveRecovery = () => {
-    const wallet = useWalletContext();
-    return <RecoveryContent publicKey={wallet.publicKey} />;
+    const account = useActiveAccount();
+    if (account.type === 'mnemonic') {
+        return <RecoveryContent accountId={account.id} />;
+    } else {
+        return <Navigate to="../" replace={true} />;
+    }
 };
 
 export const Recovery = () => {
-    const { publicKey } = useParams();
-    if (publicKey) {
-        return <RecoveryContent publicKey={publicKey} />;
+    const { accountId } = useParams();
+    if (accountId) {
+        return <RecoveryContent accountId={accountId} />;
     } else {
         return <ActiveRecovery />;
     }
 };
 
-const useMnemonic = (publicKey: string, auth: AuthState) => {
+const useMnemonic = (accountId: AccountId) => {
     const [mnemonic, setMnemonic] = useState<string[] | undefined>(undefined);
     const sdk = useAppSdk();
     const navigate = useNavigate();
@@ -34,12 +38,12 @@ const useMnemonic = (publicKey: string, auth: AuthState) => {
     useEffect(() => {
         (async () => {
             try {
-                setMnemonic(await getMnemonic(sdk, publicKey, checkTouchId));
+                setMnemonic(await getMnemonic(sdk, accountId, checkTouchId));
             } catch (e) {
                 navigate(-1);
             }
         })();
-    }, [publicKey]);
+    }, [accountId, checkTouchId]);
 
     return mnemonic;
 };
@@ -73,11 +77,18 @@ const Body = styled(Body2)`
     user-select: none;
 `;
 
-const RecoveryContent: FC<{ publicKey: string }> = ({ publicKey }) => {
-    const { auth } = useAppContext();
+const BackButtonBlockStyled = styled(BackButtonBlock)`
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            margin-top: -64px;
+        `}
+`;
+
+const RecoveryContent: FC<{ accountId: AccountId }> = ({ accountId }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const mnemonic = useMnemonic(publicKey, auth);
+    const mnemonic = useMnemonic(accountId);
 
     const onBack = () => {
         navigate(-1);
@@ -89,7 +100,7 @@ const RecoveryContent: FC<{ publicKey: string }> = ({ publicKey }) => {
 
     return (
         <Wrapper>
-            <BackButtonBlock onClick={onBack} />
+            <BackButtonBlockStyled onClick={onBack} />
             <Block>
                 <Title>{t('secret_words_title')}</Title>
                 <Body>{t('secret_words_caption')}</Body>

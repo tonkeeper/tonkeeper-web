@@ -6,17 +6,18 @@ import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../../components
 import { FullHeightBlockResponsive, Notification } from '../../components/Notification';
 import { Label2 } from '../../components/Text';
 import { ButtonBlock, ConfirmMainButton, ResultButton } from '../../components/transfer/common';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
+import { useActiveStandardTonWallet } from '../../state/wallet';
 
 const usePublishMessage = (signatureHex: string) => {
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     return useQuery([signatureHex], async () => {
-        return await publishSignerMessage(sdk, api, wallet, signatureHex);
+        return publishSignerMessage(sdk, api, wallet, signatureHex);
     });
 };
 
@@ -64,7 +65,7 @@ const Confirm: FC<{ signatureHex: string; onClose: () => void }> = ({ signatureH
 
 const SignerPublishNotification = () => {
     const { t } = useTranslation();
-    let [searchParams, setParams] = useSearchParams();
+    const [searchParams, setParams] = useSearchParams();
 
     const signatureHex = searchParams.get('sign');
 

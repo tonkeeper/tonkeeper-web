@@ -7,9 +7,7 @@ import {
 import { subscribeTonConnect } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useCallback, useEffect, useState } from 'react';
 import { useSendNotificationAnalytics } from '../../hooks/amplitude';
-import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useMutateActiveWallet } from '../../state/account';
 import {
     tonConnectAppManuallyDisconnected$,
     useAppTonConnectConnections,
@@ -19,6 +17,8 @@ import {
 import { TonTransactionNotification } from './TonTransactionNotification';
 import { SendTransactionAppRequest, useResponseSendMutation } from './connectHook';
 
+import { useActiveWallet, useMutateActiveTonWallet } from '../../state/wallet';
+
 const useUnSupportMethodMutation = () => {
     return useMutation<void, Error, TonConnectAppRequest>(replyBadRequestResponse);
 };
@@ -27,7 +27,7 @@ const TonConnectSubscription = () => {
     const [request, setRequest] = useState<SendTransactionAppRequest | undefined>(undefined);
 
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { data: appConnections } = useAppTonConnectConnections();
     const { data: lastEventId } = useTonConnectLastEventId();
 
@@ -36,7 +36,7 @@ const TonConnectSubscription = () => {
     const { mutateAsync: responseSendAsync } = useResponseSendMutation();
 
     useSendNotificationAnalytics(request?.connection?.manifest);
-    const { mutateAsync: setActiveWallet } = useMutateActiveWallet();
+    const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
 
     useEffect(() => {
         const handleMessage = (params: TonConnectAppRequest) => {
@@ -60,7 +60,7 @@ const TonConnectSubscription = () => {
                     );
 
                     if (walletToActivate) {
-                        setActiveWallet(walletToActivate.wallet.publicKey).then(() =>
+                        setActiveWallet(walletToActivate.wallet.rawAddress).then(() =>
                             setTimeout(() => {
                                 setRequest(value);
                             }, 100)
@@ -83,7 +83,7 @@ const TonConnectSubscription = () => {
         (async () => {
             if (notifications && appConnections) {
                 try {
-                    const enable = await notifications.subscribed(wallet.active.rawAddress);
+                    const enable = await notifications.subscribed(wallet.rawAddress);
                     if (enable) {
                         for (const connection of appConnections.flatMap(i => i.connections)) {
                             await notifications.subscribeTonConnect(

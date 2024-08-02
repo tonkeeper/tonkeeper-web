@@ -5,11 +5,18 @@ import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 
 export const useUserFiat = () => {
     const sdk = useAppSdk();
-    return useQuery<FiatCurrencies>([AppKey.FIAT], async () => {
-        return (
-            (await sdk.storage.get<FiatCurrencies | undefined>(AppKey.FIAT)) || FiatCurrencies.USD
-        );
-    });
+    return useQuery<FiatCurrencies>(
+        [AppKey.FIAT],
+        async () => {
+            return (
+                (await sdk.storage.get<FiatCurrencies | undefined>(AppKey.FIAT)) ||
+                FiatCurrencies.USD
+            );
+        },
+        {
+            keepPreviousData: true
+        }
+    );
 };
 
 export const useMutateUserFiat = () => {

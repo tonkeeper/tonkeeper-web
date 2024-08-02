@@ -1,9 +1,6 @@
 import { mnemonicNew } from '@ton/crypto';
-import { AccountState } from '@tonkeeper/core/dist/entries/account';
-import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { FC, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IconPage } from '../../components/Layout';
-import { CreateAuthState } from '../../components/create/CreateAuth';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { Check, Worlds } from '../../components/create/Words';
 import { Button } from '../../components/fields/Button';
@@ -15,30 +12,27 @@ import {
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveWallet } from '../../state/wallet';
-import { FinalView, useAddWalletMutation } from './Password';
+import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
+import { Account } from '@tonkeeper/core/dist/entries/account';
+import { useCreateAccountMnemonic, useMutateRenameAccount } from '../../state/wallet';
 
-const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
+const Create = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    const { config } = useAppContext();
-    const {
-        mutateAsync: checkPasswordAndCreateWalletAsync,
-        isLoading: isConfirmLoading,
-        reset
-    } = useAddWalletMutation();
+    const { defaultWalletVersion } = useAppContext();
+    const { mutateAsync: createWalletsAsync, isLoading: isCreateWalletLoading } =
+        useCreateAccountMnemonic();
+    const { mutateAsync: renameWallet, isLoading: renameLoading } = useMutateRenameAccount();
 
-    const { data: wallet } = useActiveWallet();
-    const [mnemonic, setMnemonic] = useState<string[]>([]);
-    const [account, setAccount] = useState<AccountState | undefined>(undefined);
+    const [mnemonic, setMnemonic] = useState<string[] | undefined>();
+    const [createdAccount, setCreatedAccount] = useState<Account | undefined>(undefined);
 
-    const [create, setCreate] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [check, setCheck] = useState(false);
-    const [checked, setChecked] = useState(false);
-    const [hasPassword, setHasPassword] = useState(false);
-    const [passNotifications, setPassNotification] = useState(false);
+    const [creatingAnimationPassed, setCreatingAnimationPassed] = useState(false);
+    const [infoPagePassed, setInfoPagePassed] = useState(false);
+    const [wordsPagePassed, setWordsPagePassed] = useState(false);
+    const [editNamePagePassed, setEditNamePagePassed] = useState(false);
+    const [notificationsSubscribePagePassed, setPassNotification] = useState(false);
 
     useEffect(() => {
         setTimeout(() => {
@@ -47,22 +41,22 @@ const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
     }, []);
 
     useEffect(() => {
-        if (mnemonic.length) {
+        if (mnemonic) {
             setTimeout(() => {
-                setCreate(true);
+                setCreatingAnimationPassed(true);
             }, 1500);
         }
     }, [mnemonic]);
 
-    if (mnemonic.length === 0) {
+    if (!mnemonic) {
         return <IconPage icon={<GearLottieIcon />} title={t('create_wallet_generating')} />;
     }
 
-    if (!create) {
+    if (!creatingAnimationPassed) {
         return <IconPage icon={<CheckLottieIcon />} title={t('create_wallet_generated')} />;
     }
 
-    if (!open) {
+    if (!infoPagePassed) {
         return (
             <IconPage
                 logOut
@@ -70,7 +64,13 @@ const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
                 title={t('create_wallet_title')}
                 description={t('create_wallet_caption')}
                 button={
-                    <Button size="large" fullWidth primary marginTop onClick={() => setOpen(true)}>
+                    <Button
+                        size="large"
+                        fullWidth
+                        primary
+                        marginTop
+                        onClick={() => setInfoPagePassed(true)}
+                    >
                         {t('continue')}
                     </Button>
                 }
@@ -78,64 +78,56 @@ const Create: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
         );
     }
 
-    if (!check) {
+    if (!wordsPagePassed) {
         return (
             <Worlds
                 mnemonic={mnemonic}
-                onBack={() => setOpen(false)}
-                onCheck={() => setCheck(true)}
+                onBack={() => setInfoPagePassed(false)}
+                onCheck={() => setWordsPagePassed(true)}
             />
         );
     }
 
-    if (!checked) {
+    if (!createdAccount) {
         return (
             <Check
                 mnemonic={mnemonic}
-                onBack={() => setCheck(false)}
-                onConfirm={() =>
-                    checkPasswordAndCreateWalletAsync({ mnemonic, listOfAuth }).then(state => {
-                        setChecked(true);
-                        if (state === false) {
-                            setHasPassword(false);
-                        } else {
-                            setHasPassword(true);
-                            setAccount(state);
-                        }
-                    })
-                }
-                isLoading={isConfirmLoading}
+                onBack={() => setWordsPagePassed(false)}
+                onConfirm={() => {
+                    createWalletsAsync({
+                        mnemonic,
+                        versions: [defaultWalletVersion],
+                        selectAccount: true
+                    }).then(setCreatedAccount);
+                }}
+                isLoading={isCreateWalletLoading}
             />
         );
     }
 
-    if (!hasPassword) {
+    if (!editNamePagePassed) {
         return (
-            <CreateAuthState
-                afterCreate={(password?: string) => {
-                    reset();
-                    checkPasswordAndCreateWalletAsync({ mnemonic, password }).then(state => {
-                        if (state !== false) {
-                            setHasPassword(true);
-                            setAccount(state);
-                        }
+            <UpdateWalletName
+                name={createdAccount.name}
+                submitHandler={val => {
+                    renameWallet({
+                        id: createdAccount.id,
+                        ...val
+                    }).then(newAcc => {
+                        setEditNamePagePassed(true);
+                        setCreatedAccount(newAcc);
                     });
                 }}
-                isLoading={isConfirmLoading}
+                walletEmoji={createdAccount.emoji}
+                isLoading={renameLoading}
             />
         );
     }
 
-    if (account && account.publicKeys.length > 1 && wallet && wallet.name == null) {
-        return (
-            <UpdateWalletName account={account} onUpdate={setAccount} walletEmoji={wallet.emoji} />
-        );
-    }
-
-    if (sdk.notifications && !passNotifications) {
+    if (sdk.notifications && !notificationsSubscribePagePassed) {
         return (
             <Subscribe
-                wallet={wallet!}
+                wallet={createdAccount.activeTonWallet}
                 mnemonic={mnemonic}
                 onDone={() => setPassNotification(true)}
             />
