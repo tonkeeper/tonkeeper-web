@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { emojiIcons } from './emojiIcons';
 import styled from 'styled-components';
+import { emojiIcons } from './emojiIcons';
 
 const EmojiWrapper = styled.div<{ emojiSize?: string; containerSize?: string }>`
     height: ${p => p.containerSize || '32px'};
@@ -19,12 +19,12 @@ const EmojiWrapper = styled.div<{ emojiSize?: string; containerSize?: string }>`
 `;
 
 export const WalletEmoji: FC<{
-    emoji: string;
+    emoji?: string;
     emojiSize?: string;
     containerSize?: string;
     className?: string;
 }> = ({ emoji, className, emojiSize, containerSize }) => {
-    if (emoji.startsWith('custom:')) {
+    if (emoji?.startsWith('custom:')) {
         const Emoji = emojiIcons.find(icon => icon.name === emoji);
 
         if (!Emoji) {
