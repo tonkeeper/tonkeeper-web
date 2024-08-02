@@ -13,7 +13,8 @@ import { useTranslation } from '../../hooks/translation';
 import { scrollToTop } from '../../libs/common';
 import { AppRoute } from '../../libs/routes';
 import { useAssets } from '../../state/home';
-import { useWalletFilteredNftList } from '../../state/wallet';
+
+import { useWalletFilteredNftList } from "../../state/nft";
 
 const MainColumnSkeleton = memo(() => {
     const sdk = useAppSdk();

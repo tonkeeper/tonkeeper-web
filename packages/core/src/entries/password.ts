@@ -1,25 +1,23 @@
-import { KeystonePathInfo } from "../service/keystone/types";
+import { KeystonePathInfo } from '../service/keystone/types';
 
 export type AuthState =
-    | AuthNone
     | AuthPassword
-    | WebAuthn
-    | KeychainPassword
+    | AuthKeychain
     | AuthSigner
     | AuthSignerDeepLink
     | AuthLedger
     | AuthKeystone;
 
-export interface AuthNone {
-    kind: 'none';
-}
-
 export interface AuthPassword {
     kind: 'password';
+    encryptedMnemonic: string;
 }
 
-export interface KeychainPassword {
+export interface AuthKeychain {
     kind: 'keychain';
+
+    // currently eq to publicKey
+    keychainStoreKey: string;
 }
 
 export interface AuthSigner {
@@ -27,7 +25,7 @@ export interface AuthSigner {
 }
 
 export interface AuthSignerDeepLink {
-  kind: 'signer-deeplink';
+    kind: 'signer-deeplink';
 }
 
 export interface AuthLedger {
@@ -40,11 +38,35 @@ export interface AuthKeystone {
     info?: KeystonePathInfo;
 }
 
-export interface WebAuthn {
-    kind: 'webauthn';
-    type: 'largeBlob' | 'credBlob' | 'userHandle';
-    credentialId: string;
-    transports?: AuthenticatorTransport[];
+/**
+ * @deprecated
+ */
+export type DeprecatedAuthState =
+    | DeprecatedAuthNone
+    | DeprecatedAuthPassword
+    | DeprecatedKeychainPassword
+    | AuthSigner
+    | AuthSignerDeepLink
+    | AuthLedger
+    | AuthKeystone;
+
+/**
+ * @deprecated
+ */
+export interface DeprecatedAuthNone {
+    kind: 'none';
 }
 
-export const defaultAuthState: AuthState = { kind: 'none' };
+/**
+ * @deprecated
+ */
+export interface DeprecatedAuthPassword {
+    kind: 'password';
+}
+
+/**
+ * @deprecated
+ */
+export interface DeprecatedKeychainPassword {
+    kind: 'keychain';
+}

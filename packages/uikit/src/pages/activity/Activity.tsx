@@ -3,18 +3,19 @@ import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, Suspense, useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
-import { ActivitySkeletonPage, SkeletonList } from '../../components/Skeleton';
+import { ActivitySkeletonPage, SkeletonListWithImages } from '../../components/Skeleton';
 import { MixedActivityGroup } from '../../components/activity/ActivityGroup';
 
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
 import { getMixedActivityGroups } from '../../state/mixedActivity';
+import { useActiveWallet } from '../../state/wallet';
 
 const EmptyActivity = React.lazy(() => import('../../components/activity/EmptyActivity'));
 
 const Activity: FC = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { api, standalone } = useAppContext();
 
     const ref = useRef<HTMLDivElement>(null);
@@ -26,10 +27,10 @@ const Activity: FC = () => {
         isFetchingNextPage: isTonFetchingNextPage,
         data: tonEvents
     } = useInfiniteQuery({
-        queryKey: [wallet.active.rawAddress, QueryKey.activity, 'all'],
+        queryKey: [wallet.rawAddress, QueryKey.activity, 'all'],
         queryFn: ({ pageParam = undefined }) =>
             new AccountsApi(api.tonApiV2).getAccountEvents({
-                accountId: wallet.active.rawAddress,
+                accountId: wallet.rawAddress,
                 limit: 20,
                 beforeLt: pageParam,
                 subjectOnly: true
@@ -81,7 +82,7 @@ const Activity: FC = () => {
             <ActivityHeader />
             <InnerBody ref={ref}>
                 <MixedActivityGroup items={activity} />
-                {isFetchingNextPage && <SkeletonList size={3} />}
+                {isFetchingNextPage && <SkeletonListWithImages size={3} />}
             </InnerBody>
         </>
     );

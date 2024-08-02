@@ -2,15 +2,17 @@ import { useQueryClient } from '@tanstack/react-query';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useEffect } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { QueryKey } from '../../libs/queryKey';
-import { useWalletAuthState, useWalletTotalBalance } from '../../state/wallet';
+import { useActiveAccount, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 import { Body3, Label2, Num2 } from '../Text';
-import { Badge } from '../shared';
 import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
+import { useWalletTotalBalance } from '../../state/asset';
+import { useTranslation } from '../../hooks/translation';
+import { AccountAndWalletBadgesGroup } from '../account/AccountBadge';
 
 const Block = styled.div`
     display: flex;
@@ -23,6 +25,12 @@ const Body = styled(Label2)`
     color: ${props => props.theme.textSecondary};
     user-select: none;
     display: flex;
+    cursor: pointer;
+
+    transition: transform 0.2s ease;
+    &:active {
+        transform: scale(0.97);
+    }
 `;
 
 const Amount = styled(Num2)`
@@ -40,6 +48,12 @@ const Text = styled(Body3)`
     line-height: 26px;
     color: ${props => props.theme.textSecondary};
 `;
+
+const AccountAndWalletBadgesGroupStyled = styled(AccountAndWalletBadgesGroup)`
+    display: inline-flex;
+    margin-left: 3px;
+`;
+
 const MessageBlock: FC<{ error?: Error | null; isFetching: boolean }> = ({ error }) => {
     if (error) {
         return (
@@ -66,54 +80,20 @@ export const BalanceSkeleton = () => {
     );
 };
 
-const Label = () => {
-    const wallet = useWalletContext();
-    const { data: state } = useWalletAuthState(wallet.publicKey);
-    switch (state?.kind) {
-        case 'signer':
-        case 'signer-deeplink':
-            return (
-                <>
-                    {' '}
-                    <Badge display="inline-block" color="accentPurple">
-                        Signer
-                    </Badge>
-                </>
-            );
-        case 'ledger':
-            return (
-                <>
-                    {' '}
-                    <Badge display="inline-block" color="accentGreen">
-                        Ledger
-                    </Badge>
-                </>
-            );
-        case 'keystone':
-            return (
-                <>
-                    {' '}
-                    <Badge display="inline-block" color="accentGreen">
-                        Keystone
-                    </Badge>
-                </>
-            );
-        default:
-            return <></>;
-    }
-};
-
 export const Balance: FC<{
     error?: Error | null;
     isFetching: boolean;
     assets: AssetData;
 }> = ({ error, isFetching }) => {
+    const { t } = useTranslation();
+    const account = useActiveAccount();
     const sdk = useAppSdk();
     const { fiat } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const client = useQueryClient();
+    const network = useActiveTonNetwork();
 
-    const address = formatAddress(wallet.active.rawAddress, wallet.network);
+    const address = formatAddress(wallet.rawAddress, network);
 
     const { data: total } = useWalletTotalBalance(fiat);
 
@@ -133,9 +113,12 @@ export const Balance: FC<{
         <Block>
             <MessageBlock error={error} isFetching={isFetching} />
             <Amount>{formatFiatCurrency(fiat, total || 0)}</Amount>
-            <Body onClick={() => sdk.copyToClipboard(address)}>
+            <Body onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
                 {toShortValue(address)}
-                <Label />
+                <AccountAndWalletBadgesGroupStyled
+                    account={account}
+                    walletId={account.activeTonWallet.id}
+                />
             </Body>
         </Block>
     );

@@ -10,12 +10,13 @@ import {
 import { AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 import BigNumber from 'bignumber.js';
 import { useJettonList } from '../../state/jetton';
-import { useAppContext, useWalletContext } from '../appContext';
+import { useAppContext } from '../appContext';
 import { MultiSendFormTokenized, multiSendFormToTransferMessages } from './useSendMultiTransfer';
+import { useActiveStandardTonWallet } from '../../state/wallet';
 
 export function useEstimateMultiTransfer() {
     const { api } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const { data: jettons } = useJettonList();
 
     return useMutation<

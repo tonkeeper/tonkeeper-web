@@ -2,12 +2,16 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute } from '../libs/routes';
-import { useMutateActiveWallet } from '../state/account';
 import { useUserCountry } from '../state/country';
-import { useWalletState } from '../state/wallet';
+import {
+    useActiveWallet,
+    useAccountsState,
+    useMutateActiveTonWallet,
+    useActiveTonNetwork,
+    useActiveAccount
+} from '../state/wallet';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
@@ -17,6 +21,13 @@ import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
+import {
+    sortDerivationsByIndex,
+    sortWalletsByVersion,
+    TonWalletStandard
+} from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
+import { AccountAndWalletBadgesGroup } from './account/AccountBadge';
 
 const Block = styled.div<{
     center?: boolean;
@@ -97,6 +108,7 @@ const Icon = styled.span`
     padding-left: 0.5rem;
     color: ${props => props.theme.accentBlue};
     display: flex;
+    margin-left: auto;
 `;
 
 const Row = styled.div`
@@ -114,39 +126,48 @@ const Row = styled.div`
     }
 `;
 
+const ListItemPayloadStyled = styled(ListItemPayload)`
+    justify-content: flex-start;
+`;
+
+const ColumnTextStyled = styled(ColumnText)`
+    flex-grow: 0;
+`;
+
+const DropDownContainerStyle = createGlobalStyle`
+  .header-dd-container {
+    margin-left: -135px;
+    width: 270px;
+  }
+`;
+
 const WalletRow: FC<{
-    activePublicKey?: string;
-    publicKey: string;
-    index: number;
+    account: Account;
+    wallet: TonWalletStandard;
     onClose: () => void;
-}> = ({ activePublicKey, publicKey, index, onClose }) => {
-    const { mutate } = useMutateActiveWallet();
-    const { t } = useTranslation();
-    const { data: wallet } = useWalletState(publicKey);
-    const address = wallet
-        ? toShortValue(formatAddress(wallet.active.rawAddress, wallet.network))
-        : undefined;
+}> = ({ account, wallet, onClose }) => {
+    const network = useActiveTonNetwork();
+    const { mutate } = useMutateActiveTonWallet();
+    const address = toShortValue(formatAddress(wallet.rawAddress, network));
+    const activeWallet = useActiveWallet();
     return (
         <ListItem
             dropDown
             onClick={() => {
-                mutate(publicKey);
+                mutate(wallet.id);
                 onClose();
             }}
         >
-            <ListItemPayload>
-                {wallet && <WalletEmoji emoji={wallet.emoji} />}
-                <ColumnText
-                    noWrap
-                    text={wallet?.name ? wallet.name : `${t('wallet_title')} ${index + 1}`}
-                    secondary={address}
-                />
-                {activePublicKey === publicKey ? (
+            <ListItemPayloadStyled>
+                <WalletEmoji emoji={account.emoji} />
+                <ColumnTextStyled noWrap text={account.name} secondary={address} />
+                <AccountAndWalletBadgesGroup account={account} walletId={wallet.id} />
+                {activeWallet?.id === wallet.id ? (
                     <Icon>
                         <DoneIcon />
                     </Icon>
                 ) : undefined}
-            </ListItemPayload>
+            </ListItemPayloadStyled>
         </ListItem>
     );
 };
@@ -156,10 +177,36 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
     onCreate
 }) => {
     const navigate = useNavigate();
-    const { account } = useAppContext();
     const { t } = useTranslation();
+    const accountsWallets: { wallet: TonWalletStandard; account: Account }[] =
+        useAccountsState().flatMap(a => {
+            if (a.type === 'ledger') {
+                return a.derivations
+                    .slice()
+                    .sort(sortDerivationsByIndex)
+                    .map(
+                        d =>
+                            ({
+                                wallet: d.tonWallets.find(w => w.id === d.activeTonWalletId)!,
+                                account: a
+                            } as { wallet: TonWalletStandard; account: Account })
+                    );
+            }
 
-    if (account.publicKeys.length === 1) {
+            return a.allTonWallets
+                .slice()
+                .sort(sortWalletsByVersion)
+                .map(w => ({
+                    wallet: w,
+                    account: a
+                }));
+        });
+
+    if (!accountsWallets) {
+        return null;
+    }
+
+    if (accountsWallets.length === 1) {
         return (
             <Row
                 onClick={() => {
@@ -176,12 +223,11 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
     } else {
         return (
             <>
-                {account.publicKeys.map((publicKey, index) => (
+                {accountsWallets.map(({ wallet, account }) => (
                     <WalletRow
-                        key={publicKey}
-                        publicKey={publicKey}
-                        activePublicKey={account.activePublicKey}
-                        index={index}
+                        account={account}
+                        key={wallet.id}
+                        wallet={wallet}
                         onClose={onClose}
                     />
                 ))}
@@ -202,30 +248,35 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
     }
 };
 
+const TitleStyled = styled(Title)`
+    align-items: center;
+`;
+
 export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
-    const { t } = useTranslation();
-    const wallet = useWalletContext();
+    const account = useActiveAccount();
     const [isOpen, setOpen] = useState(false);
 
-    const { account } = useAppContext();
-    const shouldShowIcon = account.publicKeys.length > 1;
+    const accounts = useAccountsState();
+    const shouldShowIcon = accounts.length > 1;
 
     return (
         <Block center>
+            <DropDownContainerStyle />
             <DropDown
                 center
                 payload={onClose => (
                     <DropDownPayload onClose={onClose} onCreate={() => setOpen(true)} />
                 )}
+                containerClassName="header-dd-container"
             >
-                <Title>
-                    {shouldShowIcon && <WalletEmoji emoji={wallet.emoji} />}
-                    <TitleName> {wallet.name ? wallet.name : t('wallet_title')}</TitleName>
+                <TitleStyled>
+                    {shouldShowIcon && <WalletEmoji emoji={account.emoji} />}
+                    <TitleName>{account.name}</TitleName>
 
                     <DownIconWrapper>
                         <DownIcon />
                     </DownIconWrapper>
-                </Title>
+                </TitleStyled>
             </DropDown>
 
             {showQrScan && <ScanButton />}

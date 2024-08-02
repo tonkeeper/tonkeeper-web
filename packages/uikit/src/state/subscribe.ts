@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 
 export const useSubscribeMutation = (
-    wallet: WalletState,
+    wallet: TonWalletStandard,
     signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>,
     onDone: () => void
 ) => {

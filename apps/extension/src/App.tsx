@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
-import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { WalletVersion } from "@tonkeeper/core/dist/entries/wallet";
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -25,7 +25,6 @@ import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/di
 import {
     AppContext,
     IAppContext,
-    WalletStateContext
 } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
@@ -40,11 +39,9 @@ import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
-import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
-import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
-import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
+import { useActiveAccountQuery, useAccountsStateQuery, useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -55,6 +52,11 @@ import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
+import { useMutateUserLanguage } from "@tonkeeper/uikit/dist/state/language";
+import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
+import { ModalsRoot } from "@tonkeeper/uikit/dist/components/ModalsRoot";
+import { Account } from "@tonkeeper/core/dist/entries/account";
+import { useDebuggingTools } from "@tonkeeper/uikit/dist/hooks/useDebuggingTools";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -175,23 +177,29 @@ const Wrapper = styled(FullSizeWrapper)<{
 `;
 
 export const Loader: FC = React.memo(() => {
-    const { data: activeWallet } = useActiveWallet();
+    const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
+    const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
     const { data: fiat } = useUserFiat();
+    const { mutate: setLang } = useMutateUserLanguage();
+    const { data: devSettings } = useDevSettings();
+    const network = useActiveTonNetwork();
+
+    useEffect(() => {
+        setLang(localizationFrom(browser.i18n.getUILanguage()))
+    }, [setLang]);
 
     const lock = useLock(sdk);
-    const { data: account } = useAccountState();
-    const { data: auth } = useAuthState();
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,
         build: sdk.version,
-        network: activeWallet?.network,
+        network,
         lang: localizationFrom(browser.i18n.getUILanguage())
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
-    const { data: tracker } = useAnalytics(sdk.storage, account, activeWallet, sdk.version);
+    const { data: tracker } = useAnalytics(sdk.storage, activeAccount || undefined, accounts, sdk.version);
 
-    if (!account || !auth || !config || lock === undefined || fiat === undefined) {
+    if (activeWalletLoading || isWalletsLoading || !config || lock === undefined || fiat === undefined || !devSettings) {
         return (
             <FullSizeWrapper standalone={false}>
                 <Loading />
@@ -199,12 +207,8 @@ export const Loader: FC = React.memo(() => {
         );
     }
 
-    const network = activeWallet?.network ?? Network.MAINNET;
-
     const context: IAppContext = {
         api: getApiConfig(config, network),
-        account,
-        auth,
         fiat,
         config,
         tonendpoint,
@@ -213,7 +217,8 @@ export const Loader: FC = React.memo(() => {
         extension: true,
         proFeatures: false,
         hideQrScanner: true,
-        hideSigner: true
+        hideSigner: true,
+        defaultWalletVersion: WalletVersion.V5R1
     };
 
     return (
@@ -221,11 +226,12 @@ export const Loader: FC = React.memo(() => {
             <OnImportAction.Provider value={sdk.openExtensionInBrowser}>
                 <AfterImportAction.Provider value={sdk.closeExtensionInBrowser}>
                     <AppContext.Provider value={context}>
-                        <Content activeWallet={activeWallet} lock={lock} />
+                        <Content activeAccount={activeAccount} lock={lock} />
                         <CopyNotification />
                         <Suspense fallback={<></>}>
                             <QrScanner />
                         </Suspense>
+                        <ModalsRoot />
                     </AppContext.Provider>
                 </AfterImportAction.Provider>
             </OnImportAction.Provider>
@@ -246,16 +252,17 @@ const InitialRedirect: FC<PropsWithChildren> = ({ children }) => {
 };
 
 export const Content: FC<{
-    activeWallet?: WalletState | null;
+    activeAccount?: Account | null;
     lock: boolean;
-}> = ({ activeWallet, lock }) => {
+}> = ({ activeAccount, lock }) => {
     const location = useLocation();
 
-    const pageView = !activeWallet || location.pathname.startsWith(AppRoute.import);
+    const pageView = !activeAccount || location.pathname.startsWith(AppRoute.import);
 
     useWindowsScroll(!pageView);
     useAppWidth();
     useTrackLocation();
+    useDebuggingTools();
 
     if (lock) {
         return (
@@ -274,7 +281,7 @@ export const Content: FC<{
                             path={any(AppRoute.import)}
                             element={
                                 <InitializeContainer fullHeight={false}>
-                                    <ImportRouter listOfAuth={[]} />
+                                    <ImportRouter />
                                 </InitializeContainer>
                             }
                         />
@@ -294,67 +301,65 @@ export const Content: FC<{
 
     return (
         <Wrapper standalone recovery={location.pathname.includes(SettingsRoute.recovery)}>
-            <WalletStateContext.Provider value={activeWallet}>
-                <Routes>
+            <Routes>
+                <Route
+                    path={AppRoute.activity}
+                    element={
+                        <Suspense fallback={<ActivitySkeletonPage />}>
+                            <Activity />
+                        </Suspense>
+                    }
+                />
+                <Route
+                    path={any(AppRoute.browser)}
+                    element={
+                        <Suspense fallback={<BrowserSkeletonPage />}>
+                            <Browser />
+                        </Suspense>
+                    }
+                />
+                <Route
+                    path={any(AppRoute.settings)}
+                    element={
+                        <Suspense fallback={<SettingsSkeletonPage />}>
+                            <Settings />
+                        </Suspense>
+                    }
+                />
+                <Route path={AppRoute.coins}>
                     <Route
-                        path={AppRoute.activity}
+                        path=":name/*"
                         element={
-                            <Suspense fallback={<ActivitySkeletonPage />}>
-                                <Activity />
+                            <Suspense fallback={<CoinSkeletonPage />}>
+                                <Coin />
                             </Suspense>
                         }
                     />
-                    <Route
-                        path={any(AppRoute.browser)}
-                        element={
-                            <Suspense fallback={<BrowserSkeletonPage />}>
-                                <Browser />
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path={any(AppRoute.settings)}
-                        element={
-                            <Suspense fallback={<SettingsSkeletonPage />}>
-                                <Settings />
-                            </Suspense>
-                        }
-                    />
-                    <Route path={AppRoute.coins}>
-                        <Route
-                            path=":name/*"
-                            element={
-                                <Suspense fallback={<CoinSkeletonPage />}>
-                                    <Coin />
-                                </Suspense>
-                            }
-                        />
-                    </Route>
-                    <Route
-                        path={AppRoute.swap}
-                        element={
-                            <Suspense fallback={null}>
-                                <SwapPage />
-                            </Suspense>
-                        }
-                    />
-                    <Route path="*" element={<IndexPage />} />
-                </Routes>
-                <Footer />
-                <MemoryScroll />
-                <TonConnectSubscription />
-                <Suspense>
-                    <SendActionNotification />
-                    <ReceiveNotification />
-                    <NftNotification />
-                    <SendNftNotification />
-                    <AddFavoriteNotification />
-                    <EditFavoriteNotification />
-                    <ConnectLedgerNotification />
-                    <SwapMobileNotification />
-                    <PairKeystoneNotification />
-                </Suspense>
-            </WalletStateContext.Provider>
+                </Route>
+                <Route
+                    path={AppRoute.swap}
+                    element={
+                        <Suspense fallback={null}>
+                            <SwapPage />
+                        </Suspense>
+                    }
+                />
+                <Route path="*" element={<IndexPage />} />
+            </Routes>
+            <Footer />
+            <MemoryScroll />
+            <TonConnectSubscription />
+            <Suspense>
+                <SendActionNotification />
+                <ReceiveNotification />
+                <NftNotification />
+                <SendNftNotification />
+                <AddFavoriteNotification />
+                <EditFavoriteNotification />
+                <ConnectLedgerNotification />
+                <SwapMobileNotification />
+                <PairKeystoneNotification />
+            </Suspense>
         </Wrapper>
     );
 };

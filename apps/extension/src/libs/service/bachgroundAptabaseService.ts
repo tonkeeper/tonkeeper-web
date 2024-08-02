@@ -18,8 +18,8 @@ export class AptabaseExtensionService {
         this.user_properties['application'] = params.application;
         this.user_properties['walletType'] = params.walletType;
         this.user_properties['network'] =
-            params.wallet?.network === Network.TESTNET ? 'testnet' : 'mainnet';
-        this.user_properties['accounts'] = params.account!.publicKeys.length;
+            params.network === Network.TESTNET ? 'testnet' : 'mainnet';
+        this.user_properties['accounts'] = params.accounts?.length || 0;
         this.user_properties['version'] = params.version;
         this.user_properties['platform'] = params.platform;
     };

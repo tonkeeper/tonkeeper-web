@@ -10,8 +10,6 @@ import { useRate } from '../../../state/rates';
 import { useAppContext } from '../../../hooks/appContext';
 import { formatFiatCurrency, useFormatCoinValue } from '../../../hooks/balance';
 import { ListBlock, ListItem } from '../../List';
-import { useWalletState } from '../../../state/wallet';
-import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { useTranslation } from '../../../hooks/translation';
 import { useEstimateMultiTransfer } from '../../../hooks/blockchain/useEstimateMultiTransferFee';
 import { Skeleton } from '../../shared/Skeleton';
@@ -31,6 +29,7 @@ import { useDisclosure } from '../../../hooks/useDisclosure';
 import { MultiSendReceiversNotification } from './MultiSendReceiversNotification';
 import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { AccountAndWalletInfo } from '../../account/AccountAndWalletInfo';
 
 const ConfirmWrapper = styled.div`
     display: flex;
@@ -96,12 +95,6 @@ const ListItemStyled = styled(ListItem)`
     }
 `;
 
-const WalletNameStyled = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 6px;
-`;
-
 const RecipientsContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -165,9 +158,6 @@ const MultiSendConfirmContent: FC<{
         willBeSentBN?.multipliedBy(rate?.prices || 0)
     );
 
-    const { account } = useAppContext();
-    const { data: wallet } = useWalletState(account.activePublicKey!);
-
     const {
         mutateAsync: estimate,
         isLoading: estimateLoading,
@@ -201,16 +191,7 @@ const MultiSendConfirmContent: FC<{
                 <ListBlockStyled noUserSelect>
                     <ListItemStyled hover={false}>
                         <Body2>{t('send_screen_steps_comfirm_wallet')}</Body2>
-                        {wallet && (
-                            <WalletNameStyled>
-                                <WalletEmoji
-                                    emojiSize="16px"
-                                    containerSize="16px"
-                                    emoji={wallet.emoji}
-                                />
-                                <Label2>{wallet.name || t('wallet_title')}</Label2>
-                            </WalletNameStyled>
-                        )}
+                        <AccountAndWalletInfo />
                     </ListItemStyled>
                     <ListItemStyled hover={false}>
                         <Body2>{t('recipients')}</Body2>

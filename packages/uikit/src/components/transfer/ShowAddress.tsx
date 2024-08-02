@@ -2,9 +2,9 @@ import { Account } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useWalletContext } from '../../hooks/appContext';
 import useTextWidth from '../../hooks/textWidth';
 import { Body1 } from '../Text';
+import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 
 interface ShowAddressProps {
     inputTextWidth: number;
@@ -16,7 +16,7 @@ export const useShowAddress = (
     value: string,
     toAccount?: Account
 ) => {
-    const wallet = useWalletContext();
+    const network = useActiveTonNetwork();
     const address = toAccount?.address ?? undefined;
 
     const [showAddress, setShowAddress] = useState<ShowAddressProps | undefined>(undefined);
@@ -41,12 +41,12 @@ export const useShowAddress = (
             setShowAddress({
                 inputTextWidth,
                 addressTextWidth,
-                value: toShortValue(formatAddress(toAccount.address, wallet.network))
+                value: toShortValue(formatAddress(toAccount.address, network))
             });
         } else {
             setShowAddress(undefined);
         }
-    }, [ref.current, toAccount, inputTextWidth, addressTextWidth]);
+    }, [ref.current, toAccount, inputTextWidth, addressTextWidth, network]);
 
     return showAddress;
 };

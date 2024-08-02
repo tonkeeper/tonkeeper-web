@@ -3,13 +3,14 @@ import { CalculatedSwap } from './useCalculatedSwap';
 import type { SwapService } from '@tonkeeper/core/dist/swapsApi';
 import { assertUnreachable, NonNullableFields } from '@tonkeeper/core/dist/utils/types';
 import { Address } from '@ton/core';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useSwapsConfig } from './useSwapsConfig';
 import BigNumber from 'bignumber.js';
 import { useSwapOptions } from './useSwapOptions';
+import { useActiveWallet } from '../wallet';
 
 export function useEncodeSwap() {
-    const { active } = useWalletContext();
+    const wallet = useActiveWallet();
     const { swapService } = useSwapsConfig();
     const { config } = useAppContext();
     const { data: swapOpaitons } = useSwapOptions();
@@ -26,7 +27,7 @@ export function useEncodeSwap() {
         return swapService.encodeSwap({
             swap: swapToProviderSwap(swap),
             options: {
-                senderAddress: active.rawAddress,
+                senderAddress: wallet.rawAddress,
                 slippage: new BigNumber(swapOpaitons.slippagePercent)
                     .div(100)
                     .decimalPlaces(5)

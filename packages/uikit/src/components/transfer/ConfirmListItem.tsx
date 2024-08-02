@@ -3,7 +3,6 @@ import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/cr
 import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC } from 'react';
-import { useWalletContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { ColumnText } from '../Layout';
@@ -11,6 +10,7 @@ import { ListItem, ListItemPayload } from '../List';
 import { Label1 } from '../Text';
 import { getRecipientAddress } from './amountView/AmountViewUI';
 import { Label } from './common';
+import { useActiveTonNetwork } from '../../state/wallet';
 
 export const cropName = (name: string) => {
     return name.length > 19 ? toShortValue(name, 8) : name;
@@ -46,8 +46,8 @@ const RecipientItemAddress: FC<{ address: string }> = ({ address }) => {
 
 export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient }) => {
     const { address } = recipient;
-    const wallet = useWalletContext();
-    const addrValue = getRecipientAddress(recipient, wallet);
+    const network = useActiveTonNetwork();
+    const addrValue = getRecipientAddress(recipient, network);
 
     if ('isFavorite' in address && address.isFavorite) {
         if (address.blockchain === BLOCKCHAIN_NAME.TRON) {

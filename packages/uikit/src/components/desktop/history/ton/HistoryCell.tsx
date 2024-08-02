@@ -6,8 +6,8 @@ import { FC, ReactNode } from 'react';
 import { Body2, Body2Class } from '../../../Text';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useFormatCoinValue } from '../../../../hooks/balance';
-import { useWalletContext } from '../../../../hooks/appContext';
 import { HistoryGridCell, HistoryGridCellFillRow } from './HistoryGrid';
+import { useActiveTonNetwork, useActiveWallet } from '../../../../state/wallet';
 
 export const HistoryCellAction = styled(HistoryGridCell)`
     display: flex;
@@ -103,7 +103,7 @@ export const HistoryCellAccount: FC<{
     account?: { address?: string; name?: string };
     fallbackAddress?: string;
 }> = ({ account, fallbackAddress }) => {
-    const wallet = useWalletContext();
+    const network = useActiveTonNetwork();
     const { t } = useTranslation();
 
     return (
@@ -111,9 +111,9 @@ export const HistoryCellAccount: FC<{
             {account?.name
                 ? account.name
                 : account?.address
-                ? toShortValue(formatAddress(account.address, wallet.network))
+                ? toShortValue(formatAddress(account.address, network))
                 : fallbackAddress
-                ? toShortValue(formatAddress(fallbackAddress, wallet.network))
+                ? toShortValue(formatAddress(fallbackAddress, network))
                 : t('transactions_unknown')}
         </HistoryCellAccountStyled>
     );

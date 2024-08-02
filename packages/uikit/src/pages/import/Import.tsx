@@ -1,78 +1,76 @@
-import { AccountState } from '@tonkeeper/core/dist/entries/account';
-import { AuthState } from '@tonkeeper/core/dist/entries/password';
-import { FC, useState } from 'react';
-import { CreateAuthState } from '../../components/create/CreateAuth';
+import React, { useState } from 'react';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { ImportWords } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useActiveWallet } from '../../state/wallet';
-import { FinalView, useAddWalletMutation } from './Password';
+import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
+import { useCreateAccountMnemonic, useMutateRenameAccount } from '../../state/wallet';
+import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
+import { AccountTonMnemonic } from '@tonkeeper/core/dist/entries/account';
 
-const Import: FC<{ listOfAuth: AuthState['kind'][] }> = ({ listOfAuth }) => {
+const Import = () => {
     const sdk = useAppSdk();
 
-    const [mnemonic, setMnemonic] = useState<string[]>([]);
-    const [account, setAccount] = useState<AccountState | undefined>(undefined);
-    const [hasPassword, setHasPassword] = useState(false);
-    const [passNotifications, setPassNotification] = useState(false);
+    const [mnemonic, setMnemonic] = useState<string[] | undefined>();
+    const [createdAccount, setCreatedAccount] = useState<AccountTonMnemonic | undefined>(undefined);
 
-    const { data: wallet } = useActiveWallet();
+    const [editNamePagePassed, setEditNamePagePassed] = useState(false);
+    const [notificationsSubscribePagePassed, setNotificationsSubscribePagePassed] = useState(false);
+    const { mutateAsync: renameAccount, isLoading: renameLoading } =
+        useMutateRenameAccount<AccountTonMnemonic>();
 
-    const {
-        mutateAsync: checkPasswordAndCreateWalletAsync,
-        isLoading: isConfirmLoading,
-        reset
-    } = useAddWalletMutation();
+    const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
+        useCreateAccountMnemonic();
 
-    if (mnemonic.length === 0) {
+    if (!mnemonic) {
+        return <ImportWords onMnemonic={setMnemonic} />;
+    }
+
+    if (!createdAccount) {
         return (
-            <ImportWords
-                isLoading={isConfirmLoading}
-                onMnemonic={m => {
-                    checkPasswordAndCreateWalletAsync({ mnemonic: m, listOfAuth }).then(state => {
-                        setMnemonic(m);
-                        if (state === false) {
-                            setHasPassword(false);
-                        } else {
-                            setHasPassword(true);
-                            setAccount(state);
-                        }
-                    });
+            <ChoseWalletVersions
+                mnemonic={mnemonic}
+                onSubmit={versions => {
+                    createWalletsAsync({
+                        mnemonic,
+                        versions,
+                        selectAccount: true
+                    }).then(setCreatedAccount);
                 }}
+                onBack={() => {
+                    setCreatedAccount(undefined);
+                    setMnemonic(undefined);
+                }}
+                isLoading={isCreatingWallets}
             />
         );
     }
 
-    if (!hasPassword) {
+    if (!editNamePagePassed) {
         return (
-            <CreateAuthState
-                afterCreate={(password?: string) => {
-                    reset();
-                    checkPasswordAndCreateWalletAsync({ mnemonic, password }).then(state => {
-                        if (state !== false) {
-                            setHasPassword(true);
-                            setAccount(state);
-                        }
+            <UpdateWalletName
+                name={createdAccount.name}
+                submitHandler={val => {
+                    renameAccount({
+                        id: createdAccount.id,
+                        ...val
+                    }).then(newAcc => {
+                        setEditNamePagePassed(true);
+                        setCreatedAccount(newAcc);
                     });
                 }}
-                isLoading={isConfirmLoading}
+                walletEmoji={createdAccount.emoji}
+                isLoading={renameLoading}
             />
         );
     }
 
-    if (account && account.publicKeys.length > 1 && wallet && wallet.name == null) {
-        return (
-            <UpdateWalletName account={account} onUpdate={setAccount} walletEmoji={wallet.emoji} />
-        );
-    }
-
-    if (sdk.notifications && !passNotifications) {
+    if (sdk.notifications && !notificationsSubscribePagePassed) {
         return (
             <Subscribe
-                wallet={wallet!}
+                wallet={createdAccount.activeTonWallet}
                 mnemonic={mnemonic}
-                onDone={() => setPassNotification(true)}
+                onDone={() => setNotificationsSubscribePagePassed(true)}
             />
         );
     }

@@ -1,6 +1,7 @@
 {
   "about_tonkeeper_pro" : "За Tonkeeper Pro",
   "actionTitle" : "Отворете портфейла",
+  "add" : "Добави",
   "add_dns_address" : "Добавете адрес на портфейл, който домейн % ще свърже.",
   "all_assets_jettons" : "Всички активи",
   "appExtensionDescription" : "Вашият разширителен портфейл на The Open Network",
@@ -45,6 +46,7 @@
   "Enable_storing_config" : "Разрешаване на съхранението на конфигурацията",
   "enter_password" : "Въведете парола",
   "export_dot_csv" : "Експортиране .CSV",
+  "hide" : "Скрий",
   "history_spam_nft" : "Спам NFT",
   "I_have_a_backup_copy_of_recovery_phrase" : "Имам резервно копие на фразата за възстановяване",
   "import_csv" : "Импортиране на CSV",
@@ -131,6 +133,7 @@
   "nft_on_sale_text" : "NFT е на продажба в момента.\nЗа да го прехвърлите, първо трябва да го изтеглите от продажба.",
   "no_connected_apps" : "Няма свързани приложения",
   "Old_password" : "Текуща парола",
+  "open" : "Отворете",
   "operation_not_supported" : "Операцията не е налична за тези портфейли. Изберете друг портфейл и опитайте отново.",
   "page_header_history" : "История",
   "page_header_purchases" : "Покупки",
@@ -217,6 +220,7 @@
   "Unexpected_QR_Code" : "Неочакван QR код",
   "Unlock" : "Отключи",
   "update" : "Актуализация",
+  "update_ledger_error" : "Уверете се, че софтуерът на Ledger е актуализиран",
   "upload_file" : "Качване на файл",
   "wallet_address" : "Адрес на портфейл",
   "wallet_aside_collectibles" : "Колекционерски предмети",
@@ -227,5 +231,6 @@
   "wallet_aside_tokens" : "Токени",
   "wallet_multi_send" : "Мулти Изпращане",
   "Wallet_name" : "Име на портфейл",
-  "wallet_sell" : "Продажба"
+  "wallet_sell" : "Продажба",
+  "wallet_version_and_tokens" : ", токени"
 }

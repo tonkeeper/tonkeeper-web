@@ -3,7 +3,7 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
 import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
-import { WalletAddress } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { getWalletsAddresses } from '@tonkeeper/core/dist/service/walletService';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { areEqAddresses, formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
@@ -11,7 +11,6 @@ import { isTMEDomain } from '@tonkeeper/core/dist/utils/nft';
 import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { useWalletContext } from '../../hooks/appContext';
 import { useToast } from '../../hooks/appSdk';
 import { useAreNftActionsDisabled } from '../../hooks/blockchain/nft/useAreNftActionsDisabled';
 import { useEstimateNftLink } from '../../hooks/blockchain/nft/useEstimateNftLink';
@@ -20,7 +19,7 @@ import { useTonRecipient } from '../../hooks/blockchain/useTonRecipient';
 import { useTranslation } from '../../hooks/translation';
 import { useNotification } from '../../hooks/useNotification';
 import { useQueryChangeWait } from '../../hooks/useQueryChangeWait';
-import { useNftDNSLinkData } from '../../state/wallet';
+import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 import { ColumnText, Gap } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
 import { Notification, NotificationBlock } from '../Notification';
@@ -39,6 +38,7 @@ import {
     ConfirmViewTitleSlot
 } from '../transfer/ConfirmView';
 import { ConfirmAndCancelMainButton } from '../transfer/common';
+import { useNftDNSLinkData } from '../../state/nft';
 
 export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
     const toast = useToast();
@@ -103,8 +103,8 @@ const LinkNftUnlinked: FC<{
     const notifyError = useNotification();
     const { t } = useTranslation();
     const [openedView, setOpenedView] = useState<'confirm' | 'wallet' | undefined>();
-    const walletState = useWalletContext();
-    const [linkToAddress, setLinkToAddress] = useState(walletState.active.rawAddress);
+    const walletState = useActiveWallet();
+    const [linkToAddress, setLinkToAddress] = useState(walletState.rawAddress);
 
     const onClose = (confirm?: boolean) => {
         if (openedView === 'wallet') {
@@ -114,7 +114,7 @@ const LinkNftUnlinked: FC<{
         if (confirm) {
             refetch();
         } else {
-            setLinkToAddress(walletState.active.rawAddress);
+            setLinkToAddress(walletState.rawAddress);
         }
     };
 
@@ -142,7 +142,8 @@ const LinkNftUnlinked: FC<{
         fee: estimation.data?.payload as TransferEstimationEvent
     });
 
-    const isSelectedCurrentAddress = areEqAddresses(linkToAddress, walletState.active.rawAddress);
+    const isSelectedCurrentAddress = areEqAddresses(linkToAddress, walletState.rawAddress);
+    const network = useActiveTonNetwork();
 
     const confirmChild = () => (
         <ConfirmView
@@ -165,7 +166,7 @@ const LinkNftUnlinked: FC<{
                         </Label>
                         <ColumnText
                             right
-                            text={toShortValue(formatAddress(linkToAddress, walletState.network))}
+                            text={toShortValue(formatAddress(linkToAddress, network))}
                             secondary={
                                 <ReplaceButton
                                     isDisabled={mutation.isLoading}
@@ -313,7 +314,7 @@ const LinkNftLinked: FC<{
 }> = ({ nft, linkedAddress, isLoading, refetch }) => {
     const notifyError = useNotification();
     const { t } = useTranslation();
-    const walletState = useWalletContext();
+    const walletState = useActiveWallet();
     const [isOpen, setIsOpen] = useState(false);
     const onClose = (confirm?: boolean) => {
         setIsOpen(false);
@@ -368,10 +369,11 @@ const LinkNftLinked: FC<{
         }
         setIsOpen(true);
     };
+    const network = useActiveTonNetwork();
 
-    const isLinkedWithAnotherWallet = Object.values<WalletAddress>(
-        getWalletsAddresses(walletState.publicKey, walletState.network)
-    ).every(address => !areEqAddresses(address.rawAddress, linkedAddress));
+    const isLinkedWithAnotherWallet = Object.values<{ address: Address; version: WalletVersion }>(
+        isStandardTonWallet(walletState) ? getWalletsAddresses(walletState.publicKey, network) : {}
+    ).every(({ address }) => !areEqAddresses(address.toRawString(), linkedAddress));
 
     return (
         <>
@@ -386,7 +388,7 @@ const LinkNftLinked: FC<{
             >
                 {t('nft_unlink_domain_button').replace(
                     '{{address}}',
-                    toShortValue(formatAddress(linkedAddress, walletState.network))
+                    toShortValue(formatAddress(linkedAddress, network))
                 )}
             </Button>
             {isLinkedWithAnotherWallet && !isLoading && (

@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query';
-import { accountChangePassword } from '@tonkeeper/core/dist/service/accountService';
 import React, { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -7,6 +6,8 @@ import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
 import { Notification, NotificationBlock } from '../Notification';
+import { usePasswordStorage } from '../../hooks/useStorage';
+import { validatePassword } from '@tonkeeper/core/dist/service/passwordService';
 
 const Block = styled.div`
     display: flex;
@@ -19,27 +20,40 @@ const Block = styled.div`
 const useUpdatePassword = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
+    const passwordStorage = usePasswordStorage();
     return useMutation<
-        string | undefined,
+        'invalid-old' | 'invalid-confirm' | 'invalid-password' | undefined,
         Error,
         { old: string; password: string; confirm: string }
-    >(async options => {
-        const error = await accountChangePassword(sdk.storage, options);
-        if (error === undefined) {
-            sdk.uiEvents.emit('copy', {
-                method: 'copy',
-                id: Date.now(),
-                params: t('PasswordChanged')
-            });
+    >(async ({ old, password, confirm }) => {
+        const isValidOld = await passwordStorage.isPasswordValid(old);
+        if (!isValidOld) {
+            return 'invalid-old';
         }
-        return error;
+
+        if (!validatePassword(password)) {
+            return 'invalid-password';
+        }
+        if (password !== confirm) {
+            return 'invalid-confirm';
+        }
+
+        await passwordStorage.updatePassword(old, password);
+
+        sdk.uiEvents.emit('copy', {
+            method: 'copy',
+            id: Date.now(),
+            params: t('PasswordChanged')
+        });
     });
 };
 
 const ChangePasswordContent: FC<{ handleClose: () => void }> = ({ handleClose }) => {
     const { t } = useTranslation();
 
-    const [error, setError] = useState<string | undefined>(undefined);
+    const [error, setError] = useState<
+        'invalid-old' | 'invalid-confirm' | 'invalid-password' | undefined
+    >(undefined);
 
     const { mutateAsync, isLoading, reset } = useUpdatePassword();
 

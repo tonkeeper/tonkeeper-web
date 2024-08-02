@@ -3,12 +3,11 @@ import { AssetIdentification } from '@tonkeeper/core/dist/entries/crypto/asset/a
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { AssetData } from '../components/home/Jettons';
-import { useWalletContext } from '../hooks/appContext';
 import { useJettonList } from './jetton';
-import { useWalletAccountInfo } from './wallet';
+import { useActiveWallet, useWalletAccountInfo } from './wallet';
 
 export const useAssets = () => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     const { data: info, error, isFetching: isAccountLoading } = useWalletAccountInfo();
     const { data: jettons, error: jettonError, isFetching: isJettonLoading } = useJettonList();

@@ -14,7 +14,8 @@ import { JettonAsset, TonAsset } from '../../components/home/Jettons';
 import { useTranslation } from '../../hooks/translation';
 import { useAssets } from '../../state/home';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
-import { useAssetsDistribution } from '../../state/wallet';
+
+import { useAssetsDistribution } from "../../state/asset";
 
 const DesktopAssetStylesOverride = css`
     background-color: transparent;

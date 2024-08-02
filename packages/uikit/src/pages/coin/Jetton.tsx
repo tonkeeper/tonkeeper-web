@@ -12,7 +12,7 @@ import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { CoinInfo } from '../../components/jettons/Info';
 import { SendAction } from '../../components/transfer/SendActionButton';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useFormatBalance } from '../../hooks/balance';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { JettonKey, QueryKey } from '../../libs/queryKey';
@@ -21,19 +21,20 @@ import { useFormatFiat, useRate } from '../../state/rates';
 import { SwapAction } from '../../components/home/SwapAction';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
+import { useActiveWallet } from '../../state/wallet';
 
 const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTMLDivElement> }> = ({
     balance,
     innerRef
 }) => {
     const { api, standalone } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
 
     const { isFetched, hasNextPage, data, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
         queryKey: [balance.walletAddress.address, QueryKey.activity, JettonKey.history],
         queryFn: ({ pageParam = undefined }) =>
             new AccountsApi(api.tonApiV2).getAccountJettonHistoryByID({
-                accountId: wallet.active.rawAddress,
+                accountId: wallet.rawAddress,
                 jettonId: balance.jetton.address,
                 limit: 20,
                 beforeLt: pageParam

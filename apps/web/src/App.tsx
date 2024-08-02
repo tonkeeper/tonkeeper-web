@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { WalletVersion } from "@tonkeeper/core/dist/entries/wallet";
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -22,7 +22,7 @@ import {
     EditFavoriteNotification
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
-import { AppContext, WalletStateContext } from '@tonkeeper/uikit/dist/hooks/appContext';
+import { AppContext, IAppContext } from "@tonkeeper/uikit/dist/hooks/appContext";
 import {
     AfterImportAction,
     AppSdkContext,
@@ -37,11 +37,9 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
-import { useAccountState } from '@tonkeeper/uikit/dist/state/account';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
-import { useAuthState } from '@tonkeeper/uikit/dist/state/password';
-import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
+import { useActiveAccountQuery, useAccountsStateQuery, useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,6 +47,11 @@ import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-ro
 import styled, { css } from 'styled-components';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from './libs/hooks';
+import { useUserLanguage } from "@tonkeeper/uikit/dist/state/language";
+import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
+import { ModalsRoot } from "@tonkeeper/uikit/dist/components/ModalsRoot";
+import { Account } from "@tonkeeper/core/dist/entries/account";
+import { useDebuggingTools } from "@tonkeeper/uikit/dist/hooks/useDebuggingTools";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -178,8 +181,12 @@ const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
 `;
 
 export const Loader: FC = () => {
-    const { data: activeWallet } = useActiveWallet();
+    const network = useActiveTonNetwork();
+    const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
+    const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
+    const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: fiat } = useUserFiat();
+    const { data: devSettings } = useDevSettings();
 
     const [ios, standalone] = useMemo(() => {
         return [sdk.isIOs(), sdk.isStandalone()] as const;
@@ -187,56 +194,54 @@ export const Loader: FC = () => {
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
-    const { data: account } = useAccountState();
-    const { data: auth } = useAuthState();
 
     const tonendpoint = useTonendpoint({
           targetEnv: TARGET_ENV,
           build: sdk.version,
-          network: activeWallet?.network,
-          lang: activeWallet?.lang
+          network,
+          lang
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
     useAppHeight();
 
-    const { data: tracker } = useAnalytics(account, activeWallet, sdk.version);
+    const { data: tracker } = useAnalytics(activeAccount || undefined, accounts, sdk.version);
 
     useEffect(() => {
         if (
-            activeWallet &&
-            activeWallet.lang &&
-            i18n.language !== localizationText(activeWallet.lang)
+            activeAccount &&
+            lang &&
+            i18n.language !== localizationText(lang)
         ) {
-            i18n.reloadResources([localizationText(activeWallet.lang)]).then(() =>
-                i18n.changeLanguage(localizationText(activeWallet.lang))
+            i18n.reloadResources([localizationText(lang)]).then(() =>
+                i18n.changeLanguage(localizationText(lang))
             );
         }
-    }, [activeWallet, i18n]);
+    }, [activeAccount, i18n]);
 
     if (
-        auth === undefined ||
-        account === undefined ||
+        isWalletsLoading ||
+        activeWalletLoading ||
+        isLangLoading ||
         config === undefined ||
         lock === undefined ||
-        fiat === undefined
+        fiat === undefined ||
+        !devSettings
     ) {
         return <Loading />;
     }
 
-    const network = activeWallet?.network ?? Network.MAINNET;
-    const context = {
+    const context: IAppContext = {
         api: getApiConfig(config, network),
-        auth,
         fiat,
-        account,
         config,
         tonendpoint,
         standalone,
         extension: false,
         proFeatures: false,
-        ios
+        ios,
+        defaultWalletVersion: WalletVersion.V5R1
     };
 
     return (
@@ -246,11 +251,12 @@ export const Loader: FC = () => {
                     value={() => navigate(AppRoute.home, { replace: true })}
                 >
                     <AppContext.Provider value={context}>
-                        <Content activeWallet={activeWallet} lock={lock} standalone={standalone} />
+                        <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
                         <CopyNotification hideSimpleCopyNotifications={!standalone} />
                         <Suspense fallback={<></>}>
                             <QrScanner />
                         </Suspense>
+                        <ModalsRoot />
                     </AppContext.Provider>
                 </AfterImportAction.Provider>
             </OnImportAction.Provider>
@@ -259,15 +265,16 @@ export const Loader: FC = () => {
 };
 
 export const Content: FC<{
-    activeWallet?: WalletState | null;
+    activeAccount?: Account | null;
     lock: boolean;
     standalone: boolean;
-}> = ({ activeWallet, lock, standalone }) => {
+}> = ({ activeAccount, lock, standalone }) => {
     const location = useLocation();
     useWindowsScroll();
     useAppWidth(standalone);
     useKeyboardHeight();
     useTrackLocation();
+    useDebuggingTools();
 
     if (lock) {
         return (
@@ -296,7 +303,7 @@ export const Content: FC<{
         );
     }
 
-    if (!activeWallet || location.pathname.startsWith(AppRoute.import)) {
+    if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
         return (
             <FullSizeWrapper standalone={false}>
                 <Suspense fallback={<Loading />}>
@@ -304,7 +311,7 @@ export const Content: FC<{
                         <Routes>
                             <Route
                                 path={any(AppRoute.import)}
-                                element={<ImportRouter listOfAuth={[]} />}
+                                element={<ImportRouter />}
                             />
                             <Route path="*" element={<Initialize />} />
                         </Routes>
@@ -316,78 +323,76 @@ export const Content: FC<{
 
     return (
         <Wrapper standalone={standalone}>
-            <WalletStateContext.Provider value={activeWallet}>
-                <Routes>
-                    <Route
-                        path={AppRoute.activity}
-                        element={
-                            <Suspense fallback={<ActivitySkeletonPage />}>
-                                <Activity />
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path={any(AppRoute.browser)}
-                        element={
-                            <Suspense fallback={<BrowserSkeletonPage />}>
-                                <Browser />
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path={any(AppRoute.settings)}
-                        element={
-                            <Suspense fallback={<SettingsSkeletonPage />}>
-                                <Settings />
-                            </Suspense>
-                        }
-                    />
-                    <Route path={AppRoute.coins}>
-                        <Route
-                            path=":name/*"
-                            element={
-                                <Suspense fallback={<CoinSkeletonPage />}>
-                                    <Coin />
-                                </Suspense>
-                            }
-                        />
-                    </Route>
-                    <Route path={AppRoute.swap} element={
-                        <Suspense fallback={null}>
-                            <SwapPage />
+            <Routes>
+                <Route
+                    path={AppRoute.activity}
+                    element={
+                        <Suspense fallback={<ActivitySkeletonPage />}>
+                            <Activity />
                         </Suspense>
-                    } />
+                    }
+                />
+                <Route
+                    path={any(AppRoute.browser)}
+                    element={
+                        <Suspense fallback={<BrowserSkeletonPage />}>
+                            <Browser />
+                        </Suspense>
+                    }
+                />
+                <Route
+                    path={any(AppRoute.settings)}
+                    element={
+                        <Suspense fallback={<SettingsSkeletonPage />}>
+                            <Settings />
+                        </Suspense>
+                    }
+                />
+                <Route path={AppRoute.coins}>
                     <Route
-                        path="*"
+                        path=":name/*"
                         element={
-                            <>
-                                <Header />
-                                <InnerBody>
-                                    <Suspense fallback={<HomeSkeleton />}>
-                                        <Home />
-                                    </Suspense>
-                                </InnerBody>
-                            </>
+                            <Suspense fallback={<CoinSkeletonPage />}>
+                                <Coin />
+                            </Suspense>
                         }
                     />
-                </Routes>
-                <Footer standalone={standalone} />
-                <MemoryScroll />
-                <Suspense>
-                    <SendActionNotification />
-                    <ReceiveNotification />
-                    <TonConnectSubscription />
-                    <NftNotification />
-                    <SendNftNotification />
-                    <AddFavoriteNotification />
-                    <EditFavoriteNotification />
-                    <PairSignerNotification />
-                    <SignerPublishNotification />
-                    <ConnectLedgerNotification />
-                    <SwapMobileNotification />
-                    <PairKeystoneNotification />
-                </Suspense>
-            </WalletStateContext.Provider>
+                </Route>
+                <Route path={AppRoute.swap} element={
+                    <Suspense fallback={null}>
+                        <SwapPage />
+                    </Suspense>
+                } />
+                <Route
+                    path="*"
+                    element={
+                        <>
+                            <Header />
+                            <InnerBody>
+                                <Suspense fallback={<HomeSkeleton />}>
+                                    <Home />
+                                </Suspense>
+                            </InnerBody>
+                        </>
+                    }
+                />
+            </Routes>
+            <Footer standalone={standalone} />
+            <MemoryScroll />
+            <Suspense>
+                <SendActionNotification />
+                <ReceiveNotification />
+                <TonConnectSubscription />
+                <NftNotification />
+                <SendNftNotification />
+                <AddFavoriteNotification />
+                <EditFavoriteNotification />
+                <PairSignerNotification />
+                <SignerPublishNotification />
+                <ConnectLedgerNotification />
+                <SwapMobileNotification />
+                <PairKeystoneNotification />
+            </Suspense>
         </Wrapper>
     );
 };
