@@ -91,7 +91,7 @@ export interface DeprecatedWalletState {
     auth?: DeprecatedAuthState;
 
     name?: string;
-    emoji: string;
+    emoji?: string;
 
     revision: number;
 
