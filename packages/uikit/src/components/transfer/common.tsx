@@ -256,7 +256,7 @@ export const ConfirmAndCancelMainButton: ConfirmMainButtonProps = ({
     const isLedger = useIsActiveWalletLedger();
     return (
         <ConfirmViewButtonsContainerStyled>
-            <Button size="large" secondary onClick={onClose}>
+            <Button size="large" secondary type="button" onClick={onClose}>
                 {t('cancel')}
             </Button>
             <Button size="large" primary type="submit" disabled={isDisabled} loading={isLoading}>
