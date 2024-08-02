@@ -10,6 +10,7 @@ import {
     AppsIcon,
     ListOfTokensIcon,
     LogOutIcon,
+    RecoveryPhraseIcon,
     SaleBadgeIcon,
     SecurityIcon,
     SettingsProIcon,
@@ -20,7 +21,6 @@ import { useActiveWallet, useAccountsState, useActiveAccount } from '../../state
 import { useWalletNftList } from '../../state/nft';
 
 const SingleAccountSettings = () => {
-    const [deleteAccount, setDeleteAccount] = useState(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
     const account = useActiveAccount();
@@ -29,21 +29,15 @@ const SingleAccountSettings = () => {
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
     const mainItems = useMemo<SettingsItem[]>(() => {
-        const items: SettingsItem[] = [
-            // {
-            //   name: t('Subscriptions'),
-            //   icon: <SubscriptionIcon />,
-            //   action: () => navigate(relative(SettingsRoute.subscriptions)),
-            // },
-        ];
+        const items: SettingsItem[] = [];
 
-        /*        if (wallet.auth == null) {
+        if (account.type === 'mnemonic') {
             items.push({
                 name: t('settings_recovery_phrase'),
                 icon: <RecoveryPhraseIcon />,
                 action: () => navigate(relative(SettingsRoute.recovery))
             });
-        }*/
+        }
 
         if (account.type === 'mnemonic' || account.type === 'ton-only') {
             items.push({
@@ -96,11 +90,6 @@ const SingleAccountSettings = () => {
             icon: <AppsIcon />,
             action: () => navigate(relative(WalletSettingsRoute.connectedApps))
         });
-        items.push({
-            name: t('Delete_wallet_data'),
-            icon: <LogOutIcon />,
-            action: () => setDeleteAccount(true)
-        });
 
         return items;
     }, [t, navigate, account, jettons, nft]);
@@ -108,10 +97,6 @@ const SingleAccountSettings = () => {
     return (
         <>
             <SettingsList items={mainItems} />
-            <DeleteAccountNotification
-                account={deleteAccount ? account : undefined}
-                handleClose={() => setDeleteAccount(false)}
-            />
         </>
     );
 };
@@ -125,6 +110,8 @@ const MultipleAccountSettings = () => {
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
     const account = useActiveAccount();
+
+    const [deleteAccount, setDeleteAccount] = useState(false);
 
     const accountItems = useMemo(() => {
         const items: SettingsItem[] = [
@@ -154,13 +141,13 @@ const MultipleAccountSettings = () => {
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
 
-        /*if (wallet.auth == null) {
+        if (account.type === 'mnemonic') {
             items.push({
                 name: t('settings_recovery_phrase'),
                 icon: <RecoveryPhraseIcon />,
                 action: () => navigate(relative(SettingsRoute.recovery))
             });
-        }*/
+        }
 
         if (account.type === 'mnemonic' || account.type === 'ton-only') {
             items.push({
@@ -205,6 +192,11 @@ const MultipleAccountSettings = () => {
             icon: <AppsIcon />,
             action: () => navigate(relative(WalletSettingsRoute.connectedApps))
         });
+        items.push({
+            name: t('Delete_wallet_data'),
+            icon: <LogOutIcon />,
+            action: () => setDeleteAccount(true)
+        });
         return items;
     }, [t, navigate, wallet, jettons, nft]);
 
@@ -212,14 +204,18 @@ const MultipleAccountSettings = () => {
         <>
             <SettingsList items={accountItems} />
             <SettingsList items={mainItems} />
+            <DeleteAccountNotification
+                account={deleteAccount ? account : undefined}
+                handleClose={() => setDeleteAccount(false)}
+            />
         </>
     );
 };
 
 export const AccountSettings = () => {
-    const wallets = useAccountsState();
+    const accounts = useAccountsState();
 
-    if (wallets.length > 1) {
+    if (accounts.length > 1) {
         return <MultipleAccountSettings />;
     } else {
         return <SingleAccountSettings />;
