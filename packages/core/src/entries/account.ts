@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
-import { AuthKeychain, AuthPassword, AuthSigner, AuthSignerDeepLink } from './password';
 import { KeystonePathInfo } from '../service/keystone/types';
+import { AuthKeychain, AuthPassword, AuthSigner, AuthSignerDeepLink } from './password';
 import { DerivationItem, TonWalletStandard, WalletId } from './wallet';
 
 /**
@@ -29,7 +29,7 @@ export interface IAccount {
     setActiveTonWallet(walletId: WalletId): void;
 }
 
-export class Clonable {
+export abstract class Clonable {
     clone() {
         const cloned = structuredClone(this);
         Object.setPrototypeOf(cloned, Object.getPrototypeOf(this));
@@ -37,7 +37,16 @@ export class Clonable {
     }
 }
 
-export class AccountTonMnemonic extends Clonable implements IAccount {
+export abstract class FallbackEmoji extends Clonable {
+    constructor(public emoji: string) {
+        super();
+        if (!this.emoji) {
+            this.emoji = '😀';
+        }
+    }
+}
+
+export class AccountTonMnemonic extends FallbackEmoji implements IAccount {
     public readonly type = 'mnemonic';
 
     get allTonWallets() {
@@ -63,7 +72,7 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
         public activeTonWalletId: WalletId,
         public tonWallets: TonWalletStandard[]
     ) {
-        super();
+        super(emoji);
     }
 
     getTonWallet(id: WalletId) {
@@ -106,7 +115,7 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
     }
 }
 
-export class AccountLedger extends Clonable implements IAccount {
+export class AccountLedger extends FallbackEmoji implements IAccount {
     public readonly type = 'ledger';
 
     get allTonWallets() {
@@ -145,7 +154,7 @@ export class AccountLedger extends Clonable implements IAccount {
         public addedDerivationsIndexes: number[],
         public readonly allAvailableDerivations: DerivationItem[]
     ) {
-        super();
+        super(emoji);
 
         if (
             addedDerivationsIndexes.some(index =>
@@ -239,7 +248,7 @@ export class AccountLedger extends Clonable implements IAccount {
     }
 }
 
-export class AccountKeystone extends Clonable implements IAccount {
+export class AccountKeystone extends FallbackEmoji implements IAccount {
     public readonly type = 'keystone';
 
     get allTonWallets() {
@@ -264,7 +273,7 @@ export class AccountKeystone extends Clonable implements IAccount {
         public readonly pathInfo: KeystonePathInfo | undefined,
         public tonWallet: TonWalletStandard
     ) {
-        super();
+        super(emoji);
     }
 
     getTonWallet(id: WalletId) {
@@ -290,7 +299,7 @@ export class AccountKeystone extends Clonable implements IAccount {
     }
 }
 
-export class AccountTonOnly extends Clonable implements IAccount {
+export class AccountTonOnly extends FallbackEmoji implements IAccount {
     public readonly type = 'ton-only';
 
     get allTonWallets() {
@@ -316,7 +325,7 @@ export class AccountTonOnly extends Clonable implements IAccount {
         public activeTonWalletId: WalletId,
         public tonWallets: TonWalletStandard[]
     ) {
-        super();
+        super(emoji);
     }
 
     getTonWallet(id: WalletId) {
