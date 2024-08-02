@@ -210,7 +210,7 @@ async function migrateToAccountsState(storage: IStorage): Promise<AccountsState 
             }
 
             const name = w.name || 'Account ' + (index + 1);
-            const emoji = w.emoji;
+            const emoji = w.emoji || getFallbackAccountEmoji(pk);
 
             const tonWallet: TonWalletStandard = {
                 id: w.active.rawAddress,
