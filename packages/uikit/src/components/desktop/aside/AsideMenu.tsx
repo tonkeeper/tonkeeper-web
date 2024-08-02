@@ -221,7 +221,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                     <AccountBadgeStyled accountType={account.type} size="s" />
 
                     {/*show settings only for non-legacy added ledger accounts*/}
-                    {account.allAvailabelDerivations.length > 1 && (
+                    {account.allAvailableDerivations.length > 1 && (
                         <GearIconButtonStyled
                             onClick={e => {
                                 e.preventDefault();

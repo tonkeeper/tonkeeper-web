@@ -130,7 +130,7 @@ export class AccountLedger extends Clonable implements IAccount {
 
     get derivations(): DerivationItem[] {
         return this.addedDerivationsIndexes.map(
-            index => this.allAvailabelDerivations.find(d => d.index === index)!
+            index => this.allAvailableDerivations.find(d => d.index === index)!
         );
     }
 
@@ -143,13 +143,13 @@ export class AccountLedger extends Clonable implements IAccount {
         public emoji: string,
         public activeDerivationIndex: number,
         public addedDerivationsIndexes: number[],
-        public readonly allAvailabelDerivations: DerivationItem[]
+        public readonly allAvailableDerivations: DerivationItem[]
     ) {
         super();
 
         if (
             addedDerivationsIndexes.some(index =>
-                allAvailabelDerivations.every(d => d.index !== index)
+                allAvailableDerivations.every(d => d.index !== index)
             )
         ) {
             throw new Error('Derivations not found');
@@ -223,7 +223,7 @@ export class AccountLedger extends Clonable implements IAccount {
         }
         if (
             addedDerivationsIndexes.some(index =>
-                this.allAvailabelDerivations.every(d => d.index !== index)
+                this.allAvailableDerivations.every(d => d.index !== index)
             )
         ) {
             throw new Error('Derivations not found');

@@ -67,7 +67,7 @@ export const ChoseLedgerIndexes: FC<{
     const { t } = useTranslation();
 
     const { data: balances } = useTonWalletsBalances(
-        account.allAvailabelDerivations.map(
+        account.allAvailableDerivations.map(
             d => d.tonWallets.find(w => w.id === d.activeTonWalletId)!.rawAddress
         )
     );
@@ -89,12 +89,12 @@ export const ChoseLedgerIndexes: FC<{
             <H2>{t('choose_wallets_title')}</H2>
             <Body1Styled>{t('choose_wallets_subtitle')}</Body1Styled>
             {!balances ? (
-                <SkeletonListStyled size={account.allAvailabelDerivations.length} />
+                <SkeletonListStyled size={account.allAvailableDerivations.length} />
             ) : (
                 <>
                     <ListBlockStyled>
                         {balances.map((balance, index) => {
-                            const derivationIndex = account.allAvailabelDerivations[index].index;
+                            const derivationIndex = account.allAvailableDerivations[index].index;
                             return (
                                 <ListItem hover={false} key={balance.address}>
                                     <ListItemPayload>

@@ -249,7 +249,6 @@ export const accountByLedger = (
     name: string,
     emoji: string
 ): AccountLedger => {
-    // const zeroAccPublicKey = walletsInfo[0].publicKey.toString('hex');
     return new AccountLedger(
         accountId,
         name,

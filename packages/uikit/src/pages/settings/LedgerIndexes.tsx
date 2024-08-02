@@ -63,7 +63,7 @@ export const LedgerIndexesPageContent: FC<{
     const navigate = useNavigate();
 
     const { data: balances } = useTonWalletsBalances(
-        account.allAvailabelDerivations.map(
+        account.allAvailableDerivations.map(
             d => d.tonWallets.find(w => w.id === d.activeTonWalletId)!.rawAddress
         )
     );
@@ -97,7 +97,7 @@ export const LedgerIndexesPageContent: FC<{
     };
 
     if (!balances) {
-        return <SkeletonList size={account.allAvailabelDerivations.length} />;
+        return <SkeletonList size={account.allAvailableDerivations.length} />;
     }
 
     const isLoading =
@@ -107,7 +107,7 @@ export const LedgerIndexesPageContent: FC<{
     return (
         <ListBlock>
             {balances.map((balance, index) => {
-                const derivationIndex = account.allAvailabelDerivations[index].index;
+                const derivationIndex = account.allAvailableDerivations[index].index;
 
                 const isDerivationAdded = account.derivations.some(
                     d => d.index === derivationIndex
