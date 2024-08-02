@@ -54,7 +54,7 @@ const SingleAccountSettings = () => {
         }
 
         // check available derivations length to filter and keep only non-legacy added ledger accounts
-        if (account.type === 'ledger' && account.allAvailabelDerivations.length > 1) {
+        if (account.type === 'ledger' && account.allAvailableDerivations.length > 1) {
             items.push({
                 name: t('settings_ledger_indexes'),
                 icon: `# ${account.activeDerivationIndex + 1}`,
@@ -171,7 +171,7 @@ const MultipleAccountSettings = () => {
         }
 
         // check available derivations length to filter and keep only non-legacy added ledger accounts
-        if (account.type === 'ledger' && account.allAvailabelDerivations.length > 1) {
+        if (account.type === 'ledger' && account.allAvailableDerivations.length > 1) {
             items.push({
                 name: t('settings_ledger_indexes'),
                 icon: `# ${account.activeDerivationIndex + 1}`,

@@ -63,7 +63,7 @@ export const DesktopWalletSettingsPage = () => {
 
     // check available derivations length to filter and keep only non-legacy added ledger accounts
     const canChangeLedgerIndex =
-        account.type === 'ledger' && account.allAvailabelDerivations.length > 1;
+        account.type === 'ledger' && account.allAvailableDerivations.length > 1;
     const activeWallet = account.activeTonWallet;
 
     return (
