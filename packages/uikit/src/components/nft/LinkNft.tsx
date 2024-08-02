@@ -318,7 +318,7 @@ const LinkNftLinked: FC<{
     const [isOpen, setIsOpen] = useState(false);
     const onClose = (confirm?: boolean) => {
         setIsOpen(false);
-        if (confirm) {
+        if (confirm === true) {
             refetch();
         }
     };
