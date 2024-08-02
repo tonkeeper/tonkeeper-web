@@ -126,7 +126,7 @@ const GlobalStyle = createGlobalStyle`
 const sdk = new DesktopAppSdk();
 const TARGET_ENV = 'desktop';
 
-const langs = 'en,zh_CN,ru,it,tr';
+const langs = 'en,zh_CN,ru,it,tr,bg';
 
 declare const REACT_APP_TONCONSOLE_API: string;
 declare const REACT_APP_TG_BOT_ID: string;
