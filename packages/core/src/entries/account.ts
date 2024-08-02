@@ -155,6 +155,10 @@ export class AccountLedger extends Clonable implements IAccount {
             throw new Error('Derivations not found');
         }
 
+        if (!addedDerivationsIndexes.includes(activeDerivationIndex)) {
+            throw new Error('Active derivation not found');
+        }
+
         this.addedDerivationsIndexes = [...new Set(addedDerivationsIndexes)];
     }
 

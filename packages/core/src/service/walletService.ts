@@ -253,7 +253,7 @@ export const accountByLedger = (
         accountId,
         name,
         emoji,
-        walletsInfo[0].accountIndex,
+        walletsIndexesToAdd[0],
         walletsIndexesToAdd,
         walletsInfo.map(item => ({
             index: item.accountIndex,

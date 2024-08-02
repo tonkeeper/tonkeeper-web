@@ -172,13 +172,15 @@ export const useAddLedgerAccountMutation = () => {
                 form.emoji
             );
 
-            // remove separately-added in legacy app version ledger wallets that should be replaced with a single account with subwallets
-            await accStorage.removeAccountsFromState(
-                form.allWallets.map(w => w.publicKey.toString('hex'))
-            );
-
             await accStorage.addAccountToState(newAccount);
             await accStorage.setActiveAccountId(newAccount.id);
+
+            // remove separately-added in legacy app version ledger wallets that should be replaced with a single account with subwallets
+            await accStorage.removeAccountsFromState(
+                form.allWallets
+                    .filter(w => w.publicKey.toString('hex') !== newAccount.id)
+                    .map(w => w.publicKey.toString('hex'))
+            );
 
             await client.invalidateQueries([QueryKey.account]);
 
