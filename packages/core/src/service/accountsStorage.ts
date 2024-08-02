@@ -32,6 +32,10 @@ export class AccountsStorage {
         } else {
             state.forEach(bindAccountToClass);
         }
+
+        if (state) {
+            this.checkEmojiMigration(state);
+        }
         return state ?? defaultAccountState;
     };
 
@@ -151,6 +155,18 @@ export class AccountsStorage {
                 ?.id || null
         );
     };
+
+    /**
+     * some wallets accounts don't have emoji
+     * @private
+     */
+    private checkEmojiMigration(state: AccountsState) {
+        state.forEach(item => {
+            if (!item.emoji) {
+                item.emoji = '🙂';
+            }
+        });
+    }
 }
 
 export const accountsStorage = (storage: IStorage): AccountsStorage => new AccountsStorage(storage);
