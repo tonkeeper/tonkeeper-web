@@ -119,9 +119,8 @@ export const LedgerIndexesPageContent: FC<{
                             <TextContainer>
                                 <Label1># {derivationIndex + 1}</Label1>
                                 <Body2Secondary>
-                                    {toShortValue(formatAddress(balance.address))}
-                                    &nbsp;·&nbsp;
-                                    {toFormattedTonBalance(balance.tonBalance)}&nbsp;TON
+                                    {toShortValue(formatAddress(balance.address)) + ' '}·
+                                    {' ' + toFormattedTonBalance(balance.tonBalance)}&nbsp;TON
                                     {balance.hasJettons && t('wallet_version_and_tokens')}
                                 </Body2Secondary>
                             </TextContainer>
