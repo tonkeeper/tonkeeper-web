@@ -1,6 +1,15 @@
 name: Tonkeeper Web Deploy
 on:
     workflow_dispatch:
+        inputs:
+            environment:
+                type: choice
+                description: Deploy to env
+                required: true
+                options:
+                    - dev
+                    - main
+
 jobs:
     web-deploy:
         name: web-deploy
@@ -32,15 +41,17 @@ jobs:
                   VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
                   VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
                   VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
-                  VITE_APP_LOCALES: en,zh_CN,ru,it,tr
+                  VITE_APP_LOCALES: en,zh_CN,ru,it,tr,bg
               with:
                   cmd: build:web
 
             - name: Publish to Cloudflare Pages
               uses: cloudflare/pages-action@v1
+              if: contains(github.ref, 'main') || inputs.environment == 'dev'
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   projectName: tonkeeper-web
                   directory: apps/web/dist
                   wranglerVersion: '3'
+                  branch: ${{ inputs.environment }}

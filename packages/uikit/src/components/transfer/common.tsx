@@ -8,7 +8,7 @@ import { seeIfBalanceError, seeIfTimeError } from '@tonkeeper/core/dist/service/
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, PropsWithChildren } from 'react';
 import styled, { css, useTheme } from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { ChevronLeftIcon } from '../Icon';
 import { NotificationCancelButton, NotificationTitleBlock } from '../Notification';
@@ -17,6 +17,7 @@ import { RoundedButton, ButtonMock } from '../fields/RoundedButton';
 import { Button } from '../fields/Button';
 import { Center, Title } from './amountView/AmountViewUI';
 import { AmountState } from './amountView/amountState';
+import { useIsActiveWalletLedger } from '../../state/ledger';
 
 export const duration = 300;
 export const timingFunction = 'ease-in-out';
@@ -221,8 +222,7 @@ export type ConfirmMainButtonProps = (props: {
 
 export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled, onClick }) => {
     const { t } = useTranslation();
-    const { auth } = useWalletContext();
-    const isLedger = auth?.kind === 'ledger';
+    const isLedger = useIsActiveWalletLedger();
     return (
         <Button
             fullWidth
@@ -253,8 +253,7 @@ export const ConfirmAndCancelMainButton: ConfirmMainButtonProps = ({
     onClose
 }) => {
     const { t } = useTranslation();
-    const { auth } = useWalletContext();
-    const isLedger = auth?.kind === 'ledger';
+    const isLedger = useIsActiveWalletLedger();
     return (
         <ConfirmViewButtonsContainerStyled>
             <Button size="large" secondary onClick={onClose}>

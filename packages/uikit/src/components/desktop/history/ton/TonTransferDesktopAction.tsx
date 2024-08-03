@@ -12,20 +12,20 @@ import {
     HistoryCellAccount,
     ErrorRow
 } from './HistoryCell';
-import { useWalletContext } from '../../../../hooks/appContext';
+import { useActiveWallet } from '../../../../state/wallet';
 
 export const TonTransferDesktopAction: FC<{
     action: Action;
     isScam: boolean;
 }> = ({ action, isScam }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { tonTransfer } = action;
 
     if (!tonTransfer) {
         return <ErrorRow />;
     }
 
-    if (eqAddresses(tonTransfer.recipient.address, wallet.active.rawAddress)) {
+    if (eqAddresses(tonTransfer.recipient.address, wallet.rawAddress)) {
         return (
             <>
                 <HistoryCellActionReceived isScam={isScam} isFailed={action.status === 'failed'} />

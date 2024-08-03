@@ -3,47 +3,27 @@ import React, { useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useEnableW5, useEnableW5Mutation } from '../../state/experemental';
-import { useMutateWalletProperty } from '../../state/wallet';
-
-const SettingsW5 = () => {
-    const { experimental } = useAppContext();
-    const { data } = useEnableW5();
-    const { mutate } = useEnableW5Mutation();
-
-    const items = useMemo<SettingsItem[]>(() => {
-        return [
-            {
-                name: 'Experimental W5',
-                icon: data ? 'Active' : 'Inactive',
-                action: () => mutate()
-            }
-        ];
-    }, [data, mutate]);
-
-    if (data === undefined || experimental !== true) return null;
-
-    return <SettingsList items={items} />;
-};
+import { useActiveWallet } from '../../state/wallet';
+import { useDevSettings, useMutateDevSettings } from '../../state/dev';
 
 export const DevSettings = React.memo(() => {
     const { t } = useTranslation();
 
-    const wallet = useWalletContext();
-    const { mutate } = useMutateWalletProperty(true);
+    const wallet = useActiveWallet();
+    const { mutate: mutateDevSettings } = useMutateDevSettings();
+    const { data: devSettings } = useDevSettings();
 
     const items = useMemo<SettingsItem[]>(() => {
-        const network = wallet.network ?? Network.MAINNET;
+        const network = devSettings?.tonNetwork ?? Network.MAINNET;
         return [
             {
                 name: t('settings_network_alert_title'),
                 icon: network === Network.MAINNET ? 'Mainnet' : 'Testnet',
-                action: () => mutate({ network: switchNetwork(network) })
+                action: () => mutateDevSettings({ tonNetwork: switchNetwork(network) })
             }
         ];
-    }, [t, wallet]);
+    }, [t, wallet, devSettings]);
 
     return (
         <>
@@ -52,7 +32,6 @@ export const DevSettings = React.memo(() => {
                 <SettingsList items={items} />
                 {/* TODO: ENABLE TRON */}
                 {/* <SettingsList items={items2} /> */}
-                <SettingsW5 />
             </InnerBody>
         </>
     );

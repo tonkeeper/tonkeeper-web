@@ -8,17 +8,35 @@ import { useTranslation } from '../../../hooks/translation';
 import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
-import { useMutateActiveWallet } from '../../../state/account';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
-import { useWalletState } from '../../../state/wallet';
+import {
+    useAccountsState,
+    useActiveTonNetwork,
+    useMutateActiveTonWallet,
+    useActiveAccount
+} from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
-import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
+import { GearIconEmpty, GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { Label2 } from '../../Text';
 import { ImportNotification } from '../../create/ImportNotification';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { AsideHeader } from './AsideHeader';
 import { SubscriptionInfo } from './SubscriptionInfo';
+import { Account } from '@tonkeeper/core/dist/entries/account';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import {
+    sortDerivationsByIndex,
+    sortWalletsByVersion,
+    WalletId
+} from '@tonkeeper/core/dist/entries/wallet';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { IconButtonTransparentBackground } from '../../fields/IconButton';
+import { useWalletVersionSettingsNotification } from '../../modals/WalletVersionSettingsNotification';
+import { useIsHovered } from '../../../hooks/useIsHovered';
+import { ScrollContainer } from '../../ScrollContainer';
+import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../account/AccountBadge';
+import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -52,10 +70,6 @@ const AsideContentContainer = styled.div`
     display: flex;
     flex-direction: column;
     padding: 0.5rem 0.5rem 0;
-`;
-
-const ScrollContainer = styled.div`
-    overflow: auto;
 `;
 
 const DividerStyled = styled.div<{ isHidden?: boolean }>`
@@ -92,18 +106,45 @@ const SubscriptionInfoStyled = styled(SubscriptionInfo)`
     padding: 6px 16px 6px 8px;
 `;
 
-export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = ({
-    publicKey,
+const AsideMenuSubItem = styled(AsideMenuItem)`
+    padding-left: 36px;
+`;
+
+const AccountBadgeStyled = styled(AccountBadge)`
+    margin-left: -4px;
+`;
+
+const WalletVersionBadgeStyled = styled(WalletVersionBadge)`
+    margin-left: -4px;
+`;
+
+const WalletIndexBadgeStyled = styled(WalletIndexBadge)`
+    margin-left: -4px;
+`;
+
+const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: boolean }>`
+    margin-left: auto;
+    margin-right: -10px;
+    flex-shrink: 0;
+    padding-left: 0;
+
+    opacity: ${p => (p.isShown ? 1 : 0)};
+    transition: opacity 0.15s ease-in-out;
+`;
+
+export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = ({
+    account,
     isSelected
 }) => {
-    const { t } = useTranslation();
-    const { data: wallet } = useWalletState(publicKey);
-    const { mutateAsync } = useMutateActiveWallet();
+    const { onOpen: openWalletVersionSettings } = useWalletVersionSettingsNotification();
+    const { onOpen: openLedgerIndexesSettings } = useLedgerIndexesSettingsNotification();
+    const network = useActiveTonNetwork();
+    const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
     const navigate = useNavigate();
     const location = useLocation();
 
-    const { account } = useAppContext();
-    const shouldShowIcon = account.publicKeys.length > 1;
+    const accounts = useAccountsState();
+    const shouldShowIcon = accounts.length > 1;
 
     const handleNavigateHome = useCallback(() => {
         const navigateHomeFromRoutes = [AppProRoute.dashboard, AppRoute.settings, AppRoute.browser];
@@ -114,30 +155,179 @@ export const AsideMenuAccount: FC<{ publicKey: string; isSelected: boolean }> = 
         }
     }, [location.pathname]);
 
-    const onClick = useCallback(() => {
-        mutateAsync(publicKey).then(handleNavigateHome);
-    }, [publicKey, mutateAsync, handleNavigateHome]);
+    const { isHovered, ref } = useIsHovered<HTMLButtonElement>();
 
-    if (!wallet) {
+    const onClickWallet = (walletId: WalletId) =>
+        setActiveWallet(walletId).then(handleNavigateHome);
+
+    if (!account) {
         return null;
     }
 
-    const name = wallet.name ? wallet.name : t('wallet_title');
+    if (account.type === 'mnemonic') {
+        const sortedWallets = account.tonWallets.slice().sort(sortWalletsByVersion);
+        return (
+            <>
+                <AsideMenuItem
+                    isSelected={false}
+                    onClick={() => onClickWallet(sortedWallets[0].id)}
+                    ref={ref}
+                >
+                    {shouldShowIcon && (
+                        <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
+                    )}
+                    <Label2>{account.name}</Label2>
+                    <GearIconButtonStyled
+                        onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openWalletVersionSettings({ accountId: account.id });
+                        }}
+                        isShown={isHovered}
+                    >
+                        <GearIconEmpty />
+                    </GearIconButtonStyled>
+                </AsideMenuItem>
+                {sortedWallets.length > 1 &&
+                    sortedWallets.map(wallet => (
+                        <AsideMenuSubItem
+                            key={wallet.id}
+                            isSelected={isSelected && account.activeTonWallet.id === wallet.id}
+                            onClick={() => onClickWallet(wallet.id)}
+                        >
+                            <Label2>
+                                {toShortValue(formatAddress(wallet.rawAddress, network))}
+                            </Label2>
+                            <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
+                        </AsideMenuSubItem>
+                    ))}
+            </>
+        );
+    }
 
-    return (
-        <AsideMenuItem isSelected={isSelected} onClick={onClick}>
-            {shouldShowIcon && (
-                <WalletEmoji emojiSize="16px" containerSize="16px" emoji={wallet.emoji} />
-            )}
-            <Label2>{name}</Label2>
-        </AsideMenuItem>
-    );
+    if (account.type === 'ledger') {
+        const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
+        return (
+            <>
+                <AsideMenuItem
+                    isSelected={false}
+                    onClick={() => onClickWallet(sortedDerivations[0].activeTonWalletId)}
+                    ref={ref}
+                >
+                    {shouldShowIcon && (
+                        <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
+                    )}
+                    <Label2>{account.name}</Label2>
+                    <AccountBadgeStyled accountType={account.type} size="s" />
+
+                    {/*show settings only for non-legacy added ledger accounts*/}
+                    {account.allAvailableDerivations.length > 1 && (
+                        <GearIconButtonStyled
+                            onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                openLedgerIndexesSettings({ accountId: account.id });
+                            }}
+                            isShown={isHovered}
+                        >
+                            <GearIconEmpty />
+                        </GearIconButtonStyled>
+                    )}
+                </AsideMenuItem>
+                {sortedDerivations.length > 1 &&
+                    sortedDerivations.map(derivation => {
+                        const wallet = derivation.tonWallets.find(
+                            w => w.id === derivation.activeTonWalletId
+                        )!;
+
+                        return (
+                            <AsideMenuSubItem
+                                key={derivation.index}
+                                isSelected={
+                                    isSelected && account.activeDerivationIndex === derivation.index
+                                }
+                                onClick={() => onClickWallet(derivation.activeTonWalletId)}
+                            >
+                                <Label2>
+                                    {toShortValue(formatAddress(wallet.rawAddress, network))}
+                                </Label2>
+                                <WalletIndexBadgeStyled size="s">
+                                    {'#' + (derivation.index + 1)}
+                                </WalletIndexBadgeStyled>
+                            </AsideMenuSubItem>
+                        );
+                    })}
+            </>
+        );
+    }
+
+    if (account.type === 'ton-only') {
+        const sortedWallets = account.tonWallets.slice().sort(sortWalletsByVersion);
+        return (
+            <>
+                <AsideMenuItem
+                    isSelected={false}
+                    onClick={() => onClickWallet(account.activeTonWallet.id)}
+                    ref={ref}
+                >
+                    {shouldShowIcon && (
+                        <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
+                    )}
+                    <Label2>{account.name}</Label2>
+                    <AccountBadgeStyled accountType={account.type} size="s" />
+                    <GearIconButtonStyled
+                        onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openWalletVersionSettings({ accountId: account.id });
+                        }}
+                        isShown={isHovered}
+                    >
+                        <GearIconEmpty />
+                    </GearIconButtonStyled>
+                </AsideMenuItem>
+                {sortedWallets.length > 1 &&
+                    sortedWallets.map(wallet => (
+                        <AsideMenuSubItem
+                            key={wallet.id}
+                            isSelected={isSelected && account.activeTonWallet.id === wallet.id}
+                            onClick={() => onClickWallet(wallet.id)}
+                        >
+                            <Label2>
+                                {toShortValue(formatAddress(wallet.rawAddress, network))}
+                            </Label2>
+                            <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
+                        </AsideMenuSubItem>
+                    ))}
+            </>
+        );
+    }
+
+    if (account.type === 'keystone') {
+        return (
+            <AsideMenuItem
+                isSelected={isSelected}
+                onClick={() => onClickWallet(account.activeTonWallet.id)}
+                ref={ref}
+            >
+                {shouldShowIcon && (
+                    <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
+                )}
+                <Label2>{account.name}</Label2>
+                <AccountBadgeStyled accountType={account.type} size="s" />
+            </AsideMenuItem>
+        );
+    }
+
+    assertUnreachable(account);
 };
 
 const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const [isOpenImport, setIsOpenImport] = useState(false);
-    const { account, proFeatures } = useAppContext();
+    const { proFeatures } = useAppContext();
+    const accounts = useAccountsState();
+    const activeAccount = useActiveAccount();
     const navigate = useNavigate();
     const location = useLocation();
     const { ref, closeBottom } = useIsScrolled();
@@ -209,15 +399,11 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_dashboard')}</Label2>
                         </AsideMenuItem>
                     )}
-                    {account.publicKeys.map(publicKey => (
+                    {accounts.map(account => (
                         <AsideMenuAccount
-                            key={publicKey}
-                            publicKey={publicKey}
-                            isSelected={
-                                !activeRoute &&
-                                !!account.activePublicKey &&
-                                account.activePublicKey === publicKey
-                            }
+                            key={account.id}
+                            account={account}
+                            isSelected={!activeRoute && activeAccount.id === account.id}
                         />
                     ))}
                 </ScrollContainer>

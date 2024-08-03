@@ -10,7 +10,6 @@ import {
 } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC, useMemo } from 'react';
-import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { useFormatFiat, useRate } from '../../../state/rates';
@@ -27,6 +26,7 @@ import {
     Title
 } from '../NotificationCommon';
 import { ActionData } from './ActivityNotification';
+import { useActiveWallet } from '../../../state/wallet';
 
 const JettonTransferActionContent: FC<{
     jettonTransfer: JettonTransferAction;
@@ -35,14 +35,14 @@ const JettonTransferActionContent: FC<{
     isScam: boolean;
     status?: ActionStatusEnum;
 }> = ({ jettonTransfer, timestamp, event, isScam, status }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { data } = useRate(Address.parse(jettonTransfer.jetton.address).toString());
     const { fiatAmount } = useFormatFiat(
         data,
         formatDecimals(jettonTransfer.amount, jettonTransfer.jetton.decimals)
     );
     const blacklist = jettonTransfer.jetton.verification === 'blacklist';
-    const kind = jettonTransfer.sender?.address === wallet.active.rawAddress ? 'send' : 'received';
+    const kind = jettonTransfer.sender?.address === wallet.rawAddress ? 'send' : 'received';
 
     return (
         <ActionDetailsBlock event={event}>

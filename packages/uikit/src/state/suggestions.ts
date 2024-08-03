@@ -5,9 +5,9 @@ import {
     getFavoriteSuggestions,
     setFavoriteSuggestion
 } from '@tonkeeper/core/dist/service/suggestionService';
-import { useWalletContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
+import { useActiveStandardTonWallet } from './wallet';
 
 const validateName = (name: string) => {
     name = name.trim();
@@ -22,22 +22,18 @@ const validateName = (name: string) => {
 
 export const useDeleteFavorite = () => {
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const queryClient = useQueryClient();
 
     return useMutation<void, Error, FavoriteSuggestion>(async favorite => {
         await deleteFavoriteSuggestion(sdk.storage, wallet.publicKey, favorite.address);
-        await queryClient.invalidateQueries([
-            wallet.active.rawAddress,
-            QueryKey.activity,
-            'suggestions'
-        ]);
+        await queryClient.invalidateQueries([wallet.rawAddress, QueryKey.activity, 'suggestions']);
     });
 };
 
 export const useEditFavorite = () => {
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const queryClient = useQueryClient();
 
     return useMutation<void, Error, { favorite: FavoriteSuggestion; name: string }>(
@@ -60,7 +56,7 @@ export const useEditFavorite = () => {
 
             await setFavoriteSuggestion(sdk.storage, wallet.publicKey, items);
             await queryClient.invalidateQueries([
-                wallet.active.rawAddress,
+                wallet.rawAddress,
                 QueryKey.activity,
                 'suggestions'
             ]);
@@ -70,7 +66,7 @@ export const useEditFavorite = () => {
 
 export const useAddFavorite = () => {
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const queryClient = useQueryClient();
 
     return useMutation<void, Error, { latest: LatestSuggestion; name: string }>(
@@ -88,7 +84,7 @@ export const useAddFavorite = () => {
             });
             await setFavoriteSuggestion(sdk.storage, wallet.publicKey, items);
             await queryClient.invalidateQueries([
-                wallet.active.rawAddress,
+                wallet.rawAddress,
                 QueryKey.activity,
                 'suggestions'
             ]);

@@ -4,7 +4,7 @@ import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { KeystoneMessageType, KeystonePathInfo } from '@tonkeeper/core/dist/service/keystone/types';
 import { constructKeystoneSignRequest } from '@tonkeeper/core/dist/service/keystone/ur';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { useAppContext, useWalletContext } from '../hooks/appContext';
+import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useKeystoneScanner } from '../hooks/keystoneScanner';
 import { useNavigate } from '../hooks/navigate';
@@ -13,6 +13,8 @@ import { Notification, NotificationBlock } from './Notification';
 import { Button } from './fields/Button';
 import { Background, HeaderBlock } from './home/AccountView';
 import { KeystoneAnimatedQRCode } from './home/qrCodeView';
+import { useActiveWallet } from '../state/wallet';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 
 export const SignerContent: FC<{
     sdk: IAppSdk;
@@ -24,7 +26,7 @@ export const SignerContent: FC<{
     onClose: () => void;
     handleResult: (result: string) => void;
 }> = ({ sdk, transactionParams, onClose, handleResult }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { t } = useTranslation();
     const { extension } = useAppContext();
 
@@ -41,7 +43,7 @@ export const SignerContent: FC<{
         return constructKeystoneSignRequest(
             transactionParams.message,
             transactionParams.messageType,
-            wallet.active.friendlyAddress,
+            formatAddress(wallet.rawAddress),
             transactionParams.pathInfo
         );
     }, [transactionParams]);

@@ -20,7 +20,7 @@ import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useAppContext } from '../../../hooks/appContext';
-import { DeleteAllNotification } from '../../settings/LogOutNotification';
+import { DeleteAllNotification } from '../../settings/DeleteAccountNotification';
 import React from 'react';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { capitalize, getCountryName, getLanguageName } from '../../../libs/common';
@@ -29,6 +29,7 @@ import { Skeleton } from '../../shared/Skeleton';
 import { useProState } from '../../../state/pro';
 import { availableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA } from '../../../libs/css';
+import { useAccountsState } from '../../../state/wallet';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -83,13 +84,14 @@ export const PreferencesAsideMenu = () => {
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
     const sdk = useAppSdk();
-    const { config, account } = useAppContext();
+    const { config } = useAppContext();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: countryData } = useCountrySetting();
     const country = countryData === null ? t('auto') : countryData;
     const { data: proState } = useProState();
     const { data: uiPreferences } = useUserUIPreferences();
     const { fiat } = useAppContext();
+    const wallets = useAccountsState();
 
     return (
         <PreferencesAsideContainer>
@@ -233,7 +235,7 @@ export const PreferencesAsideMenu = () => {
                 <AsideMenuItemStyled onClick={onOpen} isSelected={false}>
                     <ExitIcon />
                     <Label2>
-                        {account.publicKeys.length > 1
+                        {wallets.length > 1
                             ? t('preferences_aside_sign_out_all')
                             : t('preferences_aside_sign_out')}
                     </Label2>

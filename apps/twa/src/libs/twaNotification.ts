@@ -1,7 +1,7 @@
 import { MiniApp, retrieveLaunchParams } from '@tma.js/sdk';
 import { NotificationService } from '@tonkeeper/core/dist/AppSdk';
+import { TonWalletStandard } from "@tonkeeper/core/dist/entries/wallet";
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
 import {
     toTonProofItem,
     tonConnectProofPayload
@@ -31,7 +31,7 @@ export class TwaNotification implements NotificationService {
 
     private getTonConnectProof = async (
         api: APIConfig,
-        wallet: WalletState,
+        wallet: TonWalletStandard,
         signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
     ) => {
         const domain = 'https://twa.tonkeeper.com/';
@@ -40,7 +40,7 @@ export class TwaNotification implements NotificationService {
         const proofPayload = tonConnectProofPayload(
             timestamp,
             domain,
-            wallet.active.rawAddress,
+            wallet.rawAddress,
             payload
         );
         const stateInit = walletStateInitFromState(wallet);
@@ -49,7 +49,7 @@ export class TwaNotification implements NotificationService {
 
     subscribe = async (
         api: APIConfig,
-        wallet: WalletState,
+        wallet: TonWalletStandard,
         signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
     ) => {
         try {
@@ -62,7 +62,7 @@ export class TwaNotification implements NotificationService {
         await twaApi.subscribeToAccountEvents({
             subscribeToAccountEventsRequest: {
                 twaInitData: this.twaInitData,
-                address: wallet.active.rawAddress,
+                address: wallet.rawAddress,
                 proof
             }
         });

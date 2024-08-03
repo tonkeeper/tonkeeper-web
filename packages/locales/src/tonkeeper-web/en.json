@@ -1,6 +1,7 @@
 {
   "about_tonkeeper_pro" : "About Tonkeeper Pro",
   "actionTitle" : "Open the wallet",
+  "add" : "Add",
   "add_dns_address" : "Add wallet address that domain %1% will link to.",
   "all_assets_jettons" : "All Assets",
   "appExtensionDescription" : "Your extension wallet on The Open Network",
@@ -45,6 +46,7 @@
   "Enable_storing_config" : "Enable storing config",
   "enter_password" : "Enter password",
   "export_dot_csv" : "Export .CSV",
+  "hide" : "Hide",
   "history_spam_nft" : "Spam NFT",
   "I_have_a_backup_copy_of_recovery_phrase" : "I have a backup copy of recovery phrase",
   "import_csv" : "Import CSV",
@@ -131,6 +133,7 @@
   "nft_on_sale_text" : "NFT is on sale at the marketplace now.\nFor transfer, you should remove it from sale first.",
   "no_connected_apps" : "No connected apps",
   "Old_password" : "Current password",
+  "open" : "Open",
   "operation_not_supported" : "The operation is not available for this wallets. Select another wallet and try again.",
   "page_header_history" : "History",
   "page_header_purchases" : "Purchases",
@@ -169,6 +172,7 @@
   "save" : "Save",
   "settings_collectibles_list" : "Collectibles",
   "settings_connected_apps" : "Connected Apps",
+  "settings_ledger_indexes" : "Ledger subwallets",
   "start_trial_notification_description" : "Telegram connection is required solely for the purpose of verification that you are not a bot.",
   "start_trial_notification_heading" : "Connect Telegram to Pro for Free",
   "swap_balance" : "Balance",
@@ -217,6 +221,7 @@
   "Unexpected_QR_Code" : "Unexpected QR Code",
   "Unlock" : "Unlock",
   "update" : "Update",
+  "update_ledger_error" : "Make sure your Ledger software is updated",
   "upload_file" : "Upload file",
   "wallet_address" : "Wallet address",
   "wallet_aside_collectibles" : "Collectibles",
@@ -227,5 +232,6 @@
   "wallet_aside_tokens" : "Tokens",
   "wallet_multi_send" : "Multi Send",
   "Wallet_name" : "Wallet name",
-  "wallet_sell" : "Sell"
+  "wallet_sell" : "Sell",
+  "wallet_version_and_tokens" : ", tokens"
 }

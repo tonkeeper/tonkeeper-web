@@ -1,7 +1,6 @@
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
-import { useWalletContext } from '../../../hooks/appContext';
 import { useTranslation } from '../../../hooks/translation';
 import { ListBlock } from '../../List';
 import { FailedDetail } from '../ActivityDetailsLayout';
@@ -17,6 +16,7 @@ import {
     Title
 } from '../NotificationCommon';
 import { ActionData } from './ActivityNotification';
+import { useActiveTonNetwork } from '../../../state/wallet';
 
 export const UnSubscribeActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
     const { t } = useTranslation();
@@ -69,7 +69,7 @@ export const SubscribeActionDetails: FC<ActionData> = ({ action, timestamp, even
 export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { unSubscribe } = action;
-    const wallet = useWalletContext();
+    const network = useActiveTonNetwork();
 
     if (!unSubscribe) {
         return <ErrorAction />;
@@ -84,7 +84,7 @@ export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({ action
                 entry="-"
                 address={
                     unSubscribe.beneficiary.name ??
-                    toShortValue(formatAddress(unSubscribe.beneficiary.address, wallet.network))
+                    toShortValue(formatAddress(unSubscribe.beneficiary.address, network))
                 }
                 date={date}
             />
@@ -95,7 +95,7 @@ export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({ action
 export const SubscribeAction: FC<{ action: Action; date: string }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { subscribe } = action;
-    const wallet = useWalletContext();
+    const network = useActiveTonNetwork();
 
     if (!subscribe) {
         return <ErrorAction />;
@@ -111,7 +111,7 @@ export const SubscribeAction: FC<{ action: Action; date: string }> = ({ action, 
                 entry="-"
                 address={
                     subscribe.beneficiary.name ??
-                    toShortValue(formatAddress(subscribe.beneficiary.address, wallet.network))
+                    toShortValue(formatAddress(subscribe.beneficiary.address, network))
                 }
                 date={date}
             />

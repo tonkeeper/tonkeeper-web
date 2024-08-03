@@ -1,8 +1,8 @@
 import { Cell, Pie, PieChart } from 'recharts';
-import { TokenDistribution } from '../../../state/wallet';
 import { FC, memo, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Body3, Label3 } from '../../Text';
+import { TokenDistribution } from "../../../state/asset";
 
 const Container = styled.div<{ activeAddress: string | undefined }>`
     container-type: inline-size;

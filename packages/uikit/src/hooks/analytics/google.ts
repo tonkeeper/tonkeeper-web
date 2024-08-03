@@ -1,13 +1,13 @@
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { AccountState } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { WalletState } from '@tonkeeper/core/dist/entries/wallet';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import { v4 as uuidv4 } from 'uuid';
 import { Analytics } from '.';
 
 export class GoogleAnalytics4 implements Analytics {
     private user_properties: Record<string, any> = {};
+
     private clientId: string | undefined;
 
     constructor(
@@ -30,22 +30,23 @@ export class GoogleAnalytics4 implements Analytics {
         }
     }
 
-    init(
-        application: string,
-        walletType: string,
-        account?: AccountState,
-        wallet?: WalletState | null,
-        version?: string,
-        platform?: string
-    ) {
-        this.user_properties['application'] = { value: application };
-        this.user_properties['walletType'] = { value: walletType };
-        this.user_properties['network'] = {
-            value: wallet?.network === Network.TESTNET ? 'testnet' : 'mainnet'
+    init(params: {
+        application: string;
+        walletType: string;
+        activeAccount: Account;
+        accounts: Account[];
+        network?: Network;
+        version?: string;
+        platform?: string;
+    }) {
+        this.user_properties.application = { value: params.application };
+        this.user_properties.walletType = { value: params.walletType };
+        this.user_properties.network = {
+            value: params.network === Network.TESTNET ? 'testnet' : 'mainnet'
         };
-        this.user_properties['accounts'] = { value: account!.publicKeys.length };
-        this.user_properties['version'] = { value: version };
-        this.user_properties['platform'] = { value: platform };
+        this.user_properties.accounts = { value: params.accounts?.length || 0 };
+        this.user_properties.version = { value: params.version };
+        this.user_properties.platform = { value: params.platform };
     }
 
     pageView(location: string) {

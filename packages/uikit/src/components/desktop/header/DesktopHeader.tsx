@@ -8,16 +8,19 @@ import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { usePreFetchRates } from '../../../state/rates';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
-import { useWalletTotalBalance } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, PlusIconSmall } from "../../Icon";
-import { Num2 } from '../../Text';
+import { ArrowDownIcon, ArrowUpIcon, PlusIconSmall } from '../../Icon';
+import { Body2Class, Num2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { IconButton } from '../../fields/IconButton';
 import { Link } from 'react-router-dom';
-import { AppProRoute } from '../../../libs/routes';
+import { AppProRoute, AppRoute, SettingsRoute } from '../../../libs/routes';
 import { BuyNotification } from '../../home/BuyAction';
 import { Skeleton } from '../../shared/Skeleton';
+import { useWalletTotalBalance } from '../../../state/asset';
+import { hexToRGBA } from '../../../libs/css';
+import { useActiveTonNetwork } from '../../../state/wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const DesktopHeaderStyled = styled.div`
     padding-left: 1rem;
@@ -96,6 +99,26 @@ const LinkStyled = styled(Link)`
     text-decoration: unset;
 `;
 
+const TestnetBadge = styled(Link)`
+    background: ${p => hexToRGBA(p.theme.accentRed, 0.16)};
+    color: ${p => p.theme.accentRed};
+    padding: 4px 8px;
+    border-radius: ${p => p.theme.corner2xSmall};
+    border: none;
+    text-transform: uppercase;
+    margin-left: 10px;
+    margin-right: auto;
+    text-decoration: none;
+
+    transition: background 0.15s ease-in-out;
+
+    &:hover {
+        background: ${p => hexToRGBA(p.theme.accentRed, 0.36)};
+    }
+
+    ${Body2Class};
+`;
+
 const DesktopHeaderPayload = () => {
     usePreFetchRates();
     const { fiat } = useAppContext();
@@ -104,6 +127,7 @@ const DesktopHeaderPayload = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: buy } = useTonendpointBuyMethods();
     const { t } = useTranslation();
+    const network = useActiveTonNetwork();
 
     return (
         <DesktopHeaderStyled>
@@ -114,7 +138,9 @@ const DesktopHeaderPayload = () => {
                     <Num2>{formatFiatCurrency(fiat, balance || 0)}</Num2>
                 </BalanceContainer>
             )}
-            <Num2></Num2>
+            {network === Network.TESTNET && (
+                <TestnetBadge to={AppRoute.settings + SettingsRoute.dev}>Testnet</TestnetBadge>
+            )}
             <DesktopRightPart>
                 <ButtonsContainer>
                     <ButtonStyled

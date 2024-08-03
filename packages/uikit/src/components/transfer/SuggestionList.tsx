@@ -14,7 +14,7 @@ import {
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC } from 'react';
 import styled from 'styled-components';
-import { useAppContext, useWalletContext } from '../../hooks/appContext';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
@@ -22,9 +22,10 @@ import { DropDown } from '../DropDown';
 import { EllipsisIcon, StarIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
-import { SkeletonList } from '../Skeleton';
+import { SkeletonListWithImages } from '../Skeleton';
 import { Label1 } from '../Text';
 import { useSuggestionAddress } from './SuggestionAddress';
+import { useActiveStandardTonWallet } from '../../state/wallet';
 
 const Label = styled(Label1)`
     user-select: none;
@@ -36,10 +37,10 @@ const Label = styled(Label1)`
 const useLatestSuggestion = (acceptBlockchains?: BLOCKCHAIN_NAME[]) => {
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
 
     return useQuery(
-        [wallet.active.rawAddress, QueryKey.activity, 'suggestions', acceptBlockchains],
+        [wallet.rawAddress, QueryKey.activity, 'suggestions', acceptBlockchains],
         () => getSuggestionsList(sdk, api, wallet, acceptBlockchains),
         { keepPreviousData: true }
     );
@@ -67,16 +68,12 @@ const getLatestDate = (language: string, timestamp: number) => {
 
 const useDeleteFavorite = (item: FavoriteSuggestion) => {
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const queryClient = useQueryClient();
 
     return useMutation(async () => {
         await deleteFavoriteSuggestion(sdk.storage, wallet.publicKey, item.address);
-        await queryClient.invalidateQueries([
-            wallet.active.rawAddress,
-            QueryKey.activity,
-            'suggestions'
-        ]);
+        await queryClient.invalidateQueries([wallet.rawAddress, QueryKey.activity, 'suggestions']);
     });
 };
 
@@ -159,16 +156,12 @@ const FavoriteItem: FC<{
 
 const useHideSuggestion = (item: LatestSuggestion) => {
     const sdk = useAppSdk();
-    const wallet = useWalletContext();
+    const wallet = useActiveStandardTonWallet();
     const queryClient = useQueryClient();
 
     return useMutation(async () => {
         await hideSuggestions(sdk.storage, wallet.publicKey, item.address);
-        await queryClient.invalidateQueries([
-            wallet.active.rawAddress,
-            QueryKey.activity,
-            'suggestions'
-        ]);
+        await queryClient.invalidateQueries([wallet.rawAddress, QueryKey.activity, 'suggestions']);
     });
 };
 
@@ -244,7 +237,7 @@ export const SuggestionList: FC<{
         return (
             <>
                 <Label>{t('send_screen_steps_address_suggests_label')}</Label>
-                <SkeletonList size={4} margin={false} fullWidth />
+                <SkeletonListWithImages size={4} margin={false} fullWidth />
             </>
         );
     }

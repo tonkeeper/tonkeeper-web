@@ -2,7 +2,6 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AccountEvent, ActionStatusEnum, TonTransferAction } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC } from 'react';
-import { useWalletContext } from '../../../hooks/appContext';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { useFormatFiat, useRate } from '../../../state/rates';
@@ -26,6 +25,7 @@ import {
     Title
 } from '../NotificationCommon';
 import { ActionData } from './ActivityNotification';
+import { useActiveWallet } from '../../../state/wallet';
 
 const TonTransferActionContent: FC<{
     tonTransfer: TonTransferAction;
@@ -34,11 +34,11 @@ const TonTransferActionContent: FC<{
     isScam: boolean;
     status?: ActionStatusEnum;
 }> = ({ tonTransfer, timestamp, event, isScam, status }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { data } = useRate(CryptoCurrency.TON);
     const { fiatAmount } = useFormatFiat(data, formatDecimals(tonTransfer.amount));
 
-    const kind = tonTransfer.recipient.address === wallet.active.rawAddress ? 'received' : 'send';
+    const kind = tonTransfer.recipient.address === wallet.rawAddress ? 'received' : 'send';
 
     return (
         <ActionDetailsBlock event={event}>
@@ -116,8 +116,7 @@ export const AuctionBidActionDetails: FC<ActionData> = ({ action, timestamp, eve
 };
 
 export const DomainRenewActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
-    const { t } = useTranslation();
-    const { domainRenew, simplePreview } = action;
+    const { domainRenew } = action;
 
     if (!domainRenew) {
         return <ErrorActivityNotification event={event} />;

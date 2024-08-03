@@ -1,0 +1,20 @@
+{
+  "auctionBidMessage" : "Наддаване {{.Amount}} за {{.NftName}}",
+  "contractDeployAction" : "Деплой на договор{{ if .Interfaces }} с интерфейси {{.Interfaces}}{{ end }}",
+  "depositStakeAction" : "Депозит от {{.Value}} в стейкинг пул",
+  "electionsDepositStakeAction" : "Депозит от {{.Amount}} за стейк",
+  "electionsRecoverStakeAction" : "Възстановяване на {{.Amount}} стейк",
+  "helloWorld" : "Здравей свят!",
+  "jettonBurnAction" : "Изгаряне на {{.Value}} {{.JettonName}}",
+  "jettonMintAction" : "Копаене на {{.Value}} {{.JettonName}}",
+  "jettonSwapAction" : "Смяна на {{.AmountIn}} {{.JettonIn}} за {{.AmountOut}} {{.JettonOut}}",
+  "jettonTransferAction" : "Трансфер на {{.Value}} {{.JettonName}}",
+  "nftPurchaseAction" : "Покупка на {{.Name}}",
+  "nftTransferAction" : "Трансфер на 1 NFT",
+  "poolImplementationDescription" : "Минимален депозит {{.Deposit}} TON",
+  "smartContractExecMessage" : "Изпълнение на умен договор",
+  "subscriptionAction" : "Плащане {{.Value}} за абонамент",
+  "tonTransferAction" : "Трансфер на {{.Value}}",
+  "withdrawStakeAction" : "Изтегляне на {{.Value}} от стейкинг пул",
+  "withdrawStakeRequestAction" : "Заявка за изтегляне на {{.Value}} от стейкинг пул."
+}

@@ -1,25 +1,27 @@
 import { trackEvent } from '@aptabase/electron/renderer';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Analytics } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 
 export class AptabaseElectron implements Analytics {
     private user_properties: Record<string, any> = {};
 
-    init = (
-        application: string,
-        walletType: string,
-        account?: any,
-        wallet?: any,
-        version?: string | undefined,
-        platform?: string | undefined
-    ) => {
-        this.user_properties['application'] = application;
-        this.user_properties['walletType'] = walletType;
+    init = (params: {
+        application: string;
+        walletType: string;
+        activeAccount: Account;
+        accounts: Account[];
+        network?: Network;
+        version?: string;
+        platform?: string;
+    }) => {
+        this.user_properties['application'] = params.application;
+        this.user_properties['walletType'] = params.walletType;
         this.user_properties['network'] =
-            wallet?.network === Network.TESTNET ? 'testnet' : 'mainnet';
-        this.user_properties['accounts'] = account!.publicKeys.length;
-        this.user_properties['version'] = version;
-        this.user_properties['platform'] = platform;
+            params.network === Network.TESTNET ? 'testnet' : 'mainnet';
+        this.user_properties['accounts'] = params.accounts?.length ?? 0;
+        this.user_properties['version'] = params.version;
+        this.user_properties['platform'] = params.platform;
     };
 
     pageView = (location: string) => {

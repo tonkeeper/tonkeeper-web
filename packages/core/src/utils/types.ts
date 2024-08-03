@@ -11,3 +11,5 @@ export type NonNullableFields<T> = {
 export function notNullish<T>(x: T | null | undefined): x is T {
     return x !== null && x !== undefined;
 }
+
+export type AllOrNone<T> = Required<T> | Partial<Record<keyof T, undefined>>;

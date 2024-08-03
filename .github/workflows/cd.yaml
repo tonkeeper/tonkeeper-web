@@ -3,13 +3,27 @@ on:
     push:
         tags:
             - v*
+env:
+    node-version: 20.11.1
+
 jobs:
     desktop-build:
         name: desktop-build
         strategy:
             matrix:
-                os: [ubuntu-latest, macos-13, windows-latest]
-                node-version: [20.11.1]
+                include:
+                    - os: ubuntu-latest
+                      command: publish:intel
+                    - os: ubuntu-latest
+                      command: publish:arm
+                    - os: windows-latest
+                      command: publish:intel
+                    - os: macos-13
+                      command: publish:intel
+                    - os: macos-13
+                      command: publish:arm
+                    - os: macos-13
+                      command: publish:universal
 
         runs-on: ${{ matrix.os }}
         timeout-minutes: 30
@@ -34,7 +48,7 @@ jobs:
             - name: Set up Node
               uses: actions/setup-node@v4
               with:
-                  node-version: ${{ matrix.node-version }}
+                  node-version: ${{ env.node-version }}
 
             - name: Enable Corepack
               run: |
@@ -64,24 +78,10 @@ jobs:
               with:
                   cmd: build:pkg
 
-            - name: Run build intel distributive
+            - name: Run build distributive
               uses: borales/actions-yarn@v5
               with:
-                  cmd: publish:intel
-                  dir: 'apps/desktop'
-
-            - name: Run build arm distributive
-              if: runner.os != 'Windows'
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: publish:arm
-                  dir: 'apps/desktop'
-
-            - name: Run build universal distributive
-              if: runner.os == 'macOS'
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: publish:universal
+                  cmd: ${{ matrix.command }}
                   dir: 'apps/desktop'
 
             - name: Clean-up credentials
@@ -101,7 +101,7 @@ jobs:
             - name: Set up Node
               uses: actions/setup-node@v4
               with:
-                  node-version: 20.11.1
+                  node-version: ${{ env.node-version }}
 
             - name: Enable Corepack
               run: |
@@ -119,7 +119,7 @@ jobs:
                   VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
                   VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
                   VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
-                  VITE_APP_LOCALES: en,zh_CN,ru,it,tr
+                  VITE_APP_LOCALES: en,zh_CN,ru,it,tr,bg
               with:
                   cmd: build:web
 
@@ -145,7 +145,7 @@ jobs:
             - name: Set up Node
               uses: actions/setup-node@v4
               with:
-                  node-version: 20.11.1
+                  node-version: ${{ env.node-version }}
 
             - name: Enable Corepack
               run: |

@@ -15,9 +15,9 @@ import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import styled from 'styled-components';
 import { ChevronRightIcon, FireIcon, SparkIcon, SwapIcon } from '../../../Icon';
-import { useWalletContext } from '../../../../hooks/appContext';
 import { useTranslation } from '../../../../hooks/translation';
 import { toDexName } from '../../../activity/NotificationCommon';
+import { useActiveWallet } from '../../../../state/wallet';
 
 type SwapAsset = {
     amount: string | number;
@@ -66,14 +66,14 @@ export const JettonTransferDesktopAction: FC<{
     action: Action;
     isScam: boolean;
 }> = ({ action, isScam }) => {
-    const wallet = useWalletContext();
+    const wallet = useActiveWallet();
     const { jettonTransfer } = action;
 
     if (!jettonTransfer) {
         return <ErrorRow />;
     }
 
-    if (eqAddresses(wallet.active.rawAddress, jettonTransfer.sender?.address)) {
+    if (eqAddresses(wallet.rawAddress, jettonTransfer.sender?.address)) {
         return (
             <>
                 <HistoryCellActionSent isFailed={action.status === 'failed'} />

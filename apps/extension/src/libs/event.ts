@@ -4,6 +4,8 @@ import {
     TonConnectTransactionPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { ProxyConfiguration } from '../entries/proxy';
+import { Account } from "@tonkeeper/core/dist/entries/account";
+import { Network } from "@tonkeeper/core/dist/entries/network";
 
 export type PopUpEventEmitter = IEventEmitter<PupUpEvents>;
 export type BackgroundEventsEmitter = IEventEmitter<BackgroundEvents>;
@@ -53,8 +55,9 @@ export interface PayloadRequest<P = any> {
 export interface UserProperties {
     application: string;
     walletType: string;
-    account?: any;
-    wallet?: any;
+    accounts?: Account[];
+    activeAccount?: Account;
+    network?: Network;
     version?: string | undefined;
     platform?: string | undefined;
 }

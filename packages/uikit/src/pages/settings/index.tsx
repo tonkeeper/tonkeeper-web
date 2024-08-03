@@ -14,9 +14,10 @@ import { Notifications } from './Notification';
 import { ActiveRecovery, Recovery } from './Recovery';
 import { SecuritySettings } from './Security';
 import { Settings } from './Settings';
-import { WalletVersion } from './Version';
+import { WalletVersionPage } from './Version';
 import { ConnectedAppsSettings } from './ConnectedAppsSettings';
 import { NFTSettings } from './Nft';
+import { LedgerIndexesPage } from "./LedgerIndexes";
 
 const SettingsRouter = () => {
     return (
@@ -28,10 +29,11 @@ const SettingsRouter = () => {
             <Route path={SettingsRoute.account} element={<Account />} />
             <Route path={SettingsRoute.notification} element={<Notifications />} />
             <Route path={SettingsRoute.recovery}>
-                <Route path=":publicKey" element={<Recovery />} />
+                <Route path=":accountId" element={<Recovery />} />
                 <Route index element={<ActiveRecovery />} />
             </Route>
-            <Route path={SettingsRoute.version} element={<WalletVersion />} />
+            <Route path={SettingsRoute.version} element={<WalletVersionPage />} />
+            <Route path={SettingsRoute.ledgerIndexes} element={<LedgerIndexesPage />} />
             <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
             <Route path={SettingsRoute.nft} element={<NFTSettings />} />
             <Route path={SettingsRoute.security} element={<SecuritySettings />} />
