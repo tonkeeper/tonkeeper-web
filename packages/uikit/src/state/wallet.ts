@@ -330,8 +330,10 @@ export const useAccountsState = () => {
 
 export const useMutateDeleteAll = () => {
     const sdk = useAppSdk();
+    const client = useQueryClient();
     return useMutation<void, Error, void>(async () => {
         await sdk.storage.clear();
+        await client.invalidateQueries();
     });
 };
 
@@ -346,6 +348,7 @@ export const useMutateLogOut = () => {
     return useMutation<void, Error, AccountId>(async accountId => {
         await storage.removeAccountFromState(accountId);
         await client.invalidateQueries([QueryKey.account]);
+        await client.invalidateQueries([QueryKey.pro]);
     });
 };
 

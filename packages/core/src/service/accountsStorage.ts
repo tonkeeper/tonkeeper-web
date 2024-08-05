@@ -66,8 +66,16 @@ export class AccountsStorage {
 
     setActiveAccountId = async (activeAccountId: AccountId | null) => {
         const accounts = await this.getAccounts();
-        if (accounts.every(a => a.id !== activeAccountId)) {
-            throw new Error('Account not found');
+        if (activeAccountId === null) {
+            if (accounts.length > 0) {
+                throw new Error(
+                    'Account id can be removed -- set to null only if there is no added accounts'
+                );
+            }
+        } else {
+            if (accounts.every(a => a.id !== activeAccountId)) {
+                throw new Error('Account not found');
+            }
         }
         await this.storage.set(AppKey.ACTIVE_ACCOUNT_ID, activeAccountId);
     };
@@ -120,11 +128,11 @@ export class AccountsStorage {
 
         const newState = state.filter(w => !ids.includes(w.id));
 
+        await this.setAccounts(newState);
+
         if (activeAccountId !== null && ids.includes(activeAccountId)) {
             await this.setActiveAccountId(newState[0]?.id || null);
         }
-
-        await this.setAccounts(newState);
     };
 
     removeAccountFromState = async (id: AccountId) => {
