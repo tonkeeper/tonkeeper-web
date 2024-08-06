@@ -28,7 +28,7 @@ export type BouncePhaseType = typeof BouncePhaseType[keyof typeof BouncePhaseTyp
 export function instanceOfBouncePhaseType(value: any): boolean {
     for (const key in BouncePhaseType) {
         if (Object.prototype.hasOwnProperty.call(BouncePhaseType, key)) {
-            if ((BouncePhaseType as Record<string, BouncePhaseType>)[key] === value) {
+            if (BouncePhaseType[key as keyof typeof BouncePhaseType] === value) {
                 return true;
             }
         }

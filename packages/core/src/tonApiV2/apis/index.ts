@@ -10,6 +10,7 @@ export * from './GaslessApi';
 export * from './InscriptionsApi';
 export * from './JettonsApi';
 export * from './LiteServerApi';
+export * from './MultisigApi';
 export * from './NFTApi';
 export * from './RatesApi';
 export * from './StakingApi';

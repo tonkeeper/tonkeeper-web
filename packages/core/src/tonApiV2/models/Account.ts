@@ -39,6 +39,12 @@ export interface Account {
      */
     balance: number;
     /**
+     * {'USD': 1, 'IDR': 1000}
+     * @type {{ [key: string]: any; }}
+     * @memberof Account
+     */
+    currenciesBalance?: { [key: string]: any; };
+    /**
      * unix timestamp
      * @type {number}
      * @memberof Account
@@ -100,6 +106,8 @@ export interface Account {
     isWallet: boolean;
 }
 
+
+
 /**
  * Check if a given object implements the Account interface.
  */
@@ -125,6 +133,7 @@ export function AccountFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
         
         'address': json['address'],
         'balance': json['balance'],
+        'currenciesBalance': json['currencies_balance'] == null ? undefined : json['currencies_balance'],
         'lastActivity': json['last_activity'],
         'status': AccountStatusFromJSON(json['status']),
         'interfaces': json['interfaces'] == null ? undefined : json['interfaces'],
@@ -146,6 +155,7 @@ export function AccountToJSON(value?: Account | null): any {
         
         'address': value['address'],
         'balance': value['balance'],
+        'currencies_balance': value['currenciesBalance'],
         'last_activity': value['lastActivity'],
         'status': AccountStatusToJSON(value['status']),
         'interfaces': value['interfaces'],
