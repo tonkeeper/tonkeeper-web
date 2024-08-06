@@ -163,12 +163,8 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
                                 onClose={handleClose}
                                 recipient={recipient!}
                                 nftItem={nftItem}
-                                MainButton={() => (
-                                    <ConfirmViewButtons MainButton={ConfirmTwaMainButton} />
-                                )}
-                                HeaderBlock={() => (
-                                    <RecipientTwaHeaderBlock onClose={backToRecipient} />
-                                )}
+                                mainButton={<ConfirmViewButtons MainButton={ConfirmTwaMainButton} />}
+                                headerBlock={<RecipientTwaHeaderBlock onClose={backToRecipient} />}
                             />
                         )}
                     </div>

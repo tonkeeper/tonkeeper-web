@@ -4,7 +4,7 @@ import {
     sendNftTransfer
 } from '@tonkeeper/core/dist/service/transfer/nftService';
 import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 import { useAppContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
@@ -106,9 +106,9 @@ export const ConfirmNftView: FC<{
     recipient: TonRecipientData;
     nftItem: NftItem;
     onClose: () => void;
-    HeaderBlock: () => JSX.Element;
-    MainButton: () => JSX.Element;
-}> = ({ recipient, onClose, nftItem, HeaderBlock, MainButton }) => {
+    headerBlock: ReactNode;
+    mainButton: ReactNode;
+}> = ({ recipient, onClose, nftItem, headerBlock, mainButton }) => {
     const { standalone } = useAppContext();
     const [done, setDone] = useState(false);
     const { t } = useTranslation();
@@ -157,7 +157,7 @@ export const ConfirmNftView: FC<{
             }}
         >
             <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
-                <HeaderBlock />
+                {headerBlock}
                 <Info>
                     {image ? <Image src={image.url} /> : <ImageMock />}
                     <SendingTitle>{nftItem.dns ?? nftItem.metadata.name}</SendingTitle>
@@ -172,7 +172,7 @@ export const ConfirmNftView: FC<{
                 <NftDetailsBlock nftItem={nftItem} />
 
                 <Gap />
-                <MainButton />
+                {mainButton}
             </FullHeightBlock>
         </ConfirmViewContext.Provider>
     );
