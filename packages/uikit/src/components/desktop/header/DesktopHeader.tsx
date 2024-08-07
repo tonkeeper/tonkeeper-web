@@ -1,26 +1,26 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 import { ErrorBoundary } from 'react-error-boundary';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
+import { hexToRGBA } from '../../../libs/css';
+import { AppProRoute, AppRoute, SettingsRoute } from '../../../libs/routes';
+import { useWalletTotalBalance } from '../../../state/asset';
 import { usePreFetchRates } from '../../../state/rates';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
+import { useActiveTonNetwork, useIsActiveWalletReadOnly } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { ArrowDownIcon, ArrowUpIcon, PlusIconSmall } from '../../Icon';
 import { Body2Class, Num2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { IconButton } from '../../fields/IconButton';
-import { Link } from 'react-router-dom';
-import { AppProRoute, AppRoute, SettingsRoute } from '../../../libs/routes';
 import { BuyNotification } from '../../home/BuyAction';
 import { Skeleton } from '../../shared/Skeleton';
-import { useWalletTotalBalance } from '../../../state/asset';
-import { hexToRGBA } from '../../../libs/css';
-import { useActiveTonNetwork } from '../../../state/wallet';
-import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const DesktopHeaderStyled = styled.div`
     padding-left: 1rem;
@@ -128,6 +128,7 @@ const DesktopHeaderPayload = () => {
     const { data: buy } = useTonendpointBuyMethods();
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
+    const isReadOnly = useIsActiveWalletReadOnly();
 
     return (
         <DesktopHeaderStyled>
@@ -143,25 +144,29 @@ const DesktopHeaderPayload = () => {
             )}
             <DesktopRightPart>
                 <ButtonsContainer>
-                    <ButtonStyled
-                        size="small"
-                        onClick={() =>
-                            sdk.uiEvents.emit('transfer', {
-                                method: 'transfer',
-                                id: Date.now(),
-                                params: { asset: 'TON', chain: BLOCKCHAIN_NAME.TON }
-                            })
-                        }
-                    >
-                        <ArrowUpIcon />
-                        {t('wallet_send')}
-                    </ButtonStyled>
-                    <LinkStyled to={AppProRoute.multiSend}>
-                        <ButtonStyled size="small">
+                    {!isReadOnly && (
+                        <ButtonStyled
+                            size="small"
+                            onClick={() =>
+                                sdk.uiEvents.emit('transfer', {
+                                    method: 'transfer',
+                                    id: Date.now(),
+                                    params: { asset: 'TON', chain: BLOCKCHAIN_NAME.TON }
+                                })
+                            }
+                        >
                             <ArrowUpIcon />
-                            {t('wallet_multi_send')}
+                            {t('wallet_send')}
                         </ButtonStyled>
-                    </LinkStyled>
+                    )}
+                    {!isReadOnly && (
+                        <LinkStyled to={AppProRoute.multiSend}>
+                            <ButtonStyled size="small">
+                                <ArrowUpIcon />
+                                {t('wallet_multi_send')}
+                            </ButtonStyled>
+                        </LinkStyled>
+                    )}
                     <ButtonStyled
                         size="small"
                         onClick={() => {

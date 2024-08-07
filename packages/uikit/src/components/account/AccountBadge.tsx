@@ -120,6 +120,10 @@ export const AccountAndWalletBadgesGroup: FC<{
         return <AccountBadge className={className} size={size} accountType={account.type} />;
     }
 
+    if (account.type === 'read-only') {
+        return <AccountBadge className={className} size={size} accountType={account.type} />;
+    }
+
     if (account.type === 'mnemonic' && account.tonWallets.length > 1) {
         const wallet = account.tonWallets.find(w => w.id === walletId);
         if (wallet) {

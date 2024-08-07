@@ -5,11 +5,11 @@ import { FC } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { useActiveWallet, useIsActiveWalletReadOnly } from '../../state/wallet';
 import { Body2 } from '../Text';
 import { Button } from '../fields/Button';
 import { LinkNft } from './LinkNft';
 import { RenewNft } from './RenewNft';
-import { useActiveWallet } from '../../state/wallet';
 
 const getMarketplaceUrl = (nftItem: NftItem) => {
     const { marketplace } = nftItem.metadata;
@@ -89,6 +89,15 @@ export const NftAction: FC<{
     kind: NFTKind;
     nftItem: NFT;
 }> = ({ kind, nftItem }) => {
+    const isReadOnly = useIsActiveWalletReadOnly();
+    if (isReadOnly) {
+        return (
+            <>
+                <ViewOnMarketButton url={getMarketplaceUrl(nftItem)} />
+            </>
+        );
+    }
+
     switch (kind) {
         case 'token': {
             return (

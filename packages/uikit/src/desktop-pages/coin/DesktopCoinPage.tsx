@@ -1,34 +1,35 @@
-import React, { FC, useEffect, useMemo, useRef } from 'react';
+import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import BigNumber from 'bignumber.js';
+import { FC, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AppRoute } from '../../libs/routes';
-import { useTranslation } from '../../hooks/translation';
-import { useAppContext } from '../../hooks/appContext';
-import { useFetchNext } from '../../hooks/useFetchNext';
+import styled from 'styled-components';
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
+import { Body2, Label2, Num3 } from '../../components/Text';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { Body2, Label2, Num3 } from '../../components/Text';
-import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import styled from 'styled-components';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
-import { useRate } from '../../state/rates';
-import { useAssets } from '../../state/home';
-import BigNumber from 'bignumber.js';
-import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
-import { Button } from '../../components/fields/Button';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
-import { useAppSdk } from '../../hooks/appSdk';
-import { BuyNotification } from '../../components/home/BuyAction';
-import { useDisclosure } from '../../hooks/useDisclosure';
-import { useTonendpointBuyMethods } from '../../state/tonendpoint';
-import { useFetchFilteredActivity } from '../../state/activity';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
+import { Button } from '../../components/fields/Button';
+import { BuyNotification } from '../../components/home/BuyAction';
+import { useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
+import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
+import { useTranslation } from '../../hooks/translation';
+import { useDisclosure } from '../../hooks/useDisclosure';
+import { useFetchNext } from '../../hooks/useFetchNext';
+import { AppRoute } from '../../libs/routes';
+import { useFetchFilteredActivity } from '../../state/activity';
+import { useAssets } from '../../state/home';
 import { getMixedActivity } from '../../state/mixedActivity';
-import { useSwapFromAsset } from '../../state/swap/useSwapForm';
-import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
+import { useSwapFromAsset } from '../../state/swap/useSwapForm';
+import { useTonendpointBuyMethods } from '../../state/tonendpoint';
+import { useIsActiveWalletReadOnly } from '../../state/wallet';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -70,13 +71,15 @@ const ButtonStyled = styled(Button)`
 const CoinHeader: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
-
+    const isReadOnly = useIsActiveWalletReadOnly();
     const { data: buy } = useTonendpointBuyMethods();
     const canBuy = token === CryptoCurrency.TON;
     const { data: swapAssets } = useAllSwapAssets();
 
     const currentAssetAddress = tonAssetAddressFromString(token);
-    const swapAsset = swapAssets?.find(a => eqAddresses(a.address, currentAssetAddress));
+    const swapAsset = isReadOnly
+        ? undefined
+        : swapAssets?.find(a => eqAddresses(a.address, currentAssetAddress));
 
     const [_, setSwapFromAsset] = useSwapFromAsset();
     const navigate = useNavigate();
@@ -91,19 +94,21 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
         <CoinHeaderStyled>
             <CoinInfo token={token} />
             <HeaderButtonsContainer>
-                <ButtonStyled
-                    size="small"
-                    onClick={() =>
-                        sdk.uiEvents.emit('transfer', {
-                            method: 'transfer',
-                            id: Date.now(),
-                            params: { asset: token, chain: BLOCKCHAIN_NAME.TON }
-                        })
-                    }
-                >
-                    <ArrowUpIcon />
-                    {t('wallet_send')}
-                </ButtonStyled>
+                {!isReadOnly && (
+                    <ButtonStyled
+                        size="small"
+                        onClick={() =>
+                            sdk.uiEvents.emit('transfer', {
+                                method: 'transfer',
+                                id: Date.now(),
+                                params: { asset: token, chain: BLOCKCHAIN_NAME.TON }
+                            })
+                        }
+                    >
+                        <ArrowUpIcon />
+                        {t('wallet_send')}
+                    </ButtonStyled>
+                )}
                 <ButtonStyled
                     size="small"
                     onClick={() => {

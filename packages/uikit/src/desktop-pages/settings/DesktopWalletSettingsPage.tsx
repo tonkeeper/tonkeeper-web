@@ -21,7 +21,7 @@ import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
-import { useActiveAccount } from '../../state/wallet';
+import { useActiveAccount, useIsActiveWalletReadOnly } from '../../state/wallet';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -58,6 +58,8 @@ export const DesktopWalletSettingsPage = () => {
     const account = useActiveAccount();
     const { isOpen: isRenameOpen, onClose: onRenameClose, onOpen: onRenameOpen } = useDisclosure();
     const { isOpen: isDeleteOpen, onClose: onDeleteClose, onOpen: onDeleteOpen } = useDisclosure();
+
+    const isReadOnly = useIsActiveWalletReadOnly();
 
     const canChangeVersion = account.type === 'mnemonic' || account.type === 'ton-only';
 
@@ -124,12 +126,14 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_collectibles_list')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
-                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}>
-                    <SettingsListItem>
-                        <AppsIcon />
-                        <Label2>{t('settings_connected_apps')}</Label2>
-                    </SettingsListItem>
-                </LinkStyled>
+                {!isReadOnly && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}>
+                        <SettingsListItem>
+                            <AppsIcon />
+                            <Label2>{t('settings_connected_apps')}</Label2>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>

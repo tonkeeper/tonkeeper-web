@@ -542,3 +542,8 @@ export function useInvalidateActiveWalletQueries() {
         });
     });
 }
+
+export const useIsActiveWalletReadOnly = () => {
+    const wallet = useActiveAccount();
+    return wallet.type === 'read-only';
+};

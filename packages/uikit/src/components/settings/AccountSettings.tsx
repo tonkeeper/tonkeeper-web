@@ -3,8 +3,10 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { SettingsRoute, relative, WalletSettingsRoute } from '../../libs/routes';
+import { SettingsRoute, WalletSettingsRoute, relative } from '../../libs/routes';
 import { useJettonList } from '../../state/jetton';
+import { useWalletNftList } from '../../state/nft';
+import { useAccountsState, useActiveAccount, useActiveWallet } from '../../state/wallet';
 import { DeleteAccountNotification } from './DeleteAccountNotification';
 import {
     AppsIcon,
@@ -17,8 +19,6 @@ import {
     WalletsIcon
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
-import { useActiveWallet, useAccountsState, useActiveAccount } from '../../state/wallet';
-import { useWalletNftList } from '../../state/nft';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();
@@ -85,11 +85,13 @@ const SingleAccountSettings = () => {
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
         });
-        items.push({
-            name: t('settings_connected_apps'),
-            icon: <AppsIcon />,
-            action: () => navigate(relative(WalletSettingsRoute.connectedApps))
-        });
+        if (account.type !== 'read-only') {
+            items.push({
+                name: t('settings_connected_apps'),
+                icon: <AppsIcon />,
+                action: () => navigate(relative(WalletSettingsRoute.connectedApps))
+            });
+        }
 
         return items;
     }, [t, navigate, account, jettons, nft]);
@@ -187,11 +189,13 @@ const MultipleAccountSettings = () => {
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
         });
-        items.push({
-            name: t('settings_connected_apps'),
-            icon: <AppsIcon />,
-            action: () => navigate(relative(WalletSettingsRoute.connectedApps))
-        });
+        if (account.type !== 'read-only') {
+            items.push({
+                name: t('settings_connected_apps'),
+                icon: <AppsIcon />,
+                action: () => navigate(relative(WalletSettingsRoute.connectedApps))
+            });
+        }
         items.push({
             name: t('Delete_wallet_data'),
             icon: <LogOutIcon />,

@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
 import { AppRoute } from '../../../libs/routes';
+import { useIsActiveWalletReadOnly } from '../../../state/wallet';
 import {
     ClockSmoothIcon,
     CoinsIcon,
-    NotCoinIcon,
     SaleBadgeIcon,
     SettingsSmoothIcon,
     SparkIcon,
@@ -43,6 +43,7 @@ const SwapIconStyled = styled(SwapIcon)`
 export const WalletAsideMenu = () => {
     const { t } = useTranslation();
     const location = useLocation();
+    const isReadOnly = useIsActiveWalletReadOnly();
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
@@ -80,14 +81,16 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            <NavLink to={AppRoute.swap}>
-                {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
-                        <SwapIconStyled />
-                        <Label2>{t('wallet_swap')}</Label2>
-                    </AsideMenuItemStyled>
-                )}
-            </NavLink>
+            {!isReadOnly && (
+                <NavLink to={AppRoute.swap}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <SwapIconStyled />
+                            <Label2>{t('wallet_swap')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+            )}
             <NavLink to={AppRoute.walletSettings}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
