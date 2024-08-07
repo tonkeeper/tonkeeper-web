@@ -47,7 +47,20 @@ export class AccountsStorage {
                 await this.setActiveAccountId(state);
             }
         }
-        return state ?? null;
+
+        const allAccounts = await this.getAccounts();
+        if (allAccounts.every(acc => acc.id !== state)) {
+            state = null;
+        }
+
+        if (state === null) {
+            if (allAccounts.length > 0) {
+                state = allAccounts[0].id;
+                await this.setActiveAccountId(state);
+            }
+        }
+
+        return state;
     };
 
     getActiveAccount = async (): Promise<Account | null> => {
