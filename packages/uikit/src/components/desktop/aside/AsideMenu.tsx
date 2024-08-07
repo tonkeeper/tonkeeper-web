@@ -21,7 +21,6 @@ import { Label2 } from '../../Text';
 import { ImportNotification } from '../../create/ImportNotification';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
-import { AsideHeader } from './AsideHeader';
 import { SubscriptionInfoBlock } from './SubscriptionInfoBlock';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
@@ -37,6 +36,7 @@ import { useIsHovered } from '../../../hooks/useIsHovered';
 import { ScrollContainer } from '../../ScrollContainer';
 import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../account/AccountBadge';
 import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
+import { AsideHeader } from './AsideHeader';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;

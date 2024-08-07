@@ -118,6 +118,7 @@ const DDContent = styled.div<{ width: number }>`
 `;
 
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
+    const { t } = useTranslation();
     const { data } = useProState();
     const { onOpen } = useProFeaturesNotification();
     const { mutate, isLoading: isInvalidating } = useInvalidateActiveWalletQueries();
@@ -154,7 +155,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         } else {
             button = (
                 <Button primary onClick={onOpen}>
-                    Get Pro
+                    {t('pro_subscription_get_pro')}
                 </Button>
             );
         }

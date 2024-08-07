@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { FiatCurrencies } from './fiat';
+import { Address } from '@ton/core';
 
 export const columnsTypes = [
     'string',
@@ -64,3 +65,18 @@ export type DashboardCellNumericFiat = {
     value: BigNumber;
     fiat: FiatCurrencies;
 };
+
+export function toStringDashboardCell(cell: DashboardCell): string {
+    switch (cell.type) {
+        case 'string':
+            return cell.value;
+        case 'address':
+            return Address.parse(cell.raw).toString();
+        case 'numeric':
+            return cell.value;
+        case 'numeric_crypto':
+            return cell.value.div(10 ** cell.decimals).toString() + ' ' + cell.symbol;
+        case 'numeric_fiat':
+            return cell.value.toString() + ' ' + cell.fiat;
+    }
+}

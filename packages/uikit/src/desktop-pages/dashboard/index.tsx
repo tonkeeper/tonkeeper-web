@@ -1,25 +1,12 @@
 import { DashboardTable } from '../../components/dashboard/DashboardTable';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
-import { CategoriesModal } from '../../components/dashboard/CategoriesModal';
-import { Button } from '../../components/fields/Button';
 import { ProBanner } from '../../components/pro/ProBanner';
-import { useTranslation } from '../../hooks/translation';
 import { useProState } from '../../state/pro';
 import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { DesktopDashboardHeader } from '../../components/desktop/header/DesktopDashboardHeader';
 
 const DashboardTableStyled = styled(DashboardTable)``;
-
-const ButtonContainerStyled = styled.div`
-    padding: 1rem 1rem 2rem;
-    flex: 1;
-    position: sticky;
-    left: 0;
-
-    > button {
-        margin-left: auto;
-    }
-`;
 
 const ProBannerWrapper = styled.div`
     padding: 1rem;
@@ -39,27 +26,21 @@ const PageWrapper = styled.div`
 `;
 
 const DashboardPage: FC = () => {
-    const { t } = useTranslation();
-    const [isOpen, setIsOpen] = useState(false);
-
     const { data } = useProState();
     const shouldShowProBanner = data && !isPaidSubscription(data.subscription);
 
     return (
-        <PageWrapper>
-            <DashboardTableStyled />
-            <ButtonContainerStyled>
-                <Button size="small" corner="2xSmall" onClick={() => setIsOpen(true)}>
-                    {t('Manage')}
-                </Button>
-            </ButtonContainerStyled>
-            {shouldShowProBanner && (
-                <ProBannerWrapper>
-                    <ProBanner />
-                </ProBannerWrapper>
-            )}
-            <CategoriesModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
-        </PageWrapper>
+        <>
+            <DesktopDashboardHeader />
+            <PageWrapper>
+                <DashboardTableStyled />
+                {shouldShowProBanner && (
+                    <ProBannerWrapper>
+                        <ProBanner />
+                    </ProBannerWrapper>
+                )}
+            </PageWrapper>
+        </>
     );
 };
 

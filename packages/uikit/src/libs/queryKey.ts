@@ -38,6 +38,7 @@ export enum QueryKey {
     distribution = 'distribution',
     pro = 'pro',
     proBackup = 'proBackup',
+    allWalletsTotalBalance = 'allWalletsTotalBalance',
 
     dashboardColumnsForm = 'dashboardColumnsForm',
     dashboardColumns = 'dashboardColumns',
