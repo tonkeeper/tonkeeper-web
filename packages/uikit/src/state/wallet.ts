@@ -514,3 +514,10 @@ export function useInvalidateActiveWalletQueries() {
         });
     });
 }
+
+export function useInvalidateGlobalQueries() {
+    const client = useQueryClient();
+    return useMutation(async () => {
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.pro, QueryKey.dashboardData));
+    });
+}

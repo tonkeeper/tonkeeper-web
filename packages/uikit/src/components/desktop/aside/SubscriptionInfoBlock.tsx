@@ -13,7 +13,10 @@ import { Button } from '../../fields/Button';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { RefreshIcon } from '../../Icon';
-import { useInvalidateActiveWalletQueries } from '../../../state/wallet';
+import {
+    useInvalidateActiveWalletQueries,
+    useInvalidateGlobalQueries
+} from '../../../state/wallet';
 import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
 
@@ -121,7 +124,10 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     const { t } = useTranslation();
     const { data } = useProState();
     const { onOpen } = useProFeaturesNotification();
-    const { mutate, isLoading: isInvalidating } = useInvalidateActiveWalletQueries();
+    const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
+        useInvalidateActiveWalletQueries();
+    const { mutate: invalidateGlobalQueries, isLoading: isInvalidatingGlobalQueries } =
+        useInvalidateGlobalQueries();
     const [rotate, setRotate] = useState(false);
     const [containerRef, { width }] = useElementSize();
 
@@ -134,7 +140,8 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         setTimeout(() => {
             setRotate(false);
         }, 1000);
-        mutate();
+        invalidateActiveWalletQueries();
+        invalidateGlobalQueries();
     };
 
     let button = <Button loading>Pro</Button>;
@@ -166,7 +173,10 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
             <Divider />
             <BlockWrapper>
                 {button}
-                <IconButtonTransparentBackground onClick={onRefresh} disabled={isInvalidating}>
+                <IconButtonTransparentBackground
+                    onClick={onRefresh}
+                    disabled={isInvalidating || isInvalidatingGlobalQueries}
+                >
                     <RefreshIconRotating rotate={rotate} />
                 </IconButtonTransparentBackground>
             </BlockWrapper>

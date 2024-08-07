@@ -1,13 +1,16 @@
 import BigNumber from 'bignumber.js';
 import { FiatCurrencies } from './fiat';
 import { Address } from '@ton/core';
+import { Account } from './account';
+import { WalletId, walletVersionText } from './wallet';
 
 export const columnsTypes = [
     'string',
     'address',
     'numeric',
     'numeric_crypto',
-    'numeric_fiat'
+    'numeric_fiat',
+    'account_name'
 ] as const;
 
 export type DashboardColumnType = (typeof columnsTypes)[number];
@@ -26,6 +29,7 @@ export type DashboardColumn = {
 };
 
 export type DashboardCell =
+    | DashboardCellAccountName
     | DashboardCellString
     | DashboardCellAddress
     | DashboardCellNumeric
@@ -36,6 +40,13 @@ export type DashboardCellString = {
     columnId: string;
     type: 'string';
     value: string;
+};
+
+export type DashboardCellAccountName = {
+    columnId: string;
+    type: 'account_name';
+    account: Account;
+    walletId: WalletId;
 };
 
 export type DashboardCellAddress = {
@@ -68,6 +79,14 @@ export type DashboardCellNumericFiat = {
 
 export function toStringDashboardCell(cell: DashboardCell): string {
     switch (cell.type) {
+        case 'account_name':
+            const walletVersion = cell.account.getTonWallet(cell.walletId)?.version;
+            return (
+                cell.account.name +
+                ' ' +
+                cell.account.emoji +
+                (walletVersion !== undefined ? ' ' + walletVersionText(walletVersion) : '')
+            );
         case 'string':
             return cell.value;
         case 'address':

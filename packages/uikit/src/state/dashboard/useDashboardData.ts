@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
 import { DashboardCell } from '@tonkeeper/core/dist/entries/dashboard';
-import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
@@ -23,7 +23,7 @@ export function useDashboardData() {
 
     const accountsState = useAccountsState();
     const mainnetWallets = accountsState.flatMap(a =>
-        a.allTonWallets.map(item => ({ ...item, accountName: a.name, accountEmoji: a.emoji }))
+        a.allTonWallets.map(item => ({ ...item, account: a }))
     );
     const idsMainnet = mainnetWallets.map(w => w!.id);
 
@@ -60,17 +60,20 @@ export function useDashboardData() {
                     query.columns.forEach((col, colIndex) => {
                         const ClientColumnName = ClientColumns.find(c => c.id === 'name')!;
                         if (col === ClientColumnName.id) {
-                            result[rowIndex][colIndex] = {
-                                columnId: ClientColumnName.id,
-                                type: 'string',
-                                value: wallet
-                                    ? wallet.accountName +
-                                      ' ' +
-                                      wallet.accountEmoji +
-                                      ' ' +
-                                      walletVersionText(wallet.version)
-                                    : defaultWalletName
-                            };
+                            if (wallet) {
+                                result[rowIndex][colIndex] = {
+                                    columnId: ClientColumnName.id,
+                                    type: 'account_name',
+                                    account: wallet!.account,
+                                    walletId: wallet!.rawAddress
+                                };
+                            } else {
+                                result[rowIndex][colIndex] = {
+                                    columnId: ClientColumnName.id,
+                                    type: 'string',
+                                    value: defaultWalletName
+                                };
+                            }
                             return;
                         }
 
