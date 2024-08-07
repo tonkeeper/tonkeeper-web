@@ -1,41 +1,44 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { mnemonicValidate } from '@ton/crypto';
 import {
-    isStandardTonWallet,
+    Account,
+    AccountId,
+    AccountTonMnemonic,
+    AccountTonReadOnly,
+    AccountsState,
+    getAccountByWalletById,
+    getWalletById
+} from '@tonkeeper/core/dist/entries/account';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';
+import {
+    TonWalletConfig,
+    TonWalletStandard,
+    WalletId,
     WalletVersion,
     WalletVersions,
-    WalletId,
-    TonWalletStandard,
-    TonWalletConfig
+    isStandardTonWallet
 } from '@tonkeeper/core/dist/entries/wallet';
-import {
-    createStandardTonAccountByMnemonic,
-    getWalletAddress
-} from '@tonkeeper/core/dist/service/walletService';
-import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useAppContext } from '../hooks/appContext';
-import { useAppSdk } from '../hooks/appSdk';
-import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
-import { DefaultRefetchInterval } from './tonendpoint';
-import { useMemo } from 'react';
-import { useAccountsStorage } from '../hooks/useStorage';
-import { mnemonicValidate } from '@ton/crypto';
-import { getPasswordByNotification } from './mnemonic';
 import { encrypt } from '@tonkeeper/core/dist/service/cryptoService';
-import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useDevSettings } from './dev';
-import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';
 import {
     getActiveWalletConfig,
     setActiveWalletConfig
 } from '@tonkeeper/core/dist/service/wallet/configService';
 import {
-    Account,
-    AccountId,
-    AccountsState,
-    AccountTonMnemonic,
-    getAccountByWalletById,
-    getWalletById
-} from '@tonkeeper/core/dist/entries/account';
+    createReadOnlyTonAccountByAddress,
+    createStandardTonAccountByMnemonic,
+    getWalletAddress
+} from '@tonkeeper/core/dist/service/walletService';
+import { AccountsApi, Account as TonapiAccount } from '@tonkeeper/core/dist/tonApiV2';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { useMemo } from 'react';
+import { useAppContext } from '../hooks/appContext';
+import { useAppSdk } from '../hooks/appSdk';
+import { useAccountsStorage } from '../hooks/useStorage';
+import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
+import { useDevSettings } from './dev';
+import { getPasswordByNotification } from './mnemonic';
+import { DefaultRefetchInterval } from './tonendpoint';
 
 export const useActiveAccountQuery = () => {
     const storage = useAccountsStorage();
@@ -200,6 +203,31 @@ export const useMutateAccountsState = () => {
     });
 };
 
+export const useCreateAccountReadOnly = () => {
+    const sdk = useAppSdk();
+    const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
+    const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
+
+    return useMutation<
+        AccountTonReadOnly,
+        Error,
+        {
+            address: string;
+            name?: string;
+        }
+    >(async ({ address, name }) => {
+        const valid = await seeIfValidTonAddress(address);
+        if (!valid) {
+            throw new Error('Address is not valid.');
+        }
+
+        const account = await createReadOnlyTonAccountByAddress(sdk.storage, address, { name });
+
+        await addAccountToState(account);
+        await selectAccountMutation(account.id);
+        return account;
+    });
+};
 export const useCreateAccountMnemonic = () => {
     const sdk = useAppSdk();
     const context = useAppContext();

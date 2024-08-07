@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
-import { AuthKeychain, AuthPassword, AuthSigner, AuthSignerDeepLink } from './password';
 import { KeystonePathInfo } from '../service/keystone/types';
+import { AuthKeychain, AuthPassword, AuthSigner, AuthSignerDeepLink } from './password';
 import { DerivationItem, TonWalletStandard, WalletId } from './wallet';
 
 /**
@@ -103,6 +103,56 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
             throw new Error('Wallet not found');
         }
         this.activeTonWalletId = walletId;
+    }
+}
+
+export class AccountTonReadOnly extends Clonable implements IAccount {
+    public readonly type = 'read-only';
+
+    get allTonWallets() {
+        return [this.tonWallet];
+    }
+
+    get activeDerivationTonWallets() {
+        return [this.tonWallet];
+    }
+
+    get activeTonWallet() {
+        return this.tonWallet;
+    }
+
+    /**
+     *  @param id ton public key hex string without 0x corresponding to the mnemonic
+     */
+    constructor(
+        public readonly id: AccountId,
+        public name: string,
+        public emoji: string,
+        public tonWallet: TonWalletStandard
+    ) {
+        super();
+    }
+
+    getTonWallet(id: WalletId) {
+        return this.allTonWallets.find(w => w.id === id);
+    }
+
+    updateTonWallet(wallet: TonWalletStandard) {
+        this.tonWallet = wallet;
+    }
+
+    addTonWalletToActiveDerivation() {
+        throw new Error('Cannot add ton wallet to keystone account');
+    }
+
+    removeTonWalletFromActiveDerivation() {
+        throw new Error('Cannot remove ton wallet from keystone account');
+    }
+
+    setActiveTonWallet(walletId: WalletId) {
+        if (walletId !== this.tonWallet.id) {
+            throw new Error('Cannot add ton wallet to keystone account');
+        }
     }
 }
 
@@ -360,7 +410,12 @@ export class AccountTonOnly extends Clonable implements IAccount {
     }
 }
 
-export type Account = AccountTonMnemonic | AccountLedger | AccountKeystone | AccountTonOnly;
+export type Account =
+    | AccountTonMnemonic
+    | AccountLedger
+    | AccountKeystone
+    | AccountTonOnly
+    | AccountTonReadOnly;
 
 export type AccountsState = Account[];
 
@@ -374,7 +429,8 @@ const prototypes = {
     mnemonic: AccountTonMnemonic.prototype,
     ledger: AccountLedger.prototype,
     keystone: AccountKeystone.prototype,
-    'ton-only': AccountTonOnly.prototype
+    'ton-only': AccountTonOnly.prototype,
+    'read-only': AccountTonReadOnly.prototype
 } as const;
 
 export function bindAccountToClass(accountStruct: Account): void {

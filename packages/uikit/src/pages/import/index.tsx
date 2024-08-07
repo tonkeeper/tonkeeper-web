@@ -4,6 +4,7 @@ import Create from './Create';
 import Import from './Import';
 import { PairKeystone } from './Keystone';
 import { PairLedger } from './Ledger';
+import ReadOnly from './ReadOnly';
 import { PairSigner } from './Signer';
 
 const ImportRouter = () => {
@@ -14,6 +15,7 @@ const ImportRouter = () => {
             <Route path={ImportRoute.signer} element={<PairSigner />} />
             <Route path={ImportRoute.keystone} element={<PairKeystone />} />
             <Route path={ImportRoute.ledger} element={<PairLedger />} />
+            <Route path={ImportRoute.readOnly} element={<ReadOnly />} />
         </Routes>
     );
 };
