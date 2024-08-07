@@ -153,13 +153,11 @@ export const estimateTonTransfer = async (
         signEstimateMessage
     );
 
-    const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
-        ignoreSignatureCheck: true,
-        accountId: wallet.address,
-        decodeMessageRequest: { boc: cell.toString('base64') }
+    const result = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
     });
 
-    return { event };
+    return result;
 };
 
 export type ConnectTransferError = { kind: 'not-enough-balance' } | { kind: undefined };
@@ -202,13 +200,11 @@ export const estimateTonConnectTransfer = async (
         signEstimateMessage
     );
 
-    const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
-        ignoreSignatureCheck: true,
-        accountId: wallet.address,
-        decodeMessageRequest: { boc: cell.toString('base64') }
+    const result = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
     });
 
-    return { event };
+    return result;
 };
 
 export const sendTonConnectTransfer = async (

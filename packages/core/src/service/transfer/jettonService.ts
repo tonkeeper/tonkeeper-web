@@ -118,13 +118,11 @@ export const estimateJettonTransfer = async (
         signEstimateMessage
     );
 
-    const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
-        ignoreSignatureCheck: true,
-        accountId: wallet.address,
-        decodeMessageRequest: { boc: cell.toString('base64') }
+    const result = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
     });
 
-    return { event };
+    return result;
 };
 
 export const sendJettonTransfer = async (
