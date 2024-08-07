@@ -13,6 +13,7 @@ import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCusto
 import { QueryKey } from '../../libs/queryKey';
 import { useIsActiveWalletLedger } from '../../state/ledger';
 import { useConnectTonConnectAppMutation } from '../../state/tonConnect';
+import { useIsActiveWalletReadOnly } from '../../state/wallet';
 import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
