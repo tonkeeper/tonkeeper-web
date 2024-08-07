@@ -49,8 +49,9 @@ export class AccountsStorage {
         }
 
         const allAccounts = await this.getAccounts();
-        if (allAccounts.every(acc => acc.id !== state)) {
+        if (state !== null && allAccounts.every(acc => acc.id !== state)) {
             state = null;
+            await this.setActiveAccountId(state);
         }
 
         if (state === null) {
