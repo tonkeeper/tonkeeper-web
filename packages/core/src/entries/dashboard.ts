@@ -3,6 +3,7 @@ import { FiatCurrencies } from './fiat';
 import { Address } from '@ton/core';
 import { Account } from './account';
 import { WalletId, walletVersionText } from './wallet';
+import { assertUnreachable } from '../utils/types';
 
 export const columnsTypes = [
     'string',
@@ -80,12 +81,12 @@ export type DashboardCellNumericFiat = {
 export function toStringDashboardCell(cell: DashboardCell): string {
     switch (cell.type) {
         case 'account_name':
-            const walletVersion = cell.account.getTonWallet(cell.walletId)?.version;
+            const walletBadge = walletBadgeText(cell.account, cell.walletId);
             return (
                 cell.account.name +
                 ' ' +
                 cell.account.emoji +
-                (walletVersion !== undefined ? ' ' + walletVersionText(walletVersion) : '')
+                (walletBadge ? ' ' + walletBadge : '')
             );
         case 'string':
             return cell.value;
@@ -98,4 +99,34 @@ export function toStringDashboardCell(cell: DashboardCell): string {
         case 'numeric_fiat':
             return cell.value.toString() + ' ' + cell.fiat;
     }
+}
+
+function walletBadgeText(account: Account, walletId: WalletId): string {
+    if (account.allTonWallets.length === 1) {
+        return '';
+    }
+
+    switch (account.type) {
+        case 'ledger':
+            const index = account.derivations.find(d =>
+                d.tonWallets.some(w => w.id === walletId)
+            )?.index;
+            if (index === undefined) {
+                return '';
+            }
+
+            return '[' + (index + 1).toString() + ']';
+        case 'ton-only':
+        case 'mnemonic':
+            const walletVersion = account.getTonWallet(walletId)?.version;
+            if (walletVersion === undefined) {
+                return '';
+            }
+
+            return walletVersionText(walletVersion);
+        case 'keystone':
+            return '';
+    }
+
+    assertUnreachable(account);
 }
