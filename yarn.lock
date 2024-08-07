@@ -4455,6 +4455,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core::locator=%40tonkeeper%2Fcore%40workspace%3Apackages%2Fcore":
+  version: 0.0.1
+  resolution: "@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core#../../../../../ton/tonkeeper-mnemonics/packages/core::hash=922b77&locator=%40tonkeeper%2Fcore%40workspace%3Apackages%2Fcore"
+  dependencies:
+    "@scure/bip39": "npm:^1.2.2"
+    "@ton/crypto": "npm:^3.2.0"
+  checksum: 10/141f73a558cbfbc73b78bffe1b08ce1f7cfccc4deec3254d4e7635e46970dd8d73f8680d28cb4f59e07ba12a70758149c96219af5f4e967f88b172ef0c9a26ba
+  languageName: node
+  linkType: hard
+
 "@ngraveio/bc-ur@npm:^1.1.13, @ngraveio/bc-ur@npm:^1.1.5, @ngraveio/bc-ur@npm:^1.1.6":
   version: 1.1.13
   resolution: "@ngraveio/bc-ur@npm:1.1.13"
@@ -4511,7 +4521,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:^1.2.0":
+"@noble/hashes@npm:^1.2.0, @noble/hashes@npm:~1.4.0":
   version: 1.4.0
   resolution: "@noble/hashes@npm:1.4.0"
   checksum: 10/e156e65794c473794c52fa9d06baf1eb20903d0d96719530f523cc4450f6c721a957c544796e6efd0197b2296e7cd70efeb312f861465e17940a3e3c7e0febc6
@@ -5193,6 +5203,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@scure/base@npm:~1.1.6":
+  version: 1.1.7
+  resolution: "@scure/base@npm:1.1.7"
+  checksum: 10/fc50ffaab36cb46ff9fa4dc5052a06089ab6a6707f63d596bb34aaaec76173c9a564ac312a0b981b5e7a5349d60097b8878673c75d6cbfc4da7012b63a82099b
+  languageName: node
+  linkType: hard
+
 "@scure/bip32@npm:1.3.3":
   version: 1.3.3
   resolution: "@scure/bip32@npm:1.3.3"
@@ -5211,6 +5228,16 @@ __metadata:
     "@noble/hashes": "npm:~1.3.2"
     "@scure/base": "npm:~1.1.4"
   checksum: 10/f71aceda10a7937bf3779fd2b4c4156c95ec9813269470ddca464cb8ab610d2451b173037f4b1e6dac45414e406e7adc7b5814c51279f4474d5d38140bbee542
+  languageName: node
+  linkType: hard
+
+"@scure/bip39@npm:^1.2.2":
+  version: 1.3.0
+  resolution: "@scure/bip39@npm:1.3.0"
+  dependencies:
+    "@noble/hashes": "npm:~1.4.0"
+    "@scure/base": "npm:~1.1.6"
+  checksum: 10/7d71fd58153de22fe8cd65b525f6958a80487bc9d0fbc32c71c328aeafe41fa259f989d2f1e0fa4fdfeaf83b8fcf9310d52ed9862987e46c2f2bfb9dd8cf9fc1
   languageName: node
   linkType: hard
 
@@ -6792,6 +6819,7 @@ __metadata:
     "@keystonehq/keystone-sdk": "npm:0.7.2"
     "@ledgerhq/hw-transport-webhid": "npm:^6.28.6"
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
+    "@multi-account-mnemonic/core": "file:../../../../../ton/tonkeeper-mnemonics/packages/core"
     "@ton-community/ton-ledger": "npm:^7.2.0-pre.2"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"

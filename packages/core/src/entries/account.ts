@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import { AuthKeychain, AuthPassword, AuthSigner, AuthSignerDeepLink } from './password';
 import { KeystonePathInfo } from '../service/keystone/types';
-import { DerivationItem, TonWalletStandard, WalletId } from './wallet';
+import { DerivationItem, DerivationItemNamed, TonWalletStandard, WalletId } from './wallet';
 
 /**
  * @deprecated
@@ -360,7 +360,112 @@ export class AccountTonOnly extends Clonable implements IAccount {
     }
 }
 
-export type Account = AccountTonMnemonic | AccountLedger | AccountKeystone | AccountTonOnly;
+export class AccountMAM extends Clonable implements IAccount {
+    public readonly type = 'mam';
+
+    get allTonWallets() {
+        return this.derivations.flatMap(d => d.tonWallets);
+    }
+
+    get activeDerivationTonWallets() {
+        return this.activeDerivation.tonWallets;
+    }
+
+    get activeDerivation() {
+        return this.derivations.find(d => this.activeDerivationIndex === d.index)!;
+    }
+
+    get activeTonWallet() {
+        const activeDerivation = this.activeDerivation;
+        return this.activeDerivationTonWallets.find(
+            w => w.id === activeDerivation.activeTonWalletId
+        )!;
+    }
+
+    /**
+     *  @param id index 0 derivation ton public key hex string without 0x
+     */
+    constructor(
+        public readonly id: AccountId,
+        public name: string,
+        public emoji: string,
+        public auth: AuthPassword | AuthKeychain,
+        public activeDerivationIndex: number,
+        public derivations: DerivationItemNamed[]
+    ) {
+        super();
+
+        if (derivations.every(d => d.index !== activeDerivationIndex)) {
+            throw new Error('Active derivation not found');
+        }
+    }
+
+    getTonWallet(id: WalletId) {
+        return this.allTonWallets.find(w => w.id === id);
+    }
+
+    updateTonWallet(wallet: TonWalletStandard) {
+        for (const derivation of this.derivations) {
+            const index = derivation.tonWallets.findIndex(w => w.id === wallet.id);
+            if (index !== -1) {
+                derivation.tonWallets[index] = wallet;
+                return;
+            }
+        }
+
+        throw new Error('Derivation not found');
+    }
+
+    addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
+        const walletExists = this.activeDerivation.tonWallets.findIndex(w => w.id === wallet.id);
+        if (walletExists === -1) {
+            this.activeDerivation.tonWallets = this.activeDerivation.tonWallets.concat(wallet);
+        } else {
+            this.activeDerivation.tonWallets[walletExists] = wallet;
+        }
+    }
+
+    removeTonWalletFromActiveDerivation(walletId: WalletId) {
+        if (this.activeDerivation.tonWallets.length === 1) {
+            throw new Error('Cannot remove last wallet');
+        }
+
+        this.activeDerivation.tonWallets = this.activeDerivation.tonWallets.filter(
+            w => w.id !== walletId
+        );
+        if (this.activeDerivation.activeTonWalletId === walletId) {
+            this.activeDerivation.activeTonWalletId = this.activeDerivation.tonWallets[0].id;
+        }
+    }
+
+    setActiveTonWallet(walletId: WalletId) {
+        for (const derivation of this.derivations) {
+            const walletInDerivation = derivation.tonWallets.some(w => w.id === walletId);
+            if (walletInDerivation) {
+                derivation.activeTonWalletId = walletId;
+                this.activeDerivationIndex = derivation.index;
+                return;
+            }
+        }
+
+        throw new Error('Derivation not found');
+    }
+
+    setActiveDerivationIndex(index: number) {
+        if (this.derivations.every(d => d.index !== index)) {
+            throw new Error('Derivation not found');
+        }
+
+        this.activeDerivationIndex = index;
+    }
+}
+
+export type Account =
+    | AccountTonMnemonic
+    | AccountLedger
+    | AccountKeystone
+    | AccountTonOnly
+    | AccountMAM;
 
 export type AccountsState = Account[];
 
@@ -374,7 +479,8 @@ const prototypes = {
     mnemonic: AccountTonMnemonic.prototype,
     ledger: AccountLedger.prototype,
     keystone: AccountKeystone.prototype,
-    'ton-only': AccountTonOnly.prototype
+    'ton-only': AccountTonOnly.prototype,
+    mam: AccountMAM.prototype
 } as const;
 
 export function bindAccountToClass(accountStruct: Account): void {

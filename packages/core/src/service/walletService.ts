@@ -19,6 +19,7 @@ import {
 } from '../entries/account';
 import { IStorage } from '../Storage';
 import { accountsStorage } from './accountsStorage';
+import { MamRoot } from "@multi-account-mnemonic/core";
 
 export const createStandardTonAccountByMnemonic = async (
     appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
@@ -290,6 +291,63 @@ export const accountByKeystone = async (ur: UR, storage: IStorage): Promise<Acco
         version: WalletVersion.V4R2,
         rawAddress: contact.address.toRawString()
     });
+};
+
+export const createMAMAccountByMnemonic = async (
+    appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
+    storage: IStorage,
+    rootMnemonic: string[],
+    options: {
+        derivationIndexes?: WalletVersion[];
+        network?: Network;
+        auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+    }
+) => {
+    const rootAccount = await MamRoot.fromMnemonic(rootMnemonic);
+
+    const keyPair = await mnemonicToPrivateKey(mnemonic);
+
+    const publicKey = keyPair.publicKey.toString('hex');
+
+    let tonWallets: { rawAddress: string; version: WalletVersion }[] = [];
+    if (options.versions) {
+        tonWallets = options.versions
+            .map(v => getWalletAddress(publicKey, v))
+            .map(i => ({
+                rawAddress: i.address.toRawString(),
+                version: i.version
+            }));
+    } else {
+        tonWallets = [await findWalletAddress(appContext, publicKey)];
+    }
+
+    let walletAuth: AuthPassword | AuthKeychain;
+    if (options.auth.kind === 'keychain') {
+        walletAuth = {
+            kind: 'keychain',
+            keychainStoreKey: publicKey
+        };
+    } else {
+        walletAuth = options.auth;
+    }
+
+    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(publicKey);
+
+    const walletIdToActivate = tonWallets.slice().sort(sortWalletsByVersion)[0].rawAddress;
+
+    return new AccountTonMnemonic(
+        publicKey,
+        name,
+        emoji,
+        walletAuth,
+        walletIdToActivate,
+        tonWallets.map(w => ({
+            id: w.rawAddress,
+            publicKey,
+            version: w.version,
+            rawAddress: w.rawAddress
+        }))
+    );
 };
 
 export function getFallbackAccountEmoji(publicKey: string) {
