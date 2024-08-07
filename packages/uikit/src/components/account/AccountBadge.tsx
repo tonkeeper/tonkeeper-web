@@ -1,8 +1,8 @@
-import { FC, PropsWithChildren } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { Badge } from '../shared';
 import { WalletId, WalletVersion, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { FC, PropsWithChildren } from 'react';
 import styled from 'styled-components';
+import { Badge } from '../shared';
 
 export const AccountBadge: FC<
     PropsWithChildren<{
@@ -31,6 +31,14 @@ export const AccountBadge: FC<
         return (
             <Badge size={size} color="accentOrange" className={className}>
                 {children || 'Keystone'}
+            </Badge>
+        );
+    }
+
+    if (accountType === 'read-only') {
+        return (
+            <Badge size={size} color="accentRed" className={className}>
+                {children || 'Read Only'}
             </Badge>
         );
     }
@@ -117,6 +125,10 @@ export const AccountAndWalletBadgesGroup: FC<{
     }
 
     if (account.type === 'keystone') {
+        return <AccountBadge className={className} size={size} accountType={account.type} />;
+    }
+
+    if (account.type === 'real-only') {
         return <AccountBadge className={className} size={size} accountType={account.type} />;
     }
 
