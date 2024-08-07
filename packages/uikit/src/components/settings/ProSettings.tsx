@@ -24,7 +24,7 @@ import {
     useActiveTonNetwork
 } from '../../state/wallet';
 import { InnerBody } from '../Body';
-import { SubscriptionStatus } from '../desktop/aside/SubscriptionInfo';
+import { SubscriptionStatus } from '../desktop/aside/SubscriptionInfoBlock';
 import { Button } from '../fields/Button';
 import { Radio } from '../fields/Checkbox';
 import { Input } from '../fields/Input';

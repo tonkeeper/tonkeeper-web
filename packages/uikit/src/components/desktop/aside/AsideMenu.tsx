@@ -22,7 +22,7 @@ import { ImportNotification } from '../../create/ImportNotification';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { AsideHeader } from './AsideHeader';
-import { SubscriptionInfo } from './SubscriptionInfo';
+import { SubscriptionInfoBlock } from './SubscriptionInfoBlock';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import {
@@ -99,11 +99,6 @@ const AsideMenuBottom = styled.div`
 
     background: ${p => p.theme.backgroundContent};
     padding-bottom: 0.5rem;
-`;
-
-const SubscriptionInfoStyled = styled(SubscriptionInfo)`
-    margin-top: 0.5rem;
-    padding: 6px 16px 6px 8px;
 `;
 
 const AsideMenuSubItem = styled(AsideMenuItem)`
@@ -434,7 +429,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         <Label2>{t('aside_settings')}</Label2>
                     </AsideMenuItem>
                     <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load Pro State')}>
-                        <SubscriptionInfoStyled />
+                        <SubscriptionInfoBlock />
                     </ErrorBoundary>
                 </AsideMenuBottom>
                 <ImportNotification isOpen={isOpenImport} setOpen={setIsOpenImport} />
