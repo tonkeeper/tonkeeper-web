@@ -79,7 +79,7 @@ export interface EmulateMessageToWalletOperationRequest {
 export interface EmulationApiInterface {
     /**
      * Decode a given message. Only external incoming messages can be decoded currently.
-     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to base64
+     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to hex
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof EmulationApiInterface
@@ -94,7 +94,7 @@ export interface EmulationApiInterface {
     /**
      * Emulate sending message to blockchain
      * @param {string} accountId account ID
-     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to base64
+     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to hex
      * @param {string} [acceptLanguage] 
      * @param {boolean} [ignoreSignatureCheck] 
      * @param {*} [options] Override http request option.
@@ -110,7 +110,7 @@ export interface EmulationApiInterface {
 
     /**
      * Emulate sending message to blockchain
-     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to base64
+     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to hex
      * @param {string} [acceptLanguage] 
      * @param {boolean} [ignoreSignatureCheck] 
      * @param {*} [options] Override http request option.
@@ -126,7 +126,7 @@ export interface EmulationApiInterface {
 
     /**
      * Emulate sending message to blockchain
-     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to base64
+     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to hex
      * @param {boolean} [ignoreSignatureCheck] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -141,7 +141,7 @@ export interface EmulationApiInterface {
 
     /**
      * Emulate sending message to blockchain
-     * @param {EmulateMessageToWalletRequest} emulateMessageToWalletRequest bag-of-cells serialized to base64 and additional parameters to configure emulation
+     * @param {EmulateMessageToWalletRequest} emulateMessageToWalletRequest bag-of-cells serialized to base64/hex and additional parameters to configure emulation
      * @param {string} [acceptLanguage] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

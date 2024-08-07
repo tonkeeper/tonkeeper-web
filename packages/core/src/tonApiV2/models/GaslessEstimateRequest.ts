@@ -13,12 +13,12 @@
  */
 
 import { mapValues } from '../runtime';
-import type { GaslessEstimateRequestMessagesInner } from './GaslessEstimateRequestMessagesInner';
+import type { DecodeMessageRequest } from './DecodeMessageRequest';
 import {
-    GaslessEstimateRequestMessagesInnerFromJSON,
-    GaslessEstimateRequestMessagesInnerFromJSONTyped,
-    GaslessEstimateRequestMessagesInnerToJSON,
-} from './GaslessEstimateRequestMessagesInner';
+    DecodeMessageRequestFromJSON,
+    DecodeMessageRequestFromJSONTyped,
+    DecodeMessageRequestToJSON,
+} from './DecodeMessageRequest';
 
 /**
  * 
@@ -40,10 +40,10 @@ export interface GaslessEstimateRequest {
     walletPublicKey: string;
     /**
      * 
-     * @type {Array<GaslessEstimateRequestMessagesInner>}
+     * @type {Array<DecodeMessageRequest>}
      * @memberof GaslessEstimateRequest
      */
-    messages: Array<GaslessEstimateRequestMessagesInner>;
+    messages: Array<DecodeMessageRequest>;
 }
 
 /**
@@ -68,7 +68,7 @@ export function GaslessEstimateRequestFromJSONTyped(json: any, ignoreDiscriminat
         
         'walletAddress': json['wallet_address'],
         'walletPublicKey': json['wallet_public_key'],
-        'messages': ((json['messages'] as Array<any>).map(GaslessEstimateRequestMessagesInnerFromJSON)),
+        'messages': ((json['messages'] as Array<any>).map(DecodeMessageRequestFromJSON)),
     };
 }
 
@@ -80,7 +80,7 @@ export function GaslessEstimateRequestToJSON(value?: GaslessEstimateRequest | nu
         
         'wallet_address': value['walletAddress'],
         'wallet_public_key': value['walletPublicKey'],
-        'messages': ((value['messages'] as Array<any>).map(GaslessEstimateRequestMessagesInnerToJSON)),
+        'messages': ((value['messages'] as Array<any>).map(DecodeMessageRequestToJSON)),
     };
 }
 

@@ -29,7 +29,7 @@ export type AccountStatus = typeof AccountStatus[keyof typeof AccountStatus];
 export function instanceOfAccountStatus(value: any): boolean {
     for (const key in AccountStatus) {
         if (Object.prototype.hasOwnProperty.call(AccountStatus, key)) {
-            if ((AccountStatus as Record<string, AccountStatus>)[key] === value) {
+            if (AccountStatus[key as keyof typeof AccountStatus] === value) {
                 return true;
             }
         }

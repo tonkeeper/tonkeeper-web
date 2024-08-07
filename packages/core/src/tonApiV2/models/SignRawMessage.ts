@@ -32,13 +32,13 @@ export interface SignRawMessage {
      */
     amount: string;
     /**
-     * Raw one-cell BoC encoded in Base64.
+     * Raw one-cell BoC encoded in hex.
      * @type {string}
      * @memberof SignRawMessage
      */
     payload?: string;
     /**
-     * Raw once-cell BoC encoded in Base64.
+     * Raw once-cell BoC encoded in hex.
      * @type {string}
      * @memberof SignRawMessage
      */

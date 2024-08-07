@@ -9,6 +9,7 @@ apis/GaslessApi.ts
 apis/InscriptionsApi.ts
 apis/JettonsApi.ts
 apis/LiteServerApi.ts
+apis/MultisigApi.ts
 apis/NFTApi.ts
 apis/RatesApi.ts
 apis/StakingApi.ts
@@ -117,7 +118,6 @@ models/GasLimitPrices.ts
 models/GaslessConfig.ts
 models/GaslessConfigGasJettonsInner.ts
 models/GaslessEstimateRequest.ts
-models/GaslessEstimateRequestMessagesInner.ts
 models/GaslessSendRequest.ts
 models/GetAccountDiff200Response.ts
 models/GetAccountInfoByStateInitRequest.ts
@@ -176,6 +176,7 @@ models/JettonPreview.ts
 models/JettonQuantity.ts
 models/JettonSwapAction.ts
 models/JettonTransferAction.ts
+models/JettonTransferPayload.ts
 models/JettonVerificationType.ts
 models/Jettons.ts
 models/JettonsBalances.ts
@@ -186,6 +187,9 @@ models/MethodExecutionResult.ts
 models/MisbehaviourPunishmentConfig.ts
 models/ModelError.ts
 models/MsgForwardPrices.ts
+models/Multisig.ts
+models/MultisigOrder.ts
+models/Multisigs.ts
 models/NftCollection.ts
 models/NftCollections.ts
 models/NftItem.ts
@@ -200,6 +204,8 @@ models/PoolImplementationType.ts
 models/PoolInfo.ts
 models/Price.ts
 models/RawBlockchainConfig.ts
+models/ReducedBlock.ts
+models/ReducedBlocks.ts
 models/Refund.ts
 models/Risk.ts
 models/Sale.ts

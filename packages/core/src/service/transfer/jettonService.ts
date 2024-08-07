@@ -1,5 +1,6 @@
 import { Address, beginCell, Cell, comment, internal, toNano } from '@ton/core';
 import BigNumber from 'bignumber.js';
+import { Account } from '../../entries/account';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
@@ -20,7 +21,7 @@ import {
     SendMode,
     signEstimateMessage
 } from './common';
-import { Account } from '../../entries/account';
+import { getJettonCustomPayload } from './jettonPayloadService';
 
 export const jettonTransferAmount = toNano(0.1);
 export const jettonTransferForwardAmount = BigInt(1);
@@ -32,6 +33,7 @@ export const jettonTransferBody = (params: {
     responseAddress: Address;
     forwardAmount: bigint;
     forwardPayload: Cell | null;
+    customPayload: Cell | null;
 }) => {
     return beginCell()
         .storeUint(0xf8a7ea5, 32) // request_transfer op
@@ -39,14 +41,14 @@ export const jettonTransferBody = (params: {
         .storeCoins(params.jettonAmount)
         .storeAddress(params.toAddress)
         .storeAddress(params.responseAddress)
-        .storeBit(false) // null custom_payload
+        .storeMaybeRef(params.customPayload) // null custom_payload
         .storeCoins(params.forwardAmount)
         .storeMaybeRef(params.forwardPayload) // storeMaybeRef put 1 bit before cell (forward_payload in cell) or 0 for null (forward_payload in slice)
         .endCell();
 };
 
 const createJettonTransfer = async (
-    timestamp: number,
+    api: APIConfig,
     seqno: number,
     walletState: TonWalletStandard,
     recipientAddress: string,
@@ -55,6 +57,14 @@ const createJettonTransfer = async (
     forwardPayload: Cell | null,
     signer: CellSigner
 ) => {
+    const timestamp = await getServerTime(api);
+
+    const { customPayload, stateInit } = await getJettonCustomPayload(
+        api,
+        walletState.rawAddress,
+        amount
+    );
+
     const jettonAmount = BigInt(amount.stringWeiAmount);
 
     const body = jettonTransferBody({
@@ -63,7 +73,8 @@ const createJettonTransfer = async (
         toAddress: Address.parse(recipientAddress),
         responseAddress: Address.parse(walletState.rawAddress),
         forwardAmount: jettonTransferForwardAmount,
-        forwardPayload
+        forwardPayload,
+        customPayload
     });
 
     const contract = walletContractFromState(walletState);
@@ -77,7 +88,8 @@ const createJettonTransfer = async (
                 to: Address.parse(jettonWalletAddress),
                 bounce: true,
                 value: jettonTransferAmount,
-                body: body
+                body: body,
+                init: stateInit
             })
         ]
     });
@@ -92,12 +104,11 @@ export const estimateJettonTransfer = async (
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string
 ): Promise<TransferEstimationEvent> => {
-    const timestamp = await getServerTime(api);
     const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = await createJettonTransfer(
-        timestamp,
+        api,
         seqno,
         walletState,
         recipient.toAccount.address,
@@ -125,8 +136,6 @@ export const sendJettonTransfer = async (
     fee: TransferEstimationEvent,
     signer: Signer
 ) => {
-    const timestamp = await getServerTime(api);
-
     const total = new BigNumber(fee.event.extra)
         .multipliedBy(-1)
         .plus(jettonTransferAmount.toString());
@@ -142,7 +151,7 @@ export const sendJettonTransfer = async (
             throw new Error(`Unexpected account type: ${account.type}`);
         }
         buffer = await createLedgerJettonTransfer(
-            timestamp,
+            api,
             seqno,
             account,
             recipient.toAccount.address,
@@ -153,7 +162,7 @@ export const sendJettonTransfer = async (
         );
     } else {
         buffer = await createJettonTransfer(
-            timestamp,
+            api,
             seqno,
             walletState,
             recipient.toAccount.address,

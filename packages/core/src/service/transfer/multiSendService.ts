@@ -255,7 +255,8 @@ const createJettonMultiTransfer = async (
                     toAddress: Address.parse(msg.to),
                     responseAddress: Address.parse(walletState.rawAddress),
                     forwardAmount: jettonTransferForwardAmount,
-                    forwardPayload: msg.comment ? comment(msg.comment) : null
+                    forwardPayload: msg.comment ? comment(msg.comment) : null,
+                    customPayload: null
                 })
             })
         )
