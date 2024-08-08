@@ -45,7 +45,7 @@ jobs:
             APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
             REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE }}
             REACT_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
-            REACT_APP_TONCONSOLE_API: https://pro.tonconsole.com
+            REACT_APP_TONCONSOLE_API: https://dev-pro.tonconsole.com
             REACT_APP_TG_BOT_ORIGIN: https://tonkeeper.com
             REACT_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
             REACT_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
