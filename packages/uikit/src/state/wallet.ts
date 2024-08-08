@@ -551,7 +551,14 @@ export function useInvalidateActiveWalletQueries() {
     });
 }
 
+export function useInvalidateGlobalQueries() {
+    const client = useQueryClient();
+    return useMutation(async () => {
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.pro, QueryKey.dashboardData));
+    });
+}
+
 export const useIsActiveWalletWatchOnly = () => {
-    const wallet = useActiveAccount();
-    return wallet.type === 'watch-only';
+  const wallet = useActiveAccount();
+  return wallet.type === 'watch-only';
 };

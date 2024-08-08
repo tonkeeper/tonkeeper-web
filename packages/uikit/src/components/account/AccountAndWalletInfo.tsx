@@ -31,7 +31,10 @@ const AddressText = styled(Body2)`
 `;
 
 export const AccountAndWalletInfo: FC<
-    AllOrNone<{ account: Account; walletId: WalletId }>
+    AllOrNone<{ account: Account; walletId: WalletId }> & {
+        noPrefix?: boolean;
+        hideAddress?: boolean;
+    }
 > = props => {
     const { t } = useTranslation();
     let account: Account = useActiveAccount();
@@ -46,11 +49,11 @@ export const AccountAndWalletInfo: FC<
     return (
         <WalletInfoStyled>
             <NameText>
-                {t('confirmSendModal_wallet')}&nbsp;
+                {!props.noPrefix && <>{t('confirmSendModal_wallet')}&nbsp;</>}
                 {account.name}
             </NameText>
             <WalletEmoji emojiSize="20px" containerSize="20px" emoji={account.emoji} />
-            {account.allTonWallets.length > 1 ? (
+            {account.allTonWallets.length > 1 && !props.hideAddress ? (
                 <>
                     <Dot />
                     <AddressText>

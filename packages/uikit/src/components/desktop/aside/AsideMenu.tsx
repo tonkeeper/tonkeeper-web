@@ -101,11 +101,6 @@ const AsideMenuBottom = styled.div`
     padding-bottom: 0.5rem;
 `;
 
-const SubscriptionInfoStyled = styled(SubscriptionInfo)`
-    margin-top: 0.5rem;
-    padding: 6px 16px 6px 8px;
-`;
-
 const AsideMenuSubItem = styled(AsideMenuItem)`
     padding-left: 36px;
 `;
@@ -449,7 +444,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         <Label2>{t('aside_settings')}</Label2>
                     </AsideMenuItem>
                     <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load Pro State')}>
-                        <SubscriptionInfoStyled />
+                        <SubscriptionInfoBlock />
                     </ErrorBoundary>
                 </AsideMenuBottom>
                 <ImportNotification isOpen={isOpenImport} setOpen={setIsOpenImport} />

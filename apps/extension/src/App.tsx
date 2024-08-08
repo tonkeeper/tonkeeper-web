@@ -39,7 +39,7 @@ import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
-import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
+import { useUserFiatQuery } from "@tonkeeper/uikit/dist/state/fiat";
 import { useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
 import { useActiveAccountQuery, useAccountsStateQuery, useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -179,7 +179,7 @@ const Wrapper = styled(FullSizeWrapper)<{
 export const Loader: FC = React.memo(() => {
     const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
     const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
-    const { data: fiat } = useUserFiat();
+    const { data: fiat } = useUserFiatQuery();
     const { mutate: setLang } = useMutateUserLanguage();
     const { data: devSettings } = useDevSettings();
     const network = useActiveTonNetwork();
