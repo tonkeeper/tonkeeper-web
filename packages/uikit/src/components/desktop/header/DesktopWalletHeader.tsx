@@ -1,17 +1,12 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { Network } from '@tonkeeper/core/dist/entries/network';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
-import { hexToRGBA } from '../../../libs/css';
-import { AppProRoute, AppRoute, SettingsRoute } from '../../../libs/routes';
-import { useWalletTotalBalance } from '../../../state/asset';
 import { usePreFetchRates } from '../../../state/rates';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
-import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../../state/wallet';
+import { useIsActiveWalletWatchOnly } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { ArrowDownIcon, ArrowUpIcon, PlusIconSmall } from '../../Icon';
 import { Button } from '../../fields/Button';
@@ -55,7 +50,6 @@ const DesktopWalletHeaderPayload = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: buy } = useTonendpointBuyMethods();
     const { t } = useTranslation();
-    const network = useActiveTonNetwork();
     const isReadOnly = useIsActiveWalletWatchOnly();
 
     return (

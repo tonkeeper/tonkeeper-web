@@ -36,7 +36,7 @@ import { useWalletVersionSettingsNotification } from '../../modals/WalletVersion
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { AsideHeader } from './AsideHeader';
-import { SubscriptionInfo } from './SubscriptionInfo';
+import { SubscriptionInfoBlock } from "./SubscriptionInfoBlock";
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;

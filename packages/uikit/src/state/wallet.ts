@@ -559,6 +559,6 @@ export function useInvalidateGlobalQueries() {
 }
 
 export const useIsActiveWalletWatchOnly = () => {
-  const wallet = useActiveAccount();
-  return wallet.type === 'watch-only';
+    const wallet = useActiveAccount();
+    return wallet.type === 'watch-only';
 };
