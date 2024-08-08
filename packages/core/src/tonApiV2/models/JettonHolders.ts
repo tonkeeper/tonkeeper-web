@@ -33,7 +33,7 @@ export interface JettonHolders {
      */
     addresses: Array<JettonHoldersAddressesInner>;
     /**
-     * 
+     * total number of holders
      * @type {number}
      * @memberof JettonHolders
      */

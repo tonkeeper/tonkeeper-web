@@ -23,6 +23,7 @@ import type {
   BlockchainRawAccount,
   MethodExecutionResult,
   RawBlockchainConfig,
+  ReducedBlocks,
   SendBlockchainMessageRequest,
   ServiceStatus,
   StatusDefaultResponse,
@@ -47,6 +48,8 @@ import {
     MethodExecutionResultToJSON,
     RawBlockchainConfigFromJSON,
     RawBlockchainConfigToJSON,
+    ReducedBlocksFromJSON,
+    ReducedBlocksToJSON,
     SendBlockchainMessageRequestFromJSON,
     SendBlockchainMessageRequestToJSON,
     ServiceStatusFromJSON,
@@ -117,6 +120,11 @@ export interface GetBlockchainTransactionByMessageHashRequest {
 
 export interface GetRawBlockchainConfigFromBlockRequest {
     masterchainSeqno: number;
+}
+
+export interface GetReducedBlockchainBlocksRequest {
+    from: number;
+    to: number;
 }
 
 export interface SendBlockchainMessageOperationRequest {
@@ -371,8 +379,23 @@ export interface BlockchainApiInterface {
     getRawBlockchainConfigFromBlock(requestParameters: GetRawBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RawBlockchainConfig>;
 
     /**
+     * Get reduced blockchain blocks data
+     * @param {number} from 
+     * @param {number} to 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    getReducedBlockchainBlocksRaw(requestParameters: GetReducedBlockchainBlocksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ReducedBlocks>>;
+
+    /**
+     * Get reduced blockchain blocks data
+     */
+    getReducedBlockchainBlocks(requestParameters: GetReducedBlockchainBlocksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ReducedBlocks>;
+
+    /**
      * Send message to blockchain
-     * @param {SendBlockchainMessageRequest} sendBlockchainMessageRequest both a single boc and a batch of boc serialized in base64 are accepted
+     * @param {SendBlockchainMessageRequest} sendBlockchainMessageRequest both a single boc and a batch of boc serialized in base64/hex are accepted
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof BlockchainApiInterface
@@ -961,6 +984,54 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      */
     async getRawBlockchainConfigFromBlock(requestParameters: GetRawBlockchainConfigFromBlockRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RawBlockchainConfig> {
         const response = await this.getRawBlockchainConfigFromBlockRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get reduced blockchain blocks data
+     */
+    async getReducedBlockchainBlocksRaw(requestParameters: GetReducedBlockchainBlocksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ReducedBlocks>> {
+        if (requestParameters['from'] == null) {
+            throw new runtime.RequiredError(
+                'from',
+                'Required parameter "from" was null or undefined when calling getReducedBlockchainBlocks().'
+            );
+        }
+
+        if (requestParameters['to'] == null) {
+            throw new runtime.RequiredError(
+                'to',
+                'Required parameter "to" was null or undefined when calling getReducedBlockchainBlocks().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['from'] != null) {
+            queryParameters['from'] = requestParameters['from'];
+        }
+
+        if (requestParameters['to'] != null) {
+            queryParameters['to'] = requestParameters['to'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/blockchain/reduced/blocks`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ReducedBlocksFromJSON(jsonValue));
+    }
+
+    /**
+     * Get reduced blockchain blocks data
+     */
+    async getReducedBlockchainBlocks(requestParameters: GetReducedBlockchainBlocksRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ReducedBlocks> {
+        const response = await this.getReducedBlockchainBlocksRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

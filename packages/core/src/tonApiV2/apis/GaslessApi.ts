@@ -66,7 +66,7 @@ export interface GaslessApiInterface {
     /**
      * Estimates the cost of the given messages and returns a payload to sign.
      * @param {string} masterId jetton to pay commission
-     * @param {GaslessEstimateRequest} gaslessEstimateRequest bag-of-cells serialized to base64
+     * @param {GaslessEstimateRequest} gaslessEstimateRequest bag-of-cells serialized to hex
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof GaslessApiInterface
@@ -80,7 +80,7 @@ export interface GaslessApiInterface {
 
     /**
      * 
-     * @param {GaslessSendRequest} gaslessSendRequest bag-of-cells serialized to base64
+     * @param {GaslessSendRequest} gaslessSendRequest bag-of-cells serialized to hex
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof GaslessApiInterface

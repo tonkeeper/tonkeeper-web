@@ -28,6 +28,7 @@ import type {
   GetAccountsRequest,
   JettonBalance,
   JettonsBalances,
+  Multisigs,
   NftItems,
   StatusDefaultResponse,
   Subscriptions,
@@ -60,6 +61,8 @@ import {
     JettonBalanceToJSON,
     JettonsBalancesFromJSON,
     JettonsBalancesToJSON,
+    MultisigsFromJSON,
+    MultisigsToJSON,
     NftItemsFromJSON,
     NftItemsToJSON,
     StatusDefaultResponseFromJSON,
@@ -141,6 +144,10 @@ export interface GetAccountJettonsHistoryRequest {
     endDate?: number;
 }
 
+export interface GetAccountMultisigsRequest {
+    accountId: string;
+}
+
 export interface GetAccountNftItemsRequest {
     accountId: string;
     collection?: string;
@@ -164,6 +171,7 @@ export interface GetAccountTracesRequest {
 }
 
 export interface GetAccountsOperationRequest {
+    currency?: string;
     getAccountsRequest?: GetAccountsRequest;
 }
 
@@ -364,6 +372,20 @@ export interface AccountsApiInterface {
     getAccountJettonsHistory(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents>;
 
     /**
+     * Get account\'s multisigs
+     * @param {string} accountId account ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApiInterface
+     */
+    getAccountMultisigsRaw(requestParameters: GetAccountMultisigsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Multisigs>>;
+
+    /**
+     * Get account\'s multisigs
+     */
+    getAccountMultisigs(requestParameters: GetAccountMultisigsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Multisigs>;
+
+    /**
      * Get all NFT items by owner address
      * @param {string} accountId account ID
      * @param {string} [collection] nft collection
@@ -427,6 +449,7 @@ export interface AccountsApiInterface {
 
     /**
      * Get human-friendly information about several accounts without low-level details.
+     * @param {string} [currency] 
      * @param {GetAccountsRequest} [getAccountsRequest] a list of account ids
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -990,6 +1013,39 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
     }
 
     /**
+     * Get account\'s multisigs
+     */
+    async getAccountMultisigsRaw(requestParameters: GetAccountMultisigsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Multisigs>> {
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountMultisigs().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/accounts/{account_id}/multisigs`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MultisigsFromJSON(jsonValue));
+    }
+
+    /**
+     * Get account\'s multisigs
+     */
+    async getAccountMultisigs(requestParameters: GetAccountMultisigsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Multisigs> {
+        const response = await this.getAccountMultisigsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Get all NFT items by owner address
      */
     async getAccountNftItemsRaw(requestParameters: GetAccountNftItemsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NftItems>> {
@@ -1150,6 +1206,10 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      */
     async getAccountsRaw(requestParameters: GetAccountsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Accounts>> {
         const queryParameters: any = {};
+
+        if (requestParameters['currency'] != null) {
+            queryParameters['currency'] = requestParameters['currency'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

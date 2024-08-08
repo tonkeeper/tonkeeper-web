@@ -35,10 +35,8 @@ export function useEstimateTonFee<Args extends ContractCallerParams>(
         async () => {
             const boc = await caller({ ...args, walletState, api } as Args);
 
-            const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
-                ignoreSignatureCheck: true,
-                accountId: walletState.rawAddress,
-                decodeMessageRequest: { boc }
+            const { event } = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+                emulateMessageToWalletRequest: { boc }
             });
 
             const fee = new AssetAmount({

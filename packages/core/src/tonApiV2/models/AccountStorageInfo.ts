@@ -38,7 +38,7 @@ export interface AccountStorageInfo {
      */
     usedPublicCells: number;
     /**
-     * 
+     * time of the last payment
      * @type {number}
      * @memberof AccountStorageInfo
      */

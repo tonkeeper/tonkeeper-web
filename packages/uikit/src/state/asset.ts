@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
@@ -9,14 +10,20 @@ import {
     TON_ASSET,
     TRON_USDT_ASSET
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { legacyTonAssetId, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { TonAsset, legacyTonAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
+import { useAppContext } from '../hooks/appContext';
+import { QueryKey } from '../libs/queryKey';
+import { useAssets } from './home';
 import { useJettonList } from './jetton';
 import {
     getJettonsFiatAmount,
-    getTonFiatAmount,
     tokenRate as getTokenRate,
+    getTonFiatAmount,
     useRate
 } from './rates';
 import { useTronBalances } from './tron/tron';
@@ -160,7 +167,7 @@ export const useWalletTotalBalance = () => {
             return (
                 getTonFiatAmount(client, fiat, assets)
                     // .plus(getTRC20FiatAmount(client, fiat, assets))
-                    .plus(getJettonsFiatAmount(client, fiat!, assets))
+                    .plus(getJettonsFiatAmount(client, fiat, assets))
             );
         },
         { enabled: !!assets && !!tonRate }
