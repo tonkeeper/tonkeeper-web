@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { ProState, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { ProState, ProStateAuthorized, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -24,7 +24,6 @@ import { useTranslation } from '../hooks/translation';
 import { QueryKey } from '../libs/queryKey';
 import { signTonConnectOver } from './mnemonic';
 import { useCheckTouchId } from './password';
-import { useActiveWallet } from './wallet';
 import { useUserLanguage } from './language';
 import { useAccountsStorage } from '../hooks/useStorage';
 import {
@@ -43,13 +42,10 @@ export const useProBackupState = () => {
 };
 
 export const useProState = () => {
-    const wallet = useActiveWallet();
     const sdk = useAppSdk();
     const client = useQueryClient();
     return useQuery<ProState, Error>([QueryKey.pro], async () => {
-        // TODO а что если активный кошелек не стандартный?
-        // TODO сделать флоу подписки
-        const state = await getProState(sdk.storage, wallet);
+        const state = await getProState(sdk.storage);
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
         return state;
@@ -131,7 +127,7 @@ export const useCreateInvoiceMutation = () => {
     return useMutation<
         ConfirmState,
         Error,
-        { state: ProState; tierId: number | null; promoCode?: string }
+        { state: ProStateAuthorized; tierId: number | null; promoCode?: string }
     >(async data => {
         if (data.tierId === null) {
             throw new Error('missing tier');
@@ -139,7 +135,7 @@ export const useCreateInvoiceMutation = () => {
 
         const wallet = (await ws.getAccounts())
             .flatMap(a => a.allTonWallets)
-            .find(w => w.id === data.state.wallet.rawAddress);
+            .find(w => w.id === data.state.authorizedWallet.rawAddress);
         if (!wallet || !isStandardTonWallet(wallet)) {
             throw new Error('Missing wallet');
         }

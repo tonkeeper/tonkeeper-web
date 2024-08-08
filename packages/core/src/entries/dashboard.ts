@@ -102,6 +102,9 @@ export function toStringDashboardCell(cell: DashboardCell): string {
 }
 
 function walletBadgeText(account: Account, walletId: WalletId): string {
+    if (account.type === 'watch-only') {
+        return '(watch only)';
+    }
     if (account.allTonWallets.length === 1) {
         return '';
     }

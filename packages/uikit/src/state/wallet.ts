@@ -174,10 +174,16 @@ export const useAccountState = (id: AccountId | undefined) => {
 };
 
 export const useControllableAccountAndWalletByWalletId = (
-    id: WalletId
+    id: WalletId | undefined
 ): { account: Account | undefined; wallet: TonWalletStandard | undefined } => {
     const accounts = useAccountsState().filter(isAccountControllable);
     return useMemo(() => {
+        if (!id) {
+            return {
+                wallet: undefined,
+                account: undefined
+            };
+        }
         return {
             wallet: getWalletById(accounts, id),
             account: getAccountByWalletById(accounts, id)

@@ -1,5 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { isPaidSubscription, ProState } from '@tonkeeper/core/dist/entries/pro';
+import { isPaidSubscription, ProState, ProStateAuthorized } from '@tonkeeper/core/dist/entries/pro';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
@@ -147,7 +147,9 @@ const ProWallet: FC<{
     onClick: () => void;
     disabled?: boolean;
 }> = ({ data, onClick, disabled }) => {
-    const { account, wallet } = useControllableAccountAndWalletByWalletId(data.wallet.rawAddress)!;
+    const { account, wallet } = useControllableAccountAndWalletByWalletId(
+        data.authorizedWallet?.rawAddress || undefined
+    );
 
     if (!account || !wallet) {
         return null;
@@ -252,11 +254,11 @@ const ConfirmBuyProService: FC<
     return <ConfirmView estimation={estimation} {...mutation} {...rest} />;
 };
 
-const BuyProService: FC<{ data: ProState; setReLogin: () => void; onSuccess?: () => void }> = ({
-    data,
-    setReLogin,
-    onSuccess
-}) => {
+const BuyProService: FC<{
+    data: ProStateAuthorized;
+    setReLogin: () => void;
+    onSuccess?: () => void;
+}> = ({ data, setReLogin, onSuccess }) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);
@@ -364,7 +366,7 @@ const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({ data
 const ProContent: FC<{ data: ProState; onSuccess?: () => void }> = ({ data, onSuccess }) => {
     const [reLogin, setReLogin] = useState(false);
 
-    if (!data.hasWalletAuthCookie || reLogin) {
+    if (!data.authorizedWallet || reLogin) {
         return <SelectWallet onClose={() => setReLogin(false)} />;
     }
     if (isPaidSubscription(data.subscription)) {
@@ -388,7 +390,13 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
                 <Title>{t('tonkeeper_pro')}</Title>
                 <Description>{t('tonkeeper_pro_description')}</Description>
             </Block>
-            {data && <ProContent key={data.wallet.rawAddress} data={data} onSuccess={onSuccess} />}
+            {data && (
+                <ProContent
+                    key={data.authorizedWallet?.rawAddress}
+                    data={data}
+                    onSuccess={onSuccess}
+                />
+            )}
         </>
     );
 };
