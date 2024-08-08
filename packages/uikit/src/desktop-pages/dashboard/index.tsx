@@ -5,6 +5,7 @@ import { ProBanner } from '../../components/pro/ProBanner';
 import { useProState } from '../../state/pro';
 import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { DesktopDashboardHeader } from '../../components/desktop/header/DesktopDashboardHeader';
+import { desktopHeaderContainerHeight } from '../../components/desktop/header/DesktopHeaderElements';
 
 const DashboardTableStyled = styled(DashboardTable)``;
 
@@ -19,7 +20,7 @@ const ProBannerWrapper = styled.div`
 const PageWrapper = styled.div`
     overflow: auto;
     position: relative;
-    height: 100%;
+    height: calc(100% - ${desktopHeaderContainerHeight});
     box-sizing: border-box;
     display: flex;
     flex-direction: column;

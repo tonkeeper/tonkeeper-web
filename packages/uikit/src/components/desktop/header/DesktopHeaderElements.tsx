@@ -11,6 +11,8 @@ import { useUserFiat } from '../../../state/fiat';
 import { Link } from 'react-router-dom';
 import { hexToRGBA } from '../../../libs/css';
 
+export const desktopHeaderContainerHeight = '69px';
+
 export const DesktopHeaderContainer = styled.div`
     padding-left: 1rem;
     display: flex;

@@ -87,6 +87,7 @@ import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
+import { desktopHeaderContainerHeight } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeaderElements';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -220,7 +221,8 @@ const WideLayout = styled.div`
 
 const WideContent = styled.div`
     flex: 1;
-    overflow: auto;
+    min-width: 0;
+    min-height: 0;
 `;
 
 const WalletLayout = styled.div`
@@ -232,7 +234,7 @@ const WalletLayout = styled.div`
 const WalletLayoutBody = styled.div`
     flex: 1;
     display: flex;
-    max-height: calc(100% - 69px);
+    max-height: calc(100% - ${desktopHeaderContainerHeight});
 `;
 
 const WalletRoutingWrapper = styled.div`
@@ -242,8 +244,9 @@ const WalletRoutingWrapper = styled.div`
 `;
 
 const PreferencesLayout = styled.div`
-    height: 100%;
+    height: calc(100% - ${desktopHeaderContainerHeight});
     display: flex;
+    overflow: auto;
 `;
 
 const PreferencesRoutingWrapper = styled.div`
