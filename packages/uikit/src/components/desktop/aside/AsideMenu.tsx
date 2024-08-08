@@ -36,7 +36,7 @@ import { useWalletVersionSettingsNotification } from '../../modals/WalletVersion
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { AsideHeader } from './AsideHeader';
-import { SubscriptionInfoBlock } from "./SubscriptionInfoBlock";
+import { SubscriptionInfoBlock } from './SubscriptionInfoBlock';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -164,7 +164,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
         return (
             <>
                 <AsideMenuItem
-                    isSelected={false}
+                    isSelected={isSelected && sortedWallets.length === 1}
                     onClick={() => onClickWallet(sortedWallets[0].id)}
                     ref={ref}
                 >
@@ -205,7 +205,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
         return (
             <>
                 <AsideMenuItem
-                    isSelected={false}
+                    isSelected={isSelected && sortedDerivations.length === 1}
                     onClick={() => onClickWallet(sortedDerivations[0].activeTonWalletId)}
                     ref={ref}
                 >
@@ -261,7 +261,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
         return (
             <>
                 <AsideMenuItem
-                    isSelected={false}
+                    isSelected={isSelected && sortedWallets.length === 1}
                     onClick={() => onClickWallet(account.activeTonWallet.id)}
                     ref={ref}
                 >
