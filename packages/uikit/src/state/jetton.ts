@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Address } from '@ton/core';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -18,7 +17,6 @@ import BigNumber from 'bignumber.js';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { JettonKey, QueryKey } from '../libs/queryKey';
-import { getRateKey, toTokenRate } from './rates';
 import { DefaultRefetchInterval } from './tonendpoint';
 import { useActiveTonNetwork, useActiveWallet } from './wallet';
 
@@ -81,7 +79,6 @@ export const useJettonList = () => {
     const wallet = useActiveWallet();
     const network = useActiveTonNetwork();
     const { api, fiat } = useAppContext();
-    const client = useQueryClient();
     const sdk = useAppSdk();
 
     return useQuery<JettonsBalances, Error>(
@@ -97,25 +94,6 @@ export const useJettonList = () => {
             const balances = filterTokens(result.balances, config.hiddenTokens).sort(
                 compareTokensOver(fiat)
             );
-
-            result.balances.forEach(item => {
-                client.setQueryData(
-                    [wallet.id, QueryKey.jettons, JettonKey.balance, item.jetton.address],
-                    item
-                );
-
-                if (item.price) {
-                    try {
-                        const tokenRate = toTokenRate(item.price, fiat);
-                        client.setQueryData(
-                            getRateKey(fiat, Address.parse(item.jetton.address).toString()),
-                            tokenRate
-                        );
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            });
 
             const pinned = config.pinnedTokens.reduce((acc, address) => {
                 const item = balances.find(i => i.jetton.address === address);
