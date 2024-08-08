@@ -86,6 +86,7 @@ import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import { Account } from '@tonkeeper/core/dist/entries/account';
+import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -431,12 +432,15 @@ const WalletContent = () => {
 
 const PreferencesContent = () => {
     return (
-        <PreferencesLayout>
-            <PreferencesAsideMenu />
-            <PreferencesRoutingWrapper className="hide-scrollbar">
-                <DesktopPreferencesRouting />
-            </PreferencesRoutingWrapper>
-        </PreferencesLayout>
+        <>
+            <DesktopPreferencesHeader />
+            <PreferencesLayout>
+                <PreferencesAsideMenu />
+                <PreferencesRoutingWrapper className="hide-scrollbar">
+                    <DesktopPreferencesRouting />
+                </PreferencesRoutingWrapper>
+            </PreferencesLayout>
+        </>
     );
 };
 
