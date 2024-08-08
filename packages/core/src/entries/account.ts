@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import { AuthKeychain, AuthPassword, AuthSigner, AuthSignerDeepLink } from './password';
 import { KeystonePathInfo } from '../service/keystone/types';
-import { DerivationItem, TonWalletStandard, WalletId } from './wallet';
+import { DerivationItem, TonContract, TonWalletStandard, WalletId } from './wallet';
 
 /**
  * @deprecated
@@ -18,14 +18,18 @@ export interface IAccount {
     name: string;
     emoji: string;
 
+    get allTonWallets(): TonContract[];
+    get activeTonWallet(): TonContract;
+
+    getTonWallet(id: WalletId): TonContract | undefined;
+    setActiveTonWallet(walletId: WalletId): void;
+}
+
+export interface IAccountControllable extends IAccount {
     get allTonWallets(): TonWalletStandard[];
-    get activeDerivationTonWallets(): TonWalletStandard[];
     get activeTonWallet(): TonWalletStandard;
 
     getTonWallet(id: WalletId): TonWalletStandard | undefined;
-    updateTonWallet(wallet: TonWalletStandard): void;
-    addTonWalletToActiveDerivation(wallet: TonWalletStandard): void;
-    removeTonWalletFromActiveDerivation(walletId: WalletId): void;
     setActiveTonWallet(walletId: WalletId): void;
 }
 
@@ -37,7 +41,7 @@ export class Clonable {
     }
 }
 
-export class AccountTonMnemonic extends Clonable implements IAccount {
+export class AccountTonMnemonic extends Clonable implements IAccountControllable {
     public readonly type = 'mnemonic';
 
     get allTonWallets() {
@@ -70,14 +74,6 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
         return this.allTonWallets.find(w => w.id === id);
     }
 
-    updateTonWallet(wallet: TonWalletStandard) {
-        const index = this.tonWallets.findIndex(w => w.id === wallet.id)!;
-        if (index === -1) {
-            throw new Error('Wallet not found');
-        }
-        this.tonWallets[index] = wallet;
-    }
-
     addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
         const walletExists = this.tonWallets.findIndex(w => w.id === wallet.id);
         if (walletExists === -1) {
@@ -106,7 +102,7 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
     }
 }
 
-export class AccountLedger extends Clonable implements IAccount {
+export class AccountLedger extends Clonable implements IAccountControllable {
     public readonly type = 'ledger';
 
     get allTonWallets() {
@@ -164,18 +160,6 @@ export class AccountLedger extends Clonable implements IAccount {
 
     getTonWallet(id: WalletId) {
         return this.allTonWallets.find(w => w.id === id);
-    }
-
-    updateTonWallet(wallet: TonWalletStandard) {
-        for (const derivation of this.derivations) {
-            const index = derivation.tonWallets.findIndex(w => w.id === wallet.id);
-            if (index !== -1) {
-                derivation.tonWallets[index] = wallet;
-                return;
-            }
-        }
-
-        throw new Error('Derivation not found');
     }
 
     addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
@@ -239,7 +223,7 @@ export class AccountLedger extends Clonable implements IAccount {
     }
 }
 
-export class AccountKeystone extends Clonable implements IAccount {
+export class AccountKeystone extends Clonable implements IAccountControllable {
     public readonly type = 'keystone';
 
     get allTonWallets() {
@@ -271,10 +255,6 @@ export class AccountKeystone extends Clonable implements IAccount {
         return this.allTonWallets.find(w => w.id === id);
     }
 
-    updateTonWallet(wallet: TonWalletStandard) {
-        this.tonWallet = wallet;
-    }
-
     addTonWalletToActiveDerivation() {
         throw new Error('Cannot add ton wallet to keystone account');
     }
@@ -290,7 +270,7 @@ export class AccountKeystone extends Clonable implements IAccount {
     }
 }
 
-export class AccountTonOnly extends Clonable implements IAccount {
+export class AccountTonOnly extends Clonable implements IAccountControllable {
     public readonly type = 'ton-only';
 
     get allTonWallets() {
@@ -321,14 +301,6 @@ export class AccountTonOnly extends Clonable implements IAccount {
 
     getTonWallet(id: WalletId) {
         return this.allTonWallets.find(w => w.id === id);
-    }
-
-    updateTonWallet(wallet: TonWalletStandard) {
-        const index = this.tonWallets.findIndex(w => w.id === wallet.id)!;
-        if (index === -1) {
-            throw new Error('Wallet not found');
-        }
-        this.tonWallets[index] = wallet;
     }
 
     addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
