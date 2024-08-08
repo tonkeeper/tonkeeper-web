@@ -37,7 +37,7 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
-import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
+import { useUserFiatQuery } from "@tonkeeper/uikit/dist/state/fiat";
 import { useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
 import { useActiveAccountQuery, useAccountsStateQuery, useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -185,7 +185,7 @@ export const Loader: FC = () => {
     const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
     const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
-    const { data: fiat } = useUserFiat();
+    const { data: fiat } = useUserFiatQuery();
     const { data: devSettings } = useDevSettings();
 
     const [ios, standalone] = useMemo(() => {

@@ -148,7 +148,7 @@ function tokenColor(tokenAddress: string) {
 export const useWalletTotalBalance = () => {
     const [assets] = useAssets();
     const { data: tonRate } = useRate(CryptoCurrency.TON);
-    const { data: fiat } = useUserFiat();
+    const fiat = useUserFiat();
 
     const client = useQueryClient();
     return useQuery<BigNumber>(
@@ -158,7 +158,7 @@ export const useWalletTotalBalance = () => {
                 return new BigNumber(0);
             }
             return (
-                getTonFiatAmount(client, fiat!, assets)
+                getTonFiatAmount(client, fiat, assets)
                     // .plus(getTRC20FiatAmount(client, fiat, assets))
                     .plus(getJettonsFiatAmount(client, fiat!, assets))
             );
@@ -168,7 +168,7 @@ export const useWalletTotalBalance = () => {
 };
 
 export const useAllWalletsTotalBalance = () => {
-    const { data: fiat } = useUserFiat();
+    const fiat = useUserFiat();
     const allAccounts = useAccountsState();
     const allWalletsAddresses = useMemo(
         () => allAccounts.flatMap(acc => acc.allTonWallets).map(w => w.rawAddress),

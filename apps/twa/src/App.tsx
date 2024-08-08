@@ -55,7 +55,7 @@ import { SwapScreen } from './components/swap/SwapNotification';
 import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
-import { useUserFiat } from "@tonkeeper/uikit/dist/state/fiat";
+import { useUserFiatQuery } from "@tonkeeper/uikit/dist/state/fiat";
 import { useUserLanguage } from "@tonkeeper/uikit/dist/state/language";
 import { useSwapMobileNotification } from "@tonkeeper/uikit/dist/state/swap/useSwapMobileNotification";
 import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
@@ -222,7 +222,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
     const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
-    const { data: fiat } = useUserFiat();
+    const { data: fiat } = useUserFiatQuery();
     const { data: devSettings } = useDevSettings();
 
     const lock = useLock(sdk);

@@ -53,7 +53,7 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
-import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
+import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
@@ -271,7 +271,7 @@ export const Loader: FC = () => {
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
-    const { data: fiat } = useUserFiat();
+    const { data: fiat } = useUserFiatQuery();
 
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,

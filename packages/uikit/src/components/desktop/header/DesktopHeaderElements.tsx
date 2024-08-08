@@ -57,7 +57,7 @@ export const DesktopHeaderBalance: FC<{ isLoading: boolean; balance: BigNumber |
     balance
 }) => {
     const network = useActiveTonNetwork();
-    const { data: fiat } = useUserFiat();
+    const fiat = useUserFiat();
 
     return (
         <>
@@ -65,7 +65,7 @@ export const DesktopHeaderBalance: FC<{ isLoading: boolean; balance: BigNumber |
                 <Skeleton width="100px" height="36px" />
             ) : (
                 <BalanceContainer>
-                    <Num2>{formatFiatCurrency(fiat!, balance || 0)}</Num2>
+                    <Num2>{formatFiatCurrency(fiat, balance || 0)}</Num2>
                 </BalanceContainer>
             )}
             {network === Network.TESTNET && (
