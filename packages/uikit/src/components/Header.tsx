@@ -24,9 +24,9 @@ import { WalletEmoji } from './shared/emoji/WalletEmoji';
 import {
     sortDerivationsByIndex,
     sortWalletsByVersion,
-    TonWalletStandard
+    TonContract
 } from '@tonkeeper/core/dist/entries/wallet';
-import { Account } from '@tonkeeper/core/dist/entries/account';
+import { Account, isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 import { AccountAndWalletBadgesGroup } from './account/AccountBadge';
 
 const Block = styled.div<{
@@ -143,7 +143,7 @@ const DropDownContainerStyle = createGlobalStyle`
 
 const WalletRow: FC<{
     account: Account;
-    wallet: TonWalletStandard;
+    wallet: TonContract;
     onClose: () => void;
 }> = ({ account, wallet, onClose }) => {
     const network = useActiveTonNetwork();
@@ -178,8 +178,8 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
 }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const accountsWallets: { wallet: TonWalletStandard; account: Account }[] =
-        useAccountsState().flatMap(a => {
+    const accountsWallets: { wallet: TonContract; account: Account }[] = useAccountsState().flatMap(
+        a => {
             if (a.type === 'ledger') {
                 return a.derivations
                     .slice()
@@ -189,8 +189,17 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
                             ({
                                 wallet: d.tonWallets.find(w => w.id === d.activeTonWalletId)!,
                                 account: a
-                            } as { wallet: TonWalletStandard; account: Account })
+                            } as { wallet: TonContract; account: Account })
                     );
+            }
+
+            if (!isAccountControllable(a)) {
+                return [
+                    {
+                        wallet: a.activeTonWallet,
+                        account: a
+                    }
+                ];
             }
 
             return a.allTonWallets
@@ -200,7 +209,8 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
                     wallet: w,
                     account: a
                 }));
-        });
+        }
+    );
 
     if (!accountsWallets) {
         return null;

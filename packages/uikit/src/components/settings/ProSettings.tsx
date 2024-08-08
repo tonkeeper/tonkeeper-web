@@ -19,7 +19,7 @@ import {
     useWaitInvoiceMutation
 } from '../../state/pro';
 import {
-    useAccountAndWalletByWalletId,
+    useControllableAccountAndWalletByWalletId,
     useAccountsState,
     useActiveTonNetwork
 } from '../../state/wallet';
@@ -147,7 +147,7 @@ const ProWallet: FC<{
     onClick: () => void;
     disabled?: boolean;
 }> = ({ data, onClick, disabled }) => {
-    const { account, wallet } = useAccountAndWalletByWalletId(data.wallet.rawAddress)!;
+    const { account, wallet } = useControllableAccountAndWalletByWalletId(data.wallet.rawAddress)!;
 
     if (!account || !wallet) {
         return null;

@@ -1,7 +1,8 @@
 // eslint-disable-next-line max-classes-per-file
 import { KeystonePathInfo } from '../service/keystone/types';
 import { AuthKeychain, AuthPassword, AuthSigner, AuthSignerDeepLink } from './password';
-import { DerivationItem, TonWalletStandard, WalletId } from './wallet';
+import { DerivationItem, TonContract, TonWalletStandard, WalletId } from './wallet';
+import { assertUnreachable } from '../utils/types';
 
 /**
  * @deprecated
@@ -18,15 +19,24 @@ export interface IAccount {
     name: string;
     emoji: string;
 
+    get allTonWallets(): TonContract[];
+    get activeTonWallet(): TonContract;
+
+    getTonWallet(id: WalletId): TonContract | undefined;
+    setActiveTonWallet(walletId: WalletId): void;
+}
+
+export interface IAccountControllable extends IAccount {
     get allTonWallets(): TonWalletStandard[];
-    get activeDerivationTonWallets(): TonWalletStandard[];
     get activeTonWallet(): TonWalletStandard;
 
     getTonWallet(id: WalletId): TonWalletStandard | undefined;
-    updateTonWallet(wallet: TonWalletStandard): void;
+    setActiveTonWallet(walletId: WalletId): void;
+}
+
+export interface IAccountVersionsEditable extends IAccountControllable {
     addTonWalletToActiveDerivation(wallet: TonWalletStandard): void;
     removeTonWalletFromActiveDerivation(walletId: WalletId): void;
-    setActiveTonWallet(walletId: WalletId): void;
 }
 
 export class Clonable {
@@ -37,14 +47,10 @@ export class Clonable {
     }
 }
 
-export class AccountTonMnemonic extends Clonable implements IAccount {
+export class AccountTonMnemonic extends Clonable implements IAccountVersionsEditable {
     public readonly type = 'mnemonic';
 
     get allTonWallets() {
-        return this.tonWallets;
-    }
-
-    get activeDerivationTonWallets() {
         return this.tonWallets;
     }
 
@@ -68,14 +74,6 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
 
     getTonWallet(id: WalletId) {
         return this.allTonWallets.find(w => w.id === id);
-    }
-
-    updateTonWallet(wallet: TonWalletStandard) {
-        const index = this.tonWallets.findIndex(w => w.id === wallet.id)!;
-        if (index === -1) {
-            throw new Error('Wallet not found');
-        }
-        this.tonWallets[index] = wallet;
     }
 
     addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
@@ -106,14 +104,10 @@ export class AccountTonMnemonic extends Clonable implements IAccount {
     }
 }
 
-export class AccountTonReadOnly extends Clonable implements IAccount {
-    public readonly type = 'read-only';
+export class AccountTonWatchOnly extends Clonable implements IAccount {
+    public readonly type = 'watch-only';
 
     get allTonWallets() {
-        return [this.tonWallet];
-    }
-
-    get activeDerivationTonWallets() {
         return [this.tonWallet];
     }
 
@@ -122,41 +116,33 @@ export class AccountTonReadOnly extends Clonable implements IAccount {
     }
 
     /**
-     *  @param id ton public key hex string without 0x corresponding to the mnemonic
+     *  @param id eq to `tonWallet.id`
      */
     constructor(
         public readonly id: AccountId,
         public name: string,
         public emoji: string,
-        public tonWallet: TonWalletStandard
+        public tonWallet: TonContract
     ) {
         super();
     }
 
     getTonWallet(id: WalletId) {
-        return this.allTonWallets.find(w => w.id === id);
-    }
+        if (id !== this.tonWallet.id) {
+            return undefined;
+        }
 
-    updateTonWallet(wallet: TonWalletStandard) {
-        this.tonWallet = wallet;
-    }
-
-    addTonWalletToActiveDerivation() {
-        throw new Error('Cannot add ton wallet to keystone account');
-    }
-
-    removeTonWalletFromActiveDerivation() {
-        throw new Error('Cannot remove ton wallet from keystone account');
+        return this.tonWallet;
     }
 
     setActiveTonWallet(walletId: WalletId) {
         if (walletId !== this.tonWallet.id) {
-            throw new Error('Cannot add ton wallet to keystone account');
+            throw new Error('Cannot add ton wallet to watch only account');
         }
     }
 }
 
-export class AccountLedger extends Clonable implements IAccount {
+export class AccountLedger extends Clonable implements IAccountControllable {
     public readonly type = 'ledger';
 
     get allTonWallets() {
@@ -216,40 +202,6 @@ export class AccountLedger extends Clonable implements IAccount {
         return this.allTonWallets.find(w => w.id === id);
     }
 
-    updateTonWallet(wallet: TonWalletStandard) {
-        for (const derivation of this.derivations) {
-            const index = derivation.tonWallets.findIndex(w => w.id === wallet.id);
-            if (index !== -1) {
-                derivation.tonWallets[index] = wallet;
-                return;
-            }
-        }
-
-        throw new Error('Derivation not found');
-    }
-
-    addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
-        const walletExists = this.activeDerivation.tonWallets.findIndex(w => w.id === wallet.id);
-        if (walletExists === -1) {
-            this.activeDerivation.tonWallets = this.activeDerivation.tonWallets.concat(wallet);
-        } else {
-            this.activeDerivation.tonWallets[walletExists] = wallet;
-        }
-    }
-
-    removeTonWalletFromActiveDerivation(walletId: WalletId) {
-        if (this.activeDerivation.tonWallets.length === 1) {
-            throw new Error('Cannot remove last wallet');
-        }
-
-        this.activeDerivation.tonWallets = this.activeDerivation.tonWallets.filter(
-            w => w.id !== walletId
-        );
-        if (this.activeDerivation.activeTonWalletId === walletId) {
-            this.activeDerivation.activeTonWalletId = this.activeDerivation.tonWallets[0].id;
-        }
-    }
-
     setActiveTonWallet(walletId: WalletId) {
         for (const derivation of this.derivations) {
             const walletInDerivation = derivation.tonWallets.some(w => w.id === walletId);
@@ -289,14 +241,10 @@ export class AccountLedger extends Clonable implements IAccount {
     }
 }
 
-export class AccountKeystone extends Clonable implements IAccount {
+export class AccountKeystone extends Clonable implements IAccountControllable {
     public readonly type = 'keystone';
 
     get allTonWallets() {
-        return [this.tonWallet];
-    }
-
-    get activeDerivationTonWallets() {
         return [this.tonWallet];
     }
 
@@ -321,18 +269,6 @@ export class AccountKeystone extends Clonable implements IAccount {
         return this.allTonWallets.find(w => w.id === id);
     }
 
-    updateTonWallet(wallet: TonWalletStandard) {
-        this.tonWallet = wallet;
-    }
-
-    addTonWalletToActiveDerivation() {
-        throw new Error('Cannot add ton wallet to keystone account');
-    }
-
-    removeTonWalletFromActiveDerivation() {
-        throw new Error('Cannot remove ton wallet from keystone account');
-    }
-
     setActiveTonWallet(walletId: WalletId) {
         if (walletId !== this.tonWallet.id) {
             throw new Error('Cannot add ton wallet to keystone account');
@@ -340,14 +276,10 @@ export class AccountKeystone extends Clonable implements IAccount {
     }
 }
 
-export class AccountTonOnly extends Clonable implements IAccount {
+export class AccountTonOnly extends Clonable implements IAccountVersionsEditable {
     public readonly type = 'ton-only';
 
     get allTonWallets() {
-        return this.tonWallets;
-    }
-
-    get activeDerivationTonWallets() {
         return this.tonWallets;
     }
 
@@ -371,14 +303,6 @@ export class AccountTonOnly extends Clonable implements IAccount {
 
     getTonWallet(id: WalletId) {
         return this.allTonWallets.find(w => w.id === id);
-    }
-
-    updateTonWallet(wallet: TonWalletStandard) {
-        const index = this.tonWallets.findIndex(w => w.id === wallet.id)!;
-        if (index === -1) {
-            throw new Error('Wallet not found');
-        }
-        this.tonWallets[index] = wallet;
     }
 
     addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
@@ -410,12 +334,39 @@ export class AccountTonOnly extends Clonable implements IAccount {
     }
 }
 
-export type Account =
-    | AccountTonMnemonic
-    | AccountLedger
-    | AccountKeystone
-    | AccountTonOnly
-    | AccountTonReadOnly;
+export type AccountVersionEditable = AccountTonMnemonic | AccountTonOnly;
+
+export type AccountControllable = AccountVersionEditable | AccountLedger | AccountKeystone;
+
+export type Account = AccountControllable | AccountTonWatchOnly;
+
+export function isAccountVersionEditable(account: Account): account is AccountVersionEditable {
+    switch (account.type) {
+        case 'mnemonic':
+        case 'ton-only':
+            return true;
+        case 'ledger':
+        case 'keystone':
+        case 'watch-only':
+            return false;
+    }
+
+    assertUnreachable(account);
+}
+
+export function isAccountControllable(account: Account): account is AccountControllable {
+    switch (account.type) {
+        case 'keystone':
+        case 'mnemonic':
+        case 'ledger':
+        case 'ton-only':
+            return true;
+        case 'watch-only':
+            return false;
+    }
+
+    assertUnreachable(account);
+}
 
 export type AccountsState = Account[];
 
@@ -430,7 +381,7 @@ const prototypes = {
     ledger: AccountLedger.prototype,
     keystone: AccountKeystone.prototype,
     'ton-only': AccountTonOnly.prototype,
-    'read-only': AccountTonReadOnly.prototype
+    'watch-only': AccountTonWatchOnly.prototype
 } as const;
 
 export function bindAccountToClass(accountStruct: Account): void {
@@ -438,7 +389,7 @@ export function bindAccountToClass(accountStruct: Account): void {
 }
 
 export function getWalletById(
-    accounts: Account[],
+    accounts: IAccountControllable[],
     walletId: WalletId
 ): TonWalletStandard | undefined {
     for (const account of accounts || []) {

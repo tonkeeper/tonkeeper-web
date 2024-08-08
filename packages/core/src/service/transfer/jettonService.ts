@@ -1,6 +1,6 @@
 import { Address, beginCell, Cell, comment, internal, toNano } from '@ton/core';
 import BigNumber from 'bignumber.js';
-import { Account } from '../../entries/account';
+import { AccountControllable } from '../../entries/account';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
@@ -127,7 +127,7 @@ export const estimateJettonTransfer = async (
 
 export const sendJettonTransfer = async (
     api: APIConfig,
-    account: Account,
+    account: AccountControllable,
     recipient: TonRecipientData,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string,

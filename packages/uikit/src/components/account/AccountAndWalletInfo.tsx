@@ -35,7 +35,7 @@ export const AccountAndWalletInfo: FC<
 > = props => {
     const { t } = useTranslation();
     let account: Account = useActiveAccount();
-    let wallet: TonWalletStandard = account.activeTonWallet;
+    let wallet = account.activeTonWallet;
     const network = useActiveTonNetwork();
 
     if ('account' in props && props.account) {

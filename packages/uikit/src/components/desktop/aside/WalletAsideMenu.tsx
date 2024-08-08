@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
 import { AppRoute } from '../../../libs/routes';
-import { useIsActiveWalletReadOnly } from '../../../state/wallet';
+import { useIsActiveWalletWatchOnly } from '../../../state/wallet';
 import {
     ClockSmoothIcon,
     CoinsIcon,
@@ -43,7 +43,7 @@ const SwapIconStyled = styled(SwapIcon)`
 export const WalletAsideMenu = () => {
     const { t } = useTranslation();
     const location = useLocation();
-    const isReadOnly = useIsActiveWalletReadOnly();
+    const isReadOnly = useIsActiveWalletWatchOnly();
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 

@@ -13,7 +13,7 @@ import { AppProRoute, AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useWalletTotalBalance } from '../../../state/asset';
 import { usePreFetchRates } from '../../../state/rates';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
-import { useActiveTonNetwork, useIsActiveWalletReadOnly } from '../../../state/wallet';
+import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { ArrowDownIcon, ArrowUpIcon, PlusIconSmall } from '../../Icon';
 import { Body2Class, Num2 } from '../../Text';
@@ -128,7 +128,7 @@ const DesktopHeaderPayload = () => {
     const { data: buy } = useTonendpointBuyMethods();
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
-    const isReadOnly = useIsActiveWalletReadOnly();
+    const isReadOnly = useIsActiveWalletWatchOnly();
 
     return (
         <DesktopHeaderStyled>

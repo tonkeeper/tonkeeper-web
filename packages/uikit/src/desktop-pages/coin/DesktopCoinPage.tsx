@@ -29,7 +29,7 @@ import { useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
-import { useIsActiveWalletReadOnly } from '../../state/wallet';
+import { useIsActiveWalletWatchOnly } from '../../state/wallet';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -71,7 +71,7 @@ const ButtonStyled = styled(Button)`
 const CoinHeader: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const isReadOnly = useIsActiveWalletReadOnly();
+    const isReadOnly = useIsActiveWalletWatchOnly();
     const { data: buy } = useTonendpointBuyMethods();
     const canBuy = token === CryptoCurrency.TON;
     const { data: swapAssets } = useAllSwapAssets();

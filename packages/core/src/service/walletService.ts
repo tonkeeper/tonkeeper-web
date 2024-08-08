@@ -10,7 +10,7 @@ import {
     AccountLedger,
     AccountTonMnemonic,
     AccountTonOnly,
-    AccountTonReadOnly
+    AccountTonWatchOnly
 } from '../entries/account';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
@@ -28,14 +28,14 @@ export const createReadOnlyTonAccountByAddress = async (
         name?: string;
     }
 ) => {
-    const accountId = Address.parse(address).toRawString();
-    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(accountId);
+    const rawAddress = Address.parse(address).toRawString();
+    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
+        rawAddress.split(':')[1]
+    );
 
-    return new AccountTonReadOnly(accountId, options.name ?? name, emoji, {
-        id: accountId,
-        rawAddress: accountId,
-        version: WalletVersion.V5R1,
-        publicKey: accountId
+    return new AccountTonWatchOnly(rawAddress, options.name ?? name, emoji, {
+        id: rawAddress,
+        rawAddress: rawAddress
     });
 };
 

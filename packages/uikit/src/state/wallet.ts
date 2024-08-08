@@ -4,10 +4,12 @@ import {
     Account,
     AccountId,
     AccountTonMnemonic,
-    AccountTonReadOnly,
+    AccountTonWatchOnly,
     AccountsState,
     getAccountByWalletById,
-    getWalletById
+    getWalletById,
+    isAccountVersionEditable,
+    isAccountControllable
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';
@@ -171,10 +173,10 @@ export const useAccountState = (id: AccountId | undefined) => {
     );
 };
 
-export const useAccountAndWalletByWalletId = (
+export const useControllableAccountAndWalletByWalletId = (
     id: WalletId
 ): { account: Account | undefined; wallet: TonWalletStandard | undefined } => {
-    const accounts = useAccountsState();
+    const accounts = useAccountsState().filter(isAccountControllable);
     return useMemo(() => {
         return {
             wallet: getWalletById(accounts, id),
@@ -209,7 +211,7 @@ export const useCreateAccountReadOnly = () => {
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
 
     return useMutation<
-        AccountTonReadOnly,
+        AccountTonWatchOnly,
         Error,
         {
             address: string;
@@ -308,6 +310,9 @@ export const useAddTonWalletVersionToAccount = () => {
         }
     >(async ({ accountId, version }) => {
         const account = (await accountsStore.getAccount(accountId))!;
+        if (!isAccountVersionEditable(account)) {
+            throw new Error('Cannot add wallet to this account');
+        }
         const publicKey = account.activeTonWallet.publicKey;
         const w = getWalletAddress(publicKey, version);
         const wallet: TonWalletStandard = {
@@ -337,6 +342,9 @@ export const useRemoveTonWalletVersionFromAccount = () => {
         }
     >(async ({ walletId, accountId }) => {
         const account = (await storage.getAccount(accountId))!;
+        if (!isAccountVersionEditable(account)) {
+            throw new Error('Cannot add wallet to this account');
+        }
         account.removeTonWalletFromActiveDerivation(walletId);
         await storage.updateAccountInState(account);
         await client.invalidateQueries(anyOfKeysParts(QueryKey.account, account.id, walletId));
@@ -543,7 +551,7 @@ export function useInvalidateActiveWalletQueries() {
     });
 }
 
-export const useIsActiveWalletReadOnly = () => {
+export const useIsActiveWalletWatchOnly = () => {
     const wallet = useActiveAccount();
-    return wallet.type === 'read-only';
+    return wallet.type === 'watch-only';
 };

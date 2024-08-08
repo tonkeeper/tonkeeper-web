@@ -13,7 +13,7 @@ import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCusto
 import { QueryKey } from '../../libs/queryKey';
 import { useIsActiveWalletLedger } from '../../state/ledger';
 import { useConnectTonConnectAppMutation } from '../../state/tonConnect';
-import { useIsActiveWalletReadOnly } from '../../state/wallet';
+import { useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
@@ -78,7 +78,7 @@ const ConnectContent: FC<{
     handleClose: (result?: ConnectItemReply[], manifest?: DAppManifest) => void;
 }> = ({ params, manifest, origin, handleClose }) => {
     const activeIsLedger = useIsActiveWalletLedger();
-    const isReadOnly = useIsActiveWalletReadOnly();
+    const isReadOnly = useIsActiveWalletWatchOnly();
 
     const sdk = useAppSdk();
     const [done, setDone] = useState(false);

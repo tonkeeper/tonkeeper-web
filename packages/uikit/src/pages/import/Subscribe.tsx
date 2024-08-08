@@ -1,4 +1,4 @@
-import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { TonContract, TonWalletStandard } from "@tonkeeper/core/dist/entries/wallet";
 import React, { FC } from 'react';
 import { IconPage } from '../../components/Layout';
 import { Button } from '../../components/fields/Button';
@@ -8,7 +8,7 @@ import { signTonConnectMnemonicOver } from '../../state/mnemonic';
 import { useSubscribeMutation } from '../../state/subscribe';
 
 export const Subscribe: FC<{
-    wallet: TonWalletStandard;
+    wallet: TonContract;
     mnemonic: string[];
     onDone: () => void;
 }> = ({ wallet, mnemonic, onDone }) => {

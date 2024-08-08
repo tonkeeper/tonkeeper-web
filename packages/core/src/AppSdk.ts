@@ -7,7 +7,7 @@ import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
 import { TonTransferParams } from './service/deeplinkingService';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTransaction } from './service/ledger/connector';
-import { TonWalletStandard } from './entries/wallet';
+import { TonContract } from './entries/wallet';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -68,7 +68,7 @@ export interface TouchId {
 export interface NotificationService {
     subscribe: (
         api: APIConfig,
-        wallet: TonWalletStandard,
+        wallet: TonContract,
         signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
     ) => Promise<void>;
     unsubscribe: (address?: string) => Promise<void>;

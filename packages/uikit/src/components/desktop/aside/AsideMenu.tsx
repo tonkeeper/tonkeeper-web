@@ -319,7 +319,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
         );
     }
 
-    if (account.type === 'read-only') {
+    if (account.type === 'watch-only') {
         return (
             <AsideMenuItem
                 isSelected={isSelected}

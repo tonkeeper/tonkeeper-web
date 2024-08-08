@@ -27,7 +27,11 @@ import { useCheckTouchId } from './password';
 import { useActiveWallet } from './wallet';
 import { useUserLanguage } from './language';
 import { useAccountsStorage } from '../hooks/useStorage';
-import { getAccountByWalletById, getWalletById } from '@tonkeeper/core/dist/entries/account';
+import {
+    getAccountByWalletById,
+    getWalletById,
+    isAccountControllable
+} from '@tonkeeper/core/dist/entries/account';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -61,13 +65,14 @@ export const useSelectWalletForProMutation = () => {
     const accountsStorage = useAccountsStorage();
 
     return useMutation<void, Error, string>(async walletId => {
-        const accounts = await accountsStorage.getAccounts();
+        const accounts = (await accountsStorage.getAccounts()).filter(isAccountControllable);
         const account = getAccountByWalletById(accounts, walletId);
-        const wallet = getWalletById(accounts, walletId);
 
         if (!account) {
             throw new Error('Account not found');
         }
+
+        const wallet = getWalletById(accounts, walletId);
 
         if (!wallet) {
             throw new Error('Missing wallet state');

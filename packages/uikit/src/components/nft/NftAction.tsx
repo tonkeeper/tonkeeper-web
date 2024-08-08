@@ -5,7 +5,7 @@ import { FC } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveWallet, useIsActiveWalletReadOnly } from '../../state/wallet';
+import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { Body2 } from '../Text';
 import { Button } from '../fields/Button';
 import { LinkNft } from './LinkNft';
@@ -89,7 +89,7 @@ export const NftAction: FC<{
     kind: NFTKind;
     nftItem: NFT;
 }> = ({ kind, nftItem }) => {
-    const isReadOnly = useIsActiveWalletReadOnly();
+    const isReadOnly = useIsActiveWalletWatchOnly();
     if (isReadOnly) {
         return (
             <>

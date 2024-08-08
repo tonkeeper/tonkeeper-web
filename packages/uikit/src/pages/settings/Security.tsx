@@ -20,7 +20,7 @@ import {
     useMutateTouchId,
     useTouchIdEnabled
 } from '../../state/password';
-import { useIsActiveWalletReadOnly, useIsPasswordSet } from '../../state/wallet';
+import { useIsActiveWalletWatchOnly, useIsPasswordSet } from '../../state/wallet';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
@@ -105,7 +105,7 @@ const ShowPhrases = () => {
 
     const isLedger = useIsActiveWalletLedger();
     const isKeystone = useIsActiveWalletKeystone();
-    const isReadOnly = useIsActiveWalletReadOnly();
+    const isReadOnly = useIsActiveWalletWatchOnly();
     const isFullWidthMode = useIsFullWidthMode();
 
     const items = useMemo(() => {

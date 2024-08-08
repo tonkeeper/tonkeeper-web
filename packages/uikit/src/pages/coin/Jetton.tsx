@@ -21,7 +21,7 @@ import { JettonKey, QueryKey } from '../../libs/queryKey';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
-import { useActiveWallet, useIsActiveWalletReadOnly } from '../../state/wallet';
+import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../state/wallet';
 
 const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTMLDivElement> }> = ({
     balance,
@@ -81,7 +81,7 @@ const JettonHeader: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ info, 
 export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) => {
     const { data: info } = useJettonInfo(jettonAddress);
     const { data: balance } = useJettonBalance(jettonAddress);
-    const isReadOnly = useIsActiveWalletReadOnly();
+    const isReadOnly = useIsActiveWalletWatchOnly();
     const { data: swapAssets } = useAllSwapAssets();
 
     const jettonAddressRaw = Address.parse(jettonAddress).toRawString();

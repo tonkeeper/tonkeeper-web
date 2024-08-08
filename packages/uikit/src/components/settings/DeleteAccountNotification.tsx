@@ -110,7 +110,7 @@ export const DeleteAccountNotification: FC<{
                     accountId={account.id}
                     onClose={afterClose}
                     isKeystone={account.type === 'keystone'}
-                    isReadOnly={account.type === 'read-only'}
+                    isReadOnly={account.type === 'watch-only'}
                 />
             );
         },

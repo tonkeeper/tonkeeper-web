@@ -35,10 +35,10 @@ export const AccountBadge: FC<
         );
     }
 
-    if (accountType === 'read-only') {
+    if (accountType === 'watch-only') {
         return (
             <Badge size={size} color="accentRed" className={className}>
-                {children || 'Read Only'}
+                {children || 'Watch Only'}
             </Badge>
         );
     }
@@ -128,7 +128,7 @@ export const AccountAndWalletBadgesGroup: FC<{
         return <AccountBadge className={className} size={size} accountType={account.type} />;
     }
 
-    if (account.type === 'read-only') {
+    if (account.type === 'watch-only') {
         return <AccountBadge className={className} size={size} accountType={account.type} />;
     }
 
