@@ -12,13 +12,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset, legacyTonAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
-import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import { useAppContext } from '../hooks/appContext';
-import { QueryKey } from '../libs/queryKey';
-import { useAssets } from './home';
 import { useJettonList } from './jetton';
 import {
     getJettonsFiatAmount,
@@ -27,7 +21,16 @@ import {
     useRate
 } from './rates';
 import { useTronBalances } from './tron/tron';
-import { useWalletAccountInfo } from './wallet';
+import { useAccountsState, useWalletAccountInfo } from './wallet';
+import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
+import { useAssets } from './home';
+import { QueryKey } from '../libs/queryKey';
+import { useAppContext } from '../hooks/appContext';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { useUserFiat } from './fiat';
+import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
+import { useMemo } from 'react';
+import { DashboardCellNumeric } from '@tonkeeper/core/dist/entries/dashboard';
 
 export function useUserAssetBalance<
     T extends AssetIdentification = AssetIdentification,
@@ -142,9 +145,10 @@ function tokenColor(tokenAddress: string) {
     return restColors[addressId % restColors.length];
 }
 
-export const useWalletTotalBalance = (fiat: FiatCurrencies) => {
+export const useWalletTotalBalance = () => {
     const [assets] = useAssets();
     const { data: tonRate } = useRate(CryptoCurrency.TON);
+    const fiat = useUserFiat();
 
     const client = useQueryClient();
     return useQuery<BigNumber>(
@@ -160,6 +164,32 @@ export const useWalletTotalBalance = (fiat: FiatCurrencies) => {
             );
         },
         { enabled: !!assets && !!tonRate }
+    );
+};
+
+export const useAllWalletsTotalBalance = () => {
+    const fiat = useUserFiat();
+    const allAccounts = useAccountsState();
+    const allWalletsAddresses = useMemo(
+        () => allAccounts.flatMap(acc => acc.allTonWallets).map(w => w.rawAddress),
+        [allAccounts]
+    );
+
+    return useQuery<BigNumber>(
+        [QueryKey.allWalletsTotalBalance, fiat, allWalletsAddresses],
+        async () => {
+            const queryToFetch = {
+                accounts: allWalletsAddresses,
+                columns: ['total_balance']
+            };
+            const result = await getDashboardData(queryToFetch, {
+                currency: fiat
+            });
+
+            return result
+                .map(row => new BigNumber((row[0] as DashboardCellNumeric).value))
+                .reduce((v, acc) => acc.plus(v), new BigNumber(0));
+        }
     );
 };
 

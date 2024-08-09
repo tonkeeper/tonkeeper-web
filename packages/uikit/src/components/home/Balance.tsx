@@ -95,7 +95,7 @@ export const Balance: FC<{
 
     const address = formatAddress(wallet.rawAddress, network);
 
-    const { data: total } = useWalletTotalBalance(fiat);
+    const { data: total } = useWalletTotalBalance();
 
     useEffect(() => {
         const timer = setTimeout(() => {

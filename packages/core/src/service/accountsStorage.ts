@@ -1,6 +1,11 @@
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
-import { DeprecatedWalletState, TonWalletStandard, WalletId } from '../entries/wallet';
+import {
+    DeprecatedWalletState,
+    isStandardTonWallet,
+    TonWalletStandard,
+    WalletId
+} from '../entries/wallet';
 
 import {
     Account,
@@ -169,8 +174,11 @@ export class AccountsStorage {
 
         const accounts = await this.getAccounts();
         return (
-            accounts.find(a => a.allTonWallets.some(w => w.publicKey === state.activePublicKey))
-                ?.id || null
+            accounts.find(a =>
+                a.allTonWallets.some(
+                    w => isStandardTonWallet(w) && w.publicKey === state.activePublicKey
+                )
+            )?.id || null
         );
     };
 }

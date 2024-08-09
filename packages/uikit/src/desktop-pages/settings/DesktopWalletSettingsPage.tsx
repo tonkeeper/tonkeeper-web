@@ -1,4 +1,4 @@
-import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -21,7 +21,8 @@ import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
-import { useActiveAccount } from '../../state/wallet';
+import { useActiveAccount, useIsActiveWalletWatchOnly } from '../../state/wallet';
+import { isAccountVersionEditable } from '@tonkeeper/core/dist/entries/account';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -59,7 +60,9 @@ export const DesktopWalletSettingsPage = () => {
     const { isOpen: isRenameOpen, onClose: onRenameClose, onOpen: onRenameOpen } = useDisclosure();
     const { isOpen: isDeleteOpen, onClose: onDeleteClose, onOpen: onDeleteOpen } = useDisclosure();
 
-    const canChangeVersion = account.type === 'mnemonic' || account.type === 'ton-only';
+    const isReadOnly = useIsActiveWalletWatchOnly();
+
+    const canChangeVersion = isAccountVersionEditable(account);
 
     // check available derivations length to filter and keep only non-legacy added ledger accounts
     const canChangeLedgerIndex =
@@ -96,7 +99,9 @@ export const DesktopWalletSettingsPage = () => {
                             <SwitchIcon />
                             <SettingsListText>
                                 <Label2>{t('settings_wallet_version')}</Label2>
-                                <Body3>{walletVersionText(activeWallet.version)}</Body3>
+                                <Body3>
+                                    {walletVersionText((activeWallet as TonWalletStandard).version)}
+                                </Body3>
                             </SettingsListText>
                         </SettingsListItem>
                     </LinkStyled>
@@ -124,12 +129,14 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_collectibles_list')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
-                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}>
-                    <SettingsListItem>
-                        <AppsIcon />
-                        <Label2>{t('settings_connected_apps')}</Label2>
-                    </SettingsListItem>
-                </LinkStyled>
+                {!isReadOnly && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}>
+                        <SettingsListItem>
+                            <AppsIcon />
+                            <Label2>{t('settings_connected_apps')}</Label2>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>

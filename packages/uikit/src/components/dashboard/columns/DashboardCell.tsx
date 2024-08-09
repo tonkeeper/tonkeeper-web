@@ -7,9 +7,12 @@ import { NumericCell } from './NumericCell';
 import { NumericCryptoCell } from './NumericCryptoCell';
 import { NumericFiatCell } from './NumericFiatCell';
 import { Body2 } from '../../Text';
+import { AccountNameCell } from './AccountNameCell';
 
 export const DashboardCell: FC<DashboardCellProps> = props => {
     switch (props.type) {
+        case 'account_name':
+            return <AccountNameCell walletId={props.walletId} account={props.account} />;
         case 'string':
             return <StringCell value={props.value} />;
         case 'address':
