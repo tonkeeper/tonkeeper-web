@@ -18,6 +18,7 @@ import type {
   Event,
   JettonHolders,
   JettonInfo,
+  JettonTransferPayload,
   Jettons,
   StatusDefaultResponse,
 } from '../models/index';
@@ -28,6 +29,8 @@ import {
     JettonHoldersToJSON,
     JettonInfoFromJSON,
     JettonInfoToJSON,
+    JettonTransferPayloadFromJSON,
+    JettonTransferPayloadToJSON,
     JettonsFromJSON,
     JettonsToJSON,
     StatusDefaultResponseFromJSON,
@@ -42,6 +45,11 @@ export interface GetJettonHoldersRequest {
 
 export interface GetJettonInfoRequest {
     accountId: string;
+}
+
+export interface GetJettonTransferPayloadRequest {
+    accountId: string;
+    jettonId: string;
 }
 
 export interface GetJettonsRequest {
@@ -90,6 +98,21 @@ export interface JettonsApiInterface {
      * Get jetton metadata by jetton master address
      */
     getJettonInfo(requestParameters: GetJettonInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonInfo>;
+
+    /**
+     * Get jetton\'s custom payload and state init required for transfer
+     * @param {string} accountId account ID
+     * @param {string} jettonId jetton ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JettonsApiInterface
+     */
+    getJettonTransferPayloadRaw(requestParameters: GetJettonTransferPayloadRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JettonTransferPayload>>;
+
+    /**
+     * Get jetton\'s custom payload and state init required for transfer
+     */
+    getJettonTransferPayload(requestParameters: GetJettonTransferPayloadRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonTransferPayload>;
 
     /**
      * Get a list of all indexed jetton masters in the blockchain.
@@ -199,6 +222,46 @@ export class JettonsApi extends runtime.BaseAPI implements JettonsApiInterface {
      */
     async getJettonInfo(requestParameters: GetJettonInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonInfo> {
         const response = await this.getJettonInfoRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get jetton\'s custom payload and state init required for transfer
+     */
+    async getJettonTransferPayloadRaw(requestParameters: GetJettonTransferPayloadRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JettonTransferPayload>> {
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getJettonTransferPayload().'
+            );
+        }
+
+        if (requestParameters['jettonId'] == null) {
+            throw new runtime.RequiredError(
+                'jettonId',
+                'Required parameter "jettonId" was null or undefined when calling getJettonTransferPayload().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/jettons/{jetton_id}/transfer/{account_id}/payload`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))).replace(`{${"jetton_id"}}`, encodeURIComponent(String(requestParameters['jettonId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => JettonTransferPayloadFromJSON(jsonValue));
+    }
+
+    /**
+     * Get jetton\'s custom payload and state init required for transfer
+     */
+    async getJettonTransferPayload(requestParameters: GetJettonTransferPayloadRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonTransferPayload> {
+        const response = await this.getJettonTransferPayloadRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

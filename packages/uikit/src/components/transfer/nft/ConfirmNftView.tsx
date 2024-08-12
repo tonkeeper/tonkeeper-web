@@ -38,6 +38,7 @@ import {
     useActiveStandardTonWallet,
     useInvalidateActiveWalletQueries
 } from '../../../state/wallet';
+import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -85,6 +86,11 @@ const useSendNft = (
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
     return useMutation<boolean, Error>(async () => {
+        if (!isAccountControllable(account)) {
+            console.error("Can't send a transfer using this account");
+            return false;
+        }
+
         if (!fee) return false;
 
         const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);

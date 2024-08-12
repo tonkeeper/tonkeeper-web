@@ -4,22 +4,41 @@ import { Address } from '@ton/core';
 import { mnemonicToPrivateKey } from '@ton/crypto';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import queryString from 'query-string';
-import { APIConfig } from '../entries/apis';
-import { Network } from '../entries/network';
-import { AuthKeychain, AuthPassword } from '../entries/password';
-import { sortWalletsByVersion, WalletVersion, WalletVersions } from '../entries/wallet';
-import { WalletApi } from '../tonApiV2';
-import { walletContract } from './wallet/contractService';
-import { emojis } from '../utils/emojis';
+import { IStorage } from '../Storage';
 import {
     AccountKeystone,
     AccountLedger,
     AccountTonMnemonic,
-    AccountTonOnly
+    AccountTonOnly,
+    AccountTonWatchOnly
 } from '../entries/account';
-import { IStorage } from '../Storage';
+import { APIConfig } from '../entries/apis';
+import { Network } from '../entries/network';
+import { AuthKeychain, AuthPassword } from '../entries/password';
+import { WalletVersion, WalletVersions, sortWalletsByVersion } from '../entries/wallet';
+import { WalletApi } from '../tonApiV2';
+import { emojis } from '../utils/emojis';
 import { accountsStorage } from './accountsStorage';
+import { walletContract } from './wallet/contractService';
 import { MamRoot } from "@multi-account-mnemonic/core";
+
+export const createReadOnlyTonAccountByAddress = async (
+    storage: IStorage,
+    address: string,
+    options: {
+        name?: string;
+    }
+) => {
+    const rawAddress = Address.parse(address).toRawString();
+    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
+        rawAddress.split(':')[1]
+    );
+
+    return new AccountTonWatchOnly(rawAddress, options.name ?? name, emoji, {
+        id: rawAddress,
+        rawAddress: rawAddress
+    });
+};
 
 export const createStandardTonAccountByMnemonic = async (
     appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },

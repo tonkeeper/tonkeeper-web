@@ -25,6 +25,12 @@ export interface StateInit {
      * @memberof StateInit
      */
     boc: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof StateInit
+     */
+    interfaces: Array<string>;
 }
 
 /**
@@ -32,6 +38,7 @@ export interface StateInit {
  */
 export function instanceOfStateInit(value: object): value is StateInit {
     if (!('boc' in value) || value['boc'] === undefined) return false;
+    if (!('interfaces' in value) || value['interfaces'] === undefined) return false;
     return true;
 }
 
@@ -46,6 +53,7 @@ export function StateInitFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'boc': json['boc'],
+        'interfaces': json['interfaces'],
     };
 }
 
@@ -56,6 +64,7 @@ export function StateInitToJSON(value?: StateInit | null): any {
     return {
         
         'boc': value['boc'],
+        'interfaces': value['interfaces'],
     };
 }
 

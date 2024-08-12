@@ -3,8 +3,10 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { SettingsRoute, relative, WalletSettingsRoute } from '../../libs/routes';
+import { SettingsRoute, WalletSettingsRoute, relative } from '../../libs/routes';
 import { useJettonList } from '../../state/jetton';
+import { useWalletNftList } from '../../state/nft';
+import { useAccountsState, useActiveAccount } from '../../state/wallet';
 import { DeleteAccountNotification } from './DeleteAccountNotification';
 import {
     AppsIcon,
@@ -17,14 +19,15 @@ import {
     WalletsIcon
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
-import { useActiveWallet, useAccountsState, useActiveAccount } from '../../state/wallet';
-import { useWalletNftList } from '../../state/nft';
+import {
+    isAccountControllable,
+    isAccountVersionEditable
+} from '@tonkeeper/core/dist/entries/account';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const account = useActiveAccount();
-    const wallet = account.activeTonWallet;
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
@@ -42,7 +45,7 @@ const SingleAccountSettings = () => {
         if (account.type === 'mnemonic' || account.type === 'ton-only') {
             items.push({
                 name: t('settings_wallet_version'),
-                icon: walletVersionText(wallet.version),
+                icon: walletVersionText(account.activeTonWallet.version),
                 action: () => navigate(relative(SettingsRoute.version))
             });
         }
@@ -85,11 +88,13 @@ const SingleAccountSettings = () => {
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
         });
-        items.push({
-            name: t('settings_connected_apps'),
-            icon: <AppsIcon />,
-            action: () => navigate(relative(WalletSettingsRoute.connectedApps))
-        });
+        if (isAccountControllable(account)) {
+            items.push({
+                name: t('settings_connected_apps'),
+                icon: <AppsIcon />,
+                action: () => navigate(relative(WalletSettingsRoute.connectedApps))
+            });
+        }
 
         return items;
     }, [t, navigate, account, jettons, nft]);
@@ -104,7 +109,6 @@ const SingleAccountSettings = () => {
 const MultipleAccountSettings = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const wallet = useActiveWallet();
 
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
@@ -112,6 +116,8 @@ const MultipleAccountSettings = () => {
     const account = useActiveAccount();
 
     const [deleteAccount, setDeleteAccount] = useState(false);
+
+    const wallet = account.activeTonWallet;
 
     const accountItems = useMemo(() => {
         const items: SettingsItem[] = [
@@ -149,10 +155,10 @@ const MultipleAccountSettings = () => {
             });
         }
 
-        if (account.type === 'mnemonic' || account.type === 'ton-only') {
+        if (isAccountVersionEditable(account)) {
             items.push({
                 name: t('settings_wallet_version'),
-                icon: walletVersionText(wallet.version),
+                icon: walletVersionText(account.activeTonWallet.version),
                 action: () => navigate(relative(SettingsRoute.version))
             });
         }
@@ -187,18 +193,20 @@ const MultipleAccountSettings = () => {
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
         });
-        items.push({
-            name: t('settings_connected_apps'),
-            icon: <AppsIcon />,
-            action: () => navigate(relative(WalletSettingsRoute.connectedApps))
-        });
+        if (isAccountControllable(account)) {
+            items.push({
+                name: t('settings_connected_apps'),
+                icon: <AppsIcon />,
+                action: () => navigate(relative(WalletSettingsRoute.connectedApps))
+            });
+        }
         items.push({
             name: t('Delete_wallet_data'),
             icon: <LogOutIcon />,
             action: () => setDeleteAccount(true)
         });
         return items;
-    }, [t, navigate, wallet, jettons, nft]);
+    }, [t, navigate, wallet, account, jettons, nft]);
 
     return (
         <>

@@ -18,7 +18,7 @@ import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
 import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
 import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/WalletAsideMenu';
-import { DesktopHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeader';
+import { DesktopWalletHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopWalletHeader';
 import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
 import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
 import {
@@ -53,7 +53,7 @@ import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotif
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
-import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
+import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
@@ -86,6 +86,8 @@ import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import { Account } from '@tonkeeper/core/dist/entries/account';
+import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
+import { desktopHeaderContainerHeight } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeaderElements';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -219,7 +221,8 @@ const WideLayout = styled.div`
 
 const WideContent = styled.div`
     flex: 1;
-    overflow: auto;
+    min-width: 0;
+    min-height: 0;
 `;
 
 const WalletLayout = styled.div`
@@ -231,7 +234,7 @@ const WalletLayout = styled.div`
 const WalletLayoutBody = styled.div`
     flex: 1;
     display: flex;
-    max-height: calc(100% - 69px);
+    max-height: calc(100% - ${desktopHeaderContainerHeight});
 `;
 
 const WalletRoutingWrapper = styled.div`
@@ -241,8 +244,9 @@ const WalletRoutingWrapper = styled.div`
 `;
 
 const PreferencesLayout = styled.div`
-    height: 100%;
+    height: calc(100% - ${desktopHeaderContainerHeight});
     display: flex;
+    overflow: auto;
 `;
 
 const PreferencesRoutingWrapper = styled.div`
@@ -267,7 +271,7 @@ export const Loader: FC = () => {
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
-    const { data: fiat } = useUserFiat();
+    const { data: fiat } = useUserFiatQuery();
 
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,
@@ -399,7 +403,7 @@ export const Content: FC<{
 const WalletContent = () => {
     return (
         <WalletLayout>
-            <DesktopHeader />
+            <DesktopWalletHeader />
 
             <WalletLayoutBody>
                 <WalletAsideMenu />
@@ -431,12 +435,15 @@ const WalletContent = () => {
 
 const PreferencesContent = () => {
     return (
-        <PreferencesLayout>
-            <PreferencesAsideMenu />
-            <PreferencesRoutingWrapper className="hide-scrollbar">
-                <DesktopPreferencesRouting />
-            </PreferencesRoutingWrapper>
-        </PreferencesLayout>
+        <>
+            <DesktopPreferencesHeader />
+            <PreferencesLayout>
+                <PreferencesAsideMenu />
+                <PreferencesRoutingWrapper className="hide-scrollbar">
+                    <DesktopPreferencesRouting />
+                </PreferencesRoutingWrapper>
+            </PreferencesLayout>
+        </>
     );
 };
 

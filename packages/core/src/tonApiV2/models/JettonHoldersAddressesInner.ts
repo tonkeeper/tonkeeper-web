@@ -39,7 +39,7 @@ export interface JettonHoldersAddressesInner {
      */
     owner: AccountAddress;
     /**
-     * 
+     * balance in the smallest jetton's units
      * @type {string}
      * @memberof JettonHoldersAddressesInner
      */

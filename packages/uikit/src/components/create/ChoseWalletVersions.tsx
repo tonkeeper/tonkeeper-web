@@ -18,6 +18,7 @@ import { mnemonicToWalletKey } from '@ton/crypto';
 import { ChevronLeftIcon } from '../Icon';
 import { RoundedButton } from '../fields/RoundedButton';
 import { useAppContext } from '../../hooks/appContext';
+import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -86,7 +87,7 @@ export const ChoseWalletVersions: FC<{
 
     useLayoutEffect(() => {
         if (wallets) {
-            if (accountState) {
+            if (accountState && isAccountControllable(accountState)) {
                 return setCheckedVersions(accountState.allTonWallets.map(w => w.version));
             }
 

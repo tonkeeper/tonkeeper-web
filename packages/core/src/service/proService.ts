@@ -9,7 +9,7 @@ import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { DashboardCell, DashboardColumn } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import { ProState, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
+import { ProState, ProStateWallet, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { isStandardTonWallet, TonWalletStandard, WalletVersion } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
@@ -42,21 +42,14 @@ export const getBackupState = async (storage: IStorage) => {
     return backup ?? toEmptySubscription();
 };
 
-export const getProState = async (
-    storage: IStorage,
-    wallet: TonWalletStandard
-): Promise<ProState> => {
+export const getProState = async (storage: IStorage): Promise<ProState> => {
     try {
-        return await loadProState(storage, wallet);
+        return await loadProState(storage);
     } catch (e) {
         console.error(e);
         return {
             subscription: toEmptySubscription(),
-            hasWalletAuthCookie: false,
-            wallet: {
-                publicKey: wallet.publicKey,
-                rawAddress: wallet.rawAddress
-            }
+            authorizedWallet: null
         };
     }
 };
@@ -86,16 +79,10 @@ export const walletVersionFromProServiceDTO = (value: string) => {
     }
 };
 
-export const loadProState = async (
-    storage: IStorage,
-    fallbackWallet: TonWalletStandard
-): Promise<ProState> => {
+export const loadProState = async (storage: IStorage): Promise<ProState> => {
     const user = await ProServiceService.proServiceGetUserInfo();
 
-    let wallet = {
-        publicKey: fallbackWallet.publicKey,
-        rawAddress: fallbackWallet.rawAddress
-    };
+    let authorizedWallet: ProStateWallet | null = null;
     if (user.pub_key && user.version) {
         const wallets = (await accountsStorage(storage).getAccounts()).flatMap(
             a => a.allTonWallets
@@ -111,7 +98,7 @@ export const loadProState = async (
         if (!actualWallet) {
             throw new Error('Unknown wallet');
         }
-        wallet = {
+        authorizedWallet = {
             publicKey: actualWallet.publicKey,
             rawAddress: actualWallet.rawAddress
         };
@@ -146,8 +133,7 @@ export const loadProState = async (
     }
     return {
         subscription,
-        hasWalletAuthCookie: !!user.pub_key,
-        wallet
+        authorizedWallet
     };
 };
 

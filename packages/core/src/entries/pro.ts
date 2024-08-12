@@ -1,8 +1,14 @@
-export interface ProState {
-    wallet: ProStateWallet;
-    hasWalletAuthCookie: boolean;
+export interface ProStateAuthorized {
+    authorizedWallet: ProStateWallet;
     subscription: ProSubscription;
 }
+
+export interface ProStateNotAuthorized {
+    authorizedWallet: null;
+    subscription: ProSubscription;
+}
+
+export type ProState = ProStateAuthorized | ProStateNotAuthorized;
 
 export interface ProStateWallet {
     publicKey: string;

@@ -13,7 +13,8 @@ import {
     KeystoneIcon,
     LedgerIcon,
     RightIcon,
-    SignerIcon
+    SignerIcon,
+    WatchOnlyIcon
 } from './ImportIcons';
 
 const Title = styled(H2)`
@@ -95,6 +96,23 @@ export const ImportNotification: FC<{
                             noWrap
                             text={t('import_existing_wallet')}
                             secondary={t('import_existing_wallet_description')}
+                        />
+                        <ButtonIcon>
+                            <RightIcon />
+                        </ButtonIcon>
+                    </ButtonBlock>
+                    <ButtonBlock
+                        onClick={() => {
+                            onClose(() => onImport(AppRoute.import + ImportRoute.readOnly));
+                        }}
+                    >
+                        <ButtonIcon>
+                            <WatchOnlyIcon />
+                        </ButtonIcon>
+                        <ColumnText
+                            noWrap
+                            text={t('add_wallet_modal_watch_only_title')}
+                            secondary={t('add_wallet_modal_watch_only_subtitle')}
                         />
                         <ButtonIcon>
                             <RightIcon />

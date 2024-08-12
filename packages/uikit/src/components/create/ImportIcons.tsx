@@ -62,6 +62,32 @@ export const ImportIcon = () => {
         </svg>
     );
 };
+export const WatchOnlyIcon = () => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            viewBox="0 0 28 28"
+            fill="none"
+        >
+            <g clip-path="url(#clip0_0_1)">
+                <circle opacity="0.32" cx="13" cy="13" r="8" fill="currentColor" />
+                <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M21.0522 18.9309C22.2764 17.2716 23 15.2203 23 13C23 7.47715 18.5228 3 13 3C7.47715 3 3 7.47715 3 13C3 18.5228 7.47715 23 13 23C15.2203 23 17.2716 22.2764 18.9309 21.0522L21.8787 24C22.4645 24.5858 23.4142 24.5858 24 24C24.5858 23.4142 24.5858 22.4645 24 21.8787L21.0522 18.9309ZM13 20C16.866 20 20 16.866 20 13C20 9.13401 16.866 6 13 6C9.13401 6 6 9.13401 6 13C6 16.866 9.13401 20 13 20Z"
+                    fill="currentColor"
+                />
+            </g>
+            <defs>
+                <clipPath id="clip0_0_1">
+                    <rect x="-288" y="-992" width="390" height="4258" rx="20" fill="currentColor" />
+                </clipPath>
+            </defs>
+        </svg>
+    );
+};
 
 // TODO: Update icon
 export const SignerIcon: FC<{ size?: number }> = ({ size = 28 }) => {
