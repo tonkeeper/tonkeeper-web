@@ -1,7 +1,13 @@
 // eslint-disable-next-line max-classes-per-file
 import { KeystonePathInfo } from '../service/keystone/types';
 import { AuthKeychain, AuthPassword, AuthSigner, AuthSignerDeepLink } from './password';
-import { DerivationItem, TonContract, TonWalletStandard, WalletId, DerivationItemNamed } from './wallet';
+import {
+    DerivationItem,
+    TonContract,
+    TonWalletStandard,
+    WalletId,
+    DerivationItemNamed
+} from './wallet';
 import { assertUnreachable } from '../utils/types';
 
 /**
@@ -334,110 +340,106 @@ export class AccountTonOnly extends Clonable implements IAccountVersionsEditable
     }
 }
 
-export class AccountMAM extends Clonable implements IAccount {
-  public readonly type = 'mam';
+export class AccountMAM extends Clonable implements IAccountControllable {
+    public readonly type = 'mam';
 
-  get allTonWallets() {
-    return this.derivations.flatMap(d => d.tonWallets);
-  }
-
-  get activeDerivationTonWallets() {
-    return this.activeDerivation.tonWallets;
-  }
-
-  get activeDerivation() {
-    return this.derivations.find(d => this.activeDerivationIndex === d.index)!;
-  }
-
-  get activeTonWallet() {
-    const activeDerivation = this.activeDerivation;
-    return this.activeDerivationTonWallets.find(
-      w => w.id === activeDerivation.activeTonWalletId
-    )!;
-  }
-
-  /**
-   *  @param id index 0 derivation ton public key hex string without 0x
-   */
-  constructor(
-    public readonly id: AccountId,
-    public name: string,
-    public emoji: string,
-    public auth: AuthPassword | AuthKeychain,
-    public activeDerivationIndex: number,
-    public derivations: DerivationItemNamed[]
-  ) {
-    super();
-
-    if (derivations.every(d => d.index !== activeDerivationIndex)) {
-      throw new Error('Active derivation not found');
-    }
-  }
-
-  getTonWallet(id: WalletId) {
-    return this.allTonWallets.find(w => w.id === id);
-  }
-
-  updateTonWallet(wallet: TonWalletStandard) {
-    for (const derivation of this.derivations) {
-      const index = derivation.tonWallets.findIndex(w => w.id === wallet.id);
-      if (index !== -1) {
-        derivation.tonWallets[index] = wallet;
-        return;
-      }
+    get allTonWallets() {
+        return this.derivations.flatMap(d => d.tonWallets);
     }
 
-    throw new Error('Derivation not found');
-  }
-
-  addTonWalletToActiveDerivation(wallet: TonWalletStandard) {
-    const walletExists = this.activeDerivation.tonWallets.findIndex(w => w.id === wallet.id);
-    if (walletExists === -1) {
-      this.activeDerivation.tonWallets = this.activeDerivation.tonWallets.concat(wallet);
-    } else {
-      this.activeDerivation.tonWallets[walletExists] = wallet;
-    }
-  }
-
-  removeTonWalletFromActiveDerivation(walletId: WalletId) {
-    if (this.activeDerivation.tonWallets.length === 1) {
-      throw new Error('Cannot remove last wallet');
+    get activeDerivationTonWallets() {
+        return this.activeDerivation.tonWallets;
     }
 
-    this.activeDerivation.tonWallets = this.activeDerivation.tonWallets.filter(
-      w => w.id !== walletId
-    );
-    if (this.activeDerivation.activeTonWalletId === walletId) {
-      this.activeDerivation.activeTonWalletId = this.activeDerivation.tonWallets[0].id;
-    }
-  }
-
-  setActiveTonWallet(walletId: WalletId) {
-    for (const derivation of this.derivations) {
-      const walletInDerivation = derivation.tonWallets.some(w => w.id === walletId);
-      if (walletInDerivation) {
-        derivation.activeTonWalletId = walletId;
-        this.activeDerivationIndex = derivation.index;
-        return;
-      }
+    get activeDerivation() {
+        return this.derivations.find(d => this.activeDerivationIndex === d.index)!;
     }
 
-    throw new Error('Derivation not found');
-  }
-
-  setActiveDerivationIndex(index: number) {
-    if (this.derivations.every(d => d.index !== index)) {
-      throw new Error('Derivation not found');
+    get activeTonWallet() {
+        const activeDerivation = this.activeDerivation;
+        return this.activeDerivationTonWallets.find(
+            w => w.id === activeDerivation.activeTonWalletId
+        )!;
     }
 
-    this.activeDerivationIndex = index;
-  }
+    /**
+     *  @param id index 0 derivation ton public key hex string without 0x
+     */
+    constructor(
+        public readonly id: AccountId,
+        public name: string,
+        public emoji: string,
+        public auth: AuthPassword | AuthKeychain,
+        public activeDerivationIndex: number,
+        public derivations: DerivationItemNamed[]
+    ) {
+        super();
+
+        if (derivations.every(d => d.index !== activeDerivationIndex)) {
+            throw new Error('Active derivation not found');
+        }
+    }
+
+    getTonWallet(id: WalletId) {
+        return this.allTonWallets.find(w => w.id === id);
+    }
+
+    updateDerivation(newDerivation: DerivationItemNamed) {
+        const indexToPaste = this.derivations.findIndex(d => d.index === newDerivation.index);
+        if (indexToPaste !== -1) {
+            this.derivations[indexToPaste] = newDerivation;
+        }
+    }
+
+    addDerivation(derivation: DerivationItemNamed) {
+        const derivationExists = this.derivations.findIndex(d => d.index === derivation.index);
+        if (derivationExists === -1) {
+            this.derivations = this.derivations.concat(derivation);
+        } else {
+            this.derivations[derivationExists] = derivation;
+        }
+    }
+
+    removeDerivation(derivationIndex: number) {
+        if (this.derivations.length === 1) {
+            throw new Error('Cannot remove last derivation');
+        }
+
+        this.derivations = this.derivations.filter(d => d.index !== derivationIndex);
+        if (this.activeDerivationIndex === derivationIndex) {
+            this.activeDerivationIndex = this.derivations[0].index;
+        }
+    }
+
+    setActiveTonWallet(walletId: WalletId) {
+        for (const derivation of this.derivations) {
+            const walletInDerivation = derivation.tonWallets.some(w => w.id === walletId);
+            if (walletInDerivation) {
+                derivation.activeTonWalletId = walletId;
+                this.activeDerivationIndex = derivation.index;
+                return;
+            }
+        }
+
+        throw new Error('Derivation not found');
+    }
+
+    setActiveDerivationIndex(index: number) {
+        if (this.derivations.every(d => d.index !== index)) {
+            throw new Error('Derivation not found');
+        }
+
+        this.activeDerivationIndex = index;
+    }
 }
-
 
 export type AccountVersionEditable = AccountTonMnemonic | AccountTonOnly;
 
-export type AccountControllable = AccountVersionEditable | AccountLedger | AccountKeystone;
+export type AccountControllable =
+    | AccountVersionEditable
+    | AccountLedger
+    | AccountKeystone
+    | AccountMAM;
 
 export type Account = AccountControllable | AccountTonWatchOnly;
 
@@ -449,6 +451,7 @@ export function isAccountVersionEditable(account: Account): account is AccountVe
         case 'ledger':
         case 'keystone':
         case 'watch-only':
+        case 'mam':
             return false;
     }
 
@@ -461,6 +464,7 @@ export function isAccountControllable(account: Account): account is AccountContr
         case 'mnemonic':
         case 'ledger':
         case 'ton-only':
+        case 'mam':
             return true;
         case 'watch-only':
             return false;
@@ -483,7 +487,7 @@ const prototypes = {
     keystone: AccountKeystone.prototype,
     'ton-only': AccountTonOnly.prototype,
     'watch-only': AccountTonWatchOnly.prototype,
-    mam: AccountMAM.pro
+    mam: AccountMAM.prototype
 } as const;
 
 export function bindAccountToClass(accountStruct: Account): void {

@@ -29,7 +29,8 @@ export enum ImportRoute {
     signer = '/signer',
     ledger = '/ledger',
     keystone = '/keystone',
-    readOnly = '/watch-only'
+    readOnly = '/watch-only',
+    mam = '/mam'
 }
 
 export enum SettingsRoute {

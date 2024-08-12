@@ -111,6 +111,7 @@ function walletBadgeText(account: Account, walletId: WalletId): string {
 
     switch (account.type) {
         case 'ledger':
+        case 'mam':
             const index = account.derivations.find(d =>
                 d.tonWallets.some(w => w.id === walletId)
             )?.index;

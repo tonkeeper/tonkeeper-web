@@ -8,6 +8,7 @@ import { IStorage } from '../Storage';
 import {
     AccountKeystone,
     AccountLedger,
+    AccountMAM,
     AccountTonMnemonic,
     AccountTonOnly,
     AccountTonWatchOnly
@@ -15,12 +16,18 @@ import {
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
 import { AuthKeychain, AuthPassword } from '../entries/password';
-import { WalletVersion, WalletVersions, sortWalletsByVersion } from '../entries/wallet';
+import {
+    WalletVersion,
+    WalletVersions,
+    sortWalletsByVersion,
+    TonWalletStandard,
+    DerivationItemNamed
+} from '../entries/wallet';
 import { WalletApi } from '../tonApiV2';
 import { emojis } from '../utils/emojis';
 import { accountsStorage } from './accountsStorage';
 import { walletContract } from './wallet/contractService';
-import { MamRoot } from "@multi-account-mnemonic/core";
+import { MamRoot, MamTonAccount } from '@multi-account-mnemonic/core';
 
 export const createReadOnlyTonAccountByAddress = async (
     storage: IStorage,
@@ -317,59 +324,80 @@ export const createMAMAccountByMnemonic = async (
     storage: IStorage,
     rootMnemonic: string[],
     options: {
-        derivationIndexes?: WalletVersion[];
         network?: Network;
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
     const rootAccount = await MamRoot.fromMnemonic(rootMnemonic);
 
-    const keyPair = await mnemonicToPrivateKey(mnemonic);
+    const childTonWallets = await getMAMTonAccountsToImport(rootAccount, appContext.api);
 
-    const publicKey = keyPair.publicKey.toString('hex');
-
-    let tonWallets: { rawAddress: string; version: WalletVersion }[] = [];
-    if (options.versions) {
-        tonWallets = options.versions
-            .map(v => getWalletAddress(publicKey, v))
-            .map(i => ({
-                rawAddress: i.address.toRawString(),
-                version: i.version
-            }));
-    } else {
-        tonWallets = [await findWalletAddress(appContext, publicKey)];
-    }
-
-    let walletAuth: AuthPassword | AuthKeychain;
+    let auth: AuthPassword | AuthKeychain;
     if (options.auth.kind === 'keychain') {
-        walletAuth = {
+        auth = {
             kind: 'keychain',
-            keychainStoreKey: publicKey
+            keychainStoreKey: rootAccount.id
         };
     } else {
-        walletAuth = options.auth;
+        auth = options.auth;
     }
 
-    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(publicKey);
+    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
+        rootAccount.id
+    );
 
-    const walletIdToActivate = tonWallets.slice().sort(sortWalletsByVersion)[0].rawAddress;
+    const namedDerivations: DerivationItemNamed[] = childTonWallets.map(w => {
+        const tonWallet = walletContract(
+            w.tonAccount.publicKey,
+            appContext.defaultWalletVersion,
+            options.network
+        );
+        const tonWallets: TonWalletStandard[] = [
+            {
+                id: tonWallet.address.toRawString(),
+                publicKey: w.tonAccount.publicKey,
+                version: appContext.defaultWalletVersion,
+                rawAddress: tonWallet.address.toRawString()
+            }
+        ];
 
-    return new AccountTonMnemonic(
-        publicKey,
+        return {
+            name,
+            emoji,
+            index: w.derivationIndex,
+            tonWallets,
+            activeTonWalletId: tonWallets[0].id
+        };
+    });
+
+    return new AccountMAM(
+        rootAccount.id,
         name,
         emoji,
-        walletAuth,
-        walletIdToActivate,
-        tonWallets.map(w => ({
-            id: w.rawAddress,
-            publicKey,
-            version: w.version,
-            rawAddress: w.rawAddress
-        }))
+        auth,
+        childTonWallets[0].derivationIndex,
+        namedDerivations
     );
 };
 
-export function getFallbackAccountEmoji(publicKey: string) {
-    const index = Number('0x' + publicKey.slice(-6)) % emojis.length;
+export function getFallbackAccountEmoji(publicKeyOrBase64: string) {
+    let index;
+    if (/^[0-9A-Fa-f]+$/g.test(publicKeyOrBase64)) {
+        index = Number('0x' + publicKeyOrBase64.slice(-6)) % emojis.length;
+    } else {
+        try {
+            index = Buffer.from(publicKeyOrBase64, 'base64').readUint32BE() % emojis.length;
+        } catch (_) {
+            index = Buffer.from(publicKeyOrBase64).readUint32BE() % emojis.length;
+        }
+    }
+
     return emojis[index];
+}
+
+async function getMAMTonAccountsToImport(
+    root: MamRoot,
+    apiConfig: APIConfig
+): Promise<{ tonAccount: MamTonAccount; derivationIndex: number }[]> {
+    return [{ tonAccount: await root.getTonAccount(0), derivationIndex: 0 }];
 }

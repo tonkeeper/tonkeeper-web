@@ -329,6 +329,58 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
             </AsideMenuItem>
         );
     }
+
+    if (account.type === 'mam') {
+        const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
+        return (
+            <>
+                <AsideMenuItem
+                    isSelected={false}
+                    onClick={() => onClickWallet(sortedDerivations[0].activeTonWalletId)}
+                    ref={ref}
+                >
+                    {shouldShowIcon && (
+                        <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
+                    )}
+                    <Label2>{account.name}</Label2>
+                    <AccountBadgeStyled accountType={account.type} size="s" />
+
+                    <GearIconButtonStyled
+                        onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}
+                        isShown={isHovered}
+                    >
+                        <GearIconEmpty />
+                    </GearIconButtonStyled>
+                </AsideMenuItem>
+                {sortedDerivations.map(derivation => {
+                    return (
+                        <AsideMenuSubItem
+                            key={derivation.index}
+                            isSelected={
+                                isSelected && account.activeDerivationIndex === derivation.index
+                            }
+                            onClick={() => onClickWallet(derivation.activeTonWalletId)}
+                        >
+                            {shouldShowIcon && (
+                                <WalletEmoji
+                                    emojiSize="16px"
+                                    containerSize="16px"
+                                    emoji={derivation.emoji}
+                                />
+                            )}
+                            <Label2>{derivation.name}</Label2>
+                            <WalletIndexBadgeStyled size="s">
+                                {'#' + (derivation.index + 1)}
+                            </WalletIndexBadgeStyled>
+                        </AsideMenuSubItem>
+                    );
+                })}
+            </>
+        );
+    }
     assertUnreachable(account);
 };
 

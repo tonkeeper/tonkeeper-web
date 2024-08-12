@@ -43,6 +43,14 @@ export const AccountBadge: FC<
         );
     }
 
+    if (accountType === 'mam') {
+        return (
+            <Badge size={size} color="accentBlue" className={className}>
+                {children || 'multi'}
+            </Badge>
+        );
+    }
+
     return null;
 };
 

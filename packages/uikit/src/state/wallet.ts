@@ -9,7 +9,8 @@ import {
     getAccountByWalletById,
     getWalletById,
     isAccountVersionEditable,
-    isAccountControllable
+    isAccountControllable,
+    AccountMAM
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';
@@ -27,6 +28,7 @@ import {
     setActiveWalletConfig
 } from '@tonkeeper/core/dist/service/wallet/configService';
 import {
+    createMAMAccountByMnemonic,
     createReadOnlyTonAccountByAddress,
     createStandardTonAccountByMnemonic,
     getWalletAddress
@@ -293,6 +295,60 @@ export const useCreateAccountMnemonic = () => {
                 encryptedMnemonic
             },
             versions
+        });
+
+        await addAccountToState(account);
+        if (selectAccount) {
+            await selectAccountMutation(account.id);
+        }
+        return account;
+    });
+};
+
+export const useCreateAccountMAM = () => {
+    const sdk = useAppSdk();
+    const context = useAppContext();
+    const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
+    const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
+
+    return useMutation<
+        AccountMAM,
+        Error,
+        {
+            mnemonic: string[];
+            password?: string;
+            selectAccount?: boolean;
+        }
+    >(async ({ mnemonic, password, selectAccount }) => {
+        if (sdk.keychain) {
+            const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
+                auth: {
+                    kind: 'keychain'
+                }
+            });
+
+            await sdk.keychain.setPassword(
+                (account.auth as AuthKeychain).keychainStoreKey,
+                mnemonic.join(' ')
+            );
+
+            await addAccountToState(account);
+            if (selectAccount) {
+                await selectAccountMutation(account.id);
+            }
+            return account;
+        }
+
+        if (!password) {
+            password = await getPasswordByNotification(sdk);
+        }
+
+        const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
+        const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
+            auth: {
+                kind: 'password',
+                encryptedMnemonic
+            }
         });
 
         await addAccountToState(account);

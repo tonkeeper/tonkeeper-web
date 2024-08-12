@@ -73,7 +73,11 @@ export const WalletVersionPageContent: FC<{
         return <LedgerError>{t('ledger_operation_not_supported')}</LedgerError>;
     }
 
-    if (selectedAccount.type === 'keystone' || selectedAccount.type === 'watch-only') {
+    if (
+        selectedAccount.type === 'keystone' ||
+        selectedAccount.type === 'watch-only' ||
+        selectedAccount.type === 'mam'
+    ) {
         return <LedgerError>{t('operation_not_supported')}</LedgerError>;
     }
 

@@ -118,6 +118,23 @@ export const ImportNotification: FC<{
                             <RightIcon />
                         </ButtonIcon>
                     </ButtonBlock>
+                    <ButtonBlock
+                        onClick={() => {
+                            onClose(() => onImport(AppRoute.import + ImportRoute.mam));
+                        }}
+                    >
+                        <ButtonIcon>
+                            <AddIcon />
+                        </ButtonIcon>
+                        <ColumnText
+                            noWrap
+                            text={t('add_wallet_modal_mam_title')}
+                            secondary={t('add_wallet_modal_mam_subtitle')}
+                        />
+                        <ButtonIcon>
+                            <RightIcon />
+                        </ButtonIcon>
+                    </ButtonBlock>
                     {hideSigner === true ? null : (
                         <ButtonBlock
                             onClick={() => {
