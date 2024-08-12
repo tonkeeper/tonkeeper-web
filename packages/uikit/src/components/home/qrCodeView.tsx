@@ -54,7 +54,6 @@ export const AnimatedQrCode: FC<{ message: string }> = React.memo(({ message }) 
             <QRCode
                 size={400}
                 value={value}
-                qrStyle="dots"
                 eyeRadius={{
                     inner: 2,
                     outer: 16
@@ -85,7 +84,6 @@ export const KeystoneAnimatedQRCode: FC<{ data: UR }> = ({ data }) => {
             <QRCode
                 size={400}
                 value={value}
-                qrStyle="dots"
                 eyeRadius={{
                     inner: 2,
                     outer: 16

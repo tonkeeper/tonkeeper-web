@@ -9,6 +9,11 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useTronWalletState } from '../../state/tron/tron';
+import {
+    useActiveTonNetwork,
+    useActiveWallet,
+    useIsActiveWalletWatchOnly
+} from '../../state/wallet';
 import { CopyIcon } from '../Icon';
 import {
     FullHeightBlockResponsive,
@@ -18,15 +23,10 @@ import {
     NotificationTitleRow
 } from '../Notification';
 import { Body1, H3 } from '../Text';
+import { AccountBadge } from '../account/AccountBadge';
 import { Button } from '../fields/Button';
 import { Wrapper, childFactoryCreator, duration } from '../transfer/common';
 import { QrWrapper } from './qrCodeView';
-import {
-    useActiveTonNetwork,
-    useActiveWallet,
-    useIsActiveWalletWatchOnly
-} from '../../state/wallet';
-import { AccountBadge } from '../account/AccountBadge';
 
 const CopyBlock = styled.div`
     display: flex;
@@ -175,7 +175,6 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                         })}
                         logoImage="https://wallet.tonkeeper.com/img/toncoin.svg"
                         logoPadding={8}
-                        qrStyle="dots"
                         eyeRadius={{
                             inner: 2,
                             outer: 16
@@ -210,7 +209,6 @@ const ReceiveTron: FC<{ tron: TronWalletState }> = ({ tron }) => {
                         value={tron.walletAddress}
                         logoImage="https://wallet-dev.tonkeeper.com/img/usdt.svg"
                         logoPadding={8}
-                        qrStyle="dots"
                         eyeRadius={{
                             inner: 2,
                             outer: 16
