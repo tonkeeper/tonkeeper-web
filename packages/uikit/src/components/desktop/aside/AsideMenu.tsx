@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { FC, forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -37,6 +37,14 @@ import { useIsHovered } from '../../../hooks/useIsHovered';
 import { ScrollContainer } from '../../ScrollContainer';
 import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../account/AccountBadge';
 import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
+import {
+    DragDropContext,
+    Draggable,
+    DraggableProvidedDraggableProps,
+    Droppable,
+    OnDragEndResponder
+} from 'react-beautiful-dnd';
+import * as React from 'react';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -132,10 +140,10 @@ const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: 
     transition: opacity 0.15s ease-in-out;
 `;
 
-export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = ({
-    account,
-    isSelected
-}) => {
+export const AsideMenuAccount = forwardRef<
+    HTMLDivElement,
+    { account: Account; isSelected: boolean } & DraggableProvidedDraggableProps
+>(({ account, isSelected, ...rest }, fRef) => {
     const { onOpen: openWalletVersionSettings } = useWalletVersionSettingsNotification();
     const { onOpen: openLedgerIndexesSettings } = useLedgerIndexesSettingsNotification();
     const network = useActiveTonNetwork();
@@ -155,7 +163,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
         }
     }, [location.pathname]);
 
-    const { isHovered, ref } = useIsHovered<HTMLButtonElement>();
+    const { isHovered, ref } = useIsHovered<HTMLDivElement>();
 
     const onClickWallet = (walletId: WalletId) =>
         setActiveWallet(walletId).then(handleNavigateHome);
@@ -167,7 +175,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
     if (account.type === 'mnemonic') {
         const sortedWallets = account.tonWallets.slice().sort(sortWalletsByVersion);
         return (
-            <>
+            <div ref={fRef} {...rest}>
                 <AsideMenuItem
                     isSelected={false}
                     onClick={() => onClickWallet(sortedWallets[0].id)}
@@ -201,14 +209,14 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                             <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
                         </AsideMenuSubItem>
                     ))}
-            </>
+            </div>
         );
     }
 
     if (account.type === 'ledger') {
         const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
         return (
-            <>
+            <div {...rest} ref={fRef}>
                 <AsideMenuItem
                     isSelected={false}
                     onClick={() => onClickWallet(sortedDerivations[0].activeTonWalletId)}
@@ -257,14 +265,14 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                             </AsideMenuSubItem>
                         );
                     })}
-            </>
+            </div>
         );
     }
 
     if (account.type === 'ton-only') {
         const sortedWallets = account.tonWallets.slice().sort(sortWalletsByVersion);
         return (
-            <>
+            <div {...rest} ref={fRef}>
                 <AsideMenuItem
                     isSelected={false}
                     onClick={() => onClickWallet(account.activeTonWallet.id)}
@@ -299,7 +307,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                             <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
                         </AsideMenuSubItem>
                     ))}
-            </>
+            </div>
         );
     }
 
@@ -308,7 +316,8 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
             <AsideMenuItem
                 isSelected={isSelected}
                 onClick={() => onClickWallet(account.activeTonWallet.id)}
-                ref={ref}
+                ref={fRef}
+                {...rest}
             >
                 {shouldShowIcon && (
                     <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
@@ -320,6 +329,45 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
     }
 
     assertUnreachable(account);
+});
+
+const AccountDNDBlock: FC<{
+    accounts: Account[];
+    activeAccount: Account;
+    activeRoute: string | undefined;
+}> = ({ activeRoute, activeAccount, accounts }) => {
+    const handleDrop: OnDragEndResponder = useCallback(droppedItem => {
+        const destination = droppedItem.destination;
+        if (!destination) return;
+    }, []);
+
+    return (
+        <DragDropContext onDragEnd={handleDrop}>
+            <Droppable direction="vertical" droppableId="droppable-1">
+                {provided => (
+                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                        {accounts.map((account, index) => (
+                            <Draggable key={account.id} draggableId={account.id} index={index}>
+                                {(p, snapshotDrag) => {
+                                    return (
+                                        <AsideMenuAccount
+                                            ref={p.innerRef}
+                                            account={account}
+                                            isSelected={
+                                                !activeRoute && activeAccount.id === account.id
+                                            }
+                                            {...p.draggableProps}
+                                            {...p.dragHandleProps}
+                                        />
+                                    );
+                                }}
+                            </Draggable>
+                        ))}
+                    </div>
+                )}
+            </Droppable>
+        </DragDropContext>
+    );
 };
 
 const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
@@ -399,13 +447,11 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_dashboard')}</Label2>
                         </AsideMenuItem>
                     )}
-                    {accounts.map(account => (
-                        <AsideMenuAccount
-                            key={account.id}
-                            account={account}
-                            isSelected={!activeRoute && activeAccount.id === account.id}
-                        />
-                    ))}
+                    <AccountDNDBlock
+                        accounts={accounts}
+                        activeAccount={activeAccount}
+                        activeRoute={activeRoute}
+                    />
                 </ScrollContainer>
                 <AsideMenuBottom>
                     <DividerStyled isHidden={!closeBottom} />
