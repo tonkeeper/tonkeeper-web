@@ -1,7 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
 import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { WalletVersion } from "@tonkeeper/core/dist/entries/wallet";
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -9,6 +10,7 @@ import { Header, HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Head
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
+import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import {
     ActivitySkeletonPage,
     BrowserSkeletonPage,
@@ -22,10 +24,7 @@ import {
     EditFavoriteNotification
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
-import {
-    AppContext,
-    IAppContext,
-} from '@tonkeeper/uikit/dist/hooks/appContext';
+import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
     AppSdkContext,
@@ -34,14 +33,21 @@ import {
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
+import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { AppRoute, SettingsRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
-import { useUserFiatQuery } from "@tonkeeper/uikit/dist/state/fiat";
-import { useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
-import { useActiveAccountQuery, useAccountsStateQuery, useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
+import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
+import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
+import { useMutateUserLanguage } from '@tonkeeper/uikit/dist/state/language';
+import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
+import {
+    useAccountsStateQuery,
+    useActiveAccountQuery,
+    useActiveTonNetwork
+} from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -52,11 +58,6 @@ import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
-import { useMutateUserLanguage } from "@tonkeeper/uikit/dist/state/language";
-import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
-import { ModalsRoot } from "@tonkeeper/uikit/dist/components/ModalsRoot";
-import { Account } from "@tonkeeper/core/dist/entries/account";
-import { useDebuggingTools } from "@tonkeeper/uikit/dist/hooks/useDebuggingTools";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -86,6 +87,9 @@ const SwapMobileNotification = React.lazy(
 );
 const PairKeystoneNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
+);
+const PairSignerNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
 );
 
 const queryClient = new QueryClient({
@@ -185,7 +189,7 @@ export const Loader: FC = React.memo(() => {
     const network = useActiveTonNetwork();
 
     useEffect(() => {
-        setLang(localizationFrom(browser.i18n.getUILanguage()))
+        setLang(localizationFrom(browser.i18n.getUILanguage()));
     }, [setLang]);
 
     const lock = useLock(sdk);
@@ -197,9 +201,21 @@ export const Loader: FC = React.memo(() => {
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
-    const { data: tracker } = useAnalytics(sdk.storage, activeAccount || undefined, accounts, sdk.version);
+    const { data: tracker } = useAnalytics(
+        sdk.storage,
+        activeAccount || undefined,
+        accounts,
+        sdk.version
+    );
 
-    if (activeWalletLoading || isWalletsLoading || !config || lock === undefined || fiat === undefined || !devSettings) {
+    if (
+        activeWalletLoading ||
+        isWalletsLoading ||
+        !config ||
+        lock === undefined ||
+        fiat === undefined ||
+        !devSettings
+    ) {
         return (
             <FullSizeWrapper standalone={false}>
                 <Loading />
@@ -217,7 +233,6 @@ export const Loader: FC = React.memo(() => {
         extension: true,
         proFeatures: false,
         hideQrScanner: true,
-        hideSigner: true,
         defaultWalletVersion: WalletVersion.V5R1
     };
 
@@ -359,6 +374,7 @@ export const Content: FC<{
                 <ConnectLedgerNotification />
                 <SwapMobileNotification />
                 <PairKeystoneNotification />
+                <PairSignerNotification />
             </Suspense>
         </Wrapper>
     );
