@@ -17,7 +17,6 @@ import BigNumber from 'bignumber.js';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { JettonKey, QueryKey } from '../libs/queryKey';
-import { DefaultRefetchInterval } from './tonendpoint';
 import { useActiveTonNetwork, useActiveWallet } from './wallet';
 
 export const useJettonInfo = (jettonAddress: string) => {
@@ -107,12 +106,6 @@ export const useJettonList = () => {
                 item => !config.pinnedTokens.includes(item.jetton.address)
             );
             return { balances: pinned.concat(rest) };
-        },
-        {
-            refetchInterval: DefaultRefetchInterval,
-            refetchIntervalInBackground: true,
-            refetchOnWindowFocus: true,
-            keepPreviousData: true
         }
     );
 };
