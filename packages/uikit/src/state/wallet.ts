@@ -8,8 +8,8 @@ import {
     AccountsState,
     getAccountByWalletById,
     getWalletById,
-    isAccountVersionEditable,
-    isAccountControllable
+    isAccountControllable,
+    isAccountVersionEditable
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';
@@ -40,7 +40,6 @@ import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
 import { useDevSettings } from './dev';
 import { getPasswordByNotification } from './mnemonic';
-import { DefaultRefetchInterval } from './tonendpoint';
 
 export const useActiveAccountQuery = () => {
     const storage = useAccountsStorage();
@@ -423,20 +422,11 @@ export const useMutateRenameAccount = <T extends Account>() => {
 export const useWalletAccountInfo = () => {
     const wallet = useActiveWallet();
     const { api } = useAppContext();
-    return useQuery<TonapiAccount, Error>(
-        [wallet.rawAddress, QueryKey.info],
-        async () => {
-            return new AccountsApi(api.tonApiV2).getAccount({
-                accountId: wallet.rawAddress
-            });
-        },
-        {
-            refetchInterval: DefaultRefetchInterval,
-            refetchIntervalInBackground: true,
-            refetchOnWindowFocus: true,
-            keepPreviousData: true
-        }
-    );
+    return useQuery<TonapiAccount, Error>([wallet.rawAddress, QueryKey.info], async () => {
+        return new AccountsApi(api.tonApiV2).getAccount({
+            accountId: wallet.rawAddress
+        });
+    });
 };
 
 export const useActiveTonNetwork = () => {

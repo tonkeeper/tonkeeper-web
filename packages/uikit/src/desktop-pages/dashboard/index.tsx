@@ -1,11 +1,11 @@
-import { DashboardTable } from '../../components/dashboard/DashboardTable';
+import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { FC } from 'react';
 import styled from 'styled-components';
-import { ProBanner } from '../../components/pro/ProBanner';
-import { useProState } from '../../state/pro';
-import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { DashboardTable } from '../../components/dashboard/DashboardTable';
 import { DesktopDashboardHeader } from '../../components/desktop/header/DesktopDashboardHeader';
 import { desktopHeaderContainerHeight } from '../../components/desktop/header/DesktopHeaderElements';
+import { ProBanner } from '../../components/pro/ProBanner';
+import { useProState } from '../../state/pro';
 
 const DashboardTableStyled = styled(DashboardTable)``;
 
@@ -24,6 +24,7 @@ const PageWrapper = styled.div`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 `;
 
 const DashboardPage: FC = () => {
