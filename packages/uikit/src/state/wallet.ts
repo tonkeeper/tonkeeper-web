@@ -540,7 +540,7 @@ export const useMutateRenameAccount = <T extends Account>() => {
     const client = useQueryClient();
     const storage = useAccountsStorage();
 
-    return useMutation<T, Error, { id: WalletId; name?: string; emoji?: string }>(async form => {
+    return useMutation<T, Error, { id: AccountId; name?: string; emoji?: string }>(async form => {
         if (form.name !== undefined && form.name.length <= 0) {
             throw new Error('Missing name');
         }
@@ -553,6 +553,50 @@ export const useMutateRenameAccount = <T extends Account>() => {
         if (form.name) {
             account.name = form.name;
         }
+
+        await storage.updateAccountInState(account);
+
+        await client.invalidateQueries([QueryKey.account]);
+
+        return account.clone() as T;
+    });
+};
+
+export const useMutateRenameAccountDerivation = <T extends AccountMAM>() => {
+    const client = useQueryClient();
+    const storage = useAccountsStorage();
+
+    return useMutation<
+        T,
+        Error,
+        { id: AccountId; derivationIndex: number; name?: string; emoji?: string }
+    >(async form => {
+        if (form.name !== undefined && form.name.length <= 0) {
+            throw new Error('Missing name');
+        }
+
+        const account = await storage.getAccount(form.id);
+        if (!account || account.type !== 'mam') {
+            throw new Error('Account not found');
+        }
+
+        const derivation = account.allAvailableDerivations.find(
+            d => d.index === form.derivationIndex
+        )!;
+
+        if (!derivation) {
+            throw new Error('Derivation not found');
+        }
+
+        if (form.emoji) {
+            derivation.emoji = form.emoji;
+        }
+
+        if (form.name) {
+            derivation.name = form.name;
+        }
+
+        account.updateDerivation(derivation);
 
         await storage.updateAccountInState(account);
 

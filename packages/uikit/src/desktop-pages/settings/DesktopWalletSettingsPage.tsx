@@ -16,13 +16,13 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { DeleteAccountNotification } from '../../components/settings/DeleteAccountNotification';
-import { RenameWalletNotification } from '../../components/settings/wallet-name/WalletNameNotification';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useActiveAccount, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { isAccountVersionEditable } from '@tonkeeper/core/dist/entries/account';
+import { useRenameNotification } from '../../components/modals/RenameNotification';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -57,7 +57,7 @@ const LinkStyled = styled(Link)`
 export const DesktopWalletSettingsPage = () => {
     const { t } = useTranslation();
     const account = useActiveAccount();
-    const { isOpen: isRenameOpen, onClose: onRenameClose, onOpen: onRenameOpen } = useDisclosure();
+    const { onOpen: rename } = useRenameNotification();
     const { isOpen: isDeleteOpen, onClose: onDeleteClose, onOpen: onDeleteOpen } = useDisclosure();
 
     const isReadOnly = useIsActiveWalletWatchOnly();
@@ -70,19 +70,41 @@ export const DesktopWalletSettingsPage = () => {
         account.type === 'ledger' && account.allAvailableDerivations.length > 1;
     const activeWallet = account.activeTonWallet;
 
+    const activeDerivation = account.type === 'mam' ? account.activeDerivation : undefined;
+
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader borderBottom>
                 <Label2>{t('settings_title')}</Label2>
             </DesktopViewHeader>
             <SettingsListBlock>
-                <SettingsListItem onClick={onRenameOpen}>
+                <SettingsListItem onClick={() => rename({ accountId: account.id })}>
                     <WalletEmoji containerSize="16px" emojiSize="16px" emoji={account.emoji} />
                     <SettingsListText>
                         <Label2>{account.name || t('wallet_title')}</Label2>
                         <Body3>{t('customize')}</Body3>
                     </SettingsListText>
                 </SettingsListItem>
+                {activeDerivation && (
+                    <SettingsListItem
+                        onClick={() =>
+                            rename({
+                                accountId: account.id,
+                                derivationIndex: activeDerivation.index
+                            })
+                        }
+                    >
+                        <WalletEmoji
+                            containerSize="16px"
+                            emojiSize="16px"
+                            emoji={activeDerivation.emoji}
+                        />
+                        <SettingsListText>
+                            <Label2>{activeDerivation.name}</Label2>
+                            <Body3>{t('customize')}</Body3>
+                        </SettingsListText>
+                    </SettingsListItem>
+                )}
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
@@ -163,11 +185,6 @@ export const DesktopWalletSettingsPage = () => {
                 </SettingsListItem>
             </SettingsListBlock>
             <DesktopViewDivider />
-
-            <RenameWalletNotification
-                account={isRenameOpen ? account : undefined}
-                handleClose={onRenameClose}
-            />
             <DeleteAccountNotification
                 account={isDeleteOpen ? account : undefined}
                 handleClose={onDeleteClose}

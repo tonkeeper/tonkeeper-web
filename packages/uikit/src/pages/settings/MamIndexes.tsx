@@ -28,6 +28,9 @@ import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
+import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
+import { PencilIcon } from '../../components/Icon';
+import { useRenameNotification } from '../../components/modals/RenameNotification';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -94,6 +97,12 @@ const FooterButtonContainerStyled = styled.div`
     background-color: ${p => p.theme.backgroundPage};
 `;
 
+const IconButtonTransparentBackgroundStyled = styled(IconButtonTransparentBackground)`
+    > svg {
+        color: ${p => p.theme.iconTertiary};
+    }
+`;
+
 const ContentWrapper = styled.div``;
 
 export const MAMIndexesPageContent: FC<{
@@ -122,6 +131,8 @@ export const MAMIndexesPageContent: FC<{
 
     const { mutate: enableDerivation, isLoading: isEnableDerivationLoading } =
         useEnableMAMAccountDerivation();
+
+    const { onOpen: rename } = useRenameNotification();
 
     const onOpenDerivation = async (index: number) => {
         if (index !== account.activeDerivationIndex) {
@@ -174,6 +185,11 @@ export const MAMIndexesPageContent: FC<{
                             <AccountBadge accountType="mam" />
                         </FirstLineContainer>
                         <ButtonsContainer>
+                            <IconButtonTransparentBackgroundStyled
+                                onClick={() => rename({ accountId: account.id })}
+                            >
+                                <PencilIcon />
+                            </IconButtonTransparentBackgroundStyled>
                             <Button onClick={() => {}} loading={isLoading}>
                                 {t('backup_screen_title')}
                             </Button>
@@ -193,7 +209,7 @@ export const MAMIndexesPageContent: FC<{
                     return (
                         <ListItem hover={false} key={balance.address}>
                             <ListItemPayload>
-                                <WalletEmoji containerSize="24px" emoji={account.emoji} />
+                                <WalletEmoji containerSize="24px" emoji={derivation.emoji} />
                                 <TextContainer>
                                     <FirstLineContainer>
                                         <Label2>{derivation.name}</Label2>
@@ -207,6 +223,13 @@ export const MAMIndexesPageContent: FC<{
                                 </TextContainer>
                                 {isDerivationAdded ? (
                                     <ButtonsContainer>
+                                        <IconButtonTransparentBackgroundStyled
+                                            onClick={() =>
+                                                rename({ accountId: account.id, derivationIndex })
+                                            }
+                                        >
+                                            <PencilIcon />
+                                        </IconButtonTransparentBackgroundStyled>
                                         <Button
                                             onClick={() => onOpenDerivation(derivationIndex)}
                                             loading={isLoading}
@@ -224,6 +247,13 @@ export const MAMIndexesPageContent: FC<{
                                     </ButtonsContainer>
                                 ) : (
                                     <ButtonsContainer>
+                                        <IconButtonTransparentBackgroundStyled
+                                            onClick={() =>
+                                                rename({ accountId: account.id, derivationIndex })
+                                            }
+                                        >
+                                            <PencilIcon />
+                                        </IconButtonTransparentBackgroundStyled>
                                         <Button
                                             primary
                                             onClick={() => onEnableDerivation(derivationIndex)}
