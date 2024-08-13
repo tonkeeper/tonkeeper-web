@@ -51,6 +51,7 @@ export const lightTheme: DefaultTheme = {
     fieldErrorBackground: '#FF3B301F',
 
     accentBlue: '#198AFB',
+    accentBlueConstant: '#45AEF5',
     accentGreen: '#17C26D',
     accentRed: '#FF3B30',
     accentOrange: '#FF9500',

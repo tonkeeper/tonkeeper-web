@@ -41,8 +41,11 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
 import { useDevSettings } from './dev';
-import { getPasswordByNotification } from './mnemonic';
+import { getMnemonic, getPasswordByNotification } from './mnemonic';
 import { DefaultRefetchInterval } from './tonendpoint';
+import { useCheckTouchId } from './password';
+import { MamRoot } from '@multi-account-mnemonic/core';
+import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
 
 export const useActiveAccountQuery = () => {
     const storage = useAccountsStorage();
@@ -105,7 +108,7 @@ export const useMutateActiveTonWallet = () => {
     });
 };
 
-export const useMutateActiveLedgerAccountDerivation = () => {
+export const useMutateAccountActiveDerivation = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
     return useMutation<void, Error, { derivationIndex: number; accountId: AccountId }>(
@@ -163,6 +166,89 @@ export const useRemoveLedgerAccountDerivation = () => {
             );
             await storage.updateAccountInState(account);
             await client.invalidateQueries(anyOfKeysParts(QueryKey.account));
+        }
+    );
+};
+
+export const useCreateMAMAccountDerivation = () => {
+    const storage = useAccountsStorage();
+    const client = useQueryClient();
+    const sdk = useAppSdk();
+    const appContext = useAppContext();
+    const network = useActiveTonNetwork();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
+
+    return useMutation<void, Error, { accountId: AccountId }>(async ({ accountId }) => {
+        const account = await storage.getAccount(accountId);
+        if (!account || account.type !== 'mam') {
+            throw new Error('Account not found');
+        }
+        const newDerivationIndex = account.lastAddedIndex + 1;
+
+        const mnemonic = await getMnemonic(sdk, accountId, checkTouchId);
+
+        const root = await MamRoot.fromMnemonic(mnemonic);
+        const tonAccount = await root.getTonAccount(newDerivationIndex);
+
+        const tonWallet = walletContract(
+            tonAccount.publicKey,
+            appContext.defaultWalletVersion,
+            network
+        );
+        const tonWallets: TonWalletStandard[] = [
+            {
+                id: tonWallet.address.toRawString(),
+                publicKey: tonAccount.publicKey,
+                version: appContext.defaultWalletVersion,
+                rawAddress: tonWallet.address.toRawString()
+            }
+        ];
+
+        account.addDerivation({
+            name: account.getNewDerivationFallbackName(),
+            emoji: account.emoji,
+            index: newDerivationIndex,
+            tonWallets,
+            activeTonWalletId: tonWallets[0].id
+        });
+
+        await storage.updateAccountInState(account);
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.account, account.id));
+    });
+};
+
+export const useHideMAMAccountDerivation = () => {
+    const storage = useAccountsStorage();
+    const client = useQueryClient();
+    return useMutation<void, Error, { derivationIndex: number; accountId: AccountId }>(
+        async ({ accountId, derivationIndex }) => {
+            const account = await storage.getAccount(accountId);
+
+            if (!account || account.type !== 'mam') {
+                throw new Error('Account not found');
+            }
+
+            account.hideDerivation(derivationIndex);
+            await storage.updateAccountInState(account);
+            await client.invalidateQueries(anyOfKeysParts(QueryKey.account, account.id));
+        }
+    );
+};
+
+export const useEnableMAMAccountDerivation = () => {
+    const storage = useAccountsStorage();
+    const client = useQueryClient();
+    return useMutation<void, Error, { derivationIndex: number; accountId: AccountId }>(
+        async ({ accountId, derivationIndex }) => {
+            const account = await storage.getAccount(accountId);
+
+            if (!account || account.type !== 'mam') {
+                throw new Error('Account not found');
+            }
+
+            account.enableDerivation(derivationIndex);
+            await storage.updateAccountInState(account);
+            await client.invalidateQueries(anyOfKeysParts(QueryKey.account, account.id));
         }
     );
 };

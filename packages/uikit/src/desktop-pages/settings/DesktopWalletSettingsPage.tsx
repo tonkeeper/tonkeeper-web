@@ -63,6 +63,7 @@ export const DesktopWalletSettingsPage = () => {
     const isReadOnly = useIsActiveWalletWatchOnly();
 
     const canChangeVersion = isAccountVersionEditable(account);
+    const canChangeDerivations = account.type === 'mam';
 
     // check available derivations length to filter and keep only non-legacy added ledger accounts
     const canChangeLedgerIndex =
@@ -113,6 +114,22 @@ export const DesktopWalletSettingsPage = () => {
                             <SettingsListText>
                                 <Label2>{t('settings_ledger_indexes')}</Label2>
                                 <Body3># {account.activeDerivationIndex + 1}</Body3>
+                            </SettingsListText>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
+                {canChangeDerivations && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.derivations}>
+                        <SettingsListItem>
+                            <SwitchIcon />
+                            <SettingsListText>
+                                <Label2>{t('settings_mam_indexes')}</Label2>
+                                <Body3>
+                                    {t('settings_mam_number_wallets').replace(
+                                        '%{number}',
+                                        account.derivations.length.toString()
+                                    )}
+                                </Body3>
                             </SettingsListText>
                         </SettingsListItem>
                     </LinkStyled>

@@ -37,6 +37,7 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { AsideHeader } from './AsideHeader';
 import { SubscriptionInfoBlock } from './SubscriptionInfoBlock';
+import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -133,6 +134,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
 }) => {
     const { onOpen: openWalletVersionSettings } = useWalletVersionSettingsNotification();
     const { onOpen: openLedgerIndexesSettings } = useLedgerIndexesSettingsNotification();
+    const { onOpen: openMAMIndexesSettings } = useMAMIndexesSettingsNotification();
     const network = useActiveTonNetwork();
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
     const navigate = useNavigate();
@@ -349,6 +351,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                         onClick={e => {
                             e.preventDefault();
                             e.stopPropagation();
+                            openMAMIndexesSettings({ accountId: account.id });
                         }}
                         isShown={isHovered}
                     >

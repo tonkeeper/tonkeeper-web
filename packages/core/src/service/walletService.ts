@@ -346,37 +346,47 @@ export const createMAMAccountByMnemonic = async (
         rootAccount.id
     );
 
-    const namedDerivations: DerivationItemNamed[] = childTonWallets.map(w => {
-        const tonWallet = walletContract(
-            w.tonAccount.publicKey,
-            appContext.defaultWalletVersion,
-            options.network
-        );
-        const tonWallets: TonWalletStandard[] = [
-            {
-                id: tonWallet.address.toRawString(),
-                publicKey: w.tonAccount.publicKey,
-                version: appContext.defaultWalletVersion,
-                rawAddress: tonWallet.address.toRawString()
-            }
-        ];
+    const namedDerivations: { item: DerivationItemNamed; shouldAdd: boolean }[] =
+        childTonWallets.map(w => {
+            const tonWallet = walletContract(
+                w.tonAccount.publicKey,
+                appContext.defaultWalletVersion,
+                options.network
+            );
+            const tonWallets: TonWalletStandard[] = [
+                {
+                    id: tonWallet.address.toRawString(),
+                    publicKey: w.tonAccount.publicKey,
+                    version: appContext.defaultWalletVersion,
+                    rawAddress: tonWallet.address.toRawString()
+                }
+            ];
 
-        return {
-            name,
-            emoji,
-            index: w.derivationIndex,
-            tonWallets,
-            activeTonWalletId: tonWallets[0].id
-        };
-    });
+            return {
+                item: {
+                    name: AccountMAM.getNewDerivationFallbackName(w.derivationIndex),
+                    emoji,
+                    index: w.derivationIndex,
+                    tonWallets,
+                    activeTonWalletId: tonWallets[0].id
+                },
+                shouldAdd: w.shouldAdd
+            };
+        });
+
+    const addedDerivationIndexes = namedDerivations.filter(d => d.shouldAdd).map(d => d.item.index);
+    if (addedDerivationIndexes.length === 0) {
+        throw new Error('No derivations to add');
+    }
 
     return new AccountMAM(
         rootAccount.id,
         name,
         emoji,
         auth,
-        childTonWallets[0].derivationIndex,
-        namedDerivations
+        addedDerivationIndexes[0],
+        addedDerivationIndexes,
+        namedDerivations.map(d => d.item)
     );
 };
 
@@ -398,6 +408,22 @@ export function getFallbackAccountEmoji(publicKeyOrBase64: string) {
 async function getMAMTonAccountsToImport(
     root: MamRoot,
     apiConfig: APIConfig
-): Promise<{ tonAccount: MamTonAccount; derivationIndex: number }[]> {
-    return [{ tonAccount: await root.getTonAccount(0), derivationIndex: 0 }];
+): Promise<{ tonAccount: MamTonAccount; derivationIndex: number; shouldAdd: boolean }[]> {
+    return [
+        {
+            tonAccount: await root.getTonAccount(0),
+            derivationIndex: 0,
+            shouldAdd: true
+        },
+        {
+            tonAccount: await root.getTonAccount(1),
+            derivationIndex: 1,
+            shouldAdd: false
+        },
+        {
+            tonAccount: await root.getTonAccount(2),
+            derivationIndex: 2,
+            shouldAdd: true
+        }
+    ];
 }

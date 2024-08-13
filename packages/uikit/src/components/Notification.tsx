@@ -231,6 +231,9 @@ const HeaderWrapper = styled.div`
             position: sticky;
             top: 0;
             z-index: 100;
+            padding: 0 1rem;
+            margin: 0 -1rem;
+            background: ${p.theme.backgroundPage};
 
             &:empty {
                 padding-bottom: 1rem;

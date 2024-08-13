@@ -60,7 +60,8 @@ export enum WalletSettingsRoute {
     ledgerIndexes = '/ledger-indexes',
     jettons = '/jettons',
     nft = '/nft',
-    connectedApps = '/connected-apps'
+    connectedApps = '/connected-apps',
+    derivations = '/derivations'
 }
 
 export enum BrowserRoute {

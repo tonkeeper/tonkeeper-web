@@ -170,7 +170,11 @@ export const getMnemonicAndPassword = async (
     checkTouchId: () => Promise<void>
 ): Promise<{ mnemonic: string[]; password?: string }> => {
     const account = await accountsStorage(sdk.storage).getAccount(accountId);
-    if (!account || account.type !== 'mnemonic' || !('auth' in account)) {
+    if (
+        !account ||
+        (account.type !== 'mnemonic' && account.type !== 'mam') ||
+        !('auth' in account)
+    ) {
         throw new Error('Unexpected auth method for account');
     }
 

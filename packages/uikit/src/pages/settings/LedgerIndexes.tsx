@@ -8,7 +8,7 @@ import { Body2, Label1 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
 import {
     useTonWalletsBalances,
-    useMutateActiveLedgerAccountDerivation,
+    useMutateAccountActiveDerivation,
     useAddLedgerAccountDerivation,
     useRemoveLedgerAccountDerivation,
     useActiveAccount
@@ -59,7 +59,7 @@ export const LedgerIndexesPageContent: FC<{
     const { t } = useTranslation();
 
     const { mutateAsync: selectDerivation, isLoading: isSelectDerivationLoading } =
-        useMutateActiveLedgerAccountDerivation();
+        useMutateAccountActiveDerivation();
     const navigate = useNavigate();
 
     const { data: balances } = useTonWalletsBalances(

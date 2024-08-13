@@ -341,7 +341,21 @@ export class AccountTonOnly extends Clonable implements IAccountVersionsEditable
 }
 
 export class AccountMAM extends Clonable implements IAccountControllable {
+    static getNewDerivationFallbackName(index = 0) {
+        return 'Wallet ' + (index + 1);
+    }
+
     public readonly type = 'mam';
+
+    get derivations() {
+        return this.addedDerivationsIndexes.map(
+            index => this.allAvailableDerivations.find(d => d.index === index)!
+        );
+    }
+
+    get lastAddedIndex() {
+        return this.allAvailableDerivations.reduce((acc, v) => Math.max(acc, v.index), -1);
+    }
 
     get allTonWallets() {
         return this.derivations.flatMap(d => d.tonWallets);
@@ -371,13 +385,24 @@ export class AccountMAM extends Clonable implements IAccountControllable {
         public emoji: string,
         public auth: AuthPassword | AuthKeychain,
         public activeDerivationIndex: number,
-        public derivations: DerivationItemNamed[]
+        public addedDerivationsIndexes: number[],
+        public allAvailableDerivations: DerivationItemNamed[]
     ) {
         super();
 
-        if (derivations.every(d => d.index !== activeDerivationIndex)) {
+        if (
+            addedDerivationsIndexes.some(index =>
+                allAvailableDerivations.every(d => d.index !== index)
+            )
+        ) {
+            throw new Error('Derivations not found');
+        }
+
+        if (!addedDerivationsIndexes.includes(activeDerivationIndex)) {
             throw new Error('Active derivation not found');
         }
+
+        this.addedDerivationsIndexes = [...new Set(addedDerivationsIndexes)];
     }
 
     getTonWallet(id: WalletId) {
@@ -385,29 +410,42 @@ export class AccountMAM extends Clonable implements IAccountControllable {
     }
 
     updateDerivation(newDerivation: DerivationItemNamed) {
-        const indexToPaste = this.derivations.findIndex(d => d.index === newDerivation.index);
+        const indexToPaste = this.allAvailableDerivations.findIndex(
+            d => d.index === newDerivation.index
+        );
         if (indexToPaste !== -1) {
-            this.derivations[indexToPaste] = newDerivation;
+            this.allAvailableDerivations[indexToPaste] = newDerivation;
         }
     }
 
     addDerivation(derivation: DerivationItemNamed) {
-        const derivationExists = this.derivations.findIndex(d => d.index === derivation.index);
-        if (derivationExists === -1) {
-            this.derivations = this.derivations.concat(derivation);
-        } else {
-            this.derivations[derivationExists] = derivation;
+        const derivationExists = this.derivations.find(d => d.index === derivation.index);
+        if (derivationExists) {
+            throw new Error('Derivation already exists');
         }
+
+        this.allAvailableDerivations.push(derivation);
+        this.addedDerivationsIndexes.push(derivation.index);
     }
 
-    removeDerivation(derivationIndex: number) {
+    enableDerivation(derivationIndex: number) {
+        if (this.allAvailableDerivations.every(d => d.index !== derivationIndex)) {
+            throw new Error('Derivation not found');
+        }
+
+        this.addedDerivationsIndexes.push(derivationIndex);
+    }
+
+    hideDerivation(derivationIndex: number) {
         if (this.derivations.length === 1) {
             throw new Error('Cannot remove last derivation');
         }
 
-        this.derivations = this.derivations.filter(d => d.index !== derivationIndex);
+        this.addedDerivationsIndexes = this.addedDerivationsIndexes.filter(
+            d => d !== derivationIndex
+        );
         if (this.activeDerivationIndex === derivationIndex) {
-            this.activeDerivationIndex = this.derivations[0].index;
+            this.activeDerivationIndex = this.addedDerivationsIndexes[0];
         }
     }
 
@@ -430,6 +468,10 @@ export class AccountMAM extends Clonable implements IAccountControllable {
         }
 
         this.activeDerivationIndex = index;
+    }
+
+    getNewDerivationFallbackName() {
+        return 'Wallet ' + (this.lastAddedIndex + 2);
     }
 }
 
