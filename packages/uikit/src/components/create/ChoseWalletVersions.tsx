@@ -10,7 +10,7 @@ import {
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useEffect, useLayoutEffect, useState } from 'react';
 import { useAccountState, useStandardTonWalletVersions } from '../../state/wallet';
-import { SkeletonList } from '../Skeleton';
+import { SkeletonListDesktopAdaptive } from '../Skeleton';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Checkbox } from '../fields/Checkbox';
 import { Button } from '../fields/Button';
@@ -39,7 +39,7 @@ const Body1Styled = styled(Body1)`
     color: ${p => p.theme.textSecondary};
 `;
 
-const SkeletonListStyled = styled(SkeletonList)`
+const SkeletonListStyled = styled(SkeletonListDesktopAdaptive)`
     width: 100%;
 `;
 

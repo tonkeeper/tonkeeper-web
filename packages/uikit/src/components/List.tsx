@@ -1,4 +1,5 @@
 import React, {
+    ComponentProps,
     createContext,
     FC,
     forwardRef,
@@ -15,7 +16,9 @@ import { mergeRefs } from '../libs/common';
 
 const ListBlockContext = createContext({ isDesktopAdaptive: false });
 
-export const ListBlockDesktopAdaptive: FC<PropsWithChildren> = props => {
+export const ListBlockDesktopAdaptive: FC<
+    PropsWithChildren<{ className?: string } & ComponentProps<typeof ListBlock>>
+> = props => {
     const value = useMemo(
         () => ({
             isDesktopAdaptive: true

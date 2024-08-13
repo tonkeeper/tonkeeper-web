@@ -19,7 +19,7 @@ import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
 import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
-import { SkeletonList } from '../../components/Skeleton';
+import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { AccountBadge, WalletIndexBadge } from '../../components/account/AccountBadge';
 import { NotificationFooterPortal } from '../../components/Notification';
@@ -163,7 +163,7 @@ export const MAMIndexesPageContent: FC<{
     };
 
     if (!balances) {
-        return <SkeletonList size={account.allAvailableDerivations.length} />;
+        return <SkeletonListDesktopAdaptive size={account.allAvailableDerivations.length} />;
     }
 
     const isLoading =

@@ -10,7 +10,7 @@ import React, { FC } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
-import { Body2, Label1 } from '../../components/Text';
+import { Body2, Label1, Label2 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
 import {
     useStandardTonWalletVersions,
@@ -20,13 +20,18 @@ import {
     useAddTonWalletVersionToAccount,
     useAccountState
 } from '../../state/wallet';
-import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
+import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../components/List';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
 import { Address } from '@ton/core';
 import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
-import { SkeletonList } from '../../components/Skeleton';
+import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
+import {
+    DesktopViewHeader,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const LedgerError = styled(Body2)`
     margin: 0.5rem 0;
@@ -50,6 +55,19 @@ const ButtonsContainer = styled.div`
 
 export const WalletVersionPage = () => {
     const { t } = useTranslation();
+    const isFullWidth = useIsFullWidthMode();
+
+    if (isFullWidth) {
+        return (
+            <DesktopViewPageLayout>
+                <DesktopViewHeader backButton>
+                    <Label2>{t('settings_wallet_version')}</Label2>
+                </DesktopViewHeader>
+                <WalletVersionPageContent />
+            </DesktopViewPageLayout>
+        );
+    }
+
     return (
         <>
             <SubHeader title={t('settings_wallet_version')} />
@@ -63,7 +81,8 @@ export const WalletVersionPage = () => {
 export const WalletVersionPageContent: FC<{
     afterWalletOpened?: () => void;
     accountId?: AccountId;
-}> = ({ afterWalletOpened, accountId }) => {
+    className?: string;
+}> = ({ afterWalletOpened, accountId, className }) => {
     const { t } = useTranslation();
     const activeAccount = useActiveAccount();
     const passedAccount = useAccountState(accountId);
@@ -85,6 +104,7 @@ export const WalletVersionPageContent: FC<{
         <WalletVersionPageContentInternal
             afterWalletOpened={afterWalletOpened}
             account={selectedAccount}
+            className={className}
         />
     );
 };
@@ -92,7 +112,8 @@ export const WalletVersionPageContent: FC<{
 export const WalletVersionPageContentInternal: FC<{
     afterWalletOpened?: () => void;
     account: AccountVersionEditable;
-}> = ({ afterWalletOpened, account }) => {
+    className?: string;
+}> = ({ afterWalletOpened, account, className }) => {
     const { t } = useTranslation();
     const activeAccount = useActiveAccount();
     const appActiveWallet = activeAccount.activeTonWallet;
@@ -132,9 +153,8 @@ export const WalletVersionPageContentInternal: FC<{
             walletId: w.address.toRawString()
         });
     };
-
     if (!wallets) {
-        return <SkeletonList size={WalletVersions.length} />;
+        return <SkeletonListDesktopAdaptive className={className} size={WalletVersions.length} />;
     }
 
     const isLoading = isSelectWalletLoading || isCreateWalletLoading || isHideWalletLoading;
@@ -149,7 +169,7 @@ export const WalletVersionPageContentInternal: FC<{
     );
 
     return (
-        <ListBlock>
+        <ListBlockDesktopAdaptive className={className}>
             {walletsToShow.map(wallet => {
                 const isWalletAdded = currentAccountWalletsVersions.some(
                     w => w.rawAddress === wallet.address.toRawString()
@@ -197,6 +217,6 @@ export const WalletVersionPageContentInternal: FC<{
                     </ListItem>
                 );
             })}
-        </ListBlock>
+        </ListBlockDesktopAdaptive>
     );
 };
