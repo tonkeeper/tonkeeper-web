@@ -35,13 +35,13 @@ import {
 import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrowserRouter, useNavigate } from 'react-router-dom';
-import { DesktopView } from './AppDesktop';
+import { RouterProvider, createBrowserRouter, useNavigate } from 'react-router-dom';
 import { MobileView } from './AppMobile';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
+const DesktopView = React.lazy(() => import('./AppDesktop'));
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -55,7 +55,11 @@ const queryClient = new QueryClient({
 const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'web';
 
-export const App: FC<PropsWithChildren> = () => {
+export const App: FC = () => {
+    return <RouterProvider router={router} />;
+};
+
+const Providers: FC<PropsWithChildren> = () => {
     const { t, i18n } = useTranslation();
 
     const translation = useMemo(() => {
@@ -74,31 +78,36 @@ export const App: FC<PropsWithChildren> = () => {
     }, [t, i18n]);
 
     return (
-        <BrowserRouter>
-            <QueryClientProvider client={queryClient}>
-                <Suspense>
-                    <AppSdkContext.Provider value={sdk}>
-                        <TranslationContext.Provider value={translation}>
-                            <StorageContext.Provider value={sdk.storage}>
-                                <UserThemeProvider>
-                                    <GlobalStyle />
-                                    <HeaderGlobalStyle />
-                                    <FooterGlobalStyle />
-                                    <SybHeaderGlobalStyle />
-                                    <GlobalListStyle />
-                                    <Loader />
-                                    <UnlockNotification sdk={sdk} />
-                                </UserThemeProvider>
-                            </StorageContext.Provider>
-                        </TranslationContext.Provider>
-                    </AppSdkContext.Provider>
-                </Suspense>
-            </QueryClientProvider>
-        </BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+            <Suspense>
+                <AppSdkContext.Provider value={sdk}>
+                    <TranslationContext.Provider value={translation}>
+                        <StorageContext.Provider value={sdk.storage}>
+                            <UserThemeProvider>
+                                <GlobalStyle />
+                                <HeaderGlobalStyle />
+                                <FooterGlobalStyle />
+                                <SybHeaderGlobalStyle />
+                                <GlobalListStyle />
+                                <Loader />
+                                <UnlockNotification sdk={sdk} />
+                            </UserThemeProvider>
+                        </StorageContext.Provider>
+                    </TranslationContext.Provider>
+                </AppSdkContext.Provider>
+            </Suspense>
+        </QueryClientProvider>
     );
 };
 
-export const Loader: FC = () => {
+const router = createBrowserRouter([
+    {
+        path: '/*',
+        element: <Providers />
+    }
+]);
+
+const Loader: FC = () => {
     const network = useActiveTonNetwork();
     const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
     const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
@@ -186,7 +195,7 @@ export const Loader: FC = () => {
     );
 };
 
-export const Content: FC<{
+const Content: FC<{
     activeAccount?: Account | null;
     lock: boolean;
     standalone: boolean;
@@ -196,6 +205,10 @@ export const Content: FC<{
     if (isMobile) {
         return <MobileView activeAccount={activeAccount} lock={lock} standalone={standalone} />;
     } else {
-        return <DesktopView activeAccount={activeAccount} lock={lock} />;
+        return (
+            <Suspense fallback={<Loading />}>
+                <DesktopView activeAccount={activeAccount} lock={lock} />
+            </Suspense>
+        );
     }
 };

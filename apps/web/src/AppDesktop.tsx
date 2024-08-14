@@ -1,23 +1,16 @@
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
-import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
-import PairKeystoneNotification from '@tonkeeper/uikit/dist/components/PairKeystoneNotification';
-import PairSignerNotification from '@tonkeeper/uikit/dist/components/PairSignerNotification';
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
 import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
 import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/WalletAsideMenu';
 import { desktopHeaderContainerHeight } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeaderElements';
 import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
 import { DesktopWalletHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopWalletHeader';
-import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
-import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
 import {
     AddFavoriteNotification,
     EditFavoriteNotification
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
-import SendActionNotification from '@tonkeeper/uikit/dist/components/transfer/SendNotifications';
-import SendNftNotification from '@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification';
 import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
 import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/DesktopCoinPage';
 import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
@@ -41,6 +34,33 @@ import React, { FC, Suspense, useMemo } from 'react';
 import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { ThemeProvider, createGlobalStyle, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
+
+const TonConnectSubscription = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
+);
+const SendActionNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
+);
+const ReceiveNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/home/ReceiveNotification')
+);
+const NftNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/nft/NftNotification')
+);
+const SendNftNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification')
+);
+
+const PairSignerNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
+);
+const PairKeystoneNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
+);
+
+const ConnectLedgerNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/ConnectLedgerNotification')
+);
 
 const GlobalStyle = createGlobalStyle`
     ${GlobalStyleCss};
@@ -68,10 +88,6 @@ const GlobalStyle = createGlobalStyle`
       outline: inherit;
     }
 `;
-
-const TonConnectSubscription = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
-);
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -136,7 +152,7 @@ const FullSizeWrapperBounded = styled(FullSizeWrapper)`
     justify-content: center;
 `;
 
-export const DesktopView: FC<{
+const DesktopView: FC<{
     activeAccount?: Account | null;
     lock: boolean;
 }> = ({ activeAccount, lock }) => {
@@ -276,3 +292,5 @@ const BackgroundElements = () => {
         </Suspense>
     );
 };
+
+export default DesktopView;

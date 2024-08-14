@@ -22,9 +22,9 @@ import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, Suspense } from 'react';
+import React, { FC, Suspense, useMemo } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled, { ThemeProvider, css, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -107,12 +107,31 @@ export const MobileView: FC<{
     lock: boolean;
     standalone: boolean;
 }> = ({ activeAccount, lock, standalone }) => {
-    const location = useLocation();
+    const theme = useTheme();
     useWindowsScroll();
     useAppWidth(standalone);
     useKeyboardHeight();
     useTrackLocation();
     useDebuggingTools();
+
+    const updated = useMemo(() => {
+        theme.displayType = 'compact';
+        return theme;
+    }, [theme]);
+
+    return (
+        <ThemeProvider theme={updated}>
+            <MobileContent activeAccount={activeAccount} lock={lock} standalone={standalone} />
+        </ThemeProvider>
+    );
+};
+
+export const MobileContent: FC<{
+    activeAccount?: Account | null;
+    lock: boolean;
+    standalone: boolean;
+}> = ({ activeAccount, lock, standalone }) => {
+    const location = useLocation();
 
     if (lock) {
         return (
