@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Risk } from './Risk';
+import {
+    RiskFromJSON,
+    RiskFromJSONTyped,
+    RiskToJSON,
+} from './Risk';
+
 /**
  * 
  * @export
@@ -61,6 +68,12 @@ export interface MultisigOrder {
      * @memberof MultisigOrder
      */
     expirationDate: number;
+    /**
+     * 
+     * @type {Risk}
+     * @memberof MultisigOrder
+     */
+    risk: Risk;
 }
 
 /**
@@ -74,6 +87,7 @@ export function instanceOfMultisigOrder(value: object): value is MultisigOrder {
     if (!('signers' in value) || value['signers'] === undefined) return false;
     if (!('approvalsNum' in value) || value['approvalsNum'] === undefined) return false;
     if (!('expirationDate' in value) || value['expirationDate'] === undefined) return false;
+    if (!('risk' in value) || value['risk'] === undefined) return false;
     return true;
 }
 
@@ -94,6 +108,7 @@ export function MultisigOrderFromJSONTyped(json: any, ignoreDiscriminator: boole
         'signers': json['signers'],
         'approvalsNum': json['approvals_num'],
         'expirationDate': json['expiration_date'],
+        'risk': RiskFromJSON(json['risk']),
     };
 }
 
@@ -110,6 +125,7 @@ export function MultisigOrderToJSON(value?: MultisigOrder | null): any {
         'signers': value['signers'],
         'approvals_num': value['approvalsNum'],
         'expiration_date': value['expirationDate'],
+        'risk': RiskToJSON(value['risk']),
     };
 }
 
