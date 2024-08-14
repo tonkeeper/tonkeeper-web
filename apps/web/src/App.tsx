@@ -32,56 +32,16 @@ import {
     useActiveAccountQuery,
     useActiveTonNetwork
 } from '@tonkeeper/uikit/dist/state/wallet';
-import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, useNavigate } from 'react-router-dom';
-import styled, { css } from 'styled-components';
 import { DesktopView } from './AppDesktop';
+import { MobileView } from './AppMobile';
 import { BrowserAppSdk } from './libs/appSdk';
-import { useAnalytics, useAppHeight } from './libs/hooks';
+import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
 
-const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
-const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
-const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
-const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
-const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
-const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
-const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
-const TonConnectSubscription = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
-);
-const SendActionNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
-);
-const ReceiveNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/home/ReceiveNotification')
-);
-const NftNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/nft/NftNotification')
-);
-const SendNftNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification')
-);
-
-const PairSignerNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
-);
-const PairKeystoneNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
-);
-const SignerLinkPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/signer/LinkPage'));
-const SignerPublishNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/pages/signer/PublishNotification')
-);
-
-const ConnectLedgerNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/ConnectLedgerNotification')
-);
-const SwapMobileNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification')
-);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -137,40 +97,6 @@ export const App: FC<PropsWithChildren> = () => {
         </BrowserRouter>
     );
 };
-
-const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
-    ${props =>
-        props.standalone
-            ? css`
-                  position: fixed;
-                  top: 0;
-                  height: calc(var(--app-height) - 2px);
-                  -webkit-overflow-scrolling: touch;
-              `
-            : css`
-                  @media (min-width: 600px) {
-                      border-left: 1px solid ${props.theme.separatorCommon};
-                      border-right: 1px solid ${props.theme.separatorCommon};
-                  }
-              `};
-
-    > * {
-        ${props =>
-            props.standalone &&
-            css`
-                overflow: auto;
-                width: var(--app-width);
-                max-width: 548px;
-                box-sizing: border-box;
-            `}
-    }
-`;
-
-const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
-    box-sizing: border-box;
-    padding-top: 64px;
-    padding-bottom: ${props => (props.standalone ? '96' : '80')}px;
-`;
 
 export const Loader: FC = () => {
     const network = useActiveTonNetwork();
@@ -249,7 +175,7 @@ export const Loader: FC = () => {
                             standalone={standalone}
                         />
                         <CopyNotification hideSimpleCopyNotifications={!standalone} />
-                        <Suspense fallback={<></>}>
+                        <Suspense>
                             <QrScanner />
                         </Suspense>
                         <ModalsRoot />
@@ -265,5 +191,11 @@ export const Content: FC<{
     lock: boolean;
     standalone: boolean;
 }> = ({ activeAccount, lock, standalone }) => {
-    return <DesktopView activeAccount={activeAccount} lock={lock} />;
+    const isMobile = useLayout();
+
+    if (isMobile) {
+        return <MobileView activeAccount={activeAccount} lock={lock} standalone={standalone} />;
+    } else {
+        return <DesktopView activeAccount={activeAccount} lock={lock} />;
+    }
 };

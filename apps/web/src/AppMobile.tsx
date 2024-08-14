@@ -34,7 +34,6 @@ const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/A
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
 const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
-const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
 );
