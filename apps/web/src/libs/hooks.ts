@@ -85,7 +85,7 @@ export const useLayout = () => {
 
     useEffect(() => {
         const appWidth = throttle(() => {
-            if (window.innerWidth > 1290) {
+            if (window.innerWidth >= 1024) {
                 setMobile(old => {
                     if (old !== false) {
                         navigate(AppRoute.home);
