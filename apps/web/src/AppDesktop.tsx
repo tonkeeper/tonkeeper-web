@@ -1,22 +1,9 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
-import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
-import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
-import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
-import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
-import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
-import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
-import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import PairKeystoneNotification from '@tonkeeper/uikit/dist/components/PairKeystoneNotification';
 import PairSignerNotification from '@tonkeeper/uikit/dist/components/PairSignerNotification';
-import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
-import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
 import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
 import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/WalletAsideMenu';
@@ -42,61 +29,18 @@ import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/p
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
-import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
-import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
-import {
-    AfterImportAction,
-    AppSdkContext,
-    OnImportAction
-} from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
-import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
-import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
-import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
-import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
-import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
-import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
-import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
-import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
-import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import {
-    useAccountsStateQuery,
-    useActiveAccountQuery,
-    useActiveTonNetwork
-} from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import { FC, Suspense, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import {
-    Outlet,
-    Route,
-    RouterProvider,
-    Routes,
-    createMemoryRouter,
-    useLocation,
-    useNavigate
-} from 'react-router-dom';
-import styled, { createGlobalStyle } from 'styled-components';
-import { DesktopAppSdk } from '../libs/appSdk';
-import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
-import { DeepLinkSubscription } from './components/DeepLink';
-import { TonConnectSubscription } from './components/TonConnectSubscription';
-
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            staleTime: 30000,
-            refetchOnWindowFocus: false
-        }
-    }
-});
+import React, { FC, Suspense, useMemo } from 'react';
+import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
+import styled, { ThemeProvider, createGlobalStyle, useTheme } from 'styled-components';
+import { useAppWidth } from './libs/hooks';
 
 const GlobalStyle = createGlobalStyle`
     ${GlobalStyleCss};
@@ -125,79 +69,9 @@ const GlobalStyle = createGlobalStyle`
     }
 `;
 
-const sdk = new DesktopAppSdk();
-const TARGET_ENV = 'desktop';
-
-const langs = 'en,zh_CN,ru,it,tr,bg';
-
-declare const REACT_APP_TONCONSOLE_API: string;
-declare const REACT_APP_TG_BOT_ID: string;
-declare const REACT_APP_STONFI_REFERRAL_ADDRESS: string;
-
-export const Providers = () => {
-    const { t, i18n } = useTranslation();
-
-    const translation = useMemo(() => {
-        const languages = langs.split(',');
-        const client: I18nContext = {
-            t,
-            i18n: {
-                enable: true,
-                reloadResources: i18n.reloadResources,
-                changeLanguage: i18n.changeLanguage as any,
-                language: i18n.language,
-                languages: languages
-            }
-        };
-        return client;
-    }, [t, i18n]);
-
-    useEffect(() => {
-        document.body.classList.add(window.backgroundApi.platform());
-    }, []);
-
-    return (
-        <QueryClientProvider client={queryClient}>
-            <Suspense fallback={<div></div>}>
-                <AppSdkContext.Provider value={sdk}>
-                    <TranslationContext.Provider value={translation}>
-                        <StorageContext.Provider value={sdk.storage}>
-                            <ThemeAndContent />
-                        </StorageContext.Provider>
-                    </TranslationContext.Provider>
-                </AppSdkContext.Provider>
-            </Suspense>
-        </QueryClientProvider>
-    );
-};
-
-const router = createMemoryRouter([
-    {
-        path: '/*',
-        element: <Providers />
-    }
-]);
-
-export const App = () => {
-    return <RouterProvider router={router} />;
-};
-
-const ThemeAndContent = () => {
-    const { data } = useProBackupState();
-    return (
-        <UserThemeProvider displayType="full-width" isPro={data?.valid} isProSupported>
-            <DarkThemeContext.Provider value={!data?.valid}>
-                <GlobalStyle />
-                <HeaderGlobalStyle />
-                <FooterGlobalStyle />
-                <SybHeaderGlobalStyle />
-                <GlobalListStyle />
-                <Loader />
-                <UnlockNotification sdk={sdk} />
-            </DarkThemeContext.Provider>
-        </UserThemeProvider>
-    );
-};
+const TonConnectSubscription = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
+);
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -262,105 +136,35 @@ const FullSizeWrapperBounded = styled(FullSizeWrapper)`
     justify-content: center;
 `;
 
-export const Loader: FC = () => {
-    const network = useActiveTonNetwork();
-    const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
-    const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
-    const { data: lang, isLoading: isLangLoading } = useUserLanguage();
-    const { data: devSettings } = useDevSettings();
+export const DesktopView: FC<{
+    activeAccount?: Account | null;
+    lock: boolean;
+}> = ({ activeAccount, lock }) => {
+    const theme = useTheme();
+    useWindowsScroll();
+    useAppWidth(false);
+    useRecommendations();
+    useTrackLocation();
+    useDebuggingTools();
 
-    const lock = useLock(sdk);
-    const { i18n } = useTranslation();
-    const { data: fiat } = useUserFiatQuery();
-
-    const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
-        build: sdk.version,
-        network,
-        lang,
-        platform: 'desktop'
-    });
-    const { data: config } = useTonenpointConfig(tonendpoint);
-
-    const navigate = useNavigate();
-    useAppHeight();
-
-    const { data: tracker } = useAnalytics(sdk.version, activeAccount, accounts);
-
-    useEffect(() => {
-        if (lang && i18n.language !== localizationText(lang)) {
-            i18n.reloadResources([localizationText(lang)]).then(() =>
-                i18n.changeLanguage(localizationText(lang))
-            );
-        }
-    }, [lang, i18n]);
-
-    useEffect(() => {
-        window.backgroundApi.onRefresh(() => queryClient.invalidateQueries());
-    }, []);
-
-    if (
-        activeWalletLoading ||
-        isLangLoading ||
-        isWalletsLoading ||
-        config === undefined ||
-        lock === undefined ||
-        fiat === undefined ||
-        !devSettings
-    ) {
-        return <Loading />;
-    }
-
-    const context: IAppContext = {
-        api: getApiConfig(config, network, REACT_APP_TONCONSOLE_API),
-        fiat,
-        config,
-        tonendpoint,
-        standalone: true,
-        extension: false,
-        proFeatures: true,
-        experimental: true,
-        ios: false,
-        env: {
-            tgAuthBotId: REACT_APP_TG_BOT_ID,
-            stonfiReferralAddress: REACT_APP_STONFI_REFERRAL_ADDRESS
-        },
-        defaultWalletVersion: WalletVersion.V5R1
-    };
+    const updated = useMemo(() => {
+        theme.displayType = 'full-width';
+        return theme;
+    }, [theme]);
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <OnImportAction.Provider value={navigate}>
-                <AfterImportAction.Provider
-                    value={() => navigate(AppRoute.home, { replace: true })}
-                >
-                    <AppContext.Provider value={context}>
-                        <Content activeAccount={activeAccount} lock={lock} />
-                        <CopyNotification hideSimpleCopyNotifications />
-                        <QrScanner />
-                        <ModalsRoot />
-                    </AppContext.Provider>
-                </AfterImportAction.Provider>
-            </OnImportAction.Provider>
-        </AmplitudeAnalyticsContext.Provider>
+        <ThemeProvider theme={updated}>
+            <GlobalStyle />
+            <DesktopContent activeAccount={activeAccount} lock={lock} />
+        </ThemeProvider>
     );
 };
 
-const usePrefetch = () => {
-    useRecommendations();
-    useCanPromptTouchId();
-};
-
-export const Content: FC<{
+export const DesktopContent: FC<{
     activeAccount?: Account | null;
     lock: boolean;
 }> = ({ activeAccount, lock }) => {
     const location = useLocation();
-    useWindowsScroll();
-    useAppWidth();
-    useTrackLocation();
-    usePrefetch();
-    useDebuggingTools();
 
     if (lock) {
         return (
@@ -458,7 +262,7 @@ const OldAppRouting = () => {
 
 const BackgroundElements = () => {
     return (
-        <>
+        <Suspense>
             <SendActionNotification />
             <ReceiveNotification />
             <TonConnectSubscription />
@@ -466,10 +270,9 @@ const BackgroundElements = () => {
             <SendNftNotification />
             <AddFavoriteNotification />
             <EditFavoriteNotification />
-            <DeepLinkSubscription />
             <PairSignerNotification />
             <ConnectLedgerNotification />
             <PairKeystoneNotification />
-        </>
+        </Suspense>
     );
 };
