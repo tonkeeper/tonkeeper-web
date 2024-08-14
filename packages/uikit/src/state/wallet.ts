@@ -482,7 +482,8 @@ export const useStandardTonWalletVersions = (publicKey?: string) => {
                 versions.map(v =>
                     new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                         accountId: v.address.toRawString(),
-                        currencies: [fiat]
+                        currencies: [fiat],
+                        supportedExtensions: ['custom_payload']
                     })
                 )
             );
@@ -516,7 +517,8 @@ export const useTonWalletsBalances = (addresses: string[]) => {
                 addresses.map(address =>
                     new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                         accountId: address,
-                        currencies: [fiat]
+                        currencies: [fiat],
+                        supportedExtensions: ['custom_payload']
                     })
                 )
             );
