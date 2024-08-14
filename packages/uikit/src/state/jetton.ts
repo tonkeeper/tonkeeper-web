@@ -66,7 +66,8 @@ export const useJettonRawList = () => {
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                 accountId: wallet.rawAddress,
-                currencies: [fiat]
+                currencies: [fiat],
+                supportedExtensions: ['custom_payload']
             });
             const balances = filterTokens(result.balances, []).sort(compareTokensOver(fiat));
             return { balances };
@@ -85,7 +86,8 @@ export const useJettonList = () => {
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                 accountId: wallet.rawAddress,
-                currencies: [fiat]
+                currencies: [fiat],
+                supportedExtensions: ['custom_payload']
             });
 
             const config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, network);
@@ -116,15 +118,11 @@ export const useJettonBalance = (jettonAddress: string) => {
     return useQuery<JettonBalance, Error>(
         [wallet.id, QueryKey.jettons, JettonKey.balance, jettonAddress],
         async () => {
-            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.rawAddress
+            const result = await new AccountsApi(api.tonApiV2).getAccountJettonBalance({
+                accountId: wallet.rawAddress,
+                jettonId: jettonAddress
             });
-
-            const balance = result.balances.find(item => item.jetton.address === jettonAddress);
-            if (!balance) {
-                throw new Error('Missing jetton balance');
-            }
-            return balance;
+            return result;
         }
     );
 };
