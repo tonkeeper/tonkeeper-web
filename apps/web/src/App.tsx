@@ -229,7 +229,11 @@ export const Loader: FC = () => {
         extension: false,
         proFeatures: false,
         ios,
-        defaultWalletVersion: WalletVersion.V5R1
+        defaultWalletVersion: WalletVersion.V5R1,
+        env: {
+            tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
+            stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS
+        }
     };
 
     return (
