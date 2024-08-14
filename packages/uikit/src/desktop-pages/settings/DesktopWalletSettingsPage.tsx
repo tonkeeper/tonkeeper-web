@@ -1,5 +1,5 @@
 import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import {
     AppsIcon,
@@ -20,10 +20,15 @@ import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
-import { useActiveAccount, useIsActiveWalletWatchOnly } from '../../state/wallet';
-import { isAccountVersionEditable } from '@tonkeeper/core/dist/entries/account';
+import {
+    useActiveAccount,
+    useHideMAMAccountDerivation,
+    useIsActiveWalletWatchOnly
+} from '../../state/wallet';
+import { AccountMAM, isAccountVersionEditable } from '@tonkeeper/core/dist/entries/account';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
+import { WalletIndexBadge } from '../../components/account/AccountBadge';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -59,12 +64,18 @@ const LinkStyled = styled(Link)`
     color: unset;
 `;
 
+const Body3Row = styled(Body3)`
+    display: flex;
+    align-items: center;
+`;
+
 export const DesktopWalletSettingsPage = () => {
     const { t } = useTranslation();
     const account = useActiveAccount();
     const { onOpen: rename } = useRenameNotification();
     const { onOpen: recovery } = useRecoveryNotification();
     const { isOpen: isDeleteOpen, onClose: onDeleteClose, onOpen: onDeleteOpen } = useDisclosure();
+    const { mutateAsync: hideDerivation } = useHideMAMAccountDerivation();
 
     const isReadOnly = useIsActiveWalletWatchOnly();
 
@@ -77,6 +88,14 @@ export const DesktopWalletSettingsPage = () => {
     const activeWallet = account.activeTonWallet;
 
     const activeDerivation = account.type === 'mam' ? account.activeDerivation : undefined;
+    const navigate = useNavigate();
+
+    const onHide = () => {
+        hideDerivation({
+            accountId: account.id,
+            derivationIndex: (account as AccountMAM).activeDerivationIndex
+        }).then(() => navigate(AppRoute.home));
+    };
 
     return (
         <DesktopViewPageLayout>
@@ -122,6 +141,13 @@ export const DesktopWalletSettingsPage = () => {
                 )}
                 {account.type === 'mam' && (
                     <>
+                        <SettingsListItem onClick={() => recovery({ accountId: account.id })}>
+                            <KeyIcon />
+                            <SettingsListText>
+                                <Label2>{t('settings_backup_account')}</Label2>
+                                <Body3>{t('settings_backup_account_mam_description')}</Body3>
+                            </SettingsListText>
+                        </SettingsListItem>
                         <SettingsListItem
                             onClick={() =>
                                 recovery({ accountId: account.id, walletId: activeWallet.id })
@@ -129,13 +155,6 @@ export const DesktopWalletSettingsPage = () => {
                         >
                             <KeyIcon />
                             <Label2>{t('settings_backup_wallet')}</Label2>
-                        </SettingsListItem>
-                        <SettingsListItem onClick={() => recovery({ accountId: account.id })}>
-                            <KeyIcon />
-                            <SettingsListText>
-                                <Label2>{t('settings_backup_account')}</Label2>
-                                <Body3>{t('settings_backup_account_mam_description')}</Body3>
-                            </SettingsListText>
                         </SettingsListItem>
                     </>
                 )}
@@ -204,8 +223,22 @@ export const DesktopWalletSettingsPage = () => {
             <SettingsListBlock>
                 <SettingsListItem onClick={onDeleteOpen}>
                     <ExitIcon />
-                    <Label2>{t('Delete_wallet_data')}</Label2>
+                    <Label2>{t('settings_delete_account')}</Label2>
                 </SettingsListItem>
+                {account.type === 'mam' && (
+                    <SettingsListItem onClick={onHide}>
+                        <ExitIcon />
+                        <SettingsListText>
+                            <Label2>{t('settings_hide_current_wallet')}</Label2>
+                            <Body3Row>
+                                {account.activeDerivation.name}{' '}
+                                <WalletIndexBadge>
+                                    #{account.activeDerivationIndex + 1}
+                                </WalletIndexBadge>
+                            </Body3Row>
+                        </SettingsListText>
+                    </SettingsListItem>
+                )}
             </SettingsListBlock>
             <DesktopViewDivider />
             <DeleteAccountNotification

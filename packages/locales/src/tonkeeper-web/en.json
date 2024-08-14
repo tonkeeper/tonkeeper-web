@@ -181,6 +181,7 @@
   "settings_backup_wallet" : "Backup Wallet",
   "settings_collectibles_list" : "Collectibles",
   "settings_connected_apps" : "Connected Apps",
+  "settings_hide_current_wallet" : "Hide Current Wallet",
   "settings_ledger_indexes" : "Ledger subwallets",
   "settings_mam_add_wallet" : "Add New Wallet",
   "settings_mam_indexes" : "Added Wallets",
