@@ -409,6 +409,10 @@ export class AccountMAM extends Clonable implements IAccountControllable {
         return this.allTonWallets.find(w => w.id === id);
     }
 
+    getTonWalletsDerivation(id: WalletId) {
+        return this.allAvailableDerivations.find(d => d.tonWallets.some(w => w.id === id));
+    }
+
     updateDerivation(newDerivation: DerivationItemNamed) {
         const indexToPaste = this.allAvailableDerivations.findIndex(
             d => d.index === newDerivation.index

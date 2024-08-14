@@ -56,6 +56,7 @@ export enum SettingsRoute {
 export enum WalletSettingsRoute {
     index = '/',
     recovery = '/recovery',
+    recoveryMamWallet = '/recovery-mam-wallet',
     version = '/version',
     ledgerIndexes = '/ledger-indexes',
     jettons = '/jettons',

@@ -14,7 +14,7 @@ const { hook, paramsControl } = createModalControl<{
 
 export const useRenameNotification = hook;
 
-export const RenameNotification = () => {
+export const RenameNotificationControlled = () => {
     const { isOpen, onClose } = useRenameNotification();
     const { t } = useTranslation();
     const [params] = useAtom(paramsControl);

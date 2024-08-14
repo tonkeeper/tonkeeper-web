@@ -37,11 +37,15 @@ export const Label1 = styled.span`
     line-height: 24px;
 `;
 
-export const Label2 = styled.span`
+export const Label2Class = css`
     font-style: normal;
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
+`;
+
+export const Label2 = styled.span`
+    ${Label2Class}
 `;
 
 export const Label3 = styled.span`

@@ -431,17 +431,8 @@ export const Notification: FC<{
     title?: ReactNode;
     footer?: ReactNode;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
-    wrapperClassName?: string;
-}> = ({
-    children,
-    isOpen,
-    hideButton,
-    backShadow,
-    handleClose,
-    title,
-    footer,
-    wrapperClassName
-}) => {
+    className?: string;
+}> = ({ children, isOpen, hideButton, backShadow, handleClose, title, footer, className }) => {
     const [entered, setEntered] = useState(false);
     const [open, setOpen] = useState(false);
     const { displayType } = useTheme();
@@ -546,7 +537,7 @@ export const Notification: FC<{
                 >
                     <Splash ref={nodeRef} className="scrollable">
                         <NotificationOverlay handleClose={handleClose} entered={entered}>
-                            <NotificationWrapper entered={entered} className={wrapperClassName}>
+                            <NotificationWrapper entered={entered} className={className}>
                                 <Wrapper>
                                     <Padding onClick={handleCloseOnlyOnNotFullWidth} />
                                     <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
@@ -557,7 +548,7 @@ export const Notification: FC<{
                                     >
                                         <HeaderWrapper ref={headerRef}>
                                             {(title || !hideButton) && (
-                                                <NotificationHeader>
+                                                <NotificationHeader className="dialog-header">
                                                     <NotificationTitleRow
                                                         handleClose={
                                                             hideButton ? undefined : handleClose
@@ -630,17 +621,21 @@ export const NotificationFooter = forwardRef<HTMLDivElement, { children: ReactNo
     }
 );
 
-export const NotificationHeader: FC<{ children: ReactNode }> = forwardRef<
+export const NotificationHeader: FC<{ children: ReactNode; className?: string }> = forwardRef<
     HTMLDivElement,
-    { children: ReactNode }
->(({ children }, ref) => {
+    { children: ReactNode; className?: string }
+>(({ children, className }, ref) => {
     const isFullWidth = useIsFullWidthMode();
 
     if (!isFullWidth) {
         return <>{children}</>;
     }
 
-    return <NotificationHeaderStyled ref={ref}>{children}</NotificationHeaderStyled>;
+    return (
+        <NotificationHeaderStyled ref={ref} className={className}>
+            {children}
+        </NotificationHeaderStyled>
+    );
 });
 
 export const NotificationContext = createContext<{

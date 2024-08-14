@@ -16,6 +16,8 @@ import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomEr
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { MamRoot } from '@multi-account-mnemonic/core';
 
 export const signTonConnectOver = (
     sdk: IAppSdk,
@@ -49,7 +51,7 @@ export const signTonConnectOver = (
                 return Buffer.from(result, 'hex');
             }
             default: {
-                const mnemonic = await getMnemonic(sdk, accountId, checkTouchId);
+                const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
                 const keyPair = await mnemonicToPrivateKey(mnemonic);
                 const signature = nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
@@ -139,8 +141,23 @@ export const getSigner = async (
                 callback.type = 'cell' as const;
                 return callback;
             }
+            case 'mam': {
+                const wallet = account.activeTonWallet;
+                const mnemonic = await getMAMWalletMnemonic(
+                    sdk,
+                    account.id,
+                    wallet.id,
+                    checkTouchId
+                );
+                const callback = async (message: Cell) => {
+                    const keyPair = await mnemonicToPrivateKey(mnemonic);
+                    return sign(message.hash(), keyPair.secretKey);
+                };
+                callback.type = 'cell' as const;
+                return callback;
+            }
             default: {
-                const mnemonic = await getMnemonic(sdk, account.id, checkTouchId);
+                const mnemonic = await getAccountMnemonic(sdk, account.id, checkTouchId);
                 const callback = async (message: Cell) => {
                     const keyPair = await mnemonicToPrivateKey(mnemonic);
                     return sign(message.hash(), keyPair.secretKey);
@@ -155,13 +172,34 @@ export const getSigner = async (
     }
 };
 
-export const getMnemonic = async (
+export const getAccountMnemonic = async (
     sdk: IAppSdk,
     accountId: AccountId,
     checkTouchId: () => Promise<void>
 ): Promise<string[]> => {
     const { mnemonic } = await getMnemonicAndPassword(sdk, accountId, checkTouchId);
     return mnemonic;
+};
+
+export const getMAMWalletMnemonic = async (
+    sdk: IAppSdk,
+    accountId: AccountId,
+    walletId: WalletId,
+    checkTouchId: () => Promise<void>
+): Promise<string[]> => {
+    const account = await accountsStorage(sdk.storage).getAccount(accountId);
+    if (account?.type !== 'mam') {
+        throw new Error('Unexpected account type');
+    }
+    const derivation = account.getTonWalletsDerivation(walletId);
+    if (!derivation) {
+        throw new Error('Derivation not found');
+    }
+
+    const { mnemonic } = await getMnemonicAndPassword(sdk, accountId, checkTouchId);
+    const root = await MamRoot.fromMnemonic(mnemonic);
+    const tonAccount = await root.getTonAccount(derivation.index);
+    return tonAccount.mnemonics;
 };
 
 export const getMnemonicAndPassword = async (

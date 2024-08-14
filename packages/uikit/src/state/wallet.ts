@@ -41,7 +41,7 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
 import { useDevSettings } from './dev';
-import { getMnemonic, getPasswordByNotification } from './mnemonic';
+import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
 import { DefaultRefetchInterval } from './tonendpoint';
 import { useCheckTouchId } from './password';
 import { MamRoot } from '@multi-account-mnemonic/core';
@@ -185,7 +185,7 @@ export const useCreateMAMAccountDerivation = () => {
         }
         const newDerivationIndex = account.lastAddedIndex + 1;
 
-        const mnemonic = await getMnemonic(sdk, accountId, checkTouchId);
+        const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
 
         const root = await MamRoot.fromMnemonic(mnemonic);
         const tonAccount = await root.getTonAccount(newDerivationIndex);

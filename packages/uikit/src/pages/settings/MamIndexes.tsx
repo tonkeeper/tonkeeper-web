@@ -30,7 +30,8 @@ import {
 } from '../../components/desktop/DesktopViewLayout';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { PencilIcon } from '../../components/Icon';
-import { useRenameNotification } from '../../components/modals/RenameNotification';
+import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
+import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -112,6 +113,7 @@ export const MAMIndexesPageContent: FC<{
     buttonWrapperClassName?: string;
 }> = ({ afterWalletOpened, account, className, buttonWrapperClassName }) => {
     const { t } = useTranslation();
+    const { onOpen: recovery } = useRecoveryNotification();
 
     const { mutateAsync: selectDerivation, isLoading: isSelectDerivationLoading } =
         useMutateAccountActiveDerivation();
@@ -190,7 +192,10 @@ export const MAMIndexesPageContent: FC<{
                             >
                                 <PencilIcon />
                             </IconButtonTransparentBackgroundStyled>
-                            <Button onClick={() => {}} loading={isLoading}>
+                            <Button
+                                onClick={() => recovery({ accountId: account.id })}
+                                loading={isLoading}
+                            >
                                 {t('backup_screen_title')}
                             </Button>
                         </ButtonsContainer>

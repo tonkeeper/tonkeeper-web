@@ -22,7 +22,8 @@ import { useDisclosure } from '../../hooks/useDisclosure';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useActiveAccount, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { isAccountVersionEditable } from '@tonkeeper/core/dist/entries/account';
-import { useRenameNotification } from '../../components/modals/RenameNotification';
+import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
+import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -58,6 +59,7 @@ export const DesktopWalletSettingsPage = () => {
     const { t } = useTranslation();
     const account = useActiveAccount();
     const { onOpen: rename } = useRenameNotification();
+    const { onOpen: recovery } = useRecoveryNotification();
     const { isOpen: isDeleteOpen, onClose: onDeleteClose, onOpen: onDeleteOpen } = useDisclosure();
 
     const isReadOnly = useIsActiveWalletWatchOnly();
@@ -109,12 +111,29 @@ export const DesktopWalletSettingsPage = () => {
             <DesktopViewDivider />
             <SettingsListBlock>
                 {account.type === 'mnemonic' && (
-                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.recovery}>
-                        <SettingsListItem>
+                    <SettingsListItem onClick={() => recovery({ accountId: account.id })}>
+                        <KeyIcon />
+                        <Label2>{t('settings_backup_seed')}</Label2>
+                    </SettingsListItem>
+                )}
+                {account.type === 'mam' && (
+                    <>
+                        <SettingsListItem
+                            onClick={() =>
+                                recovery({ accountId: account.id, walletId: activeWallet.id })
+                            }
+                        >
                             <KeyIcon />
-                            <Label2>{t('settings_backup_seed')}</Label2>
+                            <Label2>{t('settings_backup_wallet')}</Label2>
                         </SettingsListItem>
-                    </LinkStyled>
+                        <SettingsListItem onClick={() => recovery({ accountId: account.id })}>
+                            <KeyIcon />
+                            <SettingsListText>
+                                <Label2>{t('settings_backup_account')}</Label2>
+                                <Body3>{t('settings_backup_account_mam_description')}</Body3>
+                            </SettingsListText>
+                        </SettingsListItem>
+                    </>
                 )}
                 {canChangeVersion && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>
