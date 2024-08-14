@@ -4,15 +4,22 @@ import { ImportWords } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
 import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
-import { useCreateAccountMnemonic, useMutateRenameAccount } from '../../state/wallet';
+import {
+    useCheckIfMnemonicIsMAM,
+    useCreateAccountMAM,
+    useCreateAccountMnemonic,
+    useMutateRenameAccount
+} from '../../state/wallet';
 import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
-import { AccountTonMnemonic } from '@tonkeeper/core/dist/entries/account';
+import { AccountMAM, AccountTonMnemonic } from '@tonkeeper/core/dist/entries/account';
 
 const Import = () => {
     const sdk = useAppSdk();
 
     const [mnemonic, setMnemonic] = useState<string[] | undefined>();
-    const [createdAccount, setCreatedAccount] = useState<AccountTonMnemonic | undefined>(undefined);
+    const [createdAccount, setCreatedAccount] = useState<
+        AccountTonMnemonic | AccountMAM | undefined
+    >(undefined);
 
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
     const [notificationsSubscribePagePassed, setNotificationsSubscribePagePassed] = useState(false);
@@ -21,9 +28,28 @@ const Import = () => {
 
     const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
         useCreateAccountMnemonic();
+    const { mutateAsync: createAccountMam, isLoading: isCreatingAccountMam } =
+        useCreateAccountMAM();
+    const { mutateAsync: checkIfMnemonicIsMAM, isLoading: isCheckingIfMnemonicIsMAM } =
+        useCheckIfMnemonicIsMAM();
+
+    const onMnemonic = async (m: string[]) => {
+        const _isMam = await checkIfMnemonicIsMAM(m);
+        if (_isMam) {
+            const newAccountMam = await createAccountMam({ mnemonic: m, selectAccount: true });
+            setCreatedAccount(newAccountMam);
+        }
+
+        setMnemonic(m);
+    };
 
     if (!mnemonic) {
-        return <ImportWords onMnemonic={setMnemonic} />;
+        return (
+            <ImportWords
+                onMnemonic={onMnemonic}
+                isLoading={isCheckingIfMnemonicIsMAM || isCreatingAccountMam}
+            />
+        );
     }
 
     if (!createdAccount) {

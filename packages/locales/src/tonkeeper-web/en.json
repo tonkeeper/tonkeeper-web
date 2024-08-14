@@ -3,6 +3,8 @@
   "actionTitle" : "Open the wallet",
   "add" : "Add",
   "add_dns_address" : "Add wallet address that domain %1% will link to.",
+  "add_wallet_modal_mam_subtitle" : "Manage multiple wallets with a single secret recovery phrase",
+  "add_wallet_modal_mam_title" : "New Multi-Wallet Account",
   "all_assets_jettons" : "All Assets",
   "appExtensionDescription" : "Your extension wallet on The Open Network",
   "appName" : "Tonkeeper",

@@ -3,6 +3,8 @@
   "actionTitle" : "Открыть Кошелек",
   "add" : "Добавить",
   "add_dns_address" : "Добавьте адрес кошелька, на который будет ссылаться домен %1%",
+  "add_wallet_modal_mam_subtitle" : "Управляйте несколькими кошельками с помощью одного секретного ключа ",
+  "add_wallet_modal_mam_title" : "Новый аккаунт мульти-кошелек",
   "appExtensionDescription" : "Your extension wallet on The Open Network",
   "appName" : "Tonkeeper",
   "appTitle" : "Tonkeeper — wallet for TON",

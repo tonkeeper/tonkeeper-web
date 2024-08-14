@@ -86,6 +86,22 @@ export const ImportNotification: FC<{
                     </ButtonBlock>
                     <ButtonBlock
                         onClick={() => {
+                            onClose(() => onImport(AppRoute.import + ImportRoute.mam));
+                        }}
+                    >
+                        <ButtonIcon>
+                            <AddIcon />
+                        </ButtonIcon>
+                        <ColumnText
+                            text={t('add_wallet_modal_mam_title')}
+                            secondary={t('add_wallet_modal_mam_subtitle')}
+                        />
+                        <ButtonIcon>
+                            <RightIcon />
+                        </ButtonIcon>
+                    </ButtonBlock>
+                    <ButtonBlock
+                        onClick={() => {
                             onClose(() => onImport(AppRoute.import + ImportRoute.import));
                         }}
                     >
@@ -113,23 +129,6 @@ export const ImportNotification: FC<{
                             noWrap
                             text={t('add_wallet_modal_watch_only_title')}
                             secondary={t('add_wallet_modal_watch_only_subtitle')}
-                        />
-                        <ButtonIcon>
-                            <RightIcon />
-                        </ButtonIcon>
-                    </ButtonBlock>
-                    <ButtonBlock
-                        onClick={() => {
-                            onClose(() => onImport(AppRoute.import + ImportRoute.mam));
-                        }}
-                    >
-                        <ButtonIcon>
-                            <AddIcon />
-                        </ButtonIcon>
-                        <ColumnText
-                            noWrap
-                            text={t('add_wallet_modal_mam_title')}
-                            secondary={t('add_wallet_modal_mam_subtitle')}
                         />
                         <ButtonIcon>
                             <RightIcon />

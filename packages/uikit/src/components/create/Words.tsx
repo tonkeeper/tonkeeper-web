@@ -1,4 +1,3 @@
-import { mnemonicValidate } from '@ton/crypto';
 import { wordlist } from '@ton/crypto/dist/mnemonic/wordlist';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,28 +9,49 @@ import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { BackButtonBlock } from '../BackButton';
 import { CenterContainer } from '../Layout';
-import { Body1, Body2, H2 } from '../Text';
+import { Body1, Body2, Body2Class, Body3, H2, Label2Class } from '../Text';
 import { Button } from '../fields/Button';
+import { BorderSmallResponsive } from '../shared/Styles';
+import { ExclamationMarkCircleIcon } from '../Icon';
+import { validateMnemonicTonOrMAM } from '@tonkeeper/core/dist/service/mnemonicService';
 
 const Block = styled.div`
     display: flex;
     text-align: center;
     gap: 1rem;
     flex-direction: column;
+    margin-bottom: 16px;
 
     & + & {
         margin-top: 2rem;
     }
 `;
 
+const HeadingBlock = styled(Block)`
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            gap: 2px;
+        `}
+`;
+
 const Header = styled(H2)`
     user-select: none;
+
+    ${p => p.theme.displayType === 'full-width' && Label2Class}
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            margin-bottom: 0;
+        `}
 `;
 const Body = styled(Body1)`
     user-select: none;
 
     text-align: center;
     color: ${props => props.theme.textSecondary};
+
+    ${p => p.theme.displayType === 'full-width' && Body2Class}
 `;
 
 export const WorldsGrid = styled.div`
@@ -44,8 +64,6 @@ export const WorldsGrid = styled.div`
 
     white-space: normal;
 `;
-
-const World = styled(Body1)``;
 
 export const WorldNumber = styled(Body2)`
     display: inline-block;
@@ -70,11 +88,80 @@ export const ButtonRow = styled.div`
     display: flex;
 `;
 
-export const Worlds: FC<{
+const WorldsGridStyled = styled(WorldsGrid)`
+    margin-top: 0;
+`;
+
+const MamAccountCallout = styled.div`
+    background: ${p => p.theme.backgroundContent};
+    ${BorderSmallResponsive};
+    padding: 8px 12px;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+`;
+
+const Body3Secondary = styled(Body3)`
+    color: ${p => p.theme.textSecondary};
+`;
+
+const ExclamationMarkCircleIconStyled = styled(ExclamationMarkCircleIcon)`
+    margin-top: 4px;
+    height: 16px;
+    width: 16px;
+    color: ${p => p.theme.accentOrange};
+    flex-shrink: 0;
+`;
+
+const LinkStyled = styled(Body3)`
+    color: ${p => p.theme.accentBlueConstant};
+    cursor: pointer;
+`;
+
+export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean }> = ({
+    mnemonic,
+    showMamInfo
+}) => {
+    const { t } = useTranslation();
+    const { config } = useAppContext();
+    const sdk = useAppSdk();
+
+    return (
+        <>
+            <HeadingBlock>
+                <Header>{t('secret_words_title')}</Header>
+                <Body>{t('secret_words_caption')}</Body>
+            </HeadingBlock>
+
+            {showMamInfo && (
+                <MamAccountCallout>
+                    <div>
+                        <Body3Secondary>{t('mam_account_explanation') + ' '}</Body3Secondary>
+                        <LinkStyled onClick={() => sdk.openPage(config.mamLearnMoreUrl)}>
+                            {t('learn_more')}
+                        </LinkStyled>
+                    </div>
+                    <ExclamationMarkCircleIconStyled />
+                </MamAccountCallout>
+            )}
+
+            <WorldsGridStyled>
+                {mnemonic.map((world, index) => (
+                    <Body1 key={index}>
+                        <WorldNumber> {index + 1}.</WorldNumber> {world}{' '}
+                    </Body1>
+                ))}
+            </WorldsGridStyled>
+        </>
+    );
+};
+
+export const Words: FC<{
     mnemonic: string[];
     onBack: () => void;
     onCheck: () => void;
-}> = ({ mnemonic, onBack, onCheck }) => {
+    showMamInfo?: boolean;
+}> = ({ mnemonic, onBack, onCheck, showMamInfo }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
 
@@ -87,20 +174,7 @@ export const Worlds: FC<{
     return (
         <CenterContainer>
             <BackButtonBlock onClick={onBack} />
-            <Block>
-                <div>
-                    <Header>{t('secret_words_title')}</Header>
-                    <Body>{t('secret_words_caption')}</Body>
-                </div>
-            </Block>
-
-            <WorldsGrid>
-                {mnemonic.map((world, index) => (
-                    <World key={index}>
-                        <WorldNumber> {index + 1}.</WorldNumber> {world}{' '}
-                    </World>
-                ))}
-            </WorldsGrid>
+            <WordsGridAndHeaders mnemonic={mnemonic} showMamInfo={showMamInfo} />
 
             <Button size="large" fullWidth primary marginTop onClick={onCheck}>
                 {t('continue')}
@@ -425,7 +499,7 @@ export const ImportWords: FC<{
         if (sdk.isIOs()) {
             openIosKeyboard('text');
         }
-        const valid = await mnemonicValidate(mnemonic);
+        const valid = await validateMnemonicTonOrMAM(mnemonic);
         if (!valid) {
             notify();
         } else {

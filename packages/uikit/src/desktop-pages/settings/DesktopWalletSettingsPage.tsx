@@ -40,6 +40,10 @@ const SettingsListItem = styled.div`
     &:hover {
         background-color: ${p => p.theme.backgroundContentTint};
     }
+
+    > svg {
+        flex-shrink: 0;
+    }
 `;
 
 const SettingsListText = styled.div`

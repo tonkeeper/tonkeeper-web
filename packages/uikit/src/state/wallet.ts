@@ -391,6 +391,17 @@ export const useCreateAccountMnemonic = () => {
     });
 };
 
+export const useCheckIfMnemonicIsMAM = () => {
+    return useMutation(async (mnemonic: string[]) => {
+        try {
+            await MamRoot.fromMnemonic(mnemonic);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    });
+};
+
 export const useCreateAccountMAM = () => {
     const sdk = useAppSdk();
     const context = useAppContext();
