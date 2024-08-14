@@ -155,12 +155,19 @@ export const isSpamNft = (
     nft: (NftWithCollectionId & { trust: NFT['trust'] }) | undefined,
     config: TonWalletConfig | undefined
 ) => {
-    return Boolean(
-        nft &&
-            (!!config?.spamNfts.includes(nft.collection?.address || nft.address) ||
-                (nft.trust === 'blacklist' &&
-                    !config?.trustedNfts.includes(nft.collection?.address || nft.address)))
-    );
+    if (!nft) {
+        return true;
+    }
+    const address = nft.collection?.address || nft.address;
+    if (config?.spamNfts.includes(address)) {
+        return true;
+    }
+
+    if (config?.trustedNfts.includes(address)) {
+        return false;
+    }
+
+    return ['blacklist', 'graylist'].includes(nft.trust);
 };
 
 export const isUnverifiedNft = (
