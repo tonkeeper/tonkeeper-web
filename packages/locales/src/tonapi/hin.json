@@ -11,7 +11,7 @@
     "jettonTransferAction": "{{.Value}} {{.JettonName}} को ट्रांसफर कर रहे हैं",
     "nftPurchaseAction": "{{.Name}} की खरीदो",
     "nftTransferAction": "1 NFT ट्रांसफर कर रहे हैं",
-    "poolImplementationDescription": "न्यूनतम जमा {{.Deposit}} TON",
+    "poolImplementationDescription": "न्यूनतम जमा {{.Deposit}} टॉन",
     "smartContractExecMessage": "स्मार्ट कॉन्ट्रैक्ट का निष्पादन",
     "subscriptionAction": "सदस्यता के लिए {{.Value}} का भुगतान कर रहे हैं",
     "tonTransferAction": "{{.Value}} ट्रांसफर कर रहे हैं",
