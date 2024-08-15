@@ -60,36 +60,36 @@
     "why_change" : "Why change?",
     "your_wallet" : "Your wallet"
   },
-  "add_wallet" : "Add wallet",
+  "add_wallet" : "افزودن کیف پول",
   "add_wallet_modal" : {
     "create" : {
-      "subtitle" : "Create new wallet",
-      "title" : "New Wallet"
+      "subtitle" : "کیف پول جدید بسازید",
+      "title" : "کیف پول جدید"
     },
     "import" : {
-      "subtitle" : "Import wallet with a 24 secret recovery words",
-      "title" : "Existing Wallet"
+      "subtitle" : "یک کیف پول را با کلمات ۲۴ گانه حفاظتی وارد کنید",
+      "title" : "کیف پول موجود"
     },
-    "import_subtitle" : "Choose from the options below.",
-    "import_title" : "Import Wallet",
+    "import_subtitle" : "یکی از گزینه‌های زیر را انتخاب کنید.",
+    "import_title" : "وارد کردن کیف پول",
     "ledger" : {
-      "subtitle" : "Hardware module, Bluetooth, limited TON features",
-      "title" : "Pair with Ledger"
+      "subtitle" : "ماژول سخت‌افزاری، بلوتوث، ویژگی‌های محدود تون.",
+      "title" : "جفت سازی با لجر"
     },
-    "other_options" : "Other options",
+    "other_options" : "گزینه‌های دیگر",
     "signer" : {
-      "subtitle" : "Completely offline, air-gapped, all TON features",
-      "title" : "Pair with Signer"
+      "subtitle" : "کاملا آفلاین، بدون اتصال فیزیکی، پشتیبانی از همه ویژگی‌های تون",
+      "title" : "اتصال به Signer"
     },
-    "subtitle" : "Create a new wallet or add an existing one.",
+    "subtitle" : "ساخت کیف پول جدید یا بازیابی کیف پول موجود",
     "testnet" : {
-      "subtitle" : "Import wallet with a 24 secret recovery words to Testnet",
-      "title" : "Testnet Account"
+      "subtitle" : "یک کیف پول را با کلمات ۲۴ گانه حفاظتی را به شبکه آزمایشی وارد کنید",
+      "title" : "حساب شبکه آزمایشی"
     },
-    "title" : "Add Wallet",
+    "title" : "افزودن کیف پول",
     "watch_only" : {
-      "subtitle" : "For monitor wallet activity without recovery phrase",
-      "title" : "Watch Account"
+      "subtitle" : "برای پایش کیف پول بدون کلمه باریابی",
+      "title" : "حساب پایشی"
     }
   },
   "add_watch_only" : {
