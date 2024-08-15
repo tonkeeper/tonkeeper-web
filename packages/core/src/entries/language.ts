@@ -4,7 +4,8 @@ export enum Language {
     IT = 2,
     'zh_CN' = 3,
     TR = 4,
-    BG = 5
+    BG = 5,
+    BN = 6,
 }
 
 export const defaultLanguage: Language = Language.EN;
@@ -15,7 +16,8 @@ export const languages = [
     Language.IT,
     Language['zh_CN'],
     Language.TR,
-    Language.BG
+    Language.BG,
+    Language.BN
 ];
 
 export const localizationText = (lang?: Language) => {
@@ -32,6 +34,8 @@ export const localizationText = (lang?: Language) => {
             return 'tr';
         case Language.BG:
             return 'bg';
+        case Language.BN:
+            return 'bn-BD';
         default:
             return 'en';
     }
@@ -39,6 +43,8 @@ export const localizationText = (lang?: Language) => {
 
 export const localizationFrom = (lang: string) => {
     switch (lang) {
+        case 'bn-BD':
+            return Language.EN;
         case 'en':
             return Language.EN;
         case 'ru':
@@ -51,12 +57,15 @@ export const localizationFrom = (lang: string) => {
             return Language.TR;
         case 'bg':
             return Language.BG;
+        case 'bn':
+            return Language.BN;
         default:
             return Language.EN;
     }
 };
 
 const localeMap: Record<string, string> = {
+    bn: 'bn-BD',
     zh_CN: 'zh-Hans'
 };
 
