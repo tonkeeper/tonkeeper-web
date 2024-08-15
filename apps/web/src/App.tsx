@@ -6,6 +6,7 @@ import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
 import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
+import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
@@ -26,6 +27,7 @@ import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProv
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
+import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import {
     useAccountsStateQuery,
@@ -83,20 +85,29 @@ const Providers: FC<PropsWithChildren> = () => {
                 <AppSdkContext.Provider value={sdk}>
                     <TranslationContext.Provider value={translation}>
                         <StorageContext.Provider value={sdk.storage}>
-                            <UserThemeProvider>
-                                <GlobalStyle />
-                                <HeaderGlobalStyle />
-                                <FooterGlobalStyle />
-                                <SybHeaderGlobalStyle />
-                                <GlobalListStyle />
-                                <Loader />
-                                <UnlockNotification sdk={sdk} />
-                            </UserThemeProvider>
+                            <ThemeAndContent />
                         </StorageContext.Provider>
                     </TranslationContext.Provider>
                 </AppSdkContext.Provider>
             </Suspense>
         </QueryClientProvider>
+    );
+};
+
+const ThemeAndContent = () => {
+    const { data } = useProBackupState();
+    return (
+        <UserThemeProvider isPro={data?.valid} isProSupported>
+            <DarkThemeContext.Provider value={!data?.valid}>
+                <GlobalStyle />
+                <HeaderGlobalStyle />
+                <FooterGlobalStyle />
+                <SybHeaderGlobalStyle />
+                <GlobalListStyle />
+                <Loader />
+                <UnlockNotification sdk={sdk} />
+            </DarkThemeContext.Provider>
+        </UserThemeProvider>
     );
 };
 
