@@ -23,7 +23,7 @@ import {
     TonWalletStandard,
     DerivationItemNamed
 } from '../entries/wallet';
-import { WalletApi } from '../tonApiV2';
+import { AccountsApi, WalletApi } from '../tonApiV2';
 import { emojis } from '../utils/emojis';
 import { accountsStorage } from './accountsStorage';
 import { walletContract } from './wallet/contractService';
@@ -324,13 +324,31 @@ export const createMAMAccountByMnemonic = async (
     storage: IStorage,
     rootMnemonic: string[],
     options: {
+        selectedDerivations: number[];
         network?: Network;
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
     const rootAccount = await MamRoot.fromMnemonic(rootMnemonic);
 
-    const childTonWallets = await getMAMTonAccountsToImport(rootAccount, appContext.api);
+    let childTonWallets: {
+        tonAccount: MamTonAccount;
+        derivationIndex: number;
+        shouldAdd: boolean;
+    }[];
+    if (options.selectedDerivations?.length) {
+        childTonWallets = await gePreselectedMAMTonAccountsToImport(
+            rootAccount,
+            options.selectedDerivations
+        );
+    } else {
+        childTonWallets = await getRelevantMAMTonAccountsToImport(
+            rootAccount,
+            appContext.api,
+            appContext.defaultWalletVersion,
+            options.network
+        );
+    }
 
     let auth: AuthPassword | AuthKeychain;
     if (options.auth.kind === 'keychain') {
@@ -405,25 +423,68 @@ export function getFallbackAccountEmoji(publicKeyOrBase64: string) {
     return emojis[index];
 }
 
-async function getMAMTonAccountsToImport(
+async function getRelevantMAMTonAccountsToImport(
     root: MamRoot,
-    apiConfig: APIConfig
+    api: APIConfig,
+    defaultWalletVersion: WalletVersion,
+    network?: Network
 ): Promise<{ tonAccount: MamTonAccount; derivationIndex: number; shouldAdd: boolean }[]> {
-    return [
-        {
-            tonAccount: await root.getTonAccount(0),
-            derivationIndex: 0,
-            shouldAdd: true
-        },
-        {
-            tonAccount: await root.getTonAccount(1),
-            derivationIndex: 1,
-            shouldAdd: false
-        },
-        {
-            tonAccount: await root.getTonAccount(2),
-            derivationIndex: 2,
-            shouldAdd: true
+    const getAccountsBalances = async (tonAccounts: MamTonAccount[]) => {
+        const addresses = tonAccounts.map(tonAccount =>
+            walletContract(
+                tonAccount.publicKey,
+                defaultWalletVersion,
+                network
+            ).address.toRawString()
+        );
+
+        const response = await new AccountsApi(api.tonApiV2).getAccounts({
+            getAccountsRequest: { accountIds: addresses }
+        });
+
+        return response.accounts.map(acc => acc.balance);
+    };
+
+    const accounts: { tonAccount: MamTonAccount; derivationIndex: number; shouldAdd: boolean }[] =
+        [];
+
+    const indexesGap = 5;
+    while (true) {
+        const indexFrom = accounts.length ? accounts[accounts.length - 1].derivationIndex + 1 : 0;
+        const accsToAdd = await Promise.all(
+            [...Array(indexesGap)]
+                .map((_, i) => indexFrom + i)
+                .map(async derivationIndex => ({
+                    tonAccount: await root.getTonAccount(derivationIndex),
+                    derivationIndex,
+                    shouldAdd: true
+                }))
+        );
+        const balances = await getAccountsBalances(accsToAdd.map(i => i.tonAccount));
+        if (balances.every(b => !b)) {
+            return accounts;
+        } else {
+            accsToAdd.forEach((acc, index) => {
+                const balance = balances[index];
+                if (!balance) {
+                    acc.shouldAdd = false;
+                }
+            });
+            accounts.push(...accsToAdd);
         }
-    ];
+    }
+}
+
+async function gePreselectedMAMTonAccountsToImport(
+    root: MamRoot,
+    selectedDerivations: number[]
+): Promise<{ tonAccount: MamTonAccount; derivationIndex: number; shouldAdd: boolean }[]> {
+    const maxDerivationIndex = selectedDerivations.reduce((acc, v) => Math.max(acc, v), -1);
+    return Promise.all(
+        [...Array(maxDerivationIndex + 1)].map(async (_, index) => ({
+            tonAccount: await root.getTonAccount(index),
+            derivationIndex: index,
+            shouldAdd: selectedDerivations.includes(index)
+        }))
+    );
 }

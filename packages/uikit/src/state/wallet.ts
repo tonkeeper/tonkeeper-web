@@ -413,12 +413,14 @@ export const useCreateAccountMAM = () => {
         Error,
         {
             mnemonic: string[];
+            selectedDerivations?: number[];
             password?: string;
             selectAccount?: boolean;
         }
-    >(async ({ mnemonic, password, selectAccount }) => {
+    >(async ({ selectedDerivations, mnemonic, password, selectAccount }) => {
         if (sdk.keychain) {
             const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
+                selectedDerivations,
                 auth: {
                     kind: 'keychain'
                 }
@@ -442,6 +444,7 @@ export const useCreateAccountMAM = () => {
 
         const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
         const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
+            selectedDerivations,
             auth: {
                 kind: 'password',
                 encryptedMnemonic

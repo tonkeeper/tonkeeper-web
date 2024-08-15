@@ -81,7 +81,7 @@ const PlusIconStyled = styled(PlusIcon)`
 
 export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onSelect }) => {
     const { t } = useTranslation();
-    const { hideSigner, hideLedger, hideKeystone } = useAppContext();
+    const { hideMam, hideSigner, hideLedger, hideKeystone } = useAppContext();
     const hideAllHardwareWallets = hideSigner && hideLedger && hideKeystone;
 
     return (
@@ -101,20 +101,22 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                         <RightIcon />
                     </ButtonIcon>
                 </AddMethod>
-                <AddMethod onClick={() => onSelect(AppRoute.import + ImportRoute.mam)}>
-                    <ButtonIcon>
-                        <PlusIconStyled />
-                    </ButtonIcon>
-                    <AddMethodText>
-                        <AddMethodLabel>{t('add_wallet_modal_mam_title')}</AddMethodLabel>
-                        <AddMethodDescription>
-                            {t('add_wallet_modal_mam_subtitle')}
-                        </AddMethodDescription>
-                    </AddMethodText>
-                    <ButtonIcon>
-                        <RightIcon />
-                    </ButtonIcon>
-                </AddMethod>
+                {!hideMam && (
+                    <AddMethod onClick={() => onSelect(AppRoute.import + ImportRoute.mam)}>
+                        <ButtonIcon>
+                            <PlusIconStyled />
+                        </ButtonIcon>
+                        <AddMethodText>
+                            <AddMethodLabel>{t('add_wallet_modal_mam_title')}</AddMethodLabel>
+                            <AddMethodDescription>
+                                {t('add_wallet_modal_mam_subtitle')}
+                            </AddMethodDescription>
+                        </AddMethodText>
+                        <ButtonIcon>
+                            <RightIcon />
+                        </ButtonIcon>
+                    </AddMethod>
+                )}
                 <AddMethod onClick={() => onSelect(AppRoute.import + ImportRoute.import)}>
                     <ButtonIcon>
                         <ImportIcon />

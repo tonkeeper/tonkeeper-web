@@ -241,6 +241,7 @@ export const Loader: FC = () => {
         extension: false,
         proFeatures: false,
         ios,
+        hideMam: true,
         defaultWalletVersion: WalletVersion.V5R1
     };
 

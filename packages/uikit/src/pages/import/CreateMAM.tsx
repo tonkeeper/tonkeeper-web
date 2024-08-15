@@ -94,6 +94,7 @@ const Create = () => {
                 onConfirm={() => {
                     createWalletsAsync({
                         mnemonic,
+                        selectedDerivations: [0],
                         selectAccount: true
                     }).then(setCreatedAccount);
                 }}
