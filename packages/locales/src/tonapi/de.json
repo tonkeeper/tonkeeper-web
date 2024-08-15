@@ -1,0 +1,20 @@
+{
+  "auctionBidMessage" : "Biete {{.Amount}} für {{.NftName}}",
+  "contractDeployAction" : "Bereitstellen eines Vertrags{{ if .Interfaces }} mit Schnittstellen {{.Interfaces}}{{ end }}",
+  "depositStakeAction" : "Einzahlen {{.Value}} zum Einsatz Pool",
+  "electionsDepositStakeAction" : "Einlagern von {{.Amount}} Einsatz",
+  "electionsRecoverStakeAction" : "Wiederherstellen von {{.Amount}} Einsatz",
+  "helloWorld" : "Hallo Welt!",
+  "jettonBurnAction" : "Verbrenne {{.Value}} {{.JettonName}}",
+  "jettonMintAction" : "Präge {{.Value}} {{.JettonName}}",
+  "jettonSwapAction" : "Tausche {{.AmountIn}} {{.JettonIn}} für {{.AmountOut}} {{.JettonOut}}",
+  "jettonTransferAction" : "Übertrage {{.Value}} {{.JettonName}}",
+  "nftPurchaseAction" : "Kaufe {{.Name}}",
+  "nftTransferAction" : "Übertrage 1 NFT",
+  "poolImplementationDescription" : "Minimale Einzahlung {{.Deposit}} TON",
+  "smartContractExecMessage" : "Führe Smart Contract aus",
+  "subscriptionAction" : "Bezahle {{.Value}} für ein Abo",
+  "tonTransferAction" : "Übertrage {{.Value}}",
+  "withdrawStakeAction" : "Zahle {{.Value}} aus dem Einsatz Pool aus",
+  "withdrawStakeRequestAction" : "Anfrage zum Abheben von {{.Value}} aus dem Staking-Pool."
+}
