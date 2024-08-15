@@ -176,6 +176,7 @@
   "settings_hide_current_wallet" : "Скрыть текущий кошелек",
   "settings_ledger_indexes" : "Подкошельки леджер",
   "settings_mam_add_wallet" : "Добавить новый кошелек",
+  "settings_mam_add_wallet_with_pro" : "Добавляйте новые кошельки с подпиской Pro",
   "settings_mam_indexes" : "Добавленные кошельки",
   "settings_mam_number_wallets" : "%{number} кошельков",
   "start_trial_notification_description" : "Подключение к Telegram необходимо только для проверки, что вы не бот.",

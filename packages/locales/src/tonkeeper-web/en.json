@@ -185,6 +185,7 @@
   "settings_hide_current_wallet" : "Hide Current Wallet",
   "settings_ledger_indexes" : "Ledger subwallets",
   "settings_mam_add_wallet" : "Add New Wallet",
+  "settings_mam_add_wallet_with_pro" : "Add More with Pro Subscription",
   "settings_mam_indexes" : "Added Wallets",
   "settings_mam_number_wallets" : "%{number} wallets",
   "start_trial_notification_description" : "Telegram connection is required solely for the purpose of verification that you are not a bot.",

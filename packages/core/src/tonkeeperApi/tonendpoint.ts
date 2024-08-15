@@ -31,7 +31,7 @@ export interface TonendpointConfig {
     exchangePostUrl?: string;
     supportLink?: string;
     tonkeeperNewsUrl?: string;
-    mamLearnMoreUrl?: string;
+    mam_learn_more_url?: string;
 
     mercuryoSecret?: string;
     neocryptoWebView?: string;
@@ -54,6 +54,8 @@ export interface TonendpointConfig {
     mercuryo_otc_id?: string;
 
     scam_api_url?: string;
+
+    mam_max_wallets_without_pro?: number;
 
     /**
      * @deprecated use ton api

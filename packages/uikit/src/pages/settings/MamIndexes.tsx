@@ -32,6 +32,9 @@ import { IconButtonTransparentBackground } from '../../components/fields/IconBut
 import { PencilIcon } from '../../components/Icon';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
+import { useProState } from '../../state/pro';
+import { useProFeaturesNotification } from '../../components/modals/ProFeaturesNotificationControlled';
+import { useAppContext } from '../../hooks/appContext';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -113,7 +116,10 @@ export const MAMIndexesPageContent: FC<{
     buttonWrapperClassName?: string;
 }> = ({ afterWalletOpened, account, className, buttonWrapperClassName }) => {
     const { t } = useTranslation();
+    const { config } = useAppContext();
+    const { data: proState } = useProState();
     const { onOpen: recovery } = useRecoveryNotification();
+    const { onOpen: buyPro } = useProFeaturesNotification();
 
     const { mutateAsync: selectDerivation, isLoading: isSelectDerivationLoading } =
         useMutateAccountActiveDerivation();
@@ -175,6 +181,11 @@ export const MAMIndexesPageContent: FC<{
         isEnableDerivationLoading;
 
     const canHide = account.derivations.length > 1;
+
+    const mamMaxWalletsWithoutPro = config.mam_max_wallets_without_pro || 3;
+    const showByProButton =
+        !proState?.subscription.valid &&
+        account.allAvailableDerivations.length >= mamMaxWalletsWithoutPro;
 
     return (
         <ContentWrapper className={className}>
@@ -275,9 +286,15 @@ export const MAMIndexesPageContent: FC<{
             </ListBlockStyled>
             <NotificationFooterPortal>
                 <FooterButtonContainerStyled className={buttonWrapperClassName}>
-                    <Button fullWidth onClick={onCreateDerivation}>
-                        {t('settings_mam_add_wallet')}
-                    </Button>
+                    {showByProButton ? (
+                        <Button primary fullWidth onClick={buyPro}>
+                            {t('settings_mam_add_wallet_with_pro')}
+                        </Button>
+                    ) : (
+                        <Button fullWidth onClick={onCreateDerivation}>
+                            {t('settings_mam_add_wallet')}
+                        </Button>
+                    )}
                 </FooterButtonContainerStyled>
             </NotificationFooterPortal>
         </ContentWrapper>

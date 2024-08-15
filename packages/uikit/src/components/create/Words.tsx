@@ -137,9 +137,11 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
                 <MamAccountCallout>
                     <div>
                         <Body3Secondary>{t('mam_account_explanation') + ' '}</Body3Secondary>
-                        <LinkStyled onClick={() => sdk.openPage(config.mamLearnMoreUrl)}>
-                            {t('learn_more')}
-                        </LinkStyled>
+                        {!!config.mam_learn_more_url && (
+                            <LinkStyled onClick={() => sdk.openPage(config.mam_learn_more_url)}>
+                                {t('learn_more')}
+                            </LinkStyled>
+                        )}
                     </div>
                     <ExclamationMarkCircleIconStyled />
                 </MamAccountCallout>
