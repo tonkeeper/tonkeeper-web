@@ -29,7 +29,6 @@ import { GearIconEmpty, GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../.
 import { ScrollContainer } from '../../ScrollContainer';
 import { Label2 } from '../../Text';
 import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../account/AccountBadge';
-import { ImportNotification } from '../../create/ImportNotification';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
 import { useWalletVersionSettingsNotification } from '../../modals/WalletVersionSettingsNotification';
@@ -38,6 +37,7 @@ import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { AsideHeader } from './AsideHeader';
 import { SubscriptionInfoBlock } from './SubscriptionInfoBlock';
 import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
+import { useAddWalletNotification } from '../../modals/AddWalletNotificationControlled';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -389,7 +389,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
 
 const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
-    const [isOpenImport, setIsOpenImport] = useState(false);
+    const { onOpen: addWallet } = useAddWalletNotification();
     const { proFeatures } = useAppContext();
     const accounts = useAccountsState();
     const activeAccount = useActiveAccount();
@@ -483,7 +483,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         </IconWrapper>
                         <Label2>{t('aside_discover')}</Label2>
                     </AsideMenuItem>
-                    <AsideMenuItem isSelected={false} onClick={() => setIsOpenImport(true)}>
+                    <AsideMenuItem isSelected={false} onClick={addWallet}>
                         <IconWrapper>
                             <PlusIcon />
                         </IconWrapper>
@@ -502,7 +502,6 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         <SubscriptionInfoBlock />
                     </ErrorBoundary>
                 </AsideMenuBottom>
-                <ImportNotification isOpen={isOpenImport} setOpen={setIsOpenImport} />
             </AsideContentContainer>
             <AsideResizeHandle
                 onMouseDown={() => {

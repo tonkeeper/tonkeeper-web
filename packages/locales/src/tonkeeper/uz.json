@@ -1,0 +1,1542 @@
+{
+  "about_risk_modal" : {
+    "description" : "Jami sizning hamyondan yuboriladigan tokenlar qiymati. Qaytarib berish jami qiymatga kiritilmagan.",
+    "description_with_nft" : "Tokenlarning umumiy qiymati, sizning hamyoningizdan yuboriladigan NFT xarajatlarini istisno qilgan holda. Qaytmalar umumiy qiymatga kiritilmagan.",
+    "ok_button" : "OK"
+  },
+  "about_ton" : "TON — To‘liq markazsizlashtirilgan layer-1 blokcheyni boʻlib, Telegram tomonidan milliardlab foydalanuvchilarni qo‘shish uchun yaratilgan. U ultra tezkor tranzaksiyalar, minimal komissiyalar, foydalanishga oddiy ilovalar va ekologik tozaligi bilan ajralib turadi.",
+  "access_confirmation_logout" : "Tizimdan chiqish",
+  "access_confirmation_reset" : "Qayta o'rnatish",
+  "access_confirmation_title" : "Parolni kiriting",
+  "access_confirmation_update_biometry" : "Biometrik ma'lumotlardan foydalanish uchun parolingizni kiriting",
+  "access_denied" : "Kirish rad etildi",
+  "account_deleted" : "Hisob o'chirildi",
+  "activityActionModal" : {
+    "bid" : "Taklif",
+    "burned" : "Kuygan",
+    "call_contract" : "Shartnomani chaqirish",
+    "deposit" : "Depozit",
+    "purchase" : "Sotib olish",
+    "received" : "Olingan",
+    "sent" : "Yuborildi",
+    "swapped" : "Almashildi",
+    "time_on" : "{time}da",
+    "withdraw" : "Чиқариш",
+    "withdrawal_request" : "Chiqarib olish talabi"
+  },
+  "activity" : {
+    "buy_toncoin_btn" : "TONcoin sotib olish",
+    "empty_transaction_caption" : "Birinchi tranzaksiyangizni amalga oshiring!",
+    "empty_transaction_title" : "Faoliyatingiz bu yerda ko'rsatiladi",
+    "failed_transaction" : "Muvaffaqiyatsiz",
+    "receive_btn" : "Qabul qilish",
+    "received" : "Qabul qilingan",
+    "screen_title" : "Tadbir",
+    "sent" : "Yuborildi"
+  },
+  "add_edit_favorite" : {
+    "address_label" : "Manzil",
+    "add_title" : "Yangi favorit",
+    "delete" : "O'chirish",
+    "edit_title" : "Sevimlini tahrirlash",
+    "name_placeholder" : "Ism",
+    "save" : "Saqlash"
+  },
+  "add_other_coins" : "Boshqa kriptolarni qo'shish",
+  "address_copied" : "Manzil ko‘chirildi",
+  "address_update" : {
+    "first_option" : "Ehtimol, manzil hamyoni allaqachon faol ishlatilayotgan va siz hech qanday farq sezmagansiz.",
+    "learn_more" : "Batafsil ma'lumot",
+    "new_style" : "Yangi manzil",
+    "notification_desc_did_change" : "Hamyon manzilingiz UQ formatiga yangilandi. Eski manzil ham ishlashda davom etadi.",
+    "notification_desc_will_change" : "5-oktabr kuni sizning hamyon manzilingiz yaxshiroq bo'lgan UQ formatiga yangilanadi. Eski manzilingiz ham ishlashda davom etadi. Siz hech narsa qilishingiz shart emas.",
+    "old_style" : "Eski manzil",
+    "post_dates" : "\n5 oktyabr 2023: Tonkeeperdagi barcha manzillar UQ formatiga o'tadi.\n\n1 yanvar 2024: Tonkeeper shartnoma holatini tekshirishni to'xtatadi va manzilda \"bounceable\" flagini ishlatadi. EQ manzilli nashr etilmagan shartnomalarga yuborilgan tangalar yuboruvchiga qaytariladi.",
+    "post_published_date" : "Nashr etilgan: 27 sentyabr 2023",
+    "post_rest" : "TON blokcheynida ikkita manzil uslubi mavjud va hozirgacha ilovalar va hamyonlar uchun faqat bittasi ishlatilgan.\n\nEQ formati kiruvchi mablag'larni qayta ishlaydigan aqlli shartnomalar uchun eng yaxshi hisoblanadi. Agar aqlli shartnoma hali e'lon qilinmagan bo'lsa, ya'ni, kod blokcheynga yuklanmagan bo'lsa, ushbu manzilga yuborilgan TONlar yuboruvchiga qaytadi. Bu xavfsizlik xususiyatidir: agar biron bir xato bo'lsa, TONlar orqaga qaytariladi.\n\nUQ formati hamyonlar uchun eng yaxshi hisoblanadi. Hamyonlar faqat mablag'larni saqlash uchun mo'ljallanganligi sababli, tangalar hech qachon qaytarilmaydi. Har bir hamyon blokcheynda kodsiz oddiy manzil sifatida boshlanadi. Shunday qilib, tanga qaytmasligi mantiqiy bo'ladi.\n\nBu yil biz hamyonlarni qulayroq bo'lgan UQ formatiga o'tkazmoqdamiz. Agar siz kimdir sizga bergan eski EQ manziliga mablag' yuborishda davom etsangiz, ikkita variant mavjud bo'ladi:",
+    "post_top" : "Bu yil oxiriga qadar butun TON tarmog‘i hamyon manzillarini boshqacha tarzda ko‘rsatadi. Yangi manzil EQ o‘rniga UQ bilan boshlanadi. So‘nggi to‘rt harf ham o‘zgaradi. Eski manzil ham ishlaydi va xuddi shu hamyonga yo‘naltiradi. Bu sizning hamyoningizdagi mablag‘larning xavfsizligiga hech qanday taʼsir qilmaydi.",
+    "second_option" : "Hamyon hech qachon to'lovlar uchun ishlatilmagan bo'lishi ehtimoli kamroq. Va Tonkeeper kelasi yildan boshlab ushbu manzilga tangalar yubormaydi. Qabul qiluvchidan yangi UQ manzilini so'rashingiz kerak bo'ladi.",
+    "title" : "Manzil yangilanishi",
+    "why_change" : "Nima uchun o'zgartirish?",
+    "your_wallet" : "Hamyoningiz"
+  },
+  "add_wallet" : "Hamyon qo'shish",
+  "add_wallet_modal" : {
+    "create" : {
+      "subtitle" : "Yangi hamyon yarating",
+      "title" : "Yangi Hamyon"
+    },
+    "import" : {
+      "subtitle" : "Hamyonni 24 ta maxfiy tiklash so'zi bilan import qiling",
+      "title" : "Mavjud Hamyon"
+    },
+    "import_subtitle" : "Quyidagi variantlardan birini tanlang.",
+    "import_title" : "Hamyonni import qilish",
+    "ledger" : {
+      "subtitle" : "Oliy darajadagi xavfsizlik apparat hamyoni bilan",
+      "title" : "Ledger’ni ulash"
+    },
+    "other_options" : "Boshqa variantlar",
+    "signer" : {
+      "subtitle" : "Yuqori darajadagi nazorat va xavfsizlik",
+      "title" : "Ulanish Signer bilan"
+    },
+    "subtitle" : "Yangi hamyon yarating yoki mavjudini qo'shing.",
+    "testnet" : {
+      "subtitle" : "24 ta maxfiy tiklash so'zi bilan hamyonni Testnet ga import qiling",
+      "title" : "Testnet Hisobi"
+    },
+    "title" : "Hamyon Qo'shish",
+    "watch_only" : {
+      "subtitle" : "Hamyon faoliyatini kuzatish uchun tiklash iborasiz",
+      "title" : "Hisobni tomosha qilish"
+    }
+  },
+  "add_watch_only" : {
+    "subtitle" : "So‘zlarni tiklash frazasisiz hamyon faoliyatini kuzatib boring. Ushbu hamyondan amalga oshirilgan har qanday tranzaktsiyalar haqida xabardor qilinasiz.",
+    "title" : "Кўриш ҳисоблари",
+    "wallet_not_found" : "Hamyon manzili topilmadi"
+  },
+  "all_regions" : "Barcha hududlar",
+  "appearance_accent_name" : {
+    "andromeda" : "Andromeda",
+    "arctic" : "Arktik",
+    "azure" : "Azure",
+    "coral" : "Koral",
+    "cosmos" : "Kosmos",
+    "default" : "Tonkeeper",
+    "flamingo" : "Flamingo",
+    "fluid" : "Suyuqlik",
+    "galaxy" : "Galaksiya",
+    "iris" : "Iris",
+    "marine" : "Dengiz",
+    "ocean" : "Okean",
+    "sky" : "Osmond"
+  },
+  "appearance_confirm" : "Tasdiqlash",
+  "appearance_description" : "TON Diamonds NFT hamyoningizni yanada rang-barang va noyob qiladi.",
+  "appearance_title" : "Tema",
+  "app_name" : "Tonkeeper",
+  "approval" : {
+    "accept" : "Qabul qilish",
+    "accepted" : "Qabul qilindi",
+    "accepted_at_collection" : "{date} kuni qabul qilindi",
+    "accepted_at_token" : "{date} sanada qabul qilindi",
+    "accepted_collection" : "Qabul qilingan kollektsiya",
+    "accepted_token" : "Qabul qilingan token",
+    "approve_all" : "Hamma sini tasdiqlash",
+    "approve_collection_many" : "\"{collection}\" коллекциясидан кирувчи токенларни тасдиқланг",
+    "approve_collection_one" : "\"{collection}\" kolleksiyasidan kelgan tokenni tasdiqlang",
+    "approve_many" : "{count} kiruvchi tokenni tasdiqlang",
+    "approve_many.few" : "Tasdiqlang {count} kiruvchi tokenlarni",
+    "approve_many.many" : "Tasdiqlang {count} kiruvchi tokenlarni",
+    "approve_many.one" : "Tasdiqlang {count} kiruvchi tokenni",
+    "approve_many.other" : "Tasdiqlang {count} kiruvchi tokenlar",
+    "approve_token" : "Kirilayotgan \"{name}\" tokenini tasdiqlang",
+    "approve_two_collections" : "\"{collection1}\" \"{collection2}\" kolleksiyalaridan kiruvchi tokenlarni tasdiqlang",
+    "approve_two_tokens" : "Kirish tokenlarini tasdiqlang \"{name1}\" va \"{name2}\"",
+    "blacklisted_collection" : "Qora ro'yxatga kiritilgan kollektsiya",
+    "blacklisted_token" : "Qora ro'yxatga kiritilgan token",
+    "decline" : "Rad etish",
+    "declined" : "Rad etildi",
+    "declined_at_collection" : "{date} da rad etildi",
+    "declined_at_token" : "{date} kuni rad etildi",
+    "details_collection" : "Kolleksiya tafsilotlari",
+    "details_token" : "Token tafsilotlari",
+    "id_collection" : "Kolleksiya IDsi",
+    "id_token" : "Token identifikatori",
+    "manage_tokens" : "Tokenlarni boshqarish",
+    "move_to_accepted" : "Qabul qilinganlarga ko'chiring",
+    "move_to_accepted_collection" : "Hamyoningizda kolleksiyani ko'rsatish",
+    "move_to_accepted_token" : "Hamyondagi tokenni ko‘rsatish",
+    "move_to_declined" : "Rad etilganlarga o'tkazish",
+    "move_to_declined_collection" : "Kolleksiyani hamyondan yashirish",
+    "move_to_declined_token" : "Tokenni hamyondan yashirish",
+    "name" : "Ism",
+    "not_spam" : "Spam emas",
+    "pending" : "Kutilmoqda",
+    "show_all" : "Hammasini ko'rsatish",
+    "single_token" : "Yagona token",
+    "spam" : "Spam",
+    "token_copied" : "Token ID nusxa olindi",
+    "token_count" : {
+      "few" : "{count} token",
+      "many" : "{count} tokenlar",
+      "one" : "{count} token",
+      "other" : "{count} tokenlar"
+    },
+    "unverified_token" : "Tasdiqlanmagan token",
+    "verify_collection" : "Kolleksiyani tasdiqlang",
+    "verify_description_collection" : "Bu tokenlar noma'lum chiqaruvchi tomonidan chiqarilgan. Soxta tokenlarni aniqlash uchun chiqaruvchining rasmiy manbasidan kolleksiya identifikatorini tasdiqlang. Token ko'rinishini keyinroq sozlamalar orqali o'zgartirishingiz mumkin.",
+    "verify_description_token" : "Ushbu token noma'lum nashriyotchi tomonidan chiqarilgan. Soxta tokenlarni aniqlash uchun token ID sini nashriyotchi rasmiy manbasi bilan tekshiring. Siz token ko'rinishini keyinroq sozlamalarda o'zgartirishingiz mumkin.",
+    "verify_token" : "Tokenni tasdiqlang",
+    "whitelisted_collection" : "Oq ro'yxatga kiritilgan to'plam",
+    "whitelisted_token" : "Oq roʻyxatga olingan token"
+  },
+  "auth_failed" : "Kirish muvaffaqiyatsiz tugadi",
+  "backup_check" : {
+    "caption" : "Keling, hamma narsani to'g'ri bajarganingizni tekshirib ko'raylik. So'zlarni kiriting: {one}, {two}, va {three}.",
+    "done_button" : "Tayyor",
+    "title" : "Zaxira nusxasini tekshirish"
+  },
+  "backup_screen" : {
+    "backup_warning" : "Sizning balansingiz {totalFiat}, va u faqat hali yozib olmagan tiklash iborangiz bilan himoyalangan. Qurilmangiz bilan bog'liq muammolar yuz berganda mablag'ingizni yo'qotmaslik uchun iborani zaxiralang.",
+    "last_backup_time" : "So'nggi zahira {time}",
+    "manual_backup_on" : "Yedeklɑshni  qo‘lda yoqish",
+    "manual_button" : "Qo'lda nusxalash",
+    "manual_caption" : "Hamyoningizni tiklash iborasini yozib qo'yib, qo'lda zaxira nusxasini yarating.",
+    "manual_title" : "Qo'llanma",
+    "show_recovery_phrase" : "Qayta tiklash iborasini ko'rsatish",
+    "title" : "Zaxira nusxa"
+  },
+  "backup_warning" : {
+    "cancel_button" : "Bekor qilish",
+    "caption" : "Iltimos, tiklash iborangizni ko‘rmasdan oldin quyidagilarni diqqat bilan o‘qing.",
+    "continue_button" : "Davom eting",
+    "p1" : "Hech qachon Tonkeeperdan tashqari boshqa joyda tiklash iborangizni kiritmang, bu orqali hamyoningizga kirish mumkin.",
+    "p2" : "Tonkeeper qo‘llab-quvvatlash xizmati hech qachon tiklash iborasini so‘ramaydi.",
+    "p3" : "Sizning tiklash kalitangizni bilgan har kim hamyoningizga kirishi mumkin.",
+    "title" : "Diqqat"
+  },
+  "balances_setup_wallet" : "Hamyonni sozlash",
+  "battery" : {
+    "description" : {
+      "empty" : "Tonkeeper orqali almashtiring, tokenlar va NFT yuboring.",
+      "less_10" : "Sizda 10 ta tranzaksiyadan kamroq amalga oshirish uchun yetarli batareya quvvati mavjud.",
+      "other" : "{count} zaryad"
+    },
+    "max_input_amount" : "Maksimal kiritish miqdori {amount}",
+    "ok" : "OK",
+    "other_ways" : {
+      "by_crypto" : {
+        "subtitle" : "Foydalanish {methods}",
+        "title" : "To'ldirish {symbol} bilan"
+      },
+      "gift" : {
+        "subtitle" : "Do'stlaringiz bilan ulashing",
+        "title" : "Batareya sovg‘a"
+      },
+      "promo" : {
+        "subtitle" : "Siz omadlisiz",
+        "title" : "Promo-kodni kiriting"
+      }
+    },
+    "packages" : {
+      "buy" : "Sotib olish",
+      "disclaimer" : "Bir marta zaryadlash o'rtacha tranzaksiya to'lovini qoplaydi. Ba'zi tranzaktsiyalar qimmatroq bo'lishi mumkin.",
+      "ok" : "OK",
+      "refilled" : "Batareyangiz to'ldi",
+      "refund" : "Zaryad tarixi",
+      "restore" : "Sotib olishlarni tiklash",
+      "subtitle" : {
+        "few" : "{count} zaryad",
+        "large" : "Katta paket",
+        "many" : "{count} zaryadlar",
+        "medium" : "O'rta to'plam",
+        "one" : "{count} zaryad",
+        "other" : "{count} zaryadlar",
+        "small" : "Kichik paket"
+      },
+      "title" : "'{{'cnt'}}' tranzaksiya uchun '{{'price'}}'"
+    },
+    "please_wait" : "Batareya bir necha daqiqada zaryadlanadi",
+    "promocode" : {
+      "apply" : "Qo'llash",
+      "button" : "Promo kod bilan to'ldirish",
+      "placeholder" : "Promo-kod",
+      "success" : "Batareyangiz to'ldi",
+      "title" : "Promo-kod"
+    },
+    "recharge_by_crypto" : {
+      "continue" : "Davom etish",
+      "other" : {
+        "subtitle" : "Miqdorni qo'lda kiriting",
+        "title" : "Boshqa"
+      },
+      "title" : "Zaryadlash",
+      "title_gift" : "Sovg'a",
+      "tokens" : "Tokenlar"
+    },
+    "refilled" : "Batareya to'ldirildi",
+    "refund" : {
+      "subtitle" : "To'ldirishlar va qaytarishlar",
+      "title" : "To'lovlar Tarixi"
+    },
+    "screen_title" : "Batareya",
+    "send_widget" : {
+      "battery" : "Batareya"
+    },
+    "settings" : "Batareya",
+    "title" : "Tonkeeper Batareyasi",
+    "transactions" : {
+      "charges_per_action" : {
+        "few" : "≈ {count} quvvatlanishlar har {transactionName}",
+        "many" : "≈ {count} zaryadlar per {transactionName}",
+        "one" : "≈ {count} zaryad per {transactionName}",
+        "other" : "≈ {count} marta zaryad qilish har {transactionName}"
+      },
+      "description" : "Tanlangan tranzaksiyalar Tonkeeper batareyasi bilan to'lanadi.",
+      "settings" : "Batareya sozlamalari",
+      "supported" : "Qo'llab-quvvatlanadigan tranzaktsiyalar",
+      "title" : "Tranzaktsiyalar",
+      "types" : {
+        "jetton" : "tokenlar o'tkazmasi",
+        "nft" : "NFT o'tkazmalari",
+        "swap" : "Tonkeeper orqali almashtirish",
+        "ton" : "TON o‘tkazmalari"
+      },
+      "type" : {
+        "swap" : "almashish",
+        "transfer" : "o‘tkazma"
+      },
+      "will_be_paid" : "To‘lanadi: {enabledTransactions}"
+    }
+  },
+  "biometry" : {
+    "android" : {
+      "face_recognition" : "yuzni aniqlash",
+      "face_recognition_genitive" : "yuzni aniqlash",
+      "face_recognition_instrumental" : "yuzni aniqlash",
+      "fingerprint" : "barmoq izi",
+      "fingerprint_genitive" : "barmoq izi",
+      "fingerprint_instrumental" : "barmoq izi"
+    },
+    "default" : "biometriya",
+    "default_accusative" : "biometriya",
+    "default_genitive" : "biometriya",
+    "default_instrumental" : "biometriya",
+    "ios" : {
+      "face_recognition" : "Face ID",
+      "face_recognition_genitive" : "Face ID",
+      "face_recognition_instrumental" : "Face ID",
+      "fingerprint" : "Touch ID",
+      "fingerprint_genitive" : "Touch ID",
+      "fingerprint_instrumental" : "Touch ID"
+    }
+  },
+  "bluetooth" : {
+    "permissions_alert" : {
+      "cancel" : "Bekor qilish",
+      "message" : "Iltimos, bu funksiyani ishlatish uchun sozlamalarda Bluetooth ruxsatlarini yoqing",
+      "open_settings" : "Sozlamalarni ochish",
+      "title" : "Bluetooth ruxsatlari"
+    },
+    "powered_off_alert" : {
+      "cancel" : "Bekor qilish",
+      "message" : "Iltimos, ushbu funksiyadan foydalanish uchun Bluetooth-ni yoqing",
+      "open_settings" : "Sozlamalarni ochish",
+      "title" : "Bluetooth oʻchirilgan"
+    }
+  },
+  "browser" : {
+    "about_dapps_caption" : "Tonkeeper orqali tizimga kirish va to'lovlar uchun foydalanishingiz mumkin bo'lgan ilovalar va xizmatlarni o'rganing.",
+    "about_dapps_learn_more" : "Ko'proq ma'lumot oling",
+    "about_dapps_title" : "Tonkeeper-ni barcha TON ilovalari va xizmatlari bilan ishlating",
+    "actions" : {
+      "copy_link" : "Havolani nusxalash",
+      "disconnect" : "Ulanishni uzing",
+      "mute" : "Ovozini oʻchirish",
+      "refresh" : "Yangilash",
+      "share" : "Ulashish"
+    },
+    "apps_all" : "Hammasi",
+    "connected" : "Ulangan",
+    "connected_empty_text" : "Tonkeeper brauzerida ilovalar va xizmatlarni kashf eting.",
+    "connected_empty_title" : "Ulangan dasturlar bu yerda ko'rsatiladi",
+    "connected_title" : "Ulandi",
+    "empty_search" : "Qidiruvingiz bo‘yicha hech narsa topilmadi",
+    "explore" : "Ko'rib chiqish",
+    "explore_all" : "Hammasini ko'rish",
+    "more_description" : "Bozorlar, birjalar va boshqa",
+    "more_title" : "Barcha xizmatlarni o'rganing",
+    "open_link" : "Havolani oching",
+    "popular_title" : "Mashhur",
+    "remove_alert" : {
+      "approve_button" : "O'chirish",
+      "title" : "“{name}”ni olib tashlaysizmi?"
+    },
+    "search_label" : "Qidiring yoki manzilni kiriting",
+    "start_typing" : "Manzilni kiriting yoki veb-sahifada qidiruvni boshlang",
+    "title" : "Brauzer",
+    "web_search_title" : "{searchEngine} Qidiruvi"
+  },
+  "buy_ton" : {
+    "subtitle" : "Дарҳол банк картаси билан",
+    "title" : "TON сотиб олиш"
+  },
+  "cancel" : "Bekor qilish",
+  "chart" : {
+    "check_connection" : "Iltimos, ulanishni tekshirib qayta urinib ko'ring.",
+    "no_internet" : "Internet aloqasi yo'q",
+    "periods" : {
+      "1D" : "K",
+      "1H" : "S",
+      "1M" : "O",
+      "1Y" : "Y",
+      "6M" : "6O",
+      "7D" : "H"
+    },
+    "price" : "Narx"
+  },
+  "check_words_caption" : "O‘zingizning qutqarish iborangizni to‘g‘ri yozganingizni tekshirish uchun, iltimos, {wordNum1}, {wordNum2} va {wordNum3} so‘zlarini kiriting.",
+  "check_words_success" : "Tabriklaymiz! Hamyon sozlamalaringiz muvaffaqiyatli bajarildi",
+  "check_words_title" : "Keling, tekshirib ko'raylik",
+  "choose_country" : {
+    "auto" : "Avtomatik",
+    "cancel" : "Bekor qilish",
+    "empty_placeholder" : "Qidiruv bo‘yicha hech narsa topilmadi",
+    "search" : "Qidiruv",
+    "title" : "Mamlakatingizni tanlang"
+  },
+  "choose_currency" : {
+    "currencies" : {
+      "AED" : "BAA dirhami",
+      "BDT" : "Bangladesh Takasi",
+      "BRL" : "Braziliya reali",
+      "BYN" : "Belarus rubli",
+      "CAD" : "Kanada dollari",
+      "CHF" : "Shveytsariya franki",
+      "CNY" : "Xitoy yuani",
+      "EUR" : "Yevro",
+      "GBP" : "Britaniya funti",
+      "GEL" : "Gruziya lari",
+      "IDR" : "Indoneziya Rupiyasi",
+      "ILS" : "Isroil shekeli",
+      "INR" : "Hind rupisi",
+      "IRR" : "Eron riyoli",
+      "JPY" : "Yapon iyenasi",
+      "KRW" : "Janubiy Koreya voni",
+      "KZT" : "Qozog'iston tengesi",
+      "NGN" : "Nigeriya Nayrasi",
+      "RUB" : "Rossiya rubli",
+      "THB" : "Tailand bati",
+      "TON" : "Toncoin",
+      "TRY" : "Turk lirasi",
+      "UAH" : "Ukraina grivnasi",
+      "USD" : "AQSh dollari",
+      "UZS" : "O'zbekiston so'mi",
+      "VND" : "Vetnam dongi"
+    },
+    "header_title" : "Asosiy valuta"
+  },
+  "choose_wallets" : {
+    "already_added" : "Allaqachon qo'shilgan",
+    "subtitle" : "Qo‘shmoqchi bo‘lgan jildlarni tanlang.",
+    "title" : "Hamyonlarni Tanlang",
+    "tokens" : "tokenlar",
+    "w5_subtitle" : "Kamroq blokcheyn to‘lovlari, gazsiz tranzaktsiyalar va ko‘p o'tkazmalar.",
+    "w5_subtitle_link" : "Ko‘proq ma’lumot olish"
+  },
+  "confirm" : "Tasdiqlash",
+  "confirm_renew_all_domains_title" : "Amalni tasdiqlash",
+  "confirm_sending_amount" : "Miqdor",
+  "confirm_sending_fee" : "To'lov",
+  "confirm_sending_inactive_warn_about" : "Nima qilish kerak",
+  "confirm_sending_inactive_warn_description" : "Davom etmang, agar blokcheyndan mo‘jiza kutayotgan bo‘lsangiz. Bu sodir bo‘lmaydi.",
+  "confirm_sending_inactive_warn_title" : "Nofaol shartnoma",
+  "confirm_sending_liquid_warn_description" : "Siz yuborilgan stake qilingan TONdan endi mukofot olmay qolmaysiz. Mukofotni yangi egasi ola boshlaydi.",
+  "confirm_sending_liquid_warn_title" : "Eslatma",
+  "confirm_sending_message" : "Izoh",
+  "confirm_sending_method_title" : "Mablag'laringizni {name}'ga yuborishni xohlaysizmi?",
+  "confirm_sending_recipient" : "Qabul qiluvchi",
+  "confirm_sending_recipient_address" : "Oluvchi manzili",
+  "confirm_sending_sent_caption_btc" : "Tranzaksiyangiz tarmoqqa yuborildi va bir soat ichida qayta ishlanadi.",
+  "confirm_sending_sent_caption_other" : "Sizning tranzaktsiyangiz tarmoqqa yuborildi va bir daqiqadan so'ng qayta ishlanadi.",
+  "confirm_sending_sent_caption_ton" : "Tranzaksiyangiz tarmoqqa yuborildi va bir necha soniya ichida qayta ishlanadi.",
+  "confirm_sending_sent_jetton_title" : "Jeton yuborildi",
+  "confirm_sending_sent_title" : "Valyuta yuborildi",
+  "confirm_sending_submit" : "Tasdiqlash va Yuborish",
+  "confirm_sending_title" : "Yuborishni tasdiqlash",
+  "confirmSendModal" : {
+    "network_fee" : "Tarmoq to‘lovi",
+    "refund" : "Qaytarish",
+    "title" : "Harakatni tasdiqlang",
+    "total_risk" : "Jami: {totalAmount}",
+    "to_your_address" : "Manzilingizga",
+    "transaction_type" : {
+      "burn" : "Yoqing",
+      "receive" : "Qabul qilish",
+      "send" : "Yuborish"
+    },
+    "wallet" : "Hamyon:",
+    "will_be_paid_with_battery" : "Batareya bilan toʻlanadi"
+  },
+  "continue" : "Davom eting",
+  "copied" : "Nusxalandi",
+  "copy_error_log" : "Xato logini nusxalash",
+  "create_pin_current_title" : "Joriy parolni kiriting",
+  "create_pin_new_title" : "Yangi PIN kod yarating",
+  "create_pin_repeat_title" : "Parolni qayta kiriting",
+  "create_wallet_caption" : "Kurtarma ifodasini yozib qo'yishingizni qat'iyan tavsiya qilamiz, chunki qurilmani yo'qotishingiz holatida hamyoningizga kirish va hisobingizni tiklashning yagona yo'li shudir. Undan o'zingizga elektron pochta orqali yubormang yoki skrinshootni olmang. Ushbu ifodani oflayn saqlash xavfsizroqdir.",
+  "create_wallet_continue_button" : "Davom eting",
+  "create_wallet_generated" : "Hamyoningiz yaratildi!",
+  "create_wallet_generating" : "Hamyon yaratilyapti...",
+  "create_wallet_title" : "Qalam va qog‘oz oling",
+  "customize" : "Moslashtirish",
+  "customize_modal" : {
+    "save" : "Saqlash",
+    "subtitle" : "Hamyonning nomi va belgisi qurilmangizda joylashgan holda saqlanadi.",
+    "title" : "Hamyoningizni sozlang",
+    "wallet_name" : "Hamyon nomi"
+  },
+  "decryption_error" : "Dekriptsiya xatosi",
+  "deploy_contract_button" : "Tasdiqlash va amalga oshirish",
+  "deploy_contract_title" : "Kontraktni joylashtirish",
+  "disable_nft_marketplace_banner_description" : "Yig'ing va almashining.",
+  "dns_addresses" : {
+    "few" : "{count} manzillar",
+    "many" : "{count} manzillar",
+    "one" : "{count} manzil",
+    "other" : "{count} manzillar"
+  },
+  "dns_address_linked" : "Manzil bog'langan",
+  "dns_address_unlinked" : "Manzil ulanmadi",
+  "dns_alert_expiring_many" : {
+    "few" : "Sizda muddati tugayotgan {count} domenlar mavjud. Hamma muddatlarini {untilDate} gacha yangilang.",
+    "many" : "Sizda muddati tugayotgan {count} ta domen mavjud. Hamma domenlarni {untilDate} sanasigacha yangilang.",
+    "one" : "Sizda muddati yaqinlashayotgan {count} ta domen mavjud. Hammasini {untilDate} sanasigacha yangilang.",
+    "other" : "Sizda muddati tugayotgan {count} ta domen mavjud. Ularning barchasini {untilDate} sanasigacha yangilang."
+  },
+  "dns_alert_expiring_one" : "{domain} {count} kun ichida muddati tugaydi. Uni {untilDate} sanasigacha yangilang.",
+  "dns_current_address" : "Joriy manzilingiz",
+  "dns_expiration_date" : "Amal qilish muddati",
+  "dns_link_title" : "Tranzaksiyani tasdiqlang",
+  "dns_on_sale_text" : "Domen hozirda bozorga sotuvga qo'yilgan. Transfer qilish uchun, oldin uni sotuvdan olib tashlashingiz kerak.",
+  "dns_renew_all_until_btn" : "Hammasini {untilDate} vaqtigacha yangilang",
+  "dns_renew_in_progress_btn" : "Domen yangilanish bosqichida…",
+  "dns_renew_toast_success" : "Domain yangilandi",
+  "dns_renew_until_btn" : "{untilDate} gacha yangilang",
+  "dns_renew_valid_caption" : {
+    "few" : "Тугашига {count} кун қолди",
+    "many" : "Tugashi {count} kundan keyin",
+    "one" : "{count} kun ichida tugaydi",
+    "other" : "Muddati {count} kundan keyin tugaydi"
+  },
+  "dns_replace_button" : "Almashtirish",
+  "dns_replace_description" : "'{{'domain'}}' domeniga ulanuvchi hamyon manzilini qo'shing.",
+  "dns_replace_save" : "Saqlash",
+  "dns_unlink_title" : "Havolani olib tashlashni tasdiqlang",
+  "dns_wallet_address" : "Hamyon manzili",
+  "domains_renewed" : "Yangilangan domenlar",
+  "edit_coins_add" : "Qoʻshish",
+  "edit_coins_added" : "Qo‘shildi",
+  "edit_coins_added_toast" : "Qo'shildi",
+  "edit_coins_hide" : "Yashirish",
+  "edit_coins_title" : "Kripto qo‘shish",
+  "encryptedComments" : {
+    "encryptedComment" : "Shifrlangan sharh",
+    "encryptedCommentModal" : {
+      "button" : "Sharhni shifrdan chiqarish",
+      "checkboxLabel" : "Qayta ko‘rsatma",
+      "description" : "Izoh jo'natuvchi tomonidan shifrlangan va faqat siz tomonidan ochilishi mumkin. Iltimos, kontentga ehtiyotkorlik bilan munosabatda bo'ling va firibgarliklardan saqlaning.",
+      "title" : "Shifrlangan izoh"
+    },
+    "show" : "Ko‘rsatish"
+  },
+  "error_network" : "Tarmoq xatosi",
+  "error_occurred" : "Xato yuz berdi",
+  "exchange_method_dont_show_again" : "Qayta ko‘rsatma",
+  "exchange_method_open_warning" : "Siz Tonkeeper tomonidan boshqarilmaydigan tashqi ilovani ochyapsiz.",
+  "exchange_modal" : {
+    "buy" : "Sotib olish",
+    "buy_title" : "Toncoin sotib olish",
+    "hide" : "Yashirish",
+    "other_ways_to_buy" : "Boshqa xarid qilish usullari",
+    "other_ways_to_sell" : "Boshqa sotish usullari",
+    "sell" : "Sotish",
+    "sell_title" : "Toncoin sotish",
+    "show_all" : "Hammasini koʻrsat",
+    "title" : "Sotib olish yoki Sotish"
+  },
+  "exchange" : {
+    "not_exists" : "Noto'g'ri almashuv ID"
+  },
+  "exchange_other_ways" : "TON sotib olish yoki sotishning boshqa usullari",
+  "exchange_telegram_bot" : "TELEGRAM BOTI",
+  "exchange_title" : "TON sotib oling",
+  "expiring_domains" : "Muddati tugayotgan domenlar",
+  "finish_setup" : {
+    "backup" : "Hamyon tiklash iborasini zaxiralang",
+    "done_button" : "Tayyor",
+    "enable_notifications" : "Tranzaksiya bildirishnomalarini yoqing",
+    "header_title" : "Tuzatishni yakunlash",
+    "join_tg" : "Tonkeeper kanaliga qo'shiling",
+    "use_biometry" : "{name} ni tasdiqlash uchun foydalaning"
+  },
+  "form_optional_indicator" : "Ixtiyoriy",
+  "gasless" : {
+    "switch_label" : "Bosing va {currency}da to'lash"
+  },
+  "import_add_wallet" : "Hamyon qo'shish",
+  "import_add_wallet_description" : "Yangi hamyon yarating yoki mavjud hamyonni qo'shing.",
+  "import_existing_wallet" : "Mavjud Hamyon",
+  "import_existing_wallet_description" : "24 ta maxfiy tiklash so'zi bilan hamyonni import qilish",
+  "import_new_wallet" : "Yangi Hamyon",
+  "import_new_wallet_description" : "Yangi hamyon yarating",
+  "import_signer" : "Imzo Egasini Moslashtiring",
+  "import_signer_description" : "Yuqoriroq boshqaruv va xavfsizlik darajasi",
+  "import_wallet_caption" : "Hamyoningizga kirishni tiklash uchun, hamyoningizni yaratishda sizga berilgan 24 ta maxfiy tiklash so'zlarini kiriting.",
+  "import_wallet_reset_caption" : "Iltimos, hamyoningiz yaratilganda yozib olgan 24 ta maxfiy so'zni kiriting va unga kirish huquqini tiklang.",
+  "import_wallet_title" : "Qayta tiklash ifodangizni kiriting",
+  "import_wallet_wrong_words_err" : "Noto'g'ri ibora",
+  "indexer_latency_error" : "Yuborish xatosi, kechroqda yana urinib ko'ring",
+  "info_about_inactive_back" : "Ortga qaytish",
+  "info_about_inactive_desc1" : "Tonkeeper bu manzil hamyonmi yoki aqlli shartnoma ekanligini bilmaydi.",
+  "info_about_inactive_desc2" : "Agar siz shunchaki pulni hamyonga qo'yish niyatida bo'lsangiz, davom etishingiz mumkin.",
+  "info_about_inactive_desc3_1" : "Agar aqlli shartnomadan avtomatik harakatni kutayotgan bo'lsangiz,",
+  "info_about_inactive_desc3_2" : "— transferingiz shu manzilda to'xtab qolishi mumkin.",
+  "info_about_inactive_desc3_bold" : "DAVOM ETMANG",
+  "info_about_inactive_title" : "Faol bo'lmagan shartnoma",
+  "intro_continue_btn" : "Boshlash",
+  "intro_item1_caption" : "The Open Network’ning noyob arxitekturasi tufayli, TON tranzaksiyalari bir necha soniya ichida amalga oshiriladi.",
+  "intro_item1_title" : "Jahon darajasidagi tezlik",
+  "intro_item2_caption" : "Tonkeeper shifrlash kalitlaringizni qurilmangizda saqlaydi. Barcha tranzaksiyalar markazlashmagan protokollar orqali amalga oshiriladi, shuningdek kriptovalyutangiz hech qachon markazlashgan birjalarga tushmaydi.",
+  "intro_item2_title" : "Uchdan uchi xavfsizlik",
+  "intro_item3_caption" : "-",
+  "intro_item3_title" : "-",
+  "intro_title" : "Xush kelibsiz",
+  "jetton_buy_tether" : "USD₮ сотиб олиш",
+  "jetton_id" : "Token ID: {jettonAddress}",
+  "jetton_id_copied" : "Jeton ID ko‘chirildi",
+  "jetton_locked_till" : "Bloklangan {date} gacha",
+  "jetton_migrate_tether" : "jUSDT'ni USD₮ga almashtirish",
+  "jetton_name" : "{name} Token",
+  "jetton_open_explorer" : "Tafsilotlarni ko'rish",
+  "jetton_price" : "Narx:",
+  "jettons_list_title" : "Tokenlar",
+  "jettons_manage_tokens" : "Tokenlarni boshqarish",
+  "jettons_show_jettons" : "Hamyondagi tokenlarni ko'rsatish",
+  "jetton_token" : "Token",
+  "language" : {
+    "language_alert" : {
+      "cancel" : "Bekor qilish",
+      "open" : "Sozlamalar",
+      "title" : "Ilovani tilini o'zgartirish uchun qurilma Sozlamalariga o'ting"
+    },
+    "languagesList" : {
+      "en" : "Inglizcha",
+      "es" : "Ispancha",
+      "id" : "Indonezcha",
+      "ru" : "Ruscha",
+      "system" : "Tizim",
+      "tr" : "Turkcha",
+      "uk" : "Ukraincha",
+      "uz" : "Oʻzbekcha",
+      "zh-Hans" : "Xitoycha"
+    },
+    "list_item" : {
+      "title" : "Til",
+      "value" : "O'zbek"
+    },
+    "title" : "Til"
+  },
+  "later" : "Keyinroq",
+  "ledger" : {
+    "confirm_title" : "Harakatni tasdiqlang",
+    "confirm_tx" : "Ledger'dagi tranzaksiyangizni tasdiqlang",
+    "connect" : "Ledger-ni qurilmangizga Bluetooth orqali ulang",
+    "connect_title" : "Ledger'ni ulanishingiz",
+    "install_ton_app" : "TON Ilovasini O'rnatish",
+    "min_required_version" : {
+      "button" : "OK",
+      "subtitle" : "Bu turdagi tranzaksiya amaldagi ilova versiyangizda qo'llab-quvvatlanmaydi.",
+      "title" : "Ledger'da TON ilovasini {version} versiyasiga yangilang"
+    },
+    "open_ton_app" : "Uni dan TON ilovasini oching",
+    "operation_not_supported" : "Amal Ledger hamyonlari uchun mavjud emas. Boshqa hamyonni tanlang va qaytadan urinib ko'ring."
+  },
+  "legal_font_license" : "Montserrat shrift",
+  "legal_header_title" : "Yuridik",
+  "legal_licenses_title" : "Lizinglar",
+  "legal_privacy" : "Maxfiylik siyosati",
+  "legal_terms" : "Xizmat shartlari",
+  "link_copied" : "Havola nusxalandi",
+  "loading" : "Yuklanmoqda",
+  "logout_modal" : {
+    "agreement" : "Menda tiklash iborasining zaxira nusxasi mavjud",
+    "backup_button" : "Zaxira nusxasini saqlash",
+    "caption" : "Hamyon kalitlari ushbu qurilmadan o'chiriladi.",
+    "delete_button" : "Hamyon ma'lumotlarini o'chirish",
+    "delete_caption" : "Hamyon kalitlari va barcha shaxsiy ma'lumotlar ushbu qurilmadan o'chiriladi.",
+    "delete_title" : "Hamyon ma'lumotlarini o'chirish",
+    "logout_button" : "Chiqish",
+    "title" : "Chiqish"
+  },
+  "manage_other_coins" : "Kriptolarimni boshqarish",
+  "migration_cancel_btn" : "Migratsiyani bekor qilish",
+  "migration_caption" : "Tonkeeper obunaga to'lovlarni qo'llab-quvvatlaydigan yangi hamyon formatini taqdim etmoqda. Balansingiz yangi manzilga o'tkaziladi. Maxfiy tiklash iborangiz o'sha qoladi.",
+  "migration_failed" : "Ko'chirish muvaffaqiyatsiz tugadi. Saldoingiz o'tkazib bo'lmaydi.",
+  "migration_fee_info" : "Tarmoq to‘lovi ≈{tonFee} TON ({fiatFee})",
+  "migration_in_progress" : "Hamyonning v4-versiyasiga o‘tish davom etmoqda",
+  "migration_migrate_btn" : "Hamyonni yangilang",
+  "migration_new_wallet" : "Yangi hamyon",
+  "migration_old_wallet" : "Eski hamyon",
+  "migration" : {
+    "subtitle" : "Davom etish uchun hamyonni qulfdan chiqaring.",
+    "title" : "Hamyoningizni Tonkeeper'ning yangi versiyasiga koʻchiring",
+    "with_biometry" : "{type} bilan davom eting",
+    "with_passcode" : "Parolni kiritish"
+  },
+  "migration_title" : "Hamyoningizni yangilang",
+  "nft_about_collection" : "Kolleksiya haqida",
+  "nft_about_dns" : "TON DNS foydalanuvchilarga kripto hamyonlari, aqlli shartnomalar va veb-saytlarga o'qiladigan nomlar berishga imkon beradigan xizmatdir. \n\nTON DNS bilan markazlashmagan xizmatlarga kirish internetdagi veb-saytlarga kirishga o'xshaydi.",
+  "nft_actions" : {
+    "hide_and_report" : "Yashirish va Shikoyat qilish",
+    "hide" : {
+      "collection" : "Kolleksiyani yashirish",
+      "nft" : "NFT-ni yashirish"
+    },
+    "view_on_explorer" : "Tonviewer’da ko‘rish"
+  },
+  "nft_browse_markets" : "Bozorlarni koʻrish",
+  "nft_chain" : "Zanjir",
+  "nft_change_owner_title" : "Kolleksiya egasini o'zgartirish",
+  "nft_change_theme" : "Mavzuni o'zgartirish",
+  "nft_collection" : "To'plam",
+  "nft_collection_name" : "Kolleksiya nomi",
+  "nft_confirm_operation" : "Tasdiqlash",
+  "nft_contract_address" : "Shartnoma manzili",
+  "nft_deploy_collection_title" : "NFT To'plamini Yarating",
+  "nft_details" : "Tafsilotlar",
+  "nft_diamonds_description" : "TON Diamonds, Tonkeeper hamyoningizdagi mavzuni o'zgartirish va uni NFT rangiga moslashtirish kuchiga ega.",
+  "nft_features" : "Xususiyatlar",
+  "nft_fee" : "To'lov",
+  "nft_fee_and_royalties" : "Toʻlovlar va royaltilar",
+  "nft_hide_details" : "Tafsilotlarni yashirish",
+  "nft_item_deploy_title" : "Mint NFT",
+  "nft_item_name" : "NFT nomi",
+  "nft_link_domain_button" : "Bog'lanish domeni",
+  "nft_link_domain_caption" : "Domenni ulaganingizdan so‘ng, uni o‘tkazishingiz va manzilingiz uchun taxallus sifatida ishlatishingiz mumkin.",
+  "nft_link_domain_mismatch_warn" : "Domen hozirgi manzilingizga bog‘lanmagan. Ushbu domen bilan tranzaksiyalarda ehtiyot bo‘ling.",
+  "nft_link_username_button" : "Ismni bog'lash",
+  "nft_link_username_caption" : "Ismni bog'laganingizdan so'ng, uni o'tkazishingiz va manzilingiz uchun taxallus sifatida ishlatishingiz mumkin.",
+  "nft_link_username_mismatch_warn" : "Ism joriy manzilingiz bilan bog‘liq emas. Ushbu ism bilan bitimlarni amalga oshirayotganda ehtiyot bo‘ling.",
+  "nft_marketplace_address" : "Bozor",
+  "nft_marketplace_banner_description" : "Sotib oling, soting, to‘plang va almashing.",
+  "nft_marketplace_banner_title" : "NFT tokenlaringiz bu yerda saqlanadi",
+  "nft_marketplaces" : "Kashf qilish",
+  "nft_marketplaces_title" : "NFT bozorlari",
+  "nft_metadata" : "Metadata",
+  "nft_more" : "Ko'proq",
+  "nft_new_owner_address" : "Yangi egasining manzili",
+  "nft_on_sale" : "Sotuvda",
+  "nft_on_sale_text" : "NFT hozir bozorda sotuvda. Ko'chirish uchun avval uni sotuvdan olib tashlashingiz kerak.",
+  "nft_open_in_marketplace" : "NFT Bozorida ko'rish",
+  "nft_operations_expired" : "So'rov vaqti tugadi, qayta urinib ko'ring",
+  "nft_operation_slide_to_confirm" : "Tasdiqlash uchun siljiting",
+  "nft_operation_success" : "Tayyor",
+  "nft_owner_address" : "Egasi",
+  "nft_price" : "Narx",
+  "nft_proceeds" : "Sizning daromadingiz",
+  "nft_properties" : "Xususiyatlar",
+  "nft_royalty" : "Royalti",
+  "nft_royalty_address" : "Mualliflik huquqi manzili",
+  "nft_sale_cancel_title" : "Savdodan olib tashlash",
+  "nft_sale_place_title" : "NFT ni soting",
+  "nft_show_details" : "Tafsilotlarni ko‘rsatish",
+  "nft_single_nft" : "Yagona NFT",
+  "nft_standard" : "Token Standarti",
+  "nft_title" : "NFT",
+  "nft_token_id" : "Token ID",
+  "nft_transaction_head_placeholder" : "NFT",
+  "nft_transfer_comment" : "Izoh",
+  "nft_transfer" : {
+    "confirm" : {
+      "fee" : {
+        "label" : "Xarajat",
+        "refund_label" : "Qaytarish",
+        "value" : "≈ {value} TON"
+      }
+    },
+    "title" : "NFT o'tkazmasi"
+  },
+  "nft_transfer_description" : "NFT ushbu manzilga yuboriladi. Boshqa foydalanuvchiga NFT yuborishda ehtiyot bo'ling.",
+  "nft_transfer_dns" : "O‘tkazish",
+  "nft_transfer_nft" : "O'tkazish",
+  "nft_transfer_recipient" : "Qabul qiluvchi",
+  "nft_transfer_title" : "NFT'ni o'tkazish",
+  "nft_unlink_domain_button" : "'{{'address'}}' bilan bog'langan",
+  "nft_unnamed_collection" : "Nomlanmagan kollektsiya",
+  "nft_view_in_explorer" : "Eksplorda ko'rish",
+  "nokyc" : "KYC talab qilinmaydi",
+  "notcoin" : {
+    "all" : "Tonkeeper Pro’ga hammasini almashtiring",
+    "burn_not_available" : {
+      "hours" : "Oʻzgartirish {count} soat ichida mavjud boʻladi",
+      "minutes" : "Ayirboshlash {count} daqiqadan keyin mavjud bo'ladi",
+      "seconds" : "Obmen {count} soniya ichida mavjud bo'ladi"
+    },
+    "count" : "Kuponlar soni",
+    "count_max" : "Bir almashuv uchun ko'pi bilan 4 ta",
+    "exchange" : "Voucherlarni\nNOTga almashish",
+    "exchange_all" : "Barchasini almashtiring\nTonkeeper Pro da",
+    "exchange_subtitle" : "NOT tez orada balansingizda mavjud bo'ladi almashuvdan so'ng.",
+    "exchange_title" : "Kuponlaringizni NOT'ga almashing",
+    "exchange_to_not" : "Almashtirish NOT ga",
+    "name" : "Notcoin",
+    "not_vouchers" : "NOT vaucherlar",
+    "open" : "Ochiq",
+    "open_bot" : "Notcoin Botni Ochiq",
+    "slogan" : "Ehtimol hech narsa emas",
+    "total_amount" : "Umumiy summa",
+    "verify_subtitle" : "Tasdiqlash bir necha soat davom etishi mumkin.",
+    "verify_title" : "Hamyonni Notcoin Bot-ga ulang va yoqilishni tasdiqlang"
+  },
+  "notifications" : {
+    "alert" : {
+      "cancel" : "Bekor qilish",
+      "description" : "Bildirishnoma havolasi manzili ilova manzili bilan mos kelmaydi.",
+      "open" : "Baribir ochish",
+      "title" : "Siz tashqi havolani ochmoqchi ekanligingizga ishonchingiz komilmi?"
+    },
+    "allow_notifications" : "Bildirishnomalarni yoqing",
+    "apps" : "Ilovalar",
+    "apps_description" : "Sizning faolligingizdagi ulangan ilovalardan bildirishnomalar",
+    "disconnect_app" : "{app_name} ni uzing",
+    "disconnected_app" : "Ilova ulanilishi uzildi",
+    "earlier" : "Ilgari",
+    "from_connected" : "Ulangan dasturlardan",
+    "muted" : "Bildirishnomalar o‘chirildi",
+    "mute_notifications" : "Bildirishnomalarni oʻchirish",
+    "notifications" : "Bildirishnomalar",
+    "placeholder" : {
+      "description" : "Tonkeeper brauzerida ilovalar va xizmatlarni kashf eting.",
+      "title" : "Bildirishnomalar bu yerda ko'rsatiladi"
+    },
+    "report" : "Shikoyat qiling"
+  },
+  "notifications_disabled_action" : "Sozlamalarni ochish",
+  "notifications_disabled_description" : "Telefoningiz sozlamalarida bildirishnomalar o'chirilgan. Bildirishnomalarni yoqmoq uchun qurilmangizdagi Sozlamalar-ga o'ting.",
+  "notifications_disabled_title" : "Bildirishnoma o'chirilgan",
+  "notifications_not_supported" : "Bildirishnomalar qurilmangizda qo‘llab-quvvatlanmaydi",
+  "notifications_switch_title" : "Push-bildirishnomalar",
+  "notifications_title" : "Bildirishnomalar",
+  "notification_switch_description" : "TON, tokenlar va NFT yetib kelganda xabarnomalarni oling. Ulangan ilovalardan xabarnomalar.",
+  "notify_connection_err_caption" : "{host} javob bermayapti. Iltimos, keyinroq qayta urinib ko'ring.",
+  "notify_connection_err_caption_few" : "{hosts} va {lastHost} javob bermayapti. Keyinroq yana urinib ko'ring.",
+  "notify_connection_err_title" : "Serverga ulanish imkoni bo'lmadi",
+  "notify_incorrect_time_err_caption" : "Qurilmangiz sozlamalarida avtomatik vaqt va sanani yoqing. Vaqt avtomatik tarzda o‘rnatilmaganida, bu mablag‘lar o'tkazmalariga ta'sir qilishi mumkin.",
+  "notify_incorrect_time_err_title" : "Vaqt va sana noto'g'ri",
+  "notify_no_signal_caption" : "Internet ulanishini tekshiring.",
+  "notify_no_signal_title" : "Signal yo'q",
+  "old_wallet_error" : "v4R2 versiyali hamyonni ishlating",
+  "pairSigner" : {
+    "about" : "Signer haqida",
+    "open_signer" : "Bu qurilmada imzolovchini ochish",
+    "subtitle" : "Signer’ni oching » Kerakli kalitni tanlang » QR kodni skaner qiling",
+    "title" : "QR-kodni skanerlang"
+  },
+  "passcode_changed" : "Parol o'zgartirildi",
+  "paste" : "Yopishtirish",
+  "pin_enter_faceid_err" : "Biometriya tekshiruvi muvaffaqiyatsiz bo'ldi",
+  "pin_enter_skip_faceid_err" : "Biometrik tasdiqlash talab qilinadi",
+  "platform" : {
+    "android" : {
+      "capitalized_face_recognition" : "Yuz tanish",
+      "capitalized_fingerprint" : "Barmoq izi",
+      "face_recognition" : "yuzni aniqlash",
+      "face_recognition_genitive" : "yuzni aniqlash",
+      "fingerprint" : "Barmoq izi",
+      "fingerprint_genitive" : "barmoq izi"
+    },
+    "ios" : {
+      "capitalized_face_recognition" : "Yuzni aniqlash",
+      "capitalized_fingerprint" : "Touch ID",
+      "face_recognition" : "Yuzni aniqlash",
+      "face_recognition_genitive" : "Yuzni aniqlash",
+      "fingerprint" : "Touch ID",
+      "fingerprint_genitive" : "Touch ID"
+    }
+  },
+  "programmable_nfts" : {
+    "alert" : {
+      "cancel" : "Bekor qilish",
+      "description" : "Ushbu tashqi havolani faqat to'plam muallifiga ishonsangiz tashrif buyuring. '{{'uri'}}'",
+      "open" : "Baribir ochish",
+      "title" : "Tashqi havolani ochmoqchi ekaningizga ishonchingiz komilmi?"
+    }
+  },
+  "receive_address_title" : "Yoki hamyon manzilidan foydalaning",
+  "receive_copy" : "Nusxa olish",
+  "receiveModal" : {
+    "copy" : "Nusxa olish",
+    "receive" : "Qabul qilish",
+    "receive_description" : "Faqat {tokenName} va TON tarmog'idagi tokenlarni ushbu manzilga yuboring, aks holda mablag'laringizni yo'qotishingiz mumkin.",
+    "receive_title" : "Qabul qilish {tokenName}",
+    "receive_ton" : "Bu manzilga faqat Toncoin TON va TON tarmog'idagi tokenlarni yuboring, aks holda mablag'laringizni yo'qotishingiz mumkin."
+  },
+  "receive_qr_title" : "Qabul qilish uchun QR kodni ko‘rsating",
+  "receive_received_title" : "Sizga oʻtkazildi\n{amount} {currency}",
+  "receive_share" : "Ulashish",
+  "receive_title" : "Qabul qilish {currency}",
+  "receive_ton_and_jettons" : "TON va boshqa tokenlarni qabul qiling",
+  "recovery_phrase" : {
+    "caption" : "Ushbu so'zlarni raqamlari bilan birga yozib oling va xavfsiz joyda saqlang.",
+    "check_button" : "Zaxira nusxasini tekshirish",
+    "copy_button" : "Nusxalash",
+    "title" : "Qayta tiklash iborasi"
+  },
+  "refresh_app" : "Qayta ishga tushirish",
+  "region_nokyc" : "Neytral hududlar",
+  "reminder_notifications_caption" : "TON, tokenlar va NFT olganda bildirishnomalar oling.",
+  "reminder_notifications_enable_button" : "Bildirishnomalarni yoqing",
+  "reminder_notifications_later_button" : "Keyinroқ",
+  "reminder_notifications_title" : "Tezkor bildirishnomalarni oling",
+  "renew_in_progress" : "Yangilanmoqda…",
+  "renew_progress_of" : "{current} dan {count}",
+  "require_create_wallet_modal_caption" : "Tonkeeper'dan foydalanish uchun ulangan hamyonga ehtiyojingiz bor. Yangi hamyon yarating yoki mavjud hamyonni import qiling.",
+  "require_create_wallet_modal_create_new" : "Yangi hamyon yarating",
+  "require_create_wallet_modal_import" : "Mavjud hamyonni import qilish",
+  "require_create_wallet_modal_title" : "Keling, hamyoningizni sozlaymiz",
+  "restake_banner" : {
+    "stake_into_step" : "O'zingizda mavjud boʻlgan TONni Tonstakers'ga qo'ying.",
+    "stake_into_tonstakers_action" : "Tikmoq Tonstakers Кириш",
+    "title" : "Ko‘proq TON ishlab oling %apy bilan Tonstakers suyuq steykingida",
+    "unstake_action_all" : "Bekor qilish {amount}",
+    "unstake_action_manual" : "Qo'lda kiritish",
+    "unstake_step" : "TON ni joriy staking provayderingizdan olmoq.",
+    "wait_step" : "Kutib turing, TONingiz mavjud bo'lgunga qadar.",
+    "wait_step_collect" : "Yig‘ish",
+    "wait_step_cooldown" : "Sizning TONingiz tez orada mavjud bo'ladi. Siz uni yaqin orada olishingiz mumkin.",
+    "wait_step_pending" : "TONingiz {0, number}uration dan so'ng mavjud bo'ladi. Shundan so'ng siz ularni olishingiz mumkin.",
+    "wait_step_withdraw" : "Mavjud TONni avvalgi staklash xizmat ko'rsatuvchingizdan oling."
+  },
+  "scan_qr_open_settings" : "Sozlamalarni ochish",
+  "scan_qr_permission_error" : "QR kodlarni skanerlash uchun kamera kirishiga ruxsat bering",
+  "scan_qr_title" : "QR kodni skaner qiling",
+  "secret_words_caption" : "Ushbu 24 ta so'zni quyida berilgan tartibda yozib oling va sirli, xavfsiz joyda saqlang.",
+  "secret_words_title" : "Maxfiy tiklash iborasi",
+  "security_change_passcode" : "Parolni o'zgartirish",
+  "security_lock_screen_switch" : "Blok Ekrani",
+  "security_lock_screen_tip" : "Hamyon mazmunini ko‘rish uchun parol talab qilinadi.",
+  "security_migration_caption" : "Endi balansingiz va barcha operatsiyalaringiz parol bilan himoyalangan. Shuningdek, operatsiyalarni tezlashtirish uchun biometrik nazoratdan foydalanishingiz mumkin.",
+  "security_migration_skip_button" : "Hozir yangilama",
+  "security_migration_submit_button" : "Xavfsizlik sozlamalarini yangilang",
+  "security_migration_title" : "Hamyon xavfsizligini yangilang",
+  "security_reset_passcode" : "Pin kodni tiklash",
+  "security_title" : "Xavfsizlik",
+  "security_use_biometry_switch" : "Foydalanish {biometryType}",
+  "security_use_biometry_tip" : "Hamyoningizni har doim parol bilan ochishingiz mumkin.",
+  "send_address_placeholder" : "Manzil yoki ism",
+  "send_all_warning_title" : "Все балансингизни юборишни истаясизми?",
+  "send_build_tx_error" : "Transaksiyangiz muvaffaqiyatsiz bo'ldi",
+  "send_comment_label" : "Izoh qo'shish",
+  "send_fee_estimation_error" : "To'lovni hisoblash amalga oshmadi",
+  "send_get_wallet_info_error" : "Hamyon ma'lumotlarini olish muvaffaqiyatsiz bo'ldi",
+  "send_insufficient_funds" : "Mablag' yetarli emas",
+  "send_invalid_recipient_caption" : "Domen mavjud emas yoki hamyon manzili unga bog‘lanmagan",
+  "send_invalid_recipient_title" : "Yaroqsiz qabul qiluvchi",
+  "send_liquid_jetton_warning_title" : "Siz garov balansining bir qismini yubormoqchimisiz?",
+  "send_lockup_warning_caption" : "Iltimos, ruxsat etilgan manzilga yuborayotganingizni tekshiring. Tranzaksiya muvaffaqiyatsiz tugasa ham to'lov yechib olinadi.",
+  "send_lockup_warning_submit_button" : "Yuborish",
+  "send_lockup_warning_title" : "Miqdor likvid balansidan oshadi",
+  "send_publish_tx_error" : "Tranzaktsiyani yuborib bo‘lmadi",
+  "send_screen_steps" : {
+    "address" : {
+      "delete_alert_text" : "«{name}» foydalanuvchini tanlanganlardan o'chirmoqchiligingizga aminmisiz?",
+      "placeholder" : "Hamyon manzili yoki domen",
+      "recent_label" : "Yaqinda",
+      "suggest_actions" : {
+        "add" : "Sevimlilarga qo'shish",
+        "delete" : "O'chirish",
+        "edit" : "Sevimlini tahrirlash",
+        "hide" : "Yashirish"
+      },
+      "suggests_label" : "Sevimlilar va so‘nggilari",
+      "title" : "Qabul qiluvchi"
+    },
+    "amount" : {
+      "insufficient_balance" : "Hisobda mablag' yetarli emas",
+      "less_than_min" : "Minimum {minAmount} TON",
+      "less_than_min_with_symbol" : "Minimal {minAmount} {symbol}",
+      "liquid_jetton_note" : "tsTON likvidlik tokenini yuborish",
+      "max" : "MАКС",
+      "recipient_label" : "Kimga:",
+      "remaining" : "Mavjud: {amount}",
+      "title" : "Miqdor"
+    },
+    "choose_coin" : {
+      "subtitle" : "Keyingisi, siz qabul qiluvchi va summani kiritasiz.",
+      "title" : "Jo'natish uchun tokenni tanlang"
+    },
+    "comfirm" : {
+      "action" : "{coin} o‘tkazmasi",
+      "comment_ascii_text" : "Faqat ASCII belgilardan foydalaning: raqamlar, lotin alifbosi harflari va tinish belgilari.",
+      "comment_characters_exceeded" : "Xabar hajmi {count} ta belgidan oshdi.",
+      "comment_characters_left" : "Qolgan {count} ta belgilar.",
+      "comment_decrypt" : "Parolni yechish",
+      "comment_description" : "Hamma ko'rishi mumkin bo'ladi.",
+      "comment_description_encrypted" : "Faqat qabul qiluvchi va sizga ko'rinadi.",
+      "comment_encrypt" : "Kommentni shifrlash",
+      "comment_label" : "Izoh",
+      "comment_label_encrypted" : "Shifrlangan izoh",
+      "comment_label_required" : "Kerakli izoh",
+      "comment_placeholder" : "Xabar yoki havola (ixtiyoriy)",
+      "comment_placeholder_required" : "Eslatma yoki teg",
+      "comment_required_text" : "Birja uchun ko'chirishda izohni kiritishingiz kerak. Boshqa holatda, mablag'laringiz yo'qoladi.",
+      "details_label" : "Tafsilotlar",
+      "details_max_balance_label" : "Maksimal {currency} qoldiqni jo‘natish",
+      "title" : "Harakatni tasdiqlash",
+      "wallet" : "Hamyon",
+      "will_be_paid_with_battery" : "Batareya bilan to'lanadi"
+    },
+    "done" : {
+      "add_favorite" : "Manzilni sevimlilarga qo'shish",
+      "address" : "Manzil: {address}",
+      "comment" : "Izoh: {comment}",
+      "description" : "Tranzaksiyangiz tarmoqqa jo'natildi va bir necha soniya ichida qayta ishlanadi.",
+      "done_label" : "Tayyor",
+      "favorite_saved" : "Sevimlilarga saqlandi",
+      "fee" : "To'lov: {fee}",
+      "title" : "{currency} yuborildi!",
+      "to" : "Kimga: {name}"
+    }
+  },
+  "send_sending_failed" : "Yuborish muvaffaqiyatsiz bo'ldi",
+  "send_sending_wrong_time_description" : "Qurilmangiz sozlamalarida avtomatik vaqtni va sanani yoqing. Keyin transfer qilishingizni qayta urinib ko‘ring.",
+  "send_sending_wrong_time_title" : "Xato yuz berdi",
+  "send_title" : "{currency} jo'natish",
+  "settings_appearance" : "Ko'rinish",
+  "settings_backup_seed" : "Zaxira nusxasi",
+  "settings_bank_card" : "Bank kartasi",
+  "settings_contact_support" : "Biz bilan bog'laning",
+  "settings_delete_account" : "Hisobni o'chirish",
+  "settings_delete_signer_account" : "Hisobni oʻchirishmi?",
+  "settings_delete_watch_account" : "Ko‘rish hisobini oʻchirish?",
+  "settings_delete_watch_account_button" : "O'chirish",
+  "settings_faq" : "TSS",
+  "settings_jettons_list" : "Jetonlar",
+  "settings_legal_documents" : "Huquqiy hujjatlar",
+  "settings_network_alert_title" : "Tarmoqni tanlang",
+  "settings_news" : "Tonkeeper Yangiliklari",
+  "settings_news_url" : "https://t.me/tonkeeper",
+  "settings_notifications" : "Bildirishnomalar",
+  "settings_primary_currency" : "Valyuta",
+  "settings_rate" : "Tonkeeper'ni baholang",
+  "settings_recovery_phrase" : "Qayta tiklash iborasi",
+  "settings_reset" : "Chiqish",
+  "settings_reset_alert_button" : "Chiqish",
+  "settings_reset_alert_caption" : "Bu hamyon kalitlarini o'chiradi. Qayta tiklash iborasini zaxiralaganingizga ishonch hosil qiling.",
+  "settings_reset_alert_caption_all" : "Bu barcha hamyon kalitlarini o'chiradi. Qayta tiklash iboralaringizni zaxiralaganingizga ishonch hosil qiling.",
+  "settings_reset_alert_title" : "\uD83D\uDEA7 \uD83D\uDEA8 Chiqish? \uD83D\uDEA8 \uD83D\uDEA7",
+  "settings_reset_alert_title_all" : "\uD83D\uDEA7 \uD83D\uDEA8\uD83D\uDEA8\uD83D\uDEA8 \uD83D\uDEA7\nBarcha hamyonlardan chiqishingizni istaysizmi?",
+  "settings_search_engine" : "Qidiruv",
+  "settings_security" : "Xavfsizlik",
+  "settings_subscriptions" : "Obunalar",
+  "settings_support" : "Qo'llab-quvvatlash",
+  "settings_theme" : "Mavzu",
+  "settings_theme_names" : {
+    "blue" : "To'q ko'k",
+    "dark" : "Qorong'i",
+    "light" : "Yorug'\n",
+    "system" : "Tizim"
+  },
+  "settings_title" : "Sozlamalar",
+  "settings_to_mainnet" : "Mainnetga o‘ting",
+  "settings_to_testnet" : "Testnet-ga o'tish",
+  "settings_version" : "Versiya",
+  "settings_wallet_version" : "Faol manzil",
+  "setup_biometry_caption" : "{biometryType} sizga parolni kiritmasdan hamyoningizni tezroq ochishga imkon beradi.",
+  "setup_biometry_enable_button" : "{biometryType}ni yoqish",
+  "setup_biometry_title" : "{biometryType} bilan tez kirish",
+  "setup_notifications_caption" : "Cüzdoningizga TON, token va NFT kelganda ogohlantirishlarni oling.",
+  "setup_notifications_enable_button" : "Bildirishnomalarni yoqing",
+  "setup_notifications_title" : "Tezkor bildirishnomalarni oling",
+  "signerConfirm" : {
+    "confirm" : "Transaksiyangizni Signer'da tasdiqlang",
+    "scan_qr" : "Signer yordamida QR-kodni skanerlash",
+    "scan_signed_qr" : "Signer tomonidan imzolangan tranzaksiya QR kodini skanerlang",
+    "step" : "Qadam {value}",
+    "title" : "Harakatni tasdiqlang"
+  },
+  "signer_scan_result" : "Imzolangan tranzaksiyani skaner qiling",
+  "signer_scan_tx_description" : "Iltimos, Signer'ni oching va tranzaksiyani QR kodi orqali skaner qiling",
+  "skip" : "O'tkazib yuborish",
+  "spam_action" : "Spam",
+  "staking" : {
+    "active" : "Faol",
+    "confirm" : {
+      "address" : {
+        "label" : "Qabul qiluvchining manzili"
+      },
+      "amount" : {
+        "label" : "Miqdor",
+        "value" : "{value} TON"
+      },
+      "fee" : {
+        "label" : "Toʻlov",
+        "value" : "≈ {value} TON"
+      },
+      "recipient" : {
+        "label" : "Qabul qiluvchi"
+      },
+      "withdraw_amount" : {
+        "label" : "Yechib olish miqdori",
+        "value" : "{value} TON"
+      }
+    },
+    "confirm_deposit" : "Tasdiqlash va Tikish",
+    "confirm_unstake" : "Tasdiqlash va qaytarish",
+    "deposit" : "Depozit",
+    "desc_large" : "Stakingga qo'shiling va mukofotlar oling. Staking TON tarmog'ini qo'llashga yordam beradi.",
+    "details" : {
+      "about_pool" : "Tafsilotlar",
+      "apy" : {
+        "highest_tag" : "MAKS",
+        "label" : "Yillik daromad foizi",
+        "value" : "≈ {value}%"
+      },
+      "balance" : "Staking balansi",
+      "cooldown" : {
+        "active" : "Faol",
+        "desc" : "Ikkilamchi jarayonni soddalashtirish uchun har bir sikl boshlanganida qo‘llaniladigan ikki soatlik muddat",
+        "title" : "Sovish vaqti"
+      },
+      "frequency" : {
+        "label" : "Mukofotlar tezligi",
+        "value" : "Har {count} soatda\n",
+        "value.few" : "Har {count} soat",
+        "value.many" : "Har {count} soatda",
+        "value.one" : "Har {count} soatda",
+        "value.zero" : "Har {count} soat"
+      },
+      "links_title" : "Havolalar",
+      "liquidity_token" : {
+        "label" : "{token} likvidlik tokeni",
+        "value" : "Batafsil ma'lumot"
+      },
+      "min_deposit" : {
+        "label" : "Minimal depozit",
+        "value" : "{value} TON"
+      },
+      "next_cycle" : {
+        "desc" : "Barcha tranzaksiyalar sikl tugagandan keyin kuchga kiradi.",
+        "desc_liquid" : "Barcha yechib olish so'rovlari davr tugagach amalga oshiriladi.",
+        "in" : "ichida",
+        "message" : "Unstaking so'rovi {value} ichida tasdiqlash sikli tugaganidan keyin ko‘rib chiqiladi.",
+        "reward_title" : "Keyingi mukofot",
+        "time" : "{time} ichida",
+        "title" : "Keyingi tsikl"
+      },
+      "note" : "Staking uchinchi tomonlarning aqlli shartnomalariga asoslangan. Tonkeeper staking tajribasi uchun mas'ul emas.",
+      "pendingDeposit" : "Kutilayotgan depozit",
+      "pendingWithdraw" : "Kutilayotgan yechib olish",
+      "pendingWithdrawDesc" : "sikl tugagandan keyin",
+      "pool_address" : {
+        "label" : "Hovuz manzili"
+      },
+      "readyWithdraw" : "Bo'shatish tayyor",
+      "show_details" : "Batafsil ma'lumotlar",
+      "socials" : {
+        "telegram" : "Hamjamiyat",
+        "twitter" : "Twitter"
+      },
+      "tap_to_collect" : "Yig'ish uchun bosing"
+    },
+    "estimated_profit" : "{amount} TON – agar bugun TON steyk qilsangiz yillik foyda",
+    "estimated_profit_compare" : "Yillik staking’ingizdan ko‘ra {amount} TON ko‘proq daromadli",
+    "get_withdrawal" : "Olish",
+    "highest_apy" : "ENG KO'P APY",
+    "jetton_note" : "TON-ni {poolName} hovuziga qo‘yganingizda, sizga hovuzdagi ulushingizni ifodalovchi {token} deb nomlangan token beriladi. Hovuzdagi foyda oshgani sayin, {token} tokeningiz ko‘proq TON miqdorini ifodalaydi.",
+    "learn_more" : "Ko'proq ma'lumot",
+    "message" : {
+      "pendingDeposit" : "{amount} TON qo‘shiladi",
+      "pendingWithdraw" : "{amount} TON yechiladi",
+      "pendingWithdrawLiquid" : "{amount} TON tsikldan keyin chiqariladi",
+      "readyWithdraw" : "{amount} TONni yechish tayyor.\nYechish uchun bosing"
+    },
+    "no_funds" : "Hisobingizda qaytarib olish uchun yetarli mablag' yo'q",
+    "not_exists" : "Noto'g'ri pool manzili",
+    "other" : "Boshqa",
+    "recommended" : "Tavsiya etilgan",
+    "rewards" : {
+      "after_top_up" : "Top updan keyin",
+      "current" : "Joriy",
+      "title" : "Yillik daromadingiz",
+      "value" : "≈ {value} TON"
+    },
+    "send_staked_ton" : "Tikilgan TON",
+    "staked" : "Tikildi",
+    "staked_ton" : "Steyking qilingan TON",
+    "staking_desc" : "Minimal depozit {minStake} TON.\nDaromad {maxApy}% gacha.",
+    "staking_pool_desc" : "APY ≈ {apy}%",
+    "title" : "Staking",
+    "title_large" : "TON stekingi",
+    "top_up" : "To'ldirish",
+    "transaction" : "Amalni tasdiqlash",
+    "warning" : {
+      "about" : "Haqida {name}",
+      "beta_desc" : "Biz staking jarayoni barqarorligi va tajribasi uchun javobgar emasmiz. Xizmatdan foydalanishda barcha risklar faqat sizga tegishli ekanligini unutmang.",
+      "desc" : "Staking uchinchi tomon smart-kontraktlariga asoslangan. Biz ularning ishlashi uchun javobgar emasmiz.",
+      "title" : "Ogohlantirish"
+    },
+    "widget_desc" : "APY {apy}% gacha",
+    "widget_staking_options" : "Staking variantlari",
+    "widget_title" : "Stake TON",
+    "withdraw" : "Chiqarib olish",
+    "withdrawal_fee_warning" : {
+      "continue" : "Baribir davom eting",
+      "message" : "Iltimos, balansingizda kamida '{{'amount'}}' TON qoldiring.",
+      "title" : "Sizda pulni yechib olish uchun yetarli mablag' bo'lmaydi"
+    },
+    "withdrawal_request" : "Yechib olish so'rovi"
+  },
+  "start_screen" : {
+    "caption" : "Yangi hamyon yarating yoki mavjudini qo‘shing",
+    "create_wallet_button" : "Yangi hamyon yaratish",
+    "import_wallet_button" : "Mavjud hamyonni import qilish"
+  },
+  "stop_watch" : "Soat hisobini oʻchirish",
+  "subscription_back_to_merchant_button" : "Orqaga",
+  "subscription_back_to_merchant_caption" : "Tranzaksiya qayta ishlanmoqda. Obunangiz tez orada faollashadi.",
+  "subscription_back_to_merchant_name" : "{merchantName}ga qaytish",
+  "subscription_back_to_merchant_title" : "Kanalga qaytish?",
+  "subscription_cancel" : "Obunani bekor qilish",
+  "subscription_cancel_alert_cancel_btn" : "Hozir emas",
+  "subscription_cancel_alert_caption" : "Agar hozir bekor qilsangiz, obunangizga {nextBill} sanasigacha kirishingiz mumkin bo'ladi",
+  "subscription_cancel_alert_submit_btn" : "Ha, bekor qiling",
+  "subscription_cancel_alert_title" : "Obunani bekor qilishni xohlaysizmi?",
+  "subscription_expiring" : "Muddati tugamoqda",
+  "subscription_fee" : "To‘lov",
+  "subscription_next_bill" : "Keyingi hisob-faktura",
+  "subscription_open_merchant" : "Telegramda ochish",
+  "subscription_period" : "Interval",
+  "subscription_period_custom" : "Har {period}",
+  "subscription_period_day" : "Kunlik",
+  "subscription_period_half_year" : "Yarim yillik",
+  "subscription_period_hour" : "Soatlik",
+  "subscription_period_month" : "Aylik",
+  "subscription_period_quarter" : "Har chorakda",
+  "subscription_period_week" : "Haftalik",
+  "subscription_period_weeks" : "Har {count} haftada",
+  "subscription_period_year" : "Yillik",
+  "subscription_price" : "Narx",
+  "subscription_sent" : "Tranzaksiya jo'natildi",
+  "subscriptions_item_caption" : "{price} TON, keyingi hisob {nextBill}",
+  "subscriptions_item_caption_expired" : "Muddati o'tgan {date}",
+  "subscriptions_item_caption_expiring" : "{price} TON, {date} kuni tugaydi",
+  "subscriptions_section_active" : "Faol",
+  "subscriptions_section_expired" : "Muddati tugagan",
+  "subscription_started" : "Obuna boshlandi",
+  "subscriptions_title" : "Obunalar",
+  "subscription_subscribe" : "Obuna bo'ling",
+  "subscription_title" : "Obuna",
+  "subscription_unsubscribe" : "Obunani bekor qilish",
+  "success" : "Muvaffaqiyat!",
+  "suspicious" : {
+    "buttons" : {
+      "not_spam" : "Bu spam emas",
+      "report" : "Shikoyat qilish"
+    },
+    "label" : {
+      "full" : "Tasdiqlanmagan NFT",
+      "short" : "Tekshirilmagan"
+    },
+    "status_update" : {
+      "hidden" : {
+        "collection" : "Kolleksiya yashirilgan",
+        "nft" : "NFT yashirin"
+      },
+      "spam" : {
+        "collection" : "Kolleksiya spam sifatida belgilandi",
+        "nft" : "NFT spam sifatida belgilangan"
+      }
+    }
+  },
+  "suspiciousNFTDetails" : {
+    "buttons" : {
+      "not_spam" : "Spam emas",
+      "report" : "Spamni xabar qiling"
+    },
+    "paragraphs" : {
+      "p1" : "Spam uchun ishlatiladi. Katta miqyosda keraksiz va ko'pincha mavzusiz xabarlarni yuborish uchun foydalaniladi.",
+      "p2" : "Firibgarlik uchun ishlatiladi. NFTning nomi, tavsifi yoki tasviri foydalanuvchilarni adashtirishi mumkin.",
+      "p3" : "Biz bu NFT muallifi va tarixi haqida kam ma'lumotga egamiz."
+    },
+    "subtitle" : "NFT quyidagi sabablardan biri uchun xavfsiz bo'lmasligi mumkin.",
+    "title" : "Tasdiqlanmagan NFT"
+  },
+  "swap_title" : "Almashtirish",
+  "tab_browser" : "Brauzer",
+  "tab_collectibles" : "Kolleksiyalar",
+  "tab_nft" : "NFTlar",
+  "tab_settings" : "Sozlamalar",
+  "tab_swap" : "Almashtirish",
+  "tab_wallet" : "Hamyon",
+  "today" : "Bugun",
+  "tokenDetails" : {
+    "name" : "Ism",
+    "title" : "Token tafsilotlari",
+    "token_id" : "Token ID",
+    "tonviewer_button" : "Tonviewer'da ko'rish"
+  },
+  "tonconnect_error" : {
+    "bad_request" : "Noto'g'ri so'rov",
+    "wrong_from" : "Noto'g'ri 'from' parametri",
+    "wrong_network" : "Noto'g'ri tarmoq"
+  },
+  "tonkeeper_pro" : "Tonkeeper Pro",
+  "tonkeeper_pro_description" : "Tonkeeper Pro obunasi kengaytirilgan hamyon funksiyasi bilan birga keladi va kripto boshqaruvi uchun vositalar to‘plamini taklif etadi",
+  "ton_login_back_to_button" : "{name}ga qaytish",
+  "ton_login_caption" : "{name} hamyon manzilingizga kirishni so'ramoqda",
+  "ton_login_connect_button" : "Hamyonni ulash",
+  "ton_login_notice" : "Hamyonni ulashdan oldin xizmat manzilini tekshirganingizga ishonch hosil qiling.",
+  "ton_login_success" : "Bajarildi",
+  "ton_login_title" : "{0, number}omain-ga ulansınmi?",
+  "transaction_bid_collection_name" : "Emitent",
+  "transaction_bid_date" : "Taklif {date}",
+  "transaction_bid_dns" : "Ism",
+  "transaction_buy_date" : "Sotib olingan sana {date}",
+  "transaction_buy_status_failed" : "Muvaffaqiyatsiz bo'ldi",
+  "transaction_buy_status_pending" : "Kutilmoqda",
+  "transaction_buy_status_success" : "Muvaffaqiyatli",
+  "transaction_confirmations" : "Tasdiqlar",
+  "transaction_confirm_bid" : "Taklifni tasdiqlash",
+  "transaction_contract_deploy_date" : "{date}",
+  "transaction_copy_caution" : "Tashqi havolalarga ehtiyot bo'ling. Hech qachon maxfiy so'zingizni uchinchi tomon manbalariga bermang - barcha mablag'ingizni yo'qotishingiz mumkin.\n\n- - -",
+  "transactionDetails" : {
+    "address" : "Manzil",
+    "bid_collection_name" : "Nashr qiluvchi",
+    "bid_date" : "Stavka {time}",
+    "bid_name" : "Ism",
+    "call_contract_date" : "Shartnoma chaqiruvi {time}",
+    "comment" : "Izoh",
+    "description" : "Tavsif",
+    "operation" : "Amaliyot",
+    "payload" : "Foydali yuk",
+    "purchase_date" : "Sotib olish {time} da",
+    "received_date" : "Qabul qilindi {time}",
+    "recipient" : "Qabul qiluvchi",
+    "recipient_address" : "Qabul qiluvchining manzili",
+    "sender" : "Jo'natuvchi",
+    "sender_address" : "Yuboruvchi manzili",
+    "sent_date" : "Yuborilgan {time}",
+    "spam" : "SPAM",
+    "subscription_merchant_label" : "Sotuvchi",
+    "subscription_product_label" : "Obuna",
+    "swapped_date" : "Ayirboshlagan {time}",
+    "transaction" : "Tranzaksiya",
+    "unsubscription_title" : "Obunadan chiqish",
+    "withdraw_amount" : "Vechirıladigan summa"
+  },
+  "transaction_exchange_from_currency" : "Dan",
+  "transaction_fee" : "To'lov",
+  "transaction_hash" : "Tranzaksiya",
+  "transaction_merchant" : "Savdogar",
+  "transaction_message" : "Xabar",
+  "transaction_purchase_id" : "Xarid identifikatori",
+  "transaction_receive_date" : "{date} qabul qilindi",
+  "transaction_recipient" : "Qabul qiluvchi",
+  "transaction_recipient_address" : "Qabul qiluvchi manzili",
+  "transaction_refund" : "Qaytarish",
+  "transactions" : {
+    "bid" : "Taklif",
+    "burned" : "Yo'q qilingan",
+    "contract_deploy" : "Shartnoma joylash",
+    "deposit" : "Qo'yish",
+    "failed" : "Muvaffaqiyatsiz",
+    "failed_with_reason" : {
+      "swap_refund_no_liq" : "Xato yuz berdi. Bu xatoni oldini olish uchun almashish sozlamalarida sirpanish toleransini oshiring."
+    },
+    "nft_purchase" : "NFT Xaridi",
+    "smartcontract_exec" : "Shartnomani chaqirish",
+    "spam" : "Spam",
+    "subscription" : "Obuna bo'ldingiz",
+    "swap" : "Ayirboshlash",
+    "unknown" : "Noma'lum",
+    "unknown_description" : "Bir narsa yuz berdi lekin biz uni aniqlay olmadik",
+    "unsubscription" : "Obuna bekor qilindi",
+    "wallet_initialized" : "Hamyon ishga tushirildi",
+    "withdraw" : "Chiqarish",
+    "withdrawal_request" : "Yechish so'rovi"
+  },
+  "transaction_sender" : "Yuboruvchi",
+  "transaction_sender_address" : "Jo'natuvchi manzili",
+  "transaction_send_more_button" : "Ko‘proq ushbu oluvchiga yuboring",
+  "transaction_sent_date" : "{date} da yuborildi",
+  "transaction_show_subscription_button" : "Obunani ko‘rish",
+  "transaction_status" : "Holat",
+  "transaction_subscription" : "Obuna",
+  "transaction_subscription_date" : "{date} sanasida to'lov qaydlari",
+  "transaction_transfer_name" : "O'tkazma nomi",
+  "transaction_type_bid" : "Taklif",
+  "transaction_type_bounced" : "Qaytarildi",
+  "transaction_type_buy" : "Sotib olindi",
+  "transaction_type_contract_deploy" : "Shartnoma joriy qilish",
+  "transaction_type_from" : "Kimdan",
+  "transaction_type_new_subscriber" : "Yangi obunachi",
+  "transaction_type_pending" : "Kutilmoqda",
+  "transaction_type_receive" : "Olingan",
+  "transaction_type_sent" : "Yuborildi",
+  "transaction_type_subscriber_lost" : "Obunachi yo'qotildi",
+  "transaction_type_subscription" : "Obuna",
+  "transaction_type_to" : "Qabul qiluvchi",
+  "transaction_type_unsubscription" : "Obuna bekor qilindi",
+  "transaction_type_wallet_initialized" : "Hamyon ishga tushirilgan",
+  "transaction_unsubscription" : "Obunani bekor qilish",
+  "transaction_unsubscription_date" : "Obuna bekor qilinishi sanasi {date}",
+  "transaction_view_in_explorer" : "Explorerda ko'rish",
+  "transaction_wallet_initialized_date" : "{date}",
+  "transaction_your_bid" : "Sizning taklifingiz",
+  "transfer_deeplink_address_error" : "Noto'g'ri oluvchi manzili",
+  "transfer_deeplink_amount_error" : "Noto'g'ri summa talabi",
+  "transfer_deeplink_expired_error" : "Havola muddati o‘tdi",
+  "transfer_deeplink_nft_address_error" : "Notog'ri NFT manzili",
+  "transfer_deeplink_unknown_jetton_error" : "Noma'lum token",
+  "transfer_deeplink_unknown_token" : "Noma'lum token",
+  "transfer_deeplink_wrong_params" : "Noto'g'ri parametrlar",
+  "transfer_from_old_wallet_btn" : "O‘tqazish",
+  "transfer_from_old_wallet_caption" : "Tonkeeper barcha tangalarni eski manzilingizdan yangi manzilingizga o'tkazadi.",
+  "transfer_from_old_wallet_in_progress" : "O'tkazma davom etmoqda",
+  "transfer_from_old_wallet_title" : "Joriy manzilga o'tkazish",
+  "transfer_pending_by_battery_error" : "Yana bir tranzaksiya batareya tomonidan amalga oshirilmoqda",
+  "txActions" : {
+    "amount" : "Miqdor",
+    "fee" : "To'lov",
+    "refund" : "Qaytarish",
+    "signRaw" : {
+      "addressMismatch" : {
+        "switchWallet" : {
+          "close" : "Bekor qilish",
+          "description" : "Hamyonni almashtirib, harakatni tasdiqlang.",
+          "switch" : "O'zgartiring va Davom eting",
+          "title" : "Aмал для сизнинг ҳамёнингиз {value}"
+        },
+        "wrongVersion" : {
+          "close" : "Bekor qilish",
+          "description" : "Faol manzilingizni tasdiqlash uchun {version} ga o'zgartiring.",
+          "switch" : "O'zgartirish va davom ettirish",
+          "title" : "Boshqa manzil uchun hamyoningiz operatsiyasi"
+        },
+        "wrongWallet" : {
+          "close" : "Yopish",
+          "description" : "Boshqa {address} hamyoniga kiring va qayta urinib ko'ring.",
+          "title" : "Boshqa hamyon uchun amal"
+        }
+      },
+      "comment" : "Izoh",
+      "insufficientFunds" : {
+        "rechargeBattery" : "Batareyani quvvatlang",
+        "rechargeWallet" : "Hamyonni to'ldiring",
+        "stakingDeposit" : "Ishtirok etish uchun minimal balans:\n{amount} {currency}\n",
+        "stakingFee" : "Tranzaksiya uchun {count} TON kerak. Taxminiy komissiya {fee} TON chegiriladi, qolgan qismi qaytariladi.",
+        "title" : "Hisobda mablag' yetarli emas",
+        "title_multiwallet" : "Hamyoningizda mablag' yetarli emas",
+        "toBePaid" : "To‘lanishi kerak: {amount} {currency}",
+        "withFees" : "+ blokcheyn to'lovlari.\n",
+        "yourBalance" : "Balansingiz: {balance} {currency}."
+      },
+      "recipient" : "Qabul qiluvchi",
+      "title" : "Tranzaksiyani tasdiqlash",
+      "totalFee" : "Umumiy to'lov",
+      "totalRefund" : "Umumiy qaytarish summasi",
+      "types" : {
+        "contractDeploy" : "Shartnoma joylashtirish",
+        "jettonTransfer" : "Token o‘tkazish",
+        "nftItemTransfer" : "NFT yuborish",
+        "subscribe" : "Obuna",
+        "tonTransfer" : "TON Yuborish",
+        "unknownTransaction" : "Noma'lum tranzaksiya",
+        "unSubscribe" : "Obuna bekor qilish"
+      },
+      "warning_caption" : "Tonkeeper ushbu tranzaksiyaning natijasini to'liq tekshira olmaydi. Olishchini ishonchli ekanligiga ishonch hosil qiling.",
+      "warning_title" : "Ogohlantirish",
+      "wrongTime" : {
+        "button" : "Sozlamalarni ochish",
+        "description" : "Qurilmangizning soati tarmoq bilan sinxronlashtirilmagan ko'rinadi. Qurilma sozlamalariga o'ting va avtomatik vaqt va sanani yoqing.",
+        "title" : "Soatlar sinxronizatsiyalanmagan"
+      }
+    }
+  },
+  "unverifiedTokenDetails" : {
+    "button" : "Tushunarli",
+    "description" : "Ushbu token bir yoki bir nechta sababga ko'ra shubhali ko'rinadi.",
+    "paragraphs" : {
+      "p1" : "Yuqori likvidlilik. Token qiymati bo'lishi mumkin, ammo u juda past.",
+      "p2" : "Token savdo platformalarida keltirilmagan va cheklangan talabga ega.",
+      "p3" : "Spamni tarqatish uchun ishlatiladi. Ortiqcha va ko'pincha noyorliq xabarlarni katta hajmda jo'natish uchun ishlatiladi.",
+      "p4" : "Firibgarlik uchun ishlatiladi. Tokenning nomi yoki rasmini foydalanuvchilarni aldashga olib kelishi mumkin."
+    },
+    "title" : "Tasdiqlanmagan token"
+  },
+  "update" : {
+    "description" : "Tonkeeperning yangi versiyasi mavjud. Siz uni hozir yuklab olishingiz mumkin.",
+    "download" : "Yuklab olish",
+    "downloading" : "Yuklanmoqda… '{{'progress'}}'%",
+    "mb" : "'{{'size'}}' MB",
+    "remindLater" : "Keyinroq eslatish",
+    "retry" : "Yuklab olish xatosi. Qayta urinish uchun bosing.",
+    "tap" : "Yangilash uchun bosing",
+    "title" : "Tonkeeper-ni yangilang",
+    "version" : "Versiya '{{'version'}}'"
+  },
+  "upgrade_to_w5" : {
+    "about_button" : "W5 Hamyon haqida",
+    "description" : "W5 hamyonining yangi standartini sinab ko'ring, USDT to'lovlari va boshqa qiziqarli xususiyatlar uchun hech qanday komissiyalar talab qilinmaydi.",
+    "downgrade" : "Hamyon v4R2",
+    "hide_button" : "Yashirish",
+    "settings" : "Hamyon W5",
+    "title" : "Gazsiz o'tkazmalar",
+    "try_button" : "W5 Hamyonini sinab ko'ring"
+  },
+  "username_issued_by_telegram" : "Telegram tomonidan berilgan.",
+  "username_manage_name_button" : "Ismni boshqarish",
+  "w5_stories" : {
+    "0" : {
+      "description" : "W5 tranzaksiyalarni qayta ishlash uchun samaraliroq yondashuvni qo'llaydi, bu gaz xarajatlarini 25% gacha kamaytiradi.",
+      "title" : "Kamaytirilgan blockchain komissiyalari"
+    },
+    "1" : {
+      "description" : "W5 bir vaqtning o'zida bajariladigan operatsiyalar sonini 4 tadan 255 tagacha oshiradi, bu esa komissiya xarajatlarini kamaytirishi mumkin.",
+      "title" : "Bitta tranzaksiyada 255 ta operatsiyaga qadar"
+    },
+    "2" : {
+      "description" : "USDT'ni TON'ga ega bo'lmasdan yuboring – tranzaksiya to'lovlari avtomatik ravishda bir necha tsent USDT bilan qoplanadi.",
+      "title" : "Gazsiz USDT O'tkazmalari"
+    },
+    "3" : {
+      "description" : "Eski hisoblar va W5 bir xil tiklash iborasidan foydalanadi – yangi qurilmada hisoblarni tiklaganda, eski va yangi avtomatik ravishda paydo bo'ladi.",
+      "title" : "Qayta tiklash iborasi o'zgarmaydi"
+    },
+    "4" : {
+      "button" : "W5 Hamyonini Qo'shish",
+      "description" : "Gaslarsiz tranzaksiyalar sinov jarayonida eksperimental xususiyat sifatida taklif etiladi.",
+      "title" : "W5"
+    }
+  },
+  "wallet_about" : "Haqida",
+  "wallet_buy" : "Sotib olish",
+  "wallet" : {
+    "buy_btn" : "Sotib olish & Sotish",
+    "collectibles_tab_lable" : "Kolleksiya",
+    "edit_tokens_btn" : "Tahrirlash",
+    "inscriptions_tab_label" : "Inskriptsiyalar",
+    "nft_tab_lable" : "Kolleksiyalar",
+    "old_wallets_title" : "Eski hamyonlar",
+    "old_wallet_title" : "Eski hamyon",
+    "receive_btn" : "Qabul qilish",
+    "scan_btn" : "Сканерлаш",
+    "screen_title" : "Hamyon",
+    "sell_btn" : "Sotish",
+    "send_btn" : "Yuborish",
+    "stake_btn" : "Staking",
+    "swap_btn" : "Almashtirish",
+    "tonkens_tab_lable" : "Tokenlar",
+    "updated_at" : "{value} da yangilandi"
+  },
+  "wallet_chat" : "Chat",
+  "wallet_community" : "Jamiyat",
+  "wallet_hours_symbol" : "s",
+  "wallet_old_balance" : "Eski hamyon:",
+  "wallet_receive" : "Qabul qilish",
+  "wallets" : "Hamyonlar",
+  "wallet_sell" : "Sotuv",
+  "wallet_send" : "Yuborish",
+  "wallet_source_code" : "Manba kodi",
+  "wallet_swap" : "Almashtirish",
+  "wallet_title" : "Hamyon",
+  "wallet_toncommunity_chat_link" : "https://t.me/toncoin_uz_chat",
+  "wallet_toncommunity_link" : "https://t.me/toncoin",
+  "watch_only" : "Faqat ko'rish",
+  "yesterday" : "Kecha"
+}

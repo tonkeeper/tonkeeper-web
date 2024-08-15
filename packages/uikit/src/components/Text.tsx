@@ -80,11 +80,15 @@ export const Body2 = styled.span`
     ${Body2Class}
 `;
 
-export const Body3 = styled.span`
+export const Body3Class = css`
     font-style: normal;
     font-weight: 500;
     font-size: 12px;
     line-height: 16px;
+`;
+
+export const Body3 = styled.span`
+    ${Body3Class}
 `;
 
 export const Num2Class = css`
