@@ -14,6 +14,7 @@ import {
 } from './ImportIcons';
 import { BorderSmallResponsive } from '../shared/Styles';
 import { PlusIcon } from '../Icon';
+import { Badge } from '../shared';
 
 const AddMethod = styled.button`
     display: flex;
@@ -32,7 +33,7 @@ const AddMethod = styled.button`
             padding: 10px 12px 10px 16px;
         `}
 
-    *:last-child {
+    >:last-child {
         margin-left: auto;
     }
 `;
@@ -59,6 +60,9 @@ const AddMethodText = styled.div`
 `;
 
 const AddMethodLabel = styled(Label1)`
+    display: flex;
+    align-items: center;
+    gap: 4px;
     ${p => p.theme.displayType === 'full-width' && Label2Class}
 `;
 
@@ -107,7 +111,10 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                             <PlusIconStyled />
                         </ButtonIcon>
                         <AddMethodText>
-                            <AddMethodLabel>{t('add_wallet_modal_mam_title')}</AddMethodLabel>
+                            <AddMethodLabel>
+                                {t('add_wallet_modal_mam_title')}
+                                <Badge color="accentOrange">Beta</Badge>
+                            </AddMethodLabel>
                             <AddMethodDescription>
                                 {t('add_wallet_modal_mam_subtitle')}
                             </AddMethodDescription>

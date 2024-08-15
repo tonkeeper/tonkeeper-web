@@ -448,7 +448,7 @@ async function getRelevantMAMTonAccountsToImport(
     const accounts: { tonAccount: MamTonAccount; derivationIndex: number; shouldAdd: boolean }[] =
         [];
 
-    const indexesGap = 5;
+    const indexesGap = 10;
     while (true) {
         const indexFrom = accounts.length ? accounts[accounts.length - 1].derivationIndex + 1 : 0;
         const accsToAdd = await Promise.all(

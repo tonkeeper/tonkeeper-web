@@ -4457,21 +4457,21 @@ __metadata:
 
 "@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core::locator=%40tonkeeper%2Fcore%40workspace%3Apackages%2Fcore":
   version: 0.0.1
-  resolution: "@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core#../../../../../ton/tonkeeper-mnemonics/packages/core::hash=c14a1e&locator=%40tonkeeper%2Fcore%40workspace%3Apackages%2Fcore"
+  resolution: "@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core#../../../../../ton/tonkeeper-mnemonics/packages/core::hash=ba8734&locator=%40tonkeeper%2Fcore%40workspace%3Apackages%2Fcore"
   dependencies:
     "@scure/bip39": "npm:^1.2.2"
     "@ton/crypto": "npm:^3.2.0"
-  checksum: 10/394208bb7c383e7eb558cbce12d53c490e94abc859a3ce2ac3e75d4e7d7cf8194e06e012c108749721d8a95a0eaf4ecf77c6e85131481785654c4d8c87152075
+  checksum: 10/1fbabeabd1253a6ae6cc193005786b1f6db4555bfe94c44adadb6c0e559c7b85bafa1a86713a9c662abe0587ba770ebf9d07178f938767c35cf95287de73956b
   languageName: node
   linkType: hard
 
 "@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core::locator=%40tonkeeper%2Fuikit%40workspace%3Apackages%2Fuikit":
   version: 0.0.1
-  resolution: "@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core#../../../../../ton/tonkeeper-mnemonics/packages/core::hash=c14a1e&locator=%40tonkeeper%2Fuikit%40workspace%3Apackages%2Fuikit"
+  resolution: "@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core#../../../../../ton/tonkeeper-mnemonics/packages/core::hash=ba8734&locator=%40tonkeeper%2Fuikit%40workspace%3Apackages%2Fuikit"
   dependencies:
     "@scure/bip39": "npm:^1.2.2"
     "@ton/crypto": "npm:^3.2.0"
-  checksum: 10/394208bb7c383e7eb558cbce12d53c490e94abc859a3ce2ac3e75d4e7d7cf8194e06e012c108749721d8a95a0eaf4ecf77c6e85131481785654c4d8c87152075
+  checksum: 10/1fbabeabd1253a6ae6cc193005786b1f6db4555bfe94c44adadb6c0e559c7b85bafa1a86713a9c662abe0587ba770ebf9d07178f938767c35cf95287de73956b
   languageName: node
   linkType: hard
 
