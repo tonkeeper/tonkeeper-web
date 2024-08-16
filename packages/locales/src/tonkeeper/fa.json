@@ -53,84 +53,84 @@
     "notification_desc_did_change" : "آدرس کیف پول شما به فرمت UQ به روز شده است. آدرس قدیمی نیز به کار خود ادامه می دهد.",
     "notification_desc_will_change" : "در 5 اکتبر آدرس کیف پول شما به فرمت UQ به روز می شود که بهتر است. آدرس قدیمی نیز کار خواهد کرد. شما نیازی به انجام کاری ندارید.",
     "old_style" : "Old address",
-    "post_dates" : "\n۵ اکتبر ۲۰۲۳: همه آدرس ها به فرمت UQ در تون کیپر تغییر می کنند.\n\n۱ ژوئن ۲۰۲۴: تون کیپر بررسی وضعیت قرارداد را متوقف می‌کند و از پرچم "Bounceable" در آدرس استفاده می‌کند. Coins sent to non-published contracts with an EQ address will bounce back to the sender.",
-    "post_published_date" : "Published: September 27, 2023",
-    "post_rest" : "There are two address styles on the TON blockchain and until now only one was used for apps and wallets.\n\nThe EQ format is best for smart contracts that process incoming funds. If a smart contract isn’t published yet — i.e., the code isn’t on the blockchain — then the TONs sent to that address will bounce back to the sender. And this is a safety feature: if there is any error, TONs bounce back.\n\nThe UQ format is best for wallets. Coins never bounce because wallets are designed to simply store funds. Each wallet starts as a plain address without a code on the blockchain. So, it would make no sense for coins to bounce back.\n\nThis year we are switching wallets to the more suitable UQ format. And if you continue sending funds to an old EQ address someone gave you, there will be two options:\n",
-    "post_top" : "By the end of this year the entire TON network will display wallet addresses differently. The new address will start with UQ instead of EQ. And the last four letters will change too. The old address will also work and direct to the same wallet. It doesn't effect the safety of funds stored in your wallet anyhow.",
-    "second_option" : "Less likely that the wallet has never been used for payments. And Tonkeeper won’t send coins to that address next year. You will have to ask the recipient for a new UQ address.",
-    "title" : "Address Update",
-    "why_change" : "Why change?",
-    "your_wallet" : "Your wallet"
+    "post_dates" : "\n۵ اکتبر ۲۰۲۳: همه آدرس ها به فرمت UQ در تون کیپر تغییر می کنند.\n\n۱ ژوئن ۲۰۲۴: تون کیپر بررسی وضعیت قرارداد را متوقف می‌کند و از پرچم "Bounceable" در آدرس استفاده می‌کند. کوین های ارسال شده به کانترکت‌های منتشر نشده با آدرس EQ به فرستنده بازمی گردند.",
+    "post_published_date" : "منتسر شده: ۲۷ سپتامبر، ۲۰۲۳",
+    "post_rest" : "دو سبک آدرس در بلاک چین TON وجود دارد و تاکنون تنها یکی برای برنامه ها و کیف پول ها استفاده می شد.\n\nفرمت EQ برای کانترکت های هوشمندی که وجوه دریافتی را پردازش می کنند بهترین است. اگر یک کانترکت هوشمند هنوز منتشر نشده باشد - یعنی کد روی بلاک چین نیست - آنگاه TON های ارسال شده به آن آدرس به فرستنده بازمی گردند. و این یک ویژگی ایمنی است: اگر خطایی وجود داشته باشد، TON ها به عقب برمی گردند.\n\nفرمت UQ برای کیف پول ها بهترین است. سکه ها هرگز جهش نمی کنند زیرا کیف پول ها به سادگی برای ذخیره وجوه طراحی شده اند. هر کیف پول به عنوان یک آدرس ساده بدون کد در بلاک چین شروع می شود. بنابراین، بازگشت سکه ها منطقی نیست.\n\nامسال کیف پول ها را به فرمت UQ مناسب تر تغییر می دهیم. و اگر به ارسال وجوه به آدرس EQ قدیمی که شخصی به شما داده است ادامه دهید، دو گزینه وجود خواهد داشت:\n",
+    "post_top" : "تا پایان سال جاری، کل شبکه TON آدرس های کیف پول را به طور متفاوتی نمایش می دهد. آدرس جدید به جای EQ با UQ شروع می شود. و چهار حرف آخر نیز تغییر خواهند کرد. آدرس قدیمی نیز کار می کند و به همان کیف پول هدایت می شود. به هیچ وجه بر ایمنی وجوه ذخیره شده در کیف پول شما تأثیر نمی گذارد.",
+    "second_option" : "کمتر احتمال دارد که کیف پول هرگز برای پرداخت استفاده نشده باشد. و تون کیپر سال آینده کوین هایی را به آن آدرس ارسال نخواهد کرد. شما باید از گیرنده یک آدرس UQ جدید بخواهید..",
+    "title" : "بروزرسانی آدرس",
+    "why_change" : "چرا تغییر کرده؟",
+    "your_wallet" : "کیف پول شما"
   },
-  "add_wallet" : "Add wallet",
+  "add_wallet" : "افزودن کیف پول",
   "add_wallet_modal" : {
     "create" : {
-      "subtitle" : "Create new wallet",
-      "title" : "New Wallet"
+      "subtitle" : "ساخت کیف پول جدید",
+      "title" : "کیف پول جدید"
     },
     "import" : {
-      "subtitle" : "Import wallet with a 24 secret recovery words",
-      "title" : "Existing Wallet"
+      "subtitle" : "وارد کردن کیف پول با ۲۴ کلمه بازیابی امنیتی",
+      "title" : "کیف پول قبلی"
     },
-    "import_subtitle" : "Choose from the options below.",
-    "import_title" : "Import Wallet",
+    "import_subtitle" : "از بین گزینه های زیر انتخاب کنید.",
+    "import_title" : "وارد کردن کیف پول",
     "ledger" : {
-      "subtitle" : "Hardware module, Bluetooth, limited TON features",
-      "title" : "Pair with Ledger"
+      "subtitle" : "ماژول سخت افزاری، بلوتوث، ویژگی های تون محدود",
+      "title" : "جفت سازی با دفتر حساب"
     },
-    "other_options" : "Other options",
+    "other_options" : "گزینه های دیگر",
     "signer" : {
-      "subtitle" : "Completely offline, air-gapped, all TON features",
-      "title" : "Pair with Signer"
+      "subtitle" : "کاملا آفلاین، دارای شکاف هوا، همه ویژگی های تون",
+      "title" : "جفت سازی با signer"
     },
-    "subtitle" : "Create a new wallet or add an existing one.",
+    "subtitle" : "یک کیف پول جدید ایجاد کنید یا یک کیف پول موجود اضافه کنید.",
     "testnet" : {
-      "subtitle" : "Import wallet with a 24 secret recovery words to Testnet",
-      "title" : "Testnet Account"
+      "subtitle" : "وارد کردن کیف پول با 24 کلمه بازیابی امنیتی به تست‌نت",
+      "title" : "حساب تست‌نت"
     },
-    "title" : "Add Wallet",
+    "title" : "افزودن کیف پول",
     "watch_only" : {
-      "subtitle" : "For monitor wallet activity without recovery phrase",
-      "title" : "Watch Account"
+      "subtitle" : "برای نظارت بر فعالیت کیف پول بدون عبارت بازیابی",
+      "title" : "تماشای کیف پول"
     }
   },
   "add_watch_only" : {
-    "subtitle" : "Monitor wallet activity without recovery phrase. You will be notified of any transactions from this wallet.",
-    "title" : "Watch Account",
-    "wallet_not_found" : "Wallet address not found"
+    "subtitle" : "نظارت بر فعالیت کیف پول بدون عبارت بازیابی. هر گونه تراکنش از این کیف پول به شما اطلاع داده خواهد شد.",
+    "title" : "تماشای حساب",
+    "wallet_not_found" : "آدرس کیف پول پیدا نشد"
   },
-  "all_regions" : "All Regions",
+  "all_regions" : "همه مناطق",
   "appearance_accent_name" : {
-    "andromeda" : "Andromeda",
-    "arctic" : "Arctic",
-    "azure" : "Azure",
-    "coral" : "Coral",
-    "cosmos" : "Cosmos",
-    "default" : "Tonkeeper",
-    "flamingo" : "Flamingo",
-    "fluid" : "Fluid",
-    "galaxy" : "Galaxy",
-    "iris" : "Iris",
-    "marine" : "Marine",
-    "ocean" : "Ocean",
-    "sky" : "Sky"
+    "andromeda" : "آندرومدا",
+    "arctic" : "آرکتیک",
+    "azure" : "آژور",
+    "coral" : "کورال",
+    "cosmos" : "کسمس",
+    "default" : "تون کیپر",
+    "flamingo" : "فلامینگو",
+    "fluid" : "فلوید",
+    "galaxy" : "گلکسی",
+    "iris" : "آیریس",
+    "marine" : "مارین",
+    "ocean" : "اوشن",
+    "sky" : "اسکای"
   },
-  "appearance_confirm" : "Set",
-  "appearance_description" : "TON Diamonds NFT will make your wallet more colorful and unique.",
-  "appearance_title" : "Theme",
-  "app_name" : "Tonkeeper",
+  "appearance_confirm" : "اعمال",
+  "appearance_description" : "TON Diamonds ان‌اف‌تی کیف پول شما را رنگارنگ تر و منحصر به فردتر می کند.",
+  "appearance_title" : "تم",
+  "app_name" : "تون کیپر",
   "approval" : {
-    "accept" : "Accept",
-    "accepted" : "Visible",
-    "accepted_at_collection" : "Accepted on {date}",
-    "accepted_at_token" : "Accepted on {date}",
-    "accepted_collection" : "Accepted collection",
-    "accepted_token" : "Accepted token",
-    "approve_all" : "Accept all",
-    "approve_collection_many" : "Approve incoming tokens from \"{collection}\" collection",
-    "approve_collection_one" : "Approve incoming token from \"{collection}\" collection",
-    "approve_many" : "Approve {count} incoming tokens",
-    "approve_token" : "Approve incoming token \"{name}\"",
+    "accept" : "تایید",
+    "accepted" : "نمایان",
+    "accepted_at_collection" : "تایید شده در {date}",
+    "accepted_at_token" : "تایید شده در {date}",
+    "accepted_collection" : "کلکسیون تایید شده",
+    "accepted_token" : "توکن تایید شده",
+    "approve_all" : "تایید همه",
+    "approve_collection_many" : "تایید توکن های ورودی از \"{collection}\" کلکسیون",
+    "approve_collection_one" : "تایید توکن های وروری از \"{collection}\" کلکسیون",
+    "approve_many" : "تایید {count} توکن های ورودی",
+    "approve_token" : "تایید توکن ورودی \"{name}\"",
     "approve_two_collections" : "Approve incoming tokens from \"{collection1}\" \"{collection2}\" collections",
     "approve_two_tokens" : "Approve incoming tokens \"{name1}\" and \"{name2}\"",
     "blacklisted_collection" : "Blacklisted collection",
