@@ -19,14 +19,17 @@ import { useClickOutside } from '../hooks/useClickOutside';
 import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
 import { Container } from '../styles/globalStyle';
 import { RoundedButton, ButtonMock } from './fields/RoundedButton';
-import { CloseIcon } from './Icon';
+import { ArrowLeftIcon, CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3, Label2 } from './Text';
+import { IconButtonTransparentBackground } from './fields/IconButton';
+import { AnimateHeightChange } from './shared/AnimateHeightChange';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
     padding-left: ${props => props.scrollbarWidth}px;
+    transition: max-width 0.2s ease-in-out;
 
     ${p =>
         p.theme.displayType === 'full-width' &&
@@ -275,11 +278,23 @@ const BackShadow = styled.div`
 `;
 
 export const NotificationTitleRow: FC<
-    PropsWithChildren<{ handleClose?: () => void; center?: boolean; className?: string }>
-> = ({ handleClose, children, center = false, className }) => {
+    PropsWithChildren<{
+        handleClose?: () => void;
+        center?: boolean;
+        className?: string;
+        onBack?: () => void;
+    }>
+> = ({ handleClose, children, center = false, className, onBack }) => {
     const isFullWidthMode = useIsFullWidthMode();
     return (
         <TitleRow className={className}>
+            {onBack ? (
+                <IconButtonTransparentBackground onClick={onBack}>
+                    <ArrowLeftIcon />
+                </IconButtonTransparentBackground>
+            ) : (
+                center && <ButtonMock />
+            )}
             {center && <ButtonMock />}
             {isFullWidthMode ? (
                 <RowTitleDesktop>{children}</RowTitleDesktop>
@@ -345,6 +360,16 @@ export const NotificationTitleBlock = styled.div`
 `;
 
 export const NotificationCancelButton: FC<{ handleClose: () => void }> = ({ handleClose }) => {
+    const isFullWidthMode = useIsFullWidthMode();
+
+    if (isFullWidthMode) {
+        return (
+            <IconButtonTransparentBackground onClick={handleClose}>
+                <CloseIcon />
+            </IconButtonTransparentBackground>
+        );
+    }
+
     return (
         <RoundedButton onClick={handleClose}>
             <CloseIcon />
@@ -426,13 +451,24 @@ NotificationOverlay.displayName = 'NotificationOverlay';
 export const Notification: FC<{
     isOpen: boolean;
     handleClose: () => void;
+    onBack?: () => void;
     hideButton?: boolean;
     backShadow?: boolean;
     title?: ReactNode;
     footer?: ReactNode;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
     className?: string;
-}> = ({ children, isOpen, hideButton, backShadow, handleClose, title, footer, className }) => {
+}> = ({
+    children,
+    isOpen,
+    hideButton,
+    backShadow,
+    handleClose,
+    title,
+    footer,
+    className,
+    onBack
+}) => {
     const [entered, setEntered] = useState(false);
     const [open, setOpen] = useState(false);
     const { displayType } = useTheme();
@@ -539,30 +575,33 @@ export const Notification: FC<{
                         <NotificationOverlay handleClose={handleClose} entered={entered}>
                             <NotificationWrapper entered={entered} className={className}>
                                 <Wrapper>
-                                    <Padding onClick={handleCloseOnlyOnNotFullWidth} />
-                                    <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
-                                    <Content
-                                        standalone={standalone}
-                                        ref={containerRef}
-                                        className="dialog-content"
-                                    >
-                                        <HeaderWrapper ref={headerRef}>
-                                            {(title || !hideButton) && (
-                                                <NotificationHeader className="dialog-header">
-                                                    <NotificationTitleRow
-                                                        handleClose={
-                                                            hideButton ? undefined : handleClose
-                                                        }
-                                                    >
-                                                        {title}
-                                                    </NotificationTitleRow>
-                                                </NotificationHeader>
-                                            )}
-                                        </HeaderWrapper>
-                                        {Child}
-                                        <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
-                                    </Content>
-                                    <PaddingAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
+                                    <AnimateHeightChange>
+                                        <Padding onClick={handleCloseOnlyOnNotFullWidth} />
+                                        <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
+                                        <Content
+                                            standalone={standalone}
+                                            ref={containerRef}
+                                            className="dialog-content"
+                                        >
+                                            <HeaderWrapper ref={headerRef}>
+                                                {(title || !hideButton) && (
+                                                    <NotificationHeader className="dialog-header">
+                                                        <NotificationTitleRow
+                                                            onBack={onBack}
+                                                            handleClose={
+                                                                hideButton ? undefined : handleClose
+                                                            }
+                                                        >
+                                                            {title}
+                                                        </NotificationTitleRow>
+                                                    </NotificationHeader>
+                                                )}
+                                            </HeaderWrapper>
+                                            {Child}
+                                            <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
+                                        </Content>
+                                        <PaddingAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
+                                    </AnimateHeightChange>
                                 </Wrapper>
                             </NotificationWrapper>
                         </NotificationOverlay>

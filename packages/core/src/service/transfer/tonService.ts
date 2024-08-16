@@ -1,6 +1,6 @@
 import { Address, Cell, internal } from '@ton/core';
 import BigNumber from 'bignumber.js';
-import { AccountControllable } from '../../entries/account';
+import { AccountTonWalletStandard } from '../../entries/account';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
@@ -63,7 +63,7 @@ const createTonTransfer = async (
 const createTonConnectTransfer = async (
     timestamp: number,
     seqno: number,
-    account: AccountControllable,
+    account: AccountTonWalletStandard,
     params: TonConnectTransactionPayload,
     signer: Signer
 ) => {
@@ -185,7 +185,7 @@ export const tonConnectTransferError = async (
 
 export const estimateTonConnectTransfer = async (
     api: APIConfig,
-    account: AccountControllable,
+    account: AccountTonWalletStandard,
     params: TonConnectTransactionPayload
 ): Promise<TransferEstimationEvent> => {
     const timestamp = await getServerTime(api);
@@ -209,7 +209,7 @@ export const estimateTonConnectTransfer = async (
 
 export const sendTonConnectTransfer = async (
     api: APIConfig,
-    account: AccountControllable,
+    account: AccountTonWalletStandard,
     params: TonConnectTransactionPayload,
     signer: Signer
 ) => {
@@ -229,7 +229,7 @@ export const sendTonConnectTransfer = async (
 
 export const sendTonTransfer = async (
     api: APIConfig,
-    account: AccountControllable,
+    account: AccountTonWalletStandard,
     recipient: TonRecipientData,
     amount: AssetAmount,
     isMax: boolean,

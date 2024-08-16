@@ -5,7 +5,7 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useActiveAccount, useActiveTonNetwork } from '../../state/wallet';
 import { FC } from 'react';
-import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { AccountAndWalletBadgesGroup } from './AccountBadge';
 import { useTranslation } from '../../hooks/translation';
 import styled from 'styled-components';
@@ -34,6 +34,7 @@ export const AccountAndWalletInfo: FC<
     AllOrNone<{ account: Account; walletId: WalletId }> & {
         noPrefix?: boolean;
         hideAddress?: boolean;
+        className?: string;
     }
 > = props => {
     const { t } = useTranslation();
@@ -47,7 +48,7 @@ export const AccountAndWalletInfo: FC<
     }
 
     return (
-        <WalletInfoStyled>
+        <WalletInfoStyled className={props.className}>
             <NameText>
                 {!props.noPrefix && <>{t('confirmSendModal_wallet')}&nbsp;</>}
                 {account.name}

@@ -384,6 +384,33 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
             </>
         );
     }
+    if (account.type === 'ton-multisig') {
+        return (
+            <AsideMenuItem
+                isSelected={isSelected}
+                onClick={() => onClickWallet(account.activeTonWallet.id)}
+                ref={ref}
+            >
+                {shouldShowIcon && (
+                    <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
+                )}
+                <Label2>{account.name}</Label2>
+                <AccountBadgeStyled accountType={account.type} size="s" />
+
+                <GearIconButtonStyled
+                    onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openMAMIndexesSettings({ accountId: account.id });
+                    }}
+                    isShown={isHovered}
+                >
+                    <GearIconEmpty />
+                </GearIconButtonStyled>
+            </AsideMenuItem>
+        );
+    }
+
     assertUnreachable(account);
 };
 
@@ -396,6 +423,10 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { ref, closeBottom } = useIsScrolled();
+
+    useEffect(() => {
+        addWallet();
+    }, [addWallet]);
 
     const activeRoute = useAsideActiveRoute();
 

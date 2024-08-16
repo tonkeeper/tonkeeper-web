@@ -29,7 +29,7 @@ import { useAccountsStorage } from '../hooks/useStorage';
 import {
     getAccountByWalletById,
     getWalletById,
-    isAccountControllable
+    isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
 
 export const useProBackupState = () => {
@@ -61,7 +61,7 @@ export const useSelectWalletForProMutation = () => {
     const accountsStorage = useAccountsStorage();
 
     return useMutation<void, Error, string>(async walletId => {
-        const accounts = (await accountsStorage.getAccounts()).filter(isAccountControllable);
+        const accounts = (await accountsStorage.getAccounts()).filter(isAccountTonWalletStandard);
         const account = getAccountByWalletById(accounts, walletId);
 
         if (!account) {

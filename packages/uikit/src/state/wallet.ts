@@ -9,7 +9,7 @@ import {
     getAccountByWalletById,
     getWalletById,
     isAccountVersionEditable,
-    isAccountControllable,
+    isAccountTonWalletStandard,
     AccountMAM
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
@@ -264,7 +264,7 @@ export const useAccountState = (id: AccountId | undefined) => {
 export const useControllableAccountAndWalletByWalletId = (
     id: WalletId | undefined
 ): { account: Account | undefined; wallet: TonWalletStandard | undefined } => {
-    const accounts = useAccountsState().filter(isAccountControllable);
+    const accounts = useAccountsState().filter(isAccountTonWalletStandard);
     return useMemo(() => {
         if (!id) {
             return {

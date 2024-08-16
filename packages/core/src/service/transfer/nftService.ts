@@ -16,7 +16,7 @@ import {
     getWalletBalance,
     signEstimateMessage
 } from './common';
-import { Account, AccountControllable } from "../../entries/account";
+import { Account, AccountTonWalletStandard } from "../../entries/account";
 
 const initNftTransferAmount = toNano('1');
 export const nftTransferForwardAmount = BigInt('1');
@@ -119,7 +119,7 @@ export const estimateNftTransfer = async (
 
 export const sendNftTransfer = async (
     api: APIConfig,
-    account: AccountControllable,
+    account: AccountTonWalletStandard,
     recipient: TonRecipientData,
     nftItem: NftItem,
     fee: TransferEstimationEvent,
@@ -182,7 +182,7 @@ export const sendNftTransfer = async (
 
 export const sendNftRenew = async (options: {
     api: APIConfig;
-    account: AccountControllable;
+    account: AccountTonWalletStandard;
     nftAddress: string;
     fee: TransferEstimationEvent;
     signer: CellSigner;
@@ -237,7 +237,7 @@ export const estimateNftRenew = async (options: {
 
 export const sendNftLink = async (options: {
     api: APIConfig;
-    account: AccountControllable;
+    account: AccountTonWalletStandard;
     nftAddress: string;
     linkToAddress: string;
     fee: TransferEstimationEvent;

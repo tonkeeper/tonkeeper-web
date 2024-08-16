@@ -95,7 +95,8 @@ export const WalletVersionPageContent: FC<{
     if (
         selectedAccount.type === 'keystone' ||
         selectedAccount.type === 'watch-only' ||
-        selectedAccount.type === 'mam'
+        selectedAccount.type === 'mam' ||
+        selectedAccount.type === 'ton-multisig'
     ) {
         return <LedgerError>{t('operation_not_supported')}</LedgerError>;
     }

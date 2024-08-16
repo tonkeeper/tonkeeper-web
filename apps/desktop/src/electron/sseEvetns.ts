@@ -20,7 +20,7 @@ import { MainWindow } from './mainWindow';
 import { mainStorage } from './storageService';
 import { isStandardTonWallet, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
-import { getWalletById, isAccountControllable } from '@tonkeeper/core/dist/entries/account';
+import { getWalletById, isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 
 globalThis.Buffer = BufferPolyfill;
 
@@ -50,7 +50,7 @@ export class TonConnectSSE {
         this.lastEventId = await getLastEventId(mainStorage);
 
         const walletsState = (await accountsStorage(mainStorage).getAccounts())
-            .filter(isAccountControllable)
+            .filter(isAccountTonWalletStandard)
             .flatMap(a => a.allTonWallets);
 
         this.connections = [];
@@ -81,7 +81,7 @@ export class TonConnectSSE {
 
     private onDisconnect = async ({ connection, request }: TonConnectAppRequest) => {
         const accounts = (await accountsStorage(mainStorage).getAccounts()).filter(
-            isAccountControllable
+            isAccountTonWalletStandard
         );
         const wallet = getWalletById(accounts, this.dist[connection.clientSessionId]);
 

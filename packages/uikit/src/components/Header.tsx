@@ -25,7 +25,7 @@ import {
     sortWalletsByVersion,
     TonContract
 } from '@tonkeeper/core/dist/entries/wallet';
-import { Account, isAccountControllable } from '@tonkeeper/core/dist/entries/account';
+import { Account, isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { AccountAndWalletBadgesGroup } from './account/AccountBadge';
 import { useAddWalletNotification } from './modals/AddWalletNotificationControlled';
 
@@ -193,7 +193,7 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
                     );
             }
 
-            if (!isAccountControllable(a)) {
+            if (!isAccountTonWalletStandard(a)) {
                 return [
                     {
                         wallet: a.activeTonWallet,

@@ -7004,7 +7004,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@tonkeeper/uikit@npm:0.1.0, @tonkeeper/uikit@workspace:packages/uikit":
+"@tonkeeper/uikit@npm:0.1.0, @tonkeeper/uikit@workspace:^, @tonkeeper/uikit@workspace:packages/uikit":
   version: 0.0.0-use.local
   resolution: "@tonkeeper/uikit@workspace:packages/uikit"
   dependencies:
@@ -7043,6 +7043,7 @@ __metadata:
     country-flag-icons: "npm:^1.5.7"
     country-list-js: "npm:^3.1.7"
     dayjs: "npm:^1.11.10"
+    framer-motion: "npm:^11.3.28"
     react: "npm:^18.2.0"
     react-beautiful-dnd: "npm:^13.1.1"
     react-dom: "npm:^18.2.0"
@@ -15009,6 +15010,26 @@ __metadata:
   dependencies:
     map-cache: "npm:^0.2.2"
   checksum: 10/1cbbd0b0116b67d5790175de0038a11df23c1cd2e8dcdbade58ebba5594c2d641dade6b4f126d82a7b4a6ffc2ea12e3d387dbb64ea2ae97cf02847d436f60fdc
+  languageName: node
+  linkType: hard
+
+"framer-motion@npm:^11.3.28":
+  version: 11.3.28
+  resolution: "framer-motion@npm:11.3.28"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0
+    react-dom: ^18.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 10/4c73757e9c5f0553b352d73ea3d52627388b1da29151f6f3edbdd9a030559993dab815caaf5ba2053a6e099124b32c4e1aac9cfbf9c3e80fd1195ca0615663cc
   languageName: node
   linkType: hard
 
@@ -26093,6 +26114,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "tonkeeper-web@workspace:."
   dependencies:
+    "@tonkeeper/uikit": "workspace:^"
     "@typescript-eslint/eslint-plugin": "npm:^5.50.0"
     "@typescript-eslint/parser": "npm:^5.50.0"
     eslint: "npm:^8.33.0"
@@ -26304,6 +26326,13 @@ __metadata:
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: 10/bd26c22d36736513980091a1e356378e8b662ded04204453d353a7f34a4c21ed0afc59b5f90719d4ba756e581a162ecbf93118dc9c6be5acf70aa309188166ca
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.4.0":
+  version: 2.6.3
+  resolution: "tslib@npm:2.6.3"
+  checksum: 10/52109bb681f8133a2e58142f11a50e05476de4f075ca906d13b596ae5f7f12d30c482feb0bff167ae01cfc84c5803e575a307d47938999246f5a49d174fc558c
   languageName: node
   linkType: hard
 

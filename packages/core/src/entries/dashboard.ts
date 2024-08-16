@@ -128,6 +128,8 @@ function walletBadgeText(account: Account, walletId: WalletId): string {
             }
 
             return walletVersionText(walletVersion);
+        case 'ton-multisig':
+            return 'multisig';
         case 'keystone':
             return '';
     }

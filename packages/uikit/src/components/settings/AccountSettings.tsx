@@ -20,7 +20,7 @@ import {
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
 import {
-    isAccountControllable,
+    isAccountTonWalletStandard,
     isAccountVersionEditable
 } from '@tonkeeper/core/dist/entries/account';
 
@@ -88,7 +88,7 @@ const SingleAccountSettings = () => {
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
         });
-        if (isAccountControllable(account)) {
+        if (isAccountTonWalletStandard(account)) {
             items.push({
                 name: t('settings_connected_apps'),
                 icon: <AppsIcon />,
@@ -193,7 +193,7 @@ const MultipleAccountSettings = () => {
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
         });
-        if (isAccountControllable(account)) {
+        if (isAccountTonWalletStandard(account)) {
             items.push({
                 name: t('settings_connected_apps'),
                 icon: <AppsIcon />,

@@ -51,6 +51,14 @@ export const AccountBadge: FC<
         );
     }
 
+    if (accountType === 'ton-multisig') {
+        return (
+            <Badge size={size} color="backgroundContentAttention" className={className}>
+                {children || 'Multisig'}
+            </Badge>
+        );
+    }
+
     return null;
 };
 

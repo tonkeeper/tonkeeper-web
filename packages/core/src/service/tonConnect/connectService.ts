@@ -32,7 +32,7 @@ import {
 import { SessionCrypto } from './protocol';
 import { accountsStorage } from '../accountsStorage';
 import { getDevSettings } from '../devStorage';
-import { Account, isAccountControllable } from '../../entries/account';
+import { Account, isAccountTonWalletStandard } from '../../entries/account';
 
 export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
@@ -197,7 +197,7 @@ export const getDappConnection = async (
 export const getAppConnections = async (
     storage: IStorage
 ): Promise<{ wallet: TonWalletStandard; connections: AccountConnection[] }[]> => {
-    const accounts = (await accountsStorage(storage).getAccounts()).filter(isAccountControllable);
+    const accounts = (await accountsStorage(storage).getAccounts()).filter(isAccountTonWalletStandard);
     if (!accounts.length) {
         throw new TonConnectError(
             'Missing active wallet',

@@ -156,7 +156,7 @@ export const getSigner = async (
                 callback.type = 'cell' as const;
                 return callback;
             }
-            default: {
+            case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, account.id, checkTouchId);
                 const callback = async (message: Cell) => {
                     const keyPair = await mnemonicToPrivateKey(mnemonic);
@@ -164,6 +164,15 @@ export const getSigner = async (
                 };
                 callback.type = 'cell' as const;
                 return callback;
+            }
+            case 'watch-only': {
+                throw new Error('Cannot get signer for watch-only account');
+            }
+            case 'ton-multisig': {
+                throw new Error('Cannot get signer for multisig account');
+            }
+            default: {
+                assertUnreachable(account);
             }
         }
     } catch (e) {

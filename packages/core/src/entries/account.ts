@@ -32,7 +32,7 @@ export interface IAccount {
     setActiveTonWallet(walletId: WalletId): void;
 }
 
-export interface IAccountControllable extends IAccount {
+export interface IAccountTonWalletStandard extends IAccount {
     get allTonWallets(): TonWalletStandard[];
     get activeTonWallet(): TonWalletStandard;
 
@@ -40,7 +40,7 @@ export interface IAccountControllable extends IAccount {
     setActiveTonWallet(walletId: WalletId): void;
 }
 
-export interface IAccountVersionsEditable extends IAccountControllable {
+export interface IAccountVersionsEditable extends IAccountTonWalletStandard {
     addTonWalletToActiveDerivation(wallet: TonWalletStandard): void;
     removeTonWalletFromActiveDerivation(walletId: WalletId): void;
 }
@@ -148,7 +148,7 @@ export class AccountTonWatchOnly extends Clonable implements IAccount {
     }
 }
 
-export class AccountLedger extends Clonable implements IAccountControllable {
+export class AccountLedger extends Clonable implements IAccountTonWalletStandard {
     public readonly type = 'ledger';
 
     get allTonWallets() {
@@ -247,7 +247,7 @@ export class AccountLedger extends Clonable implements IAccountControllable {
     }
 }
 
-export class AccountKeystone extends Clonable implements IAccountControllable {
+export class AccountKeystone extends Clonable implements IAccountTonWalletStandard {
     public readonly type = 'keystone';
 
     get allTonWallets() {
@@ -340,7 +340,7 @@ export class AccountTonOnly extends Clonable implements IAccountVersionsEditable
     }
 }
 
-export class AccountMAM extends Clonable implements IAccountControllable {
+export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
     static getNewDerivationFallbackName(index = 0) {
         return 'Wallet ' + (index + 1);
     }
@@ -479,15 +479,53 @@ export class AccountMAM extends Clonable implements IAccountControllable {
     }
 }
 
+export class AccountTonMultisig extends Clonable implements IAccount {
+    public readonly type = 'ton-multisig';
+
+    get allTonWallets() {
+        return [this.tonWallet];
+    }
+
+    get activeTonWallet() {
+        return this.tonWallet;
+    }
+
+    /**
+     *  @param id eq to `tonWallet.id`
+     */
+    constructor(
+        public readonly id: AccountId,
+        public name: string,
+        public emoji: string,
+        public tonWallet: TonContract
+    ) {
+        super();
+    }
+
+    getTonWallet(id: WalletId) {
+        if (id !== this.tonWallet.id) {
+            return undefined;
+        }
+
+        return this.tonWallet;
+    }
+
+    setActiveTonWallet(walletId: WalletId) {
+        if (walletId !== this.tonWallet.id) {
+            throw new Error('Cannot add ton wallet to watch only account');
+        }
+    }
+}
+
 export type AccountVersionEditable = AccountTonMnemonic | AccountTonOnly;
 
-export type AccountControllable =
+export type AccountTonWalletStandard =
     | AccountVersionEditable
     | AccountLedger
     | AccountKeystone
     | AccountMAM;
 
-export type Account = AccountControllable | AccountTonWatchOnly;
+export type Account = AccountTonWalletStandard | AccountTonWatchOnly | AccountTonMultisig;
 
 export function isAccountVersionEditable(account: Account): account is AccountVersionEditable {
     switch (account.type) {
@@ -498,13 +536,14 @@ export function isAccountVersionEditable(account: Account): account is AccountVe
         case 'keystone':
         case 'watch-only':
         case 'mam':
+        case 'ton-multisig':
             return false;
     }
 
     assertUnreachable(account);
 }
 
-export function isAccountControllable(account: Account): account is AccountControllable {
+export function isAccountTonWalletStandard(account: Account): account is AccountTonWalletStandard {
     switch (account.type) {
         case 'keystone':
         case 'mnemonic':
@@ -513,6 +552,7 @@ export function isAccountControllable(account: Account): account is AccountContr
         case 'mam':
             return true;
         case 'watch-only':
+        case 'ton-multisig':
             return false;
     }
 
@@ -533,7 +573,8 @@ const prototypes = {
     keystone: AccountKeystone.prototype,
     'ton-only': AccountTonOnly.prototype,
     'watch-only': AccountTonWatchOnly.prototype,
-    mam: AccountMAM.prototype
+    mam: AccountMAM.prototype,
+    'ton-multisig': AccountTonMultisig.prototype
 } as const;
 
 export function bindAccountToClass(accountStruct: Account): void {
@@ -541,7 +582,7 @@ export function bindAccountToClass(accountStruct: Account): void {
 }
 
 export function getWalletById(
-    accounts: IAccountControllable[],
+    accounts: IAccountTonWalletStandard[],
     walletId: WalletId
 ): TonWalletStandard | undefined {
     for (const account of accounts || []) {
