@@ -190,9 +190,18 @@ export const DropDown = ({
     );
 };
 
+export const DropDownItemsDivider = styled.div`
+    height: 1px;
+    background: ${p => p.theme.separatorCommon};
+`;
+
 export const DropDownContent = styled.div`
     background: ${p => p.theme.backgroundContentTint};
     ${BorderSmallResponsive};
+
+    ${DropDownItemsDivider}:last-child {
+        display: none;
+    }
 `;
 
 const DropDownListItemStyled = styled.div`
@@ -223,8 +232,3 @@ export const DropDownItem: FC<
         </DropDownListItemStyled>
     );
 };
-
-export const DropDownItemsDivider = styled.div`
-    height: 1px;
-    background: ${p => p.theme.separatorCommon};
-`;

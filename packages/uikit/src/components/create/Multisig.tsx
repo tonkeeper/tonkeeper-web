@@ -301,14 +301,25 @@ const ParticipantCardStyled = styled(ParticipantCard)`
 
 const QuorumAndDeadlineInputsContainer = styled.div`
     margin-top: 32px;
+
+    .dd-create-multisig-container {
+        bottom: 50%;
+        right: 32px;
+        top: unset;
+    }
+`;
+
+const StandaloneDropDownSelectHost = styled(DropDownSelectHost)`
+    background: ${p => p.theme.fieldBackground};
+    ${BorderSmallResponsive};
 `;
 
 const QuorumAndDeadlineInputs = () => {
     const { control, watch } = useFormContext<MultisigUseForm>();
     const selectedSignersNumber = watch('quorum');
-    const totalSignersNumber = watch('participants').map(
-        i => i.role === 'proposer-and-signer'
-    ).length;
+    const firsIsSigner = watch('firstParticipant').role === 'proposer-and-signer' ? 1 : 0;
+    const totalSignersNumber =
+        watch('participants').filter(i => i.role === 'proposer-and-signer').length + firsIsSigner;
     const selectedSignersPercent =
         selectedSignersNumber > totalSignersNumber || totalSignersNumber === 0
             ? null
@@ -345,7 +356,7 @@ const QuorumAndDeadlineInputs = () => {
                             </DropDownContent>
                         )}
                     >
-                        <DropDownSelectHost>
+                        <StandaloneDropDownSelectHost>
                             <Body3>Quorum</Body3>
                             <Body2>
                                 {selectedSignersNumber} signers
@@ -356,7 +367,7 @@ const QuorumAndDeadlineInputs = () => {
                                     </>
                                 )}
                             </Body2>
-                        </DropDownSelectHost>
+                        </StandaloneDropDownSelectHost>
                     </DropDownStyled>
                 )}
                 name={'quorum'}
