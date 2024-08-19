@@ -575,14 +575,14 @@ export const Notification: FC<{
                         <NotificationOverlay handleClose={handleClose} entered={entered}>
                             <NotificationWrapper entered={entered} className={className}>
                                 <Wrapper>
-                                    <AnimateHeightChange>
-                                        <Padding onClick={handleCloseOnlyOnNotFullWidth} />
-                                        <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
-                                        <Content
-                                            standalone={standalone}
-                                            ref={containerRef}
-                                            className="dialog-content"
-                                        >
+                                    <Padding onClick={handleCloseOnlyOnNotFullWidth} />
+                                    <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
+                                    <Content
+                                        standalone={standalone}
+                                        ref={containerRef}
+                                        className="dialog-content"
+                                    >
+                                        <AnimateHeightChange>
                                             <HeaderWrapper ref={headerRef}>
                                                 {(title || !hideButton) && (
                                                     <NotificationHeader className="dialog-header">
@@ -599,9 +599,9 @@ export const Notification: FC<{
                                             </HeaderWrapper>
                                             {Child}
                                             <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
-                                        </Content>
-                                        <PaddingAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
-                                    </AnimateHeightChange>
+                                        </AnimateHeightChange>
+                                    </Content>
+                                    <PaddingAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
                                 </Wrapper>
                             </NotificationWrapper>
                         </NotificationOverlay>

@@ -1,6 +1,6 @@
-import React, { FC, PropsWithChildren, useMemo, useState } from 'react';
-import styled from 'styled-components';
-import { Body1, Body2, Body2Class, Body3, H2, Label2, Label2Class } from '../Text';
+import React, { FC, PropsWithChildren, useEffect, useId, useMemo, useState } from 'react';
+import styled, { css } from 'styled-components';
+import { Body1, Body2, Body2Class, Body3, Body3Class, H2, Label2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { BorderSmallResponsive } from '../shared/Styles';
@@ -16,6 +16,7 @@ import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { DropDown, DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { Dot } from '../Dot';
 import { NotificationFooterPortal } from '../Notification';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 
 const Body3Secondary = styled(Body3)`
     color: ${p => p.theme.textSecondary};
@@ -64,7 +65,9 @@ const Participants = styled.div`
 `;
 
 const SubmitButtonContainer = styled.div`
-    padding: 16px 0;
+    margin: 0 -16px;
+    background: ${p => p.theme.backgroundPage};
+    padding: 16px;
 `;
 
 type MultisigUseForm = {
@@ -103,8 +106,10 @@ const MultisigCreatingForm: FC = () => {
         console.log(v);
     };
 
+    const formId = useId();
+
     return (
-        <FormWrapper onSubmit={handleSubmit(onSubmit)}>
+        <FormWrapper onSubmit={handleSubmit(onSubmit)} id={formId}>
             <FormProvider {...methods}>
                 <FirstParticipantCard />
                 <Body3Secondary>
@@ -133,7 +138,7 @@ const MultisigCreatingForm: FC = () => {
             </FormProvider>
             <NotificationFooterPortal>
                 <SubmitButtonContainer>
-                    <Button primary type="submit" fullWidth>
+                    <Button primary type="submit" fullWidth form={formId}>
                         Create Wallet
                     </Button>
                 </SubmitButtonContainer>
@@ -162,6 +167,13 @@ const ExternalParticipantCardFirstRow = styled.div`
     display: flex;
 `;
 
+const FormError = styled.div<{ noPaddingTop?: boolean }>`
+    padding: 8px 0;
+    color: ${p => p.theme.accentRed};
+    ${Body3Class};
+
+    ${p => p.noPaddingTop && 'padding-top: 0;'}
+`;
 const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> = ({
     fieldIndex,
     onRemove
@@ -169,31 +181,39 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
     const { control } = useFormContext<MultisigUseForm>();
     const [focus, setFocus] = useState(false);
     return (
-        <ParticipantCard registerAs={`participants.${fieldIndex}.role`}>
-            <ExternalParticipantCardFirstRow>
-                <Controller
-                    rules={{
-                        required: 'Required'
-                    }}
-                    render={({ field, fieldState }) => (
-                        <InputBlock size="small" valid={!fieldState.invalid} focus={focus}>
-                            <InputField
-                                {...field}
-                                size="small"
-                                onFocus={() => setFocus(true)}
-                                onBlur={() => setFocus(false)}
-                                placeholder="Wallet Address"
-                            />
-                        </InputBlock>
-                    )}
-                    name={`participants.${fieldIndex}.address`}
-                    control={control}
-                />
-                <IconButtonTransparentBackground onClick={onRemove}>
-                    <CloseIcon />
-                </IconButtonTransparentBackground>
-            </ExternalParticipantCardFirstRow>
-        </ParticipantCard>
+        <Controller
+            rules={{
+                required: 'Required',
+                validate: v => {
+                    if (!seeIfValidTonAddress(v)) {
+                        return 'Invalid address';
+                    }
+                }
+            }}
+            render={({ field, fieldState: { error, invalid } }) => (
+                <>
+                    <ParticipantCard registerAs={`participants.${fieldIndex}.role`}>
+                        <ExternalParticipantCardFirstRow>
+                            <InputBlock size="small" valid={!invalid} focus={focus}>
+                                <InputField
+                                    {...field}
+                                    size="small"
+                                    onFocus={() => setFocus(true)}
+                                    onBlur={() => setFocus(false)}
+                                    placeholder="Wallet Address"
+                                />
+                            </InputBlock>
+                            <IconButtonTransparentBackground onClick={onRemove}>
+                                <CloseIcon />
+                            </IconButtonTransparentBackground>
+                        </ExternalParticipantCardFirstRow>
+                    </ParticipantCard>
+                    {error && <FormError noPaddingTop>{error.message}</FormError>}
+                </>
+            )}
+            name={`participants.${fieldIndex}.address`}
+            control={control}
+        />
     );
 };
 
@@ -345,9 +365,19 @@ const QuorumAndDeadlineInputsContainer = styled.div`
     }
 `;
 
-const StandaloneDropDownSelectHost = styled(DropDownSelectHost)`
+const StandaloneField = styled.div`
     background: ${p => p.theme.fieldBackground};
     ${BorderSmallResponsive};
+`;
+
+const StandaloneDropDownSelectHost = styled(DropDownSelectHost)<{ isErrored?: boolean }>`
+    ${BorderSmallResponsive};
+    ${p =>
+        p.isErrored &&
+        css`
+            border: 1px solid ${p.theme.fieldErrorBorder};
+            background: ${p.theme.fieldErrorBackground};
+        `}
 `;
 
 const DropDownItemText = styled.div`
@@ -369,7 +399,12 @@ const timeToSignOptions = {
 
 const QuorumAndDeadlineInputs = () => {
     const { t } = useTranslation();
-    const { control, watch } = useFormContext<MultisigUseForm>();
+    const {
+        control,
+        watch,
+        trigger,
+        formState: { isSubmitted }
+    } = useFormContext<MultisigUseForm>();
     const selectedSignersNumber = watch('quorum');
     const selectedDeadline = watch('deadlineHours');
     const selectedDeadlineTranslation = Object.entries(timeToSignOptions).find(
@@ -383,13 +418,28 @@ const QuorumAndDeadlineInputs = () => {
             ? null
             : Math.round((selectedSignersNumber / totalSignersNumber) * 100);
 
+    useEffect(() => {
+        if (isSubmitted) {
+            trigger('quorum');
+        }
+    }, [trigger, totalSignersNumber, isSubmitted]);
+
     return (
         <QuorumAndDeadlineInputsContainer>
             <Controller
                 rules={{
-                    required: 'Required'
+                    required: 'Required',
+                    validate: v => {
+                        if (totalSignersNumber === 0) {
+                            return 'At least one signer is required';
+                        }
+
+                        if (v > totalSignersNumber) {
+                            return 'Invalid number of signers';
+                        }
+                    }
                 }}
-                render={({ field: { onChange } }) => (
+                render={({ field: { onChange }, fieldState: { error } }) => (
                     <DropDownStyled
                         containerClassName="dd-create-multisig-container"
                         payload={onClose => (
@@ -422,21 +472,24 @@ const QuorumAndDeadlineInputs = () => {
                             </DropDownContent>
                         )}
                     >
-                        <StandaloneDropDownSelectHost>
-                            <DropDownSelectHostText>
-                                <Body3>Quorum</Body3>
-                                <Body2>
-                                    {selectedSignersNumber} signers
-                                    {selectedSignersPercent !== null && (
-                                        <>
-                                            <Dot />
-                                            {selectedSignersPercent}%
-                                        </>
-                                    )}
-                                </Body2>
-                            </DropDownSelectHostText>
-                            <SwitchIcon />
-                        </StandaloneDropDownSelectHost>
+                        <StandaloneField>
+                            <StandaloneDropDownSelectHost isErrored={!!error}>
+                                <DropDownSelectHostText>
+                                    <Body3>Quorum</Body3>
+                                    <Body2>
+                                        {selectedSignersNumber} signers
+                                        {selectedSignersPercent !== null && (
+                                            <>
+                                                <Dot />
+                                                {selectedSignersPercent}%
+                                            </>
+                                        )}
+                                    </Body2>
+                                </DropDownSelectHostText>
+                                <SwitchIcon />
+                            </StandaloneDropDownSelectHost>
+                        </StandaloneField>
+                        {error && <FormError>{error.message}</FormError>}
                     </DropDownStyled>
                 )}
                 name={'quorum'}
@@ -469,13 +522,15 @@ const QuorumAndDeadlineInputs = () => {
                             </DropDownContent>
                         )}
                     >
-                        <StandaloneDropDownSelectHost>
-                            <DropDownSelectHostText>
-                                <Body3>Time to sign a transaction</Body3>
-                                <Body2>{t(selectedDeadlineTranslation)}</Body2>
-                            </DropDownSelectHostText>
-                            <SwitchIcon />
-                        </StandaloneDropDownSelectHost>
+                        <StandaloneField>
+                            <StandaloneDropDownSelectHost>
+                                <DropDownSelectHostText>
+                                    <Body3>Time to sign a transaction</Body3>
+                                    <Body2>{t(selectedDeadlineTranslation)}</Body2>
+                                </DropDownSelectHostText>
+                                <SwitchIcon />
+                            </StandaloneDropDownSelectHost>
+                        </StandaloneField>
                     </DropDownStyled>
                 )}
                 name={'deadlineHours'}
