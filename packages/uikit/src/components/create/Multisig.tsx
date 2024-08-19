@@ -1,6 +1,6 @@
 import React, { FC, PropsWithChildren, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { Body1, Body2Class, Body3, H2, Label2Class } from '../Text';
+import { Body1, Body2, Body2Class, Body3, H2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { BorderSmallResponsive } from '../shared/Styles';
@@ -8,12 +8,13 @@ import { Radio } from '../fields/Checkbox';
 import { InputBlock, InputField } from '../fields/Input';
 import { Button } from '../fields/Button';
 import { IconButtonTransparentBackground } from '../fields/IconButton';
-import { CloseIcon, DoneIcon } from '../Icon';
+import { CloseIcon } from '../Icon';
 import { useAccountsState, useActiveWallet } from '../../state/wallet';
 import { Account, isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
-import { DropDown } from '../DropDown';
+import { DropDown, DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
+import { Dot } from '../Dot';
 
 const ContentWrapper = styled.div`
     display: flex;
@@ -65,6 +66,8 @@ type MultisigUseForm = {
         address: string;
         role: 'proposer-and-signer' | 'proposer';
     }[];
+    quorum: number;
+    deadlineHours: number;
 };
 
 const MultisigCreatingForm: FC = () => {
@@ -75,7 +78,8 @@ const MultisigCreatingForm: FC = () => {
                 address: activeWallet.rawAddress,
                 role: 'proposer-and-signer'
             },
-            participants: [{ address: '', role: 'proposer-and-signer' }]
+            participants: [{ address: '', role: 'proposer-and-signer' }],
+            quorum: 1
         }
     });
     const { control, handleSubmit } = methods;
@@ -101,16 +105,17 @@ const MultisigCreatingForm: FC = () => {
                         />
                     ))}
                 </Participants>
+                <Button
+                    secondary
+                    type="button"
+                    size="small"
+                    fitContent
+                    onClick={() => append({ address: '', role: 'proposer-and-signer' })}
+                >
+                    Add Participant
+                </Button>
+                <QuorumAndDeadlineInputs />
             </FormProvider>
-            <Button
-                secondary
-                type="button"
-                size="small"
-                fitContent
-                onClick={() => append({ address: '', role: 'proposer-and-signer' })}
-            >
-                Add Participant
-            </Button>
         </FormWrapper>
     );
 };
@@ -170,7 +175,7 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
     );
 };
 
-const FirstParticipantSelectHost = styled.div`
+const DropDownSelectHost = styled.div`
     display: flex;
     flex-direction: column;
     padding: 8px 12px;
@@ -186,24 +191,8 @@ const AccountAndWalletInfoStyled = styled(AccountAndWalletInfo)`
     color: ${p => p.theme.textPrimary};
 `;
 
-const DropDownContent = styled.div`
-    background: ${p => p.theme.backgroundContentTint};
-    ${BorderSmallResponsive};
-`;
-
 const DropDownStyled = styled(DropDown)`
     width: 100%;
-`;
-
-const DropDownItem = styled.div`
-    padding: 10px 12px;
-    display: flex;
-    justify-content: space-between;
-    cursor: pointer;
-
-    > svg {
-        color: ${p => p.theme.accentBlue};
-    }
 `;
 
 const FirstParticipantCard: FC = () => {
@@ -240,6 +229,7 @@ const FirstParticipantCard: FC = () => {
                                 {Object.values(wallets).map(item => (
                                     <>
                                         <DropDownItem
+                                            isSelected={selectedAddress === item.wallet.rawAddress}
                                             key={item.wallet.id}
                                             onClick={() => {
                                                 onClose();
@@ -251,24 +241,21 @@ const FirstParticipantCard: FC = () => {
                                                 account={item.account}
                                                 walletId={item.wallet.id}
                                             />
-                                            {selectedAddress === item.wallet.rawAddress && (
-                                                <DoneIcon />
-                                            )}
                                         </DropDownItem>
-                                        <Divider />
+                                        <DropDownItemsDivider />
                                     </>
                                 ))}
                             </DropDownContent>
                         )}
                     >
-                        <FirstParticipantSelectHost>
+                        <DropDownSelectHost>
                             <Body3>Wallet</Body3>
                             <AccountAndWalletInfoStyled
                                 noPrefix
                                 account={selectedWallet.account}
                                 walletId={selectedWallet.wallet.id}
                             />
-                        </FirstParticipantSelectHost>
+                        </DropDownSelectHost>
                     </DropDownStyled>
                 )}
                 name={'firstParticipant.address'}
@@ -311,3 +298,70 @@ const ParticipantCardStyled = styled(ParticipantCard)`
         top: 16px;
     }
 `;
+
+const QuorumAndDeadlineInputsContainer = styled.div`
+    margin-top: 32px;
+`;
+
+const QuorumAndDeadlineInputs = () => {
+    const { control, watch } = useFormContext<MultisigUseForm>();
+    const selectedSignersNumber = watch('quorum');
+    const totalSignersNumber = watch('participants').map(
+        i => i.role === 'proposer-and-signer'
+    ).length;
+    const selectedSignersPercent =
+        selectedSignersNumber > totalSignersNumber || totalSignersNumber === 0
+            ? null
+            : Math.round((selectedSignersNumber / totalSignersNumber) * 100);
+
+    return (
+        <QuorumAndDeadlineInputsContainer>
+            <Controller
+                rules={{
+                    required: 'Required'
+                }}
+                render={({ field: { onChange } }) => (
+                    <DropDownStyled
+                        containerClassName="dd-create-multisig-container"
+                        payload={onClose => (
+                            <DropDownContent>
+                                {[...Array(totalSignersNumber)]
+                                    .map((_, i) => i + 1)
+                                    .map(item => (
+                                        <>
+                                            <DropDownItem
+                                                isSelected={selectedSignersNumber === item}
+                                                key={item}
+                                                onClick={() => {
+                                                    onClose();
+                                                    onChange(item);
+                                                }}
+                                            >
+                                                {item}
+                                            </DropDownItem>
+                                            <DropDownItemsDivider />
+                                        </>
+                                    ))}
+                            </DropDownContent>
+                        )}
+                    >
+                        <DropDownSelectHost>
+                            <Body3>Quorum</Body3>
+                            <Body2>
+                                {selectedSignersNumber} signers
+                                {selectedSignersPercent !== null && (
+                                    <>
+                                        <Dot />
+                                        {selectedSignersPercent}%
+                                    </>
+                                )}
+                            </Body2>
+                        </DropDownSelectHost>
+                    </DropDownStyled>
+                )}
+                name={'quorum'}
+                control={control}
+            />
+        </QuorumAndDeadlineInputsContainer>
+    );
+};
