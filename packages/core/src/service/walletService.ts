@@ -324,7 +324,7 @@ export const createMAMAccountByMnemonic = async (
     storage: IStorage,
     rootMnemonic: string[],
     options: {
-        selectedDerivations: number[];
+        selectedDerivations?: number[];
         network?: Network;
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
