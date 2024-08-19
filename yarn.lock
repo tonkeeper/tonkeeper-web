@@ -4455,23 +4455,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core::locator=%40tonkeeper%2Fcore%40workspace%3Apackages%2Fcore":
+"@multi-account-mnemonic/core@npm:^0.0.1":
   version: 0.0.1
-  resolution: "@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core#../../../../../ton/tonkeeper-mnemonics/packages/core::hash=ba8734&locator=%40tonkeeper%2Fcore%40workspace%3Apackages%2Fcore"
+  resolution: "@multi-account-mnemonic/core@npm:0.0.1"
   dependencies:
     "@scure/bip39": "npm:^1.2.2"
     "@ton/crypto": "npm:^3.2.0"
-  checksum: 10/1fbabeabd1253a6ae6cc193005786b1f6db4555bfe94c44adadb6c0e559c7b85bafa1a86713a9c662abe0587ba770ebf9d07178f938767c35cf95287de73956b
-  languageName: node
-  linkType: hard
-
-"@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core::locator=%40tonkeeper%2Fuikit%40workspace%3Apackages%2Fuikit":
-  version: 0.0.1
-  resolution: "@multi-account-mnemonic/core@file:../../../../../ton/tonkeeper-mnemonics/packages/core#../../../../../ton/tonkeeper-mnemonics/packages/core::hash=ba8734&locator=%40tonkeeper%2Fuikit%40workspace%3Apackages%2Fuikit"
-  dependencies:
-    "@scure/bip39": "npm:^1.2.2"
-    "@ton/crypto": "npm:^3.2.0"
-  checksum: 10/1fbabeabd1253a6ae6cc193005786b1f6db4555bfe94c44adadb6c0e559c7b85bafa1a86713a9c662abe0587ba770ebf9d07178f938767c35cf95287de73956b
+  checksum: 10/b38240772f8ae2b4716613c6fc91e42021e24b779e2576ee38e7bdad165d051f77f7234c15c56457fa11e577146bcfc0aa92fa8786fb167c7afd6d2a862f18bd
   languageName: node
   linkType: hard
 
@@ -6829,7 +6819,7 @@ __metadata:
     "@keystonehq/keystone-sdk": "npm:0.7.2"
     "@ledgerhq/hw-transport-webhid": "npm:^6.28.6"
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
-    "@multi-account-mnemonic/core": "file:../../../../../ton/tonkeeper-mnemonics/packages/core"
+    "@multi-account-mnemonic/core": "npm:^0.0.1"
     "@ton-community/ton-ledger": "npm:^7.2.0-pre.2"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
@@ -7022,7 +7012,7 @@ __metadata:
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
     "@keystonehq/keystone-sdk": "npm:0.7.2"
-    "@multi-account-mnemonic/core": "file:../../../../../ton/tonkeeper-mnemonics/packages/core"
+    "@multi-account-mnemonic/core": "npm:^0.0.1"
     "@ngraveio/bc-ur": "npm:^1.1.13"
     "@polkadot/react-qr": "npm:^3.1.1"
     "@storybook/addon-actions": "npm:^6.5.14"
