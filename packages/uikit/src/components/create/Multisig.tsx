@@ -1,6 +1,6 @@
 import React, { FC, PropsWithChildren, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { Body1, Body2, Body2Class, Body3, H2, Label2Class } from '../Text';
+import { Body1, Body2, Body2Class, Body3, H2, Label2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { BorderSmallResponsive } from '../shared/Styles';
@@ -8,13 +8,18 @@ import { Radio } from '../fields/Checkbox';
 import { InputBlock, InputField } from '../fields/Input';
 import { Button } from '../fields/Button';
 import { IconButtonTransparentBackground } from '../fields/IconButton';
-import { CloseIcon } from '../Icon';
+import { CloseIcon, SwitchIcon } from '../Icon';
 import { useAccountsState, useActiveWallet } from '../../state/wallet';
 import { Account, isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { DropDown, DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { Dot } from '../Dot';
+import { NotificationFooterPortal } from '../Notification';
+
+const Body3Secondary = styled(Body3)`
+    color: ${p => p.theme.textSecondary};
+`;
 
 const ContentWrapper = styled.div`
     display: flex;
@@ -48,13 +53,18 @@ export const CreateMultisig: FC = () => {
 const FormWrapper = styled.form`
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
 `;
 
 const Participants = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
+    margin-top: 8px;
+`;
+
+const SubmitButtonContainer = styled.div`
+    padding: 16px 0;
 `;
 
 type MultisigUseForm = {
@@ -79,7 +89,8 @@ const MultisigCreatingForm: FC = () => {
                 role: 'proposer-and-signer'
             },
             participants: [{ address: '', role: 'proposer-and-signer' }],
-            quorum: 1
+            quorum: 1,
+            deadlineHours: 24
         }
     });
     const { control, handleSubmit } = methods;
@@ -96,6 +107,10 @@ const MultisigCreatingForm: FC = () => {
         <FormWrapper onSubmit={handleSubmit(onSubmit)}>
             <FormProvider {...methods}>
                 <FirstParticipantCard />
+                <Body3Secondary>
+                    A signer can confirm transactions and propose changes, such as adding or
+                    removing participants. A proposer can only propose changes.
+                </Body3Secondary>
                 <Participants>
                     {fields.map((field, index) => (
                         <ExternalParticipantCard
@@ -116,6 +131,13 @@ const MultisigCreatingForm: FC = () => {
                 </Button>
                 <QuorumAndDeadlineInputs />
             </FormProvider>
+            <NotificationFooterPortal>
+                <SubmitButtonContainer>
+                    <Button primary type="submit" fullWidth>
+                        Create Wallet
+                    </Button>
+                </SubmitButtonContainer>
+            </NotificationFooterPortal>
         </FormWrapper>
     );
 };
@@ -177,8 +199,15 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
 
 const DropDownSelectHost = styled.div`
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     padding: 8px 12px;
+`;
+
+const DropDownSelectHostText = styled.div`
+    display: flex;
+    flex-direction: column;
     width: 100%;
     box-sizing: border-box;
 
@@ -249,12 +278,15 @@ const FirstParticipantCard: FC = () => {
                         )}
                     >
                         <DropDownSelectHost>
-                            <Body3>Wallet</Body3>
-                            <AccountAndWalletInfoStyled
-                                noPrefix
-                                account={selectedWallet.account}
-                                walletId={selectedWallet.wallet.id}
-                            />
+                            <DropDownSelectHostText>
+                                <Body3>Wallet</Body3>
+                                <AccountAndWalletInfoStyled
+                                    noPrefix
+                                    account={selectedWallet.account}
+                                    walletId={selectedWallet.wallet.id}
+                                />
+                            </DropDownSelectHostText>
+                            <SwitchIcon />
                         </DropDownSelectHost>
                     </DropDownStyled>
                 )}
@@ -301,6 +333,10 @@ const ParticipantCardStyled = styled(ParticipantCard)`
 
 const QuorumAndDeadlineInputsContainer = styled.div`
     margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
 
     .dd-create-multisig-container {
         bottom: 50%;
@@ -314,9 +350,31 @@ const StandaloneDropDownSelectHost = styled(DropDownSelectHost)`
     ${BorderSmallResponsive};
 `;
 
+const DropDownItemText = styled.div`
+    display: flex;
+    flex-direction: column;
+
+    > ${Body3} {
+        color: ${p => p.theme.textSecondary};
+    }
+`;
+
+const timeToSignOptions = {
+    '30_minutes': 0.5,
+    '1_hour': 1,
+    '6_hours': 6,
+    '12_hours': 12,
+    '24_hours': 24
+};
+
 const QuorumAndDeadlineInputs = () => {
+    const { t } = useTranslation();
     const { control, watch } = useFormContext<MultisigUseForm>();
     const selectedSignersNumber = watch('quorum');
+    const selectedDeadline = watch('deadlineHours');
+    const selectedDeadlineTranslation = Object.entries(timeToSignOptions).find(
+        ([_, v]) => v === selectedDeadline
+    )![0];
     const firsIsSigner = watch('firstParticipant').role === 'proposer-and-signer' ? 1 : 0;
     const totalSignersNumber =
         watch('participants').filter(i => i.role === 'proposer-and-signer').length + firsIsSigner;
@@ -348,7 +406,15 @@ const QuorumAndDeadlineInputs = () => {
                                                     onChange(item);
                                                 }}
                                             >
-                                                {item}
+                                                <DropDownItemText>
+                                                    <Label2>{item} signers</Label2>
+                                                    <Body3>
+                                                        {Math.round(
+                                                            (item / totalSignersNumber) * 100
+                                                        )}
+                                                        %
+                                                    </Body3>
+                                                </DropDownItemText>
                                             </DropDownItem>
                                             <DropDownItemsDivider />
                                         </>
@@ -357,22 +423,68 @@ const QuorumAndDeadlineInputs = () => {
                         )}
                     >
                         <StandaloneDropDownSelectHost>
-                            <Body3>Quorum</Body3>
-                            <Body2>
-                                {selectedSignersNumber} signers
-                                {selectedSignersPercent !== null && (
-                                    <>
-                                        <Dot />
-                                        {selectedSignersPercent}%
-                                    </>
-                                )}
-                            </Body2>
+                            <DropDownSelectHostText>
+                                <Body3>Quorum</Body3>
+                                <Body2>
+                                    {selectedSignersNumber} signers
+                                    {selectedSignersPercent !== null && (
+                                        <>
+                                            <Dot />
+                                            {selectedSignersPercent}%
+                                        </>
+                                    )}
+                                </Body2>
+                            </DropDownSelectHostText>
+                            <SwitchIcon />
                         </StandaloneDropDownSelectHost>
                     </DropDownStyled>
                 )}
                 name={'quorum'}
                 control={control}
             />
+            <Controller
+                rules={{
+                    required: 'Required'
+                }}
+                render={({ field: { onChange } }) => (
+                    <DropDownStyled
+                        containerClassName="dd-create-multisig-container"
+                        payload={onClose => (
+                            <DropDownContent>
+                                {Object.entries(timeToSignOptions).map(([translation, value]) => (
+                                    <>
+                                        <DropDownItem
+                                            isSelected={selectedDeadline === value}
+                                            key={value}
+                                            onClick={() => {
+                                                onClose();
+                                                onChange(value);
+                                            }}
+                                        >
+                                            <Label2>{t(translation)}</Label2>
+                                        </DropDownItem>
+                                        <DropDownItemsDivider />
+                                    </>
+                                ))}
+                            </DropDownContent>
+                        )}
+                    >
+                        <StandaloneDropDownSelectHost>
+                            <DropDownSelectHostText>
+                                <Body3>Time to sign a transaction</Body3>
+                                <Body2>{t(selectedDeadlineTranslation)}</Body2>
+                            </DropDownSelectHostText>
+                            <SwitchIcon />
+                        </StandaloneDropDownSelectHost>
+                    </DropDownStyled>
+                )}
+                name={'deadlineHours'}
+                control={control}
+            />
+            <Body3Secondary>
+                You can always change the number of participants, their roles, the time for signing
+                a transaction, and the number of signatures required for a successful transaction.
+            </Body3Secondary>
         </QuorumAndDeadlineInputsContainer>
     );
 };
