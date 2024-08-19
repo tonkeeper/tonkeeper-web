@@ -623,20 +623,11 @@ export const useMutateRenameAccountDerivation = <T extends AccountMAM>() => {
 export const useWalletAccountInfo = () => {
     const wallet = useActiveWallet();
     const { api } = useAppContext();
-    return useQuery<TonapiAccount, Error>(
-        [wallet.rawAddress, QueryKey.info],
-        async () => {
-            return new AccountsApi(api.tonApiV2).getAccount({
-                accountId: wallet.rawAddress
-            });
-        },
-        {
-            refetchInterval: DefaultRefetchInterval,
-            refetchIntervalInBackground: true,
-            refetchOnWindowFocus: true,
-            keepPreviousData: true
-        }
-    );
+    return useQuery<TonapiAccount, Error>([wallet.rawAddress, QueryKey.info], async () => {
+        return new AccountsApi(api.tonApiV2).getAccount({
+            accountId: wallet.rawAddress
+        });
+    });
 };
 
 export const useActiveTonNetwork = () => {
@@ -692,7 +683,8 @@ export const useStandardTonWalletVersions = (publicKey?: string) => {
                 versions.map(v =>
                     new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                         accountId: v.address.toRawString(),
-                        currencies: [fiat]
+                        currencies: [fiat],
+                        supportedExtensions: ['custom_payload']
                     })
                 )
             );
@@ -726,7 +718,8 @@ export const useTonWalletsBalances = (addresses: string[]) => {
                 addresses.map(address =>
                     new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                         accountId: address,
-                        currencies: [fiat]
+                        currencies: [fiat],
+                        supportedExtensions: ['custom_payload']
                     })
                 )
             );

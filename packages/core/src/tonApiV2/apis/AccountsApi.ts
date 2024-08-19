@@ -133,6 +133,7 @@ export interface GetAccountJettonHistoryByIDRequest {
 export interface GetAccountJettonsBalancesRequest {
     accountId: string;
     currencies?: Array<string>;
+    supportedExtensions?: Array<string>;
 }
 
 export interface GetAccountJettonsHistoryRequest {
@@ -341,6 +342,7 @@ export interface AccountsApiInterface {
      * Get all Jettons balances by owner address
      * @param {string} accountId account ID
      * @param {Array<string>} [currencies] accept ton and all possible fiat currencies, separated by commas
+     * @param {Array<string>} [supportedExtensions] comma separated list supported extensions
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApiInterface
@@ -930,6 +932,10 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
 
         if (requestParameters['currencies'] != null) {
             queryParameters['currencies'] = requestParameters['currencies']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
+        if (requestParameters['supportedExtensions'] != null) {
+            queryParameters['supported_extensions'] = requestParameters['supportedExtensions']!.join(runtime.COLLECTION_FORMATS["csv"]);
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

@@ -17,7 +17,6 @@ import BigNumber from 'bignumber.js';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { JettonKey, QueryKey } from '../libs/queryKey';
-import { DefaultRefetchInterval } from './tonendpoint';
 import { useActiveTonNetwork, useActiveWallet } from './wallet';
 
 export const useJettonInfo = (jettonAddress: string) => {
@@ -67,7 +66,8 @@ export const useJettonRawList = () => {
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                 accountId: wallet.rawAddress,
-                currencies: [fiat]
+                currencies: [fiat],
+                supportedExtensions: ['custom_payload']
             });
             const balances = filterTokens(result.balances, []).sort(compareTokensOver(fiat));
             return { balances };
@@ -86,7 +86,8 @@ export const useJettonList = () => {
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                 accountId: wallet.rawAddress,
-                currencies: [fiat]
+                currencies: [fiat],
+                supportedExtensions: ['custom_payload']
             });
 
             const config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, network);
@@ -107,12 +108,6 @@ export const useJettonList = () => {
                 item => !config.pinnedTokens.includes(item.jetton.address)
             );
             return { balances: pinned.concat(rest) };
-        },
-        {
-            refetchInterval: DefaultRefetchInterval,
-            refetchIntervalInBackground: true,
-            refetchOnWindowFocus: true,
-            keepPreviousData: true
         }
     );
 };
@@ -123,15 +118,11 @@ export const useJettonBalance = (jettonAddress: string) => {
     return useQuery<JettonBalance, Error>(
         [wallet.id, QueryKey.jettons, JettonKey.balance, jettonAddress],
         async () => {
-            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.rawAddress
+            const result = await new AccountsApi(api.tonApiV2).getAccountJettonBalance({
+                accountId: wallet.rawAddress,
+                jettonId: jettonAddress
             });
-
-            const balance = result.balances.find(item => item.jetton.address === jettonAddress);
-            if (!balance) {
-                throw new Error('Missing jetton balance');
-            }
-            return balance;
+            return result;
         }
     );
 };

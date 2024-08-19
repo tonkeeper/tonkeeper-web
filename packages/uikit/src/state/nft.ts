@@ -1,17 +1,7 @@
-import { useAppContext } from '../hooks/appContext';
-import { useAppSdk } from '../hooks/appSdk';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getActiveWalletConfig } from '@tonkeeper/core/dist/service/wallet/configService';
-import {
-    useActiveWallet,
-    useActiveTonWalletConfig,
-    useMutateActiveTonWalletConfig,
-    useActiveTonNetwork
-} from './wallet';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
-import { DefaultRefetchInterval, useTonenpointConfig } from './tonendpoint';
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
-import { useTranslation } from '../hooks/translation';
+import { getActiveWalletConfig } from '@tonkeeper/core/dist/service/wallet/configService';
 import {
     AccountsApi,
     BlockchainApi,
@@ -21,9 +11,19 @@ import {
     NftCollection,
     NftItem
 } from '@tonkeeper/core/dist/tonApiV2';
-import { QueryKey } from '../libs/queryKey';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
 import { useMemo } from 'react';
+import { useAppContext } from '../hooks/appContext';
+import { useAppSdk } from '../hooks/appSdk';
+import { useTranslation } from '../hooks/translation';
+import { QueryKey } from '../libs/queryKey';
+import { useTonenpointConfig } from './tonendpoint';
+import {
+    useActiveTonNetwork,
+    useActiveTonWalletConfig,
+    useActiveWallet,
+    useMutateActiveTonWalletConfig
+} from './wallet';
 
 type NftWithCollectionId = Pick<NFT, 'address'> & {
     collection?: Pick<Required<NFT>['collection'], 'address'>;
@@ -155,12 +155,19 @@ export const isSpamNft = (
     nft: (NftWithCollectionId & { trust: NFT['trust'] }) | undefined,
     config: TonWalletConfig | undefined
 ) => {
-    return Boolean(
-        nft &&
-            (!!config?.spamNfts.includes(nft.collection?.address || nft.address) ||
-                (nft.trust === 'blacklist' &&
-                    !config?.trustedNfts.includes(nft.collection?.address || nft.address)))
-    );
+    if (!nft) {
+        return true;
+    }
+    const address = nft.collection?.address || nft.address;
+    if (config?.spamNfts.includes(address)) {
+        return true;
+    }
+
+    if (config?.trustedNfts.includes(address)) {
+        return false;
+    }
+
+    return ['blacklist', 'graylist'].includes(nft.trust);
 };
 
 export const isUnverifiedNft = (
@@ -179,24 +186,15 @@ export const useWalletNftList = () => {
         api: { tonApiV2 }
     } = useAppContext();
 
-    return useQuery<NFT[], Error>(
-        [wallet.rawAddress, QueryKey.nft],
-        async () => {
-            const { nftItems } = await new AccountsApi(tonApiV2).getAccountNftItems({
-                accountId: wallet.rawAddress,
-                offset: 0,
-                limit: 1000,
-                indirectOwnership: true
-            });
-            return nftItems;
-        },
-        {
-            refetchInterval: DefaultRefetchInterval,
-            refetchIntervalInBackground: true,
-            refetchOnWindowFocus: true,
-            keepPreviousData: true
-        }
-    );
+    return useQuery<NFT[], Error>([wallet.rawAddress, QueryKey.nft], async () => {
+        const { nftItems } = await new AccountsApi(tonApiV2).getAccountNftItems({
+            accountId: wallet.rawAddress,
+            offset: 0,
+            limit: 1000,
+            indirectOwnership: true
+        });
+        return nftItems;
+    });
 };
 export const useWalletFilteredNftList = () => {
     const { data: nfts, ...rest } = useWalletNftList();
