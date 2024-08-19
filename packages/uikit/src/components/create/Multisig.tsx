@@ -17,6 +17,10 @@ import { DropDown, DropDownContent, DropDownItem, DropDownItemsDivider } from '.
 import { Dot } from '../Dot';
 import { NotificationFooterPortal } from '../Notification';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { useEstimateDeployMultisig } from '../../hooks/blockchain/multisig/useEstimateDeployMultisig';
+import { useDeployMultisig } from '../../hooks/blockchain/multisig/useDeployMultisig';
+import { ConfirmView } from '../transfer/ConfirmView';
+import { useDisclosure } from '../../hooks/useDisclosure';
 
 const Body3Secondary = styled(Body3)`
     color: ${p => p.theme.textSecondary};
@@ -42,11 +46,26 @@ const SubHeading = styled(Body1)`
 
 export const CreateMultisig: FC = () => {
     const { t } = useTranslation();
+    const { isOpen, onClose, onOpen } = useDisclosure();
+    const estimateMutation = useEstimateDeployMultisig();
+    const deployMutation = useDeployMultisig();
+    const { data: fee, mutateAsync: estimateDeploy } = estimateMutation;
+
     return (
         <ContentWrapper>
             <Heading>{t('multisig_add_title')}</Heading>
             <SubHeading>{t('multisig_add_description')}</SubHeading>
             <MultisigCreatingForm />
+
+            {isOpen && (
+                <ConfirmView
+                    recipient={}
+                    assetAmount={}
+                    onClose={onClose}
+                    estimation={estimateMutation}
+                    {...deployMutation}
+                ></ConfirmView>
+            )}
         </ContentWrapper>
     );
 };

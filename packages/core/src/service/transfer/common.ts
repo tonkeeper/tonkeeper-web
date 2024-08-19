@@ -122,6 +122,7 @@ export const createTransferMessage = async (
         to: string;
         value: string | bigint | BigNumber;
         body?: string | Cell | null;
+        init?: StateInit | null;
     }
 ) => {
     const value =
@@ -138,7 +139,8 @@ export const createTransferMessage = async (
                 to: Address.parse(transaction.to),
                 bounce: true,
                 value: BigInt(value),
-                body: transaction.body
+                body: transaction.body,
+                init: transaction.init
             })
         ]
     });
