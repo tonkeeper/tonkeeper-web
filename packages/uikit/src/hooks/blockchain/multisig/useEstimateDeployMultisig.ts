@@ -7,7 +7,8 @@ import { useAppContext } from '../../appContext';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useAccountsState } from '../../../state/wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
-import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { Address } from '@ton/core';
 
 export const useEstimateDeployMultisig = () => {
     const { api } = useAppContext();
@@ -15,7 +16,7 @@ export const useEstimateDeployMultisig = () => {
         .filter(isAccountTonWalletStandard)
         .flatMap(a => a.allTonWallets);
     return useMutation<
-        TransferEstimationEvent,
+        { fee: AssetAmount; address: Address },
         Error,
         { multisigConfig: MultisigConfig; fromWallet: WalletId }
     >(({ multisigConfig, fromWallet }) => {

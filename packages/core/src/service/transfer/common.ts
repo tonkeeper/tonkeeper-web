@@ -14,7 +14,7 @@ import { sign } from '@ton/crypto';
 import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
-import { TonRecipient, TransferEstimationEvent } from '../../entries/send';
+import { TonRecipient } from '../../entries/send';
 import { BaseSigner } from '../../entries/signer';
 import { TonWalletStandard } from '../../entries/wallet';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
@@ -93,7 +93,7 @@ export const getWalletSeqNo = async (api: APIConfig, accountId: string) => {
     return seqno;
 };
 
-export const getWalletBalance = async (api: APIConfig, walletState: TonWalletStandard) => {
+export const getWalletBalance = async (api: APIConfig, walletState: { rawAddress: string }) => {
     const wallet = await new AccountsApi(api.tonApiV2).getAccount({
         accountId: walletState.rawAddress
     });
@@ -156,10 +156,10 @@ signEstimateMessage.type = 'cell' as const;
 export async function getKeyPairAndSeqno(options: {
     api: APIConfig;
     walletState: TonWalletStandard;
-    fee: TransferEstimationEvent;
+    fee?: { event: { extra: number | BigNumber } };
     amount: BigNumber;
 }) {
-    const total = options.amount.plus(options.fee.event.extra * -1);
+    const total = options.fee ? options.amount.minus(options.fee.event.extra) : options.amount;
 
     const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
     checkWalletBalanceOrDie(total, wallet);

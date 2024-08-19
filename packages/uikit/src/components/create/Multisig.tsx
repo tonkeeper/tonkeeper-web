@@ -1,4 +1,12 @@
-import React, { FC, PropsWithChildren, useEffect, useId, useMemo, useState } from 'react';
+import React, {
+    FC,
+    PropsWithChildren,
+    useCallback,
+    useEffect,
+    useId,
+    useMemo,
+    useState
+} from 'react';
 import styled, { css } from 'styled-components';
 import { Body1, Body2, Body2Class, Body3, Body3Class, H2, Label2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
@@ -15,12 +23,29 @@ import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { DropDown, DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { Dot } from '../Dot';
-import { NotificationFooterPortal } from '../Notification';
+import { Notification, NotificationFooterPortal } from '../Notification';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useEstimateDeployMultisig } from '../../hooks/blockchain/multisig/useEstimateDeployMultisig';
 import { useDeployMultisig } from '../../hooks/blockchain/multisig/useDeployMultisig';
-import { ConfirmView } from '../transfer/ConfirmView';
+import {
+    ConfirmView,
+    ConfirmViewHeading,
+    ConfirmViewHeadingSlot,
+    ConfirmViewTitleSlot
+} from '../transfer/ConfirmView';
 import { useDisclosure } from '../../hooks/useDisclosure';
+import {
+    deployMultisigAssetAmount,
+    MultisigConfig
+} from '@tonkeeper/core/dist/service/multisigService';
+import { Address } from '@ton/core';
+import {
+    AsyncValidationState,
+    AsyncValidatorsStateProvider,
+    useAsyncValidator
+} from '../../hooks/useAsyncValidator';
+import { useAppContext } from '../../hooks/appContext';
+import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 
 const Body3Secondary = styled(Body3)`
     color: ${p => p.theme.textSecondary};
@@ -45,27 +70,55 @@ const SubHeading = styled(Body1)`
 `;
 
 export const CreateMultisig: FC = () => {
+    const [deployArgs, setDeployArgs] = useState<
+        Parameters<typeof useDeployMultisig>[0] | undefined
+    >();
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const estimateMutation = useEstimateDeployMultisig();
-    const deployMutation = useDeployMultisig();
-    const { data: fee, mutateAsync: estimateDeploy } = estimateMutation;
+    const deployMutation = useDeployMultisig(deployArgs);
+    const { mutateAsync: estimateDeploy } = estimateMutation;
+
+    const onSubmit = async (data: MultisigUseForm) => {
+        onOpen();
+        const fromWallet = data.firstParticipant.address;
+        const multisigConfig: MultisigConfig = {
+            proposers: data.participants
+                .concat(data.firstParticipant)
+                .filter(p => p.role === 'proposer')
+                .map(v => Address.parse(v.address)),
+            signers: data.participants
+                .concat(data.firstParticipant)
+                .filter(p => p.role === 'proposer-and-signer')
+                .map(v => Address.parse(v.address)),
+            threshold: data.quorum,
+            allowArbitrarySeqno: true //TODO
+        };
+        const result = await estimateDeploy({ multisigConfig, fromWallet });
+        setDeployArgs({ multisigConfig, fromWallet, feeWei: result?.fee.weiAmount });
+    };
 
     return (
         <ContentWrapper>
             <Heading>{t('multisig_add_title')}</Heading>
             <SubHeading>{t('multisig_add_description')}</SubHeading>
-            <MultisigCreatingForm />
+            <MultisigCreatingForm onSubmit={onSubmit} />
 
-            {isOpen && (
-                <ConfirmView
-                    recipient={}
-                    assetAmount={}
-                    onClose={onClose}
-                    estimation={estimateMutation}
-                    {...deployMutation}
-                ></ConfirmView>
-            )}
+            <Notification isOpen={isOpen} handleClose={onClose}>
+                {() => (
+                    <ConfirmView
+                        assetAmount={deployMultisigAssetAmount}
+                        onClose={onClose}
+                        estimation={{ ...estimateMutation }}
+                        {...deployMutation}
+                    >
+                        <ConfirmViewTitleSlot />
+                        <ConfirmViewHeadingSlot>
+                            <ConfirmViewHeading title="Deploy Multisig" />
+                        </ConfirmViewHeadingSlot>
+                    </ConfirmView>
+                )}
+            </Notification>
         </ContentWrapper>
     );
 };
@@ -102,7 +155,7 @@ type MultisigUseForm = {
     deadlineHours: number;
 };
 
-const MultisigCreatingForm: FC = () => {
+const MultisigCreatingForm: FC<{ onSubmit: (form: MultisigUseForm) => void }> = ({ onSubmit }) => {
     const activeWallet = useActiveWallet();
     const methods = useForm<MultisigUseForm>({
         defaultValues: {
@@ -121,43 +174,49 @@ const MultisigCreatingForm: FC = () => {
         name: 'participants'
     });
 
-    const onSubmit = v => {
-        console.log(v);
-    };
-
     const formId = useId();
+    const [formState, setFormState] = useState<AsyncValidationState>('idle');
 
     return (
         <FormWrapper onSubmit={handleSubmit(onSubmit)} id={formId}>
             <FormProvider {...methods}>
-                <FirstParticipantCard />
-                <Body3Secondary>
-                    A signer can confirm transactions and propose changes, such as adding or
-                    removing participants. A proposer can only propose changes.
-                </Body3Secondary>
-                <Participants>
-                    {fields.map((field, index) => (
-                        <ExternalParticipantCard
-                            key={field.id}
-                            fieldIndex={index}
-                            onRemove={() => remove(index)}
-                        />
-                    ))}
-                </Participants>
-                <Button
-                    secondary
-                    type="button"
-                    size="small"
-                    fitContent
-                    onClick={() => append({ address: '', role: 'proposer-and-signer' })}
-                >
-                    Add Participant
-                </Button>
-                <QuorumAndDeadlineInputs />
+                <AsyncValidatorsStateProvider onStateChange={setFormState}>
+                    <FirstParticipantCard />
+                    <Body3Secondary>
+                        A signer can confirm transactions and propose changes, such as adding or
+                        removing participants. A proposer can only propose changes.
+                    </Body3Secondary>
+                    <Participants>
+                        {fields.map((field, index) => (
+                            <ExternalParticipantCard
+                                key={field.id}
+                                fieldIndex={index}
+                                onRemove={() => remove(index)}
+                            />
+                        ))}
+                    </Participants>
+                    <Button
+                        secondary
+                        type="button"
+                        size="small"
+                        fitContent
+                        onClick={() => append({ address: '', role: 'proposer-and-signer' })}
+                    >
+                        Add Participant
+                    </Button>
+                    <QuorumAndDeadlineInputs />
+                </AsyncValidatorsStateProvider>
             </FormProvider>
             <NotificationFooterPortal>
                 <SubmitButtonContainer>
-                    <Button primary type="submit" fullWidth form={formId}>
+                    <Button
+                        primary
+                        type="submit"
+                        fullWidth
+                        form={formId}
+                        loading={formState === 'validating'}
+                        disabled={formState !== 'succeed'}
+                    >
                         Create Wallet
                     </Button>
                 </SubmitButtonContainer>
@@ -236,12 +295,19 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
     );
 };
 
-const DropDownSelectHost = styled.div`
+const DropDownSelectHost = styled.div<{ isErrored?: boolean }>`
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     padding: 8px 12px;
+    ${BorderSmallResponsive};
+    ${p =>
+        p.isErrored &&
+        css`
+            border: 1px solid ${p.theme.fieldErrorBorder};
+            background: ${p.theme.fieldErrorBackground};
+        `}
 `;
 
 const DropDownSelectHostText = styled.div`
@@ -264,7 +330,23 @@ const DropDownStyled = styled(DropDown)`
 `;
 
 const FirstParticipantCard: FC = () => {
-    const { control, watch } = useFormContext<MultisigUseForm>();
+    const methods = useFormContext<MultisigUseForm>();
+    const { watch, control } = methods;
+    const { api } = useAppContext();
+    const selectedAddress = watch('firstParticipant.address');
+
+    const asyncValidator = useCallback(
+        async (accountId: string) => {
+            const wallet = await new AccountsApi(api.tonApiV2).getAccount({ accountId });
+
+            if (deployMultisigAssetAmount.weiAmount.gt(wallet.balance)) {
+                return { message: 'Not enough TON balance for deploy' };
+            }
+        },
+        [api]
+    );
+
+    useAsyncValidator(methods, selectedAddress, 'firstParticipant.address', asyncValidator);
     const accounts = useAccountsState();
     const wallets = useMemo(() => {
         const filtered = accounts.filter(isAccountTonWalletStandard).flatMap(a =>
@@ -280,59 +362,63 @@ const FirstParticipantCard: FC = () => {
         );
     }, [accounts]);
 
-    const selectedAddress = watch('firstParticipant.address');
     const selectedWallet = wallets[selectedAddress];
 
     return (
-        <ParticipantCardStyled registerAs="firstParticipant.role">
-            <Controller
-                rules={{
-                    required: 'Required'
-                }}
-                render={({ field: { onChange } }) => (
-                    <DropDownStyled
-                        containerClassName="dd-create-multisig-container"
-                        payload={onClose => (
-                            <DropDownContent>
-                                {Object.values(wallets).map(item => (
-                                    <>
-                                        <DropDownItem
-                                            isSelected={selectedAddress === item.wallet.rawAddress}
-                                            key={item.wallet.id}
-                                            onClick={() => {
-                                                onClose();
-                                                onChange(item.wallet.rawAddress);
-                                            }}
-                                        >
-                                            <AccountAndWalletInfoStyled
-                                                noPrefix
-                                                account={item.account}
-                                                walletId={item.wallet.id}
-                                            />
-                                        </DropDownItem>
-                                        <DropDownItemsDivider />
-                                    </>
-                                ))}
-                            </DropDownContent>
-                        )}
-                    >
-                        <DropDownSelectHost>
-                            <DropDownSelectHostText>
-                                <Body3>Wallet</Body3>
-                                <AccountAndWalletInfoStyled
-                                    noPrefix
-                                    account={selectedWallet.account}
-                                    walletId={selectedWallet.wallet.id}
-                                />
-                            </DropDownSelectHostText>
-                            <SwitchIcon />
-                        </DropDownSelectHost>
-                    </DropDownStyled>
-                )}
-                name={'firstParticipant.address'}
-                control={control}
-            />
-        </ParticipantCardStyled>
+        <Controller
+            rules={{
+                required: 'Required'
+            }}
+            render={({ field: { onChange }, fieldState: { error } }) => (
+                <>
+                    <ParticipantCardStyled registerAs="firstParticipant.role">
+                        <DropDownStyled
+                            containerClassName="dd-create-multisig-container"
+                            payload={onClose => (
+                                <DropDownContent>
+                                    {Object.values(wallets).map(item => (
+                                        <>
+                                            <DropDownItem
+                                                isSelected={
+                                                    selectedAddress === item.wallet.rawAddress
+                                                }
+                                                key={item.wallet.id}
+                                                onClick={() => {
+                                                    onClose();
+                                                    onChange(item.wallet.rawAddress);
+                                                }}
+                                            >
+                                                <AccountAndWalletInfoStyled
+                                                    noPrefix
+                                                    account={item.account}
+                                                    walletId={item.wallet.id}
+                                                />
+                                            </DropDownItem>
+                                            <DropDownItemsDivider />
+                                        </>
+                                    ))}
+                                </DropDownContent>
+                            )}
+                        >
+                            <DropDownSelectHost isErrored={!!error}>
+                                <DropDownSelectHostText>
+                                    <Body3>Wallet</Body3>
+                                    <AccountAndWalletInfoStyled
+                                        noPrefix
+                                        account={selectedWallet.account}
+                                        walletId={selectedWallet.wallet.id}
+                                    />
+                                </DropDownSelectHostText>
+                                <SwitchIcon />
+                            </DropDownSelectHost>
+                        </DropDownStyled>
+                    </ParticipantCardStyled>
+                    {error && <FormError noPaddingTop>{error.message}</FormError>}
+                </>
+            )}
+            name={'firstParticipant.address'}
+            control={control}
+        />
     );
 };
 
@@ -387,16 +473,6 @@ const QuorumAndDeadlineInputsContainer = styled.div`
 const StandaloneField = styled.div`
     background: ${p => p.theme.fieldBackground};
     ${BorderSmallResponsive};
-`;
-
-const StandaloneDropDownSelectHost = styled(DropDownSelectHost)<{ isErrored?: boolean }>`
-    ${BorderSmallResponsive};
-    ${p =>
-        p.isErrored &&
-        css`
-            border: 1px solid ${p.theme.fieldErrorBorder};
-            background: ${p.theme.fieldErrorBackground};
-        `}
 `;
 
 const DropDownItemText = styled.div`
@@ -492,7 +568,7 @@ const QuorumAndDeadlineInputs = () => {
                         )}
                     >
                         <StandaloneField>
-                            <StandaloneDropDownSelectHost isErrored={!!error}>
+                            <DropDownSelectHost isErrored={!!error}>
                                 <DropDownSelectHostText>
                                     <Body3>Quorum</Body3>
                                     <Body2>
@@ -506,7 +582,7 @@ const QuorumAndDeadlineInputs = () => {
                                     </Body2>
                                 </DropDownSelectHostText>
                                 <SwitchIcon />
-                            </StandaloneDropDownSelectHost>
+                            </DropDownSelectHost>
                         </StandaloneField>
                         {error && <FormError>{error.message}</FormError>}
                     </DropDownStyled>
@@ -542,13 +618,13 @@ const QuorumAndDeadlineInputs = () => {
                         )}
                     >
                         <StandaloneField>
-                            <StandaloneDropDownSelectHost>
+                            <DropDownSelectHost>
                                 <DropDownSelectHostText>
                                     <Body3>Time to sign a transaction</Body3>
                                     <Body2>{t(selectedDeadlineTranslation)}</Body2>
                                 </DropDownSelectHostText>
                                 <SwitchIcon />
-                            </StandaloneDropDownSelectHost>
+                            </DropDownSelectHost>
                         </StandaloneField>
                     </DropDownStyled>
                 )}

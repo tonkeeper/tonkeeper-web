@@ -7,20 +7,20 @@ import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
 import { useCheckTouchId } from '../../../state/password';
-import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
 import { notifyError } from '../../../components/transfer/common';
 import { useTranslation } from '../../translation';
 import { anyOfKeysParts } from '../../../libs/queryKey';
+import BigNumber from 'bignumber.js';
 
-export const useDeployMultisig = ({
-    multisigConfig,
-    fromWallet,
-    fee
-}: {
-    multisigConfig: MultisigConfig;
-    fromWallet: WalletId;
-    fee: TransferEstimationEvent;
-}) => {
+export const useDeployMultisig = (
+    params:
+        | {
+              multisigConfig: MultisigConfig;
+              fromWallet: WalletId;
+              feeWei: BigNumber;
+          }
+        | undefined
+) => {
     const { api } = useAppContext();
     const wallets = useAccountsState()
         .filter(isAccountTonWalletStandard)
@@ -30,9 +30,13 @@ export const useDeployMultisig = ({
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
-    return useMutation<void, Error>(async () => {
+    return useMutation<boolean, Error>(async () => {
         try {
-            const accountAndWallet = wallets.find(w => w.wallet.id === fromWallet);
+            if (!params) {
+                throw new Error('Unknown error, params are empty');
+            }
+
+            const accountAndWallet = wallets.find(w => w.wallet.id === params.fromWallet);
             if (!accountAndWallet) {
                 throw new Error('Wallet not found');
             }
@@ -50,10 +54,10 @@ export const useDeployMultisig = ({
 
             const { address } = await deployMultisig({
                 api,
-                multisigConfig,
+                multisigConfig: params.multisigConfig,
                 walletState: accountAndWallet.wallet,
                 signer,
-                fee
+                feeWei: params.feeWei
             });
 
             await client.invalidateQueries(
@@ -63,8 +67,10 @@ export const useDeployMultisig = ({
                     accountAndWallet.wallet.id
                 )
             );
+            return true;
         } catch (e) {
             await notifyError(client, sdk, t, e);
+            return false;
         }
     });
 };

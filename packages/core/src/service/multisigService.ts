@@ -6,20 +6,24 @@ import {
     createTransferMessage,
     getKeyPairAndSeqno,
     getServerTime,
-    getWalletSeqNo,
     signEstimateMessage
 } from './transfer/common';
 import { APIConfig } from '../entries/apis';
-import { TransferEstimationEvent } from '../entries/send';
 import BigNumber from 'bignumber.js';
 import { BlockchainApi, EmulationApi } from '../tonApiV2';
+import { AssetAmount } from '../entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '../entries/crypto/asset/constants';
 
-const deployMultisigValue = toNano(0.01);
+const deployMultisigValue = toNano(0.1);
+export const deployMultisigAssetAmount = new AssetAmount({
+    weiAmount: new BigNumber(deployMultisigValue.toString()),
+    asset: TON_ASSET
+});
 
 export const deployMultisig = async (options: {
     api: APIConfig;
     walletState: TonWalletStandard;
-    fee: TransferEstimationEvent;
+    feeWei: BigNumber;
     signer: CellSigner;
     multisigConfig: MultisigConfig;
 }) => {
@@ -37,34 +41,34 @@ export const estimateDeployMultisig = async (options: {
     walletState: TonWalletStandard;
     multisigConfig: MultisigConfig;
 }) => {
-    const { cell } = await createMultisig({ ...options, signer: signEstimateMessage });
+    const { cell, address } = await createMultisig({ ...options, signer: signEstimateMessage });
 
-    return new EmulationApi(options.api.tonApiV2).emulateMessageToWallet({
+    const event = await new EmulationApi(options.api.tonApiV2).emulateMessageToWallet({
         emulateMessageToWalletRequest: { boc: cell.toString('base64') }
     });
+
+    return {
+        fee: new AssetAmount({ weiAmount: new BigNumber(event.event.extra), asset: TON_ASSET }),
+        address
+    };
 };
 
 const createMultisig = async (options: {
     api: APIConfig;
     walletState: TonWalletStandard;
-    fee?: TransferEstimationEvent;
+    feeWei?: BigNumber;
     signer: CellSigner;
     multisigConfig: MultisigConfig;
 }) => {
     const timestamp = await getServerTime(options.api);
 
-    let seqno: number;
-    if (options.fee) {
-        seqno = (
-            await getKeyPairAndSeqno({
-                ...options,
-                fee: options.fee,
-                amount: new BigNumber(deployMultisigValue.toString())
-            })
-        ).seqno;
-    } else {
-        seqno = await getWalletSeqNo(options.api, options.walletState.rawAddress);
-    }
+    const seqno = (
+        await getKeyPairAndSeqno({
+            ...options,
+            fee: options.feeWei !== undefined ? { event: { extra: options.feeWei } } : undefined,
+            amount: new BigNumber(deployMultisigValue.toString())
+        })
+    ).seqno;
 
     const stateInit = {
         data: multisigConfigToCell(options.multisigConfig),
