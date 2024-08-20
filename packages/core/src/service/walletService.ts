@@ -9,10 +9,10 @@ import {
     AccountKeystone,
     AccountLedger,
     AccountMAM,
-    AccountTonMnemonic,
+    AccountTonMnemonic, AccountTonMultisig,
     AccountTonOnly,
     AccountTonWatchOnly
-} from '../entries/account';
+} from "../entries/account";
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
 import { AuthKeychain, AuthPassword } from '../entries/password';
@@ -28,6 +28,24 @@ import { emojis } from '../utils/emojis';
 import { accountsStorage } from './accountsStorage';
 import { walletContract } from './wallet/contractService';
 import { MamRoot, MamTonAccount } from '@multi-account-mnemonic/core';
+
+export const createMultisigTonAccount = async (
+    storage: IStorage,
+    address: string,
+    options: {
+        name?: string;
+    }
+) => {
+    const rawAddress = Address.parse(address).toRawString();
+    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
+        rawAddress.split(':')[1]
+    );
+
+    return new AccountTonMultisig(rawAddress, options.name ?? name, emoji, {
+        id: rawAddress,
+        rawAddress: rawAddress
+    });
+};
 
 export const createReadOnlyTonAccountByAddress = async (
     storage: IStorage,

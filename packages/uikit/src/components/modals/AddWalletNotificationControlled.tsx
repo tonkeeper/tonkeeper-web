@@ -1,6 +1,6 @@
 import { Notification } from '../Notification';
 import { createModalControl } from './createModalControl';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { AddWalletContent } from '../create/AddWallet';
 import styled, { css } from 'styled-components';
 import { Body1, Body2Class, H2, Label2Class } from '../Text';
@@ -8,6 +8,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useOnImportAction } from '../../hooks/appSdk';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { CreateMultisig } from '../create/Multisig';
+import { useConfirmDiscardNotification } from './ConfirmDiscardNotificationControlled';
 
 const { hook } = createModalControl();
 
@@ -51,13 +52,28 @@ type MethodsInModal = (typeof methodsInModal)[number];
 
 export const AddWalletNotificationControlled = () => {
     const { isOpen, onClose } = useAddWalletNotification();
+    const { onOpen: askDiscard } = useConfirmDiscardNotification();
     const { t } = useTranslation();
     const onImport = useOnImportAction();
-    const [selectedMethod, setSelectedMethod] = useState<MethodsInModal | undefined>('multisig');
+    const [selectedMethod, setSelectedMethod] = useState<MethodsInModal | undefined>(undefined);
 
-    const onBack = useCallback(() => {
-        setSelectedMethod(undefined);
-    }, [setSelectedMethod]);
+    const [onBack, setOnBack] = useState<(() => void) | undefined | 'navigate-back'>(
+        'navigate-back'
+    );
+
+    const onCloseCallback = useCallback(() => {
+        askDiscard({
+            onClose: (confirmDiscard: boolean) => {
+                if (confirmDiscard) {
+                    onClose();
+                    setTimeout(() => {
+                        setSelectedMethod(undefined);
+                        setOnBack('navigate-back');
+                    }, 400);
+                }
+            }
+        });
+    }, [onClose, askDiscard]);
 
     const Content = useCallback(
         (closed: (after: () => void) => void) => {
@@ -81,21 +97,32 @@ export const AddWalletNotificationControlled = () => {
 
             switch (selectedMethod) {
                 case 'multisig': {
-                    return <CreateMultisig />;
+                    return <CreateMultisig setOnBack={setOnBack} onClose={onCloseCallback} />;
                 }
                 default: {
                     assertUnreachable(selectedMethod);
                 }
             }
         },
-        [onImport, t, selectedMethod]
+        [onImport, t, selectedMethod, setOnBack, onCloseCallback]
     );
+
+    const onBackCallback = useMemo(() => {
+        if (!selectedMethod) {
+            return undefined;
+        }
+        if (onBack === 'navigate-back') {
+            return () => setSelectedMethod(undefined);
+        } else {
+            return onBack;
+        }
+    }, [onBack, selectedMethod]);
 
     return (
         <NotificationStyled
             isOpen={isOpen}
-            handleClose={onClose}
-            onBack={selectedMethod ? onBack : undefined}
+            handleClose={onCloseCallback}
+            onBack={onBackCallback}
             mWidth={'750px'}
         >
             {Content}

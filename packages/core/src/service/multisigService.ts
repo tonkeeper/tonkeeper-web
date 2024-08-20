@@ -28,7 +28,7 @@ export const deployMultisig = async (options: {
     multisigConfig: MultisigConfig;
 }) => {
     const { cell, address } = await createMultisig(options);
-
+    return { address };
     await new BlockchainApi(options.api.tonApiV2).sendBlockchainMessage({
         sendBlockchainMessageRequest: { boc: cell.toString('base64') }
     });

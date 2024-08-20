@@ -5,6 +5,7 @@ import { MAMIndexesSettingsNotification } from './modals/MAMIndexesSettingsNotif
 import { RenameNotificationControlled } from './modals/RenameNotificationControlled';
 import { RecoveryNotificationControlled } from './modals/RecoveryNotificationControlled';
 import { AddWalletNotificationControlled } from './modals/AddWalletNotificationControlled';
+import { ConfirmDiscardNotificationControlled } from './modals/ConfirmDiscardNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -16,6 +17,7 @@ export const ModalsRoot = () => {
             <RenameNotificationControlled />
             <RecoveryNotificationControlled />
             <AddWalletNotificationControlled />
+            <ConfirmDiscardNotificationControlled />
         </>
     );
 };

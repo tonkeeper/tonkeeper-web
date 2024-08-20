@@ -10,7 +10,8 @@ import {
     getWalletById,
     isAccountVersionEditable,
     isAccountTonWalletStandard,
-    AccountMAM
+    AccountMAM,
+    AccountTonMultisig
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';
@@ -29,6 +30,7 @@ import {
 } from '@tonkeeper/core/dist/service/wallet/configService';
 import {
     createMAMAccountByMnemonic,
+    createMultisigTonAccount,
     createReadOnlyTonAccountByAddress,
     createStandardTonAccountByMnemonic,
     getWalletAddress
@@ -42,7 +44,6 @@ import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
 import { useDevSettings } from './dev';
 import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
-import { DefaultRefetchInterval } from './tonendpoint';
 import { useCheckTouchId } from './password';
 import { MamRoot } from '@multi-account-mnemonic/core';
 import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
@@ -299,6 +300,29 @@ export const useMutateAccountsState = () => {
     });
 };
 
+export const useCreateAccountTonMultisig = () => {
+    const sdk = useAppSdk();
+    const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
+
+    return useMutation<
+        AccountTonMultisig,
+        Error,
+        {
+            address: string;
+            name?: string;
+        }
+    >(async ({ address, name }) => {
+        const valid = await seeIfValidTonAddress(address);
+        if (!valid) {
+            throw new Error('Address is not valid.');
+        }
+
+        const account = await createMultisigTonAccount(sdk.storage, address, { name });
+
+        await addAccountToState(account);
+        return account;
+    });
+};
 export const useCreateAccountReadOnly = () => {
     const sdk = useAppSdk();
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();

@@ -11,6 +11,7 @@ import { notifyError } from '../../../components/transfer/common';
 import { useTranslation } from '../../translation';
 import { anyOfKeysParts } from '../../../libs/queryKey';
 import BigNumber from 'bignumber.js';
+import { MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
 
 export const useDeployMultisig = (
     params:
@@ -30,7 +31,7 @@ export const useDeployMultisig = (
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
-    return useMutation<boolean, Error>(async () => {
+    return useMutation<string | undefined, Error>(async () => {
         try {
             if (!params) {
                 throw new Error('Unknown error, params are empty');
@@ -60,6 +61,30 @@ export const useDeployMultisig = (
                 feeWei: params.feeWei
             });
 
+            const maxAttempts = 20;
+            const awaitIsDeployed = async (attempt = 0): Promise<void> => {
+                try {
+                    const deployed = await new MultisigApi(api.tonApiV2).getMultisigAccount({
+                        accountId: address.toRawString()
+                    });
+
+                    if (deployed?.address) {
+                        return;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+
+                if (attempt > maxAttempts) {
+                    throw new Error('Contract was not deployed in 20 blocks');
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                return awaitIsDeployed(attempt + 1);
+            };
+
+            // await awaitIsDeployed();
+
             await client.invalidateQueries(
                 anyOfKeysParts(
                     address.toRawString(),
@@ -67,10 +92,10 @@ export const useDeployMultisig = (
                     accountAndWallet.wallet.id
                 )
             );
-            return true;
+            return address.toRawString();
         } catch (e) {
             await notifyError(client, sdk, t, e);
-            return false;
+            return undefined;
         }
     });
 };

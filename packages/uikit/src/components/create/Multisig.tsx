@@ -5,6 +5,7 @@ import React, {
     useEffect,
     useId,
     useMemo,
+    useRef,
     useState
 } from 'react';
 import styled, { css } from 'styled-components';
@@ -17,8 +18,12 @@ import { InputBlock, InputField } from '../fields/Input';
 import { Button } from '../fields/Button';
 import { IconButtonTransparentBackground } from '../fields/IconButton';
 import { CloseIcon, SwitchIcon } from '../Icon';
-import { useAccountsState, useActiveWallet } from '../../state/wallet';
-import { Account, isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import { useAccountsState, useActiveWallet, useCreateAccountTonMultisig } from '../../state/wallet';
+import {
+    Account,
+    AccountTonMultisig,
+    isAccountTonWalletStandard
+} from '@tonkeeper/core/dist/entries/account';
 import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { DropDown, DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
@@ -46,6 +51,7 @@ import {
 } from '../../hooks/useAsyncValidator';
 import { useAppContext } from '../../hooks/appContext';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { RenameWalletContent } from '../settings/wallet-name/WalletNameNotification';
 
 const Body3Secondary = styled(Body3)`
     color: ${p => p.theme.textSecondary};
@@ -69,15 +75,46 @@ const SubHeading = styled(Body1)`
     text-align: center;
 `;
 
-export const CreateMultisig: FC = () => {
+export const CreateMultisig: FC<{
+    setOnBack: (callback: (() => void) | undefined) => void;
+    onClose: () => void;
+}> = ({ setOnBack, onClose }) => {
+    const [account, setAccount] = useState<AccountTonMultisig | undefined>();
+    const { t } = useTranslation();
+    useEffect(() => {
+        if (account) {
+            setOnBack(undefined);
+        }
+    }, [account]);
+
+    if (!account) {
+        return <CreateMultisigFormPage onCreated={acc => !account && setAccount(acc)} />;
+    } else {
+        return (
+            <ContentWrapper>
+                <Heading>{t('Customize your Wallet')}</Heading>
+                <SubHeading>
+                    {t('Wallet name and icon are stored locally on your device.')}
+                </SubHeading>
+                <RenameWalletContent account={account} onClose={onClose} />
+            </ContentWrapper>
+        );
+    }
+};
+
+const CreateMultisigFormPage: FC<{ onCreated: (account: AccountTonMultisig) => void }> = ({
+    onCreated
+}) => {
     const [deployArgs, setDeployArgs] = useState<
         Parameters<typeof useDeployMultisig>[0] | undefined
     >();
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const estimateMutation = useEstimateDeployMultisig();
+    const { mutateAsync: addAccountToStorage } = useCreateAccountTonMultisig();
     const deployMutation = useDeployMultisig(deployArgs);
     const { mutateAsync: estimateDeploy } = estimateMutation;
+    const addedAccount = useRef<AccountTonMultisig>();
 
     const onSubmit = async (data: MultisigUseForm) => {
         onOpen();
@@ -98,19 +135,36 @@ export const CreateMultisig: FC = () => {
         setDeployArgs({ multisigConfig, fromWallet, feeWei: result?.fee.weiAmount });
     };
 
+    const mutateAsync = useCallback(async () => {
+        const address = await deployMutation.mutateAsync();
+        if (address) {
+            addedAccount.current = await addAccountToStorage({ address });
+        }
+
+        return !!address;
+    }, [deployMutation.mutateAsync, onCreated]);
+
+    const onCloseConfirmView = () => {
+        if (addedAccount.current) {
+            onCreated(addedAccount.current);
+        }
+        onClose();
+    };
+
     return (
         <ContentWrapper>
             <Heading>{t('multisig_add_title')}</Heading>
             <SubHeading>{t('multisig_add_description')}</SubHeading>
             <MultisigCreatingForm onSubmit={onSubmit} />
 
-            <Notification isOpen={isOpen} handleClose={onClose}>
+            <Notification isOpen={isOpen} handleClose={onCloseConfirmView}>
                 {() => (
                     <ConfirmView
                         assetAmount={deployMultisigAssetAmount}
-                        onClose={onClose}
+                        onClose={onCloseConfirmView}
                         estimation={{ ...estimateMutation }}
                         {...deployMutation}
+                        mutateAsync={mutateAsync}
                     >
                         <ConfirmViewTitleSlot />
                         <ConfirmViewHeadingSlot>
