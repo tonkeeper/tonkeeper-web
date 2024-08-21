@@ -251,8 +251,8 @@
     "recharge_by_crypto" : {
       "continue" : "ادامه",
       "other" : {
-        "subtitle" : "",
-        "title" : "Other"
+        "subtitle" : "وارد کردن مقدار دستی",
+        "title" : "دیگر"
       },
       "title" : "Recharge",
       "title_gift" : "Gift",
