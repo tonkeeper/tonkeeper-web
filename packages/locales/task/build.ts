@@ -9,7 +9,6 @@ dotenv.config();
 const namespaces = ['tonkeeper', 'tonkeeper-web'];
 
 const localeMap = {
-    'bn-BD': 'bn',
     'ru-RU': 'ru',
     'tr-TR': 'tr',
     'zh-Hans-CN': 'zh_CN'
