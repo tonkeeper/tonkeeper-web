@@ -1,0 +1,20 @@
+{
+  "auctionBidMessage" : "{{.NftName}} এর জন্য {{.Amount}} বিড করা হচ্ছে",
+  "contractDeployAction" : "একটি কন্ট্রাক্ট স্থাপন করা হচ্ছে{{ if .Interfaces }} ইন্টারফেস {{.Interfaces}} সহ{{ end }}",
+  "depositStakeAction" : "স্টেকিং পুলে {{.Value}} জমা হচ্ছে",
+  "electionsDepositStakeAction" : "স্টেকের জন্য {{.Amount}} জমা হচ্ছে",
+  "electionsRecoverStakeAction" : "{{.Amount}} স্টেক পুনরুদ্ধার করা হচ্ছে",
+  "helloWorld" : "হ্যালো বিশ্ব!",
+  "jettonBurnAction" : "{{.Value}} {{.JettonName}} বার্ন করা হচ্ছে",
+  "jettonMintAction" : "{{.Value}} {{.JettonName}} মিন্ট করা হচ্ছে",
+  "jettonSwapAction" : "{{.AmountIn}} {{.JettonIn}} {{.AmountOut}} {{.JettonOut}} এ পরিবর্তন হচ্ছে",
+  "jettonTransferAction" : "{{.Value}} {{.JettonName}} স্থানান্তর করা হচ্ছে",
+  "nftPurchaseAction" : "{{.Name}} ক্রয় করা হচ্ছে",
+  "nftTransferAction" : "১টি NFT স্থানান্তর করা হচ্ছে",
+  "poolImplementationDescription" : "ন্যূনতম জমা {{.Deposit}} TON",
+  "smartContractExecMessage" : "স্মার্ট কন্ট্রাক্টের কার্যকরকরণ",
+  "subscriptionAction" : "সাবস্ক্রিপশনের জন্য {{.Value}} পরিশোধ করা হচ্ছে",
+  "tonTransferAction" : "{{.Value}} স্থানান্তর করা হচ্ছে",
+  "withdrawStakeAction" : "স্টেকিং পুল থেকে {{.Value}} উত্তোলন করা হচ্ছে",
+  "withdrawStakeRequestAction" : "স্টেকিং পুল থেকে {{.Value}} উত্তোলনের অনুরোধ"
+}
