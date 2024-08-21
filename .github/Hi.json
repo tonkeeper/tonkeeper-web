@@ -1,10 +1,10 @@
+;
 "android_download_apk" :".apkसीधेडाउनलोडकरें",
 "android_download_google_play" :"गूगलप्लेसेप्राप्तकरें",
 "apps_defi" :"डेफी",
-'
 "apps_exchanges" :"एक्सचेंज",
 "apps_featured" :"फीचर्ड",
-"apps_games" :"मज़ा",
+"apps_games" :"मज़ा"
 "apps_utils" :"उपयोगिता",
 "confirm_action_btn_title" :"कार्रवाईकीपुष्टिकरें",
 "confirm_action_caption" :"नीचेदिएगएबटनपरक्लिककरेंयासेवापेजपरकार्रवाईदोहराएं।",
@@ -13,7 +13,6 @@
 "deeplinking_disable_caption" :"यदिकुछगलतहोगयाहै,तोसेवापरवापसजाएंजहांसेकार्रवाईशुरूकीगईथीऔरप्रयासकरें।",
 "deeplinking_disable_title" :"आपपहलेसेहीकार्रवाईकाप्रयासकरचुकेहैं",
 "exchange_buy_subtitle" :"क्रेडिटकार्डसेटोनकोइनऔरअन्यक्रिप्टोखरीदें",
-"
 "exchange_buy_title" :"TONखरीदें",
 "exchange_buy_title_new" :"बैंककार्डऔरट्रांसफर",
 "exchange_changelly_button" :"TONखरीदें",
@@ -49,7 +48,6 @@
 "exchange_trading_title" :"ट्रेडिंग",
 "exchange_transak_button" :"TONखरीदें",
 "exchange_transak_description" :"कार्ड्सयाबैंकट्रांसफरसेतुरंतTONखरीदें",
-"
 "exchange_uniswap_description" :"युनिस्वैपएकविकेंद्रीकृतस्वचालितमार्केटमेकिंगप्लेटफॉर्महैक्रेडिटकार्डसेतुरंतखरीदें",
 "exchange_uniswap_disclaimer" :"अस्वीकरण",
 "exchange_uniswap_subtitle" :"इथेरियमटोकन्सकेलिएटनकोइनस्वैपकरें",
@@ -58,7 +56,6 @@
 "marketplace_disintar_description" :"एनएफटीएसखरीदेंऔरआपकेवर्चुअलरूमकोसजाएं",
 "marketplace_getgems_description" :"दओपननेटवर्कपरएनएफटीसंग्रहोंकाघर",
 "marketplace_tondiamonds_description" :"एकएनएफटीबाज़ारजोहोल्डर्सकोबदलेदेताहै",
-"
 "open_ton_login_button" :"ओपनटोनकीपर",
 "subscribe_how_to" :"सब्सक्राइबकैसेकरें?",
 "subscribe_how_to_step1_btn" :"ऐप्प्राप्तकरें",
@@ -70,7 +67,6 @@
 "subscribe_how_to_step3_title" :"टोनकोइनजमाकरें",
 "subscribe_how_to_step4_btn" :"सब्सक्राइबकरें",
 "subscribe_how_to_step4_caption" :"इसपेजकोरिफ्रेशकरेंऔरनीचेबटनपरक्लिककरें:",
-"
 "subscribe_how_to_step4_title" :"सब्सक्रिप्शनप्रक्रियापूर्णकरें",
 "subscription_period_custom" :"हर%{period}",
 "subscription_period_day" :"दिन",
@@ -83,7 +79,6 @@
 "tonconnect_download_apk_btn" :".apkफाइलडाउनलोडकरें",
 "tonconnect_download_caption" :"नयावॉलेटबनाएंयाफिरसेमौजूदावॉलेटकोइम्पोर्टकरें",
 "tonconnect_download_desktop_title" :"टोनकीपरडेस्कटॉपइन्स्टॉलकरें",
-"
 "tonconnect_download_title" :"टोनकीपरइन्स्टॉलकरेंऔरअपनेवॉलेटमेंलॉगइनकरें",
 "tonconnect_login_btn" :"टोनकीपरसेसाइनइनकरें",
 "tonconnect_login_caption" :"नीचेबटनपरक्लिककरेंयाफिरसेवापेजसेलॉगइनकरें",
