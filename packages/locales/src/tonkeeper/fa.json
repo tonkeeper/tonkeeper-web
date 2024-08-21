@@ -135,123 +135,123 @@
     "approve_two_tokens" : "تایید توکن های ورودی \"{name1}\" و \"{name2}\"",
     "blacklisted_collection" : "کلکسیون در لیست سیاه قرار گرفت",
     "blacklisted_token" : "توکن در لیست سیاه قرار گرفت",
-    "decline" : "Decline",
-    "declined" : "Hidden",
-    "declined_at_collection" : "Declined on {date}",
-    "declined_at_token" : "Declined on {date}",
-    "details_collection" : "Collection details",
-    "details_token" : "Token details",
-    "id_collection" : "Collection ID",
-    "id_token" : "Token ID",
-    "manage_tokens" : "Manage tokens",
-    "move_to_accepted" : "Move to Accepted",
-    "move_to_accepted_collection" : "Show collection in wallet",
-    "move_to_accepted_token" : "Show token in wallet",
-    "move_to_declined" : "Move to Declined",
-    "move_to_declined_collection" : "Hide collection from wallet",
-    "move_to_declined_token" : "Hide token from wallet",
-    "name" : "Name",
-    "not_spam" : "Not Spam",
-    "pending" : "Pending",
-    "show_all" : "Show all",
-    "single_token" : "Single token",
-    "spam" : "Spam",
-    "token_copied" : "Token ID copied",
+    "decline" : "رد کردن",
+    "declined" : "پنهان",
+    "declined_at_collection" : "رد شده در {date}",
+    "declined_at_token" : "رد شده در {date}",
+    "details_collection" : "اطلاعات کلکسیون",
+    "details_token" : "اطلاعات توکن",
+    "id_collection" : "آی‌دی کلکسیون",
+    "id_token" : "آی‌دی توکن",
+    "manage_tokens" : "مدیریت توکن ها",
+    "move_to_accepted" : "انتقال به تایید شده ها",
+    "move_to_accepted_collection" : "نمایش کلکسیون در کیف پول",
+    "move_to_accepted_token" : "نمایش توکن در کیف پول",
+    "move_to_declined" : "انتقال به رد شده ها",
+    "move_to_declined_collection" : "پنهان سازی کلکسیون از کیف پول",
+    "move_to_declined_token" : "پنهان سازی توکن از کیف پول",
+    "name" : "نام",
+    "not_spam" : "هرزنامه نیست",
+    "pending" : "در انتظار",
+    "show_all" : "نمایش همه",
+    "single_token" : "توکن تکی",
+    "spam" : "هرزنامه",
+    "token_copied" : "آی‌دی توکن کپی شد",
     "token_count" : {
-      "one" : "{count} token",
-      "other" : "{count} tokens"
+      "one" : "{count} توکن",
+      "other" : "{count} توکن"
     },
-    "unverified_token" : "Unverified Token",
-    "verify_collection" : "Verify collection",
-    "verify_description_collection" : "These tokens are from unknown issuer. To detect counterfeits, verify the collection ID with the issuer's official source. You can change token visibility later in settings.",
-    "verify_description_token" : "This token is from unknown issuer. To detect counterfeits, verify the token ID with the issuer's official source. You can change token visibility later in settings.",
-    "verify_token" : "Verify token",
-    "whitelisted_collection" : "Whitelisted collection",
-    "whitelisted_token" : "Whitelisted token"
+    "unverified_token" : "توکن تایید نشده",
+    "verify_collection" : "تایید کلکسیون",
+    "verify_description_collection" : "این کلکسیون ها از صادرکننده ناشناس هستند. برای شناسایی تقلبی ها، آی‌دی کلکسیون را با منبع رسمی صادرکننده تأیید کنید. بعداً می‌توانید نمایان بودن نشانه را در تنظیمات تغییر دهید.",
+    "verify_description_token" : "این توکن از صادرکننده ناشناس است. برای شناسایی تقلبی‌ها، آی‌دی را با منبع رسمی صادرکننده تأیید کنید. بعداً می‌توانید نمایان بودن نشانه را در تنظیمات تغییر دهید.",
+    "verify_token" : "تایید توکن",
+    "whitelisted_collection" : "کلکسیون در لیست سفید",
+    "whitelisted_token" : "توکن در لیست سفید"
   },
-  "auth_failed" : "Authentication failed",
+  "auth_failed" : "احراز ناموفق",
   "backup_check" : {
-    "caption" : "Let's see if you've got everything right. Enter words {one}, {two}, and {three}.",
-    "done_button" : "Done",
-    "title" : "Backup Check"
+    "caption" : "بیایید ببینیم آیا همه چیز را درست انجام داده اید یا خیر. کلمات {one}، {two}، و {three} را وارد کنید.",
+    "done_button" : "تمام",
+    "title" : "بررسی بکاپ"
   },
   "backup_screen" : {
-    "backup_warning" : "Your balance is {totalFiat}, and it's only protected by a recovery phrase you haven't written down yet. Backup the phrase to avoid losing funds in case of device issues.",
-    "last_backup_time" : "Last backup {time}",
-    "manual_backup_on" : "Manual Backup On",
-    "manual_button" : "Back Up Manually",
-    "manual_caption" : "Back up your wallet manually by writing down the recovery phrase.",
-    "manual_title" : "Manual",
-    "show_recovery_phrase" : "Show Recovery Phrase",
-    "title" : "Backup"
+    "backup_warning" : "موجودی شما {totalFiat} است، و فقط با عبارت بازیابی که هنوز یادداشت نکرده اید محافظت می شود. از عبارت نسخه پشتیبان تهیه کنید تا در صورت بروز مشکل در دستگاه، از از‌دست دادن سرمایه خودداری کنید.",
+    "last_backup_time" : "آخرین پشتیبانی گیری {time}",
+    "manual_backup_on" : "پشتیبان گیری دستی روشن است",
+    "manual_button" : "پشتیبان گیری به صورت دستی",
+    "manual_caption" : "با نوشتن عبارت بازیابی، به صورت دستی از کیف پول خود نسخه پشتیبان تهیه کنید.",
+    "manual_title" : "دستی",
+    "show_recovery_phrase" : "نمایش عبارت بازیابی",
+    "title" : "پشتیبان گیری"
   },
   "backup_warning" : {
-    "cancel_button" : "Cancel",
-    "caption" : "Please read the following carefully before viewing your recovery phrase.",
-    "continue_button" : "Continue",
-    "p1" : "Never enter your recovery phrase any other place than Tonkeeper to access your wallet.",
-    "p2" : "Tonkeeper Support never asks for a recovery phrase.",
-    "p3" : "Everybody with your recovery phrase can access your wallet.",
-    "title" : "Attention"
+    "cancel_button" : "لغو",
+    "caption" : "لطفاً قبل از مشاهده عبارت بازیابی، موارد زیر را به دقت بخوانید.",
+    "continue_button" : "ادامه",
+    "p1" : "هرگز عبارت بازیابی خود را در جای دیگری غیر از تون‌کیپر برای دسترسی به کیف پول خود وارد نکنید.",
+    "p2" : "پشتیبانی تون‌کیپر هرگز عبارت بازیابی را درخواست نمی کند.",
+    "p3" : "همه افراد با عبارت بازیابی شما می توانند به کیف پول شما دسترسی داشته باشند.",
+    "title" : "توجه"
   },
-  "balances_setup_wallet" : "Set up wallet",
+  "balances_setup_wallet" : "راه اندازی کیف پول",
   "battery" : {
     "description" : {
-      "empty" : "Swap, send tokens and NFTs.",
-      "less_10" : "You have enough charge battery for less than 10 transactions.",
-      "other" : "You have enough charge battery for more than %{cnt} transactions.",
-      "other.few" : "Your battery has {count} charges",
-      "other.many" : "Your battery has {count} charges",
-      "other.one" : "Your battery has {count} charge",
-      "other.other" : "Your battery has {count} charges"
+      "empty" : "سواپ، ارسال توکن و ان‌اف‌تی ها.",
+      "less_10" : "باتری شارژ کافی برای کمتر از ۱۰ تراکنش دارید.",
+      "other" : "باتری شارژ کافی برای بیش از %{cnt} تراکنش دارید.",
+      "other.few" : "باتری شما {count} شارژ دارد",
+      "other.many" : "باتری شما {count} شارژ دارد",
+      "other.one" : "باتری شما {count} شارژ دارد",
+      "other.other" : "باتری شما {count} شارژ دارد"
     },
-    "max_input_amount" : "Max input amount is {amount}",
-    "ok" : "OK",
+    "max_input_amount" : "حداکثر مقدار ورودی {amount} است",
+    "ok" : "تایید",
     "other_ways" : {
       "by_crypto" : {
-        "subtitle" : "Using {methods}",
-        "title" : "Recharge with {symbol}"
+        "subtitle" : "استفاده از {methods}",
+        "title" : "شارژ دوباره با {symbol}"
       },
       "gift" : {
-        "subtitle" : "Share with friends",
-        "title" : "Battery Gift"
+        "subtitle" : "اشتراک گذاری با دوستان",
+        "title" : "هدیه باتری"
       },
       "promo" : {
-        "subtitle" : "You're lucky",
-        "title" : "Enter Promo Code"
+        "subtitle" : "شما خوش شانس هستید",
+        "title" : "کد پرومو را وارد کنید"
       }
     },
     "packages" : {
-      "buy" : "Buy",
-      "disclaimer" : "One charge covers the average transaction fee. Some transactions may cost more.",
-      "ok" : "OK",
-      "refilled" : "Your battery is charged",
-      "refund" : "Charge history",
-      "restore" : "Restore Purchases",
+      "buy" : "خرید",
+      "disclaimer" : "یک شارژ، متوسط ​​هزینه تراکنش را پوشش می دهد. برخی از تراکنش ها ممکن است هزینه بیشتری داشته باشند.",
+      "ok" : "تایید",
+      "refilled" : "باتری شما شارژ شد",
+      "refund" : "تاریخچه شارژ ها",
+      "restore" : "بازیابی پرداخت",
       "subtitle" : {
-        "few" : "{count} charges",
-        "many" : "{count} charges",
-        "one" : "{count} charge",
-        "other" : "{count} charges"
+        "few" : "{count} شارژ",
+        "many" : "{count} شارژ",
+        "one" : "{count} شارژ",
+        "other" : "{count} شارژ"
       },
       "title" : {
-        "large" : "Large",
-        "medium" : "Medium",
-        "small" : "Small"
+        "large" : "بزرگ",
+        "medium" : "معمولی",
+        "small" : "کوچک"
       }
     },
-    "please_wait" : "Battery will charge in a few minutes",
+    "please_wait" : "باتری در چند دقیقه دیگر شارژ می شود",
     "promocode" : {
-      "apply" : "Apply",
-      "button" : "Recharge by Promo Code",
-      "placeholder" : "Code",
-      "success" : "Your battery is charged",
-      "title" : "Promo Code"
+      "apply" : "اعمال",
+      "button" : "شارژ دوباره با کد پرومو",
+      "placeholder" : "کد",
+      "success" : "باتری شما شارژ شد",
+      "title" : "کد پرومو"
     },
     "recharge_by_crypto" : {
-      "continue" : "Continue",
+      "continue" : "ادامه",
       "other" : {
-        "subtitle" : "Enter amount manually",
+        "subtitle" : "",
         "title" : "Other"
       },
       "title" : "Recharge",
