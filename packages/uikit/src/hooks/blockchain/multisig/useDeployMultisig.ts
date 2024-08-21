@@ -1,9 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deployMultisig, MultisigConfig } from '@tonkeeper/core/dist/service/multisigService';
+import {
+    checkIfMultisigExists,
+    deployMultisig,
+    MultisigConfig
+} from '@tonkeeper/core/dist/service/multisigService';
 import { useAppContext } from '../../appContext';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useAccountsState } from '../../../state/wallet';
-import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import {
+    getAccountByWalletById,
+    isAccountTonWalletStandard
+} from '@tonkeeper/core/dist/entries/account';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
 import { useCheckTouchId } from '../../../state/password';
@@ -12,6 +19,8 @@ import { useTranslation } from '../../translation';
 import { anyOfKeysParts } from '../../../libs/queryKey';
 import BigNumber from 'bignumber.js';
 import { MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
+import { useAccountsStorage } from '../../useStorage';
+import { TxConfirmationCustomError } from '../../../libs/errors/TxConfirmationCustomError';
 
 export const useDeployMultisig = (
     params:
@@ -42,6 +51,16 @@ export const useDeployMultisig = (
                 throw new Error('Wallet not found');
             }
 
+            const alreadyDeployed = await checkIfMultisigExists({
+                api,
+                multisigConfig: params.multisigConfig,
+                walletState: accountAndWallet.wallet
+            });
+
+            if (alreadyDeployed) {
+                throw new TxConfirmationCustomError(t('create_multisig_error_already_deployed'));
+            }
+
             const signer = await getSigner(sdk, accountAndWallet.account.id, checkTouchId).catch(
                 () => null
             );
@@ -61,30 +80,6 @@ export const useDeployMultisig = (
                 feeWei: params.feeWei
             });
 
-            const maxAttempts = 20;
-            const awaitIsDeployed = async (attempt = 0): Promise<void> => {
-                try {
-                    const deployed = await new MultisigApi(api.tonApiV2).getMultisigAccount({
-                        accountId: address.toRawString()
-                    });
-
-                    if (deployed?.address) {
-                        return;
-                    }
-                } catch (e) {
-                    console.error(e);
-                }
-
-                if (attempt > maxAttempts) {
-                    throw new Error('Contract was not deployed in 20 blocks');
-                }
-
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                return awaitIsDeployed(attempt + 1);
-            };
-
-            // await awaitIsDeployed();
-
             await client.invalidateQueries(
                 anyOfKeysParts(
                     address.toRawString(),
@@ -98,4 +93,40 @@ export const useDeployMultisig = (
             return undefined;
         }
     });
+};
+
+export const useAwaitMultisigIsDeployed = () => {
+    const { api } = useAppContext();
+    const client = useQueryClient();
+    const accounts = useAccountsStorage();
+    return useMutation<void, Error, { multisigAddress: string; deployerWalletId: WalletId }>(
+        async ({ multisigAddress, deployerWalletId }) => {
+            const awaitIsDeployed = async (attempt = 0): Promise<void> => {
+                try {
+                    const deployed = await new MultisigApi(api.tonApiV2).getMultisigAccount({
+                        accountId: multisigAddress
+                    });
+
+                    if (deployed?.address) {
+                        return;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                return awaitIsDeployed(attempt + 1);
+            };
+
+            await awaitIsDeployed();
+            const deployerAccountId = getAccountByWalletById(
+                await accounts.getAccounts(),
+                deployerWalletId
+            )?.id;
+
+            await client.invalidateQueries(
+                anyOfKeysParts(multisigAddress, deployerAccountId, deployerWalletId)
+            );
+        }
+    );
 };

@@ -2,10 +2,10 @@ import React, {
     FC,
     PropsWithChildren,
     useCallback,
+    useContext,
     useEffect,
     useId,
     useMemo,
-    useRef,
     useState
 } from 'react';
 import styled, { css } from 'styled-components';
@@ -17,21 +17,33 @@ import { Radio } from '../fields/Checkbox';
 import { InputBlock, InputField } from '../fields/Input';
 import { Button } from '../fields/Button';
 import { IconButtonTransparentBackground } from '../fields/IconButton';
-import { CloseIcon, SwitchIcon } from '../Icon';
-import { useAccountsState, useActiveWallet, useCreateAccountTonMultisig } from '../../state/wallet';
+import { CloseIcon, SpinnerRing, SwitchIcon } from '../Icon';
+import {
+    useAccountsState,
+    useActiveAccount,
+    useCreateAccountTonMultisig
+} from '../../state/wallet';
 import {
     Account,
     AccountTonMultisig,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
-import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { DropDown, DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { Dot } from '../Dot';
-import { Notification, NotificationFooterPortal } from '../Notification';
+import {
+    Notification,
+    NotificationFooterPortal,
+    useSetNotificationOnBack,
+    useSetNotificationOnCloseInterceptor
+} from '../Notification';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useEstimateDeployMultisig } from '../../hooks/blockchain/multisig/useEstimateDeployMultisig';
-import { useDeployMultisig } from '../../hooks/blockchain/multisig/useDeployMultisig';
+import {
+    useAwaitMultisigIsDeployed,
+    useDeployMultisig
+} from '../../hooks/blockchain/multisig/useDeployMultisig';
 import {
     ConfirmView,
     ConfirmViewHeading,
@@ -52,6 +64,9 @@ import {
 import { useAppContext } from '../../hooks/appContext';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { RenameWalletContent } from '../settings/wallet-name/WalletNameNotification';
+import { AddWalletContext } from './AddWalletContext';
+import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
+import { useAppSdk } from '../../hooks/appSdk';
 
 const Body3Secondary = styled(Body3)`
     color: ${p => p.theme.textSecondary};
@@ -76,45 +91,142 @@ const SubHeading = styled(Body1)`
 `;
 
 export const CreateMultisig: FC<{
-    setOnBack: (callback: (() => void) | undefined) => void;
     onClose: () => void;
-}> = ({ setOnBack, onClose }) => {
+}> = ({ onClose }) => {
     const [account, setAccount] = useState<AccountTonMultisig | undefined>();
-    const { t } = useTranslation();
-    useEffect(() => {
-        if (account) {
-            setOnBack(undefined);
-        }
-    }, [account]);
+    const [contractParams, setContractParams] = useState<
+        { multisigAddress: string; deployerWalletId: WalletId } | undefined
+    >();
+
+    if (!contractParams) {
+        return <CreateMultisigFormPage onSentDeploy={setContractParams} />;
+    }
 
     if (!account) {
-        return <CreateMultisigFormPage onCreated={acc => !account && setAccount(acc)} />;
-    } else {
-        return (
-            <ContentWrapper>
-                <Heading>{t('Customize your Wallet')}</Heading>
-                <SubHeading>
-                    {t('Wallet name and icon are stored locally on your device.')}
-                </SubHeading>
-                <RenameWalletContent account={account} onClose={onClose} />
-            </ContentWrapper>
-        );
+        return <CreateMultisigAwaitDeployPage onDone={setAccount} {...contractParams} />;
     }
+
+    return <CreateMultisigRenamePage account={account} onClose={onClose} />;
 };
 
-const CreateMultisigFormPage: FC<{ onCreated: (account: AccountTonMultisig) => void }> = ({
-    onCreated
+const CreateMultisigRenamePage: FC<{ account: AccountTonMultisig; onClose: () => void }> = ({
+    account,
+    onClose
 }) => {
+    useSetNotificationOnBack(undefined);
+    const { t } = useTranslation();
+    return (
+        <ContentWrapper>
+            <Heading>{t('customize_modal_title')}</Heading>
+            <SubHeading>{t('customize_modal_subtitle')}</SubHeading>
+            <RenameWalletContent account={account} onClose={onClose} />
+        </ContentWrapper>
+    );
+};
+
+const SpinnerStyled = styled(SpinnerRing)`
+    transform: scale(3);
+    margin: 36px auto;
+`;
+
+const DeployHelpSection = styled.div`
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    > ${Body2} {
+        text-align: center;
+        display: block;
+        color: ${p => p.theme.textSecondary};
+    }
+`;
+
+const CreateMultisigAwaitDeployPage: FC<{
+    onDone: (account: AccountTonMultisig) => void;
+    multisigAddress: string;
+    deployerWalletId: WalletId;
+}> = ({ onDone, multisigAddress, deployerWalletId }) => {
+    const { mutateAsync: awaitDeploy } = useAwaitMultisigIsDeployed();
+    const { mutateAsync: addAccount } = useCreateAccountTonMultisig();
+    const [showHelpButton, setShowHelpButton] = useState(false);
+    const { navigateHome } = useContext(AddWalletContext);
+    const { onOpen: openConfirmDiscard } = useConfirmDiscardNotification();
+    const { config } = useAppContext();
+    const sdk = useAppSdk();
+
+    const onNotificationBack = useCallback(() => {
+        openConfirmDiscard({
+            onClose: discard => {
+                if (discard) {
+                    navigateHome();
+                }
+            }
+        });
+    }, [openConfirmDiscard, navigateHome]);
+
+    const onNotificationCloseInterceptor = useCallback(
+        (closeHandler: () => void) => {
+            openConfirmDiscard({
+                onClose: discard => {
+                    if (discard) {
+                        closeHandler();
+                    }
+                }
+            });
+        },
+        [openConfirmDiscard]
+    );
+
+    useSetNotificationOnBack(onNotificationBack);
+    useSetNotificationOnCloseInterceptor(onNotificationCloseInterceptor);
+
+    useEffect(() => {
+        setTimeout(() => setShowHelpButton(true), 1500 * 20);
+        awaitDeploy({ multisigAddress, deployerWalletId })
+            .then(() => addAccount({ address: multisigAddress }))
+            .then(onDone);
+    }, []);
+
+    const { t } = useTranslation();
+    const explorerUrl = config.accountExplorer ?? 'https://tonviewer.com/%s';
+
+    return (
+        <ContentWrapper>
+            <Heading>{t('create_multisig_await_deployment_title')}</Heading>
+            <SubHeading>{t('create_multisig_await_deployment_description')}</SubHeading>
+            <SpinnerStyled />
+            {showHelpButton && (
+                <DeployHelpSection>
+                    <Body2>{t('create_multisig_await_deployment_help_title')}</Body2>
+                    <Button
+                        secondary
+                        onClick={() => sdk.openPage(explorerUrl.replace('%s', multisigAddress))}
+                    >
+                        {t('create_multisig_await_deployment_help_explorer_button')}
+                    </Button>
+                    {config.multisig_help_url && (
+                        <Button onClick={() => sdk.openPage(config.multisig_help_url!)}>
+                            {t('create_multisig_await_deployment_help_support_button')}
+                        </Button>
+                    )}
+                </DeployHelpSection>
+            )}
+        </ContentWrapper>
+    );
+};
+
+const CreateMultisigFormPage: FC<{
+    onSentDeploy: (info: { multisigAddress: string; deployerWalletId: WalletId }) => void;
+}> = ({ onSentDeploy }) => {
     const [deployArgs, setDeployArgs] = useState<
         Parameters<typeof useDeployMultisig>[0] | undefined
     >();
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const estimateMutation = useEstimateDeployMultisig();
-    const { mutateAsync: addAccountToStorage } = useCreateAccountTonMultisig();
     const deployMutation = useDeployMultisig(deployArgs);
     const { mutateAsync: estimateDeploy } = estimateMutation;
-    const addedAccount = useRef<AccountTonMultisig>();
 
     const onSubmit = async (data: MultisigUseForm) => {
         onOpen();
@@ -138,18 +250,13 @@ const CreateMultisigFormPage: FC<{ onCreated: (account: AccountTonMultisig) => v
     const mutateAsync = useCallback(async () => {
         const address = await deployMutation.mutateAsync();
         if (address) {
-            addedAccount.current = await addAccountToStorage({ address });
+            onSentDeploy({
+                multisigAddress: address!,
+                deployerWalletId: deployArgs!.fromWallet
+            });
         }
-
         return !!address;
-    }, [deployMutation.mutateAsync, onCreated]);
-
-    const onCloseConfirmView = () => {
-        if (addedAccount.current) {
-            onCreated(addedAccount.current);
-        }
-        onClose();
-    };
+    }, [deployMutation.mutateAsync, onSentDeploy, deployArgs?.fromWallet]);
 
     return (
         <ContentWrapper>
@@ -157,11 +264,11 @@ const CreateMultisigFormPage: FC<{ onCreated: (account: AccountTonMultisig) => v
             <SubHeading>{t('multisig_add_description')}</SubHeading>
             <MultisigCreatingForm onSubmit={onSubmit} />
 
-            <Notification isOpen={isOpen} handleClose={onCloseConfirmView}>
+            <Notification isOpen={isOpen} handleClose={onClose}>
                 {() => (
                     <ConfirmView
                         assetAmount={deployMultisigAssetAmount}
-                        onClose={onCloseConfirmView}
+                        onClose={onClose}
                         estimation={{ ...estimateMutation }}
                         {...deployMutation}
                         mutateAsync={mutateAsync}
@@ -210,7 +317,17 @@ type MultisigUseForm = {
 };
 
 const MultisigCreatingForm: FC<{ onSubmit: (form: MultisigUseForm) => void }> = ({ onSubmit }) => {
-    const activeWallet = useActiveWallet();
+    const { navigateHome } = useContext(AddWalletContext);
+    const { onOpen: openConfirmDiscard } = useConfirmDiscardNotification();
+    const activeAccount = useActiveAccount();
+    const accounts = useAccountsState();
+
+    let activeWallet = activeAccount.activeTonWallet;
+    if (activeAccount.type === 'watch-only' || activeAccount.type === 'ton-multisig') {
+        activeWallet = accounts.find(
+            acc => acc.type !== 'watch-only' && acc.type !== 'ton-multisig'
+        )!.activeTonWallet;
+    }
     const methods = useForm<MultisigUseForm>({
         defaultValues: {
             firstParticipant: {
@@ -222,11 +339,50 @@ const MultisigCreatingForm: FC<{ onSubmit: (form: MultisigUseForm) => void }> = 
             deadlineHours: 24
         }
     });
-    const { control, handleSubmit } = methods;
+    const {
+        control,
+        handleSubmit,
+        formState: { isDirty }
+    } = methods;
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'participants'
     });
+
+    const onNotificationBack = useCallback(() => {
+        if (!isDirty) {
+            navigateHome();
+        } else {
+            openConfirmDiscard({
+                onClose: discard => {
+                    if (discard) {
+                        navigateHome();
+                    }
+                }
+            });
+        }
+    }, [openConfirmDiscard, navigateHome, isDirty]);
+
+    const onNotificationCloseInterceptor = useCallback(
+        (closeHandle: () => void) => {
+            if (!isDirty) {
+                closeHandle();
+            } else {
+                openConfirmDiscard({
+                    onClose: discard => {
+                        if (discard) {
+                            closeHandle();
+                        }
+                    }
+                });
+            }
+        },
+        [openConfirmDiscard, isDirty]
+    );
+
+    useSetNotificationOnBack(onNotificationBack);
+    useSetNotificationOnCloseInterceptor(onNotificationCloseInterceptor);
+    const { t } = useTranslation();
 
     const formId = useId();
     const [formState, setFormState] = useState<AsyncValidationState>('idle');
@@ -236,10 +392,7 @@ const MultisigCreatingForm: FC<{ onSubmit: (form: MultisigUseForm) => void }> = 
             <FormProvider {...methods}>
                 <AsyncValidatorsStateProvider onStateChange={setFormState}>
                     <FirstParticipantCard />
-                    <Body3Secondary>
-                        A signer can confirm transactions and propose changes, such as adding or
-                        removing participants. A proposer can only propose changes.
-                    </Body3Secondary>
+                    <Body3Secondary>{t('create_multisig_what_are_signers')}</Body3Secondary>
                     <Participants>
                         {fields.map((field, index) => (
                             <ExternalParticipantCard
@@ -256,7 +409,7 @@ const MultisigCreatingForm: FC<{ onSubmit: (form: MultisigUseForm) => void }> = 
                         fitContent
                         onClick={() => append({ address: '', role: 'proposer-and-signer' })}
                     >
-                        Add Participant
+                        {t('create_multisig_add_participant')}
                     </Button>
                     <QuorumAndDeadlineInputs />
                 </AsyncValidatorsStateProvider>
@@ -271,7 +424,7 @@ const MultisigCreatingForm: FC<{ onSubmit: (form: MultisigUseForm) => void }> = 
                         loading={formState === 'validating'}
                         disabled={formState !== 'succeed'}
                     >
-                        Create Wallet
+                        {t('create_multisig_create_wallet')}
                     </Button>
                 </SubmitButtonContainer>
             </NotificationFooterPortal>
@@ -310,6 +463,7 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
     fieldIndex,
     onRemove
 }) => {
+    const { t } = useTranslation();
     const { control } = useFormContext<MultisigUseForm>();
     const [focus, setFocus] = useState(false);
     return (
@@ -332,7 +486,7 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
                                     size="small"
                                     onFocus={() => setFocus(true)}
                                     onBlur={() => setFocus(false)}
-                                    placeholder="Wallet Address"
+                                    placeholder={t('wallet_address')}
                                 />
                             </InputBlock>
                             <IconButtonTransparentBackground onClick={onRemove}>
@@ -417,6 +571,7 @@ const FirstParticipantCard: FC = () => {
     }, [accounts]);
 
     const selectedWallet = wallets[selectedAddress];
+    const { t } = useTranslation();
 
     return (
         <Controller
@@ -456,7 +611,7 @@ const FirstParticipantCard: FC = () => {
                         >
                             <DropDownSelectHost isErrored={!!error}>
                                 <DropDownSelectHostText>
-                                    <Body3>Wallet</Body3>
+                                    <Body3>{t('wallet_title')}</Body3>
                                     <AccountAndWalletInfoStyled
                                         noPrefix
                                         account={selectedWallet.account}
@@ -555,10 +710,10 @@ const QuorumAndDeadlineInputs = () => {
         formState: { isSubmitted }
     } = useFormContext<MultisigUseForm>();
     const selectedSignersNumber = watch('quorum');
-    const selectedDeadline = watch('deadlineHours');
+    /*const selectedDeadline = watch('deadlineHours');
     const selectedDeadlineTranslation = Object.entries(timeToSignOptions).find(
         ([_, v]) => v === selectedDeadline
-    )![0];
+    )![0];*/
     const firsIsSigner = watch('firstParticipant').role === 'proposer-and-signer' ? 1 : 0;
     const totalSignersNumber =
         watch('participants').filter(i => i.role === 'proposer-and-signer').length + firsIsSigner;
@@ -624,7 +779,7 @@ const QuorumAndDeadlineInputs = () => {
                         <StandaloneField>
                             <DropDownSelectHost isErrored={!!error}>
                                 <DropDownSelectHostText>
-                                    <Body3>Quorum</Body3>
+                                    <Body3>{t('create_multisig_quorum')}</Body3>
                                     <Body2>
                                         {selectedSignersNumber} signers
                                         {selectedSignersPercent !== null && (
@@ -644,7 +799,7 @@ const QuorumAndDeadlineInputs = () => {
                 name={'quorum'}
                 control={control}
             />
-            <Controller
+            {/*    <Controller
                 rules={{
                     required: 'Required'
                 }}
@@ -684,11 +839,8 @@ const QuorumAndDeadlineInputs = () => {
                 )}
                 name={'deadlineHours'}
                 control={control}
-            />
-            <Body3Secondary>
-                You can always change the number of participants, their roles, the time for signing
-                a transaction, and the number of signatures required for a successful transaction.
-            </Body3Secondary>
+            />*/}
+            <Body3Secondary>{t('create_multisig_can_change_hint')}</Body3Secondary>
         </QuorumAndDeadlineInputsContainer>
     );
 };

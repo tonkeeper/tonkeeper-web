@@ -10,7 +10,7 @@ import {
 } from './transfer/common';
 import { APIConfig } from '../entries/apis';
 import BigNumber from 'bignumber.js';
-import { BlockchainApi, EmulationApi } from '../tonApiV2';
+import { AccountsApi, BlockchainApi, EmulationApi } from '../tonApiV2';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../entries/crypto/asset/constants';
 
@@ -28,7 +28,7 @@ export const deployMultisig = async (options: {
     multisigConfig: MultisigConfig;
 }) => {
     const { cell, address } = await createMultisig(options);
-    return { address };
+
     await new BlockchainApi(options.api.tonApiV2).sendBlockchainMessage({
         sendBlockchainMessageRequest: { boc: cell.toString('base64') }
     });
@@ -51,6 +51,20 @@ export const estimateDeployMultisig = async (options: {
         fee: new AssetAmount({ weiAmount: new BigNumber(event.event.extra), asset: TON_ASSET }),
         address
     };
+};
+
+export const checkIfMultisigExists = async (options: {
+    api: APIConfig;
+    walletState: TonWalletStandard;
+    multisigConfig: MultisigConfig;
+}) => {
+    const { address } = await createMultisig({ ...options, signer: signEstimateMessage });
+
+    const account = await new AccountsApi(options.api.tonApiV2).getAccount({
+        accountId: address.toRawString()
+    });
+
+    return !(account.status === 'nonexist' || account.status === 'uninit');
 };
 
 const createMultisig = async (options: {

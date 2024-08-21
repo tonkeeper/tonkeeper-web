@@ -424,10 +424,6 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const location = useLocation();
     const { ref, closeBottom } = useIsScrolled();
 
-    useEffect(() => {
-        addWallet();
-    }, [addWallet]);
-
     const activeRoute = useAsideActiveRoute();
 
     const handleNavigateClick = useCallback(

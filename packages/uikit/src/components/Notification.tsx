@@ -448,27 +448,26 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void; enter
     });
 NotificationOverlay.displayName = 'NotificationOverlay';
 
+type OnCloseInterceptor = ((closeHandle: () => void) => void) | undefined;
+
 export const Notification: FC<{
     isOpen: boolean;
     handleClose: () => void;
-    onBack?: () => void;
     hideButton?: boolean;
     backShadow?: boolean;
     title?: ReactNode;
     footer?: ReactNode;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
     className?: string;
-}> = ({
-    children,
-    isOpen,
-    hideButton,
-    backShadow,
-    handleClose,
-    title,
-    footer,
-    className,
-    onBack
-}) => {
+}> = ({ children, isOpen, hideButton, backShadow, handleClose, title, footer, className }) => {
+    const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
+    const onClose = useCallback(() => {
+        if (!onCloseInterceptor) {
+            handleClose();
+        } else {
+            onCloseInterceptor(handleClose);
+        }
+    }, [handleClose, onCloseInterceptor]);
     const [entered, setEntered] = useState(false);
     const [open, setOpen] = useState(false);
     const { displayType } = useTheme();
@@ -481,19 +480,19 @@ export const Notification: FC<{
     const nodeRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const closeOnEscapeKey = (e: KeyboardEvent) => (e.key === 'Escape' ? handleClose() : null);
+        const closeOnEscapeKey = (e: KeyboardEvent) => (e.key === 'Escape' ? onClose() : null);
         document.body.addEventListener('keydown', closeOnEscapeKey);
         return () => {
             document.body.removeEventListener('keydown', closeOnEscapeKey);
         };
-    }, [handleClose]);
+    }, [onClose]);
 
     const Child = useMemo(() => {
         return children((afterClose?: () => void) => {
             setTimeout(() => afterClose && afterClose(), 300);
-            handleClose();
+            onClose();
         });
-    }, [open, children, handleClose]);
+    }, [open, children, onClose]);
 
     useEffect(() => {
         const handler = () => {
@@ -546,20 +545,23 @@ export const Notification: FC<{
     const isFullWidth = useIsFullWidthMode();
     const onClickOutside = useCallback(() => {
         if (isFullWidth) {
-            handleClose();
+            onClose();
         }
-    }, [isFullWidth, handleClose]);
+    }, [isFullWidth, onClose]);
 
     const handleCloseOnlyOnNotFullWidth = useCallback(() => {
         if (!isFullWidth) {
-            handleClose();
+            onClose();
         }
-    }, [isFullWidth, handleClose]);
+    }, [isFullWidth, onClose]);
 
     const containerRef = useClickOutside<HTMLDivElement>(onClickOutside, nodeRef.current);
+    const [onBack, setOnBack] = useState<(() => void) | undefined>();
 
     return (
-        <NotificationContext.Provider value={{ footerElement, headerElement }}>
+        <NotificationContext.Provider
+            value={{ footerElement, headerElement, setOnBack, setOnCloseInterceptor }}
+        >
             <ReactPortal wrapperId="react-portal-modal-container">
                 <CSSTransition
                     in={open}
@@ -572,7 +574,7 @@ export const Notification: FC<{
                     onExit={() => setEntered(false)}
                 >
                     <Splash ref={nodeRef} className="scrollable">
-                        <NotificationOverlay handleClose={handleClose} entered={entered}>
+                        <NotificationOverlay handleClose={onClose} entered={entered}>
                             <NotificationWrapper entered={entered} className={className}>
                                 <Wrapper>
                                     <Padding onClick={handleCloseOnlyOnNotFullWidth} />
@@ -589,7 +591,7 @@ export const Notification: FC<{
                                                         <NotificationTitleRow
                                                             onBack={onBack}
                                                             handleClose={
-                                                                hideButton ? undefined : handleClose
+                                                                hideButton ? undefined : onClose
                                                             }
                                                         >
                                                             {title}
@@ -680,9 +682,13 @@ export const NotificationHeader: FC<{ children: ReactNode; className?: string }>
 export const NotificationContext = createContext<{
     footerElement: Element | null;
     headerElement: Element | null;
+    setOnBack: (callback: (() => void) | undefined) => void;
+    setOnCloseInterceptor: (interceptor: OnCloseInterceptor) => void;
 }>({
     footerElement: null,
-    headerElement: null
+    headerElement: null,
+    setOnBack: () => {},
+    setOnCloseInterceptor: () => {}
 });
 
 export const NotificationFooterPortal: FC<{ children: ReactNode }> = ({ children }) => {
@@ -705,4 +711,28 @@ export const NotificationHeaderPortal: FC<{ children: ReactNode }> = ({ children
     }
 
     return <>{children}</>;
+};
+
+export const useSetNotificationOnBack = (onBack: undefined | (() => void)) => {
+    const { setOnBack } = useContext(NotificationContext);
+
+    useEffect(() => {
+        setOnBack(() => onBack);
+    }, [setOnBack, onBack]);
+
+    useEffect(() => {
+        return () => setOnBack(undefined);
+    }, []);
+};
+
+export const useSetNotificationOnCloseInterceptor = (interceptor: OnCloseInterceptor) => {
+    const { setOnCloseInterceptor } = useContext(NotificationContext);
+
+    useEffect(() => {
+        setOnCloseInterceptor(() => interceptor);
+    }, [setOnCloseInterceptor, interceptor]);
+
+    useEffect(() => {
+        return () => setOnCloseInterceptor(undefined);
+    }, []);
 };

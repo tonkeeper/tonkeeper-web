@@ -15,6 +15,7 @@ import {
 import { BorderSmallResponsive } from '../shared/Styles';
 import { PencilIcon, PlusIcon } from '../Icon';
 import { Badge } from '../shared';
+import { useAccountsState } from '../../state/wallet';
 
 const AddMethod = styled.button`
     display: flex;
@@ -92,6 +93,11 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
     const { hideMam, hideSigner, hideLedger, hideKeystone } = useAppContext();
     const hideAllHardwareWallets = hideSigner && hideLedger && hideKeystone;
 
+    const accounts = useAccountsState();
+    const canAddMultisig = accounts.some(
+        acc => acc.type !== 'watch-only' && acc.type !== 'ton-multisig'
+    );
+
     return (
         <AddMethodsWrapper>
             <AddMethodsGroup>
@@ -156,6 +162,22 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                         <RightIcon />
                     </ButtonIcon>
                 </AddMethod>
+                {canAddMultisig && (
+                    <AddMethod onClick={() => onSelect('multisig')}>
+                        <ButtonIcon large>
+                            <PencilIcon />
+                        </ButtonIcon>
+                        <AddMethodText>
+                            <AddMethodLabel>{t('add_wallet_new_multisig_title')}</AddMethodLabel>
+                            <AddMethodDescription>
+                                {t('add_wallet_new_multisig_description')}
+                            </AddMethodDescription>
+                        </AddMethodText>
+                        <ButtonIcon>
+                            <RightIcon />
+                        </ButtonIcon>
+                    </AddMethod>
+                )}
             </AddMethodsGroup>
             {!hideAllHardwareWallets && (
                 <>
@@ -218,24 +240,6 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                     </AddMethodsGroup>
                 </>
             )}
-            <GroupsDivider>{t('add_wallet_group_other_options')}</GroupsDivider>
-            <AddMethodsGroup>
-                <AddMethod onClick={() => onSelect('multisig')}>
-                    <ButtonIcon large>
-                        <PencilIcon />
-                    </ButtonIcon>
-                    <AddMethodText>
-                        <AddMethodLabel>{t('add_wallet_new_multisig_title')}</AddMethodLabel>
-                        <AddMethodDescription>
-                            {t('add_wallet_new_multisig_description')}
-                        </AddMethodDescription>
-                    </AddMethodText>
-                    <ButtonIcon>
-                        <RightIcon />
-                    </ButtonIcon>
-                </AddMethod>
-                <div />
-            </AddMethodsGroup>
         </AddMethodsWrapper>
     );
 };
