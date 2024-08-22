@@ -61,6 +61,7 @@ import { useSwapMobileNotification } from "@tonkeeper/uikit/dist/state/swap/useS
 import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
 import { ModalsRoot } from "@tonkeeper/uikit/dist/components/ModalsRoot";
 import { useDebuggingTools } from "@tonkeeper/uikit/dist/hooks/useDebuggingTools";
+import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -224,6 +225,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: fiat } = useUserFiatQuery();
     const { data: devSettings } = useDevSettings();
+    const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
 
     const lock = useLock(sdk);
     const network = useActiveTonNetwork();
@@ -240,7 +242,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const navigate = useNavigate();
     const { data: tracker } = useAnalytics(activeAccount || undefined, accounts, network, sdk.version);
 
-    if (isWalletsLoading || activeWalletLoading || isLangLoading || config === undefined || lock === undefined || fiat === undefined || !devSettings) {
+    if (isWalletsLoading || activeWalletLoading || isLangLoading || config === undefined || lock === undefined || fiat === undefined || !devSettings || globalPreferencesLoading) {
         return <Loading />;
     }
 

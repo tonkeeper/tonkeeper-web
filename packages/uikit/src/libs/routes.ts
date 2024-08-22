@@ -11,6 +11,8 @@ export enum AppRoute {
     signer = '/signer',
     publish = '/publish',
     swap = '/swap',
+    multisigOrders = '/multisig-orders',
+    multisigWallets = '/multisig-wallets',
     home = '/'
 }
 

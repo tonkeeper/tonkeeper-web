@@ -88,6 +88,8 @@ import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
 import { desktopHeaderContainerHeight } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeaderElements';
+import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
+import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -268,6 +270,7 @@ export const Loader: FC = () => {
     const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: devSettings } = useDevSettings();
+    const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
@@ -306,7 +309,8 @@ export const Loader: FC = () => {
         config === undefined ||
         lock === undefined ||
         fiat === undefined ||
-        !devSettings
+        !devSettings ||
+        globalPreferencesLoading
     ) {
         return <Loading />;
     }
@@ -419,6 +423,14 @@ const WalletContent = () => {
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<DesktopCoinPage />} />
                             </Route>
+                            <Route
+                                path={AppRoute.multisigWallets}
+                                element={
+                                    <Suspense fallback={null}>
+                                        <DesktopManageMultisigsPage />
+                                    </Suspense>
+                                }
+                            />
                             <Route
                                 path={any(AppRoute.walletSettings)}
                                 element={<DesktopWalletSettingsRouting />}

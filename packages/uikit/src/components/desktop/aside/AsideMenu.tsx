@@ -510,7 +510,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         </IconWrapper>
                         <Label2>{t('aside_discover')}</Label2>
                     </AsideMenuItem>
-                    <AsideMenuItem isSelected={false} onClick={addWallet}>
+                    <AsideMenuItem isSelected={false} onClick={() => addWallet()}>
                         <IconWrapper>
                             <PlusIcon />
                         </IconWrapper>

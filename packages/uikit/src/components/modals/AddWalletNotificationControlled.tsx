@@ -1,6 +1,6 @@
 import { Notification } from '../Notification';
 import { createModalControl } from './createModalControl';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AddWalletContent } from '../create/AddWallet';
 import styled, { css } from 'styled-components';
 import { Body1, Body2Class, H2, Label2Class } from '../Text';
@@ -9,8 +9,9 @@ import { useOnImportAction } from '../../hooks/appSdk';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { CreateMultisig } from '../create/Multisig';
 import { AddWalletContext } from '../create/AddWalletContext';
+import { useAtom } from '../../libs/atom';
 
-const { hook } = createModalControl();
+const { hook, paramsControl } = createModalControl<{ walletType?: MethodsInModal } | undefined>();
 
 export const useAddWalletNotification = hook;
 
@@ -52,9 +53,16 @@ type MethodsInModal = (typeof methodsInModal)[number];
 
 export const AddWalletNotificationControlled = () => {
     const { isOpen, onClose } = useAddWalletNotification();
+    const [params] = useAtom(paramsControl);
     const { t } = useTranslation();
     const onImport = useOnImportAction();
-    const [selectedMethod, setSelectedMethod] = useState<MethodsInModal | undefined>(undefined);
+    const [selectedMethod, setSelectedMethod] = useState<MethodsInModal | undefined>(
+        params?.walletType
+    );
+
+    useEffect(() => {
+        setSelectedMethod(params?.walletType);
+    }, [params?.walletType]);
 
     const onCloseCallback = useCallback(() => {
         onClose();
@@ -93,9 +101,15 @@ export const AddWalletNotificationControlled = () => {
         [onImport, t, selectedMethod, onCloseCallback]
     );
 
-    const navigateHome = useCallback(() => {
-        setSelectedMethod(undefined);
-    }, []);
+    const navigateHome = useMemo(
+        () =>
+            !params?.walletType
+                ? () => {
+                      setSelectedMethod(undefined);
+                  }
+                : undefined,
+        [params?.walletType]
+    );
 
     return (
         <AddWalletContext.Provider value={{ navigateHome }}>

@@ -559,6 +559,22 @@ export function isAccountTonWalletStandard(account: Account): account is Account
     assertUnreachable(account);
 }
 
+export function isAccountMultisigManageable(account: Account): boolean {
+    switch (account.type) {
+        case 'keystone':
+        case 'mnemonic':
+        case 'ledger':
+        case 'ton-only':
+        case 'mam':
+            return true;
+        case 'watch-only':
+        case 'ton-multisig':
+            return false;
+    }
+
+    assertUnreachable(account);
+}
+
 export type AccountsState = Account[];
 
 export const defaultAccountState: AccountsState = [];

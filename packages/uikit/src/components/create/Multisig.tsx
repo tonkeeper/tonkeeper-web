@@ -155,15 +155,20 @@ const CreateMultisigAwaitDeployPage: FC<{
     const { config } = useAppContext();
     const sdk = useAppSdk();
 
-    const onNotificationBack = useCallback(() => {
-        openConfirmDiscard({
-            onClose: discard => {
-                if (discard) {
-                    navigateHome();
-                }
-            }
-        });
-    }, [openConfirmDiscard, navigateHome]);
+    const onNotificationBack = useMemo(
+        () =>
+            navigateHome
+                ? () =>
+                      openConfirmDiscard({
+                          onClose: discard => {
+                              if (discard) {
+                                  navigateHome();
+                              }
+                          }
+                      })
+                : undefined,
+        [openConfirmDiscard, navigateHome]
+    );
 
     const onNotificationCloseInterceptor = useCallback(
         (closeHandler: () => void) => {
@@ -349,19 +354,25 @@ const MultisigCreatingForm: FC<{ onSubmit: (form: MultisigUseForm) => void }> = 
         name: 'participants'
     });
 
-    const onNotificationBack = useCallback(() => {
-        if (!isDirty) {
-            navigateHome();
-        } else {
-            openConfirmDiscard({
-                onClose: discard => {
-                    if (discard) {
-                        navigateHome();
-                    }
-                }
-            });
-        }
-    }, [openConfirmDiscard, navigateHome, isDirty]);
+    const onNotificationBack = useMemo(
+        () =>
+            navigateHome
+                ? () => {
+                      if (!isDirty) {
+                          navigateHome();
+                      } else {
+                          openConfirmDiscard({
+                              onClose: discard => {
+                                  if (discard) {
+                                      navigateHome();
+                                  }
+                              }
+                          });
+                      }
+                  }
+                : undefined,
+        [openConfirmDiscard, navigateHome, isDirty]
+    );
 
     const onNotificationCloseInterceptor = useCallback(
         (closeHandle: () => void) => {
