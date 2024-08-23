@@ -66,4 +66,5 @@ export type PendingOutgoingEvent = {
     outgoingMessageId: string;
     creationTimestampMS: number;
     estimation: AccountEvent;
+    affectAssetAddress?: string;
 };

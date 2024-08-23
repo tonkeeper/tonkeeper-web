@@ -1,12 +1,11 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { FC, Suspense, useMemo, useRef } from 'react';
+import { FC, Suspense, useRef } from 'react';
 import styled from 'styled-components';
 import { ActivitySkeletonPage } from '../../components/Skeleton';
 import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import { getMixedActivity, TonActivity } from '../../state/mixedActivity';
 import EmptyActivity from '../../components/activity/EmptyActivity';
 import {
     DesktopViewHeader,
@@ -21,7 +20,7 @@ import { useActiveWallet } from '../../state/wallet';
 import { Body2, Label2 } from '../../components/Text';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { useWalletPendingEvents } from '../../state/realtime';
-import { GenericActivity } from '../../state/activity';
+import { useMixedActivity } from '../../hooks/useMixedActivity';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
@@ -83,25 +82,7 @@ export const DesktopHistoryPage: FC = () => {
 
     const { ref: scrollRef, closeTop } = useIsScrolled();
 
-    const activity = useMemo(() => {
-        const mixedActivity = getMixedActivity(tonEvents, undefined);
-        const pendingEventsToKeep =
-            pendingOutgoingEvents?.filter(e =>
-                mixedActivity.every(
-                    a => a.event.kind === 'ton' && a.event.event.eventId !== e.outgoingMessageId
-                )
-            ) || [];
-
-        const pendingEventsActivity: GenericActivity<TonActivity>[] = pendingEventsToKeep?.map(
-            e => ({
-                timestamp: e.creationTimestampMS,
-                key: e.outgoingMessageId,
-                event: { kind: 'ton', event: e.estimation }
-            })
-        );
-
-        return [...pendingEventsActivity, ...mixedActivity];
-    }, [pendingOutgoingEvents, tonEvents]);
+    const activity = useMixedActivity(tonEvents);
 
     if (!isTonFetched) {
         return null;

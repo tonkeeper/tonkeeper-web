@@ -62,6 +62,8 @@ export function useSendTransfer<T extends Asset>(
                         estimation.payload as TransferEstimationEvent,
                         signer
                     );
+
+                    pendingOutgoingEvent.affectAssetAddress = TON_ASSET.id;
                 } else {
                     track2('send-jetton');
                     const jettonInfo = jettons!.balances.find(
@@ -78,6 +80,10 @@ export function useSendTransfer<T extends Asset>(
                         estimation.payload as TransferEstimationEvent,
                         signer
                     );
+
+                    pendingOutgoingEvent.affectAssetAddress = (
+                        amount.asset.address as Address
+                    ).toRawString();
                 }
 
                 await addPendingEvent({
