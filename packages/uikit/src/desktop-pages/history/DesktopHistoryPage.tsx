@@ -6,7 +6,7 @@ import { ActivitySkeletonPage } from '../../components/Skeleton';
 import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import { getMixedActivity } from '../../state/mixedActivity';
+import { getMixedActivity, TonActivity } from '../../state/mixedActivity';
 import EmptyActivity from '../../components/activity/EmptyActivity';
 import {
     DesktopViewHeader,
@@ -20,6 +20,8 @@ import { mergeRefs } from '../../libs/common';
 import { useActiveWallet } from '../../state/wallet';
 import { Body2, Label2 } from '../../components/Text';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { useWalletPendingEvents } from '../../state/realtime';
+import { GenericActivity } from '../../state/activity';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
@@ -55,6 +57,7 @@ export const DesktopHistoryPage: FC = () => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);
+    const { data: pendingOutgoingEvents } = useWalletPendingEvents(wallet.rawAddress);
 
     const {
         isFetched: isTonFetched,
@@ -81,8 +84,24 @@ export const DesktopHistoryPage: FC = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
 
     const activity = useMemo(() => {
-        return getMixedActivity(tonEvents, undefined);
-    }, [tonEvents]);
+        const mixedActivity = getMixedActivity(tonEvents, undefined);
+        const pendingEventsToKeep =
+            pendingOutgoingEvents?.filter(e =>
+                mixedActivity.every(
+                    a => a.event.kind === 'ton' && a.event.event.eventId !== e.outgoingMessageId
+                )
+            ) || [];
+
+        const pendingEventsActivity: GenericActivity<TonActivity>[] = pendingEventsToKeep?.map(
+            e => ({
+                timestamp: e.creationTimestampMS,
+                key: e.outgoingMessageId,
+                event: { kind: 'ton', event: e.estimation }
+            })
+        );
+
+        return [...pendingEventsActivity, ...mixedActivity];
+    }, [pendingOutgoingEvents, tonEvents]);
 
     if (!isTonFetched) {
         return null;

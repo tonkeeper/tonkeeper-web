@@ -5,6 +5,7 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import {
+    PendingOutgoingEvent,
     TonRecipientData,
     TransferEstimation,
     TransferEstimationEvent,
@@ -22,6 +23,7 @@ import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
 import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../state/wallet';
 import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
+import { useAddWalletPendingEvent } from '../../state/realtime';
 
 export function useSendTransfer<T extends Asset>(
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,
@@ -38,6 +40,7 @@ export function useSendTransfer<T extends Asset>(
     const { data: jettons } = useJettonList();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
+    const { mutateAsync: addPendingEvent } = useAddWalletPendingEvent();
 
     return useMutation<boolean, Error>(async () => {
         const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
@@ -46,10 +49,11 @@ export function useSendTransfer<T extends Asset>(
             if (!isAccountControllable(account)) {
                 throw new Error("Can't send a transfer using this account");
             }
+            let pendingOutgoingEvent: PendingOutgoingEvent;
             if (isTonAsset(amount.asset)) {
                 if (amount.asset.id === TON_ASSET.id) {
                     track2('send-ton');
-                    await sendTonTransfer(
+                    pendingOutgoingEvent = await sendTonTransfer(
                         api,
                         account,
                         recipient as TonRecipientData,
@@ -65,7 +69,7 @@ export function useSendTransfer<T extends Asset>(
                             (amount.asset.address as Address).toRawString() ===
                             jetton.jetton.address
                     )!;
-                    await sendJettonTransfer(
+                    pendingOutgoingEvent = await sendJettonTransfer(
                         api,
                         account,
                         recipient as TonRecipientData,
@@ -75,6 +79,11 @@ export function useSendTransfer<T extends Asset>(
                         signer
                     );
                 }
+
+                await addPendingEvent({
+                    walletAddress: account.activeTonWallet.rawAddress,
+                    event: pendingOutgoingEvent
+                });
             } else {
                 throw new Error('Disable trc 20 transactions');
                 // track2('send-trc20');

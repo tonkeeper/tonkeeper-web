@@ -88,6 +88,7 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
+import { useProcessPendingEventsBuffer } from '@tonkeeper/uikit/dist/state/realtime';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -361,6 +362,7 @@ export const Content: FC<{
     useTrackLocation();
     usePrefetch();
     useDebuggingTools();
+    useProcessPendingEventsBuffer();
 
     if (lock) {
         return (
