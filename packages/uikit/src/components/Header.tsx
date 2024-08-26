@@ -1,3 +1,9 @@
+import { Account, isAccountControllable } from '@tonkeeper/core/dist/entries/account';
+import {
+    TonContract,
+    sortDerivationsByIndex,
+    sortWalletsByVersion
+} from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -5,30 +11,24 @@ import styled, { createGlobalStyle, css } from 'styled-components';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute } from '../libs/routes';
 import { useUserCountry } from '../state/country';
+import { useWalletPendingEvents } from '../state/realtime';
 import {
-    useActiveWallet,
     useAccountsState,
-    useMutateActiveTonWallet,
+    useActiveAccount,
     useActiveTonNetwork,
-    useActiveAccount
+    useActiveWallet,
+    useMutateActiveTonWallet
 } from '../state/wallet';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, FlashingDotsIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
 import { Body3, H1, H3, Label1, Label2 } from './Text';
+import { AccountAndWalletBadgesGroup } from './account/AccountBadge';
 import { ScanButton } from './connect/ScanButton';
+import { useAddWalletNotification } from './modals/AddWalletNotificationControlled';
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
-import {
-    sortDerivationsByIndex,
-    sortWalletsByVersion,
-    TonContract
-} from '@tonkeeper/core/dist/entries/wallet';
-import { Account, isAccountControllable } from '@tonkeeper/core/dist/entries/account';
-import { AccountAndWalletBadgesGroup } from './account/AccountBadge';
-import { useAddWalletNotification } from './modals/AddWalletNotificationControlled';
-import { useWalletPendingEvents } from "../state/realtime";
 
 const Block = styled.div<{
     center?: boolean;
@@ -295,7 +295,6 @@ const FlashingDotsIconStyled = styled(FlashingDotsIcon)`
 export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const account = useActiveAccount();
     const { onOpen: addWallet } = useAddWalletNotification();
-    const [isOpen, setOpen] = useState(false);
     const { data: pendingEvents } = useWalletPendingEvents(account.activeTonWallet.rawAddress);
 
     const accounts = useAccountsState();
