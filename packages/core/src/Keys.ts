@@ -42,5 +42,7 @@ export enum AppKey {
 
     SIGNER_MESSAGE = 'signer_message',
     SWAP_CUSTOM_ASSETS = 'swap_custom_assets',
-    SWAP_OPTIONS = 'swap_options'
+    SWAP_OPTIONS = 'swap_options',
+
+    WALLET_PENDING_EVENTS = 'wallet_pending_events'
 }

@@ -9,8 +9,9 @@ import { MixedActivityGroup } from '../../components/activity/ActivityGroup';
 import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import { getMixedActivityGroups } from '../../state/mixedActivity';
 import { useActiveWallet } from '../../state/wallet';
+import { useMixedActivity } from '../../hooks/useMixedActivity';
+import { groupGenericActivity } from '../../state/activity';
 
 const EmptyActivity = React.lazy(() => import('../../components/activity/EmptyActivity'));
 
@@ -61,9 +62,8 @@ const Activity: FC = () => {
     useFetchNext(hasTonNextPage, isFetchingNextPage, fetchTonNextPage, standalone, ref);
     //  useFetchNext(hasTronNextPage, isFetchingNextPage, fetchTronNextPage, standalone, ref);
 
-    const activity = useMemo(() => {
-        return getMixedActivityGroups(tonEvents, undefined);
-    }, [tonEvents]);
+    const activity = useMixedActivity(tonEvents);
+    const groups = useMemo(() => groupGenericActivity(activity), [activity]);
 
     if (!isTonFetched) {
         return <ActivitySkeletonPage />;
@@ -81,7 +81,7 @@ const Activity: FC = () => {
         <>
             <ActivityHeader />
             <InnerBody ref={ref}>
-                <MixedActivityGroup items={activity} />
+                <MixedActivityGroup items={groups} />
                 {isFetchingNextPage && <SkeletonListWithImages size={3} />}
             </InnerBody>
         </>

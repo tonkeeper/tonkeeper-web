@@ -14,7 +14,9 @@ import {
     getTTL,
     getTonkeeperQueryId,
     getWalletBalance,
-    signEstimateMessage
+    signEstimateMessage,
+    getMessageId,
+    sendTransactionToBlockchain
 } from './common';
 import {
     jettonTransferAmount,
@@ -22,6 +24,7 @@ import {
     jettonTransferForwardAmount
 } from './jettonService';
 import { nftTransferBody, nftTransferForwardAmount } from './nftService';
+import { PendingOutgoingEvent } from '../../entries/send';
 
 export type TransferMessage = {
     to: string;
@@ -85,7 +88,7 @@ export const sendTonMultiTransfer = async (
     transferMessages: TransferMessage[],
     feeEstimate: BigNumber,
     signer: CellSigner
-) => {
+): Promise<PendingOutgoingEvent> => {
     const timestamp = await getServerTime(api);
 
     const total = transferMessages.reduce((acc, msg) => acc.plus(msg.weiAmount), new BigNumber(0));
@@ -102,11 +105,7 @@ export const sendTonMultiTransfer = async (
         signer
     );
 
-    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
-    });
-
-    return true;
+    return sendTransactionToBlockchain(api, cell);
 };
 
 const createTonMultiTransfer = async (
@@ -177,7 +176,7 @@ export const sendJettonMultiTransfer = async (
     transferMessages: TransferMessage[],
     feeEstimate: BigNumber,
     signer: CellSigner
-) => {
+): Promise<PendingOutgoingEvent> => {
     const timestamp = await getServerTime(api);
 
     const [wallet, seqno] = await getWalletBalance(api, walletState);
@@ -219,10 +218,13 @@ export const sendJettonMultiTransfer = async (
         signer
     );
 
+    const boc = cell.toString('base64');
+    const outgoingMessageId = getMessageId(boc);
+
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
+        sendBlockchainMessageRequest: { boc }
     });
-    return true;
+    return { estimation: res.event, outgoingMessageId, creationTimestampMS: Date.now() };
 };
 
 const createJettonMultiTransfer = async (

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
+import { PendingOutgoingEvent, TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import {
     TransferMessage,
     sendJettonMultiTransfer,
@@ -18,8 +18,9 @@ import { useTransactionAnalytics } from '../amplitude';
 import { useAppContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import { useActiveAccount } from '../../state/wallet';
+import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../state/wallet';
 import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
+import { useAddWalletPendingEvent } from '../../state/realtime';
 
 export type MultiSendFormTokenized = {
     rows: {
@@ -49,6 +50,8 @@ export function useSendMultiTransfer() {
     const track2 = useTransactionAnalytics();
     const { data: jettons } = useJettonList();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: addPendingEvent } = useAddWalletPendingEvent();
+    const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
     return useMutation<
         boolean,
@@ -56,7 +59,6 @@ export function useSendMultiTransfer() {
         { form: MultiSendFormTokenized; asset: TonAsset; feeEstimation: BigNumber }
     >(async ({ form, asset, feeEstimation }) => {
         const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
-        const walletId = account.activeTonWallet.id;
         if (signer === null) return false;
         try {
             if (!isAccountControllable(account)) {
@@ -69,9 +71,11 @@ export function useSendMultiTransfer() {
                 throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
             }
 
+            let pendingOutgoingEvent: PendingOutgoingEvent;
+
             if (asset.id === TON_ASSET.id) {
                 track2('multi-send-ton');
-                await sendTonMultiTransfer(
+                pendingOutgoingEvent = await sendTonMultiTransfer(
                     api,
                     wallet,
                     multiSendFormToTransferMessages(form),
@@ -83,7 +87,7 @@ export function useSendMultiTransfer() {
                 const jettonInfo = jettons!.balances.find(
                     jetton => (asset.address as Address).toRawString() === jetton.jetton.address
                 )!;
-                await sendJettonMultiTransfer(
+                pendingOutgoingEvent = await sendJettonMultiTransfer(
                     api,
                     wallet,
                     jettonInfo.walletAddress.address,
@@ -91,14 +95,17 @@ export function useSendMultiTransfer() {
                     feeEstimation,
                     signer
                 );
+
+                await addPendingEvent({
+                    walletAddress: account.activeTonWallet.rawAddress,
+                    event: pendingOutgoingEvent
+                });
             }
         } catch (e) {
             await notifyError(client, sdk, t, e);
         }
 
-        await client.invalidateQueries({
-            predicate: query => query.queryKey.includes(walletId)
-        });
+        await invalidateAccountQueries();
         return true;
     });
 }
