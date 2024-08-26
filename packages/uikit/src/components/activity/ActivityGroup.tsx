@@ -1,9 +1,13 @@
 import { InfiniteData } from '@tanstack/react-query';
 import { AccountEvents } from '@tonkeeper/core/dist/tonApiV2';
-import { TronEvents } from '@tonkeeper/core/dist/tronApi';
 import React, { FC, useMemo, useState } from 'react';
-import { formatActivityDate, GenericActivityGroup, getActivityTitle } from '../../state/activity';
-import { MixedActivity, getMixedActivityGroups } from '../../state/mixedActivity';
+import {
+    formatActivityDate,
+    GenericActivityGroup,
+    getActivityTitle,
+    groupGenericActivity
+} from '../../state/activity';
+import { MixedActivity } from '../../state/mixedActivity';
 import { CoinHistorySkeleton, HistoryBlock, SkeletonListWithImages } from '../Skeleton';
 import { Group, List, Title } from './ActivityLayout';
 import { ActionData, ActivityNotification } from './ton/ActivityNotification';
@@ -11,23 +15,39 @@ import { TonActivityEvents } from './ton/TonActivityEvents';
 import { TronActionData, TronActivityNotification } from './tron/ActivityNotification';
 import { TronActivityEvents } from './tron/TronActivityEvents';
 import { useTranslation } from '../../hooks/translation';
+import { useActiveWallet } from '../../state/wallet';
+import { useWalletPendingEvents } from '../../state/realtime';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { useMixedActivity } from '../../hooks/useMixedActivity';
 
 export const ActivityList: FC<{
     isFetched: boolean;
     isFetchingNextPage: boolean;
+    forAsset: string;
     tonEvents?: InfiniteData<AccountEvents>;
-    tronEvents?: InfiniteData<TronEvents>;
-}> = ({ isFetched, isFetchingNextPage, tonEvents, tronEvents }) => {
-    const activity = useMemo<GenericActivityGroup<MixedActivity>[]>(() => {
-        return getMixedActivityGroups(tonEvents, tronEvents);
-    }, [tonEvents, tronEvents]);
+}> = ({ isFetched, isFetchingNextPage, tonEvents, forAsset }) => {
+    const wallet = useActiveWallet();
+    const { data: pendingOutgoingEvents } = useWalletPendingEvents(wallet.rawAddress);
+    const tokenPendingEvents = useMemo(
+        () =>
+            pendingOutgoingEvents?.filter(e => {
+                if (forAsset === 'ton') {
+                    return e.affectAssetAddress === TON_ASSET.id;
+                } else {
+                    return e.affectAssetAddress === forAsset;
+                }
+            }),
+        [pendingOutgoingEvents, forAsset]
+    );
+    const activity = useMixedActivity(tonEvents, tokenPendingEvents);
+    const groups = useMemo(() => groupGenericActivity(activity), [activity]);
 
     if (!isFetched) {
         return <CoinHistorySkeleton />;
     }
     return (
         <HistoryBlock>
-            <MixedActivityGroup items={activity} />
+            <MixedActivityGroup items={groups} />
             {isFetchingNextPage && <SkeletonListWithImages size={3} />}
         </HistoryBlock>
     );

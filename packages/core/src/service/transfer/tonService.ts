@@ -3,12 +3,16 @@ import BigNumber from 'bignumber.js';
 import { AccountControllable } from '../../entries/account';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
-import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
+import {
+    PendingOutgoingEvent,
+    TonRecipientData,
+    TransferEstimationEvent
+} from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { TonWalletStandard } from '../../entries/wallet';
 import { LedgerError } from '../../errors/LedgerError';
-import { AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
+import { AccountsApi, EmulationApi } from '../../tonApiV2';
 import { createLedgerTonTransfer } from '../ledger/transfer';
 import { getLedgerAccountPathByIndex } from '../ledger/utils';
 import { walletContractFromState } from '../wallet/contractService';
@@ -24,7 +28,8 @@ import {
     seeIfAddressBounceable,
     seeIfTransferBounceable,
     signEstimateMessage,
-    toStateInit
+    toStateInit,
+    sendTransactionToBlockchain
 } from './common';
 
 export type EstimateData = {
@@ -212,19 +217,19 @@ export const sendTonConnectTransfer = async (
     account: AccountControllable,
     params: TonConnectTransactionPayload,
     signer: Signer
-) => {
+): Promise<{ boc: string; outgoingEvent: PendingOutgoingEvent }> => {
     const timestamp = await getServerTime(api);
     const seqno = await getWalletSeqNo(api, account.activeTonWallet.rawAddress);
 
     const external = await createTonConnectTransfer(timestamp, seqno, account, params, signer);
 
     const boc = external.toString('base64');
+    const outgoingEvent = await sendTransactionToBlockchain(api, boc);
 
-    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc }
-    });
-
-    return boc;
+    return {
+        boc,
+        outgoingEvent
+    };
 };
 
 export const sendTonTransfer = async (
@@ -235,7 +240,7 @@ export const sendTonTransfer = async (
     isMax: boolean,
     fee: TransferEstimationEvent,
     signer: Signer
-) => {
+): Promise<PendingOutgoingEvent> => {
     const timestamp = await getServerTime(api);
 
     const total = new BigNumber(fee.event.extra).multipliedBy(-1).plus(amount.weiAmount);
@@ -272,7 +277,5 @@ export const sendTonTransfer = async (
         );
     }
 
-    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc: buffer.toString('base64') }
-    });
+    return sendTransactionToBlockchain(api, buffer);
 };

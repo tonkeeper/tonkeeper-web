@@ -61,3 +61,10 @@ export type TransferEstimation<T extends Asset = Asset> = {
 };
 
 export type TransferEstimationEvent = { event: AccountEvent };
+
+export type PendingOutgoingEvent = {
+    outgoingMessageId: string;
+    creationTimestampMS: number;
+    estimation: AccountEvent;
+    affectAssetAddress?: string;
+};

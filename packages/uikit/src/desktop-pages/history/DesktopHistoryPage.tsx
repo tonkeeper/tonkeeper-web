@@ -1,12 +1,11 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { FC, Suspense, useMemo, useRef } from 'react';
+import { FC, Suspense, useRef } from 'react';
 import styled from 'styled-components';
 import { ActivitySkeletonPage } from '../../components/Skeleton';
 import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
-import { getMixedActivity } from '../../state/mixedActivity';
 import EmptyActivity from '../../components/activity/EmptyActivity';
 import {
     DesktopViewHeader,
@@ -20,6 +19,8 @@ import { mergeRefs } from '../../libs/common';
 import { useActiveWallet } from '../../state/wallet';
 import { Body2, Label2 } from '../../components/Text';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { useWalletPendingEvents } from '../../state/realtime';
+import { useMixedActivity } from '../../hooks/useMixedActivity';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
@@ -55,6 +56,7 @@ export const DesktopHistoryPage: FC = () => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);
+    const { data: pendingOutgoingEvents } = useWalletPendingEvents(wallet.rawAddress);
 
     const {
         isFetched: isTonFetched,
@@ -80,9 +82,7 @@ export const DesktopHistoryPage: FC = () => {
 
     const { ref: scrollRef, closeTop } = useIsScrolled();
 
-    const activity = useMemo(() => {
-        return getMixedActivity(tonEvents, undefined);
-    }, [tonEvents]);
+    const activity = useMixedActivity(tonEvents);
 
     if (!isTonFetched) {
         return null;
