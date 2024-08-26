@@ -56,7 +56,7 @@ export const AccountIsAlreadyAdded: FC<{
                 </RoundedButton>
             </BackButtonContainer>
             <Label1>{t('account_is_already_added_label')}</Label1>
-            <AccountAndWalletInfoStyled account={account} walletId={walletId} />
+            <AccountAndWalletInfoStyled noPrefix account={account} walletId={walletId} />
             <ButtonStyled primary size="large" onClick={onClick}>
                 {t('account_is_already_added_action')}
             </ButtonStyled>
