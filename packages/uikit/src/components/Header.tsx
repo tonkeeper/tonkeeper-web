@@ -1,5 +1,5 @@
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useTranslation } from '../hooks/translation';
@@ -9,7 +9,8 @@ import {
     useAccountsState,
     useMutateActiveTonWallet,
     useActiveTonNetwork,
-    useActiveAccount
+    useActiveAccount,
+    useActiveWallet
 } from '../state/wallet';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
@@ -17,7 +18,6 @@ import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1, Label2 } from './Text';
 import { ScanButton } from './connect/ScanButton';
-import { ImportNotification } from './create/ImportNotification';
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
 import {
@@ -27,6 +27,7 @@ import {
 } from '@tonkeeper/core/dist/entries/wallet';
 import { Account, isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 import { AccountAndWalletBadgesGroup } from './account/AccountBadge';
+import { useAddWalletNotification } from './modals/AddWalletNotificationControlled';
 
 const Block = styled.div<{
     center?: boolean;
@@ -263,7 +264,7 @@ const TitleStyled = styled(Title)`
 
 export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const account = useActiveAccount();
-    const [isOpen, setOpen] = useState(false);
+    const { onOpen: addWallet } = useAddWalletNotification();
 
     const accounts = useAccountsState();
     const shouldShowIcon = accounts.length > 1;
