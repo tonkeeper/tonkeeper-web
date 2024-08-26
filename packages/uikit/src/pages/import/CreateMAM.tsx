@@ -14,7 +14,7 @@ import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useCreateAccountMAM, useMutateRenameAccount } from '../../state/wallet';
-import { MamRoot } from '@multi-account-mnemonic/core';
+import { TonKeychainRoot } from '@ton-keychain/core';
 
 const Create = () => {
     const sdk = useAppSdk();
@@ -34,7 +34,7 @@ const Create = () => {
 
     useEffect(() => {
         setTimeout(() => {
-            MamRoot.generate().then(value => setMnemonic(value.mnemonic));
+            TonKeychainRoot.generate().then(value => setMnemonic(value.mnemonic));
         }, 1500);
     }, []);
 

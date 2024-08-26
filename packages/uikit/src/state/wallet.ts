@@ -42,9 +42,8 @@ import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
 import { useDevSettings } from './dev';
 import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
-import { DefaultRefetchInterval } from './tonendpoint';
 import { useCheckTouchId } from './password';
-import { MamRoot } from '@multi-account-mnemonic/core';
+import { TonKeychainRoot } from '@ton-keychain/core';
 import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
 
 export const useActiveAccountQuery = () => {
@@ -91,6 +90,24 @@ export const useMutateActiveAccount = () => {
     });
 };
 
+export const useMutateActiveAccountAndWallet = () => {
+    const storage = useAccountsStorage();
+    const client = useQueryClient();
+    return useMutation<void, Error, { accountId: AccountId; walletId: WalletId }>(
+        async ({ accountId, walletId }) => {
+            const account = await storage.getAccount(accountId);
+
+            if (!account) {
+                throw new Error('Account not found');
+            }
+            account.setActiveTonWallet(walletId);
+            await storage.updateAccountInState(account);
+            await storage.setActiveAccountId(account.id);
+            await client.invalidateQueries(anyOfKeysParts(QueryKey.account, accountId, walletId));
+        }
+    );
+};
+
 export const useMutateActiveTonWallet = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
@@ -115,7 +132,7 @@ export const useMutateAccountActiveDerivation = () => {
         async ({ accountId, derivationIndex }) => {
             const account = await storage.getAccount(accountId);
 
-            if (!account || account.type !== 'ledger') {
+            if (!account || (account.type !== 'ledger' && account.type !== 'mam')) {
                 throw new Error('Account not found');
             }
 
@@ -187,7 +204,7 @@ export const useCreateMAMAccountDerivation = () => {
 
         const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
 
-        const root = await MamRoot.fromMnemonic(mnemonic);
+        const root = await TonKeychainRoot.fromMnemonic(mnemonic);
         const tonAccount = await root.getTonAccount(newDerivationIndex);
 
         const tonWallet = walletContract(
@@ -394,7 +411,7 @@ export const useCreateAccountMnemonic = () => {
 export const useCheckIfMnemonicIsMAM = () => {
     return useMutation(async (mnemonic: string[]) => {
         try {
-            await MamRoot.fromMnemonic(mnemonic);
+            await TonKeychainRoot.fromMnemonic(mnemonic);
             return true;
         } catch (e) {
             return false;
