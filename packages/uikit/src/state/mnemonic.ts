@@ -50,14 +50,33 @@ export const signTonConnectOver = (
                 );
                 return Buffer.from(result, 'hex');
             }
-            default: {
+            case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
                 const keyPair = await mnemonicToPrivateKey(mnemonic);
-                const signature = nacl.sign.detached(
+                return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
                     keyPair.secretKey
                 );
-                return signature;
+            }
+            case 'mam': {
+                const wallet = account.activeTonWallet;
+                const mnemonic = await getMAMWalletMnemonic(
+                    sdk,
+                    account.id,
+                    wallet.id,
+                    checkTouchId
+                );
+                const keyPair = await mnemonicToPrivateKey(mnemonic);
+                return nacl.sign.detached(
+                    Buffer.from(sha256_sync(bufferToSign)),
+                    keyPair.secretKey
+                );
+            }
+            case 'watch-only': {
+                throw new TxConfirmationCustomError("Can't use tonconnect over watch-only wallet");
+            }
+            default: {
+                assertUnreachable(account);
             }
         }
     };
