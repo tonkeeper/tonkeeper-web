@@ -14,18 +14,11 @@ import { sign } from '@ton/crypto';
 import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
-import { PendingOutgoingEvent, TonRecipient, TransferEstimationEvent } from '../../entries/send';
+import { TonRecipient, TransferEstimationEvent } from '../../entries/send';
 import { BaseSigner } from '../../entries/signer';
 import { TonWalletStandard } from '../../entries/wallet';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
-import {
-    Account,
-    AccountsApi,
-    BlockchainApi,
-    EmulationApi,
-    LiteServerApi,
-    WalletApi
-} from '../../tonApiV2';
+import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { WalletContract, walletContractFromState } from '../wallet/contractService';
 
 export enum SendMode {
@@ -202,26 +195,3 @@ export const seeIfTransferBounceable = (account: Account, recipient: TonRecipien
 
     return account.status === 'active';
 };
-
-export function getMessageId(messageBase64: string) {
-    const cell = Cell.fromBase64(messageBase64);
-    return cell.hash().toString('hex');
-}
-
-export async function sendTransactionToBlockchain(
-    api: APIConfig,
-    cell: string | Buffer
-): Promise<PendingOutgoingEvent> {
-    const boc = typeof cell === 'string' ? cell : cell.toString('base64');
-    const outgoingMessageId = getMessageId(boc);
-
-    const { event: estimation } = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-        emulateMessageToWalletRequest: { boc }
-    });
-
-    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc }
-    });
-
-    return { estimation, outgoingMessageId, creationTimestampMS: Date.now() };
-}
