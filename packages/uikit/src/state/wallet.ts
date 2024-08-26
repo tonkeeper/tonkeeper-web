@@ -354,7 +354,9 @@ export const useRemoveTonWalletVersionFromAccount = () => {
         const { notifications } = sdk;
         if (notifications) {
             await Promise.all(
-                account.allTonWallets.map(item => notifications.unsubscribe(item.rawAddress))
+                account.allTonWallets.map(item =>
+                    notifications.unsubscribe(item.rawAddress).catch(e => console.error(e))
+                )
             );
         }
         account.removeTonWalletFromActiveDerivation(walletId);
@@ -383,7 +385,11 @@ export const useMutateDeleteAll = () => {
     return useMutation<void, Error, void>(async () => {
         const { notifications } = sdk;
         if (notifications) {
-            await notifications.unsubscribe();
+            try {
+                await notifications.unsubscribe();
+            } catch (e) {
+                console.error(e);
+            }
         }
         await storage.clearAccountFromState();
         await sdk.storage.clear();
