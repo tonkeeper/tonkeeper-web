@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { CellSigner } from '@tonkeeper/core/dist/entries/signer';
-import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
+import { PendingOutgoingEvent, TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Omit } from 'react-beautiful-dnd';
 import { notifyError } from '../../components/transfer/common';
@@ -13,6 +13,7 @@ import { useTranslation } from '../translation';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 import { useCheckTouchId } from '../../state/password';
 import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../state/wallet';
+import { useAddWalletPendingEvent } from '../../state/realtime';
 
 export type ContractExecutorParams = {
     api: APIConfig;
@@ -26,7 +27,7 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
         executor,
         eventName2
     }: {
-        executor: (params: Args) => Promise<void>;
+        executor: (params: Args) => Promise<PendingOutgoingEvent>;
         eventName2: AmplitudeTransactionType;
     },
     args: Omit<Args, Exclude<keyof ContractExecutorParams, 'fee'>>
@@ -39,6 +40,7 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
     const track2 = useTransactionAnalytics();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
+    const { mutateAsync: addPendingEvent } = useAddWalletPendingEvent();
 
     return useMutation<boolean, Error>(async () => {
         if (!args.fee) {
@@ -54,18 +56,20 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
 
         track2(eventName2);
         try {
-            await executor({
+            const result = await executor({
                 api,
                 account,
                 signer,
                 ...args
             } as Args);
+            await addPendingEvent({
+                event: result,
+                walletAddress: account.activeTonWallet.rawAddress
+            });
         } catch (e) {
             await notifyError(client, sdk, t, e);
         }
-
         await invalidateAccountQueries();
-        await client.invalidateQueries();
         return true;
     });
 }

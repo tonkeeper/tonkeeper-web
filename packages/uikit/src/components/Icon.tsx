@@ -1959,3 +1959,52 @@ export const GearIconEmpty: FC<{ className?: string }> = ({ className }) => {
         </svg>
     );
 };
+
+const FlashingDotsContainer = styled.div<{ radiusPx: number }>`
+    display: flex;
+    align-items: center;
+    gap: ${p => p.radiusPx}px;
+`;
+
+const FlashingDot = styled.div<{ radiusPx: number }>`
+    width: ${p => p.radiusPx * 2}px;
+    height: ${p => p.radiusPx * 2}px;
+    border-radius: ${p => p.radiusPx}px;
+    background-color: currentcolor;
+    animation: dot-flashing 1s infinite alternate;
+
+    @keyframes dot-flashing {
+        0% {
+            opacity: 1;
+        }
+        50%,
+        100% {
+            opacity: 0.2;
+        }
+    }
+`;
+
+const FlashingDot1 = styled(FlashingDot)`
+    animation-delay: 0s;
+`;
+
+const FlashingDot2 = styled(FlashingDot)`
+    animation-delay: 0.5s;
+`;
+
+const FlashingDot3 = styled(FlashingDot)`
+    animation-delay: 1s;
+`;
+
+export const FlashingDotsIcon: FC<{ className?: string; radiusPx?: number }> = ({
+    className,
+    radiusPx = 5
+}) => {
+    return (
+        <FlashingDotsContainer className={className} radiusPx={radiusPx}>
+            <FlashingDot1 radiusPx={radiusPx} />
+            <FlashingDot2 radiusPx={radiusPx} />
+            <FlashingDot3 radiusPx={radiusPx} />
+        </FlashingDotsContainer>
+    );
+};

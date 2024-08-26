@@ -13,10 +13,10 @@ import {
     useActiveAccount
 } from '../state/wallet';
 import { DropDown } from './DropDown';
-import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
+import { DoneIcon, DownIcon, FlashingDotsIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
-import { H1, H3, Label1, Label2 } from './Text';
+import { Body3, H1, H3, Label1, Label2 } from './Text';
 import { ScanButton } from './connect/ScanButton';
 import { ImportNotification } from './create/ImportNotification';
 import { SkeletonText } from './shared/Skeleton';
@@ -28,6 +28,7 @@ import {
 } from '@tonkeeper/core/dist/entries/wallet';
 import { Account, isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 import { AccountAndWalletBadgesGroup } from './account/AccountBadge';
+import { useWalletPendingEvents } from "../state/realtime";
 
 const Block = styled.div<{
     center?: boolean;
@@ -260,12 +261,41 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
 
 const TitleStyled = styled(Title)`
     align-items: center;
+    position: relative;
+`;
+
+const PendingEventsContainer = styled(Link)`
+    text-decoration: unset;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    justify-content: center;
+    white-space: nowrap;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+
+    color: ${p => p.theme.textSecondary};
+
+    &:hover {
+        color: ${p => p.theme.textPrimary};
+    }
+
+    transition: 0.1s ease-in-out;
+`;
+
+const FlashingDotsIconStyled = styled(FlashingDotsIcon)`
+    margin-top: 2px;
 `;
 
 export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const account = useActiveAccount();
     const [isOpen, setOpen] = useState(false);
-
+    const { data: pendingEvents } = useWalletPendingEvents(account.activeTonWallet.rawAddress);
     const accounts = useAccountsState();
     const shouldShowIcon = accounts.length > 1;
 
@@ -286,6 +316,12 @@ export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
                     <DownIconWrapper>
                         <DownIcon />
                     </DownIconWrapper>
+                    {!!pendingEvents?.length && (
+                        <PendingEventsContainer to={AppRoute.activity}>
+                            <Body3>{pendingEvents.length} pending events</Body3>
+                            <FlashingDotsIconStyled radiusPx={3} />
+                        </PendingEventsContainer>
+                    )}
                 </TitleStyled>
             </DropDown>
 

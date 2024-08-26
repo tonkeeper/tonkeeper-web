@@ -49,6 +49,7 @@ const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTML
             isFetched={isFetched}
             isFetchingNextPage={isFetchingNextPage}
             tonEvents={data}
+            forAsset={balance.jetton.address}
         />
     );
 };
