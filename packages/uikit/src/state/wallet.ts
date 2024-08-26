@@ -337,6 +337,7 @@ export const useAddTonWalletVersionToAccount = () => {
 export const useRemoveTonWalletVersionFromAccount = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
+    const sdk = useAppSdk();
 
     return useMutation<
         void,
@@ -349,6 +350,12 @@ export const useRemoveTonWalletVersionFromAccount = () => {
         const account = (await storage.getAccount(accountId))!;
         if (!isAccountVersionEditable(account)) {
             throw new Error('Cannot add wallet to this account');
+        }
+        const { notifications } = sdk;
+        if (notifications) {
+            await Promise.all(
+                account.allTonWallets.map(item => notifications.unsubscribe(item.rawAddress))
+            );
         }
         account.removeTonWalletFromActiveDerivation(walletId);
         await storage.updateAccountInState(account);
@@ -371,8 +378,14 @@ export const useAccountsState = () => {
 
 export const useMutateDeleteAll = () => {
     const sdk = useAppSdk();
+    const storage = useAccountsStorage();
     const client = useQueryClient();
     return useMutation<void, Error, void>(async () => {
+        const { notifications } = sdk;
+        if (notifications) {
+            await notifications.unsubscribe();
+        }
+        await storage.clearAccountFromState();
         await sdk.storage.clear();
         await client.invalidateQueries();
     });
