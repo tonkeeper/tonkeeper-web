@@ -78,7 +78,7 @@ export class TwaAppSdk extends BaseApp {
     getKeyboardHeight = () => 0;
 
     isIOs = () => true;
-    isStandalone = () => false;
+    isStandalone = () => true;
 
     version = packageJson.version ?? 'Unknown';
 
