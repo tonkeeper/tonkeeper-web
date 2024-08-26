@@ -90,7 +90,7 @@ export const useJettonList = () => {
                 supportedExtensions: ['custom_payload']
             });
 
-            const config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, network);
+            const config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
 
             const balances = filterTokens(result.balances, config.hiddenTokens).sort(
                 compareTokensOver(fiat)

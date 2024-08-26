@@ -452,7 +452,7 @@ export const useActiveTonWalletConfig = () => {
     const network = useActiveTonNetwork();
     return useQuery<TonWalletConfig, Error>(
         [wallet.rawAddress, network, QueryKey.walletConfig],
-        async () => getActiveWalletConfig(sdk.storage, wallet.rawAddress, network)
+        async () => getActiveWalletConfig(sdk, wallet.rawAddress, network)
     );
 };
 
@@ -462,7 +462,7 @@ export const useMutateActiveTonWalletConfig = () => {
     const client = useQueryClient();
     const network = useActiveTonNetwork();
     return useMutation<void, Error, Partial<TonWalletConfig>>(async newConfig => {
-        const config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, network);
+        const config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
 
         await setActiveWalletConfig(sdk.storage, wallet.rawAddress, network, {
             ...config,
