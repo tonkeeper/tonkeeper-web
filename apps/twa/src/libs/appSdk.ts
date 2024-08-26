@@ -33,14 +33,13 @@ export class TwaAppSdk extends BaseApp {
         const [miniApp] = initMiniApp();
         this.miniApp = miniApp;
         this.hapticFeedback = initHapticFeedback();
+        this.launchParams = retrieveLaunchParams();
 
-        this.notifications = new TwaNotification(miniApp);
+        this.notifications = new TwaNotification(miniApp, this.launchParams);
 
         const [backButton] = initBackButton();
 
         this.nativeBackButton = backButton;
-
-        this.launchParams = retrieveLaunchParams();
 
         const [mainButton] = initMainButton();
         this.mainButton = mainButton;
