@@ -1,7 +1,11 @@
 import { Address, beginCell, Cell, comment, toNano } from '@ton/core';
 import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../entries/apis';
-import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
+import {
+    PendingOutgoingEvent,
+    TonRecipientData,
+    TransferEstimationEvent
+} from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { TonWalletStandard } from '../../entries/wallet';
 import { BlockchainApi, EmulationApi, NftItem } from '../../tonApiV2';
@@ -14,9 +18,10 @@ import {
     getServerTime,
     getTonkeeperQueryId,
     getWalletBalance,
+    sendTransactionToBlockchain,
     signEstimateMessage
 } from './common';
-import { Account, AccountControllable } from "../../entries/account";
+import { AccountControllable } from '../../entries/account';
 
 const initNftTransferAmount = toNano('1');
 export const nftTransferForwardAmount = BigInt('1');
@@ -187,7 +192,7 @@ export const sendNftRenew = async (options: {
     fee: TransferEstimationEvent;
     signer: CellSigner;
     amount: BigNumber;
-}) => {
+}): Promise<PendingOutgoingEvent> => {
     const walletState = options.account.activeTonWallet;
 
     const timestamp = await getServerTime(options.api);
@@ -205,9 +210,7 @@ export const sendNftRenew = async (options: {
         { to: options.nftAddress, value: options.amount, body }
     );
 
-    await new BlockchainApi(options.api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
-    });
+    return sendTransactionToBlockchain(options.api, cell);
 };
 
 export const estimateNftRenew = async (options: {
@@ -243,7 +246,7 @@ export const sendNftLink = async (options: {
     fee: TransferEstimationEvent;
     signer: CellSigner;
     amount: BigNumber;
-}) => {
+}): Promise<PendingOutgoingEvent> => {
     const walletState = options.account.activeTonWallet;
     const timestamp = await getServerTime(options.api);
     const { seqno } = await getKeyPairAndSeqno({ ...options, walletState });
@@ -260,9 +263,7 @@ export const sendNftLink = async (options: {
         { to: options.nftAddress, value: options.amount, body }
     );
 
-    await new BlockchainApi(options.api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc: cell.toString('base64') }
-    });
+    return sendTransactionToBlockchain(options.api, cell);
 };
 
 export const estimateNftLink = async (options: {

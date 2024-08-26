@@ -80,6 +80,7 @@ export const TonPage = () => {
                     isFetched={isFetched}
                     isFetchingNextPage={isFetchingNextPage}
                     tonEvents={activity}
+                    forAsset="ton"
                 />
             </InnerBody>
         </>

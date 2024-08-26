@@ -6,7 +6,7 @@ import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { usePreFetchRates } from '../../../state/rates';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
-import { useIsActiveWalletWatchOnly } from '../../../state/wallet';
+import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { ArrowDownIcon, ArrowUpIcon, PlusIconSmall } from '../../Icon';
 import { Button } from '../../fields/Button';
@@ -15,6 +15,7 @@ import { AppProRoute } from '../../../libs/routes';
 import { BuyNotification } from '../../home/BuyAction';
 import { useWalletTotalBalance } from '../../../state/asset';
 import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderElements';
+import { useWalletPendingEvents } from '../../../state/realtime';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -51,10 +52,16 @@ const DesktopWalletHeaderPayload = () => {
     const { data: buy } = useTonendpointBuyMethods();
     const { t } = useTranslation();
     const isReadOnly = useIsActiveWalletWatchOnly();
+    const activeWallet = useActiveWallet();
+    const { data: pendingEvents } = useWalletPendingEvents(activeWallet.rawAddress);
 
     return (
         <DesktopHeaderContainer>
-            <DesktopHeaderBalance isLoading={isLoading} balance={balance} />
+            <DesktopHeaderBalance
+                isLoading={isLoading}
+                balance={balance}
+                pendingEventsNumber={pendingEvents?.length}
+            />
             <DesktopRightPart>
                 <ButtonsContainer>
                     {!isReadOnly && (

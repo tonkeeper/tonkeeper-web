@@ -4,10 +4,14 @@ import { AccountControllable } from '../../entries/account';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
-import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
+import {
+    PendingOutgoingEvent,
+    TonRecipientData,
+    TransferEstimationEvent
+} from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
 import { TonWalletStandard } from '../../entries/wallet';
-import { BlockchainApi, EmulationApi } from '../../tonApiV2';
+import { EmulationApi } from '../../tonApiV2';
 import { createLedgerJettonTransfer } from '../ledger/transfer';
 import { walletContractFromState } from '../wallet/contractService';
 import {
@@ -19,6 +23,7 @@ import {
     getTTL,
     getWalletBalance,
     SendMode,
+    sendTransactionToBlockchain,
     signEstimateMessage
 } from './common';
 import { getJettonCustomPayload } from './jettonPayloadService';
@@ -118,11 +123,9 @@ export const estimateJettonTransfer = async (
         signEstimateMessage
     );
 
-    const result = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+    return new EmulationApi(api.tonApiV2).emulateMessageToWallet({
         emulateMessageToWalletRequest: { boc: cell.toString('base64') }
     });
-
-    return result;
 };
 
 export const sendJettonTransfer = async (
@@ -133,7 +136,7 @@ export const sendJettonTransfer = async (
     jettonWalletAddress: string,
     fee: TransferEstimationEvent,
     signer: Signer
-) => {
+): Promise<PendingOutgoingEvent> => {
     const total = new BigNumber(fee.event.extra)
         .multipliedBy(-1)
         .plus(jettonTransferAmount.toString());
@@ -171,7 +174,5 @@ export const sendJettonTransfer = async (
         );
     }
 
-    await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-        sendBlockchainMessageRequest: { boc: buffer.toString('base64') }
-    });
+    return sendTransactionToBlockchain(api, buffer);
 };
