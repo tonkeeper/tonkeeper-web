@@ -104,8 +104,6 @@ export const ChoseLedgerIndexes: FC<{
                                                 {toShortValue(formatAddress(balance.address))}
                                                 &nbsp;·&nbsp;
                                                 {toFormattedTonBalance(balance.tonBalance)}&nbsp;TON
-                                                {balance.hasJettons &&
-                                                    t('wallet_version_and_tokens')}
                                             </Body2Secondary>
                                         </TextContainer>
                                         <Checkbox

@@ -250,7 +250,6 @@ export const MAMIndexesPageContent: FC<{
                                     <Body2Secondary>
                                         {toShortValue(formatAddress(balance.address)) + ' '}·
                                         {' ' + toFormattedTonBalance(balance.tonBalance)}&nbsp;TON
-                                        {balance.hasJettons && t('wallet_version_and_tokens')}
                                     </Body2Secondary>
                                 </TextContainer>
                                 {isDerivationAdded ? (

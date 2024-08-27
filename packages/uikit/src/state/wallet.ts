@@ -749,22 +749,9 @@ export const useTonWalletsBalances = (addresses: string[]) => {
                 getAccountsRequest: { accountIds: addresses }
             });
 
-            const walletsJettonsBalances = await Promise.all(
-                addresses.map(address =>
-                    new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                        accountId: address,
-                        currencies: [fiat],
-                        supportedExtensions: ['custom_payload']
-                    })
-                )
-            );
-
             return addresses.map((address, index) => ({
                 address,
-                tonBalance: response.accounts[index].balance,
-                hasJettons: walletsJettonsBalances[index].balances.some(
-                    b => b.price?.prices && Number(b.balance) > 0
-                )
+                tonBalance: response.accounts[index].balance
             }));
         },
         {
