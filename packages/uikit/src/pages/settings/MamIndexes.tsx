@@ -1,6 +1,6 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC } from 'react';
+import React, { FC, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
@@ -35,6 +35,8 @@ import { useRecoveryNotification } from '../../components/modals/RecoveryNotific
 import { useProState } from '../../state/pro';
 import { useProFeaturesNotification } from '../../components/modals/ProFeaturesNotificationControlled';
 import { useAppContext } from '../../hooks/appContext';
+import { scrollToContainersBottom } from '../../libs/web';
+import { usePrevious } from '../../hooks/usePrevious';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -120,6 +122,7 @@ export const MAMIndexesPageContent: FC<{
     const { data: proState } = useProState();
     const { onOpen: recovery } = useRecoveryNotification();
     const { onOpen: buyPro } = useProFeaturesNotification();
+    const ref = useRef<HTMLDivElement | null>(null);
 
     const { mutateAsync: selectDerivation, isLoading: isSelectDerivationLoading } =
         useMutateAccountActiveDerivation();
@@ -156,6 +159,19 @@ export const MAMIndexesPageContent: FC<{
         });
     };
 
+    const totalDerivationsDisplayed = balances?.length;
+    const totalDerivationsDisplayedPrev = usePrevious(totalDerivationsDisplayed);
+    useLayoutEffect(() => {
+        if (
+            totalDerivationsDisplayed !== undefined &&
+            totalDerivationsDisplayedPrev !== undefined &&
+            totalDerivationsDisplayed > totalDerivationsDisplayedPrev &&
+            ref.current
+        ) {
+            scrollToContainersBottom(ref.current);
+        }
+    }, [totalDerivationsDisplayed, totalDerivationsDisplayedPrev]);
+
     const onEnableDerivation = async (index: number) => {
         enableDerivation({
             accountId: account.id,
@@ -188,7 +204,7 @@ export const MAMIndexesPageContent: FC<{
         account.allAvailableDerivations.length >= mamMaxWalletsWithoutPro;
 
     return (
-        <ContentWrapper className={className}>
+        <ContentWrapper className={className} ref={ref}>
             <ListBlockStyled>
                 <ListItem hover={false}>
                     <ListItemPayload>

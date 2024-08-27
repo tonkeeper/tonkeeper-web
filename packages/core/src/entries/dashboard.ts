@@ -81,13 +81,7 @@ export type DashboardCellNumericFiat = {
 export function toStringDashboardCell(cell: DashboardCell): string {
     switch (cell.type) {
         case 'account_name':
-            const walletBadge = walletBadgeText(cell.account, cell.walletId);
-            return (
-                cell.account.name +
-                ' ' +
-                cell.account.emoji +
-                (walletBadge ? ' ' + walletBadge : '')
-            );
+            return accountAndWalletToString(cell.account, cell.walletId);
         case 'string':
             return cell.value;
         case 'address':
@@ -101,35 +95,50 @@ export function toStringDashboardCell(cell: DashboardCell): string {
     }
 }
 
-function walletBadgeText(account: Account, walletId: WalletId): string {
-    if (account.type === 'watch-only') {
-        return '(watch only)';
-    }
+function accountAndWalletToString(account: Account, walletId: WalletId): string {
+    const baseInfo = account.name + ' ' + account.emoji;
     if (account.allTonWallets.length === 1) {
-        return '';
+        return baseInfo;
     }
 
     switch (account.type) {
+        case 'watch-only':
+            return baseInfo + ' (watch only)';
         case 'ledger':
-        case 'mam':
             const index = account.derivations.find(d =>
                 d.tonWallets.some(w => w.id === walletId)
             )?.index;
             if (index === undefined) {
-                return '';
+                return baseInfo;
             }
 
-            return '[' + (index + 1).toString() + ']';
+            return baseInfo + ' [' + (index + 1).toString() + ']';
+        case 'mam':
+            const derivation = account.derivations.find(d =>
+                d.tonWallets.some(w => w.id === walletId)
+            );
+            if (derivation === undefined) {
+                return baseInfo;
+            }
+
+            return (
+                derivation.name +
+                ' ' +
+                derivation.emoji +
+                ' [' +
+                (derivation.index + 1).toString() +
+                ']'
+            );
         case 'ton-only':
         case 'mnemonic':
             const walletVersion = account.getTonWallet(walletId)?.version;
             if (walletVersion === undefined) {
-                return '';
+                return baseInfo;
             }
 
-            return walletVersionText(walletVersion);
+            return baseInfo + ' ' + walletVersionText(walletVersion);
         case 'keystone':
-            return '';
+            return baseInfo;
     }
 
     assertUnreachable(account);

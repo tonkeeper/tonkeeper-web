@@ -9,7 +9,8 @@ import {
     useCheckIfMnemonicIsMAM,
     useCreateAccountMAM,
     useCreateAccountMnemonic,
-    useMutateRenameAccount
+    useMutateRenameAccount,
+    useMutateRenameAccountDerivations
 } from '../../state/wallet';
 import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
 import {
@@ -42,8 +43,10 @@ const Import = () => {
 
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
     const [notificationsSubscribePagePassed, setNotificationsSubscribePagePassed] = useState(false);
-    const { mutateAsync: renameAccount, isLoading: renameLoading } =
+    const { mutateAsync: renameAccount, isLoading: renameAccountLoading } =
         useMutateRenameAccount<AccountTonMnemonic>();
+    const { mutateAsync: renameDerivations, isLoading: renameDerivationsLoading } =
+        useMutateRenameAccountDerivations();
 
     const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
         useCreateAccountMnemonic();
@@ -91,6 +94,27 @@ const Import = () => {
         setMnemonic(m);
     };
 
+    const onRename = async (form: { name: string; emoji: string }) => {
+        let newAcc: AccountTonMnemonic | AccountMAM = await renameAccount({
+            id: createdAccount!.id,
+            ...form
+        });
+
+        if (createdAccount!.type === 'mam') {
+            const derivationIndexes = (createdAccount as AccountMAM).allAvailableDerivations.map(
+                d => d.index
+            );
+            newAcc = await renameDerivations({
+                id: createdAccount!.id,
+                derivationIndexes,
+                ...form
+            });
+        }
+
+        setEditNamePagePassed(true);
+        setCreatedAccount(newAcc);
+    };
+
     if (!mnemonic) {
         return (
             <ImportWords
@@ -136,17 +160,9 @@ const Import = () => {
         return (
             <UpdateWalletName
                 name={createdAccount.name}
-                submitHandler={val => {
-                    renameAccount({
-                        id: createdAccount.id,
-                        ...val
-                    }).then(newAcc => {
-                        setEditNamePagePassed(true);
-                        setCreatedAccount(newAcc);
-                    });
-                }}
+                submitHandler={onRename}
                 walletEmoji={createdAccount.emoji}
-                isLoading={renameLoading}
+                isLoading={renameAccountLoading || renameDerivationsLoading}
             />
         );
     }

@@ -594,13 +594,30 @@ export const useMutateRenameAccount = <T extends Account>() => {
 };
 
 export const useMutateRenameAccountDerivation = <T extends AccountMAM>() => {
+    const { mutateAsync } = useMutateRenameAccountDerivations<T>();
+
+    return useMutation<
+        T,
+        Error,
+        { id: AccountId; derivationIndex: number; name?: string; emoji?: string }
+    >(form => {
+        return mutateAsync({
+            name: form.name,
+            emoji: form.emoji,
+            id: form.id,
+            derivationIndexes: [form.derivationIndex]
+        });
+    });
+};
+
+export const useMutateRenameAccountDerivations = <T extends AccountMAM>() => {
     const client = useQueryClient();
     const storage = useAccountsStorage();
 
     return useMutation<
         T,
         Error,
-        { id: AccountId; derivationIndex: number; name?: string; emoji?: string }
+        { id: AccountId; derivationIndexes: number[]; name?: string; emoji?: string }
     >(async form => {
         if (form.name !== undefined && form.name.length <= 0) {
             throw new Error('Missing name');
@@ -611,23 +628,24 @@ export const useMutateRenameAccountDerivation = <T extends AccountMAM>() => {
             throw new Error('Account not found');
         }
 
-        const derivation = account.allAvailableDerivations.find(
-            d => d.index === form.derivationIndex
+        const derivations = account.allAvailableDerivations.filter(d =>
+            form.derivationIndexes.includes(d.index)
         )!;
 
-        if (!derivation) {
+        if (!derivations.length) {
             throw new Error('Derivation not found');
         }
 
-        if (form.emoji) {
-            derivation.emoji = form.emoji;
-        }
+        derivations.forEach(derivation => {
+            if (form.emoji) {
+                derivation.emoji = form.emoji;
+            }
+            if (form.name) {
+                derivation.name = form.name;
+            }
 
-        if (form.name) {
-            derivation.name = form.name;
-        }
-
-        account.updateDerivation(derivation);
+            account.updateDerivation(derivation);
+        });
 
         await storage.updateAccountInState(account);
 

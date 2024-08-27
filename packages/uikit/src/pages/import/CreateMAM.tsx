@@ -12,8 +12,12 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
-import { Account } from '@tonkeeper/core/dist/entries/account';
-import { useCreateAccountMAM, useMutateRenameAccount } from '../../state/wallet';
+import { Account, AccountMAM } from '@tonkeeper/core/dist/entries/account';
+import {
+    useCreateAccountMAM,
+    useMutateRenameAccount,
+    useMutateRenameAccountDerivations
+} from '../../state/wallet';
 import { TonKeychainRoot } from '@ton-keychain/core';
 
 const Create = () => {
@@ -21,7 +25,10 @@ const Create = () => {
     const { t } = useTranslation();
     const { mutateAsync: createWalletsAsync, isLoading: isCreateWalletLoading } =
         useCreateAccountMAM();
-    const { mutateAsync: renameWallet, isLoading: renameLoading } = useMutateRenameAccount();
+    const { mutateAsync: renameAccount, isLoading: renameAccountLoading } =
+        useMutateRenameAccount();
+    const { mutateAsync: renameDerivations, isLoading: renameDerivationsLoading } =
+        useMutateRenameAccountDerivations();
 
     const [mnemonic, setMnemonic] = useState<string[] | undefined>();
     const [createdAccount, setCreatedAccount] = useState<Account | undefined>(undefined);
@@ -31,6 +38,24 @@ const Create = () => {
     const [wordsPagePassed, setWordsPagePassed] = useState(false);
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
     const [notificationsSubscribePagePassed, setPassNotification] = useState(false);
+
+    const onRename = async (form: { name: string; emoji: string }) => {
+        const derivationIndexes = (createdAccount as AccountMAM).allAvailableDerivations.map(
+            d => d.index
+        );
+        await renameAccount({
+            id: createdAccount!.id,
+            ...form
+        });
+        const newAcc = await renameDerivations({
+            id: createdAccount!.id,
+            derivationIndexes,
+            ...form
+        });
+
+        setEditNamePagePassed(true);
+        setCreatedAccount(newAcc);
+    };
 
     useEffect(() => {
         setTimeout(() => {
@@ -107,17 +132,9 @@ const Create = () => {
         return (
             <UpdateWalletName
                 name={createdAccount.name}
-                submitHandler={val => {
-                    renameWallet({
-                        id: createdAccount.id,
-                        ...val
-                    }).then(newAcc => {
-                        setEditNamePagePassed(true);
-                        setCreatedAccount(newAcc);
-                    });
-                }}
+                submitHandler={onRename}
                 walletEmoji={createdAccount.emoji}
-                isLoading={renameLoading}
+                isLoading={renameAccountLoading || renameDerivationsLoading}
             />
         );
     }
