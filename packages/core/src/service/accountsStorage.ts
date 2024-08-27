@@ -2,9 +2,9 @@ import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import {
     DeprecatedWalletState,
-    isStandardTonWallet,
     TonWalletStandard,
-    WalletId
+    WalletId,
+    isStandardTonWallet
 } from '../entries/wallet';
 
 import {
@@ -12,11 +12,11 @@ import {
     AccountId,
     AccountKeystone,
     AccountLedger,
-    AccountsState,
     AccountTonMnemonic,
     AccountTonOnly,
-    defaultAccountState,
-    bindAccountToClass
+    AccountsState,
+    bindAccountToClass,
+    defaultAccountState
 } from '../entries/account';
 
 import { DeprecatedAccountState } from '../entries/account';
@@ -156,6 +156,11 @@ export class AccountsStorage {
 
     removeAccountFromState = async (id: AccountId) => {
         return this.removeAccountsFromState([id]);
+    };
+
+    clearAccountFromState = async () => {
+        await this.setAccounts([]);
+        await this.setActiveAccountId(null);
     };
 
     async getNewAccountNameAndEmoji(accountId: AccountId) {
