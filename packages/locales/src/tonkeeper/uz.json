@@ -203,7 +203,11 @@
     "description" : {
       "empty" : "Tonkeeper orqali almashtiring, tokenlar va NFT yuboring.",
       "less_10" : "Sizda 10 ta tranzaksiyadan kamroq amalga oshirish uchun yetarli batareya quvvati mavjud.",
-      "other" : "{count} zaryad"
+      "other" : "{count} zaryad",
+      "other.few" : "Batareyangizda {count} zaryad bor",
+      "other.many" : "Batareyangizda {count} zaryad bor",
+      "other.one" : "Batareyangizda {count} zaryad bor",
+      "other.other" : "Batareyangizda {count} zaryad bor"
     },
     "max_input_amount" : "Maksimal kiritish miqdori {amount}",
     "ok" : "OK",
@@ -237,7 +241,10 @@
         "other" : "{count} zaryadlar",
         "small" : "Kichik paket"
       },
-      "title" : "'{{'cnt'}}' tranzaksiya uchun '{{'price'}}'"
+      "title" : "'{{'cnt'}}' tranzaksiya uchun '{{'price'}}'",
+      "title.large" : "Katta",
+      "title.medium" : "Oʻrtacha",
+      "title.small" : "Kichik"
     },
     "please_wait" : "Batareya bir necha daqiqada zaryadlanadi",
     "promocode" : {
@@ -451,6 +458,7 @@
     "network_fee" : "Tarmoq to‘lovi",
     "refund" : "Qaytarish",
     "title" : "Harakatni tasdiqlang",
+    "title_multiwallets" : "%{walletName} uchun amal",
     "total_risk" : "Jami: {totalAmount}",
     "to_your_address" : "Manzilingizga",
     "transaction_type" : {
@@ -595,6 +603,7 @@
   "intro_item3_caption" : "-",
   "intro_item3_title" : "-",
   "intro_title" : "Xush kelibsiz",
+  "it_expires_on" : "Uning muddati {0, number}ate% da tugaydi",
   "jetton_buy_tether" : "USD₮ сотиб олиш",
   "jetton_id" : "Token ID: {jettonAddress}",
   "jetton_id_copied" : "Jeton ID ko‘chirildi",
@@ -856,6 +865,11 @@
       "title" : "Tashqi havolani ochmoqchi ekaningizga ishonchingiz komilmi?"
     }
   },
+  "pro_subscription_is_active" : "Pro obunasi faol.",
+  "pro_trial_is_active" : "Pro sinovi faol.",
+  "purchases" : {
+    "screen_title" : "Xaridlar"
+  },
   "receive_address_title" : "Yoki hamyon manzilidan foydalaning",
   "receive_copy" : "Nusxa olish",
   "receiveModal" : {
@@ -917,6 +931,7 @@
   "security_title" : "Xavfsizlik",
   "security_use_biometry_switch" : "Foydalanish {biometryType}",
   "security_use_biometry_tip" : "Hamyoningizni har doim parol bilan ochishingiz mumkin.",
+  "select_wallet_for_authorization" : "Avtorizatsiya uchun hamyonni tanlang",
   "send_address_placeholder" : "Manzil yoki ism",
   "send_all_warning_title" : "Все балансингизни юборишни истаясизми?",
   "send_build_tx_error" : "Transaksiyangiz muvaffaqiyatsiz bo'ldi",
@@ -1001,6 +1016,9 @@
   "settings_bank_card" : "Bank kartasi",
   "settings_contact_support" : "Biz bilan bog'laning",
   "settings_delete_account" : "Hisobni o'chirish",
+  "settings_delete_alert_button" : "Hisob va maʼlumotlarni oʻchirish",
+  "settings_delete_alert_caption" : "Bu amal sizning hisobingizni va barcha ma'lumotlarni ushbu ilovadan o'chiradi.",
+  "settings_delete_alert_title" : "Haqiqatan ham hisobingizni oʻchirib tashlamoqchimisiz?",
   "settings_delete_signer_account" : "Hisobni oʻchirishmi?",
   "settings_delete_watch_account" : "Ko‘rish hisobini oʻchirish?",
   "settings_delete_watch_account_button" : "O'chirish",
