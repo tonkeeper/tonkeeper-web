@@ -107,9 +107,6 @@ export function toStringDashboardCell(cell: DashboardCell): string {
 
 function accountAndWalletToString(account: Account, walletId: WalletId): string {
     const baseInfo = account.name + ' ' + account.emoji;
-    if (account.allTonWallets.length === 1) {
-        return baseInfo;
-    }
 
     switch (account.type) {
         case 'watch-only':
@@ -141,6 +138,10 @@ function accountAndWalletToString(account: Account, walletId: WalletId): string 
             );
         case 'ton-only':
         case 'mnemonic':
+            if (account.allTonWallets.length === 1) {
+                return baseInfo;
+            }
+
             const walletVersion = account.getTonWallet(walletId)?.version;
             if (walletVersion === undefined) {
                 return baseInfo;
