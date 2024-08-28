@@ -38,7 +38,7 @@ export const useMarkNftAsSpam = () => {
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
     return useMutation<void, Error, NftWithCollectionId>(async nft => {
-        let config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, network);
+        let config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
 
         const address = nft.collection?.address || nft.address;
 
@@ -77,7 +77,7 @@ export const useMarkNftAsTrusted = () => {
     const { mutateAsync } = useMutateActiveTonWalletConfig();
     const network = useActiveTonNetwork();
     return useMutation<void, Error, NftWithCollectionId | string>(async nft => {
-        let config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, network);
+        let config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
 
         const address = typeof nft === 'string' ? nft : nft.collection?.address || nft.address;
 
@@ -98,7 +98,7 @@ export const useHideNft = () => {
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
     return useMutation<void, Error, NftWithCollectionId>(async nft => {
-        let config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, network);
+        let config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
 
         const address = nft.collection?.address || nft.address;
 
@@ -126,7 +126,7 @@ export const useMakeNftVisible = () => {
     const { mutateAsync } = useMutateActiveTonWalletConfig();
     const network = useActiveTonNetwork();
     return useMutation<void, Error, NftWithCollectionId | string>(async nft => {
-        let config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, network);
+        let config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
 
         const address = typeof nft === 'string' ? nft : nft.collection?.address || nft.address;
 

@@ -1,7 +1,11 @@
-import { MiniApp, retrieveLaunchParams } from '@tma.js/sdk';
+import { LaunchParams, MiniApp, retrieveLaunchParams } from '@tma.js/sdk';
 import { NotificationService } from '@tonkeeper/core/dist/AppSdk';
-import { isStandardTonWallet, TonContract, TonWalletStandard } from "@tonkeeper/core/dist/entries/wallet";
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
+import {
+    TonContract,
+    TonWalletStandard,
+    isStandardTonWallet
+} from '@tonkeeper/core/dist/entries/wallet';
 import {
     toTonProofItem,
     tonConnectProofPayload
@@ -18,7 +22,7 @@ const apiConfig = new Configuration({ basePath: 'https://twa-api.tonkeeper.com' 
 const twaApi = new DefaultApi(apiConfig);
 
 export class TwaNotification implements NotificationService {
-    constructor(private miniApp: MiniApp) {}
+    constructor(private miniApp: MiniApp, private launchParams: LaunchParams) {}
 
     get twaInitData() {
         const { initDataRaw } = retrieveLaunchParams();
@@ -37,12 +41,7 @@ export class TwaNotification implements NotificationService {
         const domain = 'https://twa.tonkeeper.com/';
         const { payload } = await twaApi.getTonConnectPayload();
         const timestamp = await getServerTime(api);
-        const proofPayload = tonConnectProofPayload(
-            timestamp,
-            domain,
-            wallet.rawAddress,
-            payload
-        );
+        const proofPayload = tonConnectProofPayload(timestamp, domain, wallet.rawAddress, payload);
         const stateInit = walletStateInitFromState(wallet);
         return await toTonProofItem(signTonConnect, proofPayload, true, stateInit);
     };
@@ -53,7 +52,9 @@ export class TwaNotification implements NotificationService {
         signTonConnect: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
     ) => {
         try {
-            await this.miniApp.requestWriteAccess();
+            if (!this.launchParams.initData?.user?.allowsWriteToPm) {
+                await this.miniApp.requestWriteAccess();
+            }
         } catch (e) {
             console.error(e);
         }
