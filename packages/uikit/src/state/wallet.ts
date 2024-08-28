@@ -764,13 +764,30 @@ export const useTonWalletsBalances = (addresses: string[]) => {
     return useQuery(
         [QueryKey.walletVersions, addresses, network, fiat],
         async () => {
-            const response = await new AccountsApi(api.tonApiV2).getAccounts({
-                getAccountsRequest: { accountIds: addresses }
-            });
+            const groups = addresses.reduce((acc, item) => {
+                const currGroup = acc[acc.length - 1];
+                if (currGroup && currGroup.length < 100) {
+                    currGroup.push(item);
+                } else {
+                    acc.push([item]);
+                }
+
+                return acc;
+            }, [] as string[][]);
+            const accountsApi = new AccountsApi(api.tonApiV2);
+            const accounts = (
+                await Promise.all(
+                    groups.map(accountIds =>
+                        accountsApi.getAccounts({
+                            getAccountsRequest: { accountIds }
+                        })
+                    )
+                )
+            ).flatMap(r => r.accounts);
 
             return addresses.map((address, index) => ({
                 address,
-                tonBalance: response.accounts[index].balance
+                tonBalance: accounts[index].balance
             }));
         },
         {
