@@ -6,7 +6,7 @@ import { APIConfig } from '../entries/apis';
 import { BLOCKCHAIN_NAME } from '../entries/crypto';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../entries/crypto/asset/constants';
-import { DashboardCell, DashboardColumn } from '../entries/dashboard';
+import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import { ProState, ProStateWallet, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
@@ -269,7 +269,7 @@ export async function getDashboardData(
         columns: string[];
     },
     options?: { lang?: string; currency?: FiatCurrencies }
-): Promise<DashboardCell[][]> {
+): Promise<DashboardRow[]> {
     let lang = Lang.EN;
     if (Object.values(Lang).includes(options?.lang as Lang)) {
         lang = options?.lang as Lang;
@@ -285,7 +285,10 @@ export async function getDashboardData(
     }
 
     const result = await ProServiceService.proServiceDashboardData(lang, currency, query);
-    return result.items.map(row => row.map(mapDtoCellToCell));
+    return result.items.map((row, index) => ({
+        id: query.accounts[index],
+        cells: row.map(mapDtoCellToCell)
+    }));
 }
 
 type DTOCell = Flatten<

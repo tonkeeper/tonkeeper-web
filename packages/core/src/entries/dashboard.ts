@@ -29,6 +29,16 @@ export type DashboardColumn = {
     onlyPro: boolean;
 };
 
+export type DashboardRow = {
+    id: string;
+    cells: DashboardCell[];
+};
+
+export type DashboardRowNullable = {
+    id: string;
+    cells: (DashboardCell | null)[];
+};
+
 export type DashboardCell =
     | DashboardCellAccountName
     | DashboardCellString

@@ -3,7 +3,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { Body2 } from '../Text';
 import { useDashboardColumnsAsForm } from '../../state/dashboard/useDashboardColumns';
 import { useDashboardData } from '../../state/dashboard/useDashboardData';
-import { DashboardCellAddress, DashboardColumnType } from '@tonkeeper/core/dist/entries/dashboard';
+import { DashboardColumnType } from '@tonkeeper/core/dist/entries/dashboard';
 import { Skeleton } from '../shared/Skeleton';
 import { DashboardCell } from './columns/DashboardCell';
 import { useAccountsState } from '../../state/wallet';
@@ -203,17 +203,11 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
             </thead>
             <tbody>
                 {dashboardData
-                    ? dashboardData.map((dataRow, index) => (
-                          <TrStyled key={index.toString()}>
-                              {dataRow.map((cell, i) => (
+                    ? dashboardData.map(dataRow => (
+                          <TrStyled key={dataRow.id}>
+                              {dataRow.cells.map(cell => (
                                   <Td
-                                      key={
-                                          (
-                                              dataRow.find(
-                                                  c => c.type === 'address'
-                                              ) as DashboardCellAddress
-                                          )?.raw || i.toString()
-                                      }
+                                      key={dataRow.id + '_' + cell.columnId}
                                       textAlign={isNumericColumn(cell.type) ? 'right' : undefined}
                                   >
                                       <DashboardCell {...cell} />
