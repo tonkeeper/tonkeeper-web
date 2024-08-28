@@ -1,0 +1,20 @@
+{
+    "auctionBidMessage": "{{.NftName}} के लिए {{.Amount}} की बोली लगा रहे हैं",
+    "contractDeployAction": "{{ if .Interfaces }} कॉन्ट्रैक्ट, इंटरफेस {{.Interfaces}}{{ end }} के साथ तैनात कर रहे हैं ",
+    "depositStakeAction": "स्टेकिंग पूल में {{.Value}} जमा करें",
+    "electionsDepositStakeAction": "स्टेक के लिए {{.Amount}} जमा कर रहे हैं",
+    "electionsRecoverStakeAction": "{{.Amount}} स्टेक पुनः प्राप्त करें",
+    "helloWorld": "नमस्ते दुनिया!",
+    "jettonBurnAction": "{{.Value}} {{.JettonName}} को जला रहे हैं",
+    "jettonMintAction": "{{.Value}} {{.JettonName}} को मिंट कर रहे हैं",
+    "jettonSwapAction": "{{.AmountIn}} {{.JettonIn}} के बदले {{.AmountOut}} {{.JettonOut}} को स्वैप कर रहे हैं",
+    "jettonTransferAction": "{{.Value}} {{.JettonName}} को ट्रांसफर कर रहे हैं",
+    "nftPurchaseAction": "{{.Name}} की खरीदो",
+    "nftTransferAction": "1 NFT ट्रांसफर कर रहे हैं",
+    "poolImplementationDescription": "न्यूनतम जमा {{.Deposit}} टॉन",
+    "smartContractExecMessage": "स्मार्ट कॉन्ट्रैक्ट का निष्पादन",
+    "subscriptionAction": "सदस्यता के लिए {{.Value}} का भुगतान कर रहे हैं",
+    "tonTransferAction": "{{.Value}} ट्रांसफर कर रहे हैं",
+    "withdrawStakeAction": "स्टेकिंग पूल से {{.Value}} निकालें",
+    "withdrawStakeRequestAction": "स्टेकिंग पूल से {{.Value}} निकालने का अनुरोध करे"
+  }
