@@ -52,8 +52,11 @@ import {
     RecipientTwaHeaderBlock
 } from './SendNotificationHeader';
 
-const PageWrapper = styled(Wrapper)`
-    padding: 0 16px;
+const Body = styled.div`
+    padding: 0 16px 16px;
+    box-sizing: border-box;
+    height: 100vh;
+    overflow: auto;
 `;
 
 const SendContent: FC<{
@@ -225,7 +228,7 @@ const SendContent: FC<{
     }[view];
 
     return (
-        <PageWrapper standalone={false} extension={false}>
+        <Wrapper standalone={false} extension={true}>
             <HideTwaMainButton />
             <HideTwaBackButton />
             <TransitionGroup childFactory={childFactoryCreator(right)}>
@@ -290,7 +293,7 @@ const SendContent: FC<{
                     </div>
                 </CSSTransition>
             </TransitionGroup>
-        </PageWrapper>
+        </Wrapper>
     );
 };
 
@@ -340,12 +343,14 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
 
     if (open) {
         return (
-            <SendContent
-                onClose={onClose}
-                chain={chain}
-                initAmountState={tonTransfer?.initAmountState}
-                initRecipient={tonTransfer?.initRecipient}
-            />
+            <Body>
+                <SendContent
+                    onClose={onClose}
+                    chain={chain}
+                    initAmountState={tonTransfer?.initAmountState}
+                    initRecipient={tonTransfer?.initRecipient}
+                />
+            </Body>
         );
     } else {
         return <>{children}</>;

@@ -41,7 +41,7 @@ jobs:
                   VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
                   VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
                   VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
-                  VITE_APP_LOCALES: en,zh_CN,id,ru,it,es,uk,tr,bg,uz
+                  VITE_APP_LOCALES: en,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
               with:
                   cmd: build:web
 

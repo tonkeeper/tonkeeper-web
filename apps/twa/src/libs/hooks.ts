@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { Account } from "@tonkeeper/core/dist/entries/account";
-import { Network } from "@tonkeeper/core/dist/entries/network";
-import { Analytics, AnalyticsGroup, toWalletType } from "@tonkeeper/uikit/dist/hooks/analytics";
 import { Viewport } from '@tma.js/sdk';
+import { Account } from '@tonkeeper/core/dist/entries/account';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
 import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
@@ -33,6 +33,8 @@ export const useTwaAppViewport = (setAppHeight: boolean, sdk: TwaAppSdk) => {
 
             if (setAppHeight) {
                 doc.style.setProperty('--app-height', `${value}px`);
+            } else {
+                doc.style.setProperty('--app-height', `100vh`);
             }
         };
 
@@ -67,21 +69,26 @@ export const useTwaAppViewport = (setAppHeight: boolean, sdk: TwaAppSdk) => {
     }, [sdk]);
 };
 
-export const useAnalytics = (activeAccount?: Account, accounts?: Account[], network?: Network, version?: string) => {
+export const useAnalytics = (
+    activeAccount?: Account,
+    accounts?: Account[],
+    network?: Network,
+    version?: string
+) => {
     return useQuery<Analytics>(
         [QueryKey.analytics, activeAccount, accounts, network],
         async () => {
-          const tracker = new AnalyticsGroup(
-            new AptabaseWeb(
-              import.meta.env.VITE_APP_APTABASE_HOST,
-              import.meta.env.VITE_APP_APTABASE,
-              version
-            ),
-            new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID)
-          );
+            const tracker = new AnalyticsGroup(
+                new AptabaseWeb(
+                    import.meta.env.VITE_APP_APTABASE_HOST,
+                    import.meta.env.VITE_APP_APTABASE,
+                    version
+                ),
+                new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID)
+            );
 
             tracker.init({
-                application:'Twa',
+                application: 'Twa',
                 walletType: toWalletType(activeAccount?.activeTonWallet),
                 activeAccount: activeAccount!,
                 accounts: accounts!,
@@ -90,6 +97,6 @@ export const useAnalytics = (activeAccount?: Account, accounts?: Account[], netw
 
             return tracker;
         },
-      { enabled: accounts != null && activeAccount !== undefined }
+        { enabled: accounts != null && activeAccount !== undefined }
     );
 };

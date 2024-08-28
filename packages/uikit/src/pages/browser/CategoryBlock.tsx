@@ -60,12 +60,13 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
     category,
     className
 }) => {
+    const { browserLength } = useAppContext();
     const [containerRef, { width: w }] = useElementSize();
     const width = w - 36;
     const groups = useMemo(
         () =>
             category.apps.reduce((acc, app, index) => {
-                if (index % 3 === 0) {
+                if (index % (browserLength ?? 3) === 0) {
                     acc.push([app]);
                 } else {
                     acc[acc.length - 1].push(app);

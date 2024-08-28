@@ -1,0 +1,20 @@
+{
+  "auctionBidMessage" : "{{.NftName}} uchun {{.Amount}} tikildi",
+  "contractDeployAction" : "Shartnomani {{ if .Interfaces }} interfeyslari bilan {{.Interfaces}}{{ end }} joylashtirish",
+  "depositStakeAction" : "Staking {{.Value}}",
+  "electionsDepositStakeAction" : "Stakingga {{.Amount}} depozit qilish",
+  "electionsRecoverStakeAction" : "Stakingdan {{.Amount}} qaytarib olish",
+  "helloWorld" : "Salom Dunyo!",
+  "jettonBurnAction" : "{{.Value}} {{.JettonName}} yoqib yuborish",
+  "jettonMintAction" : "{{.Value}} {{.JettonName}} zarb qilish",
+  "jettonSwapAction" : "{{.AmountIn}} {{.JettonIn}} ni {{.AmountOut}} {{.JettonOut}} ga almashtirish",
+  "jettonTransferAction" : "{{.Value}} {{.JettonName}} jo'natish",
+  "nftPurchaseAction" : "NFT sotib olish {{.Name}}",
+  "nftTransferAction" : "1 NFT jo'natish",
+  "poolImplementationDescription" : "Minimal depozit {{.Depozit}} TON",
+  "smartContractExecMessage" : "Smart kontraktni amalga oshirish",
+  "subscriptionAction" : "Obuna uchun {{.Value}} to'lash",
+  "tonTransferAction" : "{{.Value}} jo'natish",
+  "withdrawStakeAction" : "Stakingdan {{.Value}} yechib olish",
+  "withdrawStakeRequestAction" : "{{.Value}} ni stakingdan chiqarish uchun so'rov"
+}
