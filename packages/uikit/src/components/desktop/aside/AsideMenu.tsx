@@ -1,3 +1,11 @@
+import { Account } from '@tonkeeper/core/dist/entries/account';
+import {
+    WalletId,
+    sortDerivationsByIndex,
+    sortWalletsByVersion
+} from '@tonkeeper/core/dist/entries/wallet';
+import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { FC, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -5,38 +13,31 @@ import styled from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
 import { useTranslation } from '../../../hooks/translation';
+import { useIsHovered } from '../../../hooks/useIsHovered';
 import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
 import {
     useAccountsState,
+    useActiveAccount,
     useActiveTonNetwork,
-    useMutateActiveTonWallet,
-    useActiveAccount
+    useMutateActiveTonWallet
 } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { GearIconEmpty, GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
+import { ScrollContainer } from '../../ScrollContainer';
 import { Label2 } from '../../Text';
-import { ImportNotification } from '../../create/ImportNotification';
+import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../account/AccountBadge';
+import { IconButtonTransparentBackground } from '../../fields/IconButton';
+import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
+import { useWalletVersionSettingsNotification } from '../../modals/WalletVersionSettingsNotification';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { AsideHeader } from './AsideHeader';
-import { SubscriptionInfo } from './SubscriptionInfo';
-import { Account } from '@tonkeeper/core/dist/entries/account';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import {
-    sortDerivationsByIndex,
-    sortWalletsByVersion,
-    WalletId
-} from '@tonkeeper/core/dist/entries/wallet';
-import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
-import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import { useWalletVersionSettingsNotification } from '../../modals/WalletVersionSettingsNotification';
-import { useIsHovered } from '../../../hooks/useIsHovered';
-import { ScrollContainer } from '../../ScrollContainer';
-import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../account/AccountBadge';
-import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
+import { SubscriptionInfoBlock } from './SubscriptionInfoBlock';
+import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
+import { useAddWalletNotification } from '../../modals/AddWalletNotificationControlled';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -101,11 +102,6 @@ const AsideMenuBottom = styled.div`
     padding-bottom: 0.5rem;
 `;
 
-const SubscriptionInfoStyled = styled(SubscriptionInfo)`
-    margin-top: 0.5rem;
-    padding: 6px 16px 6px 8px;
-`;
-
 const AsideMenuSubItem = styled(AsideMenuItem)`
     padding-left: 36px;
 `;
@@ -138,6 +134,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
 }) => {
     const { onOpen: openWalletVersionSettings } = useWalletVersionSettingsNotification();
     const { onOpen: openLedgerIndexesSettings } = useLedgerIndexesSettingsNotification();
+    const { onOpen: openMAMIndexesSettings } = useMAMIndexesSettingsNotification();
     const network = useActiveTonNetwork();
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
     const navigate = useNavigate();
@@ -169,7 +166,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
         return (
             <>
                 <AsideMenuItem
-                    isSelected={false}
+                    isSelected={isSelected && sortedWallets.length === 1}
                     onClick={() => onClickWallet(sortedWallets[0].id)}
                     ref={ref}
                 >
@@ -210,7 +207,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
         return (
             <>
                 <AsideMenuItem
-                    isSelected={false}
+                    isSelected={isSelected && sortedDerivations.length === 1}
                     onClick={() => onClickWallet(sortedDerivations[0].activeTonWalletId)}
                     ref={ref}
                 >
@@ -266,7 +263,7 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
         return (
             <>
                 <AsideMenuItem
-                    isSelected={false}
+                    isSelected={isSelected && sortedWallets.length === 1}
                     onClick={() => onClickWallet(account.activeTonWallet.id)}
                     ref={ref}
                 >
@@ -319,12 +316,80 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
         );
     }
 
+    if (account.type === 'watch-only') {
+        return (
+            <AsideMenuItem
+                isSelected={isSelected}
+                onClick={() => onClickWallet(account.activeTonWallet.id)}
+                ref={ref}
+            >
+                {shouldShowIcon && (
+                    <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
+                )}
+                <Label2>{account.name}</Label2>
+                <AccountBadgeStyled accountType={account.type} size="s" />
+            </AsideMenuItem>
+        );
+    }
+
+    if (account.type === 'mam') {
+        const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
+        return (
+            <>
+                <AsideMenuItem
+                    isSelected={false}
+                    onClick={() => onClickWallet(sortedDerivations[0].activeTonWalletId)}
+                    ref={ref}
+                >
+                    {shouldShowIcon && (
+                        <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
+                    )}
+                    <Label2>{account.name}</Label2>
+                    <AccountBadgeStyled accountType={account.type} size="s" />
+
+                    <GearIconButtonStyled
+                        onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openMAMIndexesSettings({ accountId: account.id });
+                        }}
+                        isShown={isHovered}
+                    >
+                        <GearIconEmpty />
+                    </GearIconButtonStyled>
+                </AsideMenuItem>
+                {sortedDerivations.map(derivation => {
+                    return (
+                        <AsideMenuSubItem
+                            key={derivation.index}
+                            isSelected={
+                                isSelected && account.activeDerivationIndex === derivation.index
+                            }
+                            onClick={() => onClickWallet(derivation.activeTonWalletId)}
+                        >
+                            {shouldShowIcon && (
+                                <WalletEmoji
+                                    emojiSize="16px"
+                                    containerSize="16px"
+                                    emoji={derivation.emoji}
+                                />
+                            )}
+                            <Label2>{derivation.name}</Label2>
+                            <WalletIndexBadgeStyled size="s">
+                                {'#' + (derivation.index + 1)}
+                            </WalletIndexBadgeStyled>
+                        </AsideMenuSubItem>
+                    );
+                })}
+            </>
+        );
+    }
     assertUnreachable(account);
 };
 
 const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
-    const [isOpenImport, setIsOpenImport] = useState(false);
+    const { onOpen: addWallet } = useAddWalletNotification();
     const { proFeatures } = useAppContext();
     const accounts = useAccountsState();
     const activeAccount = useActiveAccount();
@@ -418,7 +483,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         </IconWrapper>
                         <Label2>{t('aside_discover')}</Label2>
                     </AsideMenuItem>
-                    <AsideMenuItem isSelected={false} onClick={() => setIsOpenImport(true)}>
+                    <AsideMenuItem isSelected={false} onClick={addWallet}>
                         <IconWrapper>
                             <PlusIcon />
                         </IconWrapper>
@@ -434,10 +499,9 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         <Label2>{t('aside_settings')}</Label2>
                     </AsideMenuItem>
                     <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load Pro State')}>
-                        <SubscriptionInfoStyled />
+                        <SubscriptionInfoBlock />
                     </ErrorBoundary>
                 </AsideMenuBottom>
-                <ImportNotification isOpen={isOpenImport} setOpen={setIsOpenImport} />
             </AsideContentContainer>
             <AsideResizeHandle
                 onMouseDown={() => {

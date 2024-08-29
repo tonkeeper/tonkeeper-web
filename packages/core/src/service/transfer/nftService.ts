@@ -16,7 +16,7 @@ import {
     getWalletBalance,
     signEstimateMessage
 } from './common';
-import { Account } from '../../entries/account';
+import { Account, AccountControllable } from "../../entries/account";
 
 const initNftTransferAmount = toNano('1');
 export const nftTransferForwardAmount = BigInt('1');
@@ -111,17 +111,15 @@ export const estimateNftTransfer = async (
         signEstimateMessage
     );
 
-    const event = await new EmulationApi(api.tonApiV2).emulateMessageToAccountEvent({
-        ignoreSignatureCheck: true,
-        accountId: wallet.address,
-        decodeMessageRequest: { boc: cell.toString('base64') }
+    const result = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+        emulateMessageToWalletRequest: { boc: cell.toString('base64') }
     });
-    return { event };
+    return result;
 };
 
 export const sendNftTransfer = async (
     api: APIConfig,
-    account: Account,
+    account: AccountControllable,
     recipient: TonRecipientData,
     nftItem: NftItem,
     fee: TransferEstimationEvent,
@@ -184,7 +182,7 @@ export const sendNftTransfer = async (
 
 export const sendNftRenew = async (options: {
     api: APIConfig;
-    account: Account;
+    account: AccountControllable;
     nftAddress: string;
     fee: TransferEstimationEvent;
     signer: CellSigner;
@@ -239,7 +237,7 @@ export const estimateNftRenew = async (options: {
 
 export const sendNftLink = async (options: {
     api: APIConfig;
-    account: Account;
+    account: AccountControllable;
     nftAddress: string;
     linkToAddress: string;
     fee: TransferEstimationEvent;

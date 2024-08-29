@@ -33,8 +33,11 @@ import {
 import { HideTwaBackButton, RecipientTwaHeaderBlock } from '../transfer/SendNotificationHeader';
 import { NftIndexView } from './NftIndexView';
 
-const PageWrapper = styled(Wrapper)`
-    padding: 0 12px 10px;
+const Body = styled.div`
+    padding: 0 16px 16px;
+    box-sizing: border-box;
+    height: 100vh;
+    overflow: auto;
 `;
 
 const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handleClose }) => {
@@ -126,7 +129,7 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
     }[view];
 
     return (
-        <PageWrapper standalone={false} extension={false}>
+        <Wrapper standalone={false} extension={true}>
             <HideTwaMainButton />
             <HideTwaBackButton />
             <TransitionGroup childFactory={childFactoryCreator(right)}>
@@ -163,18 +166,16 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
                                 onClose={handleClose}
                                 recipient={recipient!}
                                 nftItem={nftItem}
-                                MainButton={() => (
+                                mainButton={
                                     <ConfirmViewButtons MainButton={ConfirmTwaMainButton} />
-                                )}
-                                HeaderBlock={() => (
-                                    <RecipientTwaHeaderBlock onClose={backToRecipient} />
-                                )}
+                                }
+                                headerBlock={<RecipientTwaHeaderBlock onClose={backToRecipient} />}
                             />
                         )}
                     </div>
                 </CSSTransition>
             </TransitionGroup>
-        </PageWrapper>
+        </Wrapper>
     );
 };
 
@@ -198,7 +199,11 @@ export const TwaNftNotification: FC<PropsWithChildren> = ({ children }) => {
     }, [sdk, setNft]);
 
     if (nftItem) {
-        return <Content nftItem={nftItem} handleClose={handleClose} />;
+        return (
+            <Body>
+                <Content nftItem={nftItem} handleClose={handleClose} />
+            </Body>
+        );
     } else {
         return <>{children}</>;
     }

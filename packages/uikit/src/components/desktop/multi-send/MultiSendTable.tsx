@@ -51,7 +51,7 @@ import { ImportListNotification } from './import-list/ImportListNotification';
 import { getWillBeMultiSendValue } from './utils';
 import { removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
-import { useActiveWallet } from '../../../state/wallet';
+import { useActiveStandardTonWallet } from '../../../state/wallet';
 
 const FormHeadingWrapper = styled.div`
     display: flex;
@@ -319,7 +319,7 @@ const MultiSendAddMore: FC<{
 }> = ({ onAdd, fieldsNumber }) => {
     const { t } = useTranslation();
 
-    const wallet = useActiveWallet();
+    const wallet = useActiveStandardTonWallet();
 
     if (fieldsNumber < MAX_ALLOWED_WALLET_MSGS[wallet.version]) {
         return (
@@ -483,7 +483,7 @@ const MultiSendFooter: FC<{
 
     const { formState: formValidationState } = useAsyncValidationState();
 
-    const wallet = useActiveWallet();
+    const wallet = useActiveStandardTonWallet();
 
     const maxMsgsNumberExceeded = watch('rows').length > MAX_ALLOWED_WALLET_MSGS[wallet.version];
 

@@ -28,7 +28,7 @@ export type PoolImplementationType = typeof PoolImplementationType[keyof typeof 
 export function instanceOfPoolImplementationType(value: any): boolean {
     for (const key in PoolImplementationType) {
         if (Object.prototype.hasOwnProperty.call(PoolImplementationType, key)) {
-            if ((PoolImplementationType as Record<string, PoolImplementationType>)[key] === value) {
+            if (PoolImplementationType[key as keyof typeof PoolImplementationType] === value) {
                 return true;
             }
         }

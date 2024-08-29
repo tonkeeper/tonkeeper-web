@@ -12,7 +12,6 @@ import {
     LockIcon,
     PlaceIcon,
     SlidersIcon,
-    TelegramIcon,
     TonkeeperSkeletIcon
 } from '../../Icon';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -184,27 +183,6 @@ export const PreferencesAsideMenu = () => {
             </AsideMenuItemsBlock>
 
             <AsideMenuItemsBlock>
-                <AsideMenuItemStyled
-                    onClick={() => config.faq_url && sdk.openPage(config.faq_url)}
-                    isSelected={false}
-                >
-                    <GlobeIcon />
-                    <Label2>{t('preferences_aside_faq')}</Label2>
-                </AsideMenuItemStyled>
-                <AsideMenuItemStyled
-                    onClick={() => config.directSupportUrl && sdk.openPage(config.directSupportUrl)}
-                    isSelected={false}
-                >
-                    <TelegramIcon />
-                    <Label2>{t('settings_support')}</Label2>
-                </AsideMenuItemStyled>
-                <AsideMenuItemStyled
-                    onClick={() => config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)}
-                    isSelected={false}
-                >
-                    <TelegramIcon />
-                    <Label2>{t('settings_news')}</Label2>
-                </AsideMenuItemStyled>
                 <AsideMenuItemStyled
                     onClick={() => config.supportLink && sdk.openPage(config.supportLink)}
                     isSelected={false}

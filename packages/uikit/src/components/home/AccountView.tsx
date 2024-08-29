@@ -21,7 +21,12 @@ import { Body1, H3 } from '../Text';
 import { Button } from '../fields/Button';
 import { Wrapper, childFactoryCreator, duration } from '../transfer/common';
 import { QrWrapper } from './qrCodeView';
-import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
+import {
+    useActiveTonNetwork,
+    useActiveWallet,
+    useIsActiveWalletWatchOnly
+} from '../../state/wallet';
+import { AccountBadge } from '../account/AccountBadge';
 
 const CopyBlock = styled.div`
     display: flex;
@@ -98,6 +103,11 @@ const Description = styled(Body1)`
     color: ${props => props.theme.textSecondary};
 `;
 
+const WatchOnlyBadge = styled(AccountBadge)`
+    width: fit-content;
+    margin: 0 auto 10px;
+`;
+
 /*const values = [
     { name: BLOCKCHAIN_NAME.TON, id: BLOCKCHAIN_NAME.TON },
     { name: 'TRC20', id: BLOCKCHAIN_NAME.TRON }
@@ -140,6 +150,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     const sdk = useAppSdk();
     const { extension } = useAppContext();
     const wallet = useActiveWallet();
+    const isWatchOnly = useIsActiveWalletWatchOnly();
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
 
@@ -154,6 +165,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                     sdk.copyToClipboard(address, t('address_copied'));
                 }}
             >
+                {isWatchOnly && <WatchOnlyBadge accountType="watch-only" />}
                 <QrWrapper>
                     <QRCode
                         size={400}

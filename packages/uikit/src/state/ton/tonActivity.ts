@@ -1,8 +1,17 @@
 import { InfiniteData } from '@tanstack/react-query';
-import { AccountEvent, AccountEvents, Action } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountEvent, AccountEvents, Action, ActionTypeEnum } from '@tonkeeper/core/dist/tonApiV2';
+
+const TonActivities: ActionTypeEnum[] = [
+    'TonTransfer',
+    'DepositStake',
+    'WithdrawStake',
+    'WithdrawStakeRequest',
+    'SmartContractExec',
+    'DomainRenew'
+];
 
 export const seeIfTonTransfer = (action: Action) => {
-    if (action.type === 'TonTransfer') {
+    if (TonActivities.includes(action.type)) {
         return true;
     } else if (action.type === 'ContractDeploy') {
         if (action.contractDeploy?.interfaces?.includes('wallet')) {

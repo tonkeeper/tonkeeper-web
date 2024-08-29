@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { sha512_sync } from '@ton/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
 import {
     TonendpoinFiatButton,
     TonendpoinFiatItem,
@@ -159,7 +159,7 @@ const useShowDisclaimer = (title: string, kind: 'buy' | 'sell') => {
 const replacePlaceholders = (
     url: string,
     config: TonendpointConfig,
-    wallet: TonWalletStandard,
+    wallet: TonContract,
     fiat: FiatCurrencies,
     kind: 'buy' | 'sell'
 ) => {

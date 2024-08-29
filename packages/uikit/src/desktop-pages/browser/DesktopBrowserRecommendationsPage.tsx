@@ -21,6 +21,8 @@ const CategoryBlockStyled = styled(DesktopCategoryBlock)`
 
 const CategoriesWrapper = styled.div`
     padding-bottom: 0.5rem;
+    overflow: auto;
+    height: 100%;
 `;
 
 export const DesktopBrowserRecommendationsPage: FC = () => {

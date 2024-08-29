@@ -6,10 +6,10 @@ import { APIConfig } from '../entries/apis';
 import { BLOCKCHAIN_NAME } from '../entries/crypto';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../entries/crypto/asset/constants';
-import { DashboardCell, DashboardColumn } from '../entries/dashboard';
+import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import { ProState, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
+import { ProState, ProStateWallet, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { isStandardTonWallet, TonWalletStandard, WalletVersion } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
@@ -42,21 +42,14 @@ export const getBackupState = async (storage: IStorage) => {
     return backup ?? toEmptySubscription();
 };
 
-export const getProState = async (
-    storage: IStorage,
-    wallet: TonWalletStandard
-): Promise<ProState> => {
+export const getProState = async (storage: IStorage): Promise<ProState> => {
     try {
-        return await loadProState(storage, wallet);
+        return await loadProState(storage);
     } catch (e) {
         console.error(e);
         return {
             subscription: toEmptySubscription(),
-            hasWalletAuthCookie: false,
-            wallet: {
-                publicKey: wallet.publicKey,
-                rawAddress: wallet.rawAddress
-            }
+            authorizedWallet: null
         };
     }
 };
@@ -86,16 +79,10 @@ export const walletVersionFromProServiceDTO = (value: string) => {
     }
 };
 
-export const loadProState = async (
-    storage: IStorage,
-    fallbackWallet: TonWalletStandard
-): Promise<ProState> => {
+export const loadProState = async (storage: IStorage): Promise<ProState> => {
     const user = await ProServiceService.proServiceGetUserInfo();
 
-    let wallet = {
-        publicKey: fallbackWallet.publicKey,
-        rawAddress: fallbackWallet.rawAddress
-    };
+    let authorizedWallet: ProStateWallet | null = null;
     if (user.pub_key && user.version) {
         const wallets = (await accountsStorage(storage).getAccounts()).flatMap(
             a => a.allTonWallets
@@ -109,9 +96,16 @@ export const loadProState = async (
                     w.version === walletVersionFromProServiceDTO(user.version)
             );
         if (!actualWallet) {
-            throw new Error('Unknown wallet');
+            return {
+                authorizedWallet: null,
+                subscription: {
+                    isTrial: false,
+                    usedTrial: false,
+                    valid: false
+                }
+            };
         }
-        wallet = {
+        authorizedWallet = {
             publicKey: actualWallet.publicKey,
             rawAddress: actualWallet.rawAddress
         };
@@ -146,8 +140,7 @@ export const loadProState = async (
     }
     return {
         subscription,
-        hasWalletAuthCookie: !!user.pub_key,
-        wallet
+        authorizedWallet
     };
 };
 
@@ -283,7 +276,7 @@ export async function getDashboardData(
         columns: string[];
     },
     options?: { lang?: string; currency?: FiatCurrencies }
-): Promise<DashboardCell[][]> {
+): Promise<DashboardRow[]> {
     let lang = Lang.EN;
     if (Object.values(Lang).includes(options?.lang as Lang)) {
         lang = options?.lang as Lang;
@@ -299,7 +292,10 @@ export async function getDashboardData(
     }
 
     const result = await ProServiceService.proServiceDashboardData(lang, currency, query);
-    return result.items.map(row => row.map(mapDtoCellToCell));
+    return result.items.map((row, index) => ({
+        id: query.accounts[index],
+        cells: row.map(mapDtoCellToCell)
+    }));
 }
 
 type DTOCell = Flatten<

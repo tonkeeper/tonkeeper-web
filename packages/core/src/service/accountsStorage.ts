@@ -1,17 +1,22 @@
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
-import { DeprecatedWalletState, TonWalletStandard, WalletId } from '../entries/wallet';
+import {
+    DeprecatedWalletState,
+    TonWalletStandard,
+    WalletId,
+    isStandardTonWallet
+} from '../entries/wallet';
 
 import {
     Account,
     AccountId,
     AccountKeystone,
     AccountLedger,
-    AccountsState,
     AccountTonMnemonic,
     AccountTonOnly,
-    defaultAccountState,
-    bindAccountToClass
+    AccountsState,
+    bindAccountToClass,
+    defaultAccountState
 } from '../entries/account';
 
 import { DeprecatedAccountState } from '../entries/account';
@@ -47,7 +52,21 @@ export class AccountsStorage {
                 await this.setActiveAccountId(state);
             }
         }
-        return state ?? null;
+
+        const allAccounts = await this.getAccounts();
+        if (state !== null && allAccounts.every(acc => acc.id !== state)) {
+            state = null;
+            await this.setActiveAccountId(state);
+        }
+
+        if (state === null) {
+            if (allAccounts.length > 0) {
+                state = allAccounts[0].id;
+                await this.setActiveAccountId(state);
+            }
+        }
+
+        return state;
     };
 
     getActiveAccount = async (): Promise<Account | null> => {
@@ -66,8 +85,16 @@ export class AccountsStorage {
 
     setActiveAccountId = async (activeAccountId: AccountId | null) => {
         const accounts = await this.getAccounts();
-        if (accounts.every(a => a.id !== activeAccountId)) {
-            throw new Error('Account not found');
+        if (activeAccountId === null) {
+            if (accounts.length > 0) {
+                throw new Error(
+                    'Account id can be removed -- set to null only if there is no added accounts'
+                );
+            }
+        } else {
+            if (accounts.every(a => a.id !== activeAccountId)) {
+                throw new Error('Account not found');
+            }
         }
         await this.storage.set(AppKey.ACTIVE_ACCOUNT_ID, activeAccountId);
     };
@@ -120,15 +147,20 @@ export class AccountsStorage {
 
         const newState = state.filter(w => !ids.includes(w.id));
 
+        await this.setAccounts(newState);
+
         if (activeAccountId !== null && ids.includes(activeAccountId)) {
             await this.setActiveAccountId(newState[0]?.id || null);
         }
-
-        await this.setAccounts(newState);
     };
 
     removeAccountFromState = async (id: AccountId) => {
         return this.removeAccountsFromState([id]);
+    };
+
+    clearAccountFromState = async () => {
+        await this.setAccounts([]);
+        await this.setActiveAccountId(null);
     };
 
     async getNewAccountNameAndEmoji(accountId: AccountId) {
@@ -147,8 +179,11 @@ export class AccountsStorage {
 
         const accounts = await this.getAccounts();
         return (
-            accounts.find(a => a.allTonWallets.some(w => w.publicKey === state.activePublicKey))
-                ?.id || null
+            accounts.find(a =>
+                a.allTonWallets.some(
+                    w => isStandardTonWallet(w) && w.publicKey === state.activePublicKey
+                )
+            )?.id || null
         );
     };
 }

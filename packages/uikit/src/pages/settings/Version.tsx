@@ -5,12 +5,12 @@ import {
     walletVersionText
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { AccountId } from '@tonkeeper/core/dist/entries/account';
+import { AccountId, AccountVersionEditable } from '@tonkeeper/core/dist/entries/account';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
-import { Body2, Label1 } from '../../components/Text';
+import { Body2, Label1, Label2 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
 import {
     useStandardTonWalletVersions,
@@ -20,13 +20,18 @@ import {
     useAddTonWalletVersionToAccount,
     useAccountState
 } from '../../state/wallet';
-import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
+import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../components/List';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
 import { Address } from '@ton/core';
 import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
-import { SkeletonList } from '../../components/Skeleton';
+import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
+import {
+    DesktopViewHeader,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const LedgerError = styled(Body2)`
     margin: 0.5rem 0;
@@ -50,6 +55,19 @@ const ButtonsContainer = styled.div`
 
 export const WalletVersionPage = () => {
     const { t } = useTranslation();
+    const isFullWidth = useIsFullWidthMode();
+
+    if (isFullWidth) {
+        return (
+            <DesktopViewPageLayout>
+                <DesktopViewHeader backButton>
+                    <Label2>{t('settings_wallet_version')}</Label2>
+                </DesktopViewHeader>
+                <WalletVersionPageContent />
+            </DesktopViewPageLayout>
+        );
+    }
+
     return (
         <>
             <SubHeader title={t('settings_wallet_version')} />
@@ -63,14 +81,44 @@ export const WalletVersionPage = () => {
 export const WalletVersionPageContent: FC<{
     afterWalletOpened?: () => void;
     accountId?: AccountId;
-}> = ({ afterWalletOpened, accountId }) => {
+    className?: string;
+}> = ({ afterWalletOpened, accountId, className }) => {
     const { t } = useTranslation();
     const activeAccount = useActiveAccount();
     const passedAccount = useAccountState(accountId);
     const selectedAccount = passedAccount ?? activeAccount;
-    const selectedWallet = selectedAccount.activeTonWallet;
+
+    if (selectedAccount.type === 'ledger') {
+        return <LedgerError>{t('ledger_operation_not_supported')}</LedgerError>;
+    }
+
+    if (
+        selectedAccount.type === 'keystone' ||
+        selectedAccount.type === 'watch-only' ||
+        selectedAccount.type === 'mam'
+    ) {
+        return <LedgerError>{t('operation_not_supported')}</LedgerError>;
+    }
+
+    return (
+        <WalletVersionPageContentInternal
+            afterWalletOpened={afterWalletOpened}
+            account={selectedAccount}
+            className={className}
+        />
+    );
+};
+
+export const WalletVersionPageContentInternal: FC<{
+    afterWalletOpened?: () => void;
+    account: AccountVersionEditable;
+    className?: string;
+}> = ({ afterWalletOpened, account, className }) => {
+    const { t } = useTranslation();
+    const activeAccount = useActiveAccount();
     const appActiveWallet = activeAccount.activeTonWallet;
-    const currentAccountWalletsVersions = selectedAccount.activeDerivationTonWallets;
+    const selectedWallet = account.activeTonWallet;
+    const currentAccountWalletsVersions = account.allTonWallets;
 
     const { mutateAsync: selectWallet, isLoading: isSelectWalletLoading } =
         useMutateActiveTonWallet();
@@ -94,20 +142,19 @@ export const WalletVersionPageContent: FC<{
 
     const onAddWallet = async (w: { version: WalletVersionType; address: Address }) => {
         createWallet({
-            accountId: selectedAccount.id,
+            accountId: account.id,
             version: w.version
         });
     };
 
     const onHideWallet = async (w: { address: Address }) => {
         hideWallet({
-            accountId: selectedAccount.id,
+            accountId: account.id,
             walletId: w.address.toRawString()
         });
     };
-
     if (!wallets) {
-        return <SkeletonList size={WalletVersions.length} />;
+        return <SkeletonListDesktopAdaptive className={className} size={WalletVersions.length} />;
     }
 
     const isLoading = isSelectWalletLoading || isCreateWalletLoading || isHideWalletLoading;
@@ -121,64 +168,55 @@ export const WalletVersionPageContent: FC<{
             w.hasJettons
     );
 
-    const isLedger = selectedAccount.type === 'ledger';
-    const isKeystone = selectedAccount.type === 'keystone';
-
     return (
-        <>
-            {!isLedger && !isKeystone && (
-                <ListBlock>
-                    {walletsToShow.map(wallet => {
-                        const isWalletAdded = currentAccountWalletsVersions.some(
-                            w => w.rawAddress === wallet.address.toRawString()
-                        );
+        <ListBlockDesktopAdaptive className={className}>
+            {walletsToShow.map(wallet => {
+                const isWalletAdded = currentAccountWalletsVersions.some(
+                    w => w.rawAddress === wallet.address.toRawString()
+                );
 
-                        return (
-                            <ListItem hover={false} key={wallet.address.toRawString()}>
-                                <ListItemPayload>
-                                    <TextContainer>
-                                        <Label1>{walletVersionText(wallet.version)}</Label1>
-                                        <Body2Secondary>
-                                            {toShortValue(formatAddress(wallet.address)) + ' '}·
-                                            {' ' + toFormattedTonBalance(wallet.tonBalance)}
-                                            &nbsp;TON
-                                            {wallet.hasJettons && t('wallet_version_and_tokens')}
-                                        </Body2Secondary>
-                                    </TextContainer>
-                                    {isWalletAdded ? (
-                                        <ButtonsContainer>
-                                            <Button
-                                                onClick={() => onOpenWallet(wallet.address)}
-                                                loading={isLoading}
-                                            >
-                                                {t('open')}
-                                            </Button>
-                                            {canHide && (
-                                                <Button
-                                                    onClick={() => onHideWallet(wallet)}
-                                                    loading={isLoading}
-                                                >
-                                                    {t('hide')}
-                                                </Button>
-                                            )}
-                                        </ButtonsContainer>
-                                    ) : (
+                return (
+                    <ListItem hover={false} key={wallet.address.toRawString()}>
+                        <ListItemPayload>
+                            <TextContainer>
+                                <Label1>{walletVersionText(wallet.version)}</Label1>
+                                <Body2Secondary>
+                                    {toShortValue(formatAddress(wallet.address)) + ' '}·
+                                    {' ' + toFormattedTonBalance(wallet.tonBalance)}
+                                    &nbsp;TON
+                                    {wallet.hasJettons && t('wallet_version_and_tokens')}
+                                </Body2Secondary>
+                            </TextContainer>
+                            {isWalletAdded ? (
+                                <ButtonsContainer>
+                                    <Button
+                                        onClick={() => onOpenWallet(wallet.address)}
+                                        loading={isLoading}
+                                    >
+                                        {t('open')}
+                                    </Button>
+                                    {canHide && (
                                         <Button
-                                            primary
-                                            onClick={() => onAddWallet(wallet)}
+                                            onClick={() => onHideWallet(wallet)}
                                             loading={isLoading}
                                         >
-                                            {t('add')}
+                                            {t('hide')}
                                         </Button>
                                     )}
-                                </ListItemPayload>
-                            </ListItem>
-                        );
-                    })}
-                </ListBlock>
-            )}
-            {isLedger && <LedgerError>{t('ledger_operation_not_supported')}</LedgerError>}
-            {isKeystone && <LedgerError>{t('operation_not_supported')}</LedgerError>}
-        </>
+                                </ButtonsContainer>
+                            ) : (
+                                <Button
+                                    primary
+                                    onClick={() => onAddWallet(wallet)}
+                                    loading={isLoading}
+                                >
+                                    {t('add')}
+                                </Button>
+                            )}
+                        </ListItemPayload>
+                    </ListItem>
+                );
+            })}
+        </ListBlockDesktopAdaptive>
     );
 };

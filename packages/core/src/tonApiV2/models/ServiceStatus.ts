@@ -31,6 +31,12 @@ export interface ServiceStatus {
      * @memberof ServiceStatus
      */
     indexingLatency: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ServiceStatus
+     */
+    lastKnownMasterchainSeqno: number;
 }
 
 /**
@@ -39,6 +45,7 @@ export interface ServiceStatus {
 export function instanceOfServiceStatus(value: object): value is ServiceStatus {
     if (!('restOnline' in value) || value['restOnline'] === undefined) return false;
     if (!('indexingLatency' in value) || value['indexingLatency'] === undefined) return false;
+    if (!('lastKnownMasterchainSeqno' in value) || value['lastKnownMasterchainSeqno'] === undefined) return false;
     return true;
 }
 
@@ -54,6 +61,7 @@ export function ServiceStatusFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'restOnline': json['rest_online'],
         'indexingLatency': json['indexing_latency'],
+        'lastKnownMasterchainSeqno': json['last_known_masterchain_seqno'],
     };
 }
 
@@ -65,6 +73,7 @@ export function ServiceStatusToJSON(value?: ServiceStatus | null): any {
         
         'rest_online': value['restOnline'],
         'indexing_latency': value['indexingLatency'],
+        'last_known_masterchain_seqno': value['lastKnownMasterchainSeqno'],
     };
 }
 

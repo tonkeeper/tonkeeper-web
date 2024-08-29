@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Address } from '@ton/core';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -18,8 +17,6 @@ import BigNumber from 'bignumber.js';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { JettonKey, QueryKey } from '../libs/queryKey';
-import { getRateKey, toTokenRate } from './rates';
-import { DefaultRefetchInterval } from './tonendpoint';
 import { useActiveTonNetwork, useActiveWallet } from './wallet';
 
 export const useJettonInfo = (jettonAddress: string) => {
@@ -69,7 +66,8 @@ export const useJettonRawList = () => {
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                 accountId: wallet.rawAddress,
-                currencies: [fiat]
+                currencies: [fiat],
+                supportedExtensions: ['custom_payload']
             });
             const balances = filterTokens(result.balances, []).sort(compareTokensOver(fiat));
             return { balances };
@@ -81,7 +79,6 @@ export const useJettonList = () => {
     const wallet = useActiveWallet();
     const network = useActiveTonNetwork();
     const { api, fiat } = useAppContext();
-    const client = useQueryClient();
     const sdk = useAppSdk();
 
     return useQuery<JettonsBalances, Error>(
@@ -89,33 +86,15 @@ export const useJettonList = () => {
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
                 accountId: wallet.rawAddress,
-                currencies: [fiat]
+                currencies: [fiat],
+                supportedExtensions: ['custom_payload']
             });
 
-            const config = await getActiveWalletConfig(sdk.storage, wallet.rawAddress, network);
+            const config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
 
             const balances = filterTokens(result.balances, config.hiddenTokens).sort(
                 compareTokensOver(fiat)
             );
-
-            result.balances.forEach(item => {
-                client.setQueryData(
-                    [wallet.id, QueryKey.jettons, JettonKey.balance, item.jetton.address],
-                    item
-                );
-
-                if (item.price) {
-                    try {
-                        const tokenRate = toTokenRate(item.price, fiat);
-                        client.setQueryData(
-                            getRateKey(fiat, Address.parse(item.jetton.address).toString()),
-                            tokenRate
-                        );
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            });
 
             const pinned = config.pinnedTokens.reduce((acc, address) => {
                 const item = balances.find(i => i.jetton.address === address);
@@ -129,12 +108,6 @@ export const useJettonList = () => {
                 item => !config.pinnedTokens.includes(item.jetton.address)
             );
             return { balances: pinned.concat(rest) };
-        },
-        {
-            refetchInterval: DefaultRefetchInterval,
-            refetchIntervalInBackground: true,
-            refetchOnWindowFocus: true,
-            keepPreviousData: true
         }
     );
 };
@@ -145,15 +118,11 @@ export const useJettonBalance = (jettonAddress: string) => {
     return useQuery<JettonBalance, Error>(
         [wallet.id, QueryKey.jettons, JettonKey.balance, jettonAddress],
         async () => {
-            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.rawAddress
+            const result = await new AccountsApi(api.tonApiV2).getAccountJettonBalance({
+                accountId: wallet.rawAddress,
+                jettonId: jettonAddress
             });
-
-            const balance = result.balances.find(item => item.jetton.address === jettonAddress);
-            if (!balance) {
-                throw new Error('Missing jetton balance');
-            }
-            return balance;
+            return result;
         }
     );
 };

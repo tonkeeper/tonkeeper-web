@@ -16,7 +16,6 @@ import { ListBlock, ListItem, ListItemElement, ListItemPayload } from '../../com
 import { SkeletonListPayloadWithImage } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { Label1 } from '../../components/Text';
-import { ImportNotification } from '../../components/create/ImportNotification';
 import { DeleteAccountNotification } from '../../components/settings/DeleteAccountNotification';
 import { SetUpWalletIcon } from '../../components/settings/SettingsIcons';
 import { SettingsList } from '../../components/settings/SettingsList';
@@ -27,6 +26,7 @@ import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useMutateAccountsState, useAccountsState } from '../../state/wallet';
 import { Account as AccountType } from '@tonkeeper/core/dist/entries/account';
 import { useAccountLabel } from '../../hooks/accountUtils';
+import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 
 const Row = styled.div`
     display: flex;
@@ -130,7 +130,7 @@ const WalletRow: FC<{
 };
 
 export const Account = () => {
-    const [isOpen, setOpen] = useState(false);
+    const { onOpen: addWallet } = useAddWalletNotification();
     const { t } = useTranslation();
 
     const accounts = useAccountsState();
@@ -141,7 +141,7 @@ export const Account = () => {
             {
                 name: t('balances_setup_wallet'),
                 icon: <SetUpWalletIcon />,
-                action: () => setOpen(true)
+                action: addWallet
             }
         ];
     }, []);
@@ -194,8 +194,6 @@ export const Account = () => {
 
                 <SettingsList items={createItems} />
             </InnerBody>
-
-            <ImportNotification isOpen={isOpen} setOpen={setOpen} />
         </>
     );
 };

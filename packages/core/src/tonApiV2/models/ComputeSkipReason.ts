@@ -28,7 +28,7 @@ export type ComputeSkipReason = typeof ComputeSkipReason[keyof typeof ComputeSki
 export function instanceOfComputeSkipReason(value: any): boolean {
     for (const key in ComputeSkipReason) {
         if (Object.prototype.hasOwnProperty.call(ComputeSkipReason, key)) {
-            if ((ComputeSkipReason as Record<string, ComputeSkipReason>)[key] === value) {
+            if (ComputeSkipReason[key as keyof typeof ComputeSkipReason] === value) {
                 return true;
             }
         }

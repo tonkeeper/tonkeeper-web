@@ -33,6 +33,7 @@ import { EmulationList } from './EstimationLayout';
 import { useActiveStandardTonWallet, useAccountsState, useActiveAccount } from '../../state/wallet';
 import { LedgerError } from '@tonkeeper/core/dist/errors/LedgerError';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
+import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -63,6 +64,10 @@ const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<string, Error>(async () => {
+        if (!isAccountControllable(account)) {
+            throw new Error("Can't estimate when account is not controllable");
+        }
+
         const signer = await getSigner(sdk, account.id, checkTouchId);
 
         const boc = await sendTonConnectTransfer(api, account, params, signer);
@@ -249,6 +254,9 @@ const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boole
     return useQuery<EstimateData, Error>(
         [QueryKey.estimate, params],
         async () => {
+            if (!isAccountControllable(account)) {
+                throw new Error("Can't estimate when account is not controllable");
+            }
             const accountEvent = await estimateTonConnectTransfer(api, account, params);
             return { accountEvent };
         },

@@ -12,13 +12,14 @@ import { useTranslation } from '../../hooks/translation';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 import { QueryKey } from '../../libs/queryKey';
 import { useIsActiveWalletLedger } from '../../state/ledger';
+import { useConnectTonConnectAppMutation } from '../../state/tonConnect';
+import { useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
+import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
-import { useConnectTonConnectAppMutation } from '../../state/tonConnect';
-import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 
 const Title = styled(H2)`
     text-align: center;
@@ -77,6 +78,8 @@ const ConnectContent: FC<{
     handleClose: (result?: ConnectItemReply[], manifest?: DAppManifest) => void;
 }> = ({ params, manifest, origin, handleClose }) => {
     const activeIsLedger = useIsActiveWalletLedger();
+    const isReadOnly = useIsActiveWalletWatchOnly();
+
     const sdk = useAppSdk();
     const [done, setDone] = useState(false);
 
@@ -151,7 +154,7 @@ const ConnectContent: FC<{
                         fullWidth
                         primary
                         loading={isLoading}
-                        disabled={isLoading || cantConnectLedger}
+                        disabled={isLoading || cantConnectLedger || isReadOnly}
                         type="submit"
                     >
                         {t('ton_login_connect_button')}
@@ -160,6 +163,7 @@ const ConnectContent: FC<{
                 {cantConnectLedger && (
                     <LedgerError>{t('ledger_operation_not_supported')}</LedgerError>
                 )}
+                {isReadOnly && <LedgerError>{t('operation_not_supported')}</LedgerError>}
             </>
             <Notes>{t('ton_login_notice')}</Notes>
         </NotificationBlock>

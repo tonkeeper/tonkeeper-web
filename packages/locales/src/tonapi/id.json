@@ -1,0 +1,20 @@
+{
+  "auctionBidMessage" : "Menawar {{.Amount}} untuk {{.NftName}}",
+  "contractDeployAction" : "Menyebarkan kontrak{{ if .Interfaces }} dengan antarmuka {{.Interfaces}}{{ end }}",
+  "depositStakeAction" : "Deposit {{.Value}} ke kolam staking",
+  "electionsDepositStakeAction" : "Mendepositkan {{.Amount}} untuk stake",
+  "electionsRecoverStakeAction" : "Memulihkan {{.Amount}} stake",
+  "helloWorld" : "Halo dunia!",
+  "jettonBurnAction" : "Membakar {{.Value}} {{.JettonName}}",
+  "jettonMintAction" : "Mencetak {{.Value}} {{.JettonName}}",
+  "jettonSwapAction" : "Menukar {{.AmountIn}} {{.JettonIn}} dengan {{.AmountOut}} {{.JettonOut}}",
+  "jettonTransferAction" : "Mentransfer {{.Value}} {{.JettonName}}",
+  "nftPurchaseAction" : "Membeli {{.Name}}",
+  "nftTransferAction" : "Mentransfer 1 NFT",
+  "poolImplementationDescription" : "Deposit minimum {{.Deposit}} TON",
+  "smartContractExecMessage" : "Eksekusi kontrak pintar",
+  "subscriptionAction" : "Membayar {{.Value}} untuk langganan",
+  "tonTransferAction" : "Mentransfer {{.Value}}",
+  "withdrawStakeAction" : "Menarik {{.Value}} dari kolam staking",
+  "withdrawStakeRequestAction" : "Permintaan untuk menarik {{.Value}} dari kolam staking."
+}

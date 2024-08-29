@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
-import { DashboardCell } from '@tonkeeper/core/dist/entries/dashboard';
-import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { DashboardRow, DashboardRowNullable } from '@tonkeeper/core/dist/entries/dashboard';
+import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
 import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
@@ -23,11 +23,11 @@ export function useDashboardData() {
 
     const accountsState = useAccountsState();
     const mainnetWallets = accountsState.flatMap(a =>
-        a.allTonWallets.map(item => ({ ...item, accountName: a.name, accountEmoji: a.emoji }))
+        a.allTonWallets.map(item => ({ ...item, account: a }))
     );
     const idsMainnet = mainnetWallets.map(w => w!.id);
 
-    return useQuery<DashboardCell[][]>(
+    return useQuery<DashboardRow[]>(
         [QueryKey.dashboardData, selectedColIds, idsMainnet, fiat, language],
         async ctx => {
             if (!selectedColIds?.length || !idsMainnet?.length || !mainnetWallets?.length) {
@@ -42,7 +42,7 @@ export function useDashboardData() {
                     accounts: query.accounts
                 };
 
-                let fetchResult: DashboardCell[][] = query.accounts.map(() => []);
+                let fetchResult: DashboardRow[] = query.accounts.map(id => ({ id, cells: [] }));
                 if (queryToFetch.columns.length > 0) {
                     fetchResult = await getDashboardData(queryToFetch, {
                         currency: fiat,
@@ -52,7 +52,10 @@ export function useDashboardData() {
 
                 /* append client columns */
                 const defaultWalletName = t('wallet_title');
-                const result: DashboardCell[][] = query.accounts.map(() => []);
+                const result: DashboardRow[] = query.accounts.map(acc => ({
+                    id: acc,
+                    cells: []
+                }));
                 query.accounts.forEach((walletAddress, rowIndex) => {
                     const wallet = mainnetWallets.find(w =>
                         Address.parse(w!.rawAddress).equals(Address.parse(walletAddress))
@@ -60,22 +63,25 @@ export function useDashboardData() {
                     query.columns.forEach((col, colIndex) => {
                         const ClientColumnName = ClientColumns.find(c => c.id === 'name')!;
                         if (col === ClientColumnName.id) {
-                            result[rowIndex][colIndex] = {
-                                columnId: ClientColumnName.id,
-                                type: 'string',
-                                value: wallet
-                                    ? wallet.accountName +
-                                      ' ' +
-                                      wallet.accountEmoji +
-                                      ' ' +
-                                      walletVersionText(wallet.version)
-                                    : defaultWalletName
-                            };
+                            if (wallet) {
+                                result[rowIndex].cells[colIndex] = {
+                                    columnId: ClientColumnName.id,
+                                    type: 'account_name',
+                                    account: wallet!.account,
+                                    walletId: wallet!.rawAddress
+                                };
+                            } else {
+                                result[rowIndex].cells[colIndex] = {
+                                    columnId: ClientColumnName.id,
+                                    type: 'string',
+                                    value: defaultWalletName
+                                };
+                            }
                             return;
                         }
 
-                        result[rowIndex][colIndex] =
-                            fetchResult[rowIndex][queryToFetch.columns.indexOf(col)];
+                        result[rowIndex].cells[colIndex] =
+                            fetchResult[rowIndex].cells[queryToFetch.columns.indexOf(col)];
                     });
                 });
                 /* append client columns */
@@ -95,10 +101,13 @@ export function useDashboardData() {
 
             /* cache */
             if (pastQueries?.length) {
-                const walletsToQuerySet = new Set<TonWalletStandard>();
+                const walletsToQuerySet = new Set<TonContract>();
                 const columnsToQuerySet = new Set<string>();
 
-                const result: (DashboardCell | null)[][] = idsMainnet.map(() => []);
+                const result: DashboardRowNullable[] = idsMainnet.map(id => ({
+                    id,
+                    cells: []
+                }));
                 idsMainnet.forEach((id, walletIndex) => {
                     selectedColIds.forEach((col, colIndex) => {
                         const matchingQueries = pastQueries.filter(
@@ -108,7 +117,7 @@ export function useDashboardData() {
                         );
 
                         if (!matchingQueries.length) {
-                            result[walletIndex][colIndex] = null;
+                            result[walletIndex].cells[colIndex] = null;
                             walletsToQuerySet.add(mainnetWallets[walletIndex]!);
                             columnsToQuerySet.add(col);
                             return;
@@ -119,9 +128,9 @@ export function useDashboardData() {
                         const actualQueryWalletIndex = (actualQueryKey[2] as string[]).indexOf(id);
                         const actualQueryColIndex = (actualQueryKey[1] as string[]).indexOf(col);
 
-                        result[walletIndex][colIndex] = (actualQueryValue as DashboardCell[][])[
+                        result[walletIndex].cells[colIndex] = (actualQueryValue as DashboardRow[])[
                             actualQueryWalletIndex
-                        ][actualQueryColIndex];
+                        ].cells[actualQueryColIndex];
                     });
                 });
 
@@ -130,7 +139,7 @@ export function useDashboardData() {
                 const columnsToQuery = [...columnsToQuerySet.values()];
 
                 if (!accountsToQuery.length || !columnsToQuery.length) {
-                    return result as DashboardCell[][];
+                    return result as DashboardRow[];
                 }
 
                 const newData = await loadData({
@@ -140,13 +149,13 @@ export function useDashboardData() {
 
                 newData.forEach((row, rowIndex) => {
                     const walletIndex = idsMainnet.indexOf(walletsToQuery[rowIndex].id);
-                    row.forEach(cell => {
+                    row.cells.forEach(cell => {
                         const colIndex = selectedColIds.indexOf(cell.columnId);
-                        result[walletIndex][colIndex] = cell;
+                        result[walletIndex].cells[colIndex] = cell;
                     });
                 });
 
-                return result as DashboardCell[][];
+                return result as DashboardRow[];
             }
             /* cache */
 

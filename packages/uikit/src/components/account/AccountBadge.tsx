@@ -1,8 +1,8 @@
-import { FC, PropsWithChildren } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { Badge } from '../shared';
 import { WalletId, WalletVersion, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import { FC, PropsWithChildren } from 'react';
 import styled from 'styled-components';
+import { Badge } from '../shared';
 
 export const AccountBadge: FC<
     PropsWithChildren<{
@@ -31,6 +31,22 @@ export const AccountBadge: FC<
         return (
             <Badge size={size} color="accentOrange" className={className}>
                 {children || 'Keystone'}
+            </Badge>
+        );
+    }
+
+    if (accountType === 'watch-only') {
+        return (
+            <Badge size={size} color="accentRed" className={className}>
+                {children || 'Watch Only'}
+            </Badge>
+        );
+    }
+
+    if (accountType === 'mam') {
+        return (
+            <Badge size={size} color="accentBlueConstant" className={className}>
+                {children || 'Multi'}
             </Badge>
         );
     }
@@ -120,6 +136,10 @@ export const AccountAndWalletBadgesGroup: FC<{
         return <AccountBadge className={className} size={size} accountType={account.type} />;
     }
 
+    if (account.type === 'watch-only') {
+        return <AccountBadge className={className} size={size} accountType={account.type} />;
+    }
+
     if (account.type === 'mnemonic' && account.tonWallets.length > 1) {
         const wallet = account.tonWallets.find(w => w.id === walletId);
         if (wallet) {
@@ -131,6 +151,18 @@ export const AccountAndWalletBadgesGroup: FC<{
                 />
             );
         }
+    }
+
+    if (account.type === 'mam') {
+        const derivation = account.derivations.find(d => d.tonWallets.some(w => w.id === walletId));
+        return (
+            <Container className={className}>
+                <AccountBadge size={size} accountType={account.type} />
+                {!!derivation && (
+                    <WalletIndexBadge size={size}>#{derivation.index + 1}</WalletIndexBadge>
+                )}
+            </Container>
+        );
     }
 
     return null;

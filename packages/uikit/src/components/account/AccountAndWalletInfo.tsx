@@ -5,7 +5,7 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useActiveAccount, useActiveTonNetwork } from '../../state/wallet';
 import { FC } from 'react';
-import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { AccountAndWalletBadgesGroup } from './AccountBadge';
 import { useTranslation } from '../../hooks/translation';
 import styled from 'styled-components';
@@ -31,11 +31,14 @@ const AddressText = styled(Body2)`
 `;
 
 export const AccountAndWalletInfo: FC<
-    AllOrNone<{ account: Account; walletId: WalletId }>
+    AllOrNone<{ account: Account; walletId: WalletId }> & {
+        noPrefix?: boolean;
+        hideAddress?: boolean;
+    }
 > = props => {
     const { t } = useTranslation();
     let account: Account = useActiveAccount();
-    let wallet: TonWalletStandard = account.activeTonWallet;
+    let wallet = account.activeTonWallet;
     const network = useActiveTonNetwork();
 
     if ('account' in props && props.account) {
@@ -43,14 +46,25 @@ export const AccountAndWalletInfo: FC<
         wallet = account.getTonWallet(props.walletId)!;
     }
 
+    let name = account.name;
+    let emoji = account.emoji;
+
+    if (account.type === 'mam') {
+        const derivation = account.getTonWalletsDerivation(wallet.id);
+        if (derivation) {
+            name = derivation.name;
+            emoji = derivation.emoji;
+        }
+    }
+
     return (
         <WalletInfoStyled>
             <NameText>
-                {t('confirmSendModal_wallet')}&nbsp;
-                {account.name}
+                {!props.noPrefix && <>{t('confirmSendModal_wallet')}&nbsp;</>}
+                {name}
             </NameText>
-            <WalletEmoji emojiSize="20px" containerSize="20px" emoji={account.emoji} />
-            {account.allTonWallets.length > 1 ? (
+            <WalletEmoji emojiSize="20px" containerSize="20px" emoji={emoji} />
+            {account.allTonWallets.length > 1 && !props.hideAddress ? (
                 <>
                     <Dot />
                     <AddressText>

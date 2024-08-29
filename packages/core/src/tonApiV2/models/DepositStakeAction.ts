@@ -58,6 +58,8 @@ export interface DepositStakeAction {
     implementation: PoolImplementationType;
 }
 
+
+
 /**
  * Check if a given object implements the DepositStakeAction interface.
  */

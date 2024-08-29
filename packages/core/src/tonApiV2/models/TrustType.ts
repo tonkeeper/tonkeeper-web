@@ -29,7 +29,7 @@ export type TrustType = typeof TrustType[keyof typeof TrustType];
 export function instanceOfTrustType(value: any): boolean {
     for (const key in TrustType) {
         if (Object.prototype.hasOwnProperty.call(TrustType, key)) {
-            if ((TrustType as Record<string, TrustType>)[key] === value) {
+            if (TrustType[key as keyof typeof TrustType] === value) {
                 return true;
             }
         }

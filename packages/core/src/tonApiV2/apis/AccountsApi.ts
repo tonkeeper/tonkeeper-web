@@ -28,6 +28,7 @@ import type {
   GetAccountsRequest,
   JettonBalance,
   JettonsBalances,
+  Multisigs,
   NftItems,
   StatusDefaultResponse,
   Subscriptions,
@@ -60,6 +61,8 @@ import {
     JettonBalanceToJSON,
     JettonsBalancesFromJSON,
     JettonsBalancesToJSON,
+    MultisigsFromJSON,
+    MultisigsToJSON,
     NftItemsFromJSON,
     NftItemsToJSON,
     StatusDefaultResponseFromJSON,
@@ -130,6 +133,7 @@ export interface GetAccountJettonHistoryByIDRequest {
 export interface GetAccountJettonsBalancesRequest {
     accountId: string;
     currencies?: Array<string>;
+    supportedExtensions?: Array<string>;
 }
 
 export interface GetAccountJettonsHistoryRequest {
@@ -139,6 +143,10 @@ export interface GetAccountJettonsHistoryRequest {
     beforeLt?: number;
     startDate?: number;
     endDate?: number;
+}
+
+export interface GetAccountMultisigsRequest {
+    accountId: string;
 }
 
 export interface GetAccountNftItemsRequest {
@@ -164,6 +172,7 @@ export interface GetAccountTracesRequest {
 }
 
 export interface GetAccountsOperationRequest {
+    currency?: string;
     getAccountsRequest?: GetAccountsRequest;
 }
 
@@ -333,6 +342,7 @@ export interface AccountsApiInterface {
      * Get all Jettons balances by owner address
      * @param {string} accountId account ID
      * @param {Array<string>} [currencies] accept ton and all possible fiat currencies, separated by commas
+     * @param {Array<string>} [supportedExtensions] comma separated list supported extensions
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApiInterface
@@ -362,6 +372,20 @@ export interface AccountsApiInterface {
      * Get the transfer jettons history for account
      */
     getAccountJettonsHistory(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents>;
+
+    /**
+     * Get account\'s multisigs
+     * @param {string} accountId account ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApiInterface
+     */
+    getAccountMultisigsRaw(requestParameters: GetAccountMultisigsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Multisigs>>;
+
+    /**
+     * Get account\'s multisigs
+     */
+    getAccountMultisigs(requestParameters: GetAccountMultisigsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Multisigs>;
 
     /**
      * Get all NFT items by owner address
@@ -427,6 +451,7 @@ export interface AccountsApiInterface {
 
     /**
      * Get human-friendly information about several accounts without low-level details.
+     * @param {string} [currency] 
      * @param {GetAccountsRequest} [getAccountsRequest] a list of account ids
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -909,6 +934,10 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
             queryParameters['currencies'] = requestParameters['currencies']!.join(runtime.COLLECTION_FORMATS["csv"]);
         }
 
+        if (requestParameters['supportedExtensions'] != null) {
+            queryParameters['supported_extensions'] = requestParameters['supportedExtensions']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
@@ -986,6 +1015,39 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      */
     async getAccountJettonsHistory(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents> {
         const response = await this.getAccountJettonsHistoryRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get account\'s multisigs
+     */
+    async getAccountMultisigsRaw(requestParameters: GetAccountMultisigsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Multisigs>> {
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountMultisigs().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/accounts/{account_id}/multisigs`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MultisigsFromJSON(jsonValue));
+    }
+
+    /**
+     * Get account\'s multisigs
+     */
+    async getAccountMultisigs(requestParameters: GetAccountMultisigsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Multisigs> {
+        const response = await this.getAccountMultisigsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -1150,6 +1212,10 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      */
     async getAccountsRaw(requestParameters: GetAccountsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Accounts>> {
         const queryParameters: any = {};
+
+        if (requestParameters['currency'] != null) {
+            queryParameters['currency'] = requestParameters['currency'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

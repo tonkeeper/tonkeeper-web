@@ -21,6 +21,7 @@ import { useAppContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
 import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../state/wallet';
+import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 
 export function useSendTransfer<T extends Asset>(
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,
@@ -42,6 +43,9 @@ export function useSendTransfer<T extends Asset>(
         const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
         if (signer === null) return false;
         try {
+            if (!isAccountControllable(account)) {
+                throw new Error("Can't send a transfer using this account");
+            }
             if (isTonAsset(amount.asset)) {
                 if (amount.asset.id === TON_ASSET.id) {
                     track2('send-ton');

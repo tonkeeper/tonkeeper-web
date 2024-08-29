@@ -28,7 +28,7 @@ export type AccStatusChange = typeof AccStatusChange[keyof typeof AccStatusChang
 export function instanceOfAccStatusChange(value: any): boolean {
     for (const key in AccStatusChange) {
         if (Object.prototype.hasOwnProperty.call(AccStatusChange, key)) {
-            if ((AccStatusChange as Record<string, AccStatusChange>)[key] === value) {
+            if (AccStatusChange[key as keyof typeof AccStatusChange] === value) {
                 return true;
             }
         }

@@ -241,7 +241,10 @@
         "other" : "{count} şarj",
         "small" : "Küçük paket"
       },
-      "title" : "'{{'cnt'}}' işlem için '{{'price'}}'"
+      "title" : "'{{'cnt'}}' işlem için '{{'price'}}'",
+      "title.large" : "Büyük",
+      "title.medium" : "Orta",
+      "title.small" : "Küçük"
     },
     "please_wait" : "Batarya birkaç dakika içinde şarj olacak",
     "promocode" : {
@@ -455,6 +458,7 @@
     "network_fee" : "Ağ ücreti",
     "refund" : "İade",
     "title" : "İşlemi onaylayın",
+    "title_multiwallets" : "%{walletName} için eylem",
     "total_risk" : "Toplam: {totalAmount}",
     "to_your_address" : "Adresinize",
     "transaction_type" : {
@@ -599,6 +603,7 @@
   "intro_item3_caption" : "-",
   "intro_item3_title" : "-",
   "intro_title" : "XXXX'e hoş geldiniz",
+  "it_expires_on" : "Sona erme tarihi: ",
   "jetton_buy_tether" : "USD₮ Satın Al",
   "jetton_id" : "Token kimliği: {jettonAddress}",
   "jetton_id_copied" : "Token kimliği kopyalandı",
@@ -855,6 +860,11 @@
       "title" : "Harici bir bağlantıyı açmak istediğinizden emin misiniz?"
     }
   },
+  "pro_subscription_is_active" : "Pro üyelik aktif.",
+  "pro_trial_is_active" : "Pro deneme aktif.",
+  "purchases" : {
+    "screen_title" : "Satın alma işlemleri"
+  },
   "receive_address_title" : "ya da cüzdan adresini kullanın",
   "receive_copy" : "Kopyala",
   "receiveModal" : {
@@ -916,6 +926,7 @@
   "security_title" : "Güvenlik",
   "security_use_biometry_switch" : "{biometryType} kullanın",
   "security_use_biometry_tip" : "Cüzdanınızı her zaman bir şifre ile açabilirsiniz.",
+  "select_wallet_for_authorization" : "Onay için Cüzdan seçin",
   "send_address_placeholder" : "Adres veya isim",
   "send_all_warning_title" : "Tüm bakiyenizi göndermek istediğinizden emin misiniz?",
   "send_build_tx_error" : "İşleminiz başarısız oldu",

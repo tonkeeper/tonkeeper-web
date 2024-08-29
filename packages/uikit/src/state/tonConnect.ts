@@ -29,6 +29,7 @@ import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
 import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { useActiveWallet, useAccountsState, useActiveAccount, useActiveTonNetwork } from './wallet';
+import { isAccountControllable } from "@tonkeeper/core/dist/entries/account";
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();
@@ -167,7 +168,7 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
     const client = useQueryClient();
-    const accounts = useAccountsState();
+    const accounts = useAccountsState().filter(isAccountControllable);
 
     return useMutation(async (connection: AccountConnection | 'all') => {
         if (!isStandardTonWallet(wallet)) {

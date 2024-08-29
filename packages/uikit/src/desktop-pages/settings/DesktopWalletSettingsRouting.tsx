@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { DesktopWalletSettingsPage } from './DesktopWalletSettingsPage';
 import { DesktopConnectedAppsSettings } from './DesktopConnectedAppsSettings';
 import { DesktopNftSettings } from './DesktopNftSettings';
+import { MAMIndexesPage } from '../../pages/settings/MamIndexes';
 import { LedgerIndexesPage } from '../../pages/settings/LedgerIndexes';
 
 const OldSettingsLayoutWrapper = styled.div`
@@ -30,8 +31,6 @@ export const DesktopWalletSettingsRouting = () => {
                     <Route path=":accountId" element={<Recovery />} />
                     <Route index element={<ActiveRecovery />} />
                 </Route>
-                <Route path={WalletSettingsRoute.version} element={<WalletVersionPage />} />
-                <Route path={WalletSettingsRoute.ledgerIndexes} element={<LedgerIndexesPage />} />
                 <Route path={WalletSettingsRoute.jettons} element={<JettonsSettings />} />
             </Route>
             <Route
@@ -39,6 +38,9 @@ export const DesktopWalletSettingsRouting = () => {
                 element={<DesktopConnectedAppsSettings />}
             />
             <Route path={WalletSettingsRoute.nft} element={<DesktopNftSettings />} />
+            <Route path={WalletSettingsRoute.derivations} element={<MAMIndexesPage />} />
+            <Route path={WalletSettingsRoute.version} element={<WalletVersionPage />} />
+            <Route path={WalletSettingsRoute.ledgerIndexes} element={<LedgerIndexesPage />} />
             <Route path="*" element={<DesktopWalletSettingsPage />} />
         </Routes>
     );
