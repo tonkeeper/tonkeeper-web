@@ -96,7 +96,14 @@ export const loadProState = async (storage: IStorage): Promise<ProState> => {
                     w.version === walletVersionFromProServiceDTO(user.version)
             );
         if (!actualWallet) {
-            throw new Error('Unknown wallet');
+            return {
+                authorizedWallet: null,
+                subscription: {
+                    isTrial: false,
+                    usedTrial: false,
+                    valid: false
+                }
+            };
         }
         authorizedWallet = {
             publicKey: actualWallet.publicKey,
