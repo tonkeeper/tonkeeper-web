@@ -239,7 +239,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         placeholder={size === 'small' ? label : undefined}
                     />
                     {label && size !== 'small' && <Label active={value !== ''}>{label}</Label>}
-                    {rightElement && <RightBlock onClick={onClear}>{rightElement}</RightBlock>}
+                    {rightElement && <RightBlock>{rightElement}</RightBlock>}
                     {!!value && clearButton && !rightElement && (
                         <ClearBlock onClick={onClear}>
                             <XmarkIcon />

@@ -109,7 +109,7 @@ const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { mutateAsync, error } = useSelectWalletForProMutation();
     useNotifyError(error);
     const accounts = useAccountsState().filter(
-        acc => acc.type === 'mnemonic'
+        acc => acc.type === 'mnemonic' || acc.type === 'mam'
     ) as AccountTonMnemonic[];
 
     return (

@@ -24,14 +24,12 @@ import { useFetchNext } from '../../hooks/useFetchNext';
 import { AppRoute } from '../../libs/routes';
 import { useFetchFilteredActivity } from '../../state/activity';
 import { useAssets } from '../../state/home';
+import { getMixedActivity } from '../../state/mixedActivity';
 import { useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
-import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../state/wallet';
-import { useMixedActivity } from '../../hooks/useMixedActivity';
-import { useWalletPendingEvents } from '../../state/realtime';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { useIsActiveWalletWatchOnly } from '../../state/wallet';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -250,20 +248,9 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, ref);
 
-    const wallet = useActiveWallet();
-    const { data: pendingOutgoingEvents } = useWalletPendingEvents(wallet.rawAddress);
-    const tokenPendingEvents = useMemo(
-        () =>
-            pendingOutgoingEvents?.filter(e => {
-                if (token === 'ton') {
-                    return e.affectAssetAddress === TON_ASSET.id;
-                } else {
-                    return e.affectAssetAddress === token;
-                }
-            }),
-        [pendingOutgoingEvents, token]
-    );
-    const activity = useMixedActivity(data, tokenPendingEvents);
+    const activity = useMemo(() => {
+        return getMixedActivity(data, undefined);
+    }, [data]);
 
     const [assets] = useAssets();
     const assetSymbol = useMemo(() => {

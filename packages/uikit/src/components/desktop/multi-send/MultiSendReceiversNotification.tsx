@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Notification } from '../../Notification';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 import { Body2 } from '../../Text';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { MultiSendFormTokenized } from '../../../hooks/blockchain/useSendMultiTransfer';
@@ -11,6 +11,10 @@ import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useTranslation } from '../../../hooks/translation';
 
+const NotificationStyled = styled(Notification)`
+    max-width: 1000px;
+`;
+
 export const MultiSendReceiversNotification: FC<{
     onClose: () => void;
     isOpen: boolean;
@@ -18,23 +22,12 @@ export const MultiSendReceiversNotification: FC<{
     asset: TonAsset;
 }> = ({ onClose, isOpen, form, asset }) => {
     const { t } = useTranslation();
-    const WrapperStyles = createGlobalStyle`
-      .multi-send-receivers-notification {
-        max-width: 1000px;
-      }
-    `;
 
     return (
         <>
-            <WrapperStyles />
-            <Notification
-                title={t('wallets')}
-                isOpen={isOpen}
-                handleClose={onClose}
-                wrapperClassName="multi-send-receivers-notification"
-            >
+            <NotificationStyled title={t('wallets')} isOpen={isOpen} handleClose={onClose}>
                 {() => <ReceiversTable form={form} asset={asset} />}
-            </Notification>
+            </NotificationStyled>
         </>
     );
 };

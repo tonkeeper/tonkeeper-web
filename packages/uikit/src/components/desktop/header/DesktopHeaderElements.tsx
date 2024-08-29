@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Skeleton } from '../../shared/Skeleton';
-import { Body2Class, Body3, Num2 } from '../../Text';
+import { Body2Class, Num2 } from '../../Text';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
@@ -10,7 +10,6 @@ import { useActiveTonNetwork } from '../../../state/wallet';
 import { useUserFiat } from '../../../state/fiat';
 import { Link } from 'react-router-dom';
 import { hexToRGBA } from '../../../libs/css';
-import { FlashingDotsIcon } from '../../Icon';
 
 export const desktopHeaderContainerHeight = '69px';
 
@@ -53,41 +52,10 @@ const TestnetBadge = styled(Link)`
     ${Body2Class};
 `;
 
-const ContainerRelative = styled.div`
-    position: relative;
-`;
-
-const PendingEventsContainer = styled(Link)`
-    text-decoration: unset;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    position: absolute;
-    top: 85%;
-    left: 0;
-    white-space: nowrap;
-    display: flex;
-    gap: 5px;
-    align-items: center;
-
-    color: ${p => p.theme.textSecondary};
-
-    &:hover {
-        color: ${p => p.theme.textPrimary};
-    }
-
-    transition: 0.1s ease-in-out;
-`;
-
-const FlashingDotsIconStyled = styled(FlashingDotsIcon)`
-    margin-top: 2px;
-`;
-
-export const DesktopHeaderBalance: FC<{
-    isLoading: boolean;
-    balance: BigNumber | undefined;
-    pendingEventsNumber?: number;
-}> = ({ isLoading, balance, pendingEventsNumber }) => {
+export const DesktopHeaderBalance: FC<{ isLoading: boolean; balance: BigNumber | undefined }> = ({
+    isLoading,
+    balance
+}) => {
     const network = useActiveTonNetwork();
     const fiat = useUserFiat();
 
@@ -97,15 +65,7 @@ export const DesktopHeaderBalance: FC<{
                 <Skeleton width="100px" height="36px" />
             ) : (
                 <BalanceContainer>
-                    <ContainerRelative>
-                        <Num2>{formatFiatCurrency(fiat, balance || 0)}</Num2>
-                        {!!pendingEventsNumber && (
-                            <PendingEventsContainer to={AppRoute.activity}>
-                                <Body3>{pendingEventsNumber} pending events</Body3>
-                                <FlashingDotsIconStyled radiusPx={3} />
-                            </PendingEventsContainer>
-                        )}
-                    </ContainerRelative>
+                    <Num2>{formatFiatCurrency(fiat, balance || 0)}</Num2>
                 </BalanceContainer>
             )}
             {network === Network.TESTNET && (

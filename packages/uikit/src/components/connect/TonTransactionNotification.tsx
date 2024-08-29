@@ -34,7 +34,6 @@ import { useActiveStandardTonWallet, useAccountsState, useActiveAccount } from '
 import { LedgerError } from '@tonkeeper/core/dist/errors/LedgerError';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
-import { useAddWalletPendingEvent } from '../../state/realtime';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -63,7 +62,6 @@ const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?
     const { api } = useAppContext();
     const client = useQueryClient();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
-    const { mutateAsync: addPendingEvent } = useAddWalletPendingEvent();
 
     return useMutation<string, Error>(async () => {
         if (!isAccountControllable(account)) {
@@ -72,18 +70,13 @@ const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?
 
         const signer = await getSigner(sdk, account.id, checkTouchId);
 
-        const { boc, outgoingEvent } = await sendTonConnectTransfer(api, account, params, signer);
+        const boc = await sendTonConnectTransfer(api, account, params, signer);
 
         const invalidationPromise = client.invalidateQueries(
             anyOfKeysParts(account.id, account.activeTonWallet.id)
         );
-        const addPendingEventPromise = addPendingEvent({
-            event: outgoingEvent,
-            walletAddress: account.activeTonWallet.rawAddress
-        });
         if (waitInvalidation) {
             await invalidationPromise;
-            await addPendingEventPromise;
         }
         return boc;
     });

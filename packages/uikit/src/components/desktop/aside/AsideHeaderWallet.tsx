@@ -83,6 +83,8 @@ export const AsideHeaderWallet: FC<{ width: number }> = ({ width }) => {
     };
 
     const ref = useRef<HTMLDivElement>(null);
+    const name = account.type === 'mam' ? account.activeDerivation.name : account.name;
+    const emoji = account.type === 'mam' ? account.activeDerivation.emoji : account.emoji;
 
     return (
         <HeaderContainer
@@ -92,7 +94,7 @@ export const AsideHeaderWallet: FC<{ width: number }> = ({ width }) => {
             onMouseLeave={() => setHovered(false)}
         >
             <TextContainer>
-                <Label2>{account.name || t('wallet_title')}</Label2>
+                <Label2>{name || t('wallet_title')}</Label2>
                 <AddressWrapper>
                     <Body3>{toShortValue(address)}</Body3>
                     <AccountAndWalletBadgesGroup
@@ -114,7 +116,7 @@ export const AsideHeaderWallet: FC<{ width: number }> = ({ width }) => {
                     </Transition>
                 </AddressWrapper>
             </TextContainer>
-            <WalletEmoji emoji={account.emoji} emojiSize="24px" containerSize="24px" />
+            <WalletEmoji emoji={emoji} emojiSize="24px" containerSize="24px" />
         </HeaderContainer>
     );
 };

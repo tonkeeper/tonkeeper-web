@@ -1,6 +1,6 @@
 import { Notification } from '../../Notification';
 import { FC } from 'react';
-import { createGlobalStyle, styled } from 'styled-components';
+import { styled } from 'styled-components';
 import { Body2, Label1, Label2 } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
 import { Button } from '../../fields/Button';
@@ -10,11 +10,9 @@ import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useProState } from '../../../state/pro';
 
-const WrapperStyles = createGlobalStyle`
-      .pro-features-notification {
-        max-width: 768px;
-      }
-    `;
+const NotificationStyled = styled(Notification)`
+    max-width: 768px;
+`;
 
 export const ProFeaturesNotification: FC<{ isOpen: boolean; onClose: () => void }> = ({
     isOpen,
@@ -22,14 +20,9 @@ export const ProFeaturesNotification: FC<{ isOpen: boolean; onClose: () => void 
 }) => {
     return (
         <>
-            <WrapperStyles />
-            <Notification
-                isOpen={isOpen}
-                handleClose={onClose}
-                wrapperClassName="pro-features-notification"
-            >
+            <NotificationStyled isOpen={isOpen} handleClose={onClose}>
                 {() => <ProFeaturesNotificationContent onClose={onClose} />}
-            </Notification>
+            </NotificationStyled>
         </>
     );
 };

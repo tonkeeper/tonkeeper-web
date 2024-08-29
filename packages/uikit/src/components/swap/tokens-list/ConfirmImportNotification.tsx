@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Notification } from '../../Notification';
-import { createGlobalStyle, styled } from 'styled-components';
+import { styled } from 'styled-components';
 import { Body2, Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { useTranslation } from '../../../hooks/translation';
@@ -28,11 +28,9 @@ const ButtonsBlock = styled.div`
     }
 `;
 
-const WrapperStyles = createGlobalStyle`
-      .confirm-import-swap-token-notification {
-        ${p => p.theme.displayType === 'full-width' && 'max-width: 400px;'}
-      }
-    `;
+const NotificationStyled = styled(Notification)`
+    ${p => p.theme.displayType === 'full-width' && 'max-width: 400px;'}
+`;
 
 export const ConfirmImportNotification: FC<{
     isOpen: boolean;
@@ -42,12 +40,7 @@ export const ConfirmImportNotification: FC<{
     const { t } = useTranslation();
     return (
         <>
-            <WrapperStyles />
-            <Notification
-                isOpen={isOpen}
-                handleClose={onClose}
-                wrapperClassName="confirm-import-swap-token-notification"
-            >
+            <NotificationStyled isOpen={isOpen} handleClose={onClose}>
                 {() => (
                     <ConfirmImportNotificationContent>
                         <Label2>
@@ -64,7 +57,7 @@ export const ConfirmImportNotification: FC<{
                         </ButtonsBlock>
                     </ConfirmImportNotificationContent>
                 )}
-            </Notification>
+            </NotificationStyled>
         </>
     );
 };

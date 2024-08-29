@@ -175,6 +175,7 @@ const Loader: FC = () => {
         extension: false,
         proFeatures: false,
         ios,
+        hideMam: true,
         defaultWalletVersion: WalletVersion.V5R1,
         env: {
             tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,

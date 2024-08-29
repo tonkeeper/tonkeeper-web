@@ -5,10 +5,15 @@ import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { createModalControl } from './createModalControl';
 import { LedgerIndexesPageContent } from '../../pages/settings/LedgerIndexes';
 import { useAccountState } from '../../state/wallet';
+import styled from 'styled-components';
 
 const { hook, paramsControl } = createModalControl<{ accountId: AccountId }>();
 
 export const useLedgerIndexesSettingsNotification = hook;
+
+const LedgerIndexesPageContentStyled = styled(LedgerIndexesPageContent)`
+    margin: 0 -1rem;
+`;
 
 export const LedgerIndexesSettingsNotification = () => {
     const { isOpen, onClose } = useLedgerIndexesSettingsNotification();
@@ -25,7 +30,7 @@ export const LedgerIndexesSettingsNotification = () => {
             isOpen={isOpen}
             handleClose={() => onClose()}
         >
-            {() => <LedgerIndexesPageContent afterWalletOpened={onClose} account={account} />}
+            {() => <LedgerIndexesPageContentStyled afterWalletOpened={onClose} account={account} />}
         </Notification>
     );
 };
