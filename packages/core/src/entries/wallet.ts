@@ -128,6 +128,11 @@ export type DerivationItem = {
     //  tronWallets: never;
 };
 
+export type DerivationItemNamed = DerivationItem & {
+    name: string;
+    emoji: string;
+};
+
 export function isStandardTonWallet(wallet: TonContract): wallet is TonWalletStandard {
     return 'version' in wallet && 'publicKey' in wallet;
 }

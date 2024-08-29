@@ -24,6 +24,7 @@ export interface IAppContext {
     hideSigner?: boolean;
     hideKeystone?: boolean;
     hideLedger?: boolean;
+    hideMam?: boolean;
     hideBrowser?: boolean;
     browserLength?: number;
     env?: {

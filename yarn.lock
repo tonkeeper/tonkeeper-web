@@ -4511,7 +4511,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:^1.2.0":
+"@noble/hashes@npm:^1.2.0, @noble/hashes@npm:~1.4.0":
   version: 1.4.0
   resolution: "@noble/hashes@npm:1.4.0"
   checksum: 10/e156e65794c473794c52fa9d06baf1eb20903d0d96719530f523cc4450f6c721a957c544796e6efd0197b2296e7cd70efeb312f861465e17940a3e3c7e0febc6
@@ -5193,6 +5193,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@scure/base@npm:~1.1.6":
+  version: 1.1.7
+  resolution: "@scure/base@npm:1.1.7"
+  checksum: 10/fc50ffaab36cb46ff9fa4dc5052a06089ab6a6707f63d596bb34aaaec76173c9a564ac312a0b981b5e7a5349d60097b8878673c75d6cbfc4da7012b63a82099b
+  languageName: node
+  linkType: hard
+
 "@scure/bip32@npm:1.3.3":
   version: 1.3.3
   resolution: "@scure/bip32@npm:1.3.3"
@@ -5211,6 +5218,16 @@ __metadata:
     "@noble/hashes": "npm:~1.3.2"
     "@scure/base": "npm:~1.1.4"
   checksum: 10/f71aceda10a7937bf3779fd2b4c4156c95ec9813269470ddca464cb8ab610d2451b173037f4b1e6dac45414e406e7adc7b5814c51279f4474d5d38140bbee542
+  languageName: node
+  linkType: hard
+
+"@scure/bip39@npm:^1.2.2":
+  version: 1.3.0
+  resolution: "@scure/bip39@npm:1.3.0"
+  dependencies:
+    "@noble/hashes": "npm:~1.4.0"
+    "@scure/base": "npm:~1.1.6"
+  checksum: 10/7d71fd58153de22fe8cd65b525f6958a80487bc9d0fbc32c71c328aeafe41fa259f989d2f1e0fa4fdfeaf83b8fcf9310d52ed9862987e46c2f2bfb9dd8cf9fc1
   languageName: node
   linkType: hard
 
@@ -6738,6 +6755,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ton-keychain/core@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@ton-keychain/core@npm:0.0.2"
+  dependencies:
+    "@scure/bip39": "npm:^1.2.2"
+    "@ton/crypto": "npm:^3.2.0"
+  checksum: 10/92b04512ef5c53f252d47e2d9d45caeb9584f578b4cedb82efb3ef45b354885c13e311c51ca2beee82efe6fc410035d64f52796b10823262f4b9583d29cb9698
+  languageName: node
+  linkType: hard
+
 "@ton/core@npm:0.56.0":
   version: 0.56.0
   resolution: "@ton/core@npm:0.56.0"
@@ -6793,6 +6820,7 @@ __metadata:
     "@ledgerhq/hw-transport-webhid": "npm:^6.28.6"
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
     "@ton-community/ton-ledger": "npm:^7.2.0-pre.2"
+    "@ton-keychain/core": "npm:^0.0.2"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
     "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build10"
@@ -6836,6 +6864,7 @@ __metadata:
     "@vercel/webpack-asset-relocator-loader": "npm:1.7.3"
     buffer: "npm:^6.0.3"
     copy-to-clipboard: "npm:^3.3.3"
+    crypto-browserify: "npm:^3.12.0"
     css-loader: "npm:^6.0.0"
     dotenv: "npm:^16.3.1"
     electron: "npm:31.0.1"
@@ -6995,6 +7024,7 @@ __metadata:
     "@storybook/testing-library": "npm:^0.0.13"
     "@tanstack/react-query": "npm:4.3.4"
     "@tanstack/react-virtual": "npm:^3.8.3"
+    "@ton-keychain/core": "npm:^0.0.2"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
     "@tonkeeper/core": "npm:0.1.0"

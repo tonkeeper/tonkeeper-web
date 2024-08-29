@@ -3,34 +3,34 @@ import { useAtom } from '../../libs/atom';
 import { useTranslation } from '../../hooks/translation';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { createModalControl } from './createModalControl';
-import { LedgerIndexesPageContent } from '../../pages/settings/LedgerIndexes';
 import { useAccountState } from '../../state/wallet';
+import { MAMIndexesPageContent } from '../../pages/settings/MamIndexes';
 import styled from 'styled-components';
 
 const { hook, paramsControl } = createModalControl<{ accountId: AccountId }>();
 
-export const useLedgerIndexesSettingsNotification = hook;
+export const useMAMIndexesSettingsNotification = hook;
 
-const LedgerIndexesPageContentStyled = styled(LedgerIndexesPageContent)`
+const MAMIndexesPageContentStyled = styled(MAMIndexesPageContent)`
     margin: 0 -1rem;
 `;
 
-export const LedgerIndexesSettingsNotification = () => {
-    const { isOpen, onClose } = useLedgerIndexesSettingsNotification();
+export const MAMIndexesSettingsNotification = () => {
+    const { isOpen, onClose } = useMAMIndexesSettingsNotification();
     const { t } = useTranslation();
     const [params] = useAtom(paramsControl);
     const account = useAccountState(params?.accountId);
-    if (!account || account.type !== 'ledger') {
+    if (!account || account.type !== 'mam') {
         return null;
     }
 
     return (
         <Notification
-            title={t('settings_ledger_indexes')}
+            title={t('settings_mam_indexes')}
             isOpen={isOpen}
             handleClose={() => onClose()}
         >
-            {() => <LedgerIndexesPageContentStyled afterWalletOpened={onClose} account={account} />}
+            {() => <MAMIndexesPageContentStyled afterWalletOpened={onClose} account={account} />}
         </Notification>
     );
 };

@@ -29,7 +29,8 @@ export enum ImportRoute {
     signer = '/signer',
     ledger = '/ledger',
     keystone = '/keystone',
-    readOnly = '/watch-only'
+    readOnly = '/watch-only',
+    mam = '/mam'
 }
 
 export enum SettingsRoute {
@@ -55,11 +56,13 @@ export enum SettingsRoute {
 export enum WalletSettingsRoute {
     index = '/',
     recovery = '/recovery',
+    recoveryMamWallet = '/recovery-mam-wallet',
     version = '/version',
     ledgerIndexes = '/ledger-indexes',
     jettons = '/jettons',
     nft = '/nft',
-    connectedApps = '/connected-apps'
+    connectedApps = '/connected-apps',
+    derivations = '/derivations'
 }
 
 export enum BrowserRoute {

@@ -43,6 +43,14 @@ export const AccountBadge: FC<
         );
     }
 
+    if (accountType === 'mam') {
+        return (
+            <Badge size={size} color="accentBlueConstant" className={className}>
+                {children || 'Multi'}
+            </Badge>
+        );
+    }
+
     return null;
 };
 
@@ -143,6 +151,18 @@ export const AccountAndWalletBadgesGroup: FC<{
                 />
             );
         }
+    }
+
+    if (account.type === 'mam') {
+        const derivation = account.derivations.find(d => d.tonWallets.some(w => w.id === walletId));
+        return (
+            <Container className={className}>
+                <AccountBadge size={size} accountType={account.type} />
+                {!!derivation && (
+                    <WalletIndexBadge size={size}>#{derivation.index + 1}</WalletIndexBadge>
+                )}
+            </Container>
+        );
     }
 
     return null;

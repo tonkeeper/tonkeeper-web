@@ -5,7 +5,7 @@ import { useTranslation } from '../../hooks/translation';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import { useTonWalletsBalances } from '../../state/wallet';
-import { SkeletonList } from '../Skeleton';
+import { SkeletonListDesktopAdaptive } from '../Skeleton';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Checkbox } from '../fields/Checkbox';
 import { Button } from '../fields/Button';
@@ -32,7 +32,7 @@ const Body1Styled = styled(Body1)`
     color: ${p => p.theme.textSecondary};
 `;
 
-const SkeletonListStyled = styled(SkeletonList)`
+const SkeletonListStyled = styled(SkeletonListDesktopAdaptive)`
     width: 100%;
 `;
 
@@ -104,8 +104,6 @@ export const ChoseLedgerIndexes: FC<{
                                                 {toShortValue(formatAddress(balance.address))}
                                                 &nbsp;·&nbsp;
                                                 {toFormattedTonBalance(balance.tonBalance)}&nbsp;TON
-                                                {balance.hasJettons &&
-                                                    t('wallet_version_and_tokens')}
                                             </Body2Secondary>
                                         </TextContainer>
                                         <Checkbox

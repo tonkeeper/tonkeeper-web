@@ -28,10 +28,15 @@ export const rendererConfig: Configuration = {
             ),
             '@ton/core': path.resolve(__dirname, '../../packages/core/node_modules/@ton/core'),
             '@ton/crypto': path.resolve(__dirname, '../../packages/core/node_modules/@ton/crypto'),
+            '@ton/crypto/dist/mnemonic/mnemonic': path.resolve(
+                __dirname,
+                '../../packages/core/node_modules/@ton/crypto/dist/mnemonic/mnemonic'
+            ),
             '@ton/ton': path.resolve(__dirname, '../../packages/core/node_modules/@ton/ton')
         },
         fallback: {
-            stream: require.resolve('stream-browserify')
+            stream: require.resolve('stream-browserify'),
+            crypto: require.resolve('crypto-browserify')
         }
     }
 };

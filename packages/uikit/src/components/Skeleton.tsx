@@ -7,7 +7,7 @@ import { ActionsRow } from './home/Actions';
 import { BalanceSkeleton } from './home/Balance';
 import { CoinInfoSkeleton } from './jettons/Info';
 import { ColumnText } from './Layout';
-import { ListBlock, ListItem, ListItemPayload } from './List';
+import { ListBlock, ListBlockDesktopAdaptive, ListItem, ListItemPayload } from './List';
 import { SubHeader } from './SubHeader';
 import { H3 } from './Text';
 import { SkeletonImage, SkeletonText } from './shared/Skeleton';
@@ -86,14 +86,14 @@ export const SkeletonListPayload = React.memo(() => {
     );
 });
 
-export const SkeletonList: FC<{
+export const SkeletonListDesktopAdaptive: FC<{
     size?: number;
     margin?: boolean;
     fullWidth?: boolean;
     className?: string;
 }> = React.memo(({ size = 1, margin, fullWidth, className }) => {
     return (
-        <ListBlock margin={margin} fullWidth={fullWidth} className={className}>
+        <ListBlockDesktopAdaptive margin={margin} fullWidth={fullWidth} className={className}>
             {Array(size)
                 .fill(null)
                 .map((_, index) => (
@@ -101,7 +101,7 @@ export const SkeletonList: FC<{
                         <SkeletonListPayload />
                     </ListItem>
                 ))}
-        </ListBlock>
+        </ListBlockDesktopAdaptive>
     );
 });
 
