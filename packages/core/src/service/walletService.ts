@@ -449,7 +449,7 @@ async function getRelevantMAMTonAccountsToImport(
         return response.accounts.map(acc => acc.balance);
     };
 
-    const accounts: {
+    let accounts: {
         tonAccount: KeychainTonAccount;
         derivationIndex: number;
         shouldAdd: boolean;
@@ -469,6 +469,15 @@ async function getRelevantMAMTonAccountsToImport(
         );
         const balances = await getAccountsBalances(accsToAdd.map(i => i.tonAccount));
         if (balances.every(b => !b)) {
+            const lastAccountToAdd = accounts
+                .slice()
+                .reverse()
+                .findIndex(a => a.shouldAdd);
+
+            if (lastAccountToAdd !== -1) {
+                accounts = accounts.slice(0, accounts.length - lastAccountToAdd);
+            }
+
             return accounts;
         } else {
             accsToAdd.forEach((acc, index) => {
