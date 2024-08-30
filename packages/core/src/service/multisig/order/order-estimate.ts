@@ -19,11 +19,12 @@ export async function estimateExistingOrder({
         methodName: 'get_order_data'
     });
 
-    const orderBodyData = result.stack[result.stack.length - 1].cell;
-    const orderValidUntilSeconds = result.stack[result.stack.length - 2].num;
+    const orderSeqno = result.stack[1]?.num;
+    const orderValidUntilSeconds = result.stack[result.stack.length - 2]?.num;
+    const orderBodyData = result.stack[result.stack.length - 1]?.cell;
 
-    if (!orderBodyData || !orderValidUntilSeconds) {
-        throw new Error('Order not found');
+    if (!orderBodyData || !orderValidUntilSeconds || orderSeqno === undefined) {
+        throw new Error('Order data not found');
     }
 
     const orderBodyCell = Cell.fromBase64(orderBodyData);
@@ -32,7 +33,8 @@ export async function estimateExistingOrder({
         api,
         orderBodyCell,
         multisig,
-        orderValidUntilSeconds: Number(orderValidUntilSeconds)
+        orderValidUntilSeconds: Number(orderValidUntilSeconds),
+        orderSeqno: Number(orderSeqno)
     });
 }
 
@@ -55,9 +57,25 @@ async function estimateOrderByBodyCell(options: {
     multisig: Pick<Multisig, 'address' | 'signers' | 'threshold'>;
     orderBodyCell: Cell;
     orderValidUntilSeconds: number;
+    orderSeqno?: number;
 }) {
-    // TODO seqno
-    const orderSeqno = 123;
+    let orderSeqno = options.orderSeqno;
+    if (orderSeqno === undefined) {
+        const result = await new BlockchainApi(
+            options.api.tonApiV2
+        ).execGetMethodForBlockchainAccount({
+            accountId: options.multisig.address,
+            methodName: 'get_multisig_data'
+        });
+
+        const nextSeqno = result.stack[0]?.num;
+        if (nextSeqno === undefined) {
+            throw new Error("Can't get next seqno");
+        }
+
+        orderSeqno = Number(nextSeqno);
+    }
+
     const orderData = orderConfigToCell({
         multisigAddress: options.multisig.address,
         orderSeqno
