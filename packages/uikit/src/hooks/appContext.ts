@@ -1,5 +1,6 @@
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { Configuration as ConfigurationV2 } from '@tonkeeper/core/dist/tonApiV2';
 import {
     defaultTonendpointConfig,
@@ -8,7 +9,6 @@ import {
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { Configuration as TronConfiguration } from '@tonkeeper/core/dist/tronApi';
 import React, { useContext } from 'react';
-import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 
 export interface IAppContext {
     api: APIConfig;
@@ -26,6 +26,7 @@ export interface IAppContext {
     hideLedger?: boolean;
     hideMam?: boolean;
     hideBrowser?: boolean;
+    browserLength?: number;
     env?: {
         tgAuthBotId: string;
         stonfiReferralAddress: string;

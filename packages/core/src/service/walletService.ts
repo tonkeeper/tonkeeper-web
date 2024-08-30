@@ -27,7 +27,7 @@ import { AccountsApi, WalletApi } from '../tonApiV2';
 import { emojis } from '../utils/emojis';
 import { accountsStorage } from './accountsStorage';
 import { walletContract } from './wallet/contractService';
-import { MamRoot, MamTonAccount } from '@multi-account-mnemonic/core';
+import { TonKeychainRoot, KeychainTonAccount } from '@ton-keychain/core';
 
 export const createMultisigTonAccount = async (
     storage: IStorage,
@@ -347,10 +347,10 @@ export const createMAMAccountByMnemonic = async (
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
-    const rootAccount = await MamRoot.fromMnemonic(rootMnemonic);
+    const rootAccount = await TonKeychainRoot.fromMnemonic(rootMnemonic);
 
     let childTonWallets: {
-        tonAccount: MamTonAccount;
+        tonAccount: KeychainTonAccount;
         derivationIndex: number;
         shouldAdd: boolean;
     }[];
@@ -366,6 +366,10 @@ export const createMAMAccountByMnemonic = async (
             appContext.defaultWalletVersion,
             options.network
         );
+
+        if (!childTonWallets.length) {
+            childTonWallets = await gePreselectedMAMTonAccountsToImport(rootAccount, [0]);
+        }
     }
 
     let auth: AuthPassword | AuthKeychain;
@@ -442,12 +446,12 @@ export function getFallbackAccountEmoji(publicKeyOrBase64: string) {
 }
 
 async function getRelevantMAMTonAccountsToImport(
-    root: MamRoot,
+    root: TonKeychainRoot,
     api: APIConfig,
     defaultWalletVersion: WalletVersion,
     network?: Network
-): Promise<{ tonAccount: MamTonAccount; derivationIndex: number; shouldAdd: boolean }[]> {
-    const getAccountsBalances = async (tonAccounts: MamTonAccount[]) => {
+): Promise<{ tonAccount: KeychainTonAccount; derivationIndex: number; shouldAdd: boolean }[]> {
+    const getAccountsBalances = async (tonAccounts: KeychainTonAccount[]) => {
         const addresses = tonAccounts.map(tonAccount =>
             walletContract(
                 tonAccount.publicKey,
@@ -463,8 +467,11 @@ async function getRelevantMAMTonAccountsToImport(
         return response.accounts.map(acc => acc.balance);
     };
 
-    const accounts: { tonAccount: MamTonAccount; derivationIndex: number; shouldAdd: boolean }[] =
-        [];
+    let accounts: {
+        tonAccount: KeychainTonAccount;
+        derivationIndex: number;
+        shouldAdd: boolean;
+    }[] = [];
 
     const indexesGap = 10;
     while (true) {
@@ -480,6 +487,15 @@ async function getRelevantMAMTonAccountsToImport(
         );
         const balances = await getAccountsBalances(accsToAdd.map(i => i.tonAccount));
         if (balances.every(b => !b)) {
+            const lastAccountToAdd = accounts
+                .slice()
+                .reverse()
+                .findIndex(a => a.shouldAdd);
+
+            if (lastAccountToAdd !== -1) {
+                accounts = accounts.slice(0, accounts.length - lastAccountToAdd);
+            }
+
             return accounts;
         } else {
             accsToAdd.forEach((acc, index) => {
@@ -494,9 +510,9 @@ async function getRelevantMAMTonAccountsToImport(
 }
 
 async function gePreselectedMAMTonAccountsToImport(
-    root: MamRoot,
+    root: TonKeychainRoot,
     selectedDerivations: number[]
-): Promise<{ tonAccount: MamTonAccount; derivationIndex: number; shouldAdd: boolean }[]> {
+): Promise<{ tonAccount: KeychainTonAccount; derivationIndex: number; shouldAdd: boolean }[]> {
     const maxDerivationIndex = selectedDerivations.reduce((acc, v) => Math.max(acc, v), -1);
     return Promise.all(
         [...Array(maxDerivationIndex + 1)].map(async (_, index) => ({

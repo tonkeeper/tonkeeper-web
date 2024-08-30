@@ -1,5 +1,7 @@
 {
   "about_tonkeeper_pro" : "О Tonkeeper Pro",
+  "account_is_already_added_action" : "Открыть кошелек",
+  "account_is_already_added_label" : "Этот кошелек уже добавлен как",
   "actionTitle" : "Открыть Кошелек",
   "add" : "Добавить",
   "add_dns_address" : "Добавьте адрес кошелька, на который будет ссылаться домен %1%",
@@ -189,6 +191,7 @@
   "replace" : "Заменить",
   "reset_tron_cache" : "Reset Tron cache",
   "save" : "Сохранить",
+  "secret_words_account_title" : "Секретный ключ вашего аккаунта",
   "settings_backup_account" : "Резервная копия аккаунта",
   "settings_backup_account_mam_description" : "Используется для восстановления доступа к вашему мультикаккаунту и всем связанным с ним кошелькам.",
   "settings_backup_wallet" : "Резервная копия кошелька",

@@ -129,7 +129,9 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
     return (
         <>
             <HeadingBlock>
-                <Header>{t('secret_words_title')}</Header>
+                <Header>
+                    {t(showMamInfo ? 'secret_words_account_title' : 'secret_words_title')}
+                </Header>
                 <Body>{t('secret_words_caption')}</Body>
             </HeadingBlock>
 

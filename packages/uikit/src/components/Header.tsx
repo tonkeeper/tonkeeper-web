@@ -6,11 +6,11 @@ import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute } from '../libs/routes';
 import { useUserCountry } from '../state/country';
 import {
-    useActiveWallet,
     useAccountsState,
     useMutateActiveTonWallet,
     useActiveTonNetwork,
-    useActiveAccount
+    useActiveAccount,
+    useActiveWallet
 } from '../state/wallet';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';

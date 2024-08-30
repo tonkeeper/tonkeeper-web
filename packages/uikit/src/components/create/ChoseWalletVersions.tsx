@@ -1,23 +1,25 @@
-import { ListBlock, ListItem, ListItemPayload } from '../List';
-import styled from 'styled-components';
-import { Body1, Body2, H2, Label1 } from '../Text';
-import { useTranslation } from '../../hooks/translation';
+import { mnemonicToWalletKey } from '@ton/crypto';
 import {
     WalletVersion,
     WalletVersions,
     walletVersionText
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useEffect, useLayoutEffect, useState } from 'react';
+import { FC, useEffect, useLayoutEffect, useState } from 'react';
+import styled from 'styled-components';
+import { useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
+import { toFormattedTonBalance } from '../../hooks/balance';
+import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
+import { useTranslation } from '../../hooks/translation';
 import { useAccountState, useStandardTonWalletVersions } from '../../state/wallet';
 import { SkeletonListDesktopAdaptive } from '../Skeleton';
-import { toFormattedTonBalance } from '../../hooks/balance';
 import { Checkbox } from '../fields/Checkbox';
 import { Button } from '../fields/Button';
-import { mnemonicToWalletKey } from '@ton/crypto';
-import { ChevronLeftIcon } from '../Icon';
 import { RoundedButton } from '../fields/RoundedButton';
-import { useAppContext } from '../../hooks/appContext';
+import { Body1, Body2, H2, Label1 } from '../Text';
+import { ListBlock, ListItem, ListItemPayload } from '../List';
+import { ChevronLeftIcon } from '../Icon';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 
 const Wrapper = styled.div`
@@ -72,12 +74,19 @@ export const ChoseWalletVersions: FC<{
     isLoading?: boolean;
 }> = ({ mnemonic, onSubmit, onBack, isLoading }) => {
     const { t } = useTranslation();
+    const sdk = useAppSdk();
     const { defaultWalletVersion } = useAppContext();
 
     const [publicKey, setPublicKey] = useState<string | undefined>(undefined);
     const { data: wallets } = useStandardTonWalletVersions(publicKey);
     const [checkedVersions, setCheckedVersions] = useState<WalletVersion[]>([]);
     const accountState = useAccountState(publicKey);
+
+    useEffect(() => {
+        if (sdk.isIOs()) {
+            hideIosKeyboard();
+        }
+    }, []);
 
     useEffect(() => {
         mnemonicToWalletKey(mnemonic).then(keypair =>
@@ -105,6 +114,13 @@ export const ChoseWalletVersions: FC<{
         setCheckedVersions(state =>
             isChecked ? state.concat(version) : state.filter(i => i !== version)
         );
+    };
+
+    const onSelect = () => {
+        if (sdk.isIOs()) {
+            openIosKeyboard('text', 'password');
+        }
+        onSubmit(checkedVersions);
     };
 
     return (
@@ -145,10 +161,11 @@ export const ChoseWalletVersions: FC<{
                     </ListBlockStyled>
                     <SubmitBlock>
                         <Button
+                            size="large"
                             fullWidth
                             primary
                             disabled={!checkedVersions.length}
-                            onClick={() => onSubmit(checkedVersions)}
+                            onClick={onSelect}
                             loading={isLoading}
                         >
                             {t('continue')}

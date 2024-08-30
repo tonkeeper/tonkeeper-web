@@ -4455,16 +4455,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@multi-account-mnemonic/core@npm:^0.0.1":
-  version: 0.0.1
-  resolution: "@multi-account-mnemonic/core@npm:0.0.1"
-  dependencies:
-    "@scure/bip39": "npm:^1.2.2"
-    "@ton/crypto": "npm:^3.2.0"
-  checksum: 10/b38240772f8ae2b4716613c6fc91e42021e24b779e2576ee38e7bdad165d051f77f7234c15c56457fa11e577146bcfc0aa92fa8786fb167c7afd6d2a862f18bd
-  languageName: node
-  linkType: hard
-
 "@ngraveio/bc-ur@npm:^1.1.13, @ngraveio/bc-ur@npm:^1.1.5, @ngraveio/bc-ur@npm:^1.1.6":
   version: 1.1.13
   resolution: "@ngraveio/bc-ur@npm:1.1.13"
@@ -6765,6 +6755,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ton-keychain/core@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@ton-keychain/core@npm:0.0.2"
+  dependencies:
+    "@scure/bip39": "npm:^1.2.2"
+    "@ton/crypto": "npm:^3.2.0"
+  checksum: 10/92b04512ef5c53f252d47e2d9d45caeb9584f578b4cedb82efb3ef45b354885c13e311c51ca2beee82efe6fc410035d64f52796b10823262f4b9583d29cb9698
+  languageName: node
+  linkType: hard
+
 "@ton/core@npm:0.56.0":
   version: 0.56.0
   resolution: "@ton/core@npm:0.56.0"
@@ -6819,8 +6819,8 @@ __metadata:
     "@keystonehq/keystone-sdk": "npm:0.7.2"
     "@ledgerhq/hw-transport-webhid": "npm:^6.28.6"
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
-    "@multi-account-mnemonic/core": "npm:^0.0.1"
     "@ton-community/ton-ledger": "npm:^7.2.0-pre.2"
+    "@ton-keychain/core": "npm:^0.0.2"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
     "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build10"
@@ -7012,7 +7012,6 @@ __metadata:
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
     "@keystonehq/keystone-sdk": "npm:0.7.2"
-    "@multi-account-mnemonic/core": "npm:^0.0.1"
     "@ngraveio/bc-ur": "npm:^1.1.13"
     "@polkadot/react-qr": "npm:^3.1.1"
     "@storybook/addon-actions": "npm:^6.5.14"
@@ -7025,6 +7024,7 @@ __metadata:
     "@storybook/testing-library": "npm:^0.0.13"
     "@tanstack/react-query": "npm:4.3.4"
     "@tanstack/react-virtual": "npm:^3.8.3"
+    "@ton-keychain/core": "npm:^0.0.2"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
     "@tonkeeper/core": "npm:0.1.0"

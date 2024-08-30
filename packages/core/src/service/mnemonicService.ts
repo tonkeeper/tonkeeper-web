@@ -1,7 +1,7 @@
 import { mnemonicValidate } from '@ton/crypto';
 import { decrypt } from './cryptoService';
 import { AuthPassword } from '../entries/password';
-import { MamRoot } from '@multi-account-mnemonic/core';
+import { TonKeychainRoot } from '@ton-keychain/core';
 
 export const decryptWalletMnemonic = async (state: { auth: AuthPassword }, password: string) => {
     const mnemonic = (await decrypt(state.auth.encryptedMnemonic, password)).split(' ');
@@ -20,7 +20,7 @@ export const validateMnemonicTonOrMAM = async (mnemonic: string[]) => {
     }
 
     try {
-        await MamRoot.fromMnemonic(mnemonic);
+        await TonKeychainRoot.fromMnemonic(mnemonic);
         return true;
     } catch (e) {
         return false;

@@ -17,7 +17,7 @@ import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { MamRoot } from '@multi-account-mnemonic/core';
+import { TonKeychainRoot } from '@ton-keychain/core';
 
 export const signTonConnectOver = (
     sdk: IAppSdk,
@@ -50,14 +50,33 @@ export const signTonConnectOver = (
                 );
                 return Buffer.from(result, 'hex');
             }
-            default: {
+            case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
                 const keyPair = await mnemonicToPrivateKey(mnemonic);
-                const signature = nacl.sign.detached(
+                return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
                     keyPair.secretKey
                 );
-                return signature;
+            }
+            case 'mam': {
+                const wallet = account.activeTonWallet;
+                const mnemonic = await getMAMWalletMnemonic(
+                    sdk,
+                    account.id,
+                    wallet.id,
+                    checkTouchId
+                );
+                const keyPair = await mnemonicToPrivateKey(mnemonic);
+                return nacl.sign.detached(
+                    Buffer.from(sha256_sync(bufferToSign)),
+                    keyPair.secretKey
+                );
+            }
+            case 'watch-only': {
+                throw new TxConfirmationCustomError("Can't use tonconnect over watch-only wallet");
+            }
+            default: {
+                assertUnreachable(account);
             }
         }
     };
@@ -206,7 +225,7 @@ export const getMAMWalletMnemonic = async (
     }
 
     const { mnemonic } = await getMnemonicAndPassword(sdk, accountId, checkTouchId);
-    const root = await MamRoot.fromMnemonic(mnemonic);
+    const root = await TonKeychainRoot.fromMnemonic(mnemonic);
     const tonAccount = await root.getTonAccount(derivation.index);
     return tonAccount.mnemonics;
 };

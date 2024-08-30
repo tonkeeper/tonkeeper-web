@@ -18,17 +18,21 @@ import {
 import { DeleteAccountNotification } from '../../components/settings/DeleteAccountNotification';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
-import { useDisclosure } from '../../hooks/useDisclosure';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import {
     useActiveAccount,
     useHideMAMAccountDerivation,
     useIsActiveWalletWatchOnly
 } from '../../state/wallet';
-import { AccountMAM, isAccountVersionEditable } from '@tonkeeper/core/dist/entries/account';
+import {
+    AccountMAM,
+    isAccountVersionEditable,
+    Account
+} from '@tonkeeper/core/dist/entries/account';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 import { WalletIndexBadge } from '../../components/account/AccountBadge';
+import { useState } from 'react';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -74,7 +78,7 @@ export const DesktopWalletSettingsPage = () => {
     const account = useActiveAccount();
     const { onOpen: rename } = useRenameNotification();
     const { onOpen: recovery } = useRecoveryNotification();
-    const { isOpen: isDeleteOpen, onClose: onDeleteClose, onOpen: onDeleteOpen } = useDisclosure();
+    const [accountToDelete, setAccountToDelete] = useState<Account | undefined>(undefined);
     const { mutateAsync: hideDerivation } = useHideMAMAccountDerivation();
 
     const isReadOnly = useIsActiveWalletWatchOnly();
@@ -221,7 +225,7 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                <SettingsListItem onClick={onDeleteOpen}>
+                <SettingsListItem onClick={() => setAccountToDelete(account)}>
                     <ExitIcon />
                     <Label2>{t('settings_delete_account')}</Label2>
                 </SettingsListItem>
@@ -242,8 +246,8 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <DeleteAccountNotification
-                account={isDeleteOpen ? account : undefined}
-                handleClose={onDeleteClose}
+                account={accountToDelete}
+                handleClose={() => setAccountToDelete(undefined)}
             />
         </DesktopViewPageLayout>
     );

@@ -1,5 +1,7 @@
 {
   "about_tonkeeper_pro" : "About Tonkeeper Pro",
+  "account_is_already_added_action" : "Open wallet",
+  "account_is_already_added_label" : "This wallet is already added as",
   "actionTitle" : "Open the wallet",
   "add" : "Add",
   "add_dns_address" : "Add wallet address that domain %1% will link to.",
@@ -198,6 +200,7 @@
   "replace" : "Replace",
   "reset_tron_cache" : "Reset Tron cache",
   "save" : "Save",
+  "secret_words_account_title" : "Your Account Recovery Phrase",
   "settings_backup_account" : "Backup Account",
   "settings_backup_account_mam_description" : "Used to restore access to your multi-wallet account and all associated wallets",
   "settings_backup_wallet" : "Backup Wallet",

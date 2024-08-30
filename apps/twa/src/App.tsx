@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { Network, getApiConfig } from '@tonkeeper/core/dist/entries/network';
-import { WalletVersion } from "@tonkeeper/core/dist/entries/wallet";
-import { Account } from "@tonkeeper/core/dist/entries/account";
+import { Account } from '@tonkeeper/core/dist/entries/account';
+import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -18,10 +18,7 @@ import {
     SettingsSkeletonPage
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
-import {
-    AppContext,
-    IAppContext,
-} from '@tonkeeper/uikit/dist/hooks/appContext';
+import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import {
     AfterImportAction,
     AppSdkContext,
@@ -34,11 +31,21 @@ import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
 import { Platform as TwaPlatform, initViewport } from '@tma.js/sdk';
 import { SDKProvider } from '@tma.js/sdk-react';
+import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
+import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import { useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
-import { useActiveAccountQuery, useAccountsStateQuery, useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
+import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
+import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
+import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
+import { useSwapMobileNotification } from '@tonkeeper/uikit/dist/state/swap/useSwapMobileNotification';
+import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
+import {
+    useAccountsStateQuery,
+    useActiveAccountQuery,
+    useActiveTonNetwork
+} from '@tonkeeper/uikit/dist/state/wallet';
 import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
@@ -231,18 +238,31 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const network = useActiveTonNetwork();
 
     const tonendpoint = useTonendpoint({
-       targetEnv: TARGET_ENV,
-       build: sdk.version,
-       network,
-       lang
-}
-    );
+        targetEnv: TARGET_ENV,
+        build: sdk.version,
+        network,
+        lang
+    });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     const navigate = useNavigate();
-    const { data: tracker } = useAnalytics(activeAccount || undefined, accounts, network, sdk.version);
+    const { data: tracker } = useAnalytics(
+        activeAccount || undefined,
+        accounts,
+        network,
+        sdk.version
+    );
 
-    if (isWalletsLoading || activeWalletLoading || isLangLoading || config === undefined || lock === undefined || fiat === undefined || !devSettings || globalPreferencesLoading) {
+    if (
+        isWalletsLoading ||
+        activeWalletLoading ||
+        isLangLoading ||
+        config === undefined ||
+        lock === undefined ||
+        fiat === undefined ||
+        !devSettings ||
+        globalPreferencesLoading
+    ) {
         return <Loading />;
     }
 
@@ -258,12 +278,12 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         ios: true,
         proFeatures: false,
         hideLedger: true,
-        hideBrowser: true,
         hideSigner: !showQrScan,
         hideKeystone: !showQrScan,
         hideQrScanner: !showQrScan,
         hideMam: true,
-        defaultWalletVersion: WalletVersion.V5R1
+        defaultWalletVersion: WalletVersion.V5R1,
+        browserLength: 4
     };
 
     return (
@@ -342,14 +362,14 @@ const Content: FC<{
 
     return (
         <>
-          <Routes>
-            <Route path={AppRoute.swap} element={<SwapScreen />} />
-            <Route path={'*'} element={<MainPages showQrScan={showQrScan} sdk={sdk} />} />
-          </Routes>
-          <Suspense>
-            <PairSignerNotification />
-            <PairKeystoneNotification />
-          </Suspense>
+            <Routes>
+                <Route path={AppRoute.swap} element={<SwapScreen />} />
+                <Route path={'*'} element={<MainPages showQrScan={showQrScan} sdk={sdk} />} />
+            </Routes>
+            <Suspense>
+                <PairSignerNotification />
+                <PairKeystoneNotification />
+            </Suspense>
         </>
     );
 };

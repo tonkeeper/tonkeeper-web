@@ -47,13 +47,24 @@ export const AccountAndWalletInfo: FC<
         wallet = account.getTonWallet(props.walletId)!;
     }
 
+    let name = account.name;
+    let emoji = account.emoji;
+
+    if (account.type === 'mam') {
+        const derivation = account.getTonWalletsDerivation(wallet.id);
+        if (derivation) {
+            name = derivation.name;
+            emoji = derivation.emoji;
+        }
+    }
+
     return (
         <WalletInfoStyled className={props.className}>
             <NameText>
                 {!props.noPrefix && <>{t('confirmSendModal_wallet')}&nbsp;</>}
-                {account.name}
+                {name}
             </NameText>
-            <WalletEmoji emojiSize="20px" containerSize="20px" emoji={account.emoji} />
+            <WalletEmoji emojiSize="20px" containerSize="20px" emoji={emoji} />
             {account.allTonWallets.length > 1 && !props.hideAddress ? (
                 <>
                     <Dot />

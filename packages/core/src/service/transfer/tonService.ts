@@ -73,7 +73,7 @@ const createTonConnectTransfer = async (
 
     if (signer.type === 'ledger') {
         if (params.messages.length !== 1) {
-            throw new Error('Ledger signer does not support multiple messages');
+            throw new LedgerError('Ledger signer does not support multiple messages');
         }
         if (account.type !== 'ledger') {
             throw new Error('Ledger signer can only be used with ledger accounts');
