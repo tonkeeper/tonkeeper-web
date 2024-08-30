@@ -10,13 +10,13 @@ import {
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
     createTransferMessage,
-    getKeyPairAndSeqno,
+    getWalletSeqnoAndCheckBalance,
     getServerTime,
     getTonkeeperQueryId,
     getWalletBalance,
     signEstimateMessage
 } from './common';
-import { Account, AccountTonWalletStandard } from "../../entries/account";
+import { AccountTonWalletStandard } from '../../entries/account';
 
 const initNftTransferAmount = toNano('1');
 export const nftTransferForwardAmount = BigInt('1');
@@ -191,7 +191,7 @@ export const sendNftRenew = async (options: {
     const walletState = options.account.activeTonWallet;
 
     const timestamp = await getServerTime(options.api);
-    const { seqno } = await getKeyPairAndSeqno({ ...options, walletState });
+    const { seqno } = await getWalletSeqnoAndCheckBalance({ ...options, walletState });
 
     const body = nftRenewBody({ queryId: getTonkeeperQueryId() });
 
@@ -246,7 +246,7 @@ export const sendNftLink = async (options: {
 }) => {
     const walletState = options.account.activeTonWallet;
     const timestamp = await getServerTime(options.api);
-    const { seqno } = await getKeyPairAndSeqno({ ...options, walletState });
+    const { seqno } = await getWalletSeqnoAndCheckBalance({ ...options, walletState });
 
     const body = nftLinkBody({ ...options, queryId: getTonkeeperQueryId() });
 

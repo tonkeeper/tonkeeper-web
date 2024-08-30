@@ -153,7 +153,7 @@ export const signEstimateMessage = async (message: Cell): Promise<Buffer> => {
 };
 signEstimateMessage.type = 'cell' as const;
 
-export async function getKeyPairAndSeqno(options: {
+export async function getWalletSeqnoAndCheckBalance(options: {
     api: APIConfig;
     walletState: TonWalletStandard;
     fee?: { event: { extra: number | BigNumber } };

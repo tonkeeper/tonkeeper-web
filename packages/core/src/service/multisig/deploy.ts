@@ -1,18 +1,19 @@
 /*https://github.com/ton-blockchain/multisig-contract-v2*/
-import { Address, beginCell, Cell, contractAddress, Dictionary, toNano } from '@ton/core';
-import { TonWalletStandard } from '../entries/wallet';
-import { CellSigner } from '../entries/signer';
+import { Address, beginCell, Cell, contractAddress, toNano } from '@ton/core';
+import { TonWalletStandard } from '../../entries/wallet';
+import { CellSigner } from '../../entries/signer';
 import {
     createTransferMessage,
-    getKeyPairAndSeqno,
+    getWalletSeqnoAndCheckBalance,
     getServerTime,
     signEstimateMessage
-} from './transfer/common';
-import { APIConfig } from '../entries/apis';
+} from '../transfer/common';
+import { APIConfig } from '../../entries/apis';
 import BigNumber from 'bignumber.js';
-import { AccountsApi, BlockchainApi, EmulationApi } from '../tonApiV2';
-import { AssetAmount } from '../entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '../entries/crypto/asset/constants';
+import { AccountsApi, BlockchainApi, EmulationApi } from '../../tonApiV2';
+import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '../../entries/crypto/asset/constants';
+import { arrayToCell, MultisigParams } from './utils';
 
 const deployMultisigValue = toNano(0.1);
 export const deployMultisigAssetAmount = new AssetAmount({
@@ -77,7 +78,7 @@ const createMultisig = async (options: {
     const timestamp = await getServerTime(options.api);
 
     const seqno = (
-        await getKeyPairAndSeqno({
+        await getWalletSeqnoAndCheckBalance({
             ...options,
             fee: options.feeWei !== undefined ? { event: { extra: options.feeWei } } : undefined,
             amount: new BigNumber(deployMultisigValue.toString())
@@ -126,52 +127,12 @@ export type MultisigConfig = {
     allowArbitrarySeqno: boolean;
 };
 
-const Op = {
-    multisig: {
-        new_order: 0xf718510f,
-        execute: 0x75097f5d,
-        execute_internal: 0xa32c59bf
-    },
-
-    order: {
-        approve: 0xa762230f,
-        expired: 0x6,
-        approve_rejected: 0xafaf283e,
-        approved: 0x82609bf6,
-        init: 0x9c73fba2
-    },
-
-    actions: {
-        send_message: 0xf1381e5b,
-        update_multisig_params: 0x1d0cfbd3
-    }
-};
-
-const Params = {
-    bitsize: {
-        op: 32,
-        queryId: 64,
-        orderSeqno: 256,
-        signerIndex: 8,
-        actionIndex: 8,
-        time: 48
-    }
-};
-
-function arrayToCell(arr: Array<Address>): Dictionary<number, Address> {
-    const dict = Dictionary.empty(Dictionary.Keys.Uint(8), Dictionary.Values.Address());
-    for (let i = 0; i < arr.length; i++) {
-        dict.set(i, arr[i]);
-    }
-    return dict;
-}
-
-export function multisigConfigToCell(config: MultisigConfig): Cell {
+function multisigConfigToCell(config: MultisigConfig): Cell {
     return beginCell()
-        .storeUint(0, Params.bitsize.orderSeqno)
-        .storeUint(config.threshold, Params.bitsize.signerIndex)
+        .storeUint(0, MultisigParams.bitsize.orderSeqno)
+        .storeUint(config.threshold, MultisigParams.bitsize.signerIndex)
         .storeRef(beginCell().storeDictDirect(arrayToCell(config.signers)))
-        .storeUint(config.signers.length, Params.bitsize.signerIndex)
+        .storeUint(config.signers.length, MultisigParams.bitsize.signerIndex)
         .storeDict(arrayToCell(config.proposers))
         .storeBit(config.allowArbitrarySeqno)
         .endCell();
