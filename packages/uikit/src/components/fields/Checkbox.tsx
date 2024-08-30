@@ -2,7 +2,7 @@ import React, { FC, forwardRef, PropsWithChildren, useId } from 'react';
 import styled, { css } from 'styled-components';
 import { CheckboxIcon } from '../Icon';
 import { Body1 } from '../Text';
-import { ChangeHandler } from "react-hook-form";
+import { ChangeHandler } from 'react-hook-form';
 
 export interface CheckboxProps {
     checked: boolean;
@@ -135,7 +135,7 @@ export const Radio = forwardRef<
     PropsWithChildren<{
         className?: string;
         checked?: boolean;
-        onChange?: ChangeHandler;
+        onChange?: ChangeHandler | ((event: { target: unknown; type?: unknown }) => void);
         disabled?: boolean;
         value?: string;
     }>

@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import {
     estimateDeployMultisig,
     MultisigConfig
-} from 'packages/core/src/service/multisig/multisigService';
+} from '@tonkeeper/core/dist/service/multisig/multisigService';
 import { useAppContext } from '../../appContext';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useAccountsState } from '../../../state/wallet';

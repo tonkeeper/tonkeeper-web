@@ -75,6 +75,9 @@ export const signTonConnectOver = (
             case 'watch-only': {
                 throw new TxConfirmationCustomError("Can't use tonconnect over watch-only wallet");
             }
+            case 'ton-multisig': {
+                throw new TxConfirmationCustomError("Can't use multisig wallet with this dApp");
+            }
             default: {
                 assertUnreachable(account);
             }

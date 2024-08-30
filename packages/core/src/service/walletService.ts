@@ -9,10 +9,11 @@ import {
     AccountKeystone,
     AccountLedger,
     AccountMAM,
-    AccountTonMnemonic, AccountTonMultisig,
+    AccountTonMnemonic,
+    AccountTonMultisig,
     AccountTonOnly,
     AccountTonWatchOnly
-} from "../entries/account";
+} from '../entries/account';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
 import { AuthKeychain, AuthPassword } from '../entries/password';
@@ -34,6 +35,7 @@ export const createMultisigTonAccount = async (
     address: string,
     options: {
         name?: string;
+        emoji?: string;
     }
 ) => {
     const rawAddress = Address.parse(address).toRawString();
@@ -41,7 +43,7 @@ export const createMultisigTonAccount = async (
         rawAddress.split(':')[1]
     );
 
-    return new AccountTonMultisig(rawAddress, options.name ?? name, emoji, {
+    return new AccountTonMultisig(rawAddress, options.name ?? name, options.emoji ?? emoji, {
         id: rawAddress,
         rawAddress: rawAddress
     });

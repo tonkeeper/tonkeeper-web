@@ -328,14 +328,15 @@ export const useCreateAccountTonMultisig = () => {
         {
             address: string;
             name?: string;
+            emoji?: string;
         }
-    >(async ({ address, name }) => {
+    >(async ({ address, name, emoji }) => {
         const valid = await seeIfValidTonAddress(address);
         if (!valid) {
             throw new Error('Address is not valid.');
         }
 
-        const account = await createMultisigTonAccount(sdk.storage, address, { name });
+        const account = await createMultisigTonAccount(sdk.storage, address, { name, emoji });
 
         await addAccountToState(account);
         return account;

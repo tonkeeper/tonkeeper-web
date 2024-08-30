@@ -1845,7 +1845,7 @@ export const InvisibleIcon = () => {
     );
 };
 
-export const PinIcon = () => {
+export const PinIcon: FC<{ className?: string }> = ({ className }) => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -1853,6 +1853,7 @@ export const PinIcon = () => {
             height="28"
             viewBox="0 0 28 28"
             fill="none"
+            className={className}
         >
             <g clipPath="url(#clip0_35112_65606)">
                 <path

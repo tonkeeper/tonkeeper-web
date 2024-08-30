@@ -14,14 +14,24 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { PencilIcon, PinIcon } from '../../components/Icon';
 import { Button } from '../../components/fields/Button';
-import { useGlobalPreferences } from '../../state/global-preferences';
-import { useAccountsState, useActiveAccount } from '../../state/wallet';
+import { useGlobalPreferences, useMutateGlobalPreferences } from '../../state/global-preferences';
+import {
+    useAccountsState,
+    useActiveAccount,
+    useCreateAccountTonMultisig,
+    useMutateActiveAccount
+} from '../../state/wallet';
 import { styled } from 'styled-components';
 import { Dot } from '../../components/Dot';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
+import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
+import { getFallbackAccountEmoji } from '@tonkeeper/core/dist/service/walletService';
+import { Address } from '@ton/core';
+import { AppRoute } from '../../libs/routes';
+import { useNavigate } from 'react-router-dom';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -76,31 +86,89 @@ const IconButtonTransparentBackgroundStyled = styled(IconButtonTransparentBackgr
     }
 `;
 
-const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = ({ multisigs }) => {
-    const config = useGlobalPreferences();
+const PinIconStyled = styled(PinIcon)<{ isActive: boolean }>`
+    color: ${p => (p.isActive ? p.theme.accentBlue : p.theme.iconTertiary)};
+`;
+
+export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = ({ multisigs }) => {
     const { t } = useTranslation();
     const accounts = useAccountsState();
     const currentActiveAccount = useActiveAccount();
+    const { onOpen: openRename } = useRenameNotification();
+    const { mutateAsync: createMultisig } = useCreateAccountTonMultisig();
+    const { pinnedMultisigs } = useGlobalPreferences();
+    const { mutateAsync: mutateGlobalPreferences } = useMutateGlobalPreferences();
+    const { mutateAsync: setActiveAccount } = useMutateActiveAccount();
 
     const multisigAccounts = useMemo(() => {
         return multisigs.map(m => {
             const existingAccount = accounts.find(a => a.id === m.address);
-            const name = existingAccount?.name || currentActiveAccount.name;
-            const emoji = existingAccount?.emoji || currentActiveAccount.emoji;
+            const name =
+                existingAccount?.name || 'Multisig ' + toShortValue(formatAddress(m.address));
+            const emoji =
+                existingAccount?.emoji ||
+                getFallbackAccountEmoji(Address.parse(m.address).hash.toString('hex'));
 
             return {
                 address: m.address,
                 name,
                 emoji,
                 isAdded: !!existingAccount,
-                isPinned: config.pinnedMultisigs.some(item => m.address === item),
+                isPinned: pinnedMultisigs.includes(m.address),
                 role: m.signers.includes(currentActiveAccount.activeTonWallet.rawAddress)
                     ? 'signer-and-proposer'
                     : 'proposer',
                 balance: m.balance
             };
         });
-    }, [accounts, multisigs, config, currentActiveAccount.name, currentActiveAccount.emoji]);
+    }, [
+        accounts,
+        multisigs,
+        pinnedMultisigs,
+        currentActiveAccount.name,
+        currentActiveAccount.emoji
+    ]);
+
+    const onRename = async (item: { address: string; name: string; emoji: string }) => {
+        if (!accounts.some(a => a.id === item.address)) {
+            await createMultisig(item);
+        }
+
+        openRename({ accountId: item.address });
+    };
+
+    const onTogglePin = async (item: {
+        address: string;
+        name: string;
+        emoji: string;
+        isPinned: boolean;
+    }) => {
+        if (!accounts.some(a => a.id === item.address)) {
+            await createMultisig(item);
+        }
+
+        if (item.isPinned) {
+            await mutateGlobalPreferences({
+                pinnedMultisigs: pinnedMultisigs.filter(i => i !== item.address)
+            });
+        } else {
+            await mutateGlobalPreferences({
+                pinnedMultisigs: pinnedMultisigs
+                    .filter(i => i !== item.address)
+                    .concat(item.address)
+            });
+        }
+    };
+
+    const navigate = useNavigate();
+    const onOpen = async (item: { address: string; name: string; emoji: string }) => {
+        if (!accounts.some(a => a.id === item.address)) {
+            await createMultisig(item);
+        }
+
+        await setActiveAccount(item.address);
+        navigate(AppRoute.home);
+    };
 
     return (
         <ListBlockDesktopAdaptive>
@@ -120,22 +188,15 @@ const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = ({ mult
                         </TextContainer>
 
                         <ButtonsContainer>
-                            <IconButtonTransparentBackgroundStyled
-                                onClick={() => rename({ accountId: account.id, derivationIndex })}
-                            >
+                            <IconButtonTransparentBackgroundStyled onClick={() => onRename(item)}>
                                 <PencilIcon />
                             </IconButtonTransparentBackgroundStyled>
                             <IconButtonTransparentBackgroundStyled
-                                onClick={() => rename({ accountId: account.id, derivationIndex })}
+                                onClick={() => onTogglePin(item)}
                             >
-                                <PinIcon />
+                                <PinIconStyled isActive={item.isPinned} />
                             </IconButtonTransparentBackgroundStyled>
-                            <Button
-                                onClick={() => onOpenDerivation(derivationIndex)}
-                                loading={isLoading}
-                            >
-                                {t('open')}
-                            </Button>
+                            <Button onClick={() => onOpen(item)}>{t('open')}</Button>
                         </ButtonsContainer>
                     </ListItemPayload>
                 </ListItem>

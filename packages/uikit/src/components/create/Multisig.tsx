@@ -54,7 +54,7 @@ import { useDisclosure } from '../../hooks/useDisclosure';
 import {
     deployMultisigAssetAmount,
     MultisigConfig
-} from 'packages/core/src/service/multisig/multisigService';
+} from '@tonkeeper/core/dist/service/multisig/multisigService';
 import { Address } from '@ton/core';
 import {
     AsyncValidationState,

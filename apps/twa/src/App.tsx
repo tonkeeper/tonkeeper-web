@@ -62,12 +62,6 @@ import { SwapScreen } from './components/swap/SwapNotification';
 import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
-import { useUserFiatQuery } from "@tonkeeper/uikit/dist/state/fiat";
-import { useUserLanguage } from "@tonkeeper/uikit/dist/state/language";
-import { useSwapMobileNotification } from "@tonkeeper/uikit/dist/state/swap/useSwapMobileNotification";
-import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
-import { ModalsRoot } from "@tonkeeper/uikit/dist/components/ModalsRoot";
-import { useDebuggingTools } from "@tonkeeper/uikit/dist/hooks/useDebuggingTools";
 import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
