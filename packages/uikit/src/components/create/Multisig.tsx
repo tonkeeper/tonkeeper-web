@@ -8,7 +8,7 @@ import React, {
     useMemo,
     useState
 } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { Body1, Body2, Body2Class, Body3, Body3Class, H2, Label2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
@@ -30,7 +30,7 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
-import { DropDown, DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
+import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { Dot } from '../Dot';
 import {
     Notification,
@@ -67,6 +67,12 @@ import { RenameWalletContent } from '../settings/wallet-name/WalletNameNotificat
 import { AddWalletContext } from './AddWalletContext';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
 import { useAppSdk } from '../../hooks/appSdk';
+import {
+    SelectDropDown,
+    SelectDropDownHost,
+    SelectDropDownHostText,
+    SelectField
+} from '../fields/Select';
 
 const Body3Secondary = styled(Body3)`
     color: ${p => p.theme.textSecondary};
@@ -514,38 +520,8 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
     );
 };
 
-const DropDownSelectHost = styled.div<{ isErrored?: boolean }>`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    ${BorderSmallResponsive};
-    ${p =>
-        p.isErrored &&
-        css`
-            border: 1px solid ${p.theme.fieldErrorBorder};
-            background: ${p.theme.fieldErrorBackground};
-        `}
-`;
-
-const DropDownSelectHostText = styled.div`
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    box-sizing: border-box;
-
-    > :first-child {
-        color: ${p => p.theme.textSecondary};
-    }
-`;
-
 const AccountAndWalletInfoStyled = styled(AccountAndWalletInfo)`
     color: ${p => p.theme.textPrimary};
-`;
-
-const DropDownStyled = styled(DropDown)`
-    width: 100%;
 `;
 
 const FirstParticipantCard: FC = () => {
@@ -592,8 +568,11 @@ const FirstParticipantCard: FC = () => {
             render={({ field: { onChange }, fieldState: { error } }) => (
                 <>
                     <ParticipantCardStyled registerAs="firstParticipant.role">
-                        <DropDownStyled
-                            containerClassName="dd-create-multisig-container"
+                        <SelectDropDown
+                            width="350px"
+                            maxHeight="250px"
+                            right="32px"
+                            top="16px"
                             payload={onClose => (
                                 <DropDownContent>
                                     {Object.values(wallets).map(item => (
@@ -620,18 +599,18 @@ const FirstParticipantCard: FC = () => {
                                 </DropDownContent>
                             )}
                         >
-                            <DropDownSelectHost isErrored={!!error}>
-                                <DropDownSelectHostText>
+                            <SelectDropDownHost isErrored={!!error}>
+                                <SelectDropDownHostText>
                                     <Body3>{t('wallet_title')}</Body3>
                                     <AccountAndWalletInfoStyled
                                         noPrefix
                                         account={selectedWallet.account}
                                         walletId={selectedWallet.wallet.id}
                                     />
-                                </DropDownSelectHostText>
+                                </SelectDropDownHostText>
                                 <SwitchIcon />
-                            </DropDownSelectHost>
-                        </DropDownStyled>
+                            </SelectDropDownHost>
+                        </SelectDropDown>
                     </ParticipantCardStyled>
                     {error && <FormError noPaddingTop>{error.message}</FormError>}
                 </>
@@ -668,12 +647,6 @@ const ParticipantCard: FC<
 
 const ParticipantCardStyled = styled(ParticipantCard)`
     width: 100%;
-    .dd-create-multisig-container {
-        width: 350px;
-        max-height: 250px;
-        right: 32px;
-        top: 16px;
-    }
 `;
 
 const QuorumAndDeadlineInputsContainer = styled.div`
@@ -682,17 +655,6 @@ const QuorumAndDeadlineInputsContainer = styled.div`
     flex-direction: column;
     gap: 8px;
     margin-bottom: 16px;
-
-    .dd-create-multisig-container {
-        bottom: 50%;
-        right: 32px;
-        top: unset;
-    }
-`;
-
-const StandaloneField = styled.div`
-    background: ${p => p.theme.fieldBackground};
-    ${BorderSmallResponsive};
 `;
 
 const DropDownItemText = styled.div`
@@ -704,14 +666,6 @@ const DropDownItemText = styled.div`
     }
 `;
 
-const timeToSignOptions = {
-    '30_minutes': 0.5,
-    '1_hour': 1,
-    '6_hours': 6,
-    '12_hours': 12,
-    '24_hours': 24
-};
-
 const QuorumAndDeadlineInputs = () => {
     const { t } = useTranslation();
     const {
@@ -721,10 +675,6 @@ const QuorumAndDeadlineInputs = () => {
         formState: { isSubmitted }
     } = useFormContext<MultisigUseForm>();
     const selectedSignersNumber = watch('quorum');
-    /*const selectedDeadline = watch('deadlineHours');
-    const selectedDeadlineTranslation = Object.entries(timeToSignOptions).find(
-        ([_, v]) => v === selectedDeadline
-    )![0];*/
     const firsIsSigner = watch('firstParticipant').role === 'proposer-and-signer' ? 1 : 0;
     const totalSignersNumber =
         watch('participants').filter(i => i.role === 'proposer-and-signer').length + firsIsSigner;
@@ -755,8 +705,10 @@ const QuorumAndDeadlineInputs = () => {
                     }
                 }}
                 render={({ field: { onChange }, fieldState: { error } }) => (
-                    <DropDownStyled
-                        containerClassName="dd-create-multisig-container"
+                    <SelectDropDown
+                        bottom="50%"
+                        right="32px"
+                        top="unset"
                         payload={onClose => (
                             <DropDownContent>
                                 {[...Array(totalSignersNumber)]
@@ -787,9 +739,9 @@ const QuorumAndDeadlineInputs = () => {
                             </DropDownContent>
                         )}
                     >
-                        <StandaloneField>
-                            <DropDownSelectHost isErrored={!!error}>
-                                <DropDownSelectHostText>
+                        <SelectField>
+                            <SelectDropDownHost isErrored={!!error}>
+                                <SelectDropDownHostText>
                                     <Body3>{t('create_multisig_quorum')}</Body3>
                                     <Body2>
                                         {selectedSignersNumber} signers
@@ -800,57 +752,16 @@ const QuorumAndDeadlineInputs = () => {
                                             </>
                                         )}
                                     </Body2>
-                                </DropDownSelectHostText>
+                                </SelectDropDownHostText>
                                 <SwitchIcon />
-                            </DropDownSelectHost>
-                        </StandaloneField>
+                            </SelectDropDownHost>
+                        </SelectField>
                         {error && <FormError>{error.message}</FormError>}
-                    </DropDownStyled>
+                    </SelectDropDown>
                 )}
                 name={'quorum'}
                 control={control}
             />
-            {/*    <Controller
-                rules={{
-                    required: 'Required'
-                }}
-                render={({ field: { onChange } }) => (
-                    <DropDownStyled
-                        containerClassName="dd-create-multisig-container"
-                        payload={onClose => (
-                            <DropDownContent>
-                                {Object.entries(timeToSignOptions).map(([translation, value]) => (
-                                    <>
-                                        <DropDownItem
-                                            isSelected={selectedDeadline === value}
-                                            key={value}
-                                            onClick={() => {
-                                                onClose();
-                                                onChange(value);
-                                            }}
-                                        >
-                                            <Label2>{t(translation)}</Label2>
-                                        </DropDownItem>
-                                        <DropDownItemsDivider />
-                                    </>
-                                ))}
-                            </DropDownContent>
-                        )}
-                    >
-                        <StandaloneField>
-                            <DropDownSelectHost>
-                                <DropDownSelectHostText>
-                                    <Body3>Time to sign a transaction</Body3>
-                                    <Body2>{t(selectedDeadlineTranslation)}</Body2>
-                                </DropDownSelectHostText>
-                                <SwitchIcon />
-                            </DropDownSelectHost>
-                        </StandaloneField>
-                    </DropDownStyled>
-                )}
-                name={'deadlineHours'}
-                control={control}
-            />*/}
             <Body3Secondary>{t('create_multisig_can_change_hint')}</Body3Secondary>
         </QuorumAndDeadlineInputsContainer>
     );

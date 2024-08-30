@@ -222,6 +222,18 @@ const SendContent: FC<{
                 >
                     {status => (
                         <div ref={nodeRef}>
+                            {/* TODO handle navigation */}
+                            {/* <MultisigOrderFormView
+                                onSubmit={console.log}
+                                isAnimationProcess={status === 'exiting'}
+                                Header={() => (
+                                    <TransferViewHeaderBlock
+                                        title={t('multisig_create_order_title')}
+                                        onClose={onClose}
+                                    />
+                                )}
+                                MainButton={MainButton}
+                            />*/}
                             {view === 'recipient' && (
                                 <RecipientView
                                     data={recipient}

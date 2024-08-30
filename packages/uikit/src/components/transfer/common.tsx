@@ -160,7 +160,7 @@ export const ButtonBlock = React.forwardRef<HTMLDivElement, PropsWithChildren>(
 );
 ButtonBlock.displayName = 'ButtonBlock';
 
-export const MainButton = ({ isLoading, onClick }: { isLoading: boolean; onClick: () => void }) => {
+export const MainButton = ({ isLoading, onClick }: { isLoading?: boolean; onClick: () => void }) => {
     const { t } = useTranslation();
 
     return (
@@ -263,6 +263,19 @@ export const ConfirmAndCancelMainButton: ConfirmMainButtonProps = ({
                 {t(isLedger ? 'ledger_continue_with_ledger' : 'confirm')}
             </Button>
         </ConfirmViewButtonsContainerStyled>
+    );
+};
+
+export const TransferViewHeaderBlock: FC<{ title: string; onClose: () => void }> = ({
+    title,
+    onClose
+}) => {
+    return (
+        <NotificationTitleBlock>
+            <ButtonMock />
+            <H3>{title}</H3>
+            <NotificationCancelButton handleClose={onClose} />
+        </NotificationTitleBlock>
     );
 };
 
