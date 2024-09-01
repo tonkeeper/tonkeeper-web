@@ -47,7 +47,7 @@ const DesktopDashboardHeaderPayload = () => {
         const columnsRow = selectedColumns
             .filter(c => c.isEnabled)
             .map(c => columns.find(item => item.id === c.id)?.name || c.id);
-        const dataRows: string[][] = data.map(row => row.map(toStringDashboardCell));
+        const dataRows: string[][] = data.map(row => row.cells.map(toStringDashboardCell));
         return arrayToCsvString([columnsRow, ...dataRows]);
     }, [data, columns, selectedColumns]);
 

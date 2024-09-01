@@ -17,10 +17,14 @@ const workchain = 0;
 export type WalletContract = ReturnType<typeof walletContract>;
 
 export const walletContract = (
-    publicKey: Buffer,
+    publicKey: Buffer | string,
     version: WalletVersion,
     network = Network.MAINNET
 ) => {
+    if (typeof publicKey === 'string') {
+        publicKey = Buffer.from(publicKey, 'hex');
+    }
+
     switch (version) {
         case WalletVersion.V3R1:
             return WalletContractV3R1.create({ workchain, publicKey });

@@ -2,7 +2,7 @@ import { mnemonicNew } from '@ton/crypto';
 import { useEffect, useState } from 'react';
 import { IconPage } from '../../components/Layout';
 import { UpdateWalletName } from '../../components/create/WalletName';
-import { Check, Worlds } from '../../components/create/Words';
+import { Check, Words } from '../../components/create/Words';
 import { Button } from '../../components/fields/Button';
 import {
     CheckLottieIcon,
@@ -80,7 +80,7 @@ const Create = () => {
 
     if (!wordsPagePassed) {
         return (
-            <Worlds
+            <Words
                 mnemonic={mnemonic}
                 onBack={() => setInfoPagePassed(false)}
                 onCheck={() => setWordsPagePassed(true)}

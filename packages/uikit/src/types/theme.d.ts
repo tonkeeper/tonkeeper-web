@@ -52,6 +52,7 @@ declare module 'styled-components' {
         fieldErrorBackground: string;
 
         accentBlue: string;
+        accentBlueConstant: string;
         accentGreen: string;
         accentRed: string;
         accentOrange: string;

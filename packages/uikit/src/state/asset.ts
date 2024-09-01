@@ -187,7 +187,7 @@ export const useAllWalletsTotalBalance = () => {
             });
 
             return result
-                .map(row => new BigNumber((row[0] as DashboardCellNumeric).value))
+                .map(row => new BigNumber((row.cells[0] as DashboardCellNumeric).value))
                 .reduce((v, acc) => acc.plus(v), new BigNumber(0));
         }
     );

@@ -2,14 +2,13 @@ import React, { FC, useEffect, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { BackButtonBlock } from '../../components/BackButton';
-import { Body1, Body2, H2 } from '../../components/Text';
-import { WorldNumber, WorldsGrid } from '../../components/create/Words';
+import { WordsGridAndHeaders } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useTranslation } from '../../hooks/translation';
-import { getMnemonic } from '../../state/mnemonic';
+import { getAccountMnemonic, getMAMWalletMnemonic } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
-import { useActiveAccount } from '../../state/wallet';
+import { useAccountState, useActiveAccount } from '../../state/wallet';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 
 export const ActiveRecovery = () => {
     const account = useActiveAccount();
@@ -29,7 +28,7 @@ export const Recovery = () => {
     }
 };
 
-const useMnemonic = (accountId: AccountId) => {
+const useMnemonic = (accountId: AccountId, walletId?: WalletId) => {
     const [mnemonic, setMnemonic] = useState<string[] | undefined>(undefined);
     const sdk = useAppSdk();
     const navigate = useNavigate();
@@ -38,12 +37,18 @@ const useMnemonic = (accountId: AccountId) => {
     useEffect(() => {
         (async () => {
             try {
-                setMnemonic(await getMnemonic(sdk, accountId, checkTouchId));
+                let _mnemonic;
+                if (walletId !== undefined) {
+                    _mnemonic = await getMAMWalletMnemonic(sdk, accountId, walletId, checkTouchId);
+                } else {
+                    _mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
+                }
+                setMnemonic(_mnemonic);
             } catch (e) {
                 navigate(-1);
             }
         })();
-    }, [accountId, checkTouchId]);
+    }, [accountId, checkTouchId, walletId]);
 
     return mnemonic;
 };
@@ -58,25 +63,6 @@ const Wrapper = styled.div`
     position: relative;
 `;
 
-const Block = styled.div`
-    display: flex;
-    text-align: center;
-    flex-direction: column;
-
-    position: relative;
-`;
-
-const Title = styled(H2)`
-    user-select: none;
-    padding: 0 2rem;
-`;
-
-const Body = styled(Body2)`
-    text-align: center;
-    color: ${props => props.theme.textSecondary};
-    user-select: none;
-`;
-
 const BackButtonBlockStyled = styled(BackButtonBlock)`
     ${p =>
         p.theme.displayType === 'full-width' &&
@@ -85,10 +71,13 @@ const BackButtonBlockStyled = styled(BackButtonBlock)`
         `}
 `;
 
-const RecoveryContent: FC<{ accountId: AccountId }> = ({ accountId }) => {
-    const { t } = useTranslation();
+export const RecoveryContent: FC<{ accountId: AccountId; walletId?: WalletId }> = ({
+    accountId,
+    walletId
+}) => {
     const navigate = useNavigate();
-    const mnemonic = useMnemonic(accountId);
+    const mnemonic = useMnemonic(accountId, walletId);
+    const account = useAccountState(accountId);
 
     const onBack = () => {
         navigate(-1);
@@ -101,18 +90,10 @@ const RecoveryContent: FC<{ accountId: AccountId }> = ({ accountId }) => {
     return (
         <Wrapper>
             <BackButtonBlockStyled onClick={onBack} />
-            <Block>
-                <Title>{t('secret_words_title')}</Title>
-                <Body>{t('secret_words_caption')}</Body>
-            </Block>
-
-            <WorldsGrid>
-                {mnemonic.map((world, index) => (
-                    <Body1 key={index}>
-                        <WorldNumber> {index + 1}.</WorldNumber> {world}{' '}
-                    </Body1>
-                ))}
-            </WorldsGrid>
+            <WordsGridAndHeaders
+                mnemonic={mnemonic}
+                showMamInfo={account?.type === 'mam' && walletId === undefined}
+            />
         </Wrapper>
     );
 };

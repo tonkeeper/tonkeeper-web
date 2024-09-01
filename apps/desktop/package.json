@@ -1,7 +1,7 @@
 {
     "name": "@tonkeeper/desktop",
     "license": "Apache-2.0",
-    "version": "3.20.1",
+    "version": "3.21.1",
     "description": "Your desktop wallet on The Open Network",
     "main": ".webpack/main",
     "repository": {
@@ -70,6 +70,7 @@
         "@tonkeeper/uikit": "0.1.0",
         "buffer": "^6.0.3",
         "copy-to-clipboard": "^3.3.3",
+        "crypto-browserify": "^3.12.0",
         "electron-is-dev": "^2.0.0",
         "electron-log": "^5.0.1",
         "electron-squirrel-startup": "^1.0.0",

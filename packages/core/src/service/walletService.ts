@@ -8,6 +8,7 @@ import { IStorage } from '../Storage';
 import {
     AccountKeystone,
     AccountLedger,
+    AccountMAM,
     AccountTonMnemonic,
     AccountTonOnly,
     AccountTonWatchOnly
@@ -15,11 +16,18 @@ import {
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
 import { AuthKeychain, AuthPassword } from '../entries/password';
-import { WalletVersion, WalletVersions, sortWalletsByVersion } from '../entries/wallet';
-import { WalletApi } from '../tonApiV2';
+import {
+    WalletVersion,
+    WalletVersions,
+    sortWalletsByVersion,
+    TonWalletStandard,
+    DerivationItemNamed
+} from '../entries/wallet';
+import { AccountsApi, WalletApi } from '../tonApiV2';
 import { emojis } from '../utils/emojis';
 import { accountsStorage } from './accountsStorage';
 import { walletContract } from './wallet/contractService';
+import { TonKeychainRoot, KeychainTonAccount } from '@ton-keychain/core';
 
 export const createReadOnlyTonAccountByAddress = async (
     storage: IStorage,
@@ -311,7 +319,188 @@ export const accountByKeystone = async (ur: UR, storage: IStorage): Promise<Acco
     });
 };
 
-export function getFallbackAccountEmoji(publicKey: string) {
-    const index = Number('0x' + publicKey.slice(-6)) % emojis.length;
+export const createMAMAccountByMnemonic = async (
+    appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
+    storage: IStorage,
+    rootMnemonic: string[],
+    options: {
+        selectedDerivations?: number[];
+        network?: Network;
+        auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+    }
+) => {
+    const rootAccount = await TonKeychainRoot.fromMnemonic(rootMnemonic);
+
+    let childTonWallets: {
+        tonAccount: KeychainTonAccount;
+        derivationIndex: number;
+        shouldAdd: boolean;
+    }[];
+    if (options.selectedDerivations?.length) {
+        childTonWallets = await gePreselectedMAMTonAccountsToImport(
+            rootAccount,
+            options.selectedDerivations
+        );
+    } else {
+        childTonWallets = await getRelevantMAMTonAccountsToImport(
+            rootAccount,
+            appContext.api,
+            appContext.defaultWalletVersion,
+            options.network
+        );
+
+        if (!childTonWallets.length) {
+            childTonWallets = await gePreselectedMAMTonAccountsToImport(rootAccount, [0]);
+        }
+    }
+
+    let auth: AuthPassword | AuthKeychain;
+    if (options.auth.kind === 'keychain') {
+        auth = {
+            kind: 'keychain',
+            keychainStoreKey: rootAccount.id
+        };
+    } else {
+        auth = options.auth;
+    }
+
+    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
+        rootAccount.id
+    );
+
+    const namedDerivations: { item: DerivationItemNamed; shouldAdd: boolean }[] =
+        childTonWallets.map(w => {
+            const tonWallet = walletContract(
+                w.tonAccount.publicKey,
+                appContext.defaultWalletVersion,
+                options.network
+            );
+            const tonWallets: TonWalletStandard[] = [
+                {
+                    id: tonWallet.address.toRawString(),
+                    publicKey: w.tonAccount.publicKey,
+                    version: appContext.defaultWalletVersion,
+                    rawAddress: tonWallet.address.toRawString()
+                }
+            ];
+
+            return {
+                item: {
+                    name: AccountMAM.getNewDerivationFallbackName(w.derivationIndex),
+                    emoji,
+                    index: w.derivationIndex,
+                    tonWallets,
+                    activeTonWalletId: tonWallets[0].id
+                },
+                shouldAdd: w.shouldAdd
+            };
+        });
+
+    const addedDerivationIndexes = namedDerivations.filter(d => d.shouldAdd).map(d => d.item.index);
+    if (addedDerivationIndexes.length === 0) {
+        throw new Error('No derivations to add');
+    }
+
+    return new AccountMAM(
+        rootAccount.id,
+        name,
+        emoji,
+        auth,
+        addedDerivationIndexes[0],
+        addedDerivationIndexes,
+        namedDerivations.map(d => d.item)
+    );
+};
+
+export function getFallbackAccountEmoji(publicKeyOrBase64: string) {
+    let index;
+    if (/^[0-9A-Fa-f]+$/g.test(publicKeyOrBase64)) {
+        index = Number('0x' + publicKeyOrBase64.slice(-6)) % emojis.length;
+    } else {
+        try {
+            index = Buffer.from(publicKeyOrBase64, 'base64').readUint32BE() % emojis.length;
+        } catch (_) {
+            index = Buffer.from(publicKeyOrBase64).readUint32BE() % emojis.length;
+        }
+    }
+
     return emojis[index];
+}
+
+async function getRelevantMAMTonAccountsToImport(
+    root: TonKeychainRoot,
+    api: APIConfig,
+    defaultWalletVersion: WalletVersion,
+    network?: Network
+): Promise<{ tonAccount: KeychainTonAccount; derivationIndex: number; shouldAdd: boolean }[]> {
+    const getAccountsBalances = async (tonAccounts: KeychainTonAccount[]) => {
+        const addresses = tonAccounts.map(tonAccount =>
+            walletContract(
+                tonAccount.publicKey,
+                defaultWalletVersion,
+                network
+            ).address.toRawString()
+        );
+
+        const response = await new AccountsApi(api.tonApiV2).getAccounts({
+            getAccountsRequest: { accountIds: addresses }
+        });
+
+        return response.accounts.map(acc => acc.balance);
+    };
+
+    let accounts: {
+        tonAccount: KeychainTonAccount;
+        derivationIndex: number;
+        shouldAdd: boolean;
+    }[] = [];
+
+    const indexesGap = 10;
+    while (true) {
+        const indexFrom = accounts.length ? accounts[accounts.length - 1].derivationIndex + 1 : 0;
+        const accsToAdd = await Promise.all(
+            [...Array(indexesGap)]
+                .map((_, i) => indexFrom + i)
+                .map(async derivationIndex => ({
+                    tonAccount: await root.getTonAccount(derivationIndex),
+                    derivationIndex,
+                    shouldAdd: true
+                }))
+        );
+        const balances = await getAccountsBalances(accsToAdd.map(i => i.tonAccount));
+        if (balances.every(b => !b)) {
+            const lastAccountToAdd = accounts
+                .slice()
+                .reverse()
+                .findIndex(a => a.shouldAdd);
+
+            if (lastAccountToAdd !== -1) {
+                accounts = accounts.slice(0, accounts.length - lastAccountToAdd);
+            }
+
+            return accounts;
+        } else {
+            accsToAdd.forEach((acc, index) => {
+                const balance = balances[index];
+                if (!balance) {
+                    acc.shouldAdd = false;
+                }
+            });
+            accounts.push(...accsToAdd);
+        }
+    }
+}
+
+async function gePreselectedMAMTonAccountsToImport(
+    root: TonKeychainRoot,
+    selectedDerivations: number[]
+): Promise<{ tonAccount: KeychainTonAccount; derivationIndex: number; shouldAdd: boolean }[]> {
+    const maxDerivationIndex = selectedDerivations.reduce((acc, v) => Math.max(acc, v), -1);
+    return Promise.all(
+        [...Array(maxDerivationIndex + 1)].map(async (_, index) => ({
+            tonAccount: await root.getTonAccount(index),
+            derivationIndex: index,
+            shouldAdd: selectedDerivations.includes(index)
+        }))
+    );
 }

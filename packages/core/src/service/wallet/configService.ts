@@ -1,4 +1,5 @@
 import { Address } from '@ton/core';
+import { IAppSdk } from '../../AppSdk';
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
 import { Network } from '../../entries/network';
@@ -25,15 +26,15 @@ const migration = async (storage: IStorage, address: string, network: Network | 
 };
 
 export const getActiveWalletConfig = async (
-    storage: IStorage,
+    sdk: IAppSdk,
     address: string,
     network: Network | undefined
 ) => {
     const formatted = Address.parse(address).toString({ testOnly: network === Network.TESTNET });
-    let config = await storage.get<TonWalletConfig>(`${AppKey.WALLET_CONFIG}_${formatted}`);
+    let config = await sdk.storage.get<TonWalletConfig>(`${AppKey.WALLET_CONFIG}_${formatted}`);
 
-    if (!config) {
-        config = await migration(storage, address, network);
+    if (sdk.targetEnv !== 'twa' && !config) {
+        config = await migration(sdk.storage, address, network);
     }
     if (!config) {
         return defaultConfig;
