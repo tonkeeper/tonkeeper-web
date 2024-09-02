@@ -5,14 +5,22 @@ import { decrypt } from './cryptoService';
 
 export const decryptWalletMnemonic = async (state: { auth: AuthPassword }, password: string) => {
     const mnemonic = (await decrypt(state.auth.encryptedMnemonic, password)).split(' ');
+    const isValid = await seeIfMnemonicValid(mnemonic);
+    if (!isValid) {
+        throw new Error('Wallet mnemonic not valid');
+    }
+    return mnemonic;
+};
+
+export const seeIfMnemonicValid = async (mnemonic: string[]) => {
     const isValid = await mnemonicValidate(mnemonic);
     if (!isValid) {
         const isMam = await validateMnemonicTonOrMAM(mnemonic);
         if (!isMam) {
-            throw new Error('Wallet mnemonic not valid');
+            return false;
         }
     }
-    return mnemonic;
+    return true;
 };
 
 export const validateMnemonicTonOrMAM = async (mnemonic: string[]) => {

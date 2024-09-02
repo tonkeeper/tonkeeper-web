@@ -1,3 +1,4 @@
+import { validatePassword } from '@tonkeeper/core/dist/service/passwordService';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -6,7 +7,6 @@ import { CenterContainer } from '../Layout';
 import { H2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
-import { validatePassword } from '@tonkeeper/core/dist/service/passwordService';
 
 const Block = styled.form`
     display: flex;

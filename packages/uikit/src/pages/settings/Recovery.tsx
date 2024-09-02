@@ -1,6 +1,6 @@
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { BackButtonBlock } from '../../components/BackButton';
@@ -33,10 +33,9 @@ export const Recovery = () => {
     }
 };
 
-const useMnemonic = (accountId: AccountId, walletId?: WalletId) => {
+const useMnemonic = (onBack: () => void, accountId: AccountId, walletId?: WalletId) => {
     const [mnemonic, setMnemonic] = useState<string[] | undefined>(undefined);
     const sdk = useAppSdk();
-    const navigate = useNavigate();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     useEffect(() => {
@@ -50,10 +49,10 @@ const useMnemonic = (accountId: AccountId, walletId?: WalletId) => {
                 }
                 setMnemonic(_mnemonic);
             } catch (e) {
-                navigate(-1);
+                onBack();
             }
         })();
-    }, [accountId, checkTouchId, walletId]);
+    }, [onBack, accountId, checkTouchId, walletId]);
 
     return mnemonic;
 };
@@ -80,14 +79,15 @@ export const RecoveryContent: FC<{
     accountId: AccountId;
     walletId?: WalletId;
     isPage?: boolean;
-}> = ({ accountId, walletId, isPage = true }) => {
+    onClose?: () => void;
+}> = ({ accountId, walletId, isPage = true, onClose }) => {
     const navigate = useNavigate();
-    const mnemonic = useMnemonic(accountId, walletId);
-    const account = useAccountState(accountId);
+    const onBack = useCallback(() => {
+        onClose ? onClose() : navigate(-1);
+    }, [onClose, navigate]);
 
-    const onBack = () => {
-        navigate(-1);
-    };
+    const mnemonic = useMnemonic(onBack, accountId, walletId);
+    const account = useAccountState(accountId);
 
     if (!mnemonic) {
         return <Wrapper />;

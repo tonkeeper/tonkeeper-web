@@ -32,9 +32,14 @@ export const RecoveryNotificationControlled = () => {
         }
 
         return (
-            <RecoveryContent accountId={account.id} walletId={params?.walletId} isPage={false} />
+            <RecoveryContent
+                accountId={account.id}
+                walletId={params?.walletId}
+                isPage={false}
+                onClose={onClose}
+            />
         );
-    }, [account, params?.walletId]);
+    }, [account, params?.walletId, onClose]);
 
     return (
         <NotificationStyled isOpen={isOpen} handleClose={onClose}>
