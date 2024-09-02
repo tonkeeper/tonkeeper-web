@@ -107,7 +107,7 @@ const Import = () => {
             newAcc = await renameDerivations({
                 id: createdAccount!.id,
                 derivationIndexes,
-                ...form
+                emoji: form.emoji
             });
         }
 
