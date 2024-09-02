@@ -9,7 +9,9 @@ export enum Language {
     ID = 7,
     UK = 8,
     UZ = 9,
-    BN = 10
+    BN = 10,
+    DE = 11,
+    HI = 12
 }
 
 export const defaultLanguage: Language = Language.EN;
@@ -25,7 +27,9 @@ export const languages = [
     Language.ID,
     Language.UK,
     Language.UZ,
-    Language.BN
+    Language.BN,
+    Language.DE,
+    Language.HI
 ];
 
 export const localizationText = (lang?: Language) => {
@@ -52,6 +56,10 @@ export const localizationText = (lang?: Language) => {
             return 'uz';
         case Language.BN:
             return 'bn';
+        case Language.DE:
+            return 'de';
+        case Language.HI:
+            return 'hi';
         default:
             return 'en';
     }
@@ -81,6 +89,10 @@ export const localizationFrom = (lang: string) => {
             return Language.UZ;
         case 'bn':
             return Language.BN;
+        case 'de':
+            return Language.DE;
+        case 'hi':
+            return Language.HI;
         default:
             return Language.EN;
     }
