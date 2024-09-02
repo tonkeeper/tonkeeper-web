@@ -1,15 +1,17 @@
-import { mnemonicValidate } from '@ton/crypto';
-import { decrypt } from './cryptoService';
-import { AuthPassword } from '../entries/password';
 import { TonKeychainRoot } from '@ton-keychain/core';
+import { mnemonicValidate } from '@ton/crypto';
+import { AuthPassword } from '../entries/password';
+import { decrypt } from './cryptoService';
 
 export const decryptWalletMnemonic = async (state: { auth: AuthPassword }, password: string) => {
     const mnemonic = (await decrypt(state.auth.encryptedMnemonic, password)).split(' ');
     const isValid = await mnemonicValidate(mnemonic);
     if (!isValid) {
-        throw new Error('Wallet mnemonic not valid');
+        const isMam = await validateMnemonicTonOrMAM(mnemonic);
+        if (!isMam) {
+            throw new Error('Wallet mnemonic not valid');
+        }
     }
-
     return mnemonic;
 };
 

@@ -1,12 +1,12 @@
-import { Notification } from '../Notification';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
-import { createModalControl } from './createModalControl';
-import React, { useCallback } from 'react';
-import { useAtom } from '../../libs/atom';
-import { useAccountState } from '../../state/wallet';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { RecoveryContent } from '../../pages/settings/Recovery';
+import { useCallback } from 'react';
 import styled from 'styled-components';
+import { useAtom } from '../../libs/atom';
+import { RecoveryContent } from '../../pages/settings/Recovery';
+import { useAccountState } from '../../state/wallet';
+import { Notification } from '../Notification';
+import { createModalControl } from './createModalControl';
 
 const { hook, paramsControl } = createModalControl<{
     accountId: AccountId;
@@ -31,7 +31,9 @@ export const RecoveryNotificationControlled = () => {
             return null;
         }
 
-        return <RecoveryContent accountId={account.id} walletId={params?.walletId} />;
+        return (
+            <RecoveryContent accountId={account.id} walletId={params?.walletId} isPage={false} />
+        );
     }, [account, params?.walletId]);
 
     return (

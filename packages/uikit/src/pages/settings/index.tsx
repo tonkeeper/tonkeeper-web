@@ -4,20 +4,21 @@ import { SettingsHeader } from '../../components/Header';
 import { ProSettings } from '../../components/settings/ProSettings';
 import { SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
 import { Account } from './Account';
+import { ConnectedAppsSettings } from './ConnectedAppsSettings';
 import { CountrySettings } from './Country';
 import { DevSettings } from './Dev';
 import { FiatCurrency } from './FiatCurrency';
 import { JettonsSettings } from './Jettons';
+import { LedgerIndexesPage } from './LedgerIndexes';
 import { Legal } from './Legal';
 import { Localization } from './Localization';
+import { MAMIndexesPage } from './MamIndexes';
+import { NFTSettings } from './Nft';
 import { Notifications } from './Notification';
 import { ActiveRecovery, Recovery } from './Recovery';
 import { SecuritySettings } from './Security';
 import { Settings } from './Settings';
 import { WalletVersionPage } from './Version';
-import { ConnectedAppsSettings } from './ConnectedAppsSettings';
-import { NFTSettings } from './Nft';
-import { LedgerIndexesPage } from "./LedgerIndexes";
 
 const SettingsRouter = () => {
     return (
@@ -40,6 +41,7 @@ const SettingsRouter = () => {
             <Route path={SettingsRoute.country} element={<CountrySettings />} />
             <Route path={SettingsRoute.pro} element={<ProSettings />} />
             <Route path={WalletSettingsRoute.connectedApps} element={<ConnectedAppsSettings />} />
+            <Route path={WalletSettingsRoute.derivations} element={<MAMIndexesPage />} />
             <Route
                 path="*"
                 element={

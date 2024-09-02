@@ -1,5 +1,7 @@
-import React, { FC, useEffect, useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { AccountId } from '@tonkeeper/core/dist/entries/account';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { BackButtonBlock } from '../../components/BackButton';
 import { WordsGridAndHeaders } from '../../components/create/Words';
@@ -7,12 +9,10 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { getAccountMnemonic, getMAMWalletMnemonic } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
 import { useAccountState, useActiveAccount } from '../../state/wallet';
-import { AccountId } from '@tonkeeper/core/dist/entries/account';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 
 export const ActiveRecovery = () => {
     const account = useActiveAccount();
-    if (account.type === 'mnemonic') {
+    if (account.type === 'mnemonic' || account.type === 'mam') {
         return <RecoveryContent accountId={account.id} />;
     } else {
         return <Navigate to="../" replace={true} />;
@@ -21,8 +21,13 @@ export const ActiveRecovery = () => {
 
 export const Recovery = () => {
     const { accountId } = useParams();
+    const [searchParams] = useSearchParams();
+    const walletId = useMemo(() => {
+        return new URLSearchParams(searchParams).get('wallet') ?? undefined;
+    }, [searchParams, location]);
+
     if (accountId) {
-        return <RecoveryContent accountId={accountId} />;
+        return <RecoveryContent accountId={accountId} walletId={walletId} />;
     } else {
         return <ActiveRecovery />;
     }
@@ -71,10 +76,11 @@ const BackButtonBlockStyled = styled(BackButtonBlock)`
         `}
 `;
 
-export const RecoveryContent: FC<{ accountId: AccountId; walletId?: WalletId }> = ({
-    accountId,
-    walletId
-}) => {
+export const RecoveryContent: FC<{
+    accountId: AccountId;
+    walletId?: WalletId;
+    isPage?: boolean;
+}> = ({ accountId, walletId, isPage = true }) => {
     const navigate = useNavigate();
     const mnemonic = useMnemonic(accountId, walletId);
     const account = useAccountState(accountId);
@@ -89,7 +95,7 @@ export const RecoveryContent: FC<{ accountId: AccountId; walletId?: WalletId }> 
 
     return (
         <Wrapper>
-            <BackButtonBlockStyled onClick={onBack} />
+            {isPage && <BackButtonBlockStyled onClick={onBack} />}
             <WordsGridAndHeaders
                 mnemonic={mnemonic}
                 showMamInfo={account?.type === 'mam' && walletId === undefined}
