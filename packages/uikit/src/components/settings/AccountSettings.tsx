@@ -209,7 +209,13 @@ const MultipleAccountSettings = () => {
 
             items.push({
                 name: t('customize'),
-                icon: <WalletEmoji containerSize="28px" emojiSize="28px" emoji={account.emoji} />,
+                icon: (
+                    <WalletEmoji
+                        containerSize="28px"
+                        emojiSize="28px"
+                        emoji={account.activeDerivation.emoji}
+                    />
+                ),
                 action: () =>
                     rename({
                         accountId: account.id,
