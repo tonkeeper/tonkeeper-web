@@ -28,9 +28,9 @@ import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools
 import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
-import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
+import Initialize from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, Suspense, useMemo } from 'react';
+import React, { FC, PropsWithChildren, Suspense, useLayoutEffect, useMemo } from 'react';
 import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { ThemeProvider, createGlobalStyle, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
@@ -72,6 +72,12 @@ const GlobalStyle = createGlobalStyle`
     html, body, #root {
         height: 100%;
         overflow: hidden;
+    }
+
+    html.scroll,
+    html.scroll body,
+    html.scroll #root {
+        overflow: auto;
     }
 
     html.is-locked {
@@ -145,13 +151,6 @@ const PreferencesRoutingWrapper = styled.div`
     position: relative;
 `;
 
-const FullSizeWrapperBounded = styled(FullSizeWrapper)`
-    max-height: 100%;
-    overflow: auto;
-
-    justify-content: center;
-`;
-
 const DesktopView: FC<{
     activeAccount?: Account | null;
     lock: boolean;
@@ -176,6 +175,25 @@ const DesktopView: FC<{
     );
 };
 
+const InitializeContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    min-height: var(--app-height);
+    padding: 1rem 1rem;
+    box-sizing: border-box;
+    position: relative;
+    justify-content: center;
+`;
+
+const FullScreen: FC<PropsWithChildren> = ({ children }) => {
+    useLayoutEffect(() => {
+        document.documentElement.classList.add('scroll');
+        return () => {
+            document.documentElement.classList.remove('scroll');
+        };
+    }, []);
+    return <FullSizeWrapper>{children}</FullSizeWrapper>;
+};
 export const DesktopContent: FC<{
     activeAccount?: Account | null;
     lock: boolean;
@@ -184,22 +202,22 @@ export const DesktopContent: FC<{
 
     if (lock) {
         return (
-            <FullSizeWrapper>
+            <FullScreen>
                 <Unlock />
-            </FullSizeWrapper>
+            </FullScreen>
         );
     }
 
     if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
         return (
-            <FullSizeWrapperBounded className="full-size-wrapper">
-                <InitializeContainer fullHeight={false}>
+            <FullScreen>
+                <InitializeContainer>
                     <Routes>
                         <Route path={any(AppRoute.import)} element={<ImportRouter />} />
                         <Route path="*" element={<Initialize />} />
                     </Routes>
                 </InitializeContainer>
-            </FullSizeWrapperBounded>
+            </FullScreen>
         );
     }
 
