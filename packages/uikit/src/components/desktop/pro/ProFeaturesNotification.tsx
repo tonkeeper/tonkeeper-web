@@ -1,14 +1,14 @@
-import { Notification } from '../../Notification';
 import { FC } from 'react';
 import { styled } from 'styled-components';
-import { Body2, Label1, Label2 } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
-import { Button } from '../../fields/Button';
-import { ProDashboardIcon, ProMultisendIcon } from './Icons';
-import { ProNotification } from '../../pro/ProNotification';
-import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useProState } from '../../../state/pro';
+import { Notification } from '../../Notification';
+import { Body2, Label1, Label2 } from '../../Text';
+import { Button } from '../../fields/Button';
+import { ProNotification } from '../../pro/ProNotification';
+import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
+import { ProDashboardIcon, ProMultisendIcon } from './Icons';
 
 const NotificationStyled = styled(Notification)`
     max-width: 768px;
@@ -32,6 +32,7 @@ const ContentWrapper = styled.div`
     flex-direction: column;
     align-items: center;
     padding-top: 40px;
+    overflow: hidden;
 `;
 
 const ProImage = styled.img`
@@ -58,6 +59,8 @@ const FeatureBlock = styled.div`
     flex-direction: column;
     text-align: center;
     align-items: center;
+    overflow: hidden;
+    max-width: 100%;
 
     > * {
         display: block;
