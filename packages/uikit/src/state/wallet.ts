@@ -555,7 +555,7 @@ export const useAccountsState = () => {
 export const useMutateDeleteAll = () => {
     const sdk = useAppSdk();
     const storage = useAccountsStorage();
-    const client = useQueryClient();
+
     return useMutation<void, Error, void>(async () => {
         const { notifications } = sdk;
         if (notifications) {
@@ -565,9 +565,9 @@ export const useMutateDeleteAll = () => {
                 console.error(e);
             }
         }
+
         await storage.clearAccountFromState();
         await sdk.storage.clear();
-        await client.invalidateQueries();
     });
 };
 
