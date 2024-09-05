@@ -25,7 +25,7 @@ import { AppRoute } from '../../libs/routes';
 import { useFetchFilteredActivity } from '../../state/activity';
 import { useAssets } from '../../state/home';
 import { getMixedActivity } from '../../state/mixedActivity';
-import { useRate } from '../../state/rates';
+import { toTokenRate, useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
@@ -170,7 +170,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
 
     const asset: { symbol: string; image: string; amount: string; fiatAmount: string } | undefined =
         useMemo(() => {
-            if (!assets || !rate) {
+            if (!assets) {
                 return undefined;
             }
 
@@ -182,7 +182,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
                     amount: format(amount),
                     fiatAmount: formatFiatCurrency(
                         fiat,
-                        new BigNumber(rate.prices).multipliedBy(shiftedDecimals(amount))
+                        rate ? new BigNumber(rate.prices).multipliedBy(shiftedDecimals(amount)) : 0
                     )
                 };
             }
@@ -203,9 +203,12 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
                 amount: format(amount, jettonBalance.jetton.decimals),
                 fiatAmount: formatFiatCurrency(
                     fiat,
-                    new BigNumber(rate.prices || 0).multipliedBy(
-                        shiftedDecimals(jettonBalance.balance, jettonBalance.jetton.decimals)
-                    )
+                    jettonBalance.price
+                        ? shiftedDecimals(
+                              jettonBalance.balance,
+                              jettonBalance.jetton.decimals
+                          ).multipliedBy(toTokenRate(jettonBalance.price, fiat).prices)
+                        : 0
                 )
             };
         }, [assets, format, rate, fiat]);
