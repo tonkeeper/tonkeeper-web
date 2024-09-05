@@ -219,7 +219,7 @@ export const RecipientView: FC<{
     const isMemoValid = useMemo(() => {
         if (isLedger) {
             // only ascii symbols are supported by ledger
-            if (/^[ -~]*$/gm.test(comment)) {
+            if (!/^[ -~]*$/gm.test(comment)) {
                 return false;
             }
         }
