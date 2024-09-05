@@ -19,6 +19,7 @@ import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { scrollToTop } from '../../libs/common';
 import { QueryKey } from '../../libs/queryKey';
 import { useIsActiveWalletLedger } from '../../state/ledger';
+import { useActiveTonNetwork } from '../../state/wallet';
 import { Gap } from '../Layout';
 import {
     FullHeightBlock,
@@ -32,7 +33,6 @@ import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
-import { useActiveTonNetwork } from '../../state/wallet';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -219,7 +219,9 @@ export const RecipientView: FC<{
     const isMemoValid = useMemo(() => {
         if (isLedger) {
             // only ascii symbols are supported by ledger
-            return /^[ -~]*$/gm.test(comment);
+            if (/^[ -~]*$/gm.test(comment)) {
+                return false;
+            }
         }
 
         if (!toAccount) return true;
