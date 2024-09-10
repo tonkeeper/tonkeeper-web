@@ -1,17 +1,17 @@
 import { useMutation } from '@tanstack/react-query';
 import { IAppSdk, KeyboardParams } from '@tonkeeper/core/dist/AppSdk';
+import { passwordStorage, validatePassword } from '@tonkeeper/core/dist/service/passwordService';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { Notification } from '../../components/Notification';
+import { CreatePassword } from '../../components/create/CreatePassword';
 import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
 import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
-import { passwordStorage, validatePassword } from '@tonkeeper/core/dist/service/passwordService';
 import { useIsPasswordSet } from '../../state/wallet';
-import { CreatePassword } from '../../components/create/CreatePassword';
 
 const Block = styled.form<{ padding: number }>`
     display: flex;
@@ -237,7 +237,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
             isOpen={requestId != null}
             hideButton
             handleClose={onCancel}
-            title={t('enter_password')}
+            title={isPasswordSet ? t('enter_password') : undefined}
         >
             {Content}
         </Notification>

@@ -11,7 +11,7 @@ import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import { ProState, ProStateWallet, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
-import { isStandardTonWallet, TonWalletStandard, WalletVersion } from '../entries/wallet';
+import { TonWalletStandard, WalletVersion, isStandardTonWallet } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
 import {
     FiatCurrencies as FiatCurrenciesGenerated,
@@ -27,11 +27,11 @@ import {
 } from '../tonConsoleApi';
 import { delay } from '../utils/common';
 import { Flatten } from '../utils/types';
+import { accountsStorage } from './accountsStorage';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './transfer/common';
 import { walletStateInitFromState } from './wallet/contractService';
-import { accountsStorage } from './accountsStorage';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -232,6 +232,16 @@ export const createRecipient = async (
     });
 
     return [recipient, asset];
+};
+
+export const retryProService = async (storage: IStorage) => {
+    for (let i = 0; i < 10; i++) {
+        const state = await getProState(storage);
+        if (state.subscription.valid) {
+            return;
+        }
+        await delay(5000);
+    }
 };
 
 export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {

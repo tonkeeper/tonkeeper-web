@@ -1,16 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { TonKeychainRoot } from '@ton-keychain/core';
 import { mnemonicValidate } from '@ton/crypto';
 import {
     Account,
     AccountId,
+    AccountMAM,
     AccountTonMnemonic,
     AccountTonWatchOnly,
     AccountsState,
     getAccountByWalletById,
     getWalletById,
-    isAccountVersionEditable,
     isAccountControllable,
-    AccountMAM
+    isAccountVersionEditable
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';
@@ -27,6 +28,7 @@ import {
     getActiveWalletConfig,
     setActiveWalletConfig
 } from '@tonkeeper/core/dist/service/wallet/configService';
+import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
 import {
     createMAMAccountByMnemonic,
     createReadOnlyTonAccountByAddress,
@@ -43,8 +45,6 @@ import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
 import { useDevSettings } from './dev';
 import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
 import { useCheckTouchId } from './password';
-import { TonKeychainRoot } from '@ton-keychain/core';
-import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
 
 export const useActiveAccountQuery = () => {
     const storage = useAccountsStorage();
@@ -555,7 +555,7 @@ export const useAccountsState = () => {
 export const useMutateDeleteAll = () => {
     const sdk = useAppSdk();
     const storage = useAccountsStorage();
-    const client = useQueryClient();
+
     return useMutation<void, Error, void>(async () => {
         const { notifications } = sdk;
         if (notifications) {
@@ -565,15 +565,17 @@ export const useMutateDeleteAll = () => {
                 console.error(e);
             }
         }
+
         await storage.clearAccountFromState();
         await sdk.storage.clear();
-        await client.invalidateQueries();
     });
 };
 
 export const useIsPasswordSet = () => {
     const wallets = useAccountsState();
-    return (wallets || []).some(acc => acc.type === 'mnemonic' && acc.auth.kind === 'password');
+    return (wallets || []).some(
+        acc => (acc.type === 'mnemonic' || acc.type === 'mam') && acc.auth.kind === 'password'
+    );
 };
 
 export const useMutateLogOut = () => {

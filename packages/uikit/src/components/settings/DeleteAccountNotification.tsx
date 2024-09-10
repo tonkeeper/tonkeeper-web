@@ -36,7 +36,7 @@ const DisclaimerLink = styled(Label1)`
 `;
 
 const DeleteContent: FC<{
-    onClose: (action: () => void) => void;
+    onClose: () => void;
     accountId: AccountId;
     isKeystone: boolean;
     isReadOnly: boolean;
@@ -48,7 +48,8 @@ const DeleteContent: FC<{
 
     const onDelete = async () => {
         await mutateAsync(accountId);
-        onClose(() => navigate(AppRoute.home));
+        navigate(AppRoute.home);
+        onClose();
     };
 
     return (
@@ -71,13 +72,10 @@ const DeleteContent: FC<{
                         </Checkbox>
                     </DisclaimerText>
                     <DisclaimerLink
-                        onClick={() =>
-                            onClose(() =>
-                                navigate(
-                                    AppRoute.settings + SettingsRoute.recovery + '/' + accountId
-                                )
-                            )
-                        }
+                        onClick={() => {
+                            navigate(AppRoute.settings + SettingsRoute.recovery + '/' + accountId);
+                            onClose();
+                        }}
                     >
                         {t('Back_up_now')}
                     </DisclaimerLink>
@@ -103,7 +101,7 @@ export const DeleteAccountNotification: FC<{
     handleClose: () => void;
 }> = ({ account, handleClose }) => {
     const Content = useCallback(
-        (afterClose: (action: () => void) => void) => {
+        (afterClose: () => void) => {
             if (!account) return undefined;
             return (
                 <DeleteContent
@@ -124,7 +122,7 @@ export const DeleteAccountNotification: FC<{
     );
 };
 
-const DeleteAllContent: FC<{ onClose: (action: () => void) => void }> = ({ onClose }) => {
+const DeleteAllContent: FC<{ onClose: () => void }> = ({ onClose }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
@@ -133,10 +131,7 @@ const DeleteAllContent: FC<{ onClose: (action: () => void) => void }> = ({ onClo
 
     const onDelete = async () => {
         await mutateAsync();
-        onClose(async () => {
-            await client.invalidateQueries();
-            navigate(AppRoute.home);
-        });
+        window.location.href = window.location.origin;
     };
 
     return (
@@ -153,9 +148,10 @@ const DeleteAllContent: FC<{ onClose: (action: () => void) => void }> = ({ onClo
                     </Checkbox>
                 </DisclaimerText>
                 <DisclaimerLink
-                    onClick={() =>
-                        onClose(() => navigate(AppRoute.settings + SettingsRoute.recovery))
-                    }
+                    onClick={() => {
+                        navigate(AppRoute.settings + SettingsRoute.recovery);
+                        onClose();
+                    }}
                 >
                     {t('Back_up_now')}
                 </DisclaimerLink>
@@ -179,7 +175,7 @@ export const DeleteAllNotification: FC<{
     handleClose: () => void;
 }> = ({ open, handleClose }) => {
     const Content = useCallback(
-        (afterClose: (action: () => void) => void) => {
+        (afterClose: () => void) => {
             if (!open) return undefined;
             return <DeleteAllContent onClose={afterClose} />;
         },

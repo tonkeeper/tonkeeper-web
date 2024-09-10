@@ -1,10 +1,9 @@
 import { IStorage } from '../Storage';
-import { decrypt, encrypt } from './cryptoService';
-import { mnemonicValidate } from '@ton/crypto';
-import { decryptWalletMnemonic } from './mnemonicService';
-import { AccountsStorage } from './accountsStorage';
-import { AuthPassword } from '../entries/password';
 import { AccountTonMnemonic } from '../entries/account';
+import { AuthPassword } from '../entries/password';
+import { AccountsStorage } from './accountsStorage';
+import { decrypt, encrypt } from './cryptoService';
+import { decryptWalletMnemonic, seeIfMnemonicValid } from './mnemonicService';
 
 export class PasswordStorage {
     private readonly accountsStorage: AccountsStorage;
@@ -28,7 +27,7 @@ export class PasswordStorage {
             const mnemonic = (
                 await decrypt((accToCheck.auth as AuthPassword).encryptedMnemonic, password)
             ).split(' ');
-            return await mnemonicValidate(mnemonic);
+            return await seeIfMnemonicValid(mnemonic);
         } catch (e) {
             console.error(e);
             return false;
@@ -65,7 +64,7 @@ export class PasswordStorage {
     private async getPasswordAuthAccounts(): Promise<AccountTonMnemonic[]> {
         const accounts = await this.accountsStorage.getAccounts();
         return accounts.filter(
-            a => a.type === 'mnemonic' && a.auth.kind === 'password'
+            a => (a.type === 'mnemonic' || a.type === 'mam') && a.auth.kind === 'password'
         ) as AccountTonMnemonic[];
     }
 }

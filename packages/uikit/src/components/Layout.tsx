@@ -23,7 +23,6 @@ const Body = styled(Body2)`
 `;
 
 export const CenterContainer = styled.div`
-    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;

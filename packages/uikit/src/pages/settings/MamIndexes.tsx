@@ -1,42 +1,42 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useLayoutEffect, useRef } from 'react';
+import { FC, useLayoutEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
+import { PencilIcon } from '../../components/Icon';
+import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
+import { NotificationFooterPortal } from '../../components/Notification';
+import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Label2 } from '../../components/Text';
-import { useTranslation } from '../../hooks/translation';
-import {
-    useTonWalletsBalances,
-    useMutateAccountActiveDerivation,
-    useActiveAccount,
-    useCreateMAMAccountDerivation,
-    useHideMAMAccountDerivation,
-    useEnableMAMAccountDerivation
-} from '../../state/wallet';
-import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../components/List';
-import { toFormattedTonBalance } from '../../hooks/balance';
-import { Button } from '../../components/fields/Button';
-import { useNavigate } from 'react-router-dom';
-import { AppRoute } from '../../libs/routes';
-import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
-import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { AccountBadge, WalletIndexBadge } from '../../components/account/AccountBadge';
-import { NotificationFooterPortal } from '../../components/Notification';
-import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
+import { Button } from '../../components/fields/Button';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
-import { PencilIcon } from '../../components/Icon';
-import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
-import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
-import { useProState } from '../../state/pro';
 import { useProFeaturesNotification } from '../../components/modals/ProFeaturesNotificationControlled';
+import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
+import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
+import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useAppContext } from '../../hooks/appContext';
-import { scrollToContainersBottom } from '../../libs/web';
+import { toFormattedTonBalance } from '../../hooks/balance';
+import { useTranslation } from '../../hooks/translation';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { usePrevious } from '../../hooks/usePrevious';
+import { AppRoute } from '../../libs/routes';
+import { scrollToContainersBottom } from '../../libs/web';
+import { useProState } from '../../state/pro';
+import {
+    useActiveAccount,
+    useCreateMAMAccountDerivation,
+    useEnableMAMAccountDerivation,
+    useHideMAMAccountDerivation,
+    useMutateAccountActiveDerivation,
+    useTonWalletsBalances
+} from '../../state/wallet';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -107,6 +107,26 @@ const IconButtonTransparentBackgroundStyled = styled(IconButtonTransparentBackgr
     > svg {
         color: ${p => p.theme.iconTertiary};
     }
+`;
+
+const NameContainer = styled.div`
+    display: flex;
+    gap: 1rem;
+`;
+const ListItemPayload = styled.div`
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1rem 1rem 0;
+    box-sizing: border-box;
+    gap: 10px;
+
+    width: 100%;
+
+    ${props =>
+        props.theme.displayType === 'full-width'
+            ? `align-items: center;`
+            : `flex-direction: column;`}
 `;
 
 const ContentWrapper = styled.div``;
@@ -241,17 +261,22 @@ export const MAMIndexesPageContent: FC<{
                     return (
                         <ListItem hover={false} key={balance.address}>
                             <ListItemPayload>
-                                <WalletEmoji containerSize="24px" emoji={derivation.emoji} />
-                                <TextContainer>
-                                    <FirstLineContainer>
-                                        <Label2>{derivation.name}</Label2>
-                                        <WalletIndexBadge>#{derivationIndex + 1}</WalletIndexBadge>
-                                    </FirstLineContainer>
-                                    <Body2Secondary>
-                                        {toShortValue(formatAddress(balance.address)) + ' '}·
-                                        {' ' + toFormattedTonBalance(balance.tonBalance)}&nbsp;TON
-                                    </Body2Secondary>
-                                </TextContainer>
+                                <NameContainer>
+                                    <WalletEmoji containerSize="24px" emoji={derivation.emoji} />
+                                    <TextContainer>
+                                        <FirstLineContainer>
+                                            <Label2>{derivation.name}</Label2>
+                                            <WalletIndexBadge>
+                                                #{derivationIndex + 1}
+                                            </WalletIndexBadge>
+                                        </FirstLineContainer>
+                                        <Body2Secondary>
+                                            {toShortValue(formatAddress(balance.address)) + ' '}·
+                                            {' ' + toFormattedTonBalance(balance.tonBalance)}
+                                            &nbsp;TON
+                                        </Body2Secondary>
+                                    </TextContainer>
+                                </NameContainer>
                                 {isDerivationAdded ? (
                                     <ButtonsContainer>
                                         <IconButtonTransparentBackgroundStyled

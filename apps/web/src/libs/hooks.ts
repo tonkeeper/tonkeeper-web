@@ -1,12 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { Account } from "@tonkeeper/core/dist/entries/account";
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
 import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
-import { useEffect } from 'react';
-import { useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
+import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -48,11 +50,7 @@ export const useAppWidth = (standalone: boolean) => {
     }, [standalone]);
 };
 
-export const useAnalytics = (
-    activeAccount?: Account,
-    accounts?: Account[],
-    version?: string
-) => {
+export const useAnalytics = (activeAccount?: Account, accounts?: Account[], version?: string) => {
     const network = useActiveTonNetwork();
     return useQuery<Analytics>(
         [QueryKey.analytics, network],
@@ -72,11 +70,47 @@ export const useAnalytics = (
                 activeAccount: activeAccount!,
                 accounts: accounts!,
                 network
-            }
-        );
+            });
 
             return tracker;
         },
-      { enabled: accounts != null && activeAccount !== undefined }
+        { enabled: accounts != null && activeAccount !== undefined }
     );
+};
+
+export const useLayout = () => {
+    const navigate = useNavigate();
+
+    const [isMobile, setMobile] = useState(localStorage.getItem('layout') === 'true');
+
+    useEffect(() => {
+        const appWidth = throttle(() => {
+            if (window.innerWidth >= 1024) {
+                setMobile(old => {
+                    if (old !== false) {
+                        navigate(AppRoute.home);
+                        localStorage.setItem('layout', 'false');
+                    }
+                    return false;
+                });
+            } else {
+                setMobile(old => {
+                    if (old !== true) {
+                        navigate(AppRoute.home);
+                        localStorage.setItem('layout', 'true');
+                    }
+                    return true;
+                });
+            }
+        }, 50);
+
+        window.addEventListener('resize', appWidth);
+
+        appWidth();
+
+        return () => {
+            window.removeEventListener('resize', appWidth);
+        };
+    }, [navigate, setMobile]);
+    return isMobile;
 };
