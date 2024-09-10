@@ -101,7 +101,12 @@ export const CreateMultisig: FC<{
 }> = ({ onClose }) => {
     const [account, setAccount] = useState<AccountTonMultisig | undefined>();
     const [contractParams, setContractParams] = useState<
-        { multisigAddress: string; deployerWalletId: WalletId } | undefined
+        | {
+              multisigAddress: string;
+              deployerWalletId: WalletId;
+              hostWallets: WalletId[];
+          }
+        | undefined
     >();
 
     if (!contractParams) {
@@ -152,7 +157,8 @@ const CreateMultisigAwaitDeployPage: FC<{
     onDone: (account: AccountTonMultisig) => void;
     multisigAddress: string;
     deployerWalletId: WalletId;
-}> = ({ onDone, multisigAddress, deployerWalletId }) => {
+    hostWallets: WalletId[];
+}> = ({ onDone, multisigAddress, deployerWalletId, hostWallets }) => {
     const { mutateAsync: awaitDeploy } = useAwaitMultisigIsDeployed();
     const { mutateAsync: addAccount } = useCreateAccountTonMultisig();
     const [showHelpButton, setShowHelpButton] = useState(false);
@@ -195,7 +201,13 @@ const CreateMultisigAwaitDeployPage: FC<{
     useEffect(() => {
         setTimeout(() => setShowHelpButton(true), 1500 * 20);
         awaitDeploy({ multisigAddress, deployerWalletId })
-            .then(() => addAccount({ address: multisigAddress }))
+            .then(() =>
+                addAccount({
+                    address: multisigAddress,
+                    hostWallets,
+                    selectedHostWalletId: deployerWalletId
+                })
+            )
             .then(onDone);
     }, []);
 
@@ -228,7 +240,11 @@ const CreateMultisigAwaitDeployPage: FC<{
 };
 
 const CreateMultisigFormPage: FC<{
-    onSentDeploy: (info: { multisigAddress: string; deployerWalletId: WalletId }) => void;
+    onSentDeploy: (info: {
+        multisigAddress: string;
+        deployerWalletId: WalletId;
+        hostWallets: WalletId[];
+    }) => void;
 }> = ({ onSentDeploy }) => {
     const [deployArgs, setDeployArgs] = useState<
         Parameters<typeof useDeployMultisig>[0] | undefined
@@ -238,6 +254,7 @@ const CreateMultisigFormPage: FC<{
     const estimateMutation = useEstimateDeployMultisig();
     const deployMutation = useDeployMultisig(deployArgs);
     const { mutateAsync: estimateDeploy } = estimateMutation;
+    const accounts = useAccountsState();
 
     const onSubmit = async (data: MultisigUseForm) => {
         onOpen();
@@ -252,7 +269,7 @@ const CreateMultisigFormPage: FC<{
                 .filter(p => p.role === 'proposer-and-signer')
                 .map(v => Address.parse(v.address)),
             threshold: data.quorum,
-            allowArbitrarySeqno: true //TODO
+            allowArbitrarySeqno: true
         };
         const result = await estimateDeploy({ multisigConfig, fromWallet });
         setDeployArgs({ multisigConfig, fromWallet, feeWei: result?.fee.weiAmount });
@@ -261,13 +278,19 @@ const CreateMultisigFormPage: FC<{
     const mutateAsync = useCallback(async () => {
         const address = await deployMutation.mutateAsync();
         if (address) {
+            const wallets = accounts.flatMap(a => a.allTonWallets);
             onSentDeploy({
                 multisigAddress: address!,
-                deployerWalletId: deployArgs!.fromWallet
+                deployerWalletId: deployArgs!.fromWallet,
+                hostWallets: wallets
+                    .map(w => w.rawAddress)
+                    .filter(w =>
+                        deployArgs!.multisigConfig.signers.some(a => a.equals(Address.parse(w)))
+                    )
             });
         }
         return !!address;
-    }, [deployMutation.mutateAsync, onSentDeploy, deployArgs?.fromWallet]);
+    }, [deployMutation.mutateAsync, onSentDeploy, deployArgs?.fromWallet, accounts]);
 
     return (
         <ContentWrapper>

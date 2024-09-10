@@ -3,6 +3,7 @@ import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonCo
 import {
     ConnectTransferError,
     EstimateData,
+    estimateMultisigTonConnectTransfer,
     estimateTonConnectTransfer,
     sendTonConnectTransfer,
     tonConnectTransferError
@@ -34,6 +35,8 @@ import { useActiveStandardTonWallet, useAccountsState, useActiveAccount } from '
 import { LedgerError } from '@tonkeeper/core/dist/errors/LedgerError';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import { MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
+import { getMultisigSignerInfo } from '../../state/multisig';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -250,15 +253,31 @@ const ConnectContent: FC<{
 const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boolean) => {
     const { api } = useAppContext();
     const account = useActiveAccount();
+    const accounts = useAccountsState();
 
     return useQuery<EstimateData, Error>(
-        [QueryKey.estimate, params],
+        [QueryKey.estimate, params, account, accounts],
         async () => {
-            if (!isAccountTonWalletStandard(account)) {
-                throw new Error("Can't estimate when account is not controllable");
+            if (isAccountTonWalletStandard(account)) {
+                const accountEvent = await estimateTonConnectTransfer(api, account, params);
+                return { accountEvent };
             }
-            const accountEvent = await estimateTonConnectTransfer(api, account, params);
-            return { accountEvent };
+
+            if (account.type === 'ton-multisig') {
+                const multisig = await new MultisigApi(api.tonApiV2).getMultisigAccount({
+                    accountId: account.activeTonWallet.rawAddress
+                });
+                const { signerWallet } = getMultisigSignerInfo(accounts, account);
+                const accountEvent = await estimateMultisigTonConnectTransfer(
+                    api,
+                    signerWallet,
+                    multisig,
+                    params
+                );
+                return { accountEvent };
+            }
+
+            throw new Error(`Ton Connect does not support this account type: ${account.type}`);
         },
         { enabled: errorFetched }
     );

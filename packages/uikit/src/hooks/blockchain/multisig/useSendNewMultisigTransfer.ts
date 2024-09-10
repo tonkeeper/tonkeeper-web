@@ -9,15 +9,20 @@ import { sendMultisigTonTransfer } from '@tonkeeper/core/dist/service/transfer/t
 import { useTranslation } from '../../translation';
 import { useAppSdk } from '../../appSdk';
 import { useAppContext } from '../../appContext';
-import { useInvalidateActiveWalletQueries } from '../../../state/wallet';
+import {
+    useAccountsState,
+    useActiveAccount,
+    useInvalidateActiveWalletQueries
+} from '../../../state/wallet';
 import { useTransactionAnalytics } from '../../amplitude';
 import { useJettonList } from '../../../state/jetton';
 import { useCheckTouchId } from '../../../state/password';
 import { getSigner } from '../../../state/mnemonic';
-import { useActiveMultisigSignerInfo, useActiveMultisigWalletInfo } from '../../../state/multisig';
+import { getMultisigSignerInfo, useActiveMultisigWalletInfo } from '../../../state/multisig';
 import { MultisigOrderLifetimeMinutes } from '../../../libs/multisig';
 import { useAsyncQueryData } from '../../useAsyncQueryData';
 import { notifyError } from '../../../components/transfer/common';
+import { AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
 
 export function useSendNewMultisigTransfer(
     recipient: TonRecipientData,
@@ -29,10 +34,10 @@ export function useSendNewMultisigTransfer(
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
+    const activeAccount = useActiveAccount();
+    const accounts = useAccountsState();
     const { data: multisigInfoData } = useActiveMultisigWalletInfo();
     const multisigInfoPromise = useAsyncQueryData(multisigInfoData);
-    const signerInfoData = useActiveMultisigSignerInfo();
-    const signerInfoPromise = useAsyncQueryData(signerInfoData);
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
     const { data: jettons } = useJettonList();
@@ -43,13 +48,11 @@ export function useSendNewMultisigTransfer(
         try {
             const ttlSeconds = Number(ttl) * 60;
 
-            const signerInfo = await signerInfoPromise;
-            if (!signerInfo) {
-                throw new Error('Signer not found');
-            }
-            const signer = await getSigner(sdk, signerInfo.account.id, checkTouchId).catch(
-                () => null
+            const { signerWallet, signerAccount } = getMultisigSignerInfo(
+                accounts,
+                activeAccount as AccountTonMultisig
             );
+            const signer = await getSigner(sdk, signerAccount.id, checkTouchId).catch(() => null);
             if (signer === null || signer.type !== 'cell') {
                 throw new Error('Signer not found');
             }
@@ -63,7 +66,7 @@ export function useSendNewMultisigTransfer(
                 track2('send-ton');
                 await sendMultisigTonTransfer({
                     api,
-                    hostWallet: signerInfo.wallet,
+                    hostWallet: signerWallet,
                     recipient: recipient as TonRecipientData,
                     multisig,
                     weiAmount: amount.weiAmount,
@@ -80,7 +83,7 @@ export function useSendNewMultisigTransfer(
                 )!;
                 await sendMultisigJettonTransfer({
                     api,
-                    hostWallet: signerInfo.wallet,
+                    hostWallet: signerWallet,
                     recipient: recipient as TonRecipientData,
                     multisig,
                     amount,

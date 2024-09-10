@@ -160,7 +160,7 @@
   "multisig_status_completed" : "Completed",
   "multisig_status_expired" : "Expired",
   "multisig_status_label" : "Status",
-  "multisig_status_pending" : "Pending",
+  "multisig_status_progress" : "Pending",
   "multisig_time_left" : "Time left",
   "multisig_time_to_sign_transaction" : "Time to sign a transaction",
   "Name_your_wallet" : "Name your wallet",

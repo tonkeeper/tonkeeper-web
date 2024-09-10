@@ -153,7 +153,7 @@
   "multisig_status_completed" : "Выполнено",
   "multisig_status_expired" : "Истек",
   "multisig_status_label" : "Статус",
-  "multisig_status_pending" : "В ожидании",
+  "multisig_status_progress" : "В ожидании",
   "multisig_time_left" : "Оставшееся время",
   "multisig_time_to_sign_transaction" : "Время на подпись транзакции",
   "Name_your_wallet" : "Назовите свой кошелек",

@@ -11,7 +11,7 @@ import {
 } from '../../transfer/common';
 import BigNumber from 'bignumber.js';
 import { CellSigner } from '../../../entries/signer';
-import { createNewOrderMessage, NewOrder } from './order-utils';
+import { createNewOrderMessage, MAX_ORDER_SEQNO, NewOrder } from './order-utils';
 
 const createOrderAmount = toNano(0.2);
 const signOrderAmount = toNano(0.1);
@@ -41,6 +41,7 @@ export async function sendCreateOrder(options: {
         options.order.validUntilSeconds,
         isSigner,
         addrIdx,
+        MAX_ORDER_SEQNO,
         queryId
     );
 

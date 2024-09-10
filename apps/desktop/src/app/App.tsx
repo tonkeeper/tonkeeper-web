@@ -90,6 +90,7 @@ import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
+import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -271,6 +272,7 @@ export const Loader: FC = () => {
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
+    useGlobalSetup();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();

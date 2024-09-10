@@ -3,13 +3,10 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 
-export interface GlobalPreferences {
-    pinnedMultisigs: string[];
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface GlobalPreferences {}
 
-const defaultGlobalPreferences: GlobalPreferences = {
-    pinnedMultisigs: []
-};
+const defaultGlobalPreferences: GlobalPreferences = {};
 
 export const useGlobalPreferencesQuery = () => {
     const sdk = useAppSdk();

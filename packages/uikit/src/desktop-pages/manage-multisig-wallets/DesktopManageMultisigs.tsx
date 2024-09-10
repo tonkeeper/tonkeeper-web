@@ -5,16 +5,20 @@ import {
 import { Body2, Body3, Label2 } from '../../components/Text';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { useTranslation } from '../../hooks/translation';
-import { MultisigInfo, useActiveWalletMultisigWallets } from '../../state/multisig';
+import {
+    MultisigInfo,
+    useActiveWalletMultisigWallets,
+    useMultisigTogglePinForWallet,
+    useMutateMultisigSelectedHostWallet
+} from '../../state/multisig';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import React, { FC, useMemo } from 'react';
 import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../components/List';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { toFormattedTonBalance } from '../../hooks/balance';
-import { PencilIcon, PinIcon } from '../../components/Icon';
+import { PencilIcon, PinIconOutline, UnpinIconOutline } from '../../components/Icon';
 import { Button } from '../../components/fields/Button';
-import { useGlobalPreferences, useMutateGlobalPreferences } from '../../state/global-preferences';
 import {
     useAccountsState,
     useActiveAccount,
@@ -32,6 +36,8 @@ import { getFallbackAccountEmoji } from '@tonkeeper/core/dist/service/walletServ
 import { Address } from '@ton/core';
 import { AppRoute } from '../../libs/routes';
 import { useNavigate } from 'react-router-dom';
+import { AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -76,6 +82,7 @@ const TextContainer = styled.div`
 
 const ButtonsContainer = styled.div`
     margin-left: auto;
+    align-items: center;
     display: flex;
     gap: 8px;
 `;
@@ -86,23 +93,22 @@ const IconButtonTransparentBackgroundStyled = styled(IconButtonTransparentBackgr
     }
 `;
 
-const PinIconStyled = styled(PinIcon)<{ isActive: boolean }>`
-    color: ${p => (p.isActive ? p.theme.accentBlue : p.theme.iconTertiary)};
-`;
-
 export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = ({ multisigs }) => {
     const { t } = useTranslation();
     const accounts = useAccountsState();
     const currentActiveAccount = useActiveAccount();
     const { onOpen: openRename } = useRenameNotification();
     const { mutateAsync: createMultisig } = useCreateAccountTonMultisig();
-    const { pinnedMultisigs } = useGlobalPreferences();
-    const { mutateAsync: mutateGlobalPreferences } = useMutateGlobalPreferences();
     const { mutateAsync: setActiveAccount } = useMutateActiveAccount();
+    const { mutateAsync: selectMultisigHost } = useMutateMultisigSelectedHostWallet();
+
+    const selectedHostWalletId = currentActiveAccount.activeTonWallet.rawAddress;
+    const { mutate: togglePinForWallet } = useMultisigTogglePinForWallet();
 
     const multisigAccounts = useMemo(() => {
+        const allWallets = accounts.flatMap(a => a.activeTonWallet).map(w => w.rawAddress);
         return multisigs.map(m => {
-            const existingAccount = accounts.find(a => a.id === m.address);
+            const existingAccount = accounts.find(a => a.id === m.address) as AccountTonMultisig;
             const name =
                 existingAccount?.name || 'Multisig ' + toShortValue(formatAddress(m.address));
             const emoji =
@@ -114,24 +120,27 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
                 name,
                 emoji,
                 isAdded: !!existingAccount,
-                isPinned: pinnedMultisigs.includes(m.address),
-                role: m.signers.includes(currentActiveAccount.activeTonWallet.rawAddress)
-                    ? 'signer-and-proposer'
-                    : 'proposer',
-                balance: m.balance
+                isPinned: existingAccount?.isPinnedForWallet(selectedHostWalletId),
+                balance: m.balance,
+                hostWallets: m.signers.filter(s => allWallets.includes(s))
             };
         });
     }, [
         accounts,
         multisigs,
-        pinnedMultisigs,
+        selectedHostWalletId,
         currentActiveAccount.name,
         currentActiveAccount.emoji
     ]);
 
-    const onRename = async (item: { address: string; name: string; emoji: string }) => {
+    const onRename = async (item: {
+        address: string;
+        name: string;
+        emoji: string;
+        hostWallets: WalletId[];
+    }) => {
         if (!accounts.some(a => a.id === item.address)) {
-            await createMultisig(item);
+            await createMultisig({ ...item, selectedHostWalletId });
         }
 
         openRename({ accountId: item.address });
@@ -142,30 +151,29 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
         name: string;
         emoji: string;
         isPinned: boolean;
+        hostWallets: WalletId[];
     }) => {
         if (!accounts.some(a => a.id === item.address)) {
-            await createMultisig(item);
+            await createMultisig({ ...item, selectedHostWalletId });
         }
 
-        if (item.isPinned) {
-            await mutateGlobalPreferences({
-                pinnedMultisigs: pinnedMultisigs.filter(i => i !== item.address)
-            });
-        } else {
-            await mutateGlobalPreferences({
-                pinnedMultisigs: pinnedMultisigs
-                    .filter(i => i !== item.address)
-                    .concat(item.address)
-            });
-        }
+        togglePinForWallet({ multisigId: item.address, hostWalletId: selectedHostWalletId });
     };
 
     const navigate = useNavigate();
-    const onOpen = async (item: { address: string; name: string; emoji: string }) => {
+    const onOpen = async (item: {
+        address: string;
+        name: string;
+        emoji: string;
+        hostWallets: WalletId[];
+    }) => {
         if (!accounts.some(a => a.id === item.address)) {
-            await createMultisig(item);
+            await createMultisig({ ...item, selectedHostWalletId });
         }
-
+        await selectMultisigHost({
+            multisigId: item.address,
+            selectedWalletId: selectedHostWalletId
+        });
         await setActiveAccount(item.address);
         navigate(AppRoute.home);
     };
@@ -182,8 +190,6 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
                                 {toShortValue(formatAddress(item.address))}
                                 <Dot />
                                 {toFormattedTonBalance(item.balance)}&nbsp;TON
-                                <Dot />
-                                {t(item.role)}
                             </Body3>
                         </TextContainer>
 
@@ -194,7 +200,7 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
                             <IconButtonTransparentBackgroundStyled
                                 onClick={() => onTogglePin(item)}
                             >
-                                <PinIconStyled isActive={item.isPinned} />
+                                {item.isPinned ? <UnpinIconOutline /> : <PinIconOutline />}
                             </IconButtonTransparentBackgroundStyled>
                             <Button onClick={() => onOpen(item)}>{t('open')}</Button>
                         </ButtonsContainer>

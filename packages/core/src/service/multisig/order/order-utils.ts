@@ -22,12 +22,15 @@ export type NewOrder = {
     validUntilSeconds: number;
 };
 
+export const MAX_ORDER_SEQNO =
+    115792089237316195423570985008687907853269984665640564039457584007913129639935n;
+
 export function createNewOrderMessage(
     actions: Action[],
     expirationDate: number,
     isSigner: boolean,
     addrIdx: number,
-    order_id = 115792089237316195423570985008687907853269984665640564039457584007913129639935n,
+    order_id = MAX_ORDER_SEQNO,
     query_id: number | bigint = 0
 ) {
     if (actions.length === 0) {

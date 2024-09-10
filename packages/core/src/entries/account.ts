@@ -497,7 +497,12 @@ export class AccountTonMultisig extends Clonable implements IAccount {
         public readonly id: AccountId,
         public name: string,
         public emoji: string,
-        public tonWallet: TonContract
+        public tonWallet: TonContract,
+        public hostWallets: {
+            address: string;
+            isPinned: boolean;
+        }[],
+        public selectedHostWalletId: WalletId
     ) {
         super();
     }
@@ -514,6 +519,51 @@ export class AccountTonMultisig extends Clonable implements IAccount {
         if (walletId !== this.tonWallet.id) {
             throw new Error('Cannot add ton wallet to watch only account');
         }
+    }
+
+    setSelectedHostWalletId(walletId: WalletId) {
+        if (!this.hostWallets.some(w => w.address === walletId)) {
+            throw new Error('Host wallet not found');
+        }
+
+        this.selectedHostWalletId = walletId;
+    }
+
+    setHostWallets(wallets: { address: string; isPinned: boolean }[]) {
+        this.hostWallets = wallets;
+        if (!this.hostWallets.some(w => w.address === this.selectedHostWalletId)) {
+            this.selectedHostWalletId = this.hostWallets[0].address;
+        }
+    }
+
+    addHostWallet(wallet: WalletId) {
+        if (this.hostWallets.some(w => w.address === wallet)) {
+            return;
+        }
+
+        this.hostWallets.push({ address: wallet, isPinned: false });
+    }
+
+    removeHostWallet(wallet: WalletId) {
+        this.hostWallets = this.hostWallets.filter(w => w.address !== wallet);
+    }
+
+    togglePinForWallet(walletId: WalletId) {
+        if (!this.hostWallets.some(w => w.address === walletId)) {
+            throw new Error('Host wallet not found');
+        }
+
+        this.hostWallets = this.hostWallets.map(w => {
+            if (w.address === walletId) {
+                return { ...w, isPinned: !w.isPinned };
+            }
+
+            return w;
+        });
+    }
+
+    isPinnedForWallet(walletId: WalletId) {
+        return this.hostWallets.find(w => w.address === walletId)?.isPinned ?? false;
     }
 }
 

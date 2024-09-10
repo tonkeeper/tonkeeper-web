@@ -26,6 +26,7 @@ export enum QueryKey {
     walletVersions = 'walletVersions',
     globalPreferencesConfig = 'globalPreferencesConfig',
     multisigWallets = 'multisigWallets',
+    multisigSigners = 'multisigSigners',
 
     tonConnectConnection = 'tonConnectConnection',
     tonConnectLastEventId = 'tonConnectLastEventId',

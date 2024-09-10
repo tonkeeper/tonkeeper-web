@@ -1,5 +1,5 @@
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
+import { TonRecipientData, TransferEstimationEventFee } from "@tonkeeper/core/dist/entries/send";
 import React, { FC, PropsWithChildren, useEffect } from 'react';
 import { ConfirmView, ConfirmViewAdditionalBottomSlot } from './ConfirmView';
 import { useEstimateNewMultisigTransfer } from '../../hooks/blockchain/multisig/useEstimateNewMultisigTransfer';
@@ -27,7 +27,7 @@ export const ConfirmMultisigNewTransferView: FC<
         rest.assetAmount,
         isMax,
         ttl,
-        estimation.data!.payload
+        estimation.data?.payload as TransferEstimationEventFee
     );
 
     useEffect(() => {

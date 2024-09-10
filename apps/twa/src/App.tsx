@@ -63,6 +63,7 @@ import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
 import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
+import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -227,6 +228,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { data: fiat } = useUserFiatQuery();
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
+    useGlobalSetup();
 
     const lock = useLock(sdk);
     const network = useActiveTonNetwork();

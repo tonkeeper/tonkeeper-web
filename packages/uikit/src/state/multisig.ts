@@ -1,12 +1,25 @@
-import { useQuery } from '@tanstack/react-query';
-import { QueryKey } from '../libs/queryKey';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { useAppContext } from '../hooks/appContext';
-import { AccountsApi, Multisig, MultisigApi, MultisigOrder } from '@tonkeeper/core/dist/tonApiV2';
+import {
+    AccountsApi,
+    Multisig,
+    MultisigApi,
+    MultisigOrder,
+    Multisigs
+} from '@tonkeeper/core/dist/tonApiV2';
 import { useAccountsState, useActiveAccount } from './wallet';
-import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { orderStatus } from '@tonkeeper/core/dist/service/multisig/multisigService';
 import { useRef } from 'react';
 import { useCountdown } from '../hooks/useCountDown';
+import {
+    AccountId,
+    AccountsState,
+    AccountTonMultisig,
+    getAccountByWalletById
+} from '@tonkeeper/core/dist/entries/account';
+import { useAccountsStorage } from '../hooks/useStorage';
 
 export const useMultisigWalletInfo = (walletAddressRaw: string) => {
     const { api } = useAppContext();
@@ -26,25 +39,61 @@ export const useActiveMultisigWalletInfo = () => {
     return useMultisigWalletInfo(account.id);
 };
 
-export const useActiveMultisigSignerInfo = () => {
-    const { data: multisig } = useActiveMultisigWalletInfo();
-
+export const useCheckMultisigsSigners = () => {
     const accounts = useAccountsState();
+    const { api } = useAppContext();
+    const accountsStorage = useAccountsStorage();
+    const queryClient = useQueryClient();
 
-    if (!multisig) {
-        return undefined;
-    }
-    for (const account of accounts) {
-        const walletId = multisig.signers.find(s => account.getTonWallet(s));
-        if (walletId) {
-            const wallet = account.getTonWallet(walletId);
-            if (wallet && isStandardTonWallet(wallet)) {
-                return { account, wallet };
+    return useQuery({
+        queryKey: [QueryKey.multisigSigners, accounts],
+        queryFn: async () => {
+            const multisigs = accounts.filter(a => a.type === 'ton-multisig');
+            const allAddedWallets = accounts.flatMap(a => a.allTonWallets).map(w => w.rawAddress);
+            const multisigApi = new MultisigApi(api.tonApiV2);
+            const data = await Promise.all(
+                multisigs.map(m =>
+                    multisigApi.getMultisigAccount({ accountId: m.activeTonWallet.rawAddress })
+                )
+            );
+
+            let needChanges = false;
+            for (const multisigData of data) {
+                const supposedSigners = allAddedWallets.filter(w =>
+                    multisigData.signers.includes(w)
+                );
+                const multisigAccount = multisigs.find(
+                    m => m.activeTonWallet.rawAddress === multisigData.address
+                ) as AccountTonMultisig;
+
+                const notIncludedSigners = supposedSigners.filter(
+                    s => !multisigAccount.hostWallets.some(w => w.address === s)
+                );
+
+                for (const signer of notIncludedSigners) {
+                    needChanges = true;
+                    multisigAccount.addHostWallet(signer);
+                }
+
+                const reducedSigners = multisigAccount.hostWallets.filter(
+                    w => !supposedSigners.includes(w.address)
+                );
+
+                for (const signer of reducedSigners) {
+                    needChanges = true;
+                    multisigAccount.removeHostWallet(signer.address);
+                }
+            }
+
+            if (needChanges) {
+                await accountsStorage.updateAccountsInState(multisigs);
+
+                await queryClient.invalidateQueries(
+                    anyOfKeysParts(QueryKey.account, ...multisigs.map(m => m.id))
+                );
             }
         }
-    }
-
-    throw new Error('Signer not found');
+    });
 };
 
 export const useActiveWalletMultisigWallets = () => {
@@ -57,21 +106,33 @@ export type MultisigInfo = Multisig & { balance: number };
 export const useWalletMultisigWallets = (walletAddressRaw: string) => {
     const { api } = useAppContext();
     return useQuery([walletAddressRaw, QueryKey.multisigWallets, api], async () => {
-        const accountsApi = new AccountsApi(api.tonApiV2);
-        const response = await accountsApi.getAccountMultisigs({ accountId: walletAddressRaw });
+        let response: Multisigs;
+        try {
+            const accountsApi = new AccountsApi(api.tonApiV2);
+            response = await accountsApi.getAccountMultisigs({ accountId: walletAddressRaw });
+        } catch (e) {
+            return [];
+        }
 
         if (!response.multisigs.length) {
             return [];
         }
 
-        const contractsInfo = await new AccountsApi(api.tonApiV2).getAccounts({
-            getAccountsRequest: { accountIds: response.multisigs.map(m => m.address) }
-        });
+        try {
+            const contractsInfo = await new AccountsApi(api.tonApiV2).getAccounts({
+                getAccountsRequest: { accountIds: response.multisigs.map(m => m.address) }
+            });
 
-        return response.multisigs.map(m => ({
-            ...m,
-            balance: contractsInfo.accounts.find(a => a.address === m.address)!.balance
-        }));
+            return response.multisigs.map(m => ({
+                ...m,
+                balance: contractsInfo.accounts.find(a => a.address === m.address)!.balance
+            }));
+        } catch (e) {
+            return response.multisigs.map(m => ({
+                ...m,
+                balance: 0
+            }));
+        }
     });
 };
 
@@ -93,4 +154,51 @@ export const useOrderInfo = (order: MultisigOrder) => {
         total,
         secondsLeft
     };
+};
+
+export function getMultisigSignerInfo(accounts: AccountsState, activeAccount: AccountTonMultisig) {
+    const signerAccount = getAccountByWalletById(accounts, activeAccount.selectedHostWalletId);
+    const signerWallet = signerAccount?.getTonWallet(activeAccount.selectedHostWalletId);
+    if (!signerAccount || !signerWallet || !isStandardTonWallet(signerWallet)) {
+        throw new Error('Signer not found');
+    }
+
+    return {
+        signerAccount,
+        signerWallet
+    };
+}
+
+export const useMultisigTogglePinForWallet = () => {
+    const client = useQueryClient();
+    const storage = useAccountsStorage();
+    return useMutation<void, Error, { multisigId: AccountId; hostWalletId: WalletId }>(
+        async ({ multisigId, hostWalletId }) => {
+            const multisig = await storage.getAccount(multisigId);
+            if (!multisig || multisig.type !== 'ton-multisig') {
+                throw new Error('Multisig not found');
+            }
+
+            multisig.togglePinForWallet(hostWalletId);
+            await storage.updateAccountInState(multisig);
+            await client.invalidateQueries(anyOfKeysParts(QueryKey.account, multisigId));
+        }
+    );
+};
+
+export const useMutateMultisigSelectedHostWallet = () => {
+    const client = useQueryClient();
+    const storage = useAccountsStorage();
+    return useMutation<void, Error, { selectedWalletId: WalletId; multisigId: AccountId }>(
+        async ({ multisigId, selectedWalletId }) => {
+            const multisig = await storage.getAccount(multisigId);
+            if (!multisig || multisig.type !== 'ton-multisig') {
+                throw new Error('Multisig not found');
+            }
+
+            multisig.setSelectedHostWalletId(selectedWalletId);
+            await storage.updateAccountInState(multisig);
+            await client.invalidateQueries(anyOfKeysParts(QueryKey.account, multisigId));
+        }
+    );
 };

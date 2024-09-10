@@ -1,4 +1,4 @@
-import { Account } from '@tonkeeper/core/dist/entries/account';
+import { Account, AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
 import {
     WalletId,
     sortDerivationsByIndex,
@@ -6,7 +6,16 @@ import {
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
-import { FC, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+    FC,
+    forwardRef,
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState
+} from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -38,6 +47,7 @@ import { AsideHeader } from './AsideHeader';
 import { SubscriptionInfoBlock } from './SubscriptionInfoBlock';
 import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
 import { useAddWalletNotification } from '../../modals/AddWalletNotificationControlled';
+import { useMutateMultisigSelectedHostWallet } from '../../../state/multisig';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -102,7 +112,7 @@ const AsideMenuBottom = styled.div`
     padding-bottom: 0.5rem;
 `;
 
-const AsideMenuSubItem = styled(AsideMenuItem)`
+const AsideMenuSubItemContainer = styled.div`
     padding-left: 36px;
 `;
 
@@ -127,6 +137,83 @@ const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: 
     opacity: ${p => (p.isShown ? 1 : 0)};
     transition: opacity 0.15s ease-in-out;
 `;
+
+const MultisigsGroupGap = styled.div`
+    height: 8px;
+`;
+
+const AsideMultisigsGroup: FC<{
+    onClickWallet: (id: string) => void;
+    hostWalletId: WalletId;
+}> = ({ hostWalletId, onClickWallet }) => {
+    const accounts = useAccountsState();
+    const activeAccount = useActiveAccount();
+
+    const multisigsToDisplay = useMemo(() => {
+        const multisigs = accounts.filter(a => a.type === 'ton-multisig') as AccountTonMultisig[];
+
+        const result: {
+            account: AccountTonMultisig;
+            isPinned: boolean;
+            isSelected: boolean;
+        }[] = [];
+        for (const multisig of multisigs) {
+            const hostWallet = multisig.hostWallets.find(w => w.address === hostWalletId);
+
+            if (hostWallet) {
+                result.push({
+                    account: multisig,
+                    isPinned: hostWallet.isPinned,
+                    isSelected:
+                        activeAccount.id === multisig.id &&
+                        hostWalletId === multisig.selectedHostWalletId
+                });
+            }
+        }
+
+        return result.filter(m => m.isSelected || m.isPinned);
+    }, [accounts, hostWalletId, activeAccount]);
+
+    return (
+        <>
+            {multisigsToDisplay.map(val => (
+                <AsideMultisigItem
+                    key={val.account.id}
+                    account={val.account}
+                    onClickWallet={onClickWallet}
+                    hostWalletId={hostWalletId}
+                    isSelected={val.isSelected}
+                />
+            ))}
+            {multisigsToDisplay.length > 0 && <MultisigsGroupGap />}
+        </>
+    );
+};
+
+const AsideMultisigItem = forwardRef<
+    HTMLButtonElement,
+    {
+        account: AccountTonMultisig;
+        onClickWallet: (id: string) => void;
+        hostWalletId: WalletId;
+        isSelected: boolean;
+    }
+>(({ account, onClickWallet, hostWalletId, isSelected }, ref) => {
+    const { mutateAsync } = useMutateMultisigSelectedHostWallet();
+
+    const onClick = async () => {
+        await mutateAsync({ selectedWalletId: hostWalletId, multisigId: account.id });
+        onClickWallet(account.activeTonWallet.id);
+    };
+
+    return (
+        <AsideMenuItem isSelected={isSelected} onClick={onClick} ref={ref}>
+            <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
+            <Label2>{account.name}</Label2>
+            <AccountBadgeStyled accountType={account.type} size="s" />
+        </AsideMenuItem>
+    );
+});
 
 export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = ({
     account,
@@ -187,16 +274,21 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                 </AsideMenuItem>
                 {sortedWallets.length > 1 &&
                     sortedWallets.map(wallet => (
-                        <AsideMenuSubItem
-                            key={wallet.id}
-                            isSelected={isSelected && account.activeTonWallet.id === wallet.id}
-                            onClick={() => onClickWallet(wallet.id)}
-                        >
-                            <Label2>
-                                {toShortValue(formatAddress(wallet.rawAddress, network))}
-                            </Label2>
-                            <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
-                        </AsideMenuSubItem>
+                        <AsideMenuSubItemContainer key={wallet.id}>
+                            <AsideMenuItem
+                                isSelected={isSelected && account.activeTonWallet.id === wallet.id}
+                                onClick={() => onClickWallet(wallet.id)}
+                            >
+                                <Label2>
+                                    {toShortValue(formatAddress(wallet.rawAddress, network))}
+                                </Label2>
+                                <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
+                            </AsideMenuItem>
+                            <AsideMultisigsGroup
+                                hostWalletId={wallet.id}
+                                onClickWallet={onClickWallet}
+                            />
+                        </AsideMenuSubItemContainer>
                     ))}
             </>
         );
@@ -238,20 +330,22 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                         )!;
 
                         return (
-                            <AsideMenuSubItem
-                                key={derivation.index}
-                                isSelected={
-                                    isSelected && account.activeDerivationIndex === derivation.index
-                                }
-                                onClick={() => onClickWallet(derivation.activeTonWalletId)}
-                            >
-                                <Label2>
-                                    {toShortValue(formatAddress(wallet.rawAddress, network))}
-                                </Label2>
-                                <WalletIndexBadgeStyled size="s">
-                                    {'#' + (derivation.index + 1)}
-                                </WalletIndexBadgeStyled>
-                            </AsideMenuSubItem>
+                            <AsideMenuSubItemContainer key={derivation.index}>
+                                <AsideMenuItem
+                                    isSelected={
+                                        isSelected &&
+                                        account.activeDerivationIndex === derivation.index
+                                    }
+                                    onClick={() => onClickWallet(derivation.activeTonWalletId)}
+                                >
+                                    <Label2>
+                                        {toShortValue(formatAddress(wallet.rawAddress, network))}
+                                    </Label2>
+                                    <WalletIndexBadgeStyled size="s">
+                                        {'#' + (derivation.index + 1)}
+                                    </WalletIndexBadgeStyled>
+                                </AsideMenuItem>
+                            </AsideMenuSubItemContainer>
                         );
                     })}
             </>
@@ -285,16 +379,21 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                 </AsideMenuItem>
                 {sortedWallets.length > 1 &&
                     sortedWallets.map(wallet => (
-                        <AsideMenuSubItem
-                            key={wallet.id}
-                            isSelected={isSelected && account.activeTonWallet.id === wallet.id}
-                            onClick={() => onClickWallet(wallet.id)}
-                        >
-                            <Label2>
-                                {toShortValue(formatAddress(wallet.rawAddress, network))}
-                            </Label2>
-                            <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
-                        </AsideMenuSubItem>
+                        <AsideMenuSubItemContainer key={wallet.id}>
+                            <AsideMenuItem
+                                isSelected={isSelected && account.activeTonWallet.id === wallet.id}
+                                onClick={() => onClickWallet(wallet.id)}
+                            >
+                                <Label2>
+                                    {toShortValue(formatAddress(wallet.rawAddress, network))}
+                                </Label2>
+                                <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
+                            </AsideMenuItem>
+                            <AsideMultisigsGroup
+                                hostWalletId={wallet.id}
+                                onClickWallet={onClickWallet}
+                            />
+                        </AsideMenuSubItemContainer>
                     ))}
             </>
         );
@@ -360,55 +459,37 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                 </AsideMenuItem>
                 {sortedDerivations.map(derivation => {
                     return (
-                        <AsideMenuSubItem
-                            key={derivation.index}
-                            isSelected={
-                                isSelected && account.activeDerivationIndex === derivation.index
-                            }
-                            onClick={() => onClickWallet(derivation.activeTonWalletId)}
-                        >
-                            {shouldShowIcon && (
-                                <WalletEmoji
-                                    emojiSize="16px"
-                                    containerSize="16px"
-                                    emoji={derivation.emoji}
-                                />
-                            )}
-                            <Label2>{derivation.name}</Label2>
-                            <WalletIndexBadgeStyled size="s">
-                                {'#' + (derivation.index + 1)}
-                            </WalletIndexBadgeStyled>
-                        </AsideMenuSubItem>
+                        <AsideMenuSubItemContainer key={derivation.index}>
+                            <AsideMenuItem
+                                isSelected={
+                                    isSelected && account.activeDerivationIndex === derivation.index
+                                }
+                                onClick={() => onClickWallet(derivation.activeTonWalletId)}
+                            >
+                                {shouldShowIcon && (
+                                    <WalletEmoji
+                                        emojiSize="16px"
+                                        containerSize="16px"
+                                        emoji={derivation.emoji}
+                                    />
+                                )}
+                                <Label2>{derivation.name}</Label2>
+                                <WalletIndexBadgeStyled size="s">
+                                    {'#' + (derivation.index + 1)}
+                                </WalletIndexBadgeStyled>
+                            </AsideMenuItem>
+                            <AsideMultisigsGroup
+                                hostWalletId={derivation.activeTonWalletId}
+                                onClickWallet={onClickWallet}
+                            />
+                        </AsideMenuSubItemContainer>
                     );
                 })}
             </>
         );
     }
     if (account.type === 'ton-multisig') {
-        return (
-            <AsideMenuItem
-                isSelected={isSelected}
-                onClick={() => onClickWallet(account.activeTonWallet.id)}
-                ref={ref}
-            >
-                {shouldShowIcon && (
-                    <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
-                )}
-                <Label2>{account.name}</Label2>
-                <AccountBadgeStyled accountType={account.type} size="s" />
-
-                <GearIconButtonStyled
-                    onClick={e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openMAMIndexesSettings({ accountId: account.id });
-                    }}
-                    isShown={isHovered}
-                >
-                    <GearIconEmpty />
-                </GearIconButtonStyled>
-            </AsideMenuItem>
-        );
+        return null;
     }
 
     assertUnreachable(account);

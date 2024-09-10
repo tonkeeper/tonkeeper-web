@@ -329,14 +329,27 @@ export const useCreateAccountTonMultisig = () => {
             address: string;
             name?: string;
             emoji?: string;
+            hostWallets: WalletId[];
+            selectedHostWalletId: WalletId;
+            pinToWallet?: string;
         }
-    >(async ({ address, name, emoji }) => {
+    >(async ({ address, name, emoji, selectedHostWalletId, pinToWallet, hostWallets }) => {
         const valid = await seeIfValidTonAddress(address);
         if (!valid) {
             throw new Error('Address is not valid.');
         }
 
-        const account = await createMultisigTonAccount(sdk.storage, address, { name, emoji });
+        const account = await createMultisigTonAccount(
+            sdk.storage,
+            address,
+            hostWallets,
+            selectedHostWalletId,
+            {
+                name,
+                emoji,
+                pinToWallet
+            }
+        );
 
         await addAccountToState(account);
         return account;

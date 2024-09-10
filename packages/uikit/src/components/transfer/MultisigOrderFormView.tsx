@@ -45,11 +45,11 @@ export const MultisigOrderFormView: FC<{
     const isFullWidth = useIsFullWidthMode();
     const { standalone } = useAppContext();
     const shouldHideHeaderAndFooter = isFullWidth && isAnimationProcess;
-    const [lifeTime, setLifeTime] = useState<MultisigOrderLifetimeMinutes>('60');
+    const [lifetime, lifetimeTime] = useState<MultisigOrderLifetimeMinutes>('60');
     const { t } = useTranslation();
 
     const handleSubmit = () => {
-        onSubmit({ lifetime: '30' });
+        onSubmit({ lifetime });
     };
 
     return (
@@ -82,11 +82,11 @@ export const MultisigOrderFormView: FC<{
                             ([value, translation]) => (
                                 <>
                                     <DropDownItem
-                                        isSelected={lifeTime === value}
+                                        isSelected={lifetime === value}
                                         key={value}
                                         onClick={() => {
                                             onClose();
-                                            setLifeTime(value as MultisigOrderLifetimeMinutes);
+                                            lifetimeTime(value as MultisigOrderLifetimeMinutes);
                                         }}
                                     >
                                         <Label2>{t(translation)}</Label2>
@@ -102,7 +102,7 @@ export const MultisigOrderFormView: FC<{
                     <SelectDropDownHost>
                         <SelectDropDownHostText>
                             <Body3>{t('multisig_time_to_sign_transaction')}</Body3>
-                            <Body2>{t(multisigOrderLifetimeMinutes[lifeTime])}</Body2>
+                            <Body2>{t(multisigOrderLifetimeMinutes[lifetime])}</Body2>
                         </SelectDropDownHostText>
                         <SwitchIcon />
                     </SelectDropDownHost>

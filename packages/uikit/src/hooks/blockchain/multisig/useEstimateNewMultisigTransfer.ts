@@ -12,8 +12,10 @@ import { estimateMultisigJettonTransfer } from '@tonkeeper/core/dist/service/tra
 import { estimateMultisigTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { useAppContext } from '../../appContext';
 import { useJettonList } from '../../../state/jetton';
-import { useActiveMultisigSignerInfo, useActiveMultisigWalletInfo } from '../../../state/multisig';
+import { getMultisigSignerInfo, useActiveMultisigWalletInfo } from '../../../state/multisig';
 import { useAsyncQueryData } from '../../useAsyncQueryData';
+import { AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
+import { useAccountsState, useActiveAccount } from '../../../state/wallet';
 
 export function useEstimateNewMultisigTransfer(
     recipient: TonRecipientData,
@@ -21,17 +23,17 @@ export function useEstimateNewMultisigTransfer(
     isMax: boolean
 ) {
     const { api } = useAppContext();
+    const accounts = useAccountsState();
+    const activeAccount = useActiveAccount();
     const { data: multisigInfoData } = useActiveMultisigWalletInfo();
     const multisigInfoPromise = useAsyncQueryData(multisigInfoData);
-    const signerInfoData = useActiveMultisigSignerInfo();
-    const signerInfoPromise = useAsyncQueryData(signerInfoData);
     const { data: jettons } = useJettonList();
 
     return useMutation<TransferEstimation<TonAsset>, Error>(async () => {
-        const signerInfo = await signerInfoPromise;
-        if (!signerInfo) {
-            throw new Error('Signer not found');
-        }
+        const { signerWallet } = getMultisigSignerInfo(
+            accounts,
+            activeAccount as AccountTonMultisig
+        );
 
         const multisig = await multisigInfoPromise;
         if (!multisig) {
@@ -43,7 +45,7 @@ export function useEstimateNewMultisigTransfer(
         if (amount.asset.id === TON_ASSET.id) {
             payload = await estimateMultisigTonTransfer({
                 api,
-                hostWallet: signerInfo.wallet,
+                hostWallet: signerWallet,
                 recipient: recipient,
                 multisig,
                 weiAmount: amount.weiAmount,
@@ -55,7 +57,7 @@ export function useEstimateNewMultisigTransfer(
             )!;
             payload = await estimateMultisigJettonTransfer({
                 api,
-                hostWallet: signerInfo.wallet,
+                hostWallet: signerWallet,
                 recipient: recipient,
                 multisig,
                 amount,

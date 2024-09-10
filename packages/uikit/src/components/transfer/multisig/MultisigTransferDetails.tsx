@@ -7,6 +7,8 @@ import { toTimeLeft } from '@tonkeeper/core/dist/utils/date';
 import { useTranslation } from '../../../hooks/translation';
 
 const MultisigDetailsBlock = styled.div`
+    width: 100%;
+    box-sizing: border-box;
     ${BorderSmallResponsive};
     background: ${p => p.theme.backgroundContent};
     padding: 8px 12px;
@@ -41,13 +43,13 @@ export const MultisigTransferDetails: FC<{
                 <Body2>{t('multisig_signed_label')}</Body2>
                 <Body2>
                     {t('multisig_signed_value')
-                        .replace('{signed}', signed.toString())
-                        .replace('{total}', total.toString())}
+                        .replace(/%?\{signed}/, signed.toString())
+                        .replace(/%?\{total}/, total.toString())}
                 </Body2>
             </MultisigDetailsRow>
             <MultisigDetailsRow>
                 <Body2>{t('multisig_time_left')}</Body2>
-                <Body2>{toTimeLeft(secondsLeft, { days: false })}</Body2>
+                <Body2>{toTimeLeft(secondsLeft * 1000, { days: false })}</Body2>
             </MultisigDetailsRow>
         </MultisigDetailsBlock>
     );

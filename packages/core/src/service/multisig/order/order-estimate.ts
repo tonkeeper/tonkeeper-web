@@ -1,6 +1,6 @@
 import { APIConfig } from '../../../entries/apis';
 import { BlockchainApi, EmulationApi, Multisig, MultisigOrder } from '../../../tonApiV2';
-import { NewOrder, packOrderBody } from './order-utils';
+import { MAX_ORDER_SEQNO, NewOrder, packOrderBody } from './order-utils';
 import { Address, beginCell, Cell, contractAddress, toNano, storeMessage } from '@ton/core';
 import { arrayToCell, MultisigOp, MultisigParams } from '../utils';
 import { bufferToBigInt } from '../../../utils/common';
@@ -59,7 +59,7 @@ async function estimateOrderByBodyCell(options: {
     orderValidUntilSeconds: number;
     orderSeqno?: number;
 }) {
-    let orderSeqno = options.orderSeqno;
+    let orderSeqno: number | bigint | undefined = options.orderSeqno;
     if (orderSeqno === undefined) {
         const result = await new BlockchainApi(
             options.api.tonApiV2
@@ -73,7 +73,15 @@ async function estimateOrderByBodyCell(options: {
             throw new Error("Can't get next seqno");
         }
 
-        orderSeqno = Number(nextSeqno);
+        if (nextSeqno.startsWith('-')) {
+            if (Number(nextSeqno.slice(1)) !== 1) {
+                throw new Error('Invalid next seqno');
+            }
+
+            orderSeqno = MAX_ORDER_SEQNO;
+        } else {
+            orderSeqno = Number(nextSeqno);
+        }
     }
 
     const orderData = orderConfigToCell({
@@ -133,7 +141,8 @@ async function estimateOrderByBodyCell(options: {
                 body: msgBody
             })
         )
-        .endCell();
+        .endCell()
+        .toBoc();
 
     return new EmulationApi(options.api.tonApiV2).emulateMessageToWallet({
         emulateMessageToWalletRequest: { boc: msgCell.toString('base64') }
@@ -161,7 +170,10 @@ async function estimateOrderByBodyCell(options: {
      */
 }
 
-export function orderConfigToCell(config: { multisigAddress: string; orderSeqno: number }): Cell {
+export function orderConfigToCell(config: {
+    multisigAddress: string;
+    orderSeqno: number | bigint;
+}): Cell {
     return beginCell()
         .storeAddress(Address.parse(config.multisigAddress))
         .storeUint(config.orderSeqno, MultisigParams.bitsize.orderSeqno)

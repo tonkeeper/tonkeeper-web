@@ -22,7 +22,8 @@ import {
     WalletVersions,
     sortWalletsByVersion,
     TonWalletStandard,
-    DerivationItemNamed
+    DerivationItemNamed,
+    WalletId
 } from '../entries/wallet';
 import { AccountsApi, WalletApi } from '../tonApiV2';
 import { emojis } from '../utils/emojis';
@@ -33,9 +34,12 @@ import { TonKeychainRoot, KeychainTonAccount } from '@ton-keychain/core';
 export const createMultisigTonAccount = async (
     storage: IStorage,
     address: string,
+    hostWallets: WalletId[],
+    selectedHostWalletId: WalletId,
     options: {
         name?: string;
         emoji?: string;
+        pinToWallet?: string;
     }
 ) => {
     const rawAddress = Address.parse(address).toRawString();
@@ -43,10 +47,20 @@ export const createMultisigTonAccount = async (
         rawAddress.split(':')[1]
     );
 
-    return new AccountTonMultisig(rawAddress, options.name ?? name, options.emoji ?? emoji, {
-        id: rawAddress,
-        rawAddress: rawAddress
-    });
+    return new AccountTonMultisig(
+        rawAddress,
+        options.name ?? name,
+        options.emoji ?? emoji,
+        {
+            id: rawAddress,
+            rawAddress: rawAddress
+        },
+        hostWallets.map(a => ({
+            address: a,
+            isPinned: a === options.pinToWallet
+        })),
+        selectedHostWalletId
+    );
 };
 
 export const createReadOnlyTonAccountByAddress = async (
