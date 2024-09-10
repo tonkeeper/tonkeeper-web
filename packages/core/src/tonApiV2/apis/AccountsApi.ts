@@ -22,7 +22,6 @@ import type {
   DnsExpiring,
   DomainNames,
   FoundAccounts,
-  GaslessEstimateRequestMessagesInner,
   GetAccountDiff200Response,
   GetAccountPublicKey200Response,
   GetAccountsRequest,
@@ -49,8 +48,6 @@ import {
     DomainNamesToJSON,
     FoundAccountsFromJSON,
     FoundAccountsToJSON,
-    GaslessEstimateRequestMessagesInnerFromJSON,
-    GaslessEstimateRequestMessagesInnerToJSON,
     GetAccountDiff200ResponseFromJSON,
     GetAccountDiff200ResponseToJSON,
     GetAccountPublicKey200ResponseFromJSON,
@@ -75,13 +72,6 @@ import {
 
 export interface AccountDnsBackResolveRequest {
     accountId: string;
-}
-
-export interface EmulateMessageToAccountEventRequest {
-    accountId: string;
-    gaslessEstimateRequestMessagesInner: GaslessEstimateRequestMessagesInner;
-    acceptLanguage?: string;
-    ignoreSignatureCheck?: boolean;
 }
 
 export interface GetAccountRequest {
@@ -208,23 +198,6 @@ export interface AccountsApiInterface {
      * Get account\'s domains
      */
     accountDnsBackResolve(requestParameters: AccountDnsBackResolveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DomainNames>;
-
-    /**
-     * Emulate sending message to blockchain
-     * @param {string} accountId account ID
-     * @param {GaslessEstimateRequestMessagesInner} gaslessEstimateRequestMessagesInner bag-of-cells serialized to hex
-     * @param {string} [acceptLanguage] 
-     * @param {boolean} [ignoreSignatureCheck] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AccountsApiInterface
-     */
-    emulateMessageToAccountEventRaw(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvent>>;
-
-    /**
-     * Emulate sending message to blockchain
-     */
-    emulateMessageToAccountEvent(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvent>;
 
     /**
      * Get human-friendly information about an account without low-level details.
@@ -537,57 +510,6 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      */
     async accountDnsBackResolve(requestParameters: AccountDnsBackResolveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DomainNames> {
         const response = await this.accountDnsBackResolveRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Emulate sending message to blockchain
-     */
-    async emulateMessageToAccountEventRaw(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvent>> {
-        if (requestParameters['accountId'] == null) {
-            throw new runtime.RequiredError(
-                'accountId',
-                'Required parameter "accountId" was null or undefined when calling emulateMessageToAccountEvent().'
-            );
-        }
-
-        if (requestParameters['gaslessEstimateRequestMessagesInner'] == null) {
-            throw new runtime.RequiredError(
-                'gaslessEstimateRequestMessagesInner',
-                'Required parameter "gaslessEstimateRequestMessagesInner" was null or undefined when calling emulateMessageToAccountEvent().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        if (requestParameters['ignoreSignatureCheck'] != null) {
-            queryParameters['ignore_signature_check'] = requestParameters['ignoreSignatureCheck'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (requestParameters['acceptLanguage'] != null) {
-            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
-        }
-
-        const response = await this.request({
-            path: `/v2/accounts/{account_id}/events/emulate`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: GaslessEstimateRequestMessagesInnerToJSON(requestParameters['gaslessEstimateRequestMessagesInner']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => AccountEventFromJSON(jsonValue));
-    }
-
-    /**
-     * Emulate sending message to blockchain
-     */
-    async emulateMessageToAccountEvent(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvent> {
-        const response = await this.emulateMessageToAccountEventRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
