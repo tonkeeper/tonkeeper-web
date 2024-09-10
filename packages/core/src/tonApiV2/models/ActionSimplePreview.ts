@@ -18,6 +18,7 @@ import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -93,10 +94,15 @@ export function ActionSimplePreviewFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function ActionSimplePreviewToJSON(value?: ActionSimplePreview | null): any {
+  export function ActionSimplePreviewToJSON(json: any): ActionSimplePreview {
+      return ActionSimplePreviewToJSONTyped(json, false);
+  }
+
+  export function ActionSimplePreviewToJSONTyped(value?: ActionSimplePreview | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'name': value['name'],

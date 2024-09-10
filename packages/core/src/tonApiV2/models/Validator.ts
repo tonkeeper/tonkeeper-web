@@ -73,10 +73,15 @@ export function ValidatorFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function ValidatorToJSON(value?: Validator | null): any {
+  export function ValidatorToJSON(json: any): Validator {
+      return ValidatorToJSONTyped(json, false);
+  }
+
+  export function ValidatorToJSONTyped(value?: Validator | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

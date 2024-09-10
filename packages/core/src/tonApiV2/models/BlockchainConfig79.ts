@@ -18,6 +18,7 @@ import {
     JettonBridgeParamsFromJSON,
     JettonBridgeParamsFromJSONTyped,
     JettonBridgeParamsToJSON,
+    JettonBridgeParamsToJSONTyped,
 } from './JettonBridgeParams';
 
 /**
@@ -56,10 +57,15 @@ export function BlockchainConfig79FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig79ToJSON(value?: BlockchainConfig79 | null): any {
+  export function BlockchainConfig79ToJSON(json: any): BlockchainConfig79 {
+      return BlockchainConfig79ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig79ToJSONTyped(value?: BlockchainConfig79 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'jetton_bridge_params': JettonBridgeParamsToJSON(value['jettonBridgeParams']),

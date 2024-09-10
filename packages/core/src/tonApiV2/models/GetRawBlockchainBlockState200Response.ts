@@ -18,6 +18,7 @@ import {
     BlockRawFromJSON,
     BlockRawFromJSONTyped,
     BlockRawToJSON,
+    BlockRawToJSONTyped,
 } from './BlockRaw';
 
 /**
@@ -80,10 +81,15 @@ export function GetRawBlockchainBlockState200ResponseFromJSONTyped(json: any, ig
     };
 }
 
-export function GetRawBlockchainBlockState200ResponseToJSON(value?: GetRawBlockchainBlockState200Response | null): any {
+  export function GetRawBlockchainBlockState200ResponseToJSON(json: any): GetRawBlockchainBlockState200Response {
+      return GetRawBlockchainBlockState200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetRawBlockchainBlockState200ResponseToJSONTyped(value?: GetRawBlockchainBlockState200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': BlockRawToJSON(value['id']),

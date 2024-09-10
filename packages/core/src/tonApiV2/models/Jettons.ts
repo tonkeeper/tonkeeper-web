@@ -18,6 +18,7 @@ import {
     JettonInfoFromJSON,
     JettonInfoFromJSONTyped,
     JettonInfoToJSON,
+    JettonInfoToJSONTyped,
 } from './JettonInfo';
 
 /**
@@ -56,10 +57,15 @@ export function JettonsFromJSONTyped(json: any, ignoreDiscriminator: boolean): J
     };
 }
 
-export function JettonsToJSON(value?: Jettons | null): any {
+  export function JettonsToJSON(json: any): Jettons {
+      return JettonsToJSONTyped(json, false);
+  }
+
+  export function JettonsToJSONTyped(value?: Jettons | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'jettons': ((value['jettons'] as Array<any>).map(JettonInfoToJSON)),

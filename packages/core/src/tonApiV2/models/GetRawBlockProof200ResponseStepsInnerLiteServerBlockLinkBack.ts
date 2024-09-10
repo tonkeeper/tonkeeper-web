@@ -18,6 +18,7 @@ import {
     BlockRawFromJSON,
     BlockRawFromJSONTyped,
     BlockRawToJSON,
+    BlockRawToJSONTyped,
 } from './BlockRaw';
 
 /**
@@ -96,10 +97,15 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackFrom
     };
 }
 
-export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackToJSON(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack | null): any {
+  export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackToJSON(json: any): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack {
+      return GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackToJSONTyped(json, false);
+  }
+
+  export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackToJSONTyped(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'to_key_block': value['toKeyBlock'],

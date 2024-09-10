@@ -18,6 +18,7 @@ import {
     ComputeSkipReasonFromJSON,
     ComputeSkipReasonFromJSONTyped,
     ComputeSkipReasonToJSON,
+    ComputeSkipReasonToJSONTyped,
 } from './ComputeSkipReason';
 
 /**
@@ -107,10 +108,15 @@ export function ComputePhaseFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function ComputePhaseToJSON(value?: ComputePhase | null): any {
+  export function ComputePhaseToJSON(json: any): ComputePhase {
+      return ComputePhaseToJSONTyped(json, false);
+  }
+
+  export function ComputePhaseToJSONTyped(value?: ComputePhase | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'skipped': value['skipped'],

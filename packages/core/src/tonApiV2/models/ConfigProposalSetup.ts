@@ -105,10 +105,15 @@ export function ConfigProposalSetupFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function ConfigProposalSetupToJSON(value?: ConfigProposalSetup | null): any {
+  export function ConfigProposalSetupToJSON(json: any): ConfigProposalSetup {
+      return ConfigProposalSetupToJSONTyped(json, false);
+  }
+
+  export function ConfigProposalSetupToJSONTyped(value?: ConfigProposalSetup | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'min_tot_rounds': value['minTotRounds'],

@@ -18,6 +18,7 @@ import {
     FoundAccountsAddressesInnerFromJSON,
     FoundAccountsAddressesInnerFromJSONTyped,
     FoundAccountsAddressesInnerToJSON,
+    FoundAccountsAddressesInnerToJSONTyped,
 } from './FoundAccountsAddressesInner';
 
 /**
@@ -56,10 +57,15 @@ export function FoundAccountsFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function FoundAccountsToJSON(value?: FoundAccounts | null): any {
+  export function FoundAccountsToJSON(json: any): FoundAccounts {
+      return FoundAccountsToJSONTyped(json, false);
+  }
+
+  export function FoundAccountsToJSONTyped(value?: FoundAccounts | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'addresses': ((value['addresses'] as Array<any>).map(FoundAccountsAddressesInnerToJSON)),

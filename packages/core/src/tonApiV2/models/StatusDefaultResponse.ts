@@ -49,10 +49,15 @@ export function StatusDefaultResponseFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function StatusDefaultResponseToJSON(value?: StatusDefaultResponse | null): any {
+  export function StatusDefaultResponseToJSON(json: any): StatusDefaultResponse {
+      return StatusDefaultResponseToJSONTyped(json, false);
+  }
+
+  export function StatusDefaultResponseToJSONTyped(value?: StatusDefaultResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'error': value['error'],

@@ -18,54 +18,63 @@ import {
     StoragePhaseFromJSON,
     StoragePhaseFromJSONTyped,
     StoragePhaseToJSON,
+    StoragePhaseToJSONTyped,
 } from './StoragePhase';
 import type { AccountStatus } from './AccountStatus';
 import {
     AccountStatusFromJSON,
     AccountStatusFromJSONTyped,
     AccountStatusToJSON,
+    AccountStatusToJSONTyped,
 } from './AccountStatus';
 import type { TransactionType } from './TransactionType';
 import {
     TransactionTypeFromJSON,
     TransactionTypeFromJSONTyped,
     TransactionTypeToJSON,
+    TransactionTypeToJSONTyped,
 } from './TransactionType';
 import type { ActionPhase } from './ActionPhase';
 import {
     ActionPhaseFromJSON,
     ActionPhaseFromJSONTyped,
     ActionPhaseToJSON,
+    ActionPhaseToJSONTyped,
 } from './ActionPhase';
 import type { Message } from './Message';
 import {
     MessageFromJSON,
     MessageFromJSONTyped,
     MessageToJSON,
+    MessageToJSONTyped,
 } from './Message';
 import type { BouncePhaseType } from './BouncePhaseType';
 import {
     BouncePhaseTypeFromJSON,
     BouncePhaseTypeFromJSONTyped,
     BouncePhaseTypeToJSON,
+    BouncePhaseTypeToJSONTyped,
 } from './BouncePhaseType';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 import type { ComputePhase } from './ComputePhase';
 import {
     ComputePhaseFromJSON,
     ComputePhaseFromJSONTyped,
     ComputePhaseToJSON,
+    ComputePhaseToJSONTyped,
 } from './ComputePhase';
 import type { CreditPhase } from './CreditPhase';
 import {
     CreditPhaseFromJSON,
     CreditPhaseFromJSONTyped,
     CreditPhaseToJSON,
+    CreditPhaseToJSONTyped,
 } from './CreditPhase';
 
 /**
@@ -290,10 +299,15 @@ export function TransactionFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function TransactionToJSON(value?: Transaction | null): any {
+  export function TransactionToJSON(json: any): Transaction {
+      return TransactionToJSONTyped(json, false);
+  }
+
+  export function TransactionToJSONTyped(value?: Transaction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'hash': value['hash'],

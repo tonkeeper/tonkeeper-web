@@ -18,18 +18,21 @@ import {
     AccountStatusFromJSON,
     AccountStatusFromJSONTyped,
     AccountStatusToJSON,
+    AccountStatusToJSONTyped,
 } from './AccountStatus';
 import type { BlockchainRawAccountLibrariesInner } from './BlockchainRawAccountLibrariesInner';
 import {
     BlockchainRawAccountLibrariesInnerFromJSON,
     BlockchainRawAccountLibrariesInnerFromJSONTyped,
     BlockchainRawAccountLibrariesInnerToJSON,
+    BlockchainRawAccountLibrariesInnerToJSONTyped,
 } from './BlockchainRawAccountLibrariesInner';
 import type { AccountStorageInfo } from './AccountStorageInfo';
 import {
     AccountStorageInfoFromJSON,
     AccountStorageInfoFromJSONTyped,
     AccountStorageInfoToJSON,
+    AccountStorageInfoToJSONTyped,
 } from './AccountStorageInfo';
 
 /**
@@ -144,10 +147,15 @@ export function BlockchainRawAccountFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function BlockchainRawAccountToJSON(value?: BlockchainRawAccount | null): any {
+  export function BlockchainRawAccountToJSON(json: any): BlockchainRawAccount {
+      return BlockchainRawAccountToJSONTyped(json, false);
+  }
+
+  export function BlockchainRawAccountToJSONTyped(value?: BlockchainRawAccount | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

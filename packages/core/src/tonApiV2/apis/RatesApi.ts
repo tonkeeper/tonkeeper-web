@@ -83,7 +83,7 @@ export interface RatesApiInterface {
     getMarketsRates(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetMarketsRates200Response>;
 
     /**
-     * Get the token price to the currency
+     * Get the token price in the chosen currency for display only. Don’t use this for financial transactions.
      * @param {Array<string>} tokens accept ton and jetton master addresses, separated by commas
      * @param {Array<string>} currencies accept ton and all possible fiat currencies, separated by commas
      * @param {*} [options] Override http request option.
@@ -93,7 +93,7 @@ export interface RatesApiInterface {
     getRatesRaw(requestParameters: GetRatesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRates200Response>>;
 
     /**
-     * Get the token price to the currency
+     * Get the token price in the chosen currency for display only. Don’t use this for financial transactions.
      */
     getRates(requestParameters: GetRatesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetRates200Response>;
 
@@ -184,7 +184,7 @@ export class RatesApi extends runtime.BaseAPI implements RatesApiInterface {
     }
 
     /**
-     * Get the token price to the currency
+     * Get the token price in the chosen currency for display only. Don’t use this for financial transactions.
      */
     async getRatesRaw(requestParameters: GetRatesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetRates200Response>> {
         if (requestParameters['tokens'] == null) {
@@ -224,7 +224,7 @@ export class RatesApi extends runtime.BaseAPI implements RatesApiInterface {
     }
 
     /**
-     * Get the token price to the currency
+     * Get the token price in the chosen currency for display only. Don’t use this for financial transactions.
      */
     async getRates(requestParameters: GetRatesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetRates200Response> {
         const response = await this.getRatesRaw(requestParameters, initOverrides);

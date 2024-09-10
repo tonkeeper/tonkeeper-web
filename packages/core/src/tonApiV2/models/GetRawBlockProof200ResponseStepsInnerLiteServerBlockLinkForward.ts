@@ -18,12 +18,14 @@ import {
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesFromJSON,
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesFromJSONTyped,
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesToJSON,
+    GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesToJSONTyped,
 } from './GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures';
 import type { BlockRaw } from './BlockRaw';
 import {
     BlockRawFromJSON,
     BlockRawFromJSONTyped,
     BlockRawToJSON,
+    BlockRawToJSONTyped,
 } from './BlockRaw';
 
 /**
@@ -102,10 +104,15 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardF
     };
 }
 
-export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSON(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward | null): any {
+  export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSON(json: any): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward {
+      return GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSONTyped(json, false);
+  }
+
+  export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSONTyped(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'to_key_block': value['toKeyBlock'],

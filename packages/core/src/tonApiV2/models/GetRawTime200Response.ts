@@ -49,10 +49,15 @@ export function GetRawTime200ResponseFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function GetRawTime200ResponseToJSON(value?: GetRawTime200Response | null): any {
+  export function GetRawTime200ResponseToJSON(json: any): GetRawTime200Response {
+      return GetRawTime200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetRawTime200ResponseToJSONTyped(value?: GetRawTime200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'time': value['time'],

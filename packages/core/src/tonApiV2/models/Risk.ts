@@ -18,12 +18,14 @@ import {
     JettonQuantityFromJSON,
     JettonQuantityFromJSONTyped,
     JettonQuantityToJSON,
+    JettonQuantityToJSONTyped,
 } from './JettonQuantity';
 import type { NftItem } from './NftItem';
 import {
     NftItemFromJSON,
     NftItemFromJSONTyped,
     NftItemToJSON,
+    NftItemToJSONTyped,
 } from './NftItem';
 
 /**
@@ -86,10 +88,15 @@ export function RiskFromJSONTyped(json: any, ignoreDiscriminator: boolean): Risk
     };
 }
 
-export function RiskToJSON(value?: Risk | null): any {
+  export function RiskToJSON(json: any): Risk {
+      return RiskToJSONTyped(json, false);
+  }
+
+  export function RiskToJSONTyped(value?: Risk | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'transfer_all_remaining_balance': value['transferAllRemainingBalance'],

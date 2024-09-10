@@ -84,10 +84,15 @@ export function InscriptionBalanceFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function InscriptionBalanceToJSON(value?: InscriptionBalance | null): any {
+  export function InscriptionBalanceToJSON(json: any): InscriptionBalance {
+      return InscriptionBalanceToJSONTyped(json, false);
+  }
+
+  export function InscriptionBalanceToJSONTyped(value?: InscriptionBalance | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'type': value['type'],

@@ -18,6 +18,7 @@ import {
     JettonBalanceFromJSON,
     JettonBalanceFromJSONTyped,
     JettonBalanceToJSON,
+    JettonBalanceToJSONTyped,
 } from './JettonBalance';
 
 /**
@@ -56,10 +57,15 @@ export function JettonsBalancesFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function JettonsBalancesToJSON(value?: JettonsBalances | null): any {
+  export function JettonsBalancesToJSON(json: any): JettonsBalances {
+      return JettonsBalancesToJSONTyped(json, false);
+  }
+
+  export function JettonsBalancesToJSONTyped(value?: JettonsBalances | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'balances': ((value['balances'] as Array<any>).map(JettonBalanceToJSON)),

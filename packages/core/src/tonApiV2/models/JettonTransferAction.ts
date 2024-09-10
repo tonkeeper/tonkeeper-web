@@ -18,24 +18,28 @@ import {
     JettonPreviewFromJSON,
     JettonPreviewFromJSONTyped,
     JettonPreviewToJSON,
+    JettonPreviewToJSONTyped,
 } from './JettonPreview';
 import type { Refund } from './Refund';
 import {
     RefundFromJSON,
     RefundFromJSONTyped,
     RefundToJSON,
+    RefundToJSONTyped,
 } from './Refund';
 import type { EncryptedComment } from './EncryptedComment';
 import {
     EncryptedCommentFromJSON,
     EncryptedCommentFromJSONTyped,
     EncryptedCommentToJSON,
+    EncryptedCommentToJSONTyped,
 } from './EncryptedComment';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -133,10 +137,15 @@ export function JettonTransferActionFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function JettonTransferActionToJSON(value?: JettonTransferAction | null): any {
+  export function JettonTransferActionToJSON(json: any): JettonTransferAction {
+      return JettonTransferActionToJSONTyped(json, false);
+  }
+
+  export function JettonTransferActionToJSONTyped(value?: JettonTransferAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'sender': AccountAddressToJSON(value['sender']),

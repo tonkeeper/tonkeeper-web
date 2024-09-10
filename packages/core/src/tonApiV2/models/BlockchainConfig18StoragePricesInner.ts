@@ -81,10 +81,15 @@ export function BlockchainConfig18StoragePricesInnerFromJSONTyped(json: any, ign
     };
 }
 
-export function BlockchainConfig18StoragePricesInnerToJSON(value?: BlockchainConfig18StoragePricesInner | null): any {
+  export function BlockchainConfig18StoragePricesInnerToJSON(json: any): BlockchainConfig18StoragePricesInner {
+      return BlockchainConfig18StoragePricesInnerToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig18StoragePricesInnerToJSONTyped(value?: BlockchainConfig18StoragePricesInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'utime_since': value['utimeSince'],

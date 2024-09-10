@@ -57,10 +57,15 @@ export function BlockCurrencyCollectionOtherInnerFromJSONTyped(json: any, ignore
     };
 }
 
-export function BlockCurrencyCollectionOtherInnerToJSON(value?: BlockCurrencyCollectionOtherInner | null): any {
+  export function BlockCurrencyCollectionOtherInnerToJSON(json: any): BlockCurrencyCollectionOtherInner {
+      return BlockCurrencyCollectionOtherInnerToJSONTyped(json, false);
+  }
+
+  export function BlockCurrencyCollectionOtherInnerToJSONTyped(value?: BlockCurrencyCollectionOtherInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],

@@ -65,10 +65,15 @@ export function MarketTonRatesFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function MarketTonRatesToJSON(value?: MarketTonRates | null): any {
+  export function MarketTonRatesToJSON(json: any): MarketTonRates {
+      return MarketTonRatesToJSONTyped(json, false);
+  }
+
+  export function MarketTonRatesToJSONTyped(value?: MarketTonRates | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'market': value['market'],

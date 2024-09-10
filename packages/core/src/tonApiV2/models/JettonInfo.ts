@@ -18,18 +18,21 @@ import {
     JettonVerificationTypeFromJSON,
     JettonVerificationTypeFromJSONTyped,
     JettonVerificationTypeToJSON,
+    JettonVerificationTypeToJSONTyped,
 } from './JettonVerificationType';
 import type { JettonMetadata } from './JettonMetadata';
 import {
     JettonMetadataFromJSON,
     JettonMetadataFromJSONTyped,
     JettonMetadataToJSON,
+    JettonMetadataToJSONTyped,
 } from './JettonMetadata';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -109,10 +112,15 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-export function JettonInfoToJSON(value?: JettonInfo | null): any {
+  export function JettonInfoToJSON(json: any): JettonInfo {
+      return JettonInfoToJSONTyped(json, false);
+  }
+
+  export function JettonInfoToJSONTyped(value?: JettonInfo | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'mintable': value['mintable'],

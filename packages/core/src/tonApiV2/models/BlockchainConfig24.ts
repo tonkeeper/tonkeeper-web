@@ -18,6 +18,7 @@ import {
     MsgForwardPricesFromJSON,
     MsgForwardPricesFromJSONTyped,
     MsgForwardPricesToJSON,
+    MsgForwardPricesToJSONTyped,
 } from './MsgForwardPrices';
 
 /**
@@ -56,10 +57,15 @@ export function BlockchainConfig24FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig24ToJSON(value?: BlockchainConfig24 | null): any {
+  export function BlockchainConfig24ToJSON(json: any): BlockchainConfig24 {
+      return BlockchainConfig24ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig24ToJSONTyped(value?: BlockchainConfig24 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'msg_forward_prices': MsgForwardPricesToJSON(value['msgForwardPrices']),

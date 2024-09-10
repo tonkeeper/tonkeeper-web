@@ -55,10 +55,15 @@ export function SendBlockchainMessageRequestFromJSONTyped(json: any, ignoreDiscr
     };
 }
 
-export function SendBlockchainMessageRequestToJSON(value?: SendBlockchainMessageRequest | null): any {
+  export function SendBlockchainMessageRequestToJSON(json: any): SendBlockchainMessageRequest {
+      return SendBlockchainMessageRequestToJSONTyped(json, false);
+  }
+
+  export function SendBlockchainMessageRequestToJSONTyped(value?: SendBlockchainMessageRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'boc': value['boc'],

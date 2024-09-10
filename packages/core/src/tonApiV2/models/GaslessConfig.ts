@@ -18,6 +18,7 @@ import {
     GaslessConfigGasJettonsInnerFromJSON,
     GaslessConfigGasJettonsInnerFromJSONTyped,
     GaslessConfigGasJettonsInnerToJSON,
+    GaslessConfigGasJettonsInnerToJSONTyped,
 } from './GaslessConfigGasJettonsInner';
 
 /**
@@ -64,10 +65,15 @@ export function GaslessConfigFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function GaslessConfigToJSON(value?: GaslessConfig | null): any {
+  export function GaslessConfigToJSON(json: any): GaslessConfig {
+      return GaslessConfigToJSONTyped(json, false);
+  }
+
+  export function GaslessConfigToJSONTyped(value?: GaslessConfig | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'relay_address': value['relayAddress'],

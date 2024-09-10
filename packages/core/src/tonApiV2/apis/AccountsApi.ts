@@ -19,10 +19,10 @@ import type {
   AccountEvent,
   AccountEvents,
   Accounts,
-  AddressParse200Response,
   DnsExpiring,
   DomainNames,
   FoundAccounts,
+  GaslessEstimateRequestMessagesInner,
   GetAccountDiff200Response,
   GetAccountPublicKey200Response,
   GetAccountsRequest,
@@ -43,14 +43,14 @@ import {
     AccountEventsToJSON,
     AccountsFromJSON,
     AccountsToJSON,
-    AddressParse200ResponseFromJSON,
-    AddressParse200ResponseToJSON,
     DnsExpiringFromJSON,
     DnsExpiringToJSON,
     DomainNamesFromJSON,
     DomainNamesToJSON,
     FoundAccountsFromJSON,
     FoundAccountsToJSON,
+    GaslessEstimateRequestMessagesInnerFromJSON,
+    GaslessEstimateRequestMessagesInnerToJSON,
     GetAccountDiff200ResponseFromJSON,
     GetAccountDiff200ResponseToJSON,
     GetAccountPublicKey200ResponseFromJSON,
@@ -77,8 +77,11 @@ export interface AccountDnsBackResolveRequest {
     accountId: string;
 }
 
-export interface AddressParseRequest {
+export interface EmulateMessageToAccountEventRequest {
     accountId: string;
+    gaslessEstimateRequestMessagesInner: GaslessEstimateRequestMessagesInner;
+    acceptLanguage?: string;
+    ignoreSignatureCheck?: boolean;
 }
 
 export interface GetAccountRequest {
@@ -118,6 +121,7 @@ export interface GetAccountJettonBalanceRequest {
     accountId: string;
     jettonId: string;
     currencies?: Array<string>;
+    supportedExtensions?: Array<string>;
 }
 
 export interface GetAccountJettonHistoryByIDRequest {
@@ -206,18 +210,21 @@ export interface AccountsApiInterface {
     accountDnsBackResolve(requestParameters: AccountDnsBackResolveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DomainNames>;
 
     /**
-     * parse address and display in all formats
+     * Emulate sending message to blockchain
      * @param {string} accountId account ID
+     * @param {GaslessEstimateRequestMessagesInner} gaslessEstimateRequestMessagesInner bag-of-cells serialized to hex
+     * @param {string} [acceptLanguage] 
+     * @param {boolean} [ignoreSignatureCheck] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApiInterface
      */
-    addressParseRaw(requestParameters: AddressParseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AddressParse200Response>>;
+    emulateMessageToAccountEventRaw(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvent>>;
 
     /**
-     * parse address and display in all formats
+     * Emulate sending message to blockchain
      */
-    addressParse(requestParameters: AddressParseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AddressParse200Response>;
+    emulateMessageToAccountEvent(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvent>;
 
     /**
      * Get human-friendly information about an account without low-level details.
@@ -307,6 +314,7 @@ export interface AccountsApiInterface {
      * @param {string} accountId account ID
      * @param {string} jettonId jetton ID
      * @param {Array<string>} [currencies] accept ton and all possible fiat currencies, separated by commas
+     * @param {Array<string>} [supportedExtensions] comma separated list supported extensions
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApiInterface
@@ -533,35 +541,53 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
     }
 
     /**
-     * parse address and display in all formats
+     * Emulate sending message to blockchain
      */
-    async addressParseRaw(requestParameters: AddressParseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AddressParse200Response>> {
+    async emulateMessageToAccountEventRaw(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvent>> {
         if (requestParameters['accountId'] == null) {
             throw new runtime.RequiredError(
                 'accountId',
-                'Required parameter "accountId" was null or undefined when calling addressParse().'
+                'Required parameter "accountId" was null or undefined when calling emulateMessageToAccountEvent().'
+            );
+        }
+
+        if (requestParameters['gaslessEstimateRequestMessagesInner'] == null) {
+            throw new runtime.RequiredError(
+                'gaslessEstimateRequestMessagesInner',
+                'Required parameter "gaslessEstimateRequestMessagesInner" was null or undefined when calling emulateMessageToAccountEvent().'
             );
         }
 
         const queryParameters: any = {};
 
+        if (requestParameters['ignoreSignatureCheck'] != null) {
+            queryParameters['ignore_signature_check'] = requestParameters['ignoreSignatureCheck'];
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
+        }
+
         const response = await this.request({
-            path: `/v2/address/{account_id}/parse`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
-            method: 'GET',
+            path: `/v2/accounts/{account_id}/events/emulate`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
+            method: 'POST',
             headers: headerParameters,
             query: queryParameters,
+            body: GaslessEstimateRequestMessagesInnerToJSON(requestParameters['gaslessEstimateRequestMessagesInner']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AddressParse200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccountEventFromJSON(jsonValue));
     }
 
     /**
-     * parse address and display in all formats
+     * Emulate sending message to blockchain
      */
-    async addressParse(requestParameters: AddressParseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AddressParse200Response> {
-        const response = await this.addressParseRaw(requestParameters, initOverrides);
+    async emulateMessageToAccountEvent(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvent> {
+        const response = await this.emulateMessageToAccountEventRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -828,6 +854,10 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
 
         if (requestParameters['currencies'] != null) {
             queryParameters['currencies'] = requestParameters['currencies']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
+        if (requestParameters['supportedExtensions'] != null) {
+            queryParameters['supported_extensions'] = requestParameters['supportedExtensions']!.join(runtime.COLLECTION_FORMATS["csv"]);
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

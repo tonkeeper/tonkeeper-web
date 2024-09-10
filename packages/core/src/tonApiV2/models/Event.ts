@@ -18,12 +18,14 @@ import {
     ActionFromJSON,
     ActionFromJSONTyped,
     ActionToJSON,
+    ActionToJSONTyped,
 } from './Action';
 import type { ValueFlow } from './ValueFlow';
 import {
     ValueFlowFromJSON,
     ValueFlowFromJSONTyped,
     ValueFlowToJSON,
+    ValueFlowToJSONTyped,
 } from './ValueFlow';
 
 /**
@@ -110,10 +112,15 @@ export function EventFromJSONTyped(json: any, ignoreDiscriminator: boolean): Eve
     };
 }
 
-export function EventToJSON(value?: Event | null): any {
+  export function EventToJSON(json: any): Event {
+      return EventToJSONTyped(json, false);
+  }
+
+  export function EventToJSONTyped(value?: Event | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'event_id': value['eventId'],

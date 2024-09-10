@@ -18,6 +18,7 @@ import {
     GetOutMsgQueueSizes200ResponseShardsInnerFromJSON,
     GetOutMsgQueueSizes200ResponseShardsInnerFromJSONTyped,
     GetOutMsgQueueSizes200ResponseShardsInnerToJSON,
+    GetOutMsgQueueSizes200ResponseShardsInnerToJSONTyped,
 } from './GetOutMsgQueueSizes200ResponseShardsInner';
 
 /**
@@ -64,10 +65,15 @@ export function GetOutMsgQueueSizes200ResponseFromJSONTyped(json: any, ignoreDis
     };
 }
 
-export function GetOutMsgQueueSizes200ResponseToJSON(value?: GetOutMsgQueueSizes200Response | null): any {
+  export function GetOutMsgQueueSizes200ResponseToJSON(json: any): GetOutMsgQueueSizes200Response {
+      return GetOutMsgQueueSizes200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetOutMsgQueueSizes200ResponseToJSONTyped(value?: GetOutMsgQueueSizes200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'ext_msg_queue_size_limit': value['extMsgQueueSizeLimit'],

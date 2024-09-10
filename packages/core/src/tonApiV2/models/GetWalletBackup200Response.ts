@@ -49,10 +49,15 @@ export function GetWalletBackup200ResponseFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-export function GetWalletBackup200ResponseToJSON(value?: GetWalletBackup200Response | null): any {
+  export function GetWalletBackup200ResponseToJSON(json: any): GetWalletBackup200Response {
+      return GetWalletBackup200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetWalletBackup200ResponseToJSONTyped(value?: GetWalletBackup200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'dump': value['dump'],

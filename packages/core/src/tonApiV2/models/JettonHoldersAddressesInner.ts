@@ -18,6 +18,7 @@ import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -72,10 +73,15 @@ export function JettonHoldersAddressesInnerFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function JettonHoldersAddressesInnerToJSON(value?: JettonHoldersAddressesInner | null): any {
+  export function JettonHoldersAddressesInnerToJSON(json: any): JettonHoldersAddressesInner {
+      return JettonHoldersAddressesInnerToJSONTyped(json, false);
+  }
+
+  export function JettonHoldersAddressesInnerToJSONTyped(value?: JettonHoldersAddressesInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

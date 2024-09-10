@@ -64,10 +64,15 @@ export function ValidatorsSetListInnerFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-export function ValidatorsSetListInnerToJSON(value?: ValidatorsSetListInner | null): any {
+  export function ValidatorsSetListInnerToJSON(json: any): ValidatorsSetListInner {
+      return ValidatorsSetListInnerToJSONTyped(json, false);
+  }
+
+  export function ValidatorsSetListInnerToJSONTyped(value?: ValidatorsSetListInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'public_key': value['publicKey'],
