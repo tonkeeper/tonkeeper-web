@@ -122,7 +122,13 @@ export const useConnectTonConnectAppMutation = () => {
                 if (activeIsLedger) {
                     throw new Error('Ledger doesnt support ton_proof');
                 }
-                const signTonConnect = signTonConnectOver(sdk, account.id, t, checkTouchId);
+                const signTonConnect = signTonConnectOver(
+                    sdk,
+                    account.id,
+                    undefined,
+                    t,
+                    checkTouchId
+                );
                 const timestamp = await getServerTime(api);
                 const proof = tonConnectProofPayload(
                     timestamp,

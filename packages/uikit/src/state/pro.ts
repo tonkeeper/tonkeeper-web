@@ -1,8 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+    getAccountByWalletById,
+    getWalletById,
+    isAccountControllable
+} from '@tonkeeper/core/dist/entries/account';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { ProState, ProStateAuthorized, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard, isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import {
     authViaTonConnect,
     createProServiceInvoice,
@@ -21,16 +26,11 @@ import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
+import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey } from '../libs/queryKey';
+import { useUserLanguage } from './language';
 import { signTonConnectOver } from './mnemonic';
 import { useCheckTouchId } from './password';
-import { useUserLanguage } from './language';
-import { useAccountsStorage } from '../hooks/useStorage';
-import {
-    getAccountByWalletById,
-    getWalletById,
-    isAccountControllable
-} from '@tonkeeper/core/dist/entries/account';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -78,7 +78,11 @@ export const useSelectWalletForProMutation = () => {
             throw new Error("Can't use non-standard ton wallet for pro auth");
         }
 
-        await authViaTonConnect(api, wallet, signTonConnectOver(sdk, account.id, t, checkTouchId));
+        await authViaTonConnect(
+            api,
+            wallet,
+            signTonConnectOver(sdk, account.id, wallet, t, checkTouchId)
+        );
 
         await client.invalidateQueries([QueryKey.pro]);
     });
