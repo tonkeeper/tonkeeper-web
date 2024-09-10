@@ -3,9 +3,16 @@ import BigNumber from 'bignumber.js';
 import { AccountTonWalletStandard } from '../../entries/account';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
-import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
+import {
+    TonRecipientData,
+    TransferEstimationEvent,
+    TransferEstimationEventFee
+} from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
-import { TonConnectTransactionPayload } from '../../entries/tonConnect';
+import {
+    TonConnectTransactionPayload,
+    TonConnectTransactionPayloadMessage
+} from '../../entries/tonConnect';
 import { TonContract, TonWalletStandard } from '../../entries/wallet';
 import { LedgerError } from '../../errors/LedgerError';
 import { AccountsApi, BlockchainApi, EmulationApi, Multisig } from '../../tonApiV2';
@@ -24,9 +31,11 @@ import {
     seeIfAddressBounceable,
     seeIfTransferBounceable,
     signEstimateMessage,
-    toStateInit
+    toStateInit,
+    getWalletSeqnoAndCheckBalance
 } from './common';
 import { estimateNewOrder } from '../multisig/order/order-estimate';
+import { sendCreateOrder } from '../multisig/order/order-send';
 
 export type EstimateData = {
     accountEvent: TransferEstimationEvent;
@@ -306,20 +315,48 @@ export const estimateMultisigTonTransfer = async ({
         api,
         order: {
             validUntilSeconds: getTTL(timestamp),
-            actions: [
-                {
-                    type: 'transfer',
-                    message: internal({
-                        to: Address.parse(recipient.toAccount.address),
-                        bounce: seeIfTransferBounceable(recipient.toAccount, recipient.address),
-                        value: BigInt(weiAmount.toFixed(0)),
-                        body: recipient.comment !== '' ? recipient.comment : undefined
-                    }),
-                    sendMode: isMax
-                        ? SendMode.CARRY_ALL_REMAINING_BALANCE + SendMode.IGNORE_ERRORS
-                        : SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
-                }
-            ]
+            actions: tonTransferToMultisigActions({ recipient, weiAmount, isMax })
+        }
+    });
+};
+
+export const sendMultisigTonTransfer = async ({
+    api,
+    hostWallet,
+    multisig,
+    recipient,
+    weiAmount,
+    isMax,
+    fee,
+    signer,
+    ttlSeconds
+}: {
+    api: APIConfig;
+    hostWallet: TonWalletStandard;
+    multisig: Pick<Multisig, 'address' | 'signers' | 'proposers'>;
+    recipient: TonRecipientData;
+    weiAmount: BigNumber;
+    isMax: boolean;
+    fee: TransferEstimationEventFee;
+    signer: CellSigner;
+    ttlSeconds: number;
+}): Promise<void> => {
+    const timestamp = await getServerTime(api);
+    const [wallet] = await getWalletBalance(api, hostWallet);
+    if (isMax) {
+        checkWalletPositiveBalanceOrDie(wallet);
+    } else {
+        checkWalletBalanceOrDie(weiAmount.minus(fee.event.extra), wallet);
+    }
+
+    await sendCreateOrder({
+        multisig,
+        api,
+        hostWallet,
+        signer,
+        order: {
+            validUntilSeconds: timestamp + ttlSeconds,
+            actions: tonTransferToMultisigActions({ recipient, weiAmount, isMax })
         }
     });
 };
@@ -332,11 +369,12 @@ export const estimateMultisigTonConnectTransfer = async (
 ): Promise<TransferEstimationEvent> => {
     const timestamp = await getServerTime(api);
     const [wallet] = await getWalletBalance(api, hostWallet);
-    checkWalletPositiveBalanceOrDie(wallet);
 
-    if (params.messages.length > 1) {
+    if (params.messages.length !== 1) {
         throw new Error('Multisig wallets can only send one message at a time');
     }
+
+    checkWalletBalanceOrDie(new BigNumber(params.messages[0].amount), wallet);
 
     const message = params.messages[0];
 
@@ -345,21 +383,94 @@ export const estimateMultisigTonConnectTransfer = async (
         api,
         order: {
             validUntilSeconds: getTTL(timestamp),
-            actions: [
-                {
-                    type: 'transfer',
-                    message: internal({
-                        to: Address.parse(message.address),
-                        bounce: seeIfAddressBounceable(message.address),
-                        value: BigInt(message.amount),
-                        body: message.payload ? Cell.fromBase64(message.payload) : undefined,
-                        init: message.stateInit
-                            ? loadStateInit(Cell.fromBase64(message.stateInit).beginParse())
-                            : undefined
-                    }),
-                    sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
-                }
-            ]
+            actions: tonConnectMessageToMultisigActions(message)
         }
     });
 };
+
+export const sendMultisigTonConnectTransfer = async ({
+    api,
+    multisig,
+    fee,
+    params,
+    hostWallet,
+    signer,
+    ttlSeconds
+}: {
+    api: APIConfig;
+    hostWallet: TonWalletStandard;
+    multisig: Pick<Multisig, 'address' | 'signers' | 'proposers'>;
+    params: TonConnectTransactionPayload;
+    fee: TransferEstimationEventFee;
+    signer: CellSigner;
+    ttlSeconds: number;
+}): Promise<void> => {
+    const timestamp = await getServerTime(api);
+
+    if (params.messages.length !== 1) {
+        throw new Error('Multisig wallets can only send one message at a time');
+    }
+
+    await getWalletSeqnoAndCheckBalance({
+        api,
+        walletState: hostWallet,
+        fee,
+        amount: new BigNumber(params.messages[0].amount)
+    });
+
+    const message = params.messages[0];
+
+    await sendCreateOrder({
+        multisig,
+        api,
+        hostWallet,
+        signer,
+        order: {
+            validUntilSeconds: timestamp + ttlSeconds,
+            actions: tonConnectMessageToMultisigActions(message)
+        }
+    });
+};
+
+function tonConnectMessageToMultisigActions(message: TonConnectTransactionPayloadMessage) {
+    return [
+        {
+            type: 'transfer',
+            message: internal({
+                to: Address.parse(message.address),
+                bounce: seeIfAddressBounceable(message.address),
+                value: BigInt(message.amount),
+                body: message.payload ? Cell.fromBase64(message.payload) : undefined,
+                init: message.stateInit
+                    ? loadStateInit(Cell.fromBase64(message.stateInit).beginParse())
+                    : undefined
+            }),
+            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
+        } as const
+    ];
+}
+
+function tonTransferToMultisigActions({
+    recipient,
+    weiAmount,
+    isMax
+}: {
+    recipient: TonRecipientData;
+    weiAmount: BigNumber;
+    isMax: boolean;
+}) {
+    return [
+        {
+            type: 'transfer',
+            message: internal({
+                to: Address.parse(recipient.toAccount.address),
+                bounce: seeIfTransferBounceable(recipient.toAccount, recipient.address),
+                value: BigInt(weiAmount.toFixed(0)),
+                body: recipient.comment !== '' ? recipient.comment : undefined
+            }),
+            sendMode: isMax
+                ? SendMode.CARRY_ALL_REMAINING_BALANCE + SendMode.IGNORE_ERRORS
+                : SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
+        } as const
+    ];
+}

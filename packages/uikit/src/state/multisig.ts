@@ -1,8 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
 import { useAppContext } from '../hooks/appContext';
-import { AccountsApi, Multisig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountsApi, Multisig, MultisigApi, MultisigOrder } from '@tonkeeper/core/dist/tonApiV2';
 import { useAccountsState, useActiveAccount } from './wallet';
+import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { orderStatus } from '@tonkeeper/core/dist/service/multisig/multisigService';
+import { useRef } from 'react';
+import { useCountdown } from '../hooks/useCountDown';
 
 export const useMultisigWalletInfo = (walletAddressRaw: string) => {
     const { api } = useAppContext();
@@ -33,7 +37,10 @@ export const useActiveMultisigSignerInfo = () => {
     for (const account of accounts) {
         const walletId = multisig.signers.find(s => account.getTonWallet(s));
         if (walletId) {
-            return { account, walletId };
+            const wallet = account.getTonWallet(walletId);
+            if (wallet && isStandardTonWallet(wallet)) {
+                return { account, wallet };
+            }
         }
     }
 
@@ -71,4 +78,19 @@ export const useWalletMultisigWallets = (walletAddressRaw: string) => {
 export const useIsActiveAccountMultisig = () => {
     const account = useActiveAccount();
     return account.type === 'ton-multisig';
+};
+
+export const useOrderInfo = (order: MultisigOrder) => {
+    const status = orderStatus(order);
+    const signed = order.approvalsNum;
+    const total = order.threshold;
+    const renderTimeSeconds = useRef(Math.round(Date.now() / 1000));
+    const secondsLeft = useCountdown(order.expirationDate - renderTimeSeconds.current);
+
+    return {
+        status,
+        signed,
+        total,
+        secondsLeft
+    };
 };

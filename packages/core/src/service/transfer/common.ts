@@ -16,7 +16,7 @@ import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipient } from '../../entries/send';
 import { BaseSigner } from '../../entries/signer';
-import { TonWalletStandard } from '../../entries/wallet';
+import { TonContract, TonWalletStandard } from '../../entries/wallet';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
 import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { WalletContract, walletContractFromState } from '../wallet/contractService';
@@ -155,7 +155,7 @@ signEstimateMessage.type = 'cell' as const;
 
 export async function getWalletSeqnoAndCheckBalance(options: {
     api: APIConfig;
-    walletState: TonWalletStandard;
+    walletState: TonContract;
     fee?: { event: { extra: number | BigNumber } };
     amount: BigNumber;
 }) {

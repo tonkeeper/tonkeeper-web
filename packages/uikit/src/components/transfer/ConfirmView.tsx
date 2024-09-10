@@ -122,6 +122,7 @@ export function ConfirmView<T extends Asset = Asset>({
             <ConfirmViewDetailsComment />
         </ConfirmViewDetailsSlot>
     );
+    let additionalDetails = <ConfirmViewAdditionalBottomSlot />;
     let buttons = (
         <ConfirmViewButtonsSlot>
             <ConfirmViewButtons MainButton={ConfirmMainButton} />
@@ -139,6 +140,9 @@ export function ConfirmView<T extends Asset = Asset>({
                     return;
                 case ConfirmViewDetailsSlot:
                     details = child;
+                    return;
+                case ConfirmViewAdditionalBottomSlot:
+                    additionalDetails = child;
                     return;
                 case ConfirmViewButtonsSlot:
                     buttons = child;
@@ -197,6 +201,7 @@ export function ConfirmView<T extends Asset = Asset>({
                 <ListBlock margin={false} fullWidth>
                     {details}
                 </ListBlock>
+                {additionalDetails}
                 <Gap />
 
                 <ButtonBlock>{buttons}</ButtonBlock>
@@ -260,6 +265,9 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
     );
 };
 
+export const ConfirmViewAdditionalBottomSlot: FC<PropsWithChildren> = ({ children }) => (
+    <>{children}</>
+);
 export const ConfirmViewDetailsSlot: FC<PropsWithChildren> = ({ children }) => <>{children}</>;
 
 export const ConfirmViewDetailsRecipient: FC = () => {

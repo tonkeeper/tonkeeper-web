@@ -116,6 +116,7 @@ export const RecipientView: FC<{
     setRecipient: (options: RecipientData) => void;
     keyboard?: 'decimal';
     onScan: (value: string) => void;
+    onBack?: () => void;
     isExternalLoading?: boolean;
     acceptBlockchains?: BLOCKCHAIN_NAME[];
     MainButton: (props: { isLoading: boolean; onClick: () => void }) => JSX.Element;

@@ -18,17 +18,17 @@ const signOrderAmount = toNano(0.1);
 
 export async function sendCreateOrder(options: {
     api: APIConfig;
-    walletState: TonWalletStandard;
+    hostWallet: TonWalletStandard;
     multisig: Pick<Multisig, 'address' | 'signers' | 'proposers'>;
     order: NewOrder;
     signer: CellSigner;
 }) {
     let isSigner = false;
-    let addrIdx = options.multisig.signers.indexOf(options.walletState.rawAddress);
+    let addrIdx = options.multisig.signers.indexOf(options.hostWallet.rawAddress);
     if (addrIdx !== -1) {
         isSigner = true;
     } else {
-        addrIdx = options.multisig.proposers.indexOf(options.walletState.rawAddress);
+        addrIdx = options.multisig.proposers.indexOf(options.hostWallet.rawAddress);
         if (addrIdx === -1) {
             throw new Error('Sender is not a signer or proposer');
         }
@@ -47,12 +47,13 @@ export async function sendCreateOrder(options: {
     const timestamp = await getServerTime(options.api);
     const { seqno } = await getWalletSeqnoAndCheckBalance({
         ...options,
+        walletState: options.hostWallet,
         amount: BigNumber(createOrderAmount.toString())
     });
 
     const boc = await createTransferMessage(
         {
-            state: options.walletState,
+            state: options.hostWallet,
             timestamp,
             seqno,
             signer: options.signer

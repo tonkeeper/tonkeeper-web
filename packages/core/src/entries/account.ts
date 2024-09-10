@@ -559,7 +559,7 @@ export function isAccountTonWalletStandard(account: Account): account is Account
     assertUnreachable(account);
 }
 
-export function isAccountMultisigManageable(account: Account): boolean {
+export function isAccountCanManageMultisigs(account: Account): boolean {
     switch (account.type) {
         case 'keystone':
         case 'mnemonic':

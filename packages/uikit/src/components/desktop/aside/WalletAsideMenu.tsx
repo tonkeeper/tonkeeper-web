@@ -17,7 +17,7 @@ import {
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { useIsActiveAccountMultisig } from '../../../state/multisig';
-import { isAccountMultisigManageable } from '@tonkeeper/core/dist/entries/account';
+import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -54,7 +54,7 @@ export const WalletAsideMenu = () => {
     const isReadOnly = useIsActiveWalletWatchOnly();
     const isMultisig = useIsActiveAccountMultisig();
     const account = useActiveAccount();
-    const showMultisigs = isAccountMultisigManageable(account);
+    const showMultisigs = isAccountCanManageMultisigs(account);
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
