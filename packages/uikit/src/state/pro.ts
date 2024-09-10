@@ -16,6 +16,7 @@ import {
     getProServiceTiers,
     getProState,
     logoutTonConsole,
+    retryProService,
     setBackupState,
     startProServiceTrial,
     waitProServiceInvoice
@@ -157,8 +158,10 @@ export const useCreateInvoiceMutation = () => {
 
 export const useWaitInvoiceMutation = () => {
     const client = useQueryClient();
+    const sdk = useAppSdk();
     return useMutation<void, Error, ConfirmState>(async data => {
         await waitProServiceInvoice(data.invoice);
+        await retryProService(sdk.storage);
         await client.invalidateQueries([QueryKey.pro]);
     });
 };
