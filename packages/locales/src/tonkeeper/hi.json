@@ -1,5 +1,6 @@
 {
   "about_risk_modal" : {
+    "description" : "तोकनों की कुल मूल्य जो आपके वॉलेट से भेजे जाएंगे। वापसी कुल मूल्य में शामिल नहीं है।",
     "description_with_nft" : "एनएफटी की लागत को छोड़कर टोकन का कुल मूल्य, जो आपके वॉलेट से भेजा जाएगा। रिफंड कुल मूल्य में शामिल नहीं हैं। ",
     "ok_button" : "ठीक है"
   },
@@ -10,11 +11,36 @@
   "access_confirmation_update_biometry" : "बायोमेट्रिक्स ऑथ डेटा का उपयोग करने के लिए पासकोड दर्ज करें",
   "access_denied" : "एक्सेस अस्वीकृत",
   "account_deleted" : "खाता हटाया गया",
+  "activityActionModal" : {
+    "bid" : "बोली",
+    "burned" : "जला",
+    "call_contract" : "कॉल अनुबंध",
+    "deposit" : "दांव",
+    "purchase" : "खरीदना",
+    "received" : "प्राप्त",
+    "sent" : "भेजा",
+    "swapped" : "बदली",
+    "time_on" : "पर {time}",
+    "withdraw" : "दाँव से उतारना",
+    "withdrawal_request" : "दांव से हटाने का अनुरोध"
+  },
+  "activity" : {
+    "buy_toncoin_btn" : "खरीदना toncoin",
+    "empty_transaction_caption" : "अपना पहला लेनदेन करें!",
+    "empty_transaction_title" : "आपका इतिहास यहां दिखाया जाएगा",
+    "failed_transaction" : "असफल",
+    "receive_btn" : "प्राप्त करें",
+    "received" : "प्राप्त",
+    "screen_title" : "इतिहास",
+    "sent" : "भेजा"
+  },
   "add_edit_favorite" : {
     "address_label" : "पता",
     "add_title" : "नया पसंदीदा",
+    "delete" : "मिटाना",
     "edit_title" : "पसंदीदा संपादित करें",
-    "name_placeholder" : "नाम"
+    "name_placeholder" : "नाम",
+    "save" : "बचाना"
   },
   "add_other_coins" : "अन्य क्रिप्टो जोड़ें",
   "address_copied" : "पता कॉपी किया गया",
@@ -32,6 +58,10 @@
   "appearance_description" : "टन हीरे NFT अपने बटुए और अधिक रंगीन और अद्वितीय कर देगा.",
   "app_name" : "टोनकीपर",
   "auth_failed" : "प्रमाणीकरण विफल",
+  "browser" : {
+    "about_dapps_caption" : "उन ऐप्स और सेवाओं का अन्वेषण करें जहां आप साइन-इन और भुगतान के लिए टोनकीपर का उपयोग कर सकते हैं।",
+    "about_dapps_learn_more" : "और अधिक जानें"
+  },
   "check_words_caption" : "यह जांचने के लिए कि आपने अपना पुनर्प्राप्ति वाक्यांश सही ढंग से लिखा है या नहीं, कृपया %{wordNum1}th, %{wordNum2}th, और %{wordNum3}st words दर्ज करें.",
   "check_words_success" : "बधाई! आपने अपना बटुआ सेट कर लिया है ",
   "check_words_title" : "तो, चलो जाँच करें",
