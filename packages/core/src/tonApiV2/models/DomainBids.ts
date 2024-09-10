@@ -18,6 +18,7 @@ import {
     DomainBidFromJSON,
     DomainBidFromJSONTyped,
     DomainBidToJSON,
+    DomainBidToJSONTyped,
 } from './DomainBid';
 
 /**
@@ -56,10 +57,15 @@ export function DomainBidsFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-export function DomainBidsToJSON(value?: DomainBids | null): any {
+  export function DomainBidsToJSON(json: any): DomainBids {
+      return DomainBidsToJSONTyped(json, false);
+  }
+
+  export function DomainBidsToJSONTyped(value?: DomainBids | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'data': ((value['data'] as Array<any>).map(DomainBidToJSON)),

@@ -129,10 +129,15 @@ export function MisbehaviourPunishmentConfigFromJSONTyped(json: any, ignoreDiscr
     };
 }
 
-export function MisbehaviourPunishmentConfigToJSON(value?: MisbehaviourPunishmentConfig | null): any {
+  export function MisbehaviourPunishmentConfigToJSON(json: any): MisbehaviourPunishmentConfig {
+      return MisbehaviourPunishmentConfigToJSONTyped(json, false);
+  }
+
+  export function MisbehaviourPunishmentConfigToJSONTyped(value?: MisbehaviourPunishmentConfig | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'default_flat_fine': value['defaultFlatFine'],

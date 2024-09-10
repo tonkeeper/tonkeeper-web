@@ -57,10 +57,15 @@ export function BlockchainConfig6FromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function BlockchainConfig6ToJSON(value?: BlockchainConfig6 | null): any {
+  export function BlockchainConfig6ToJSON(json: any): BlockchainConfig6 {
+      return BlockchainConfig6ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig6ToJSONTyped(value?: BlockchainConfig6 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'mint_new_price': value['mintNewPrice'],

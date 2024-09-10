@@ -18,18 +18,21 @@ import {
     RefundFromJSON,
     RefundFromJSONTyped,
     RefundToJSON,
+    RefundToJSONTyped,
 } from './Refund';
 import type { EncryptedComment } from './EncryptedComment';
 import {
     EncryptedCommentFromJSON,
     EncryptedCommentFromJSONTyped,
     EncryptedCommentToJSON,
+    EncryptedCommentToJSONTyped,
 } from './EncryptedComment';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -110,10 +113,15 @@ export function NftItemTransferActionFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function NftItemTransferActionToJSON(value?: NftItemTransferAction | null): any {
+  export function NftItemTransferActionToJSON(json: any): NftItemTransferAction {
+      return NftItemTransferActionToJSONTyped(json, false);
+  }
+
+  export function NftItemTransferActionToJSONTyped(value?: NftItemTransferAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'sender': AccountAddressToJSON(value['sender']),

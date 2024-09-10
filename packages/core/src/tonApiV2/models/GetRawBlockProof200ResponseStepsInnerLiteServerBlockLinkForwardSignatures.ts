@@ -18,6 +18,7 @@ import {
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerFromJSON,
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerFromJSONTyped,
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerToJSON,
+    GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerToJSONTyped,
 } from './GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner';
 
 /**
@@ -72,10 +73,15 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardS
     };
 }
 
-export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesToJSON(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures | null): any {
+  export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesToJSON(json: any): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures {
+      return GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesToJSONTyped(json, false);
+  }
+
+  export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesToJSONTyped(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignatures | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'validator_set_hash': value['validatorSetHash'],

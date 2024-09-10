@@ -18,6 +18,7 @@ import {
     DnsExpiringItemsInnerFromJSON,
     DnsExpiringItemsInnerFromJSONTyped,
     DnsExpiringItemsInnerToJSON,
+    DnsExpiringItemsInnerToJSONTyped,
 } from './DnsExpiringItemsInner';
 
 /**
@@ -56,10 +57,15 @@ export function DnsExpiringFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function DnsExpiringToJSON(value?: DnsExpiring | null): any {
+  export function DnsExpiringToJSON(json: any): DnsExpiring {
+      return DnsExpiringToJSONTyped(json, false);
+  }
+
+  export function DnsExpiringToJSONTyped(value?: DnsExpiring | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'items': ((value['items'] as Array<any>).map(DnsExpiringItemsInnerToJSON)),

@@ -18,6 +18,7 @@ import {
     BlockRawFromJSON,
     BlockRawFromJSONTyped,
     BlockRawToJSON,
+    BlockRawToJSONTyped,
 } from './BlockRaw';
 
 /**
@@ -80,10 +81,15 @@ export function GetRawConfig200ResponseFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-export function GetRawConfig200ResponseToJSON(value?: GetRawConfig200Response | null): any {
+  export function GetRawConfig200ResponseToJSON(json: any): GetRawConfig200Response {
+      return GetRawConfig200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetRawConfig200ResponseToJSONTyped(value?: GetRawConfig200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'mode': value['mode'],

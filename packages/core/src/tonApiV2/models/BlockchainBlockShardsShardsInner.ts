@@ -18,6 +18,7 @@ import {
     BlockchainBlockFromJSON,
     BlockchainBlockFromJSONTyped,
     BlockchainBlockToJSON,
+    BlockchainBlockToJSONTyped,
 } from './BlockchainBlock';
 
 /**
@@ -64,10 +65,15 @@ export function BlockchainBlockShardsShardsInnerFromJSONTyped(json: any, ignoreD
     };
 }
 
-export function BlockchainBlockShardsShardsInnerToJSON(value?: BlockchainBlockShardsShardsInner | null): any {
+  export function BlockchainBlockShardsShardsInnerToJSON(json: any): BlockchainBlockShardsShardsInner {
+      return BlockchainBlockShardsShardsInnerToJSONTyped(json, false);
+  }
+
+  export function BlockchainBlockShardsShardsInnerToJSONTyped(value?: BlockchainBlockShardsShardsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'last_known_block_id': value['lastKnownBlockId'],

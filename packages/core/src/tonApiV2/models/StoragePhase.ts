@@ -18,6 +18,7 @@ import {
     AccStatusChangeFromJSON,
     AccStatusChangeFromJSONTyped,
     AccStatusChangeToJSON,
+    AccStatusChangeToJSONTyped,
 } from './AccStatusChange';
 
 /**
@@ -73,10 +74,15 @@ export function StoragePhaseFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function StoragePhaseToJSON(value?: StoragePhase | null): any {
+  export function StoragePhaseToJSON(json: any): StoragePhase {
+      return StoragePhaseToJSONTyped(json, false);
+  }
+
+  export function StoragePhaseToJSONTyped(value?: StoragePhase | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'fees_collected': value['feesCollected'],

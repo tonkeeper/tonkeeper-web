@@ -52,3 +52,7 @@ export function TransactionTypeToJSON(value?: TransactionType | null): any {
     return value as any;
 }
 
+export function TransactionTypeToJSONTyped(value: any, ignoreDiscriminator: boolean): TransactionType {
+    return value as TransactionType;
+}
+

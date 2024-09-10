@@ -18,12 +18,14 @@ import {
     PoolImplementationTypeFromJSON,
     PoolImplementationTypeFromJSONTyped,
     PoolImplementationTypeToJSON,
+    PoolImplementationTypeToJSONTyped,
 } from './PoolImplementationType';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -87,10 +89,15 @@ export function WithdrawStakeRequestActionFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-export function WithdrawStakeRequestActionToJSON(value?: WithdrawStakeRequestAction | null): any {
+  export function WithdrawStakeRequestActionToJSON(json: any): WithdrawStakeRequestAction {
+      return WithdrawStakeRequestActionToJSONTyped(json, false);
+  }
+
+  export function WithdrawStakeRequestActionToJSONTyped(value?: WithdrawStakeRequestAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'amount': value['amount'],

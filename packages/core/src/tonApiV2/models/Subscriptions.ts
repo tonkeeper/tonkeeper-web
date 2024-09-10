@@ -18,6 +18,7 @@ import {
     SubscriptionFromJSON,
     SubscriptionFromJSONTyped,
     SubscriptionToJSON,
+    SubscriptionToJSONTyped,
 } from './Subscription';
 
 /**
@@ -56,10 +57,15 @@ export function SubscriptionsFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function SubscriptionsToJSON(value?: Subscriptions | null): any {
+  export function SubscriptionsToJSON(json: any): Subscriptions {
+      return SubscriptionsToJSONTyped(json, false);
+  }
+
+  export function SubscriptionsToJSONTyped(value?: Subscriptions | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'subscriptions': ((value['subscriptions'] as Array<any>).map(SubscriptionToJSON)),

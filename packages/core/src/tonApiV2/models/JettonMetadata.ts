@@ -73,6 +73,12 @@ export interface JettonMetadata {
      * @memberof JettonMetadata
      */
     catalogs?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof JettonMetadata
+     */
+    customPayloadApiUri?: string;
 }
 
 /**
@@ -105,13 +111,19 @@ export function JettonMetadataFromJSONTyped(json: any, ignoreDiscriminator: bool
         'social': json['social'] == null ? undefined : json['social'],
         'websites': json['websites'] == null ? undefined : json['websites'],
         'catalogs': json['catalogs'] == null ? undefined : json['catalogs'],
+        'customPayloadApiUri': json['custom_payload_api_uri'] == null ? undefined : json['custom_payload_api_uri'],
     };
 }
 
-export function JettonMetadataToJSON(value?: JettonMetadata | null): any {
+  export function JettonMetadataToJSON(json: any): JettonMetadata {
+      return JettonMetadataToJSONTyped(json, false);
+  }
+
+  export function JettonMetadataToJSONTyped(value?: JettonMetadata | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],
@@ -123,6 +135,7 @@ export function JettonMetadataToJSON(value?: JettonMetadata | null): any {
         'social': value['social'],
         'websites': value['websites'],
         'catalogs': value['catalogs'],
+        'custom_payload_api_uri': value['customPayloadApiUri'],
     };
 }
 

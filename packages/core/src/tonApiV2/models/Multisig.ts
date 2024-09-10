@@ -18,6 +18,7 @@ import {
     MultisigOrderFromJSON,
     MultisigOrderFromJSONTyped,
     MultisigOrderToJSON,
+    MultisigOrderToJSONTyped,
 } from './MultisigOrder';
 
 /**
@@ -96,10 +97,15 @@ export function MultisigFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function MultisigToJSON(value?: Multisig | null): any {
+  export function MultisigToJSON(json: any): Multisig {
+      return MultisigToJSONTyped(json, false);
+  }
+
+  export function MultisigToJSONTyped(value?: Multisig | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

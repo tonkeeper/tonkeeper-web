@@ -18,6 +18,7 @@ import {
     TraceIDFromJSON,
     TraceIDFromJSONTyped,
     TraceIDToJSON,
+    TraceIDToJSONTyped,
 } from './TraceID';
 
 /**
@@ -56,10 +57,15 @@ export function TraceIDsFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function TraceIDsToJSON(value?: TraceIDs | null): any {
+  export function TraceIDsToJSON(json: any): TraceIDs {
+      return TraceIDsToJSONTyped(json, false);
+  }
+
+  export function TraceIDsToJSONTyped(value?: TraceIDs | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'traces': ((value['traces'] as Array<any>).map(TraceIDToJSON)),

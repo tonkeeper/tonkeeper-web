@@ -18,12 +18,14 @@ import {
     ActionFromJSON,
     ActionFromJSONTyped,
     ActionToJSON,
+    ActionToJSONTyped,
 } from './Action';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -118,10 +120,15 @@ export function AccountEventFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function AccountEventToJSON(value?: AccountEvent | null): any {
+  export function AccountEventToJSON(json: any): AccountEvent {
+      return AccountEventToJSONTyped(json, false);
+  }
+
+  export function AccountEventToJSONTyped(value?: AccountEvent | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'event_id': value['eventId'],

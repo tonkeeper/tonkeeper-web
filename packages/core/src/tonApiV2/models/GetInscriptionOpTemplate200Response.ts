@@ -57,10 +57,15 @@ export function GetInscriptionOpTemplate200ResponseFromJSONTyped(json: any, igno
     };
 }
 
-export function GetInscriptionOpTemplate200ResponseToJSON(value?: GetInscriptionOpTemplate200Response | null): any {
+  export function GetInscriptionOpTemplate200ResponseToJSON(json: any): GetInscriptionOpTemplate200Response {
+      return GetInscriptionOpTemplate200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetInscriptionOpTemplate200ResponseToJSONTyped(value?: GetInscriptionOpTemplate200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'comment': value['comment'],

@@ -18,6 +18,7 @@ import {
     ValidatorFromJSON,
     ValidatorFromJSONTyped,
     ValidatorToJSON,
+    ValidatorToJSONTyped,
 } from './Validator';
 
 /**
@@ -88,10 +89,15 @@ export function ValidatorsFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-export function ValidatorsToJSON(value?: Validators | null): any {
+  export function ValidatorsToJSON(json: any): Validators {
+      return ValidatorsToJSONTyped(json, false);
+  }
+
+  export function ValidatorsToJSONTyped(value?: Validators | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'elect_at': value['electAt'],

@@ -64,7 +64,7 @@ export interface GaslessApiInterface {
     gaslessConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GaslessConfig>;
 
     /**
-     * Estimates the cost of the given messages and returns a payload to sign.
+     * Estimates the cost of the given messages and returns a payload to sign
      * @param {string} masterId jetton to pay commission
      * @param {GaslessEstimateRequest} gaslessEstimateRequest bag-of-cells serialized to hex
      * @param {*} [options] Override http request option.
@@ -74,12 +74,12 @@ export interface GaslessApiInterface {
     gaslessEstimateRaw(requestParameters: GaslessEstimateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SignRawParams>>;
 
     /**
-     * Estimates the cost of the given messages and returns a payload to sign.
+     * Estimates the cost of the given messages and returns a payload to sign
      */
     gaslessEstimate(requestParameters: GaslessEstimateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SignRawParams>;
 
     /**
-     * 
+     * Submits the signed gasless transaction message to the network
      * @param {GaslessSendRequest} gaslessSendRequest bag-of-cells serialized to hex
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -88,6 +88,7 @@ export interface GaslessApiInterface {
     gaslessSendRaw(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
+     * Submits the signed gasless transaction message to the network
      */
     gaslessSend(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
@@ -125,7 +126,7 @@ export class GaslessApi extends runtime.BaseAPI implements GaslessApiInterface {
     }
 
     /**
-     * Estimates the cost of the given messages and returns a payload to sign.
+     * Estimates the cost of the given messages and returns a payload to sign
      */
     async gaslessEstimateRaw(requestParameters: GaslessEstimateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SignRawParams>> {
         if (requestParameters['masterId'] == null) {
@@ -160,7 +161,7 @@ export class GaslessApi extends runtime.BaseAPI implements GaslessApiInterface {
     }
 
     /**
-     * Estimates the cost of the given messages and returns a payload to sign.
+     * Estimates the cost of the given messages and returns a payload to sign
      */
     async gaslessEstimate(requestParameters: GaslessEstimateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SignRawParams> {
         const response = await this.gaslessEstimateRaw(requestParameters, initOverrides);
@@ -168,6 +169,7 @@ export class GaslessApi extends runtime.BaseAPI implements GaslessApiInterface {
     }
 
     /**
+     * Submits the signed gasless transaction message to the network
      */
     async gaslessSendRaw(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['gaslessSendRequest'] == null) {
@@ -195,6 +197,7 @@ export class GaslessApi extends runtime.BaseAPI implements GaslessApiInterface {
     }
 
     /**
+     * Submits the signed gasless transaction message to the network
      */
     async gaslessSend(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.gaslessSendRaw(requestParameters, initOverrides);

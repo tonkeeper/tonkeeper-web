@@ -18,6 +18,7 @@ import {
     SizeLimitsConfigFromJSON,
     SizeLimitsConfigFromJSONTyped,
     SizeLimitsConfigToJSON,
+    SizeLimitsConfigToJSONTyped,
 } from './SizeLimitsConfig';
 
 /**
@@ -56,10 +57,15 @@ export function BlockchainConfig43FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig43ToJSON(value?: BlockchainConfig43 | null): any {
+  export function BlockchainConfig43ToJSON(json: any): BlockchainConfig43 {
+      return BlockchainConfig43ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig43ToJSONTyped(value?: BlockchainConfig43 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'size_limits_config': SizeLimitsConfigToJSON(value['sizeLimitsConfig']),

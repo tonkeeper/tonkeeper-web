@@ -89,10 +89,15 @@ export function MsgForwardPricesFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function MsgForwardPricesToJSON(value?: MsgForwardPrices | null): any {
+  export function MsgForwardPricesToJSON(json: any): MsgForwardPrices {
+      return MsgForwardPricesToJSONTyped(json, false);
+  }
+
+  export function MsgForwardPricesToJSONTyped(value?: MsgForwardPrices | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'lump_price': value['lumpPrice'],

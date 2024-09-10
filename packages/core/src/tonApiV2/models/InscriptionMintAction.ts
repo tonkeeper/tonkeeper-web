@@ -18,6 +18,7 @@ import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -99,10 +100,15 @@ export function InscriptionMintActionFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function InscriptionMintActionToJSON(value?: InscriptionMintAction | null): any {
+  export function InscriptionMintActionToJSON(json: any): InscriptionMintAction {
+      return InscriptionMintActionToJSONTyped(json, false);
+  }
+
+  export function InscriptionMintActionToJSONTyped(value?: InscriptionMintAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'recipient': AccountAddressToJSON(value['recipient']),

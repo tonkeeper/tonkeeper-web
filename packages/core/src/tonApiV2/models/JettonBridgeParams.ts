@@ -18,12 +18,14 @@ import {
     JettonBridgePricesFromJSON,
     JettonBridgePricesFromJSONTyped,
     JettonBridgePricesToJSON,
+    JettonBridgePricesToJSONTyped,
 } from './JettonBridgePrices';
 import type { Oracle } from './Oracle';
 import {
     OracleFromJSON,
     OracleFromJSONTyped,
     OracleToJSON,
+    OracleToJSONTyped,
 } from './Oracle';
 
 /**
@@ -107,10 +109,15 @@ export function JettonBridgeParamsFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function JettonBridgeParamsToJSON(value?: JettonBridgeParams | null): any {
+  export function JettonBridgeParamsToJSON(json: any): JettonBridgeParams {
+      return JettonBridgeParamsToJSONTyped(json, false);
+  }
+
+  export function JettonBridgeParamsToJSONTyped(value?: JettonBridgeParams | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'bridge_address': value['bridgeAddress'],

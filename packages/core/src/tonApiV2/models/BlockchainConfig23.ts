@@ -18,6 +18,7 @@ import {
     BlockLimitsFromJSON,
     BlockLimitsFromJSONTyped,
     BlockLimitsToJSON,
+    BlockLimitsToJSONTyped,
 } from './BlockLimits';
 
 /**
@@ -56,10 +57,15 @@ export function BlockchainConfig23FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig23ToJSON(value?: BlockchainConfig23 | null): any {
+  export function BlockchainConfig23ToJSON(json: any): BlockchainConfig23 {
+      return BlockchainConfig23ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig23ToJSONTyped(value?: BlockchainConfig23 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'block_limits': BlockLimitsToJSON(value['blockLimits']),

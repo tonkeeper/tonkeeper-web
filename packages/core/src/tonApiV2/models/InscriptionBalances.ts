@@ -18,6 +18,7 @@ import {
     InscriptionBalanceFromJSON,
     InscriptionBalanceFromJSONTyped,
     InscriptionBalanceToJSON,
+    InscriptionBalanceToJSONTyped,
 } from './InscriptionBalance';
 
 /**
@@ -56,10 +57,15 @@ export function InscriptionBalancesFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function InscriptionBalancesToJSON(value?: InscriptionBalances | null): any {
+  export function InscriptionBalancesToJSON(json: any): InscriptionBalances {
+      return InscriptionBalancesToJSONTyped(json, false);
+  }
+
+  export function InscriptionBalancesToJSONTyped(value?: InscriptionBalances | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'inscriptions': ((value['inscriptions'] as Array<any>).map(InscriptionBalanceToJSON)),

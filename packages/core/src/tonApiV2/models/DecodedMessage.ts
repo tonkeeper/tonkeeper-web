@@ -18,12 +18,14 @@ import {
     DecodedMessageExtInMsgDecodedFromJSON,
     DecodedMessageExtInMsgDecodedFromJSONTyped,
     DecodedMessageExtInMsgDecodedToJSON,
+    DecodedMessageExtInMsgDecodedToJSONTyped,
 } from './DecodedMessageExtInMsgDecoded';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -77,10 +79,15 @@ export function DecodedMessageFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function DecodedMessageToJSON(value?: DecodedMessage | null): any {
+  export function DecodedMessageToJSON(json: any): DecodedMessage {
+      return DecodedMessageToJSONTyped(json, false);
+  }
+
+  export function DecodedMessageToJSONTyped(value?: DecodedMessage | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'destination': AccountAddressToJSON(value['destination']),

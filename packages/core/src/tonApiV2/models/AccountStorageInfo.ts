@@ -81,10 +81,15 @@ export function AccountStorageInfoFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function AccountStorageInfoToJSON(value?: AccountStorageInfo | null): any {
+  export function AccountStorageInfoToJSON(json: any): AccountStorageInfo {
+      return AccountStorageInfoToJSONTyped(json, false);
+  }
+
+  export function AccountStorageInfoToJSONTyped(value?: AccountStorageInfo | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'used_cells': value['usedCells'],

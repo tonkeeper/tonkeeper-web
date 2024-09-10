@@ -49,3 +49,7 @@ export function TrustTypeToJSON(value?: TrustType | null): any {
     return value as any;
 }
 
+export function TrustTypeToJSONTyped(value: any, ignoreDiscriminator: boolean): TrustType {
+    return value as TrustType;
+}
+

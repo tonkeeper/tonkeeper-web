@@ -18,6 +18,7 @@ import {
     TonConnectProofRequestProofFromJSON,
     TonConnectProofRequestProofFromJSONTyped,
     TonConnectProofRequestProofToJSON,
+    TonConnectProofRequestProofToJSONTyped,
 } from './TonConnectProofRequestProof';
 
 /**
@@ -64,10 +65,15 @@ export function TonConnectProofRequestFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-export function TonConnectProofRequestToJSON(value?: TonConnectProofRequest | null): any {
+  export function TonConnectProofRequestToJSON(json: any): TonConnectProofRequest {
+      return TonConnectProofRequestToJSONTyped(json, false);
+  }
+
+  export function TonConnectProofRequestToJSONTyped(value?: TonConnectProofRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

@@ -15,6 +15,7 @@ apis/RatesApi.ts
 apis/StakingApi.ts
 apis/StorageApi.ts
 apis/TracesApi.ts
+apis/UtilitiesApi.ts
 apis/WalletApi.ts
 apis/index.ts
 index.ts
@@ -89,7 +90,6 @@ models/ComputeSkipReason.ts
 models/ConfigProposalSetup.ts
 models/ContractDeployAction.ts
 models/CreditPhase.ts
-models/DecodeMessageRequest.ts
 models/DecodedMessage.ts
 models/DecodedMessageExtInMsgDecoded.ts
 models/DecodedMessageExtInMsgDecodedWalletHighloadV2.ts
@@ -118,6 +118,7 @@ models/GasLimitPrices.ts
 models/GaslessConfig.ts
 models/GaslessConfigGasJettonsInner.ts
 models/GaslessEstimateRequest.ts
+models/GaslessEstimateRequestMessagesInner.ts
 models/GaslessSendRequest.ts
 models/GetAccountDiff200Response.ts
 models/GetAccountInfoByStateInitRequest.ts

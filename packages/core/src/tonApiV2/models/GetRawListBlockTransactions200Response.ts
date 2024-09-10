@@ -18,12 +18,14 @@ import {
     BlockRawFromJSON,
     BlockRawFromJSONTyped,
     BlockRawToJSON,
+    BlockRawToJSONTyped,
 } from './BlockRaw';
 import type { GetRawListBlockTransactions200ResponseIdsInner } from './GetRawListBlockTransactions200ResponseIdsInner';
 import {
     GetRawListBlockTransactions200ResponseIdsInnerFromJSON,
     GetRawListBlockTransactions200ResponseIdsInnerFromJSONTyped,
     GetRawListBlockTransactions200ResponseIdsInnerToJSON,
+    GetRawListBlockTransactions200ResponseIdsInnerToJSONTyped,
 } from './GetRawListBlockTransactions200ResponseIdsInner';
 
 /**
@@ -94,10 +96,15 @@ export function GetRawListBlockTransactions200ResponseFromJSONTyped(json: any, i
     };
 }
 
-export function GetRawListBlockTransactions200ResponseToJSON(value?: GetRawListBlockTransactions200Response | null): any {
+  export function GetRawListBlockTransactions200ResponseToJSON(json: any): GetRawListBlockTransactions200Response {
+      return GetRawListBlockTransactions200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetRawListBlockTransactions200ResponseToJSONTyped(value?: GetRawListBlockTransactions200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': BlockRawToJSON(value['id']),

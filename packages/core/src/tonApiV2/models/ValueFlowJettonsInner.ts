@@ -18,12 +18,14 @@ import {
     JettonPreviewFromJSON,
     JettonPreviewFromJSONTyped,
     JettonPreviewToJSON,
+    JettonPreviewToJSONTyped,
 } from './JettonPreview';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -78,10 +80,15 @@ export function ValueFlowJettonsInnerFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function ValueFlowJettonsInnerToJSON(value?: ValueFlowJettonsInner | null): any {
+  export function ValueFlowJettonsInnerToJSON(json: any): ValueFlowJettonsInner {
+      return ValueFlowJettonsInnerToJSONTyped(json, false);
+  }
+
+  export function ValueFlowJettonsInnerToJSONTyped(value?: ValueFlowJettonsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'account': AccountAddressToJSON(value['account']),

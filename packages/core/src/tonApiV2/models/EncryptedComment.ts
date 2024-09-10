@@ -57,10 +57,15 @@ export function EncryptedCommentFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function EncryptedCommentToJSON(value?: EncryptedComment | null): any {
+  export function EncryptedCommentToJSON(json: any): EncryptedComment {
+      return EncryptedCommentToJSONTyped(json, false);
+  }
+
+  export function EncryptedCommentToJSONTyped(value?: EncryptedComment | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'encryption_type': value['encryptionType'],

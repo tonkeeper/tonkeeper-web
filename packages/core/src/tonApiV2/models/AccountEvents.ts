@@ -18,6 +18,7 @@ import {
     AccountEventFromJSON,
     AccountEventFromJSONTyped,
     AccountEventToJSON,
+    AccountEventToJSONTyped,
 } from './AccountEvent';
 
 /**
@@ -64,10 +65,15 @@ export function AccountEventsFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function AccountEventsToJSON(value?: AccountEvents | null): any {
+  export function AccountEventsToJSON(json: any): AccountEvents {
+      return AccountEventsToJSONTyped(json, false);
+  }
+
+  export function AccountEventsToJSONTyped(value?: AccountEvents | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'events': ((value['events'] as Array<any>).map(AccountEventToJSON)),

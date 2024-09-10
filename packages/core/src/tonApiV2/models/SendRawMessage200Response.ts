@@ -49,10 +49,15 @@ export function SendRawMessage200ResponseFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function SendRawMessage200ResponseToJSON(value?: SendRawMessage200Response | null): any {
+  export function SendRawMessage200ResponseToJSON(json: any): SendRawMessage200Response {
+      return SendRawMessage200ResponseToJSONTyped(json, false);
+  }
+
+  export function SendRawMessage200ResponseToJSONTyped(value?: SendRawMessage200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'code': value['code'],

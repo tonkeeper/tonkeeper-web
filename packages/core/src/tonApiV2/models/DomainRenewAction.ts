@@ -18,6 +18,7 @@ import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -72,10 +73,15 @@ export function DomainRenewActionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function DomainRenewActionToJSON(value?: DomainRenewAction | null): any {
+  export function DomainRenewActionToJSON(json: any): DomainRenewAction {
+      return DomainRenewActionToJSONTyped(json, false);
+  }
+
+  export function DomainRenewActionToJSONTyped(value?: DomainRenewAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'domain': value['domain'],

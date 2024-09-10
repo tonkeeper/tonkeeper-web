@@ -65,10 +65,15 @@ export function FoundAccountsAddressesInnerFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function FoundAccountsAddressesInnerToJSON(value?: FoundAccountsAddressesInner | null): any {
+  export function FoundAccountsAddressesInnerToJSON(json: any): FoundAccountsAddressesInner {
+      return FoundAccountsAddressesInnerToJSONTyped(json, false);
+  }
+
+  export function FoundAccountsAddressesInnerToJSONTyped(value?: FoundAccountsAddressesInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

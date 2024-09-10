@@ -18,6 +18,7 @@ import {
     BlockchainConfig7CurrenciesInnerFromJSON,
     BlockchainConfig7CurrenciesInnerFromJSONTyped,
     BlockchainConfig7CurrenciesInnerToJSON,
+    BlockchainConfig7CurrenciesInnerToJSONTyped,
 } from './BlockchainConfig7CurrenciesInner';
 
 /**
@@ -56,10 +57,15 @@ export function BlockchainConfig7FromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function BlockchainConfig7ToJSON(value?: BlockchainConfig7 | null): any {
+  export function BlockchainConfig7ToJSON(json: any): BlockchainConfig7 {
+      return BlockchainConfig7ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig7ToJSONTyped(value?: BlockchainConfig7 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'currencies': ((value['currencies'] as Array<any>).map(BlockchainConfig7CurrenciesInnerToJSON)),

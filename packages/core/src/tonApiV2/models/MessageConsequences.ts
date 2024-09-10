@@ -18,18 +18,21 @@ import {
     TraceFromJSON,
     TraceFromJSONTyped,
     TraceToJSON,
+    TraceToJSONTyped,
 } from './Trace';
 import type { AccountEvent } from './AccountEvent';
 import {
     AccountEventFromJSON,
     AccountEventFromJSONTyped,
     AccountEventToJSON,
+    AccountEventToJSONTyped,
 } from './AccountEvent';
 import type { Risk } from './Risk';
 import {
     RiskFromJSON,
     RiskFromJSONTyped,
     RiskToJSON,
+    RiskToJSONTyped,
 } from './Risk';
 
 /**
@@ -84,10 +87,15 @@ export function MessageConsequencesFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function MessageConsequencesToJSON(value?: MessageConsequences | null): any {
+  export function MessageConsequencesToJSON(json: any): MessageConsequences {
+      return MessageConsequencesToJSONTyped(json, false);
+  }
+
+  export function MessageConsequencesToJSONTyped(value?: MessageConsequences | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'trace': TraceToJSON(value['trace']),

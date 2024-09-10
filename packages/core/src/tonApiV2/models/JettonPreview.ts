@@ -18,6 +18,7 @@ import {
     JettonVerificationTypeFromJSON,
     JettonVerificationTypeFromJSONTyped,
     JettonVerificationTypeToJSON,
+    JettonVerificationTypeToJSONTyped,
 } from './JettonVerificationType';
 
 /**
@@ -98,10 +99,15 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function JettonPreviewToJSON(value?: JettonPreview | null): any {
+  export function JettonPreviewToJSON(json: any): JettonPreview {
+      return JettonPreviewToJSONTyped(json, false);
+  }
+
+  export function JettonPreviewToJSONTyped(value?: JettonPreview | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

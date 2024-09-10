@@ -55,10 +55,15 @@ export function JettonTransferPayloadFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function JettonTransferPayloadToJSON(value?: JettonTransferPayload | null): any {
+  export function JettonTransferPayloadToJSON(json: any): JettonTransferPayload {
+      return JettonTransferPayloadToJSONTyped(json, false);
+  }
+
+  export function JettonTransferPayloadToJSONTyped(value?: JettonTransferPayload | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'custom_payload': value['customPayload'],

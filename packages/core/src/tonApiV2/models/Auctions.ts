@@ -18,6 +18,7 @@ import {
     AuctionFromJSON,
     AuctionFromJSONTyped,
     AuctionToJSON,
+    AuctionToJSONTyped,
 } from './Auction';
 
 /**
@@ -64,10 +65,15 @@ export function AuctionsFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function AuctionsToJSON(value?: Auctions | null): any {
+  export function AuctionsToJSON(json: any): Auctions {
+      return AuctionsToJSONTyped(json, false);
+  }
+
+  export function AuctionsToJSONTyped(value?: Auctions | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'data': ((value['data'] as Array<any>).map(AuctionToJSON)),
