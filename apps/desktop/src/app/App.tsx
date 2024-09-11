@@ -91,6 +91,7 @@ import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
+import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -427,11 +428,11 @@ const WalletContent = () => {
                             </Route>
                             <Route
                                 path={AppRoute.multisigWallets}
-                                element={
-                                    <Suspense fallback={null}>
-                                        <DesktopManageMultisigsPage />
-                                    </Suspense>
-                                }
+                                element={<DesktopManageMultisigsPage />}
+                            />
+                            <Route
+                                path={AppRoute.multisigOrders}
+                                element={<DesktopMultisigOrdersPage />}
                             />
                             <Route
                                 path={any(AppRoute.walletSettings)}

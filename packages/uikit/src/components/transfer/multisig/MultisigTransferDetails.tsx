@@ -49,7 +49,7 @@ export const MultisigTransferDetails: FC<{
             </MultisigDetailsRow>
             <MultisigDetailsRow>
                 <Body2>{t('multisig_time_left')}</Body2>
-                <Body2>{toTimeLeft(secondsLeft * 1000, { days: false })}</Body2>
+                <Body2>{toTimeLeft(secondsLeft * 1000)}</Body2>
             </MultisigDetailsRow>
         </MultisigDetailsBlock>
     );

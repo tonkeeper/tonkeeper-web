@@ -10,12 +10,13 @@ function addStartZero(value: number): string {
     }
     return strValue;
 }
-export function toTimeLeft(ms: number, { days = true }): string {
+export function toTimeLeft(ms: number, options?: { days?: boolean }): string {
+    const days = options?.days ?? false;
     const { days: daysNumber, hours: hoursNumber, minutes, seconds } = toStructTimeLeft(ms);
 
     let result = '';
     let hours = hoursNumber;
-    if (days) {
+    if (daysNumber) {
         if (days) {
             result = `${days} d`;
 

@@ -1,0 +1,20 @@
+{
+  "auctionBidMessage" : "為 {{.NftName}} 出價 {{.Amount}}",
+  "contractDeployAction" : "使用介面 {{.Interfaces}}{{ end }} 部署合約 {{ if .Interfaces }}",
+  "depositStakeAction" : "存入 {{.Value}} 到質押池",
+  "electionsDepositStakeAction" : "存入 {{.Amount}} 進行質押",
+  "electionsRecoverStakeAction" : "收回 {{.Amount}} 的質押",
+  "helloWorld" : "你好，世界！",
+  "jettonBurnAction" : "燒毀 {{.Value}} {{.JettonName}}",
+  "jettonMintAction" : "鑄造 {{.Value}} {{.JettonName}}",
+  "jettonSwapAction" : "將 {{.AmountIn}} {{.JettonIn}} 交換為 {{.AmountOut}} {{.JettonOut}}",
+  "jettonTransferAction" : "發送 {{.Value}}{{.JettonName}}",
+  "nftPurchaseAction" : "購買 {{.Name}}",
+  "nftTransferAction" : "轉移 1 個 NFT",
+  "poolImplementationDescription" : "最低存款金額 {{.Deposit}} TON",
+  "smartContractExecMessage" : "執行智能合約",
+  "subscriptionAction" : "支付 {{.Value}} 訂閱費用",
+  "tonTransferAction" : "轉移 {{.Value}}",
+  "withdrawStakeAction" : "從質押池提取 {{.Value}}",
+  "withdrawStakeRequestAction" : "請求從質押池提取 {{.Value}}"
+}

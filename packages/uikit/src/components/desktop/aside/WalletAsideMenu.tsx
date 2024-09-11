@@ -7,12 +7,12 @@ import { useActiveAccount, useIsActiveWalletWatchOnly } from '../../../state/wal
 import {
     ClockSmoothIcon,
     CoinsIcon,
+    InboxIcon,
     ListIcon,
     SaleBadgeIcon,
     SettingsSmoothIcon,
     SparkIcon,
-    SwapIcon,
-    TextIcon
+    SwapIcon
 } from '../../Icon';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
@@ -106,7 +106,7 @@ export const WalletAsideMenu = () => {
                 <NavLink to={AppRoute.multisigOrders}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive}>
-                            <TextIcon />
+                            <InboxIcon />
                             <Label2>{t('wallet_aside_orders')}</Label2>
                         </AsideMenuItemStyled>
                     )}

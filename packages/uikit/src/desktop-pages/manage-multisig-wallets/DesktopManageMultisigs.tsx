@@ -35,8 +35,11 @@ import { useRenameNotification } from '../../components/modals/RenameNotificatio
 import { getFallbackAccountEmoji } from '@tonkeeper/core/dist/service/walletService';
 import { Address } from '@ton/core';
 import { AppRoute } from '../../libs/routes';
-import { useNavigate } from 'react-router-dom';
-import { AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
+import { Navigate, useNavigate } from 'react-router-dom';
+import {
+    AccountTonMultisig,
+    isAccountCanManageMultisigs
+} from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
@@ -46,6 +49,12 @@ const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
 export const DesktopManageMultisigsPage = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
     const { t } = useTranslation();
+    const activeAccount = useActiveAccount();
+    const isActiveAccountMultisigManagable = isAccountCanManageMultisigs(activeAccount);
+
+    if (!isActiveAccountMultisigManagable) {
+        return <Navigate to={AppRoute.home} />;
+    }
 
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
@@ -247,7 +256,7 @@ const EmptyMultisigsPage = () => {
     const sdk = useAppSdk();
     const { onOpen: addWallet } = useAddWalletNotification();
 
-    const multisig_about_url = config.multisig_about_url || '123';
+    const multisig_about_url = config.multisig_about_url;
 
     return (
         <EmptyMultisigsPageWrapper>

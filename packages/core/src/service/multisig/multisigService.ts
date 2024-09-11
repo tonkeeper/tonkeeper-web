@@ -17,7 +17,7 @@ export function orderStatus(order: MultisigOrder): MultisigOrderStatus {
         return 'completed';
     }
 
-    if (order.expirationDate * 1000 < Date.now()) {
+    if (order.expirationDate * 1000 > Date.now()) {
         return 'progress';
     }
 

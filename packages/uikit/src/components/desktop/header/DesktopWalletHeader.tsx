@@ -1,4 +1,3 @@
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { ErrorBoundary } from 'react-error-boundary';
 import styled from 'styled-components';
 import { useAppSdk } from '../../../hooks/appSdk';
@@ -15,6 +14,7 @@ import { AppProRoute } from '../../../libs/routes';
 import { BuyNotification } from '../../home/BuyAction';
 import { useWalletTotalBalance } from '../../../state/asset';
 import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderElements';
+import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -51,6 +51,7 @@ const DesktopWalletHeaderPayload = () => {
     const { data: buy } = useTonendpointBuyMethods();
     const { t } = useTranslation();
     const isReadOnly = useIsActiveWalletWatchOnly();
+    const { onOpen: sendTransfer } = useSendTransferNotification();
 
     return (
         <DesktopHeaderContainer>
@@ -58,16 +59,7 @@ const DesktopWalletHeaderPayload = () => {
             <DesktopRightPart>
                 <ButtonsContainer>
                     {!isReadOnly && (
-                        <ButtonStyled
-                            size="small"
-                            onClick={() =>
-                                sdk.uiEvents.emit('transfer', {
-                                    method: 'transfer',
-                                    id: Date.now(),
-                                    params: { asset: 'TON', chain: BLOCKCHAIN_NAME.TON }
-                                })
-                            }
-                        >
+                        <ButtonStyled size="small" onClick={() => sendTransfer()}>
                             <ArrowUpIcon />
                             {t('wallet_send')}
                         </ButtonStyled>
