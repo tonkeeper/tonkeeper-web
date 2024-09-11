@@ -69,6 +69,8 @@ export async function sendCreateOrder(options: {
     await new BlockchainApi(options.api.tonApiV2).sendBlockchainMessage({
         sendBlockchainMessageRequest: { boc: boc.toString('base64') }
     });
+
+    return boc;
 }
 
 export async function signOrder(options: {

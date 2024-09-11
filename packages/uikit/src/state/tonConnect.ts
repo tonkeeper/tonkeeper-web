@@ -29,7 +29,7 @@ import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
 import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { useActiveWallet, useAccountsState, useActiveAccount, useActiveTonNetwork } from './wallet';
-import { isAccountTonWalletStandard } from "@tonkeeper/core/dist/entries/account";
+import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();
@@ -97,9 +97,7 @@ export const useConnectTonConnectAppMutation = () => {
         }
     >(async ({ request, manifest, webViewUrl }) => {
         const wallet = account.activeTonWallet;
-        if (!isStandardTonWallet(wallet)) {
-            throw new Error('Only standard ton wallets can be connected');
-        }
+
         const params = await getTonConnectParams(request);
 
         const result = [] as ConnectItemReply[];
@@ -109,6 +107,9 @@ export const useConnectTonConnectAppMutation = () => {
                 result.push(toTonAddressItemReply(wallet, network));
             }
             if (item.name === 'ton_proof') {
+                if (!isStandardTonWallet(wallet)) {
+                    throw new Error('Cannot connect to non standard wallet');
+                }
                 if (activeIsLedger) {
                     throw new Error('Ledger doesnt support ton_proof');
                 }

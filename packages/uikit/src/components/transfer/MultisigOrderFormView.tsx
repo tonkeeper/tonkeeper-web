@@ -33,7 +33,7 @@ const SelectDropDownStyled = styled(SelectDropDown)`
 export const MultisigOrderFormView: FC<{
     onSubmit: (form: { lifetime: MultisigOrderLifetimeMinutes }) => void;
     isAnimationProcess: boolean;
-    Header: () => React.JSX.Element;
+    Header?: () => React.JSX.Element;
     MainButton: ({
         isLoading,
         onClick
@@ -62,7 +62,7 @@ export const MultisigOrderFormView: FC<{
             standalone={standalone}
             noPadding
         >
-            {!shouldHideHeaderAndFooter && (
+            {!shouldHideHeaderAndFooter && !!Header && (
                 <NotificationHeaderPortal>
                     <NotificationHeader>
                         <Header />

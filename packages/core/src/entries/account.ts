@@ -647,10 +647,7 @@ export function bindAccountToClass(accountStruct: Account): void {
     Object.setPrototypeOf(accountStruct, prototypes[accountStruct.type]);
 }
 
-export function getWalletById(
-    accounts: IAccountTonWalletStandard[],
-    walletId: WalletId
-): TonWalletStandard | undefined {
+export function getWalletById(accounts: Account[], walletId: WalletId): TonContract | undefined {
     for (const account of accounts || []) {
         const wallet = account.getTonWallet(walletId);
         if (wallet) {

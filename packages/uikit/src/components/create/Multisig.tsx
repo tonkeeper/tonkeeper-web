@@ -269,7 +269,7 @@ const CreateMultisigFormPage: FC<{
                 .filter(p => p.role === 'proposer-and-signer')
                 .map(v => Address.parse(v.address)),
             threshold: data.quorum,
-            allowArbitrarySeqno: true
+            allowArbitrarySeqno: false
         };
         const result = await estimateDeploy({ multisigConfig, fromWallet });
         setDeployArgs({ multisigConfig, fromWallet, feeWei: result?.fee.weiAmount });

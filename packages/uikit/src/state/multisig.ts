@@ -48,6 +48,9 @@ export const useCheckMultisigsSigners = () => {
     return useQuery({
         queryKey: [QueryKey.multisigSigners, accounts],
         queryFn: async () => {
+            if (!accounts?.length) {
+                return;
+            }
             const multisigs = accounts.filter(a => a.type === 'ton-multisig');
             const allAddedWallets = accounts.flatMap(a => a.allTonWallets).map(w => w.rawAddress);
             const multisigApi = new MultisigApi(api.tonApiV2);

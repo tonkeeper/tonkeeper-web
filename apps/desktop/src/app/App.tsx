@@ -90,7 +90,7 @@ import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
-import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
+import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 
 const queryClient = new QueryClient({
     defaultOptions: {

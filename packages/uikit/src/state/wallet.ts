@@ -291,8 +291,17 @@ export const useControllableAccountAndWalletByWalletId = (
                 account: undefined
             };
         }
+        const wallet = getWalletById(accounts, id);
+
+        if (wallet && !isStandardTonWallet(wallet)) {
+            return {
+                wallet: undefined,
+                account: undefined
+            };
+        }
+
         return {
-            wallet: getWalletById(accounts, id),
+            wallet,
             account: getAccountByWalletById(accounts, id)
         };
     }, [accounts, id]);

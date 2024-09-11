@@ -174,7 +174,7 @@ export type ConnectTransferError = { kind: 'not-enough-balance' } | { kind: unde
 
 export const tonConnectTransferError = async (
     api: APIConfig,
-    walletState: TonWalletStandard,
+    walletState: TonContract,
     params: TonConnectTransactionPayload
 ): Promise<ConnectTransferError> => {
     const wallet = await new AccountsApi(api.tonApiV2).getAccount({
@@ -370,20 +370,18 @@ export const estimateMultisigTonConnectTransfer = async (
     const timestamp = await getServerTime(api);
     const [wallet] = await getWalletBalance(api, hostWallet);
 
-    if (params.messages.length !== 1) {
-        throw new Error('Multisig wallets can only send one message at a time');
+    if (params.messages.length > 255) {
+        throw new Error('Multisig wallets can send maximum 255 message at a time');
     }
 
     checkWalletBalanceOrDie(new BigNumber(params.messages[0].amount), wallet);
-
-    const message = params.messages[0];
 
     return estimateNewOrder({
         multisig,
         api,
         order: {
             validUntilSeconds: getTTL(timestamp),
-            actions: tonConnectMessageToMultisigActions(message)
+            actions: tonConnectMessagesToMultisigActions(params.messages)
         }
     });
 };
@@ -391,7 +389,6 @@ export const estimateMultisigTonConnectTransfer = async (
 export const sendMultisigTonConnectTransfer = async ({
     api,
     multisig,
-    fee,
     params,
     hostWallet,
     signer,
@@ -401,53 +398,54 @@ export const sendMultisigTonConnectTransfer = async ({
     hostWallet: TonWalletStandard;
     multisig: Pick<Multisig, 'address' | 'signers' | 'proposers'>;
     params: TonConnectTransactionPayload;
-    fee: TransferEstimationEventFee;
     signer: CellSigner;
     ttlSeconds: number;
-}): Promise<void> => {
+}): Promise<string> => {
     const timestamp = await getServerTime(api);
 
-    if (params.messages.length !== 1) {
-        throw new Error('Multisig wallets can only send one message at a time');
+    if (params.messages.length > 255) {
+        throw new Error('Multisig wallets can send maximum 255 message at a time');
     }
 
     await getWalletSeqnoAndCheckBalance({
         api,
         walletState: hostWallet,
-        fee,
-        amount: new BigNumber(params.messages[0].amount)
+        amount: new BigNumber(
+            params.messages.reduce((acc, m) => acc.plus(m.amount), new BigNumber(0))
+        )
     });
 
-    const message = params.messages[0];
-
-    await sendCreateOrder({
+    const boc = await sendCreateOrder({
         multisig,
         api,
         hostWallet,
         signer,
         order: {
             validUntilSeconds: timestamp + ttlSeconds,
-            actions: tonConnectMessageToMultisigActions(message)
+            actions: tonConnectMessagesToMultisigActions(params.messages)
         }
     });
+
+    return boc.toString('base64');
 };
 
-function tonConnectMessageToMultisigActions(message: TonConnectTransactionPayloadMessage) {
-    return [
-        {
-            type: 'transfer',
-            message: internal({
-                to: Address.parse(message.address),
-                bounce: seeIfAddressBounceable(message.address),
-                value: BigInt(message.amount),
-                body: message.payload ? Cell.fromBase64(message.payload) : undefined,
-                init: message.stateInit
-                    ? loadStateInit(Cell.fromBase64(message.stateInit).beginParse())
-                    : undefined
-            }),
-            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
-        } as const
-    ];
+function tonConnectMessagesToMultisigActions(messages: TonConnectTransactionPayloadMessage[]) {
+    return messages.map(
+        message =>
+            ({
+                type: 'transfer',
+                message: internal({
+                    to: Address.parse(message.address),
+                    bounce: seeIfAddressBounceable(message.address),
+                    value: BigInt(message.amount),
+                    body: message.payload ? Cell.fromBase64(message.payload) : undefined,
+                    init: message.stateInit
+                        ? loadStateInit(Cell.fromBase64(message.stateInit).beginParse())
+                        : undefined
+                }),
+                sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
+            } as const)
+    );
 }
 
 function tonTransferToMultisigActions({
