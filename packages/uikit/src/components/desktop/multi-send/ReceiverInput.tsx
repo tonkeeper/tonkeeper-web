@@ -1,4 +1,3 @@
-import { Address } from '@ton/core';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
@@ -79,15 +78,11 @@ export const ReceiverInput: FC<{
         setInputValue(
             'dns' in field.value && field.value.dns.account.name
                 ? field.value.dns.account.name
-                : Address.parse(field.value.address).toString({ bounceable: false })
+                : field.value.address
         );
     }, []);
 
-    const { onCopy, copied } = useCopyToClipboard(
-        validationProduct?.address
-            ? Address.parse(validationProduct?.address).toString({ bounceable: false })
-            : ''
-    );
+    const { onCopy, copied } = useCopyToClipboard(validationProduct?.address ?? '');
 
     const validate = useMultiSendReceiverValidator();
     const onPaste = useCallback(

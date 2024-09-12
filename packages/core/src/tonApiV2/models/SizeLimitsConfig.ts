@@ -103,10 +103,15 @@ export function SizeLimitsConfigFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function SizeLimitsConfigToJSON(value?: SizeLimitsConfig | null): any {
+  export function SizeLimitsConfigToJSON(json: any): SizeLimitsConfig {
+      return SizeLimitsConfigToJSONTyped(json, false);
+  }
+
+  export function SizeLimitsConfigToJSONTyped(value?: SizeLimitsConfig | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'max_msg_bits': value['maxMsgBits'],

@@ -34,10 +34,10 @@ const getTronClient = (current?: Network) => {
 export const getApiConfig = (config: TonendpointConfig, network?: Network, TonConsoleBase = '') => {
     // Global config
     TonConsoleApi.BASE = TonConsoleBase;
+    TonConsoleApi.WITH_CREDENTIALS = true;
 
     return {
         tonApiV2: getTonClientV2(config, network),
         tronApi: getTronClient(network)
     };
 };
-

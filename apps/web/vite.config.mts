@@ -1,9 +1,20 @@
 import react from '@vitejs/plugin-react';
 import * as path from 'path';
 import { defineConfig } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
-    plugins: [react()],
+    plugins: [
+        nodePolyfills({
+            globals: {
+                Buffer: true,
+                global: true,
+                process: true
+            },
+            include: ['stream', 'buffer', 'crypto']
+        }),
+        react()
+    ],
     resolve: {
         alias: {
             react: path.resolve(__dirname, './node_modules/react'),

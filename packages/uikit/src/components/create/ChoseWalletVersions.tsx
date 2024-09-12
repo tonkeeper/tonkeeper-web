@@ -14,13 +14,13 @@ import { toFormattedTonBalance } from '../../hooks/balance';
 import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useAccountState, useStandardTonWalletVersions } from '../../state/wallet';
-import { ChevronLeftIcon } from '../Icon';
-import { ListBlock, ListItem, ListItemPayload } from '../List';
-import { SkeletonList } from '../Skeleton';
-import { Body1, Body2, H2, Label1 } from '../Text';
-import { Button } from '../fields/Button';
+import { SkeletonListDesktopAdaptive } from '../Skeleton';
 import { Checkbox } from '../fields/Checkbox';
+import { Button } from '../fields/Button';
 import { RoundedButton } from '../fields/RoundedButton';
+import { Body1, Body2, H2, Label1 } from '../Text';
+import { ListBlock, ListItem, ListItemPayload } from '../List';
+import { ChevronLeftIcon } from '../Icon';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -41,7 +41,7 @@ const Body1Styled = styled(Body1)`
     color: ${p => p.theme.textSecondary};
 `;
 
-const SkeletonListStyled = styled(SkeletonList)`
+const SkeletonListStyled = styled(SkeletonListDesktopAdaptive)`
     width: 100%;
 `;
 

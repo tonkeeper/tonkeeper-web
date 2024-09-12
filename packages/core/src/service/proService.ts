@@ -6,12 +6,12 @@ import { APIConfig } from '../entries/apis';
 import { BLOCKCHAIN_NAME } from '../entries/crypto';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../entries/crypto/asset/constants';
-import { DashboardCell, DashboardColumn } from '../entries/dashboard';
+import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import { ProState, ProStateWallet, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
-import { isStandardTonWallet, TonWalletStandard, WalletVersion } from '../entries/wallet';
+import { TonWalletStandard, WalletVersion, isStandardTonWallet } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
 import {
     FiatCurrencies as FiatCurrenciesGenerated,
@@ -27,11 +27,11 @@ import {
 } from '../tonConsoleApi';
 import { delay } from '../utils/common';
 import { Flatten } from '../utils/types';
+import { accountsStorage } from './accountsStorage';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './transfer/common';
 import { walletStateInitFromState } from './wallet/contractService';
-import { accountsStorage } from './accountsStorage';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -96,7 +96,14 @@ export const loadProState = async (storage: IStorage): Promise<ProState> => {
                     w.version === walletVersionFromProServiceDTO(user.version)
             );
         if (!actualWallet) {
-            throw new Error('Unknown wallet');
+            return {
+                authorizedWallet: null,
+                subscription: {
+                    isTrial: false,
+                    usedTrial: false,
+                    valid: false
+                }
+            };
         }
         authorizedWallet = {
             publicKey: actualWallet.publicKey,
@@ -227,6 +234,16 @@ export const createRecipient = async (
     return [recipient, asset];
 };
 
+export const retryProService = async (storage: IStorage) => {
+    for (let i = 0; i < 10; i++) {
+        const state = await getProState(storage);
+        if (state.subscription.valid) {
+            return;
+        }
+        await delay(5000);
+    }
+};
+
 export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
     let updated = invoice;
 
@@ -269,7 +286,7 @@ export async function getDashboardData(
         columns: string[];
     },
     options?: { lang?: string; currency?: FiatCurrencies }
-): Promise<DashboardCell[][]> {
+): Promise<DashboardRow[]> {
     let lang = Lang.EN;
     if (Object.values(Lang).includes(options?.lang as Lang)) {
         lang = options?.lang as Lang;
@@ -285,7 +302,10 @@ export async function getDashboardData(
     }
 
     const result = await ProServiceService.proServiceDashboardData(lang, currency, query);
-    return result.items.map(row => row.map(mapDtoCellToCell));
+    return result.items.map((row, index) => ({
+        id: query.accounts[index],
+        cells: row.map(mapDtoCellToCell)
+    }));
 }
 
 type DTOCell = Flatten<

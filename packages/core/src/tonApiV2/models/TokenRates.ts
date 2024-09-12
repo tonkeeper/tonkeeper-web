@@ -69,10 +69,15 @@ export function TokenRatesFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-export function TokenRatesToJSON(value?: TokenRates | null): any {
+  export function TokenRatesToJSON(json: any): TokenRates {
+      return TokenRatesToJSONTyped(json, false);
+  }
+
+  export function TokenRatesToJSONTyped(value?: TokenRates | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'prices': value['prices'],

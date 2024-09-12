@@ -18,6 +18,7 @@ import {
     ConfigProposalSetupFromJSON,
     ConfigProposalSetupFromJSONTyped,
     ConfigProposalSetupToJSON,
+    ConfigProposalSetupToJSONTyped,
 } from './ConfigProposalSetup';
 
 /**
@@ -64,10 +65,15 @@ export function BlockchainConfig11FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig11ToJSON(value?: BlockchainConfig11 | null): any {
+  export function BlockchainConfig11ToJSON(json: any): BlockchainConfig11 {
+      return BlockchainConfig11ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig11ToJSONTyped(value?: BlockchainConfig11 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'normal_params': ConfigProposalSetupToJSON(value['normalParams']),

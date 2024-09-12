@@ -18,12 +18,14 @@ import {
     PoolImplementationTypeFromJSON,
     PoolImplementationTypeFromJSONTyped,
     PoolImplementationTypeToJSON,
+    PoolImplementationTypeToJSONTyped,
 } from './PoolImplementationType';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -88,10 +90,15 @@ export function DepositStakeActionFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function DepositStakeActionToJSON(value?: DepositStakeAction | null): any {
+  export function DepositStakeActionToJSON(json: any): DepositStakeAction {
+      return DepositStakeActionToJSONTyped(json, false);
+  }
+
+  export function DepositStakeActionToJSONTyped(value?: DepositStakeAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'amount': value['amount'],

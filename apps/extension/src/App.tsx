@@ -218,6 +218,7 @@ export const Loader: FC = React.memo(() => {
         proFeatures: false,
         hideQrScanner: true,
         hideSigner: true,
+        hideMam: true,
         defaultWalletVersion: WalletVersion.V5R1
     };
 

@@ -51,6 +51,7 @@ export const proTheme: DefaultTheme = {
     fieldErrorBackground: 'rgb(255 71 102 / 8%)',
 
     accentBlue: '#FFDB29',
+    accentBlueConstant: '#45AEF5',
     accentGreen: '#39CC83',
     accentRed: '#FF4766',
     accentOrange: '#F5A73B',

@@ -71,10 +71,15 @@ export function SignRawMessageFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function SignRawMessageToJSON(value?: SignRawMessage | null): any {
+  export function SignRawMessageToJSON(json: any): SignRawMessage {
+      return SignRawMessageToJSONTyped(json, false);
+  }
+
+  export function SignRawMessageToJSONTyped(value?: SignRawMessage | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

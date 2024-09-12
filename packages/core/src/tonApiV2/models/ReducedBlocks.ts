@@ -18,6 +18,7 @@ import {
     ReducedBlockFromJSON,
     ReducedBlockFromJSONTyped,
     ReducedBlockToJSON,
+    ReducedBlockToJSONTyped,
 } from './ReducedBlock';
 
 /**
@@ -56,10 +57,15 @@ export function ReducedBlocksFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function ReducedBlocksToJSON(value?: ReducedBlocks | null): any {
+  export function ReducedBlocksToJSON(json: any): ReducedBlocks {
+      return ReducedBlocksToJSONTyped(json, false);
+  }
+
+  export function ReducedBlocksToJSONTyped(value?: ReducedBlocks | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'blocks': ((value['blocks'] as Array<any>).map(ReducedBlockToJSON)),

@@ -48,3 +48,7 @@ export function AccStatusChangeToJSON(value?: AccStatusChange | null): any {
     return value as any;
 }
 
+export function AccStatusChangeToJSONTyped(value: any, ignoreDiscriminator: boolean): AccStatusChange {
+    return value as AccStatusChange;
+}
+

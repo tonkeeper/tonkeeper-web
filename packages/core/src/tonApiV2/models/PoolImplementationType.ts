@@ -48,3 +48,7 @@ export function PoolImplementationTypeToJSON(value?: PoolImplementationType | nu
     return value as any;
 }
 
+export function PoolImplementationTypeToJSONTyped(value: any, ignoreDiscriminator: boolean): PoolImplementationType {
+    return value as PoolImplementationType;
+}
+

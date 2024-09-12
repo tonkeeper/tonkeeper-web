@@ -18,12 +18,14 @@ import {
     PoolImplementationFromJSON,
     PoolImplementationFromJSONTyped,
     PoolImplementationToJSON,
+    PoolImplementationToJSONTyped,
 } from './PoolImplementation';
 import type { PoolInfo } from './PoolInfo';
 import {
     PoolInfoFromJSON,
     PoolInfoFromJSONTyped,
     PoolInfoToJSON,
+    PoolInfoToJSONTyped,
 } from './PoolInfo';
 
 /**
@@ -70,10 +72,15 @@ export function GetStakingPools200ResponseFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-export function GetStakingPools200ResponseToJSON(value?: GetStakingPools200Response | null): any {
+  export function GetStakingPools200ResponseToJSON(json: any): GetStakingPools200Response {
+      return GetStakingPools200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetStakingPools200ResponseToJSONTyped(value?: GetStakingPools200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'pools': ((value['pools'] as Array<any>).map(PoolInfoToJSON)),

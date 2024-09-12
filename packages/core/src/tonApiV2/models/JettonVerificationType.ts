@@ -48,3 +48,7 @@ export function JettonVerificationTypeToJSON(value?: JettonVerificationType | nu
     return value as any;
 }
 
+export function JettonVerificationTypeToJSONTyped(value: any, ignoreDiscriminator: boolean): JettonVerificationType {
+    return value as JettonVerificationType;
+}
+

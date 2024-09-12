@@ -18,6 +18,7 @@ import {
     TvmStackRecordFromJSON,
     TvmStackRecordFromJSONTyped,
     TvmStackRecordToJSON,
+    TvmStackRecordToJSONTyped,
 } from './TvmStackRecord';
 
 /**
@@ -79,10 +80,15 @@ export function MethodExecutionResultFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function MethodExecutionResultToJSON(value?: MethodExecutionResult | null): any {
+  export function MethodExecutionResultToJSON(json: any): MethodExecutionResult {
+      return MethodExecutionResultToJSONTyped(json, false);
+  }
+
+  export function MethodExecutionResultToJSONTyped(value?: MethodExecutionResult | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'success': value['success'],

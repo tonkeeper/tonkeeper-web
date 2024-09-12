@@ -128,6 +128,10 @@
     "approve_collection_many" : "Одобрете входящи токени от колекцията \"{collection}\"",
     "approve_collection_one" : "Одобрете входящия токен от колекцията \"{collection}\"",
     "approve_many" : "Одобрете {count} входящи токени",
+    "approve_many.few" : "Одобрете {count} входящи токена",
+    "approve_many.many" : "Одобрете {count} входящи токени",
+    "approve_many.one" : "Одобрете {count} входящ токен",
+    "approve_many.other" : "Одобрете {count} входящ токен",
     "approve_token" : "Одобрете входящия токен \"{name}\"",
     "approve_two_collections" : "Одобрете входящите токени от колекциите \"{collection1}\" и \"{collection2}\"",
     "approve_two_tokens" : "Одобрете входящите токени \"{name1}\" и \"{name2}\"",
@@ -156,6 +160,8 @@
     "spam" : "Спам",
     "token_copied" : "ID на токена е копирано",
     "token_count" : {
+      "few" : "{count} токена",
+      "many" : "{count} токена",
       "one" : "{count} токен",
       "other" : "{count} токени"
     },
@@ -495,6 +501,10 @@
     "other" : "Имате {count} изтичащи домейна. Обновете всички до {untilDate}."
   },
   "dns_alert_expiring_one" : "{domain} изтича след {count} дни. Обновете го до {untilDate}.",
+  "dns_alert_expiring_one.few" : "{domain} изтича след {count} дни. Продължете до {untilDate}.",
+  "dns_alert_expiring_one.many" : "{domain} изтича след {count} дни. Продължете до {untilDate}.",
+  "dns_alert_expiring_one.one" : "{domain} изтича след {count} ден. Продължете до {untilDate}.",
+  "dns_alert_expiring_one.other" : "{domain} изтича след {count} дни. Продължете до {untilDate}.",
   "dns_current_address" : "Вашият текущ адрес",
   "dns_expiration_date" : "Дата на изтичане",
   "dns_link_title" : "Потвърдете транзакцията",
@@ -504,6 +514,8 @@
   "dns_renew_toast_success" : "Домейнът е обновен",
   "dns_renew_until_btn" : "Обновете до {untilDate}",
   "dns_renew_valid_caption" : {
+    "few" : "Изтича след {count} дни",
+    "many" : "Изтича след {count} дни",
     "one" : "Изтича след {count} ден",
     "other" : "Изтича след {count} дни"
   },
@@ -549,6 +561,7 @@
   "expiring_domains" : "Изтичащи домейни",
   "finish_setup" : {
     "backup" : "Направете резервно копие на възстановителната фраза на портфейла",
+    "done_buttom" : "Готово",
     "done_button" : "Готово",
     "enable_notifications" : "Активирайте известията за транзакции",
     "header_title" : "Завършете настройката",
@@ -751,8 +764,20 @@
     "all" : "Размяна на всички в Tonkeeper Pro",
     "burn_not_available" : {
       "hours" : "Размяната ще бъде достъпна след {count} часа",
+      "hours.few" : "Размяната ще бъде достъпна след {count} часа",
+      "hours.many" : "Размяната ще бъде достъпна след {count} часа",
+      "hours.one" : "Размяната ще бъде достъпна след {count} час",
+      "hours.other" : "Размяната ще бъде достъпна след {count} часа",
       "minutes" : "Размяната ще бъде достъпна след {count} минути",
-      "seconds" : "Размяната ще бъде достъпна след {count} секунди"
+      "minutes.few" : "Размяната ще бъде достъпна след {count} минути",
+      "minutes.many" : "Размяната ще бъде достъпна след {count} минути",
+      "minutes.one" : "Размяната ще бъде достъпна след {count} минута",
+      "minutes.other" : "Размяната ще бъде достъпна след {count} минути",
+      "seconds" : "Размяната ще бъде достъпна след {count} секунди",
+      "seconds.few" : "Размяната ще бъде достъпна след {count} секунди",
+      "seconds.many" : "Размяната ще бъде достъпна след {count} секунди",
+      "seconds.one" : "Размяната ще бъде достъпна след {count} секунда",
+      "seconds.other" : "Размяната ще бъде достъпна след {count} секунди"
     },
     "count" : "Брой ваучери",
     "count_max" : "Максимум 4 на размяна",

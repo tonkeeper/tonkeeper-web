@@ -120,7 +120,8 @@ export const useJettonBalance = (jettonAddress: string) => {
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonBalance({
                 accountId: wallet.rawAddress,
-                jettonId: jettonAddress
+                jettonId: jettonAddress,
+                supportedExtensions: ['custom_payload']
             });
             return result;
         }

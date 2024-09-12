@@ -57,10 +57,15 @@ export function BlockchainConfig44FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig44ToJSON(value?: BlockchainConfig44 | null): any {
+  export function BlockchainConfig44ToJSON(json: any): BlockchainConfig44 {
+      return BlockchainConfig44ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig44ToJSONTyped(value?: BlockchainConfig44 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'accounts': value['accounts'],

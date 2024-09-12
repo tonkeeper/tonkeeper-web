@@ -203,7 +203,11 @@
     "description" : {
       "empty" : "Intercambia a través de Tonkeeper, envía tokens y NFT.",
       "less_10" : "Tienes suficiente batería para menos de 10 transacciones.",
-      "other" : "{count} cargas"
+      "other" : "{count} cargas",
+      "other.few" : "Tu billetera tiene {count} cargas",
+      "other.many" : "Tu billetera tiene {count} cargas",
+      "other.one" : "Tu billetera tiene {count} carga",
+      "other.other" : "Tu billetera tiene {count} cargas"
     },
     "max_input_amount" : "La cantidad máxima de entrada es {amount}",
     "ok" : "OK",
@@ -237,7 +241,10 @@
         "other" : "{count} cargas",
         "small" : "Paquete pequeño"
       },
-      "title" : "'{{'cnt'}}' transacciones por '{{'price'}}'"
+      "title" : "'{{'cnt'}}' transacciones por '{{'price'}}'",
+      "title.large" : "Grande",
+      "title.medium" : "Medio",
+      "title.small" : "Pequeño"
     },
     "please_wait" : "La batería se cargará en unos minutos",
     "promocode" : {
@@ -451,6 +458,7 @@
     "network_fee" : "Tarifa de red",
     "refund" : "Reembolso",
     "title" : "Confirmar acción",
+    "title_multiwallets" : "Acción para %{walletName}",
     "total_risk" : "Total: {totalAmount}",
     "to_your_address" : "A su dirección",
     "transaction_type" : {
@@ -595,6 +603,7 @@
   "intro_item3_caption" : "-",
   "intro_item3_title" : "-",
   "intro_title" : "Bienvenido\\na ",
+  "it_expires_on" : "Expira el",
   "jetton_buy_tether" : "Comprar USD₮",
   "jetton_id" : "ID de token: {jettonAddress}",
   "jetton_id_copied" : "ID del token copiado",

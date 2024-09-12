@@ -57,10 +57,15 @@ export function BlockchainAccountInspectMethodsInnerFromJSONTyped(json: any, ign
     };
 }
 
-export function BlockchainAccountInspectMethodsInnerToJSON(value?: BlockchainAccountInspectMethodsInner | null): any {
+  export function BlockchainAccountInspectMethodsInnerToJSON(json: any): BlockchainAccountInspectMethodsInner {
+      return BlockchainAccountInspectMethodsInnerToJSONTyped(json, false);
+  }
+
+  export function BlockchainAccountInspectMethodsInnerToJSONTyped(value?: BlockchainAccountInspectMethodsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],

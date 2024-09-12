@@ -21,7 +21,8 @@ export const getJettonCustomPayload = async (
 ): Promise<{ customPayload: Cell | null; stateInit: StateInit }> => {
     const jetton = await new AccountsApi(api.tonApiV2).getAccountJettonBalance({
         accountId: walletAddress,
-        jettonId: (amount.asset.address as Address).toRawString()
+        jettonId: (amount.asset.address as Address).toRawString(),
+        supportedExtensions: ['custom_payload']
     });
 
     if (!seeIfCompressed(jetton)) {

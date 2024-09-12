@@ -18,24 +18,28 @@ import {
     JettonPreviewFromJSON,
     JettonPreviewFromJSONTyped,
     JettonPreviewToJSON,
+    JettonPreviewToJSONTyped,
 } from './JettonPreview';
 import type { TokenRates } from './TokenRates';
 import {
     TokenRatesFromJSON,
     TokenRatesFromJSONTyped,
     TokenRatesToJSON,
+    TokenRatesToJSONTyped,
 } from './TokenRates';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 import type { JettonBalanceLock } from './JettonBalanceLock';
 import {
     JettonBalanceLockFromJSON,
     JettonBalanceLockFromJSONTyped,
     JettonBalanceLockToJSON,
+    JettonBalanceLockToJSONTyped,
 } from './JettonBalanceLock';
 
 /**
@@ -111,10 +115,15 @@ export function JettonBalanceFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function JettonBalanceToJSON(value?: JettonBalance | null): any {
+  export function JettonBalanceToJSON(json: any): JettonBalance {
+      return JettonBalanceToJSONTyped(json, false);
+  }
+
+  export function JettonBalanceToJSONTyped(value?: JettonBalance | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'balance': value['balance'],

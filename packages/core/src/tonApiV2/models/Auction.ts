@@ -81,10 +81,15 @@ export function AuctionFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
     };
 }
 
-export function AuctionToJSON(value?: Auction | null): any {
+  export function AuctionToJSON(json: any): Auction {
+      return AuctionToJSONTyped(json, false);
+  }
+
+  export function AuctionToJSONTyped(value?: Auction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'domain': value['domain'],

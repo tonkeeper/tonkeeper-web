@@ -18,6 +18,7 @@ import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -88,10 +89,15 @@ export function DomainBidFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function DomainBidToJSON(value?: DomainBid | null): any {
+  export function DomainBidToJSON(json: any): DomainBid {
+      return DomainBidToJSONTyped(json, false);
+  }
+
+  export function DomainBidToJSONTyped(value?: DomainBid | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'success': value['success'],

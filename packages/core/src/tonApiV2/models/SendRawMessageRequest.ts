@@ -49,10 +49,15 @@ export function SendRawMessageRequestFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function SendRawMessageRequestToJSON(value?: SendRawMessageRequest | null): any {
+  export function SendRawMessageRequestToJSON(json: any): SendRawMessageRequest {
+      return SendRawMessageRequestToJSONTyped(json, false);
+  }
+
+  export function SendRawMessageRequestToJSONTyped(value?: SendRawMessageRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'body': value['body'],

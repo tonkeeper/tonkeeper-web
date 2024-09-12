@@ -48,3 +48,7 @@ export function ComputeSkipReasonToJSON(value?: ComputeSkipReason | null): any {
     return value as any;
 }
 
+export function ComputeSkipReasonToJSONTyped(value: any, ignoreDiscriminator: boolean): ComputeSkipReason {
+    return value as ComputeSkipReason;
+}
+

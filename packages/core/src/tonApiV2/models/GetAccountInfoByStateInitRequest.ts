@@ -49,10 +49,15 @@ export function GetAccountInfoByStateInitRequestFromJSONTyped(json: any, ignoreD
     };
 }
 
-export function GetAccountInfoByStateInitRequestToJSON(value?: GetAccountInfoByStateInitRequest | null): any {
+  export function GetAccountInfoByStateInitRequestToJSON(json: any): GetAccountInfoByStateInitRequest {
+      return GetAccountInfoByStateInitRequestToJSONTyped(json, false);
+  }
+
+  export function GetAccountInfoByStateInitRequestToJSONTyped(value?: GetAccountInfoByStateInitRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'state_init': value['stateInit'],

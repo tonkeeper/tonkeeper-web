@@ -18,6 +18,7 @@ import {
     AccountFromJSON,
     AccountFromJSONTyped,
     AccountToJSON,
+    AccountToJSONTyped,
 } from './Account';
 
 /**
@@ -56,10 +57,15 @@ export function AccountsFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function AccountsToJSON(value?: Accounts | null): any {
+  export function AccountsToJSON(json: any): Accounts {
+      return AccountsToJSONTyped(json, false);
+  }
+
+  export function AccountsToJSONTyped(value?: Accounts | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'accounts': ((value['accounts'] as Array<any>).map(AccountToJSON)),

@@ -20,7 +20,14 @@ module.exports = [
             fallback: {
                 buffer: require.resolve('buffer/'),
                 'process/browser': require.resolve('process/browser'),
-                stream: require.resolve('stream-browserify')
+                stream: require.resolve('stream-browserify'),
+                crypto: require.resolve('crypto-browserify')
+            },
+            alias: {
+                '@ton/crypto/dist/mnemonic/mnemonic': path.resolve(
+                  __dirname,
+                  '../../../packages/core/node_modules/@ton/crypto/dist/mnemonic/mnemonic'
+                ),
             }
         },
         output: {

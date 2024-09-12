@@ -89,10 +89,15 @@ export function JettonBridgePricesFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function JettonBridgePricesToJSON(value?: JettonBridgePrices | null): any {
+  export function JettonBridgePricesToJSON(json: any): JettonBridgePrices {
+      return JettonBridgePricesToJSONTyped(json, false);
+  }
+
+  export function JettonBridgePricesToJSONTyped(value?: JettonBridgePrices | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'bridge_burn_fee': value['bridgeBurnFee'],

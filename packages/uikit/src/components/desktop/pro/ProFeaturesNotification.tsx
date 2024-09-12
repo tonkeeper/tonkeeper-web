@@ -1,20 +1,18 @@
-import { Notification } from '../../Notification';
 import { FC } from 'react';
-import { createGlobalStyle, styled } from 'styled-components';
-import { Body2, Label1, Label2 } from '../../Text';
+import { styled } from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
-import { Button } from '../../fields/Button';
-import { ProDashboardIcon, ProMultisendIcon } from './Icons';
-import { ProNotification } from '../../pro/ProNotification';
-import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useProState } from '../../../state/pro';
+import { Notification } from '../../Notification';
+import { Body2, Label1, Label2 } from '../../Text';
+import { Button } from '../../fields/Button';
+import { ProNotification } from '../../pro/ProNotification';
+import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
+import { ProDashboardIcon, ProMultisendIcon } from './Icons';
 
-const WrapperStyles = createGlobalStyle`
-      .pro-features-notification {
-        max-width: 768px;
-      }
-    `;
+const NotificationStyled = styled(Notification)`
+    max-width: 768px;
+`;
 
 export const ProFeaturesNotification: FC<{ isOpen: boolean; onClose: () => void }> = ({
     isOpen,
@@ -22,14 +20,9 @@ export const ProFeaturesNotification: FC<{ isOpen: boolean; onClose: () => void 
 }) => {
     return (
         <>
-            <WrapperStyles />
-            <Notification
-                isOpen={isOpen}
-                handleClose={onClose}
-                wrapperClassName="pro-features-notification"
-            >
+            <NotificationStyled isOpen={isOpen} handleClose={onClose}>
                 {() => <ProFeaturesNotificationContent onClose={onClose} />}
-            </Notification>
+            </NotificationStyled>
         </>
     );
 };
@@ -39,6 +32,7 @@ const ContentWrapper = styled.div`
     flex-direction: column;
     align-items: center;
     padding-top: 40px;
+    overflow: hidden;
 `;
 
 const ProImage = styled.img`
@@ -65,6 +59,8 @@ const FeatureBlock = styled.div`
     flex-direction: column;
     text-align: center;
     align-items: center;
+    overflow: hidden;
+    max-width: 100%;
 
     > * {
         display: block;

@@ -79,10 +79,15 @@ export function AccountAddressFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function AccountAddressToJSON(value?: AccountAddress | null): any {
+  export function AccountAddressToJSON(json: any): AccountAddress {
+      return AccountAddressToJSONTyped(json, false);
+  }
+
+  export function AccountAddressToJSONTyped(value?: AccountAddress | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

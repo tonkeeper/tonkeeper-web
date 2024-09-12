@@ -12,25 +12,26 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset, legacyTonAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
+import { DashboardCellNumeric } from '@tonkeeper/core/dist/entries/dashboard';
+import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
+import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
+import { useMemo } from 'react';
+import { useAppContext } from '../hooks/appContext';
+import { QueryKey } from '../libs/queryKey';
+import { useUserFiat } from './fiat';
+import { useAssets } from './home';
 import { useJettonList } from './jetton';
 import {
     getJettonsFiatAmount,
     tokenRate as getTokenRate,
     getTonFiatAmount,
+    toTokenRate,
     useRate
 } from './rates';
 import { useTronBalances } from './tron/tron';
 import { useAccountsState, useWalletAccountInfo } from './wallet';
-import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
-import { useAssets } from './home';
-import { QueryKey } from '../libs/queryKey';
-import { useAppContext } from '../hooks/appContext';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { useUserFiat } from './fiat';
-import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
-import { useMemo } from 'react';
-import { DashboardCellNumeric } from '@tonkeeper/core/dist/entries/dashboard';
 
 export function useUserAssetBalance<
     T extends AssetIdentification = AssetIdentification,
@@ -187,7 +188,7 @@ export const useAllWalletsTotalBalance = () => {
             });
 
             return result
-                .map(row => new BigNumber((row[0] as DashboardCellNumeric).value))
+                .map(row => new BigNumber((row.cells[0] as DashboardCellNumeric).value))
                 .reduce((v, acc) => acc.plus(v), new BigNumber(0));
         }
     );
@@ -238,9 +239,7 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
 
             const tokensOmited: Omit<TokenDistribution, 'percent'>[] = [ton].concat(
                 assets.ton.jettons.balances.map(b => {
-                    const price =
-                        getTokenRate(client, fiat, Address.parse(b.jetton.address).toString())
-                            ?.prices || 0;
+                    const price = b.price ? toTokenRate(b.price, fiat).prices : 0;
                     const fiatBalance = shiftedDecimals(b.balance, b.jetton.decimals).multipliedBy(
                         price
                     );

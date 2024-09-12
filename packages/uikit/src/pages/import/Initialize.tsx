@@ -1,13 +1,13 @@
-import { FC, PropsWithChildren, useState } from 'react';
+import { FC, PropsWithChildren } from 'react';
 import styled, { css } from 'styled-components';
 import { CenterContainer } from '../../components/Layout';
 import { H1 } from '../../components/Text';
 import { RocketIcon, ShieldIcon } from '../../components/create/CreateIcon';
 import { Description } from '../../components/create/Description';
-import { ImportNotification } from '../../components/create/ImportNotification';
 import { Button } from '../../components/fields/Button';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 
 const Block = styled.div<{ fullHeight: boolean }>`
     display: flex;
@@ -56,12 +56,12 @@ const Title = styled(H1)`
 
 const Initialize: FC = () => {
     const { t } = useTranslation();
-    const [isOpen, setOpen] = useState(false);
+    const { onOpen: addWallet } = useAddWalletNotification();
     const sdk = useAppSdk();
 
     const onClick = () => {
         sdk.twaExpand && sdk.twaExpand();
-        sdk.requestExtensionPermission().then(() => setOpen(true));
+        sdk.requestExtensionPermission().then(() => addWallet());
     };
 
     return (
@@ -85,7 +85,6 @@ const Initialize: FC = () => {
             <Button size="large" fullWidth primary marginTop onClick={onClick}>
                 {t('intro_continue_btn')}
             </Button>
-            <ImportNotification isOpen={isOpen} setOpen={setOpen} />
         </CenterContainer>
     );
 };

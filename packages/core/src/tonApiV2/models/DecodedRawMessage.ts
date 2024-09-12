@@ -18,6 +18,7 @@ import {
     DecodedRawMessageMessageFromJSON,
     DecodedRawMessageMessageFromJSONTyped,
     DecodedRawMessageMessageToJSON,
+    DecodedRawMessageMessageToJSONTyped,
 } from './DecodedRawMessageMessage';
 
 /**
@@ -64,10 +65,15 @@ export function DecodedRawMessageFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function DecodedRawMessageToJSON(value?: DecodedRawMessage | null): any {
+  export function DecodedRawMessageToJSON(json: any): DecodedRawMessage {
+      return DecodedRawMessageToJSONTyped(json, false);
+  }
+
+  export function DecodedRawMessageToJSONTyped(value?: DecodedRawMessage | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'message': DecodedRawMessageMessageToJSON(value['message']),

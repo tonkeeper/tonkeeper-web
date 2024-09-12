@@ -49,10 +49,15 @@ export function BlockchainConfig9FromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function BlockchainConfig9ToJSON(value?: BlockchainConfig9 | null): any {
+  export function BlockchainConfig9ToJSON(json: any): BlockchainConfig9 {
+      return BlockchainConfig9ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig9ToJSONTyped(value?: BlockchainConfig9 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'mandatory_params': value['mandatoryParams'],

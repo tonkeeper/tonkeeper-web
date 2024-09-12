@@ -1,45 +1,55 @@
-import { QueryKey } from '../libs/queryKey';
-import { useAppSdk } from '../hooks/appSdk';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { IStorage } from '@tonkeeper/core/dist/Storage';
+import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
+import {
+    ConnectItemReply,
+    ConnectRequest,
+    DAppManifest
+} from '@tonkeeper/core/dist/entries/tonConnect';
+import { TonWalletStandard, isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    getAppConnections,
+    getTonConnectParams,
+    toTonAddressItemReply,
+    toTonProofItemReply,
+    tonConnectProofPayload
+} from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import {
     AccountConnection,
     getTonWalletConnections,
     saveAccountConnection,
     setAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { useAppContext } from '../hooks/appContext';
-import {
-    ConnectItemReply,
-    ConnectRequest,
-    DAppManifest
-} from '@tonkeeper/core/dist/entries/tonConnect';
-import { subject } from '../libs/atom';
 import { getLastEventId } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
+import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
+import { useAppContext } from '../hooks/appContext';
+import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
+import { subject } from '../libs/atom';
+import { QueryKey } from '../libs/queryKey';
+import { signTonConnectOver } from './mnemonic';
 import { useCheckTouchId } from './password';
 import {
-    getAppConnections,
-    getTonConnectParams,
-    tonConnectProofPayload,
-    toTonAddressItemReply,
-    toTonProofItemReply
-} from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import { signTonConnectOver } from './mnemonic';
-import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
-import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { useActiveWallet, useAccountsState, useActiveAccount, useActiveTonNetwork } from './wallet';
-import { isAccountControllable } from "@tonkeeper/core/dist/entries/account";
+    useAccountsState,
+    useAccountsStateQuery,
+    useActiveAccount,
+    useActiveTonNetwork,
+    useActiveWallet
+} from './wallet';
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();
-    const wallets = useAccountsState().flatMap(a => a.allTonWallets);
+
+    const { data } = useAccountsStateQuery();
+
+    const wallets = data?.flatMap(a => a.allTonWallets);
 
     return useQuery<{ wallet: TonWalletStandard; connections: AccountConnection[] }[]>(
-        [QueryKey.tonConnectConnection, wallets.map(i => i.id)],
+        [QueryKey.tonConnectConnection, wallets?.map(i => i.id)],
         async () => {
             return getAppConnections(sdk.storage);
-        }
+        },
+        { enabled: wallets != undefined }
     );
 };
 
@@ -112,7 +122,13 @@ export const useConnectTonConnectAppMutation = () => {
                 if (activeIsLedger) {
                     throw new Error('Ledger doesnt support ton_proof');
                 }
-                const signTonConnect = signTonConnectOver(sdk, account.id, t, checkTouchId);
+                const signTonConnect = signTonConnectOver(
+                    sdk,
+                    account.id,
+                    undefined,
+                    t,
+                    checkTouchId
+                );
                 const timestamp = await getServerTime(api);
                 const proof = tonConnectProofPayload(
                     timestamp,

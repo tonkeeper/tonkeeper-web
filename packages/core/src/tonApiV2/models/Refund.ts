@@ -69,10 +69,15 @@ export function RefundFromJSONTyped(json: any, ignoreDiscriminator: boolean): Re
     };
 }
 
-export function RefundToJSON(value?: Refund | null): any {
+  export function RefundToJSON(json: any): Refund {
+      return RefundToJSONTyped(json, false);
+  }
+
+  export function RefundToJSONTyped(value?: Refund | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'type': value['type'],

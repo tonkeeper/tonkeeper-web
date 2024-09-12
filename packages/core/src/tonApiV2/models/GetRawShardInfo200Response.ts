@@ -18,6 +18,7 @@ import {
     BlockRawFromJSON,
     BlockRawFromJSONTyped,
     BlockRawToJSON,
+    BlockRawToJSONTyped,
 } from './BlockRaw';
 
 /**
@@ -80,10 +81,15 @@ export function GetRawShardInfo200ResponseFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-export function GetRawShardInfo200ResponseToJSON(value?: GetRawShardInfo200Response | null): any {
+  export function GetRawShardInfo200ResponseToJSON(json: any): GetRawShardInfo200Response {
+      return GetRawShardInfo200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetRawShardInfo200ResponseToJSONTyped(value?: GetRawShardInfo200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': BlockRawToJSON(value['id']),
