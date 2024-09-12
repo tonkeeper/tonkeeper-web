@@ -68,6 +68,16 @@ export const useActiveAccount = () => {
     return data;
 };
 
+export const useActiveControllableAccount = () => {
+    const data = useActiveAccount()
+    if (!isAccountControllable(data)) {
+        throw new Error('No active controllable account');
+    }
+    return data;
+};
+
+
+
 export const useActiveWallet = () => {
     const account = useActiveAccount();
     return account.activeTonWallet;

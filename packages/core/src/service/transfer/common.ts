@@ -13,12 +13,14 @@ import { Maybe } from '@ton/core/dist/utils/maybe';
 import { sign } from '@ton/crypto';
 import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
+import { AccountControllable } from '../../entries/account';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipient, TransferEstimationEvent } from '../../entries/send';
-import { BaseSigner } from '../../entries/signer';
+import { Signer } from '../../entries/signer';
 import { TonWalletStandard } from '../../entries/wallet';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
 import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
+import { getLedgerAccountPathByIndex } from '../ledger/utils';
 import { WalletContract, walletContractFromState } from '../wallet/contractService';
 
 export enum SendMode {
@@ -93,11 +95,11 @@ export const getWalletSeqNo = async (api: APIConfig, accountId: string) => {
     return seqno;
 };
 
-export const getWalletBalance = async (api: APIConfig, walletState: TonWalletStandard) => {
+export const getWalletBalance = async (api: APIConfig, rawAddress: string) => {
     const wallet = await new AccountsApi(api.tonApiV2).getAccount({
-        accountId: walletState.rawAddress
+        accountId: rawAddress
     });
-    const seqno = await getWalletSeqNo(api, walletState.rawAddress);
+    const seqno = await getWalletSeqNo(api, rawAddress);
 
     return [wallet, seqno] as const;
 };
@@ -112,10 +114,11 @@ export const seeIfTimeError = (e: unknown): e is Error => {
 };
 
 export const createTransferMessage = async (
+    account: AccountControllable,
     wallet: {
         seqno: number;
         state: TonWalletStandard;
-        signer: BaseSigner;
+        signer: Signer;
         timestamp: number;
     },
     transaction: {
@@ -127,22 +130,47 @@ export const createTransferMessage = async (
     const value =
         transaction.value instanceof BigNumber ? transaction.value.toFixed(0) : transaction.value;
     const contract = walletContractFromState(wallet.state);
+    let transfer: Cell;
 
-    const transfer = await contract.createTransferAndSignRequestAsync({
-        seqno: wallet.seqno,
-        signer: wallet.signer,
-        timeout: getTTL(wallet.timestamp),
-        sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-        messages: [
-            internal({
-                to: Address.parse(transaction.to),
-                bounce: true,
-                value: BigInt(value),
-                body: transaction.body
-            })
-        ]
-    });
+    if (wallet.signer.type === 'ledger') {
+        if (account.type !== 'ledger') {
+            throw new Error('Ledger signer can only be used with ledger accounts');
+        }
+        const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
 
+        transfer = await wallet.signer(path, {
+            to: Address.parse(transaction.to),
+            bounce: true,
+            amount: BigInt(value),
+            seqno: wallet.seqno,
+            timeout: getTTL(wallet.timestamp),
+            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+            payload: transaction.body
+                ? {
+                      type: 'unsafe',
+                      message:
+                          typeof transaction.body == 'string'
+                              ? Cell.fromBase64(transaction.body)
+                              : transaction.body
+                  }
+                : undefined
+        });
+    } else {
+        transfer = await contract.createTransferAndSignRequestAsync({
+            seqno: wallet.seqno,
+            signer: wallet.signer,
+            timeout: getTTL(wallet.timestamp),
+            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+            messages: [
+                internal({
+                    to: Address.parse(transaction.to),
+                    bounce: true,
+                    value: BigInt(value),
+                    body: transaction.body
+                })
+            ]
+        });
+    }
     return externalMessage(contract, wallet.seqno, transfer).toBoc();
 };
 
@@ -151,15 +179,15 @@ export const signEstimateMessage = async (message: Cell): Promise<Buffer> => {
 };
 signEstimateMessage.type = 'cell' as const;
 
-export async function getKeyPairAndSeqno(options: {
+export async function getAccountSeqno(options: {
     api: APIConfig;
-    walletState: TonWalletStandard;
+    rawAddress: string;
     fee: TransferEstimationEvent;
     amount: BigNumber;
 }) {
     const total = options.amount.plus(options.fee.event.extra * -1);
 
-    const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
+    const [wallet, seqno] = await getWalletBalance(options.api, options.rawAddress);
     checkWalletBalanceOrDie(total, wallet);
     return { seqno };
 }

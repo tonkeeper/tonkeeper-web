@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Account } from '@tonkeeper/core/dist/entries/account';
+import { AccountControllable, isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
-import { CellSigner } from '@tonkeeper/core/dist/entries/signer';
+import { Signer } from '@tonkeeper/core/dist/entries/signer';
 import { Omit } from 'react-beautiful-dnd';
 import { notifyError } from '../../components/transfer/common';
 import { getSigner } from '../../state/mnemonic';
@@ -15,8 +15,8 @@ import { useTranslation } from '../translation';
 
 export type ContractExecutorParams = {
     api: APIConfig;
-    account: Account;
-    signer: CellSigner;
+    account: AccountControllable;
+    signer: Signer;
     fee: TransferEstimationEvent;
 };
 
@@ -40,6 +40,9 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
     return useMutation<boolean, Error>(async () => {
+        if (!isAccountControllable(account)) {
+            return false;
+        }
         if (!args.fee) {
             return false;
         }

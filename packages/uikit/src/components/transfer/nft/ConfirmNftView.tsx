@@ -13,6 +13,7 @@ import { ListBlock } from '../../List';
 import { FullHeightBlock } from '../../Notification';
 import { notifyError } from '../common';
 
+import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
@@ -25,6 +26,7 @@ import { useTransactionAnalytics } from '../../../hooks/amplitude';
 import { QueryKey } from '../../../libs/queryKey';
 import { getSigner } from '../../../state/mnemonic';
 import { useCheckTouchId } from '../../../state/password';
+import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../../state/wallet';
 import { Image, ImageMock, Info, SendingTitle, Title } from '../Confirm';
 import {
     ConfirmViewContext,
@@ -33,12 +35,6 @@ import {
     ConfirmViewDetailsRecipient
 } from '../ConfirmView';
 import { NftDetailsBlock } from './Common';
-import {
-    useActiveAccount,
-    useActiveStandardTonWallet,
-    useInvalidateActiveWalletQueries
-} from '../../../state/wallet';
-import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -49,14 +45,24 @@ const useNftTransferEstimation = (nftItem: NftItem, data?: TonRecipientData) => 
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useActiveStandardTonWallet();
+    const account = useActiveAccount();
     const client = useQueryClient();
 
     return useQuery<TransferEstimation<TonAsset>, Error>(
         [QueryKey.estimate, data?.address],
         async () => {
             try {
-                const payload = await estimateNftTransfer(api, wallet, data!, nftItem);
+                if (!isAccountControllable(account)) {
+                    throw new Error('account not controllable');
+                }
+
+                const payload = await estimateNftTransfer(
+                    api,
+                    account,
+                    account.activeTonWallet,
+                    data!,
+                    nftItem
+                );
                 const fee = new AssetAmount({
                     asset: TON_ASSET,
                     weiAmount: payload.event.extra * -1
