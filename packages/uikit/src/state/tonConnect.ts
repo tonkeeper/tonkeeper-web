@@ -210,7 +210,9 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
         if (sdk.notifications) {
             await Promise.all(
                 connectionsToDisconnect.map(c =>
-                    sdk.notifications?.unsubscribeTonConnect(c.clientSessionId)
+                    sdk.notifications
+                        ?.unsubscribeTonConnect(c.clientSessionId)
+                        .catch(e => console.warn(e))
                 )
             );
         }

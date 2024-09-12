@@ -1,17 +1,18 @@
-import { styled } from 'styled-components';
-import {
-    useDisconnectTonConnectApp,
-    useActiveWalletTonConnectConnections
-} from '../../state/tonConnect';
-import { Body2, Body3, Label2 } from '../Text';
+import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { FC, useState } from 'react';
+import { styled } from 'styled-components';
+import { useTranslation } from '../../hooks/translation';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import {
+    useActiveWalletTonConnectConnections,
+    useDisconnectTonConnectApp
+} from '../../state/tonConnect';
+import { ListBlock, ListItem } from '../List';
+import { Loading } from '../Loading';
+import { Body2, Body3, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ConfirmDisconnectNotification } from './ConfirmDisconnectNotification';
-import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { formatDappUrl } from './utils';
-import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { ListBlock, ListItem } from '../List';
-import { useTranslation } from '../../hooks/translation';
 
 const DesktopListContainer = styled.ul`
     padding: 0;
@@ -88,25 +89,29 @@ const DisconnectButton = styled(Button)`
 
 export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
-    const { data: connections } = useActiveWalletTonConnectConnections();
+    const { data: connections, refetch } = useActiveWalletTonConnectConnections();
     const [modalData, setModalData] = useState<AccountConnection | undefined | 'all'>();
-    const { mutate: disconnectDapp } = useDisconnectTonConnectApp();
+    const { mutateAsync: disconnectDapp, isLoading } = useDisconnectTonConnectApp();
     const isFullWidthMode = useIsFullWidthMode();
 
-    const onCloseModal = (isConfirmed?: boolean) => {
+    const onCloseModal = async (isConfirmed?: boolean) => {
         if (isConfirmed) {
             if (modalData === 'all') {
-                disconnectDapp('all');
+                await disconnectDapp('all');
             } else {
-                disconnectDapp(modalData!);
+                await disconnectDapp(modalData!);
             }
+            await refetch();
         }
-
         setModalData(undefined);
     };
 
     if (!connections) {
-        return null;
+        return (
+            <FullHeightContainer className={className}>
+                <Loading />
+            </FullHeightContainer>
+        );
     }
 
     if (!connections.length) {
@@ -124,6 +129,7 @@ export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => 
             <List connections={connections} onDisconnect={setModalData} className={className} />
             <ConfirmDisconnectNotification
                 isOpen={!!modalData}
+                isLoading={isLoading}
                 onClose={onCloseModal}
                 app={
                     !!modalData && typeof modalData === 'object'
