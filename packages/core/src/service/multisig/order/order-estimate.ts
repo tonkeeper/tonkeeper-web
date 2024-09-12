@@ -33,7 +33,7 @@ export async function estimateExistingOrder({
         throw new Error('Order data not found');
     }
 
-    const orderBodyCell = Cell.fromBase64(orderBodyData);
+    const orderBodyCell = Cell.fromBoc(Buffer.from(orderBodyData, 'hex'))[0];
 
     return estimateOrderByBodyCell({
         api,
@@ -181,31 +181,28 @@ export function hideMultisigCallFromEstimation(
     multisigAddress: string,
     estimation: { event: AccountEvent }
 ) {
-    const firstAction = estimation.event.actions[0];
-
-    if (
-        firstAction?.type === 'SmartContractExec' &&
-        'smartContractExec' in firstAction &&
-        firstAction.smartContractExec
-    ) {
-        const eventInfo = firstAction.smartContractExec as {
-            contract: {
-                address: string;
-            };
-            operation: 'MultisigExecute';
-        };
+    const actions = estimation.event.actions.filter(action => {
         if (
-            eventInfo.operation === 'MultisigExecute' &&
-            eventInfo.contract.address === multisigAddress
+            action.type === 'SmartContractExec' &&
+            'smartContractExec' in action &&
+            action.smartContractExec
         ) {
-            return {
-                event: {
-                    ...estimation.event,
-                    actions: estimation.event.actions.slice(1)
-                }
+            const eventInfo = action.smartContractExec as {
+                contract: {
+                    address: string;
+                };
+                operation: 'MultisigExecute';
             };
+            if (
+                eventInfo.operation === 'MultisigExecute' &&
+                eventInfo.contract.address === multisigAddress
+            ) {
+                return false;
+            }
         }
-    }
 
-    return estimation;
+        return true;
+    });
+
+    return { ...estimation, event: { ...estimation.event, actions } };
 }

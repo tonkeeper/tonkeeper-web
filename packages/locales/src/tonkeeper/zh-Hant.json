@@ -1,0 +1,25 @@
+{
+  "about_risk_modal" : {
+    "description" : "將從您的錢包發送的代幣總價值。退款不包含在總價值中。",
+    "description_with_nft" : "將從您的錢包發送的代幣總價值，不包括 NFT 的成本。退款不包含在總價值中。",
+    "ok_button" : "確定"
+  },
+  "about_ton" : "TON 是由 Telegram 設計的完全去中心化的第一層區塊鏈，由於它擁有超快的交易速度、極低的費用、易於使用的應用程序，而且對環境友好，吸引了數十億用戶。",
+  "access_confirmation_logout" : "登出",
+  "access_confirmation_reset" : "重置",
+  "access_confirmation_title" : "輸入密碼",
+  "access_confirmation_update_biometry" : "輸入密碼以使用生物辨識身份驗證數據",
+  "access_denied" : "訪問被禁止",
+  "account_deleted" : "帳戶已刪除",
+  "activityActionModal" : {
+    "bid" : "出價",
+    "burned" : "燒毀",
+    "call_contract" : "呼叫合約",
+    "deposit" : "質押",
+    "purchase" : "購買",
+    "received" : "已收到",
+    "sent" : "發送",
+    "swapped" : "交換了",
+    "time_on" : "於{time}"
+  }
+}

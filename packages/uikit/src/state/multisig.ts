@@ -144,18 +144,24 @@ export const useIsActiveAccountMultisig = () => {
     return account.type === 'ton-multisig';
 };
 
+export const useActiveMultisigAccountHost = () => {
+    const activeAccount = useActiveAccount();
+    const accounts = useAccountsState();
+    return getMultisigSignerInfo(accounts, activeAccount as AccountTonMultisig);
+};
+
 export const useOrderInfo = (order: MultisigOrder) => {
     const status = orderStatus(order);
-    const signed = order.approvalsNum;
     const total = order.threshold;
     const renderTimeSeconds = useRef(Math.round(Date.now() / 1000));
     const secondsLeft = useCountdown(order.expirationDate - renderTimeSeconds.current);
 
     return {
         status,
-        signed,
         total,
-        secondsLeft
+        secondsLeft,
+        signedWallets: order.signers, // TODO,
+        pendingWallets: order.signers // TODO
     };
 };
 

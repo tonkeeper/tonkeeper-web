@@ -75,18 +75,19 @@ export async function sendCreateOrder(options: {
 
 export async function signOrder(options: {
     api: APIConfig;
-    walletState: TonWalletStandard;
+    hostWallet: TonWalletStandard;
     multisig: Pick<Multisig, 'signers'>;
     orderAddress: string;
     signer: CellSigner;
 }) {
-    const addrIdx = options.multisig.signers.indexOf(options.walletState.rawAddress);
+    const addrIdx = options.multisig.signers.indexOf(options.hostWallet.rawAddress);
     if (addrIdx === -1) {
         throw new Error('Sender is not a signer');
     }
 
     const { seqno } = await getWalletSeqnoAndCheckBalance({
         ...options,
+        walletState: options.hostWallet,
         amount: BigNumber(signOrderAmount.toString())
     });
 
@@ -99,7 +100,7 @@ export async function signOrder(options: {
 
     const boc = await createTransferMessage(
         {
-            state: options.walletState,
+            state: options.hostWallet,
             timestamp: await getServerTime(options.api),
             seqno,
             signer: options.signer

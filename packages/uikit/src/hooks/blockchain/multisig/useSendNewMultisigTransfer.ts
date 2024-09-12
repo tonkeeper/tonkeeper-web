@@ -9,20 +9,15 @@ import { sendMultisigTonTransfer } from '@tonkeeper/core/dist/service/transfer/t
 import { useTranslation } from '../../translation';
 import { useAppSdk } from '../../appSdk';
 import { useAppContext } from '../../appContext';
-import {
-    useAccountsState,
-    useActiveAccount,
-    useInvalidateActiveWalletQueries
-} from '../../../state/wallet';
+import { useInvalidateActiveWalletQueries } from '../../../state/wallet';
 import { useTransactionAnalytics } from '../../amplitude';
 import { useJettonList } from '../../../state/jetton';
 import { useCheckTouchId } from '../../../state/password';
 import { getSigner } from '../../../state/mnemonic';
-import { getMultisigSignerInfo, useActiveMultisigWalletInfo } from '../../../state/multisig';
+import { useActiveMultisigAccountHost, useActiveMultisigWalletInfo } from '../../../state/multisig';
 import { MultisigOrderLifetimeMinutes } from '../../../libs/multisig';
 import { useAsyncQueryData } from '../../useAsyncQueryData';
 import { notifyError } from '../../../components/transfer/common';
-import { AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
 
 export function useSendNewMultisigTransfer(
     recipient: TonRecipientData,
@@ -34,8 +29,7 @@ export function useSendNewMultisigTransfer(
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const activeAccount = useActiveAccount();
-    const accounts = useAccountsState();
+    const { signerWallet, signerAccount } = useActiveMultisigAccountHost();
     const { data: multisigInfoData } = useActiveMultisigWalletInfo();
     const multisigInfoPromise = useAsyncQueryData(multisigInfoData);
     const client = useQueryClient();
@@ -48,10 +42,6 @@ export function useSendNewMultisigTransfer(
         try {
             const ttlSeconds = Number(ttl) * 60;
 
-            const { signerWallet, signerAccount } = getMultisigSignerInfo(
-                accounts,
-                activeAccount as AccountTonMultisig
-            );
             const signer = await getSigner(sdk, signerAccount.id, checkTouchId).catch(() => null);
             if (signer === null || signer.type !== 'cell') {
                 throw new Error('Signer not found');

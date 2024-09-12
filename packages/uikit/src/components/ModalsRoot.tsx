@@ -6,6 +6,7 @@ import { RenameNotificationControlled } from './modals/RenameNotificationControl
 import { RecoveryNotificationControlled } from './modals/RecoveryNotificationControlled';
 import { AddWalletNotificationControlled } from './modals/AddWalletNotificationControlled';
 import { ConfirmDiscardNotificationControlled } from './modals/ConfirmDiscardNotificationControlled';
+import { MultisigOrderNotificationControlled } from './modals/MultisigOrderNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -18,6 +19,7 @@ export const ModalsRoot = () => {
             <RecoveryNotificationControlled />
             <AddWalletNotificationControlled />
             <ConfirmDiscardNotificationControlled />
+            <MultisigOrderNotificationControlled />
         </>
     );
 };

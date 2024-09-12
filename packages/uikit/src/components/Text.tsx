@@ -108,3 +108,7 @@ export const Num3 = styled.span`
     font-size: 24px;
     line-height: 32px;
 `;
+
+export const Mono = styled.span`
+    font-family: ${p => p.theme.fontMono};
+`;

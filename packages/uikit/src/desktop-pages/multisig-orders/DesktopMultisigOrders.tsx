@@ -11,7 +11,7 @@ import {
     useOrderInfo
 } from '../../state/multisig';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Button } from '../../components/fields/Button';
 
 import { styled } from 'styled-components';
@@ -26,6 +26,9 @@ import { ArrowUpIcon } from '../../components/Icon';
 import { toNano } from '@ton/core';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { useMultisigOrderNotification } from '../../components/modals/MultisigOrderNotificationControlled';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { useDateTimeFormatFromNow } from '../../hooks/useDateTimeFormat';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -65,10 +68,23 @@ const DesktopMultisigOrdersPageBody = () => {
 };
 
 export const ManageExistingMultisigOrders: FC<{ multisig: Multisig }> = ({ multisig }) => {
+    const { t } = useTranslation();
+
+    const sortedOrders = useMemo(
+        () => multisig.orders.sort((a, b) => a.expirationDate - b.expirationDate), // TODO
+        [multisig.orders]
+    );
+
     return (
         <OrdersGrid>
             <RowDivider />
-            {multisig.orders.map(order => (
+            <TH>{t('multisig_orders_th_created')}</TH>
+            <TH>{t('multisig_orders_th_status')}</TH>
+            <TH>{t('multisig_orders_th_signatures')}</TH>
+            <AmountTH>{t('multisig_orders_th_send')}</AmountTH>
+            <TH />
+            <RowDivider />
+            {sortedOrders.map(order => (
                 <OrderRow key={order.orderSeqno} order={order} />
             ))}
         </OrdersGrid>
@@ -77,7 +93,7 @@ export const ManageExistingMultisigOrders: FC<{ multisig: Multisig }> = ({ multi
 
 const OrdersGrid = styled.div`
     display: grid;
-    grid-template-columns: minmax(96px, auto) minmax(134px, auto) minmax(134px, auto) 1fr auto;
+    grid-template-columns: minmax(128px, auto) minmax(96px, auto) minmax(70px, auto) 1fr auto;
     column-gap: 0.5rem;
     padding: 0 1rem;
 `;
@@ -91,58 +107,58 @@ const RowDivider = styled.div`
 
 const OrderRow: FC<{ order: MultisigOrder }> = ({ order }) => {
     const { t } = useTranslation();
-    const { status, signed, total, secondsLeft } = useOrderInfo(order);
+    const { status, signedWallets, secondsLeft, total } = useOrderInfo(order);
+    const { onOpen: onView } = useMultisigOrderNotification();
+    const formattedDate = useDateTimeFormatFromNow(order.expirationDate * 1000); // TODO
+
+    const sdk = useAppSdk();
+    const { config } = useAppContext();
+
+    const onOpenTonviewer = (address: string) => {
+        const explorerUrl = config.accountExplorer ?? 'https://tonviewer.com/%s';
+
+        sdk.openPage(explorerUrl.replace('%s', formatAddress(address)));
+    };
+
     return (
         <>
+            <ExpirationDateCell>{formattedDate}</ExpirationDateCell>
             {status === 'progress' ? (
                 <TimeCell>{toTimeLeft(secondsLeft * 1000)}</TimeCell>
             ) : (
                 <StatusCell>{t('multisig_status_' + status)}</StatusCell>
             )}
-            <ActionCell risk={order.risk} />
             <Cell>
                 {t('multisig_signed_value')
-                    .replace(/%?\{signed}/, signed.toString())
+                    .replace(/%?\{signed}/, signedWallets.length.toString())
                     .replace(/%?\{total}/, total.toString())}
             </Cell>
             <AmountCell risk={order.risk} />
-            <Cell>
-                <Button primary={status === 'progress'} secondary={status !== 'progress'}>
+            <ButtonCell>
+                <Button
+                    primary={status === 'progress'}
+                    secondary={status !== 'progress'}
+                    onClick={() => {
+                        if (status === 'expired') {
+                            onOpenTonviewer(order.address);
+                        } else {
+                            onView({ orderAddress: order.address });
+                        }
+                    }}
+                >
                     {t('multisig_order_view')}
                 </Button>
-            </Cell>
+            </ButtonCell>
             <RowDivider />
         </>
     );
 };
 
 const ArrowUpIconStyled = styled(ArrowUpIcon)`
-    color: ${p => p.theme.textPrimary};
+    color: ${p => p.theme.iconSecondary};
+    margin-right: 2px;
+    flex-shrink: 0;
 `;
-
-const ActionCell: FC<{ risk: Risk }> = ({ risk }) => {
-    const { t } = useTranslation();
-    const displayTonLimit = toNano(1.05);
-
-    let text;
-    switch (true) {
-        case risk.jettons?.length && risk.ton > displayTonLimit:
-            text = t('order_send_token_and_ton');
-            break;
-        case !!risk.jettons?.length:
-            text = t('order_send_token');
-            break;
-        default:
-            text = t('order_send_ton');
-    }
-
-    return (
-        <ActionCellContainer>
-            <ArrowUpIconStyled />
-            <Body2>{text}</Body2>
-        </ActionCellContainer>
-    );
-};
 
 const Cell = styled.div`
     display: flex;
@@ -152,9 +168,25 @@ const Cell = styled.div`
     ${Body2Class};
 `;
 
+const TH = styled(Body2)`
+    color: ${p => p.theme.textSecondary};
+    padding: 8px 0;
+`;
+
+const AmountTH = styled(TH)`
+    text-align: right;
+`;
+
+const ExpirationDateCell = styled(Cell)`
+    color: ${p => p.theme.textSecondary};
+`;
+
+const ButtonCell = styled(Cell)`
+    margin-left: 8px;
+`;
+
 const AmountCellContainer = styled(Cell)`
     justify-content: flex-end;
-    margin-right: 8px;
     overflow: hidden;
 `;
 
@@ -185,6 +217,7 @@ const AmountCell: FC<{ risk: Risk }> = ({ risk }) => {
     if (risk.jettons?.length && risk.ton > displayTonLimit) {
         return (
             <AmountCellContainer>
+                <ArrowUpIconStyled />
                 <AmountValueText>
                     {getTonText()} {getJettonsText()}
                 </AmountValueText>
@@ -195,6 +228,7 @@ const AmountCell: FC<{ risk: Risk }> = ({ risk }) => {
     if (risk.jettons?.length) {
         return (
             <AmountCellContainer>
+                <ArrowUpIconStyled />
                 <AmountValueText>{getJettonsText()}</AmountValueText>
             </AmountCellContainer>
         );
@@ -202,17 +236,11 @@ const AmountCell: FC<{ risk: Risk }> = ({ risk }) => {
 
     return (
         <AmountCellContainer>
+            <ArrowUpIconStyled />
             <AmountValueText>{getTonText()}</AmountValueText>
         </AmountCellContainer>
     );
 };
-
-const ActionCellContainer = styled(Cell)`
-    display: flex;
-    gap: 6px;
-    color: ${p => p.theme.textPrimary};
-    align-items: center;
-`;
 
 const TimeCell = styled(Cell)`
     font-family: ${p => p.theme.fontMono};
