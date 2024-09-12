@@ -8,15 +8,74 @@ export class TwaStorage implements IStorage {
         this.cloudStorage = initCloudStorage();
     }
 
+    private timeout = 500;
+
+    private stringToHash(string: string) {
+        let hash = 0;
+
+        if (string.length === 0) {
+            throw new Error('Unexpected string');
+        }
+
+        for (const char of string) {
+            hash ^= char.charCodeAt(0); // Bitwise XOR operation
+        }
+
+        return String(hash);
+    }
+
+    private innerGet = async <R>(key: string) => {
+        try {
+            return await this.cloudStorage.get(key, { timeout: this.timeout });
+        } catch (e) {
+            if (e instanceof Error && e.message.startsWith('Timeout')) {
+                return await this.cloudStorage.get(this.stringToHash(key), {
+                    timeout: this.timeout
+                });
+            } else {
+                throw e;
+            }
+        }
+    };
+
+    private innerGetWithKey = async <R>(key: string) => {
+        try {
+            return [await this.cloudStorage.get(key, { timeout: this.timeout }), key] as const;
+        } catch (e) {
+            if (e instanceof Error && e.message.startsWith('Timeout')) {
+                return [
+                    await this.cloudStorage.get(this.stringToHash(key), { timeout: this.timeout }),
+                    this.stringToHash(key)
+                ] as const;
+            } else {
+                throw e;
+            }
+        }
+    };
+
+    private innerSet = async <R>(key: string, payload: string) => {
+        try {
+            await this.cloudStorage.set(key, payload, { timeout: this.timeout });
+        } catch (e) {
+            if (e instanceof Error && e.message.startsWith('Timeout')) {
+                return await this.cloudStorage.set(this.stringToHash(key), payload, {
+                    timeout: this.timeout
+                });
+            } else {
+                throw e;
+            }
+        }
+    };
+
     get = async <R>(key: string) => {
-        const value = await this.cloudStorage.get(key, { timeout: 1000 });
+        const value = await this.innerGet(key);
         if (!value) return null;
         const { payload } = JSON.parse(value) as { payload: R };
         return payload;
     };
 
     set = async <R>(key: string, payload: R) => {
-        await this.cloudStorage.set(key, JSON.stringify({ payload }));
+        await this.innerSet(key, JSON.stringify({ payload }));
         return payload;
     };
 
@@ -28,10 +87,10 @@ export class TwaStorage implements IStorage {
     };
 
     delete = async <R>(key: string) => {
-        const payload = await this.get<R>(key);
-        if (payload != null) {
-            await this.cloudStorage.delete([key]);
-        }
+        const [value, innerKey] = await this.innerGetWithKey(key);
+        if (!value) return null;
+        await this.cloudStorage.delete([innerKey]);
+        const { payload } = JSON.parse(value) as { payload: R };
         return payload;
     };
 
