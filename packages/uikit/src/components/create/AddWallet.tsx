@@ -3,7 +3,10 @@ import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, ImportRoute } from '../../libs/routes';
+import { PlusIcon } from '../Icon';
 import { Body2, Body3Class, Label1, Label2Class } from '../Text';
+import { Badge } from '../shared';
+import { BorderSmallResponsive } from '../shared/Styles';
 import {
     ImportIcon,
     KeystoneIcon,
@@ -12,9 +15,6 @@ import {
     SignerIcon,
     WatchOnlyIcon
 } from './ImportIcons';
-import { BorderSmallResponsive } from '../shared/Styles';
-import { PlusIcon } from '../Icon';
-import { Badge } from '../shared';
 
 const AddMethod = styled.button`
     display: flex;
@@ -63,6 +63,7 @@ const AddMethodLabel = styled(Label1)`
     display: flex;
     align-items: center;
     gap: 4px;
+    color: ${p => p.theme.textPrimary};
     ${p => p.theme.displayType === 'full-width' && Label2Class}
 `;
 
