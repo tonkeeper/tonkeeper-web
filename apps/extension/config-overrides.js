@@ -24,8 +24,8 @@ module.exports = function override(config, env) {
         'react-i18next': path.resolve(__dirname, './node_modules/react-i18next'),
         '@tanstack/react-query': path.resolve(__dirname, './node_modules/@tanstack/react-query'),
         '@ton/crypto/dist/mnemonic/mnemonic': path.resolve(
-          __dirname,
-          '../../packages/core/node_modules/@ton/crypto/dist/mnemonic/mnemonic'
+            __dirname,
+            '../../packages/core/node_modules/@ton/crypto/dist/mnemonic/mnemonic'
         )
     };
 
@@ -34,7 +34,6 @@ module.exports = function override(config, env) {
         ...config.plugins,
         new webpack.ProvidePlugin({
             process: 'process/browser',
-            crypto: 'crypto-browserify',
             Buffer: ['buffer', 'Buffer']
         })
     ];
