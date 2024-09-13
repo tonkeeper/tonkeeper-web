@@ -7,6 +7,7 @@ import { RecoveryNotificationControlled } from './modals/RecoveryNotificationCon
 import { AddWalletNotificationControlled } from './modals/AddWalletNotificationControlled';
 import { ConfirmDiscardNotificationControlled } from './modals/ConfirmDiscardNotificationControlled';
 import { MultisigOrderNotificationControlled } from './modals/MultisigOrderNotificationControlled';
+import { MultisigChangeConfigNotificationControlled } from './modals/MultisigChangeConfigNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -20,6 +21,7 @@ export const ModalsRoot = () => {
             <AddWalletNotificationControlled />
             <ConfirmDiscardNotificationControlled />
             <MultisigOrderNotificationControlled />
+            <MultisigChangeConfigNotificationControlled />
         </>
     );
 };

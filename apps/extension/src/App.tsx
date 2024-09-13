@@ -33,7 +33,7 @@ import {
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
+import { I18nContext, TranslationContext, useTWithReplaces } from "@tonkeeper/uikit/dist/hooks/translation";
 import { AppRoute, SettingsRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -103,9 +103,11 @@ const TARGET_ENV = 'extension';
 connectToBackground();
 
 export const App: FC = () => {
+    const t = useTWithReplaces(browser.i18n.getMessage);
+
     const translation = useMemo(() => {
         const client: I18nContext = {
-            t: browser.i18n.getMessage,
+            t,
             i18n: {
                 enable: false,
                 reloadResources: async () => {},
@@ -115,7 +117,7 @@ export const App: FC = () => {
             }
         };
         return client;
-    }, []);
+    }, [t]);
 
     return (
         <QueryClientProvider client={queryClient}>

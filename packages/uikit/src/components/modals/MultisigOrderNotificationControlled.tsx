@@ -5,7 +5,7 @@ import {
     NotificationFooterPortal
 } from '../Notification';
 import { createModalControl } from './createModalControl';
-import React, { FC, useLayoutEffect } from 'react';
+import React, { FC, useLayoutEffect, useMemo } from 'react';
 import { useTranslation } from '../../hooks/translation';
 import { useAtom } from '../../libs/atom';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -25,6 +25,11 @@ import {
     useActiveMultisigWalletInfo,
     useOrderInfo
 } from '../../state/multisig';
+import { MultisigConfigDiff } from '../multisig/MultisigConfigDiff';
+import { Address } from '@ton/core';
+import { BorderSmallResponsive } from '../shared/Styles';
+import { useNavigate } from 'react-router-dom';
+import { AppRoute } from '../../libs/routes';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -71,6 +76,14 @@ const AlreadySignedButton = styled(ResultButton)`
     }
 `;
 
+const MultisigConfigDiffStyled = styled(MultisigConfigDiff)`
+    background-color: ${p => p.theme.backgroundContent};
+    padding: 8px 12px;
+    ${BorderSmallResponsive};
+    width: 100%;
+    box-sizing: border-box;
+`;
+
 const NotificationContentMultisigProvider: FC<{
     orderAddress: MultisigOrder['address'];
     handleClose: () => void;
@@ -94,12 +107,12 @@ const NotificationContent: FC<{
 
     const { t } = useTranslation();
     const orderInfo = useOrderInfo(order);
+    const { data: multisig } = useActiveMultisigWalletInfo();
     const { signerWallet } = useActiveMultisigAccountHost();
 
     const {
         mutate: estimate,
         data: estimation,
-        isLoading: isEstimating,
         isError
     } = useEstimateExisitingMultisigOrder(order.address);
     const {
@@ -109,11 +122,16 @@ const NotificationContent: FC<{
         data: sendResult
     } = useSendExisitingMultisigOrder(order.address);
 
+    const navigate = useNavigate();
+
     const onSubmit = async () => {
         try {
             await mutateAsync();
             sdk.hapticNotification('success');
-            setTimeout(() => handleClose(), 300);
+            setTimeout(() => {
+                handleClose();
+                navigate(AppRoute.activity);
+            }, 300);
         } catch (e) {
             setTimeout(() => handleClose(), 3000);
             console.error(e);
@@ -124,7 +142,19 @@ const NotificationContent: FC<{
         estimate();
     }, [estimate, order.address]);
 
-    if (isEstimating) {
+    const currentConfig = useMemo(() => {
+        if (!multisig) {
+            return undefined;
+        }
+
+        return {
+            proposers: [] as Address[],
+            signers: multisig.signers.map(v => Address.parse(v)),
+            threshold: multisig.threshold
+        };
+    }, [multisig]);
+
+    if (!estimation || !multisig || !currentConfig) {
         return <NotificationSkeleton handleClose={handleClose} />;
     }
 
@@ -195,10 +225,15 @@ const NotificationContent: FC<{
 
     return (
         <NotificationBlock>
-            <EmulationList
-                isError={isError}
-                estimate={estimation ? { accountEvent: estimation } : undefined}
-            />
+            {estimation.type === 'transfer' && (
+                <EmulationList isError={isError} estimate={{ accountEvent: estimation }} />
+            )}
+            {estimation?.type === 'update' && (
+                <MultisigConfigDiffStyled
+                    prevConfig={currentConfig}
+                    newConfig={estimation.config}
+                />
+            )}
             <MultisigTransferDetails
                 {...orderInfo}
                 hostAddress={signerWallet.rawAddress}

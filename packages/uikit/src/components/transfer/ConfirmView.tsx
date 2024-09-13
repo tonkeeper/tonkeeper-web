@@ -72,6 +72,7 @@ export function useConfirmViewContext() {
 
 type ConfirmViewProps<T extends Asset> = PropsWithChildren<
     {
+        className?: string;
         recipient?: RecipientData;
         assetAmount: AssetAmount<T>;
         onBack?: () => void;
@@ -97,6 +98,7 @@ export function ConfirmView<T extends Asset = Asset>({
     onClose,
     assetAmount,
     fitContent,
+    className,
     ...mutation
 }: ConfirmViewProps<T>) {
     const { mutateAsync, isLoading, reset } = mutation;
@@ -195,6 +197,7 @@ export function ConfirmView<T extends Asset = Asset>({
                 onSubmit={onSubmit}
                 standalone={standalone}
                 fitContent={fitContent}
+                className={className}
             >
                 {titleBlock}
                 {heading}

@@ -7,9 +7,14 @@ import {
     MultisigOrder
 } from '../../../tonApiV2';
 import { MAX_ORDER_SEQNO, NewOrder, packOrderBody } from './order-utils';
-import { Address, beginCell, Cell, toNano, storeMessage } from '@ton/core';
+import { Address, beginCell, Cell, toNano, storeMessage, Dictionary } from '@ton/core';
 import { arrayToCell, MultisigOp, MultisigParams } from '../utils';
 import { bufferToBigInt } from '../../../utils/common';
+import { MultisigConfig } from '../deploy';
+
+export type OrderEstimation =
+    | { type: 'transfer'; event: AccountEvent }
+    | { type: 'update'; config: Omit<MultisigConfig, 'allowArbitrarySeqno'> };
 
 export async function estimateExistingOrder({
     api,
@@ -19,7 +24,7 @@ export async function estimateExistingOrder({
     api: APIConfig;
     multisig: Pick<Multisig, 'address' | 'signers' | 'threshold'>;
     order: Pick<MultisigOrder, 'orderSeqno' | 'address' | 'expirationDate'>;
-}) {
+}): Promise<OrderEstimation> {
     const result = await new BlockchainApi(api.tonApiV2).execGetMethodForBlockchainAccount({
         accountId: order.address,
         methodName: 'get_order_data'
@@ -35,13 +40,67 @@ export async function estimateExistingOrder({
 
     const orderBodyCell = Cell.fromBoc(Buffer.from(orderBodyData, 'hex'))[0];
 
-    return estimateOrderByBodyCell({
+    const dict = orderBodyCell
+        .beginParse()
+        .loadDictDirect(Dictionary.Keys.Uint(8), Dictionary.Values.Cell());
+
+    /**
+     *     return beginCell()
+     *         .storeUint(MultisigOp.actions.update_multisig_params, MultisigParams.bitsize.op)
+     *         .storeUint(update.threshold, MultisigParams.bitsize.signerIndex)
+     *         .storeRef(beginCell().storeDictDirect(arrayToCell(update.signers)))
+     *         .storeDict(arrayToCell(update.proposers))
+     *         .endCell();
+     */
+    const dictKeys = dict.keys();
+    for (const key of dictKeys) {
+        const val = dict.get(key);
+        const action = val!.beginParse();
+        const op = action.loadUint(MultisigParams.bitsize.op);
+        if (op === MultisigOp.actions.update_multisig_params) {
+            if (dictKeys.length > 1) {
+                throw new Error('Only one update action emulation is supported');
+            }
+
+            const threshold = action.loadUint(MultisigParams.bitsize.signerIndex);
+            const signers = action
+                .loadRef()
+                .beginParse()
+                .loadDictDirect(Dictionary.Keys.Uint(8), Dictionary.Values.Address())
+                .values();
+            const proposers = action
+                .loadDict(Dictionary.Keys.Uint(8), Dictionary.Values.Address())
+                .values();
+
+            if (proposers.length !== 0) {
+                throw new Error('Proposers emulation is not supported');
+            }
+
+            return {
+                type: 'update',
+                config: {
+                    threshold,
+                    signers,
+                    proposers
+                }
+            };
+        }
+    }
+
+    let emulation = await estimateOrderByBodyCell({
         api,
         orderBodyCell,
         multisig,
         orderValidUntilSeconds: Number(orderValidUntilSeconds),
         orderSeqno: Number(orderSeqno)
     });
+
+    emulation = hideMultisigCallFromEstimation(multisig.address, emulation);
+
+    return {
+        type: 'transfer',
+        ...emulation
+    };
 }
 
 export async function estimateNewOrder(options: {
@@ -51,11 +110,13 @@ export async function estimateNewOrder(options: {
 }) {
     const orderBodyCell = packOrderBody(options.order.actions);
 
-    return estimateOrderByBodyCell({
+    const estimation = await estimateOrderByBodyCell({
         ...options,
         orderBodyCell,
         orderValidUntilSeconds: options.order.validUntilSeconds
     });
+
+    return hideMultisigCallFromEstimation(options.multisig.address, estimation);
 }
 
 async function estimateOrderByBodyCell(options: {
@@ -165,16 +226,6 @@ async function estimateOrderByBodyCell(options: {
     });
 
     return { event };
-}
-
-export function orderConfigToCell(config: {
-    multisigAddress: string;
-    orderSeqno: number | bigint;
-}): Cell {
-    return beginCell()
-        .storeAddress(Address.parse(config.multisigAddress))
-        .storeUint(config.orderSeqno, MultisigParams.bitsize.orderSeqno)
-        .endCell();
 }
 
 export function hideMultisigCallFromEstimation(

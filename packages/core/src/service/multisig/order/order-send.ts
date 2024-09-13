@@ -13,8 +13,8 @@ import BigNumber from 'bignumber.js';
 import { CellSigner } from '../../../entries/signer';
 import { createNewOrderMessage, MAX_ORDER_SEQNO, NewOrder } from './order-utils';
 
-const createOrderAmount = toNano(0.2);
-const signOrderAmount = toNano(0.1);
+const createOrderAmount = toNano(0.05);
+const signOrderAmount = toNano(0.05);
 
 export async function sendCreateOrder(options: {
     api: APIConfig;

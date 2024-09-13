@@ -1,0 +1,14 @@
+{
+  "add_wallet_modal_mam_subtitle" : "使用單一的秘密助記詞管理多個錢包",
+  "check_words_caption" : "為了檢查您是否正確寫下了助記詞，請輸入第 %1%、%2% 和 %3% 個單詞。",
+  "I_have_a_backup_copy_of_recovery_phrase" : "我有一份助記詞的備份",
+  "import_multisend_error_invalid_amount" : "無效的轉移數量",
+  "import_multisend_table_heading_amount" : "數量",
+  "logout_on_unlock_many" : "這將會刪除您的所有錢包金鑰。請確保您已備份您的助記詞。",
+  "logout_on_unlock_one" : "這將會刪除您的錢包金鑰。請確保您已備份您的助記詞。",
+  "mam_account_explanation" : "帳戶助記詞可用於訪問所有使用它創建的錢包，並且僅在 Tonkeeper Pro 中受支持。如果您想導出特定錢包，請改用錢包助記詞備份。",
+  "multi_send_save_description" : "儲存包含地址、金額和評論的列表以供將來使用。",
+  "secret_words_account_title" : "您的帳戶助記詞",
+  "swap_enter_amount" : "輸入數量",
+  "swap_minimum_received_tooltip" : "交易完成後您保證收到的最低金額。"
+}

@@ -30,7 +30,7 @@ import {
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
+import { I18nContext, TranslationContext, tReplace, useTWithReplaces } from "@tonkeeper/uikit/dist/hooks/translation";
 import { AppRoute, SignerRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -41,7 +41,7 @@ import { useUserFiatQuery } from "@tonkeeper/uikit/dist/state/fiat";
 import { useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
 import { useActiveAccountQuery, useAccountsStateQuery, useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
+import React, { FC, PropsWithChildren, Suspense, useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -106,7 +106,9 @@ const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'web';
 
 export const App: FC<PropsWithChildren> = () => {
-    const { t, i18n } = useTranslation();
+    const { t: tSimple, i18n } = useTranslation();
+
+    const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
         const languages = (import.meta.env.VITE_APP_LOCALES ?? 'en').split(',');

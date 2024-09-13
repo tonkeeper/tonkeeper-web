@@ -40,7 +40,6 @@ import { MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
 import { getMultisigSignerInfo, useIsActiveAccountMultisig } from '../../state/multisig';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { MultisigOrderFormView } from '../transfer/MultisigOrderFormView';
-import { hideMultisigCallFromEstimation } from '@tonkeeper/core/dist/service/multisig/order/order-estimate';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -304,14 +303,12 @@ const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boole
                     accountId: account.activeTonWallet.rawAddress
                 });
                 const { signerWallet } = getMultisigSignerInfo(accounts, account);
-                let accountEvent = await estimateMultisigTonConnectTransfer(
+                const accountEvent = await estimateMultisigTonConnectTransfer(
                     api,
                     signerWallet,
                     multisig,
                     params
                 );
-
-                accountEvent = hideMultisigCallFromEstimation(multisig.address, accountEvent);
 
                 return { accountEvent };
             }

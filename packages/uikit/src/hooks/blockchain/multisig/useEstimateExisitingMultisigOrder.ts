@@ -1,12 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
-import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
 import { useAppContext } from '../../appContext';
 import { useActiveMultisigWalletInfo } from '../../../state/multisig';
 import { useAsyncQueryData } from '../../useAsyncQueryData';
 import { AccountEvent, AccountsApi, MultisigOrder } from '@tonkeeper/core/dist/tonApiV2';
 import {
     estimateExistingOrder,
-    hideMultisigCallFromEstimation
+    OrderEstimation
 } from '@tonkeeper/core/dist/service/multisig/order/order-estimate';
 
 export function useEstimateExisitingMultisigOrder(orderAddress: MultisigOrder['address']) {
@@ -14,7 +13,7 @@ export function useEstimateExisitingMultisigOrder(orderAddress: MultisigOrder['a
     const { data: multisigInfoData } = useActiveMultisigWalletInfo();
     const multisigInfoPromise = useAsyncQueryData(multisigInfoData);
 
-    return useMutation<TransferEstimationEvent, Error>(async () => {
+    return useMutation<OrderEstimation, Error>(async () => {
         const multisig = await multisigInfoPromise;
         if (!multisig) {
             throw new Error('Multisig not found');
@@ -48,25 +47,24 @@ export function useEstimateExisitingMultisigOrder(orderAddress: MultisigOrder['a
                     accountId: multisig.address,
                     eventId: executeOrderEvent.eventId
                 });
-            } else {
-                event = (
-                    await estimateExistingOrder({
-                        api,
-                        multisig,
-                        order
-                    })
-                ).event;
-            }
 
-            return hideMultisigCallFromEstimation(multisig.address, { event });
+                return {
+                    type: 'transfer',
+                    event
+                } as const;
+            } else {
+                return estimateExistingOrder({
+                    api,
+                    multisig,
+                    order
+                });
+            }
         }
 
-        const result = await estimateExistingOrder({
+        return estimateExistingOrder({
             api,
             multisig,
             order
         });
-
-        return hideMultisigCallFromEstimation(multisig.address, result);
     });
 }
