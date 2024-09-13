@@ -1,7 +1,7 @@
 {
   "about_risk_modal" : {
-    "description" : "Die Gesamte Summe der Token, die von Ihrem Wallet gesendet werden. Rückerstattungen sind in der Gesamtsumme nicht enthalten.",
-    "description_with_nft" : "Die Gesamte Summe der Token, die von Ihrem Wallet gesendet werden. Rückerstattungen sind in der Gesamtsumme nicht enthalten.",
+    "description" : "Das ist die gesamte Summe der Token, die von Ihrem Wallet gesendet werden. Rückerstattungen sind in der Gesamtsumme nicht enthalten.",
+    "description_with_nft" : "Das ist die gesamte Summe der Token, die von Ihrem Wallet gesendet werden. Rückerstattungen sind in der Gesamtsumme nicht enthalten.",
     "ok_button" : "OK"
   },
   "about_ton" : "TON ist eine vollständig dezentralisierte Layer-1-Blockchain, die von Telegram entwickelt wurde, um Milliarden von Benutzern zu unterstützen. Sie bietet ultraschnelle Transaktionen, geringe Gebühren, benutzerfreundliche Apps und ist umweltfreundlich.",
@@ -10,26 +10,26 @@
   "access_confirmation_title" : "Passwort eingeben",
   "access_confirmation_update_biometry" : "Geben Sie das Passwort ein, um die biometrischen Authentifizierungsdaten zu verwenden",
   "access_denied" : "Zugriff verweigert",
-  "account_deleted" : "Konto gelöscht",
+  "account_deleted" : "Das Konto wurde gelöscht",
   "activityActionModal" : {
-    "bid" : "Geboten",
+    "bid" : "Gebot",
     "burned" : "Verbrannt",
     "call_contract" : "Call Vertrag",
     "deposit" : "Einzahlung",
     "purchase" : "Kauf",
-    "received" : "Empfangen",
+    "received" : "Empfangt",
     "sent" : "Gesendet",
     "swapped" : "Getauscht",
     "time_on" : "am {time}",
     "withdraw" : "Auszahlen",
-    "withdrawal_request" : "Auszahlungs Anfrage"
+    "withdrawal_request" : "Auszahlungsanfrage"
   },
   "activity" : {
     "buy_toncoin_btn" : "Kaufe Toncoin",
     "empty_transaction_caption" : "Mach deine erste Transaktion!",
-    "empty_transaction_title" : "Der Verlauf wird hier Angezeigt",
-    "failed_transaction" : "Fehlgeschlagen",
-    "receive_btn" : "Empfang",
+    "empty_transaction_title" : "Der Verlauf wird hier angezeigt",
+    "failed_transaction" : "Transaktion fehlgeschlagt",
+    "receive_btn" : "Bitcoin empfangen",
     "received" : "Empfangen",
     "screen_title" : "Aktivität",
     "sent" : "Gesendet"
@@ -56,7 +56,7 @@
     "post_rest" : "Auf der TON-Blockchain gibt es zwei Adressarten, von denen bisher nur eine für Apps und Wallets verwendet wurde.\n\nDas EQ-Format ist am besten für Smart Contracts geeignet, die eingehende Gelder verarbeiten. Wenn ein intelligenter Vertrag noch nicht veröffentlicht ist - d.h. der Code ist nicht auf der Blockchain - dann werden die TONs, die an diese Adresse gesendet werden, an den Absender zurückgeschickt. Und das ist eine Sicherheitsfunktion: Wenn ein Fehler auftritt, werden die TONs zurückgeschickt.\n\nDas UQ-Format ist am besten für Wallets geeignet. Münzen werden nie zurückgeschickt, weil Wallets einfach dazu gedacht sind, Geld zu speichern. Jedes Wallet beginnt als einfache Adresse ohne Code auf der Blockchain. Es würde also keinen Sinn machen, wenn Münzen zurückspringen würden.\n\nIn diesem Jahr stellen wir die Wallets auf das besser geeignete UQ-Format um. Wenn Sie weiterhin Geld an eine alte EQ-Adresse senden, die Ihnen jemand gegeben hat, gibt es zwei Möglichkeiten:\n",
     "post_top" : "Bis zum Ende dieses Jahres wird das gesamte TON-Netzwerk Wallet-Adressen anders anzeigen. Die neue Adresse beginnt mit UQ anstelle von EQ. Und die letzten vier Buchstaben werden sich ebenfalls ändern. Die alte Adresse funktioniert weiterhin und leitet zur gleichen Wallet weiter. Dies hat keinerlei Auswirkungen auf die Sicherheit der in Ihrer Wallet gespeicherten Gelder.",
     "second_option" : "Es ist unwahrscheinlicher, dass das Wallet noch nie für Zahlungen verwendet wurde. Und Tonkeeper wird nächstes Jahr keine Münzen an diese Adresse senden. Sie müssen den Empfänger um eine neue UQ-Adresse bitten.",
-    "title" : "Addressen Update",
+    "title" : "Addresse ändern",
     "why_change" : "Warum ändern?",
     "your_wallet" : "Dein Wallet"
   },
@@ -89,13 +89,13 @@
     "title" : "Füge Wallet hinzu",
     "watch_only" : {
       "subtitle" : "Beobachte Wallet-Aktivitäten ohne Wiederherstellungsphrase.",
-      "title" : "Beobachtungs Account"
+      "title" : "Beobachtungskonto"
     }
   },
   "add_watch_only" : {
     "subtitle" : "Beobachte Wallet-Aktivitäten ohne Wiederherstellungsphrase. Sie werden über alle Transaktionen von diesem Wallet benachrichtigt.",
-    "title" : "Beobachtungs Account",
-    "wallet_not_found" : "Wallet addresse nicht gefunden"
+    "title" : "Beobachtungskccount",
+    "wallet_not_found" : "Wallet-Addresse nicht gefunden"
   },
   "all_regions" : "Alle Regionen",
   "appearance_accent_name" : {
@@ -106,7 +106,7 @@
     "cosmos" : "Kosmos",
     "default" : "Tonkeeper",
     "flamingo" : "Flamingo",
-    "fluid" : "Flüssig",
+    "fluid" : "Fluid",
     "galaxy" : "Galaxie",
     "iris" : "Iris",
     "marine" : "Marine",
@@ -124,18 +124,18 @@
     "accepted_at_token" : "Akzeptiert am {date}",
     "accepted_collection" : "Akzeptierte Sammlung",
     "accepted_token" : "Akzeptierter Token",
-    "approve_all" : "Alles Bestätigen",
-    "approve_collection_many" : "Bestätige eingehende Token aus der \"{collection}\" sammlung",
-    "approve_collection_one" : "Bestätige eingehendes Token aus der \"{collection}\" sammlung",
+    "approve_all" : "Alles bestätigen",
+    "approve_collection_many" : "Bestätige eingehende Token aus der \"{collection}\" -Sammlung",
+    "approve_collection_one" : "Bestätige eingehendes Token aus der \"{collection}\" -Sammlung",
     "approve_many" : "{count} eingehende Token genehmigen",
-    "approve_many.one" : "Ein Eingehendes Token Genehmigen",
+    "approve_many.one" : "Ein eingehendes Token genehmigen",
     "approve_token" : "Eingehenden Token „{name}“ genehmigen",
     "approve_two_collections" : "Eingehende Token aus \"{collection1}\", \"{collection2}\"-Sammlungen genehmigen",
     "approve_two_tokens" : "Eingehende Token \"{name1}\" und \"{name2}\" genehmigen",
     "blacklisted_collection" : "Verbotene Sammlung",
     "blacklisted_token" : "Verbotener Token",
     "decline" : "Ablehnen",
-    "declined" : "Versteckt",
+    "declined" : "Abgelehnt",
     "declined_at_collection" : "Abgelehnt am {date}",
     "declined_at_token" : "Abgelehnt am {date}",
     "details_collection" : "Sammlungsdetails",
@@ -151,8 +151,8 @@
     "move_to_declined_token" : "Token aus Wallet ausblenden",
     "name" : "Name",
     "not_spam" : "Kein Spam",
-    "pending" : "Ausstehend",
-    "show_all" : "Zeige alle",
+    "pending" : "Anhängig",
+    "show_all" : "Alle anzeigen",
     "single_token" : "Einziger Token",
     "spam" : "Spam",
     "token_copied" : "Token ID kopiert",
@@ -190,7 +190,7 @@
     "continue_button" : "Weiter",
     "p1" : "Geben Sie Ihre Wiederherstellungsphrase NIEMALS an einem anderen Ort als Tonkeeper ein, um auf Ihr Wallet zuzugreifen.",
     "p2" : "Der Tonkeeper Support wird Sie NIEMALS nach Ihrer Wiederherstellungsphrase fragen.",
-    "p3" : "JEDER mit ihrer Wiederherstellungsphrase hatt ABSOLUTEN Zugriff auf ihr Wallet und kann PROBLEMLOS all ihre Gelder stehlen.",
+    "p3" : "JEDER mit ihrer Wiederherstellungsphrase hatt ABSOLUTEN Zugriff zu ihrem Wallet und kann PROBLEMLOS all ihre Geld stehlen.",
     "title" : "ACHTUNG!"
   },
   "balances_setup_wallet" : "Wallet einrichten",
@@ -217,7 +217,7 @@
       },
       "promo" : {
         "subtitle" : "Sie Haben Glück",
-        "title" : "Geben sie ihren Promo Code ein"
+        "title" : "Geben sie ihren Aktionscode ein"
       }
     },
     "packages" : {
@@ -225,11 +225,11 @@
       "disclaimer" : "Eine Ladung deckt die durchschnittliche Transaktionsgebühr ab. Einige Transaktionen können mehr kosten.",
       "ok" : "OK",
       "refilled" : "Ihre Batterie wurde aufgeladen",
-      "refund" : "Ladungshistorie",
-      "restore" : "Einkäufe Wiederherstellen",
+      "refund" : "Rückerstattung",
+      "restore" : "Einkäufe wiederherstellen",
       "subtitle" : {
         "few" : "Nur {count} Ladungen",
-        "many" : "{count} Landungen",
+        "many" : "{count} Ladungen",
         "one" : "Nur {count} Ladung",
         "other" : "{count} Ladungen"
       },
@@ -242,15 +242,15 @@
     "please_wait" : "Bitte warten, ihre Batterie wird in den nächsten Minuten aufgeladen",
     "promocode" : {
       "apply" : "Anwenden",
-      "button" : "Aufkladen durch Promo Code",
-      "placeholder" : "Promo Code",
+      "button" : "Aufkladen durch Aktionscode",
+      "placeholder" : "Aktionscode",
       "success" : "Ihre Batterie wurde aufgeladen",
-      "title" : "Promo Code"
+      "title" : "Aktionscode"
     },
     "recharge_by_crypto" : {
-      "continue" : "Fortfahren",
+      "continue" : "Weiter",
       "other" : {
-        "subtitle" : "Menge Manuell eingeben",
+        "subtitle" : "Menge manuell eingeben",
         "title" : "Andere Menge"
       },
       "title" : "Baterie Laden",
@@ -276,20 +276,20 @@
         "other" : "≈ {count} Ladungen pro {transactionName}"
       },
       "description" : "Ausgewählte Transaktionen werden von der Tonkeeper Batterie bezahlt.",
-      "settings" : "Batterie Einstellungen",
+      "settings" : "Batterie-Einstellungen",
       "supported" : "Unterstützte Transaktionen",
       "title" : "Transaktionen",
       "types" : {
-        "jetton" : "Münzen übertragung",
-        "nft" : "NFT übertragung",
-        "swap" : "tausch",
-        "ton" : "TON übertragung"
+        "jetton" : "Münzenübertragung",
+        "nft" : "NFT-Übertragung",
+        "swap" : "tauschen",
+        "ton" : "TON-Übertragung"
       },
       "type" : {
         "swap" : "Tausch",
         "transfer" : "Übertragung"
       },
-      "will_be_paid" : "Wird Bezahlt: {enabledTransactions}"
+      "will_be_paid" : "Wird bezahlt: {enabledTransactions}"
     }
   },
   "biometry" : {
@@ -317,15 +317,15 @@
   "bluetooth" : {
     "permissions_alert" : {
       "cancel" : "Ablehnen",
-      "message" : "Bitte aktiviere Bluetooth Berechtigungen in deinen Einstellungen um dieses Feature zu benutzen",
-      "open_settings" : "Einstellungen Öffnen",
-      "title" : "Bluetooth Berechtigungen"
+      "message" : "Bitte aktiviere Bluetooth-Berechtigungen in deinen Einstellungen, um diese Fuktion zu benutzen",
+      "open_settings" : "Einstellungen öffnen",
+      "title" : "Bluetooth-Berechtigungen"
     },
     "powered_off_alert" : {
       "cancel" : "Ablehnen",
-      "message" : "Bitte aktiviere Bluetooth Berechtigungen in deinen Einstellungen um dieses Feature zu benutzen",
-      "open_settings" : "Einstellungen Öffnen",
-      "title" : "Bluetooth Berechtigungen"
+      "message" : "Bitte aktiviere Bluetooth-Berechtigungen in deinen Einstellungen, um diese Funktion zu benutzen",
+      "open_settings" : "Einstellungen öffnen",
+      "title" : "Bluetooth-Berechtigungen"
     }
   },
   "browser" : {
@@ -342,23 +342,23 @@
     "apps_all" : "Alle",
     "connected" : "Verbunden",
     "connected_empty_text" : "Erkunde Apps und Dienste im Tonkeeper Browser.",
-    "connected_empty_title" : "Verbundene Apps werden hier Angezeigt",
+    "connected_empty_title" : "Verbundene Apps werden hier angezeigt",
     "connected_title" : "Verbunden",
     "empty_search" : "Deine Suche ergab keine Ergebnisse",
     "explore" : "Erkunde",
-    "explore_all" : "Alles Erkunden",
+    "explore_all" : "Alles erkunden",
     "more_description" : "Märkte, Börsen und mehr",
     "more_title" : "Erkunde alle Dienste",
     "open_link" : "Öffne Link",
     "popular_title" : "Beliebt",
     "remove_alert" : {
       "approve_button" : "Ja",
-      "title" : "Willst du wirklich “{name}” Löschen?"
+      "title" : "Willst du wirklich “{name}” löschen?"
     },
     "search_label" : "Suche oder gieb eine Adresse ein",
     "start_typing" : "Gieb eine Adresse ein oder suche im Web",
     "title" : "Browser",
-    "web_search_title" : "{searchEngine} Suche"
+    "web_search_title" : "{searchEngine} suchen"
   },
   "buy_ton" : {
     "subtitle" : "Sofort mit einer Kreditkarte",
@@ -431,7 +431,7 @@
   "confirm_renew_all_domains_title" : "Alle Domains erneuern",
   "confirm_sending_amount" : "Betrag",
   "confirm_sending_fee" : "Gebühr",
-  "confirm_sending_inactive_warn_about" : "Was sollten sie tun?",
+  "confirm_sending_inactive_warn_about" : "Was sollten Sie tun?",
   "confirm_sending_inactive_warn_description" : "Fahren sie nicht fort, wenn sie erwarten, dass Blockchain-Magie passiert. Es wird nicht.",
   "confirm_sending_inactive_warn_title" : "Inaktiver Vertrag",
   "confirm_sending_liquid_warn_description" : "Sie erhalten keine Belohnungen mehr für die gesendeten gestakten TON. Der neue Besitzer wird Belohnungen erhalten.",
@@ -442,12 +442,12 @@
   "confirm_sending_recipient_address" : "Empfangsadresse",
   "confirm_sending_sent_caption_btc" : "Ihre Transaktion wird an das Netzwerk gesendet und innerhalb einer Stunde verarbeitet.",
   "confirm_sending_sent_caption_ton" : "Ihre Transaktion wird an das Netzwerk gesendet und innerhalb ein paar Sekunden verarbeitet.",
-  "confirm_sending_submit" : "Bestätigen und Senden",
-  "confirm_sending_title" : "Bestätigen sie die Transaktion",
+  "confirm_sending_submit" : "Bestätigen und senden",
+  "confirm_sending_title" : "Bestätigen Sie die Transaktion",
   "confirmSendModal" : {
     "network_fee" : "Netzwerk Gebühr",
     "refund" : "Rückerstattung",
-    "title" : "Bestätigen sie die Aktion",
+    "title" : "Bestätigen Sie die Aktion",
     "title_multiwallets" : "Aktion für %{walletName}",
     "total_risk" : "Gesamt: {totalAmount}",
     "to_your_address" : "zu deiner Adresse",
