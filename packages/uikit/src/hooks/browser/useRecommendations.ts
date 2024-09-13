@@ -28,7 +28,10 @@ export function useRecommendations() {
         // TODO: Remove mobile hack
         data.categories = data.categories.filter(item => item.id !== 'featured');
 
-        shuffle(data.apps);
+        if (data.apps) {
+            shuffle(data.apps);
+        }
+
         return data;
     });
 }
