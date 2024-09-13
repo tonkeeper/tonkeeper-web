@@ -1,5 +1,6 @@
 import { Address, beginCell, Cell, comment, toNano } from '@ton/core';
 import BigNumber from 'bignumber.js';
+import { AccountControllable } from '../../entries/account';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
@@ -10,13 +11,12 @@ import {
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
     createTransferMessage,
-    getKeyPairAndSeqno,
+    getAccountSeqno,
     getServerTime,
     getTonkeeperQueryId,
     getWalletBalance,
     signEstimateMessage
 } from './common';
-import { Account, AccountControllable } from "../../entries/account";
 
 const initNftTransferAmount = toNano('1');
 export const nftTransferForwardAmount = BigInt('1');
@@ -69,6 +69,7 @@ const nftLinkBody = (params: { queryId: bigint; linkToAddress: string }) => {
 const createNftTransfer = (
     timestamp: number,
     seqno: number,
+    account: AccountControllable,
     walletState: TonWalletStandard,
     recipientAddress: string,
     nftAddress: string,
@@ -85,6 +86,7 @@ const createNftTransfer = (
     });
 
     return createTransferMessage(
+        account,
         { timestamp, seqno, state: walletState, signer },
         { to: nftAddress, value: nftTransferAmount, body }
     );
@@ -92,17 +94,19 @@ const createNftTransfer = (
 
 export const estimateNftTransfer = async (
     api: APIConfig,
+    account: AccountControllable,
     walletState: TonWalletStandard,
     recipient: TonRecipientData,
     nftItem: NftItem
 ): Promise<TransferEstimationEvent> => {
     const timestamp = await getServerTime(api);
-    const [wallet, seqno] = await getWalletBalance(api, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = await createNftTransfer(
         timestamp,
         seqno,
+        account,
         walletState,
         recipient.toAccount.address,
         nftItem.address,
@@ -139,7 +143,7 @@ export const sendNftTransfer = async (
     }
 
     const walletState = account.activeTonWallet;
-    const [wallet, seqno] = await getWalletBalance(api, walletState);
+    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
     checkWalletBalanceOrDie(total, wallet);
 
     let buffer: Buffer;
@@ -148,6 +152,7 @@ export const sendNftTransfer = async (
             buffer = await createNftTransfer(
                 timestamp,
                 seqno,
+                account,
                 walletState,
                 recipient.toAccount.address,
                 nftItem.address,
@@ -185,17 +190,17 @@ export const sendNftRenew = async (options: {
     account: AccountControllable;
     nftAddress: string;
     fee: TransferEstimationEvent;
-    signer: CellSigner;
+    signer: Signer;
     amount: BigNumber;
 }) => {
     const walletState = options.account.activeTonWallet;
-
     const timestamp = await getServerTime(options.api);
-    const { seqno } = await getKeyPairAndSeqno({ ...options, walletState });
+    const { seqno } = await getAccountSeqno({ ...options, rawAddress: walletState.rawAddress });
 
     const body = nftRenewBody({ queryId: getTonkeeperQueryId() });
 
     const cell = await createTransferMessage(
+        options.account,
         {
             timestamp,
             seqno,
@@ -212,17 +217,19 @@ export const sendNftRenew = async (options: {
 
 export const estimateNftRenew = async (options: {
     api: APIConfig;
+    account: AccountControllable;
     walletState: TonWalletStandard;
     nftAddress: string;
     amount: BigNumber;
 }) => {
     const timestamp = await getServerTime(options.api);
-    const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
+    const [wallet, seqno] = await getWalletBalance(options.api, options.walletState.rawAddress);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const body = nftRenewBody({ queryId: getTonkeeperQueryId() });
 
     const cell = await createTransferMessage(
+        options.account,
         {
             timestamp,
             seqno,
@@ -244,13 +251,16 @@ export const sendNftLink = async (options: {
     signer: CellSigner;
     amount: BigNumber;
 }) => {
-    const walletState = options.account.activeTonWallet;
+    const { account } = options;
+
+    const walletState = account.activeTonWallet;
     const timestamp = await getServerTime(options.api);
-    const { seqno } = await getKeyPairAndSeqno({ ...options, walletState });
+    const { seqno } = await getAccountSeqno({ ...options, rawAddress: walletState.rawAddress });
 
     const body = nftLinkBody({ ...options, queryId: getTonkeeperQueryId() });
 
     const cell = await createTransferMessage(
+        options.account,
         {
             timestamp,
             seqno,
@@ -267,18 +277,20 @@ export const sendNftLink = async (options: {
 
 export const estimateNftLink = async (options: {
     api: APIConfig;
+    account: AccountControllable;
     walletState: TonWalletStandard;
     nftAddress: string;
     linkToAddress: string;
     amount: BigNumber;
 }) => {
     const timestamp = await getServerTime(options.api);
-    const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
+    const [wallet, seqno] = await getWalletBalance(options.api, options.walletState.rawAddress);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const body = nftLinkBody({ ...options, queryId: getTonkeeperQueryId() });
 
     const cell = await createTransferMessage(
+        options.account,
         {
             timestamp,
             seqno,

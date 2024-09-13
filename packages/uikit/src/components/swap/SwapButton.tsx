@@ -1,5 +1,7 @@
-import { Button } from '../fields/Button';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { FC } from 'react';
+import { useTranslation } from '../../hooks/translation';
+import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
 import {
     useIsSwapFormNotCompleted,
     useMaxSwapValue,
@@ -8,11 +10,8 @@ import {
     useSwapFromAsset,
     useSwapPriceImpact
 } from '../../state/swap/useSwapForm';
-import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
-import { FC } from 'react';
-import { useIsActiveWalletLedger } from '../../state/ledger';
 import { useSwapOptions } from '../../state/swap/useSwapOptions';
-import { useTranslation } from '../../hooks/translation';
+import { Button } from '../fields/Button';
 
 export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }> = ({
     onClick,
@@ -29,15 +28,6 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
     const { data: swapOptions } = useSwapOptions();
 
     const isNotCompleted = useIsSwapFormNotCompleted();
-    const activeIsLedger = useIsActiveWalletLedger();
-
-    if (activeIsLedger) {
-        return (
-            <Button size="medium" secondary disabled>
-                {t('swap_ledger_not_supported')}
-            </Button>
-        );
-    }
 
     if (isNotCompleted) {
         return (
