@@ -16,6 +16,7 @@ export enum AppKey {
     ACTIVE_ACCOUNT_ID = 'active_account_id',
     WALLET_CONFIG = 'wallet_config',
     GLOBAL_PREFERENCES_CONFIG = 'global_preferences_config',
+    MULTISIG_VIEWED_ORDERS = 'viewed_multisig_orders',
 
     THEME = 'theme',
     UI_PREFERENCES = 'ui_preferences',

@@ -27,6 +27,7 @@ export enum QueryKey {
     globalPreferencesConfig = 'globalPreferencesConfig',
     multisigWallets = 'multisigWallets',
     multisigSigners = 'multisigSigners',
+    viewedMultisigOrders = 'viewedMultisigOrders
 
     tonConnectConnection = 'tonConnectConnection',
     tonConnectLastEventId = 'tonConnectLastEventId',

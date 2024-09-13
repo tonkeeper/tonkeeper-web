@@ -8,10 +8,11 @@ import { useTranslation } from '../../hooks/translation';
 import {
     useActiveMultisigWalletInfo,
     useIsActiveAccountMultisig,
+    useMarkAccountOrdersAsViewed,
     useOrderInfo
 } from '../../state/multisig';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
-import React, { FC, useMemo } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { Button } from '../../components/fields/Button';
 
 import { styled } from 'styled-components';
@@ -69,6 +70,11 @@ const DesktopMultisigOrdersPageBody = () => {
 
 export const ManageExistingMultisigOrders: FC<{ multisig: Multisig }> = ({ multisig }) => {
     const { t } = useTranslation();
+    const { mutate: markAsViewed } = useMarkAccountOrdersAsViewed();
+
+    useEffect(() => {
+        markAsViewed({ orders: multisig.orders.map(o => o.address) });
+    }, [multisig.orders, markAsViewed]);
 
     const sortedOrders = useMemo(
         () => multisig.orders.sort((a, b) => a.expirationDate - b.expirationDate), // TODO

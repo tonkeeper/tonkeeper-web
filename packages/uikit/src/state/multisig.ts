@@ -20,6 +20,8 @@ import {
     getAccountByWalletById
 } from '@tonkeeper/core/dist/entries/account';
 import { useAccountsStorage } from '../hooks/useStorage';
+import { useAppSdk } from '../hooks/appSdk';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 
 export const useMultisigWalletInfo = (walletAddressRaw: string) => {
     const { api } = useAppContext();
@@ -210,4 +212,67 @@ export const useMutateMultisigSelectedHostWallet = () => {
             await client.invalidateQueries(anyOfKeysParts(QueryKey.account, multisigId));
         }
     );
+};
+
+type ViewedMultisigOrders = {
+    [multisigAddress: string]: string[];
+};
+
+export const useUnviewedAccountOrdersNumber = () => {
+    const { data: multisigInfo } = useActiveMultisigWalletInfo();
+    const { data: viewedOrders } = useViewedAccountOrders();
+
+    if (!multisigInfo || !viewedOrders) {
+        return undefined;
+    }
+
+    const accountViewedOrders = viewedOrders[multisigInfo.address] || [];
+
+    return multisigInfo.orders.filter(o => !accountViewedOrders.includes(o.address)).length;
+};
+
+export const useViewedAccountOrders = () => {
+    const sdk = useAppSdk();
+    const account = useActiveAccount();
+    return useQuery(
+        [QueryKey.viewedMultisigOrders, account.id],
+        async () => {
+            if (account.type !== 'ton-multisig') {
+                return {};
+            }
+            return (
+                (await sdk.storage.get<ViewedMultisigOrders>(AppKey.MULTISIG_VIEWED_ORDERS)) || {}
+            );
+        },
+        {
+            keepPreviousData: true
+        }
+    );
+};
+
+export const useMarkAccountOrdersAsViewed = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+    const account = useActiveAccount();
+    return useMutation<void, Error, { orders: string[] }>(async ({ orders }) => {
+        if (account.type !== 'ton-multisig') {
+            throw new Error('Not multisig account');
+        }
+        const viewed =
+            (await sdk.storage.get<ViewedMultisigOrders>(AppKey.MULTISIG_VIEWED_ORDERS)) || {};
+        const currentAccountViews = viewed[account.id] || [];
+
+        const unviewed = orders.filter(o => !currentAccountViews.includes(o));
+
+        if (!unviewed.length) {
+            return;
+        }
+
+        currentAccountViews.push(...unviewed);
+        await sdk.storage.set(AppKey.MULTISIG_VIEWED_ORDERS, {
+            ...viewed,
+            [account.id]: currentAccountViews
+        });
+        await client.invalidateQueries([QueryKey.viewedMultisigOrders]);
+    });
 };

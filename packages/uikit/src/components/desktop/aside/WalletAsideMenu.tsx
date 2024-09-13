@@ -16,8 +16,12 @@ import {
 } from '../../Icon';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
-import { useIsActiveAccountMultisig } from '../../../state/multisig';
+import {
+    useIsActiveAccountMultisig,
+    useUnviewedAccountOrdersNumber
+} from '../../../state/multisig';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
+import { RoundedBadge } from '../../shared/Badge';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -102,16 +106,7 @@ export const WalletAsideMenu = () => {
                     )}
                 </NavLink>
             )}
-            {isMultisig && (
-                <NavLink to={AppRoute.multisigOrders}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <InboxIcon />
-                            <Label2>{t('wallet_aside_orders')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-            )}
+            {isMultisig && <MultisigOrdersMenuItem />}
             {showMultisigs && (
                 <NavLink to={AppRoute.multisigWallets}>
                     {({ isActive }) => (
@@ -131,5 +126,27 @@ export const WalletAsideMenu = () => {
                 )}
             </NavLink>
         </WalletAsideContainer>
+    );
+};
+
+const BadgeStyled = styled(RoundedBadge)`
+    margin-left: auto;
+    margin-right: -40px;
+`;
+
+const MultisigOrdersMenuItem = () => {
+    const ordersNumber = useUnviewedAccountOrdersNumber();
+    const { t } = useTranslation();
+
+    return (
+        <NavLink to={AppRoute.multisigOrders}>
+            {({ isActive }) => (
+                <AsideMenuItemStyled isSelected={isActive}>
+                    <InboxIcon />
+                    <Label2>{t('wallet_aside_orders')}</Label2>
+                    {!!ordersNumber && <BadgeStyled>{ordersNumber}</BadgeStyled>}
+                </AsideMenuItemStyled>
+            )}
+        </NavLink>
     );
 };
