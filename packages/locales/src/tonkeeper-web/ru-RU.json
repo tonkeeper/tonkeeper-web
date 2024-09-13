@@ -49,7 +49,7 @@
   "create_multisig_create_wallet" : "Создать кошелек",
   "create_multisig_error_already_deployed" : "Такой мультисиг-контракт уже существует. Попробуйте использовать другой кошелек для деплоя мультисиг-контракта.",
   "create_multisig_quorum" : "Кворум",
-  "create_multisig_what_are_signers" : "Signer может подтверждать транзакции и предлагать изменения, такие как добавление или удаление участников. Proposer может только предлагать изменения.",
+  "create_multisig_what_are_signers" : "Участники могут подтверждать транзакции и предлагать изменения, такие как добавление или удаление участников.",
   "Create_password" : "Придумайте пароль",
   "dashboard_column_name" : "Имя",
   "dashboard_manage_modal_title" : "Дэшборд",

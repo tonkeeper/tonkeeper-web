@@ -1,19 +1,8 @@
-import React, {
-    FC,
-    PropsWithChildren,
-    useCallback,
-    useContext,
-    useEffect,
-    useId,
-    useMemo,
-    useState
-} from 'react';
+import React, { FC, useCallback, useContext, useEffect, useId, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Body1, Body2, Body2Class, Body3, Body3Class, H2, Label2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
-import { BorderSmallResponsive } from '../shared/Styles';
-import { Radio } from '../fields/Checkbox';
 import { InputBlock, InputField } from '../fields/Input';
 import { Button } from '../fields/Button';
 import { IconButtonTransparentBackground } from '../fields/IconButton';
@@ -258,16 +247,13 @@ const CreateMultisigFormPage: FC<{
 
     const onSubmit = async (data: MultisigUseForm) => {
         onOpen();
-        const fromWallet = data.firstParticipant.address;
+        const fromWallet = data.firstParticipant;
         const multisigConfig: MultisigConfig = {
-            proposers: data.participants
-                .concat(data.firstParticipant)
-                .filter(p => p.role === 'proposer')
-                .map(v => Address.parse(v.address)),
+            proposers: [],
             signers: data.participants
+                .map(p => p.address)
                 .concat(data.firstParticipant)
-                .filter(p => p.role === 'proposer-and-signer')
-                .map(v => Address.parse(v.address)),
+                .map(v => Address.parse(v)),
             threshold: data.quorum,
             allowArbitrarySeqno: false
         };
@@ -338,16 +324,9 @@ const SubmitButtonContainer = styled.div`
 `;
 
 type MultisigUseForm = {
-    firstParticipant: {
-        address: string;
-        role: 'proposer-and-signer' | 'proposer';
-    };
-    participants: {
-        address: string;
-        role: 'proposer-and-signer' | 'proposer';
-    }[];
+    firstParticipant: string;
+    participants: { address: string }[];
     quorum: number;
-    deadlineHours: number;
 };
 
 const MultisigCreatingForm: FC<{ onSubmit: (form: MultisigUseForm) => void }> = ({ onSubmit }) => {
@@ -364,13 +343,9 @@ const MultisigCreatingForm: FC<{ onSubmit: (form: MultisigUseForm) => void }> = 
     }
     const methods = useForm<MultisigUseForm>({
         defaultValues: {
-            firstParticipant: {
-                address: activeWallet.rawAddress,
-                role: 'proposer-and-signer'
-            },
-            participants: [{ address: '', role: 'proposer-and-signer' }],
-            quorum: 1,
-            deadlineHours: 24
+            firstParticipant: activeWallet.rawAddress,
+            participants: [{ address: '' }],
+            quorum: 1
         }
     });
     const {
@@ -447,11 +422,11 @@ const MultisigCreatingForm: FC<{ onSubmit: (form: MultisigUseForm) => void }> = 
                         type="button"
                         size="small"
                         fitContent
-                        onClick={() => append({ address: '', role: 'proposer-and-signer' })}
+                        onClick={() => append({ address: '' })}
                     >
                         {t('create_multisig_add_participant')}
                     </Button>
-                    <QuorumAndDeadlineInputs />
+                    <QuorumInput />
                 </AsyncValidatorsStateProvider>
             </FormProvider>
             <NotificationFooterPortal>
@@ -471,22 +446,6 @@ const MultisigCreatingForm: FC<{ onSubmit: (form: MultisigUseForm) => void }> = 
         </FormWrapper>
     );
 };
-
-const Divider = styled.div`
-    height: 1px;
-    background: ${p => p.theme.separatorCommon};
-`;
-
-const CardWrapper = styled.div`
-    background: ${p => p.theme.fieldBackground};
-    ${BorderSmallResponsive};
-`;
-
-const CardFooter = styled.div`
-    padding: 9px;
-    display: flex;
-    gap: 12px;
-`;
 
 const ExternalParticipantCardFirstRow = styled.div`
     display: flex;
@@ -518,22 +477,20 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
             }}
             render={({ field, fieldState: { error, invalid } }) => (
                 <>
-                    <ParticipantCard registerAs={`participants.${fieldIndex}.role`}>
-                        <ExternalParticipantCardFirstRow>
-                            <InputBlock size="small" valid={!invalid} focus={focus}>
-                                <InputField
-                                    {...field}
-                                    size="small"
-                                    onFocus={() => setFocus(true)}
-                                    onBlur={() => setFocus(false)}
-                                    placeholder={t('wallet_address')}
-                                />
-                            </InputBlock>
-                            <IconButtonTransparentBackground onClick={onRemove}>
-                                <CloseIcon />
-                            </IconButtonTransparentBackground>
-                        </ExternalParticipantCardFirstRow>
-                    </ParticipantCard>
+                    <ExternalParticipantCardFirstRow>
+                        <InputBlock size="small" valid={!invalid} focus={focus}>
+                            <InputField
+                                {...field}
+                                size="small"
+                                onFocus={() => setFocus(true)}
+                                onBlur={() => setFocus(false)}
+                                placeholder={t('wallet_address')}
+                            />
+                        </InputBlock>
+                        <IconButtonTransparentBackground onClick={onRemove}>
+                            <CloseIcon />
+                        </IconButtonTransparentBackground>
+                    </ExternalParticipantCardFirstRow>
                     {error && <FormError noPaddingTop>{error.message}</FormError>}
                 </>
             )}
@@ -547,11 +504,15 @@ const AccountAndWalletInfoStyled = styled(AccountAndWalletInfo)`
     color: ${p => p.theme.textPrimary};
 `;
 
+const SelectDropDownHostStyled = styled(SelectDropDownHost)`
+    background-color: ${p => p.theme.fieldBackground};
+`;
+
 const FirstParticipantCard: FC = () => {
     const methods = useFormContext<MultisigUseForm>();
     const { watch, control } = methods;
     const { api } = useAppContext();
-    const selectedAddress = watch('firstParticipant.address');
+    const selectedAddress = watch('firstParticipant');
 
     const asyncValidator = useCallback(
         async (accountId: string) => {
@@ -564,7 +525,7 @@ const FirstParticipantCard: FC = () => {
         [api]
     );
 
-    useAsyncValidator(methods, selectedAddress, 'firstParticipant.address', asyncValidator);
+    useAsyncValidator(methods, selectedAddress, 'firstParticipant', asyncValidator);
     const accounts = useAccountsState();
     const wallets = useMemo(() => {
         const filtered = accounts.filter(isAccountTonWalletStandard).flatMap(a =>
@@ -590,87 +551,55 @@ const FirstParticipantCard: FC = () => {
             }}
             render={({ field: { onChange }, fieldState: { error } }) => (
                 <>
-                    <ParticipantCardStyled registerAs="firstParticipant.role">
-                        <SelectDropDown
-                            width="350px"
-                            maxHeight="250px"
-                            right="32px"
-                            top="16px"
-                            payload={onClose => (
-                                <DropDownContent>
-                                    {Object.values(wallets).map(item => (
-                                        <>
-                                            <DropDownItem
-                                                isSelected={
-                                                    selectedAddress === item.wallet.rawAddress
-                                                }
-                                                key={item.wallet.id}
-                                                onClick={() => {
-                                                    onClose();
-                                                    onChange(item.wallet.rawAddress);
-                                                }}
-                                            >
-                                                <AccountAndWalletInfoStyled
-                                                    noPrefix
-                                                    account={item.account}
-                                                    walletId={item.wallet.id}
-                                                />
-                                            </DropDownItem>
-                                            <DropDownItemsDivider />
-                                        </>
-                                    ))}
-                                </DropDownContent>
-                            )}
-                        >
-                            <SelectDropDownHost isErrored={!!error}>
-                                <SelectDropDownHostText>
-                                    <Body3>{t('wallet_title')}</Body3>
-                                    <AccountAndWalletInfoStyled
-                                        noPrefix
-                                        account={selectedWallet.account}
-                                        walletId={selectedWallet.wallet.id}
-                                    />
-                                </SelectDropDownHostText>
-                                <SwitchIcon />
-                            </SelectDropDownHost>
-                        </SelectDropDown>
-                    </ParticipantCardStyled>
+                    <SelectDropDown
+                        width="350px"
+                        maxHeight="250px"
+                        right="32px"
+                        top="16px"
+                        payload={onClose => (
+                            <DropDownContent>
+                                {Object.values(wallets).map(item => (
+                                    <>
+                                        <DropDownItem
+                                            isSelected={selectedAddress === item.wallet.rawAddress}
+                                            key={item.wallet.id}
+                                            onClick={() => {
+                                                onClose();
+                                                onChange(item.wallet.rawAddress);
+                                            }}
+                                        >
+                                            <AccountAndWalletInfoStyled
+                                                noPrefix
+                                                account={item.account}
+                                                walletId={item.wallet.id}
+                                            />
+                                        </DropDownItem>
+                                        <DropDownItemsDivider />
+                                    </>
+                                ))}
+                            </DropDownContent>
+                        )}
+                    >
+                        <SelectDropDownHostStyled isErrored={!!error}>
+                            <SelectDropDownHostText>
+                                <Body3>{t('wallet_title')}</Body3>
+                                <AccountAndWalletInfoStyled
+                                    noPrefix
+                                    account={selectedWallet.account}
+                                    walletId={selectedWallet.wallet.id}
+                                />
+                            </SelectDropDownHostText>
+                            <SwitchIcon />
+                        </SelectDropDownHostStyled>
+                    </SelectDropDown>
                     {error && <FormError noPaddingTop>{error.message}</FormError>}
                 </>
             )}
-            name={'firstParticipant.address'}
+            name={'firstParticipant'}
             control={control}
         />
     );
 };
-
-const ParticipantCard: FC<
-    PropsWithChildren & {
-        registerAs: 'firstParticipant.role' | `participants.${number}.role`;
-        className?: string;
-    }
-> = ({ children, registerAs, className }) => {
-    const { register } = useFormContext<MultisigUseForm>();
-
-    return (
-        <CardWrapper className={className}>
-            {children}
-            <Divider />
-            <CardFooter>
-                <Radio value="proposer-and-signer" {...register(registerAs)}>
-                    Signer & Proposer
-                </Radio>
-                <Radio value="proposer" {...register(registerAs)}>
-                    Proposer
-                </Radio>
-            </CardFooter>
-        </CardWrapper>
-    );
-};
-
-const ParticipantCardStyled = styled(ParticipantCard)`
-    width: 100%;
-`;
 
 const QuorumAndDeadlineInputsContainer = styled.div`
     margin-top: 32px;
@@ -689,7 +618,7 @@ const DropDownItemText = styled.div`
     }
 `;
 
-const QuorumAndDeadlineInputs = () => {
+const QuorumInput = () => {
     const { t } = useTranslation();
     const {
         control,
@@ -698,9 +627,7 @@ const QuorumAndDeadlineInputs = () => {
         formState: { isSubmitted }
     } = useFormContext<MultisigUseForm>();
     const selectedSignersNumber = watch('quorum');
-    const firsIsSigner = watch('firstParticipant').role === 'proposer-and-signer' ? 1 : 0;
-    const totalSignersNumber =
-        watch('participants').filter(i => i.role === 'proposer-and-signer').length + firsIsSigner;
+    const totalSignersNumber = watch('participants').length + 1;
     const selectedSignersPercent =
         selectedSignersNumber > totalSignersNumber || totalSignersNumber === 0
             ? null
