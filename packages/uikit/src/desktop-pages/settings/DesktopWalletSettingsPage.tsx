@@ -7,7 +7,6 @@ import {
     ExitIcon,
     KeyIcon,
     SaleBadgeIcon,
-    SlidersIcon,
     SwitchIcon
 } from '../../components/Icon';
 import { Body3, Label2 } from '../../components/Text';
@@ -34,7 +33,6 @@ import { useRenameNotification } from '../../components/modals/RenameNotificatio
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 import { WalletIndexBadge } from '../../components/account/AccountBadge';
 import { useState } from 'react';
-import { useIsActiveAccountMultisig } from '../../state/multisig';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -88,7 +86,6 @@ export const DesktopWalletSettingsPage = () => {
 
     const canChangeVersion = isAccountVersionEditable(account);
     const canChangeDerivations = account.type === 'mam';
-    const canChangeMultisigSettings = useIsActiveAccountMultisig();
 
     // check available derivations length to filter and keep only non-legacy added ledger accounts
     const canChangeLedgerIndex =
@@ -165,16 +162,6 @@ export const DesktopWalletSettingsPage = () => {
                             <Label2>{t('settings_backup_wallet')}</Label2>
                         </SettingsListItem>
                     </>
-                )}
-                {canChangeMultisigSettings && (
-                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.multisigSettings}>
-                        <SettingsListItem>
-                            <SlidersIcon />
-                            <SettingsListText>
-                                <Label2>{t('settings_multisig_settings')}</Label2>
-                            </SettingsListText>
-                        </SettingsListItem>
-                    </LinkStyled>
                 )}
                 {canChangeVersion && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>

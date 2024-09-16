@@ -64,8 +64,7 @@ export enum WalletSettingsRoute {
     jettons = '/jettons',
     nft = '/nft',
     connectedApps = '/connected-apps',
-    derivations = '/derivations',
-    multisigSettings = '/multisig-settings'
+    derivations = '/derivations'
 }
 
 export enum BrowserRoute {
