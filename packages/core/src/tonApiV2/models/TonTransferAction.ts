@@ -18,18 +18,21 @@ import {
     RefundFromJSON,
     RefundFromJSONTyped,
     RefundToJSON,
+    RefundToJSONTyped,
 } from './Refund';
 import type { EncryptedComment } from './EncryptedComment';
 import {
     EncryptedCommentFromJSON,
     EncryptedCommentFromJSONTyped,
     EncryptedCommentToJSON,
+    EncryptedCommentToJSONTyped,
 } from './EncryptedComment';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -105,10 +108,15 @@ export function TonTransferActionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function TonTransferActionToJSON(value?: TonTransferAction | null): any {
+  export function TonTransferActionToJSON(json: any): TonTransferAction {
+      return TonTransferActionToJSONTyped(json, false);
+  }
+
+  export function TonTransferActionToJSONTyped(value?: TonTransferAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'sender': AccountAddressToJSON(value['sender']),

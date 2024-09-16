@@ -18,6 +18,7 @@ import {
     AddressParse200ResponseBounceableFromJSON,
     AddressParse200ResponseBounceableFromJSONTyped,
     AddressParse200ResponseBounceableToJSON,
+    AddressParse200ResponseBounceableToJSONTyped,
 } from './AddressParse200ResponseBounceable';
 
 /**
@@ -88,10 +89,15 @@ export function AddressParse200ResponseFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-export function AddressParse200ResponseToJSON(value?: AddressParse200Response | null): any {
+  export function AddressParse200ResponseToJSON(json: any): AddressParse200Response {
+      return AddressParse200ResponseToJSONTyped(json, false);
+  }
+
+  export function AddressParse200ResponseToJSONTyped(value?: AddressParse200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'raw_form': value['rawForm'],

@@ -18,12 +18,14 @@ import {
     PoolImplementationFromJSON,
     PoolImplementationFromJSONTyped,
     PoolImplementationToJSON,
+    PoolImplementationToJSONTyped,
 } from './PoolImplementation';
 import type { PoolInfo } from './PoolInfo';
 import {
     PoolInfoFromJSON,
     PoolInfoFromJSONTyped,
     PoolInfoToJSON,
+    PoolInfoToJSONTyped,
 } from './PoolInfo';
 
 /**
@@ -70,10 +72,15 @@ export function GetStakingPoolInfo200ResponseFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-export function GetStakingPoolInfo200ResponseToJSON(value?: GetStakingPoolInfo200Response | null): any {
+  export function GetStakingPoolInfo200ResponseToJSON(json: any): GetStakingPoolInfo200Response {
+      return GetStakingPoolInfo200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetStakingPoolInfo200ResponseToJSONTyped(value?: GetStakingPoolInfo200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'implementation': PoolImplementationToJSON(value['implementation']),

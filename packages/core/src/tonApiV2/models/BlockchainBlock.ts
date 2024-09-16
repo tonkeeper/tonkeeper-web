@@ -18,6 +18,7 @@ import {
     BlockValueFlowFromJSON,
     BlockValueFlowFromJSONTyped,
     BlockValueFlowToJSON,
+    BlockValueFlowToJSONTyped,
 } from './BlockValueFlow';
 
 /**
@@ -285,10 +286,15 @@ export function BlockchainBlockFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function BlockchainBlockToJSON(value?: BlockchainBlock | null): any {
+  export function BlockchainBlockToJSON(json: any): BlockchainBlock {
+      return BlockchainBlockToJSONTyped(json, false);
+  }
+
+  export function BlockchainBlockToJSONTyped(value?: BlockchainBlock | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'tx_quantity': value['txQuantity'],

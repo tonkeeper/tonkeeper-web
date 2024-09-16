@@ -18,6 +18,7 @@ import {
     TokenRatesFromJSON,
     TokenRatesFromJSONTyped,
     TokenRatesToJSON,
+    TokenRatesToJSONTyped,
 } from './TokenRates';
 
 /**
@@ -56,10 +57,15 @@ export function GetRates200ResponseFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function GetRates200ResponseToJSON(value?: GetRates200Response | null): any {
+  export function GetRates200ResponseToJSON(json: any): GetRates200Response {
+      return GetRates200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetRates200ResponseToJSONTyped(value?: GetRates200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'rates': (mapValues(value['rates'], TokenRatesToJSON)),

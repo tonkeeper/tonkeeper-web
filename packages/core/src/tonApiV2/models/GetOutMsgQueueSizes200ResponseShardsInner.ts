@@ -18,6 +18,7 @@ import {
     BlockRawFromJSON,
     BlockRawFromJSONTyped,
     BlockRawToJSON,
+    BlockRawToJSONTyped,
 } from './BlockRaw';
 
 /**
@@ -64,10 +65,15 @@ export function GetOutMsgQueueSizes200ResponseShardsInnerFromJSONTyped(json: any
     };
 }
 
-export function GetOutMsgQueueSizes200ResponseShardsInnerToJSON(value?: GetOutMsgQueueSizes200ResponseShardsInner | null): any {
+  export function GetOutMsgQueueSizes200ResponseShardsInnerToJSON(json: any): GetOutMsgQueueSizes200ResponseShardsInner {
+      return GetOutMsgQueueSizes200ResponseShardsInnerToJSONTyped(json, false);
+  }
+
+  export function GetOutMsgQueueSizes200ResponseShardsInnerToJSONTyped(value?: GetOutMsgQueueSizes200ResponseShardsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': BlockRawToJSON(value['id']),

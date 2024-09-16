@@ -18,12 +18,14 @@ import {
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackFromJSON,
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackFromJSONTyped,
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackToJSON,
+    GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackToJSONTyped,
 } from './GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBack';
 import type { GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward } from './GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward';
 import {
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardFromJSON,
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardFromJSONTyped,
     GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSON,
+    GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSONTyped,
 } from './GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward';
 
 /**
@@ -70,10 +72,15 @@ export function GetRawBlockProof200ResponseStepsInnerFromJSONTyped(json: any, ig
     };
 }
 
-export function GetRawBlockProof200ResponseStepsInnerToJSON(value?: GetRawBlockProof200ResponseStepsInner | null): any {
+  export function GetRawBlockProof200ResponseStepsInnerToJSON(json: any): GetRawBlockProof200ResponseStepsInner {
+      return GetRawBlockProof200ResponseStepsInnerToJSONTyped(json, false);
+  }
+
+  export function GetRawBlockProof200ResponseStepsInnerToJSONTyped(value?: GetRawBlockProof200ResponseStepsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'lite_server_block_link_back': GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkBackToJSON(value['liteServerBlockLinkBack']),

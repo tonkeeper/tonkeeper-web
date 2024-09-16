@@ -18,6 +18,7 @@ import {
     ValidatorsSetListInnerFromJSON,
     ValidatorsSetListInnerFromJSONTyped,
     ValidatorsSetListInnerToJSON,
+    ValidatorsSetListInnerToJSONTyped,
 } from './ValidatorsSetListInner';
 
 /**
@@ -95,10 +96,15 @@ export function ValidatorsSetFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function ValidatorsSetToJSON(value?: ValidatorsSet | null): any {
+  export function ValidatorsSetToJSON(json: any): ValidatorsSet {
+      return ValidatorsSetToJSONTyped(json, false);
+  }
+
+  export function ValidatorsSetToJSONTyped(value?: ValidatorsSet | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'utime_since': value['utimeSince'],

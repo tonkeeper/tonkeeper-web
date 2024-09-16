@@ -18,6 +18,7 @@ import {
     BlockchainBlockShardsShardsInnerFromJSON,
     BlockchainBlockShardsShardsInnerFromJSONTyped,
     BlockchainBlockShardsShardsInnerToJSON,
+    BlockchainBlockShardsShardsInnerToJSONTyped,
 } from './BlockchainBlockShardsShardsInner';
 
 /**
@@ -56,10 +57,15 @@ export function BlockchainBlockShardsFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function BlockchainBlockShardsToJSON(value?: BlockchainBlockShards | null): any {
+  export function BlockchainBlockShardsToJSON(json: any): BlockchainBlockShards {
+      return BlockchainBlockShardsToJSONTyped(json, false);
+  }
+
+  export function BlockchainBlockShardsToJSONTyped(value?: BlockchainBlockShards | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'shards': ((value['shards'] as Array<any>).map(BlockchainBlockShardsShardsInnerToJSON)),

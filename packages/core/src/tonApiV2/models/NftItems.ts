@@ -18,6 +18,7 @@ import {
     NftItemFromJSON,
     NftItemFromJSONTyped,
     NftItemToJSON,
+    NftItemToJSONTyped,
 } from './NftItem';
 
 /**
@@ -56,10 +57,15 @@ export function NftItemsFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function NftItemsToJSON(value?: NftItems | null): any {
+  export function NftItemsToJSON(json: any): NftItems {
+      return NftItemsToJSONTyped(json, false);
+  }
+
+  export function NftItemsToJSONTyped(value?: NftItems | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'nft_items': ((value['nftItems'] as Array<any>).map(NftItemToJSON)),

@@ -70,10 +70,15 @@ export function GetRawListBlockTransactions200ResponseIdsInnerFromJSONTyped(json
     };
 }
 
-export function GetRawListBlockTransactions200ResponseIdsInnerToJSON(value?: GetRawListBlockTransactions200ResponseIdsInner | null): any {
+  export function GetRawListBlockTransactions200ResponseIdsInnerToJSON(json: any): GetRawListBlockTransactions200ResponseIdsInner {
+      return GetRawListBlockTransactions200ResponseIdsInnerToJSONTyped(json, false);
+  }
+
+  export function GetRawListBlockTransactions200ResponseIdsInnerToJSONTyped(value?: GetRawListBlockTransactions200ResponseIdsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'mode': value['mode'],

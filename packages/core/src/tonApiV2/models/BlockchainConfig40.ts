@@ -18,6 +18,7 @@ import {
     MisbehaviourPunishmentConfigFromJSON,
     MisbehaviourPunishmentConfigFromJSONTyped,
     MisbehaviourPunishmentConfigToJSON,
+    MisbehaviourPunishmentConfigToJSONTyped,
 } from './MisbehaviourPunishmentConfig';
 
 /**
@@ -56,10 +57,15 @@ export function BlockchainConfig40FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig40ToJSON(value?: BlockchainConfig40 | null): any {
+  export function BlockchainConfig40ToJSON(json: any): BlockchainConfig40 {
+      return BlockchainConfig40ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig40ToJSONTyped(value?: BlockchainConfig40 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'misbehaviour_punishment_config': MisbehaviourPunishmentConfigToJSON(value['misbehaviourPunishmentConfig']),

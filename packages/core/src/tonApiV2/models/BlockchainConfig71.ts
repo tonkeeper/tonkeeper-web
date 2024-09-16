@@ -18,6 +18,7 @@ import {
     OracleBridgeParamsFromJSON,
     OracleBridgeParamsFromJSONTyped,
     OracleBridgeParamsToJSON,
+    OracleBridgeParamsToJSONTyped,
 } from './OracleBridgeParams';
 
 /**
@@ -56,10 +57,15 @@ export function BlockchainConfig71FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig71ToJSON(value?: BlockchainConfig71 | null): any {
+  export function BlockchainConfig71ToJSON(json: any): BlockchainConfig71 {
+      return BlockchainConfig71ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig71ToJSONTyped(value?: BlockchainConfig71 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'oracle_bridge_params': OracleBridgeParamsToJSON(value['oracleBridgeParams']),

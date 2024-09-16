@@ -18,12 +18,14 @@ import {
     StateInitFromJSON,
     StateInitFromJSONTyped,
     StateInitToJSON,
+    StateInitToJSONTyped,
 } from './StateInit';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -203,10 +205,15 @@ export function MessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): M
     };
 }
 
-export function MessageToJSON(value?: Message | null): any {
+  export function MessageToJSON(json: any): Message {
+      return MessageToJSONTyped(json, false);
+  }
+
+  export function MessageToJSONTyped(value?: Message | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'msg_type': value['msgType'],

@@ -49,3 +49,7 @@ export function AccountStatusToJSON(value?: AccountStatus | null): any {
     return value as any;
 }
 
+export function AccountStatusToJSONTyped(value: any, ignoreDiscriminator: boolean): AccountStatus {
+    return value as AccountStatus;
+}
+

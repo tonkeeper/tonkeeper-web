@@ -18,6 +18,7 @@ import {
     JettonVerificationTypeFromJSON,
     JettonVerificationTypeFromJSONTyped,
     JettonVerificationTypeToJSON,
+    JettonVerificationTypeToJSONTyped,
 } from './JettonVerificationType';
 
 /**
@@ -62,6 +63,12 @@ export interface JettonPreview {
      * @memberof JettonPreview
      */
     verification: JettonVerificationType;
+    /**
+     * 
+     * @type {string}
+     * @memberof JettonPreview
+     */
+    customPayloadApiUri?: string;
 }
 
 
@@ -95,13 +102,19 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
         'decimals': json['decimals'],
         'image': json['image'],
         'verification': JettonVerificationTypeFromJSON(json['verification']),
+        'customPayloadApiUri': json['custom_payload_api_uri'] == null ? undefined : json['custom_payload_api_uri'],
     };
 }
 
-export function JettonPreviewToJSON(value?: JettonPreview | null): any {
+  export function JettonPreviewToJSON(json: any): JettonPreview {
+      return JettonPreviewToJSONTyped(json, false);
+  }
+
+  export function JettonPreviewToJSONTyped(value?: JettonPreview | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],
@@ -110,6 +123,7 @@ export function JettonPreviewToJSON(value?: JettonPreview | null): any {
         'decimals': value['decimals'],
         'image': value['image'],
         'verification': JettonVerificationTypeToJSON(value['verification']),
+        'custom_payload_api_uri': value['customPayloadApiUri'],
     };
 }
 

@@ -96,10 +96,15 @@ export function ActionPhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function ActionPhaseToJSON(value?: ActionPhase | null): any {
+  export function ActionPhaseToJSON(json: any): ActionPhase {
+      return ActionPhaseToJSONTyped(json, false);
+  }
+
+  export function ActionPhaseToJSONTyped(value?: ActionPhase | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'success': value['success'],

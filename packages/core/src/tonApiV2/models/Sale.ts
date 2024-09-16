@@ -18,12 +18,14 @@ import {
     PriceFromJSON,
     PriceFromJSONTyped,
     PriceToJSON,
+    PriceToJSONTyped,
 } from './Price';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -85,10 +87,15 @@ export function SaleFromJSONTyped(json: any, ignoreDiscriminator: boolean): Sale
     };
 }
 
-export function SaleToJSON(value?: Sale | null): any {
+  export function SaleToJSON(json: any): Sale {
+      return SaleToJSONTyped(json, false);
+  }
+
+  export function SaleToJSONTyped(value?: Sale | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

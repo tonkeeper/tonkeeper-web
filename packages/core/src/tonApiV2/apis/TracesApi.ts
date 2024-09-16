@@ -15,15 +15,23 @@
 
 import * as runtime from '../runtime';
 import type {
+  GaslessEstimateRequestMessagesInner,
   StatusDefaultResponse,
   Trace,
 } from '../models/index';
 import {
+    GaslessEstimateRequestMessagesInnerFromJSON,
+    GaslessEstimateRequestMessagesInnerToJSON,
     StatusDefaultResponseFromJSON,
     StatusDefaultResponseToJSON,
     TraceFromJSON,
     TraceToJSON,
 } from '../models/index';
+
+export interface EmulateMessageToTraceRequest {
+    gaslessEstimateRequestMessagesInner: GaslessEstimateRequestMessagesInner;
+    ignoreSignatureCheck?: boolean;
+}
 
 export interface GetTraceRequest {
     traceId: string;
@@ -36,6 +44,21 @@ export interface GetTraceRequest {
  * @interface TracesApiInterface
  */
 export interface TracesApiInterface {
+    /**
+     * Emulate sending message to blockchain
+     * @param {GaslessEstimateRequestMessagesInner} gaslessEstimateRequestMessagesInner bag-of-cells serialized to hex
+     * @param {boolean} [ignoreSignatureCheck] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TracesApiInterface
+     */
+    emulateMessageToTraceRaw(requestParameters: EmulateMessageToTraceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Trace>>;
+
+    /**
+     * Emulate sending message to blockchain
+     */
+    emulateMessageToTrace(requestParameters: EmulateMessageToTraceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Trace>;
+
     /**
      * Get the trace by trace ID or hash of any transaction in trace
      * @param {string} traceId trace ID or transaction hash in hex (without 0x) or base64url format
@@ -56,6 +79,46 @@ export interface TracesApiInterface {
  * 
  */
 export class TracesApi extends runtime.BaseAPI implements TracesApiInterface {
+
+    /**
+     * Emulate sending message to blockchain
+     */
+    async emulateMessageToTraceRaw(requestParameters: EmulateMessageToTraceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Trace>> {
+        if (requestParameters['gaslessEstimateRequestMessagesInner'] == null) {
+            throw new runtime.RequiredError(
+                'gaslessEstimateRequestMessagesInner',
+                'Required parameter "gaslessEstimateRequestMessagesInner" was null or undefined when calling emulateMessageToTrace().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['ignoreSignatureCheck'] != null) {
+            queryParameters['ignore_signature_check'] = requestParameters['ignoreSignatureCheck'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/v2/traces/emulate`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: GaslessEstimateRequestMessagesInnerToJSON(requestParameters['gaslessEstimateRequestMessagesInner']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TraceFromJSON(jsonValue));
+    }
+
+    /**
+     * Emulate sending message to blockchain
+     */
+    async emulateMessageToTrace(requestParameters: EmulateMessageToTraceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Trace> {
+        const response = await this.emulateMessageToTraceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get the trace by trace ID or hash of any transaction in trace

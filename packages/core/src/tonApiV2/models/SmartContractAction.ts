@@ -18,12 +18,14 @@ import {
     RefundFromJSON,
     RefundFromJSONTyped,
     RefundToJSON,
+    RefundToJSONTyped,
 } from './Refund';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -100,10 +102,15 @@ export function SmartContractActionFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function SmartContractActionToJSON(value?: SmartContractAction | null): any {
+  export function SmartContractActionToJSON(json: any): SmartContractAction {
+      return SmartContractActionToJSONTyped(json, false);
+  }
+
+  export function SmartContractActionToJSONTyped(value?: SmartContractAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'executor': AccountAddressToJSON(value['executor']),

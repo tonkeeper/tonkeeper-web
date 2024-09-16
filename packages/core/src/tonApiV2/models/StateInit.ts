@@ -57,10 +57,15 @@ export function StateInitFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function StateInitToJSON(value?: StateInit | null): any {
+  export function StateInitToJSON(json: any): StateInit {
+      return StateInitToJSONTyped(json, false);
+  }
+
+  export function StateInitToJSONTyped(value?: StateInit | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'boc': value['boc'],

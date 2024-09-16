@@ -18,6 +18,7 @@ import {
     EmulateMessageToWalletRequestParamsInnerFromJSON,
     EmulateMessageToWalletRequestParamsInnerFromJSONTyped,
     EmulateMessageToWalletRequestParamsInnerToJSON,
+    EmulateMessageToWalletRequestParamsInnerToJSONTyped,
 } from './EmulateMessageToWalletRequestParamsInner';
 
 /**
@@ -63,10 +64,15 @@ export function EmulateMessageToWalletRequestFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-export function EmulateMessageToWalletRequestToJSON(value?: EmulateMessageToWalletRequest | null): any {
+  export function EmulateMessageToWalletRequestToJSON(json: any): EmulateMessageToWalletRequest {
+      return EmulateMessageToWalletRequestToJSONTyped(json, false);
+  }
+
+  export function EmulateMessageToWalletRequestToJSONTyped(value?: EmulateMessageToWalletRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'boc': value['boc'],

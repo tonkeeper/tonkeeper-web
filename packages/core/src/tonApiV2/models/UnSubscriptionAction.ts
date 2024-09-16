@@ -18,6 +18,7 @@ import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -72,10 +73,15 @@ export function UnSubscriptionActionFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function UnSubscriptionActionToJSON(value?: UnSubscriptionAction | null): any {
+  export function UnSubscriptionActionToJSON(json: any): UnSubscriptionAction {
+      return UnSubscriptionActionToJSONTyped(json, false);
+  }
+
+  export function UnSubscriptionActionToJSONTyped(value?: UnSubscriptionAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'subscriber': AccountAddressToJSON(value['subscriber']),

@@ -18,6 +18,7 @@ import {
     OracleFromJSON,
     OracleFromJSONTyped,
     OracleToJSON,
+    OracleToJSONTyped,
 } from './Oracle';
 
 /**
@@ -80,10 +81,15 @@ export function OracleBridgeParamsFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function OracleBridgeParamsToJSON(value?: OracleBridgeParams | null): any {
+  export function OracleBridgeParamsToJSON(json: any): OracleBridgeParams {
+      return OracleBridgeParamsToJSONTyped(json, false);
+  }
+
+  export function OracleBridgeParamsToJSONTyped(value?: OracleBridgeParams | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'bridge_addr': value['bridgeAddr'],

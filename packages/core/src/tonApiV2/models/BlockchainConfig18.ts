@@ -18,6 +18,7 @@ import {
     BlockchainConfig18StoragePricesInnerFromJSON,
     BlockchainConfig18StoragePricesInnerFromJSONTyped,
     BlockchainConfig18StoragePricesInnerToJSON,
+    BlockchainConfig18StoragePricesInnerToJSONTyped,
 } from './BlockchainConfig18StoragePricesInner';
 
 /**
@@ -56,10 +57,15 @@ export function BlockchainConfig18FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig18ToJSON(value?: BlockchainConfig18 | null): any {
+  export function BlockchainConfig18ToJSON(json: any): BlockchainConfig18 {
+      return BlockchainConfig18ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig18ToJSONTyped(value?: BlockchainConfig18 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'storage_prices': ((value['storagePrices'] as Array<any>).map(BlockchainConfig18StoragePricesInnerToJSON)),

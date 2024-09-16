@@ -49,10 +49,15 @@ export function GetAccountDiff200ResponseFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function GetAccountDiff200ResponseToJSON(value?: GetAccountDiff200Response | null): any {
+  export function GetAccountDiff200ResponseToJSON(json: any): GetAccountDiff200Response {
+      return GetAccountDiff200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetAccountDiff200ResponseToJSONTyped(value?: GetAccountDiff200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'balance_change': value['balanceChange'],

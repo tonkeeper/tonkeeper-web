@@ -49,10 +49,15 @@ export function BlockchainConfig31FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig31ToJSON(value?: BlockchainConfig31 | null): any {
+  export function BlockchainConfig31ToJSON(json: any): BlockchainConfig31 {
+      return BlockchainConfig31ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig31ToJSONTyped(value?: BlockchainConfig31 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'fundamental_smc_addr': value['fundamentalSmcAddr'],

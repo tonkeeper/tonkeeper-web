@@ -57,10 +57,15 @@ export function CreditPhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function CreditPhaseToJSON(value?: CreditPhase | null): any {
+  export function CreditPhaseToJSON(json: any): CreditPhase {
+      return CreditPhaseToJSONTyped(json, false);
+  }
+
+  export function CreditPhaseToJSONTyped(value?: CreditPhase | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'fees_collected': value['feesCollected'],

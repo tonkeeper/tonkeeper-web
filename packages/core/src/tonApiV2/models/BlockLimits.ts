@@ -18,6 +18,7 @@ import {
     BlockParamLimitsFromJSON,
     BlockParamLimitsFromJSONTyped,
     BlockParamLimitsToJSON,
+    BlockParamLimitsToJSONTyped,
 } from './BlockParamLimits';
 
 /**
@@ -72,10 +73,15 @@ export function BlockLimitsFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function BlockLimitsToJSON(value?: BlockLimits | null): any {
+  export function BlockLimitsToJSON(json: any): BlockLimits {
+      return BlockLimitsToJSONTyped(json, false);
+  }
+
+  export function BlockLimitsToJSONTyped(value?: BlockLimits | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'bytes': BlockParamLimitsToJSON(value['bytes']),

@@ -18,6 +18,7 @@ import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -64,10 +65,15 @@ export function ElectionsDepositStakeActionFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function ElectionsDepositStakeActionToJSON(value?: ElectionsDepositStakeAction | null): any {
+  export function ElectionsDepositStakeActionToJSON(json: any): ElectionsDepositStakeAction {
+      return ElectionsDepositStakeActionToJSONTyped(json, false);
+  }
+
+  export function ElectionsDepositStakeActionToJSONTyped(value?: ElectionsDepositStakeAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'amount': value['amount'],

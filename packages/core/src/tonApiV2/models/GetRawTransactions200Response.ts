@@ -18,6 +18,7 @@ import {
     BlockRawFromJSON,
     BlockRawFromJSONTyped,
     BlockRawToJSON,
+    BlockRawToJSONTyped,
 } from './BlockRaw';
 
 /**
@@ -64,10 +65,15 @@ export function GetRawTransactions200ResponseFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-export function GetRawTransactions200ResponseToJSON(value?: GetRawTransactions200Response | null): any {
+  export function GetRawTransactions200ResponseToJSON(json: any): GetRawTransactions200Response {
+      return GetRawTransactions200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetRawTransactions200ResponseToJSONTyped(value?: GetRawTransactions200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'ids': ((value['ids'] as Array<any>).map(BlockRawToJSON)),

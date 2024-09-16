@@ -65,10 +65,15 @@ export function BlockchainConfig13FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig13ToJSON(value?: BlockchainConfig13 | null): any {
+  export function BlockchainConfig13ToJSON(json: any): BlockchainConfig13 {
+      return BlockchainConfig13ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig13ToJSONTyped(value?: BlockchainConfig13 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'deposit': value['deposit'],

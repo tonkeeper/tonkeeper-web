@@ -18,6 +18,7 @@ import {
     AccountStakingInfoFromJSON,
     AccountStakingInfoFromJSONTyped,
     AccountStakingInfoToJSON,
+    AccountStakingInfoToJSONTyped,
 } from './AccountStakingInfo';
 
 /**
@@ -56,10 +57,15 @@ export function AccountStakingFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function AccountStakingToJSON(value?: AccountStaking | null): any {
+  export function AccountStakingToJSON(json: any): AccountStaking {
+      return AccountStakingToJSONTyped(json, false);
+  }
+
+  export function AccountStakingToJSONTyped(value?: AccountStaking | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'pools': ((value['pools'] as Array<any>).map(AccountStakingInfoToJSON)),

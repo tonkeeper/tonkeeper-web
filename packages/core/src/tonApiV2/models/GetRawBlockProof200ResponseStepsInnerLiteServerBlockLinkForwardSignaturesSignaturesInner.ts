@@ -57,10 +57,15 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardS
     };
 }
 
-export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerToJSON(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner | null): any {
+  export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerToJSON(json: any): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner {
+      return GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerToJSONTyped(json, false);
+  }
+
+  export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInnerToJSONTyped(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardSignaturesSignaturesInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'node_id_short': value['nodeIdShort'],

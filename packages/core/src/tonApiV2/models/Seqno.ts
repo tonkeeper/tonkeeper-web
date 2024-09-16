@@ -49,10 +49,15 @@ export function SeqnoFromJSONTyped(json: any, ignoreDiscriminator: boolean): Seq
     };
 }
 
-export function SeqnoToJSON(value?: Seqno | null): any {
+  export function SeqnoToJSON(json: any): Seqno {
+      return SeqnoToJSONTyped(json, false);
+  }
+
+  export function SeqnoToJSONTyped(value?: Seqno | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'seqno': value['seqno'],

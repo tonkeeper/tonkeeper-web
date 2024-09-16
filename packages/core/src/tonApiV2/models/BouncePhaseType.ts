@@ -48,3 +48,7 @@ export function BouncePhaseTypeToJSON(value?: BouncePhaseType | null): any {
     return value as any;
 }
 
+export function BouncePhaseTypeToJSONTyped(value: any, ignoreDiscriminator: boolean): BouncePhaseType {
+    return value as BouncePhaseType;
+}
+
