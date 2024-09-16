@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -127,11 +126,10 @@ const DeleteAllContent: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
     const { mutateAsync, isLoading } = useMutateDeleteAll();
-    const client = useQueryClient();
 
     const onDelete = async () => {
         await mutateAsync();
-        window.location.href = window.location.origin;
+        window.location.href = window.location.href;
     };
 
     return (
