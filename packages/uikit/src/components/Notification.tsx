@@ -137,7 +137,7 @@ const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ ente
 const Splash = styled.div`
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: ${p => p.theme.backgroundOverlayStrong};
     display: flex;
     flex-direction: column;
     align-items: center;

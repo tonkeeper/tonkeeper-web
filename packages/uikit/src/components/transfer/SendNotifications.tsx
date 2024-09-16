@@ -249,6 +249,7 @@ const SendContent: FC<{
                             {view === 'multisig-settings' && (
                                 <MultisigOrderFormView
                                     onSubmit={val => {
+                                        setRight(true);
                                         setMultisigTimeout(val.lifetime);
                                         setView('recipient');
                                     }}
@@ -275,7 +276,10 @@ const SendContent: FC<{
                                         <RecipientHeaderBlock
                                             onBack={
                                                 isActiveAccountMultisig
-                                                    ? () => setView('multisig-settings')
+                                                    ? () => {
+                                                          setRight(false);
+                                                          setView('multisig-settings');
+                                                      }
                                                     : undefined
                                             }
                                             title={t('transaction_recipient')}
