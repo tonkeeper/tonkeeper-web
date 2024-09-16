@@ -57,7 +57,7 @@ export const estimateTonMultiTransfer = async (
     const timestamp = await getServerTime(api);
 
     const total = transferMessages.reduce((acc, msg) => acc.plus(msg.weiAmount), new BigNumber(0));
-    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
     checkMaxAllowedMessagesInMultiTransferOrDie(transferMessages.length, walletState.version);
@@ -89,7 +89,7 @@ export const sendTonMultiTransfer = async (
     const timestamp = await getServerTime(api);
 
     const total = transferMessages.reduce((acc, msg) => acc.plus(msg.weiAmount), new BigNumber(0));
-    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total.plus(feeEstimate), wallet);
 
     checkMaxAllowedMessagesInMultiTransferOrDie(transferMessages.length, walletState.version);
@@ -144,7 +144,7 @@ export const estimateJettonMultiTransfer = async (
 ) => {
     const timestamp = await getServerTime(api);
 
-    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(
         BigNumber((jettonTransferAmount * BigInt(transferMessages.length)).toString()),
         wallet
@@ -180,7 +180,7 @@ export const sendJettonMultiTransfer = async (
 ) => {
     const timestamp = await getServerTime(api);
 
-    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
 
     checkMaxAllowedMessagesInMultiTransferOrDie(transferMessages.length, walletState.version);
 
@@ -311,7 +311,7 @@ export const sendNftMultiTransfer = async (
 ) => {
     const timestamp = await getServerTime(api);
 
-    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
 
     checkMaxAllowedMessagesInMultiTransferOrDie(transferMessages.length, walletState.version);
 

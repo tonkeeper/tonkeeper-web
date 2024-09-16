@@ -57,7 +57,7 @@ export enum QueryKey {
     swapCustomToken = 'swapCustomToken',
 
     multisigWallet = 'multisigWallet',
-    multisigWallet = 'multisigOrder'
+    multisigOrder = 'multisigOrder'
 }
 
 export enum JettonKey {

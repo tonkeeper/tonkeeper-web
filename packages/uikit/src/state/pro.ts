@@ -1,9 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-    getAccountByWalletById,
-    getWalletById,
-    isAccountControllable
-} from '@tonkeeper/core/dist/entries/account';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { ProState, ProStateAuthorized, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
@@ -32,8 +27,6 @@ import { QueryKey } from '../libs/queryKey';
 import { useUserLanguage } from './language';
 import { signTonConnectOver } from './mnemonic';
 import { useCheckTouchId } from './password';
-import { useUserLanguage } from './language';
-import { useAccountsStorage } from '../hooks/useStorage';
 import {
     getAccountByWalletById,
     getWalletById,
@@ -89,7 +82,7 @@ export const useSelectWalletForProMutation = () => {
         await authViaTonConnect(
             api,
             wallet,
-            signTonConnectOver(sdk, account.id, wallet, t, checkTouchId)
+            signTonConnectOver({ sdk, accountId: account.id, wallet, t, checkTouchId })
         );
 
         await client.invalidateQueries([QueryKey.pro]);

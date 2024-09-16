@@ -20,7 +20,7 @@ import {
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
+import { I18nContext, TranslationContext, useTWithReplaces } from "@tonkeeper/uikit/dist/hooks/translation";
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
@@ -41,6 +41,8 @@ import { RouterProvider, createBrowserRouter, useNavigate } from 'react-router-d
 import { MobileView } from './AppMobile';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
+import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
+import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));

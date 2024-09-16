@@ -1,12 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 import {
     ConnectItemReply,
     ConnectRequest,
     DAppManifest
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { TonWalletStandard, isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import {
     getAppConnections,
     getTonConnectParams,
@@ -28,10 +25,8 @@ import { useTranslation } from '../hooks/translation';
 import { subject } from '../libs/atom';
 import { QueryKey } from '../libs/queryKey';
 import { signTonConnectOver } from './mnemonic';
-import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
 import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { useActiveWallet, useAccountsState, useActiveAccount, useActiveTonNetwork } from './wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { useCheckTouchId } from './password';
 import {
@@ -54,7 +49,7 @@ export const useAppTonConnectConnections = () => {
         async () => {
             return getAppConnections(sdk.storage);
         },
-        { enabled: wallets != undefined }
+        { enabled: wallets !== undefined }
     );
 };
 
@@ -128,7 +123,12 @@ export const useConnectTonConnectAppMutation = () => {
                 if (activeIsLedger) {
                     throw new Error('Ledger doesnt support ton_proof');
                 }
-                const signTonConnect = signTonConnectOver(sdk, account.id, t, checkTouchId);
+                const signTonConnect = signTonConnectOver({
+                    sdk,
+                    accountId: account.id,
+                    t,
+                    checkTouchId
+                });
                 const timestamp = await getServerTime(api);
                 const proof = tonConnectProofPayload(
                     timestamp,

@@ -2,7 +2,6 @@ import { Address, beginCell, storeStateInit } from '@ton/core';
 import { getSecureRandomBytes, keyPairFromSeed, sha256_sync } from '@ton/crypto';
 import queryString from 'query-string';
 import { IStorage } from '../../Storage';
-import { Account, isAccountControllable } from '../../entries/account';
 import { TonConnectError } from '../../entries/exception';
 import { Network } from '../../entries/network';
 import {
@@ -21,7 +20,7 @@ import {
     TonConnectAccount,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
-import { isStandardTonWallet, TonContract, TonWalletStandard } from '../../entries/wallet';
+import { isStandardTonWallet, TonContract } from '../../entries/wallet';
 import { TonWalletStandard, WalletVersion } from '../../entries/wallet';
 import { accountsStorage } from '../accountsStorage';
 import { getDevSettings } from '../devStorage';
@@ -34,8 +33,6 @@ import {
     saveAccountConnection
 } from './connectionService';
 import { SessionCrypto } from './protocol';
-import { accountsStorage } from '../accountsStorage';
-import { getDevSettings } from '../devStorage';
 import { Account, isAccountTonWalletStandard } from '../../entries/account';
 
 export function parseTonConnect(options: { url: string }): TonConnectParams | string {
@@ -399,7 +396,10 @@ export const saveWalletTonConnect = async (options: {
 }): Promise<ConnectEvent> => {
     await saveAccountConnection(options);
 
-    const maxMessages = options.wallet.version === WalletVersion.V5R1 ? 255 : 4;
+    const maxMessages =
+        isStandardTonWallet(options.wallet) && options.wallet.version === WalletVersion.V5R1
+            ? 255
+            : 4;
     return {
         id: Date.now(),
         event: 'connect',

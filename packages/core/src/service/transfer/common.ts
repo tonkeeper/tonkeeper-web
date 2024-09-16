@@ -15,15 +15,10 @@ import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipient } from '../../entries/send';
-import { BaseSigner } from '../../entries/signer';
 import { TonContract, TonWalletStandard } from '../../entries/wallet';
-import { TonRecipient, TransferEstimationEvent } from '../../entries/send';
 import { Signer } from '../../entries/signer';
-import { TonWalletStandard } from '../../entries/wallet';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
 import { Account, AccountsApi, EmulationApi, LiteServerApi, WalletApi } from '../../tonApiV2';
-import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
-import { getLedgerAccountPathByIndex } from '../ledger/utils';
 import { WalletContract, walletContractFromState } from '../wallet/contractService';
 
 export enum SendMode {
@@ -121,7 +116,7 @@ export const createAutoFeeTransferMessage = async (
     wallet: {
         seqno: number;
         state: TonWalletStandard;
-        signer: BaseSigner;
+        signer: Signer;
         timestamp: number;
     },
     transaction: {
@@ -167,12 +162,7 @@ export const createTransferMessage = async (
     let transfer: Cell;
 
     if (wallet.signer.type === 'ledger') {
-        if (account.type !== 'ledger') {
-            throw new Error('Ledger signer can only be used with ledger accounts');
-        }
-        const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
-
-        transfer = await wallet.signer(path, {
+        transfer = await wallet.signer({
             to: Address.parse(transaction.to),
             bounce: true,
             amount: BigInt(value),

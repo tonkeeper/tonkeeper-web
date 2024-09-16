@@ -16,23 +16,14 @@
 import * as runtime from '../runtime';
 import type {
   Event,
-  GaslessEstimateRequestMessagesInner,
   StatusDefaultResponse,
 } from '../models/index';
 import {
     EventFromJSON,
     EventToJSON,
-    GaslessEstimateRequestMessagesInnerFromJSON,
-    GaslessEstimateRequestMessagesInnerToJSON,
     StatusDefaultResponseFromJSON,
     StatusDefaultResponseToJSON,
 } from '../models/index';
-
-export interface EmulateMessageToEventRequest {
-    gaslessEstimateRequestMessagesInner: GaslessEstimateRequestMessagesInner;
-    acceptLanguage?: string;
-    ignoreSignatureCheck?: boolean;
-}
 
 export interface GetEventRequest {
     eventId: string;
@@ -46,22 +37,6 @@ export interface GetEventRequest {
  * @interface EventsApiInterface
  */
 export interface EventsApiInterface {
-    /**
-     * Emulate sending message to blockchain
-     * @param {GaslessEstimateRequestMessagesInner} gaslessEstimateRequestMessagesInner bag-of-cells serialized to hex
-     * @param {string} [acceptLanguage] 
-     * @param {boolean} [ignoreSignatureCheck] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof EventsApiInterface
-     */
-    emulateMessageToEventRaw(requestParameters: EmulateMessageToEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Event>>;
-
-    /**
-     * Emulate sending message to blockchain
-     */
-    emulateMessageToEvent(requestParameters: EmulateMessageToEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Event>;
-
     /**
      * Get an event either by event ID or a hash of any transaction in a trace. An event is built on top of a trace which is a series of transactions caused by one inbound message. TonAPI looks for known patterns inside the trace and splits the trace into actions, where a single action represents a meaningful high-level operation like a Jetton Transfer or an NFT Purchase. Actions are expected to be shown to users. It is advised not to build any logic on top of actions because actions can be changed at any time.
      * @param {string} eventId event ID or transaction hash in hex (without 0x) or base64url format
@@ -83,50 +58,6 @@ export interface EventsApiInterface {
  * 
  */
 export class EventsApi extends runtime.BaseAPI implements EventsApiInterface {
-
-    /**
-     * Emulate sending message to blockchain
-     */
-    async emulateMessageToEventRaw(requestParameters: EmulateMessageToEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Event>> {
-        if (requestParameters['gaslessEstimateRequestMessagesInner'] == null) {
-            throw new runtime.RequiredError(
-                'gaslessEstimateRequestMessagesInner',
-                'Required parameter "gaslessEstimateRequestMessagesInner" was null or undefined when calling emulateMessageToEvent().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        if (requestParameters['ignoreSignatureCheck'] != null) {
-            queryParameters['ignore_signature_check'] = requestParameters['ignoreSignatureCheck'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (requestParameters['acceptLanguage'] != null) {
-            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
-        }
-
-        const response = await this.request({
-            path: `/v2/events/emulate`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: GaslessEstimateRequestMessagesInnerToJSON(requestParameters['gaslessEstimateRequestMessagesInner']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => EventFromJSON(jsonValue));
-    }
-
-    /**
-     * Emulate sending message to blockchain
-     */
-    async emulateMessageToEvent(requestParameters: EmulateMessageToEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Event> {
-        const response = await this.emulateMessageToEventRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
 
     /**
      * Get an event either by event ID or a hash of any transaction in a trace. An event is built on top of a trace which is a series of transactions caused by one inbound message. TonAPI looks for known patterns inside the trace and splits the trace into actions, where a single action represents a meaningful high-level operation like a Jetton Transfer or an NFT Purchase. Actions are expected to be shown to users. It is advised not to build any logic on top of actions because actions can be changed at any time.

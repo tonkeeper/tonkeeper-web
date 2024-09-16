@@ -17,7 +17,6 @@ import { TonContract, TonWalletStandard } from '../../entries/wallet';
 import { LedgerError } from '../../errors/LedgerError';
 import { AccountsApi, BlockchainApi, EmulationApi, Multisig } from '../../tonApiV2';
 import { createLedgerTonTransfer } from '../ledger/transfer';
-import { getLedgerAccountPathByIndex } from '../ledger/utils';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     SendMode,
@@ -84,16 +83,12 @@ const createTonConnectTransfer = async (
         if (params.messages.length !== 1) {
             throw new LedgerError('Ledger signer does not support multiple messages');
         }
-        if (account.type !== 'ledger') {
-            throw new Error('Ledger signer can only be used with ledger accounts');
-        }
 
         const message = params.messages[0];
-        const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
 
         let transfer: Cell;
         try {
-            transfer = await signer(path, {
+            transfer = await signer({
                 to: Address.parse(message.address),
                 bounce: seeIfAddressBounceable(message.address),
                 amount: BigInt(message.amount),
@@ -148,7 +143,7 @@ export const estimateTonTransfer = async (
     isMax: boolean
 ) => {
     const timestamp = await getServerTime(api);
-    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     if (!isMax) {
         checkWalletPositiveBalanceOrDie(wallet);
     }
@@ -199,7 +194,7 @@ export const estimateTonConnectTransfer = async (
     params: TonConnectTransactionPayload
 ): Promise<TransferEstimationEvent> => {
     const timestamp = await getServerTime(api);
-    const [wallet, seqno] = await getWalletBalance(api, account.activeTonWallet.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(api, account.activeTonWallet);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = await createTonConnectTransfer(
@@ -251,7 +246,7 @@ export const sendTonTransfer = async (
     const total = new BigNumber(fee.event.extra).multipliedBy(-1).plus(amount.weiAmount);
 
     const wallet = account.activeTonWallet;
-    const [tonapiWallet, seqno] = await getWalletBalance(api, wallet.rawAddress);
+    const [tonapiWallet, seqno] = await getWalletBalance(api, wallet);
     if (!isMax) {
         checkWalletBalanceOrDie(total, tonapiWallet);
     }

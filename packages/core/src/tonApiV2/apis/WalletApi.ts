@@ -16,9 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   Accounts,
-  EmulateMessageToWalletRequest,
   GetWalletBackup200Response,
-  MessageConsequences,
   Seqno,
   StatusDefaultResponse,
   TonConnectProof200Response,
@@ -27,12 +25,8 @@ import type {
 import {
     AccountsFromJSON,
     AccountsToJSON,
-    EmulateMessageToWalletRequestFromJSON,
-    EmulateMessageToWalletRequestToJSON,
     GetWalletBackup200ResponseFromJSON,
     GetWalletBackup200ResponseToJSON,
-    MessageConsequencesFromJSON,
-    MessageConsequencesToJSON,
     SeqnoFromJSON,
     SeqnoToJSON,
     StatusDefaultResponseFromJSON,
@@ -42,11 +36,6 @@ import {
     TonConnectProofRequestFromJSON,
     TonConnectProofRequestToJSON,
 } from '../models/index';
-
-export interface EmulateMessageToWalletOperationRequest {
-    emulateMessageToWalletRequest: EmulateMessageToWalletRequest;
-    acceptLanguage?: string;
-}
 
 export interface GetAccountSeqnoRequest {
     accountId: string;
@@ -76,21 +65,6 @@ export interface TonConnectProofOperationRequest {
  * @interface WalletApiInterface
  */
 export interface WalletApiInterface {
-    /**
-     * Emulate sending message to blockchain
-     * @param {EmulateMessageToWalletRequest} emulateMessageToWalletRequest bag-of-cells serialized to base64/hex and additional parameters to configure emulation
-     * @param {string} [acceptLanguage] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof WalletApiInterface
-     */
-    emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageConsequences>>;
-
-    /**
-     * Emulate sending message to blockchain
-     */
-    emulateMessageToWallet(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageConsequences>;
-
     /**
      * Get account seqno
      * @param {string} accountId account ID
@@ -168,46 +142,6 @@ export interface WalletApiInterface {
  * 
  */
 export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
-
-    /**
-     * Emulate sending message to blockchain
-     */
-    async emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageConsequences>> {
-        if (requestParameters['emulateMessageToWalletRequest'] == null) {
-            throw new runtime.RequiredError(
-                'emulateMessageToWalletRequest',
-                'Required parameter "emulateMessageToWalletRequest" was null or undefined when calling emulateMessageToWallet().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (requestParameters['acceptLanguage'] != null) {
-            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
-        }
-
-        const response = await this.request({
-            path: `/v2/wallet/emulate`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: EmulateMessageToWalletRequestToJSON(requestParameters['emulateMessageToWalletRequest']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => MessageConsequencesFromJSON(jsonValue));
-    }
-
-    /**
-     * Emulate sending message to blockchain
-     */
-    async emulateMessageToWallet(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageConsequences> {
-        const response = await this.emulateMessageToWalletRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
 
     /**
      * Get account seqno

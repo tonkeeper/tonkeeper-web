@@ -33,11 +33,7 @@ import {
     ConfirmViewDetailsRecipient
 } from '../ConfirmView';
 import { NftDetailsBlock } from './Common';
-import {
-    useActiveAccount,
-    useActiveStandardTonWallet,
-    useInvalidateActiveWalletQueries
-} from '../../../state/wallet';
+import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../../state/wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 
 const assetAmount = new AssetAmount({
@@ -56,13 +52,12 @@ const useNftTransferEstimation = (nftItem: NftItem, data?: TonRecipientData) => 
         [QueryKey.estimate, data?.address],
         async () => {
             try {
-                if (!isAccountControllable(account)) {
+                if (!isAccountTonWalletStandard(account)) {
                     throw new Error('account not controllable');
                 }
 
                 const payload = await estimateNftTransfer(
                     api,
-                    account,
                     account.activeTonWallet,
                     data!,
                     nftItem

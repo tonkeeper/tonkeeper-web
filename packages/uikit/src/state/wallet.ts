@@ -4,18 +4,15 @@ import { mnemonicValidate } from '@ton/crypto';
 import {
     Account,
     AccountId,
-    AccountMAM,
-    AccountTonMnemonic,
     AccountTonWatchOnly,
     AccountsState,
     getAccountByWalletById,
     getWalletById,
     isAccountVersionEditable,
     isAccountTonWalletStandard,
-    AccountMAM,
-    AccountTonMultisig
-    isAccountControllable,
-    isAccountVersionEditable
+    AccountTonMultisig,
+    AccountTonMnemonic,
+    AccountMAM
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';

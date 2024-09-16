@@ -222,7 +222,7 @@ async function estimateOrderByBodyCell(options: {
 
     const event = await new EmulationApi(options.api.tonApiV2).emulateMessageToAccountEvent({
         accountId: options.multisig.address,
-        decodeMessageRequest: { boc: msgCell.toString('base64') }
+        gaslessEstimateRequestMessagesInner: { boc: msgCell.toString('base64') }
     });
 
     return { event };

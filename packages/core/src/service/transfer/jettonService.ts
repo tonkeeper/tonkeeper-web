@@ -135,7 +135,7 @@ export const estimateJettonTransfer = async (
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string
 ): Promise<TransferEstimationEvent> => {
-    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
     const cell = await createJettonTransferExternal(
@@ -170,7 +170,7 @@ export const sendJettonTransfer = async (
         .plus(jettonTransferAmount.toString());
 
     const walletState = account.activeTonWallet;
-    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
     let buffer: Buffer;

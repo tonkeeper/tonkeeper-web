@@ -1,4 +1,4 @@
-import { Account, isAccountControllable } from '@tonkeeper/core/dist/entries/account';
+import { Account } from '@tonkeeper/core/dist/entries/account';
 import {
     DerivationItemNamed,
     TonContract,
@@ -29,14 +29,7 @@ import { ScanButton } from './connect/ScanButton';
 import { useAddWalletNotification } from './modals/AddWalletNotificationControlled';
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
-import {
-    sortDerivationsByIndex,
-    sortWalletsByVersion,
-    TonContract
-} from '@tonkeeper/core/dist/entries/wallet';
-import { Account, isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
-import { AccountAndWalletBadgesGroup } from './account/AccountBadge';
-import { useAddWalletNotification } from './modals/AddWalletNotificationControlled';
+import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 
 const Block = styled.div<{
     center?: boolean;
@@ -210,14 +203,14 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
                 );
         }
 
-            if (!isAccountTonWalletStandard(a)) {
-                return [
-                    {
-                        wallet: a.activeTonWallet,
-                        account: a
-                    }
-                ];
-            }
+        if (!isAccountTonWalletStandard(a)) {
+            return [
+                {
+                    wallet: a.activeTonWallet,
+                    account: a
+                }
+            ];
+        }
 
         if (a.type === 'mam') {
             return a.derivations.map(derivation => ({

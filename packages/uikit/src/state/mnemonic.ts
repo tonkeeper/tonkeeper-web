@@ -18,14 +18,21 @@ import { delay } from '@tonkeeper/core/dist/utils/common';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import nacl from 'tweetnacl';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
+import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
 
-export const signTonConnectOver = (
-    sdk: IAppSdk,
-    accountId: AccountId,
-    wallet: TonWalletStandard | undefined,
-    t: (text: string) => string,
-    checkTouchId: () => Promise<void>
-) => {
+export const signTonConnectOver = ({
+    sdk,
+    accountId,
+    checkTouchId,
+    wallet,
+    t
+}: {
+    sdk: IAppSdk;
+    accountId: AccountId;
+    wallet?: TonWalletStandard;
+    t: (text: string) => string;
+    checkTouchId: () => Promise<void>;
+}) => {
     return async (bufferToSign: Buffer) => {
         const account = await accountsStorage(sdk.storage).getAccount(accountId);
 
@@ -141,7 +148,8 @@ export const getSigner = async (
                 return assertUnreachable(account.auth);
             }
             case 'ledger': {
-                const callback = async (path: number[], transaction: LedgerTransaction) =>
+                const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
+                const callback = async (transaction: LedgerTransaction) =>
                     pairLedgerByNotification(sdk, path, transaction);
                 callback.type = 'ledger' as const;
                 return callback;
