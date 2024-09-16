@@ -21,8 +21,8 @@
     "sent" : "發送",
     "swapped" : "交換了",
     "time_on" : "於{time}",
-    "withdraw" : "提取",
-    "withdrawal_request" : "提現請求"
+    "withdraw" : "解除質押",
+    "withdrawal_request" : "請求解除質押"
   },
   "activity" : {
     "buy_toncoin_btn" : "購買Toncoin",
@@ -128,11 +128,12 @@
     "approve_collection_many" : "批准來自“{collection}\"收藏的代幣",
     "approve_collection_one" : "批准來自“{collection}\"收藏的代幣",
     "approve_many" : "批准 {count} 收到的代幣",
+    "approve_many.few" : " ",
     "approve_many.many" : " ",
     "approve_many.one" : " ",
     "approve_many.other" : " ",
     "approve_token" : "批准收到的代幣“{name}\"",
-    "approve_two_collections" : "批准來自“{collection1}” “{collection2}”集合的代幣",
+    "approve_two_collections" : "批准來自“{collection1}” “{collection2}”收藏的代幣",
     "approve_two_tokens" : "批准收到的代幣“{name1}”和“{name2}”",
     "blacklisted_collection" : "黑名單收藏",
     "blacklisted_token" : "列入黑名單的代幣",
@@ -142,7 +143,7 @@
     "declined_at_token" : "已於 {date} 拒絕",
     "details_collection" : "收藏詳細資料",
     "details_token" : "代幣詳情",
-    "id_collection" : "集合 ID",
+    "id_collection" : "收藏 ID",
     "id_token" : "代幣ID",
     "manage_tokens" : "管理代幣",
     "move_to_accepted" : "移至接受",
@@ -152,18 +153,18 @@
     "move_to_declined_collection" : "從錢包中隱藏收藏",
     "move_to_declined_token" : "從錢包中隱藏代幣",
     "name" : "名稱",
-    "not_spam" : "不是垃圾郵件",
+    "not_spam" : "不是垃圾訊息",
     "pending" : "待處理",
     "show_all" : "顯示全部",
     "single_token" : "單一代幣",
-    "spam" : "垃圾郵件",
+    "spam" : "垃圾訊息",
     "token_copied" : "代幣ID已複製",
     "token_count" : {
       "few" : " ",
       "one" : "{count} 個代幣",
       "other" : "{count} 個代幣"
     },
-    "unverified_token" : "未驗證的令牌",
+    "unverified_token" : "未驗證的代幣",
     "verify_collection" : "驗證收藏",
     "verify_description_collection" : "這些代幣來自未知的發行者。要檢測偽造品，請使用發行者的官方來源驗證收藏ID。您可以稍後在設置中更改代幣的可見性。",
     "verify_description_token" : "這個代幣來自未知的發行者。要檢測偽造品，請使用發行者的官方來源驗證代幣ID。您可以稍後在設置中更改代幣的可見性。",
@@ -429,7 +430,7 @@
     "subtitle" : "選擇您想要添加的錢包。",
     "title" : "選擇錢包",
     "tokens" : "代幣",
-    "w5_subtitle" : "更低的區塊鏈費用、更少燃料費的交易和多重轉帳。",
+    "w5_subtitle" : "更低的區塊鏈費用、Gasless交易和多重轉帳。",
     "w5_subtitle_link" : "了解更多"
   },
   "confirm" : "確認",
@@ -921,7 +922,7 @@
     "stake_into_step" : "質押可用的TON到Tonstakers。",
     "stake_into_tonstakers_action" : "質押到Tonstakers",
     "title" : "通過 Tonstakers 流動質押賺取更多 TON，收益率為 %apy",
-    "unstake_action_all" : "提取 {amount}",
+    "unstake_action_all" : "解除質押 {amount}",
     "unstake_action_manual" : "手動輸入",
     "unstake_step" : "從您目前的質押提供者解除質押 TON。",
     "wait_step" : "等待您的 TON 可用。",
@@ -1064,50 +1065,536 @@
     "light" : "淺色",
     "system" : "系統"
   },
+  "settings_title" : "設定",
+  "settings_to_mainnet" : "切換到主網",
   "settings_to_testnet" : "切換到測試網",
   "settings_version" : "版本",
   "settings_wallet_version" : "啟用地址",
+  "setup_biometry_caption" : "{biometryType} 讓你可以更快打開錢包，無需輸入密碼。",
+  "setup_biometry_enable_button" : "啟用{biometryType}",
+  "setup_biometry_title" : "使用{biometryType}快速登入",
+  "setup_notifications_caption" : "當您收到\nTON、代幣和 NFT 時接收通知",
+  "setup_notifications_enable_button" : "啟用通知",
+  "setup_notifications_title" : "獲取即時\n通知",
+  "signerConfirm" : {
+    "confirm" : "在 Signer 中確認您的交易",
+    "scan_qr" : "使用 Signer 掃描二維碼",
+    "scan_signed_qr" : "從Signer掃描已簽署的交易 QR 碼",
+    "step" : "步驟 {value}",
+    "title" : "確認操作"
+  },
+  "signer_scan_result" : "掃描已簽署的交易",
+  "signer_scan_tx_description" : "請打開 Signer 並掃描交易二維碼",
+  "skip" : "跳過",
+  "spam_action" : "垃圾訊息",
   "staking" : {
+    "active" : "啟用",
     "confirm" : {
+      "address" : {
+        "label" : "接收者地址"
+      },
       "amount" : {
         "label" : "數量",
         "value" : "{value} TON"
       },
+      "fee" : {
+        "label" : "費用",
+        "value" : "≈ {value} TON"
+      },
+      "recipient" : {
+        "label" : "接收者"
+      },
       "withdraw_amount" : {
-        "label" : "提取數量",
-        "value" : " "
+        "label" : "解除質押數量",
+        "value" : "  "
       }
+    },
+    "confirm_deposit" : "確認並質押",
+    "confirm_unstake" : "確認並解除質押",
+    "deposit" : "質押",
+    "desc_large" : "加入質押並獲得獎勵。質押有助於維護TON網絡。",
+    "details" : {
+      "about_pool" : "詳情",
+      "apy" : {
+        "highest_tag" : "最大",
+        "label" : "年利率",
+        "value" : "≈ {value}%"
+      },
+      "balance" : "質押餘額",
+      "cooldown" : {
+        "active" : "啟用",
+        "desc" : "在每個質押週期開始時應用的兩小時期間，以改進週期之間的提取和存款過程",
+        "title" : "冷卻期"
+      },
+      "frequency" : {
+        "label" : "獎勵頻率",
+        "value" : "每 {count} 小時",
+        "value.few" : " ",
+        "value.many" : " ",
+        "value.one" : " ",
+        "value.zero" : " "
+      },
+      "links_title" : " ",
+      "liquidity_token" : {
+        "label" : "{token} 流動性代幣",
+        "value" : "了解更多"
+      },
+      "min_deposit" : {
+        "label" : "最低存款金額",
+        "value" : "{value} TON"
+      },
+      "next_cycle" : {
+        "desc" : "所有交易在周期結束後生效。",
+        "desc_liquid" : "解除質押請求在周期結束後完成。",
+        "in" : "在",
+        "message" : "解除質押請求將在驗證週期結束後處理，時間為 {value}",
+        "reward_title" : "下一次獎勵",
+        "time" : " ",
+        "title" : "下一個週期"
+      },
+      "note" : "質押是基於第三方的智能合約。Tonkeeper 不對質押體驗負責。",
+      "pendingDeposit" : "待處理質押",
+      "pendingWithdraw" : "待處理解除質押",
+      "pendingWithdrawDesc" : "在週期結束後",
+      "pool_address" : {
+        "label" : "池地址"
+      },
+      "readyWithdraw" : "解除質押已準備",
+      "show_details" : " ",
+      "socials" : {
+        "telegram" : "社群",
+        "twitter" : "推特"
+      },
+      "tap_to_collect" : "點擊收藏"
     },
     "estimated_profit" : "{amount} TON – 年利潤\n如果你今天質押 TON",
     "estimated_profit_compare" : "比您目前的質押每年多賺 {amount} TON",
+    "get_withdrawal" : "提取",
+    "highest_apy" : "最大年利率",
     "jetton_note" : "當您在 {poolName} 池中質押 TON 時，您會收到一個名為 {token} 的代幣，該代幣代表您在池中的份額。隨著池中累積利潤，您的 {token} 代表的 TON 數量會增加。",
+    "learn_more" : "了解更多",
     "message" : {
       "pendingDeposit" : "已質押 {amount} TON\n",
+      "pendingDeposit.few" : " ",
+      "pendingDeposit.many" : " ",
+      "pendingDeposit.one" : " ",
+      "pendingDeposit.other" : " ",
+      "pendingDeposit.zero" : " ",
       "pendingWithdraw" : "已提取 {amount} TON\n",
+      "pendingWithdraw.few" : " ",
       "pendingWithdrawLiquid" : "{amount} TON 在週期結束後解除質押",
-      "readyWithdraw" : "{amount} TON 已準備好。\n點擊以收集"
+      "pendingWithdrawLiquid.few" : " ",
+      "pendingWithdrawLiquid.many" : " ",
+      "pendingWithdrawLiquid.one" : " ",
+      "pendingWithdrawLiquid.other" : " ",
+      "pendingWithdrawLiquid.zero" : " ",
+      "pendingWithdraw.many" : " ",
+      "pendingWithdraw.one" : " ",
+      "pendingWithdraw.other" : " ",
+      "pendingWithdraw.zero" : " ",
+      "readyWithdraw" : "{amount} TON 已準備好。\n點擊以收集",
+      "readyWithdraw.few" : " ",
+      "readyWithdraw.many" : " ",
+      "readyWithdraw.one" : " ",
+      "readyWithdraw.zero" : " "
     },
+    "no_funds" : "沒有可解除質押的資金",
+    "not_exists" : "無效的池地址",
+    "other" : "其他",
+    "recommended" : " ",
+    "rewards" : {
+      "after_top_up" : "質押後",
+      "current" : "當前",
+      "title" : "您的年利率",
+      "value" : "≈ {value} TON"
+    },
+    "send_staked_ton" : "已質押 TON",
+    "staked" : "已質押",
+    "staked_ton" : "已質押 TON",
+    "staking_desc" : "最低存款 {minStake} TON。\n賺取高達 {maxApy}% 的收益。",
+    "staking_pool_desc" : "年利率 ≈ {apy}%",
+    "title" : "質押",
+    "title_large" : "TON 質押",
+    "top_up" : "質押",
+    "transaction" : "確認操作",
+    "warning" : {
+      "about" : "關於 {name}",
+      "beta_desc" : "我們不對穩定性和質押體驗負責。使用風險自負。",
+      "desc" : "基於第三方智慧合約的權益質押。我們不對他們的工作負責。",
+      "title" : "警告"
+    },
+    "widget_desc" : "年利率高達 {apy}%",
+    "widget_staking_options" : "質押選項",
+    "widget_title" : "質押 TON",
+    "withdraw" : "解除質押",
     "withdrawal_fee_warning" : {
-      "message" : "請在餘額中至少保留 '{{'amount'}}' TON。"
-    }
+      "continue" : "仍然繼續",
+      "message" : "請在餘額中至少保留 '{{'amount'}}' TON。",
+      "title" : "您的資金不足以提取"
+    },
+    "withdrawal_request" : "解除質押"
   },
-  "transactionDetails" : {
-    "withdraw_amount" : "提取數量"
+  "start_screen" : {
+    "caption" : "建立一個新錢包或添加\n現有錢包",
+    "create_wallet_button" : "創建新錢包",
+    "import_wallet_button" : "導入現有錢包"
   },
-  "transfer_deeplink_amount_error" : "數量請求不正確",
-  "txActions" : {
-    "amount" : "數量",
-    "signRaw" : {
-      "insufficientFunds" : {
-        "stakingDeposit" : "參與的最低餘額：\n{amount} {currency}\n",
-        "toBePaid" : "待支付：{amount} {currency}\n"
+  "stop_watch" : "刪除觀察帳戶",
+  "subscription_back_to_merchant_button" : "返回",
+  "subscription_back_to_merchant_caption" : "交易正在處理中。您的訂閱將很快生效。",
+  "subscription_back_to_merchant_name" : "返回 {merchantName}",
+  "subscription_back_to_merchant_title" : "返回頻道？",
+  "subscription_cancel" : "取消訂閱",
+  "subscription_cancel_alert_cancel_btn" : "不是現在",
+  "subscription_cancel_alert_caption" : "如果您現在取消，您仍然可以訪問您的訂閱直到 {nextBill}",
+  "subscription_cancel_alert_submit_btn" : "是，取消",
+  "subscription_cancel_alert_title" : "取消訂閱？",
+  "subscription_expiring" : "即將到期",
+  "subscription_fee" : "費用",
+  "subscription_next_bill" : "下一張帳單",
+  "subscription_open_merchant" : "在 Telegram 中開啟",
+  "subscription_period" : "間隔",
+  "subscription_period_custom" : "每 {period}",
+  "subscription_period_day" : "每日",
+  "subscription_period_half_year" : "每半年",
+  "subscription_period_hour" : "每小時",
+  "subscription_period_month" : "每月",
+  "subscription_period_quarter" : "每季",
+  "subscription_period_week" : "每週",
+  "subscription_period_weeks" : "每 {count} 週",
+  "subscription_period_year" : "每年",
+  "subscription_price" : "價格",
+  "subscription_sent" : "交易已發送",
+  "subscriptions_item_caption" : "{price} TON，下一次帳單日期：{nextBill}",
+  "subscriptions_item_caption_expired" : "已過期 {date}",
+  "subscriptions_item_caption_expiring" : "{price} TON，有效期至 {date}",
+  "subscriptions_section_active" : "啟用",
+  "subscriptions_section_expired" : "已過期",
+  "subscription_started" : "訂閱已開始",
+  "subscriptions_title" : "訂閱",
+  "subscription_subscribe" : "訂閱",
+  "subscription_title" : "訂閱",
+  "subscription_unsubscribe" : "取消訂閱",
+  "success" : "成功！",
+  "suspicious" : {
+    "buttons" : {
+      "not_spam" : "不是垃圾訊息",
+      "report" : "舉報垃圾訊息"
+    },
+    "label" : {
+      "full" : "未驗證的NFT",
+      "short" : "未驗證"
+    },
+    "status_update" : {
+      "hidden" : {
+        "collection" : "隐藏收藏",
+        "nft" : "隱藏NFT"
+      },
+      "spam" : {
+        "collection" : "已標記為垃圾訊息的收藏",
+        "nft" : "已標記為垃圾訊息的NFT"
       }
     }
   },
+  "suspiciousNFTDetails" : {
+    "buttons" : {
+      "not_spam" : "不是垃圾訊息",
+      "report" : "舉報垃圾訊息"
+    },
+    "paragraphs" : {
+      "p1" : "用於垃圾訊息。用於大規模發送不需要且通常不相關的訊息。",
+      "p2" : "用於詐騙。NFT 的名稱、描述或圖像可能會導致用戶受騙。",
+      "p3" : "我們對這個 NFT 的作者和歷史知之甚少。"
+    },
+    "subtitle" : "NFT 可能因以下原因之一而不安全使用。",
+    "title" : "未驗證的NFT"
+  },
+  "swap_title" : "兌換",
+  "tab_browser" : "瀏覽器",
+  "tab_collectibles" : "收藏品",
+  "tab_nft" : "NFTs",
+  "tab_settings" : "設定",
+  "tab_swap" : "兌換",
+  "tab_wallet" : "錢包",
+  "today" : "今天",
+  "tokenDetails" : {
+    "name" : "名稱",
+    "title" : "代幣詳情",
+    "token_id" : "代幣ID",
+    "tonviewer_button" : "在 Tonviewer 上查看"
+  },
+  "tonconnect_error" : {
+    "bad_request" : "錯誤的請求",
+    "wrong_from" : " 'from' 參數錯誤",
+    "wrong_network" : "網路錯誤"
+  },
+  "tonkeeper_pro" : "Tonkeeper Pro",
+  "tonkeeper_pro_description" : "Tonkeeper Pro 的訂閱包含擴展錢包功能，提供加密貨幣管理工具組。 ",
+  "ton_login_back_to_button" : "返回至{name}",
+  "ton_login_caption" : "{name} 正在請求訪問您的錢包地址",
+  "ton_login_connect_button" : "連接錢包",
+  "ton_login_notice" : "連接錢包前，請務必檢查服務地址。",
+  "ton_login_success" : "完成",
+  "ton_login_title" : "連接到 {0, number}域？",
+  "transaction_bid_collection_name" : "發行人",
+  "transaction_bid_date" : "出價 {date}",
+  "transaction_bid_dns" : "名稱",
+  "transaction_buy_date" : "購買日期於{date}",
+  "transaction_buy_status_failed" : "失敗",
+  "transaction_buy_status_pending" : "待處理",
+  "transaction_buy_status_success" : "成功",
+  "transaction_confirmations" : "確認",
+  "transaction_confirm_bid" : "確認出價",
+  "transaction_contract_deploy_date" : "{date}",
+  "transaction_copy_caution" : "小心外部連結。切勿將您的助記詞提供給第三方資源——您可能會失去所有資金。\n\n- - -\n\n",
+  "transactionDetails" : {
+    "address" : "地址",
+    "bid_collection_name" : "發行人",
+    "bid_date" : " ",
+    "bid_name" : "名稱",
+    "call_contract_date" : " ",
+    "comment" : "Comment",
+    "description" : "描述",
+    "operation" : "操作",
+    "payload" : "有效負載",
+    "purchase_date" : " ",
+    "received_date" : " ",
+    "recipient" : "接收者",
+    "recipient_address" : "接收者地址",
+    "sender" : "發送者",
+    "sender_address" : "發送者地址",
+    "sent_date" : " ",
+    "spam" : "垃圾訊息",
+    "subscription_merchant_label" : "商家",
+    "subscription_product_label" : "訂閱",
+    "swapped_date" : " ",
+    "transaction" : "交易",
+    "unsubscription_title" : "已取消訂閱",
+    "withdraw_amount" : "解除質押數量"
+  },
+  "transaction_exchange_from_currency" : "從",
+  "transaction_fee" : "費用",
+  "transaction_hash" : "交易",
+  "transaction_merchant" : "商家",
+  "transaction_message" : "訊息",
+  "transaction_purchase_id" : "購買 ID",
+  "transaction_receive_date" : "已收到於 {date}",
+  "transaction_recipient" : "接收者",
+  "transaction_recipient_address" : "接收者地址",
+  "transaction_refund" : "退款",
+  "transactions" : {
+    "bid" : "出價",
+    "burned" : "燒毀",
+    "contract_deploy" : "部署合約",
+    "deposit" : "質押",
+    "failed" : "失敗",
+    "failed_with_reason" : {
+      "swap_refund_no_liq" : "失敗。增加交換設置中的滑點容差以避免此錯誤。"
+    },
+    "nft_purchase" : "NFT 購買",
+    "smartcontract_exec" : "呼叫合約",
+    "spam" : "垃圾訊息",
+    "subscription" : "已訂閱",
+    "swap" : "兌換",
+    "unknown" : "未知",
+    "unknown_description" : "發生了一些事情，但我們無法識別",
+    "unsubscription" : "已取消訂閱",
+    "wallet_initialized" : "錢包已初始化",
+    "withdraw" : "解除質押",
+    "withdrawal_request" : "請求解除質押"
+  },
+  "transaction_sender" : "發送者",
+  "transaction_sender_address" : "發送者地址",
+  "transaction_send_more_button" : "發送更多給此接收者",
+  "transaction_sent_date" : "發送於 {date}",
+  "transaction_show_subscription_button" : "查看訂閱",
+  "transaction_status" : "狀態",
+  "transaction_subscription" : "訂閱",
+  "transaction_subscription_date" : "已收費於{date}",
+  "transaction_transfer_name" : "轉移名稱",
+  "transaction_type_bid" : "出價",
+  "transaction_type_bounced" : "退回",
+  "transaction_type_buy" : "已購買",
+  "transaction_type_contract_deploy" : "部署合約",
+  "transaction_type_from" : "從",
+  "transaction_type_new_subscriber" : "新訂閱者",
+  "transaction_type_pending" : "待處理",
+  "transaction_type_receive" : "已接收",
+  "transaction_type_sent" : "已發送",
+  "transaction_type_subscriber_lost" : "失去訂閱者",
+  "transaction_type_subscription" : "已訂閱",
+  "transaction_type_to" : "至",
+  "transaction_type_unsubscription" : "已取消訂閱",
+  "transaction_type_wallet_initialized" : "錢包已初始化",
+  "transaction_unsubscription" : "取消訂閱",
+  "transaction_unsubscription_date" : "{date}",
+  "transaction_view_in_explorer" : "在瀏覽器中查看",
+  "transaction_wallet_initialized_date" : "{date}",
+  "transaction_your_bid" : "您的出價",
+  "transfer_deeplink_address_error" : "接收者地址不正確",
+  "transfer_deeplink_amount_error" : "數量請求不正確",
+  "transfer_deeplink_expired_error" : "連結已過期",
+  "transfer_deeplink_nft_address_error" : "NFT 地址不正確",
+  "transfer_deeplink_unknown_jetton_error" : "未知代幣",
+  "transfer_deeplink_unknown_token" : "未知代幣",
+  "transfer_deeplink_wrong_params" : "參數錯誤",
+  "transfer_from_old_wallet_btn" : "轉移",
+  "transfer_from_old_wallet_caption" : "Tonkeeper 將把所有幣從您的舊地址轉移到您目前的地址。",
+  "transfer_from_old_wallet_in_progress" : "轉移進行中",
+  "transfer_from_old_wallet_title" : "轉移到目前的地址",
+  "transfer_pending_by_battery_error" : "另一個交易正在由電池處理",
+  "txActions" : {
+    "amount" : "數量",
+    "fee" : "費用: {fee}",
+    "refund" : "退款",
+    "signRaw" : {
+      "addressMismatch" : {
+        "switchWallet" : {
+          "close" : "取消",
+          "description" : "切換錢包以確認操作。",
+          "switch" : "切換並繼續",
+          "title" : "錢包操作 {value}"
+        },
+        "wrongVersion" : {
+          "close" : "取消",
+          "description" : "切換您的活動地址至%{version}以確認操作。",
+          "switch" : "切換並繼續",
+          "title" : "另一個錢包地址的操作"
+        },
+        "wrongWallet" : {
+          "close" : "確定",
+          "description" : "登入另一個錢包 {address} 並重試。",
+          "title" : "另一個錢包的操作"
+        }
+      },
+      "comment" : "Comment",
+      "insufficientFunds" : {
+        "rechargeBattery" : "充電",
+        "rechargeWallet" : "購買 {currency}",
+        "stakingDeposit" : "參與的最低餘額：\n{amount} {currency}\n",
+        "stakingFee" : "交易需要 {count} TON。預計手續費 {fee} TON 將被扣除，其餘將被退還。",
+        "stakingFee.few" : " ",
+        "stakingFee.many" : " ",
+        "stakingFee.one" : " ",
+        "stakingFee.other" : " ",
+        "stakingFee.zero" : " ",
+        "title" : "資金不足",
+        "title_multiwallet" : "錢包資金不足",
+        "toBePaid" : "待支付：{amount} {currency}\n",
+        "withFees" : "+ 區塊鏈費用。\n",
+        "yourBalance" : "您的餘額：{balance} {currency}."
+      },
+      "recipient" : "接收者",
+      "title" : "確認交易",
+      "totalFee" : "總費用",
+      "totalRefund" : "總退款",
+      "types" : {
+        "contractDeploy" : "部署合約",
+        "jettonTransfer" : "代幣轉移",
+        "nftItemTransfer" : "NFT 轉移",
+        "subscribe" : "訂閱",
+        "tonTransfer" : "TON 轉移",
+        "unknownTransaction" : "未知交易",
+        "unSubscribe" : "取消訂閱"
+      },
+      "warning_caption" : "Tonkeeper 無法完全驗證此交易的結果。請確保您信任接收者。",
+      "warning_title" : "警告",
+      "wrongTime" : {
+        "button" : "開啟設定",
+        "description" : "看起來您的設備時鐘與網絡不同步。請打開設備設置並啟用自動時間和日期。",
+        "title" : "時鐘未同步"
+      }
+    }
+  },
+  "unverifiedTokenDetails" : {
+    "button" : "確定",
+    "description" : "此代幣因一個或多個原因看起來可疑。",
+    "paragraphs" : {
+      "p1" : "流動性低。代幣可能有一些價值，但非常低。",
+      "p2" : "代幣未在交易平台上列出，需求有限。",
+      "p3" : "用於垃圾訊息。用於大規模發送不需要且通常不相關的訊息。",
+      "p4" : "用於詐騙。Token 的名稱或圖像可能會導致用戶受騙。"
+    },
+    "title" : "未驗證的代幣"
+  },
+  "update" : {
+    "description" : "Tonkeeper 的新版本已經推出。您現在可以下載。",
+    "download" : "下載",
+    "downloading" : "下載中… '{{'progress'}}'%",
+    "mb" : "'{{'size'}}' MB",
+    "remindLater" : "稍後提醒我",
+    "retry" : "下載錯誤。點擊重試。",
+    "tap" : "點擊以更新",
+    "title" : "更新 Tonkeeper",
+    "version" : "版本 '{{'version'}}' "
+  },
+  "upgrade_to_w5" : {
+    "about_button" : "關於 W5 錢包",
+    "description" : "嘗試全新的 W5 錢包標準，支持無需燃料費的 USDT 付款和其他酷炫功能。",
+    "downgrade" : " ",
+    "hide_button" : "隱藏",
+    "settings" : "W5錢包",
+    "title" : "Gasless轉移",
+    "try_button" : "嘗試W5錢包"
+  },
+  "username_issued_by_telegram" : "由 Telegram 發行。",
+  "username_manage_name_button" : "管理名稱",
   "w5_stories" : {
+    "0" : {
+      "description" : "W5 採用更高效的交易處理方法，這意味著最多可降低 25% 的 gas 成本。",
+      "title" : "降低區塊鏈費用"
+    },
+    "1" : {
+      "description" : "W5 將同時操作的數量從 4 增加到 255，這可以節省費用成本。",
+      "title" : "一筆交易最多可包含 255 個操作"
+    },
+    "2" : {
+      "description" : "無需擁有TON即可發送USDT——交易費用將自動由幾美分的USDT支付。",
+      "title" : "Gasless USDT轉移"
+    },
     "3" : {
       "description" : "舊帳戶和 W5 使用相同的助記詞——在新設備上恢復帳戶時，舊帳戶和新帳戶都會自動顯示。",
       "title" : "助記詞不會改變"
+    },
+    "4" : {
+      "button" : "添加 W5 錢包",
+      "description" : "W5 標準尚未定案。Gasless交易作為實驗性功能提供，以測試其運作方式。在最終版本發布之前，請勿將所有資產轉移到 W5 錢包。 ",
+      "title" : "W5 是測試版"
     }
-  }
+  },
+  "wallet_about" : "關於",
+  "wallet_buy" : "購買",
+  "wallet" : {
+    "buy_btn" : "購買與出售",
+    "collectibles_tab_lable" : "收藏品",
+    "edit_tokens_btn" : "編輯",
+    "inscriptions_tab_label" : "銘文",
+    "nft_tab_lable" : "收藏品",
+    "old_wallets_title" : "舊錢包",
+    "old_wallet_title" : "舊錢包",
+    "receive_btn" : "接收",
+    "scan_btn" : "掃描",
+    "screen_title" : "錢包",
+    "sell_btn" : " ",
+    "send_btn" : "發送",
+    "stake_btn" : "質押",
+    "swap_btn" : "兌換",
+    "tonkens_tab_lable" : "代幣",
+    "updated_at" : "更新於 {value}"
+  },
+  "wallet_chat" : "聊天",
+  "wallet_community" : "社群",
+  "wallet_hours_symbol" : "小時",
+  "wallet_old_balance" : "舊錢包:",
+  "wallet_receive" : "接收",
+  "wallets" : "錢包",
+  "wallet_sell" : "出售",
+  "wallet_send" : "發送",
+  "wallet_source_code" : "源代碼",
+  "wallet_swap" : "兌換",
+  "wallet_title" : "錢包",
+  "wallet_toncommunity_chat_link" : " ",
+  "wallet_toncommunity_link" : " ",
+  "watch_only" : "僅限觀看",
+  "yesterday" : "昨天"
 }
