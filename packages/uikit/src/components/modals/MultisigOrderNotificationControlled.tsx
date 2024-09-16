@@ -23,7 +23,8 @@ import { MultisigTransferDetails } from '../transfer/multisig/MultisigTransferDe
 import {
     useActiveMultisigAccountHost,
     useActiveMultisigWalletInfo,
-    useOrderInfo
+    useOrderInfo,
+    useOrderSignedBy
 } from '../../state/multisig';
 import { MultisigConfigDiff } from '../multisig/MultisigConfigDiff';
 import { Address } from '@ton/core';
@@ -107,8 +108,17 @@ const NotificationContent: FC<{
 
     const { t } = useTranslation();
     const orderInfo = useOrderInfo(order);
+    const { data: signedBy } = useOrderSignedBy(order.address);
     const { data: multisig } = useActiveMultisigWalletInfo();
     const { signerWallet } = useActiveMultisigAccountHost();
+
+    const pendingWallets = useMemo(() => {
+        if (!signedBy) {
+            return undefined;
+        }
+
+        return order.signers.filter(v => !signedBy.includes(v));
+    }, [signedBy, order.signers]);
 
     const {
         mutate: estimate,
@@ -154,13 +164,13 @@ const NotificationContent: FC<{
         };
     }, [multisig]);
 
-    if (!estimation || !multisig || !currentConfig) {
+    if (!estimation || !multisig || !currentConfig || !signedBy || !pendingWallets) {
         return <NotificationSkeleton handleClose={handleClose} />;
     }
 
     const done = sendResult !== undefined;
 
-    const alreadySignedByUser = orderInfo.signedWallets.includes(signerWallet.rawAddress);
+    const alreadySignedByUser = signedBy.includes(signerWallet.rawAddress);
 
     let bottom;
     switch (true) {
@@ -236,6 +246,8 @@ const NotificationContent: FC<{
             )}
             <MultisigTransferDetails
                 {...orderInfo}
+                signedWallets={signedBy}
+                pendingWallets={pendingWallets}
                 hostAddress={signerWallet.rawAddress}
                 orderAddress={order.address}
             />

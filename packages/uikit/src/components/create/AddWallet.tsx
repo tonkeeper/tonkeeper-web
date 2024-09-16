@@ -168,7 +168,10 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                             <PencilIcon />
                         </ButtonIcon>
                         <AddMethodText>
-                            <AddMethodLabel>{t('add_wallet_new_multisig_title')}</AddMethodLabel>
+                            <AddMethodLabel>
+                                {t('add_wallet_new_multisig_title')}{' '}
+                                <Badge color="accentBlue">PRO</Badge>
+                            </AddMethodLabel>
                             <AddMethodDescription>
                                 {t('add_wallet_new_multisig_description')}
                             </AddMethodDescription>

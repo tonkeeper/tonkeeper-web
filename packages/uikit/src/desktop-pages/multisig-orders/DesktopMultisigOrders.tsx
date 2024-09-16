@@ -113,7 +113,7 @@ const RowDivider = styled.div`
 
 const OrderRow: FC<{ order: MultisigOrder }> = ({ order }) => {
     const { t } = useTranslation();
-    const { status, signedWallets, secondsLeft, total } = useOrderInfo(order);
+    const { status, secondsLeft } = useOrderInfo(order);
     const { onOpen: onView } = useMultisigOrderNotification();
     const formattedDate = useDateTimeFormatFromNow(order.expirationDate * 1000); // TODO
 
@@ -136,8 +136,8 @@ const OrderRow: FC<{ order: MultisigOrder }> = ({ order }) => {
             )}
             <Cell>
                 {t('multisig_signed_value')
-                    .replace(/%?\{signed}/, signedWallets.length.toString())
-                    .replace(/%?\{total}/, total.toString())}
+                    .replace(/%?\{signed}/, order.approvalsNum.toString())
+                    .replace(/%?\{total}/, order.threshold.toString())}
             </Cell>
             <AmountCell risk={order.risk} />
             <ButtonCell>

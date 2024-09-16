@@ -4,10 +4,10 @@ import { APIConfig } from '../../../entries/apis';
 import { TonWalletStandard } from '../../../entries/wallet';
 import { BlockchainApi, Multisig } from '../../../tonApiV2';
 import {
-    createTransferMessage,
     getWalletSeqnoAndCheckBalance,
     getServerTime,
-    getTonkeeperQueryId
+    getTonkeeperQueryId,
+    createAutoFeeTransferMessage
 } from '../../transfer/common';
 import BigNumber from 'bignumber.js';
 import { CellSigner } from '../../../entries/signer';
@@ -52,7 +52,8 @@ export async function sendCreateOrder(options: {
         amount: BigNumber(createOrderAmount.toString())
     });
 
-    const boc = await createTransferMessage(
+    const boc = await createAutoFeeTransferMessage(
+        options.api,
         {
             state: options.hostWallet,
             timestamp,
@@ -98,7 +99,8 @@ export async function signOrder(options: {
         .storeUint(addrIdx, MultisigParams.bitsize.signerIndex)
         .endCell();
 
-    const boc = await createTransferMessage(
+    const boc = await createAutoFeeTransferMessage(
+        options.api,
         {
             state: options.hostWallet,
             timestamp: await getServerTime(options.api),

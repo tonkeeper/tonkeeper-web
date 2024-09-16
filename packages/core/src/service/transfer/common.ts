@@ -18,7 +18,7 @@ import { TonRecipient } from '../../entries/send';
 import { BaseSigner } from '../../entries/signer';
 import { TonContract, TonWalletStandard } from '../../entries/wallet';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
-import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
+import { Account, AccountsApi, EmulationApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import { WalletContract, walletContractFromState } from '../wallet/contractService';
 
 export enum SendMode {
@@ -109,6 +109,37 @@ export const getServerTime = async (api: APIConfig) => {
 
 export const seeIfTimeError = (e: unknown): e is Error => {
     return e instanceof Error && e.message.startsWith('Time and date are incorrect');
+};
+
+export const createAutoFeeTransferMessage = async (
+    api: APIConfig,
+    wallet: {
+        seqno: number;
+        state: TonWalletStandard;
+        signer: BaseSigner;
+        timestamp: number;
+    },
+    transaction: {
+        to: string;
+        value: string | bigint | BigNumber;
+        body?: string | Cell | null;
+        init?: StateInit | null;
+    }
+) => {
+    const bocToEstimate = await createTransferMessage(wallet, transaction);
+
+    const result = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+        emulateMessageToWalletRequest: { boc: bocToEstimate.toString('base64') }
+    });
+
+    const finalAttachValue = new BigNumber(result.event.extra)
+        .absoluteValue()
+        .plus(transaction.value.toString());
+
+    const [acc] = await getWalletBalance(api, wallet.state);
+    checkWalletBalanceOrDie(finalAttachValue, acc);
+
+    return createTransferMessage(wallet, { ...transaction, value: finalAttachValue });
 };
 
 export const createTransferMessage = async (

@@ -10,6 +10,8 @@ import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { CreateMultisig } from '../create/Multisig';
 import { AddWalletContext } from '../create/AddWalletContext';
 import { useAtom } from '../../libs/atom';
+import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
+import { useProState } from '../../state/pro';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: MethodsInModal } | undefined>();
 
@@ -52,6 +54,8 @@ const methodsInModal = ['multisig'] as const;
 type MethodsInModal = (typeof methodsInModal)[number];
 
 export const AddWalletNotificationControlled = () => {
+    const { onOpen: openBuyPro } = useProFeaturesNotification();
+    const { data: proState } = useProState();
     const { isOpen, onClose } = useAddWalletNotification();
     const [params] = useAtom(paramsControl);
     const { t } = useTranslation();
@@ -69,6 +73,23 @@ export const AddWalletNotificationControlled = () => {
         setTimeout(() => setSelectedMethod(undefined), 400);
     }, [onClose, setSelectedMethod]);
 
+    const onSelect = useCallback(
+        (closed: (after: () => void) => void) => {
+            return (path: string) => {
+                if (methodsInModal.includes(path as MethodsInModal)) {
+                    if (path === 'multisig' && !proState?.subscription.valid) {
+                        openBuyPro();
+                        return;
+                    }
+                    setSelectedMethod(path as MethodsInModal);
+                } else {
+                    closed(() => onImport(path));
+                }
+            };
+        },
+        [proState?.subscription.valid, openBuyPro, setSelectedMethod, onImport]
+    );
+
     const Content = useCallback(
         (closed: (after: () => void) => void) => {
             if (!selectedMethod) {
@@ -76,15 +97,7 @@ export const AddWalletNotificationControlled = () => {
                     <NotificationContentWrapper>
                         <Heading>{t('import_add_wallet')}</Heading>
                         <SubHeading>{t('import_add_wallet_description')}</SubHeading>
-                        <AddWalletContent
-                            onSelect={path => {
-                                if (methodsInModal.includes(path as MethodsInModal)) {
-                                    setSelectedMethod(path as MethodsInModal);
-                                } else {
-                                    closed(() => onImport(path));
-                                }
-                            }}
-                        />
+                        <AddWalletContent onSelect={onSelect(closed)} />
                     </NotificationContentWrapper>
                 );
             }
@@ -98,7 +111,7 @@ export const AddWalletNotificationControlled = () => {
                 }
             }
         },
-        [onImport, t, selectedMethod, onCloseCallback]
+        [onImport, t, selectedMethod, onCloseCallback, onSelect]
     );
 
     const navigateHome = useMemo(

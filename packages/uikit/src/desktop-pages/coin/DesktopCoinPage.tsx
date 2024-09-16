@@ -235,6 +235,7 @@ const HistorySubheader = styled(Label2)`
 
 const HistoryContainer = styled.div`
     overflow-x: auto;
+    overflow-y: hidden;
 `;
 
 export const CoinPage: FC<{ token: string }> = ({ token }) => {

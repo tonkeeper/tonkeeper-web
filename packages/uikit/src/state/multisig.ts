@@ -3,6 +3,7 @@ import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { useAppContext } from '../hooks/appContext';
 import {
     AccountsApi,
+    BlockchainApi,
     Multisig,
     MultisigApi,
     MultisigOrder,
@@ -22,6 +23,7 @@ import {
 import { useAccountsStorage } from '../hooks/useStorage';
 import { useAppSdk } from '../hooks/appSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { Cell, Dictionary } from '@ton/core';
 
 export const useMultisigWalletInfo = (walletAddressRaw: string) => {
     const { api } = useAppContext();
@@ -154,17 +156,40 @@ export const useActiveMultisigAccountHost = () => {
 
 export const useOrderInfo = (order: MultisigOrder) => {
     const status = orderStatus(order);
-    const total = order.threshold;
     const renderTimeSeconds = useRef(Math.round(Date.now() / 1000));
     const secondsLeft = useCountdown(order.expirationDate - renderTimeSeconds.current);
 
     return {
         status,
-        total,
-        secondsLeft,
-        signedWallets: order.signers, // TODO,
-        pendingWallets: order.signers // TODO
+        secondsLeft
     };
+};
+
+export const useOrderSignedBy = (orderAddress: string) => {
+    const api = useAppContext().api;
+    return useQuery([QueryKey.multisigWallet, QueryKey.multisigOrder, orderAddress], async () => {
+        const result = await new BlockchainApi(api.tonApiV2).execGetMethodForBlockchainAccount({
+            accountId: orderAddress,
+            methodName: 'get_order_data'
+        });
+
+        const signersHex = result.stack?.[4]?.cell;
+        const mask = result.stack?.[5]?.num;
+
+        if (!signersHex || mask === undefined) {
+            throw new Error('Wrong response');
+        }
+        const signersCell = Cell.fromBoc(Buffer.from(signersHex, 'hex'))[0];
+        const signers = signersCell
+            .beginParse()
+            .loadDictDirect(Dictionary.Keys.Uint(8), Dictionary.Values.Address())
+            .values();
+
+        const bitArray = Number(mask).toString(2).split('');
+        return signers
+            .filter((_, index) => bitArray[bitArray.length - 1 - index] === '1')
+            .map(a => a.toRawString());
+    });
 };
 
 export function getMultisigSignerInfo(accounts: AccountsState, activeAccount: AccountTonMultisig) {
