@@ -30,6 +30,7 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useMultisigOrderNotification } from '../../components/modals/MultisigOrderNotificationControlled';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { useDateTimeFormatFromNow } from '../../hooks/useDateTimeFormat';
+import { orderStatus } from '@tonkeeper/core/dist/service/multisig/multisigService';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -77,7 +78,29 @@ export const ManageExistingMultisigOrders: FC<{ multisig: Multisig }> = ({ multi
     }, [multisig.orders, markAsViewed]);
 
     const sortedOrders = useMemo(
-        () => multisig.orders.sort((a, b) => a.expirationDate - b.expirationDate), // TODO
+        () =>
+            multisig.orders.sort((a, b) => {
+                if (a.creationDate && b.creationDate) {
+                    return b.creationDate - a.creationDate;
+                }
+
+                const aStatus = orderStatus(a);
+                const bStatus = orderStatus(b);
+
+                if (aStatus === 'expired') {
+                    if (bStatus === 'expired') {
+                        return b.expirationDate - a.expirationDate;
+                    } else {
+                        return 1;
+                    }
+                }
+
+                if (bStatus === 'expired') {
+                    return -1;
+                }
+
+                return b.expirationDate - a.expirationDate;
+            }),
         [multisig.orders]
     );
 
@@ -115,7 +138,6 @@ const OrderRow: FC<{ order: MultisigOrder }> = ({ order }) => {
     const { t } = useTranslation();
     const { status, secondsLeft } = useOrderInfo(order);
     const { onOpen: onView } = useMultisigOrderNotification();
-    const formattedDate = useDateTimeFormatFromNow(order.expirationDate * 1000); // TODO
 
     const sdk = useAppSdk();
     const { config } = useAppContext();
@@ -128,7 +150,9 @@ const OrderRow: FC<{ order: MultisigOrder }> = ({ order }) => {
 
     return (
         <>
-            <ExpirationDateCell>{formattedDate}</ExpirationDateCell>
+            <CreationDateCellContent>
+                {order.creationDate ? <CreationDateCell creationDate={order.creationDate} /> : '—'}
+            </CreationDateCellContent>
             {status === 'progress' ? (
                 <TimeCell>{toTimeLeft(secondsLeft * 1000)}</TimeCell>
             ) : (
@@ -160,6 +184,11 @@ const OrderRow: FC<{ order: MultisigOrder }> = ({ order }) => {
     );
 };
 
+const CreationDateCell: FC<{ creationDate: number }> = ({ creationDate }) => {
+    const formattedDate = useDateTimeFormatFromNow(creationDate * 1000);
+    return <CreationDateCellContent>{formattedDate}</CreationDateCellContent>;
+};
+
 const ArrowUpIconStyled = styled(ArrowUpIcon)`
     color: ${p => p.theme.iconSecondary};
     margin-right: 2px;
@@ -183,7 +212,7 @@ const AmountTH = styled(TH)`
     text-align: right;
 `;
 
-const ExpirationDateCell = styled(Cell)`
+const CreationDateCellContent = styled(Cell)`
     color: ${p => p.theme.textSecondary};
 `;
 
