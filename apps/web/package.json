@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/web",
-    "version": "3.21.1",
+    "version": "3.22.4",
     "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "Your web wallet on The Open Network",
     "dependencies": {
@@ -38,7 +38,8 @@
         "react-is": "^18.2.0",
         "ts-node": "^10.9.1",
         "typescript": "5.2.2",
-        "vite": "^5.0.11"
+        "vite": "^5.0.11",
+        "vite-plugin-node-polyfills": "0.17.0"
     },
     "scripts": {
         "locales": "ts-node ./task/locales",

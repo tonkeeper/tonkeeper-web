@@ -7,6 +7,8 @@ import { SettingsRoute, WalletSettingsRoute, relative } from '../../libs/routes'
 import { useJettonList } from '../../state/jetton';
 import { useWalletNftList } from '../../state/nft';
 import { useAccountsState, useActiveAccount } from '../../state/wallet';
+import { useRenameNotification } from '../modals/RenameNotificationControlled';
+import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { DeleteAccountNotification } from './DeleteAccountNotification';
 import {
     AppsIcon,
@@ -31,14 +33,48 @@ const SingleAccountSettings = () => {
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
+    const { onOpen: rename } = useRenameNotification();
+
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
 
-        if (account.type === 'mnemonic') {
+        if (account.type === 'mnemonic' || account.type === 'mam') {
             items.push({
                 name: t('settings_recovery_phrase'),
                 icon: <RecoveryPhraseIcon />,
                 action: () => navigate(relative(SettingsRoute.recovery))
+            });
+        }
+        if (account.type === 'mam') {
+            items.push({
+                name: t('settings_backup_wallet'),
+                icon: <RecoveryPhraseIcon />,
+                action: () =>
+                    navigate(
+                        relative(
+                            SettingsRoute.recovery +
+                                '/' +
+                                account.id +
+                                '?wallet=' +
+                                account.activeTonWallet.id
+                        )
+                    )
+            });
+
+            items.push({
+                name: t('customize'),
+                icon: <WalletEmoji containerSize="28px" emojiSize="28px" emoji={account.emoji} />,
+                action: () =>
+                    rename({
+                        accountId: account.id,
+                        derivationIndex: account.activeDerivation.index
+                    })
+            });
+
+            items.push({
+                name: t('settings_mam_indexes'),
+                icon: `#${account.derivations.length.toString()}`,
+                action: () => navigate(relative(WalletSettingsRoute.derivations))
             });
         }
 
@@ -114,6 +150,7 @@ const MultipleAccountSettings = () => {
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
     const account = useActiveAccount();
+    const { onOpen: rename } = useRenameNotification();
 
     const [deleteAccount, setDeleteAccount] = useState(false);
 
@@ -147,11 +184,49 @@ const MultipleAccountSettings = () => {
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
 
-        if (account.type === 'mnemonic') {
+        if (account.type === 'mnemonic' || account.type === 'mam') {
             items.push({
                 name: t('settings_recovery_phrase'),
                 icon: <RecoveryPhraseIcon />,
                 action: () => navigate(relative(SettingsRoute.recovery))
+            });
+        }
+        if (account.type === 'mam') {
+            items.push({
+                name: t('settings_backup_wallet'),
+                icon: <RecoveryPhraseIcon />,
+                action: () =>
+                    navigate(
+                        relative(
+                            SettingsRoute.recovery +
+                                '/' +
+                                account.id +
+                                '?wallet=' +
+                                account.activeTonWallet.id
+                        )
+                    )
+            });
+
+            items.push({
+                name: t('customize'),
+                icon: (
+                    <WalletEmoji
+                        containerSize="28px"
+                        emojiSize="28px"
+                        emoji={account.activeDerivation.emoji}
+                    />
+                ),
+                action: () =>
+                    rename({
+                        accountId: account.id,
+                        derivationIndex: account.activeDerivation.index
+                    })
+            });
+
+            items.push({
+                name: t('settings_mam_indexes'),
+                icon: `#${account.derivations.length.toString()}`,
+                action: () => navigate(relative(WalletSettingsRoute.derivations))
             });
         }
 

@@ -1,8 +1,12 @@
+import { TonKeychainRoot } from '@ton-keychain/core';
 import { Cell } from '@ton/core';
 import { mnemonicToPrivateKey, sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { AuthPassword } from '@tonkeeper/core/dist/entries/password';
 import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
+import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
 import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
 import { decryptWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
@@ -11,17 +15,14 @@ import {
     storeTransactionAndCreateDeepLink
 } from '@tonkeeper/core/dist/service/signerService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import nacl from 'tweetnacl';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
-import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
-import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
-import { AccountId } from '@tonkeeper/core/dist/entries/account';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { TonKeychainRoot } from '@ton-keychain/core';
 
 export const signTonConnectOver = (
     sdk: IAppSdk,
     accountId: AccountId,
+    wallet: TonWalletStandard | undefined,
     t: (text: string) => string,
     checkTouchId: () => Promise<void>
 ) => {
@@ -59,13 +60,8 @@ export const signTonConnectOver = (
                 );
             }
             case 'mam': {
-                const wallet = account.activeTonWallet;
-                const mnemonic = await getMAMWalletMnemonic(
-                    sdk,
-                    account.id,
-                    wallet.id,
-                    checkTouchId
-                );
+                const w = wallet ?? account.activeTonWallet;
+                const mnemonic = await getMAMWalletMnemonic(sdk, account.id, w.id, checkTouchId);
                 const keyPair = await mnemonicToPrivateKey(mnemonic);
                 return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),

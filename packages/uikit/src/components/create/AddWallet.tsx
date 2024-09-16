@@ -73,6 +73,7 @@ const AddMethodLabel = styled(Label1)`
     display: flex;
     align-items: center;
     gap: 4px;
+    color: ${p => p.theme.textPrimary};
     ${p => p.theme.displayType === 'full-width' && Label2Class}
 `;
 

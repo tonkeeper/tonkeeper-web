@@ -49,14 +49,24 @@ const useNftTransferEstimation = (nftItem: NftItem, data?: TonRecipientData) => 
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useActiveStandardTonWallet();
+    const account = useActiveAccount();
     const client = useQueryClient();
 
     return useQuery<TransferEstimation<TonAsset>, Error>(
         [QueryKey.estimate, data?.address],
         async () => {
             try {
-                const payload = await estimateNftTransfer(api, wallet, data!, nftItem);
+                if (!isAccountControllable(account)) {
+                    throw new Error('account not controllable');
+                }
+
+                const payload = await estimateNftTransfer(
+                    api,
+                    account,
+                    account.activeTonWallet,
+                    data!,
+                    nftItem
+                );
                 const fee = new AssetAmount({
                     asset: TON_ASSET,
                     weiAmount: payload.event.extra * -1

@@ -1,5 +1,5 @@
 {
-  "auctionBidMessage" : "Biete {{.Amount}} für {{.NftName}}",
+  "auctionBidMessage" : "Bidding {{.Amount}} für {{.NftName}}",
   "contractDeployAction" : "Bereitstellen eines Vertrags{{ if .Interfaces }} mit Schnittstellen {{.Interfaces}}{{ end }}",
   "depositStakeAction" : "Einzahlen {{.Value}} zum Einsatz Pool",
   "electionsDepositStakeAction" : "Einlagern von {{.Amount}} Einsatz",

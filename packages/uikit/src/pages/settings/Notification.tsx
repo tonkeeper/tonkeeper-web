@@ -5,13 +5,13 @@ import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Label1 } from '../../components/Text';
 import { Switch } from '../../components/fields/Switch';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { signTonConnectOver } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
 import { useActiveAccount, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
-import { useAppContext } from '../../hooks/appContext';
 
 const useSubscribed = () => {
     const sdk = useAppSdk();
@@ -47,7 +47,7 @@ const useToggleSubscribe = () => {
                 await notifications.subscribe(
                     api,
                     wallet,
-                    signTonConnectOver(sdk, account.id, t, checkTouchId)
+                    signTonConnectOver(sdk, account.id, undefined, t, checkTouchId)
                 );
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);

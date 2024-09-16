@@ -2,6 +2,7 @@ import { Address, beginCell, storeStateInit } from '@ton/core';
 import { getSecureRandomBytes, keyPairFromSeed, sha256_sync } from '@ton/crypto';
 import queryString from 'query-string';
 import { IStorage } from '../../Storage';
+import { Account, isAccountControllable } from '../../entries/account';
 import { TonConnectError } from '../../entries/exception';
 import { Network } from '../../entries/network';
 import {
@@ -21,13 +22,16 @@ import {
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
 import { isStandardTonWallet, TonContract, TonWalletStandard } from '../../entries/wallet';
+import { TonWalletStandard, WalletVersion } from '../../entries/wallet';
+import { accountsStorage } from '../accountsStorage';
+import { getDevSettings } from '../devStorage';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     AccountConnection,
+    TonConnectParams,
     disconnectAccountConnection,
     getTonWalletConnections,
-    saveAccountConnection,
-    TonConnectParams
+    saveAccountConnection
 } from './connectionService';
 import { SessionCrypto } from './protocol';
 import { accountsStorage } from '../accountsStorage';
@@ -151,7 +155,7 @@ function getPlatform(): DeviceInfo['platform'] {
     return os!;
 }
 
-export const getDeviceInfo = (appVersion: string): DeviceInfo => {
+export const getDeviceInfo = (appVersion: string, maxMessages: number): DeviceInfo => {
     return {
         platform: getPlatform()!,
         appName: 'Tonkeeper',
@@ -161,7 +165,7 @@ export const getDeviceInfo = (appVersion: string): DeviceInfo => {
             'SendTransaction',
             {
                 name: 'SendTransaction',
-                maxMessages: 4
+                maxMessages: maxMessages
             }
         ]
     };
@@ -394,12 +398,14 @@ export const saveWalletTonConnect = async (options: {
     webViewUrl?: string;
 }): Promise<ConnectEvent> => {
     await saveAccountConnection(options);
+
+    const maxMessages = options.wallet.version === WalletVersion.V5R1 ? 255 : 4;
     return {
         id: Date.now(),
         event: 'connect',
         payload: {
             items: options.replyItems,
-            device: getDeviceInfo(options.appVersion)
+            device: getDeviceInfo(options.appVersion, maxMessages)
         }
     };
 };

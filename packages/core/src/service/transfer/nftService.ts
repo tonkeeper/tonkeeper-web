@@ -185,11 +185,10 @@ export const sendNftRenew = async (options: {
     account: AccountTonWalletStandard;
     nftAddress: string;
     fee: TransferEstimationEvent;
-    signer: CellSigner;
+    signer: Signer;
     amount: BigNumber;
 }) => {
     const walletState = options.account.activeTonWallet;
-
     const timestamp = await getServerTime(options.api);
     const { seqno } = await getWalletSeqnoAndCheckBalance({ ...options, walletState });
 

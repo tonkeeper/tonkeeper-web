@@ -17,8 +17,13 @@ import { APIConfig } from '../../entries/apis';
 import { TonRecipient } from '../../entries/send';
 import { BaseSigner } from '../../entries/signer';
 import { TonContract, TonWalletStandard } from '../../entries/wallet';
+import { TonRecipient, TransferEstimationEvent } from '../../entries/send';
+import { Signer } from '../../entries/signer';
+import { TonWalletStandard } from '../../entries/wallet';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
 import { Account, AccountsApi, EmulationApi, LiteServerApi, WalletApi } from '../../tonApiV2';
+import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
+import { getLedgerAccountPathByIndex } from '../ledger/utils';
 import { WalletContract, walletContractFromState } from '../wallet/contractService';
 
 export enum SendMode {
@@ -146,7 +151,7 @@ export const createTransferMessage = async (
     wallet: {
         seqno: number;
         state: TonWalletStandard;
-        signer: BaseSigner;
+        signer: Signer;
         timestamp: number;
     },
     transaction: {
@@ -159,23 +164,48 @@ export const createTransferMessage = async (
     const value =
         transaction.value instanceof BigNumber ? transaction.value.toFixed(0) : transaction.value;
     const contract = walletContractFromState(wallet.state);
+    let transfer: Cell;
 
-    const transfer = await contract.createTransferAndSignRequestAsync({
-        seqno: wallet.seqno,
-        signer: wallet.signer,
-        timeout: getTTL(wallet.timestamp),
-        sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-        messages: [
-            internal({
-                to: Address.parse(transaction.to),
-                bounce: true,
-                value: BigInt(value),
-                body: transaction.body,
-                init: transaction.init
-            })
-        ]
-    });
+    if (wallet.signer.type === 'ledger') {
+        if (account.type !== 'ledger') {
+            throw new Error('Ledger signer can only be used with ledger accounts');
+        }
+        const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
 
+        transfer = await wallet.signer(path, {
+            to: Address.parse(transaction.to),
+            bounce: true,
+            amount: BigInt(value),
+            seqno: wallet.seqno,
+            timeout: getTTL(wallet.timestamp),
+            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+            payload: transaction.body
+                ? {
+                      type: 'unsafe',
+                      message:
+                          typeof transaction.body == 'string'
+                              ? Cell.fromBase64(transaction.body)
+                              : transaction.body
+                  }
+                : undefined
+        });
+    } else {
+        transfer = await contract.createTransferAndSignRequestAsync({
+            seqno: wallet.seqno,
+            signer: wallet.signer,
+            timeout: getTTL(wallet.timestamp),
+            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+            messages: [
+                internal({
+                    to: Address.parse(transaction.to),
+                    bounce: true,
+                    value: BigInt(value),
+                    body: transaction.body,
+                    init: transaction.init
+                })
+            ]
+        });
+    }
     return externalMessage(contract, wallet.seqno, transfer).toBoc();
 };
 

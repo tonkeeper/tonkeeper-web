@@ -1,23 +1,22 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AccountControllable, isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
-import { CellSigner } from '@tonkeeper/core/dist/entries/signer';
 import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
-import { Account } from '@tonkeeper/core/dist/entries/account';
+import { Signer } from '@tonkeeper/core/dist/entries/signer';
 import { Omit } from 'react-beautiful-dnd';
 import { notifyError } from '../../components/transfer/common';
 import { getSigner } from '../../state/mnemonic';
+import { useCheckTouchId } from '../../state/password';
+import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../state/wallet';
 import { AmplitudeTransactionType, useTransactionAnalytics } from '../amplitude';
 import { useAppContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
-import { useCheckTouchId } from '../../state/password';
-import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../state/wallet';
 
 export type ContractExecutorParams = {
     api: APIConfig;
-    account: Account;
-    signer: CellSigner;
+    account: AccountControllable;
+    signer: Signer;
     fee: TransferEstimationEvent;
 };
 
@@ -41,15 +40,14 @@ export function useExecuteTonContract<Args extends ContractExecutorParams>(
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
     return useMutation<boolean, Error>(async () => {
+        if (!isAccountControllable(account)) {
+            return false;
+        }
         if (!args.fee) {
             return false;
         }
 
         const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
-        if (signer?.type !== 'cell') {
-            throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
-        }
-
         if (signer === null) return false;
 
         track2(eventName2);
