@@ -97,6 +97,8 @@
   "import_multisend_table_heading_amount" : "Amount",
   "import_multisend_table_heading_asset" : "Fiat ticker / TON / hex, EQ or UQ address of token-master",
   "import_multisend_table_heading_comment" : "Optional comment",
+  "import_wallet_12_words" : "12 words",
+  "import_wallet_24_words" : "24 words",
   "IncorrectCurrentPassword" : "Incorrect current password.",
   "keystone_pair_subtitle" : "A higher level of security with AIR-GAP hardware wallet",
   "keystone_pair_title" : "Pair with Keystone",

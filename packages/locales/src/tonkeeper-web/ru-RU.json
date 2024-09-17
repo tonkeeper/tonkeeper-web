@@ -95,6 +95,8 @@
   "import_multisend_table_heading_amount" : "Сумма",
   "import_multisend_table_heading_asset" : "Фиатный тикер / TON / hex, EQ или UQ адрес жетон мастера",
   "import_multisend_table_heading_comment" : "Комментарий, необязательно",
+  "import_wallet_12_words" : "12 слов",
+  "import_wallet_24_words" : "24 слова",
   "IncorrectCurrentPassword" : "Неверный текущий пароль.",
   "learn_more" : "Подробнее",
   "ledger_choose_wallets" : "Выберите кошельки",

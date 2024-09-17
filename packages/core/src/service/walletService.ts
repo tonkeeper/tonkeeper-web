@@ -1,7 +1,6 @@
 import { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
 import { parseTonAccount } from '@keystonehq/keystone-sdk/dist/wallet/hdKey';
 import { Address } from '@ton/core';
-import { mnemonicToPrivateKey } from '@ton/crypto';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import queryString from 'query-string';
 import { IStorage } from '../Storage';
@@ -30,6 +29,7 @@ import { emojis } from '../utils/emojis';
 import { accountsStorage } from './accountsStorage';
 import { walletContract } from './wallet/contractService';
 import { TonKeychainRoot, KeychainTonAccount } from '@ton-keychain/core';
+import { mnemonicToKeypair } from "./mnemonicService";
 
 export const createMultisigTonAccount = async (
     storage: IStorage,
@@ -91,7 +91,7 @@ export const createStandardTonAccountByMnemonic = async (
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
-    const keyPair = await mnemonicToPrivateKey(mnemonic);
+    const keyPair = await mnemonicToKeypair(mnemonic);
 
     const publicKey = keyPair.publicKey.toString('hex');
 

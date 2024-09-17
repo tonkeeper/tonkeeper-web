@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonKeychainRoot } from '@ton-keychain/core';
-import { mnemonicValidate } from '@ton/crypto';
 import {
     Account,
     AccountId,
@@ -47,6 +46,7 @@ import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
 import { useDevSettings } from './dev';
 import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
 import { useCheckTouchId } from './password';
+import { seeIfMnemonicValid } from "@tonkeeper/core/dist/service/mnemonicService";
 
 export const useActiveAccountQuery = () => {
     const storage = useAccountsStorage();
@@ -405,7 +405,7 @@ export const useCreateAccountMnemonic = () => {
             selectAccount?: boolean;
         }
     >(async ({ mnemonic, password, versions, selectAccount }) => {
-        const valid = await mnemonicValidate(mnemonic);
+        const valid = await seeIfMnemonicValid(mnemonic);
         if (!valid) {
             throw new Error('Mnemonic is not valid.');
         }
