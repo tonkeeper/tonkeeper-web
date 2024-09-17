@@ -161,18 +161,18 @@
       "other" : "{count} Token"
     },
     "unverified_token" : "Unverifizierter Token",
-    "verify_collection" : "Verifiziere Sammlung",
+    "verify_collection" : "Verifizieren Sie die Sammlung",
     "verify_description_collection" : "Diese Tokens stammen von einem unbekannten Herausgeber. Um Fälschungen zu erkennen, überprüfen Sie die Sammlungs-ID mit der offiziellen Quelle des Herausgebers. Sie können die Sichtbarkeit der Tokens später in den Einstellungen ändern.",
     "verify_description_token" : "Dieser Token stammt von einem unbekannten Herausgeber. Um Fälschungen zu erkennen, überprüfen Sie die Token-ID mit der offiziellen Quelle des Herausgebers. Sie können die Sichtbarkeit des Tokens später in den Einstellungen ändern.",
-    "verify_token" : "Verifiziere Token",
+    "verify_token" : "Verifizieren Sie Token",
     "whitelisted_collection" : "Erlaubte Sammlung",
     "whitelisted_token" : "Erlaubte Token"
   },
-  "auth_failed" : "Authentifizierung fehlgeschlagen",
+  "auth_failed" : "Authentifizierung ausgefallen",
   "backup_check" : {
-    "caption" : "Lass uns sehen, ob du alles richtig abgeschrieben hast. Gib die Wörter {one}, {two} und {three} ein.",
+    "caption" : "Lassen Sie uns, bitte, sehen, ob Sie alles richtig abgeschrieben haben. Geben Sie die Wörter {one}, {two} und {three} ein.",
     "done_button" : "Fertig",
-    "title" : "Backup Prüfen"
+    "title" : "Backup überprüfen"
   },
   "backup_screen" : {
     "backup_warning" : "Ihr Guthaben beträgt {totalFiat} und wird nur durch eine Wiederherstellungsphrase geschützt, die Sie noch nicht aufgeschrieben haben. Sichern Sie die Phrase, um zu verhindern, dass Sie bei Problemen mit dem Gerät Geld verlieren.",
@@ -212,12 +212,12 @@
         "title" : "Mit {symbol} aufladen"
       },
       "gift" : {
-        "subtitle" : "Teile mit Freunden",
+        "subtitle" : "Teilen Sie mit Freunden",
         "title" : "Batterie Geschenk"
       },
       "promo" : {
-        "subtitle" : "Sie Haben Glück",
-        "title" : "Geben sie ihren Aktionscode ein"
+        "subtitle" : "Sie haben Glück",
+        "title" : "Geben Sie Ihren Aktionscode ein"
       }
     },
     "packages" : {
@@ -239,10 +239,10 @@
         "small" : "Klein"
       }
     },
-    "please_wait" : "Bitte warten, ihre Batterie wird in den nächsten Minuten aufgeladen",
+    "please_wait" : "Bitte warten, Ihre Batterie wird in den nächsten Minuten aufgeladen",
     "promocode" : {
       "apply" : "Anwenden",
-      "button" : "Aufkladen durch Aktionscode",
+      "button" : "Aufladen durch Aktionscode",
       "placeholder" : "Aktionscode",
       "success" : "Ihre Batterie wurde aufgeladen",
       "title" : "Aktionscode"
@@ -253,7 +253,7 @@
         "subtitle" : "Menge manuell eingeben",
         "title" : "Andere Menge"
       },
-      "title" : "Baterie Laden",
+      "title" : "Batterie laden",
       "title_gift" : "Geschenk",
       "tokens" : "Token"
     },
@@ -280,14 +280,14 @@
       "supported" : "Unterstützte Transaktionen",
       "title" : "Transaktionen",
       "types" : {
-        "jetton" : "Münzenübertragung",
+        "jetton" : "Jettonübertragung",
         "nft" : "NFT-Übertragung",
-        "swap" : "tauschen",
-        "ton" : "TON-Übertragung"
+        "swap" : "Swaps",
+        "ton" : "TON-Überweisungen"
       },
       "type" : {
         "swap" : "Tausch",
-        "transfer" : "Übertragung"
+        "transfer" : "Überweisung"
       },
       "will_be_paid" : "Wird bezahlt: {enabledTransactions}"
     }
@@ -317,13 +317,13 @@
   "bluetooth" : {
     "permissions_alert" : {
       "cancel" : "Ablehnen",
-      "message" : "Bitte aktiviere Bluetooth-Berechtigungen in deinen Einstellungen, um diese Fuktion zu benutzen",
+      "message" : "Bitte aktivieren Sie Bluetooth-Berechtigungen in Ihren Einstellungen, um diese Fuktion zu benutzen",
       "open_settings" : "Einstellungen öffnen",
       "title" : "Bluetooth-Berechtigungen"
     },
     "powered_off_alert" : {
       "cancel" : "Ablehnen",
-      "message" : "Bitte aktiviere Bluetooth-Berechtigungen in deinen Einstellungen, um diese Funktion zu benutzen",
+      "message" : "Bitte aktivieren Sie Bluetooth-Berechtigungen in Ihren Einstellungen, um diese Funktion zu benutzen",
       "open_settings" : "Einstellungen öffnen",
       "title" : "Bluetooth-Berechtigungen"
     }
@@ -331,9 +331,9 @@
   "browser" : {
     "about_dapps_caption" : "Entdecken Sie Apps und Dienste, bei denen Sie Tonkeeper für die Anmeldung und Zahlungen verwenden können.",
     "about_dapps_learn_more" : "Mehr erfahren",
-    "about_dapps_title" : "Benutze Tonkeeper mit allen TON Apps und Diensten",
+    "about_dapps_title" : "Benutzen Sie Tonkeeper mit allen TON Apps und Diensten",
     "actions" : {
-      "copy_link" : "Kopiere Link",
+      "copy_link" : "Link kopieren",
       "disconnect" : "Trennen",
       "mute" : "Stummschalten",
       "refresh" : "Aktualisieren",
@@ -341,28 +341,28 @@
     },
     "apps_all" : "Alle",
     "connected" : "Verbunden",
-    "connected_empty_text" : "Erkunde Apps und Dienste im Tonkeeper Browser.",
+    "connected_empty_text" : "Erkunden Sie Apps und Dienste im Tonkeeper Browser.",
     "connected_empty_title" : "Verbundene Apps werden hier angezeigt",
     "connected_title" : "Verbunden",
-    "empty_search" : "Deine Suche ergab keine Ergebnisse",
-    "explore" : "Erkunde",
+    "empty_search" : "Ihre Suche ergab keine Ergebnisse",
+    "explore" : "Erkunden Sie",
     "explore_all" : "Alles erkunden",
-    "more_description" : "Märkte, Börsen und mehr",
-    "more_title" : "Erkunde alle Dienste",
-    "open_link" : "Öffne Link",
-    "popular_title" : "Beliebt",
+    "more_description" : "Märkte, Austausch und mehr",
+    "more_title" : "Erkunden Sie alle Dienste",
+    "open_link" : "Link öffnen",
+    "popular_title" : "Beliebtes",
     "remove_alert" : {
-      "approve_button" : "Ja",
-      "title" : "Willst du wirklich “{name}” löschen?"
+      "approve_button" : "Löschen",
+      "title" : "Wollen Sie das wirklich “{name}” löschen?"
     },
-    "search_label" : "Suche oder gieb eine Adresse ein",
-    "start_typing" : "Gieb eine Adresse ein oder suche im Web",
+    "search_label" : "Suchen Sie oder geben die Adresse ein",
+    "start_typing" : "Geben eine Adresse ein oder suchen Sie im Web",
     "title" : "Browser",
     "web_search_title" : "{searchEngine} suchen"
   },
   "buy_ton" : {
     "subtitle" : "Sofort mit einer Kreditkarte",
-    "title" : "Kaufe TON"
+    "title" : "Kaufen Sie TON"
   },
   "cancel" : "Abbrechen",
   "chart" : {
@@ -372,7 +372,7 @@
       "1D" : "T",
       "1H" : "S",
       "1M" : "M",
-      "1Y" : "Y",
+      "1Y" : "J",
       "6M" : "6M",
       "7D" : "W"
     },
@@ -384,9 +384,9 @@
   "choose_country" : {
     "auto" : "Automatisch",
     "cancel" : "Abbrechen",
-    "empty_placeholder" : "Deine Suche ergab keine Ergebnisse",
+    "empty_placeholder" : "Ihre Suche ergab keine Ergebnisse",
     "search" : "Suche",
-    "title" : "Wähle dein Land"
+    "title" : "Wählen Sie Ihr Land"
   },
   "choose_currency" : {
     "currencies" : {
@@ -395,7 +395,7 @@
       "BRL" : "Brasilianischer Real",
       "BYN" : "Belarussischer Rubel",
       "CAD" : "Kannadischer Dollar",
-      "CHF" : "Schweizer Franken",
+      "CHF" : "Schweizerfranken",
       "CNY" : "Chinesischer Yuan",
       "EUR" : "Euro",
       "GBP" : "Pfund Sterling",
@@ -417,7 +417,7 @@
       "UZS" : "Usbekistanischer sum",
       "VND" : "Vietnamesischer Dong"
     },
-    "header_title" : "Haupt Währung"
+    "header_title" : "Hauptwährung"
   },
   "choose_wallets" : {
     "already_added" : "Schon hinzugefügt",
@@ -432,14 +432,14 @@
   "confirm_sending_amount" : "Betrag",
   "confirm_sending_fee" : "Gebühr",
   "confirm_sending_inactive_warn_about" : "Was sollten Sie tun?",
-  "confirm_sending_inactive_warn_description" : "Fahren sie nicht fort, wenn sie erwarten, dass Blockchain-Magie passiert. Es wird nicht.",
+  "confirm_sending_inactive_warn_description" : "Fahren sie nicht fort, wenn Sie erwarten, dass Blockchain-Magie passiert. Es wird nicht.",
   "confirm_sending_inactive_warn_title" : "Inaktiver Vertrag",
   "confirm_sending_liquid_warn_description" : "Sie erhalten keine Belohnungen mehr für die gesendeten gestakten TON. Der neue Besitzer wird Belohnungen erhalten.",
   "confirm_sending_liquid_warn_title" : "Bemerkung",
   "confirm_sending_message" : "Kommentar",
-  "confirm_sending_method_title" : "Senden an {name}?",
+  "confirm_sending_method_title" : "Senden Sie an {name}?",
   "confirm_sending_recipient" : "Empfänger",
-  "confirm_sending_recipient_address" : "Empfangsadresse",
+  "confirm_sending_recipient_address" : "Empfängersadresse",
   "confirm_sending_sent_caption_btc" : "Ihre Transaktion wird an das Netzwerk gesendet und innerhalb einer Stunde verarbeitet.",
   "confirm_sending_sent_caption_ton" : "Ihre Transaktion wird an das Netzwerk gesendet und innerhalb ein paar Sekunden verarbeitet.",
   "confirm_sending_submit" : "Bestätigen und senden",
@@ -450,16 +450,19 @@
     "title" : "Bestätigen Sie die Aktion",
     "title_multiwallets" : "Aktion für %{walletName}",
     "total_risk" : "Gesamt: {totalAmount}",
-    "to_your_address" : "zu deiner Adresse",
+    "to_your_address" : "Zu Ihrer Adresse",
     "transaction_type" : {
-      "burn" : "Verbrenne",
-      "receive" : "Empfange",
-      "send" : "Sende"
+      "burn" : "Verbrennen",
+      "receive" : "Empfangen",
+      "send" : "Senden"
     },
     "wallet" : "Wallet:",
     "will_be_paid_with_battery" : "Wird mit der Tonkeeper Batterie bezahlt"
   },
   "continue" : "Weiter",
   "copied" : "Kopiert",
-  "copy_error_log" : "Kopiere Fehlerprotokoll"
+  "copy_error_log" : "Fehlerprotokoll kopieren",
+  "create_pin_current_title" : "Geben Sie den aktuellen Passcode ein",
+  "create_pin_new_title" : "Neuen Passwort erstellen",
+  "create_pin_repeat_title" : "Passwort erneut eingeben"
 }
