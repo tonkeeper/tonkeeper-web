@@ -533,7 +533,13 @@ export const ImportWords: FC<{
             <Block>
                 <div>
                     <Header>{t('import_wallet_title')}</Header>
-                    <Body>{t('import_wallet_caption')}</Body>
+                    <Body>
+                        {t(
+                            wordsNumber === 12
+                                ? 'import_wallet_caption_12'
+                                : 'import_wallet_caption'
+                        )}
+                    </Body>
                 </div>
             </Block>
             <ToggleButtonStyled>
