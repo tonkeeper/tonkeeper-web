@@ -43,7 +43,7 @@ import { useUserFiatQuery } from "@tonkeeper/uikit/dist/state/fiat";
 import { useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
 import { useActiveAccountQuery, useAccountsStateQuery, useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
+import React, { FC, PropsWithChildren, Suspense, useCallback, useEffect, useMemo } from "react";
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
@@ -103,7 +103,8 @@ const TARGET_ENV = 'extension';
 connectToBackground();
 
 export const App: FC = () => {
-    const t = useTWithReplaces(browser.i18n.getMessage);
+    const browserT = useCallback((key: string) => browser.i18n.getMessage(key), []);
+    const t = useTWithReplaces(browserT);
 
     const translation = useMemo(() => {
         const client: I18nContext = {
