@@ -55,9 +55,9 @@ const Body = styled(Body1)`
     ${p => p.theme.displayType === 'full-width' && Body2Class}
 `;
 
-export const WorldsGrid = styled.div`
+export const WorldsGrid = styled.div<{ wordsNumber: 12 | 24 }>`
     display: grid;
-    grid-template-rows: repeat(12, minmax(0, 1fr));
+    grid-template-rows: repeat(${p => p.wordsNumber / 2}, minmax(0, 1fr));
     grid-auto-flow: column;
     gap: 0.5rem;
     place-content: space-evenly;
@@ -133,7 +133,9 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
                 <Header>
                     {t(showMamInfo ? 'secret_words_account_title' : 'secret_words_title')}
                 </Header>
-                <Body>{t('secret_words_caption')}</Body>
+                <Body>
+                    {t(mnemonic.length === 12 ? 'secret_words_caption_12' : 'secret_words_caption')}
+                </Body>
             </HeadingBlock>
 
             {showMamInfo && (
@@ -150,7 +152,7 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
                 </MamAccountCallout>
             )}
 
-            <WorldsGridStyled>
+            <WorldsGridStyled wordsNumber={mnemonic.length as 12 | 24}>
                 {mnemonic.map((world, index) => (
                     <Body1 key={index}>
                         <WorldNumber> {index + 1}.</WorldNumber> {world}{' '}
@@ -508,8 +510,10 @@ export const ImportWords: FC<{
             focusInput(ref.current, invalid);
             notify();
         }
-        if (mnemonic.length < 24) {
-            focusInput(ref.current, mnemonic.length - 1);
+
+        const notFilledField = mnemonic.findIndex(word => word === '');
+        if (notFilledField !== -1) {
+            focusInput(ref.current, notFilledField);
             notify();
         }
         if (sdk.isIOs()) {

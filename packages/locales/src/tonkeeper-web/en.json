@@ -243,6 +243,7 @@
   "reset_tron_cache" : "Reset Tron cache",
   "save" : "Save",
   "secret_words_account_title" : "Your Account Recovery Phrase",
+  "secret_words_caption_12" : "Write down these 12 words in the order given below and store them in a secret, safe place.",
   "settings_backup_account" : "Backup Account",
   "settings_backup_account_mam_description" : "Used to restore access to your multi-wallet account and all associated wallets",
   "settings_backup_wallet" : "Backup Wallet",

@@ -1,8 +1,12 @@
 import { TonKeychainRoot } from '@ton-keychain/core';
-import { keyPairFromSeed, mnemonicToPrivateKey, mnemonicValidate } from '@ton/crypto';
+import {
+    keyPairFromSeed,
+    mnemonicToPrivateKey,
+    mnemonicValidate as validateStandardTonMnemonic
+} from '@ton/crypto';
 import { AuthPassword } from '../entries/password';
 import { decrypt } from './cryptoService';
-import { mnemonicToSeed, validateMnemonic } from 'bip39';
+import { mnemonicToSeed, validateMnemonic as validBip39Mnemonic } from 'bip39';
 import { deriveED25519Path } from './ed25519';
 
 export const decryptWalletMnemonic = async (state: { auth: AuthPassword }, password: string) => {
@@ -15,7 +19,7 @@ export const decryptWalletMnemonic = async (state: { auth: AuthPassword }, passw
 };
 
 export const seeIfMnemonicValid = async (mnemonic: string[]) => {
-    const isValid = await mnemonicValidate(mnemonic);
+    const isValid = await validateStandardTonMnemonic(mnemonic);
     if (!isValid) {
         const isMam = await validateMnemonicTonOrMAM(mnemonic);
         if (!isMam) {
@@ -26,13 +30,11 @@ export const seeIfMnemonicValid = async (mnemonic: string[]) => {
 };
 
 export const validateMnemonicTonOrMAM = async (mnemonic: string[]) => {
-    const isValidTon = await mnemonicValidate(mnemonic);
-    if (isValidTon) {
+    if (await validateStandardTonMnemonic(mnemonic)) {
         return true;
     }
 
-    const isValidForTrustWallet = validateMnemonic(mnemonic.join(' '));
-    if (isValidForTrustWallet) {
+    if (validBip39Mnemonic(mnemonic.join(' '))) {
         return true;
     }
 
@@ -58,12 +60,16 @@ export const mnemonicToKeypair = async (mnemonic: string[]) => {
     if (await isMamMnemonic(mnemonic)) {
         throw new Error('Cannot convert MAM mnemonic to keypair');
     }
-    const isValidStandardTonMnemonic = await mnemonicValidate(mnemonic);
-    if (isValidStandardTonMnemonic) {
+
+    if (await validateStandardTonMnemonic(mnemonic)) {
         return mnemonicToPrivateKey(mnemonic);
     }
 
-    const seed = await mnemonicToSeed(mnemonic.join(' '));
-    const seedContainer = deriveED25519Path(TON_DERIVATION_PATH, seed.toString('hex'));
-    return keyPairFromSeed(seedContainer.key);
+    if (validBip39Mnemonic(mnemonic.join(' '))) {
+        const seed = await mnemonicToSeed(mnemonic.join(' '));
+        const seedContainer = deriveED25519Path(TON_DERIVATION_PATH, seed.toString('hex'));
+        return keyPairFromSeed(seedContainer.key);
+    }
+
+    throw new Error('Invalid mnemonic');
 };
