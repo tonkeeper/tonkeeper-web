@@ -464,5 +464,29 @@
   "copy_error_log" : "Fehlerprotokoll kopieren",
   "create_pin_current_title" : "Geben Sie den aktuellen Passcode ein",
   "create_pin_new_title" : "Neuen Passwort erstellen",
-  "create_pin_repeat_title" : "Passwort erneut eingeben"
+  "create_pin_repeat_title" : "Passwort erneut eingeben",
+  "create_wallet_caption" : "Wir empfehlen Ihnen dringend, den Wiederherstellungssatz aufzuschreiben, da dies die einzige Möglichkeit ist, auf Ihr Wallet zuzugreifen und es wiederherzustellen, falls Sie Ihr Gerät verlieren. Senden Sie es sich nicht per E-Mail oder machen Sie einen Screenshot. Es ist sicherer, wenn es offline bleibt.",
+  "create_wallet_continue_button" : "Weiter",
+  "create_wallet_generated" : "Ihr Wallen wurde gerade erstellt!",
+  "create_wallet_generating" : "Wallet-Erzeugung...",
+  "create_wallet_title" : "Nehmen Sie einen Stift und ein Blatt Papier",
+  "customize" : "Anpassen",
+  "customize_modal" : {
+    "save" : "Speichern",
+    "subtitle" : "Walletname und -symbol werden lokal auf Ihrem Gerät gespeichert.",
+    "title" : "Passen Sie Ihr Wallen an",
+    "wallet_name" : "Walletname"
+  },
+  "decryption_error" : "Entschlüsselungsfehler",
+  "deploy_contract_button" : "Bestätigen und bereitstellen",
+  "deploy_contract_title" : "Vertrag bereitstellen",
+  "disable_nft_marketplace_banner_description" : "Sammeln und umtauschen.",
+  "dns_addresses" : {
+    "few" : "{count} Addressen",
+    "many" : "{count} Addressen",
+    "one" : "{count} Addresse",
+    "other" : "{count} Addressen"
+  },
+  "dns_address_linked" : "Adresse verlinkt",
+  "dns_address_unlinked" : "Adresse nicht verknüpft"
 }

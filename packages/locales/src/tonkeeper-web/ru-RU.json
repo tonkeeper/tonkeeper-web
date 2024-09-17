@@ -247,6 +247,7 @@
   "settings_collectibles_list" : "Коллекции",
   "settings_connected_apps" : "Подключенные приложения",
   "settings_hide_current_wallet" : "Скрыть текущий кошелек",
+  "settings_hide_multisig" : "Скрыть Multisig кошелек",
   "settings_ledger_indexes" : "Подкошельки леджер",
   "settings_mam_add_wallet" : "Добавить новый кошелек",
   "settings_mam_add_wallet_with_pro" : "Добавляйте новые кошельки с подпиской Pro",
