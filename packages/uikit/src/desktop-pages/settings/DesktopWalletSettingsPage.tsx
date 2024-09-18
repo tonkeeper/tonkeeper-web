@@ -29,7 +29,8 @@ import {
 import {
     AccountMAM,
     isAccountVersionEditable,
-    Account
+    Account,
+    AccountTonMultisig
 } from '@tonkeeper/core/dist/entries/account';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
@@ -270,9 +271,10 @@ const UnpinMultisigSettingsListItem = () => {
     const { mutateAsync: togglePinForMultisigWallet } = useMultisigTogglePinForWallet();
     const { mutateAsync: mutateActiveAccount } = useMutateActiveAccount();
     const { signerWallet, signerAccount } = useActiveMultisigAccountHost();
-    const account = useActiveAccount();
+    const account = useActiveAccount() as AccountTonMultisig;
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const isPinned = account.isPinnedForWallet(signerWallet.id);
 
     const onUnpin = async () => {
         await togglePinForMultisigWallet({
@@ -282,6 +284,10 @@ const UnpinMultisigSettingsListItem = () => {
         await mutateActiveAccount(signerAccount.id);
         navigate(AppRoute.home);
     };
+
+    if (!isPinned) {
+        return null;
+    }
 
     return (
         <SettingsListItem onClick={onUnpin}>

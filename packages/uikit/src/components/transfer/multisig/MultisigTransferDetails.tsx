@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 import { styled } from 'styled-components';
-import { BorderSmallResponsive } from '../../shared/Styles';
 import { Body2, Mono } from '../../Text';
 import { MultisigOrderStatus } from '@tonkeeper/core/dist/service/multisig/multisigService';
 import { toTimeLeft } from '@tonkeeper/core/dist/utils/date';
@@ -12,8 +11,6 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 const MultisigDetailsBlock = styled.div`
     width: 100%;
     box-sizing: border-box;
-    ${BorderSmallResponsive};
-    background: ${p => p.theme.backgroundContent};
     padding: 8px 12px;
 `;
 
