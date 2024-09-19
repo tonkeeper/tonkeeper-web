@@ -116,7 +116,8 @@ export const getSigner = async (
                     const callback = async (message: Cell) => {
                         const result = await pairSignerByNotification(
                             sdk,
-                            message.toBoc({ idx: false }).toString('base64')
+                            message.toBoc({ idx: false }).toString('base64'),
+                            account.activeTonWallet
                         );
                         return parseSignerSignature(result);
                     };
@@ -307,13 +308,17 @@ export const getPasswordByNotification = async (sdk: IAppSdk): Promise<string> =
     });
 };
 
-const pairSignerByNotification = async (sdk: IAppSdk, boc: string): Promise<string> => {
+const pairSignerByNotification = async (
+    sdk: IAppSdk,
+    boc: string,
+    wallet: TonWalletStandard
+): Promise<string> => {
     const id = Date.now();
     return new Promise<string>((resolve, reject) => {
         sdk.uiEvents.emit('signer', {
             method: 'signer',
             id,
-            params: boc
+            params: { boc, wallet }
         });
 
         const onCallback = (message: {

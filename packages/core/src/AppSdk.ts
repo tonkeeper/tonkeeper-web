@@ -7,7 +7,7 @@ import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
 import { TonTransferParams } from './service/deeplinkingService';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTransaction } from './service/ledger/connector';
-import { TonContract } from './entries/wallet';
+import { TonContract, TonWalletStandard } from './entries/wallet';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -33,7 +33,10 @@ export interface UIEvents {
     resize: void;
     navigate: void;
     getPassword: void;
-    signer: string;
+    signer: {
+        boc: string;
+        wallet: TonWalletStandard;
+    };
     ledger: { path: number[]; transaction: LedgerTransaction };
     keystone: { message: Buffer; messageType: KeystoneMessageType; pathInfo?: KeystonePathInfo };
     loading: void;
