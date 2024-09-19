@@ -1,10 +1,9 @@
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import {
     DragDropContext,
     Draggable,
     DraggableProvidedDragHandleProps,
-    Droppable,
-    OnDragEndResponder
+    Droppable
 } from 'react-beautiful-dnd';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -23,7 +22,7 @@ import { RenameWalletNotification } from '../../components/settings/wallet-name/
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useMutateAccountsState, useAccountsState } from '../../state/wallet';
+import { useAccountsState, useAccountsDNDDrop } from '../../state/wallet';
 import { Account as AccountType } from '@tonkeeper/core/dist/entries/account';
 import { useAccountLabel } from '../../hooks/accountUtils';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
@@ -134,7 +133,7 @@ export const Account = () => {
     const { t } = useTranslation();
 
     const accounts = useAccountsState();
-    const { mutate } = useMutateAccountsState();
+    const handleDrop = useAccountsDNDDrop();
 
     const createItems = useMemo(() => {
         return [
@@ -145,17 +144,6 @@ export const Account = () => {
             }
         ];
     }, []);
-
-    const handleDrop: OnDragEndResponder = useCallback(
-        droppedItem => {
-            if (!droppedItem.destination) return;
-            const updatedList = [...accounts];
-            const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
-            updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
-            mutate(updatedList);
-        },
-        [accounts, mutate]
-    );
 
     return (
         <>

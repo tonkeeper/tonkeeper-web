@@ -39,7 +39,7 @@ import {
 } from '@tonkeeper/core/dist/service/walletService';
 import { AccountsApi, Account as TonapiAccount } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
@@ -47,6 +47,7 @@ import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
 import { useDevSettings } from './dev';
 import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
 import { useCheckTouchId } from './password';
+import { DropResult, ResponderProvided } from 'react-beautiful-dnd';
 
 export const useActiveAccountQuery = () => {
     const storage = useAccountsStorage();
@@ -315,6 +316,24 @@ export const useAccountsStateQuery = () => {
         {
             keepPreviousData: true
         }
+    );
+};
+
+export const useAccountsDNDDrop = () => {
+    const { mutate } = useMutateAccountsState();
+    const accounts = useAccountsState();
+    return useCallback<(result: DropResult, provided: ResponderProvided) => Account[] | undefined>(
+        droppedItem => {
+            if (!droppedItem.destination) {
+                return;
+            }
+            const updatedList = [...accounts];
+            const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
+            updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
+            mutate(updatedList);
+            return updatedList;
+        },
+        [accounts, mutate]
     );
 };
 
