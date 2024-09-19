@@ -450,7 +450,10 @@ const QuorumInput = () => {
                                                 }}
                                             >
                                                 <DropDownItemText>
-                                                    <Label2>{item} signers</Label2>
+                                                    <Label2>
+                                                        {item}{' '}
+                                                        {t('create_multisig_quorum_participants')}
+                                                    </Label2>
                                                     <Body3>
                                                         {Math.round(
                                                             (item / totalSignersNumber) * 100

@@ -24,11 +24,11 @@ import {
     getWalletBalance,
     getWalletSeqnoAndCheckBalance,
     SendMode,
+    sendMultisigTransfer,
     signEstimateMessage
 } from './common';
 import { getJettonCustomPayload } from './jettonPayloadService';
 import { estimateNewOrder } from '../multisig/order/order-estimate';
-import { sendCreateOrder } from '../multisig/order/order-send';
 
 export const jettonTransferAmount = toNano(0.1);
 export const jettonTransferForwardAmount = BigInt(1);
@@ -254,17 +254,7 @@ export const estimateMultisigJettonTransfer = async ({
     });
 };
 
-export const sendMultisigJettonTransfer = async ({
-    api,
-    hostWallet,
-    multisig,
-    recipient,
-    jettonWalletAddress,
-    amount,
-    fee,
-    signer,
-    ttlSeconds
-}: {
+export const sendMultisigJettonTransfer = async (params: {
     api: APIConfig;
     hostWallet: TonWalletStandard;
     multisig: Pick<Multisig, 'address' | 'signers' | 'proposers'>;
@@ -275,37 +265,18 @@ export const sendMultisigJettonTransfer = async ({
     signer: CellSigner;
     ttlSeconds: number;
 }): Promise<void> => {
-    const timestamp = await getServerTime(api);
-    await getWalletSeqnoAndCheckBalance({
-        api,
-        walletState: hostWallet,
-        amount: new BigNumber(jettonTransferAmount.toString()),
-        fee
-    });
-
     const internalParams = await createJettonTransferMsgParams({
-        api,
-        walletState: { rawAddress: multisig.address },
-        recipientAddress: recipient.toAccount.address,
-        amount,
-        jettonWalletAddress,
-        forwardPayload: recipient.comment ? comment(recipient.comment) : null
+        api: params.api,
+        walletState: { rawAddress: params.multisig.address },
+        recipientAddress: params.recipient.toAccount.address,
+        amount: params.amount,
+        jettonWalletAddress: params.jettonWalletAddress,
+        forwardPayload: params.recipient.comment ? comment(params.recipient.comment) : null
     });
 
-    await sendCreateOrder({
-        hostWallet,
-        multisig,
-        api,
-        signer,
-        order: {
-            validUntilSeconds: timestamp + ttlSeconds,
-            actions: [
-                {
-                    type: 'transfer',
-                    message: internal(internalParams),
-                    sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
-                }
-            ]
-        }
+    await sendMultisigTransfer({
+        ...params,
+        amount: new BigNumber(jettonTransferAmount.toString()),
+        message: internal(internalParams)
     });
 };
