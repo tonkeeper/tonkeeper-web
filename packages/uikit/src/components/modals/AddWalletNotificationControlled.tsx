@@ -65,8 +65,14 @@ export const AddWalletNotificationControlled = () => {
     );
 
     useEffect(() => {
+        if (isOpen && params?.walletType === 'multisig' && !proState?.subscription.valid) {
+            onClose();
+            openBuyPro();
+            return;
+        }
+
         setSelectedMethod(params?.walletType);
-    }, [params?.walletType]);
+    }, [isOpen, params?.walletType, proState?.subscription.valid, openBuyPro, onClose]);
 
     const onCloseCallback = useCallback(() => {
         onClose();

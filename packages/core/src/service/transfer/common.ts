@@ -6,6 +6,7 @@ import {
     external,
     internal,
     loadStateInit,
+    MessageRelaxed,
     storeMessage,
     toNano
 } from '@ton/core';
@@ -14,12 +15,20 @@ import { sign } from '@ton/crypto';
 import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
-import { TonRecipient } from '../../entries/send';
+import { TonRecipient, TransferEstimationEventFee } from '../../entries/send';
 import { TonContract, TonWalletStandard } from '../../entries/wallet';
-import { Signer } from '../../entries/signer';
+import { CellSigner, Signer } from '../../entries/signer';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
-import { Account, AccountsApi, EmulationApi, LiteServerApi, WalletApi } from '../../tonApiV2';
+import {
+    Account,
+    AccountsApi,
+    EmulationApi,
+    LiteServerApi,
+    Multisig,
+    WalletApi
+} from '../../tonApiV2';
 import { WalletContract, walletContractFromState } from '../wallet/contractService';
+import { sendCreateOrder } from '../multisig/order/order-send';
 
 export enum SendMode {
     CARRY_ALL_REMAINING_BALANCE = 128,
@@ -126,7 +135,10 @@ export const createAutoFeeTransferMessage = async (
         init?: StateInit | null;
     }
 ) => {
-    const bocToEstimate = await createTransferMessage(wallet, transaction);
+    const bocToEstimate = await createTransferMessage(
+        { ...wallet, signer: signEstimateMessage },
+        transaction
+    );
 
     const result = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
         emulateMessageToWalletRequest: { boc: bocToEstimate.toString('base64') }
@@ -247,4 +259,49 @@ export const seeIfTransferBounceable = (account: Account, recipient: TonRecipien
     }
 
     return account.status === 'active';
+};
+
+export const sendMultisigTransfer = async ({
+    api,
+    hostWallet,
+    multisig,
+    message,
+    amount,
+    fee,
+    signer,
+    ttlSeconds
+}: {
+    api: APIConfig;
+    hostWallet: TonWalletStandard;
+    multisig: Pick<Multisig, 'address' | 'signers' | 'proposers'>;
+    message: MessageRelaxed;
+    fee: TransferEstimationEventFee;
+    amount: BigNumber;
+    signer: CellSigner;
+    ttlSeconds: number;
+}): Promise<void> => {
+    const timestamp = await getServerTime(api);
+    await getWalletSeqnoAndCheckBalance({
+        api,
+        walletState: hostWallet,
+        amount,
+        fee
+    });
+
+    await sendCreateOrder({
+        hostWallet,
+        multisig,
+        api,
+        signer,
+        order: {
+            validUntilSeconds: timestamp + ttlSeconds,
+            actions: [
+                {
+                    type: 'transfer',
+                    message,
+                    sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
+                }
+            ]
+        }
+    });
 };

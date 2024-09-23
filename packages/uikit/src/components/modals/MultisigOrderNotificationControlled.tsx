@@ -246,6 +246,7 @@ const NotificationContent: FC<{
             )}
             <MultisigTransferDetails
                 {...orderInfo}
+                threshold={multisig.threshold}
                 signedWallets={signedBy}
                 pendingWallets={pendingWallets}
                 hostAddress={signerWallet.rawAddress}

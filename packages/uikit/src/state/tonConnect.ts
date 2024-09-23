@@ -36,6 +36,7 @@ import {
     useActiveTonNetwork,
     useActiveWallet
 } from './wallet';
+import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();
@@ -117,11 +118,10 @@ export const useConnectTonConnectAppMutation = () => {
                 result.push(toTonAddressItemReply(wallet, network));
             }
             if (item.name === 'ton_proof') {
-                if (!isStandardTonWallet(wallet)) {
-                    throw new Error('Cannot connect to non standard wallet');
-                }
-                if (activeIsLedger) {
-                    throw new Error('Ledger doesnt support ton_proof');
+                if (!isStandardTonWallet(wallet) || activeIsLedger) {
+                    throw new TxConfirmationCustomError(
+                        "Current wallet doesn't support connection to the service"
+                    );
                 }
                 const signTonConnect = signTonConnectOver({
                     sdk,

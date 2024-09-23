@@ -93,7 +93,7 @@ export const MultisigConfigForm: FC<{
         defaultValues: {
             firstParticipant: activeWallet.rawAddress,
             participants: [{ address: '' }],
-            quorum: 1
+            quorum: 2
         }
     });
 
@@ -228,22 +228,21 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
     return (
         <Controller
             rules={{
-                required: 'Required',
                 validate: v => {
                     if (!seeIfValidTonAddress(v)) {
-                        return 'Invalid address';
+                        return t('create_multisig_invalid_address_error');
                     }
 
-                    try {
-                        if (
-                            participants.filter(p =>
-                                Address.parse(p.address).equals(Address.parse(v))
-                            ).length > 1
-                        ) {
-                            return 'Duplicated address';
-                        }
-                    } catch (e) {
-                        return;
+                    if (
+                        participants.filter(p => {
+                            try {
+                                return Address.parse(p.address).equals(Address.parse(v));
+                            } catch (e) {
+                                return false;
+                            }
+                        }).length > 1
+                    ) {
+                        return t('create_multisig_duplicated_address_error');
                     }
                 }
             }}
@@ -422,11 +421,11 @@ const QuorumInput = () => {
                     required: 'Required',
                     validate: v => {
                         if (totalSignersNumber === 0) {
-                            return 'At least one signer is required';
+                            return t('create_multisig_quorum_zero_participants_error');
                         }
 
                         if (v > totalSignersNumber) {
-                            return 'Invalid number of signers';
+                            return t('create_multisig_quorum_invalid_number_participants_error');
                         }
                     }
                 }}
@@ -450,7 +449,10 @@ const QuorumInput = () => {
                                                 }}
                                             >
                                                 <DropDownItemText>
-                                                    <Label2>{item} signers</Label2>
+                                                    <Label2>
+                                                        {item}{' '}
+                                                        {t('create_multisig_quorum_participants')}
+                                                    </Label2>
                                                     <Body3>
                                                         {Math.round(
                                                             (item / totalSignersNumber) * 100
@@ -470,7 +472,8 @@ const QuorumInput = () => {
                                 <SelectDropDownHostText>
                                     <Body3>{t('create_multisig_quorum')}</Body3>
                                     <Body2>
-                                        {selectedSignersNumber} signers
+                                        {selectedSignersNumber}{' '}
+                                        {t('create_multisig_quorum_participants')}
                                         {selectedSignersPercent !== null && (
                                             <>
                                                 <Dot />

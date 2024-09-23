@@ -272,6 +272,12 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                         <GearIconEmpty />
                     </GearIconButtonStyled>
                 </AsideMenuItem>
+                {sortedWallets.length === 1 && (
+                    <AsideMultisigsGroup
+                        hostWalletId={sortedWallets[0].id}
+                        onClickWallet={onClickWallet}
+                    />
+                )}
                 {sortedWallets.length > 1 &&
                     sortedWallets.map(wallet => (
                         <AsideMenuSubItemContainer key={wallet.id}>
@@ -377,6 +383,12 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                         <GearIconEmpty />
                     </GearIconButtonStyled>
                 </AsideMenuItem>
+                {sortedWallets.length === 1 && (
+                    <AsideMultisigsGroup
+                        hostWalletId={sortedWallets[0].id}
+                        onClickWallet={onClickWallet}
+                    />
+                )}
                 {sortedWallets.length > 1 &&
                     sortedWallets.map(wallet => (
                         <AsideMenuSubItemContainer key={wallet.id}>
