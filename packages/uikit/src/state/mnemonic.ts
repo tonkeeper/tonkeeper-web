@@ -1,6 +1,6 @@
 import { TonKeychainRoot } from '@ton-keychain/core';
 import { Cell } from '@ton/core';
-import { mnemonicToPrivateKey, sha256_sync, sign } from '@ton/crypto';
+import { sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { AuthPassword } from '@tonkeeper/core/dist/entries/password';
@@ -9,7 +9,10 @@ import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
 import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
-import { decryptWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
+import {
+    decryptWalletMnemonic,
+    mnemonicToKeypair
+} from '@tonkeeper/core/dist/service/mnemonicService';
 import {
     parseSignerSignature,
     storeTransactionAndCreateDeepLink
@@ -60,7 +63,7 @@ export const signTonConnectOver = ({
             }
             case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
-                const keyPair = await mnemonicToPrivateKey(mnemonic);
+                const keyPair = await mnemonicToKeypair(mnemonic);
                 return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
                     keyPair.secretKey
@@ -69,7 +72,7 @@ export const signTonConnectOver = ({
             case 'mam': {
                 const w = wallet ?? account.activeTonWallet;
                 const mnemonic = await getMAMWalletMnemonic(sdk, account.id, w.id, checkTouchId);
-                const keyPair = await mnemonicToPrivateKey(mnemonic);
+                const keyPair = await mnemonicToKeypair(mnemonic);
                 return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
                     keyPair.secretKey
@@ -90,7 +93,7 @@ export const signTonConnectOver = ({
 
 export const signTonConnectMnemonicOver = (mnemonic: string[]) => {
     return async (bufferToSign: Buffer) => {
-        const keyPair = await mnemonicToPrivateKey(mnemonic);
+        const keyPair = await mnemonicToKeypair(mnemonic);
         const signature = nacl.sign.detached(
             Buffer.from(sha256_sync(bufferToSign)),
             keyPair.secretKey
@@ -102,7 +105,12 @@ export const signTonConnectMnemonicOver = (mnemonic: string[]) => {
 export const getSigner = async (
     sdk: IAppSdk,
     accountId: AccountId,
-    checkTouchId: () => Promise<void>
+    checkTouchId: () => Promise<void>,
+    {
+        walletId
+    }: {
+        walletId?: WalletId;
+    } = {}
 ): Promise<Signer> => {
     try {
         const account = await accountsStorage(sdk.storage).getAccount(accountId);
@@ -110,13 +118,17 @@ export const getSigner = async (
             throw new Error('Wallet not found');
         }
 
+        const wallet =
+            walletId !== undefined ? account.getTonWallet(walletId) : account.activeTonWallet;
+
         switch (account.type) {
             case 'ton-only': {
                 if (account.auth.kind === 'signer') {
                     const callback = async (message: Cell) => {
                         const result = await pairSignerByNotification(
                             sdk,
-                            message.toBoc({ idx: false }).toString('base64')
+                            message.toBoc({ idx: false }).toString('base64'),
+                            wallet as TonWalletStandard
                         );
                         return parseSignerSignature(result);
                     };
@@ -125,12 +137,11 @@ export const getSigner = async (
                 }
 
                 if (account.auth.kind === 'signer-deeplink') {
-                    const wallet = account.activeTonWallet;
                     const callback = async (message: Cell) => {
                         const deeplink = await storeTransactionAndCreateDeepLink(
                             sdk,
-                            wallet.publicKey,
-                            wallet.version,
+                            (wallet as TonWalletStandard).publicKey,
+                            (wallet as TonWalletStandard).version,
                             message.toBoc({ idx: false }).toString('base64')
                         );
 
@@ -148,7 +159,10 @@ export const getSigner = async (
                 return assertUnreachable(account.auth);
             }
             case 'ledger': {
-                const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
+                const derivation = account.allAvailableDerivations.find(
+                    d => d.activeTonWalletId === wallet!.id
+                )!;
+                const path = getLedgerAccountPathByIndex(derivation.index);
                 const callback = async (transaction: LedgerTransaction) =>
                     pairLedgerByNotification(sdk, path, transaction);
                 callback.type = 'ledger' as const;
@@ -168,15 +182,14 @@ export const getSigner = async (
                 return callback;
             }
             case 'mam': {
-                const wallet = account.activeTonWallet;
                 const mnemonic = await getMAMWalletMnemonic(
                     sdk,
                     account.id,
-                    wallet.id,
+                    wallet!.id,
                     checkTouchId
                 );
                 const callback = async (message: Cell) => {
-                    const keyPair = await mnemonicToPrivateKey(mnemonic);
+                    const keyPair = await mnemonicToKeypair(mnemonic);
                     return sign(message.hash(), keyPair.secretKey);
                 };
                 callback.type = 'cell' as const;
@@ -185,7 +198,7 @@ export const getSigner = async (
             case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, account.id, checkTouchId);
                 const callback = async (message: Cell) => {
-                    const keyPair = await mnemonicToPrivateKey(mnemonic);
+                    const keyPair = await mnemonicToKeypair(mnemonic);
                     return sign(message.hash(), keyPair.secretKey);
                 };
                 callback.type = 'cell' as const;
@@ -307,13 +320,17 @@ export const getPasswordByNotification = async (sdk: IAppSdk): Promise<string> =
     });
 };
 
-const pairSignerByNotification = async (sdk: IAppSdk, boc: string): Promise<string> => {
+const pairSignerByNotification = async (
+    sdk: IAppSdk,
+    boc: string,
+    wallet: TonWalletStandard
+): Promise<string> => {
     const id = Date.now();
     return new Promise<string>((resolve, reject) => {
         sdk.uiEvents.emit('signer', {
             method: 'signer',
             id,
-            params: boc
+            params: { boc, wallet }
         });
 
         const onCallback = (message: {

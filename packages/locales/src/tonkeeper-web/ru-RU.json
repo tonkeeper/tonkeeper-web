@@ -175,6 +175,7 @@
   "multisig_participant_you" : "Вы:",
   "multisig_signed_label" : "Подписали",
   "multisig_signed_value" : "{signed} из {total} участников",
+  "multisig_signed_value_short" : "{signed} из {total}",
   "multisig_status_completed" : "Выполнено",
   "multisig_status_expired" : "Истек",
   "multisig_status_label" : "Статус",

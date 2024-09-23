@@ -33,10 +33,19 @@ export const MultisigTransferDetails: FC<{
     status: MultisigOrderStatus;
     signedWallets: string[];
     pendingWallets: string[];
+    threshold: number;
     secondsLeft: number;
     orderAddress?: string;
     hostAddress: string;
-}> = ({ status, secondsLeft, signedWallets, pendingWallets, orderAddress, hostAddress }) => {
+}> = ({
+    status,
+    secondsLeft,
+    signedWallets,
+    pendingWallets,
+    threshold,
+    orderAddress,
+    hostAddress
+}) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { config } = useAppContext();
@@ -47,8 +56,6 @@ export const MultisigTransferDetails: FC<{
         sdk.openPage(explorerUrl.replace('%s', formatAddress(address)));
     };
 
-    const total = signedWallets.length + pendingWallets.length;
-
     return (
         <MultisigDetailsBlock>
             <MultisigDetailsRow>
@@ -58,9 +65,7 @@ export const MultisigTransferDetails: FC<{
             <MultisigDetailsRow>
                 <Body2>{t('multisig_signed_label')}</Body2>
                 <Body2>
-                    {t('multisig_signed_value')
-                        .replace(/%?\{signed}/, signedWallets.length.toString())
-                        .replace(/%?\{total}/, total.toString())}
+                    {t('multisig_signed_value', { signed: signedWallets.length, total: threshold })}
                 </Body2>
             </MultisigDetailsRow>
             {secondsLeft > 0 && status === 'progress' && (

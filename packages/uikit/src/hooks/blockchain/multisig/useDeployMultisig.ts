@@ -61,9 +61,9 @@ export const useDeployMultisig = (
                 throw new TxConfirmationCustomError(t('create_multisig_error_already_deployed'));
             }
 
-            const signer = await getSigner(sdk, accountAndWallet.account.id, checkTouchId).catch(
-                () => null
-            );
+            const signer = await getSigner(sdk, accountAndWallet.account.id, checkTouchId, {
+                walletId: accountAndWallet.wallet.id
+            }).catch(() => null);
             if (signer === null) {
                 throw new Error('Signer not found');
             }

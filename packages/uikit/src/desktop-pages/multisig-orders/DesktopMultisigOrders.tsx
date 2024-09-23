@@ -159,9 +159,10 @@ const OrderRow: FC<{ order: MultisigOrder }> = ({ order }) => {
                 <StatusCell>{t('multisig_status_' + status)}</StatusCell>
             )}
             <Cell>
-                {t('multisig_signed_value')
-                    .replace(/%?\{signed}/, order.approvalsNum.toString())
-                    .replace(/%?\{total}/, order.threshold.toString())}
+                {t('multisig_signed_value_short', {
+                    signed: order.approvalsNum,
+                    total: order.threshold
+                })}
             </Cell>
             <AmountCell risk={order.risk} />
             <ButtonCell>

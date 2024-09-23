@@ -29,6 +29,7 @@
         "@ton/crypto": "3.2.0",
         "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build10",
         "bignumber.js": "^9.1.1",
+        "bip39": "^3.1.0",
         "ethers": "^6.6.5",
         "query-string": "^8.1.0",
         "tweetnacl": "^1.0.3"

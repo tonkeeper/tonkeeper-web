@@ -183,6 +183,7 @@
   "multisig_participant_you" : "You:",
   "multisig_signed_label" : "Signers",
   "multisig_signed_value" : "{signed} of {total} signers",
+  "multisig_signed_value_short" : "{signed} of {total}",
   "multisig_status_completed" : "Completed",
   "multisig_status_expired" : "Expired",
   "multisig_status_label" : "Status",

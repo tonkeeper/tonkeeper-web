@@ -34,6 +34,10 @@ import React, { FC, PropsWithChildren, Suspense, useLayoutEffect, useMemo } from
 import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { ThemeProvider, createGlobalStyle, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
+import {
+  DesktopManageMultisigsPage
+} from "@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs";
+import { DesktopMultisigOrdersPage } from "@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders";
 
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
@@ -257,6 +261,14 @@ const WalletContent = () => {
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<DesktopCoinPage />} />
                             </Route>
+                            <Route
+                              path={AppRoute.multisigWallets}
+                              element={<DesktopManageMultisigsPage />}
+                            />
+                            <Route
+                              path={AppRoute.multisigOrders}
+                              element={<DesktopMultisigOrdersPage />}
+                            />
                             <Route
                                 path={any(AppRoute.walletSettings)}
                                 element={<DesktopWalletSettingsRouting />}

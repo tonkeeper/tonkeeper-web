@@ -47,6 +47,7 @@ export const ConfirmMultisigNewTransferView: FC<
                     <MultisigTransferDetailsStyled
                         status="progress"
                         signedWallets={[]}
+                        threshold={multisigInfo.threshold}
                         pendingWallets={multisigInfo.signers}
                         hostAddress={signerWallet.rawAddress}
                         secondsLeft={Number(ttl) * 60}
