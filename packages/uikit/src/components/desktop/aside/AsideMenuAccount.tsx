@@ -18,12 +18,15 @@ import {
     AccountTonWatchOnly,
     Account
 } from '@tonkeeper/core/dist/entries/account';
-import { FC, forwardRef, useMemo } from 'react';
+import { FC, forwardRef } from 'react';
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import styled from 'styled-components';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import { useAccountsState, useActiveAccount, useActiveTonNetwork } from '../../../state/wallet';
-import { useMutateMultisigSelectedHostWallet } from '../../../state/multisig';
+import { useAccountsState, useActiveTonNetwork } from '../../../state/wallet';
+import {
+    useMultisigsOfAccountToDisplay,
+    useMutateMultisigSelectedHostWallet
+} from '../../../state/multisig';
 import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../account/AccountBadge';
 import { useWalletVersionSettingsNotification } from '../../modals/WalletVersionSettingsNotification';
 import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
@@ -64,33 +67,7 @@ const AsideMultisigsGroup: FC<{
     onClickWallet: (id: string) => void;
     hostWalletId: WalletId;
 }> = ({ hostWalletId, onClickWallet }) => {
-    const accounts = useAccountsState();
-    const activeAccount = useActiveAccount();
-
-    const multisigsToDisplay = useMemo(() => {
-        const multisigs = accounts.filter(a => a.type === 'ton-multisig') as AccountTonMultisig[];
-
-        const result: {
-            account: AccountTonMultisig;
-            isPinned: boolean;
-            isSelected: boolean;
-        }[] = [];
-        for (const multisig of multisigs) {
-            const hostWallet = multisig.hostWallets.find(w => w.address === hostWalletId);
-
-            if (hostWallet) {
-                result.push({
-                    account: multisig,
-                    isPinned: hostWallet.isPinned,
-                    isSelected:
-                        activeAccount.id === multisig.id &&
-                        hostWalletId === multisig.selectedHostWalletId
-                });
-            }
-        }
-
-        return result.filter(m => m.isSelected || m.isPinned);
-    }, [accounts, hostWalletId, activeAccount]);
+    const multisigsToDisplay = useMultisigsOfAccountToDisplay(hostWalletId);
 
     return (
         <>
@@ -167,6 +144,12 @@ export const AsideMenuAccountMnemonic: FC<{
                     <GearIconEmpty />
                 </GearIconButtonStyled>
             </AsideMenuItem>
+            {sortedWallets.length === 1 && (
+                <AsideMultisigsGroup
+                    hostWalletId={sortedWallets[0].id}
+                    onClickWallet={onClickWallet}
+                />
+            )}
             {sortedWallets.length > 1 &&
                 sortedWallets.map(wallet => (
                     <AsideMenuSubItemContainer key={wallet.id}>
@@ -289,6 +272,12 @@ export const AsideMenuAccountTonOnly: FC<{
                     <GearIconEmpty />
                 </GearIconButtonStyled>
             </AsideMenuItem>
+            {sortedWallets.length === 1 && (
+                <AsideMultisigsGroup
+                    hostWalletId={sortedWallets[0].id}
+                    onClickWallet={onClickWallet}
+                />
+            )}
             {sortedWallets.length > 1 &&
                 sortedWallets.map(wallet => (
                     <AsideMenuSubItemContainer key={wallet.id}>

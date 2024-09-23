@@ -2,11 +2,26 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
+import { AccountId } from '@tonkeeper/core/dist/entries/account';
+import { notNullish } from '@tonkeeper/core/dist/utils/types';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GlobalPreferences {}
+export type AccountsFolder = {
+    id: string;
+    type: 'folder';
+    accounts: AccountId[];
+    name: string;
+    lastIsOpen: boolean;
+};
 
-const defaultGlobalPreferences: GlobalPreferences = {};
+export interface GlobalPreferences {
+    folders: AccountsFolder[];
+    sideBarOrder: string[];
+}
+
+const defaultGlobalPreferences: GlobalPreferences = {
+    folders: [],
+    sideBarOrder: []
+};
 
 export const useGlobalPreferencesQuery = () => {
     const sdk = useAppSdk();
@@ -44,3 +59,10 @@ export const useMutateGlobalPreferences = () => {
         await client.invalidateQueries([QueryKey.globalPreferencesConfig]);
     });
 };
+
+export function applySideBarSorting<T extends { id: string }>(items: T[], order: string[]): T[] {
+    return order
+        .map(id => items.find(item => item.id === id))
+        .filter(notNullish)
+        .concat(items.filter(item => !order.includes(item.id)));
+}

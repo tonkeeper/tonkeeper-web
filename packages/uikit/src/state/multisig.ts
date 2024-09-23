@@ -12,7 +12,7 @@ import {
 import { useAccountsState, useActiveAccount } from './wallet';
 import { isStandardTonWallet, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { orderStatus } from '@tonkeeper/core/dist/service/multisig/multisigService';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useCountdown } from '../hooks/useCountDown';
 import {
     AccountId,
@@ -300,4 +300,34 @@ export const useMarkAccountOrdersAsViewed = () => {
         });
         await client.invalidateQueries([QueryKey.viewedMultisigOrders]);
     });
+};
+
+export const useMultisigsOfAccountToDisplay = (hostWalletId: WalletId) => {
+    const accounts = useAccountsState();
+    const activeAccount = useActiveAccount();
+
+    return useMemo(() => {
+        const multisigs = accounts.filter(a => a.type === 'ton-multisig') as AccountTonMultisig[];
+
+        const result: {
+            account: AccountTonMultisig;
+            isPinned: boolean;
+            isSelected: boolean;
+        }[] = [];
+        for (const multisig of multisigs) {
+            const hostWallet = multisig.hostWallets.find(w => w.address === hostWalletId);
+
+            if (hostWallet) {
+                result.push({
+                    account: multisig,
+                    isPinned: hostWallet.isPinned,
+                    isSelected:
+                        activeAccount.id === multisig.id &&
+                        hostWalletId === multisig.selectedHostWalletId
+                });
+            }
+        }
+
+        return result.filter(m => m.isSelected || m.isPinned);
+    }, [accounts, hostWalletId, activeAccount]);
 };
