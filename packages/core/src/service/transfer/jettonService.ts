@@ -17,18 +17,17 @@ import { walletContractFromState } from '../wallet/contractService';
 import {
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
+    estimateMultisigTransfer,
     externalMessage,
     getServerTime,
     getTonkeeperQueryId,
     getTTL,
     getWalletBalance,
-    getWalletSeqnoAndCheckBalance,
     SendMode,
     sendMultisigTransfer,
     signEstimateMessage
 } from './common';
 import { getJettonCustomPayload } from './jettonPayloadService';
-import { estimateNewOrder } from '../multisig/order/order-estimate';
 
 export const jettonTransferAmount = toNano(0.1);
 export const jettonTransferForwardAmount = BigInt(1);
@@ -222,13 +221,6 @@ export const estimateMultisigJettonTransfer = async ({
     amount: AssetAmount<TonAsset>;
     jettonWalletAddress: string;
 }): Promise<TransferEstimationEvent> => {
-    const timestamp = await getServerTime(api);
-    await getWalletSeqnoAndCheckBalance({
-        api,
-        walletState: hostWallet,
-        amount: BigNumber(jettonTransferAmount.toString())
-    });
-
     const internalParams = await createJettonTransferMsgParams({
         api,
         walletState: { rawAddress: multisig.address },
@@ -238,19 +230,12 @@ export const estimateMultisigJettonTransfer = async ({
         forwardPayload: recipient.comment ? comment(recipient.comment) : null
     });
 
-    return estimateNewOrder({
-        multisig,
+    return estimateMultisigTransfer({
         api,
-        order: {
-            validUntilSeconds: getTTL(timestamp),
-            actions: [
-                {
-                    type: 'transfer',
-                    message: internal(internalParams),
-                    sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
-                }
-            ]
-        }
+        hostWallet,
+        multisig,
+        amount: BigNumber(jettonTransferAmount.toString()),
+        message: internal(internalParams)
     });
 };
 

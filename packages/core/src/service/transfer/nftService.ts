@@ -19,7 +19,8 @@ import {
     getTonkeeperQueryId,
     getWalletBalance,
     signEstimateMessage,
-    sendMultisigTransfer
+    sendMultisigTransfer,
+    estimateMultisigTransfer
 } from './common';
 import { AccountTonWalletStandard } from '../../entries/account';
 
@@ -319,6 +320,37 @@ export const estimateNftLink = async (options: {
     );
 
     return cell.toString('base64');
+};
+
+export const estimateMultisigNFTTransfer = async ({
+    api,
+    hostWallet,
+    multisig,
+    recipient,
+    nftAddress
+}: {
+    api: APIConfig;
+    hostWallet: TonWalletStandard;
+    multisig: Pick<Multisig, 'address' | 'signers' | 'threshold'>;
+    recipient: TonRecipientData;
+    nftAddress: string;
+}) => {
+    const nftTransferAmount = toNano('0.05');
+    const internalParams = createNftTransferMsgParams({
+        walletState: { rawAddress: multisig.address },
+        recipientAddress: recipient.toAccount.address,
+        nftAddress,
+        nftTransferAmount,
+        forwardPayload: recipient.comment ? comment(recipient.comment) : null
+    });
+
+    return estimateMultisigTransfer({
+        hostWallet,
+        multisig,
+        amount: new BigNumber(nftTransferAmount.toString()),
+        api,
+        message: internal(internalParams)
+    });
 };
 
 export const sendMultisigNFTTransfer = async ({

@@ -27,7 +27,7 @@ import { Cell, Dictionary } from '@ton/core';
 
 export const useMultisigWalletInfo = (walletAddressRaw: string) => {
     const { api } = useAppContext();
-    return useQuery([QueryKey.multisigWallet, walletAddressRaw, api], async () => {
+    return useQuery([QueryKey.multisigWallet, walletAddressRaw], async () => {
         const multisigApi = new MultisigApi(api.tonApiV2);
         return multisigApi.getMultisigAccount({ accountId: walletAddressRaw });
     });
