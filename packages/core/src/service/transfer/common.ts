@@ -29,6 +29,7 @@ import {
 } from '../../tonApiV2';
 import { WalletContract, walletContractFromState } from '../wallet/contractService';
 import { sendCreateOrder } from '../multisig/order/order-send';
+import { estimateNewOrder } from '../multisig/order/order-estimate';
 
 export enum SendMode {
     CARRY_ALL_REMAINING_BALANCE = 128,
@@ -295,6 +296,42 @@ export const sendMultisigTransfer = async ({
         signer,
         order: {
             validUntilSeconds: timestamp + ttlSeconds,
+            actions: [
+                {
+                    type: 'transfer',
+                    message,
+                    sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
+                }
+            ]
+        }
+    });
+};
+
+export const estimateMultisigTransfer = async ({
+    api,
+    hostWallet,
+    multisig,
+    message,
+    amount
+}: {
+    api: APIConfig;
+    hostWallet: TonWalletStandard;
+    multisig: Pick<Multisig, 'address' | 'signers' | 'threshold'>;
+    message: MessageRelaxed;
+    amount: BigNumber;
+}) => {
+    const timestamp = await getServerTime(api);
+    await getWalletSeqnoAndCheckBalance({
+        api,
+        walletState: hostWallet,
+        amount
+    });
+
+    return estimateNewOrder({
+        multisig,
+        api,
+        order: {
+            validUntilSeconds: getTTL(timestamp),
             actions: [
                 {
                     type: 'transfer',

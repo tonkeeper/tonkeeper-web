@@ -280,6 +280,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         hideKeystone: !showQrScan,
         hideQrScanner: !showQrScan,
         hideMam: true,
+        hideMultisig: true,
         defaultWalletVersion: WalletVersion.V5R1,
         browserLength: 4
     };
