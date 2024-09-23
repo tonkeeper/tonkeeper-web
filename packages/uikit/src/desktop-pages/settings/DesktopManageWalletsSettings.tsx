@@ -6,7 +6,7 @@ import {
     Droppable
 } from 'react-beautiful-dnd';
 import styled, { css } from 'styled-components';
-import { DropDownContent, DropDownItem, DropDownItem } from '../../components/DropDown';
+import { DropDownContent, DropDownItem } from '../../components/DropDown';
 import { EllipsisIcon, PlusIcon, ReorderIcon } from '../../components/Icon';
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { Label2, TextEllipsis } from '../../components/Text';
@@ -160,7 +160,7 @@ export const DesktopManageAccountsPage = () => {
             </DragDropContext>
 
             <BottomButtonContainer>
-                <Button secondary fullWidth>
+                <Button secondary fullWidth onClick={addWallet}>
                     <PlusIcon />
                     Add Wallet
                 </Button>
