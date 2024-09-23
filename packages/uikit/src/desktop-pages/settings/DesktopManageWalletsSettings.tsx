@@ -160,7 +160,7 @@ export const DesktopManageAccountsPage = () => {
             </DragDropContext>
 
             <BottomButtonContainer>
-                <Button secondary fullWidth onClick={addWallet}>
+                <Button secondary fullWidth onClick={() => addWallet()}>
                     <PlusIcon />
                     Add Wallet
                 </Button>
