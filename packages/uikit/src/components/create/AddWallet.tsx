@@ -91,7 +91,7 @@ const GroupsDivider = styled(Body2)`
 
 export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onSelect }) => {
     const { t } = useTranslation();
-    const { hideMam, hideSigner, hideLedger, hideKeystone } = useAppContext();
+    const { hideMam, hideSigner, hideLedger, hideKeystone, hideMultisig } = useAppContext();
     const hideAllHardwareWallets = hideSigner && hideLedger && hideKeystone;
 
     const accounts = useAccountsState();
@@ -163,7 +163,7 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                         <RightIcon />
                     </ButtonIcon>
                 </AddMethod>
-                {canAddMultisig && (
+                {canAddMultisig && !hideMultisig && (
                     <AddMethod onClick={() => onSelect('multisig')}>
                         <ButtonIcon large>
                             <PencilIcon />

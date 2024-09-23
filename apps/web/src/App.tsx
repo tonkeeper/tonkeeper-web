@@ -30,10 +30,11 @@ import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import {
+    useAccountsState,
     useAccountsStateQuery,
     useActiveAccountQuery,
-    useActiveTonNetwork
-} from '@tonkeeper/uikit/dist/state/wallet';
+    useActiveTonNetwork, useMutateActiveAccount
+} from "@tonkeeper/uikit/dist/state/wallet";
 import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +44,7 @@ import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
 import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
 import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
+import { useIsActiveAccountMultisig } from "@tonkeeper/uikit/dist/state/multisig";
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -160,6 +162,8 @@ const Loader: FC = () => {
         }
     }, [activeAccount, i18n]);
 
+    const isMobile = useLayout();
+
     if (
         isWalletsLoading ||
         activeWalletLoading ||
@@ -183,6 +187,7 @@ const Loader: FC = () => {
         proFeatures: true,
         ios,
         defaultWalletVersion: WalletVersion.V5R1,
+        hideMultisig: isMobile,
         env: {
             tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
             stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS
@@ -219,6 +224,18 @@ const Content: FC<{
     standalone: boolean;
 }> = ({ activeAccount, lock, standalone }) => {
     const isMobile = useLayout();
+    const accounts = useAccountsState();
+    const isActiveMultisig = useIsActiveAccountMultisig();
+    const { mutate: setActiveAccount } = useMutateActiveAccount();
+
+    useEffect(() => {
+        if (isMobile && isActiveMultisig) {
+            const firstNotMultisig = accounts.filter(a => a.type !== 'ton-multisig')[0];
+            if (firstNotMultisig) {
+                setActiveAccount(firstNotMultisig.id)
+            }
+        }
+    }, [isMobile, isActiveMultisig, setActiveAccount]);
 
     if (isMobile) {
         return <MobileView activeAccount={activeAccount} lock={lock} standalone={standalone} />;
