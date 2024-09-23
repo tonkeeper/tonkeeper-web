@@ -135,7 +135,10 @@ export const createAutoFeeTransferMessage = async (
         init?: StateInit | null;
     }
 ) => {
-    const bocToEstimate = await createTransferMessage(wallet, transaction);
+    const bocToEstimate = await createTransferMessage(
+        { ...wallet, signer: signEstimateMessage },
+        transaction
+    );
 
     const result = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
         emulateMessageToWalletRequest: { boc: bocToEstimate.toString('base64') }

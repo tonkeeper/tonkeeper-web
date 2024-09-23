@@ -102,13 +102,21 @@ export const signTonConnectMnemonicOver = (mnemonic: string[]) => {
 export const getSigner = async (
     sdk: IAppSdk,
     accountId: AccountId,
-    checkTouchId: () => Promise<void>
+    checkTouchId: () => Promise<void>,
+    {
+        walletId
+    }: {
+        walletId?: WalletId;
+    } = {}
 ): Promise<Signer> => {
     try {
         const account = await accountsStorage(sdk.storage).getAccount(accountId);
         if (!account) {
             throw new Error('Wallet not found');
         }
+
+        const wallet =
+            walletId !== undefined ? account.getTonWallet(walletId) : account.activeTonWallet;
 
         switch (account.type) {
             case 'ton-only': {
@@ -117,7 +125,7 @@ export const getSigner = async (
                         const result = await pairSignerByNotification(
                             sdk,
                             message.toBoc({ idx: false }).toString('base64'),
-                            account.activeTonWallet
+                            wallet as TonWalletStandard
                         );
                         return parseSignerSignature(result);
                     };
@@ -126,12 +134,11 @@ export const getSigner = async (
                 }
 
                 if (account.auth.kind === 'signer-deeplink') {
-                    const wallet = account.activeTonWallet;
                     const callback = async (message: Cell) => {
                         const deeplink = await storeTransactionAndCreateDeepLink(
                             sdk,
-                            wallet.publicKey,
-                            wallet.version,
+                            (wallet as TonWalletStandard).publicKey,
+                            (wallet as TonWalletStandard).version,
                             message.toBoc({ idx: false }).toString('base64')
                         );
 
@@ -149,7 +156,10 @@ export const getSigner = async (
                 return assertUnreachable(account.auth);
             }
             case 'ledger': {
-                const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
+                const derivation = account.allAvailableDerivations.find(
+                    d => d.activeTonWalletId === wallet!.id
+                )!;
+                const path = getLedgerAccountPathByIndex(derivation.index);
                 const callback = async (transaction: LedgerTransaction) =>
                     pairLedgerByNotification(sdk, path, transaction);
                 callback.type = 'ledger' as const;
@@ -169,11 +179,10 @@ export const getSigner = async (
                 return callback;
             }
             case 'mam': {
-                const wallet = account.activeTonWallet;
                 const mnemonic = await getMAMWalletMnemonic(
                     sdk,
                     account.id,
-                    wallet.id,
+                    wallet!.id,
                     checkTouchId
                 );
                 const callback = async (message: Cell) => {

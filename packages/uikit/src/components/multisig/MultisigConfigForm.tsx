@@ -228,22 +228,21 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
     return (
         <Controller
             rules={{
-                required: 'Required',
                 validate: v => {
                     if (!seeIfValidTonAddress(v)) {
                         return t('create_multisig_invalid_address_error');
                     }
 
-                    try {
-                        if (
-                            participants.filter(p =>
-                                Address.parse(p.address).equals(Address.parse(v))
-                            ).length > 1
-                        ) {
-                            return t('create_multisig_duplicated_address_error');
-                        }
-                    } catch (e) {
-                        return;
+                    if (
+                        participants.filter(p => {
+                            try {
+                                return Address.parse(p.address).equals(Address.parse(v));
+                            } catch (e) {
+                                return false;
+                            }
+                        }).length > 1
+                    ) {
+                        return t('create_multisig_duplicated_address_error');
                     }
                 }
             }}

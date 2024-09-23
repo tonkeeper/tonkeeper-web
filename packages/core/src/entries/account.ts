@@ -611,14 +611,14 @@ export function isAccountTonWalletStandard(account: Account): account is Account
 
 export function isAccountCanManageMultisigs(account: Account): boolean {
     switch (account.type) {
-        case 'keystone':
         case 'mnemonic':
-        case 'ledger':
         case 'ton-only':
         case 'mam':
             return true;
         case 'watch-only':
         case 'ton-multisig':
+        case 'keystone':
+        case 'ledger':
             return false;
     }
 
