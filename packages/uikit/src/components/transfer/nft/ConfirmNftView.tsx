@@ -82,7 +82,7 @@ const useNftTransferEstimation = (nftItem: NftItem, data?: TonRecipientData) => 
                     let multisig = client.getQueryData([
                         QueryKey.multisigWallet,
                         account.activeTonWallet.rawAddress
-                    ]);
+                    ]) as Multisig | null;
                     if (!multisig) {
                         multisig = await new MultisigApi(api.tonApiV2).getMultisigAccount({
                             accountId: account.activeTonWallet.rawAddress
