@@ -72,14 +72,14 @@ const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, o
             const item = { address: address };
             const toAccount = await getAccountAsync(item);
 
-            setRecipient({
+            onRecipient({
                 address: { ...item, blockchain: BLOCKCHAIN_NAME.TON },
                 toAccount,
                 comment: '',
                 done: true
             });
         },
-        [setRecipient, getAccountAsync]
+        [onRecipient, getAccountAsync]
     );
 
     const onScan = async (signature: string) => {
