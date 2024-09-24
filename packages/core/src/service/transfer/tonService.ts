@@ -34,7 +34,7 @@ import {
     getWalletSeqnoAndCheckBalance
 } from './common';
 import { estimateNewOrder } from '../multisig/order/order-estimate';
-import { sendCreateOrder } from '../multisig/order/order-send';
+import { orderActionMinAmount, sendCreateOrder } from '../multisig/order/order-send';
 
 export type EstimateData = {
     accountEvent: TransferEstimationEvent;
@@ -298,12 +298,19 @@ export const estimateMultisigTonTransfer = async ({
     isMax: boolean;
 }): Promise<TransferEstimationEvent> => {
     const timestamp = await getServerTime(api);
-    const [wallet] = await getWalletBalance(api, hostWallet);
+
+    const [walletInfo] = await getWalletBalance(api, { rawAddress: multisig.address });
     if (isMax) {
-        checkWalletPositiveBalanceOrDie(wallet);
+        checkWalletPositiveBalanceOrDie(walletInfo);
     } else {
-        checkWalletBalanceOrDie(weiAmount, wallet);
+        checkWalletBalanceOrDie(weiAmount, walletInfo);
     }
+
+    await getWalletSeqnoAndCheckBalance({
+        walletState: hostWallet,
+        amount: orderActionMinAmount,
+        api
+    });
 
     return estimateNewOrder({
         multisig,
@@ -337,12 +344,19 @@ export const sendMultisigTonTransfer = async ({
     ttlSeconds: number;
 }): Promise<void> => {
     const timestamp = await getServerTime(api);
-    const [wallet] = await getWalletBalance(api, hostWallet);
+
+    const [walletInfo] = await getWalletBalance(api, { rawAddress: multisig.address });
     if (isMax) {
-        checkWalletPositiveBalanceOrDie(wallet);
+        checkWalletPositiveBalanceOrDie(walletInfo);
     } else {
-        checkWalletBalanceOrDie(weiAmount.minus(fee.event.extra), wallet);
+        checkWalletBalanceOrDie(weiAmount.minus(fee.event.extra), walletInfo);
     }
+
+    await getWalletSeqnoAndCheckBalance({
+        walletState: hostWallet,
+        amount: orderActionMinAmount,
+        api
+    });
 
     await sendCreateOrder({
         multisig,
@@ -363,13 +377,21 @@ export const estimateMultisigTonConnectTransfer = async (
     params: TonConnectTransactionPayload
 ): Promise<TransferEstimationEvent> => {
     const timestamp = await getServerTime(api);
-    const [wallet] = await getWalletBalance(api, hostWallet);
 
-    if (params.messages.length > 255) {
-        throw new Error('Multisig wallets can send maximum 255 message at a time');
-    }
+    const amount = new BigNumber(
+        params.messages.reduce((acc, m) => acc.plus(m.amount), new BigNumber(0))
+    );
+    await getWalletSeqnoAndCheckBalance({
+        api,
+        walletState: { rawAddress: multisig.address },
+        amount
+    });
 
-    checkWalletBalanceOrDie(new BigNumber(params.messages[0].amount), wallet);
+    await getWalletSeqnoAndCheckBalance({
+        walletState: hostWallet,
+        amount: orderActionMinAmount,
+        api
+    });
 
     return estimateNewOrder({
         multisig,
@@ -398,16 +420,19 @@ export const sendMultisigTonConnectTransfer = async ({
 }): Promise<string> => {
     const timestamp = await getServerTime(api);
 
-    if (params.messages.length > 255) {
-        throw new Error('Multisig wallets can send maximum 255 message at a time');
-    }
-
+    const amount = new BigNumber(
+        params.messages.reduce((acc, m) => acc.plus(m.amount), new BigNumber(0))
+    );
     await getWalletSeqnoAndCheckBalance({
         api,
+        walletState: { rawAddress: multisig.address },
+        amount
+    });
+
+    await getWalletSeqnoAndCheckBalance({
         walletState: hostWallet,
-        amount: new BigNumber(
-            params.messages.reduce((acc, m) => acc.plus(m.amount), new BigNumber(0))
-        )
+        amount: orderActionMinAmount,
+        api
     });
 
     const boc = await sendCreateOrder({

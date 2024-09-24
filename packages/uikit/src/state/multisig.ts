@@ -9,7 +9,7 @@ import {
     MultisigOrder,
     Multisigs
 } from '@tonkeeper/core/dist/tonApiV2';
-import { useAccountsState, useActiveAccount } from './wallet';
+import { useAccountsState, useActiveAccount, useActiveAccountQuery } from './wallet';
 import { isStandardTonWallet, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { orderStatus } from '@tonkeeper/core/dist/service/multisig/multisigService';
 import { useRef } from 'react';
@@ -144,8 +144,8 @@ export const useWalletMultisigWallets = (walletAddressRaw: string) => {
 };
 
 export const useIsActiveAccountMultisig = () => {
-    const account = useActiveAccount();
-    return account.type === 'ton-multisig';
+    const { data } = useActiveAccountQuery();
+    return data?.type === 'ton-multisig';
 };
 
 export const useActiveMultisigAccountHost = () => {

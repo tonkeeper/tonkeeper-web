@@ -32,7 +32,11 @@ import {
 import { useAppContext } from '../../hooks/appContext';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { deployMultisigAssetAmount } from '@tonkeeper/core/dist/service/multisig/deploy';
-import { Account, isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import {
+    Account,
+    isAccountCanManageMultisigs,
+    isAccountTonWalletStandard
+} from '@tonkeeper/core/dist/entries/account';
 import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { Dot } from '../Dot';
@@ -303,12 +307,15 @@ const FirstParticipantCard: FC<{ skipBalanceCheck?: boolean }> = ({ skipBalanceC
     useAsyncValidator(methods, selectedAddress, 'firstParticipant', asyncValidator);
     const accounts = useAccountsState();
     const wallets = useMemo(() => {
-        const filtered = accounts.filter(isAccountTonWalletStandard).flatMap(a =>
-            a.allTonWallets.map(w => ({
-                account: a,
-                wallet: w
-            }))
-        );
+        const filtered = accounts
+            .filter(isAccountCanManageMultisigs)
+            .filter(isAccountTonWalletStandard)
+            .flatMap(a =>
+                a.allTonWallets.map(w => ({
+                    account: a,
+                    wallet: w
+                }))
+            );
 
         return filtered.reduce(
             (acc, v) => ({ ...acc, [v.wallet.rawAddress]: v }),
