@@ -46,8 +46,14 @@ import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
 import { useDevSettings } from './dev';
 import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
 import { useCheckTouchId } from './password';
-import { seeIfMnemonicValid } from "@tonkeeper/core/dist/service/mnemonicService";
+import { seeIfMnemonicValid } from '@tonkeeper/core/dist/service/mnemonicService';
 import { DropResult, ResponderProvided } from 'react-beautiful-dnd';
+import {
+    AccountsFolder,
+    applySideBarSorting,
+    useGlobalPreferences,
+    useMutateGlobalPreferences
+} from './global-preferences';
 
 export const useActiveAccountQuery = () => {
     const storage = useAccountsStorage();
@@ -319,21 +325,37 @@ export const useAccountsStateQuery = () => {
     );
 };
 
-export const useAccountsDNDDrop = () => {
-    const { mutate } = useMutateAccountsState();
+export const useSideBarItems = () => {
     const accounts = useAccountsState();
-    return useCallback<(result: DropResult, provided: ResponderProvided) => Account[] | undefined>(
+    const { sideBarOrder, folders } = useGlobalPreferences();
+
+    return useMemo(() => {
+        const accountsNotInFolder = accounts.filter(
+            a => !folders.some(f => f.accounts.includes(a.id))
+        );
+        return applySideBarSorting(
+            (accountsNotInFolder as (Account | AccountsFolder)[]).concat(folders),
+            sideBarOrder
+        );
+    }, [accounts, folders, sideBarOrder]);
+};
+
+export const useAccountsDNDDrop = () => {
+    const { mutate } = useMutateGlobalPreferences();
+    const items = useSideBarItems();
+
+    return useCallback<(result: DropResult, provided: ResponderProvided) => string[]>(
         droppedItem => {
+            const updatedList = [...items].map(i => i.id);
             if (!droppedItem.destination) {
-                return;
+                return updatedList;
             }
-            const updatedList = [...accounts];
             const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
             updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
-            mutate(updatedList);
+            mutate({ sideBarOrder: updatedList });
             return updatedList;
         },
-        [accounts, mutate]
+        [items, mutate]
     );
 };
 

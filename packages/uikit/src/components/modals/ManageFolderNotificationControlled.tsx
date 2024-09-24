@@ -34,7 +34,13 @@ export const ManageFolderNotificationControlled = () => {
     }, [onClose, params?.folderId, folders]);
 
     return (
-        <Notification isOpen={isOpen} handleClose={onClose} title={t('accounts_new_folder')}>
+        <Notification
+            isOpen={isOpen}
+            handleClose={onClose}
+            title={t(
+                params?.folderId !== undefined ? 'accounts_manage_folder' : 'accounts_new_folder'
+            )}
+        >
             {Content}
         </Notification>
     );
@@ -86,7 +92,7 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
     onClose
 }) => {
     const { t } = useTranslation();
-    const accounts = useAccountsState();
+    const accounts = useAccountsState().filter(a => a.type !== 'ton-multisig');
     const { folders } = useGlobalPreferences();
     const newFolderName = useNewFolderName();
     const { mutate: updateFolder } = useUpdateFolder();

@@ -1,4 +1,4 @@
-import { FC, forwardRef, Fragment, useMemo } from 'react';
+import { FC, forwardRef, Fragment } from 'react';
 import {
     DragDropContext,
     Draggable,
@@ -12,7 +12,7 @@ import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { Body2Class, Label2, TextEllipsis } from '../../components/Text';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
-import { useAccountsState, useAccountsDNDDrop, useActiveTonNetwork } from '../../state/wallet';
+import { useAccountsState, useAccountsDNDDrop, useActiveTonNetwork, useSideBarItems } from "../../state/wallet";
 import {
     Account,
     AccountKeystone,
@@ -33,11 +33,7 @@ import {
     WalletIndexBadge,
     WalletVersionBadge
 } from '../../components/account/AccountBadge';
-import {
-    AccountsFolder,
-    applySideBarSorting,
-    useGlobalPreferences
-} from '../../state/global-preferences';
+import { AccountsFolder } from '../../state/global-preferences';
 import {
     sortDerivationsByIndex,
     sortWalletsByVersion,
@@ -52,24 +48,33 @@ import { useDeleteAccountNotification } from '../../components/modals/DeleteAcco
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 import { Button } from '../../components/fields/Button';
 import { useManageFolderNotification } from '../../components/modals/ManageFolderNotificationControlled';
+import { useDeleteFolder } from '../../state/folders';
+import { useIsScrolled } from '../../hooks/useIsScrolled';
 
-const Row = styled.div`
+const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
+    height: 100%;
+`;
+
+const Row = styled.div<{ $tabLevel?: number }>`
     height: 40px;
     box-sizing: border-box;
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    ${p => `padding-left: ${16 + (p.$tabLevel ?? 0) * 28}px !important;`}
+    border-bottom: none !important;
 
     width: 100%;
-`;
-
-const SubRow = styled(Row)`
-    padding-left: 52px !important;
 `;
 
 const Icon = styled.span`
     display: flex;
     color: ${props => props.theme.iconSecondary};
+`;
+
+const DragHandleMock = styled.div`
+    width: 28px;
+    height: 28px;
 `;
 
 const DropDownStyled = styled(SelectDropDown)`
@@ -88,6 +93,10 @@ const ListItemStyled = styled(ListItem)<{ $isDragging: boolean }>`
                 border: none !important;
             }
         `}
+
+    &:last-child {
+        border-bottom: 1px solid ${p => p.theme.separatorCommon};
+    }
 `;
 
 const BottomButtonContainer = styled.div`
@@ -108,26 +117,18 @@ const NewFolderButton = styled.button`
 `;
 
 export const DesktopManageAccountsPage = () => {
+    const { ref: scrollRef, closeTop } = useIsScrolled();
     const { onOpen: addWallet } = useAddWalletNotification();
     const { onOpen: manageFolders } = useManageFolderNotification();
     const { t } = useTranslation();
 
-    const accounts = useAccountsState();
     const handleDrop = useAccountsDNDDrop();
 
-    const { folders, sideBarOrder } = useGlobalPreferences();
-    const items = useMemo(
-        () =>
-            applySideBarSorting(
-                (accounts as (Account | AccountsFolder)[]).concat(folders),
-                sideBarOrder
-            ),
-        [folders, sideBarOrder, accounts]
-    );
+    const items = useSideBarItems();
 
     return (
-        <DesktopViewPageLayout>
-            <DesktopViewHeader>
+        <DesktopViewPageLayoutStyled ref={scrollRef}>
+            <DesktopViewHeader borderBottom={!closeTop}>
                 <Label2>{t('Manage_wallets')}</Label2>
                 <NewFolderButton onClick={() => manageFolders()}>
                     {t('accounts_new_folder')}
@@ -183,7 +184,7 @@ export const DesktopManageAccountsPage = () => {
                     {t('add_wallet')}
                 </Button>
             </BottomButtonContainer>
-        </DesktopViewPageLayout>
+        </DesktopViewPageLayoutStyled>
     );
 };
 
@@ -252,16 +253,13 @@ const AccountMenu: FC<{ options: { name: string; onClick: () => void }[] }> = ({
 
 const MultisigsGroupRows: FC<{
     hostWalletId: WalletId;
-}> = ({ hostWalletId }) => {
+    tabLevel: number;
+}> = ({ hostWalletId, tabLevel }) => {
     const multisigsToDisplay = useMultisigsOfAccountToDisplay(hostWalletId);
     return (
         <>
             {multisigsToDisplay.map(val => (
-                <MultisigItemRow
-                    key={val.account.id}
-                    account={val.account}
-                    hostWalletId={hostWalletId}
-                />
+                <MultisigItemRow key={val.account.id} account={val.account} tabLevel={tabLevel} />
             ))}
         </>
     );
@@ -271,13 +269,14 @@ const MultisigItemRow = forwardRef<
     HTMLDivElement,
     {
         account: AccountTonMultisig;
-        hostWalletId: WalletId;
+        tabLevel: number;
     }
->(({ account }, ref) => {
+>(({ account, tabLevel }, ref) => {
     const { onRename } = useAccountOptions();
     const { t } = useTranslation();
     return (
-        <SubRow ref={ref}>
+        <Row ref={ref} $tabLevel={tabLevel}>
+            <DragHandleMock />
             <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
             <Label2Styled>{account.name}</Label2Styled>
             <AccountBadgeStyled accountType={account.type} size="s" />
@@ -286,14 +285,15 @@ const MultisigItemRow = forwardRef<
                     { name: t('Rename'), onClick: () => onRename({ accountId: account.id }) }
                 ]}
             />
-        </SubRow>
+        </Row>
     );
 });
 
 const AccountMnemonicRow: FC<{
     account: AccountTonMnemonic;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-}> = ({ account, dragHandleProps }) => {
+    tabLevel: number;
+}> = ({ account, dragHandleProps, tabLevel }) => {
     const network = useActiveTonNetwork();
     const { t } = useTranslation();
     const { onRename, onDelete, onRecovery } = useAccountOptions();
@@ -302,7 +302,7 @@ const AccountMnemonicRow: FC<{
 
     return (
         <>
-            <Row>
+            <Row $tabLevel={tabLevel}>
                 <Icon {...dragHandleProps}>
                     <ReorderIcon />
                 </Icon>
@@ -323,18 +323,19 @@ const AccountMnemonicRow: FC<{
                 />
             </Row>
             {sortedWallets.length === 1 && (
-                <MultisigsGroupRows hostWalletId={sortedWallets[0].id} />
+                <MultisigsGroupRows hostWalletId={sortedWallets[0].id} tabLevel={tabLevel + 1} />
             )}
             {sortedWallets.length > 1 &&
                 sortedWallets.map(wallet => (
                     <Fragment key={wallet.id}>
-                        <SubRow>
+                        <Row $tabLevel={tabLevel + 1}>
+                            <DragHandleMock />
                             <Label2Styled>
                                 {toShortValue(formatAddress(wallet.rawAddress, network))}
                             </Label2Styled>
                             <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
-                        </SubRow>
-                        <MultisigsGroupRows hostWalletId={wallet.id} />
+                        </Row>
+                        <MultisigsGroupRows hostWalletId={wallet.id} tabLevel={tabLevel + 2} />
                     </Fragment>
                 ))}
         </>
@@ -344,7 +345,8 @@ const AccountMnemonicRow: FC<{
 const AccountLedgerRow: FC<{
     account: AccountLedger;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-}> = ({ account, dragHandleProps }) => {
+    tabLevel: number;
+}> = ({ account, dragHandleProps, tabLevel }) => {
     const network = useActiveTonNetwork();
     const { t } = useTranslation();
     const { onRename, onDelete } = useAccountOptions();
@@ -352,7 +354,7 @@ const AccountLedgerRow: FC<{
     const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
     return (
         <>
-            <Row>
+            <Row $tabLevel={tabLevel}>
                 <Icon {...dragHandleProps}>
                     <ReorderIcon />
                 </Icon>
@@ -376,14 +378,15 @@ const AccountLedgerRow: FC<{
                     )!;
 
                     return (
-                        <SubRow key={derivation.index}>
+                        <Row key={derivation.index} $tabLevel={tabLevel + 1}>
+                            <DragHandleMock />
                             <Label2Styled>
                                 {toShortValue(formatAddress(wallet.rawAddress, network))}
                             </Label2Styled>
                             <WalletIndexBadgeStyled size="s">
                                 {'#' + (derivation.index + 1)}
                             </WalletIndexBadgeStyled>
-                        </SubRow>
+                        </Row>
                     );
                 })}
         </>
@@ -393,7 +396,8 @@ const AccountLedgerRow: FC<{
 const AccountTonOnlyRow: FC<{
     account: AccountTonOnly;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-}> = ({ account, dragHandleProps }) => {
+    tabLevel: number;
+}> = ({ account, dragHandleProps, tabLevel }) => {
     const network = useActiveTonNetwork();
     const { t } = useTranslation();
     const { onRename, onDelete } = useAccountOptions();
@@ -401,7 +405,7 @@ const AccountTonOnlyRow: FC<{
     const sortedWallets = account.tonWallets.slice().sort(sortWalletsByVersion);
     return (
         <>
-            <Row>
+            <Row $tabLevel={tabLevel}>
                 <Icon {...dragHandleProps}>
                     <ReorderIcon />
                 </Icon>
@@ -419,18 +423,19 @@ const AccountTonOnlyRow: FC<{
                 />
             </Row>
             {sortedWallets.length === 1 && (
-                <MultisigsGroupRows hostWalletId={sortedWallets[0].id} />
+                <MultisigsGroupRows hostWalletId={sortedWallets[0].id} tabLevel={tabLevel + 1} />
             )}
             {sortedWallets.length > 1 &&
                 sortedWallets.map(wallet => (
                     <Fragment key={wallet.id}>
-                        <SubRow>
+                        <Row $tabLevel={tabLevel}>
+                            <DragHandleMock />
                             <Label2Styled>
                                 {toShortValue(formatAddress(wallet.rawAddress, network))}
                             </Label2Styled>
                             <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
-                        </SubRow>
-                        <MultisigsGroupRows hostWalletId={wallet.id} />
+                        </Row>
+                        <MultisigsGroupRows hostWalletId={wallet.id} tabLevel={tabLevel + 2} />
                     </Fragment>
                 ))}
         </>
@@ -440,11 +445,12 @@ const AccountTonOnlyRow: FC<{
 const AccountKeystoneRow: FC<{
     account: AccountKeystone;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-}> = ({ account, dragHandleProps }) => {
+    tabLevel: number;
+}> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
     const { onRename, onDelete } = useAccountOptions();
     return (
-        <Row>
+        <Row $tabLevel={tabLevel}>
             <Icon {...dragHandleProps}>
                 <ReorderIcon />
             </Icon>
@@ -467,11 +473,12 @@ const AccountKeystoneRow: FC<{
 const AccountWatchOnlyRow: FC<{
     account: AccountTonWatchOnly;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-}> = ({ account, dragHandleProps }) => {
+    tabLevel: number;
+}> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
     const { onRename, onDelete } = useAccountOptions();
     return (
-        <Row>
+        <Row $tabLevel={tabLevel}>
             <Icon {...dragHandleProps}>
                 <ReorderIcon />
             </Icon>
@@ -494,13 +501,14 @@ const AccountWatchOnlyRow: FC<{
 const AccountMAMRow: FC<{
     account: AccountMAM;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-}> = ({ account, dragHandleProps }) => {
+    tabLevel: number;
+}> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
     const { onRename, onDelete, onRecovery } = useAccountOptions();
     const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
     return (
         <>
-            <Row>
+            <Row $tabLevel={tabLevel}>
                 <Icon {...dragHandleProps}>
                     <ReorderIcon />
                 </Icon>
@@ -524,7 +532,8 @@ const AccountMAMRow: FC<{
             {sortedDerivations.map(derivation => {
                 return (
                     <Fragment key={derivation.index}>
-                        <SubRow>
+                        <Row $tabLevel={tabLevel + 1}>
+                            <DragHandleMock />
                             <WalletEmoji
                                 emojiSize="16px"
                                 containerSize="16px"
@@ -554,8 +563,11 @@ const AccountMAMRow: FC<{
                                     }
                                 ]}
                             />
-                        </SubRow>
-                        <MultisigsGroupRows hostWalletId={derivation.activeTonWalletId} />
+                        </Row>
+                        <MultisigsGroupRows
+                            hostWalletId={derivation.activeTonWalletId}
+                            tabLevel={tabLevel + 2}
+                        />
                     </Fragment>
                 );
             })}
@@ -570,6 +582,7 @@ const AccountMultisigRow = () => {
 const AccountRow: FC<{
     account: Account;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+    tabLevel: number;
 }> = ({ account, ...rest }) => {
     switch (account.type) {
         case 'mnemonic':
@@ -594,12 +607,17 @@ const AccountRow: FC<{
 const ItemRow: FC<{
     item: Account | AccountsFolder;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-}> = ({ item, dragHandleProps }) => {
+    tabLevel?: number;
+}> = ({ item, dragHandleProps, tabLevel = 0 }) => {
+    const { t } = useTranslation();
     const accounts = useAccountsState();
+    const { onOpen: onManageFolder } = useManageFolderNotification();
+    const { mutate: deleteFolder } = useDeleteFolder();
+
     if (item.type === 'folder') {
         return (
             <>
-                <Row>
+                <Row $tabLevel={tabLevel}>
                     <Icon {...dragHandleProps}>
                         <ReorderIcon />
                     </Icon>
@@ -607,17 +625,30 @@ const ItemRow: FC<{
                         <FolderIcon />
                     </Icon>
                     <Label2Styled>{item.name}</Label2Styled>
+                    <AccountMenu
+                        options={[
+                            {
+                                name: t('accounts_manage_folder'),
+                                onClick: () => onManageFolder({ folderId: item.id })
+                            },
+                            {
+                                name: t('accounts_delete_folder'),
+                                onClick: () => deleteFolder(item)
+                            }
+                        ]}
+                    />
                 </Row>
                 {item.accounts.map(acc => (
                     <ItemRow
                         key={acc}
                         item={accounts.find(a => a.id === acc)!}
                         dragHandleProps={dragHandleProps}
+                        tabLevel={1}
                     />
                 ))}
             </>
         );
     }
 
-    return <AccountRow account={item} dragHandleProps={dragHandleProps} />;
+    return <AccountRow account={item} dragHandleProps={dragHandleProps} tabLevel={tabLevel} />;
 };
