@@ -189,45 +189,47 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
         wallet: TonContract;
         account: Account;
         derivation?: DerivationItemNamed;
-    }[] = useAccountsState().flatMap(a => {
-        if (a.type === 'ledger') {
-            return a.derivations
+    }[] = useAccountsState()
+        .filter(a => a.type !== 'ton-multisig')
+        .flatMap(a => {
+            if (a.type === 'ledger') {
+                return a.derivations
+                    .slice()
+                    .sort(sortDerivationsByIndex)
+                    .map(
+                        d =>
+                            ({
+                                wallet: d.tonWallets.find(w => w.id === d.activeTonWalletId)!,
+                                account: a
+                            } as { wallet: TonContract; account: Account })
+                    );
+            }
+
+            if (!isAccountTonWalletStandard(a)) {
+                return [
+                    {
+                        wallet: a.activeTonWallet,
+                        account: a
+                    }
+                ];
+            }
+
+            if (a.type === 'mam') {
+                return a.derivations.map(derivation => ({
+                    wallet: derivation.tonWallets[0],
+                    account: a,
+                    derivation
+                }));
+            }
+
+            return a.allTonWallets
                 .slice()
-                .sort(sortDerivationsByIndex)
-                .map(
-                    d =>
-                        ({
-                            wallet: d.tonWallets.find(w => w.id === d.activeTonWalletId)!,
-                            account: a
-                        } as { wallet: TonContract; account: Account })
-                );
-        }
-
-        if (!isAccountTonWalletStandard(a)) {
-            return [
-                {
-                    wallet: a.activeTonWallet,
+                .sort(sortWalletsByVersion)
+                .map(w => ({
+                    wallet: w,
                     account: a
-                }
-            ];
-        }
-
-        if (a.type === 'mam') {
-            return a.derivations.map(derivation => ({
-                wallet: derivation.tonWallets[0],
-                account: a,
-                derivation
-            }));
-        }
-
-        return a.allTonWallets
-            .slice()
-            .sort(sortWalletsByVersion)
-            .map(w => ({
-                wallet: w,
-                account: a
-            }));
-    });
+                }));
+        });
 
     if (!accountsWallets) {
         return null;
