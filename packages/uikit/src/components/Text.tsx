@@ -122,3 +122,11 @@ export const TextEllipsis = css`
     white-space: nowrap;
     text-overflow: ellipsis;
 `;
+
+export const NoSelectText = css`
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+`;

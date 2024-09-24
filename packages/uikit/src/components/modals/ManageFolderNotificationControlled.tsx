@@ -1,4 +1,4 @@
-import { Notification } from '../Notification';
+import { Notification, NotificationFooterPortal } from '../Notification';
 import { createModalControl } from './createModalControl';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from '../../hooks/translation';
@@ -8,10 +8,13 @@ import { useAccountsState } from '../../state/wallet';
 import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../List';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import styled from 'styled-components';
-import { Label2, TextEllipsis } from '../Text';
+import { Body3, Label2, NoSelectText, TextEllipsis } from '../Text';
 import { AccountBadge } from '../account/AccountBadge';
 import { Checkbox } from '../fields/Checkbox';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
+import { Button } from '../fields/Button';
+import { Input } from '../fields/Input';
+import { useDeleteFolder, useNewFolderName, useUpdateFolder } from '../../state/folders';
 
 const { hook, paramsControl } = createModalControl<{
     folderId?: string;
@@ -37,6 +40,8 @@ export const ManageFolderNotificationControlled = () => {
     );
 };
 
+const ModalContentWrapper = styled.div``;
+
 const Label2Styled = styled(Label2)`
     ${TextEllipsis}
 `;
@@ -48,23 +53,51 @@ const ListBlockDesktopAdaptiveStyled = styled(ListBlockDesktopAdaptive)`
 
 const ListItemPayloadStyled = styled(ListItemPayload)`
     justify-content: flex-start;
+
+    * {
+        ${NoSelectText};
+    }
 `;
 
 const CheckboxStyled = styled(Checkbox)`
     margin-left: auto;
 `;
 
+const Body3Secondary = styled(Body3)`
+    color: ${props => props.theme.textSecondary};
+`;
+
+const ButtonsContainer = styled.div`
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem 0;
+
+    > * {
+        flex: 1;
+    }
+`;
+
+const InputStyled = styled(Input)`
+    margin-bottom: 1rem;
+`;
+
 const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
     folder,
     onClose
 }) => {
-    const [checkedAccounts, setChecked] = useState(folder?.accounts || []);
+    const { t } = useTranslation();
     const accounts = useAccountsState();
     const { folders } = useGlobalPreferences();
+    const newFolderName = useNewFolderName();
+    const { mutate: updateFolder } = useUpdateFolder();
+    const { mutate: deleteFolder } = useDeleteFolder();
+
+    const [checkedAccounts, setChecked] = useState(folder?.accounts || []);
+    const [folderName, setFolderName] = useState(folder?.name || newFolderName);
 
     const { availableAccounts, unAvailableAccounts } = useMemo(() => {
         const _availableAccounts = accounts.filter(acc =>
-            folders.every(f => f.id !== folder?.id || !f.accounts.includes(acc.id))
+            folders.every(f => f.id === folder?.id || !f.accounts.includes(acc.id))
         );
         return {
             availableAccounts: _availableAccounts,
@@ -80,21 +113,89 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
         }
     };
 
+    const isValidInput = folderName.length > 0;
+    const folderNameDiffers = folderName !== folder?.name;
+    const accountsDiffers =
+        JSON.stringify(checkedAccounts) !== JSON.stringify(folder?.accounts || []);
+    const canSave = (isValidInput && folderNameDiffers) || accountsDiffers;
+
+    const onSave = () => {
+        onClose();
+        if (!checkedAccounts.length && folder?.id !== undefined) {
+            setTimeout(() => {
+                deleteFolder({ id: folder.id });
+            }, 150);
+        }
+
+        if (checkedAccounts.length) {
+            setTimeout(() => {
+                updateFolder({ id: folder?.id, name: folderName, accounts: checkedAccounts });
+            }, 150);
+        }
+    };
+
     return (
-        <ListBlockDesktopAdaptiveStyled>
-            {availableAccounts.map(acc => (
-                <ListItem key={acc.id} hover={false}>
-                    <ListItemPayloadStyled>
-                        <WalletEmoji emojiSize="16px" containerSize="16px" emoji={acc.emoji} />
-                        <Label2Styled>{acc.name}</Label2Styled>
-                        <AccountBadge accountType={acc.type} size="s" />
-                        <CheckboxStyled
-                            checked={checkedAccounts.includes(acc.id)}
-                            onChange={() => toggleCheckbox(acc.id)}
-                        />
-                    </ListItemPayloadStyled>
-                </ListItem>
-            ))}
-        </ListBlockDesktopAdaptiveStyled>
+        <ModalContentWrapper>
+            <InputStyled
+                value={folderName}
+                onChange={setFolderName}
+                label={t('accounts_manage_folder_name')}
+                isValid={isValidInput}
+                clearButton
+            />
+            <ListBlockDesktopAdaptiveStyled>
+                {availableAccounts.map(acc => (
+                    <ListItem key={acc.id} hover={false}>
+                        <ListItemPayloadStyled>
+                            <WalletEmoji emojiSize="16px" containerSize="16px" emoji={acc.emoji} />
+                            <Label2Styled>{acc.name}</Label2Styled>
+                            <AccountBadge accountType={acc.type} size="s" />
+                            <CheckboxStyled
+                                checked={checkedAccounts.includes(acc.id)}
+                                onChange={() => toggleCheckbox(acc.id)}
+                            />
+                        </ListItemPayloadStyled>
+                    </ListItem>
+                ))}
+                {!!unAvailableAccounts.length && (
+                    <>
+                        <ListItem hover={false}>
+                            <ListItemPayloadStyled>
+                                <Body3Secondary>
+                                    {t('accounts_manage_folder_move_from_other')}
+                                </Body3Secondary>
+                            </ListItemPayloadStyled>
+                        </ListItem>
+                        {unAvailableAccounts.map(acc => (
+                            <ListItem key={acc.id} hover={false}>
+                                <ListItemPayloadStyled>
+                                    <WalletEmoji
+                                        emojiSize="16px"
+                                        containerSize="16px"
+                                        emoji={acc.emoji}
+                                    />
+                                    <Label2Styled>{acc.name}</Label2Styled>
+                                    <AccountBadge accountType={acc.type} size="s" />
+                                    <CheckboxStyled
+                                        checked={checkedAccounts.includes(acc.id)}
+                                        onChange={() => toggleCheckbox(acc.id)}
+                                    />
+                                </ListItemPayloadStyled>
+                            </ListItem>
+                        ))}
+                    </>
+                )}
+            </ListBlockDesktopAdaptiveStyled>
+            <NotificationFooterPortal>
+                <ButtonsContainer>
+                    <Button secondary onClick={onClose}>
+                        {t('cancel')}
+                    </Button>
+                    <Button primary disabled={!canSave} onClick={onSave}>
+                        {t('save')}
+                    </Button>
+                </ButtonsContainer>
+            </NotificationFooterPortal>
+        </ModalContentWrapper>
     );
 };

@@ -7,7 +7,7 @@ import {
 } from 'react-beautiful-dnd';
 import styled, { css } from 'styled-components';
 import { DropDownContent, DropDownItem } from '../../components/DropDown';
-import { EllipsisIcon, PlusIcon, ReorderIcon } from '../../components/Icon';
+import { EllipsisIcon, FolderIcon, PlusIcon, ReorderIcon } from '../../components/Icon';
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { Body2Class, Label2, TextEllipsis } from '../../components/Text';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
@@ -594,7 +594,7 @@ const AccountRow: FC<{
 const ItemRow: FC<{
     item: Account | AccountsFolder;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-}> = ({ item, ...dragHandleProps }) => {
+}> = ({ item, dragHandleProps }) => {
     const accounts = useAccountsState();
     if (item.type === 'folder') {
         return (
@@ -603,18 +603,21 @@ const ItemRow: FC<{
                     <Icon {...dragHandleProps}>
                         <ReorderIcon />
                     </Icon>
+                    <Icon>
+                        <FolderIcon />
+                    </Icon>
                     <Label2Styled>{item.name}</Label2Styled>
                 </Row>
                 {item.accounts.map(acc => (
                     <ItemRow
                         key={acc}
                         item={accounts.find(a => a.id === acc)!}
-                        {...dragHandleProps}
+                        dragHandleProps={dragHandleProps}
                     />
                 ))}
             </>
         );
     }
 
-    return <AccountRow account={item} {...dragHandleProps} />;
+    return <AccountRow account={item} dragHandleProps={dragHandleProps} />;
 };
