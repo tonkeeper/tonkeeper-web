@@ -150,6 +150,8 @@ function accountAndWalletToString(account: Account, walletId: WalletId): string 
             return baseInfo + ' ' + walletVersionText(walletVersion);
         case 'keystone':
             return baseInfo;
+        case 'ton-multisig':
+            return baseInfo + ' ' + 'multisig';
     }
 
     assertUnreachable(account);

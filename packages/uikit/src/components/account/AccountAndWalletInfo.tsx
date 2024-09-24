@@ -34,6 +34,7 @@ export const AccountAndWalletInfo: FC<
     AllOrNone<{ account: Account; walletId: WalletId }> & {
         noPrefix?: boolean;
         hideAddress?: boolean;
+        className?: string;
     }
 > = props => {
     const { t } = useTranslation();
@@ -58,7 +59,7 @@ export const AccountAndWalletInfo: FC<
     }
 
     return (
-        <WalletInfoStyled>
+        <WalletInfoStyled className={props.className}>
             <NameText>
                 {!props.noPrefix && <>{t('confirmSendModal_wallet')}&nbsp;</>}
                 {name}

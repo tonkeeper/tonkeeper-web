@@ -24,7 +24,7 @@ import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../compo
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
 import { Address } from '@ton/core';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import {
@@ -83,21 +83,18 @@ export const WalletVersionPageContent: FC<{
     accountId?: AccountId;
     className?: string;
 }> = ({ afterWalletOpened, accountId, className }) => {
-    const { t } = useTranslation();
     const activeAccount = useActiveAccount();
     const passedAccount = useAccountState(accountId);
     const selectedAccount = passedAccount ?? activeAccount;
 
-    if (selectedAccount.type === 'ledger') {
-        return <LedgerError>{t('ledger_operation_not_supported')}</LedgerError>;
-    }
-
     if (
+        selectedAccount.type === 'ledger' ||
         selectedAccount.type === 'keystone' ||
         selectedAccount.type === 'watch-only' ||
-        selectedAccount.type === 'mam'
+        selectedAccount.type === 'mam' ||
+        selectedAccount.type === 'ton-multisig'
     ) {
-        return <LedgerError>{t('operation_not_supported')}</LedgerError>;
+        return <Navigate to="../" />;
     }
 
     return (

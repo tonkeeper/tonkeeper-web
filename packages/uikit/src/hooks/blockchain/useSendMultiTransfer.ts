@@ -19,7 +19,7 @@ import { useAppContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
 import { useActiveAccount } from '../../state/wallet';
-import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
+import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 
 export type MultiSendFormTokenized = {
     rows: {
@@ -59,7 +59,7 @@ export function useSendMultiTransfer() {
         const walletId = account.activeTonWallet.id;
         if (signer === null) return false;
         try {
-            if (!isAccountControllable(account)) {
+            if (!isAccountTonWalletStandard(account)) {
                 throw new Error("Can't send a transfer using this account");
             }
 

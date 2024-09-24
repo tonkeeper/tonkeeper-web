@@ -1,42 +1,42 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useLayoutEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { PencilIcon } from '../../components/Icon';
-import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { NotificationFooterPortal } from '../../components/Notification';
-import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Label2 } from '../../components/Text';
+import { useTranslation } from '../../hooks/translation';
+import {
+    useTonWalletsBalances,
+    useMutateAccountActiveDerivation,
+    useActiveAccount,
+    useCreateMAMAccountDerivation,
+    useHideMAMAccountDerivation,
+    useEnableMAMAccountDerivation
+} from '../../state/wallet';
+import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
+import { toFormattedTonBalance } from '../../hooks/balance';
+import { Button } from '../../components/fields/Button';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { AppRoute } from '../../libs/routes';
+import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
+import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { AccountBadge, WalletIndexBadge } from '../../components/account/AccountBadge';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { Button } from '../../components/fields/Button';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useProFeaturesNotification } from '../../components/modals/ProFeaturesNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
-import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useAppContext } from '../../hooks/appContext';
-import { toFormattedTonBalance } from '../../hooks/balance';
-import { useTranslation } from '../../hooks/translation';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { usePrevious } from '../../hooks/usePrevious';
-import { AppRoute } from '../../libs/routes';
 import { scrollToContainersBottom } from '../../libs/web';
 import { useProState } from '../../state/pro';
-import {
-    useActiveAccount,
-    useCreateMAMAccountDerivation,
-    useEnableMAMAccountDerivation,
-    useHideMAMAccountDerivation,
-    useMutateAccountActiveDerivation,
-    useTonWalletsBalances
-} from '../../state/wallet';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -66,7 +66,7 @@ export const MAMIndexesPage = () => {
     const isFullWidth = useIsFullWidthMode();
 
     if (account.type !== 'mam') {
-        return null;
+        return <Navigate to="../" />;
     }
 
     if (isFullWidth) {
@@ -125,8 +125,8 @@ const ListItemPayload = styled.div`
 
     ${props =>
         props.theme.displayType === 'full-width'
-            ? `align-items: center;`
-            : `flex-direction: column;`}
+            ? 'align-items: center;'
+            : 'flex-direction: column;'}
 `;
 
 const ContentWrapper = styled.div``;

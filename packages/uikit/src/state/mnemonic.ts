@@ -18,14 +18,21 @@ import { delay } from '@tonkeeper/core/dist/utils/common';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import nacl from 'tweetnacl';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
+import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
 
-export const signTonConnectOver = (
-    sdk: IAppSdk,
-    accountId: AccountId,
-    wallet: TonWalletStandard | undefined,
-    t: (text: string) => string,
-    checkTouchId: () => Promise<void>
-) => {
+export const signTonConnectOver = ({
+    sdk,
+    accountId,
+    checkTouchId,
+    wallet,
+    t
+}: {
+    sdk: IAppSdk;
+    accountId: AccountId;
+    wallet?: TonWalletStandard;
+    t: (text: string) => string;
+    checkTouchId: () => Promise<void>;
+}) => {
     return async (bufferToSign: Buffer) => {
         const account = await accountsStorage(sdk.storage).getAccount(accountId);
 
@@ -71,6 +78,9 @@ export const signTonConnectOver = (
             case 'watch-only': {
                 throw new TxConfirmationCustomError("Can't use tonconnect over watch-only wallet");
             }
+            case 'ton-multisig': {
+                throw new TxConfirmationCustomError("Can't use multisig wallet with this dApp");
+            }
             default: {
                 assertUnreachable(account);
             }
@@ -92,7 +102,12 @@ export const signTonConnectMnemonicOver = (mnemonic: string[]) => {
 export const getSigner = async (
     sdk: IAppSdk,
     accountId: AccountId,
-    checkTouchId: () => Promise<void>
+    checkTouchId: () => Promise<void>,
+    {
+        walletId
+    }: {
+        walletId?: WalletId;
+    } = {}
 ): Promise<Signer> => {
     try {
         const account = await accountsStorage(sdk.storage).getAccount(accountId);
@@ -100,13 +115,17 @@ export const getSigner = async (
             throw new Error('Wallet not found');
         }
 
+        const wallet =
+            walletId !== undefined ? account.getTonWallet(walletId) : account.activeTonWallet;
+
         switch (account.type) {
             case 'ton-only': {
                 if (account.auth.kind === 'signer') {
                     const callback = async (message: Cell) => {
                         const result = await pairSignerByNotification(
                             sdk,
-                            message.toBoc({ idx: false }).toString('base64')
+                            message.toBoc({ idx: false }).toString('base64'),
+                            wallet as TonWalletStandard
                         );
                         return parseSignerSignature(result);
                     };
@@ -115,12 +134,11 @@ export const getSigner = async (
                 }
 
                 if (account.auth.kind === 'signer-deeplink') {
-                    const wallet = account.activeTonWallet;
                     const callback = async (message: Cell) => {
                         const deeplink = await storeTransactionAndCreateDeepLink(
                             sdk,
-                            wallet.publicKey,
-                            wallet.version,
+                            (wallet as TonWalletStandard).publicKey,
+                            (wallet as TonWalletStandard).version,
                             message.toBoc({ idx: false }).toString('base64')
                         );
 
@@ -138,7 +156,11 @@ export const getSigner = async (
                 return assertUnreachable(account.auth);
             }
             case 'ledger': {
-                const callback = async (path: number[], transaction: LedgerTransaction) =>
+                const derivation = account.allAvailableDerivations.find(
+                    d => d.activeTonWalletId === wallet!.id
+                )!;
+                const path = getLedgerAccountPathByIndex(derivation.index);
+                const callback = async (transaction: LedgerTransaction) =>
                     pairLedgerByNotification(sdk, path, transaction);
                 callback.type = 'ledger' as const;
                 return callback;
@@ -157,11 +179,10 @@ export const getSigner = async (
                 return callback;
             }
             case 'mam': {
-                const wallet = account.activeTonWallet;
                 const mnemonic = await getMAMWalletMnemonic(
                     sdk,
                     account.id,
-                    wallet.id,
+                    wallet!.id,
                     checkTouchId
                 );
                 const callback = async (message: Cell) => {
@@ -171,7 +192,7 @@ export const getSigner = async (
                 callback.type = 'cell' as const;
                 return callback;
             }
-            default: {
+            case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, account.id, checkTouchId);
                 const callback = async (message: Cell) => {
                     const keyPair = await mnemonicToPrivateKey(mnemonic);
@@ -179,6 +200,15 @@ export const getSigner = async (
                 };
                 callback.type = 'cell' as const;
                 return callback;
+            }
+            case 'watch-only': {
+                throw new Error('Cannot get signer for watch-only account');
+            }
+            case 'ton-multisig': {
+                throw new Error('Cannot get signer for multisig account');
+            }
+            default: {
+                assertUnreachable(account);
             }
         }
     } catch (e) {
@@ -287,13 +317,17 @@ export const getPasswordByNotification = async (sdk: IAppSdk): Promise<string> =
     });
 };
 
-const pairSignerByNotification = async (sdk: IAppSdk, boc: string): Promise<string> => {
+const pairSignerByNotification = async (
+    sdk: IAppSdk,
+    boc: string,
+    wallet: TonWalletStandard
+): Promise<string> => {
     const id = Date.now();
     return new Promise<string>((resolve, reject) => {
         sdk.uiEvents.emit('signer', {
             method: 'signer',
             id,
-            params: boc
+            params: { boc, wallet }
         });
 
         const onCallback = (message: {

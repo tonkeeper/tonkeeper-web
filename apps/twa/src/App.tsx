@@ -25,7 +25,7 @@ import {
     OnImportAction
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
+import { I18nContext, TranslationContext, useTWithReplaces } from "@tonkeeper/uikit/dist/hooks/translation";
 import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
@@ -62,6 +62,8 @@ import { SwapScreen } from './components/swap/SwapNotification';
 import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
+import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
+import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -160,7 +162,9 @@ const getUsePadding = (platform: TwaPlatform): boolean => {
 };
 
 const TwaApp: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
-    const { t, i18n } = useTranslation();
+    const { t: tSimple, i18n } = useTranslation();
+
+    const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
         const client: I18nContext = {
@@ -225,6 +229,8 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: fiat } = useUserFiatQuery();
     const { data: devSettings } = useDevSettings();
+    const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
+    useGlobalSetup();
 
     const lock = useLock(sdk);
     const network = useActiveTonNetwork();
@@ -252,7 +258,8 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         config === undefined ||
         lock === undefined ||
         fiat === undefined ||
-        !devSettings
+        !devSettings ||
+        globalPreferencesLoading
     ) {
         return <Loading />;
     }
@@ -273,6 +280,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         hideKeystone: !showQrScan,
         hideQrScanner: !showQrScan,
         hideMam: true,
+        hideMultisig: true,
         defaultWalletVersion: WalletVersion.V5R1,
         browserLength: 4
     };

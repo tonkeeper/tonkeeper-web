@@ -20,21 +20,27 @@ import {
     RecipientHeaderBlock,
     Wrapper,
     childFactoryCreator,
-    duration
+    duration,
+    TransferViewHeaderBlock
 } from '../common';
 import { ConfirmHeaderBlock } from './Common';
 import { ConfirmNftView } from './ConfirmNftView';
 import { useMinimalBalance } from './hooks';
+import { MultisigOrderFormView } from '../MultisigOrderFormView';
+import { MultisigOrderLifetimeMinutes } from '../../../libs/multisig';
+import { useIsActiveAccountMultisig } from '../../../state/multisig';
 
 const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, onClose }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { standalone, extension } = useAppContext();
+    const multisigSettingsRef = useRef<HTMLDivElement>(null);
     const recipientRef = useRef<HTMLDivElement>(null);
     const confirmRef = useRef<HTMLDivElement>(null);
 
     const [right, setRight] = useState(true);
     const [recipient, setRecipient] = useState<TonRecipientData | undefined>();
+    const isMultisig = useIsActiveAccountMultisig();
 
     const { mutateAsync: getAccountAsync } = useGetToAccount();
 
@@ -44,33 +50,36 @@ const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, o
         await checkBalanceAsync();
         setRight(true);
         setRecipient(data as TonRecipientData);
+        setView('confirm');
     };
 
     const backToRecipient = useCallback(() => {
         setRight(false);
         setRecipient(value => (value ? { ...value, done: false } : undefined));
+        setView('recipient');
     }, [setRecipient]);
 
-    const [state, nodeRef] = (() => {
-        if (!recipient || !recipient.done) {
-            return ['recipient', recipientRef] as const;
-        }
-        return ['confirm', confirmRef] as const;
-    })();
+    const [multisigTimeout, setMultisigTimeout] = useState<
+        MultisigOrderLifetimeMinutes | undefined
+    >();
+
+    const [view, setView] = useState<'multisig-settings' | 'recipient' | 'confirm'>(
+        isMultisig ? 'multisig-settings' : 'recipient'
+    );
 
     const processRecipient = useCallback(
         async ({ address }: TonTransferParams) => {
             const item = { address: address };
             const toAccount = await getAccountAsync(item);
 
-            setRecipient({
+            onRecipient({
                 address: { ...item, blockchain: BLOCKCHAIN_NAME.TON },
                 toAccount,
                 comment: '',
                 done: true
             });
         },
-        [setRecipient, getAccountAsync]
+        [onRecipient, getAccountAsync]
     );
 
     const onScan = async (signature: string) => {
@@ -85,49 +94,78 @@ const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, o
         }
     };
 
+    const nodeRef = {
+        'multisig-settings': multisigSettingsRef,
+        recipient: recipientRef,
+        confirm: confirmRef
+    }[view];
+
     return (
         <Wrapper standalone={standalone} extension={extension}>
             <TransitionGroup childFactory={childFactoryCreator(right)}>
                 <CSSTransition
-                    key={state}
+                    key={view}
                     nodeRef={nodeRef}
                     classNames="right-to-left"
                     addEndListener={done => {
                         setTimeout(done, duration);
                     }}
                 >
-                    <div ref={nodeRef}>
-                        {state === 'recipient' && (
-                            <RecipientView
-                                data={recipient}
-                                setRecipient={onRecipient}
-                                onScan={onScan}
-                                isExternalLoading={isChecking}
-                                acceptBlockchains={[BLOCKCHAIN_NAME.TON]}
-                                MainButton={MainButton}
-                                HeaderBlock={() => (
-                                    <RecipientHeaderBlock
-                                        title={t('nft_transfer_title')}
-                                        onClose={onClose}
-                                    />
-                                )}
-                            />
-                        )}
-                        {state === 'confirm' && (
-                            <ConfirmNftView
-                                onClose={onClose}
-                                recipient={recipient!}
-                                nftItem={nftItem}
-                                mainButton={<ConfirmViewButtons MainButton={ConfirmMainButton} />}
-                                headerBlock={
-                                    <ConfirmHeaderBlock
-                                        onBack={backToRecipient}
-                                        onClose={onClose}
-                                    />
-                                }
-                            />
-                        )}
-                    </div>
+                    {status => (
+                        <div ref={nodeRef}>
+                            {view === 'multisig-settings' && (
+                                <MultisigOrderFormView
+                                    onSubmit={val => {
+                                        setRight(true);
+                                        setMultisigTimeout(val.lifetime);
+                                        setView('recipient');
+                                    }}
+                                    isAnimationProcess={status === 'exiting'}
+                                    Header={() => (
+                                        <TransferViewHeaderBlock
+                                            title={t('multisig_create_order_title')}
+                                            onClose={onClose}
+                                        />
+                                    )}
+                                    MainButton={MainButton}
+                                />
+                            )}
+                            {view === 'recipient' && (
+                                <RecipientView
+                                    data={recipient}
+                                    setRecipient={onRecipient}
+                                    onScan={onScan}
+                                    isExternalLoading={isChecking}
+                                    acceptBlockchains={[BLOCKCHAIN_NAME.TON]}
+                                    MainButton={MainButton}
+                                    HeaderBlock={() => (
+                                        <RecipientHeaderBlock
+                                            title={t('nft_transfer_title')}
+                                            onClose={onClose}
+                                            onBack={isMultisig ? backToRecipient : undefined}
+                                        />
+                                    )}
+                                />
+                            )}
+                            {view === 'confirm' && (
+                                <ConfirmNftView
+                                    onClose={onClose}
+                                    recipient={recipient!}
+                                    nftItem={nftItem}
+                                    mainButton={
+                                        <ConfirmViewButtons MainButton={ConfirmMainButton} />
+                                    }
+                                    headerBlock={
+                                        <ConfirmHeaderBlock
+                                            onBack={backToRecipient}
+                                            onClose={onClose}
+                                        />
+                                    }
+                                    multisigTTL={multisigTimeout}
+                                />
+                            )}
+                        </div>
+                    )}
                 </CSSTransition>
             </TransitionGroup>
         </Wrapper>

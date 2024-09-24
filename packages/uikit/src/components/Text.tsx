@@ -48,11 +48,15 @@ export const Label2 = styled.span`
     ${Label2Class}
 `;
 
-export const Label3 = styled.span`
+export const Label3Class = css`
     font-style: normal;
     font-weight: 600;
     font-size: 12px;
     line-height: 16px;
+`;
+
+export const Label3 = styled.span`
+    ${Label3Class}
 `;
 
 export const Label4 = styled.span`
@@ -107,4 +111,8 @@ export const Num3 = styled.span`
     font-weight: 510;
     font-size: 24px;
     line-height: 32px;
+`;
+
+export const Mono = styled.span`
+    font-family: ${p => p.theme.fontMono};
 `;

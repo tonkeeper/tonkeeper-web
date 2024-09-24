@@ -237,7 +237,7 @@ export interface TonAddressItemReply {
     address: string;
     network: string;
     walletStateInit: string;
-    publicKey: string;
+    publicKey?: string;
 }
 
 export interface TonProofItem {

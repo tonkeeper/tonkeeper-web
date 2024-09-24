@@ -141,7 +141,7 @@ export const Account = () => {
             {
                 name: t('balances_setup_wallet'),
                 icon: <SetUpWalletIcon />,
-                action: addWallet
+                action: () => addWallet()
             }
         ];
     }, []);

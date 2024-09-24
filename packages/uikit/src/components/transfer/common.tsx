@@ -160,7 +160,13 @@ export const ButtonBlock = React.forwardRef<HTMLDivElement, PropsWithChildren>(
 );
 ButtonBlock.displayName = 'ButtonBlock';
 
-export const MainButton = ({ isLoading, onClick }: { isLoading: boolean; onClick: () => void }) => {
+export const MainButton = ({
+    isLoading,
+    onClick
+}: {
+    isLoading?: boolean;
+    onClick: () => void;
+}) => {
     const { t } = useTranslation();
 
     return (
@@ -266,13 +272,33 @@ export const ConfirmAndCancelMainButton: ConfirmMainButtonProps = ({
     );
 };
 
-export const RecipientHeaderBlock: FC<{ title: string; onClose: () => void }> = ({
+export const TransferViewHeaderBlock: FC<{ title: string; onClose: () => void }> = ({
     title,
     onClose
 }) => {
     return (
         <NotificationTitleBlock>
             <ButtonMock />
+            <H3>{title}</H3>
+            <NotificationCancelButton handleClose={onClose} />
+        </NotificationTitleBlock>
+    );
+};
+
+export const RecipientHeaderBlock: FC<{
+    title: string;
+    onClose: () => void;
+    onBack?: () => void;
+}> = ({ title, onClose, onBack }) => {
+    return (
+        <NotificationTitleBlock>
+            {onBack ? (
+                <RoundedButton onClick={onBack}>
+                    <ChevronLeftIcon />
+                </RoundedButton>
+            ) : (
+                <ButtonMock />
+            )}
             <H3>{title}</H3>
             <NotificationCancelButton handleClose={onClose} />
         </NotificationTitleBlock>

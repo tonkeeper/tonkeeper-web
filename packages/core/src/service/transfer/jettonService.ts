@@ -1,24 +1,30 @@
 import { Address, beginCell, Cell, comment, internal, toNano } from '@ton/core';
 import BigNumber from 'bignumber.js';
-import { AccountControllable } from '../../entries/account';
+import { AccountTonWalletStandard } from '../../entries/account';
 import { APIConfig } from '../../entries/apis';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
-import { TonRecipientData, TransferEstimationEvent } from '../../entries/send';
+import {
+    TonRecipientData,
+    TransferEstimationEvent,
+    TransferEstimationEventFee
+} from '../../entries/send';
 import { CellSigner, Signer } from '../../entries/signer';
-import { TonWalletStandard } from '../../entries/wallet';
-import { BlockchainApi, EmulationApi } from '../../tonApiV2';
+import { TonContract, TonWalletStandard } from '../../entries/wallet';
+import { BlockchainApi, EmulationApi, Multisig } from '../../tonApiV2';
 import { createLedgerJettonTransfer } from '../ledger/transfer';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     checkWalletBalanceOrDie,
     checkWalletPositiveBalanceOrDie,
+    estimateMultisigTransfer,
     externalMessage,
     getServerTime,
     getTonkeeperQueryId,
     getTTL,
     getWalletBalance,
     SendMode,
+    sendMultisigTransfer,
     signEstimateMessage
 } from './common';
 import { getJettonCustomPayload } from './jettonPayloadService';
@@ -47,18 +53,21 @@ export const jettonTransferBody = (params: {
         .endCell();
 };
 
-const createJettonTransfer = async (
-    api: APIConfig,
-    seqno: number,
-    walletState: TonWalletStandard,
-    recipientAddress: string,
-    amount: AssetAmount<TonAsset>,
-    jettonWalletAddress: string,
-    forwardPayload: Cell | null,
-    signer: CellSigner
-) => {
-    const timestamp = await getServerTime(api);
-
+const createJettonTransferMsgParams = async ({
+    api,
+    jettonWalletAddress,
+    amount,
+    recipientAddress,
+    walletState,
+    forwardPayload
+}: {
+    api: APIConfig;
+    walletState: Pick<TonContract, 'rawAddress'>;
+    recipientAddress: string;
+    amount: AssetAmount<TonAsset>;
+    jettonWalletAddress: string;
+    forwardPayload: Cell | null;
+}) => {
     const { customPayload, stateInit } = await getJettonCustomPayload(
         api,
         walletState.rawAddress,
@@ -77,21 +86,42 @@ const createJettonTransfer = async (
         customPayload
     });
 
+    return {
+        to: Address.parse(jettonWalletAddress),
+        bounce: true,
+        value: jettonTransferAmount,
+        body: body,
+        init: stateInit
+    };
+};
+
+const createJettonTransferExternal = async (
+    api: APIConfig,
+    seqno: number,
+    walletState: TonWalletStandard,
+    recipientAddress: string,
+    amount: AssetAmount<TonAsset>,
+    jettonWalletAddress: string,
+    forwardPayload: Cell | null,
+    signer: CellSigner
+) => {
+    const timestamp = await getServerTime(api);
+    const internalParams = await createJettonTransferMsgParams({
+        api,
+        walletState,
+        recipientAddress,
+        amount,
+        jettonWalletAddress,
+        forwardPayload
+    });
+
     const contract = walletContractFromState(walletState);
     const transfer = await contract.createTransferAndSignRequestAsync({
         seqno,
         signer,
         timeout: getTTL(timestamp),
         sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-        messages: [
-            internal({
-                to: Address.parse(jettonWalletAddress),
-                bounce: true,
-                value: jettonTransferAmount,
-                body: body,
-                init: stateInit
-            })
-        ]
+        messages: [internal(internalParams)]
     });
 
     return externalMessage(contract, seqno, transfer).toBoc();
@@ -104,10 +134,10 @@ export const estimateJettonTransfer = async (
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string
 ): Promise<TransferEstimationEvent> => {
-    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletPositiveBalanceOrDie(wallet);
 
-    const cell = await createJettonTransfer(
+    const cell = await createJettonTransferExternal(
         api,
         seqno,
         walletState,
@@ -127,7 +157,7 @@ export const estimateJettonTransfer = async (
 
 export const sendJettonTransfer = async (
     api: APIConfig,
-    account: AccountControllable,
+    account: AccountTonWalletStandard,
     recipient: TonRecipientData,
     amount: AssetAmount<TonAsset>,
     jettonWalletAddress: string,
@@ -139,7 +169,7 @@ export const sendJettonTransfer = async (
         .plus(jettonTransferAmount.toString());
 
     const walletState = account.activeTonWallet;
-    const [wallet, seqno] = await getWalletBalance(api, walletState.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(api, walletState);
     checkWalletBalanceOrDie(total, wallet);
 
     let buffer: Buffer;
@@ -159,7 +189,7 @@ export const sendJettonTransfer = async (
             signer
         );
     } else {
-        buffer = await createJettonTransfer(
+        buffer = await createJettonTransferExternal(
             api,
             seqno,
             walletState,
@@ -173,5 +203,65 @@ export const sendJettonTransfer = async (
 
     await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
         sendBlockchainMessageRequest: { boc: buffer.toString('base64') }
+    });
+};
+
+export const estimateMultisigJettonTransfer = async ({
+    api,
+    hostWallet,
+    multisig,
+    recipient,
+    jettonWalletAddress,
+    amount
+}: {
+    api: APIConfig;
+    hostWallet: TonWalletStandard;
+    multisig: Pick<Multisig, 'address' | 'signers' | 'threshold'>;
+    recipient: TonRecipientData;
+    amount: AssetAmount<TonAsset>;
+    jettonWalletAddress: string;
+}): Promise<TransferEstimationEvent> => {
+    const internalParams = await createJettonTransferMsgParams({
+        api,
+        walletState: { rawAddress: multisig.address },
+        recipientAddress: recipient.toAccount.address,
+        amount,
+        jettonWalletAddress,
+        forwardPayload: recipient.comment ? comment(recipient.comment) : null
+    });
+
+    return estimateMultisigTransfer({
+        api,
+        hostWallet,
+        multisig,
+        amount: BigNumber(jettonTransferAmount.toString()),
+        message: internal(internalParams)
+    });
+};
+
+export const sendMultisigJettonTransfer = async (params: {
+    api: APIConfig;
+    hostWallet: TonWalletStandard;
+    multisig: Pick<Multisig, 'address' | 'signers' | 'proposers'>;
+    recipient: TonRecipientData;
+    amount: AssetAmount<TonAsset>;
+    jettonWalletAddress: string;
+    fee: TransferEstimationEventFee;
+    signer: CellSigner;
+    ttlSeconds: number;
+}): Promise<void> => {
+    const internalParams = await createJettonTransferMsgParams({
+        api: params.api,
+        walletState: { rawAddress: params.multisig.address },
+        recipientAddress: params.recipient.toAccount.address,
+        amount: params.amount,
+        jettonWalletAddress: params.jettonWalletAddress,
+        forwardPayload: params.recipient.comment ? comment(params.recipient.comment) : null
+    });
+
+    await sendMultisigTransfer({
+        ...params,
+        amount: new BigNumber(jettonTransferAmount.toString()),
+        message: internal(internalParams)
     });
 };

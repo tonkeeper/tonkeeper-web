@@ -4,14 +4,15 @@ import { mnemonicValidate } from '@ton/crypto';
 import {
     Account,
     AccountId,
-    AccountMAM,
-    AccountTonMnemonic,
     AccountTonWatchOnly,
     AccountsState,
     getAccountByWalletById,
     getWalletById,
-    isAccountControllable,
-    isAccountVersionEditable
+    isAccountVersionEditable,
+    isAccountTonWalletStandard,
+    AccountTonMultisig,
+    AccountTonMnemonic,
+    AccountMAM
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';
@@ -31,6 +32,7 @@ import {
 import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
 import {
     createMAMAccountByMnemonic,
+    createMultisigTonAccount,
     createReadOnlyTonAccountByAddress,
     createStandardTonAccountByMnemonic,
     getWalletAddress
@@ -281,7 +283,7 @@ export const useAccountState = (id: AccountId | undefined) => {
 export const useControllableAccountAndWalletByWalletId = (
     id: WalletId | undefined
 ): { account: Account | undefined; wallet: TonWalletStandard | undefined } => {
-    const accounts = useAccountsState().filter(isAccountControllable);
+    const accounts = useAccountsState().filter(isAccountTonWalletStandard);
     return useMemo(() => {
         if (!id) {
             return {
@@ -289,8 +291,17 @@ export const useControllableAccountAndWalletByWalletId = (
                 account: undefined
             };
         }
+        const wallet = getWalletById(accounts, id);
+
+        if (wallet && !isStandardTonWallet(wallet)) {
+            return {
+                wallet: undefined,
+                account: undefined
+            };
+        }
+
         return {
-            wallet: getWalletById(accounts, id),
+            wallet,
             account: getAccountByWalletById(accounts, id)
         };
     }, [accounts, id]);
@@ -316,6 +327,43 @@ export const useMutateAccountsState = () => {
     });
 };
 
+export const useCreateAccountTonMultisig = () => {
+    const sdk = useAppSdk();
+    const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
+
+    return useMutation<
+        AccountTonMultisig,
+        Error,
+        {
+            address: string;
+            name?: string;
+            emoji?: string;
+            hostWallets: WalletId[];
+            selectedHostWalletId: WalletId;
+            pinToWallet?: string;
+        }
+    >(async ({ address, name, emoji, selectedHostWalletId, pinToWallet, hostWallets }) => {
+        const valid = await seeIfValidTonAddress(address);
+        if (!valid) {
+            throw new Error('Address is not valid.');
+        }
+
+        const account = await createMultisigTonAccount(
+            sdk.storage,
+            address,
+            hostWallets,
+            selectedHostWalletId,
+            {
+                name,
+                emoji,
+                pinToWallet
+            }
+        );
+
+        await addAccountToState(account);
+        return account;
+    });
+};
 export const useCreateAccountReadOnly = () => {
     const sdk = useAppSdk();
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();

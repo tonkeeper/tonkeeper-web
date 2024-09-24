@@ -2,8 +2,8 @@ import { TransferInitParams } from '@tonkeeper/core/dist/AppSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { toTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { RecipientData } from '@tonkeeper/core/dist/entries/send';
+import { jettonToTonAsset, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
     TonTransferParams,
     parseTonTransfer
@@ -47,8 +47,13 @@ import {
     childFactoryCreator,
     duration,
     getInitData,
-    getJetton
+    getJetton,
+    TransferViewHeaderBlock
 } from './common';
+import { MultisigOrderFormView } from './MultisigOrderFormView';
+import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
+import { useIsActiveAccountMultisig } from '../../state/multisig';
+import { ConfirmMultisigNewTransferView } from './ConfirmMultisigNewTransferView';
 
 const SendContent: FC<{
     onClose: () => void;
@@ -61,9 +66,26 @@ const SendContent: FC<{
     const { t } = useTranslation();
     const { data: filter } = useJettonList();
     const isFullWidth = useIsFullWidthMode();
+    const isActiveAccountMultisig = useIsActiveAccountMultisig();
 
-    const [view, setView] = useState<'recipient' | 'amount' | 'confirm'>('recipient');
+    const [view, _setView] = useState<'multisig-settings' | 'recipient' | 'amount' | 'confirm'>(
+        isActiveAccountMultisig ? 'multisig-settings' : 'recipient'
+    );
+    const setView = useCallback(
+        (val: typeof view) => {
+            if (!isActiveAccountMultisig && val === 'multisig-settings') {
+                val = 'recipient';
+            }
+
+            _setView(val);
+        },
+        [_setView, isActiveAccountMultisig]
+    );
+
     const [right, setRight] = useState(true);
+    const [multisigTimeout, setMultisigTimeout] = useState<
+        MultisigOrderLifetimeMinutes | undefined
+    >();
     const [recipient, _setRecipient] = useState<RecipientData | undefined>(initRecipient);
     const [amountViewState, setAmountViewState] = useState<Partial<AmountState> | undefined>(
         initAmountState
@@ -199,11 +221,13 @@ const SendContent: FC<{
         });
     };
 
+    const multisigSettingsRef = useRef<HTMLDivElement>(null);
     const recipientRef = useRef<HTMLDivElement>(null);
     const amountRef = useRef<HTMLDivElement>(null);
     const confirmRef = useRef<HTMLDivElement>(null);
 
     const nodeRef = {
+        'multisig-settings': multisigSettingsRef,
         recipient: recipientRef,
         amount: amountRef,
         confirm: confirmRef
@@ -222,6 +246,23 @@ const SendContent: FC<{
                 >
                     {status => (
                         <div ref={nodeRef}>
+                            {view === 'multisig-settings' && (
+                                <MultisigOrderFormView
+                                    onSubmit={val => {
+                                        setRight(true);
+                                        setMultisigTimeout(val.lifetime);
+                                        setView('recipient');
+                                    }}
+                                    isAnimationProcess={status === 'exiting'}
+                                    Header={() => (
+                                        <TransferViewHeaderBlock
+                                            title={t('multisig_create_order_title')}
+                                            onClose={onClose}
+                                        />
+                                    )}
+                                    MainButton={MainButton}
+                                />
+                            )}
                             {view === 'recipient' && (
                                 <RecipientView
                                     data={recipient}
@@ -233,6 +274,14 @@ const SendContent: FC<{
                                     MainButton={MainButton}
                                     HeaderBlock={() => (
                                         <RecipientHeaderBlock
+                                            onBack={
+                                                isActiveAccountMultisig
+                                                    ? () => {
+                                                          setRight(false);
+                                                          setView('multisig-settings');
+                                                      }
+                                                    : undefined
+                                            }
                                             title={t('transaction_recipient')}
                                             onClose={onClose}
                                         />
@@ -252,39 +301,75 @@ const SendContent: FC<{
                                     isAnimationProcess={status === 'exiting'}
                                 />
                             )}
-                            {view === 'confirm' && (
-                                <ConfirmTransferView
-                                    onClose={onClose}
-                                    onBack={backToAmount}
-                                    recipient={recipient!}
-                                    assetAmount={AssetAmount.fromRelativeAmount({
-                                        asset: amountViewState!.token!,
-                                        amount: amountViewState!.coinValue!
-                                    })}
-                                    isMax={amountViewState!.isMax!}
-                                >
-                                    {status !== 'exiting' && isFullWidth && (
-                                        <ConfirmViewTitleSlot>
-                                            <NotificationHeaderPortal>
-                                                <NotificationHeader>
-                                                    <ConfirmViewTitle />
-                                                </NotificationHeader>
-                                            </NotificationHeaderPortal>
-                                        </ConfirmViewTitleSlot>
-                                    )}
-                                    {status !== 'exiting' && isFullWidth && (
-                                        <ConfirmViewButtonsSlot>
-                                            <NotificationFooterPortal>
-                                                <NotificationFooter>
-                                                    <ConfirmViewButtons
-                                                        MainButton={ConfirmMainButton}
-                                                    />
-                                                </NotificationFooter>
-                                            </NotificationFooterPortal>
-                                        </ConfirmViewButtonsSlot>
-                                    )}
-                                </ConfirmTransferView>
-                            )}
+                            {view === 'confirm' &&
+                                (isActiveAccountMultisig ? (
+                                    <ConfirmMultisigNewTransferView
+                                        onClose={onClose}
+                                        onBack={backToAmount}
+                                        recipient={recipient as TonRecipientData}
+                                        assetAmount={
+                                            AssetAmount.fromRelativeAmount({
+                                                asset: amountViewState!.token!,
+                                                amount: amountViewState!.coinValue!
+                                            }) as AssetAmount<TonAsset>
+                                        }
+                                        isMax={amountViewState!.isMax!}
+                                        ttl={multisigTimeout!}
+                                    >
+                                        {status !== 'exiting' && isFullWidth && (
+                                            <ConfirmViewTitleSlot>
+                                                <NotificationHeaderPortal>
+                                                    <NotificationHeader>
+                                                        <ConfirmViewTitle />
+                                                    </NotificationHeader>
+                                                </NotificationHeaderPortal>
+                                            </ConfirmViewTitleSlot>
+                                        )}
+                                        {status !== 'exiting' && isFullWidth && (
+                                            <ConfirmViewButtonsSlot>
+                                                <NotificationFooterPortal>
+                                                    <NotificationFooter>
+                                                        <ConfirmViewButtons
+                                                            MainButton={ConfirmMainButton}
+                                                        />
+                                                    </NotificationFooter>
+                                                </NotificationFooterPortal>
+                                            </ConfirmViewButtonsSlot>
+                                        )}
+                                    </ConfirmMultisigNewTransferView>
+                                ) : (
+                                    <ConfirmTransferView
+                                        onClose={onClose}
+                                        onBack={backToAmount}
+                                        recipient={recipient!}
+                                        assetAmount={AssetAmount.fromRelativeAmount({
+                                            asset: amountViewState!.token!,
+                                            amount: amountViewState!.coinValue!
+                                        })}
+                                        isMax={amountViewState!.isMax!}
+                                    >
+                                        {status !== 'exiting' && isFullWidth && (
+                                            <ConfirmViewTitleSlot>
+                                                <NotificationHeaderPortal>
+                                                    <NotificationHeader>
+                                                        <ConfirmViewTitle />
+                                                    </NotificationHeader>
+                                                </NotificationHeaderPortal>
+                                            </ConfirmViewTitleSlot>
+                                        )}
+                                        {status !== 'exiting' && isFullWidth && (
+                                            <ConfirmViewButtonsSlot>
+                                                <NotificationFooterPortal>
+                                                    <NotificationFooter>
+                                                        <ConfirmViewButtons
+                                                            MainButton={ConfirmMainButton}
+                                                        />
+                                                    </NotificationFooter>
+                                                </NotificationFooterPortal>
+                                            </ConfirmViewButtonsSlot>
+                                        )}
+                                    </ConfirmTransferView>
+                                ))}
                         </div>
                     )}
                 </CSSTransition>

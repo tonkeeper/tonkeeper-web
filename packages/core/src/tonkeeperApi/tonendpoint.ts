@@ -65,6 +65,10 @@ export interface TonendpointConfig {
      * @deprecated use ton api
      */
     tonEndpointAPIKey?: string;
+
+    multisig_help_url?: string;
+
+    multisig_about_url?: string;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';

@@ -6,6 +6,7 @@ import {
     external,
     internal,
     loadStateInit,
+    MessageRelaxed,
     storeMessage,
     toNano
 } from '@ton/core';
@@ -13,15 +14,22 @@ import { Maybe } from '@ton/core/dist/utils/maybe';
 import { sign } from '@ton/crypto';
 import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
-import { AccountControllable } from '../../entries/account';
 import { APIConfig } from '../../entries/apis';
-import { TonRecipient, TransferEstimationEvent } from '../../entries/send';
-import { Signer } from '../../entries/signer';
+import { TonRecipient, TransferEstimationEventFee } from '../../entries/send';
 import { TonWalletStandard } from '../../entries/wallet';
+import { CellSigner, Signer } from '../../entries/signer';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
-import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
-import { getLedgerAccountPathByIndex } from '../ledger/utils';
+import {
+    Account,
+    AccountsApi,
+    EmulationApi,
+    LiteServerApi,
+    Multisig,
+    WalletApi
+} from '../../tonApiV2';
 import { WalletContract, walletContractFromState } from '../wallet/contractService';
+import { orderActionMinAmount, sendCreateOrder } from '../multisig/order/order-send';
+import { estimateNewOrder } from '../multisig/order/order-estimate';
 
 export enum SendMode {
     CARRY_ALL_REMAINING_BALANCE = 128,
@@ -95,11 +103,11 @@ export const getWalletSeqNo = async (api: APIConfig, accountId: string) => {
     return seqno;
 };
 
-export const getWalletBalance = async (api: APIConfig, rawAddress: string) => {
+export const getWalletBalance = async (api: APIConfig, walletState: { rawAddress: string }) => {
     const wallet = await new AccountsApi(api.tonApiV2).getAccount({
-        accountId: rawAddress
+        accountId: walletState.rawAddress
     });
-    const seqno = await getWalletSeqNo(api, rawAddress);
+    const seqno = await getWalletSeqNo(api, walletState.rawAddress);
 
     return [wallet, seqno] as const;
 };
@@ -113,8 +121,8 @@ export const seeIfTimeError = (e: unknown): e is Error => {
     return e instanceof Error && e.message.startsWith('Time and date are incorrect');
 };
 
-export const createTransferMessage = async (
-    account: AccountControllable,
+export const createAutoFeeTransferMessage = async (
+    api: APIConfig,
     wallet: {
         seqno: number;
         state: TonWalletStandard;
@@ -125,6 +133,40 @@ export const createTransferMessage = async (
         to: string;
         value: string | bigint | BigNumber;
         body?: string | Cell | null;
+        init?: StateInit | null;
+    }
+) => {
+    const bocToEstimate = await createTransferMessage(
+        { ...wallet, signer: signEstimateMessage },
+        transaction
+    );
+
+    const result = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+        emulateMessageToWalletRequest: { boc: bocToEstimate.toString('base64') }
+    });
+
+    const finalAttachValue = new BigNumber(result.event.extra)
+        .absoluteValue()
+        .plus(transaction.value.toString());
+
+    const [acc] = await getWalletBalance(api, wallet.state);
+    checkWalletBalanceOrDie(finalAttachValue, acc);
+
+    return createTransferMessage(wallet, { ...transaction, value: finalAttachValue });
+};
+
+export const createTransferMessage = async (
+    wallet: {
+        seqno: number;
+        state: TonWalletStandard;
+        signer: Signer;
+        timestamp: number;
+    },
+    transaction: {
+        to: string;
+        value: string | bigint | BigNumber;
+        body?: string | Cell | null;
+        init?: StateInit | null;
     }
 ) => {
     const value =
@@ -133,12 +175,7 @@ export const createTransferMessage = async (
     let transfer: Cell;
 
     if (wallet.signer.type === 'ledger') {
-        if (account.type !== 'ledger') {
-            throw new Error('Ledger signer can only be used with ledger accounts');
-        }
-        const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
-
-        transfer = await wallet.signer(path, {
+        transfer = await wallet.signer({
             to: Address.parse(transaction.to),
             bounce: true,
             amount: BigInt(value),
@@ -166,7 +203,8 @@ export const createTransferMessage = async (
                     to: Address.parse(transaction.to),
                     bounce: true,
                     value: BigInt(value),
-                    body: transaction.body
+                    body: transaction.body,
+                    init: transaction.init
                 })
             ]
         });
@@ -179,15 +217,15 @@ export const signEstimateMessage = async (message: Cell): Promise<Buffer> => {
 };
 signEstimateMessage.type = 'cell' as const;
 
-export async function getAccountSeqno(options: {
+export async function getWalletSeqnoAndCheckBalance(options: {
     api: APIConfig;
-    rawAddress: string;
-    fee: TransferEstimationEvent;
+    walletState: { rawAddress: string };
+    fee?: { event: { extra: number | BigNumber } };
     amount: BigNumber;
 }) {
-    const total = options.amount.plus(options.fee.event.extra * -1);
+    const total = options.fee ? options.amount.minus(options.fee.event.extra) : options.amount;
 
-    const [wallet, seqno] = await getWalletBalance(options.api, options.rawAddress);
+    const [wallet, seqno] = await getWalletBalance(options.api, options.walletState);
     checkWalletBalanceOrDie(total, wallet);
     return { seqno };
 }
@@ -222,4 +260,91 @@ export const seeIfTransferBounceable = (account: Account, recipient: TonRecipien
     }
 
     return account.status === 'active';
+};
+
+export const sendMultisigTransfer = async ({
+    api,
+    hostWallet,
+    multisig,
+    message,
+    amount,
+    fee,
+    signer,
+    ttlSeconds
+}: {
+    api: APIConfig;
+    hostWallet: TonWalletStandard;
+    multisig: Pick<Multisig, 'address' | 'signers' | 'proposers'>;
+    message: MessageRelaxed;
+    fee: TransferEstimationEventFee;
+    amount: BigNumber;
+    signer: CellSigner;
+    ttlSeconds: number;
+}): Promise<void> => {
+    const timestamp = await getServerTime(api);
+
+    await getWalletSeqnoAndCheckBalance({
+        api,
+        walletState: { rawAddress: multisig.address },
+        amount,
+        fee
+    });
+    await getWalletSeqnoAndCheckBalance({
+        walletState: hostWallet,
+        amount: orderActionMinAmount,
+        api
+    });
+
+    await sendCreateOrder({
+        hostWallet,
+        multisig,
+        api,
+        signer,
+        order: {
+            validUntilSeconds: timestamp + ttlSeconds,
+            actions: [
+                {
+                    type: 'transfer',
+                    message,
+                    sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
+                }
+            ]
+        }
+    });
+};
+
+export const estimateMultisigTransfer = async ({
+    api,
+    hostWallet,
+    multisig,
+    message,
+    amount
+}: {
+    api: APIConfig;
+    hostWallet: TonWalletStandard;
+    multisig: Pick<Multisig, 'address' | 'signers' | 'threshold'>;
+    message: MessageRelaxed;
+    amount: BigNumber;
+}) => {
+    const timestamp = await getServerTime(api);
+    await getWalletSeqnoAndCheckBalance({
+        api,
+        walletState: hostWallet,
+        amount
+    });
+
+    return estimateNewOrder({
+        multisig,
+        api,
+        order: {
+            validUntilSeconds: getTTL(timestamp),
+            actions: [
+                {
+                    type: 'transfer',
+                    message,
+                    sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
+                }
+            ]
+        }
+    });
 };

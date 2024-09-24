@@ -1,4 +1,3 @@
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { ErrorBoundary } from 'react-error-boundary';
 import styled from 'styled-components';
 import { useAppSdk } from '../../../hooks/appSdk';
@@ -6,7 +5,7 @@ import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { usePreFetchRates } from '../../../state/rates';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
-import { useIsActiveWalletWatchOnly } from '../../../state/wallet';
+import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { ArrowDownIcon, ArrowUpIcon, PlusIconSmall } from '../../Icon';
 import { Button } from '../../fields/Button';
@@ -15,6 +14,8 @@ import { AppProRoute } from '../../../libs/routes';
 import { BuyNotification } from '../../home/BuyAction';
 import { useWalletTotalBalance } from '../../../state/asset';
 import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderElements';
+import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
+import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -51,6 +52,8 @@ const DesktopWalletHeaderPayload = () => {
     const { data: buy } = useTonendpointBuyMethods();
     const { t } = useTranslation();
     const isReadOnly = useIsActiveWalletWatchOnly();
+    const activeWallet = useActiveWallet();
+    const { onOpen: sendTransfer } = useSendTransferNotification();
 
     return (
         <DesktopHeaderContainer>
@@ -58,21 +61,12 @@ const DesktopWalletHeaderPayload = () => {
             <DesktopRightPart>
                 <ButtonsContainer>
                     {!isReadOnly && (
-                        <ButtonStyled
-                            size="small"
-                            onClick={() =>
-                                sdk.uiEvents.emit('transfer', {
-                                    method: 'transfer',
-                                    id: Date.now(),
-                                    params: { asset: 'TON', chain: BLOCKCHAIN_NAME.TON }
-                                })
-                            }
-                        >
+                        <ButtonStyled size="small" onClick={() => sendTransfer()}>
                             <ArrowUpIcon />
                             {t('wallet_send')}
                         </ButtonStyled>
                     )}
-                    {!isReadOnly && (
+                    {!isReadOnly && isStandardTonWallet(activeWallet) && (
                         <LinkStyled to={AppProRoute.multiSend}>
                             <ButtonStyled size="small">
                                 <ArrowUpIcon />

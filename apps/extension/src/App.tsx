@@ -33,7 +33,7 @@ import {
 } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
+import { I18nContext, TranslationContext, useTWithReplaces } from "@tonkeeper/uikit/dist/hooks/translation";
 import { AppRoute, SettingsRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -43,7 +43,7 @@ import { useUserFiatQuery } from "@tonkeeper/uikit/dist/state/fiat";
 import { useTonendpoint, useTonenpointConfig } from "@tonkeeper/uikit/dist/state/tonendpoint";
 import { useActiveAccountQuery, useAccountsStateQuery, useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
+import React, { FC, PropsWithChildren, Suspense, useCallback, useEffect, useMemo } from "react";
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
@@ -57,6 +57,8 @@ import { useDevSettings } from "@tonkeeper/uikit/dist/state/dev";
 import { ModalsRoot } from "@tonkeeper/uikit/dist/components/ModalsRoot";
 import { Account } from "@tonkeeper/core/dist/entries/account";
 import { useDebuggingTools } from "@tonkeeper/uikit/dist/hooks/useDebuggingTools";
+import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
+import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
 
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -101,9 +103,12 @@ const TARGET_ENV = 'extension';
 connectToBackground();
 
 export const App: FC = () => {
+    const browserT = useCallback((key: string) => browser.i18n.getMessage(key), []);
+    const t = useTWithReplaces(browserT);
+
     const translation = useMemo(() => {
         const client: I18nContext = {
-            t: browser.i18n.getMessage,
+            t,
             i18n: {
                 enable: false,
                 reloadResources: async () => {},
@@ -113,7 +118,7 @@ export const App: FC = () => {
             }
         };
         return client;
-    }, []);
+    }, [t]);
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -183,6 +188,8 @@ export const Loader: FC = React.memo(() => {
     const { mutate: setLang } = useMutateUserLanguage();
     const { data: devSettings } = useDevSettings();
     const network = useActiveTonNetwork();
+    const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
+    useGlobalSetup();
 
     useEffect(() => {
         setLang(localizationFrom(browser.i18n.getUILanguage()))
@@ -199,7 +206,7 @@ export const Loader: FC = React.memo(() => {
 
     const { data: tracker } = useAnalytics(sdk.storage, activeAccount || undefined, accounts, sdk.version);
 
-    if (activeWalletLoading || isWalletsLoading || !config || lock === undefined || fiat === undefined || !devSettings) {
+    if (activeWalletLoading || isWalletsLoading || !config || lock === undefined || fiat === undefined || !devSettings || globalPreferencesLoading) {
         return (
             <FullSizeWrapper standalone={false}>
                 <Loading />
@@ -219,6 +226,7 @@ export const Loader: FC = React.memo(() => {
         hideQrScanner: true,
         hideSigner: true,
         hideMam: true,
+        hideMultisig: true,
         defaultWalletVersion: WalletVersion.V5R1
     };
 

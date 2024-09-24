@@ -2,11 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import {
-    RecipientData,
-    TransferEstimation,
-    isTonRecipientData
-} from '@tonkeeper/core/dist/entries/send';
+import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import React, {
     Children,
     FC,
@@ -47,12 +43,15 @@ type MutationProps = Pick<
 >;
 
 type ConfirmViewContextValue = {
-    recipient: RecipientData;
+    recipient?: RecipientData;
     assetAmount: AssetAmount;
     estimation: {
-        data: TransferEstimation | undefined;
+        data:
+            | {
+                  fee: AssetAmount;
+              }
+            | undefined;
         isLoading: boolean;
-        isFetching: boolean;
     };
     formState: {
         done: boolean;
@@ -73,15 +72,19 @@ export function useConfirmViewContext() {
 
 type ConfirmViewProps<T extends Asset> = PropsWithChildren<
     {
-        recipient: RecipientData;
+        className?: string;
+        recipient?: RecipientData;
         assetAmount: AssetAmount<T>;
         onBack?: () => void;
         onClose: (confirmed?: boolean) => void;
         fitContent?: boolean;
         estimation: {
-            data: TransferEstimation<T> | undefined;
+            data:
+                | {
+                      fee: AssetAmount<T>;
+                  }
+                | undefined;
             isLoading: boolean;
-            isFetching: boolean;
             error?: Error | null;
         };
     } & MutationProps
@@ -95,6 +98,7 @@ export function ConfirmView<T extends Asset = Asset>({
     onClose,
     assetAmount,
     fitContent,
+    className,
     ...mutation
 }: ConfirmViewProps<T>) {
     const { mutateAsync, isLoading, reset } = mutation;
@@ -120,6 +124,7 @@ export function ConfirmView<T extends Asset = Asset>({
             <ConfirmViewDetailsComment />
         </ConfirmViewDetailsSlot>
     );
+    let additionalDetails = <ConfirmViewAdditionalBottomSlot />;
     let buttons = (
         <ConfirmViewButtonsSlot>
             <ConfirmViewButtons MainButton={ConfirmMainButton} />
@@ -137,6 +142,9 @@ export function ConfirmView<T extends Asset = Asset>({
                     return;
                 case ConfirmViewDetailsSlot:
                     details = child;
+                    return;
+                case ConfirmViewAdditionalBottomSlot:
+                    additionalDetails = child;
                     return;
                 case ConfirmViewButtonsSlot:
                     buttons = child;
@@ -189,12 +197,14 @@ export function ConfirmView<T extends Asset = Asset>({
                 onSubmit={onSubmit}
                 standalone={standalone}
                 fitContent={fitContent}
+                className={className}
             >
                 {titleBlock}
                 {heading}
                 <ListBlock margin={false} fullWidth>
                     {details}
                 </ListBlock>
+                {additionalDetails}
                 <Gap />
 
                 <ButtonBlock>{buttons}</ButtonBlock>
@@ -242,11 +252,13 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
         [TRON_USDT_ASSET.id]: t('txActions_USDT_transfer')
     };
 
-    title ||= isTonRecipientData(recipient)
-        ? recipient.toAccount.name
-        : fallbackTitles[assetAmount.asset.id] || t('txActions_signRaw_types_jettonTransfer');
+    title ||=
+        recipient && isTonRecipientData(recipient)
+            ? recipient.toAccount.name
+            : fallbackTitles[assetAmount.asset.id] || t('txActions_signRaw_types_jettonTransfer');
 
-    const icon = isTonRecipientData(recipient) ? recipient.toAccount.icon || image : image;
+    const icon =
+        recipient && isTonRecipientData(recipient) ? recipient.toAccount.icon || image : image;
     return (
         <Info className={className}>
             {icon ? <Image full src={image} /> : <ImageMock full />}
@@ -256,10 +268,16 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
     );
 };
 
+export const ConfirmViewAdditionalBottomSlot: FC<PropsWithChildren> = ({ children }) => (
+    <>{children}</>
+);
 export const ConfirmViewDetailsSlot: FC<PropsWithChildren> = ({ children }) => <>{children}</>;
 
 export const ConfirmViewDetailsRecipient: FC = () => {
     const { recipient } = useConfirmViewContext();
+    if (!recipient) {
+        return null;
+    }
     return <RecipientListItem recipient={recipient} />;
 };
 
@@ -282,12 +300,12 @@ export const ConfirmViewDetailsFee: FC = () => {
     const { estimation } = useConfirmViewContext();
 
     return (
-        <ActionFeeDetailsUniversal fee={estimation.isFetching ? undefined : estimation.data?.fee} />
+        <ActionFeeDetailsUniversal fee={estimation.isLoading ? undefined : estimation.data?.fee} />
     );
 };
 export const ConfirmViewDetailsComment: FC = () => {
     const { recipient } = useConfirmViewContext();
-    if (!isTonRecipientData(recipient)) {
+    if (!recipient || !isTonRecipientData(recipient)) {
         return null;
     }
     return <TransferComment comment={recipient.comment} />;
@@ -316,7 +334,7 @@ export const ConfirmViewButtons: FC<{
 
     const {
         formState: { done, error, isLoading },
-        estimation: { isFetching: estimationLoading },
+        estimation: { isLoading: estimationLoading },
         onClose,
         handleSubmit
     } = useConfirmViewContext();

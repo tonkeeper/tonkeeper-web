@@ -27,6 +27,7 @@ const HistoryPageWrapper = styled(DesktopViewPageLayout)`
 
 const HistoryContainer = styled.div`
     overflow-x: auto;
+    overflow-y: hidden;
 `;
 
 const HistoryHeaderContainer = styled(DesktopViewHeader)`

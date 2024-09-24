@@ -21,7 +21,6 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { useActiveWallet } from '../../state/wallet';
-import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 
 export const useGetConnectInfo = () => {
     const sdk = useAppSdk();
@@ -77,11 +76,6 @@ export const useResponseConnectionMutation = () => {
 
     return useMutation<undefined, Error, AppConnectionProps>(
         async ({ params, replyItems, manifest }) => {
-            if (!isStandardTonWallet(wallet)) {
-                console.error('Attempt to connect to non standard ton wallet');
-                return;
-            }
-
             if (replyItems && manifest) {
                 const response = await saveWalletTonConnect({
                     storage: sdk.storage,

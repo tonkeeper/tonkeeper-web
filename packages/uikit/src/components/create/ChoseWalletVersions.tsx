@@ -1,5 +1,4 @@
 import { mnemonicToWalletKey } from '@ton/crypto';
-import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
 import {
     WalletVersion,
     WalletVersions,
@@ -21,6 +20,7 @@ import { RoundedButton } from '../fields/RoundedButton';
 import { Body1, Body2, H2, Label1 } from '../Text';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { ChevronLeftIcon } from '../Icon';
+import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -96,7 +96,7 @@ export const ChoseWalletVersions: FC<{
 
     useLayoutEffect(() => {
         if (wallets) {
-            if (accountState && isAccountControllable(accountState)) {
+            if (accountState && isAccountTonWalletStandard(accountState)) {
                 return setCheckedVersions(accountState.allTonWallets.map(w => w.version));
             }
 

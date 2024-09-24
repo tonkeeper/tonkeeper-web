@@ -10,16 +10,15 @@ import { Notification, NotificationBlock } from './Notification';
 import { Button } from './fields/Button';
 import { Background, HeaderBlock } from './home/AccountView';
 import { AnimatedQrCode } from './home/qrCodeView';
-import { useActiveWallet } from '../state/wallet';
-import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 
 export const SignerContent: FC<{
     sdk: IAppSdk;
     boc: string;
     onClose: () => void;
     onSubmit: (result: string) => void;
-}> = ({ sdk, boc, onClose, onSubmit }) => {
-    const wallet = useActiveWallet();
+    wallet: TonWalletStandard;
+}> = ({ sdk, boc, onClose, onSubmit, wallet }) => {
     const { t } = useTranslation();
     const { extension } = useAppContext();
 
@@ -58,6 +57,7 @@ const PairSignerNotification = () => {
 
     const [boc, setBoc] = useState<string | undefined>(undefined);
     const [requestId, setId] = useState<number | undefined>(undefined);
+    const [wallet, setWallet] = useState<TonWalletStandard | undefined>(undefined);
 
     const close = useCallback(() => {
         setBoc(undefined);
@@ -93,10 +93,14 @@ const PairSignerNotification = () => {
         const handler = (options: {
             method: 'signer';
             id?: number | undefined;
-            params: string;
+            params: {
+                boc: string;
+                wallet: TonWalletStandard;
+            };
         }) => {
-            setBoc(options.params!);
+            setBoc(options.params!.boc);
             setId(options.id);
+            setWallet(options.params!.wallet);
         };
         sdk.uiEvents.on('signer', handler);
         return () => {
@@ -105,9 +109,17 @@ const PairSignerNotification = () => {
     }, [sdk]);
 
     const Content = useCallback(() => {
-        if (!boc || !requestId) return undefined;
-        return <SignerContent sdk={sdk} boc={boc} onClose={onCancel} onSubmit={onSubmit} />;
-    }, [sdk, boc, requestId, onCancel, onSubmit]);
+        if (!boc || !requestId || !wallet) return undefined;
+        return (
+            <SignerContent
+                sdk={sdk}
+                boc={boc}
+                onClose={onCancel}
+                onSubmit={onSubmit}
+                wallet={wallet}
+            />
+        );
+    }, [sdk, boc, requestId, onCancel, onSubmit, wallet]);
 
     return (
         <Notification isOpen={boc != null && requestId != null} handleClose={onCancel}>

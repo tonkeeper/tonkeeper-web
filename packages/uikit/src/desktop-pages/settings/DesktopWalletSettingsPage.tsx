@@ -7,7 +7,8 @@ import {
     ExitIcon,
     KeyIcon,
     SaleBadgeIcon,
-    SwitchIcon
+    SwitchIcon,
+    UnpinIconOutline
 } from '../../components/Icon';
 import { Body3, Label2 } from '../../components/Text';
 import {
@@ -22,17 +23,24 @@ import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import {
     useActiveAccount,
     useHideMAMAccountDerivation,
-    useIsActiveWalletWatchOnly
+    useIsActiveWalletWatchOnly,
+    useMutateActiveAccount
 } from '../../state/wallet';
 import {
     AccountMAM,
     isAccountVersionEditable,
-    Account
+    Account,
+    AccountTonMultisig
 } from '@tonkeeper/core/dist/entries/account';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 import { WalletIndexBadge } from '../../components/account/AccountBadge';
 import { useState } from 'react';
+import {
+    useActiveMultisigAccountHost,
+    useIsActiveAccountMultisig,
+    useMultisigTogglePinForWallet
+} from '../../state/multisig';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -51,6 +59,7 @@ const SettingsListItem = styled.div`
     }
 
     > svg {
+        color: ${p => p.theme.iconSecondary};
         flex-shrink: 0;
     }
 `;
@@ -82,6 +91,7 @@ export const DesktopWalletSettingsPage = () => {
     const { mutateAsync: hideDerivation } = useHideMAMAccountDerivation();
 
     const isReadOnly = useIsActiveWalletWatchOnly();
+    const isMultisig = useIsActiveAccountMultisig();
 
     const canChangeVersion = isAccountVersionEditable(account);
     const canChangeDerivations = account.type === 'mam';
@@ -225,10 +235,14 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                <SettingsListItem onClick={() => setAccountToDelete(account)}>
-                    <ExitIcon />
-                    <Label2>{t('settings_delete_account')}</Label2>
-                </SettingsListItem>
+                {isMultisig ? (
+                    <UnpinMultisigSettingsListItem />
+                ) : (
+                    <SettingsListItem onClick={() => setAccountToDelete(account)}>
+                        <ExitIcon />
+                        <Label2>{t('settings_delete_account')}</Label2>
+                    </SettingsListItem>
+                )}
                 {account.type === 'mam' && (
                     <SettingsListItem onClick={onHide}>
                         <ExitIcon />
@@ -250,5 +264,35 @@ export const DesktopWalletSettingsPage = () => {
                 handleClose={() => setAccountToDelete(undefined)}
             />
         </DesktopViewPageLayout>
+    );
+};
+
+const UnpinMultisigSettingsListItem = () => {
+    const { mutateAsync: togglePinForMultisigWallet } = useMultisigTogglePinForWallet();
+    const { mutateAsync: mutateActiveAccount } = useMutateActiveAccount();
+    const { signerWallet, signerAccount } = useActiveMultisigAccountHost();
+    const account = useActiveAccount() as AccountTonMultisig;
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const isPinned = account.isPinnedForWallet(signerWallet.id);
+
+    const onUnpin = async () => {
+        await togglePinForMultisigWallet({
+            multisigId: account.id,
+            hostWalletId: signerWallet.id
+        });
+        await mutateActiveAccount(signerAccount.id);
+        navigate(AppRoute.home);
+    };
+
+    if (!isPinned) {
+        return null;
+    }
+
+    return (
+        <SettingsListItem onClick={onUnpin}>
+            <UnpinIconOutline />
+            <Label2>{t('settings_hide_multisig')}</Label2>
+        </SettingsListItem>
     );
 };

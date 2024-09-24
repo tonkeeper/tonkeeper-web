@@ -13,7 +13,7 @@ export const AccountBadge: FC<
 > = ({ accountType, size = 'm', className, children }) => {
     if (accountType === 'ledger') {
         return (
-            <Badge size={size} color="accentGreen" className={className}>
+            <Badge size={size} color="accentPurple" className={className}>
                 {children || 'Ledger'}
             </Badge>
         );
@@ -29,7 +29,7 @@ export const AccountBadge: FC<
 
     if (accountType === 'keystone') {
         return (
-            <Badge size={size} color="accentOrange" className={className}>
+            <Badge size={size} color="accentPurple" className={className}>
                 {children || 'Keystone'}
             </Badge>
         );
@@ -37,7 +37,7 @@ export const AccountBadge: FC<
 
     if (accountType === 'watch-only') {
         return (
-            <Badge size={size} color="accentRed" className={className}>
+            <Badge size={size} color="accentOrange" className={className}>
                 {children || 'Watch Only'}
             </Badge>
         );
@@ -47,6 +47,14 @@ export const AccountBadge: FC<
         return (
             <Badge size={size} color="accentBlueConstant" className={className}>
                 {children || 'Multi'}
+            </Badge>
+        );
+    }
+
+    if (accountType === 'ton-multisig') {
+        return (
+            <Badge size={size} color="accentGreen" className={className}>
+                {children || 'Multisig'}
             </Badge>
         );
     }

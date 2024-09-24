@@ -1,5 +1,5 @@
 import { ConnectRequest, DAppManifest, KeyPair } from '../../entries/tonConnect';
-import { TonWalletStandard } from '../../entries/wallet';
+import { TonContract, TonWalletStandard } from '../../entries/wallet';
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
 import { getDevSettings } from '../devStorage';
@@ -20,7 +20,10 @@ export interface AccountConnection {
 
 export const getTonWalletConnections = async (
     storage: IStorage,
-    wallet: Pick<TonWalletStandard, 'id' | 'publicKey'>
+    wallet: {
+        id: string;
+        publicKey?: string;
+    }
 ) => {
     const network = (await getDevSettings(storage)).tonNetwork;
 
@@ -29,11 +32,14 @@ export const getTonWalletConnections = async (
     );
 
     if (!result) {
-        result = await migrateAccountConnections(storage, wallet);
-        await setAccountConnection(storage, wallet, result);
+        const publicKey = wallet.publicKey;
+        if (publicKey !== undefined) {
+            result = await migrateAccountConnections(storage, { publicKey });
+        }
+        await setAccountConnection(storage, wallet, result ?? []);
     }
 
-    return result;
+    return result ?? [];
 };
 
 export const setAccountConnection = async (
@@ -48,7 +54,7 @@ export const setAccountConnection = async (
 
 export const saveAccountConnection = async (options: {
     storage: IStorage;
-    wallet: TonWalletStandard;
+    wallet: TonContract;
     manifest: DAppManifest;
     params: TonConnectParams;
     webViewUrl?: string;

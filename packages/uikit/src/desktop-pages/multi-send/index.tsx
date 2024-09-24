@@ -9,7 +9,7 @@ import { useRate } from '../../state/rates';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { SkeletonText } from '../../components/shared/Skeleton';
 import { DesktopMultiSendFormPage } from './MultiSendFormPage';
-import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { getWillBeMultiSendValue } from '../../components/desktop/multi-send/utils';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
@@ -18,6 +18,9 @@ import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { ImportListNotification } from '../../components/desktop/multi-send/import-list/ImportListNotification';
+import { useActiveWallet } from '../../state/wallet';
+import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { AppRoute } from '../../libs/routes';
 
 const PageWrapper = styled.div`
     overflow: auto;
@@ -107,11 +110,18 @@ export const DesktopMultiSendPage: FC = () => {
     const navigate = useNavigate();
     const { isOpen, onClose, onOpen } = useDisclosure();
 
+    const wallet = useActiveWallet();
+    const isStandardWallet = isStandardTonWallet(wallet);
+
     useEffect(() => {
-        if (lists && !lists.length) {
+        if (lists && !lists.length && !isStandardWallet) {
             navigate('./list/' + 1);
         }
-    }, [lists]);
+    }, [lists, isStandardWallet]);
+
+    if (!isStandardWallet) {
+        return <Navigate to={AppRoute.home} />;
+    }
 
     const onCreateList = () => {
         const id = Math.max(1, ...lists!.map(l => l.id)) + 1;

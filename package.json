@@ -42,5 +42,8 @@
             "apps/*"
         ]
     },
-    "packageManager": "yarn@4.3.0"
+    "packageManager": "yarn@4.3.0",
+    "dependencies": {
+        "@tonkeeper/uikit": "workspace:^"
+    }
 }

@@ -2,7 +2,6 @@ import { Address, beginCell, storeStateInit } from '@ton/core';
 import { getSecureRandomBytes, keyPairFromSeed, sha256_sync } from '@ton/crypto';
 import queryString from 'query-string';
 import { IStorage } from '../../Storage';
-import { Account, isAccountControllable } from '../../entries/account';
 import { TonConnectError } from '../../entries/exception';
 import { Network } from '../../entries/network';
 import {
@@ -21,6 +20,7 @@ import {
     TonConnectAccount,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
+import { isStandardTonWallet, TonContract } from '../../entries/wallet';
 import { TonWalletStandard, WalletVersion } from '../../entries/wallet';
 import { accountsStorage } from '../accountsStorage';
 import { getDevSettings } from '../devStorage';
@@ -33,6 +33,7 @@ import {
     saveAccountConnection
 } from './connectionService';
 import { SessionCrypto } from './protocol';
+import { Account, isAccountTonWalletStandard } from '../../entries/account';
 
 export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
@@ -197,7 +198,9 @@ export const getDappConnection = async (
 export const getAppConnections = async (
     storage: IStorage
 ): Promise<{ wallet: TonWalletStandard; connections: AccountConnection[] }[]> => {
-    const accounts = (await accountsStorage(storage).getAccounts()).filter(isAccountControllable);
+    const accounts = (await accountsStorage(storage).getAccounts()).filter(
+        isAccountTonWalletStandard
+    );
     if (!accounts.length) {
         throw new TonConnectError(
             'Missing active wallet',
@@ -247,9 +250,23 @@ export const tonReConnectRequest = async (
     return [toTonAddressItemReply(connection.wallet, (await getDevSettings(storage)).tonNetwork)];
 };
 
-export const toTonAddressItemReply = (wallet: TonWalletStandard, network: Network) => {
+export const toTonAddressItemReply = (
+    wallet: TonContract,
+    network: Network
+): TonAddressItemReply => {
+    /**
+     * for multisig wallets
+     */
+    if (!isStandardTonWallet(wallet)) {
+        return {
+            name: 'ton_addr',
+            address: wallet.rawAddress,
+            network: network.toString(),
+            walletStateInit: ''
+        };
+    }
     const contract = walletContractFromState(wallet);
-    const result: TonAddressItemReply = {
+    return {
         name: 'ton_addr',
         address: contract.address.toRawString(),
         network: network.toString(),
@@ -260,8 +277,6 @@ export const toTonAddressItemReply = (wallet: TonWalletStandard, network: Networ
             .toString('base64'),
         publicKey: wallet.publicKey
     };
-
-    return result;
 };
 
 export interface ConnectProofPayload {
@@ -372,7 +387,7 @@ export const tonDisconnectRequest = async (options: { storage: IStorage; webView
 
 export const saveWalletTonConnect = async (options: {
     storage: IStorage;
-    wallet: TonWalletStandard;
+    wallet: TonContract;
     manifest: DAppManifest;
     params: TonConnectParams;
     replyItems: ConnectItemReply[];
@@ -381,7 +396,10 @@ export const saveWalletTonConnect = async (options: {
 }): Promise<ConnectEvent> => {
     await saveAccountConnection(options);
 
-    const maxMessages = options.wallet.version === WalletVersion.V5R1 ? 255 : 4;
+    const maxMessages =
+        isStandardTonWallet(options.wallet) && options.wallet.version === WalletVersion.V5R1
+            ? 255
+            : 4;
     return {
         id: Date.now(),
         event: 'connect',
