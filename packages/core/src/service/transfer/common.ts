@@ -16,7 +16,7 @@ import BigNumber from 'bignumber.js';
 import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipient, TransferEstimationEventFee } from '../../entries/send';
-import { TonContract, TonWalletStandard } from '../../entries/wallet';
+import { TonWalletStandard } from '../../entries/wallet';
 import { CellSigner, Signer } from '../../entries/signer';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
 import {
@@ -28,7 +28,7 @@ import {
     WalletApi
 } from '../../tonApiV2';
 import { WalletContract, walletContractFromState } from '../wallet/contractService';
-import { sendCreateOrder } from '../multisig/order/order-send';
+import { orderActionMinAmount, sendCreateOrder } from '../multisig/order/order-send';
 import { estimateNewOrder } from '../multisig/order/order-estimate';
 
 export enum SendMode {
@@ -219,7 +219,7 @@ signEstimateMessage.type = 'cell' as const;
 
 export async function getWalletSeqnoAndCheckBalance(options: {
     api: APIConfig;
-    walletState: TonContract;
+    walletState: { rawAddress: string };
     fee?: { event: { extra: number | BigNumber } };
     amount: BigNumber;
 }) {
@@ -282,11 +282,17 @@ export const sendMultisigTransfer = async ({
     ttlSeconds: number;
 }): Promise<void> => {
     const timestamp = await getServerTime(api);
+
     await getWalletSeqnoAndCheckBalance({
         api,
-        walletState: hostWallet,
+        walletState: { rawAddress: multisig.address },
         amount,
         fee
+    });
+    await getWalletSeqnoAndCheckBalance({
+        walletState: hostWallet,
+        amount: orderActionMinAmount,
+        api
     });
 
     await sendCreateOrder({
