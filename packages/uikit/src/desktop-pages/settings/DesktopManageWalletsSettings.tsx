@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 import { DropDownContent, DropDownItem } from '../../components/DropDown';
 import { EllipsisIcon, PlusIcon, ReorderIcon } from '../../components/Icon';
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
-import { Label2, TextEllipsis } from '../../components/Text';
+import { Body2Class, Label2, TextEllipsis } from '../../components/Text';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { useAccountsState, useAccountsDNDDrop, useActiveTonNetwork } from '../../state/wallet';
@@ -51,6 +51,7 @@ import { useRenameNotification } from '../../components/modals/RenameNotificatio
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 import { Button } from '../../components/fields/Button';
+import { useManageFolderNotification } from '../../components/modals/ManageFolderNotificationControlled';
 
 const Row = styled.div`
     height: 40px;
@@ -93,8 +94,22 @@ const BottomButtonContainer = styled.div`
     padding: 1rem;
 `;
 
+const NewFolderButton = styled.button`
+    border: none;
+    background-color: transparent;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: ${p => p.theme.textAccent};
+    margin-left: auto;
+    ${Body2Class};
+`;
+
 export const DesktopManageAccountsPage = () => {
     const { onOpen: addWallet } = useAddWalletNotification();
+    const { onOpen: manageFolders } = useManageFolderNotification();
     const { t } = useTranslation();
 
     const accounts = useAccountsState();
@@ -114,6 +129,9 @@ export const DesktopManageAccountsPage = () => {
         <DesktopViewPageLayout>
             <DesktopViewHeader>
                 <Label2>{t('Manage_wallets')}</Label2>
+                <NewFolderButton onClick={() => manageFolders()}>
+                    {t('accounts_new_folder')}
+                </NewFolderButton>
             </DesktopViewHeader>
             <DragDropContext onDragEnd={handleDrop}>
                 <Droppable droppableId="wallets">
@@ -162,7 +180,7 @@ export const DesktopManageAccountsPage = () => {
             <BottomButtonContainer>
                 <Button secondary fullWidth onClick={() => addWallet()}>
                     <PlusIcon />
-                    Add Wallet
+                    {t('add_wallet')}
                 </Button>
             </BottomButtonContainer>
         </DesktopViewPageLayout>

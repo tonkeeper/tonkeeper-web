@@ -8,6 +8,7 @@ import { AddWalletNotificationControlled } from './modals/AddWalletNotificationC
 import { ConfirmDiscardNotificationControlled } from './modals/ConfirmDiscardNotificationControlled';
 import { MultisigOrderNotificationControlled } from './modals/MultisigOrderNotificationControlled';
 import { DeleteAccountNotificationControlled } from './modals/DeleteAccountNotificationControlled';
+import { ManageFolderNotificationControlled } from './modals/ManageFolderNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -22,6 +23,7 @@ export const ModalsRoot = () => {
             <ConfirmDiscardNotificationControlled />
             <MultisigOrderNotificationControlled />
             <DeleteAccountNotificationControlled />
+            <ManageFolderNotificationControlled />
         </>
     );
 };
