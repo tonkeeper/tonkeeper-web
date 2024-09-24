@@ -9,11 +9,12 @@ import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { BackButtonBlock } from '../BackButton';
 import { CenterContainer } from '../Layout';
-import { Body1, Body2, Body2Class, Body3, H2, Label2Class } from '../Text';
+import { Body1, Body2, Body2Class, Body3, H2, Label2, Label2Class } from '../Text';
 import { Button } from '../fields/Button';
 import { BorderSmallResponsive } from '../shared/Styles';
 import { ExclamationMarkCircleIcon } from '../Icon';
 import { validateMnemonicTonOrMAM } from '@tonkeeper/core/dist/service/mnemonicService';
+import { ToggleButton, ToggleButtonItem } from '../shared/ToggleButton';
 
 const Block = styled.div`
     display: flex;
@@ -54,9 +55,9 @@ const Body = styled(Body1)`
     ${p => p.theme.displayType === 'full-width' && Body2Class}
 `;
 
-export const WorldsGrid = styled.div`
+export const WorldsGrid = styled.div<{ wordsNumber: 12 | 24 }>`
     display: grid;
-    grid-template-rows: repeat(12, minmax(0, 1fr));
+    grid-template-rows: repeat(${p => p.wordsNumber / 2}, minmax(0, 1fr));
     grid-auto-flow: column;
     gap: 0.5rem;
     place-content: space-evenly;
@@ -132,7 +133,9 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
                 <Header>
                     {t(showMamInfo ? 'secret_words_account_title' : 'secret_words_title')}
                 </Header>
-                <Body>{t('secret_words_caption')}</Body>
+                <Body>
+                    {t(mnemonic.length === 12 ? 'secret_words_caption_12' : 'secret_words_caption')}
+                </Body>
             </HeadingBlock>
 
             {showMamInfo && (
@@ -149,7 +152,7 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
                 </MamAccountCallout>
             )}
 
-            <WorldsGridStyled>
+            <WorldsGridStyled wordsNumber={mnemonic.length as 12 | 24}>
                 {mnemonic.map((world, index) => (
                     <Body1 key={index}>
                         <WorldNumber> {index + 1}.</WorldNumber> {world}{' '}
@@ -408,20 +411,22 @@ export const Check: FC<{
     );
 };
 
-const Inputs = styled.div`
+const Inputs = styled.div<{ wordsNumber: 12 | 24 }>`
     display: grid;
     grid-template-rows: repeat(12, minmax(0, 1fr));
     grid-auto-flow: column;
     gap: 0.5rem;
 
     @media (max-width: 768px) {
-        grid-template-rows: repeat(24, minmax(0, 1fr));
+        grid-template-rows: repeat(${p => p.wordsNumber}, minmax(0, 1fr));
     }
 
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
-            grid-template-rows: repeat(8, minmax(0, 1fr));
+            grid-template-rows: ${p.wordsNumber === 24
+                ? 'repeat(8, minmax(0, 1fr))'
+                : 'repeat(6, minmax(0, 1fr))'};
         `}
 `;
 
@@ -436,10 +441,15 @@ const focusInput = (current: HTMLDivElement | null, index: number) => {
     wrapper.querySelector('input')?.focus();
 };
 
+const ToggleButtonStyled = styled(ToggleButton)`
+    margin: 0 auto 1rem;
+`;
+
 export const ImportWords: FC<{
     isLoading?: boolean;
     onMnemonic: (mnemonic: string[]) => void;
 }> = ({ isLoading, onMnemonic }) => {
+    const [wordsNumber, setWordsNumber] = useState<12 | 24>(24);
     const sdk = useAppSdk();
     const { standalone } = useAppContext();
     const ref = useRef<HTMLDivElement>(null);
@@ -447,7 +457,11 @@ export const ImportWords: FC<{
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const [mnemonic, setMnemonic] = useState<string[]>(Array(24).fill(''));
+    const [_mnemonic, setMnemonic] = useState<string[]>(Array(24).fill(''));
+
+    const mnemonic = useMemo(() => {
+        return _mnemonic.slice(0, wordsNumber);
+    }, [_mnemonic, wordsNumber]);
 
     const onChange = useCallback(
         (newValue: string, index: number) => {
@@ -496,8 +510,10 @@ export const ImportWords: FC<{
             focusInput(ref.current, invalid);
             notify();
         }
-        if (mnemonic.length < 24) {
-            focusInput(ref.current, mnemonic.length - 1);
+
+        const notFilledField = mnemonic.findIndex(word => word === '');
+        if (notFilledField !== -1) {
+            focusInput(ref.current, notFilledField);
             notify();
         }
         if (sdk.isIOs()) {
@@ -517,12 +533,26 @@ export const ImportWords: FC<{
             <Block>
                 <div>
                     <Header>{t('import_wallet_title')}</Header>
-                    <Body>{t('import_wallet_caption')}</Body>
+                    <Body>
+                        {t(
+                            wordsNumber === 12
+                                ? 'import_wallet_caption_12'
+                                : 'import_wallet_caption'
+                        )}
+                    </Body>
                 </div>
             </Block>
+            <ToggleButtonStyled>
+                <ToggleButtonItem active={wordsNumber === 24} onClick={() => setWordsNumber(24)}>
+                    <Label2>{t('import_wallet_24_words')}</Label2>
+                </ToggleButtonItem>
+                <ToggleButtonItem active={wordsNumber === 12} onClick={() => setWordsNumber(12)}>
+                    <Label2>{t('import_wallet_12_words')}</Label2>
+                </ToggleButtonItem>
+            </ToggleButtonStyled>
             <Block>
-                <Inputs ref={ref}>
-                    {mnemonic.map((item, index) => (
+                <Inputs ref={ref} wordsNumber={wordsNumber}>
+                    {mnemonic.slice(0, wordsNumber).map((item, index) => (
                         <WordInput
                             key={index}
                             value={item}

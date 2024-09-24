@@ -142,7 +142,7 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                     <AddMethodText>
                         <AddMethodLabel>{t('import_existing_wallet')}</AddMethodLabel>
                         <AddMethodDescription>
-                            {t('import_existing_wallet_description')}
+                            {t('import_existing_wallet_description_extended')}
                         </AddMethodDescription>
                     </AddMethodText>
                     <ButtonIcon>

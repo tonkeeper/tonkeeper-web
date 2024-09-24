@@ -6864,6 +6864,7 @@ __metadata:
     "@ton/crypto": "npm:3.2.0"
     "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build10"
     bignumber.js: "npm:^9.1.1"
+    bip39: "npm:^3.1.0"
     ethers: "npm:^6.6.5"
     npm-run-all: "npm:^4.1.5"
     query-string: "npm:^8.1.0"
@@ -10039,6 +10040,15 @@ __metadata:
   dependencies:
     file-uri-to-path: "npm:1.0.0"
   checksum: 10/593d5ae975ffba15fbbb4788fe5abd1e125afbab849ab967ab43691d27d6483751805d98cb92f7ac24a2439a8a8678cd0131c535d5d63de84e383b0ce2786133
+  languageName: node
+  linkType: hard
+
+"bip39@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "bip39@npm:3.1.0"
+  dependencies:
+    "@noble/hashes": "npm:^1.2.0"
+  checksum: 10/406c0b5bdab0d43df2ff8916c5b57bb7f65cd36a115cbd7620a75b972638f8511840bfc27bfc68946027086fd33ed3050d8cd304e85fd527503b23d857a8486e
   languageName: node
   linkType: hard
 
