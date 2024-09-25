@@ -85,6 +85,9 @@ const createMultisig = async (options: {
         })
     ).seqno;
 
+    /**
+     * https://raw.githubusercontent.com/ton-blockchain/multisig-contract-v2/2cb4b84faf5a6340c2d452695f35779c997ae0f0/build/Multisig.compiled.json
+     */
     const stateInit = {
         data: multisigConfigToCell(options.multisigConfig),
         code: Cell.fromBase64(
