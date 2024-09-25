@@ -55,6 +55,25 @@ export const useUpdateFolder = () => {
     );
 };
 
+export const useSetFolderLastIsOpened = () => {
+    const { folders } = useGlobalPreferences();
+    const { mutateAsync } = useMutateGlobalPreferences();
+    return useMutation<void, Error, { id: string; lastIsOpened: boolean }>(
+        ({ id, lastIsOpened }) => {
+            const folderIndex = folders.findIndex(f => f.id === id);
+
+            if (folderIndex === -1) {
+                throw new Error('Folder not found');
+            }
+
+            const newFolders = folders.slice();
+            newFolders[folderIndex].lastIsOpened = lastIsOpened;
+
+            return mutateAsync({ folders: newFolders });
+        }
+    );
+};
+
 export const useDeleteFolder = () => {
     const { folders } = useGlobalPreferences();
     const { mutateAsync } = useMutateGlobalPreferences();

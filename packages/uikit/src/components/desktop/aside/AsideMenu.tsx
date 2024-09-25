@@ -14,9 +14,8 @@ import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state
 import {
     useAccountsDNDDrop,
     useActiveAccount,
-    useMutateActiveTonWallet,
-    useSideBarItems
-} from '../../../state/wallet';
+    useMutateActiveTonWallet, useSideBarItems
+} from "../../../state/wallet";
 import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { ScrollContainer } from '../../ScrollContainer';
@@ -29,9 +28,7 @@ import {
     DragDropContext,
     Draggable,
     DraggableProvidedDraggableProps,
-    Droppable,
-    DropResult,
-    ResponderProvided
+    Droppable
 } from 'react-beautiful-dnd';
 import { AsideMenuAccount } from './AsideMenuAccount';
 import { AccountsFolder } from '../../../state/global-preferences';
@@ -171,22 +168,7 @@ const AccountDNDBlock: FC<{
     activeAccount: Account;
     activeRoute: string | undefined;
 }> = ({ activeRoute, activeAccount, items }) => {
-    const [itemsOptimistic, setItemsOptimistic] = useState(items);
-
-    useEffect(() => {
-        setItemsOptimistic(items);
-    }, [items]);
-
-    const _handleDrop = useAccountsDNDDrop();
-    const handleDrop = useCallback(
-        (droppedItem: DropResult, provided: ResponderProvided) => {
-            const result = _handleDrop(droppedItem, provided);
-            if (result) {
-                setItemsOptimistic(result);
-            }
-        },
-        [_handleDrop]
-    );
+    const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
 
     return (
         <DragDropContext onDragEnd={handleDrop}>

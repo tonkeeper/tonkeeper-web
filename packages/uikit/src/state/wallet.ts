@@ -38,7 +38,7 @@ import {
 } from '@tonkeeper/core/dist/service/walletService';
 import { AccountsApi, Account as TonapiAccount } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
@@ -330,19 +330,28 @@ export const useSideBarItems = () => {
     const preferences = useGlobalPreferences();
 
     const { folders, sideBarOrder } = preferences;
-    const accountsNotInFolder = accounts.filter(a => !folders.some(f => f.accounts.includes(a.id)));
-    return applySideBarSorting(
-        (accountsNotInFolder as (Account | AccountsFolder)[]).concat(folders),
-        sideBarOrder
-    );
+    return useMemo(() => {
+        const accountsNotInFolder = accounts.filter(
+            a => !folders.some(f => f.accounts.includes(a.id))
+        );
+        return applySideBarSorting(
+            (accountsNotInFolder as (Account | AccountsFolder)[]).concat(folders),
+            sideBarOrder
+        );
+    }, [folders, sideBarOrder, accounts]);
 };
 
-export const useAccountsDNDDrop = () => {
+export const useAccountsDNDDrop = (items: (Account | AccountsFolder)[]) => {
     const { mutate } = useMutateGlobalPreferences();
-    const items = useSideBarItems();
     const { folders } = useGlobalPreferences();
 
-    return useCallback<
+    const [itemsOptimistic, setItemsOptimistic] = useState(items);
+
+    useEffect(() => {
+        setItemsOptimistic(items);
+    }, [items]);
+
+    const _handleDrop = useCallback<
         (result: DropResult, provided: ResponderProvided) => (Account | AccountsFolder)[]
     >(
         droppedItem => {
@@ -384,8 +393,23 @@ export const useAccountsDNDDrop = () => {
             mutate({ sideBarOrder: updatedList.map(i => i.id) });
             return updatedList;
         },
-        [items, mutate, folders]
+        [items, mutate, folders, setItemsOptimistic]
     );
+
+    const handleDrop = useCallback(
+        (droppedItem: DropResult, provided: ResponderProvided) => {
+            const result = _handleDrop(droppedItem, provided);
+            if (result) {
+                setItemsOptimistic(result);
+            }
+        },
+        [_handleDrop]
+    );
+
+    return {
+        handleDrop,
+        itemsOptimistic
+    };
 };
 
 export const useMutateAccountsState = () => {

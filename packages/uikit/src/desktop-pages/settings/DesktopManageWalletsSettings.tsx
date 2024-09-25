@@ -38,7 +38,7 @@ import {
     WalletIndexBadge,
     WalletVersionBadge
 } from '../../components/account/AccountBadge';
-import { AccountsFolder, useGlobalPreferencesQuery } from '../../state/global-preferences';
+import { AccountsFolder } from '../../state/global-preferences';
 import {
     sortDerivationsByIndex,
     sortWalletsByVersion,
@@ -142,11 +142,8 @@ export const DesktopManageAccountsPage = () => {
     const { onOpen: manageFolders } = useManageFolderNotification();
     const { t } = useTranslation();
 
-    const handleDrop = useAccountsDNDDrop();
-
-    const { data } = useGlobalPreferencesQuery();
-    console.log(data);
     const items = useSideBarItems();
+    const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
 
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
@@ -164,7 +161,7 @@ export const DesktopManageAccountsPage = () => {
                             ref={provided.innerRef}
                             margin={false}
                         >
-                            {items.map((item, index) => (
+                            {itemsOptimistic.map((item, index) => (
                                 <Draggable key={item.id} draggableId={item.id} index={index}>
                                     {(p, snapshot) => {
                                         const transform = p.draggableProps.style?.transform;

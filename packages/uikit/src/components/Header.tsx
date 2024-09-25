@@ -17,7 +17,8 @@ import {
     useActiveAccount,
     useActiveTonNetwork,
     useActiveWallet,
-    useMutateActiveTonWallet
+    useMutateActiveTonWallet,
+    useSideBarItems
 } from '../state/wallet';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
@@ -30,6 +31,7 @@ import { useAddWalletNotification } from './modals/AddWalletNotificationControll
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import { notNullish } from '@tonkeeper/core/dist/utils/types';
 
 const Block = styled.div<{
     center?: boolean;
@@ -185,11 +187,17 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
 }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const accounts = useAccountsState();
     const accountsWallets: {
         wallet: TonContract;
         account: Account;
         derivation?: DerivationItemNamed;
-    }[] = useAccountsState()
+    }[] = useSideBarItems()
+        .map(i =>
+            i.type === 'folder' ? i.accounts.map(a => accounts.find(acc => acc.id === a)) : [i]
+        )
+        .flat()
+        .filter(notNullish)
         .filter(a => a.type !== 'ton-multisig')
         .flatMap(a => {
             if (a.type === 'ledger') {

@@ -95,8 +95,8 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
     const accounts = useAccountsState().filter(a => a.type !== 'ton-multisig');
     const { folders } = useGlobalPreferences();
     const newFolderName = useNewFolderName();
-    const { mutate: updateFolder } = useUpdateFolder();
-    const { mutate: deleteFolder } = useDeleteFolder();
+    const { mutateAsync: updateFolder } = useUpdateFolder();
+    const { mutateAsync: deleteFolder } = useDeleteFolder();
 
     const [checkedAccounts, setChecked] = useState(folder?.accounts || []);
     const [folderName, setFolderName] = useState(folder?.name || newFolderName);
@@ -125,18 +125,15 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
         JSON.stringify(checkedAccounts) !== JSON.stringify(folder?.accounts || []);
     const canSave = (isValidInput && folderNameDiffers) || accountsDiffers;
 
-    const onSave = () => {
-        onClose();
+    const onSave = async () => {
         if (!checkedAccounts.length && folder?.id !== undefined) {
-            setTimeout(() => {
-                deleteFolder({ id: folder.id });
-            }, 150);
+            await deleteFolder({ id: folder.id });
+            onClose();
         }
 
         if (checkedAccounts.length) {
-            setTimeout(() => {
-                updateFolder({ id: folder?.id, name: folderName, accounts: checkedAccounts });
-            }, 150);
+            await updateFolder({ id: folder?.id, name: folderName, accounts: checkedAccounts });
+            onClose();
         }
     };
 

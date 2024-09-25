@@ -12,6 +12,7 @@ import { Accordion } from '../../shared/Accordion';
 import { AsideMenuAccount } from './AsideMenuAccount';
 import { useAccountsState } from '../../../state/wallet';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { useSetFolderLastIsOpened } from '../../../state/folders';
 
 const FolderIconStyled = styled(FolderIcon)`
     color: ${p => p.theme.iconSecondary};
@@ -40,10 +41,17 @@ export const AsideMenuFolder: FC<{
     const { onOpen: onManageFolder } = useManageFolderNotification();
     const { isOpen, onToggle } = useDisclosure(folder.lastIsOpened);
     const accounts = useAccountsState();
+    const { mutate, reset } = useSetFolderLastIsOpened();
+
+    const onClickFolder = () => {
+        reset();
+        mutate({ id: folder.id, lastIsOpened: !isOpen });
+        onToggle();
+    };
 
     return (
         <>
-            <AsideMenuItem isSelected={false} onClick={onToggle} ref={ref}>
+            <AsideMenuItem isSelected={false} onClick={onClickFolder} ref={ref}>
                 <FolderIconStyled />
                 <Label2>{folder.name}</Label2>
                 <GearIconButtonStyled
