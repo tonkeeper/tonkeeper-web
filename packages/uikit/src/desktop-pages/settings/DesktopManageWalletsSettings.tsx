@@ -12,7 +12,12 @@ import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { Body2Class, Label2, TextEllipsis } from '../../components/Text';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
-import { useAccountsState, useAccountsDNDDrop, useActiveTonNetwork, useSideBarItems } from "../../state/wallet";
+import {
+    useAccountsState,
+    useAccountsDNDDrop,
+    useActiveTonNetwork,
+    useSideBarItems
+} from '../../state/wallet';
 import {
     Account,
     AccountKeystone,
@@ -33,7 +38,7 @@ import {
     WalletIndexBadge,
     WalletVersionBadge
 } from '../../components/account/AccountBadge';
-import { AccountsFolder } from '../../state/global-preferences';
+import { AccountsFolder, useGlobalPreferencesQuery } from '../../state/global-preferences';
 import {
     sortDerivationsByIndex,
     sortWalletsByVersion,
@@ -61,6 +66,10 @@ const Row = styled.div<{ $tabLevel?: number }>`
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    border-top: 1px solid ${p => p.theme.separatorCommon};
+    padding-top: 7px;
+    padding-bottom: 8px;
+    padding-right: 1rem;
     ${p => `padding-left: ${16 + (p.$tabLevel ?? 0) * 28}px !important;`}
     border-bottom: none !important;
 
@@ -82,6 +91,17 @@ const DropDownStyled = styled(SelectDropDown)`
     width: fit-content;
 `;
 
+const DraggingBlock = styled.div<{ $isDragging: boolean }>`
+    ${p =>
+        p.$isDragging &&
+        css`
+            background-color: ${p.theme.backgroundContent};
+            > div {
+                border: none !important;
+            }
+        `}
+`;
+
 const ListItemStyled = styled(ListItem)<{ $isDragging: boolean }>`
     flex-direction: column;
     ${p =>
@@ -89,7 +109,7 @@ const ListItemStyled = styled(ListItem)<{ $isDragging: boolean }>`
         css`
             border-radius: unset !important;
             background-color: ${p.theme.backgroundContent};
-            > div {
+            div {
                 border: none !important;
             }
         `}
@@ -124,6 +144,8 @@ export const DesktopManageAccountsPage = () => {
 
     const handleDrop = useAccountsDNDDrop();
 
+    const { data } = useGlobalPreferencesQuery();
+    console.log(data);
     const items = useSideBarItems();
 
     return (
@@ -135,7 +157,7 @@ export const DesktopManageAccountsPage = () => {
                 </NewFolderButton>
             </DesktopViewHeader>
             <DragDropContext onDragEnd={handleDrop}>
-                <Droppable droppableId="wallets">
+                <Droppable droppableId="settings_wallets" type="all_items">
                     {provided => (
                         <ListBlockDesktopAdaptive
                             {...provided.droppableProps}
@@ -291,7 +313,7 @@ const MultisigItemRow = forwardRef<
 
 const AccountMnemonicRow: FC<{
     account: AccountTonMnemonic;
-    dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const network = useActiveTonNetwork();
@@ -303,9 +325,13 @@ const AccountMnemonicRow: FC<{
     return (
         <>
             <Row $tabLevel={tabLevel}>
-                <Icon {...dragHandleProps}>
-                    <ReorderIcon />
-                </Icon>
+                {dragHandleProps ? (
+                    <Icon {...dragHandleProps}>
+                        <ReorderIcon />
+                    </Icon>
+                ) : (
+                    <DragHandleMock />
+                )}
                 <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 <Label2Styled>{account.name}</Label2Styled>
                 <AccountMenu
@@ -344,7 +370,7 @@ const AccountMnemonicRow: FC<{
 
 const AccountLedgerRow: FC<{
     account: AccountLedger;
-    dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const network = useActiveTonNetwork();
@@ -355,9 +381,13 @@ const AccountLedgerRow: FC<{
     return (
         <>
             <Row $tabLevel={tabLevel}>
-                <Icon {...dragHandleProps}>
-                    <ReorderIcon />
-                </Icon>
+                {dragHandleProps ? (
+                    <Icon {...dragHandleProps}>
+                        <ReorderIcon />
+                    </Icon>
+                ) : (
+                    <DragHandleMock />
+                )}
                 <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 <Label2Styled>{account.name}</Label2Styled>
                 <AccountBadgeStyled accountType={account.type} size="s" />
@@ -395,7 +425,7 @@ const AccountLedgerRow: FC<{
 
 const AccountTonOnlyRow: FC<{
     account: AccountTonOnly;
-    dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const network = useActiveTonNetwork();
@@ -406,9 +436,13 @@ const AccountTonOnlyRow: FC<{
     return (
         <>
             <Row $tabLevel={tabLevel}>
-                <Icon {...dragHandleProps}>
-                    <ReorderIcon />
-                </Icon>
+                {dragHandleProps ? (
+                    <Icon {...dragHandleProps}>
+                        <ReorderIcon />
+                    </Icon>
+                ) : (
+                    <DragHandleMock />
+                )}
                 <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 <Label2Styled>{account.name}</Label2Styled>
                 <AccountBadgeStyled accountType={account.type} size="s" />
@@ -444,16 +478,20 @@ const AccountTonOnlyRow: FC<{
 
 const AccountKeystoneRow: FC<{
     account: AccountKeystone;
-    dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
     const { onRename, onDelete } = useAccountOptions();
     return (
         <Row $tabLevel={tabLevel}>
-            <Icon {...dragHandleProps}>
-                <ReorderIcon />
-            </Icon>
+            {dragHandleProps ? (
+                <Icon {...dragHandleProps}>
+                    <ReorderIcon />
+                </Icon>
+            ) : (
+                <DragHandleMock />
+            )}
             <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
             <Label2Styled>{account.name}</Label2Styled>
             <AccountBadgeStyled accountType={account.type} size="s" />
@@ -472,16 +510,20 @@ const AccountKeystoneRow: FC<{
 
 const AccountWatchOnlyRow: FC<{
     account: AccountTonWatchOnly;
-    dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
     const { onRename, onDelete } = useAccountOptions();
     return (
         <Row $tabLevel={tabLevel}>
-            <Icon {...dragHandleProps}>
-                <ReorderIcon />
-            </Icon>
+            {dragHandleProps ? (
+                <Icon {...dragHandleProps}>
+                    <ReorderIcon />
+                </Icon>
+            ) : (
+                <DragHandleMock />
+            )}
             <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
             <Label2Styled>{account.name}</Label2Styled>
             <AccountBadgeStyled accountType={account.type} size="s" />
@@ -500,7 +542,7 @@ const AccountWatchOnlyRow: FC<{
 
 const AccountMAMRow: FC<{
     account: AccountMAM;
-    dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
@@ -509,9 +551,13 @@ const AccountMAMRow: FC<{
     return (
         <>
             <Row $tabLevel={tabLevel}>
-                <Icon {...dragHandleProps}>
-                    <ReorderIcon />
-                </Icon>
+                {dragHandleProps ? (
+                    <Icon {...dragHandleProps}>
+                        <ReorderIcon />
+                    </Icon>
+                ) : (
+                    <DragHandleMock />
+                )}
                 <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 <Label2Styled>{account.name}</Label2Styled>
                 <AccountBadgeStyled accountType={account.type} size="s" />
@@ -581,7 +627,7 @@ const AccountMultisigRow = () => {
 
 const AccountRow: FC<{
     account: Account;
-    dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, ...rest }) => {
     switch (account.type) {
@@ -604,9 +650,14 @@ const AccountRow: FC<{
     }
 };
 
+const FolderDropableWrapper = styled.div`
+    padding: 0 !important;
+    border: none !important;
+`;
+
 const ItemRow: FC<{
     item: Account | AccountsFolder;
-    dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel?: number;
 }> = ({ item, dragHandleProps, tabLevel = 0 }) => {
     const { t } = useTranslation();
@@ -615,6 +666,10 @@ const ItemRow: FC<{
     const { mutate: deleteFolder } = useDeleteFolder();
 
     if (item.type === 'folder') {
+        if (!item.accounts.length) {
+            return null;
+        }
+
         return (
             <>
                 <Row $tabLevel={tabLevel}>
@@ -638,14 +693,51 @@ const ItemRow: FC<{
                         ]}
                     />
                 </Row>
-                {item.accounts.map(acc => (
-                    <ItemRow
-                        key={acc}
-                        item={accounts.find(a => a.id === acc)!}
-                        dragHandleProps={dragHandleProps}
-                        tabLevel={1}
-                    />
-                ))}
+                {item.accounts.length === 1 ? (
+                    <ItemRow item={accounts.find(a => a.id === item.accounts[0])!} tabLevel={1} />
+                ) : (
+                    <Droppable droppableId={'folder_' + item.id} type="folder">
+                        {provided => (
+                            <FolderDropableWrapper
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                            >
+                                {item.accounts.map((acc, index) => (
+                                    <Draggable key={acc} draggableId={acc} index={index}>
+                                        {(p, snapshot) => {
+                                            const transform = p.draggableProps.style?.transform;
+                                            if (transform) {
+                                                try {
+                                                    const tr = transform.split(',')[1];
+                                                    p.draggableProps.style!.transform =
+                                                        'translate(0px,' + tr;
+                                                } catch (_) {
+                                                    //
+                                                }
+                                            }
+
+                                            return (
+                                                <DraggingBlock
+                                                    $isDragging={snapshot.isDragging}
+                                                    ref={p.innerRef}
+                                                    {...p.draggableProps}
+                                                >
+                                                    <ItemRow
+                                                        key={acc}
+                                                        item={accounts.find(a => a.id === acc)!}
+                                                        dragHandleProps={p.dragHandleProps}
+                                                        tabLevel={tabLevel + 1}
+                                                    />
+                                                </DraggingBlock>
+                                            );
+                                        }}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                            </FolderDropableWrapper>
+                        )}
+                    </Droppable>
+                )}
             </>
         );
     }

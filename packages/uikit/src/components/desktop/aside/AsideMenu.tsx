@@ -3,7 +3,7 @@ import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { FC, forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
 import { useTranslation } from '../../../hooks/translation';
@@ -13,9 +13,9 @@ import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
 import {
     useAccountsDNDDrop,
-    useAccountsState,
     useActiveAccount,
-    useMutateActiveTonWallet
+    useMutateActiveTonWallet,
+    useSideBarItems
 } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
@@ -34,6 +34,8 @@ import {
     ResponderProvided
 } from 'react-beautiful-dnd';
 import { AsideMenuAccount } from './AsideMenuAccount';
+import { AccountsFolder } from '../../../state/global-preferences';
+import { AsideMenuFolder } from './AsideMenuFolder';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -98,10 +100,35 @@ const AsideMenuBottom = styled.div`
     padding-bottom: 0.5rem;
 `;
 
+const DraggingBlock = styled.div<{ $isDragging: boolean }>`
+    cursor: pointer !important;
+    border-radius: ${p => p.theme.corner2xSmall};
+    transition: background-color 0.15s ease-in-out;
+    ${p =>
+        p.$isDragging &&
+        css`
+            pointer-events: auto !important;
+            cursor: grabbing !important;
+            background-color: ${p.theme.backgroundContentTint};
+
+            * {
+                pointer-events: none;
+            }
+
+            div {
+                background-color: ${p.theme.backgroundContentTint};
+            }
+        `}
+`;
+
 export const AsideMenuDNDItem = forwardRef<
     HTMLDivElement,
-    { account: Account; isSelected: boolean } & DraggableProvidedDraggableProps
->(({ account, isSelected, ...rest }, fRef) => {
+    {
+        item: Account | AccountsFolder;
+        isSelected: boolean;
+        isDragging: boolean;
+    } & DraggableProvidedDraggableProps
+>(({ item, isSelected, isDragging, ...rest }, fRef) => {
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
     const navigate = useNavigate();
     const location = useLocation();
@@ -120,38 +147,42 @@ export const AsideMenuDNDItem = forwardRef<
         [setActiveWallet, handleNavigateHome]
     );
 
-    if (!account) {
+    if (!item) {
         return null;
     }
 
     return (
-        <div ref={fRef} {...rest}>
-            <AsideMenuAccount
-                account={account}
-                isSelected={isSelected}
-                onClickWallet={onClickWallet}
-            />
-        </div>
+        <DraggingBlock ref={fRef} $isDragging={isDragging} {...rest}>
+            {item.type === 'folder' ? (
+                <AsideMenuFolder folder={item} onClickWallet={onClickWallet} />
+            ) : (
+                <AsideMenuAccount
+                    account={item}
+                    isSelected={isSelected}
+                    onClickWallet={onClickWallet}
+                />
+            )}
+        </DraggingBlock>
     );
 });
 
 const AccountDNDBlock: FC<{
-    accounts: Account[];
+    items: (Account | AccountsFolder)[];
     activeAccount: Account;
     activeRoute: string | undefined;
-}> = ({ activeRoute, activeAccount, accounts }) => {
-    const [accs, setAccs] = useState(accounts);
+}> = ({ activeRoute, activeAccount, items }) => {
+    const [itemsOptimistic, setItemsOptimistic] = useState(items);
 
     useEffect(() => {
-        setAccs(accounts);
-    }, [accounts]);
+        setItemsOptimistic(items);
+    }, [items]);
 
     const _handleDrop = useAccountsDNDDrop();
     const handleDrop = useCallback(
         (droppedItem: DropResult, provided: ResponderProvided) => {
             const result = _handleDrop(droppedItem, provided);
             if (result) {
-                setAccs(result);
+                setItemsOptimistic(result);
             }
         },
         [_handleDrop]
@@ -162,9 +193,9 @@ const AccountDNDBlock: FC<{
             <Droppable direction="vertical" droppableId="droppable-1">
                 {provided => (
                     <div {...provided.droppableProps} ref={provided.innerRef}>
-                        {accs.map((account, index) => (
+                        {itemsOptimistic.map((account, index) => (
                             <Draggable key={account.id} draggableId={account.id} index={index}>
-                                {p => {
+                                {(p, snapshot) => {
                                     const transform = p.draggableProps.style?.transform;
                                     if (transform) {
                                         try {
@@ -178,10 +209,11 @@ const AccountDNDBlock: FC<{
                                     return (
                                         <AsideMenuDNDItem
                                             ref={p.innerRef}
-                                            account={account}
+                                            item={account}
                                             isSelected={
                                                 !activeRoute && activeAccount.id === account.id
                                             }
+                                            isDragging={snapshot.isDragging}
                                             {...p.draggableProps}
                                             {...p.dragHandleProps}
                                         />
@@ -201,7 +233,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const { onOpen: addWallet } = useAddWalletNotification();
     const { proFeatures } = useAppContext();
-    const accounts = useAccountsState();
+    const items = useSideBarItems();
     const activeAccount = useActiveAccount();
     const navigate = useNavigate();
     const location = useLocation();
@@ -275,7 +307,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         </AsideMenuItem>
                     )}
                     <AccountDNDBlock
-                        accounts={accounts}
+                        items={items}
                         activeAccount={activeAccount}
                         activeRoute={activeRoute}
                     />

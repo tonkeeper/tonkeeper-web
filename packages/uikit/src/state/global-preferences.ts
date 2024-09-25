@@ -10,7 +10,7 @@ export type AccountsFolder = {
     type: 'folder';
     accounts: AccountId[];
     name: string;
-    lastIsOpen: boolean;
+    lastIsOpened: boolean;
 };
 
 export interface GlobalPreferences {

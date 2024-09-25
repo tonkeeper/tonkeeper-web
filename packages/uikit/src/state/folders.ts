@@ -38,7 +38,7 @@ export const useUpdateFolder = () => {
                     type: 'folder',
                     accounts,
                     name,
-                    lastIsOpen: true
+                    lastIsOpened: true
                 });
             }
 

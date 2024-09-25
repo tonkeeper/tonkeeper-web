@@ -327,35 +327,64 @@ export const useAccountsStateQuery = () => {
 
 export const useSideBarItems = () => {
     const accounts = useAccountsState();
-    const { sideBarOrder, folders } = useGlobalPreferences();
+    const preferences = useGlobalPreferences();
 
-    return useMemo(() => {
-        const accountsNotInFolder = accounts.filter(
-            a => !folders.some(f => f.accounts.includes(a.id))
-        );
-        return applySideBarSorting(
-            (accountsNotInFolder as (Account | AccountsFolder)[]).concat(folders),
-            sideBarOrder
-        );
-    }, [accounts, folders, sideBarOrder]);
+    const { folders, sideBarOrder } = preferences;
+    const accountsNotInFolder = accounts.filter(a => !folders.some(f => f.accounts.includes(a.id)));
+    return applySideBarSorting(
+        (accountsNotInFolder as (Account | AccountsFolder)[]).concat(folders),
+        sideBarOrder
+    );
 };
 
 export const useAccountsDNDDrop = () => {
     const { mutate } = useMutateGlobalPreferences();
     const items = useSideBarItems();
+    const { folders } = useGlobalPreferences();
 
-    return useCallback<(result: DropResult, provided: ResponderProvided) => string[]>(
+    return useCallback<
+        (result: DropResult, provided: ResponderProvided) => (Account | AccountsFolder)[]
+    >(
         droppedItem => {
-            const updatedList = [...items].map(i => i.id);
+            const updatedList = [...items];
             if (!droppedItem.destination) {
                 return updatedList;
             }
+
+            const insideFolderId = droppedItem.source.droppableId.startsWith('folder_')
+                ? droppedItem.source.droppableId.split('folder_')[1]
+                : null;
+            if (insideFolderId) {
+                if (droppedItem.destination.droppableId !== droppedItem.source.droppableId) {
+                    throw new Error('Cannot move item from one folder to another');
+                }
+                const folder = folders.find(i => i.id === insideFolderId) as AccountsFolder;
+                if (!folder) {
+                    throw new Error(`Folder ${insideFolderId} not found`);
+                }
+                const newAccounts = folder.accounts.slice();
+
+                const [reorderedItem] = newAccounts.splice(droppedItem.source.index, 1);
+                newAccounts.splice(droppedItem.destination.index, 0, reorderedItem);
+
+                const folderIndex = folders.findIndex(i => i.id === insideFolderId);
+                const newFolders = folders.slice();
+                newFolders[folderIndex] = { ...folder, accounts: newAccounts };
+                mutate({ folders: newFolders });
+
+                updatedList[updatedList.findIndex(i => i.id === insideFolderId)] = {
+                    ...folder,
+                    accounts: newAccounts
+                };
+                return updatedList;
+            }
+
             const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
             updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
-            mutate({ sideBarOrder: updatedList });
+            mutate({ sideBarOrder: updatedList.map(i => i.id) });
             return updatedList;
         },
-        [items, mutate]
+        [items, mutate, folders]
     );
 };
 

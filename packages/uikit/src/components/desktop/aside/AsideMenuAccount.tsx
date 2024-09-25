@@ -44,7 +44,7 @@ const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: 
 `;
 
 const AsideMenuSubItemContainer = styled.div`
-    padding-left: 36px;
+    padding-left: 16px;
 `;
 
 const AccountBadgeStyled = styled(AccountBadge)`
