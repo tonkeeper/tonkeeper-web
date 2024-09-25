@@ -1,0 +1,1511 @@
+{
+  "about_risk_modal": {
+    "description": "القيمة الإجمالية للرموز التي سيتم إرسالها من محفظتك. المبالغ المستردة غير مشمولة في القيمة الإجمالية.",
+    "description_with_nft": "القيمة الإجمالية للرموز، بإستثناء تكلفة NFTs، التي سيتم إرسالها من محفظتك. لا يتم تضمين المبالغ المستردة في القيمة الإجمالية.",
+    "ok_button": "موافق"
+  },
+  "about_ton": "إن TON هو بلوكتشين طبقة أولى(L1) بالكامل ومصمم من قبل تيليجرام لاستيعاب مليارات المستخدمين. يتميز بمعاملات فائقة السرعة، ورسوم منخفضة، وتطبيقات سهلة الاستخدام، وهو صديق للبيئة.",
+  "access_confirmation_logout": "تسجيل الخروج",
+  "access_confirmation_reset": "إعادة ضبط",
+  "access_confirmation_title": "أدخل رمز المرور",
+  "access_confirmation_update_biometry": "أدخل رمز المرور لاستخدام بيانات المصادقة البيومترية",
+  "access_denied": "الوصول مرفوض",
+  "account_deleted": "تم حذف الحساب",
+  "activityActionModal": {
+    "bid": "مزايدة",
+    "burned": "تم حرقه",
+    "call_contract": "استدعاء العقد",
+    "deposit": "إيداع",
+    "purchase": "شراء",
+    "received": "تم الاستلام",
+    "sent": "مُرسل",
+    "swapped": "تم التبديل",
+    "time_on": "في {time}",
+    "withdraw": "سحب",
+    "withdrawal_request": "طلب سحب"
+  },
+  "activity": {
+    "buy_toncoin_btn": "شراء تونكوين (Toncoin)",
+    "empty_transaction_caption": "قم بإجراء معاملتك الأولى!",
+    "empty_transaction_title": "سوف يتم عرض سجلك هنا",
+    "failed_transaction": "فشل",
+    "receive_btn": "استلام",
+    "received": "تم الاستلام",
+    "screen_title": "السجل",
+    "sent": "مُرسل"
+  },
+  "add_edit_favorite": {
+    "address_label": "عنوان",
+    "add_title": "مفضل جديد",
+    "delete": "حذف",
+    "edit_title": "تعديل المفضل",
+    "name_placeholder": "الاسم",
+    "save": "حفظ"
+  },
+  "add_other_coins": "إضافة عملات مشفرة أخرى",
+  "address_copied": "تم نسخ العنوان",
+  "address_update": {
+    "first_option": "على الأرجح أن المحفظة الوجهة مستخدمة بالفعل بشكل نشط ولن تلاحظ أي فرق.",
+    "learn_more": "تعلم المزيد",
+    "new_style": "محفظة جديدة",
+    "notification_desc_did_change": "تم تحديث عنوان محفظتك إلى تنسيق UQ. ويستمر العنوان القديم في العمل أيضًا.",
+    "notification_desc_will_change": "في 5 من أكتوبر، سيتم تحديث عنوان محفظتك إلى تنسيق UQ وهو أفضل. وسيعمل العنوان القديم أيضًا. لست بحاجة إلى القيام بأي شيء.",
+    "old_style": "عنوان قديم",
+    "post_dates": "5 أكتوبر 2023: تتحول جميع العناوين إلى تنسيق UQ في تونكيبر.\n\n1 يناير 2024: يتوقف تونكيبر عن التحقق من حالة العقد ويستخدم علامة \"قابل للارتداد\" في العنوان. ستعود العملات المرسلة إلى عقود غير منشورة بعنوان EQ إلى المرسل.",
+    "post_published_date": "نُشر بتاريخ: 27 سبتمبر 2023",
+    "post_rest": "توجد نوعان من أنماط العناوين على سلسلة كتل TON، ولغاية الآن تم استخدام أحدهما فقط للتطبيقات والمحافظ.\n\nتنسيق EQ هو الأفضل للعقود الذكية التي تعالج الأموال الواردة. إذا لم يتم نشر العقد الذكي بعد — أي أن الشيفرة ليست على سلسلة الكتل — فإن العملات المرسلة إلى هذا العنوان ستعود إلى المرسل. وهذه ميزة أمان: إذا كان هناك أي خطأ، فإن العملات ستعود.\n\nتنسيق UQ هو الأفضل للمحافظ. العملات لا تعود أبداً لأن المحافظ مصممة ببساطة لتخزين الأموال. تبدأ كل محفظة كعنوان عادي بدون شيفرة على سلسلة الكتل. لذا، لا معنى لأن تعود العملات.\n\nهذا العام، نحن بصدد تحويل المحافظ إلى تنسيق UQ الأكثر ملاءمة. وإذا واصلت إرسال الأموال إلى عنوان EQ القديم الذي أعطاه لك شخص ما، فستكون هناك خياران:\n",
+    "post_top": "بنهاية هذا العام، ستعرض شبكة TON بأكملها عناوين المحافظ بشكل مختلف. ستبدأ العناوين الجديدة بـ UQ بدلاً من EQ. كما ستتغير الأحرف الأربعة الأخيرة أيضاً. سيظل العنوان القديم يعمل ويوجه إلى نفس المحفظة. لا يؤثر هذا التغيير على أمان الأموال المخزنة في محفظتك بأي شكل من الأشكال.",
+    "second_option": "من غير المرجح أن يتم استخدام المحفظة مطلقًا للدفع. ولن ترسل تونكيبر عملات معدنية إلى هذا العنوان في العام المقبل. سيتعين عليك أن تطلب من المستلم عنوان UQ جديد.",
+    "title": "تحديث العنوان",
+    "why_change": "لماذا التغيير؟",
+    "your_wallet": "محفظتك"
+  },
+  "add_wallet": "إضافة المحفظة",
+  "add_wallet_modal": {
+    "create": {
+      "subtitle": "إنشاء محفظة جديدة",
+      "title": "محفظة جديدة"
+    },
+    "import": {
+      "subtitle": "استيراد المحفظة باستخدام 24 كلمة استرداد سرية",
+      "title": "محفظة موجودة"
+    },
+    "import_subtitle": "اختر من الخيارات أدناه.",
+    "import_title": "استيراد المحفظة",
+    "ledger": {
+      "subtitle": "وحدة الأجهزة، البلوتوث، ميزات TON المحدودة",
+      "title": "اقترن بجهاز المحفظة (Ledger)"
+    },
+    "other_options": "خيارات أخرى",
+    "signer": {
+      "subtitle": "غير متصل بالإنترنت، معزول عن الشبكة، مع جميع ميزات TON",
+      "title": "الاقتران مع الموقِّع (Signer)"
+    },
+    "subtitle": "إنشاء محفظة جديدة أو إضافة محفظة موجودة.",
+    "testnet": {
+      "subtitle": "استيراد المحفظة باستخدام 24 كلمة استرداد سرية إلى الشبكة التجريبية (Testnet).",
+      "title": "حساب الشبكة التجريبية"
+    },
+    "title": "إضافة محفظة",
+    "watch_only": {
+      "subtitle": "لمراقبة نشاط المحفظة دون عبارة استرداد",
+      "title": "مراقبة الحساب"
+    }
+  },
+  "add_watch_only": {
+    "subtitle": "راقب نشاط المحفظة دون عبارة استرداد. سيتم إعلامك بأي معاملات من هذه المحفظة.",
+    "title": "مراقبة الحساب",
+    "wallet_not_found": "لم يتم العثور على عنوان المحفظة"
+  },
+  "all_regions": "كل المناطق",
+  "appearance_accent_name": {
+    "andromeda": "أندروميدا",
+    "arctic": "القطب الشمالي",
+    "azure": "أزرق سماوي",
+    "coral": "الشعاب المرجانية",
+    "cosmos": "الكون",
+    "default": "تونكيبر",
+    "flamingo": "فلامينغو",
+    "fluid": "سائل",
+    "galaxy": "المجرة",
+    "iris": "إيريس",
+    "marine": "بحري",
+    "ocean": "المحيط",
+    "sky": "السماء"
+  },
+  "appearance_confirm": "تعيين",
+  "appearance_description": "يمكن ل TON Diamonds NFT أن تجعل محفظتك أكثر تنوعًا وفرادة.",
+  "appearance_title": "سمة",
+  "app_name": "تونكيبر",
+  "approval": {
+    "accept": "موافقة",
+    "accepted": "مرئي",
+    "accepted_at_collection": "تمت الموافقة في {date}",
+    "accepted_at_token": "تمت الموافقة في {date}",
+    "accepted_collection": "المجموعة تمت الموافقة عليها",
+    "accepted_token": "رمز تمت الموافقة عليه",
+    "approve_all": "موافقة على الكل",
+    "approve_collection_many": "الموافقة على الرموز الواردة من مجموعة \"{collection}\"",
+    "approve_collection_one": "الموافقة على الرمز الوارد من مجموعة \"{collection}\"",
+    "approve_many": "الموافقة على {count} رموز واردة",
+    "approve_token": "الموافقة على الرمز الوارد \"{name}\"",
+    "approve_two_collections": "الموافقة على الرموز الواردة من مجموعات \"{collection1}\" \"{collection2}\"",
+    "approve_two_tokens": "الموافقة على الرموز الواردة \"{name1}\" و\"{name2}\"",
+    "blacklisted_collection": "مجموعة مُدرَجة في القائمة السوداء",
+    "blacklisted_token": "رمز مُدرَج في القائمة السوداء",
+    "decline": "رفض",
+    "declined": "مخفي",
+    "declined_at_collection": "تم الرفض في {date}",
+    "declined_at_token": "تم الرفض في {date}",
+    "details_collection": "تفاصيل المجموعة",
+    "details_token": "تفاصيل الرمز",
+    "id_collection": "معرّف المجموعة",
+    "id_token": "معرّف الرمز",
+    "manage_tokens": "إدارة الرموز",
+    "move_to_accepted": "نقل إلى الموافق عليها",
+    "move_to_accepted_collection": "عرض المجموعة في المحفظة",
+    "move_to_accepted_token": "عرض الرمز في المحفظة",
+    "move_to_declined": "نقل إلى المرفوضة",
+    "move_to_declined_collection": "إخفاء المجموعة من المحفظة",
+    "move_to_declined_token": "إخفاء الرمز من المحفظة",
+    "name": "اسم",
+    "not_spam": "ليست معاملة غير مرغوب فيها",
+    "pending": "قيد الانتظار",
+    "show_all": "عرض الكل",
+    "single_token": "رمز واحد",
+    "spam": "معاملة غير مرغوب فيها",
+    "token_copied": "تم نسخ معرّف الرمز",
+    "token_count": {
+      "one": "{count} رمز",
+      "other": "{count} رموز"
+    },
+    "unverified_token": "رمز لم يتم التحقق منه",
+    "verify_collection": "التحقق من المجموعة",
+    "verify_description_collection": "هذه الرموز من إصدار جهة غير معروفة. لاكتشاف العملات المزيفة، تحقق من معرّف المجموعة باستخدام المصدر الرسمي للجهة المصدرة. يمكنك تغيير إمكانية رؤية الرمز لاحقًا في الإعدادات.",
+    "verify_description_token": "هذا الرمز من إصدار جهة غير معروفة. لاكتشاف التزوير، تحقق من معرّف الرمز من خلال المصدر الرسمي للجهة المصدرة. يمكنك تغيير إمكانية رؤية الرمز لاحقًا في الإعدادات.",
+    "verify_token": "التحقق من الرمز",
+    "whitelisted_collection": "مجموعة مدرجة في القائمة البيضاء",
+    "whitelisted_token": "رمز مدرج في القائمة البيضاء"
+  },
+  "auth_failed": "فشل المصادقة",
+  "backup_check": {
+    "caption": "لنرَ إذا كنت قد أدخلت كل شيء بشكل صحيح. أدخل الكلمات {one} و{two} و{three}.",
+    "done_button": "اكتملت",
+    "title": "التحقق من النسخ الاحتياطي"
+  },
+  "backup_screen": {
+    "backup_warning": "رصيدك هو {totalFiat}، وهو محمي فقط بعبارة استرداد لم تقم بكتابتها بعد. قم بعمل نسخة احتياطية من العبارة لتجنب فقدان الأموال في حال حدوث مشاكل في الجهاز.",
+    "last_backup_time": "آخر نسخ احتياطي {time}",
+    "manual_backup_on": "تشغيل النسخ الاحتياطي اليدوي",
+    "manual_button": "النسخ الاحتياطي يدويًا",
+    "manual_caption": "قم بعمل نسخة احتياطية لمحفظتك يدويًا عن طريق كتابة عبارة الاسترداد.",
+    "manual_title": "يدوي",
+    "show_recovery_phrase": "عرض عبارة الاسترداد",
+    "title": "نسخ احتياطي"
+  },
+  "backup_warning": {
+    "cancel_button": "إلغاء",
+    "caption": "يرجى قراءة ما يلي بعناية قبل عرض عبارة الاسترداد الخاصة بك.",
+    "continue_button": "استمر",
+    "p1": "لا تدخل عبارة الاسترداد الخاصة بك في أي مكان آخر غير تونكيبر للوصول إلى محفظتك.",
+    "p2": "دعم تونكيبر لا يطلب أبدًا عبارة الاسترداد.",
+    "p3": "أي شخص لديه عبارة الاسترداد الخاصة بك يمكنه الوصول إلى محفظتك.",
+    "title": "تنبيه"
+  },
+  "balances_setup_wallet": "إعداد المحفظة",
+  "battery": {
+    "description": {
+      "empty": "قم بالتبديل وإرسال الرموز والرموز و NFTs",
+      "less_10": "لديك شحن كافٍ للبطارية لأقل من 10 معاملات.",
+      "other": "لديك شحن كافٍ للبطارية لأكثر من %{cnt} معاملات.",
+      "other.few": "تحتوي بطاريتك على {count} شحنة",
+      "other.many": "تحتوي بطاريتك على {count} شحنة",
+      "other.one": "بطاريتك بها {count} شحنة",
+      "other.other": "تحتوي بطاريتك على {count} شحنة"
+    },
+    "max_input_amount": "أقصى مبلغ للإدخال هو {amount}",
+    "ok": "موافق",
+    "other_ways": {
+      "by_crypto": {
+        "subtitle": "باستخدام {methods}",
+        "title": "إعادة الشحن بـ {symbol}"
+      },
+      "gift": {
+        "subtitle": "شارك مع الأصدقاء",
+        "title": "هدية البطارية"
+      },
+      "promo": {
+        "subtitle": "أنت محظوظ",
+        "title": "أدخل رمز ترويجي"
+      }
+    },
+    "packages": {
+      "buy": "شراء",
+      "disclaimer": "شحنة واحدة تغطي متوسط رسوم المعاملات. قد تكلف بعض المعاملات أكثر.",
+      "ok": "موافق",
+      "refilled": "بطاريتك مشحونة",
+      "refund": "سجل الشحن",
+      "restore": "استعادة المشتريات",
+      "subtitle": {
+        "few": "{count} شحنات",
+        "many": "{count} شحنات",
+        "one": "{count} شحنة",
+        "other": "{count} شحنات"
+      },
+      "title": {
+        "large": "كبير",
+        "medium": "متوسط",
+        "small": "صغير"
+      }
+    },
+    "please_wait": "ستُشحن البطارية في بضع دقائق",
+    "promocode": {
+      "apply": "تطبيق",
+      "button": "إعادة الشحن باستخدام رمز الترويج",
+      "placeholder": "الرمز",
+      "success": "تم شحن بطاريتك",
+      "title": "رمز ترويجي"
+    },
+    "recharge_by_crypto": {
+      "continue": "استمر",
+      "other": {
+        "subtitle": "أدخل المبلغ يدويًا",
+        "title": "آخر"
+      },
+      "title": "إعادة شحن",
+      "title_gift": "هدية",
+      "tokens": "رموز"
+    },
+    "refilled": "تم إعادة شحن البطارية",
+    "refund": {
+      "subtitle": "إعادة الشحن واسترداد الأموال",
+      "title": "سجل الشحن"
+    },
+    "screen_title": "البطارية",
+    "send_widget": {
+      "battery": "البطارية"
+    },
+    "settings": "البطارية",
+    "title": "بطارية تونكيبر",
+    "transactions": {
+      "charges_per_action": {
+        "few": "≈ {count} شحنات لكل {transactionName}",
+        "many": "≈ {count} شحنات لكل {transactionName}",
+        "one": "≈ {count} شحنة لكل {transactionName}",
+        "other": "≈ {count} شحنات لكل {transactionName}"
+      },
+      "description": "سيتم دفع المعاملات المحددة بواسطة بطارية تونكيبر.",
+      "settings": "إعدادات البطارية",
+      "supported": "المعاملات المدعومة",
+      "title": "المعاملات",
+      "types": {
+        "jetton": "تحويلات الرموز (Jettons)",
+        "nft": "تحويلات الرموز غير القابلة للاستبدال(NFTs)",
+        "swap": "المبادلات",
+        "ton": "تحويلات TON"
+      },
+      "type": {
+        "swap": "مبادلة",
+        "transfer": "تحويل"
+      },
+      "will_be_paid": "سيتم دفع: {enabledTransactions}"
+    }
+  },
+  "biometry": {
+    "android": {
+      "face_recognition": "التعرف على الوجه",
+      "face_recognition_genitive": "التعرف على الوجه",
+      "face_recognition_instrumental": "التعرف على الوجه",
+      "fingerprint": "بصمة الإصبع",
+      "fingerprint_genitive": "بصمة الإصبع",
+      "fingerprint_instrumental": "بصمة الإصبع"
+    },
+    "default": "التعرف البيومتري",
+    "default_accusative": "التعرف البيومتري",
+    "default_genitive": "التعرف البيومتري",
+    "default_instrumental": "التعرف البيومتري",
+    "ios": {
+      "face_recognition": "معرّف الوجه",
+      "face_recognition_genitive": "معرّف الوجه",
+      "face_recognition_instrumental": "معرّف الوجه",
+      "fingerprint": "معرّف اللمس",
+      "fingerprint_genitive": "معرّف اللمس",
+      "fingerprint_instrumental": "معرّف اللمس"
+    }
+  },
+  "bluetooth": {
+    "permissions_alert": {
+      "cancel": "إلغاء",
+      "message": "يرجى تمكين أذونات البلوتوث في إعداداتك لاستخدام هذه الميزة.",
+      "open_settings": "فتح الإعدادات",
+      "title": "أذونات البلوتوث"
+    },
+    "powered_off_alert": {
+      "cancel": "إلغاء",
+      "message": "يرجى تشغيل البلوتوث لاستخدام هذه الميزة.",
+      "open_settings": "فتح الإعدادات",
+      "title": "البلوتوث مغلق"
+    }
+  },
+  "browser": {
+    "about_dapps_caption": "استكشف التطبيقات والخدمات التي يمكنك استخدام تونكيبر فيها لتسجيل الدخول والدفع.",
+    "about_dapps_learn_more": "تعلم المزيد",
+    "about_dapps_title": "استخدم تونكيبر مع جميع تطبيقات وخدمات TON",
+    "actions": {
+      "copy_link": "نسخ الرابط",
+      "disconnect": "قطع الاتصال",
+      "mute": "كتم",
+      "refresh": "تحديث الصفحة",
+      "share": "مشاركة"
+    },
+    "apps_all": "الكل",
+    "connected": "متصل",
+    "connected_empty_text": "استكشف التطبيقات والخدمات في متصفح تونكيبر.",
+    "connected_empty_title": "التطبيقات المتصلة ستُعرض هنا",
+    "connected_title": "متصل",
+    "empty_search": "لم تُسفر عملية البحث عن أي نتائج",
+    "explore": "إستكشاف",
+    "explore_all": "إستكشاف الكل",
+    "more_description": "الأسواق، التبادلات، والمزيد",
+    "more_title": "إستكشاف كل الخدمات",
+    "open_link": "فتح الرابط",
+    "popular_title": "شائع",
+    "remove_alert": {
+      "approve_button": "إزالة",
+      "title": "إزالة “{name}”？"
+    },
+    "search_label": "ابحث أو أدخل العنوان",
+    "start_typing": "أدخل عنوانًا أو ابحث على الويب",
+    "title": "متصفح",
+    "web_search_title": "بحث باستخدام {searchEngine}"
+  },
+  "buy_ton": {
+    "subtitle": "فورًا باستخدام بطاقة بنكية",
+    "title": "شراء TON"
+  },
+  "cancel": "إلغاء",
+  "chart": {
+    "check_connection": "يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+    "no_internet": "لا يوجد اتصال بالإنترنت",
+    "periods": {
+      "1D": "يوم",
+      "1H": "ساعة",
+      "1M": "شهر",
+      "1Y": "سنة",
+      "6M": "6 أشهر",
+      "7D": "7 أيام"
+    },
+    "price": "السعر"
+  },
+  "check_words_caption": "للتحقق مما إذا كنت قد كتبت عبارة الاسترداد بشكل صحيح، يرجى إدخال الكلمات %{wordNum1} و%{wordNum2} و%{wordNum3}.",
+  "check_words_success": "تهانينا! لقد قمت بإعداد محفظتك",
+  "check_words_title": "إذن، دعنا نتحقق",
+  "choose_country": {
+    "auto": "تلقائي",
+    "cancel": "إلغاء",
+    "empty_placeholder": "لم تُسفر عملية البحث عن أي نتائج",
+    "search": "بحث",
+    "title": "اختر بلدك"
+  },
+  "choose_currency": {
+    "currencies": {
+      "AED": "الدرهم الإماراتي",
+      "BDT": "التاكا البنغلاديشي",
+      "BRL": "الريال البرازيلي",
+      "BYN": "الروبل البيلاروسي",
+      "CAD": "الدولار الكندي",
+      "CHF": "الفرنك السويسري",
+      "CNY": "اليوان الصيني",
+      "EUR": "اليورو",
+      "GBP": "الجنيه الإسترليني",
+      "GEL": "اللاري الجورجي",
+      "IDR": "الروبية الإندونيسية",
+      "ILS": "الشيكل الإسرائيلي",
+      "INR": "الروبية الهندية",
+      "IRR": "الريال الإيراني",
+      "JPY": "الين الياباني",
+      "KRW": "الوون الكوري الجنوبي",
+      "KZT": "التنغ الكازاخستاني",
+      "NGN": "النيرة النيجيرية",
+      "RUB": "الروبل الروسي",
+      "THB": "البات التايلاندي",
+      "TON": "تونكوين",
+      "TRY": "الليرا التركية",
+      "UAH": "الهريفنا الأوكرانية",
+      "USD": "الدولار الأمريكي",
+      "UZS": "السوم الأوزبكي",
+      "VND": "الدونغ الفيتنامي"
+    },
+    "header_title": "العملة الرئيسية"
+  },
+  "choose_wallets": {
+    "already_added": "تمت الإضافة بالفعل",
+    "subtitle": "اختر المحافظ التي تريد إضافتها.",
+    "title": "اختر المحافظ",
+    "tokens": "الرموز",
+    "w5_subtitle": "رسوم بلوكشين أقل، معاملات بدون رسوم غاز، وتحويلات متعددة.",
+    "w5_subtitle_link": "إقرأ المزيد"
+  },
+  "confirm": "تأكيد",
+  "confirm_renew_all_domains_title": "تأكيد الإجراء",
+  "confirm_sending_amount": "المبلغ",
+  "confirm_sending_fee": "الرسوم",
+  "confirm_sending_inactive_warn_about": "ما الذي يجب عليك القيام به",
+  "confirm_sending_inactive_warn_description": "لا تتقدم إذا كنت تتوقع حدوث معجزة على البلوكشين. لأن هذا لم يحدث.",
+  "confirm_sending_inactive_warn_title": "عقد غير نشط",
+  "confirm_sending_liquid_warn_description": "لن تتلقى بعد الآن مكافآت من TON المودع الذي أرسلته. سيبدأ المالك الجديد في تلقي المكافآت.",
+  "confirm_sending_liquid_warn_title": "ملاحظة",
+  "confirm_sending_message": "تعليق",
+  "confirm_sending_method_title": "أرسل أموالك إلى {name}؟",
+  "confirm_sending_recipient": "المستلم",
+  "confirm_sending_recipient_address": "عنوان المستلم",
+  "confirm_sending_sent_caption_btc": "تم إرسال معاملتك إلى الشبكة وسُتعالج خلال ساعة.",
+  "confirm_sending_sent_caption_ton": "تم إرسال معاملتك إلى الشبكة وسُتعالج خلال بضع ثوانٍ.",
+  "confirm_sending_submit": "تأكيد وإرسال",
+  "confirm_sending_title": "تأكيد الإرسال",
+  "confirmSendModal": {
+    "network_fee": "رسوم الشبكة",
+    "refund": "إسترداد",
+    "title": "تأكيد الإجراء",
+    "title_multiwallets": "الإجراء الخاص بـ %{walletName}",
+    "total_risk": "المجموع: {totalAmount}",
+    "to_your_address": "إلى عنوانك",
+    "transaction_type": {
+      "burn": "حرق",
+      "receive": "استلام",
+      "send": "إرسال"
+    },
+    "wallet": "المحفظة:",
+    "will_be_paid_with_battery": "سيتم الدفع باستخدام البطارية"
+  },
+  "continue": "استمر",
+  "copied": "تم النسخ",
+  "copy_error_log": "نسخ سجل الأخطاء",
+  "create_pin_current_title": "أدخل رمز المرور الحالي",
+  "create_pin_new_title": "إنشاء رمز مرور جديد",
+  "create_pin_repeat_title": "إعادة إدخال رمز المرور",
+  "create_wallet_caption": "نوصيك بشدة بتدوين عبارة الاسترداد لأنها الطريقة الوحيدة للوصول إلى محفظتك واستردادها في حالة فقدان جهازك. لا ترسلها إلى نفسك عبر البريد الإلكتروني أو تلتقط لقطة شاشة. يكون الأمر أكثر أمانًا عند إبقائها غير متصلة بالإنترنت.",
+  "create_wallet_continue_button": "استمر",
+  "create_wallet_generated": "لقد تم إنشاء محفظتك للتو!",
+  "create_wallet_generating": "جاري إنشاء المحفظة...",
+  "create_wallet_title": "خذ قلمًا وقطعة من الورق",
+  "customize": "تخصيص",
+  "customize_modal": {
+    "save": "حفظ",
+    "subtitle": "يتم تخزين اسم المحفظة ورمزها محليًا على جهازك.",
+    "title": "قم بتخصيص محفظتك",
+    "wallet_name": "اسم المحفظة"
+  },
+  "decryption_error": "خطأ في فك التشفير",
+  "deploy_contract_button": "تأكيد ونشر",
+  "deploy_contract_title": "نشر العقد",
+  "disable_nft_marketplace_banner_description": "جمع وتبادل.",
+  "dns_addresses": {
+    "few": "{count} عنوان",
+    "many": "{count} عنوان",
+    "one": "{count} عنوان",
+    "other": "{count} عنوان"
+  },
+  "dns_address_linked": "العنوان مرتبط",
+  "dns_address_unlinked": "العنوان غير مرتبط",
+  "dns_alert_expiring_many": {
+    "few": "لديك {count} نطاقات على وشك الانتهاء. قم بتجديد الكل حتى {untilDate}.",
+    "many": "لديك {count} نطاقات على وشك الانتهاء. قم بتجديد الكل حتى {untilDate}.",
+    "one": "لديك {count} نطاق على وشك الانتهاء. قم بتجديد الكل حتى {untilDate}.",
+    "other": "لديك {count} نطاقات على وشك الانتهاء. قم بتجديد الكل حتى {untilDate}."
+  },
+  "dns_alert_expiring_one": "ينتهي {domain} خلال {count} أيام. قم بتجديده حتى {untilDate}.",
+  "dns_current_address": "عنوانك الحالي",
+  "dns_expiration_date": "تاريخ إنتهاء الصلاحية",
+  "dns_link_title": "تأكيد المعاملة",
+  "dns_on_sale_text": "النطاق معروض للبيع في السوق حاليًا. لإجراء التحويل، يجب إزالته من البيع أولاً.",
+  "dns_renew_all_until_btn": "تجديد الكل حتى {untilDate}",
+  "dns_renew_in_progress_btn": "جاري تجديد النطاق…",
+  "dns_renew_toast_success": "تم تجديد النطاق",
+  "dns_renew_until_btn": "تجديد حتى {untilDate}",
+  "dns_renew_valid_caption": {
+    "one": "تنتهي صلاحيتها خلال {count} يوم",
+    "other": "تنتهي صلاحيتها خلال {count} أيام"
+  },
+  "dns_replace_button": "استبدال",
+  "dns_replace_description": "أضف عنوان المحفظة الذي سيرتبط بالنطاق '{{'domain'}}'.",
+  "dns_replace_save": "حفظ",
+  "dns_unlink_title": "تأكيد إلغاء الارتباط",
+  "dns_wallet_address": "عنوان المحفظة",
+  "domains_renewed": "تم تجديد النطاقات",
+  "edit_coins_add": "إضافة",
+  "edit_coins_added": "تمت الإضافة",
+  "edit_coins_added_toast": "تمت الإضافة",
+  "edit_coins_hide": "إخفاء",
+  "edit_coins_title": "إضافة عملة مشفرة",
+  "encryptedComments": {
+    "encryptedComment": "تعليق مشفَّر",
+    "encryptedCommentModal": {
+      "button": "فك تشفير التعليق",
+      "checkboxLabel": "عدم العرض مرة أخرى",
+      "description": "التعليق مشفَّر بواسطة المرسل ولا يمكن فكه إلا من قبلك. يرجى توخي الحذر عند التعامل مع المحتوى والحذر من الاحتيال.",
+      "title": "تعليق مشفَّر"
+    },
+    "show": "عرض"
+  },
+  "error_network": "خطأ في الشبكة",
+  "error_occurred": "حدث خطأ",
+  "exchange_method_dont_show_again": "عدم العرض مرة أخرى",
+  "exchange_method_open_warning": "أنت بصدد فتح تطبيق خارجي لا تديره تونكيبر.",
+  "exchange_modal": {
+    "buy": "شراء",
+    "hide": "إخفاء",
+    "other_ways_to_buy": "طرق أخرى للشراء",
+    "sell": "بيع",
+    "show_all": "عرض الكل",
+    "title": "شراء أو بيع"
+  },
+  "exchange": {
+    "not_exists": "معرّف التبادل غير صالح"
+  },
+  "exchange_other_ways": "طرق أخرى لشراء أو بيع TON",
+  "exchange_telegram_bot": "بوت تيليجرام",
+  "exchange_title": "شراء TON",
+  "expiring_domains": "النطاقات التي ستنتهي صلاحيتها",
+  "finish_setup": {
+    "backup": "قم بعمل نسخة احتياطية لعبارة استرداد المحفظة",
+    "done_button": "تم",
+    "enable_notifications": "تفعيل إشعارات المعاملات",
+    "header_title": "إنهاء الإعداد",
+    "join_tg": "الانضمام إلى قناة تونكيبر",
+    "use_biometry": "استخدم {name} للموافقة على المعاملة"
+  },
+  "form_optional_indicator": "اختياري",
+  "gasless": {
+    "switch_label": "اضغط للدفع بـ{currency}"
+  },
+  "import_add_wallet": "إضافة محفظة",
+  "import_add_wallet_description": "إنشاء محفظة جديدة أو إضافة محفظة موجودة.",
+  "import_existing_wallet": "محفظة موجودة",
+  "import_existing_wallet_description": "استيراد المحفظة مع 24 كلمة استرداد سرية",
+  "import_new_wallet": "محفظة جديدة",
+  "import_new_wallet_description": "إنشاء محفظة جديدة",
+  "import_signer": "الاقتران مع الموقِّع (Signer)",
+  "import_signer_description": "غير متصل بالإنترنت، معزول عن الشبكة، مع جميع ميزات TON",
+  "import_wallet_caption": "لاستعادة الوصول إلى محفظتك، أدخل كلمات الاسترداد السرية الـ 24 التي تم منحها لك عند إنشاء محفظتك.",
+  "import_wallet_reset_caption": "يرجى استعادة الوصول إلى محفظتك\nعن طريق إدخال 24 كلمة سرية كتبتها، ثم إنشاء المحفظة.",
+  "import_wallet_title": "أدخل عبارة الاسترداد الخاصة بك",
+  "import_wallet_wrong_words_err": "عبارة غير صحيحة",
+  "indexer_latency_error": "خطأ في الإرسال، حاول مرة أخرى لاحقًا",
+  "info_about_inactive_back": "رجوع",
+  "info_about_inactive_desc1": "لا يعرف تونكيبر ما إذا كان هذا العنوان عبارة عن محفظة أو عقد ذكي.",
+  "info_about_inactive_desc2": "إذا كنت ترغب ببساطة في إيداع المال في المحفظة، يمكنك المتابعة.",
+  "info_about_inactive_desc3_1": "إذا كنت تتوقع إجراءً تلقائيًا من عقد ذكي،",
+  "info_about_inactive_desc3_2": "— قد يتعطل التحويل الخاص بك على هذا العنوان.",
+  "info_about_inactive_desc3_bold": "لا تستمر",
+  "info_about_inactive_title": "عقد غير نشط",
+  "intro_continue_btn": "البدء",
+  "intro_item1_caption": "بفضل البنية الفريدة للشبكة المفتوحة (TON)، تتم تسوية معاملات TON في ثوانٍ.",
+  "intro_item1_title": "سرعة عالمية المستوى",
+  "intro_item2_caption": "يخزن تونكيبر مفاتيح التشفير الخاصة بك على جهازك. يتم تنفيذ جميع الصفقات عبر بروتوكولات لامركزية حتى لا تنتهي عملاتك المشفرة أبدًا في أيدي البورصات المركزية.",
+  "intro_item2_title": "الأمان من البداية إلى النهاية",
+  "intro_item3_caption": "-",
+  "intro_item3_title": "-",
+  "intro_title": "مرحبا بكم في",
+  "it_expires_on": "تنتهي صلاحيتها في",
+  "jetton_buy_tether": "شراء USD₮",
+  "jetton_id": "معرّف الرمز: {jettonAddress}",
+  "jetton_id_copied": "تم نسخ معرّف الرمز",
+  "jetton_locked_till": "مغلق حتى {date}",
+  "jetton_migrate_tether": "تبديل jUSDT إلى USD₮",
+  "jetton_name": "{name} رمز",
+  "jetton_open_explorer": "عرض التفاصيل",
+  "jetton_price": "السعر:",
+  "jettons_list_title": "الرموز",
+  "jettons_manage_tokens": "إدارة الرموز",
+  "jettons_show_jettons": "عرض الرموز في المحفظة",
+  "jetton_token": "رمز",
+  "language": {
+    "language_alert": {
+      "cancel": "إلغاء",
+      "open": "الإعدادت",
+      "title": "لتغيير لغة التطبيق، انتقل إلى إعدادات الجهاز"
+    },
+    "languagesList": {
+      "en": "الإنجليزية",
+      "es": "الإسبانية",
+      "id": "الإندونيسية",
+      "ru": "الروسية",
+      "system": "النظام",
+      "tr": "التركية",
+      "uk": "الأوكرانية",
+      "uz": "الأوزبكية",
+      "zh-Hans": "الصينية"
+    },
+    "list_item": {
+      "title": "اللغة",
+      "value": "الإنجليزية"
+    },
+    "title": "اللغة"
+  },
+  "later": "لاحقًا",
+  "ledger": {
+    "confirm_title": "تأكيد الإجراء",
+    "confirm_tx": "أكد معاملتك على جهاز المحفظة (Ledger)",
+    "connect": "قم بتوصيل جهاز محفظة (Ledger) بجهازك عبر البلوتوث",
+    "connect_title": "ربط جهاز محفظة (Ledger)",
+    "install_ton_app": "تثبيت تطبيق TON",
+    "open_ton_app": "افتحه وافتح تطبيق TON",
+    "operation_not_supported": "العملية غير متاحة لأجهزة المحافظ (Ledger). حدد محفظة أخرى وحاول مرة أخرى."
+  },
+  "legal_font_license": "Montserrat خط",
+  "legal_header_title": "قانوني",
+  "legal_licenses_title": "التراخيص",
+  "legal_privacy": "سياسة الخصوصية",
+  "legal_terms": "شروط الخدمة",
+  "link_copied": "تم نسخ الرابط",
+  "loading": "جارٍ التحميل",
+  "logout_modal": {
+    "agreement": "لدي نسخة احتياطية من عبارة الاستعادة لـ",
+    "backup_button": "نسخة احتياطية",
+    "caption": "ستتم إزالة مفاتيح المحفظة من هذا الجهاز.",
+    "delete_button": "حذف بيانات المحفظة",
+    "delete_caption": "سيتم إزالة مفاتيح المحفظة وجميع البيانات الشخصية من هذا الجهاز.",
+    "delete_title": "حذف بيانات المحفظة",
+    "logout_button": "تسجيل الخروج",
+    "title": "تسجيل الخروج"
+  },
+  "manage_other_coins": "إدارة عملاتي المشفرة",
+  "migration_cancel_btn": "الترقية لاحقًا",
+  "migration_caption": "يقدم تونكيبر تنسيقًا جديدًا للمحفظة يدعم مدفوعات الاشتراك. سيتم تحويل رصيدك إلى عنوان جديد. ستظل عبارة الاسترداد الخاصة بك كما هي.",
+  "migration_failed": "فشلت عملية التحويل. تعذر تحويل الرصيد.",
+  "migration_fee_info": "رسوم الشبكة ≈%{tonFee} TON (%{fiatFee})",
+  "migration_in_progress": "جاري الترحيل إلى المحفظة v4",
+  "migration_migrate_btn": "ترقية المحفظة",
+  "migration_new_wallet": "عنوان جديد",
+  "migration_old_wallet": "العنوان القديم",
+  "migration": {
+    "subtitle": "افتح المحفظة للمتابعة.",
+    "title": "قم بترحيل محفظتك إلى النسخة الجديدة من تونكيبر.",
+    "with_biometry": "الاستمرار باستخدام {type}",
+    "with_passcode": "أدخل رمز المرور"
+  },
+  "migration_title": "قم بترقية محفظتك",
+  "nft_about_collection": "حول المجموعة",
+  "nft_about_dns": "TON DNS هي خدمة تتيح للمستخدمين تعيين اسم سهل القراءة للمحافظ الرقمية، العقود الذكية، والمواقع الإلكترونية.\n\nمع TON DNS، يصبح الوصول إلى الخدمات اللامركزية مشابهًا للوصول إلى المواقع على الإنترنت.",
+  "nft_actions": {
+    "hide_and_report": "إخفاء وإبلاغ عن البريد المزعج",
+    "hide": {
+      "collection": "إخفاء المجموعة",
+      "nft": "إخفاء NFT"
+    },
+    "view_on_explorer": "عرض على Tonviewer"
+  },
+  "nft_browse_markets": "تصفح الأسواق",
+  "nft_chain": "السلسلة",
+  "nft_change_owner_title": "تغيير مالك المجموعة",
+  "nft_change_theme": "تغيير السمة",
+  "nft_collection": "المجموعة",
+  "nft_collection_name": "اسم المجموعة",
+  "nft_confirm_operation": "تأكيد",
+  "nft_contract_address": "عنوان العقد",
+  "nft_deploy_collection_title": "إنشاء مجموعة NFT",
+  "nft_details": "التفاصيل",
+  "nft_diamonds_description": "تمتلك TON Diamonds القدرة على تغيير السمة في محفظة تونكيبر الخاصة بك لتتناسب مع لون NFT الخاص بك.",
+  "nft_features": "المميزات",
+  "nft_fee": "الرسوم",
+  "nft_fee_and_royalties": "الرسوم والإتاوات",
+  "nft_hide_details": "إخفاء التفاصيل",
+  "nft_item_deploy_title": "سك NFT",
+  "nft_item_name": "اسم NFT",
+  "nft_link_domain_button": "ربط النطاق",
+  "nft_link_domain_caption": "بعد ربط النطاق، ستتمكن من تحويله واستخدامه كإسم مستعار لعنوانك.",
+  "nft_link_domain_mismatch_warn": "النطاق غير مرتبط بعنوانك الحالي. كن حذرًا مع المعاملات الموجهة لهذا النطاق.",
+  "nft_link_username_button": "ربط الاسم",
+  "nft_link_username_caption": "بعد ربط الاسم، ستتمكن من تحويله واستخدامه كإسم مستعار لعنوانك.",
+  "nft_link_username_mismatch_warn": "الاسم غير مرتبط بعنوانك الحالي. كن حذرًا مع المعاملات الموجهة لهذا الاسم.",
+  "nft_marketplace_address": "السوق",
+  "nft_marketplace_banner_description": "اشترِ، بِع، إجمع واستبدل.",
+  "nft_marketplace_banner_title": "سيتم تخزين رموز NFT الخاصة بك هنا",
+  "nft_marketplaces": "إكتشف",
+  "nft_marketplaces_title": "أسواق NFT",
+  "nft_metadata": "البيانات الوصفية",
+  "nft_more": "المزيد",
+  "nft_new_owner_address": "عنوان المالك الجديد",
+  "nft_on_sale": "معروض للبيع",
+  "nft_on_sale_text": "ال NFT معروض للبيع في السوق حاليًا. لإجراء التحويل، يجب عليك إزالته من البيع أولاً.",
+  "nft_open_in_marketplace": "عرض في سوق NFT",
+  "nft_operations_expired": "انتهت مهلة الطلب، يرجى المحاولة مرة أخرى",
+  "nft_operation_slide_to_confirm": "إسحب للتأكيد",
+  "nft_operation_success": "تم",
+  "nft_owner_address": "المالك",
+  "nft_price": "السعر",
+  "nft_proceeds": "عائداتك",
+  "nft_properties": "الخصائص",
+  "nft_royalty": "الإتاوة",
+  "nft_royalty_address": "عنوان الإتاوة",
+  "nft_sale_cancel_title": "إزالة من البيع",
+  "nft_sale_place_title": "بيع NFT",
+  "nft_show_details": "عرض التفاصيل",
+  "nft_single_nft": "NFT فردي",
+  "nft_standard": "معيار الرمز",
+  "nft_title": "NFTs",
+  "nft_token_id": "معرّف الرمز",
+  "nft_transaction_head_placeholder": "NFT",
+  "nft_transfer_comment": "تعليق",
+  "nft_transfer": {
+    "confirm": {
+      "fee": {
+        "label": "الرسوم",
+        "refund_label": "إسترداد",
+        "value": "≈ {value} TON"
+      }
+    },
+    "title": "NFT تحويل"
+  },
+  "nft_transfer_description": "سيتم إرسال NFT إلى هذا العنوان. كن حذرًا عند إرسال NFT إلى مستخدم آخر.",
+  "nft_transfer_dns": "تحويل",
+  "nft_transfer_nft": "تحويل",
+  "nft_transfer_recipient": "المستلم",
+  "nft_transfer_title": "تحويل NFT",
+  "nft_unlink_domain_button": "مرتبط بـ '{{'address'}}'",
+  "nft_unnamed_collection": "مجموعة بدون اسم",
+  "nft_view_in_explorer": "عرض في المستكشف",
+  "nokyc": "بدون تحقق من الهوية",
+  "notcoin": {
+    "all": "إستبدال الكل في تونكيبر النسخة الإحترافية(Pro)",
+    "burn_not_available": {
+      "hours": "سيكون التبادل متاحًا في {count} ساعات",
+      "minutes": "سيكون التبادل متاحًا في {count} دقائق",
+      "seconds": "سيكون التبادل متاحًا في {count} ثواني"
+    },
+    "count": "عدد القسائم",
+    "count_max": "أقصى حد 4 لكل تبادل",
+    "exchange": "إستبدال\nالقسائم إلى NOT",
+    "exchange_all": "تبادل الكل في\nتونكيبر النسخة الإحترافية(Pro)",
+    "exchange_subtitle": "ستكون NOT متاحة في رصيدك بعد فترة قصيرة من الإستبدال.",
+    "exchange_title": "تبادل قسائمك إلى NOT",
+    "exchange_to_not": "تبادل إلى NOT",
+    "name": "نوتكوين",
+    "not_vouchers": "قسائم NOT",
+    "open": "فتح",
+    "open_bot": "فتح بوت نوتكوين",
+    "slogan": "ربما لا شيء",
+    "total_amount": "المبلغ الإجمالي",
+    "verify_subtitle": "قد يستغرق التحقق بضع ساعات.",
+    "verify_title": "قم بربط المحفظة ببوت نوتكوين للتحقق من عملية الحرق"
+  },
+  "notifications": {
+    "alert": {
+      "cancel": "إلغاء",
+      "description": "عنوان الرابط من الإشعار لا يتطابق مع عنوان التطبيق.",
+      "open": "فتح على أي حال",
+      "title": "هل أنت متأكد أنك تريد فتح رابط خارجي؟"
+    },
+    "allow_notifications": "تفعيل الإشعارات",
+    "apps": "التطبيقات",
+    "apps_description": "الإشعارات من التطبيقات المتصلة في نشاطك",
+    "disconnect_app": "فصل {app_name}",
+    "disconnected_app": "تطبيق غير متصل",
+    "earlier": "في وقت سابق",
+    "from_connected": "من التطبيقات المتصلة",
+    "muted": "تم كتم الإشعارات",
+    "mute_notifications": "كتم الإشعارات",
+    "notifications": "الإشعارات",
+    "placeholder": {
+      "description": "إستكشف التطبيقات والخدمات في متصفح تونكيبر.",
+      "title": "سيتم عرض الإشعارات هنا"
+    },
+    "report": "تقرير"
+  },
+  "notifications_disabled_action": "فتح الإعدادات",
+  "notifications_disabled_description": "لقد قمت بإيقاف الإشعارات في إعدادات هاتفك. لتفعيل الإشعارات، إنتقل إلى الإعدادات على هذا الجهاز.",
+  "notifications_disabled_title": "الإشعارات معطلة",
+  "notifications_not_supported": "الإشعارات غير مدعومة على جهازك",
+  "notifications_switch_title": "الإشعارات الفورية",
+  "notifications_title": "الإشعارات",
+  "notification_switch_description": "أحصل على إشعارات عند إستلامك لـ TON و الرموز و NFTs. إشعارات من التطبيقات المتصلة.",
+  "notify_connection_err_caption": "{host} لا يستجيب. يرجى المحاولة لاحقًا.",
+  "notify_connection_err_caption_few": "{hosts} و {lastHost} لا يستجيبان. يرجى المحاولة لاحقًا.",
+  "notify_connection_err_title": "لم يتمكن من الإتصال بالخادم",
+  "notify_incorrect_time_err_caption": "في إعدادات الجهاز، قم بتمكين الوقت والتاريخ التلقائي. عندما لا يتم ضبط الوقت تلقائيًا، قد يؤثر ذلك على تحويل الأموال.",
+  "notify_incorrect_time_err_title": "الوقت والتاريخ غير صحيحين",
+  "notify_no_signal_caption": "يرجى التحقق من إتصالك بالإنترنت.",
+  "notify_no_signal_title": "لا يوجد إشارة",
+  "old_wallet_error": "إستخدم محفظة بالإصدار v4R2",
+  "pairSigner": {
+    "about": "عن الموقِّع (Signer)",
+    "open_signer": "إفتح الموقّع (Signer) على هذا الجهاز",
+    "subtitle": "افتح الموقّع (Signer) » إختر المفتاح المطلوب » إمسح رمز الاستجابة السريعة (QR)",
+    "title": "مسح رمز الاستجابة السريعة (QR)"
+  },
+  "passcode_changed": "تم تغيير رمز المرور",
+  "paste": "لصق",
+  "pin_enter_faceid_err": "فشل التحقق البيومتري",
+  "pin_enter_skip_faceid_err": "التحقق البيومتري مطلوب",
+  "platform": {
+    "android": {
+      "capitalized_face_recognition": "التعرف على الوجه",
+      "capitalized_fingerprint": "بصمة الإصبع",
+      "face_recognition": "التعرف على الوجه",
+      "face_recognition_genitive": "التعرف على الوجه",
+      "fingerprint": "بصمة الإصبع",
+      "fingerprint_genitive": "بصمة الإصبع"
+    },
+    "ios": {
+      "capitalized_face_recognition": "معرّف الوجه",
+      "capitalized_fingerprint": "معرّف اللمس",
+      "face_recognition": "معرّف الوجه",
+      "face_recognition_genitive": "معرّف الوجه",
+      "fingerprint": "معرّف اللمس",
+      "fingerprint_genitive": "معرّف اللمس"
+    }
+  },
+  "programmable_nfts": {
+    "alert": {
+      "cancel": "إلغاء",
+      "description": "قم بزيارة هذا الرابط الخارجي فقط إذا كنت تثق في مؤلف المجموعة.\n\n'{{'uri'}}'",
+      "open": "افتح على أي حال",
+      "title": "هل أنت متأكد أنك تريد فتح رابط خارجي؟"
+    }
+  },
+  "pro_subscription_is_active": "اشتراك تونكيبر برو نشط.",
+  "pro_trial_is_active": "الفترة التجريبية ل تونكيبر برو نشطة.",
+  "purchases": {
+    "screen_title": "المشتريات"
+  },
+  "receive_address_title": "أو استخدم عنوان المحفظة",
+  "receive_copy": "نسخ",
+  "receiveModal": {
+    "copy": "نسخ",
+    "receive": "استلام",
+    "receive_description": "أرسل فقط {tokenName} والرموز في شبكة TON إلى هذا العنوان، أو قد تفقد أموالك.",
+    "receive_title": "استلام {tokenName}",
+    "receive_ton": "أرسل Toncoin TON والرموز فقط في شبكة TON إلى هذا العنوان، أو قد تفقد أموالك."
+  },
+  "receive_qr_title": "عرض رمز الاستجابة السريعة (QR) للاستلام",
+  "receive_received_title": "لقد استلمت\n{amount} {currency}",
+  "receive_share": "مشاركة",
+  "receive_title": "استلام {currency}",
+  "receive_ton_and_jettons": "إستلم TON ورموز أخرى",
+  "recovery_phrase": {
+    "caption": "أكتب هذه الكلمات مع أرقامها واحفظها في مكان آمن.",
+    "check_button": "تحقق من النسخ الاحتياطي",
+    "copy_button": "نسخ",
+    "title": "عبارة استرداد"
+  },
+  "refresh_app": "إعادة تشغيل",
+  "region_nokyc": "المياه المحايدة",
+  "reminder_notifications_caption": "احصل على إشعارات عند استلام TON والرموز المميزة و NFTs",
+  "reminder_notifications_enable_button": "تمكين الإشعارات",
+  "reminder_notifications_later_button": "لاحقا",
+  "reminder_notifications_title": "احصل على إشعارات فورية",
+  "renew_in_progress": "جاري التجديد…",
+  "renew_progress_of": "{current} من {count}",
+  "require_create_wallet_modal_caption": "تحتاج إلى محفظة متصلة لاستخدامها\nتونكيبر. إما إنشاء محفظة جديدة أو استيراد محفظة موجودة.",
+  "require_create_wallet_modal_create_new": "إنشاء محفظة جديدة",
+  "require_create_wallet_modal_import": "استيراد المحفظة الموجودة",
+  "require_create_wallet_modal_title": "لنقم بإعداد محفظتك",
+  "restake_banner": {
+    "stake_into_step": "قم بتحصيص TON المتاحة في Tonstakers.",
+    "stake_into_tonstakers_action": "التحصيص في Tonstakers",
+    "title": "احصل على المزيد من TON مع %apy من خلال التحصيص السائل في Tonstakers",
+    "unstake_action_all": "المبلغ المراد إلغاء تحصيصه {amount}",
+    "unstake_action_manual": "أدخل يدويًا",
+    "unstake_step": "قم بإلغاء تحصيص TON من مزود التحصيص الحالي لديك.",
+    "wait_step": "انتظر حتى تصبح TON الخاصة بك متاحة.",
+    "wait_step_collect": "جمع",
+    "wait_step_cooldown": "ستكون TON الخاصة بك متاحة قريبًا. ستتمكن من جمعها قريبًا.",
+    "wait_step_pending": "ستكون TON الخاصة بك متاحة في {0, number} مدة. بعد هذه الفترة، يمكنك جمعها.",
+    "wait_step_withdraw": "اجمع TON المتاحة من مزود التحصيص السابق لديك."
+  },
+  "scan_qr_open_settings": "فتح الإعدادات",
+  "scan_qr_permission_error": "إسمح بالوصول إلى الكاميرا لمسح رموز الاستجابة السريعة (QR)",
+  "scan_qr_title": "مسح رمز الاستجابة السريعة (QR)",
+  "secret_words_caption": "دوّن هذه الكلمات الـ 24 بالترتيب المقدم أدناه واحتفظ بها في مكان سري وآمن.",
+  "secret_words_title": "عبارة الاسترداد الخاصة بك",
+  "security_change_passcode": "تغيير رمز المرور",
+  "security_lock_screen_switch": "قفل الشاشة",
+  "security_lock_screen_tip": "يتطلب رمز المرور لعرض محتويات المحفظة.",
+  "security_migration_caption": "الآن رصيدك وأي عمليات محمية برمز مرور. يمكنك أيضًا تسريع التحقق باستخدام التحقق البيومتري.",
+  "security_migration_skip_button": "عدم التحديث الآن",
+  "security_migration_submit_button": "تحديث إعدادات الأمان",
+  "security_migration_title": "تحديث أمان المحفظة",
+  "security_reset_passcode": "إعادة تعيين رمز المرور",
+  "security_title": "الأمان",
+  "security_use_biometry_switch": "استخدم {biometryType}",
+  "security_use_biometry_tip": "يمكنك دائمًا فتح محفظتك باستخدام رمز المرور.",
+  "select_wallet_for_authorization": "حدد المحفظة للتفويض",
+  "send_address_placeholder": "العنوان أو الاسم",
+  "send_all_warning_title": "هل أنت متأكد أنك تريد إرسال كامل رصيدك؟",
+  "send_build_tx_error": "فشل معاملتك",
+  "send_comment_label": "أضف تعليقًا",
+  "send_fee_estimation_error": "فشل في حساب الرسوم",
+  "send_get_wallet_info_error": "فشل في الحصول على معلومات المحفظة",
+  "send_insufficient_funds": "أموال غير كافية",
+  "send_invalid_recipient_caption": "النطاق غير موجود أو عنوان المحفظة غير مرتبط به",
+  "send_invalid_recipient_title": "المستلم غير صحيح",
+  "send_lockup_warning_caption": "يرجى التحقق من أنك ترسل إلى العنوان المسموح به.\n\nسيتم خصم الرسوم حتى إذا فشلت المعاملة.",
+  "send_lockup_warning_submit_button": "إرسال",
+  "send_lockup_warning_title": "المبلغ يتجاوز الرصيد السائل",
+  "send_publish_tx_error": "فشل في إرسال المعاملة",
+  "send_screen_steps": {
+    "address": {
+      "delete_alert_text": "هل أنت متأكد من أنك تريد حذف «{name}» من المفضلة لديك ؟",
+      "placeholder": "عنوان المحفظة أو النطاق",
+      "recent_label": "الأحدث",
+      "suggest_actions": {
+        "add": "إضافة إلى المفضلة",
+        "delete": "حذف",
+        "edit": "تعديل المفضلة",
+        "hide": "إخفاء"
+      },
+      "suggests_label": "المفضلة والأحدث",
+      "title": "المستلم"
+    },
+    "amount": {
+      "insufficient_balance": "أموال غير كافية",
+      "less_than_min": "الحد الأدنى {minAmount} TON",
+      "less_than_min_with_symbol": "الحد الأدنى {minAmount} {symbol}",
+      "liquid_jetton_note": "إرسال رمز السيولة tsTON",
+      "max": "الحد الأقصى",
+      "recipient_label": "إلى:",
+      "remaining": "متوفر: {amount}",
+      "title": "المبلغ"
+    },
+    "comfirm": {
+      "action": "تحويل {coin}",
+      "comment_ascii_text": "استخدم فقط الأحرف ASCII: الأرقام، حروف الأبجدية اللاتينية وعلامات الترقيم.",
+      "comment_decrypt": "فك التشفير",
+      "comment_description": "سوف يكون مرئيا للجميع.",
+      "comment_description_encrypted": "سوف يكون مرئيا لك وللمستلم فقط.",
+      "comment_encrypt": "تشفير التعليق",
+      "comment_label": "تعليق",
+      "comment_label_encrypted": "تعليق مشفر",
+      "comment_label_required": "التعليق مطلوب",
+      "comment_required_text": "يجب أن تتضمن الملاحظة من البورصة للتحويل. بدونها ستفقد أموالك.",
+      "details_label": "تفاصيل",
+      "details_max_balance_label": "إرسال الحد الأقصى لرصيد {currency}",
+      "title": "تأكيد الإجراء",
+      "wallet": "محفظة",
+      "will_be_paid_with_battery": "سيتم الدفع باستخدام البطارية"
+    },
+    "done": {
+      "add_favorite": "حفظ العنوان في المفضلة",
+      "address": "العنوان: {address}",
+      "comment": "التعليق: {comment}",
+      "description": "تم إرسال معاملتك إلى الشبكة وسيتم معالجتها في غضون ثوانٍ.",
+      "done_label": "تم",
+      "favorite_saved": "تم حفظه في المفضلة",
+      "fee": "الرسوم: {fee}",
+      "title": "تم إرسال {currency}!",
+      "to": "إلى: {name}"
+    }
+  },
+  "send_sending_failed": "فشل الإرسال",
+  "send_sending_wrong_time_description": "قم بتشغيل الوقت والتاريخ التلقائي في إعدادات جهازك. ثم حاول إجراء التحويل مرة أخرى.",
+  "send_sending_wrong_time_title": "حدث خطأ",
+  "send_title": "إرسال {currency}",
+  "settings_appearance": "السمات",
+  "settings_backup_seed": "نسخ احتياطي",
+  "settings_bank_card": "بطاقة بنكية",
+  "settings_contact_support": "اتصل بنا",
+  "settings_delete_account": "حذف الحساب",
+  "settings_delete_alert_button": "حذف الحساب والبيانات",
+  "settings_delete_alert_caption": "ستؤدي هذه العملية إلى حذف حسابك وجميع البيانات من هذا التطبيق.",
+  "settings_delete_alert_title": "هل أنت متأكد أنك تريد حذف حسابك؟",
+  "settings_delete_signer_account": "حذف الحساب؟",
+  "settings_delete_watch_account": "حذف حساب المراقبة؟",
+  "settings_delete_watch_account_button": "حذف",
+  "settings_faq": "الأسئلة الشائعة",
+  "settings_jettons_list": "الرموز(Jettons)",
+  "settings_legal_documents": "الوثائق القانونية",
+  "settings_network_alert_title": "حدد الشبكة",
+  "settings_news": "أخبار تونكيبر",
+  "settings_notifications": "الإشعارات",
+  "settings_primary_currency": "العملة",
+  "settings_rate": "تقييم تونكيبر",
+  "settings_recovery_phrase": "عبارة الاسترداد",
+  "settings_reset": "تسجيل الخروج",
+  "settings_reset_alert_button": "تسجيل الخروج",
+  "settings_reset_alert_caption": "سيؤدي هذا إلى مسح مفتاح محفظتك. تأكد من أنك قد قمت بعمل نسخة احتياطية من عبارة الاسترداد الخاصة بك.",
+  "settings_reset_alert_caption_all": "سيؤدي هذا إلى مسح مفاتيح جميع المحافظ. تأكد من أنك قد قمت بعمل نسخة احتياطية من عبارات الاسترداد الخاصة بك.",
+  "settings_reset_alert_title": "تسجيل الخروج؟",
+  "settings_reset_alert_title_all": "تسجيل الخروج من جميع المحافظ؟",
+  "settings_search_engine": "البحث",
+  "settings_security": "الأمان",
+  "settings_subscriptions": "الاشتراكات",
+  "settings_support": "الدعم",
+  "settings_theme": "السمات",
+  "settings_theme_names": {
+    "blue": "أزرق عميق",
+    "dark": "مظلم",
+    "light": "فاتح",
+    "system": "النظام"
+  },
+  "settings_title": "الإعدادت",
+  "settings_to_mainnet": "التبديل إلى الشبكة الرئيسية",
+  "settings_to_testnet": "التبديل إلى شبكة الاختبار",
+  "settings_version": "النسخة",
+  "settings_wallet_version": "العنوان النشط",
+  "setup_biometry_caption": "يتيح لك {biometryType} فتح محفظتك بشكل أسرع دون الحاجة إلى إدخال كلمة مرورك.",
+  "setup_biometry_enable_button": "تمكين  {biometryType}",
+  "setup_biometry_title": "تسجيل الدخول السريع باستخدام {biometryType}",
+  "setup_notifications_caption": "احصل على إشعار عند استلامك لعملات TON والرموز و NFTs",
+  "setup_notifications_enable_button": "تمكين الإشعارات",
+  "setup_notifications_title": "احصل على إشعارات فورية",
+  "signerConfirm": {
+    "confirm": "تأكيد معاملتك في الموقّع (Signer)",
+    "scan_qr": "امسح رمز الاستجابة السريعة (QR) باستخدام الموقّع (Signer)",
+    "scan_signed_qr": "امسح رمز الاستجابة السريعة (QR) للمعاملة الموقعة من الموقّع (Signer)",
+    "step": "الخطوة {value}",
+    "title": "تأكيد الإجراء"
+  },
+  "signer_scan_result": "مسح المعاملة الموقعة",
+  "signer_scan_tx_description": "الرجاء فتح الموقّع (Signer) ومسح رمز الاستجابة السريعة (QR) مع المعاملة",
+  "skip": "تخطي",
+  "spam_action": "غير مرغوب فيها",
+  "staking": {
+    "active": "نشط",
+    "confirm": {
+      "address": {
+        "label": "عنوان المستلم"
+      },
+      "amount": {
+        "label": "المبلغ",
+        "value": "{value} TON"
+      },
+      "fee": {
+        "label": "الرسوم",
+        "value": "≈ {value} TON"
+      },
+      "recipient": {
+        "label": "المستلم"
+      },
+      "withdraw_amount": {
+        "label": "إلغاء تحصيص المبلغ"
+      }
+    },
+    "confirm_deposit": "تأكيد وتحصيص",
+    "confirm_unstake": "تأكيد وإلغاء التحصيص",
+    "deposit": "تحصيص",
+    "desc_large": "انضم إلى التحصيص واحصل على المكافآت. يساعد التحصيص في الحفاظ على شبكة TON.",
+    "details": {
+      "about_pool": "التفاصيل",
+      "apy": {
+        "highest_tag": "الحد الأقصى",
+        "label": "نسبة العائد السنوي(APY)",
+        "value": "≈ {value}%"
+      },
+      "balance": "رصيد التحصيص",
+      "cooldown": {
+        "active": "نشط",
+        "desc": "يتم تطبيق فترة ساعتين في بداية كل دورة تحصيص لتحسين عملية السحب والإيداع بين الدورات",
+        "title": "فترة تهدئة"
+      },
+      "frequency": {
+        "label": "معدل توزيع المكافآت",
+        "value": "كل {count} ساعات"
+      },
+      "links_title": "الروابط",
+      "liquidity_token": {
+        "label": "رمز السيولة {token}",
+        "value": "إقرأ المزيد"
+      },
+      "min_deposit": {
+        "label": "الحد الأدنى للإيداع",
+        "value": "{value} TON"
+      },
+      "next_cycle": {
+        "desc": "تدخل جميع المعاملات حيز التنفيذ عند انتهاء الدورة.",
+        "desc_liquid": "تكتمل طلبات إلغاء التحصيص بعد انتهاء الدورة.",
+        "in": "في",
+        "message": "سيتم معالجة طلب إلغاء التحصيص بعد نهاية دورة التحقق في {value}.",
+        "reward_title": "المكافأة التالية",
+        "title": "الدورة التالية"
+      },
+      "note": "التحصيص يعتمد على العقود الذكية التي يقدمها أطراف ثالثة. تونكيبر غير مسؤول عن تجربة التحصيص.",
+      "pendingDeposit": "تحصيص معلق",
+      "pendingWithdraw": "إلغاء التحصيص المعلق",
+      "pendingWithdrawDesc": "بعد انتهاء الدورة",
+      "pool_address": {
+        "label": "عنوان التجمع"
+      },
+      "readyWithdraw": "جاهز لإلغاء التحصيص",
+      "socials": {
+        "telegram": "المجتمع",
+        "twitter": "تويتر"
+      },
+      "tap_to_collect": "اضغط للجمع"
+    },
+    "estimated_profit": "{amount} TON – سيكون ربحك السنوي \nإذا قمت بتحصيص TON اليوم",
+    "estimated_profit_compare": "أكثر ربحية بمقدار {amount} TON سنويًا من تحصيصك الحالي",
+    "get_withdrawal": "استلام السحب",
+    "highest_apy": "أقصى نسبة عائد سنوي",
+    "jetton_note": "عندما تقوم بتحصيص عملة TON في تجمع {poolName}، ستتلقى رمزًا يُدعى {token} والذي يمثل حصتك في التجمع. مع تراكم الأرباح في التجمع سيُمثل رمز {token} لديك مبلغ أكبر من عملة TON.",
+    "learn_more": "إقرأ المزيد",
+    "message": {
+      "pendingDeposit": "{amount} TON تم تحصيصها",
+      "pendingWithdraw": "{amount} TON تم الغاء تحصيصها",
+      "pendingWithdrawLiquid": "{amount} TON تم الغاء تحصيصها بعد انتهاء الدورة",
+      "readyWithdraw": "{amount} TON جاهز.\nانقر لجمع المبلغ"
+    },
+    "no_funds": "لا توجد أموال متاحة لإلغاء تحصيصها",
+    "not_exists": "عنوان التجمع غير صالح",
+    "other": "آخر",
+    "rewards": {
+      "after_top_up": "بعد التحصيص",
+      "current": "حاليا",
+      "title": "نسبة عائدك السنوي",
+      "value": "≈ {value} TON"
+    },
+    "send_staked_ton": "الـ TON المحصص",
+    "staked": "محصصة",
+    "staked_ton": "TON المحصص",
+    "staking_desc": "الحد الأدنى للإيداع: {minStake} TON.\nاكسب حتى {maxApy}%.",
+    "staking_pool_desc": "APY ≈ {apy}%",
+    "title": "تحصيص",
+    "title_large": "TON تحصيص",
+    "top_up": "تحصيص",
+    "transaction": "تأكيد الإجراء",
+    "warning": {
+      "about": "عن  {name}",
+      "beta_desc": "نحن غير مسؤولين عن استقرار التجربة أو التحصيص. استخدم ذلك على مسؤوليتك الخاصة.",
+      "desc": "التحصيص يعتمد على العقود الذكية الخاصة بطرف ثالث. نحن غير مسؤولين عن أدائها.",
+      "title": "تحذير"
+    },
+    "widget_desc": "نسبة العائد السنوي تصل إلى {apy}%",
+    "widget_staking_options": "خيارات التحصيص",
+    "widget_title": "تحصيص TON",
+    "withdraw": "الغاء التحصيص",
+    "withdrawal_fee_warning": {
+      "continue": "استمر على أي حال",
+      "message": "يرجى ترك ما لا يقل عن '{{'amount'}}' TON في رصيدك.",
+      "title": "لن يكون لديك أموال كافية للسحب"
+    },
+    "withdrawal_request": "الغاء التحصيص"
+  },
+  "start_screen": {
+    "caption": "انشاء محفظة جديدة أو قم بإضافة محفظة موجودة",
+    "create_wallet_button": "إنشاء محفظة جديدة",
+    "import_wallet_button": "استيراد محفظة موجودة"
+  },
+  "stop_watch": "حذف حساب المراقبة",
+  "subscription_back_to_merchant_button": "رجوع",
+  "subscription_back_to_merchant_caption": "جاري معالجة المعاملة، وسيتم تفعيل اشتراكك قريبًا.",
+  "subscription_back_to_merchant_name": "الرجوع إلى {merchantName}",
+  "subscription_back_to_merchant_title": "العودة إلى القناة؟",
+  "subscription_cancel": "إلغاء الاشتراك",
+  "subscription_cancel_alert_cancel_btn": "ليس الآن",
+  "subscription_cancel_alert_caption": "إذا قمت بالإلغاء الآن، فلا يزال بإمكانك الوصول إلى اشتراكك حتى {nextBill}",
+  "subscription_cancel_alert_submit_btn": "نعم، إلغاء",
+  "subscription_cancel_alert_title": "إلغاء الاشتراك؟",
+  "subscription_expiring": "انتهاء الصلاحية",
+  "subscription_fee": "الرسوم",
+  "subscription_next_bill": "الفاتوة التالية",
+  "subscription_open_merchant": "افتح في تيليجرام",
+  "subscription_period": "الفترة الزمنية",
+  "subscription_period_custom": "كل {period}",
+  "subscription_period_day": "يوميا",
+  "subscription_period_half_year": "نصف سنوي",
+  "subscription_period_hour": "كل ساعة",
+  "subscription_period_month": "شهريا",
+  "subscription_period_quarter": "ربع سنوي",
+  "subscription_period_week": "أسبوعيا",
+  "subscription_period_weeks": "كل {count} أسبوع",
+  "subscription_period_year": "سنويا",
+  "subscription_price": "السعر",
+  "subscription_sent": "تم ارسال المعاملة",
+  "subscriptions_item_caption": "{price} TON، الفاتورة التالية في {nextBill}",
+  "subscriptions_item_caption_expired": "منتهي الصلاحية في {date}",
+  "subscriptions_item_caption_expiring": "{price} TON، تنتهي صلاحيته في {date}",
+  "subscriptions_section_active": "نشط",
+  "subscriptions_section_expired": "منتهي الصلاحية",
+  "subscription_started": "تم تفعيل الاشتراك",
+  "subscriptions_title": "الإشتراكات",
+  "subscription_subscribe": "اشتراك",
+  "subscription_title": "اشتراك",
+  "subscription_unsubscribe": "إلغاء الاشتراك",
+  "success": "نجاح!",
+  "suspicious": {
+    "buttons": {
+      "not_spam": "ليست معاملة عشوائية",
+      "report": "الإبلاغ عن معاملة غير مرغوب فيها"
+    },
+    "label": {
+      "full": "NFT لم يتم التحقق منه",
+      "short": "لم يتم التحقق منه"
+    },
+    "status_update": {
+      "hidden": {
+        "collection": "مجموعة مخفية",
+        "nft": "NFT مخفية"
+      },
+      "spam": {
+        "collection": "مجموعة تم تحديدها على أنها غير مرغوب فيها",
+        "nft": "NFT تم تحديدها على أنها غير مرغوب فيها"
+      }
+    }
+  },
+  "suspiciousNFTDetails": {
+    "buttons": {
+      "not_spam": "ليست معاملة غير مرغوب فيها",
+      "report": "الإبلاغ عن معاملة غير مرغوب فيها"
+    },
+    "paragraphs": {
+      "p1": "تُستخدم لإرسال رسائل غير مرغوب فيها وغير مفيدة.",
+      "p2": "تُستخدم للإحتيال. قد يؤدي اسم الـNFT، وصفه أو صورته إلى خداع المستخدمين.",
+      "p3": "لدينا معلومات قليلة حول مؤلف وتاريخ هذا الـNFT."
+    },
+    "subtitle": "قد يكون الـNFT غير آمن للاستخدام بسبب أحد الأسباب التالية.",
+    "title": "لم يتم التحقق منه NFT"
+  },
+  "swap_title": "مبادلة",
+  "tab_browser": "المتصفح",
+  "tab_collectibles": "المقتنيات",
+  "tab_nft": "الرموز الغير قابلة للإستبدال (NFTs) ",
+  "tab_settings": "الإعدادت",
+  "tab_swap": "مبادلة",
+  "tab_wallet": "المحفظة",
+  "today": "اليوم",
+  "tokenDetails": {
+    "name": "الاسم",
+    "title": "تفاصيل الرمز",
+    "token_id": "معرّف الرمز",
+    "tonviewer_button": "عرض على Tonviewer"
+  },
+  "tonconnect_error": {
+    "bad_request": "طلب غير صالح",
+    "wrong_from": "المعلمة 'from' غير صحيحة",
+    "wrong_network": "شبكة غير صحيحة"
+  },
+  "tonkeeper_pro": "تونكيبر برو",
+  "tonkeeper_pro_description": "يأتي اشتراك تونكييبر برو مع ميزة محفظة موسعة، مما يوفر مجموعة أدوات لإدارة العملات المشفرة.",
+  "ton_login_back_to_button": "الرجوع إلى {name}",
+  "ton_login_caption": "يطلب {name} الإذن للوصول إلى عنوان محفظتك.",
+  "ton_login_connect_button": "ربط المحفظة",
+  "ton_login_notice": "يرجى التحقق من عنوان الخدمة قبل ربط المحفظة.",
+  "ton_login_success": "تم",
+  "ton_login_title": "الاتصال بـ {0, number} النطاق؟",
+  "transaction_bid_collection_name": "الجهة المُصدِرة",
+  "transaction_bid_date": "عرض في {date}",
+  "transaction_bid_dns": "الاسم",
+  "transaction_buy_date": "تم الشراء في {date}",
+  "transaction_buy_status_failed": "فشل",
+  "transaction_buy_status_pending": "معلق",
+  "transaction_buy_status_success": "نجاح",
+  "transaction_confirmations": "التأكيدات",
+  "transaction_confirm_bid": "تأكيد العرض",
+  "transaction_contract_deploy_date": "{date}",
+  "transaction_copy_caution": "كن حذرا مع الروابط الخارجية. لا تعطي أبداً عبارة الاسترداد الخاصة بك لمصادر خارجية — قد تخسر جميع أموالك.",
+  "transactionDetails": {
+    "address": "العنوان",
+    "bid_collection_name": "الجهة المُصدِرة",
+    "bid_name": "الاسم",
+    "comment": "تعليق",
+    "description": "الوصف",
+    "operation": "العملية",
+    "payload": "الحمولة",
+    "recipient": "المستلم",
+    "recipient_address": "عنوان المستلم",
+    "sender": "المرسل",
+    "sender_address": "عنوان المرسل",
+    "spam": "غير مرغوب فيها",
+    "subscription_merchant_label": "تاجر",
+    "subscription_product_label": "الاشتراك",
+    "transaction": "المعاملة",
+    "unsubscription_title": "تم إلغاء الاشتراك",
+    "withdraw_amount": "المبلغ المراد إلغاء تحصيصه"
+  },
+  "transaction_exchange_from_currency": "من",
+  "transaction_fee": "الرسوم",
+  "transaction_hash": "المعاملة",
+  "transaction_merchant": "تاجر",
+  "transaction_message": "الرسالة",
+  "transaction_purchase_id": "معرّف الشراء",
+  "transaction_receive_date": "تم الاستلام في {date}",
+  "transaction_recipient": "المستلم",
+  "transaction_recipient_address": "عنوان المستلم",
+  "transaction_refund": "إسترداد",
+  "transactions": {
+    "bid": "مزاد علني",
+    "burned": "تم حرقه",
+    "contract_deploy": "نشر العقد",
+    "deposit": "حصة",
+    "failed": "فشل",
+    "failed_with_reason": {
+      "swap_refund_no_liq": "فشل. قم بزيادة نسبة الانزلاق في إعدادات المبادلة لتجنب هذا الخطأ."
+    },
+    "nft_purchase": "شراء NFT",
+    "smartcontract_exec": "استدعاء العقد",
+    "spam": "غير مرغوب فيها",
+    "subscription": "مشترك",
+    "swap": "مبادلة",
+    "unknown": "غير معروف",
+    "unknown_description": "لقد حدث شيء ما ولكننا لم نتمكن من التعرف عليه",
+    "unsubscription": "تم إلغاء الاشتراك",
+    "wallet_initialized": "تم إعداد المحفظة",
+    "withdraw": "إلغاء الحِصَّة",
+    "withdrawal_request": "طلب الغاء التحصيص"
+  },
+  "transaction_sender": "المرسل",
+  "transaction_sender_address": "عنوان المرسل",
+  "transaction_send_more_button": "إرسال المزيد إلى هذا المستلم",
+  "transaction_sent_date": "أُرسل في {date}",
+  "transaction_show_subscription_button": "عرض الاشتراك",
+  "transaction_status": "الحالة",
+  "transaction_subscription": "الاشتراك",
+  "transaction_subscription_date": "تم الخصم في {date}",
+  "transaction_transfer_name": "اسم التحويل",
+  "transaction_type_bid": "عرض",
+  "transaction_type_bounced": "مردود",
+  "transaction_type_buy": "شراء",
+  "transaction_type_contract_deploy": "نشر العقد",
+  "transaction_type_from": "من",
+  "transaction_type_new_subscriber": "مشترك جديد",
+  "transaction_type_pending": "معلق",
+  "transaction_type_receive": "تم الاستلام",
+  "transaction_type_sent": "تم الإرسال",
+  "transaction_type_subscriber_lost": "المشترك فقد",
+  "transaction_type_subscription": "اشترك",
+  "transaction_type_to": "إلى",
+  "transaction_type_unsubscription": "إلغاء الاشتراك",
+  "transaction_type_wallet_initialized": "تم تهيئة المحفظة",
+  "transaction_unsubscription": "إلغاء الإشتراك",
+  "transaction_unsubscription_date": "{date}",
+  "transaction_view_in_explorer": "عرض في المتصفح",
+  "transaction_wallet_initialized_date": "{date}",
+  "transaction_your_bid": "عرضك",
+  "transfer_deeplink_address_error": "عنوان المستلم غير صحيح",
+  "transfer_deeplink_amount_error": "طلب المبلغ غير صحيح",
+  "transfer_deeplink_expired_error": "الرابط منتهي الصلاحية",
+  "transfer_deeplink_nft_address_error": "عنوان NFT غير صحيح",
+  "transfer_deeplink_unknown_jetton_error": "رمز غير معروف",
+  "transfer_deeplink_unknown_token": "رمز غير معروف",
+  "transfer_deeplink_wrong_params": "معلمات خاطئة",
+  "transfer_from_old_wallet_btn": "تحويل",
+  "transfer_from_old_wallet_caption": "سوف يقوم تونكيبر بتحويل جميع العملات من عنوانك القديم إلى عنوانك الحالي.",
+  "transfer_from_old_wallet_in_progress": "جارٍ التحويل",
+  "transfer_from_old_wallet_title": "التحويل إلى العنوان الحالي",
+  "transfer_pending_by_battery_error": "تتم معالجة معاملة أخرى بواسطة البطارية",
+  "txActions": {
+    "amount": "المبلغ",
+    "fee": "الرسوم",
+    "refund": "إسترداد",
+    "signRaw": {
+      "addressMismatch": {
+        "switchWallet": {
+          "close": "إلغاء",
+          "description": "قم بتبديل المحفظة لتأكيد الإجراء.",
+          "switch": "تبديل واستمرار",
+          "title": "إجراء لمحفظتك {value}"
+        },
+        "wrongVersion": {
+          "close": "إلغاء",
+          "description": "قم بتبديل عنوانك النشط إلى %{version} لتأكيد الإجراء.",
+          "switch": "تبديل واستمرار",
+          "title": "إجراء لعنوان آخر في محفظتك"
+        },
+        "wrongWallet": {
+          "close": "موافق",
+          "description": "قم بتسجيل الدخول إلى محفظة أخرى {address} وحاول مرة أخرى.",
+          "title": "إجراء لمحفظة أخرى"
+        }
+      },
+      "comment": "تعليق",
+      "insufficientFunds": {
+        "rechargeBattery": "شحن البطارية",
+        "rechargeWallet": "شراء  {currency}",
+        "stakingDeposit": "الحد الأدنى من الرصيد للمشاركة:\n{amount} {currency}",
+        "stakingFee": "{count} TON مطلوبة للمعاملة. سيتم خصم الرسوم المقدرة {fee} TON، وسيتم استرداد الباقي.",
+        "title": "أموال غير كافية",
+        "title_multiwallet": "لا يوجد رصيد كاف في المحفظة",
+        "toBePaid": "المطلوب دفعه: {amount} {currency}",
+        "withFees": "+ رسوم البلوكتشين.",
+        "yourBalance": "رصيدك: {balance} {currency}."
+      },
+      "recipient": "المستلم",
+      "title": "تأكيد المعاملة",
+      "totalFee": "إجمالي الرسوم",
+      "totalRefund": "المبلغ الإجمالي المسترد",
+      "types": {
+        "contractDeploy": "نشر العقد",
+        "jettonTransfer": "تحويل رمز",
+        "nftItemTransfer": "NFT تحويل",
+        "subscribe": "الاشتراك",
+        "tonTransfer": "تحويل TON",
+        "unknownTransaction": "معاملة غير معروفة",
+        "unSubscribe": "إلغاء الاشتراك"
+      },
+      "warning_caption": "لا يمكن لـ تونكيبر التحقق بشكل كامل من نتيجة هذه المعاملة. من فضلك تأكد من ثقتك بالمستلم.",
+      "warning_title": "تحذير",
+      "wrongTime": {
+        "button": "إفتح الإعدادات",
+        "description": "يبدو أن ساعة جهازك ليست متزامنة مع الشبكة. افتح إعدادات الجهاز وقم بتمكين الوقت والتاريخ التلقائي.",
+        "title": "الساعات غير متزامنة"
+      }
+    }
+  },
+  "unverifiedTokenDetails": {
+    "button": "موافق",
+    "description": "يبدو هذا الرمز مشبوهًا لسبب واحد أو أكثر.",
+    "paragraphs": {
+      "p1": "سيولة منخفضة. قد يكون للرمز بعض القيمة، ولكنها منخفضة للغاية.",
+      "p2": "الرمز غير مدرج على منصات التداول والطلب عليه محدود.",
+      "p3": "تُستخدم لإرسال رسائل غير مرغوب فيها وغير مفيدة.",
+      "p4": "تُستخدم للإحتيال. قد يؤدي اسم الرمز أو صورته إلى خداع المستخدمين."
+    },
+    "title": "رمز لم يتم التحقق منه"
+  },
+  "update": {
+    "description": "تتوفر نسخة جديدة من تونكيبر. يمكنك تحميله الآن.",
+    "download": "تحميل",
+    "downloading": "جاري التحميل… '{{'progress'}}'%",
+    "mb": "'{{'size'}}' ميغابايت",
+    "remindLater": "ذكرني لاحقًا",
+    "retry": "خطأ في التنزيل. أنقر لإعادة المحاولة.",
+    "tap": "أنقر للتحديث",
+    "title": "تحديث تونكيبر",
+    "version": "النسخة  '{{'version'}}'"
+  },
+  "upgrade_to_w5": {
+    "about_button": "عن محفظة W5",
+    "description": "جرب معيار المحفظة الجديدة W5 مع دعم مدفوعات USDT بدون غاز وميزات أخرى رائعة.",
+    "hide_button": "إخفاء",
+    "settings": "محفظة W5",
+    "title": "تحويلات بدون رسوم غاز",
+    "try_button": "جرب محفظة W5"
+  },
+  "username_issued_by_telegram": "صادر عن تيليجرام.",
+  "username_manage_name_button": "إدارة الإسم",
+  "w5_stories": {
+    "0": {
+      "description": "تستخدم W5 نهجًا أكثر كفاءة في معالجة المعاملات، مما يعني إنخفاض تكاليف الغاز بنسبة تصل إلى 25%.",
+      "title": "تقليل رسوم البلوكشين"
+    },
+    "1": {
+      "description": "تزيد W5 من عدد العمليات المتزامنة من 4 إلى 255، مما يمكن أن يوفر في تكاليف الرسوم.",
+      "title": "تصل إلى 255 عملية في معاملة واحدة"
+    },
+    "2": {
+      "description": "أرسل USDT بدون الحاجة إلى TON - ستغطي رسوم المعاملات تلقائيًا من بضع سنتات من USDT.",
+      "title": "تحويلات USDT بدون رسوم غاز"
+    },
+    "3": {
+      "description": "الحسابات القديمة وW5 تستخدم نفس عبارة الاسترداد - عند استعادة الحسابات على جهاز جديد، ستظهر الحسابات القديمة والجديدة تلقائيًا.",
+      "title": "عبارة الاسترداد لا تتغير"
+    },
+    "4": {
+      "button": "إضافة محفظة W5",
+      "description": "معيار W5 ليس نهائيًا. يتم تقديم المعاملات بدون رسوم الغاز كميزة تجريبية لاختبار كيفية عملها. لا تقم بنقل جميع أصولك إلى محفظة W5 حتى الإصدار النهائي.",
+      "title": "W5 في النسخة التجريبية"
+    }
+  },
+  "wallet_about": "عن",
+  "wallet_buy": "شراء",
+  "wallet": {
+    "buy_btn": "شراء وبيع",
+    "collectibles_tab_lable": "المقتنيات",
+    "edit_tokens_btn": "تعديل",
+    "inscriptions_tab_label": "النقوش",
+    "nft_tab_lable": "المقتنيات",
+    "old_wallets_title": "المحافظ القديمة",
+    "old_wallet_title": "المحفظة القديمة",
+    "receive_btn": "استلام",
+    "scan_btn": "مسح",
+    "screen_title": "المحفظة",
+    "send_btn": "إرسال",
+    "stake_btn": "تحصيص",
+    "swap_btn": "تبادل",
+    "tonkens_tab_lable": "الرموز",
+    "updated_at": "تحديث في {value}"
+  },
+  "wallet_chat": "دردشة",
+  "wallet_community": "مجتمع",
+  "wallet_hours_symbol": "الساعة",
+  "wallet_old_balance": "المحفظة القديمة:",
+  "wallet_receive": "استلام",
+  "wallets": "المحافظ",
+  "wallet_sell": "بيع",
+  "wallet_send": "إرسال",
+  "wallet_source_code": "رمز المصدر",
+  "wallet_swap": "تبادل",
+  "wallet_title": "المحفظة",
+  "watch_only": "عرض فقط",
+  "yesterday": "أمس"
+}
