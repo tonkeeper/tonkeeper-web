@@ -1,12 +1,19 @@
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
-import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountEvents, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAppContext } from '../hooks/appContext';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { seeIfTonTransfer } from './ton/tonActivity';
 import { MixedActivity } from './mixedActivity';
 import { useActiveWallet } from './wallet';
+import { atom, useAtom } from '../libs/atom';
+import { useCallback, useEffect } from 'react';
+import {
+    TonAsset,
+    tonAssetAddressToString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useGlobalPreferences, useMutateGlobalPreferences } from './global-preferences';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -136,33 +143,66 @@ export const groupActivityGeneric = <T>(
     return groupGenericActivity(activity);
 };
 
-export const useFetchFilteredActivity = (asset: string) => {
+export const useFetchFilteredActivity = (asset?: string) => {
     const wallet = useActiveWallet();
     const { api } = useAppContext();
+    const { asset: selectedAsset, filterSpam, onlyInitiator } = useHistoryFilters();
 
     return useInfiniteQuery({
-        queryKey: [wallet.rawAddress, QueryKey.activity, asset],
+        queryKey: [
+            wallet.rawAddress,
+            QueryKey.activity,
+            asset,
+            selectedAsset?.id,
+            onlyInitiator,
+            filterSpam
+        ],
         queryFn: async ({ pageParam = undefined }) => {
-            if (asset.toLowerCase() === CryptoCurrency.TON.toLowerCase()) {
-                const activity = await new AccountsApi(api.tonApiV2).getAccountEvents({
+            let activity: AccountEvents;
+            if (!asset && !selectedAsset) {
+                activity = await new AccountsApi(api.tonApiV2).getAccountEvents({
                     accountId: wallet.rawAddress,
                     limit: 20,
                     beforeLt: pageParam,
-                    subjectOnly: true
+                    subjectOnly: true,
+                    initiator: onlyInitiator ? onlyInitiator : undefined
                 });
-
-                activity.events = activity.events.filter(event =>
-                    event.actions.every(seeIfTonTransfer)
-                );
-                return activity;
             } else {
-                return new AccountsApi(api.tonApiV2).getAccountJettonHistoryByID({
-                    accountId: wallet.rawAddress,
-                    jettonId: asset,
-                    limit: 20,
-                    beforeLt: pageParam
-                });
+                let assetTonApiId: string;
+                if (selectedAsset) {
+                    assetTonApiId = tonAssetAddressToString(selectedAsset.address);
+                }
+                if (asset) {
+                    assetTonApiId =
+                        asset.toLowerCase() === CryptoCurrency.TON.toLowerCase() ? 'TON' : asset;
+                }
+
+                if (assetTonApiId! === 'TON') {
+                    activity = await new AccountsApi(api.tonApiV2).getAccountEvents({
+                        accountId: wallet.rawAddress,
+                        limit: 20,
+                        beforeLt: pageParam,
+                        subjectOnly: true,
+                        initiator: onlyInitiator ? onlyInitiator : undefined
+                    });
+
+                    activity.events = activity.events.filter(event =>
+                        event.actions.every(seeIfTonTransfer)
+                    );
+                } else {
+                    activity = await new AccountsApi(api.tonApiV2).getAccountJettonHistoryByID({
+                        accountId: wallet.rawAddress,
+                        jettonId: assetTonApiId!,
+                        limit: 20,
+                        beforeLt: pageParam
+                    });
+                }
             }
+
+            if (filterSpam) {
+                activity.events = activity.events.filter(event => !event.isScam);
+            }
+            return activity;
         },
         getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
     });
@@ -184,3 +224,54 @@ export type GroupedActivityItemGroup = {
 export type GroupedActivityItem = GroupedActivityItemSingle | GroupedActivityItemGroup;
 
 export type GroupedActivity = GroupedActivityItem[];
+
+export const defaultHistoryFilters = {
+    asset: undefined,
+    onlyInitiator: false,
+    filterSpam: false
+};
+
+const historyFilters$ = atom<{
+    asset: TonAsset | undefined;
+    onlyInitiator: boolean;
+    filterSpam: boolean;
+}>(defaultHistoryFilters);
+
+let isInited = false;
+
+export const useHistoryFilters = () => {
+    const [filters, setFilters] = useAtom(historyFilters$);
+    const { historyFilterSpam } = useGlobalPreferences();
+    const { mutate, reset } = useMutateGlobalPreferences();
+
+    useEffect(() => {
+        if (!isInited) {
+            isInited = true;
+            setFilters(f => ({ ...f, filterSpam: historyFilterSpam }));
+        }
+    }, [historyFilterSpam]);
+
+    const toggleOnlyInitiator = useCallback(() => {
+        setFilters(f => ({ ...f, onlyInitiator: !f.onlyInitiator }));
+    }, [setFilters]);
+
+    const toggleFilterSpam = useCallback(() => {
+        reset();
+        mutate({ historyFilterSpam: !filters.filterSpam });
+        setFilters(f => ({ ...f, filterSpam: !f.filterSpam }));
+    }, [setFilters, mutate, filters.filterSpam]);
+
+    const setAsset = useCallback(
+        (asset: TonAsset | undefined) => {
+            setFilters(f => ({ ...f, asset }));
+        },
+        [setFilters]
+    );
+
+    return {
+        ...filters,
+        toggleOnlyInitiator,
+        toggleFilterSpam,
+        setAsset
+    };
+};

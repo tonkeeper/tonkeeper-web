@@ -1,5 +1,5 @@
 import React, { FC, forwardRef, PropsWithChildren, useId } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 import { CheckboxIcon } from '../Icon';
 import { Body1 } from '../Text';
 import { ChangeHandler } from 'react-hook-form';
@@ -10,9 +10,13 @@ export interface CheckboxProps {
     disabled?: boolean;
     light?: boolean;
     className?: string;
+    borderColor?: keyof DefaultTheme;
 }
 
 const Wrapper = styled.div`
+    width: 22px;
+    height: 22px;
+
     display: inline-flex;
     gap: 8px;
     align-items: center;
@@ -20,7 +24,7 @@ const Wrapper = styled.div`
     cursor: pointer;
 `;
 
-const IconBase = styled.div<{ checked: boolean; disabled?: boolean }>`
+const IconBase = styled.div<{ checked: boolean; disabled?: boolean; $borderColor: string }>`
     display: flex;
     align-items: center;
     justify-content: center;
@@ -46,14 +50,13 @@ const IconBase = styled.div<{ checked: boolean; disabled?: boolean }>`
             : css`
                   color: transparent;
                   background: transparent;
-                  border-color: ${props.theme.backgroundContentTint};
+                  border-color: ${props.theme[props.$borderColor]};
               `}
 `;
 const CheckboxItem = styled(IconBase)`
-    width: 22px;
-    height: 22px;
-
     border-radius: 6px;
+    height: 100%;
+    width: 100%;
 `;
 
 const RadioInput = styled.input`
@@ -118,11 +121,16 @@ export const Checkbox: FC<PropsWithChildren<CheckboxProps>> = ({
     disabled,
     children,
     light,
-    className
+    className,
+    borderColor = 'backgroundContentTint'
 }) => {
     return (
         <Wrapper onClick={() => onChange(!checked)} className={className}>
-            <CheckboxItem checked={checked} disabled={disabled}>
+            <CheckboxItem
+                checked={checked}
+                disabled={disabled}
+                $borderColor={borderColor.toString()}
+            >
                 {checked ? <CheckboxIcon /> : undefined}
             </CheckboxItem>
             {children && <Text light={light}>{children}</Text>}

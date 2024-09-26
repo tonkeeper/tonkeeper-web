@@ -4,9 +4,13 @@ import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GlobalPreferences {}
+export interface GlobalPreferences {
+    historyFilterSpam: boolean;
+}
 
-const defaultGlobalPreferences: GlobalPreferences = {};
+const defaultGlobalPreferences: GlobalPreferences = {
+    historyFilterSpam: false
+};
 
 export const useGlobalPreferencesQuery = () => {
     const sdk = useAppSdk();
