@@ -329,6 +329,12 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                         </GearIconButtonStyled>
                     )}
                 </AsideMenuItem>
+                {sortedDerivations.length === 1 && (
+                    <AsideMultisigsGroup
+                        hostWalletId={sortedDerivations[0].activeTonWalletId}
+                        onClickWallet={onClickWallet}
+                    />
+                )}
                 {sortedDerivations.length > 1 &&
                     sortedDerivations.map(derivation => {
                         const wallet = derivation.tonWallets.find(
@@ -351,6 +357,10 @@ export const AsideMenuAccount: FC<{ account: Account; isSelected: boolean }> = (
                                         {'#' + (derivation.index + 1)}
                                     </WalletIndexBadgeStyled>
                                 </AsideMenuItem>
+                                <AsideMultisigsGroup
+                                    hostWalletId={wallet.id}
+                                    onClickWallet={onClickWallet}
+                                />
                             </AsideMenuSubItemContainer>
                         );
                     })}

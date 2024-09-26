@@ -1,7 +1,7 @@
 /*https://github.com/ton-blockchain/multisig-contract-v2*/
 import { Address, beginCell, Cell, contractAddress, toNano } from '@ton/core';
 import { TonWalletStandard } from '../../entries/wallet';
-import { CellSigner } from '../../entries/signer';
+import { Signer } from '../../entries/signer';
 import {
     createTransferMessage,
     getWalletSeqnoAndCheckBalance,
@@ -25,7 +25,7 @@ export const deployMultisig = async (options: {
     api: APIConfig;
     walletState: TonWalletStandard;
     feeWei: BigNumber;
-    signer: CellSigner;
+    signer: Signer;
     multisigConfig: MultisigConfig;
 }) => {
     const { cell, address } = await createMultisig(options);
@@ -72,7 +72,7 @@ const createMultisig = async (options: {
     api: APIConfig;
     walletState: TonWalletStandard;
     feeWei?: BigNumber;
-    signer: CellSigner;
+    signer: Signer;
     multisigConfig: MultisigConfig;
 }) => {
     const timestamp = await getServerTime(options.api);

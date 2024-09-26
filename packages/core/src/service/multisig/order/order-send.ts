@@ -10,7 +10,7 @@ import {
     createAutoFeeTransferMessage
 } from '../../transfer/common';
 import BigNumber from 'bignumber.js';
-import { CellSigner } from '../../../entries/signer';
+import { Signer } from '../../../entries/signer';
 import { createNewOrderMessage, MAX_ORDER_SEQNO, NewOrder } from './order-utils';
 
 const createOrderAmount = toNano(0.05);
@@ -24,7 +24,7 @@ export async function sendCreateOrder(options: {
     hostWallet: TonWalletStandard;
     multisig: Pick<Multisig, 'address' | 'signers' | 'proposers'>;
     order: NewOrder;
-    signer: CellSigner;
+    signer: Signer;
 }) {
     let isSigner = false;
     let addrIdx = options.multisig.signers.indexOf(options.hostWallet.rawAddress);
@@ -82,7 +82,7 @@ export async function signOrder(options: {
     hostWallet: TonWalletStandard;
     multisig: Pick<Multisig, 'signers'>;
     orderAddress: string;
-    signer: CellSigner;
+    signer: Signer;
 }) {
     const addrIdx = options.multisig.signers.indexOf(options.hostWallet.rawAddress);
     if (addrIdx === -1) {

@@ -369,7 +369,7 @@ export const sendMultisigNFTTransfer = async ({
     recipient: TonRecipientData;
     nftAddress: string;
     fee: TransferEstimationEventFee;
-    signer: CellSigner;
+    signer: Signer;
     ttlSeconds: number;
 }): Promise<void> => {
     const min = toNano('0.05').toString();
